@@ -6,7 +6,7 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.2 2013-11-13 20:46:42 stefano Exp $
+ * $Id: time.c,v 1.3 2013-11-14 06:57:05 stefano Exp $
  */
 
 
@@ -26,9 +26,9 @@ time_t time(time_t *store)
 	struct tm t;
 
 	subcpu_command(SUBCPU_GET_CALENDAR);
-	t.tm_year  =  subcpu_get()-1900;
-    t.tm_mon   =  subcpu_get()-1;
-    t.tm_mday  =  subcpu_get();
+	t.tm_year  =  unbcd(subcpu_get())+100;
+    t.tm_mon   =  unbcd(subcpu_get()>>4)-1;
+    t.tm_mday  =  unbcd(subcpu_get());
 
 	subcpu_command(SUBCPU_GET_CLOCK);
     t.tm_hour  =  unbcd(subcpu_get());

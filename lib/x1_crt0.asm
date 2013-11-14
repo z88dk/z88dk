@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.4 2013-11-08 09:10:53 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.5 2013-11-14 06:57:05 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -41,7 +41,7 @@
 	XDEF	_wait_sub_cpu
 
 ;--------
-; Non-zero origins are currently causing nothing but problems.
+; Non-zero origins must be >=32768 (startup=2 must be used for this)
 ;--------
 
         IF      !myzorg
