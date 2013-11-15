@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.4 2009-04-15 21:00:58 stefano Exp $
+# $Id: Makefile,v 1.5 2013-11-15 07:26:41 stefano Exp $
 #
 
 include ../Make.config
@@ -12,13 +12,6 @@ AFILES = \
 	msx_blit_fill_vram.c \
 	msx_blit_ram_vram.c \
 	msx_calculate_side.c \
-	msx_psg_channels.c \
-	msx_psg_envelope.c \
-	msx_psg_noise.c \
-	msx_psg_noise_channels.c \
-	msx_psg_tone.c \
-	msx_psg_tone_channels.c \
-	msx_psg_volume.c \
 	msx_put_sprite_16.c \
 	msx_put_sprite_8.c \
 	msx_set_char.c \
@@ -38,7 +31,7 @@ all:    $(AOBJECTS)
 
 
 .c.o:
-	zcc +msx $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i

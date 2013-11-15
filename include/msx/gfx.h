@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.6 2009-05-13 14:41:11 stefano Exp $
+$Id: gfx.h,v 1.7 2013-11-15 07:26:41 stefano Exp $
 
 
 =========================================================================*/
@@ -181,44 +181,18 @@ extern void *put_sprite(unsigned char, int, int, unsigned char, unsigned char);
 
 //@}
 
-/// @name PSG
-/// PSG (sound generator) manipulation functions
-//@{
 
-/// alias for setting psg registers (for the BASIC fans)
-#define sound(reg, value) msx_sound(reg, value)
+// alias for setting psg registers (for the BASIC fans)
+#define sound(reg, value) set_psg(reg, value)
 
-/// set a psg register with a \a value
-#define psg_set(reg, value) msx_sound(reg, value)
+// set a psg register with a \a value
+#define psg_set(reg, value) set_psg(reg, value)
 
-/// get value from psg register
-#define psg_get(reg) msx_readpsg(reg)
+// get value from psg register
+#define psg_get(reg) get_psg(reg)
 
-/// initialize psg
+// initialize psg
 #define psg_init() msx_initpsg()
-
-/// set a given tone for the channel (0-2)
-#define psg_tone(channel,period) msx_psg_tone(channel,period)
-
-/// set the global noise period
-#define psg_noise(period) msx_psg_noise(period)
-
-/// set channel's volume
-#define psg_volume(channel,volume) msx_psg_volume(channel,volume)
-
-/// set the volume envelope of number \a waveform, with the given period, on a group of channels (ORed bits)
-#define psg_envelope(waveform,period,channels) msx_psg_envelope(waveform,period,channels)
-
-/// set noise or tone generation on a group of channels (ORed bits)
-#define psg_channels(tone_channels,noise_channels) msx_psg_channels(tone_channels,noise_channels)
-
-/// get the group of channels currently generating tone (ORed bits)
-#define psg_tone_channels() msx_psg_tone_channels()
-
-/// get the group of channels currently generating noise (ORed bits)
-#define psg_noise_channels() msx_psg_noise_channels()
-
-//@}
 
 
 #endif

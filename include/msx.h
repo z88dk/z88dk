@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.19 2011-03-18 07:12:41 stefano Exp $
+ * $Id: msx.h,v 1.20 2013-11-15 07:26:41 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -17,63 +17,14 @@
 
 // PSG register, sound, ...
 
-// Init the PSG (reset sound etc..)
-extern void __LIB__ msx_initpsg();
-#define msx_init_psg msx_initpsg
-
 // Play a sound by PSG
-extern void __LIB__ msx_sound(unsigned char reg, unsigned char val);
-#define msx_set_psg(x, y)	msx_sound(x, y)
+extern void __LIB__ set_psg(unsigned char reg, unsigned char val);
 
 // Read the PSG register
-extern int __LIB__ __FASTCALL__ msx_readpsg(int regno);
-#define msx_get_psg(x)	msx_readpsg(x)
+extern int __LIB__ __FASTCALL__ get_psg(int regno);
 
-// Set a given tone for the channel (0-2)
-extern void __LIB__ msx_psg_tone(unsigned char channel, int period);
-
-// Set the global noise period
-extern void __LIB__ msx_psg_noise(unsigned char period);
-
-// Set channel's volume
-extern void __LIB__ msx_psg_volume(unsigned char channel, unsigned char volume);
-
-// Set the volume envelope of number \a waveform, with the given period, on a group of channels (ORed bits)
-extern void __LIB__ msx_psg_envelope(unsigned char waveform, int period, unsigned char channels);
-
-// Set noise or tone generation on a group of channels (ORed bits)
-extern void __LIB__ msx_psg_channels(unsigned char tone_channels, unsigned char noise_channels);
-
-// Get the group of channels currently generating tone (ORed bits)
-extern unsigned char __LIB__ msx_psg_tone_channels();
-
-// Get the group of channels currently generating noise (ORed bits)
-extern unsigned char __LIB__ msx_psg_noise_channels();
-
-// convert a given frequency into a suitable period for PSG
-#define psgT(hz)		((int)(111760.0 / (hz)))
-
-enum {	
-	chanNone = 0,	///< no channel
-	chan0 = 1,	///< the first audio channel
-	chan1 = 2,	///< the second audio channel
-	chan2 = 4,	///< the third audio channel
-	chanAll = 7	///< all audio channels
-};
-
-// volume envelopes, where U = up, D = down, H = high
-enum {
-	envD = 0,	///< envelope, falling into silence
-	envU = 4,	///< envelope, raising to highest volume, then silenced
-	envDD = 8,	///< envelope, falling into silence multiple times
-	envDUD = 10,	///< envelope, first falling, and then triangle shaped
-	envDH = 11,	///< envelope, falling into silence, then abrupt high volume
-	envUU = 12,	///< envelope, raising until top multiple times
-	envUH = 13,	///< envelope, raising until top and then mantaining high volume
-	envUDUD = 14	///< envelope, triangle shaped
-};
-
-
+// Init the PSG (reset sound etc..)
+extern void __LIB__ psg_init() ();
 
 
 // Video related functions

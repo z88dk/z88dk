@@ -7,13 +7,13 @@
 
 	Get the group of channels currently generating tone (ORed bits)
 	
-	$Id: msx_psg_tone_channels.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: psg_tone_channels.c,v 1.1 2013-11-15 07:26:41 stefano Exp $
 */
 
-#include <msx.h>
+#include <psg.h>
 
-unsigned char msx_psg_tone_channels() {
+unsigned char psg_tone_channels() {
 
-	return (msx_psg_get(7) >> 3) & 7;
+	return (get_psg(7) >> 3) & 7;
 
 }
