@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.185 2013-11-13 15:34:45 stefano Exp $
+# $Id: Makefile,v 1.186 2013-11-15 10:59:30 stefano Exp $
 
 
 include Make.config
@@ -1003,6 +1003,7 @@ svi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
@@ -1020,6 +1021,7 @@ msx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
@@ -1036,6 +1038,7 @@ mtx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
@@ -1082,6 +1085,7 @@ einstein.lib:
 	$(MAKE) msxdeps
 	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
@@ -1097,6 +1101,7 @@ m5_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
@@ -1331,6 +1336,7 @@ sms_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -1346,6 +1352,7 @@ sc3000_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
@@ -1401,6 +1408,7 @@ x1ansi_clib.lib:
 	cd time ; $(MAKE) lx1 ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd x1 ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
@@ -1516,6 +1524,7 @@ clean:
 	cd abc800 ; $(RM) *.o ; cd ..
 	cd enterprise ; $(MAKE) clean ; cd ..
 	cd msx      ; $(MAKE) clean ; cd ..
+	cd psg      ; $(MAKE) clean ; cd ..
 	cd newbrain ; $(RM) *.o ; cd ..
 	cd ts2068   ; $(RM) *.o ; cd ..
 	cd vz       ; $(RM) *.o ; cd ..

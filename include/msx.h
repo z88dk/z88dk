@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.20 2013-11-15 07:26:41 stefano Exp $
+ * $Id: msx.h,v 1.21 2013-11-15 10:59:30 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -24,7 +24,7 @@ extern void __LIB__ set_psg(unsigned char reg, unsigned char val);
 extern int __LIB__ __FASTCALL__ get_psg(int regno);
 
 // Init the PSG (reset sound etc..)
-extern void __LIB__ psg_init() ();
+extern void __LIB__ psg_init();
 
 
 // Video related functions

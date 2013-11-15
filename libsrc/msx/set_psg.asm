@@ -7,10 +7,10 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: msx_sound.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: set_psg.asm,v 1.1 2013-11-15 10:59:30 stefano Exp $
 ;
 
-	XLIB	msx_sound
+	XLIB	set_psg
 	LIB     msxbios
 	
 IF FORmsx
@@ -19,7 +19,7 @@ ELSE
         INCLUDE "svibios.def"
 ENDIF
 
-msx_sound:
+set_psg:
 
 	pop	bc
 	pop	de

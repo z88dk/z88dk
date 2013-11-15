@@ -7,10 +7,10 @@
 ;	Read the specified PSG register
 ;
 ;
-;	$Id: msx_readpsg.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: get_psg.asm,v 1.1 2013-11-15 10:59:30 stefano Exp $
 ;
 
-	XLIB	msx_readpsg
+	XLIB	get_psg	
 
 	;;LIB     msxbios
 	
@@ -21,7 +21,7 @@ ELSE
 ENDIF
 
 
-msx_readpsg:
+get_psg:
 	ld	a,l
 	;ld	ix,RDPSG
 	;call	msxbios

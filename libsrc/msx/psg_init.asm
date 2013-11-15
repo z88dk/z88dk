@@ -7,10 +7,10 @@
 ;	Init the PSG (reset sound etc..)
 ;
 ;
-;	$Id: msx_initpsg.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: psg_init.asm,v 1.1 2013-11-15 10:59:30 stefano Exp $
 ;
 
-	XLIB	msx_initpsg
+	XLIB	psg_init
 	LIB     msxbios
 	
 IF FORmsx
@@ -19,6 +19,6 @@ ELSE
         INCLUDE "svibios.def"
 ENDIF
 
-msx_initpsg:
+psg_init:
 	ld	ix,GICINI
 	jp	msxbios
