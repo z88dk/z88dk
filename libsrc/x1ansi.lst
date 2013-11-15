@@ -29,10 +29,5 @@ x1/x1_set_text_40
 x1/set_psg
 x1/get_psg
 psg/psg_channels
-psg/psg_envelope
-psg/psg_noise
-psg/psg_noise_channels
-psg/psg_tone
-psg/psg_tone_channels
-psg/psg_volume
+@psg/psg.lst
 @z80.lst
