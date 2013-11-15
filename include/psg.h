@@ -2,12 +2,14 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.1 2013-11-15 07:26:41 stefano Exp $
+ * $Id: psg.h,v 1.2 2013-11-15 17:07:47 stefano Exp $
  *
  */
 
 #ifndef __PSG_H__
 #define __PSG_H__
+
+#include <math.h>
 
 #ifdef __X1__
 #include <x1.h>
@@ -21,7 +23,18 @@
 #include <msx.h>
 #endif
 
-/// alias for setting psg registers (for the BASIC fans)
+
+// Play a sound by PSG
+extern void __LIB__ set_psg(unsigned char reg, unsigned char val);
+
+// Read the PSG register
+extern int __LIB__ __FASTCALL__ get_psg(int regno);
+
+// Init the PSG (reset sound etc..)
+extern void __LIB__ psg_init();
+
+
+// alias for setting psg registers (for the BASIC fans)
 #define sound(reg, value) set_psg(reg, value)
 
 // Set a given tone for the channel (0-2)

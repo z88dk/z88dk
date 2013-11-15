@@ -63,9 +63,6 @@ msx/msx_map_m2_pixel
 msx/msx_map_m2_subpixel
 msx/msx_put_sprite_16
 msx/msx_put_sprite_8
-msx/psg_init
-msx/get_psg
-msx/set_psg
 msx/svi_screen
 msx/msx_screenmode
 msx/msx_set_char
@@ -87,5 +84,8 @@ msx/svi_vram
 msx/msx_vread
 msx/msx_vwrite
 msx/msx_vwrite_direct
+msx/psg_init
+msx/get_psg
+msx/set_psg
 @psg/psg.lst
 @z80.lst

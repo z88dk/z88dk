@@ -1,7 +1,7 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.5 2013-11-15 10:59:30 stefano Exp $
+ * $Id: x1.h,v 1.6 2013-11-15 17:07:47 stefano Exp $
  *
  */
 
@@ -13,16 +13,6 @@
 
 // Init the PSG (reset sound etc..)
 //extern void __LIB__ x1_initpsg();
-
-// Play a sound by PSG
-extern void __LIB__ set_psg(unsigned char reg, unsigned char val);
-
-// Read the PSG register
-extern int __LIB__ __FASTCALL__ get_psg(int regno);
-
-// initialize psg
-#define psg_init() {}
-
 
 
 // Programmable Character Generator

@@ -7,23 +7,21 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.2 2013-11-15 17:07:47 stefano Exp $
+;	$Id: psg_init.asm,v 1.1 2013-11-15 17:07:47 stefano Exp $
 ;
 
-	XLIB	set_psg
+	XLIB	psg_init
 	
-set_psg:
+psg_init:
 
-	pop	bc
-	pop	de
-	pop	hl
+	ld	a,8	; Ch.A  Level
+	ld	e,0 ; set to 0
+	call outpsg
+	inc	a	; Ch.B
+	call outpsg
+	inc	a	; Ch.C
 
-	push	hl
-	push	de
-	push	bc
-	
-	ld	a,l
-
+outpsg:
     LD	BC,1C00H
 	OUT	(C),A
 	ld	a,e
