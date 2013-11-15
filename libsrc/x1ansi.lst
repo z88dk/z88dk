@@ -28,6 +28,5 @@ x1/x1_set_text_80
 x1/x1_set_text_40
 x1/set_psg
 x1/get_psg
-psg/psg_channels
 @psg/psg.lst
 @z80.lst
