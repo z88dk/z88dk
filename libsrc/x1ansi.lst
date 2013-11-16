@@ -1,3 +1,4 @@
+@input/x1.lst
 stdio/x1/fgetc_cons
 stdio/x1/getk
 stdio/ansi/puts_cons

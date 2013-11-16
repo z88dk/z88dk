@@ -1,7 +1,7 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.6 2013-11-15 17:07:47 stefano Exp $
+ * $Id: x1.h,v 1.7 2013-11-16 10:27:48 stefano Exp $
  *
  */
 
@@ -154,12 +154,17 @@ extern void wait_sub_cpu();
 #define TAPE_SET   2	// set if cassette is present
 #define TAPE_WP    3    // set if Write Protected 
 
-
 // Time / Date
 #define SUBCPU_SET_CALENDAR   0xec
 #define SUBCPU_GET_CALENDAR   0xed
 #define SUBCPU_SET_CLOCK      0xee
 #define SUBCPU_GET_CLOCK      0xef
 
+
+// Input.h
+extern unsigned int  __LIB__ in_JoyX1(char num);
+#define in_JoyX1_1() in_JoyX1(0x0E);
+#define in_JoyX1_2() in_JoyX1(0x0F);
+#define in_GetKey() in_Inkey();
 
 #endif

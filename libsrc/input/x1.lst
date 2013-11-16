@@ -1,0 +1,8 @@
+input/x1/in_Inkey
+input/x1/in_JoyX1
+input/x1/in_LookupKey
+input/x1/in_KeyPressed
+input/x1/in_Pause
+input/x1/in_Wait
+input/x1/in_WaitForKey
+input/x1/in_WaitForNoKey
