@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.7 2013-11-15 07:26:41 stefano Exp $
+$Id: gfx.h,v 1.8 2013-11-16 09:27:24 stefano Exp $
 
 
 =========================================================================*/
@@ -40,6 +40,7 @@ $Id: gfx.h,v 1.7 2013-11-15 07:26:41 stefano Exp $
 #include <msx.h>
 #include <string.h>
 #include <graphics.h>
+#include <psg.h>
 
 // --- library functions / enums
 
