@@ -31,4 +31,5 @@ games/bit_frequency
 games/bit_beep
 games/spectrum/beeper
 @spectrum/spectrum.lst
+@psg/psg.lst
 @z80.lst

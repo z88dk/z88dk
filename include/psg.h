@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.2 2013-11-15 17:07:47 stefano Exp $
+ * $Id: psg.h,v 1.3 2013-11-18 10:59:06 stefano Exp $
  *
  */
 
@@ -12,15 +12,33 @@
 #include <math.h>
 
 #ifdef __X1__
-#include <x1.h>
+// convert a given frequency into a suitable period for PSG
+#define psgT(hz)		((int)(62500.0 / (hz)))
 #endif
 
 #ifdef __MSX__
 #include <msx.h>
+// convert a given frequency into a suitable period for PSG
+// src clock: 17897725.5 divided internally by 16
+#define psgT(hz)		((int)(111760.0 / (hz)))
 #endif
 
 #ifdef __SVI__
 #include <msx.h>
+// convert a given frequency into a suitable period for PSG
+#define psgT(hz)		((int)(111760.0 / (hz)))
+#endif
+
+#ifdef __SPECTRUM__
+// src clock: 1773400 divided internally by 16
+// convert a given frequency into a suitable period for PSG
+#define psgT(hz)		((int)(110837.5 / (hz)))
+#endif
+
+#ifdef __CPC__
+// src clock: 1000000 divided internally by 16
+// convert a given frequency into a suitable period for PSG
+#define psgT(hz)		((int)(62500 / (hz)))
 #endif
 
 
@@ -58,8 +76,6 @@ extern unsigned char __LIB__ psg_tone_channels();
 // Get the group of channels currently generating noise (ORed bits)
 extern unsigned char __LIB__ psg_noise_channels();
 
-// convert a given frequency into a suitable period for PSG
-#define psgT(hz)		((int)(111760.0 / (hz)))
 
 
 enum {	
