@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.1 2013-11-15 07:26:41 stefano Exp $
+# $Id: Makefile,v 1.2 2013-11-18 13:44:18 stefano Exp $
 #
 
 include ../Make.config
@@ -20,6 +20,16 @@ AOBJECTS = $(AFILES:.c=.o)
 
 
 all:    $(AOBJECTS)
+
+
+generic_iy:
+	zcc +test $(CFLAGS) -Ca-IXIY psg_channels.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_envelope.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_noise.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_noise_channels.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_tone.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_tone_channels.c
+	zcc +test $(CFLAGS) -Ca-IXIY psg_volume.c
 
 
 .c.o:

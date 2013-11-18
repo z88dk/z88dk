@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.186 2013-11-15 10:59:30 stefano Exp $
+# $Id: Makefile,v 1.187 2013-11-18 13:44:17 stefano Exp $
 
 
 include Make.config
@@ -111,6 +111,7 @@ zx81deps:
 	$(RM) -f zx81/tape/*.o
 	$(RM) -f zx81/basic/*.o
 	$(RM) -f time/zx81/*.o
+	cd psg ; $(MAKE) clean ; cd ..
 
 # interesting algorithms - aralbrec
 algorithm.lib:
@@ -303,6 +304,7 @@ zx_clib.lib:
 	cd time ; $(MAKE) lzx ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 
@@ -324,6 +326,7 @@ zxan_clib.lib:
 	cd time ; $(MAKE) lzx ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxan_clib @$(LISTFILE_DIRECTORY)/zxansi.lst
 
@@ -346,6 +349,7 @@ ts2068_clib.lib:
 	cd time ; $(MAKE) lzx ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -DFORts2068 -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
@@ -367,6 +371,7 @@ ts2068an_clib.lib:
 	cd time ; $(MAKE) lzx ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
@@ -528,6 +533,7 @@ zx80_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) lzx ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 
@@ -545,6 +551,7 @@ zx81_clib.lib:
 	cd assert ; $(MAKE) generic_iy ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) lzx81 ; cd ..
+	cd psg ; $(MAKE) generic_iy ; cd ..
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
@@ -563,6 +570,7 @@ zx81ansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) lzx81 ; cd ..
+	cd psg ; $(MAKE) generic_iy ; cd ..
 	$(LIBLINKER) -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
 	$(MAKE) zx81deps
 

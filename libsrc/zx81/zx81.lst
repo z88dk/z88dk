@@ -1,3 +1,6 @@
+zx81/psg_init
+zx81/set_psg
+zx81/get_psg
 zx81/cnvtab
 zx81/filltxt
 zx81/gen_tv_field_init
