@@ -7,7 +7,7 @@
 ;	Set up the PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.1 2013-11-18 13:44:18 stefano Exp $
+;	$Id: psg_init.asm,v 1.2 2013-11-18 14:00:22 stefano Exp $
 ;
 
 	XLIB	psg_init
@@ -42,8 +42,8 @@ skip:
 	ld	a,11
 
 outpsg:
-    LD	BC,$cf
-    ;LD	BC,$df
+    ;LD	BC,$cf
+    LD	BC,$df
 	OUT	(C),a
 	LD	C,$0f
 	;LD	C,$1f

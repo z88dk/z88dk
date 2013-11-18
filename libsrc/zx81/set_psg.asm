@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.1 2013-11-18 13:44:18 stefano Exp $
+;	$Id: set_psg.asm,v 1.2 2013-11-18 14:00:22 stefano Exp $
 ;
 
 	XLIB	set_psg
@@ -24,7 +24,8 @@ set_psg:
 	push	de
 	push	bc
 	
-    ld bc,$cf
+    ;ld bc,$cf
+    ld bc,$df
 	out (c),l
 
 	ld c,$0f
