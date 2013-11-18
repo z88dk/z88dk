@@ -1,7 +1,7 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.7 2013-11-16 10:27:48 stefano Exp $
+ * $Id: x1.h,v 1.8 2013-11-18 16:13:11 stefano Exp $
  *
  */
 
@@ -22,9 +22,13 @@ extern int __LIB__ x1_get_pcg_version();
 
 // Switch to 40 columns text mode
 extern void __LIB__ x1_set_text_40();
+// HighScan version, for turbo models only
+extern void __LIB__ x1_set_text_40_hs();
 
 // Switch to 80 columns text mode
 extern void __LIB__ x1_set_text_80();
+// HighScan version, for turbo models only
+extern void __LIB__ x1_set_text_80_hs();
 
 // Set 16 6845 CRTC registers at once
 extern void __FASTCALL__ __LIB__ set_crtc(void *reg_list);

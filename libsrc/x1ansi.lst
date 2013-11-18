@@ -26,7 +26,9 @@ x1/set_crtc_10
 x1/set_crtc_reg
 x1/x1_get_pcg_version
 x1/x1_set_text_80
+x1/x1_set_text_80_hs
 x1/x1_set_text_40
+x1/x1_set_text_40_hs
 x1/set_psg
 x1/get_psg
 x1/psg_init

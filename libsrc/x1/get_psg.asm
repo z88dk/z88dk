@@ -7,18 +7,16 @@
 ;	Get a PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.2 2013-11-15 17:07:47 stefano Exp $
+;	$Id: get_psg.asm,v 1.3 2013-11-18 16:13:11 stefano Exp $
 ;
 
 	XLIB	get_psg
 	
 get_psg:
 
-	ld	a,l
-
-    LD	BC,1C00H
-	OUT	(C),A
-	inc bc
+    LD	BC,$1C00
+	OUT	(C),l
+	dec	b
 	IN	a,(C)
-	ld	l,a
+	ld	l,a	; NOTE: A register has to keep the same value
 	ret
