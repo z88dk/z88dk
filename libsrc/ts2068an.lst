@@ -31,4 +31,5 @@ games/bit_beep
 games/beeper
 @spectrum/spectrum.lst
 ts2068/ts_vmod
+@psg/psg.lst
 @z80.lst
