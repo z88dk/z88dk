@@ -17,7 +17,8 @@ export Z80_OZFILES
 export ZCCCFG
 
 CC=gcc
-CFLAGS="-g -O2"
+#CFLAGS="-g -O2"	# "make -e" below overrides CFLAGS in the called Makefiles by this one
+					# causing problems building z80asm
 CCOPT=-DUNIX
 export CC
 export CFLAGS
