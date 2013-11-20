@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.1 2013-11-20 13:26:13 stefano Exp $
+;	$Id: set_psg_callee.asm,v 1.2 2013-11-20 15:44:01 stefano Exp $
 ;
 
 	XLIB	set_psg_callee
@@ -17,13 +17,9 @@
 	
 set_psg_callee:
 
-	pop	bc
-	pop	de
-	pop	hl
-
-	push	hl
-	push	de
-	push	bc
+   pop hl
+   pop de
+   ex (sp),hl
 	
 .asmentry
 
