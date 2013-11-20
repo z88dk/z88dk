@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.90 2013-11-11 23:47:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.91 2013-11-20 13:26:13 stefano Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -35,6 +35,9 @@ INSTALL ?= install
 #	E.g. for Debian:
 #		apt-get install pkg-config
 #		apt-get install libglib2.0
+#
+# CygWin
+#   Before 'make', install pkg-config and libglib2.0-devel
 #
 # Use GLIB in Win32/MinGW, see http://www.gtk.org/download/win32.php,
 #   Installation of pkg-config and glib-2.0:
@@ -238,7 +241,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.90  2013-11-11 23:47:03  pauloscustodio
+# Revision 1.91  2013-11-20 13:26:13  stefano
+# Sorted out the PSG stuff for the X1
+#
+# Revision 1.90  2013/11/11 23:47:03  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).

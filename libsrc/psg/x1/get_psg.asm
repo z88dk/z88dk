@@ -7,7 +7,7 @@
 ;	Get a PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.3 2013-11-18 16:13:11 stefano Exp $
+;	$Id: get_psg.asm,v 1.1 2013-11-20 13:26:13 stefano Exp $
 ;
 
 	XLIB	get_psg

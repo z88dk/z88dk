@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.2 2013-11-18 16:13:11 stefano Exp $
+;	$Id: psg_init.asm,v 1.1 2013-11-20 13:26:13 stefano Exp $
 ;
 
 	XLIB	psg_init

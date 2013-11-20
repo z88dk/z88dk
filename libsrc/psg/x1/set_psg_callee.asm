@@ -7,12 +7,15 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.3 2013-11-18 16:13:11 stefano Exp $
+;	$Id: set_psg_callee.asm,v 1.1 2013-11-20 13:26:13 stefano Exp $
 ;
 
-	XLIB	set_psg
+	XLIB	set_psg_callee
+
+	XDEF ASMDISP_SET_PSG_CALLEE
+
 	
-set_psg:
+set_psg_callee:
 
 	pop	bc
 	pop	de
@@ -22,6 +25,7 @@ set_psg:
 	push	de
 	push	bc
 	
+.asmentry
 
     LD	BC,$1C00
 	OUT	(C),l
@@ -29,4 +33,6 @@ set_psg:
 	dec b
 	OUT	(C),e
 	ret
+
+DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 
