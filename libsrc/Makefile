@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.187 2013-11-18 13:44:17 stefano Exp $
+# $Id: Makefile,v 1.188 2013-11-20 09:05:42 stefano Exp $
 
 
 include Make.config
@@ -86,6 +86,7 @@ msxdeps:
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/msx/*.o
 	$(RM) -f graphics/msx/surface/*.o
+	$(RM) -f psg/msx/*.o
 	$(RM) -f msx/*.o
 
 zx81deps:

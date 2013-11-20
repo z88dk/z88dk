@@ -84,8 +84,9 @@ msx/svi_vram
 msx/msx_vread
 msx/msx_vwrite
 msx/msx_vwrite_direct
-msx/psg_init
-msx/get_psg
-msx/set_psg
+psg/msx/psg_init
+psg/msx/get_psg
+psg/msx/set_psg
+psg/msx/set_psg_callee
 @psg/psg.lst
 @z80.lst

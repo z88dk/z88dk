@@ -7,7 +7,7 @@
 ;	Init the PSG (reset sound etc..)
 ;
 ;
-;	$Id: psg_init.asm,v 1.1 2013-11-15 10:59:30 stefano Exp $
+;	$Id: psg_init.asm,v 1.1 2013-11-20 09:05:43 stefano Exp $
 ;
 
 	XLIB	psg_init
