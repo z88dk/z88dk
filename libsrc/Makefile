@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.189 2013-11-20 18:12:35 stefano Exp $
+# $Id: Makefile,v 1.190 2013-11-20 22:05:07 stefano Exp $
 
 
 include Make.config
@@ -936,6 +936,7 @@ aquarius_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) laquarius ; cd ..
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 
@@ -952,6 +953,7 @@ aquansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) laquarius ; cd ..
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquansi_clib.lib @$(LISTFILE_DIRECTORY)/aquansi.lst
 

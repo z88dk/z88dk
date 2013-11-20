@@ -19,4 +19,9 @@ games/bit_frequency
 games/bit_beep
 games/beeper
 games/joystick
+psg/mc1000/set_psg
+psg/mc1000/set_psg_callee
+psg/mc1000/get_psg
+psg/mc1000/psg_init
+@psg/psg.lst
 @z80.lst
