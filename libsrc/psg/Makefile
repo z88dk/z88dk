@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.3 2013-11-20 13:26:13 stefano Exp $
+# $Id: Makefile,v 1.4 2013-11-20 18:12:35 stefano Exp $
 #
 
 include ../Make.config
@@ -36,6 +36,7 @@ generic_iy:
 	zcc +test $(CFLAGS) $*.c
 
 clean:
+	$(RM) -f mc1000/*.o
 	$(RM) -f msx/*.o
 	$(RM) -f x1/*.o
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i

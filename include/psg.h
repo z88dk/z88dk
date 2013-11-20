@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.6 2013-11-20 09:05:42 stefano Exp $
+ * $Id: psg.h,v 1.7 2013-11-20 18:12:35 stefano Exp $
  *
  */
 
@@ -14,6 +14,12 @@
 #ifdef __X1__
 // convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(125000.0 / (hz)))
+#endif
+
+#ifdef __MC1000__
+// convert a given frequency into a suitable period for PSG
+// CPU clock: 3.57 mhz, let's divide by 32
+#define psgT(hz)		((int)(111562.0 / (hz)))
 #endif
 
 #ifdef __MSX__

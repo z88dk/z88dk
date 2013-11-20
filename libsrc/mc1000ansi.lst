@@ -41,4 +41,8 @@ games/bit_synth
 games/bit_frequency
 games/bit_beep
 games/beeper
+psg/mc1000/set_psg
+psg/mc1000/set_psg_callee
+psg/mc1000/get_psg
+psg/mc1000/psg_init
 @z80.lst
