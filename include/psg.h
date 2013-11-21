@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.8 2013-11-20 22:05:07 stefano Exp $
+ * $Id: psg.h,v 1.9 2013-11-21 09:01:38 stefano Exp $
  *
  */
 
@@ -43,6 +43,12 @@
 #ifdef __SPECTRUM__
 // src clock: 1773400 divided internally by 16
 // convert a given frequency into a suitable period for PSG
+#define psgT(hz)		((int)(110837.5 / (hz)))
+#endif
+
+#ifdef __SPRINTER__
+// The PPS Sprinter PSG lib is totally untested, let's assume it is connected
+// and clocked as for a Spectrum, but probably we're wrong
 #define psgT(hz)		((int)(110837.5 / (hz)))
 #endif
 

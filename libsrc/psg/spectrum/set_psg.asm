@@ -7,13 +7,15 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.1 2013-11-18 10:59:06 stefano Exp $
+;	$Id: set_psg.asm,v 1.1 2013-11-21 09:01:39 stefano Exp $
 ;
 
 	XLIB	set_psg
-	XDEF	psg_patch0
-	XDEF	psg_patch1
+	LIB		set_psg_callee
+
+	XREF ASMDISP_SET_PSG_CALLEE
 	
+
 set_psg:
 
 	pop	bc
@@ -24,11 +26,5 @@ set_psg:
 	push	de
 	push	bc
 	
-psg_patch0:
-    ld bc,$fffd
-	out (c),l
-psg_patch1:
-	ld b,$bf
-	out (c),e
+	jp set_psg_callee + ASMDISP_SET_PSG_CALLEE
 
-	ret

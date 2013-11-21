@@ -1,7 +1,4 @@
 graphics/spectrum/rowtab
-spectrum/psg_init
-spectrum/set_psg
-spectrum/get_psg
 spectrum/zx_attr
 spectrum/zx_attr_callee
 spectrum/zx_border

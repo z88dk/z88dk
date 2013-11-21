@@ -21,5 +21,9 @@ games/bit_frequency
 games/bit_beep
 games/spectrum/beeper
 @spectrum/spectrum.lst
+psg/spectrum/set_psg
+psg/spectrum/set_psg_callee
+psg/spectrum/get_psg
+psg/spectrum/psg_init
 @psg/psg.lst
 @z80.lst

@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.5 2013-11-20 22:05:07 stefano Exp $
+# $Id: Makefile,v 1.6 2013-11-21 09:01:39 stefano Exp $
 #
 
 include ../Make.config
@@ -39,5 +39,7 @@ clean:
 	$(RM) -f aquarius/*.o
 	$(RM) -f mc1000/*.o
 	$(RM) -f msx/*.o
+	$(RM) -f spectrum/*.o
+	$(RM) -f ts2068/*.o
 	$(RM) -f x1/*.o
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i

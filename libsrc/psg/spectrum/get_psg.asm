@@ -1,5 +1,5 @@
 ;
-;	Sharp specific routines
+;	ZX Spectrum specific routines
 ;	by Stefano Bodrato, Fall 2013
 ;
 ;	int get_psg(int reg);
@@ -7,7 +7,7 @@
 ;	Get a PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.1 2013-11-18 10:59:06 stefano Exp $
+;	$Id: get_psg.asm,v 1.1 2013-11-21 09:01:39 stefano Exp $
 ;
 
 	XLIB	get_psg

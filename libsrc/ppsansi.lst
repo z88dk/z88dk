@@ -33,4 +33,9 @@ stdio/ansi/sprinter/f_ansi_cls
 stdio/ansi/sprinter/f_ansi_dline
 stdio/ansi/sprinter/f_ansi_scrollup
 games/joystick
+psg/spectrum/set_psg
+psg/spectrum/set_psg_callee
+psg/spectrum/get_psg
+psg/spectrum/psg_init
+@psg/psg.lst
 @z80.lst

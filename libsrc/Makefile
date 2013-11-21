@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.190 2013-11-20 22:05:07 stefano Exp $
+# $Id: Makefile,v 1.191 2013-11-21 09:01:39 stefano Exp $
 
 
 include Make.config
@@ -466,6 +466,7 @@ pps_clib.lib:
 	cd time ; $(MAKE) lpps ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
@@ -485,6 +486,7 @@ ppsansi_clib.lib:
 	cd time ; $(MAKE) lpps ; cd ..
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
 
