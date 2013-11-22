@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.29 2013-10-16 00:14:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.30 2013-11-22 00:21:43 pauloscustodio Exp $
 #
 # Test options
 
@@ -989,8 +989,62 @@ t_binary($binary, pack("C*",
 						7, 8, 9, 1, 2, 3, 4, 5, 6,
 						));
 
+# XLIB, XDEF and LIB, without -sdcc
+unlink_testfiles();
+
+write_file(asm1_file(), "
+	XLIB func_1
+	XDEF func_2
+func_1:
+	ld a,1
+func_2:
+	ld a,2
+	ret
+");
+
+write_file(asm2_file(), "
+	LIB  func_2
+	call func_2
+	ret
+");
+
+# link object files
+t_z80asm_capture("-r0 -b ".asm2_file()." ".asm1_file(), "", "", 0);
+t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
+
+# link library files
+t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
+t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 
+# XLIB, XDEF and XREF, with -sdcc
+unlink_testfiles();
+
+write_file(asm1_file(), "
+	XLIB func_1
+	XDEF func_2
+func_1:
+	ld a,1
+func_2:
+	ld a,2
+	ret
+");
+
+write_file(asm2_file(), "
+	XREF func_2
+	call func_2
+	ret
+");
+
+# link object files
+t_z80asm_capture("-r0 -b ".asm2_file()." ".asm1_file(), "", "", 0);
+t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
+
+# link library files
+t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-sdcc -r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
+t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 
 
@@ -999,7 +1053,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.29  2013-10-16 00:14:37  pauloscustodio
+# Revision 1.30  2013-11-22 00:21:43  pauloscustodio
+# Test XREF pulling in a library module by -sdcc
+#
+# Revision 1.29  2013/10/16 00:14:37  pauloscustodio
 # Move FileStack implementation to scan.c, remove FileStack.
 # Move getline_File() to scan.c.
 #
