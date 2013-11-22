@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.191 2013-11-21 09:01:39 stefano Exp $
+# $Id: Makefile,v 1.192 2013-11-22 07:40:38 stefano Exp $
 
 
 include Make.config
@@ -434,6 +434,7 @@ pc6001_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 
 # PC6001 ansi lib - Stefano
@@ -448,6 +449,7 @@ pc6001ansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001ansi_clib @$(LISTFILE_DIRECTORY)/pc6001ansi.lst
 
 # Native for sprinter - dom
@@ -1205,6 +1207,7 @@ cpc_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd rs232 ; $(MAKE) lcpc ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
@@ -1220,6 +1223,7 @@ cpcansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd rs232 ; $(MAKE) lcpc ; cd ..
+	cd psg ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcansi_clib @$(LISTFILE_DIRECTORY)/cpcansi.lst
 
 cpcfs.lib:

@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.7 2013-11-21 10:52:56 stefano Exp $
+# $Id: Makefile,v 1.8 2013-11-22 07:40:38 stefano Exp $
 #
 
 include ../Make.config
@@ -37,8 +37,10 @@ generic_iy:
 
 clean:
 	$(RM) -f aquarius/*.o
+	$(RM) -f cpc/*.o
 	$(RM) -f mc1000/*.o
 	$(RM) -f msx/*.o
+	$(RM) -f pc6001/*.o
 	$(RM) -f spectrum/*.o
 	$(RM) -f ts2068/*.o
 	$(RM) -f x1/*.o

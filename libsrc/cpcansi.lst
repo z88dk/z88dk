@@ -63,4 +63,9 @@ cpc/cpc_rsx_strcpy
 cpc/cpc_rsx_strcpy_callee
 cpc/firmware
 cpc/fdc_address
+psg/cpc/set_psg
+psg/cpc/set_psg_callee
+psg/cpc/get_psg
+psg/cpc/psg_init
+@psg/psg.lst
 @z80.lst

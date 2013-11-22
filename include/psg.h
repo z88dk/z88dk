@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.10 2013-11-21 10:52:56 stefano Exp $
+ * $Id: psg.h,v 1.11 2013-11-22 07:40:38 stefano Exp $
  *
  */
 
@@ -11,38 +11,40 @@
 
 #include <math.h>
 
-#ifdef __X1__
 // convert a given frequency into a suitable period for PSG
+
+#ifdef __X1__
+// Z80 is clocked at 4mhz
 #define psgT(hz)		((int)(125000.0 / (hz)))
 #endif
 
 #ifdef __MC1000__
-// convert a given frequency into a suitable period for PSG
 // CPU clock: 3.57 mhz, let's divide by 32
 #define psgT(hz)		((int)(111562.5 / (hz)))
 #endif
 
 #ifdef __AQUARIUS__
-// convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(111861.0 / (hz)))
 #endif
 
 #ifdef __MSX__
 #include <msx.h>
-// convert a given frequency into a suitable period for PSG
 // src clock: 17897725.5 divided internally by 16
 #define psgT(hz)		((int)(111760.0 / (hz)))
 #endif
 
 #ifdef __SVI__
 #include <msx.h>
-// convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(111760.0 / (hz)))
+#endif
+
+#ifdef __PC6001__
+// 3.8 Mhz on earlier models, 4Mhz on next ones
+#define psgT(hz)		((int)(118750.0 / (hz)))
 #endif
 
 #ifdef __SPECTRUM__
 // src clock: 1773400 divided internally by 16
-// convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(110837.5 / (hz)))
 #endif
 
@@ -54,21 +56,32 @@
 
 #ifdef __CPC__
 // src clock: 1000000 divided internally by 16
-// convert a given frequency into a suitable period for PSG
+#ifndef psgT
 #define psgT(hz)		((int)(62500.0 / (hz)))
+#endif
 #endif
 
 #ifdef __ZX80__
 // ZON-X81 clock: 1625000  divided internally by 16
-// convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(101562.0 / (hz)))
 #endif
 
 #ifdef __ZX81__
 // ZON-X81 clock: 1625000  divided internally by 16
-// convert a given frequency into a suitable period for PSG
 #define psgT(hz)		((int)(101562.0 / (hz)))
 #endif
+
+
+// Keep CP/M on at the end of the models list, so it can be overriden
+
+#ifdef __CPM__
+// This one is tricky.
+// Clock varies, so let's use a generic value which che programmer can override
+#ifndef psgT
+#define psgT(hz)		((int)(85000.0 / (hz)))
+#endif
+#endif
+
 
 
 // Play a sound by PSG
