@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.4 2010-04-10 23:48:47 dom Exp $
+ * $Id: cpp4.c,v 1.5 2013-11-23 09:04:36 dom Exp $
  *
  *
  * Edit History
@@ -33,7 +33,10 @@ static char	*parmp;			/* Free space in parm		*/
 static char	*parlist[LASTPARM];	/* -> start of each parameter	*/
 static int	nargs;			/* Parameters for this macro	*/
 
-dodefine()
+void stparmscan(int delim);
+void checkparm(register int	c, DEFBUF *dp);
+
+void dodefine()
 /*
  * Called from control when a #define is scanned.  This module
  * parses formal parameters and the replacement string.  When
@@ -224,7 +227,7 @@ bad_define:
 	inmacro = FALSE;			/* Stop <newline> hack	*/
 }
 
-checkparm(c, dp)
+void checkparm(c, dp)
 register int	c;
 DEFBUF		*dp;
 /*
@@ -252,7 +255,7 @@ DEFBUF		*dp;
 }
 
 #if STRING_FORMAL
-stparmscan(delim, dp)
+void stparmscan(delim, dp)
 int		delim;
 register DEFBUF	*dp;
 /*
@@ -289,7 +292,7 @@ register DEFBUF	*dp;
 	save(c);
 }
 #else
-stparmscan(delim)
+void stparmscan(delim)
 int		delim;
 /*
  * Normal string parameter scan.
@@ -373,7 +376,7 @@ register int	c;
 
 static DEFBUF	*macro;		/* Catches start of infinite macro	*/
 
-expand(tokenp)
+void expand(tokenp)
 register DEFBUF	*tokenp;
 /*
  * Expand a macro.  Called from the cpp mainline routine (via subroutine

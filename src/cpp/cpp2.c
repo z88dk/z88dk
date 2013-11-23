@@ -3,7 +3,7 @@
  *
  *                         Process #control lines
  *
- * $Id: cpp2.c,v 1.3 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp2.c,v 1.4 2013-11-23 09:04:36 dom Exp $
  *
  *
  * Edit history
@@ -53,6 +53,9 @@
 #define L_debug         ('d' + ('b' << 1))      /* #debug               */
 #define L_nodebug       ('n' + ('d' << 1))      /* #nodebug             */
 #endif
+
+FILE_LOCAL void doif(int hash);
+FILE_LOCAL void doinclude(void);
 
 int
 control(counter)
@@ -304,7 +307,7 @@ nest_err:       cerror("#%s must be in an #if", token);
         return (counter + 1);
 }
 
-FILE_LOCAL
+FILE_LOCAL void
 doif(hash)
 int             hash;
 /*
@@ -350,8 +353,8 @@ badif:  cerror("#if, #ifdef, or #ifndef without an argument", NULLST);
         return;
 }
 
-FILE_LOCAL
-doinclude()
+FILE_LOCAL void
+doinclude(void) 
 /*
  * Process the #include control line.
  * There are three variations:

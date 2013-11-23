@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.7 2012-11-28 20:28:30 dom Exp $
+ * $Id: cpp6.c,v 1.8 2013-11-23 09:04:37 dom Exp $
  *
  *
  * Edit History
@@ -123,7 +123,12 @@ OP_LPA,OP_RPA,OP_MUL,OP_ADD,   000,OP_SUB,   DOT,OP_DIV, /* 28 ()*+,-./	*/
    000,   000,   000,   000,   000,   000,   000,   000, /*   80 .. FF	*/
 };
 
-skipnl()
+void unget();
+void save(register int	c);
+void ungetstring(char		*text);
+static void domsg(char *severity, char *format, intptr_t arg);
+
+void skipnl()
 /*
  * Skip to the end of the current input line.
  */
@@ -153,7 +158,7 @@ skipws()
 	return (c);
 }
 
-scanid(c)
+void scanid(c)
 register int	c;				/* First char of id	*/
 /*
  * Get the next token (an id) into the token buffer.
@@ -300,7 +305,7 @@ int		(*outfun)();		/* Output function		*/
 	}
 }
 
-scannumber(c, outfun)
+void scannumber(c, outfun)
 register int	c;				/* First char of number	*/
 register int	(*outfun)();			/* Output/store func	*/
 /*
@@ -437,7 +442,7 @@ nomore:	unget();				/* Not part of a number	*/
 	    cwarn("Illegal digit in octal number", NULLST);
 }
 
-save(c)
+void save(c)
 register int	c;
 {
 	if (workp >= &work[NWORK]) {
@@ -858,7 +863,7 @@ test:		if (keepcomments && c != EOF_CHAR)
 	return (c);				/* Just return the char	*/
 }
 
-unget()
+void unget()
 /*
  * Backup the pointer to reread the last character.  Fatal error
  * (code bug) if we backup too far.  unget() may be called,
@@ -876,7 +881,7 @@ unget()
 	    --line;			/* Unget the line number, too	*/
 }
 
-ungetstring(text)
+void ungetstring(text)
 char		*text;
 /*
  * Push a string back on the input stream.  This is done by treating
@@ -916,11 +921,11 @@ cget()
  * are shorter than  char *'s.
  */
 
-static
+static void
 domsg(severity, format, arg)
 char		*severity;		/* "Error", "Warning", "Fatal"	*/
 char		*format;		/* Format for the error message	*/
-char		*arg;			/* Something for the message	*/
+intptr_t arg;			/* Something for the message	*/
 /*
  * Print filenames, macro names, and line numbers for error messages.
  */
