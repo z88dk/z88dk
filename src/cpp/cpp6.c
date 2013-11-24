@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.8 2013-11-23 09:04:37 dom Exp $
+ * $Id: cpp6.c,v 1.9 2013-11-24 18:01:28 dom Exp $
  *
  *
  * Edit History
@@ -26,6 +26,7 @@
 #include	<ctype.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<stdint.h>
 #include	"cppdef.h"
 #include	"cpp.h"
 
