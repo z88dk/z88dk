@@ -218,7 +218,7 @@ main()
 
    // initialize SP1.LIB
    
-   zx_border(BLACK);
+   zx_border(INK_BLACK);
    sp1_Initialize(SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE, INK_BLACK | PAPER_WHITE, ' ');
    sp1_TileEntry(' ', hash);    // redefine graphic associated with space character
    sp1_TileEntry('#', grass);   // redefine graphic associated with # character
