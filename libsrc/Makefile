@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.192 2013-11-22 07:40:38 stefano Exp $
+# $Id: Makefile,v 1.193 2013-11-25 06:11:32 aralbrec Exp $
 
 
 include Make.config
@@ -25,7 +25,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
-	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs
+	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
 genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
@@ -1488,6 +1488,9 @@ sp1:
 	@echo
 	@echo "make sp1-clean         (recommended prior to building)"
 	@echo
+
+sp1-all:
+	cd sprites/software/sp1 ; $(MAKE) sp1-all; cd ../../..
 
 sp1-spectrum:
 	cd sprites/software/sp1 ; $(MAKE) sp1-spectrum; cd ../../..
