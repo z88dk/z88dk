@@ -4,10 +4,14 @@
 
 XLIB zx_border
 
-XREF snd_tick
+zx_border:
 
-.zx_border
-   ld a,l
+   in a,(254)
+   and $40
+   
+   rra
+   rra
+   or l
+   
    out (254),a
-   ld (snd_tick),a
    ret
