@@ -666,7 +666,8 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    ld a,-SP1V_DISPWIDTH*10
    add a,e
    ld e,a
-   ld a,#(((SP1V_DISPWIDTH*10):$ffff)+1)/256
+   ld a,-SP1V_DISPWIDTH*10/256
+;   ld a,#(((SP1V_DISPWIDTH*10):$ffff)+1)/256
    adc a,d
    ld d,a
    exx
