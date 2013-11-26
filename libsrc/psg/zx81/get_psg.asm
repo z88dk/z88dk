@@ -8,15 +8,15 @@
 ;	does not work on original ZonX, ZXpand-AY Sound Module is required
 ;
 ;
-;	$Id: get_psg.asm,v 1.1 2013-11-21 10:52:56 stefano Exp $
+;	$Id: get_psg.asm,v 1.2 2013-11-26 06:51:15 stefano Exp $
 ;
 
 	XLIB	get_psg
 	
 get_psg:
 
-    ;LD	BC,$cf
-    ld bc,$df
+    LD	BC,$cf
+    ;ld bc,$df
 	OUT	(C),l
 
     LD	c,$ef
