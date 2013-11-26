@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.51 2013-10-05 13:45:19 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.52 2013-11-26 22:46:03 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.51  2013-10-05 13:45:19  pauloscustodio
+/* Revision 1.52  2013-11-26 22:46:03  pauloscustodio
+/* Version 1.2.10
+/*
+/* Revision 1.51  2013/10/05 13:45:19  pauloscustodio
 /* Version 1.2.9
 /*
 /* Revision 1.50  2013/09/12 00:10:02  pauloscustodio
@@ -1423,6 +1426,19 @@ Based on 1.0.31
 	- Parse command line options via look-up tables.
 
 -------------------------------------------------------------------------------
+26.11.2013 [1.2.10] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- mkinit.pl to generate new main function that calls a set of initializers
+	  before user main()
+	- Replace Flex-based lexer by a Ragel-based one.
+	- Move FileStack implementation to scan.c, remove FileStack.
+	- Move getline_File() to scan.c.
+	- Move source code generation tools to dev/Makefile, only called on request,
+	  and keep the generated files in z80asm directory, so that build does 
+	  not require tools used for the code generation (ragel, perl).
+	- Remove code generation for structs - use CLASS macro instead.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1445,7 +1461,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.9"
+#define VERSION     "1.2.10"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
