@@ -539,7 +539,10 @@ XREF SP1V_TEMP_IX, SP1V_TEMP_AF
    ld a,-SP1V_DISPWIDTH*9
    add a,e
    ld e,a
-   ld a,#(((SP1V_DISPWIDTH*9):$ffff)+1)/256
+
+   ld a,-SP1V_DISPWIDTH*9/256
+;    ld a,#(((SP1V_DISPWIDTH*9):$ffff)+1)/256
+
    adc a,d
    ld d,a
    exx

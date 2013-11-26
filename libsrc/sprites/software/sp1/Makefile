@@ -19,21 +19,15 @@ sp1-all:
 	@echo
 	@echo Making sp1-spectrum
 	@echo
-	$(LIBLINKER) -xsp1 @spectrum.lst
-	cp sp1.lib spectrum
-	rm sp1.lib
+	$(LIBLINKER) -xspectrum/sp1 @spectrum.lst
 	@echo
 	@echo Making sp1-ts2068hr
 	@echo
-	$(LIBLINKER) -xsp1 @ts2068hr.lst
-	cp sp1.lib ts2068hr
-	rm sp1.lib
+	$(LIBLINKER) -xts2068hr/sp1 @ts2068hr.lst
 	@echo
 	@echo Making sp1-zx81hr
 	@echo
-	$(LIBLINKER) -xsp1 -IXIY @zx81hr.lst
-	cp sp1.lib zx81hr
-	rm sp1.lib
+	$(LIBLINKER) -xzx81hr/sp1 -IXIY @zx81hr.lst
 	@echo
 
 sp1-spectrum:
