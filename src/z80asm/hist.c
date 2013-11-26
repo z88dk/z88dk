@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.52 2013-11-26 22:46:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.53 2013-11-26 22:59:08 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.52  2013-11-26 22:46:03  pauloscustodio
+/* Revision 1.53  2013-11-26 22:59:08  pauloscustodio
+/* Version 2.0.0: new C-like expression syntax, incompatible object file format with previous version
+/*
+/* Revision 1.52  2013/11/26 22:46:03  pauloscustodio
 /* Version 1.2.10
 /*
 /* Revision 1.51  2013/10/05 13:45:19  pauloscustodio
@@ -1439,6 +1442,13 @@ Based on 1.0.31
 	- Remove code generation for structs - use CLASS macro instead.
 
 -------------------------------------------------------------------------------
+26.11.2013 [2.0.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- C-like expression syntax instead of old operators
+	- Object and Library file version incremented to 02 due to incompatibility
+	  with old expression syntax
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1461,7 +1471,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.10"
+#define VERSION     "2.0.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

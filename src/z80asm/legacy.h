@@ -1,1 +1,1 @@
-#define __LEGACY_Z80ASM_SYNTAX 
+#undef __LEGACY_Z80ASM_SYNTAX 

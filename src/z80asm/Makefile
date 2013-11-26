@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.91 2013-11-20 13:26:13 stefano Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.92 2013-11-26 22:59:08 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -164,8 +164,8 @@ clean :
 # test
 #------------------------------------------------------------------------------
 test : $(TARGET)
-	$(MAKE) new    prove
 	$(MAKE) legacy prove
+	$(MAKE) new    prove
 
 prove: $(TARGET)
 	perl -S prove t/*.t
@@ -241,7 +241,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.91  2013-11-20 13:26:13  stefano
+# Revision 1.92  2013-11-26 22:59:08  pauloscustodio
+# Version 2.0.0: new C-like expression syntax, incompatible object file format with previous version
+#
+# Revision 1.91  2013/11/20 13:26:13  stefano
 # Sorted out the PSG stuff for the X1
 #
 # Revision 1.90  2013/11/11 23:47:03  pauloscustodio
