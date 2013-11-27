@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.1 2013-11-27 10:24:25 stefano Exp $
+;       $Id: sos_crt0.asm,v 1.2 2013-11-27 14:38:44 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -95,6 +95,9 @@ ENDIF
 ; We must start from the end 
 	ld	hl,0	;NULL pointer at end, just in case
 	push	hl
+	ld	b,h     ; parameter counter
+	ld	c,h     ; character counter
+
 	ld	hl,($1F76)	; #KBFAD
 
 ; Program is entered with a 'J' (jump command) at location 3000
@@ -102,15 +105,31 @@ ENDIF
 ; so "J3000" and "J  3000" will have the same effect
 skipblank:
 	inc hl
+	inc hl
 	ld	a,(hl)
 	cp  ' '
 	jr	z,skipblank
-	
-	ld	b,0
+
+	ld	a,(hl)
 	and	a
 	jr	z,argv_done
-	ld	c,a
-	add	hl,bc	;now points to the end
+
+	dec hl
+find_end:
+	inc	hl
+	inc c
+	ld	a,(hl)
+	and	a
+	jr	nz,find_end
+	dec hl
+	; now HL points to the end of command line
+	; and C holds the length of args buffer
+	
+;	ld	b,0
+;	and	a
+;	jr	z,argv_done
+;	ld	c,a
+;	add	hl,bc	;now points to the end
 ; Try to find the end of the arguments
 argv_loop_1:
 	ld	a,(hl)
