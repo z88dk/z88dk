@@ -1,0 +1,5 @@
+stdio/sos/fputc_cons
+stdio/sos/fgetc_cons
+stdio/sos/getk
+stdio/puts_cons
+@z80.lst

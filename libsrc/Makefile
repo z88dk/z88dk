@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.193 2013-11-25 06:11:32 aralbrec Exp $
+# $Id: Makefile,v 1.194 2013-11-27 10:24:25 stefano Exp $
 
 
 include Make.config
@@ -22,7 +22,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
-	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
+	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib\
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
@@ -1430,6 +1430,19 @@ x1ansi_clib.lib:
 	cd psg ; $(MAKE) ; cd ..
 	cd x1 ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
+
+# S-OS (The Sentinel) - Stefano
+sos_clib.lib:
+	@echo ''
+	@echo '--- Building S-OS (The Sentinel) Library ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) losca ; cd ..
+	cd stdio ; $(MAKE) lcpm ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:

@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.5 2013-11-14 06:57:05 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.6 2013-11-27 10:24:25 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -142,6 +142,15 @@ IF NEED_floatpack
         call    init_floatpack
 ENDIF
 
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+IF DEFINED_USING_amalloc
+	ld	hl,0
+	add	hl,sp
+    INCLUDE "amalloc.def"
+ENDIF
+
         call    _main
 
 cleanup:
@@ -267,6 +276,16 @@ _wait_sub_cpu:
 
 
 
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+	defw ASMTAIL	; Location of the last program byte
+	defw 0
+ENDIF
 
 
 IF NEED_floatpack

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.41 2013-11-08 09:41:29 stefano Exp $
+# $Id: Makefile,v 1.42 2013-11-27 10:24:25 stefano Exp $
 #
 
 include ../Make.config
@@ -163,6 +163,7 @@ clean:
 	$(RM) pc6001/*.o
 	$(RM) sam/*.o
 	$(RM) sms/*.o
+	$(RM) sos/*.o
 	$(RM) sorcerer/*.o
 	$(RM) spectrum/*.o
 	$(RM) test/*.o
