@@ -24,9 +24,13 @@ strcasecmp
 Edited by Jeremy Drake to create unsquished 83P and 8XP files
 with correct "End" and "AsmPrgm" symbols
 
-Edited by Thibault Duponchelle (z88dk version not bin2var) because it was buggy at least for 8xp (due to the port to z88dk probably or maybe the bin2var which was used was simply an old bin2var ressource).
-I'm not sure if I haven't added some other issues but I tested it and now it works for 8xp (so it's better than before).
-In fact I just have used vimdiff to correct the bugs, and not checked the real meaning of each written byte/word but only checked some of them).
+Edited by Thibault Duponchelle (z88dk version not bin2var) because it
+was buggy at least for 8xp (due to the port to z88dk probably or maybe
+the bin2var  which was used was simply an old bin2var ressource).
+I'm not sure if I haven't added some other issues but I tested it and
+now it works for 8xp (so it's better than before).
+In fact I just have used vimdiff to correct the bugs, and not checked 
+the real meaning of each written byte/word but only checked some of them).
 - Tested for ti84.
 - Tested for ti83 regular (squished and unsquished).
 */
@@ -102,26 +106,6 @@ void cfwrite(const void *buf, int len, FILE *fp, unsigned short *chk)
     for(i = 0; i < len; i++)
         *chk += ((unsigned char *)buf)[i];
 }
-
-void datawrite(unsigned char *buf, int len, FILE *fp, unsigned short *chk)
-{
-    int i, n;
-    char charbuffer[5];
-
-    for (i = 0; i < len; i++) {
-        n = (unsigned char)buf[i];
-        sprintf(charbuffer,"%X",n);
-        if( charbuffer[1] == 0 ) {
-            charbuffer[1] = charbuffer[0];
-            charbuffer[0] = '0';
-        }
-        fwrite(charbuffer, 2, 1, fp);
-
-        *chk += charbuffer[0];
-        *chk += charbuffer[1];
-    }
-}
-
 
 void writecomment(FILE *fp, const char *comment)
 {

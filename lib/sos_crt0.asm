@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.2 2013-11-27 14:38:44 stefano Exp $
+;       $Id: sos_crt0.asm,v 1.3 2013-11-28 15:33:52 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -49,12 +49,18 @@
 	XDEF	snd_tick	; for sound code, if any
 	XDEF	bit_irqstatus	; current irq status when DI is necessary
 
+        IF      !myzorg
+                defc    myzorg  = $3000
+        ENDIF
 
-        org     $3000-18
 
+        org     myzorg
 
-	defm "_SOS 01 3000 3000"
-	defb $0A
+;        org     $3000-18
+;
+;
+;	defm "_SOS 01 3000 3000"
+;	defb $0A
 	
 ;----------------------
 ; Execution starts here

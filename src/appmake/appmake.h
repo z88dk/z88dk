@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.28 2013-03-01 10:03:42 stefano Exp $
+ *   $Id: appmake.h,v 1.29 2013-11-28 15:33:52 stefano Exp $
  */
 
 
@@ -79,6 +79,9 @@ extern option_t  nec_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
+
+extern int       sos_exec(char *target);
+extern option_t  sos_options;
 
 extern int       newbrain_exec(char *target);
 extern option_t  newbrain_options;
@@ -181,6 +184,9 @@ struct {
     { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
       "Packaging for Sorcerer Exidy, --audio for WAV format",
       sorcerer_exec,    &sorcerer_options },
+    { "sentinel",   "sos",       "(C) 2013 Stefano Bodrato",
+      "Add a header for S-OS (The Sentinel)",
+      sos_exec,    &sos_options },
     { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",
       "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       newbrain_exec,    &newbrain_options },
@@ -239,7 +245,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optional WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 35
+#define APPMAKE_TARGETS 36
 #endif
 
 
