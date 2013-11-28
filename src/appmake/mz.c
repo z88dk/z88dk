@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.10 2011-10-12 20:52:32 stefano Exp $
+ *        $Id: mz.c,v 1.11 2013-11-28 18:26:13 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -658,7 +658,7 @@ int mz_exec(char *target)
 
 		if ( outfile == NULL ) {
 			strcpy(filename,binname);
-			suffix_change(filename,".m12");
+			suffix_change(filename,".mzt");
 		} else {
 			strcpy(filename,outfile);
 		}
