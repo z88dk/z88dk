@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2013
  *
- *	$Id: sos.h,v 1.1 2013-11-29 14:34:02 stefano Exp $
+ *	$Id: sos.h,v 1.2 2013-12-03 13:42:32 stefano Exp $
  */
 
 
@@ -18,7 +18,8 @@ extern unsigned int   SOS_USR   @0x1f7e;	// Address to jump to after a cold star
 extern unsigned char  SOS_DVSW  @0x1f7d;	// Tape format.
 extern unsigned char  SOS_LPSW  @0x1f7c;	// If non-zero, output also to the printer.
 extern unsigned int   SOS_PRCNT @0x1f7a;	// Number of characters displayed in a new line.
-extern unsigned int   SOS_XYADR @0x1f78;	// Cursor coordinates.
+//extern unsigned int   SOS_XYADR @0x1f78;	// Cursor coordinates.
+extern unsigned char *SOS_XYADR @0x1f78;	// Cursor coordinates.
 extern unsigned char  SOS_XADR  @0x1f78;
 extern unsigned char  SOS_YADR  @0x1f79;
 extern unsigned int   SOS_KBFAD @0x1f76;	// Keyboard input buffer address.
@@ -40,5 +41,80 @@ extern unsigned char  SOS_WIDTH @0x1f5c;	// Display size (columns).
 extern unsigned char  SOS_MXLIN @0x1f5b;	// Display size (lines).
 
 
+#define SOS_FILEATTR_BIN    0x01
+#define SOS_FILEATTR_BAS    0x02
+#define SOS_FILEATTR_ASC    0x04
+#define SOS_FILEATTR_DIR    0x80
+
+#define SOS_ERR_DEV_IO            1
+#define SOS_ERR_DEV_OFFLINE       2
+#define SOS_ERR_FILE_DESCRIPTOR   3
+#define SOS_ERR_WR_PROTECTED      4
+#define SOS_ERR_BAD_RECORD        5
+#define SOS_ERR_FILE_MODE         6
+#define SOS_ERR_ALLOCATION_TABLE  7
+#define SOS_ERR_FILE_NOT_FOUND    8
+#define SOS_ERR_DEVICE_FULL       9
+#define SOS_ERR_FILE_EXISTS      10
+#define SOS_ERR_RESERVED         11
+#define SOS_ERR_FILE_NOT_OPEN    12
+#define SOS_ERR_SYNTAX           13
+#define SOS_ERR_BAD_DATA         14
+
+
+// For positioning the text cursor.  The macros can be
+// used to inline code if the parameters resolve to constants.
+
+#define M_SOS_GOTOXY(xpos,ypos) asm("ld\tl,"#xpos"\nld\th,"#ypos"\ncall\t$201E\n");
+
+// Set console cursor position, top-left=(0;0)
+extern void  __LIB__              setcursorpos(int x, int y);
+extern void  __LIB__ __CALLEE__   setcursorpos_callee(int x, int y);
+#define setcursorpos(a,b)     setcursorpos_callee(a,b)
+
+// Get character at given position, top-left=(0;0)
+extern int  __LIB__              screen(int x, int y);
+extern int  __LIB__ __CALLEE__   screen_callee(int x, int y);
+#define screen(a,b)     screen_callee(a,b)
+
+// Set screen size (if possible)
+extern int  __LIB__ __FASTCALL__  width(int columns);
+
+// Print the error message for the given code
+extern int  __LIB__ __FASTCALL__  print_error(int err_code);
+
+// Enable/disable echo on printer
+extern void  __LIB__ lpton();
+extern void  __LIB__ lptoff();
+
+// Test for BREAK being pressed
+extern int  __LIB__ break_key(void);
+
+// Set console cursor position, top-left=(0;0)
+extern void  __LIB__              setcursorpos(int x, int y);
+extern void  __LIB__ __CALLEE__   setcursorpos_callee(int x, int y);
+#define setcursorpos(a,b)     setcursorpos_callee(a,b)
+
+// Get cursor position
+extern int  __LIB__     get_cursor_x();
+extern int  __LIB__     get_cursor_y();
+
+// Set file name and type
+extern void  __LIB__              sos_file(char *name, int attributes);
+extern void  __LIB__ __CALLEE__   sos_file_callee(char *name, int attributes);
+#define sos_file(a,b)     sos_file_callee(a,b)
+
+
+struct SOS_IBF {
+	u8_t	record;
+	char    name[10];	/* file name */
+	
+//	File descriptor seems to be a 32 bytes buffer , what's in depends on the S-OS driver for the specific platform.
+};
+/*
+10F0 01 61 20 20 20 20 20 20
+10F8 20 20 20 20 20 20 6F 62
+1100 6A 00 00 00 00 00 00 00
+*/
 
 #endif /* __SOS_H__ */

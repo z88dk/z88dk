@@ -2,4 +2,17 @@ stdio/sos/fputc_cons
 stdio/sos/fgetc_cons
 stdio/sos/getk
 stdio/puts_cons
+sos/break_key.asm
+sos/lptoff.asm
+sos/lpton.asm
+sos/print_error.asm
+sos/screen.asm
+sos/screen_callee .asm
+sos/setcursorpos.asm
+sos/setcursorpos_callee.asm
+sos/get_cursor_x.asm
+sos/get_cursor_y.asm
+sos/width.asm
+sos/sos_file.asm
+sos/sos_file_callee.asm
 @z80.lst

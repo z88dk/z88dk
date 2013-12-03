@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.11 2013-11-28 18:26:13 stefano Exp $
+ *        $Id: mz.c,v 1.12 2013-12-03 13:42:32 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -64,8 +64,8 @@ option_t mz_options[] = {
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &mz80b },
-    {  0,  "src",      "Patch from (80B,700,2000)",  OPT_STR,   &src },
-    {  0,  "dst",      "Patch to (80B,700,2000)",    OPT_STR,   &dst },
+    {  0,  "src",      "Patch from (80B,700,2000,sos)",  OPT_STR,   &src },
+    {  0,  "dst",      "Patch to (80B,700,2000,sos)",    OPT_STR,   &dst },
     {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
     {  0,  "patchall", "Patch more types of JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -319,6 +319,84 @@ unsigned int mz2000_codes[] = {
 	0
 };
 
+
+unsigned int sos_codes[] = {
+	0x1fc4,	// BEEP (keep always in first position)
+	0x1fd3,	// GETL - Get LINE (up to 80 characters)
+	0x1feb,	// Double newline (1 line space)
+	0x1fee,	// Newline
+	0x1ff1,	// print space
+	0x1fdf,	// print TAB  (not sure this is right)
+	0x1ff4,	// print character
+	0x1fe5,	// print message	(control characters transcoding)
+	0x1fe8,	// print messageX
+	0x1fd0,	// GETKY - Get Key
+	0x1fcd,	// test BREAK
+	0x1fd6,	// write header info (located in $10f0)
+	0x1fd6,	// write data
+	0x1fd6,	// read header info (header is located in $10F0)
+	0x1fd6,	// read tape data
+	0x1fd6,	// verify tape data
+	0x1fd6,	// SOUND (play melody)
+	0x1fd6,	// set time
+	0x1fd6,	// read time
+	0x1fd6,	// set tempo (melody)
+	0x1fd6,	// start continous sound
+	0x0047,	// stop continous sound
+
+	0x1fc4,	// BEEP
+	0x1fd3,	// GETL - Get LINE (up to 80 characters)
+	0x1feb,	// Double newline (1 line space)
+	0x1fee,	// Newline
+	0x1ff1,	// print space
+	0x1fdf,	// print TAB  (not sure this is right)
+	0x1ff4,	// print character
+	0x1fe5,	// print message	(control characters transcoding)
+	0x1fe8,	// print messageX
+	0x1fd0,	// GETKY - Get Key (ASCII code)
+	0x1fcd,	// test BREAK
+	0x1fd6,	// write header info (located in $10f0)
+	0x1fd6,	// write data
+	0x1fd6,	// read header info (header is located in $10F0)
+	0x1fd6,	// read tape data
+	0x1fd6,	// verify tape data
+	0x1fd6,	// SOUND (play melody)
+	0x1fd6,	// set time
+	0x1fd6,	// read time
+	0x1fd6,	// set tempo (melody)
+	0x1fd6,	// start continous sound
+	0x1fd6,	// stop continous sound
+
+	0x1f8e,	// MONITOR entry
+
+	0x1fbe,	// print hex value of HL
+	0x1fc1,	// print hex value of A
+	0x1fb8,	// format hex digit to ascii
+	0x1fb5,	// format ascii to hex digit
+	0x1fb5,	// format ascii to hex digit
+	0x1fca,	// Wait for a key and get key code
+	
+	0x1fd6,	// ASCII code to display code conversion
+//	0x0fb1,	// console stuff ?  (c53)
+	0x1fd6,	// console stuff ?	(8ee)
+	0x1fd6,	// console stuff ?	(8ef)
+//	0x0939,	// console stuff ?  (91a)
+//	0x0db5,	// console stuff ?  (c7a)
+//	0x096c,	// raw character output ?
+	0x1fd6,	// display code to ASCII conversion
+	0x1fd6,	// display code to ASCII conversion
+	0x1fd6,	// screen control (scroll, cursor, etc..)
+	0x1ffa, // break in (will HOT boot be ok ?)
+	0x1fd6, // POP HL,DE,BC,AF and ret  (** NO MATCH **)
+	0x1fd6, // POP DE,BC,AF and ret	  (** NO MATCH **)
+	0x1fd6, // (0x4ce)
+	0x1fd6, // (0x446)
+	0x0038,	// Interrupt handler
+	0x0038,	// Interrupt handler
+	0x0038,	// Interrupt handler
+	0x1fd6, // ??? = $D18 on mz80b = $CEE on mz2000  ** RET **
+	0
+};
 
 /* Code from mzf2wav (physical.c) */
 
@@ -611,6 +689,9 @@ int mz_exec(char *target)
 		if (strcmp(dst,"2000") == 0)
 			dst_codes = mz2000_codes;
 
+		if (strcmp(dst,"sos") == 0)
+			dst_codes = sos_codes;
+
 		if (dst_codes == 0) {
 			fprintf(stderr,"Specified dst model for patching is not valid\n");
 			myexit(NULL,1);
@@ -631,6 +712,9 @@ int mz_exec(char *target)
 
 		if (strcmp(src,"2000") == 0)
 			src_codes = mz2000_codes;
+
+		if (strcmp(src,"sos") == 0)
+			src_codes = sos_codes;
 
 		if (src_codes == 0) {
 			fprintf(stderr,"Specified src model for patching is not valid\n");
