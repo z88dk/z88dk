@@ -12,7 +12,17 @@ sos/setcursorpos.asm
 sos/setcursorpos_callee.asm
 sos/get_cursor_x.asm
 sos/get_cursor_y.asm
+sos/get_sos_model.asm
+sos/get_sos_version.asm
 sos/width.asm
 sos/sos_file.asm
 sos/sos_file_callee.asm
+sos/sos_ropen.asm
+sos/sos_wopen.asm
+sos/sos_rdd.asm
+sos/sos_wrd.asm
+sos/tape/tape_save.asm
+sos/tape/tape_save_block.asm
+sos/tape/tape_load.asm
+sos/tape/tape_load_block.asm
 @z80.lst

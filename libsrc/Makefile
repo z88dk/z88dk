@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.194 2013-11-27 10:24:25 stefano Exp $
+# $Id: Makefile,v 1.195 2013-12-05 09:34:00 stefano Exp $
 
 
 include Make.config
@@ -1437,11 +1437,12 @@ sos_clib.lib:
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) losca ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) lcpm ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd sos ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
@@ -1566,6 +1567,7 @@ clean:
 	cd zx81     ; $(MAKE) clean ; cd ..
 	cd cpc      ; $(RM) *.o ; cd ..
 	cd sms      ; $(MAKE) clean ; cd ..
+	cd sos      ; $(MAKE) clean ; cd ..
 	cd threading/preempt    ; $(MAKE) clean ; cd ../..
 	cd sprites/software/sp1 ; $(MAKE) clean ; cd ../../..
 	cd stdio_new ; $(MAKE) clean ; cd ..

@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.45 2013-11-14 06:57:05 stefano Exp $
+ * $Id: stdlib.h,v 1.46 2013-12-05 09:34:00 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -107,10 +107,6 @@ extern   int opterr;
 extern   int optind;
 extern   int optopt;
 extern   int optreset;
-
-#ifdef __Z88__
-extern int system(char *text);              /* should this be in the z88 library? */
-#endif
 
 //////////////////
 //// Search & Sort
@@ -232,7 +228,9 @@ extern int __LIB__ wcmatch(char *wildnam, char *filnam);
 extern unsigned int __LIB__ unbcd(unsigned int value);
 
 #ifdef __Z88__
+extern int system(char *text);              /* should this be in the z88 library? */
 #endif
+
 
 
 #endif

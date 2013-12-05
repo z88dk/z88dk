@@ -4,7 +4,7 @@
 ;
 ; int print_error(code)
 ;
-;       $Id: print_error.asm,v 1.1 2013-12-03 13:42:32 stefano Exp $
+;       $Id: print_error.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
 ;
 
 XLIB print_error
