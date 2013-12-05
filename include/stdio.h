@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.26 2013-06-11 14:55:18 stefano Exp $ */
+/* $Id: stdio.h,v 1.27 2013-12-05 15:42:42 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -42,6 +42,10 @@
 #ifdef __OSCA__
 /* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
 #include <flos.h>
+#endif
+
+#ifdef __SOS__
+#include <sos.h>
 #endif
 
 #ifdef ZXVGS
