@@ -5,7 +5,7 @@
 
 XLIB itoa_callee
 XDEF ASMDISP_ITOA_CALLEE
-XDEF ASMDISP2_ITOA_CALLEE
+XDEF LIBDISP_ITOA_CALLEE
 
 LIB l_deneg, l_div_u, strrev
 LIB stdio_basechar, stdio_error_zc
