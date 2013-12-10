@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.7 2013-10-21 14:23:44 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.8 2013-12-10 11:43:14 stefano Exp $
 ;
 
 
@@ -114,7 +114,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
