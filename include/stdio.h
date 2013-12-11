@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.27 2013-12-05 15:42:42 stefano Exp $ */
+/* $Id: stdio.h,v 1.28 2013-12-11 12:03:23 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -137,11 +137,11 @@ extern int __LIB__ fflush(FILE *);
 
 /* Our new and improved functions!! */
 
-extern FILE __LIB__ *fopen(far char *name, unsigned char *mode);
-extern FILE __LIB__ *fopen_z88(far char *name, unsigned char *mode, unsigned char *explicit, size_t len);
-extern FILE __LIB__ *freopen(far char *name, unsigned char *mode, FILE *fp);
-extern FILE __LIB__ *freopen_z88(far char *n, unsigned char *m, FILE *fp, unsigned char *explicit, size_t len);
-extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode);
+extern FILE __LIB__ *fopen(far char *name, unsigned char *mode) __SMALLCDECL;
+extern FILE __LIB__ *fopen_z88(far char *name, unsigned char *mode, unsigned char *explicit, size_t len) __SMALLCDECL;
+extern FILE __LIB__ *freopen(far char *name, unsigned char *mode, FILE *fp) __SMALLCDECL;
+extern FILE __LIB__ *freopen_z88(far char *n, unsigned char *m, FILE *fp, unsigned char *explicit, size_t len) __SMALLCDECL;
+extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode) __SMALLCDECL;
 
 extern int __LIB__ fclose(FILE *fp);
 
@@ -154,12 +154,12 @@ extern void __LIB__ closeall();
 /* The "8080" stdio lib is at the moment used only by the        */
 /* Rabbit Control Module, which is not fully z80 compatible      */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
+extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __SMALLCDECL;
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __SMALLCDECL;
 extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
 extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *);
+extern int __LIB__ ungetc(int c, FILE *) __SMALLCDECL;
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
 
@@ -175,17 +175,17 @@ extern int __LIB__ puts(unsigned char *);
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
+extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __SMALLCDECL;
 
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __SMALLCDECL;
 extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
 
-extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp);
-extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp);
+extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp) __SMALLCDECL;
+extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp) __SMALLCDECL;
 extern int __LIB__ fgetc(FILE *fp);
 
 #define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *);
+extern int __LIB__ ungetc(int c, FILE *) __SMALLCDECL;
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
 
@@ -203,14 +203,14 @@ extern int __LIB__ puts(unsigned char *);
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos);
+extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __SMALLCDECL;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
-extern int __LIB__ fseek(FILE *fp, fpos_t offset, int whence);
+extern int __LIB__ fseek(FILE *fp, fpos_t offset, int whence) __SMALLCDECL;
 
 /* Block read/writing */
-extern int __LIB__ fread(void *ptr, int size, int num, FILE *);
-extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *);
+extern int __LIB__ fread(void *ptr, int size, int num, FILE *) __SMALLCDECL;
+extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __SMALLCDECL;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
@@ -222,33 +222,33 @@ extern char __LIB__ *gets(char *s);
  * a jp to the real routine is in the startup code
  */
 
-extern int __LIB__ printf(char *,...);
-extern int __LIB__ fprintf(FILE *,char *,...);
-extern int __LIB__ sprintf(char *,char *,...);
-extern int  vfprintf(FILE *,unsigned char *fmt,void *ap);
-extern int __LIB__ vsprintf(char *str,unsigned char *fmt,void *ap);
+extern int __LIB__ printf(char *,...) __SMALLCDECL;
+extern int __LIB__ fprintf(FILE *,char *,...) __SMALLCDECL;
+extern int __LIB__ sprintf(char *,char *,...) __SMALLCDECL;
+extern int  vfprintf(FILE *,unsigned char *fmt,void *ap) __SMALLCDECL;
+extern int __LIB__ vsprintf(char *str,unsigned char *fmt,void *ap) __SMALLCDECL;
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 
 /* real printf cores */
 
-extern int __LIB__ vfprintf_mini(FILE *, unsigned char *, void *);
-extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *);
-extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *);
+extern int __LIB__ vfprintf_mini(FILE *, unsigned char *, void *) __SMALLCDECL;
+extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *) __SMALLCDECL;
+extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *) __SMALLCDECL;
 
-extern __LIB__ printn(int number, int radix,FILE *file);
-extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag);
+extern __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
+extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag) __SMALLCDECL;
 
 
 /*
  * Scanf family 
  */
 
-extern int __LIB__ scanf(unsigned char *fmt,...);
-extern int __LIB__ fscanf(FILE *,unsigned char *fmt,...);
-extern int __LIB__ sscanf(char *,unsigned char *fmt,...);
-extern int __LIB__ vfscanf(FILE *, unsigned char *fmt, void *ap);
-extern int __LIB__ vsscanf(char *str, unsigned char *fmt, void *ap);
+extern int __LIB__ scanf(unsigned char *fmt,...) __SMALLCDECL;
+extern int __LIB__ fscanf(FILE *,unsigned char *fmt,...) __SMALLCDECL;
+extern int __LIB__ sscanf(char *,unsigned char *fmt,...) __SMALLCDECL;
+extern int __LIB__ vfscanf(FILE *, unsigned char *fmt, void *ap) __SMALLCDECL;
+extern int __LIB__ vsscanf(char *str, unsigned char *fmt, void *ap) __SMALLCDECL;
 #define vscanf(ctl,arg) vfscanf(stdout,ctl,arg)
 
 
@@ -277,14 +277,14 @@ extern int __LIB__ fchkstd(FILE *);
 /* All functions below here are machine specific */
 extern int __LIB__ fgetc_cons();
 extern int __LIB__ fputc_cons(char c);
-extern int __LIB__ fgets_cons(char *s, int n);
+extern int __LIB__ fgets_cons(char *s, int n) __SMALLCDECL;
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
 extern long __LIB__ fdtell(int fd);
-extern int __LIB__ fdgetpos(int fd, fpos_t *posn);
+extern int __LIB__ fdgetpos(int fd, fpos_t *posn) __SMALLCDECL;
 /* Rename a file */
-extern int __LIB__ rename(char *s, char *d);
+extern int __LIB__ rename(char *s, char *d) __SMALLCDECL;
 /* Remove a file */
 extern int __LIB__ remove(char *name);
 
@@ -300,7 +300,7 @@ extern int __LIB__ remove(char *name);
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(char *message);
-extern void __LIB__ printk(char *fmt,...);
+extern void __LIB__ printk(char *fmt,...) __SMALLCDECL;
 
 
 /*

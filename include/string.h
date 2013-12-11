@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.23 2013-04-29 16:51:27 stefano Exp $
+ *	$Id: string.h,v 1.24 2013-12-11 12:03:23 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -19,85 +19,85 @@
 // First a list of functions using CALLER and FASTCALL linkage
 
 extern int  __LIB__ __FASTCALL__  strlen(char *);
-extern char __LIB__              *strcat(char *, char *);
-extern int  __LIB__               strcmp(char *, char *);
-extern char __LIB__              *strcpy(char *, char *);
-extern char __LIB__              *strncat(char *, char *, uint);
-extern int  __LIB__               strncmp(char *, char *, uint);
-extern char __LIB__              *strncpy(char *, char *, uint);
+extern char __LIB__              *strcat(char *, char *) __SMALLCDECL;
+extern int  __LIB__               strcmp(char *, char *) __SMALLCDECL;
+extern char __LIB__              *strcpy(char *, char *) __SMALLCDECL;
+extern char __LIB__              *strncat(char *, char *, uint) __SMALLCDECL;
+extern int  __LIB__               strncmp(char *, char *, uint) __SMALLCDECL;
+extern char __LIB__              *strncpy(char *, char *, uint) __SMALLCDECL;
 extern char __LIB__ __FASTCALL__ *strrev(char *);
-extern char __LIB__              *strchr(unsigned char *, unsigned char);
-extern char __LIB__              *strchrnul(unsigned char *, unsigned char);
-extern char __LIB__              *strrchr(unsigned char *, unsigned char);
-extern char __LIB__              *strrstrip(char *, char);
-extern char __LIB__              *strstrip(char *, uint);
-extern char __LIB__              *strstr(char *, char *);
-extern char __LIB__              *strrstr(char *, char *);
-extern char __LIB__              *strtok(char *, char *);
-extern char __LIB__              *strtok_r(char *, char *, char **);
-extern char __LIB__              *strtok_s(char *, char *, char **);
-extern char __LIB__              *strsep(char **, char *);
-extern char __LIB__              *strpbrk(char *, char *);
-extern int  __LIB__               strpos(char *, uint);
-extern int  __LIB__               strcspn(char *, char *);
-extern int  __LIB__               strspn(char *, char *);
-extern int  __LIB__               stricmp(char *, char *);
-extern int  __LIB__               strcasecmp(char *, char *);
-extern int  __LIB__               strnicmp(char *, char *, uint);
-extern int  __LIB__               strncasecmp(char *, char *, uint);
+extern char __LIB__              *strchr(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__              *strchrnul(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__              *strrchr(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__              *strrstrip(char *, char) __SMALLCDECL;
+extern char __LIB__              *strstrip(char *, uint) __SMALLCDECL;
+extern char __LIB__              *strstr(char *, char *) __SMALLCDECL;
+extern char __LIB__              *strrstr(char *, char *) __SMALLCDECL;
+extern char __LIB__              *strtok(char *, char *) __SMALLCDECL;
+extern char __LIB__              *strtok_r(char *, char *, char **) __SMALLCDECL;
+extern char __LIB__              *strtok_s(char *, char *, char **) __SMALLCDECL;
+extern char __LIB__              *strsep(char **, char *) __SMALLCDECL;
+extern char __LIB__              *strpbrk(char *, char *) __SMALLCDECL;
+extern int  __LIB__               strpos(char *, uint) __SMALLCDECL;
+extern int  __LIB__               strcspn(char *, char *) __SMALLCDECL;
+extern int  __LIB__               strspn(char *, char *) __SMALLCDECL;
+extern int  __LIB__               stricmp(char *, char *) __SMALLCDECL;
+extern int  __LIB__               strcasecmp(char *, char *) __SMALLCDECL;
+extern int  __LIB__               strnicmp(char *, char *, uint) __SMALLCDECL;
+extern int  __LIB__               strncasecmp(char *, char *, uint) __SMALLCDECL;
 extern char __LIB__ __FASTCALL__ *strlwr(char *);
 extern char __LIB__ __FASTCALL__ *strupr(char *);
-extern uint __LIB__               strlcat(char *, char *, uint);
-extern uint __LIB__               strlcpy(char *, char *, uint);
+extern uint __LIB__               strlcat(char *, char *, uint) __SMALLCDECL;
+extern uint __LIB__               strlcpy(char *, char *, uint) __SMALLCDECL;
 
-extern void __LIB__              *memset(void *, unsigned char, uint);
-extern void __LIB__              *memcpy(void *, void *,uint);
-extern void __LIB__              *memmove(void *, void *, uint);
-extern void __LIB__              *memchr(void *, unsigned char, uint);
-extern void __LIB__              *memrchr(void *, unsigned char, uint);
-extern int  __LIB__               memcmp(void *, void *, uint);
-extern void __LIB__              *memswap(void *, void *, uint);
-extern void __LIB__              *memopi(void *, void *, uint, uint);
-extern void __LIB__              *memopd(void *, void *, uint, uint);
+extern void __LIB__              *memset(void *, unsigned char, uint) __SMALLCDECL;
+extern void __LIB__              *memcpy(void *, void *,uint) __SMALLCDECL;
+extern void __LIB__              *memmove(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__              *memchr(void *, unsigned char, uint) __SMALLCDECL;
+extern void __LIB__              *memrchr(void *, unsigned char, uint) __SMALLCDECL;
+extern int  __LIB__               memcmp(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__              *memswap(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__              *memopi(void *, void *, uint, uint) __SMALLCDECL;
+extern void __LIB__              *memopd(void *, void *, uint, uint) __SMALLCDECL;
 
 extern char __LIB__ __FASTCALL__ *strdup(char *);
 
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
-extern char __LIB__ __CALLEE__   *strcat_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    strcmp_callee(char *, char *);
-extern char __LIB__ __CALLEE__   *strcpy_callee(char *, char *);
-extern char __LIB__ __CALLEE__   *strncat_callee(char *, char *, uint);
-extern int  __LIB__ __CALLEE__    strncmp_callee(char *, char *, uint);
-extern char __LIB__ __CALLEE__   *strncpy_callee(char *, char *, uint);
-extern char __LIB__ __CALLEE__   *strchr_callee(unsigned char *, unsigned char);
-extern char __LIB__ __CALLEE__   *strchrnul_callee(unsigned char *, unsigned char);
-extern char __LIB__ __CALLEE__   *strrchr_callee(unsigned char *, unsigned char);
-extern char __LIB__ __CALLEE__   *strrstrip_callee(char *, char);
-extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint);
-extern char __LIB__ __CALLEE__   *strstr_callee(char *, char *);
-extern char __LIB__ __CALLEE__   *strrstr_callee(char *, char *);
-extern char __LIB__ __CALLEE__   *strtok_callee(char *, char *);
-extern char __LIB__ __CALLEE__   *strtok_r_callee(char *, char *, char **);
-extern char __LIB__ __CALLEE__   *strsep_callee(char **, char *);
-extern char __LIB__ __CALLEE__   *strpbrk_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint);
-extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint);
-extern uint __LIB__ __CALLEE__    strlcat_callee(char *, char *, uint);
-extern uint __LIB__ __CALLEE__    strlcpy_callee(char *, char *, uint);
+extern char __LIB__ __CALLEE__   *strcat_callee(char *, char *) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strcmp_callee(char *, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strcpy_callee(char *, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strncat_callee(char *, char *, uint) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strncmp_callee(char *, char *, uint) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strncpy_callee(char *, char *, uint) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strchr_callee(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strchrnul_callee(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strrchr_callee(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strrstrip_callee(char *, char) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strstr_callee(char *, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strrstr_callee(char *, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strtok_callee(char *, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strtok_r_callee(char *, char *, char **) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strsep_callee(char **, char *) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strpbrk_callee(char *, char *) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint) __SMALLCDECL;
+extern uint __LIB__ __CALLEE__    strlcat_callee(char *, char *, uint) __SMALLCDECL;
+extern uint __LIB__ __CALLEE__    strlcpy_callee(char *, char *, uint) __SMALLCDECL;
 
-extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint);
-extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint);
-extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint);
-extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint);
-extern void __LIB__ __CALLEE__   *memrchr_callee(void *, unsigned char, uint);
-extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
-extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint);
-extern void __LIB__ __CALLEE__   *memopi_callee(void *, void *, uint, uint);
-extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
+extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memrchr_callee(void *, unsigned char, uint) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memopi_callee(void *, void *, uint, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint) __SMALLCDECL;
 
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster
@@ -152,19 +152,19 @@ extern int __LIB__ strlen_far(far char *);
 
 #undef strcat
 #define strcat(s1,s2) strcat_far(s1,s2)
-extern far char __LIB__ *strcat_far(far char *, far char *);
+extern far char __LIB__ *strcat_far(far char *, far char *) __SMALLCDECL;
 
 #undef strcpy
 #define strcpy(s1,s2) strcpy_far(s1,s2)
-extern far char __LIB__ *strcpy_far(far char *, far char *);
+extern far char __LIB__ *strcpy_far(far char *, far char *) __SMALLCDECL;
 
 #undef strncat
 #define strncat(s1,s2) strncat_far(s1,s2,n)
-extern far char __LIB__ *strncat_far(far char *, far char *, int);
+extern far char __LIB__ *strncat_far(far char *, far char *, int) __SMALLCDECL;
 
 #undef strncpy
 #define strncpy(s1,s2) strncpy_far(s1,s2,n)
-extern far char __LIB__ *strncpy_far(far char *, far char *, int);
+extern far char __LIB__ *strncpy_far(far char *, far char *, int) __SMALLCDECL;
 
 #define strlwr(s) strlwr_far(s)
 extern far char __LIB__ *strlwr_far(far char *);
@@ -174,11 +174,11 @@ extern far char __LIB__ *strupr_far(far char *);
 
 #undef strchr
 #define strchr(s,c) strchr_far(s1,c)
-extern far char __LIB__ *strchr_far(far unsigned char *, unsigned char);
+extern far char __LIB__ *strchr_far(far unsigned char *, unsigned char) __SMALLCDECL;
 
 #undef strrchr
 #define strrchr(s,c) strrchr_far(s1,c)
-extern far char __LIB__ *strrchr_far(far unsigned char *, unsigned char);
+extern far char __LIB__ *strrchr_far(far unsigned char *, unsigned char) __SMALLCDECL;
 
 #define strdup(s) strdup_far(s)
 extern far char __LIB__ *strdup_far(far char *);
@@ -190,11 +190,11 @@ extern far char __LIB__ *strdup_far(far char *);
  * Okay..some nice BSD-isms now..
  */
 
-extern void __LIB__  *bzero(void *, uint);
-extern int  __LIB__   bcmp(void *, void *, uint);
-extern void __LIB__  *bcopy(void *, void *,uint);
-extern char __LIB__  *index(unsigned char *, unsigned char);
-extern char __LIB__  *rindex(unsigned char *, unsigned char);
+extern void __LIB__  *bzero(void *, uint) __SMALLCDECL;
+extern int  __LIB__   bcmp(void *, void *, uint) __SMALLCDECL;
+extern void __LIB__  *bcopy(void *, void *,uint) __SMALLCDECL;
+extern char __LIB__  *index(unsigned char *, unsigned char) __SMALLCDECL;
+extern char __LIB__  *rindex(unsigned char *, unsigned char) __SMALLCDECL;
 
 #define bzero(s,n)    memset_callee(s,0,n)
 #define bcmp(s1,s2,n) memcmp_callee(s1,s2,n)
@@ -207,11 +207,11 @@ extern char __LIB__  *rindex(unsigned char *, unsigned char);
  * Some more C legacy stuff
  */
 
-extern void __LIB__   *strset(unsigned char *, unsigned char);
-extern void __LIB__   *strnset(unsigned char *, unsigned char, uint);
-extern int  __LIB__   strcmpi(char *, char *);
-extern int  __LIB__   strncmpi(char *, char *, uint);
-extern void __LIB__   *rawmemchr(void *, unsigned char);
+extern void __LIB__   *strset(unsigned char *, unsigned char) __SMALLCDECL;
+extern void __LIB__   *strnset(unsigned char *, unsigned char, uint) __SMALLCDECL;
+extern int  __LIB__   strcmpi(char *, char *) __SMALLCDECL;
+extern int  __LIB__   strncmpi(char *, char *, uint) __SMALLCDECL;
+extern void __LIB__   *rawmemchr(void *, unsigned char) __SMALLCDECL;
 
 #define strset(s,c)           memset_callee(s,c,sizeof(s)-1)
 #define strnset(string,c,n)   memset_callee(string,c,n)
