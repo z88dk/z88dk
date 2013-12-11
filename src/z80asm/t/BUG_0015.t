@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.2 2013-01-20 21:24:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.3 2013-12-11 23:33:55 pauloscustodio Exp $
 # $Log: BUG_0015.t,v $
-# Revision 1.2  2013-01-20 21:24:28  pauloscustodio
+# Revision 1.3  2013-12-11 23:33:55  pauloscustodio
+# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+#
+# Revision 1.2  2013/01/20 21:24:28  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2011/10/07 17:53:05  pauloscustodio
@@ -76,7 +79,7 @@ my $testa_obj = objfile(NAME => 'TESTA',
 				 ['C', 0x0009, 'A2']],
 			SYMBOLS => [['G', 'A', 0x0000, 'A1'],
 				    ['G', 'A', 0x000B, 'A2']],
-			LIBS => ['L1'],
+			LIBS => ['B1','B2','L1'],
 			CODE => "\x3E\x01".
 				"\xCD\x00\x00".
 				"\xCD\x00\x00".
@@ -114,7 +117,7 @@ my $testb_obj = objfile(NAME => 'TESTB',
 				 ['C', 0x0009, 'B2']],
 			SYMBOLS => [['G', 'A', 0x0000, 'B1'],
 				    ['G', 'A', 0x000B, 'B2']],
-			LIBS => ['L1'],
+			LIBS => ['A1','A2','L1'],
 			CODE => "\x06\x01".
 				"\xCD\x00\x00".
 				"\xCD\x00\x00".

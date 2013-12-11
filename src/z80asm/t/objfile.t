@@ -15,9 +15,12 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.3 2013-06-04 21:40:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.4 2013-12-11 23:33:55 pauloscustodio Exp $
 # $Log: objfile.t,v $
-# Revision 1.3  2013-06-04 21:40:21  pauloscustodio
+# Revision 1.4  2013-12-11 23:33:55  pauloscustodio
+# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+#
+# Revision 1.3  2013/06/04 21:40:21  pauloscustodio
 # added test cases
 #
 # Revision 1.2  2013/01/20 21:24:29  pauloscustodio
@@ -168,7 +171,7 @@ t_binary($obj, objfile(NAME => 'test',
 				["C", 5, "extlib"]],
 		       SYMBOLS => [["L", "A", 0, "local"],
 				   ["G", "A", 1, "global"]],
-		       LIBS => ["extlib"],
+		       LIBS => ["extlib","extobj"],
 		       CODE => "\x00".
 		               "\xCD\x00\x00".
 		               "\xCD\x00\x00"));
@@ -207,6 +210,7 @@ t_z80asm_capture(asm2_file(), "", "", 0);
 $obj = read_binfile(obj2_file());
 t_binary($obj, objfile(NAME => 'TEST2',
 				EXPR => [["C", 1, "main"]],
+				LIBS => ["main"],
 				CODE => "\xC3\0\0"));
 write_binfile(obj3_file(), $obj);
 

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.30 2013-11-22 00:21:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.31 2013-12-11 23:33:55 pauloscustodio Exp $
 #
 # Test options
 
@@ -900,7 +900,7 @@ for my $options ('-D', '-D=', '--define', '--define=') {
 
 #------------------------------------------------------------------------------
 # -i, --use-lib, -x, --make-lib
-# test BUG_0002
+# test BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
 #------------------------------------------------------------------------------
 
 unlink_testfiles();
@@ -955,6 +955,60 @@ for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 }
 
 unlink_testfiles($lib);
+
+SKIP: { skip "BUG_0038";
+
+# test BUG_0038: library modules not loaded in sequence
+# obj1 requires libobj7 and obj3;
+# obj2 requires libobj6 and obj3;
+# obj3 requires libobj5 and obj1;
+# libobj5 requires libobj6;
+# libobj6 requires libobj7;
+# libobj7 requires libobj5;
+unlink_testfiles();
+write_file(asm_file(),  "xdef A1 \n xref A3 \n lib A7 \n A1: defb 1,A7,A3");	# A1 at addr 0, len 3
+write_file(asm2_file(), "xdef A2 \n xref A3 \n lib A6 \n A2: defb 2,A6,A3");	# A2 at addr 3, len 3
+write_file(asm3_file(), "xdef A3 \n xref A1 \n lib A5 \n A3: defb 3,A5,A1");	# A3 at addr 6, len 3
+
+write_file(asm5_file(), "xlib A5 \n lib A6 \n A5: defb 5,A6");					# A5 at addr 9, len 2
+write_file(asm6_file(), "xlib A6 \n lib A7 \n A6: defb 6,A7");					# A6 at addr 11, len 2
+write_file(asm7_file(), "xlib A7 \n lib A5 \n A7: defb 7,A5");					# A7 at addr 13, len 2
+
+t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
+ok -f lib5_file();
+t_z80asm_capture("-x".lib6_file()." ".asm6_file(), "", "", 0); 
+ok -f lib6_file();
+t_z80asm_capture("-x".lib7_file()." ".asm7_file(), "", "", 0); 
+ok -f lib7_file();
+
+t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." -i".lib6_file()." -i".lib7_file()." ".
+				 asm_file()." ".asm2_file()." ".asm3_file(), "", "", 0);
+ok -f bin_file();
+t_binary(read_binfile(bin_file()), 
+		pack("C*",
+				1, 13, 6,
+				2, 11, 6,
+				3,  9, 0,
+				5, 11, 
+				6, 13,
+				7,  9,
+			));
+
+};
+
+# test BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+unlink_testfiles();
+
+write_file(asm_file(),  "xref A51 \n defb A51");
+
+write_file(asm5_file(), "xlib A5 \n xdef A51 \n A5: defc A51 = 51");
+
+t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
+ok -f lib5_file();
+
+t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." ".asm_file(), "", "", 0);
+ok -f bin_file();
+t_binary(read_binfile(bin_file()), pack("C*", 51 ));
 
 
 # link objects and libs
@@ -1053,7 +1107,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.30  2013-11-22 00:21:43  pauloscustodio
+# Revision 1.31  2013-12-11 23:33:55  pauloscustodio
+# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+#
+# Revision 1.30  2013/11/22 00:21:43  pauloscustodio
 # Test XREF pulling in a library module by -sdcc
 #
 # Revision 1.29  2013/10/16 00:14:37  pauloscustodio

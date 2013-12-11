@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.62 2013-10-05 08:14:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.63 2013-12-11 23:33:55 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.62  2013-10-05 08:14:43  pauloscustodio
+Revision 1.63  2013-12-11 23:33:55  pauloscustodio
+BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+
+Revision 1.62  2013/10/05 08:14:43  pauloscustodio
 Parse command line options via look-up tables:
 -C, --line-mode
 
@@ -747,8 +750,10 @@ StoreLocalNames( SymbolHash *symtab )
 }
 
 
+/* BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+   Store both LIB and XREF symbols */
 void
-StoreLibReferences( SymbolHash *symtab )
+StoreExternReferences( SymbolHash *symtab )
 {
     size_t b;
 
@@ -760,7 +765,7 @@ StoreLibReferences( SymbolHash *symtab )
 	{
 		sym = (Symbol *)iter->value;
 
-		if ( ( sym->type & SYMXREF ) && ( sym->type & SYMDEF ) && ( sym->type & SYMTOUCHED ) )
+		if ( ( sym->type & SYMXREF ) && ( sym->type & SYMTOUCHED ) )
 		{
 			b = strlen( sym->name );
 			xfput_u8( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
@@ -938,7 +943,7 @@ Z80pass2( void )
     fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
 
 	/* Store library reference name declarations to relocatable file */
-	StoreLibReferences( get_global_tab() );
+	StoreExternReferences( get_global_tab() );
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );
