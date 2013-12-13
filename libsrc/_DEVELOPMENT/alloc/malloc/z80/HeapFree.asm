@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void free(void *p)
+; void HeapFree(void *p)
 ;
 ; Return a previously allocated block to the heap for reuse.
 ;
@@ -11,23 +11,25 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
+XLIB HeapFree
+XDEF asm_HeapFree, free, asm_free
 
-XLIB free
-XDEF asm_free
+LIB __0_malloc_block_free
 
+HeapFree:
+asm_HeapFree:
 free:
 asm_free:
 
    ; enter : hl = void *p
    ;
-   ; exit  : hl = 0
-   ;         carry set if p does not belong to heap
+   ; exit  : none
    ;
    ; uses  : af, bc, de, hl
 
-   ld c,l
-   ld b,h
-   
-   ld hl,(__heap)
-   jp asm_HeapFree
+   ld a,h
+   or l
+   ret z                       ; if p == NULL
+
+   jp __0_malloc_block_free
+

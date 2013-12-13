@@ -16,7 +16,7 @@ XLIB HeapAlloc_callee
 XDEF asm_HeapAlloc
 
 LIB error_enomem_zc
-LIB __malloc_region_info, __malloc_first_fit, __malloc_block_alloc
+LIB __malloc_region_info, __malloc_first_fit, __malloc_block_allocate
 
 HeapAlloc_callee:
 
@@ -46,7 +46,7 @@ asm_HeapAlloc:
    or l
    ret z                       ; return 0 and no error if size == 0
    
-   ld bc,4                     ; header size
+   ld bc,6                     ; header size
    add hl,bc                   ; add space for header
    jp c, error_enomem_zc
    
@@ -98,4 +98,4 @@ found_memory:
    ; stack = & next_region
    
    pop de
-   jp __malloc_block_alloc
+   jp __malloc_block_allocate  ; allocate into block

@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
+INCLUDE "../../../crt_vars.inc"
 
 XLIB calloc_callee
 XDEF asm_calloc

@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
+INCLUDE "../../../crt_vars.inc"
 
 XLIB malloc
 XDEF asm_malloc
