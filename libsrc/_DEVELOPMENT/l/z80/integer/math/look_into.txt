@@ -1,3 +1,4 @@
 utoa
 ultoa
 __strtoul
+HeapCalloc
