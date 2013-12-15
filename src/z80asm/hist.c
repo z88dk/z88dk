@@ -20,9 +20,16 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.54 2013-12-15 13:18:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.55 2013-12-15 23:31:04 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.54  2013-12-15 13:18:33  pauloscustodio
+/* Revision 1.55  2013-12-15 23:31:04  pauloscustodio
+/* Replace code-generation for init() functions by macros in init.h
+/* to help define init() and fini() functions per module.
+/* Code generation complicates maintenance, as all the modules with init()
+/* functions are coupled together, and it may not be clear how the init()
+/* module appears.
+/*
+/* Revision 1.54  2013/12/15 13:18:33  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -1465,6 +1472,15 @@ Based on 1.0.31
 	- Move library modules independent from z80asm to the lib subdirectory.
 	- Move memory allocation routines to lib/xmalloc, instead of glib, 
 	  introduce memory leak report on exit and memory fence check.
+
+-------------------------------------------------------------------------------
+xx.xx.201x [2.1.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Replace code-generation for init() functions by macros in init.h 
+	  to help define init() and fini() functions per module.
+	  Code generation complicates maintenance, as all the modules with init() 
+	  functions are coupled together, and it may not be clear how the init() 
+	  module appears.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
