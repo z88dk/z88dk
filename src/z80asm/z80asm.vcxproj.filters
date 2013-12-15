@@ -13,6 +13,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Header Files\lib">
+      <UniqueIdentifier>{132dd26c-6c8e-43b4-83f1-b7372e44576c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{11f0b633-9337-4155-98ce-5562bced38d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -25,9 +31,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="codearea.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="die.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dynstr.h">
@@ -52,9 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="safestr.h">
@@ -135,6 +135,15 @@
     <ClInclude Include="options_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\die.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\queue.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\xmalloc.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -171,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="codearea.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="die.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dynstr.c">
@@ -244,6 +250,12 @@
     </ClCompile>
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\die.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\xmalloc.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
