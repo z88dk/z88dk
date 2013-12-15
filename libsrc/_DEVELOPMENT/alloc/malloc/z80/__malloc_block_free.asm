@@ -13,14 +13,16 @@ __malloc_block_free:
    ; uses  : af, bc, de, hl
 
    ld de,6
-   add hl,de                   ; hl = void *p
+   add hl,de
 
 __0_malloc_block_free:
+
+   ; hl = void *p
 
    dec hl
    ld d,(hl)
    dec hl
-   ld e,(hl)                   ; de = block_p->prev
+   ld e,(hl)                   ; de = block_p->prev = & block_prev
    dec hl                      ; hl = & block_p->committed + 1b
 
    ld a,d
@@ -31,26 +33,34 @@ __0_malloc_block_free:
    dec hl
    dec hl                      ; hl = & block_p
    
-   ld c,(hl)
+   ; hl = & block_p
+   ; de = & block_prev
+   
    ldi
    ld a,(hl)
    ld (de),a                   ; block_prev->next = block_p->next
-   
    dec de                      ; de = & block_prev
-   inc c
-   ld l,c
-   ld h,a                      ; hl = block_p->next
    
-   or c
-   ret z                       ; if block_p->next == 0
+   dec hl
+   ld l,(hl)
+   ld h,a                      ; hl = block_p->next = & block_next
    
-   ld bc,4
-   add hl,bc                   ; hl = & block_next->prev
-
+   ld a,(hl)
+   inc hl
+   or (hl)
+   ret z                       ; block_next is a region terminator
+   
+   inc hl
+   inc hl
+   inc hl
+   
+   ; hl = & block_next->prev
+   ; de = & block_prev
+   
    ld (hl),e
    inc hl
    ld (hl),d                   ; block_next->prev = & block_prev
-
+   
    ret
 
 first_block:

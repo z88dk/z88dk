@@ -9,7 +9,6 @@ __malloc_first_fit:
    ;
    ; enter : bc = request size
    ;         hl = & first block in region
-   ;         carry reset
    ;
    ; exit  : success
    ;
@@ -25,6 +24,8 @@ __malloc_first_fit:
 block_loop:
 
    call __malloc_block_size    ; hl = block size, de = & block
+   ret c                       ; if no more blocks
+   
    sbc hl,bc                   ; can satisfy request?
    
    ex de,hl                    ; hl = current block
@@ -34,9 +35,5 @@ block_loop:
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = & next_block
-   
-   or h
-   jp nz, block_loop
-   
-   scf
-   ret
+
+   jp block_loop

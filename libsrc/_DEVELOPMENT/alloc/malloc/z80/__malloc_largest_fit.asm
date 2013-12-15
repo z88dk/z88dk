@@ -33,7 +33,7 @@ region_loop:
    pop hl
    ex de,hl                    ; hl = & next_region, de = & region
    
-   jr c, region_loop           ; region is too small to have bigger block
+   jr c, region_loop           ; if region is too small to hold a bigger block
    
    push hl                     ; save & region_next
 

@@ -41,7 +41,8 @@ asm_galloc:
    ;
    ;         fail
    ;
-   ;           carry set, errno = enomem
+   ;           carry set, errno = enomem / einval
+   ;           hl = 0
    ;
    ; uses  : af, bc, de, hl
 

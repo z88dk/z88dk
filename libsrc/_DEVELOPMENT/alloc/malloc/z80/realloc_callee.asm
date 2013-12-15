@@ -52,6 +52,7 @@ asm_realloc:
    ;         fail
    ;
    ;           carry set, errno = enomem
+   ;           hl = 0
    ;
    ; uses  : af, bc, de, hl
 

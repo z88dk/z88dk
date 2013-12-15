@@ -26,8 +26,8 @@
 XLIB HeapRealloc_callee
 XDEF asm_HeapRealloc
 
-LIB error_enomem_zc, asm_memmove
-LIB __0_malloc_block_free, __malloc_largest_fit, __malloc_block_allocate
+LIB error_enomem_zc, asm_memmove, __0_malloc_block_free
+LIB __malloc_largest_fit, __malloc_block_allocate, malloc_block_allocate_fixed
 
 HeapRealloc_callee:
 
@@ -50,6 +50,7 @@ asm_HeapRealloc:
    ;         fail
    ;
    ;           carry set, errno = enomem
+   ;           hl = 0
    ;
    ; uses  : af, bc, de, hl
    
@@ -79,12 +80,12 @@ valid_p:
    
    ld d,(hl)
    dec hl                      ; hl = & block_p
-   ld e,(hl)                   ; de = block_p->next
+   ld e,(hl)                   ; de = block_p->next = & block_next
    
    ex de,hl
    
    or a
-   sbc hl,de                   ; hl = block_p->next - block_p
+   sbc hl,de                   ; hl = & block_next - block_p
    sbc hl,bc                   ; enough space for request?
    
    ex de,hl
@@ -221,52 +222,32 @@ realloc_fail:
    ; stack = p, block_p->committed, & block_largest
 
    ; we are left with the sticky situation of restoring block_p in the heap
-   ; free(p) may have changed block_p->committed but other parts of the header ok
    
    pop bc
-   pop bc                      ; bc = block_p->committed
+   pop bc                      ; bc = block_p->committed = "request size"
    pop hl                      ; hl = void *p
    
    dec hl
    ld d,(hl)
    dec hl
-   ld e,(hl)                   ; de = block_p->prev
-   
+   ld e,(hl)                   ; de = block_p->prev = & block_prev = "& block"
+
    dec hl
-   ld (hl),b
    dec hl
-   ld (hl),c                   ; block_p->committed = block_p->committed
+   dec hl
+   dec hl                      ; hl = & block_p = "& new_block"
    
    ld a,d
    or e
-   jp z, error_enomem_zc       ; if no block_prev, we are done
-   
-   dec hl
-   dec hl
-   
-   ex de,hl
-   
-   ; hl = & block_prev
-   ; de = & block_p
+   jr nz, rejoin
 
-   ld c,(hl)
-   ld (hl),e
-   inc hl
-   ld b,(hl)                   ; bc = block_prev->next = & block_next
-   ld (hl),d                   ; block_prev->next = block_p
+   ; no previous block -- block is first in region
    
-   ; de = & block_p
-   ; bc = & block_next
-   
-   ld a,b   
-   or c
-   jp z, error_enomem_zc      ; if there is no block_next
-   
-   ld hl,4
-   add hl,bc                  ; hl = & block_next->prev
-   
-   ld (hl),e
-   inc hl
-   ld (hl),d                  ; block_next->prev = & block_p
-   
+   ld e,l
+   ld d,h
+
+rejoin:
+
+   ex de,hl
+   call malloc_block_allocate_fixed
    jp error_enomem_zc

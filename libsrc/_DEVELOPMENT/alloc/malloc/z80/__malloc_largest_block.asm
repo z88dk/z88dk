@@ -23,8 +23,8 @@ block_loop:
    ; bc = block_largest size
    ; stack = & block_largest
 
-   or a
    call __malloc_block_size    ; hl = block size, de = & block
+   jr c, done                  ; if no more blocks
 
    sbc hl,bc
    jr c, not_bigger
@@ -47,9 +47,12 @@ not_bigger:
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = & block_next
+
+   jp block_loop
+
+done:
+
+   pop hl                      ; hl = & block_largest
    
-   or h
-   jp nz, block_loop
-   
-   pop hl
+   or a
    ret

@@ -16,7 +16,7 @@
 XLIB HeapGalloc_callee
 XDEF asm_HeapGalloc
 
-LIB error_enomem_zc
+LIB error_einval_zc
 
 HeapGalloc_callee:
 
@@ -38,7 +38,8 @@ asm_HeapGalloc:
    ;
    ;         fail
    ;
-   ;           carry set, errno = enomem
+   ;           carry set, errno = enomem / einval
+   ;           hl = 0
    ;
    ; uses  : af, bc, de, hl
 
@@ -70,4 +71,4 @@ asm_HeapGalloc:
    
    jp nc, asm_HeapRealloc
    
-   jp error_enomem_zc          ; request size bad
+   jp error_einval_zc          ; request size bad

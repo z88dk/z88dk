@@ -29,7 +29,7 @@ asm_HeapCalloc:
 
    ; enter : hl = nmemb
    ;         de = size
-   ;         bc = & heap (ptr to region)
+   ;         bc = heap (ptr to region)
    ;
    ; exit  : success
    ;
