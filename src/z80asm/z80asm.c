@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.117 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.118 2013-12-15 23:05:54 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.117  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.118  2013-12-15 23:05:54  pauloscustodio
+/* Remove code-generation for init() functions, do a plain call from main().
+/* Complicates maintenance, as all the modules with init() functions
+/* are coupled together, and it may not be clear how the init() module
+/* appears.
+/*
+/* Revision 1.117  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -667,13 +673,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "errors.h"
 #include "file.h"
 #include "hist.h"
-#include "init.h"
 #include "legacy.h"
 #include "listfile.h"
 #include "mapfile.h"
 #include "objfile.h"
 #include "options.h"
 #include "safestr.h"
+#include "scan.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
@@ -1309,6 +1315,17 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
+	/* init modules */
+	init_strpool();
+	atexit(fini_strpool);
+	init_errors();
+	atexit(fini_errors);
+	init_options();
+	init_scan();
+	atexit(fini_scan);
+	init_codearea();
+	atexit(fini_codearea);
+
 	/* start try..catch with finally to cleanup any allocated memory */
     TRY
     {

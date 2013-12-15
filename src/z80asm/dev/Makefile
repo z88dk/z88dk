@@ -14,27 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.2 2013-12-15 13:18:35 pauloscustodio Exp $
-
-INIT_IN := \
-	lib\xmalloc.h	\
-	strpool.h		\
-	errors.h		\
-	file.h			\
-	options.h		\
-	scan.h			\
-					\
-	codearea.h		\
-
-INIT_OUT := init
-
-#------------------------------------------------------------------------------
-# init
-#------------------------------------------------------------------------------
-all : $(INIT_OUT).c $(INIT_OUT).h
-
-$(INIT_OUT).c $(INIT_OUT).h : $(INIT_IN) dev/mkinit.pl dev/Makefile
-	perl dev/mkinit.pl -o $(INIT_OUT) $(INIT_IN)
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.3 2013-12-15 23:05:54 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # ragel
@@ -63,7 +43,13 @@ scan.c : scan.rl dev/Makefile
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.2  2013-12-15 13:18:35  pauloscustodio
+# Revision 1.3  2013-12-15 23:05:54  pauloscustodio
+# Remove code-generation for init() functions, do a plain call from main().
+# Complicates maintenance, as all the modules with init() functions
+# are coupled together, and it may not be clear how the init() module
+# appears.
+#
+# Revision 1.2  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #
