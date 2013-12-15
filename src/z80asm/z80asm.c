@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.115 2013-10-05 13:43:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.116 2013-12-15 12:10:06 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.115  2013-10-05 13:43:05  pauloscustodio
+/* Revision 1.116  2013-12-15 12:10:06  pauloscustodio
+/* Fix memory leak on recursive file include fatal error
+/*
+/* Revision 1.115  2013/10/05 13:43:05  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -i, --use-lib
 /* -x, --make-lib
@@ -1264,10 +1267,14 @@ ReleaseExprns( struct expression *express )
 void
 ReleaseFile( struct sourcefile *srcfile )
 {
+	if ( srcfile == NULL )
+		return;
+
+	if ( srcfile->prevsourcefile != NULL )
+		ReleaseFile( srcfile->prevsourcefile );
+
     if ( srcfile->usedsourcefile != NULL )
-    {
         ReleaseOwnedFile( srcfile->usedsourcefile );
-    }
 
     g_free0( srcfile->fname );   /* Release allocated area for filename */
     g_free0( srcfile );          /* Release file information record for this file */
