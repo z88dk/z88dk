@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.3 2013-12-15 23:05:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.4 2013-12-15 23:38:49 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # ragel
@@ -23,7 +23,7 @@ all : scan.c
 
 scan.c : scan.rl dev/Makefile
 	ragel -G2 scan.rl
-	perl -i.bak -pe "s/^#line/\/\/#line/" scan.c
+	perl -i.bak -pe "s/^#line/\/\/#line/; s/\x24Header/:Header/; s/\x24Log/:Log/;" scan.c
 	$(RM) scan.c.bak
 
 #------------------------------------------------------------------------------
@@ -43,7 +43,10 @@ scan.c : scan.rl dev/Makefile
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.3  2013-12-15 23:05:54  pauloscustodio
+# Revision 1.4  2013-12-15 23:38:49  pauloscustodio
+# Remove CVS tags from generated file
+#
+# Revision 1.3  2013/12/15 23:05:54  pauloscustodio
 # Remove code-generation for init() functions, do a plain call from main().
 # Complicates maintenance, as all the modules with init() functions
 # are coupled together, and it may not be clear how the init() module
