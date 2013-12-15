@@ -26,7 +26,7 @@
 # extern void finiXXXX();			--> generates a call to atexit(finiXXXX) from main() before
 #	 									user_main() starts
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/mkinit.pl,v 1.1 2013-11-11 23:47:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/mkinit.pl,v 1.2 2013-12-15 12:44:51 pauloscustodio Exp $
 
 use Modern::Perl;
 use Getopt::Std;
@@ -35,6 +35,7 @@ use File::Slurp;
 use List::Uniq 'uniq';
 use Data::Dump 'dump';
 
+my @INCLUDE; my %INCLUDE;
 my @INIT;
 
 our $opt_o;		# output file name
@@ -50,6 +51,8 @@ output($opt_o // "init");
 #------------------------------------------------------------------------------
 sub parse {
 	while (<>) {
+		push @INCLUDE, basename($ARGV) unless $INCLUDE{ basename($ARGV) }++;
+		
 		/ ^ \s* extern \s+ void \s+ ( (?:init|fini) \w+) \s* \( \s* (?:void)? \s* \) \s* ; /x
 			and push @INIT, [$ARGV, $1];
 	}
@@ -70,7 +73,7 @@ END_H
 		join("\n", 
 			map {"#include \"$_\""} 
 			uniq
-			map {$_->[0]} @INIT);
+			@INCLUDE);
 	my $init = 
 		join("\n", 
 			map { /^init/ ? "\t$_();" : "\tatexit($_);"} 
@@ -99,7 +102,10 @@ exit 0;
 
 __END__
 # $Log: mkinit.pl,v $
-# Revision 1.1  2013-11-11 23:47:05  pauloscustodio
+# Revision 1.2  2013-12-15 12:44:51  pauloscustodio
+# Include all referenced modules in init.c, even if they declared no init functions.
+#
+# Revision 1.1  2013/11/11 23:47:05  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
