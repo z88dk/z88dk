@@ -30,11 +30,11 @@ CLASS(Obj)
 	char *string;
 END_CLASS;
 
-void Obj_init (Obj *self) 	{ self->string = g_malloc0_n(100, sizeof(char)); }
+void Obj_init (Obj *self) 	{ self->string = xnew_n(char, 100); }
 void Obj_copy (Obj *self, Obj *other)
-							{ self->string = g_malloc0_n(100, sizeof(char));
+							{ self->string = xnew_n(char, 100);
 							  strcpy( self->string, other->string); }
-void Obj_fini (Obj *self)	{ g_free0(self->string); }
+void Obj_fini (Obj *self)	{ xfree(self->string); }
 void Obj_clear(Obj *self)	{ self->string[0] = 0; }
 
 DEF_CLASS(Obj);
@@ -237,20 +237,7 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |         12 |         12 |          0 |          0 |         +0
-        60 |          2 |          2 |          0 |          0 |         +0
-       100 |         12 |         12 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=1724, zero-initialized=1704 (98.84%), freed=1724 (100.00%), remaining=0
-OUT
+t_run_module([], '', <<'ERR', 0);
 start
 ring = ""
   #                     
@@ -755,17 +742,21 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.8 2013-09-22 21:06:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.9 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.8  2013-09-22 21:06:00  pauloscustodio
+# Revision 1.9  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.8  2013/09/22 21:06:00  pauloscustodio
 # replace g_free by g_free0
 #
 # Revision 1.7  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.6  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with g_malloc0 et al.
+# Replaced xmalloc et al with glib functions
 #
 # Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -775,11 +766,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.4  2013/09/01 18:08:29  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.3  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.2  2013/05/12 19:20:34  pauloscustodio
 # warnings

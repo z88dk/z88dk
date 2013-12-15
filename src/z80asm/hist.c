@@ -20,9 +20,13 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.53 2013-11-26 22:59:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.54 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.53  2013-11-26 22:59:08  pauloscustodio
+/* Revision 1.54  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.53  2013/11/26 22:59:08  pauloscustodio
 /* Version 2.0.0: new C-like expression syntax, incompatible object file format with previous version
 /*
 /* Revision 1.52  2013/11/26 22:46:03  pauloscustodio
@@ -32,7 +36,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Version 1.2.9
 /*
 /* Revision 1.50  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.49  2013/09/01 00:18:28  pauloscustodio
@@ -987,7 +991,7 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
     CH_0007 : Garbage collector
     - Added automatic garbage collection on exit and simple fence mechanism
-      to detect buffer underflow and overflow, to memalloc functions.
+      to detect buffer underflow and overflow, to xmalloc functions.
       No longer needed to call init_malloc().
       No longer need to try/catch during creation of memory structures to
       free partially created data - all not freed data is freed atexit().
@@ -1392,18 +1396,18 @@ Based on 1.0.31
 12.09.2013 [1.2.8] (pauloscustodio)
 -------------------------------------------------------------------------------
 	- Included GLIB in the Makefile options. Setup GLib memory allocation 
-	  functions to use memalloc functions. Unified glib compilation options 
+	  functions to use xmalloc functions. Unified glib compilation options 
 	  between MinGW and Linux.
-	- Replaced xmalloc et al with g_malloc0 et al.
+	- Replaced xmalloc et al with glib functions
 	- Replaced e4c exception mechanism by a much simpler one based on a few
 	  macros. The former did not allow an exit(1) to be called within a
 	  try-catch block.
 	- Created a code-generation mechanism for automatic execution of initialize 
 	  code before the main() function starts, and methods for struct malloc
 	  and free calling constructors and destructors.
-	- Force memalloc to be the first include, to be able to use MSVC 
+	- Force xmalloc to be the first include, to be able to use MSVC 
 	  memory debug tools
-	- Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+	- Removed xmalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 	  Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 	- Replaced strpool code by GLib String Chunks.
 	- New error module with one error function per error, no need for the error
@@ -1412,7 +1416,7 @@ Based on 1.0.31
 	  error initialization from main(). Moved all error-testing scripts to 
 	  one file errors.t.
 	- Integrate codearea in init() mechanism.
-	- Create g_free0() macro that NULLs the pointer after free, required
+	- Create xfree() macro that NULLs the pointer after free, required
 	  by z80asm to find out if a pointer was already freed.
 
 -------------------------------------------------------------------------------
@@ -1449,6 +1453,20 @@ Based on 1.0.31
 	  with old expression syntax
 
 -------------------------------------------------------------------------------
+15.12.2013 [2.1.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+		A library must define one XLIB symbol and zero or more XDEF symbols.
+		For the library to be pulled in to the linked binary, the XLIB
+		symbol needs to be referenced by LIB and used in some expression.
+		If one of the XDEF symbols is referenced by XREF and used in an 
+		expression, the library is not pulled in and the symbol is not found.
+
+	- Move library modules independent from z80asm to the lib subdirectory.
+	- Move memory allocation routines to lib/xmalloc, instead of glib, 
+	  introduce memory leak report on exit and memory fence check.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1457,6 +1475,20 @@ FUTURE CHANGES - require change of the object file format
         - See example from zx48.asm ROM image in t/BUG_0011.t test file.
         - Need to change object file format to correct - need patchptr and
           address of instruction start.
+
+	BUG_0038: library modules not loaded in sequence
+		The library modules loaded to the linked binary file should respect 
+		the order given on the command line.
+		"z80asm -ilib1 -ilib2 obj1.o obj2.o"
+		should load obj1, obj2, objects from lib1, objects from lib2 in this 
+		order.
+		The load order is today: obj1, obj2, and then all library modules 
+		required by obj1, and then library modules required by obj2, 
+		independently of the -i sequence.
+		This poses problems when trying to keep all data at the end of the 
+		binary code by defining a library with all the data and linking it
+		last in the command line - the -i sequence is not respected and the
+		data appears in the middle of other library modules.
 
 	CH_0019 : Replaced tokenizer with Flex based scanner
 		Simplified code by using flex instead of special-built scanner and 
@@ -1467,11 +1499,11 @@ FUTURE CHANGES - require change of the object file format
 
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "hist.h"
 
-#define VERSION     "2.0.0"
+#define VERSION     "2.1.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

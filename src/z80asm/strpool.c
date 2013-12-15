@@ -19,7 +19,7 @@ Strings with the same contents are reused.
 Changed to use GLib String Chunks
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "strpool.h"
 #include "types.h"
@@ -55,9 +55,13 @@ char *strpool_add( char *string )
 
 
 /* */
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.8 2013-09-08 00:36:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.9 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.8  2013-09-08 00:36:42  pauloscustodio
+/* Revision 1.9  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.8  2013/09/08 00:36:42  pauloscustodio
 /* strpool_add() accepts NULL
 /*
 /* Revision 1.7  2013/09/01 16:51:26  pauloscustodio

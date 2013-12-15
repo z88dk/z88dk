@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.38 2013-10-03 23:48:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.39 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.38  2013-10-03 23:48:31  pauloscustodio
+Revision 1.39  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.38  2013/10/03 23:48:31  pauloscustodio
 Parse command line options via look-up tables:
 -r, --origin=ORG_HEX
 
@@ -25,7 +29,7 @@ Parse command line options via look-up tables:
 --help, --verbose
 
 Revision 1.36  2013/09/01 11:59:05  pauloscustodio
-Force memalloc to be the first include, to be able to use MSVC memory debug tools
+Force xmalloc to be the first include, to be able to use MSVC memory debug tools
 
 Revision 1.35  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
@@ -181,7 +185,7 @@ $History: Z80ASM.C $
 #ifndef Z80ASM_H
 #define Z80ASM_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "config.h"
 #include "types.h"

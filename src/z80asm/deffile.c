@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.4 2013-10-04 23:09:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.5 2013-12-15 13:18:33 pauloscustodio Exp $
 $Log: deffile.c,v $
-Revision 1.4  2013-10-04 23:09:24  pauloscustodio
+Revision 1.5  2013-12-15 13:18:33  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.4  2013/10/04 23:09:24  pauloscustodio
 Parse command line options via look-up tables:
 -R, --relocatable
 --RCMX000
@@ -36,7 +40,7 @@ Move deffile writing to deffile.c, remove global variable deffile
 
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "deffile.h"
 #include "file.h"

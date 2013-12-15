@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.59 2013-10-05 10:54:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.60 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.59  2013-10-05 10:54:35  pauloscustodio
+ * Revision 1.60  2013-12-15 13:18:33  pauloscustodio
+ * Move memory allocation routines to lib/xmalloc, instead of glib,
+ * introduce memory leak report on exit and memory fence check.
+ *
+ * Revision 1.59  2013/10/05 10:54:35  pauloscustodio
  * Parse command line options via look-up tables:
  * -I, --inc-path
  * -L, --lib-path
@@ -42,7 +46,7 @@ Copyright (C) Paulo Custodio, 2011-2013
  * Fix nested comment problem with clang
  *
  * Revision 1.53  2013/09/08 08:29:21  pauloscustodio
- * Replaced xmalloc et al with g_malloc0 et al.
+ * Replaced xmalloc et al with glib functions
  *
  * Revision 1.52  2013/09/08 00:43:58  pauloscustodio
  * New error module with one error function per error, no need for the error
@@ -344,7 +348,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Improvements on defm() and Fetchfilename(): */
 /* fgetc() logic now handled better according to EOF events. */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "xmalloc.h"   /* before any other include to enable memory leak detection */
 
 #include "codearea.h"
 #include "config.h"
@@ -1287,7 +1291,7 @@ DeclModuleName( void )
     {
         if ( sym == name )
         {
-            CURRENTMODULE->mname = g_strdup( ident );
+            CURRENTMODULE->mname = xstrdup( ident );
         }
         else
         {

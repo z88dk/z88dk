@@ -15,10 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.10 2013-09-08 00:43:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.11 2013-12-15 13:18:34 pauloscustodio Exp $
 
 $Log: objfile.c,v $
-Revision 1.10  2013-09-08 00:43:59  pauloscustodio
+Revision 1.11  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.10  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -54,7 +58,7 @@ Revision 1.6  2013/05/12 19:46:35  pauloscustodio
 New module for object file handling
 
 Revision 1.5  2013/03/30 00:02:22  pauloscustodio
-include memalloc.h before any other include
+include xmalloc.h before any other include
 
 Revision 1.4  2013/01/20 21:24:28  pauloscustodio
 Updated copyright year to 2013
@@ -81,7 +85,7 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
 
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "errors.h"

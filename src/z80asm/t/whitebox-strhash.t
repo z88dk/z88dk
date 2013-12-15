@@ -19,7 +19,6 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-# test memalloc
 my $objs = "strhash.o class.o";
 
 t_compile_module(<<'END_INIT', <<'END', $objs);
@@ -301,25 +300,7 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          4 |          4 |          0 |          0 |         +0
-        40 |         16 |         16 |          0 |          0 |         +0
-        44 |          6 |          6 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          6 |          6 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=6248, zero-initialized=5204 (83.29%), freed=4476 (71.64%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 0);
 init
 ERR
 
@@ -329,11 +310,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.14 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.15 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.14  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.15  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.14  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.13  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -343,11 +328,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.12  2013/09/01 17:10:49  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.11  2013/09/01 11:52:56  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.10  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few

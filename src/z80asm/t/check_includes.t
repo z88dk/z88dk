@@ -13,9 +13,9 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.1 2013-09-01 11:59:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.2 2013-12-15 13:18:35 pauloscustodio Exp $
 #
-# Check that memalloc.h is included before any other include
+# Check that xmalloc.h is included before any other include
 
 use Modern::Perl;
 use File::Slurp;
@@ -34,14 +34,14 @@ done_testing;
 sub check_file {
 	my($file) = @_;
 	
-	return if $file eq "memalloc.h";
+	return if $file eq "xmalloc.h";
 	
 	open(my $fh, "<", $file) or die "Open $file: $!\n";
 	$. = 0;
 	while (<$fh>) {
 		if (/^\s*\#\s*include\s*[<\"]([\w\\\/\.]+)/) {
-			if ($1 ne 'memalloc.h') {
-				ok 0, "File $file:$. includes $1 before memalloc.h";
+			if ($1 ne 'xmalloc.h') {
+				ok 0, "File $file:$. includes $1 before xmalloc.h";
 			}
 			return;
 		}
@@ -51,6 +51,10 @@ sub check_file {
 
 __END__
 # $Log: check_includes.t,v $
-# Revision 1.1  2013-09-01 11:59:05  pauloscustodio
-# Force memalloc to be the first include, to be able to use MSVC memory debug tools
+# Revision 1.2  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.1  2013/09/01 11:59:05  pauloscustodio
+# Force xmalloc to be the first include, to be able to use MSVC memory debug tools
 #

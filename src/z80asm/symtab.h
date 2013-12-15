@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.9 2013-06-16 22:25:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.10 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.9  2013-06-16 22:25:39  pauloscustodio
+Revision 1.10  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.9  2013/06/16 22:25:39  pauloscustodio
 New remove_all_{local,static,global}_syms( void ) functions
 to encapsulate calls to get_global_tab().
 
@@ -60,7 +64,7 @@ Move symbol to sym.c, rename to Symbol
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "classhash.h"
 #include "sym.h"

@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.16 2013-09-24 00:05:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.17 2013-12-15 13:18:34 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "memalloc.h"				/* before any other include */
+#include "xmalloc.h"				/* before any other include */
 
 #include <glib.h>
 
@@ -60,7 +60,11 @@ extern char *strtolower( char *string );
 
 /* */
 /* $Log: strutil.h,v $
-/* Revision 1.16  2013-09-24 00:05:36  pauloscustodio
+/* Revision 1.17  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.16  2013/09/24 00:05:36  pauloscustodio
 /* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 /* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 /* Removed normalize_eol.

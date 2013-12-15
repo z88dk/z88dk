@@ -231,47 +231,7 @@ END
 
 write_file(asm4_file(), "\"Very long number token\" " . ("0" x (32*1024)) . "12345\n" );
 
-t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], <<'OUT', <<'ERR', 0); 
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          5 |         20 |         15 |         +0
-         8 |          0 |          0 |         12 |         12 |         +0
-         9 |          0 |         18 |         18 |          0 |         +0
-        12 |         42 |          0 |          0 |         42 |         +0
-        16 |          0 |          2 |         14 |         12 |         +0
-        18 |          0 |         18 |         18 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        22 |          4 |          0 |          0 |          4 |         +0
-        23 |          0 |          4 |          4 |          0 |         +0
-        24 |         42 |         42 |         24 |         24 |         +0
-        31 |          8 |          0 |          0 |          8 |         +0
-        32 |          1 |          9 |         21 |         13 |         +0
-        35 |          0 |          6 |          6 |          0 |         +0
-        36 |          2 |          2 |          0 |          0 |         +0
-        40 |          1 |          1 |          0 |          0 |         +0
-        44 |         55 |         13 |          4 |         46 |         +0
-        48 |          0 |          0 |          6 |          6 |         +0
-        62 |          0 |          0 |          8 |          8 |         +0
-        64 |          0 |          0 |         12 |         12 |         +0
-        76 |         18 |         18 |          0 |          0 |         +0
-        88 |          0 |         42 |         42 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       128 |          0 |          4 |         12 |          8 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          0 |          8 |          8 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
-       512 |          0 |          4 |          9 |          5 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          4 |          4 |         +0
-      2048 |          0 |          0 |          4 |          4 |         +0
-   >  4096 |          0 |          5 |         21 |         16 |        ***
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=610856, zero-initialized=3808 (0.62%), freed=609084 (99.71%), remaining=1772
-OUT
+t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], '', <<'ERR', 0); 
 Scan file "test1.asm" by lines (0)
     0 t_end       , value     0, ""
     0 t_end       , value     0, ""
@@ -1042,43 +1002,7 @@ t_compile_module($init, <<'END', $objs);
 	}
 END
 
-t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], <<'OUT', <<'ERR', 1); 
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          3 |          7 |          4 |         +0
-         8 |          0 |          1 |          4 |          3 |         +0
-        12 |          2 |          0 |          0 |          2 |         +0
-        16 |          0 |          0 |          3 |          3 |         +0
-        18 |          0 |          1 |          1 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        21 |          1 |          0 |          0 |          1 |         +0
-        24 |          3 |          3 |          1 |          1 |         +0
-        32 |          1 |          2 |          4 |          3 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
-        40 |          3 |          3 |          0 |          0 |         +0
-        42 |          0 |          0 |          1 |          1 |         +0
-        44 |          4 |          2 |          1 |          3 |         +0
-        64 |          0 |          1 |          3 |          2 |         +0
-        76 |          6 |          6 |          0 |          0 |         +0
-        84 |          0 |          0 |          1 |          1 |         +0
-        88 |          0 |          3 |          3 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       128 |          0 |          0 |          2 |          2 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          0 |          2 |          2 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
-       512 |          0 |          1 |          2 |          1 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          1 |          1 |         +0
-      2048 |          0 |          0 |          1 |          1 |         +0
-   >  4096 |          0 |          1 |          5 |          4 |        ***
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=136977, zero-initialized=2940 (2.15%), freed=135205 (98.71%), remaining=1772
-OUT
+t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], '', <<'ERR', 1); 
 Scan file "test1.asm"
     0 t_end       , value     0, ""
     0 t_end       , value     0, ""
@@ -1153,34 +1077,7 @@ t_compile_module($init, <<'END', $objs);
 	
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          6 |          8 |          2 |         +0
-         8 |          0 |         27 |         28 |          1 |         +0
-        12 |         81 |          0 |          0 |         81 |         +0
-        16 |          0 |          2 |          2 |          0 |         +0
-        18 |          0 |         27 |         27 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |         81 |        108 |         54 |         27 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
-        40 |          7 |          7 |          0 |          0 |         +0
-        44 |         82 |          1 |          0 |         81 |         +0
-        76 |          7 |          7 |          0 |          0 |         +0
-        88 |          0 |         81 |         81 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=19898, zero-initialized=3176 (15.96%), freed=18126 (91.09%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 0);
 Scan test1.asm
 Warning at file 'test1.asm' line 1: option '' is deprecated
 "A<0A>"
@@ -1244,34 +1141,7 @@ Warning at file 'test1.asm' line 5: option '' is deprecated
 "E<0A>"
 ERR
 
-t_run_module(['-l'], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          6 |          8 |          2 |         +0
-         8 |          0 |         27 |         28 |          1 |         +0
-        12 |         81 |          0 |          0 |         81 |         +0
-        16 |          0 |          2 |          2 |          0 |         +0
-        18 |          0 |         27 |         27 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |         81 |        108 |         54 |         27 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
-        40 |          7 |          7 |          0 |          0 |         +0
-        44 |         82 |          1 |          0 |         81 |         +0
-        76 |          7 |          7 |          0 |          0 |         +0
-        88 |          0 |         81 |         81 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=19898, zero-initialized=3176 (15.96%), freed=18126 (91.09%), remaining=1772
-OUT
+t_run_module(['-l'], '', <<'ERR', 0);
 Scan test1.asm
 0000 test1.asm            1 A
 Warning at file 'test1.asm' line 1: option '' is deprecated
@@ -1362,34 +1232,7 @@ Warning at file 'test1.asm' line 5: option '' is deprecated
 "E<0A>"
 ERR
 
-t_run_module(['-C'], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          6 |          8 |          2 |         +0
-         8 |          0 |          0 |          1 |          1 |         +0
-        12 |         54 |          0 |          0 |         54 |         +0
-        16 |          0 |          2 |          2 |          0 |         +0
-        18 |          0 |         27 |         27 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |         54 |         81 |         54 |         27 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
-        40 |          7 |          7 |          0 |          0 |         +0
-        44 |         55 |          1 |          0 |         54 |         +0
-        76 |          7 |          7 |          0 |          0 |         +0
-        88 |          0 |         54 |         54 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=15146, zero-initialized=3176 (20.97%), freed=13374 (88.30%), remaining=1772
-OUT
+t_run_module(['-C'], '', <<'ERR', 0);
 Scan test1.asm
 Warning at file 'test1.asm': option '' is deprecated
 "A<0A>"
@@ -1460,9 +1303,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.22 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.23 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.22  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.23  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.22  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -1505,10 +1352,10 @@ __END__
 #
 # Revision 1.13  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.12  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with g_malloc0 et al.
+# Replaced xmalloc et al with glib functions
 #
 # Revision 1.11  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -1518,11 +1365,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.10  2013/09/01 17:28:48  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.9  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.8  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few

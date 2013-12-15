@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.21 2013-11-11 23:47:03 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.22 2013-12-15 13:18:34 pauloscustodio Exp $ 
 */
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "types.h"
@@ -164,7 +164,11 @@ extern void Skipline( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.21  2013-11-11 23:47:03  pauloscustodio
+* Revision 1.22  2013-12-15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.21  2013/11/11 23:47:03  pauloscustodio
 * Move source code generation tools to dev/Makefile, only called on request,
 * and keep the generated files in z80asm directory, so that build does
 * not require tools used for the code generation (ragel, perl).

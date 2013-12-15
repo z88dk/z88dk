@@ -17,9 +17,13 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.12 2013-10-05 10:54:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.13 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.12  2013-10-05 10:54:36  pauloscustodio
+/* Revision 1.13  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.12  2013/10/05 10:54:36  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -I, --inc-path
 /* -L, --lib-path
@@ -42,11 +46,11 @@ Allows pushing back of lines, for example to expand macros.
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.7  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.6  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
@@ -71,7 +75,7 @@ Allows pushing back of lines, for example to expand macros.
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "errors.h"
@@ -304,9 +308,9 @@ void SourceFile_ungetline( SourceFile *self, char *line )
 	/* is there a next line in input? */
 	if ( search_next_line( line ) != NULL )
 	{
-		line_cpy = g_strdup( line );		/* so that we can modify line */
+		line_cpy = xstrdup( line );		/* so that we can modify line */
 		do_ungetline( self, line_cpy );
-		g_free0( line_cpy );
+		xfree( line_cpy );
 	}
 	else 
 	{

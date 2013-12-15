@@ -71,34 +71,7 @@ t_compile_module($init, <<'END', $objs);
 	warn("NOT REACHED\n");	
 END
 
-t_run_module([], <<'OUT', <<'ERR', 1);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        12 |          3 |          0 |          0 |          3 |         +0
-        13 |          0 |          1 |          1 |          0 |         +0
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          3 |          1 |          1 |         +0
-        25 |          0 |          0 |          1 |          1 |         +0
-        26 |          0 |          1 |          1 |          0 |         +0
-        28 |          0 |          1 |          1 |          0 |         +0
-        33 |          0 |          0 |          1 |          1 |         +0
-        34 |          0 |          1 |          1 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        44 |          4 |          1 |          0 |          3 |         +0
-        50 |          0 |          0 |          1 |          1 |         +0
-        66 |          0 |          0 |          1 |          1 |         +0
-        88 |          0 |          3 |          3 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2789, zero-initialized=1868 (66.98%), freed=1017 (36.46%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 1);
 Information
 0 errors occurred during assembly
 Warning
@@ -176,35 +149,7 @@ t_compile_module($init, <<'END', $objs);
 	
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         8 |          0 |          4 |          4 |          0 |         +0
-        12 |         25 |          0 |          0 |         25 |         +0
-        13 |          0 |         13 |         13 |          0 |         +0
-        15 |          0 |          4 |          4 |          0 |         +0
-        17 |          0 |          4 |          4 |          0 |         +0
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |         13 |         13 |         21 |         21 |         +0
-        28 |          0 |          1 |          1 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        40 |          1 |          1 |          0 |          0 |         +0
-        44 |         27 |         14 |          0 |         13 |         +0
-        88 |          0 |         13 |         13 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=7323, zero-initialized=2464 (33.65%), freed=5551 (75.80%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 0);
 Fatal error
 Error: cannot read file 'file.asm'
 Error: syntax error
@@ -239,9 +184,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.15 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.16 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.15  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.16  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.15  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -270,7 +219,7 @@ __END__
 #
 # Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.8  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error

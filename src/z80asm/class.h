@@ -20,14 +20,18 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.9 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.10 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.9  2013-09-12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Revision 1.10  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.9  2013/09/12 00:10:02  pauloscustodio
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.8  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.7  2013/05/12 21:39:05  pauloscustodio
 /* OBJ_DELETE() now accepts and ignores a NULL argument
@@ -58,7 +62,7 @@ each object, which in turn may call destructors of contained objects.
 #ifndef CLASS_H
 #define CLASS_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "queue.h"
 #include "types.h"
 
@@ -77,10 +81,10 @@ END_CLASS;
 DEF_CLASS(T);
 
 // helper functions, need to be defined
-void T_init (T *self)   { self->string = g_malloc0_n(1000,1); }
+void T_init (T *self)   { self->string = xcalloc(1000,1); }
 void T_copy (T *self, T *other)
-						{ self->string = g_strdup(other->string); }
-void T_fini (T *self)   { g_free0(self->string); }
+						{ self->string = xstrdup(other->string); }
+void T_fini (T *self)   { xfree(self->string); }
 
 // usage of class
 T * obj1 = OBJ_NEW(T);  // same as T_new()
@@ -137,7 +141,7 @@ struct ObjRegister;
     /* constructor */                                                       \
     T * T##_new (void)                                                      \
     {                                                                       \
-        T * self = g_new0(T, 1);            /* allocate object */           \
+        T * self = xnew(T);		            /* allocate object */           \
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
         _register_obj((struct ObjRegister *) self,                          \
@@ -149,7 +153,7 @@ struct ObjRegister;
     /* copy-constructor */                                                  \
     T * T##_clone (T * other)                                               \
     {                                                                       \
-        T * self = g_malloc0(sizeof(T));      /* allocate object */           \
+        T * self = xnew(T);					/* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self, other);              /* alloc memory if needed */    \
         _update_register_obj((struct ObjRegister *) self,                   \
@@ -163,7 +167,7 @@ struct ObjRegister;
         _deregister_obj((struct ObjRegister *) self, __FILE__, __LINE__);   \
         /* remove from cleanup list */  \
         T##_fini(self);                     /* call user cleanup */         \
-        g_free0(self);                        /* reclaim memory */            \
+        xfree(self);                        /* reclaim memory */            \
     }
 
 /*-----------------------------------------------------------------------------

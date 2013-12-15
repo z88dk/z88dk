@@ -15,10 +15,10 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.18 2013-09-22 21:34:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.19 2013-12-15 13:18:33 pauloscustodio Exp $
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include <assert.h>
 #include <memory.h>
@@ -46,7 +46,7 @@ static size_t PC;		                /* Program Counter */
 void init_codearea(void)
 {
     /* allocate memory for Z80 machine code */
-    codearea = (byte_t *) g_malloc0_n( MAXCODESIZE, sizeof( char ) );
+    codearea = xnew_n( char, MAXCODESIZE );
 
     reset_codearea();	/* init vars */
     codesize  = 0;		/* marks start of each new module, always incremented, BUG_0015 */
@@ -54,7 +54,7 @@ void init_codearea(void)
 
 void fini_codearea(void)
 {
-	g_free0( codearea );
+	xfree( codearea );
 }
 
 /*-----------------------------------------------------------------------------
@@ -211,18 +211,22 @@ byte_t get_byte( size_t *paddr )
 
 /* */
 /* $Log: codearea.c,v $
-/* Revision 1.18  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.19  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.18  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.17  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.16  2013/09/09 00:15:11  pauloscustodio
 /* Integrate codearea in init() mechanism.
 /*
 /* Revision 1.15  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.14  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
@@ -240,7 +244,7 @@ byte_t get_byte( size_t *paddr )
 /* warnings
 /*
 /* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
-/* include memalloc.h before any other include
+/* include xmalloc.h before any other include
 /*
 /* Revision 1.10  2013/02/22 17:19:19  pauloscustodio
 /* Add listfile interface to append bytes to the listing
@@ -268,7 +272,7 @@ byte_t get_byte( size_t *paddr )
 /* Revision 1.4  2012/05/20 06:02:08  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
-/* to detect buffer underflow and overflow, to memalloc functions.
+/* to detect buffer underflow and overflow, to xmalloc functions.
 /* No longer needed to call init_malloc().
 /* No longer need to try/catch during creation of memory structures to
 /* free partially created data - all not freed data is freed atexit().

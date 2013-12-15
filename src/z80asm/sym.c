@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.8 2013-10-05 13:43:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.9 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.8  2013-10-05 13:43:05  pauloscustodio
+Revision 1.9  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.8  2013/10/05 13:43:05  pauloscustodio
 Parse command line options via look-up tables:
 -i, --use-lib
 -x, --make-lib
@@ -48,7 +52,7 @@ Move SymbolRef to symref.c
 
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "listfile.h"
 #include "options.h"

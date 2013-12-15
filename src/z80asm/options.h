@@ -15,12 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.34 2013-10-05 13:43:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.35 2013-12-15 13:18:34 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "types.h"
 #include "strutil.h"
@@ -80,7 +80,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.34  2013-10-05 13:43:05  pauloscustodio
+* Revision 1.35  2013-12-15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.34  2013/10/05 13:43:05  pauloscustodio
 * Parse command line options via look-up tables:
 * -i, --use-lib
 * -x, --make-lib
@@ -171,7 +175,7 @@ extern char *get_map_filename( char *filename );
 * --help, --verbose
 *
 * Revision 1.14  2013/09/01 11:59:05  pauloscustodio
-* Force memalloc to be the first include, to be able to use MSVC memory debug tools
+* Force xmalloc to be the first include, to be able to use MSVC memory debug tools
 *
 * Revision 1.13  2013/04/07 22:26:07  pauloscustodio
 * Removed global variable smallc_source, no longer used

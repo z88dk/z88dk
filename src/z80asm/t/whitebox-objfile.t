@@ -157,34 +157,7 @@ for my $code_size (0, 1, 65536) {
 	write_binfile(obj1_file(), $obj1); 
 	write_binfile(lib1_file(), libfile($obj1));
 
-	t_run_module([$code_size], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        12 |          2 |          0 |          0 |          2 |         +0
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          3 |          2 |          2 |         +0
-        28 |          0 |          1 |          1 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        35 |          0 |          2 |          2 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        40 |          1 |          1 |          0 |          0 |         +0
-        44 |          4 |          1 |          0 |          3 |         +0
-        48 |          0 |          0 |          2 |          2 |         +0
-        80 |          3 |          3 |          0 |          0 |         +0
-        88 |          0 |          3 |          3 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4440, zero-initialized=2608 (58.74%), freed=2668 (60.09%), remaining=1772
-OUT
+	t_run_module([$code_size], '', <<'END', 0);
 
 ---- TEST: File not found, test mode ----
 
@@ -227,9 +200,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.11 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.12 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.11  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.12  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.11  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -254,7 +231,7 @@ __END__
 #
 # Revision 1.6  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -264,11 +241,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.4  2013/09/01 17:34:50  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.3  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.2  2013/05/16 22:45:21  pauloscustodio
 # Add ObjFile to struct module

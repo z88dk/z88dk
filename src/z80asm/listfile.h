@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.6 2013-09-30 00:24:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.7 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.6  2013-09-30 00:24:25  pauloscustodio
+/* Revision 1.7  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.6  2013/09/30 00:24:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -e, --asm-ext
 /* -M, --obj-ext
@@ -50,7 +54,7 @@ Handle assembly listing and symbol table listing.
 #ifndef LISTFILE_H
 #define LISTFILE_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "dynstr.h"

@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.37 2013-10-04 23:31:50 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.38 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.37  2013-10-04 23:31:50  pauloscustodio
+/* Revision 1.38  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.37  2013/10/04 23:31:50  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -IXIY, --swap-ix-iy
 /*
@@ -207,7 +211,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* GetSym() and Skipline() improved with EOF handling. */
 
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <string.h>

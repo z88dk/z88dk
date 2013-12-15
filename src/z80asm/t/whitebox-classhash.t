@@ -17,7 +17,6 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-# test memalloc
 my $objs = "strhash.o class.o "; 
 
 t_compile_module(<<'END_INIT', <<'END', $objs);
@@ -30,10 +29,10 @@ CLASS(Obj)
 	char *string;
 END_CLASS;
 
-void Obj_init (Obj *self) 	{ self->string = g_strdup("Hello World"); }
+void Obj_init (Obj *self) 	{ self->string = xstrdup("Hello World"); }
 void Obj_copy (Obj *self, Obj *other)
-							{ self->string = g_strdup(other->string); }
-void Obj_fini (Obj *self)	{ g_free0(self->string); }
+							{ self->string = xstrdup(other->string); }
+void Obj_fini (Obj *self)	{ xfree(self->string); }
 
 DEF_CLASS(Obj);
 
@@ -357,28 +356,7 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          3 |          3 |          0 |          0 |         +0
-        12 |         14 |         14 |          0 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |         25 |         25 |          0 |          0 |         +0
-        40 |         16 |         16 |          0 |          0 |         +0
-        44 |          6 |          6 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          6 |          6 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=7100, zero-initialized=5876 (82.76%), freed=5328 (75.04%), remaining=1772
-OUT
-ERR
+t_run_module([], '', '', 0);
 
 
 unlink_testfiles();
@@ -386,17 +364,21 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.9 2013-09-22 21:06:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.10 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.9  2013-09-22 21:06:00  pauloscustodio
+# Revision 1.10  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.9  2013/09/22 21:06:00  pauloscustodio
 # replace g_free by g_free0
 #
 # Revision 1.8  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.7  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with g_malloc0 et al.
+# Replaced xmalloc et al with glib functions
 #
 # Revision 1.6  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -406,11 +388,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.5  2013/09/01 18:14:44  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.4  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.3  2013/05/27 22:43:34  pauloscustodio
 # StrHash_set failed when the key string buffer was reused later in the code.

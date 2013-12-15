@@ -14,10 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.7 2013-06-08 23:08:38 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.8 2013-12-15 13:18:34 pauloscustodio Exp $ 
 
 $Log: objfile.h,v $
-Revision 1.7  2013-06-08 23:08:38  pauloscustodio
+Revision 1.8  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.7  2013/06/08 23:08:38  pauloscustodio
 comments
 
 Revision 1.6  2013/05/12 19:46:35  pauloscustodio
@@ -54,7 +58,7 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
 #ifndef OBJFILE_H
 #define OBJFILE_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "types.h"

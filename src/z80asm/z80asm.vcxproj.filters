@@ -48,9 +48,6 @@
     <ClInclude Include="hist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memalloc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="objfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -189,9 +186,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="file.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="memalloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objfile.c">

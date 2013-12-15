@@ -17,9 +17,13 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.3 2013-10-05 10:54:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.4 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: srcfile.h,v $
-/* Revision 1.3  2013-10-05 10:54:36  pauloscustodio
+/* Revision 1.4  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.3  2013/10/05 10:54:36  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -I, --inc-path
 /* -L, --lib-path
@@ -37,7 +41,7 @@ Allows pushing back of lines, for example to expand macros.
 #ifndef SRCFILE_H
 #define SRCFILE_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "classlist.h"

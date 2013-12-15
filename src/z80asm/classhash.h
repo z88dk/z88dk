@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Uses StrHash to keep the keys, takes care of memory allocation of values.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classhash.h,v 1.2 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classhash.h,v 1.3 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: classhash.h,v $
-/* Revision 1.2  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.3  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.2  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.1  2013/02/02 00:08:26  pauloscustodio
@@ -32,7 +36,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 #ifndef CLASSHASH_H
 #define CLASSHASH_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "queue.h"
 #include "types.h"
 #include "class.h"

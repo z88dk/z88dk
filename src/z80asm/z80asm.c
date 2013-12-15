@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.116 2013-12-15 12:10:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.117 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.116  2013-12-15 12:10:06  pauloscustodio
+/* Revision 1.117  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.116  2013/12/15 12:10:06  pauloscustodio
 /* Fix memory leak on recursive file include fatal error
 /*
 /* Revision 1.115  2013/10/05 13:43:05  pauloscustodio
@@ -86,14 +90,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.101  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.100  2013/09/09 00:15:11  pauloscustodio
 /* Integrate codearea in init() mechanism.
 /*
 /* Revision 1.99  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.98  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
@@ -290,7 +294,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Revision 1.49  2012/05/20 06:02:09  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
-/* to detect buffer underflow and overflow, to memalloc functions.
+/* to detect buffer underflow and overflow, to xmalloc functions.
 /* No longer needed to call init_malloc().
 /* No longer need to try/catch during creation of memory structures to
 /* free partially created data - all not freed data is freed atexit().
@@ -655,7 +659,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 /* Oops, screw up! exit(0) (was exit(-1))  should be exit(1) - djm 29/2/99 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "config.h"
@@ -879,7 +883,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
             path_basename( module_name, src_filename );
             path_remove_ext( module_name );
             strtoupper( module_name );
-            CURRENTMODULE->mname = g_strdup( module_name );
+            CURRENTMODULE->mname = xstrdup( module_name );
         }
 
         set_error_null();
@@ -960,7 +964,7 @@ BOOL load_module_object( char *filename )
         else
             inc_codesize( obj_file->code_size );	/* BUG_0015 */
 
-		CURRENTMODULE->mname	= g_strdup( obj_file->modname );
+		CURRENTMODULE->mname	= xstrdup( obj_file->modname );
 		CURRENTMODULE->obj_file = obj_file;
 
 		return TRUE;
@@ -1054,7 +1058,7 @@ char *GetLibfile( char *filename )
         }
     }
 
-    newlib->libfilename = g_strdup( found_libfilename );		/* freed when newlib is freed */
+    newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
 
     file = xfopen( found_libfilename, "rb" );           /* CH_0012 */
     xfget_char( fheader, 8U, file );     /* read first 8 chars from file into array */
@@ -1083,12 +1087,12 @@ NewModule( void )
 
     if ( modulehdr == NULL )
     {
-        modulehdr = g_new0( struct modules, 1 );
+        modulehdr = xnew(struct modules);
         modulehdr->first = NULL;
         modulehdr->last = NULL; /* Module header initialised */
     }
 
-    newm = g_new0( struct module, 1 );
+    newm = xnew(struct module);
 
     newm->nextmodule = NULL;
     newm->mname = NULL;
@@ -1097,14 +1101,14 @@ NewModule( void )
     newm->cfile = NULL;
     newm->local_tab   = OBJ_NEW(SymbolHash);
 
-    newm->mexpr = g_new0( struct expression, 1 );
+    newm->mexpr = xnew(struct expression);
 
     /* Allocate room for expression header */
     newm->mexpr->firstexpr = NULL;
     newm->mexpr->currexpr = NULL;
     /* Module expression header initialised */
 
-    newm->JRaddr = g_new0( struct JRPC_Hdr, 1 );
+    newm->JRaddr = xnew(struct JRPC_Hdr);
 
     newm->JRaddr->firstref = NULL;
     newm->JRaddr->lastref = NULL;
@@ -1133,12 +1137,12 @@ NewLibrary( void )
 
     if ( libraryhdr == NULL )
     {
-        libraryhdr = g_new0( struct liblist, 1 );
+        libraryhdr = xnew(struct liblist);
         libraryhdr->firstlib = NULL;
         libraryhdr->currlib = NULL;     /* Library header initialised */
     }
 
-    newl = g_new0( struct libfile, 1 );
+    newl = xnew(struct libfile);
     newl->nextlib = NULL;
     newl->libfilename = NULL;
     newl->nextobjfile = -1;
@@ -1197,26 +1201,26 @@ ReleaseModules( void )
             {
                 prevJR = curJR;
                 curJR = curJR->nextref; /* get ready for next JR instruction */
-                g_free0( prevJR );
+                xfree( prevJR );
             }
 
-            g_free0( curptr->JRaddr );
+            xfree( curptr->JRaddr );
             curptr->JRaddr = NULL;
         }
 
         if ( curptr->mname != NULL )
         {
-            g_free0( curptr->mname );
+            xfree( curptr->mname );
         }
 
 		OBJ_DELETE( curptr->obj_file );
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;
-        g_free0( tmpptr );       /* Release module */
+        xfree( tmpptr );       /* Release module */
     }
 
-    g_free0( modulehdr );
+    xfree( modulehdr );
     CURRENTMODULE = NULL;
 }
 
@@ -1233,15 +1237,15 @@ ReleaseLibraries( void )
     {
         if ( curptr->libfilename != NULL )
         {
-            g_free0( curptr->libfilename );
+            xfree( curptr->libfilename );
         }
 
         tmpptr = curptr;
         curptr = curptr->nextlib;
-        g_free0( tmpptr );       /* release library */
+        xfree( tmpptr );       /* release library */
     }
 
-    g_free0( libraryhdr );       /* Release library header */
+    xfree( libraryhdr );       /* Release library header */
 }
 
 
@@ -1260,7 +1264,7 @@ ReleaseExprns( struct expression *express )
         curexpr = tmpexpr;
     }
 
-    g_free0( express );
+    xfree( express );
 }
 
 
@@ -1276,8 +1280,8 @@ ReleaseFile( struct sourcefile *srcfile )
     if ( srcfile->usedsourcefile != NULL )
         ReleaseOwnedFile( srcfile->usedsourcefile );
 
-    g_free0( srcfile->fname );   /* Release allocated area for filename */
-    g_free0( srcfile );          /* Release file information record for this file */
+    xfree( srcfile->fname );   /* Release allocated area for filename */
+    xfree( srcfile );          /* Release file information record for this file */
 }
 
 
@@ -1296,7 +1300,7 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
         ReleaseFile( ownedfile->ownedsourcefile );
     }
 
-    g_free0( ownedfile );        /* Then release this owned file */
+    xfree( ownedfile );        /* Then release this owned file */
 }
 
 
@@ -1374,7 +1378,7 @@ int main( int argc, char *argv[] )
         {
             if ( reloctable != NULL )
             {
-                g_free0( reloctable );
+                xfree( reloctable );
             }
         }
 

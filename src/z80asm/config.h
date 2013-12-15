@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.27 2013-09-01 11:59:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.28 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.27  2013-09-01 11:59:05  pauloscustodio
-/* Force memalloc to be the first include, to be able to use MSVC memory debug tools
+/* Revision 1.28  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.27  2013/09/01 11:59:05  pauloscustodio
+/* Force xmalloc to be the first include, to be able to use MSVC memory debug tools
 /*
 /* Revision 1.26  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
@@ -143,7 +147,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 /* Pick up the default installation path */
 #ifndef WIN32

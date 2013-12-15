@@ -14,10 +14,10 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.35 2013-11-11 23:47:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.36 2013-12-15 13:18:33 pauloscustodio Exp $
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "file.h"
 #include "listfile.h"
@@ -236,7 +236,7 @@ void OpenFile_fini( OpenFile *self )
     HASH_ITER( hh, self->hash, elem, tmp )
     {
         HASH_DEL( self->hash, elem );
-        g_free0( elem );
+        xfree( elem );
     }
 }
 
@@ -261,7 +261,7 @@ static void add_filename( FILE *file, char *filename )
 	else
 	{
 		/* new, create hash entry */
-		elem = g_new0(OpenFileElem, 1);
+		elem = xnew(OpenFileElem);
 		elem->file 		= file;
 		elem->filename 	= strpool_add(filename);		
 		
@@ -487,7 +487,11 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.35  2013-11-11 23:47:03  pauloscustodio
+Revision 1.36  2013-12-15 13:18:33  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.35  2013/11/11 23:47:03  pauloscustodio
 Move source code generation tools to dev/Makefile, only called on request,
 and keep the generated files in z80asm directory, so that build does
 not require tools used for the code generation (ragel, perl).
@@ -535,7 +539,7 @@ Revision 1.25  2013/09/22 21:04:21  pauloscustodio
 New File and FileStack objects
 
 Revision 1.23  2013/09/08 08:29:21  pauloscustodio
-Replaced xmalloc et al with g_malloc0 et al.
+Replaced xmalloc et al with glib functions
 
 Revision 1.22  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
@@ -564,7 +568,7 @@ Revision 1.17  2013/04/04 23:08:18  pauloscustodio
 Helper functions to create file names of each of the extensions used in z80asm
 
 Revision 1.16  2013/03/30 00:02:22  pauloscustodio
-include memalloc.h before any other include
+include xmalloc.h before any other include
 
 Revision 1.15  2013/02/27 20:44:32  pauloscustodio
 Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList

@@ -35,7 +35,7 @@
 
 
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 
 

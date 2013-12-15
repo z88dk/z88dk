@@ -15,12 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.10 2013-09-09 00:15:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.11 2013-12-15 13:18:33 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "types.h"
 
 #include <stdio.h>
@@ -78,7 +78,11 @@ extern byte_t get_byte( size_t *paddr );
 
 /* */
 /* $Log: codearea.h,v $
-/* Revision 1.10  2013-09-09 00:15:11  pauloscustodio
+/* Revision 1.11  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.10  2013/09/09 00:15:11  pauloscustodio
 /* Integrate codearea in init() mechanism.
 /*
 /* Revision 1.9  2013/05/16 22:39:39  pauloscustodio

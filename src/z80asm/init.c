@@ -1,6 +1,7 @@
-#include "memalloc.h"
+#include "xmalloc.h"
 #include "strpool.h"
 #include "errors.h"
+#include "file.h"
 #include "options.h"
 #include "scan.h"
 #include "codearea.h"
@@ -10,8 +11,6 @@ extern int init_main(int argc, char *argv[]);
 
 static void init(void)
 {
-	init_memalloc();
-	atexit(fini_memalloc);
 	init_strpool();
 	atexit(fini_strpool);
 	init_errors();

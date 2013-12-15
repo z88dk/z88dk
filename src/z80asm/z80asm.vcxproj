@@ -106,7 +106,6 @@
     <ClInclude Include="lib\xmalloc.h" />
     <ClInclude Include="listfile.h" />
     <ClInclude Include="mapfile.h" />
-    <ClInclude Include="memalloc.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
@@ -145,7 +144,6 @@
     <ClCompile Include="lib\xmalloc.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />
-    <ClCompile Include="memalloc.c" />
     <ClCompile Include="model.c" />
     <ClCompile Include="model_symref.c" />
     <ClCompile Include="modlink.c" />

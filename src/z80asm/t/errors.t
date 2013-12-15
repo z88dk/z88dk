@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.3 2013-10-08 21:53:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.4 2013-12-15 13:20:25 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -1003,15 +1003,17 @@ t_z80asm_capture(asm_file(), "",
 		"1 errors occurred during assembly\n",
 		1);
 
-
-
 unlink_testfiles();
 done_testing();
 
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.3  2013-10-08 21:53:07  pauloscustodio
+# Revision 1.4  2013-12-15 13:20:25  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.3  2013/10/08 21:53:07  pauloscustodio
 # Replace Flex-based lexer by a Ragel-based one.
 # Add interface to file.c to read files by tokens, calling the lexer.
 #

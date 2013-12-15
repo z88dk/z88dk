@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.6 2013-06-16 16:49:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.7 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.6  2013-06-16 16:49:20  pauloscustodio
+Revision 1.7  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.6  2013/06/16 16:49:20  pauloscustodio
 Symbol_fullname() to return full symbol name NAME@MODULE
 
 Revision 1.5  2013/06/08 23:37:32  pauloscustodio
@@ -44,7 +48,7 @@ Move SymbolRef to symref.c
 #ifndef SYM_H
 #define SYM_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "symref.h"

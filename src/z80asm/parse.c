@@ -81,9 +81,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Bison grammar for z80asm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.4 2013-06-03 23:20:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.5 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: parse.c,v $
-Revision 1.4  2013-06-03 23:20:15  pauloscustodio
+Revision 1.5  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.4  2013/06/03 23:20:15  pauloscustodio
 rcs keywords
 
 Revision 1.1  2013/05/01 19:03:46  pauloscustodio
@@ -131,7 +135,7 @@ Embryo of parse module
 
 
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 
 

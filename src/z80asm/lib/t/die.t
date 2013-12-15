@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/die.t,v 1.1 2013-12-15 04:02:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/die.t,v 1.2 2013-12-15 13:18:35 pauloscustodio Exp $
 #
 # Test die.c
 
@@ -62,12 +62,16 @@ done_testing;
 
 
 # $Log: die.t,v $
-# Revision 1.1  2013-12-15 04:02:26  pauloscustodio
+# Revision 1.2  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.1  2013/12/15 04:02:26  pauloscustodio
 # Move the die and queue modules to the z80asm/lib directory
 #
 # Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.8  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few

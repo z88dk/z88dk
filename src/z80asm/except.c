@@ -39,7 +39,7 @@ Simple exception mechanism
 
 /* modified to allow THROW() from a called function */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "except.h"
 #include <stdlib.h>
@@ -50,9 +50,13 @@ Simple exception mechanism
 jmp_buf except_current_buf;
 int     except_current_count;
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.13 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.14 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.13  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.14  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.13  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.12  2013/09/01 00:18:28  pauloscustodio
@@ -61,7 +65,7 @@ int     except_current_count;
 /*   try-catch block.
 /*
 /* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
-/* include memalloc.h before any other include
+/* include xmalloc.h before any other include
 /*
 /* Revision 1.10  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and

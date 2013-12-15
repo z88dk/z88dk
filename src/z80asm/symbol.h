@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.27 2013-08-30 01:11:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.28 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.27  2013-08-30 01:11:54  pauloscustodio
+/* Revision 1.28  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.27  2013/08/30 01:11:54  pauloscustodio
 /* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
 /* same order. Moreover need to define some different symbols for the legacy
 /* version.
@@ -157,7 +161,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "model.h"
 #include "objfile.h"

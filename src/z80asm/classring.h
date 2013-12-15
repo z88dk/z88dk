@@ -16,9 +16,13 @@ Fixed-size circular ring of objects defined by class.h
 Objects are pre-allocated and cleared before being returned to caller as new elements.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.3 2013-09-01 18:45:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.4 2013-12-15 13:18:33 pauloscustodio Exp $
 $Log: classring.h,v $
-Revision 1.3  2013-09-01 18:45:35  pauloscustodio
+Revision 1.4  2013-12-15 13:18:33  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.3  2013/09/01 18:45:35  pauloscustodio
 Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
 Remove FALSE, TRUE, MIN, MAX; defined in glib.h
 
@@ -37,7 +41,7 @@ look-ahead for the parser without the need to push back tokens.
 #ifndef CLASSRING_H
 #define CLASSRING_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "types.h"
 #include "class.h"
 

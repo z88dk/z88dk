@@ -356,35 +356,7 @@ t_compile_module($init_code, <<'END', $objs);
 	return 0;
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          4 |          4 |          0 |         +0
-         7 |          0 |         11 |         11 |          0 |         +0
-         8 |          0 |         23 |         23 |          0 |         +0
-        12 |         44 |         40 |          0 |          4 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          4 |          0 |          0 |          4 |         +0
-        28 |          6 |          6 |          0 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        40 |         52 |         52 |          0 |          0 |         +0
-        44 |          5 |          1 |          0 |          4 |         +0
-        48 |          7 |         11 |          4 |          0 |         +0
-        88 |          0 |          0 |          4 |          4 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          4 |          4 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          7 |         41 |         34 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=18785, zero-initialized=5224 (27.81%), freed=17013 (90.57%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 0);
 last object deleted
 ERR
 
@@ -425,35 +397,7 @@ t_compile_module($init_code, <<'END', $objs);
 	return ret;
 END
 
-t_run_module([], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          1 |          1 |          0 |         +0
-        12 |          3 |          2 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        21 |          1 |          0 |          0 |          1 |         +0
-        24 |          2 |          1 |          0 |          1 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        37 |          0 |          1 |          1 |          0 |         +0
-        40 |          7 |          7 |          0 |          0 |         +0
-        42 |          0 |          0 |          1 |          1 |         +0
-        44 |          3 |          1 |          0 |          2 |         +0
-        48 |          2 |          3 |          1 |          0 |         +0
-        88 |          0 |          1 |          2 |          1 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          1 |          1 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          2 |          2 |          0 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4938, zero-initialized=2728 (55.25%), freed=3166 (64.12%), remaining=1772
-OUT
+t_run_module([], '', <<'END', 0);
 Error: cannot include file 'f0' recursively
 END
 diag "Should show error message location";
@@ -484,29 +428,7 @@ t_compile_module($init_code, <<'END', $objs);
 	return ret;
 END
 
-t_run_module([], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          2 |          1 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        40 |          3 |          3 |          0 |          0 |         +0
-        44 |          1 |          0 |          0 |          1 |         +0
-        48 |          1 |          1 |          0 |          0 |         +0
-        88 |          0 |          1 |          1 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          1 |          1 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3570, zero-initialized=2036 (57.03%), freed=1798 (50.36%), remaining=1772
-OUT
+t_run_module([], '', <<'END', 0);
 Error: cannot read file 'fxxx'
 END
 
@@ -540,32 +462,7 @@ t_compile_module($init_code, <<'END', $objs);
 	return ret;
 END
 
-t_run_module([], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        12 |          1 |          1 |          0 |          0 |         +0
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          2 |          1 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        40 |          6 |          6 |          0 |          0 |         +0
-        44 |          2 |          1 |          0 |          1 |         +0
-        48 |          2 |          2 |          0 |          0 |         +0
-        88 |          0 |          1 |          1 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       256 |          0 |          2 |          2 |          0 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4466, zero-initialized=2676 (59.92%), freed=2694 (60.32%), remaining=1772
-OUT
+t_run_module([], '', <<'END', 0);
 Error: cannot read file 'fxxx'
 END
 diag "Should show error message location";
@@ -578,9 +475,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.19 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.20 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.19  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.20  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.19  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -630,7 +531,7 @@ __END__
 #
 # Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.8  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -640,11 +541,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.7  2013/09/01 17:14:02  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.6  2013/09/01 11:52:56  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.5  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few

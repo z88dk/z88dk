@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.7 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.8 2013-12-15 13:18:43 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.7  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.8  2013-12-15 13:18:43  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.7  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -30,7 +34,7 @@
 # New File and FileStack objects
 #
 # Revision 1.4  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with g_malloc0 et al.
+# Replaced xmalloc et al with glib functions
 #
 # Revision 1.3  2013/09/01 18:45:35  pauloscustodio
 # Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
@@ -50,7 +54,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o memalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o";
+my $objs = "avltree.o xmalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o";
 my $src = "t/data/zx48.asm";
 my @words;
 
@@ -112,7 +116,7 @@ void FreeSym2( Symbol *node )
 		OBJ_DELETE( node->references );
     }
 
-    g_free0( node );               /* then release the symbol record */
+    xfree( node );               /* then release the symbol record */
 }
 
 
@@ -130,7 +134,7 @@ void add_avltree(char *name)
 	}
 	else
 	{
-		foundsymbol = g_new0(Symbol, 1);
+		foundsymbol = xnew(Symbol);
 		foundsymbol->name = name;
 		foundsymbol->value = 0;
 		insert( &avlroot, foundsymbol, ( int ( * )( void *, void * ) ) 		 cmpid );
@@ -170,7 +174,7 @@ void add_hash(char *name)
 	}
 	else
 	{
-		foundsymbol = g_new0(Symbol, 1);
+		foundsymbol = xnew(Symbol);
 		foundsymbol->name = name;
 		foundsymbol->value = 0;
 		StrHash_set( hashroot, name, foundsymbol );
@@ -199,7 +203,7 @@ void test_hash()
 	
     HASH_ITER( hh, hashroot->hash, elem, tmp )
     {
-        g_free0(elem->value);
+        xfree(elem->value);
     }
 }
 

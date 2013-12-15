@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.51 2013-12-15 04:02:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.52 2013-12-15 13:18:35 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -469,7 +469,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG memalloc.c lib/die.o except.o strpool.o";
+	$compile_args .= " -DMEMALLOC_DEBUG lib/xmalloc.c lib/die.o except.o strpool.o";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {
@@ -556,7 +556,6 @@ void dump_file ( char *filename )
 '.$init_code.'
 int main (int argc, char **argv) 
 {
-	init_memalloc(); atexit( fini_memalloc );
 	init_strpool(); atexit( fini_strpool );
 
 	{
@@ -1017,7 +1016,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.51  2013-12-15 04:02:26  pauloscustodio
+# Revision 1.52  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.51  2013/12/15 04:02:26  pauloscustodio
 # Move the die and queue modules to the z80asm/lib directory
 #
 # Revision 1.50  2013/10/08 21:53:07  pauloscustodio
@@ -1051,7 +1054,7 @@ __END__
 #
 # Revision 1.43  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.42  2013/09/08 00:37:23  pauloscustodio
 # Call winmergeu to show differences in test results
@@ -1063,8 +1066,8 @@ __END__
 # Unified glib compilation options between MinGW and Linux
 #
 # Revision 1.39  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.38  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few

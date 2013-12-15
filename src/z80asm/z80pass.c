@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.63 2013-12-11 23:33:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.64 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.63  2013-12-11 23:33:55  pauloscustodio
+Revision 1.64  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.63  2013/12/11 23:33:55  pauloscustodio
 BUG_0039: library not pulled in if XLIB symbol not referenced in expression
 
 Revision 1.62  2013/10/05 08:14:43  pauloscustodio
@@ -49,11 +53,11 @@ Revision 1.56  2013/09/22 21:34:48  pauloscustodio
 Remove legacy xxx_err() interface
 
 Revision 1.55  2013/09/12 00:10:02  pauloscustodio
-Create g_free0() macro that NULLs the pointer after free, required
+Create xfree() macro that NULLs the pointer after free, required
 by z80asm to find out if a pointer was already freed.
 
 Revision 1.54  2013/09/08 08:29:21  pauloscustodio
-Replaced xmalloc et al with g_malloc0 et al.
+Replaced xmalloc et al with glib functions
 
 Revision 1.53  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
@@ -164,7 +168,7 @@ astyle
 Revision 1.26  2012/05/20 06:02:09  pauloscustodio
 Garbage collector
 Added automatic garbage collection on exit and simple fence mechanism
-to detect buffer underflow and overflow, to memalloc functions.
+to detect buffer underflow and overflow, to xmalloc functions.
 No longer needed to call init_malloc().
 No longer need to try/catch during creation of memory structures to
 free partially created data - all not freed data is freed atexit().
@@ -381,7 +385,7 @@ First import of z88dk into the sourceforge system <gulp>
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "config.h"
@@ -846,7 +850,7 @@ Z80pass2( void )
 
                     prevJR = curJR;
                     curJR = curJR->nextref;       /* get ready for next JR instruction */
-                    g_free0( prevJR );
+                    xfree( prevJR );
                 }
                 else
                 {
@@ -874,7 +878,7 @@ Z80pass2( void )
 
                         prevJR = curJR;
                         curJR = curJR->nextref;       /* get ready for JR instruction */
-                        g_free0( prevJR );
+                        xfree( prevJR );
                         break;
 
                     case RANGE_8UNSIGN:
@@ -922,8 +926,8 @@ Z80pass2( void )
 		set_error_file( NULL );
 		set_error_line( 0 );
 
-		g_free0( CURRENTMODULE->mexpr );   /* Release header of expressions list */
-        g_free0( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
+		xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
     }
 
     if ( ! get_num_errors() && opts.symtable )
@@ -1038,7 +1042,7 @@ Prevfile( void )
     struct usedfile *newusedfile;
     struct sourcefile *ownedfile;
 
-    newusedfile = g_new0( struct usedfile, 1 );
+    newusedfile = xnew(struct usedfile);
     ownedfile = CURRENTFILE;
     CURRENTFILE = CURRENTFILE->prevsourcefile;    /* get back to owner file - now the current */
     CURRENTFILE->newsourcefile = NULL;    /* current file is now the last in the list */
@@ -1059,7 +1063,7 @@ Newfile( struct sourcefile *curfile, char *fname )
     struct sourcefile *nfile;
     struct sourcefile *ret;
 
-    nfile = g_new0( struct sourcefile, 1 );
+    nfile = xnew(struct sourcefile);
     ret = Setfile( curfile, nfile, fname );
 
     return ret;
@@ -1072,7 +1076,7 @@ Setfile( struct sourcefile *curfile,    /* pointer to record of current source f
                                          * source file */
          char *filename )
 {
-    nfile->fname = g_strdup( filename );   /* pointer to filename string */
+    nfile->fname = xstrdup( filename );   /* pointer to filename string */
     nfile->prevsourcefile = curfile;
     nfile->newsourcefile = NULL;
     nfile->usedsourcefile = NULL;

@@ -20,9 +20,13 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.c,v 1.2 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.c,v 1.3 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: class.c,v $
-/* Revision 1.2  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.3  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.2  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -32,7 +36,7 @@ each object, which in turn may call destructors of contained objects.
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "class.h"
 #include "types.h"
 #include "die.h"

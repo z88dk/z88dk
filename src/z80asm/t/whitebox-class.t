@@ -33,19 +33,19 @@ DEF_CLASS(Name);
 void Name_init (Name *self)
 { 
 	fprintf(stderr, "Name_init 0x%p\n", self);
-	self->str = g_strdup("John"); 
+	self->str = xstrdup("John"); 
 }
 
 void Name_copy (Name *self, Name *other) 	
 { 
 	fprintf(stderr, "Name_copy 0x%p\n", self);
-	self->str = g_strdup(self->str); 
+	self->str = xstrdup(self->str); 
 }
 
 void Name_fini (Name *self) 	
 { 
 	fprintf(stderr, "Name_fini 0x%p\n", self);
-	g_free0(self->str); 
+	xfree(self->str); 
 }
 
 CLASS(Person)
@@ -121,34 +121,11 @@ t_compile_module($init, <<'END', $objs);
 END
 
 # no allocation
-t_run_module([0], <<'END', '', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
-END
+t_run_module([0], '', '', 0);
 
 
 # alloc one, no free
-t_run_module([1], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         5 |          1 |          1 |          0 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=93, zero-initialized=68 (73.12%), freed=93 (100.00%), remaining=0
-OUT
+t_run_module([1], '', <<'END', 0);
 Person_init ADDR_1
 Name_init ADDR_2
 class: init
@@ -163,20 +140,7 @@ END
 
 
 # alloc one, clone another, no free
-t_run_module([2], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         5 |          2 |          2 |          0 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          2 |          2 |          0 |          0 |         +0
-        36 |          2 |          2 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
-OUT
+t_run_module([2], '', <<'END', 0);
 Person_init ADDR_1
 Name_init ADDR_2
 class: init
@@ -199,20 +163,7 @@ END
 
 
 # alloc one, clone another, free first
-t_run_module([3], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         5 |          2 |          2 |          0 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          2 |          2 |          0 |          0 |         +0
-        36 |          2 |          2 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
-OUT
+t_run_module([3], '', <<'END', 0);
 Person_init ADDR_1
 Name_init ADDR_2
 class: init
@@ -235,20 +186,7 @@ END
 
 
 # alloc one, clone another, free first and then second
-t_run_module([4], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         5 |          2 |          2 |          0 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          2 |          2 |          0 |          0 |         +0
-        36 |          2 |          2 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
-OUT
+t_run_module([4], '', <<'END', 0);
 Person_init ADDR_1
 Name_init ADDR_2
 class: init
@@ -275,17 +213,21 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.12 2013-09-22 21:06:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.13 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.12  2013-09-22 21:06:00  pauloscustodio
-# replace g_free by g_free0
+# Revision 1.13  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.12  2013/09/22 21:06:00  pauloscustodio
+# replace glib free by xfree
 #
 # Revision 1.11  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.10  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with g_malloc0 et al.
+# Replaced xmalloc et al with glib functions
 #
 # Revision 1.9  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -295,11 +237,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.8  2013/09/01 18:30:15  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.7  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.6  2013/05/12 21:39:05  pauloscustodio
 # OBJ_DELETE() now accepts and ignores a NULL argument

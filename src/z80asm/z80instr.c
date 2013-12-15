@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.37 2013-10-04 23:20:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.38 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.37  2013-10-04 23:20:21  pauloscustodio
+/* Revision 1.38  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.37  2013/10/04 23:20:21  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -plus, --ti83plus
 /*
@@ -26,7 +30,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* --RCMX000
 /*
 /* Revision 1.35  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.34  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
@@ -230,7 +234,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Updated in $/Z80asm */
 /* SourceSafe version history comment block added. */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1200,7 +1204,7 @@ NewJRaddr( void )
 {
     struct JRPC *newJRPC;
 
-    newJRPC = g_new0( struct JRPC, 1 );
+    newJRPC = xnew(struct JRPC);
     newJRPC->nextref = NULL;
     newJRPC->PCaddr = (size_t)get_PC();
 

@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.47 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.48 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.47  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.48  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.47  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -25,11 +29,11 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.45  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.44  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.43  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
@@ -123,7 +127,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Revision 1.24  2012/05/20 06:02:08  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
-/* to detect buffer underflow and overflow, to memalloc functions.
+/* to detect buffer underflow and overflow, to xmalloc functions.
 /* No longer needed to call init_malloc().
 /* No longer need to try/catch during creation of memory structures to
 /* free partially created data - all not freed data is freed atexit().
@@ -318,7 +322,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Improved handling of fgetc() character reading in relation to premature */
 /* EOF handling (for character constants in expressions). */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "config.h"
@@ -750,7 +754,7 @@ ParseNumExpr( void )
     struct expr *pfixhdr;
     enum symbols constant_expression = nil;
 
-    pfixhdr = g_new0( struct expr, 1 );
+    pfixhdr = xnew(struct expr);
 
     pfixhdr->firstnode = NULL;
     pfixhdr->currentnode = NULL;
@@ -760,7 +764,7 @@ ParseNumExpr( void )
     pfixhdr->infixexpr = NULL;
     pfixhdr->infixptr = NULL;
 
-    pfixhdr->infixexpr = g_new0( char, 128 );     /* TODO: make size a constant */
+    pfixhdr->infixexpr = xnew_n( char, 128 );     /* TODO: make size a constant */
 
     pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
@@ -1051,19 +1055,19 @@ RemovePfixlist( struct expr *pfixexpr )
 
         if ( node->id != NULL )
         {
-            g_free0( node->id );    /* Remove symbol id, if defined */
+            xfree( node->id );    /* Remove symbol id, if defined */
         }
 
-        g_free0( node );
+        xfree( node );
         node = tmpnode;
     }
 
     if ( pfixexpr->infixexpr != NULL )
     {
-        g_free0( pfixexpr->infixexpr );    /* release infix expr. string */
+        xfree( pfixexpr->infixexpr );    /* release infix expr. string */
     }
 
-    g_free0( pfixexpr );           /* release header of postfix expression */
+    xfree( pfixexpr );           /* release header of postfix expression */
 }
 
 
@@ -1078,7 +1082,7 @@ NewPfixSymbol( struct expr *pfixexpr,
 {
     struct postfixlist *newnode;
 
-    newnode = g_new0( struct postfixlist, 1 );
+    newnode = xnew(struct postfixlist);
 
     newnode->operandconst = oprconst;
     newnode->operatortype = oprtype;
@@ -1087,7 +1091,7 @@ NewPfixSymbol( struct expr *pfixexpr,
 
     if ( symident != NULL )
     {
-        newnode->id = g_strdup( symident );    /* Allocate symbol */
+        newnode->id = xstrdup( symident );    /* Allocate symbol */
     }
     else
     {
@@ -1113,7 +1117,7 @@ PushItem( long oprconst, struct pfixstack **stackpointer )
 {
     struct pfixstack *newitem;
 
-    newitem = g_new0( struct pfixstack, 1 );
+    newitem = xnew(struct pfixstack);
     newitem->stackconstant = oprconst;
     newitem->prevstackitem = *stackpointer;     /* link new node to current node */
     *stackpointer = newitem;                    /* update stackpointer to new item */
@@ -1131,7 +1135,7 @@ PopItem( struct pfixstack **stackpointer )
     constant = ( *stackpointer )->stackconstant;
     stackitem = *stackpointer;
     *stackpointer = ( *stackpointer )->prevstackitem;   /* move stackpointer to previous item */
-    g_free0( stackitem );                                /* return old item memory to OS */
+    xfree( stackitem );                                /* return old item memory to OS */
     return ( constant );
 }
 

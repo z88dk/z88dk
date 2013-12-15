@@ -15,10 +15,10 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.29 2013-09-22 21:34:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.30 2013-12-15 13:18:33 pauloscustodio Exp $ 
 */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "except.h"
@@ -254,7 +254,11 @@ static void do_error( enum ErrType err_type, char *message )
 
 /* */
 /* $Log: errors.c,v $
-/* Revision 1.29  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.30  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.29  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.28  2013/09/08 00:43:58  pauloscustodio

@@ -17,19 +17,23 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.12 2013-09-24 00:05:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.13 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.12  2013-09-24 00:05:35  pauloscustodio
+/* Revision 1.13  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.12  2013/09/24 00:05:35  pauloscustodio
 /* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 /* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 /* Removed normalize_eol.
 /*
 /* Revision 1.11  2013/09/12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.10  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.9  2013/05/01 21:10:49  pauloscustodio
 /* Add getline to Str, converting EOL sequences to LF.
@@ -38,7 +42,7 @@ Strings may contain zero byte, length is defined by separate field.
 /* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 /*
 /* Revision 1.7  2013/03/30 00:02:22  pauloscustodio
-/* include memalloc.h before any other include
+/* include xmalloc.h before any other include
 /*
 /* Revision 1.6  2013/02/28 00:32:35  pauloscustodio
 /* New interface to Str to copy characters to string
@@ -61,7 +65,8 @@ Strings may contain zero byte, length is defined by separate field.
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
+
 #include <string.h>
 #include <ctype.h>
 #include "dynstr.h"
@@ -85,14 +90,14 @@ void Str_init( Str *self )
 
 void Str_copy( Str *self, Str *other )
 {
-    char *data_copy = g_malloc0( self->size );
+    char *data_copy = xnew_n( char, self->size );
     memcpy( data_copy, self->data, self->size );
     self->data = data_copy;
 }
 
 void Str_fini( Str *self )
 {
-    g_free0( self->data );
+    xfree( self->data );
 }
 
 /*-----------------------------------------------------------------------------
@@ -122,7 +127,7 @@ void Str_reserve( Str *self, size_t num_chars )
             new_size += SIZE_MASK + 1;
         }
 
-        self->data = ( char * ) g_realloc( self->data, new_size );
+        self->data = ( char * ) xrealloc( self->data, new_size );
         self->size = new_size;
     }
 }
@@ -134,7 +139,7 @@ void Str_unreserve( Str *self )
 {
     size_t need_size = self->len + 1;
 
-    self->data = ( char * ) g_realloc( self->data, need_size );
+    self->data = ( char * ) xrealloc( self->data, need_size );
     self->size = need_size;
 }
 

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.13 2013-09-24 00:05:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.14 2013-12-15 13:18:35 pauloscustodio Exp $
 #
 # Test strutil
 
@@ -101,19 +101,6 @@ List1, break at two
 ->one
 ->two
 List2
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 unlink_testfiles();
@@ -122,7 +109,11 @@ done_testing;
 
 __END__
 # $Log: whitebox-strutil.t,v $
-# Revision 1.13  2013-09-24 00:05:36  pauloscustodio
+# Revision 1.14  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.13  2013/09/24 00:05:36  pauloscustodio
 # Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 # toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 # Removed normalize_eol.
@@ -134,7 +125,7 @@ __END__
 #
 # Revision 1.11  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.10  2013/04/29 22:24:33  pauloscustodio
 # Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF

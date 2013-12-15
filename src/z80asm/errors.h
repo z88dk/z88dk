@@ -16,12 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.17 2013-09-22 21:34:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.18 2013-12-15 13:18:33 pauloscustodio Exp $ 
 */
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include <stdio.h>
 
@@ -66,7 +66,11 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /* */
 /* $Log: errors.h,v $
-/* Revision 1.17  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.18  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.17  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.16  2013/09/08 00:43:58  pauloscustodio
@@ -77,7 +81,7 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 /* one file errors.t.
 /*
 /* Revision 1.15  2013/09/01 11:59:05  pauloscustodio
-/* Force memalloc to be the first include, to be able to use MSVC memory debug tools
+/* Force xmalloc to be the first include, to be able to use MSVC memory debug tools
 /*
 /* Revision 1.14  2013/05/11 00:29:26  pauloscustodio
 /* CH_0021 : Exceptions on file IO show file name

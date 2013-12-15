@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.23 2013-10-16 21:42:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.24 2013-12-15 13:18:33 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "strutil.h"
 #include "types.h"
@@ -115,7 +115,11 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.23  2013-10-16 21:42:06  pauloscustodio
+Revision 1.24  2013-12-15 13:18:33  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.23  2013/10/16 21:42:06  pauloscustodio
 Allocate minimum-sized string, grow as needed.
 Allocate a GString text inside of File, to be used by file reading methods.
 

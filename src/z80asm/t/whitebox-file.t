@@ -93,25 +93,7 @@ t_run_module([ asm_file(),
 			   asm4_file(), 
 			   asm5_file(), 
 			   asm6_file(), 
-			   asm7_file() ], <<'OUT', <<'ERR', 1);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        18 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          1 |          0 |          0 |         +0
-        28 |          0 |          1 |          1 |          0 |         +0
-        36 |          0 |          0 |          1 |          1 |         +0
-        44 |          1 |          0 |          0 |          1 |         +0
-        88 |          0 |          1 |          1 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2030, zero-initialized=1772 (87.29%), freed=258 (12.71%), remaining=1772
-OUT
+			   asm7_file() ], '', <<'ERR', 1);
 Error: cannot read file 'test.asm'
 Uncaught runtime exception at errors.c(1)
 ERR
@@ -123,7 +105,7 @@ t_run_module([ asm1_file(),
 			   asm4_file(), 
 			   asm5_file(), 
 			   asm6_file(), 
-			   asm7_file() ], <<'OUT', <<'ERR', 0);
+			   asm7_file() ], <<'OUT', '', 0);
 Read file test1.asm:
 End of file
 Read file test2.asm:
@@ -165,26 +147,7 @@ Read file test7.asm:
 ABCDEFGHIJ
 abcdefghij
 End of file
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          7 |          7 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        40 |          7 |          7 |          0 |          0 |         +0
-        44 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3680, zero-initialized=2608 (70.87%), freed=1908 (51.85%), remaining=1772
 OUT
-ERR
 
 
 # test file writing
@@ -195,25 +158,7 @@ t_compile_module($init, <<'END', $objs);
 	printf("write file failed\n");
 END
 
-t_run_module([], <<'OUT', <<'ERR', 1);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        19 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          1 |          0 |          0 |         +0
-        36 |          0 |          1 |          1 |          0 |         +0
-        38 |          0 |          0 |          1 |          1 |         +0
-        44 |          1 |          0 |          0 |          1 |         +0
-        88 |          0 |          1 |          1 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2041, zero-initialized=1772 (86.82%), freed=269 (13.18%), remaining=1772
-OUT
+t_run_module([], '', <<'ERR', 1);
 Error: cannot write file 'x/y/z/test1.asm'
 Uncaught runtime exception at errors.c(1)
 ERR
@@ -232,27 +177,7 @@ t_compile_module($init, <<'END', $objs);
 END
 
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         4 |          0 |          2 |          2 |          0 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        40 |          2 |          2 |          0 |          0 |         +0
-        44 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3460, zero-initialized=2408 (69.60%), freed=1688 (48.79%), remaining=1772
-OUT
-ERR
+t_run_module([], '', '', 0);
 
 ok ! -f "test1.asm";
 is read_file("test2.asm"), "write file ok\n";
@@ -284,204 +209,16 @@ write_file('x2/f2', "");
 write_file('x3/f2', "");
 write_file('x3/f3', "");
 
-t_run_module(['f0', '0'], <<'OUT', "", 0);
-f0
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f1', '0'], <<'OUT', "", 0);
-f1
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f2', '0'], <<'OUT', "", 0);
-f2
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f3', '0'], <<'OUT', "", 0);
-f3
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f4', '0'], <<'OUT', "", 0);
-f4
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-
-t_run_module(['f0', '1'], <<'OUT', "", 0);
-f0
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f1', '1'], <<'OUT', "", 0);
-x1/f1
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          1 |          1 |          0 |         +0
-        12 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          0 |          0 |          1 |         +0
-        44 |          1 |          0 |          0 |          1 |         +0
-        48 |          0 |          1 |          1 |          0 |         +0
-        88 |          0 |          0 |          1 |          1 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          1 |          1 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3310, zero-initialized=1868 (56.44%), freed=1538 (46.47%), remaining=1772
-OUT
-
-t_run_module(['f2', '1'], <<'OUT', "", 0);
-x2/f2
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          2 |          2 |          0 |         +0
-        12 |          2 |          0 |          0 |          2 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          2 |          0 |          0 |          2 |         +0
-        44 |          2 |          0 |          0 |          2 |         +0
-        48 |          0 |          2 |          2 |          0 |         +0
-        88 |          0 |          0 |          2 |          2 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          2 |          2 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3708, zero-initialized=1868 (50.38%), freed=1936 (52.21%), remaining=1772
-OUT
-
-t_run_module(['f3', '1'], <<'OUT', "", 0);
-x3/f3
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          3 |          3 |          0 |         +0
-        12 |          3 |          0 |          0 |          3 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          0 |          0 |          3 |         +0
-        44 |          3 |          0 |          0 |          3 |         +0
-        48 |          0 |          3 |          3 |          0 |         +0
-        88 |          0 |          0 |          3 |          3 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          3 |          3 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4106, zero-initialized=1868 (45.49%), freed=2334 (56.84%), remaining=1772
-OUT
-
-t_run_module(['f4', '1'], <<'OUT', "", 0);
-f4
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          3 |          3 |          0 |         +0
-        12 |          3 |          0 |          0 |          3 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          0 |          0 |          3 |         +0
-        44 |          3 |          0 |          0 |          3 |         +0
-        48 |          0 |          3 |          3 |          0 |         +0
-        88 |          0 |          0 |          3 |          3 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          3 |          3 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4106, zero-initialized=1868 (45.49%), freed=2334 (56.84%), remaining=1772
-OUT
+t_run_module(['f0', '0'], "f0\n", '', 0);
+t_run_module(['f1', '0'], "f1\n", '', 0);
+t_run_module(['f2', '0'], "f2\n", '', 0);
+t_run_module(['f3', '0'], "f3\n", '', 0);
+t_run_module(['f4', '0'], "f4\n", '', 0);
+t_run_module(['f0', '1'], "f0\n", '', 0);
+t_run_module(['f1', '1'], "x1/f1\n", '', 0);
+t_run_module(['f2', '1'], "x2/f2\n", '', 0);
+t_run_module(['f3', '1'], "x3/f3\n", '', 0);
+t_run_module(['f4', '1'], "f4\n", '', 0);
 
 
 # test file manipulation
@@ -529,18 +266,7 @@ t_compile_module($init, <<'END', $objs);
 	
 END
 
-t_run_module([], <<'OUT', <<'ERR', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
-OUT
-ERR
+t_run_module([], '', '', 0);
 
 # test file IO
 t_compile_module($init, <<'END', $objs);
@@ -847,34 +573,7 @@ t_compile_module($init, <<'END', $objs);
 
 END
 
-t_run_module([], <<'OUT', <<'END', 0);
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        18 |         17 |          0 |          0 |         17 |         +0
-        19 |         11 |          0 |          0 |         11 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |         28 |         28 |          0 |          0 |         +0
-        29 |          0 |         15 |         15 |          0 |         +0
-        30 |          0 |         10 |         10 |          0 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
-        33 |          0 |          2 |          2 |          0 |         +0
-        36 |          0 |          0 |         17 |         17 |         +0
-        38 |          0 |          1 |         11 |         10 |         +0
-        40 |          1 |          1 |          0 |          0 |         +0
-        44 |         29 |          1 |          0 |         28 |         +0
-        88 |          0 |         28 |         28 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-       384 |          1 |          1 |          0 |          0 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=10126, zero-initialized=2368 (23.39%), freed=8354 (82.50%), remaining=1772
-OUT
+t_run_module([], '', <<'END', 0);
 
 ---- TEST: xfopen ----
 
@@ -1044,9 +743,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.24 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.25 2013-12-15 13:18:35 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.24  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.25  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.24  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).
@@ -1089,7 +792,7 @@ __END__
 #
 # Revision 1.15  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
 #
 # Revision 1.14  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
@@ -1099,11 +802,11 @@ __END__
 # one file errors.t.
 #
 # Revision 1.13  2013/09/01 17:39:26  pauloscustodio
-# Change in test output due to memalloc change.
+# Change in test output due to xmalloc change.
 #
 # Revision 1.12  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
+# Setup xmalloc on init.c.
+# Setup GLib memory allocation functions to use xmalloc functions.
 #
 # Revision 1.11  2013/05/12 19:20:34  pauloscustodio
 # warnings

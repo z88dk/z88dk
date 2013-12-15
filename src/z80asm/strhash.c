@@ -18,14 +18,18 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.12 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.13 2013-12-15 13:18:34 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.12  2013-09-12 00:10:02  pauloscustodio
-/* Create g_free0() macro that NULLs the pointer after free, required
+/* Revision 1.13  2013-12-15 13:18:34  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.12  2013/09/12 00:10:02  pauloscustodio
+/* Create xfree() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
 /* Revision 1.11  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
+/* Replaced xmalloc et al with glib functions
 /*
 /* Revision 1.10  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
@@ -70,7 +74,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 #include "strhash.h"
 #include "strpool.h"
 
@@ -135,7 +139,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 	if ( elem )
 	{
 		HASH_DEL( self->hash, elem );
-		g_free0( elem );
+		xfree( elem );
 	}
 }
 
@@ -152,7 +156,7 @@ void StrHash_set( StrHash *self, char *key, void *value )
 	/* create new element if not found, value is updated at the end */
 	if (elem == NULL) 
 	{						
-		elem = g_new0( StrHashElem, 1 );
+		elem = xnew(StrHashElem);
 		elem->key = strpool_add( key );
 		
 		/* add to hash, need to store elem->key instead of key, as it is invariant */

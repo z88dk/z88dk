@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Bison grammar for z80asm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/parse.y,v 1.1 2013-05-01 19:03:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/parse.y,v 1.2 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: parse.y,v $
-Revision 1.1  2013-05-01 19:03:46  pauloscustodio
+Revision 1.2  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.1  2013/05/01 19:03:46  pauloscustodio
 Simplified scanner and adapted to be used with a BISON generated parser.
 Removed balanced struct checking and token ring.
 Removed start condition to list assembly lines, as it was difficult to keep in sync across included
@@ -38,7 +42,7 @@ Embryo of parse module
 *----------------------------------------------------------------------------*/
 %code requires {
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 }
 

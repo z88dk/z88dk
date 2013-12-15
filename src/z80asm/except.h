@@ -45,7 +45,7 @@ Simple exception mechanism
 
 #pragma once
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "die.h"
 #include "types.h"
@@ -95,9 +95,13 @@ extern int     except_current_count;
 #define THROWN() except_current_throw		/* last thrown */
 
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.12 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.13 2013-12-15 13:18:33 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.12  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.13  2013-12-15 13:18:33  pauloscustodio
+/* Move memory allocation routines to lib/xmalloc, instead of glib,
+/* introduce memory leak report on exit and memory fence check.
+/*
+/* Revision 1.12  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.11  2013/09/08 00:22:09  pauloscustodio

@@ -14,10 +14,10 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.1 2013-11-11 23:47:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.2 2013-12-15 13:18:35 pauloscustodio Exp $
 
 INIT_IN := \
-	memalloc.h 		\
+	lib\xmalloc.h	\
 	strpool.h		\
 	errors.h		\
 	file.h			\
@@ -63,7 +63,11 @@ scan.c : scan.rl dev/Makefile
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.1  2013-11-11 23:47:04  pauloscustodio
+# Revision 1.2  2013-12-15 13:18:35  pauloscustodio
+# Move memory allocation routines to lib/xmalloc, instead of glib,
+# introduce memory leak report on exit and memory fence check.
+#
+# Revision 1.1  2013/11/11 23:47:04  pauloscustodio
 # Move source code generation tools to dev/Makefile, only called on request,
 # and keep the generated files in z80asm directory, so that build does
 # not require tools used for the code generation (ragel, perl).

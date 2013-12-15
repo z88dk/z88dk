@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.2 2013-10-01 22:50:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.3 2013-12-15 13:18:34 pauloscustodio Exp $
 $Log: symref.h,v $
-Revision 1.2  2013-10-01 22:50:27  pauloscustodio
+Revision 1.3  2013-12-15 13:18:34  pauloscustodio
+Move memory allocation routines to lib/xmalloc, instead of glib,
+introduce memory leak report on exit and memory fence check.
+
+Revision 1.2  2013/10/01 22:50:27  pauloscustodio
 Parse command line options via look-up tables:
 -s, --symtable
 -ns, --no-symtable
@@ -32,7 +36,7 @@ Move SymbolRef to symref.c
 #ifndef SYMREF_H
 #define SYMREF_H
 
-#include "memalloc.h"   /* before any other include */
+#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "classlist.h"
