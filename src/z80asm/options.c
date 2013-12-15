@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.61 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.62 2013-12-15 19:01:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -158,7 +158,7 @@ static void process_opt(int *parg, int argc, char *argv[])
 	char	*opt_arg_ptr;
 
 	/* search opts_lu[] */
-	for ( j = 0; j < (int)G_N_ELEMENTS(opts_lu); j++ )
+	for ( j = 0; j < NUM_ELEMS(opts_lu); j++ )
 	{
 		if ( (opt_arg_ptr = check_option( argv[i], opts_lu[j].long_opt )) != NULL ||
 			 (opt_arg_ptr = check_option( argv[i], opts_lu[j].short_opt )) != NULL )
@@ -538,7 +538,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.61  2013-12-15 13:18:34  pauloscustodio
+* Revision 1.62  2013-12-15 19:01:07  pauloscustodio
+* Move platform specific defines from types.h to config.h.
+* Remove dependency of types.h from glib.h.
+* Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+*
+* Revision 1.61  2013/12/15 13:18:34  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *

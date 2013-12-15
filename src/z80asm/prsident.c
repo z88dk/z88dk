@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.49 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.50 2013-12-15 19:01:07 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.49  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.50  2013-12-15 19:01:07  pauloscustodio
+/* Move platform specific defines from types.h to config.h.
+/* Remove dependency of types.h from glib.h.
+/* Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+/*
+/* Revision 1.49  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -489,7 +494,7 @@ struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, G_N_ELEMENTS( Z80ident ), sizeof( struct Z80sym ),
+    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }

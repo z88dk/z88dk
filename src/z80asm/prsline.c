@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.38 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.39 2013-12-15 19:01:07 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.38  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.39  2013-12-15 19:01:07  pauloscustodio
+/* Move platform specific defines from types.h to config.h.
+/* Remove dependency of types.h from glib.h.
+/* Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+/*
+/* Revision 1.38  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -673,7 +678,7 @@ CheckCondition( void )
     char   *text = ident;
     size_t  len = strlen( text );
 
-    for ( i = 0; i < G_N_ELEMENTS(flags); i++ )
+    for ( i = 0; i < NUM_ELEMS(flags); i++ )
     {
         if ( len != strlen( flags[i].name ) )
         {

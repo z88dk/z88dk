@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.8 2013-12-15 13:18:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.9 2013-12-15 19:01:07 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.8  2013-12-15 13:18:43  pauloscustodio
+# Revision 1.9  2013-12-15 19:01:07  pauloscustodio
+# Move platform specific defines from types.h to config.h.
+# Remove dependency of types.h from glib.h.
+# Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+#
+# Revision 1.8  2013/12/15 13:18:43  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #
@@ -198,7 +203,7 @@ void test_hash()
 	time(&end_time);
 	warn("hash: %ld s\n", end_time-start_time);
 
-	warn("total source input words: %5d\n", G_N_ELEMENTS(words));
+	warn("total source input words: %5d\n", NUM_ELEMS(words));
 	warn("total different words:    %5d\n", HASH_COUNT(hashroot->hash));
 	
     HASH_ITER( hh, hashroot->hash, elem, tmp )

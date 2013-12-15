@@ -53,7 +53,7 @@ void dump_ring( char *name, ObjRing *ring )
 	int i, size;
 	Obj *obj;
 	
-	size = G_N_ELEMENTS(ring->queue);
+	size = NUM_ELEMS(ring->queue);
 
 	warn("%s = \"", name);
 	for (i = 0; i < size; i++) {
@@ -742,9 +742,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.9 2013-12-15 13:18:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.10 2013-12-15 19:01:07 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.9  2013-12-15 13:18:35  pauloscustodio
+# Revision 1.10  2013-12-15 19:01:07  pauloscustodio
+# Move platform specific defines from types.h to config.h.
+# Remove dependency of types.h from glib.h.
+# Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+#
+# Revision 1.9  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #

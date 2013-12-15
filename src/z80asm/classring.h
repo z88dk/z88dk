@@ -16,9 +16,14 @@ Fixed-size circular ring of objects defined by class.h
 Objects are pre-allocated and cleared before being returned to caller as new elements.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.4 2013-12-15 13:18:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.5 2013-12-15 19:01:07 pauloscustodio Exp $
 $Log: classring.h,v $
-Revision 1.4  2013-12-15 13:18:33  pauloscustodio
+Revision 1.5  2013-12-15 19:01:07  pauloscustodio
+Move platform specific defines from types.h to config.h.
+Remove dependency of types.h from glib.h.
+Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+
+Revision 1.4  2013/12/15 13:18:33  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -105,7 +110,7 @@ DEF_CLASS_RING(T);
 	void T##Ring_init ( T##Ring *self )										\
 	{																		\
 		int i;																\
-		for ( i = 0; i < (int)G_N_ELEMENTS(self->queue); i++ ) 				\
+		for ( i = 0; i < NUM_ELEMS(self->queue); i++ ) 						\
 		{																	\
 			self->queue[i] = OBJ_NEW(T);									\
 			OBJ_AUTODELETE( self->queue[i] ) = FALSE;						\
@@ -116,7 +121,7 @@ DEF_CLASS_RING(T);
 	void T##Ring_copy ( T##Ring *self, T##Ring *other )						\
 	{																		\
 		int i;																\
-		for ( i = 0; i < (int)G_N_ELEMENTS(self->queue); i++ )					\
+		for ( i = 0; i < NUM_ELEMS(self->queue); i++ )						\
 		{																	\
 			self->queue[i] = T##_clone( other->queue[i] );					\
 		}																	\
@@ -125,7 +130,7 @@ DEF_CLASS_RING(T);
 	void T##Ring_fini ( T##Ring *self )										\
 	{																		\
 		int i;																\
-		for ( i = 0; i < (int)G_N_ELEMENTS(self->queue); i++ ) 				\
+		for ( i = 0; i < NUM_ELEMS(self->queue); i++ ) 						\
 		{																	\
 			OBJ_DELETE( self->queue[i] );									\
 		}																	\
@@ -140,7 +145,7 @@ DEF_CLASS_RING(T);
 	/* check if ring is full */												\
 	BOOL T##Ring_full( T##Ring *self )										\
 	{																		\
-		return ((self->last + 1) % (int)G_N_ELEMENTS(self->queue)) == self->first;	\
+		return ((self->last + 1) % NUM_ELEMS(self->queue)) == self->first;	\
 	}																		\
 																			\
 	/* get pointer to ring element number N for N=0,1,2,..,-2,-1 */			\
@@ -153,7 +158,7 @@ DEF_CLASS_RING(T);
 		first = self->first;												\
 		last  = self->last;													\
 		if ( first > last )													\
-			last += G_N_ELEMENTS(self->queue);									\
+			last += NUM_ELEMS(self->queue);									\
 																			\
 		/* convert n to index */											\
 		if ( n >= 0 ) 			/* positive n */							\
@@ -165,7 +170,7 @@ DEF_CLASS_RING(T);
 		if ( n < first || n >= last )										\
 			return NULL;													\
 		else																\
-			return self->queue[ n % G_N_ELEMENTS(self->queue) ];				\
+			return self->queue[ n % NUM_ELEMS(self->queue) ];				\
 	}																		\
 																			\
 	/* add object to end of ring - clear the element and return pointer */	\
@@ -178,7 +183,7 @@ DEF_CLASS_RING(T);
 		else 																\
 		{																	\
 			obj = self->queue[ self->last++ ];								\
-			self->last %= G_N_ELEMENTS(self->queue);							\
+			self->last %= NUM_ELEMS(self->queue);							\
 			T##_clear( obj );												\
 			return obj;														\
 		}																	\
@@ -195,7 +200,7 @@ DEF_CLASS_RING(T);
 		{																	\
 			self->first--;													\
 			if ( self->first < 0 )											\
-				self->first += G_N_ELEMENTS(self->queue);						\
+				self->first += NUM_ELEMS(self->queue);						\
 			obj = self->queue[ self->first ];								\
 			T##_clear( obj );												\
 			return obj;														\
@@ -213,7 +218,7 @@ DEF_CLASS_RING(T);
 		else 																\
 		{																	\
 			obj = self->queue[ self->first++ ];								\
-			self->first %= G_N_ELEMENTS(self->queue);							\
+			self->first %= NUM_ELEMS(self->queue);							\
 			return obj;														\
 		}																	\
 	}																		\
@@ -230,7 +235,7 @@ DEF_CLASS_RING(T);
 		{																	\
 			self->last--;													\
 			if ( self->last < 0 )											\
-				self->last += G_N_ELEMENTS(self->queue);						\
+				self->last += NUM_ELEMS(self->queue);						\
 			obj = self->queue[ self->last ];								\
 			return obj;														\
 		}																	\

@@ -103,6 +103,7 @@
     <ClInclude Include="legacy.h" />
     <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\queue.h" />
+    <ClInclude Include="lib\uthash.h" />
     <ClInclude Include="lib\xmalloc.h" />
     <ClInclude Include="listfile.h" />
     <ClInclude Include="mapfile.h" />
@@ -124,7 +125,6 @@
     <ClInclude Include="symtab.h" />
     <ClInclude Include="token_def.h" />
     <ClInclude Include="types.h" />
-    <ClInclude Include="uthash.h" />
     <ClInclude Include="z80asm.h" />
   </ItemGroup>
   <ItemGroup>

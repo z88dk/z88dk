@@ -66,9 +66,6 @@
     <ClInclude Include="types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="uthash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="z80asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -139,6 +136,9 @@
       <Filter>Header Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\xmalloc.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uthash.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
