@@ -6,13 +6,14 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.1 2013-12-15 13:18:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.2 2013-12-15 23:51:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "die.h"
 #include "queue.h"
+#include "init.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -57,9 +58,33 @@ static LIST_HEAD( MemBlockList, MemBlock ) mem_blocks = LIST_HEAD_INITIALIZER( m
 
 
 /*-----------------------------------------------------------------------------
+*   Initialize functions
+*----------------------------------------------------------------------------*/
+DEFINE_init()
+{
+#ifdef XMALLOC_DEBUG
+	warn( "xmalloc: init\n" );
+#endif
+
+#ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
+#define REPORT_STDERR(reportType)   \
+			_CrtSetReportMode(reportType, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG); \
+			_CrtSetReportFile(reportType, _CRTDBG_FILE_STDERR )
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	REPORT_STDERR( _CRT_WARN );
+	REPORT_STDERR( _CRT_ERROR );
+	REPORT_STDERR( _CRT_ASSERT );
+#undef REPORT_STDERR
+
+	/* break on allocation Nr. XX */
+	/* _CrtSetBreakAlloc(86); */
+#endif
+}
+
+/*-----------------------------------------------------------------------------
 *   Terminate function
 *----------------------------------------------------------------------------*/
-static void fini(void)
+DEFINE_fini()
 {
     MemBlock *block;
 
@@ -81,42 +106,6 @@ static void fini(void)
         _xfree( CLIENT_PTR( block ), __FILE__, __LINE__ );  /* deletes from list */
     }
 }
-
-
-/*-----------------------------------------------------------------------------
-*   Initialize functions
-*----------------------------------------------------------------------------*/
-#define REPORT_STDERR(reportType)   \
-    _CrtSetReportMode(reportType, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG); \
-    _CrtSetReportFile(reportType, _CRTDBG_FILE_STDERR )
-
-static void init(void)
-{
-	static int initialized = 0;
-	
-	if ( ! initialized++ )
-	{
-		xatexit( fini );
-
-#ifdef XMALLOC_DEBUG
-		warn( "xmalloc: init\n" );
-#endif
-
-#ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
-		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-		REPORT_STDERR( _CRT_WARN );
-		REPORT_STDERR( _CRT_ERROR );
-		REPORT_STDERR( _CRT_ASSERT );
-
-		/* break on allocation Nr. XX */
-		/* _CrtSetBreakAlloc(86); */
-#endif
-		
-	}
-}
-
-#undef REPORT_STDERR
-
 
 /*-----------------------------------------------------------------------------
 *   Create a new MemBlock
@@ -348,7 +337,10 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
 /* 
 * $Log: xmalloc.c,v $
-* Revision 1.1  2013-12-15 13:18:43  pauloscustodio
+* Revision 1.2  2013-12-15 23:51:25  pauloscustodio
+* Use init.h
+*
+* Revision 1.1  2013/12/15 13:18:43  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *
