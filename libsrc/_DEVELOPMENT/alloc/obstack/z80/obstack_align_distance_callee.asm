@@ -41,19 +41,19 @@ asm_obstack_align_distance:
    
    call l_power_2_bc           ; bc = power of 2
    jp c, error_einval_mc
+   
+   dec bc                      ; bc = alignment - 1
+   ld a,b
+   or c
+   jp z, error_znc             ; distance is 0 for alignment == 1
 
    ld e,(hl)
    inc hl
    ld d,(hl)                   ; de = ob->fence
-
-   dec c
-   jp z, error_znc             ; distance is zero for alignment == 1
-   inc c
    
    ld l,e
    ld h,d                      ; hl = ob->fence
    
-   dec bc
    add hl,bc                   ; hl = fence + (alignment-1)
    jp c, error_einval_mc
    
