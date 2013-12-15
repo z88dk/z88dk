@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.50 2013-10-08 21:53:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.51 2013-12-15 04:02:26 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -469,7 +469,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o";
+	$compile_args .= " -DMEMALLOC_DEBUG memalloc.c lib/die.o except.o strpool.o";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {
@@ -480,7 +480,7 @@ sub t_compile_module {
 	
 	# get list of object files
 	my %modules;
-	while ($compile_args =~ /(\w+)\.[co]/ig) {
+	while ($compile_args =~ /(\S+)\.[co]\b/ig) {
 		$modules{$1}++;
 	}
 
@@ -990,6 +990,9 @@ list_first_line();
 sub get_gcc_options {
 	our %FLAGS;
 	
+	# hack
+	$ENV{LOCAL_LIB} = "lib";
+	
 	if ( ! %FLAGS ) {
 		open(my $pipe, "make -p|") or die;
 		while (<$pipe>) {
@@ -1014,7 +1017,10 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.50  2013-10-08 21:53:07  pauloscustodio
+# Revision 1.51  2013-12-15 04:02:26  pauloscustodio
+# Move the die and queue modules to the z80asm/lib directory
+#
+# Revision 1.50  2013/10/08 21:53:07  pauloscustodio
 # Replace Flex-based lexer by a Ragel-based one.
 # Add interface to file.c to read files by tokens, calling the lexer.
 #

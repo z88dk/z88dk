@@ -1,15 +1,14 @@
 @echo off
-rem $Id: gccmake.bat,v 1.19 2013-11-11 23:47:03 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.20 2013-12-15 04:02:25 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
 echo *******************
-del *.o
+del *.o lib\*.o
 gcc -c -o asmdrctv.o             asmdrctv.c
 gcc -c -o class.o                class.c
 gcc -c -o codearea.o             codearea.c
 gcc -c -o deffile.o              deffile.c
-gcc -c -o die.o                  die.c
 gcc -c -o dynstr.o               dynstr.c
 gcc -c -o errors.o               errors.c
 gcc -c -o except.o               except.c
@@ -41,6 +40,7 @@ gcc -c -o symtab.o               symtab.c
 gcc -c -o z80asm.o               z80asm.c
 gcc -c -o z80instr.o             z80instr.c
 gcc -c -o z80pass.o              z80pass.c
-gcc -o z80asm.exe *.o
+gcc -c -o lib/die.o              lib/die.c
+gcc -o z80asm.exe *.o lib\*.o
 copy z80asm.exe ..\..\bin
 del z80asm.exe
