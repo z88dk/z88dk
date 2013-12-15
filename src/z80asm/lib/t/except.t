@@ -1,35 +1,29 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
-#
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.11 2013-12-15 13:18:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.1 2013-12-15 20:30:39 pauloscustodio Exp $
 #
-# Test exceptions
+# Test except.c
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+use File::Slurp;
+use Capture::Tiny 'capture';
 
-my $objs = "strutil.o safestr.o";
+my $compile = "cc -Wall -otest test.c except.c die.c";
 
 # compile
-t_compile_module('', <<'END', $objs);
+write_file("test.c", <<'END');
+#include "except.h"
+#include <stdlib.h>
+int main(int argc, char *argv[])
+{
 	int test;
 	
 	if (argc != 2) 				return 1;
 	test = atoi(argv[1]);
-	
+
 	if (test == 0)
 	{
 		warn("Throw without try\n");
@@ -86,19 +80,20 @@ t_compile_module('', <<'END', $objs);
 		ETRY;
 	}
 	warn("End of main\n");	
-	return 0;
-END
 
+	return 0;
+}
+END
+ok !system $compile;
 
 # THROW outside of TRY
-t_run_module([0], '', <<'ERR', 1);
+is_deeply [capture {system "test 0"}], ["", <<'ERR', 256];
 Throw without try
-Uncaught runtime exception at test.c(1)
+Uncaught runtime exception at test.c(13)
 ERR
 
-
 # run FatalErrorException
-t_run_module([1], '', <<'ERR', 0);
+is_deeply [capture {system "test 1"}], ["", <<'ERR', 0];
 Before try
 In try
 Throw FatalErrorException
@@ -107,7 +102,7 @@ End of main
 ERR
 
 # run AssertionException
-t_run_module([2], '', <<'ERR', 0);
+is_deeply [capture {system "test 2"}], ["", <<'ERR', 0];
 Before try
 In try
 Throw AssertionException
@@ -117,7 +112,7 @@ End of main
 ERR
 
 # run second-level try and rethrow
-t_run_module([3], '', <<'ERR', 0);
+is_deeply [capture {system "test 3"}], ["", <<'ERR', 0];
 Before try
 In try
 In test 3, new try
@@ -129,13 +124,15 @@ Finally, THROWN() = 2
 End of main
 ERR
 
-unlink_testfiles();
+unlink <test.*>;
 done_testing;
 
 
-__END__
-# $Log: whitebox-except.t,v $
-# Revision 1.11  2013-12-15 13:18:35  pauloscustodio
+# $Log: except.t,v $
+# Revision 1.1  2013-12-15 20:30:39  pauloscustodio
+# Move except.c to the z80asm/lib directory
+#
+# Revision 1.11  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #

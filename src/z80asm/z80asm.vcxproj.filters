@@ -63,9 +63,6 @@
     <ClInclude Include="strutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="z80asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,9 +117,6 @@
     <ClInclude Include="token_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="except.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -139,6 +133,12 @@
       <Filter>Header Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\uthash.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\types.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\except.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -239,9 +239,6 @@
     <ClCompile Include="deffile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="except.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -249,6 +246,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\xmalloc.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\except.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
