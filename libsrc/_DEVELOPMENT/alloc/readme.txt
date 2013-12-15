@@ -2,14 +2,14 @@
 Various memory allocators:
 
 
-= block ==================
+= balloc ==================
 
 A block allocator that allocates fixed size blocks from queues of available blocks.  Fastest, one byte overhead per block, smallest code footprint, and no external fragmentation.  Main purpose is to efficiently handle frequently allocated and deallocated fixed size memory blocks.
 
 
 = malloc =================
 
-Implements the standard C malloc-related functions, able to allocate variable-size blocks from a heap.  Slowest, four bytes per block overhead, largest code footprint, suffers from external fragmentation.  Main purpose is to handle allocation requests of varying size.
+Implements the standard C malloc-related functions, able to allocate variable-size blocks from a heap.  Slowest, six bytes per block overhead, largest code footprint, suffers from external fragmentation.  Main purpose is to handle allocation requests of varying size and uncertain lifetimes.
 
 
 = obstack ================

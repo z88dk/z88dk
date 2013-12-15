@@ -6,7 +6,7 @@ struct region
    struct region *next;      // +0 // 0 if no next region in list
    uint_16        size;      // +2 // & region + size = & byte following region
    struct block   blocks[];  // +4 // array of allocation blocks
-   void          *terminal;  // +? // last two bytes are NULL == 0
+   void          *terminal;  // +? // last two bytes are 0
 };
 
 Within the region is a linked list of allocation blocks.  During execution, these blocks are packed together like an array and completely occupy the space up to terminal but the number of blocks and size of each block will vary.
