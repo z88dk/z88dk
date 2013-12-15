@@ -15,8 +15,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../obstack.inc"
-
 XLIB obstack_free_callee
 XDEF asm_obstack_free
 
@@ -87,7 +85,7 @@ free_all:
    ; hl = struct obstack *ob
    
    ex de,hl
-   ld hl,__ob_mem
+   ld hl,6
    add hl,de
    ex de,hl                    ; de = & ob->mem
    

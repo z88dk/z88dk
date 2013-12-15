@@ -10,8 +10,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../obstack.inc"
-
 XLIB obstack_init_callee
 XDEF asm_obstack_init
 
@@ -60,7 +58,7 @@ big_enough:
 
    push de                     ; save ob
 
-   ld hl,__ob_mem
+   ld hl,6
    add hl,de                   ; hl = & first allocatable byte = new fence
    ex de,hl                    ; de = new fence, hl = ob
    
