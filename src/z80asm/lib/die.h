@@ -3,7 +3,7 @@ Exit with a fatal error, warn on stderr
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.1 2013-12-15 04:02:26 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.2 2013-12-15 13:01:40 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -17,13 +17,18 @@ extern void die( char *msg, ... );
 extern void warn( char *msg, ... );
 
 /* OS-interface - die on error */
-#define xatexit(func) 	if ( atexit(func) ) \
-						{ die("atexit() failed at %s:%d\n", __FILE__, __LINE__ ); } \
-						else
+#define xatexit(func) 	do { \
+							if ( atexit(func) ) \
+								die("atexit() failed at %s:%d\n", __FILE__, __LINE__ ); \
+						} while (0)
 
 /*
 * $Log: die.h,v $
-* Revision 1.1  2013-12-15 04:02:26  pauloscustodio
+* Revision 1.2  2013-12-15 13:01:40  pauloscustodio
+* Replace "if(1) { ... } else" in macro with "do { ... } while (0)" to avoid warning
+* "suggest braces around empty body in an 'else' statement [-Wempty-body]"
+*
+* Revision 1.1  2013/12/15 04:02:26  pauloscustodio
 * Move the die and queue modules to the z80asm/lib directory
 *
 * Revision 1.6  2013/09/01 00:18:28  pauloscustodio
