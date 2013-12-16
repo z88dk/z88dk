@@ -4,6 +4,9 @@ XDEF __0_malloc_block_allocate_fixed, __1_malloc_block_allocate_fixed
 
 __malloc_block_allocate_fixed:
 
+   ; Create a new memory block block_new inside the existing memory
+   ; block block.  Assumes there is sufficient space for the new block.
+   ;
    ; enter : bc = request size
    ;         hl = & block
    ;         de = & block_new

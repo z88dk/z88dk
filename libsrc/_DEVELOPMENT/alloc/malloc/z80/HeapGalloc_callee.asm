@@ -47,10 +47,14 @@ asm_HeapGalloc:
    or e
    jp z, asm_HeapRealloc       ; if p == 0 we are allocating, not resizing
    
-   push hl                     ; save heap
-   push de                     ; save p
-   
    ex de,hl
+   
+   ld a,b
+   or c
+   ret z                       ; if size == 0
+   
+   push de                     ; save heap
+   push hl                     ; save p
    
    dec hl
    dec hl
