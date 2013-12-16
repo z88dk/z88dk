@@ -182,9 +182,9 @@ extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, void *drawf,
 extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, void *drawf);
 extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
 
-extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
-extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
-extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
+extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uchar row, uchar col, uchar vrot, uchar hrot);
+extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint x, uint y);
 
 extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
 extern void               __LIB__   sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2);
@@ -203,9 +203,9 @@ extern void  __FASTCALL__ __LIB__   sp1_RemoveCharStruct(struct sp1_cs *cs);
 
 extern struct sp1_ss __CALLEE__ __LIB__ *sp1_CreateSpr_callee(void *drawf, uchar type, uchar height, int graphic, uchar plane);
 extern uint          __CALLEE__ __LIB__  sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uchar row, uchar col, uchar vrot, uchar hrot);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint x, uint y);
 extern void          __CALLEE__ __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1);
 extern void          __CALLEE__ __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2);
 extern void          __CALLEE__ __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf);
