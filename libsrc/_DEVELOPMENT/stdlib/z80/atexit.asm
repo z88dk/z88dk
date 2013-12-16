@@ -36,6 +36,7 @@ asm0_atexit:
 
    cp (hl)                     ; space for another function?
    jp z, error_mc
+   jp c, error_mc
    inc (hl)
    
    ld c,(hl)
