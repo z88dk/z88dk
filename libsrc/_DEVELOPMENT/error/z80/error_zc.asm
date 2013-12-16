@@ -1,7 +1,6 @@
 
 XLIB error_zc
 
-
    pop hl
 
 error_zc:
@@ -10,5 +9,6 @@ error_zc:
    ; set carry flag
 
    ld hl,0
+   
    scf
    ret

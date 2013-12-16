@@ -2,7 +2,7 @@
 XLIB l_divu_32_32x32
 XDEF l0_divu_32_32x32
 
-LIB error_divide_mc
+LIB error_divide_by_zero_mc
 
 l_divu_32_32x32:
 
@@ -121,4 +121,4 @@ divide_zero:
    push af
    
    dec de
-   jp error_divide_mc
+   jp error_divide_by_zero_mc

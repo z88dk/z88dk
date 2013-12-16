@@ -1,9 +1,7 @@
+INCLUDE "../../errorno.inc"
 
 XLIB error_edom_zc
-
-INCLUDE "../../errorno.inc"
 LIB errno_zc
-
 
    pop hl
    

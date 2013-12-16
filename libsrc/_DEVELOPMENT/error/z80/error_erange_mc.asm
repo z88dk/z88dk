@@ -1,9 +1,7 @@
+INCLUDE "../../errorno.inc"
 
 XLIB error_erange_mc
-
-INCLUDE "../../errorno.inc"
 LIB errno_mc
-
 
    pop hl
    

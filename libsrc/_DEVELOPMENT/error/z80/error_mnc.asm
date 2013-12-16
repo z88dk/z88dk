@@ -1,7 +1,6 @@
 
 XLIB error_mnc
 
-
    pop hl
    
 error_mnc:
@@ -10,6 +9,7 @@ error_mnc:
    ; reset carry flag
 
    ld hl,-1
+   
    scf
    ccf
    ret

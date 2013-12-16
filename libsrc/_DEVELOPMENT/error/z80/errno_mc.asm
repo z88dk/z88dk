@@ -1,7 +1,7 @@
 
-XLIB errno_mc
-
 INCLUDE "../../crt_vars.inc"
+
+XLIB errno_mc
 LIB error_mc
    
 errno_mc:
