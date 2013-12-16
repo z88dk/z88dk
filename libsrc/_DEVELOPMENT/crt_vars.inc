@@ -13,8 +13,29 @@
 
 defvars __crt_vars_host
 {
-   __system           ds.w  1      ;; address of system() function or zero
+
+   ;;;;;;;;;;;;;;;;;;
+   ;; host jump table
+   ;;;;;;;;;;;;;;;;;;
    
+   ; int system(char *s)
+   ;
+   ; enter : hl = char *s
+   ;
+   ; exit  : if s == 0
+   ;
+   ;           carry reset
+   ;           hl = non-zero
+   ;
+   ;         else
+   ;
+   ;           hl = result
+   ;
+   ; uses  : all
+   
+   __ch_system        ds.b  1      ;; 195 = JP
+                      ds.w  1      ;; address of system function
+                                   ;; (default = error_zc)
    __END_CRT_VARS_HOST
 }
 
@@ -71,7 +92,7 @@ defvars __crt_vars_thread
    
    __ct_free          ds.b  1      ;; 195 = JP
                       ds.w  1      ;; address of free compatible function
-
+                                   ;; (default = free)
    ; library memory allocator
    ;
    ; enter : hl = request size in bytes
@@ -90,6 +111,7 @@ defvars __crt_vars_thread
                       
    __ct_malloc        ds.b  1      ;; 195 = JP
                       ds.w  1      ;; address of malloc compatible function
+                                   ;; (default = malloc)
 
    __END_CRT_VARS_THREAD
 }
@@ -116,7 +138,7 @@ defvars __crt_locale
    
    __lc_char_cmp_bc   db.1         ;; 195 = JP
                       dw.1         ;; function address
-   
+                                   ;; (default = __lc_char_cmp_bc_default)
    ; char to ordinal mapping
    ;
    ; enter : a = char
@@ -127,6 +149,6 @@ defvars __crt_locale
    
    __lc_char_ordinal  db.1         ;; 195 = JP
                       dw.1         ;; function address
-
+                                   ;; (default = __lc_char_ordinal_default)
    __END_CRT_LOCALE
 }
