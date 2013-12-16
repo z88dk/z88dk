@@ -16,6 +16,8 @@ INCLUDE "../../crt_vars.inc"
 XLIB system
 XDEF asm_system
 
+LIB l_inc_sp
+
 system:
 asm_system:
 
@@ -33,9 +35,7 @@ asm_system:
    ;
    ; uses  :  all
    
-   push hl
-
+   push hl                     ; parameter on stack in case of c linkage
    call __ch_system
+   jp l_inc_sp - 2             ; do not disturb any return values
 
-   pop hl
-   ret
