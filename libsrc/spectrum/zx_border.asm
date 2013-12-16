@@ -14,4 +14,11 @@ zx_border:
    or l
    
    out (254),a
+   
+   ld a,l
+   add a,a
+   add a,a
+   add a,a
+   ld (23624),a   ; system var bordcr is where we are storing border colour for now
+   
    ret
