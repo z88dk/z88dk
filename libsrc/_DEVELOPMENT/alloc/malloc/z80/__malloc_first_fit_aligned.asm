@@ -1,14 +1,11 @@
 
-********* NEED TO REPAIR
-
-
-XLIB __malloc_first_fit_aligned
-LIB l_andc_hlbc
+XLIB __malloc_first_fit_aligned, l_andc_hlbc, l_inc_sp
+LIB __malloc_block_adequate, __malloc_block_allocate_fixed
 
 __malloc_first_fit_aligned:
 
-   ; Return the first block found to have enough free
-   ; bytes at an aligned address to accommodate the request
+   ; Return the first block found to have enough
+   ; free bytes at an aligned address
    ;
    ; enter : de = request size
    ;         hl = & first block in region
@@ -17,9 +14,9 @@ __malloc_first_fit_aligned:
    ; exit  : success
    ;
    ;           carry reset
-   ;           de = p_aligned
-   ;           bc = request size
    ;           hl = & block
+   ;           de = & block_p = p_aligned - 6
+   ;           bc = request size
    ;
    ;         fail, adequate block not found
    ;
@@ -35,8 +32,9 @@ block_loop:
    ; hl = & block
    ; de = request size
    
-   push hl                     ; save & block
+   push bc                     ; save alignment - 1
    push de                     ; save request size
+   push hl                     ; save & block
    push hl                     ; save & block
    
    ; find first aligned address in block
@@ -56,9 +54,9 @@ block_loop:
    ld l,a                      ; hl = block->committed
 
    ; bc = alignment - 1
-   ; de = & block->next
+   ; de = & block_next
    ; hl = block->committed
-   ; stack = & block, request size, & block
+   ; stack = alignment - 1, request size, & block, & block
    
    ex de,hl
    ex (sp),hl
@@ -66,99 +64,125 @@ block_loop:
    ; bc = alignment - 1
    ; hl = & block
    ; de = block->committed
-   ; stack = & block, request size, & block_next
-****** special case committed = 0
-   add hl,de                   ; hl = p = & first available byte in block
-   add hl,bc                   ; hl = p + (alignment - 1)
-   jr c, not_this_block        ; if ptr wrapped
+   ; stack = alignment - 1, request size, & block, & block_next
 
-   call l_andc_hlbc            ; hl = hl & ~(bc) = p_aligned
-   ex de,hl
+   add hl,de
+
+   ld a,d
+   or e
    
-   ; find free bytes from aligned address
-   
-   ; de = p_aligned
+   ld de,6                     ;de = sizeof(header)
+
+   jr z, test_overlay          ; if block->committed == 0
+
+   add hl,de                   ; hl = & block + block->committed + sizeof(header)
+   jr c, block_fail
+
+cond_1:
+
+   ; hl = proposed p
    ; bc = alignment - 1
-   ; stack = & block, request size, & block_next
+   ; de = sizeof(header) = 6
+   ; stack = alignment - 1, request size, & block, & block_next
+   
+   add hl,bc
+   call l_andc_hlbc            ; hl = proposed p_aligned
 
-   pop hl
+cond_0:
+
+   sbc hl,de                   ; hl = p_aligned - 6 = & block_p
+
+   ; hl = & block_p
+   ; stack = alignment - 1, request size, & block, & block_next
+
    pop af
-   push bc
-   push hl
+   pop de
+   pop bc
    push af
-   pop bc
-   
-   ; de = p_aligned
+
+   ; hl = & block_p
+   ; de = & block
    ; bc = request size
-   ; hl = & block_next
-   ; stack = & block, alignment - 1, & block_next
-
-   scf
-   sbc hl,de                   ; hl = available bytes
-   jr c, aligned_outside_block
-
-   ; enough room ?
+   ; stack = alignment - 1, & block_next
    
-   sbc hl,bc                   ; can satisfy request ?
-   jr nc, found_block
+   push de                       ; save & block
+   call __malloc_block_adequate  ; can we place block_p ?
+   pop hl                        ; hl = & block
    
+   ; hl = & block
+   ; de = & block_p
+   ; bc = request size
+   ; stack = alignment - 1, & block_next
+   
+   jp nc, l_inc_sp - 4         ; found block, return after popping two items
+
    ; better luck with next block
-
-aligned_outside_block:
-
-   ld e,c
-   ld d,b
    
-   pop hl
-   pop bc
-   pop af
-
+   ld e,c
+   ld d,b                      ; de = request size
+   pop hl                      ; hl = & block_next
+   pop bc                      ; bc = alignment - 1
+   
    ; bc = alignment - 1
    ; hl = & block_next
    ; de = request size
-
+  
    jp block_loop
 
-not_this_block:
+test_overlay:
 
    ; bc = alignment - 1
-   ; stack = & block, request size, & block_next
+   ; hl = & block
+   ; de = sizeof(header) = 6
+   ; stack = alignment - 1, request size, & block, & block_next
+
+   ; block->committed == 0 so try to place on top of block
+   
+   add hl,de                   ; hl = & block + header = proposed p
+
+   ld a,l
+   and c
+   jr nz, not_aligned
+   
+   ld a,h
+   and b
+   jr z, cond_0                ; if block supports an aligned address
+
+not_aligned:
+
+   ; block is not at an aligned address so move
+   ; proposed p past header
+
+   add hl,de
+   jp cond_1
+
+block_fail:
+
+   ; stack = alignment - 1, request size, & block, & block_next
 
    pop hl
    pop de
-   pop af
+   pop de
+   pop bc
 
    ; bc = alignment - 1
    ; hl = & block_next
    ; de = request size
-
+  
    jp block_loop
-
-found_block:
-
-   ; de = p_aligned
-   ; bc = request size
-   ; stack = & block, alignment - 1, & block_next
-
-   pop hl
-   pop hl
-   pop hl
-
-   ; carry reset
-   ; de = p_aligned
-   ; bc = request size
-   ; hl = & block
-
-   ret
 
 fail_exit:
 
-   ; bc = alignment - 1
-   ; stack = X, request size, X
-   
+   ; stack = alignment - 1, request size, ?, ?
+
    pop de
    pop de
-   pop hl
-   
+   pop de
+   pop bc
    scf
+   
+   ; carry set
+   ; de = request size
+   ; bc = alignment - 1
+
    ret

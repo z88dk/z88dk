@@ -121,16 +121,10 @@ search_region:
 
 found_memory:
    
-   ; de = p_aligned
+   ; de = & block_p = & block_new
    ; bc = request size
    ; hl = & block
    ; stack = & next_region
    
-   ex (sp),hl
-   
-   ld hl,-6
-   add hl,de
-   ex de,hl                          ; de = & block_new = p_aligned - 6
-
-   pop hl                            ; hl = & block
+   pop af
    jp __malloc_block_allocate_fixed  ; allocate at fixed memory address
