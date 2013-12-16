@@ -3,8 +3,8 @@
 ;; CRT USER DEFINES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; defc __EXITSTACK_SZ       = 32  ;; less than 256
-;; defc __QUICK_EXITSTACK_SZ = 32  ;; less than 256
+;; defc __EXITSTACK_SZ       = 32  ;; less than 255
+;; defc __QUICK_EXITSTACK_SZ = 32  ;; less than 255
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
