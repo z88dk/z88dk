@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *galloc(void *p, int resize)
+; void *_galloc(void *p, int resize)
 ;
 ; Implicitly uses the thread's heap for allocation.
 ;
@@ -17,19 +17,19 @@
 
 INCLUDE "../../../crt_vars.inc"
 
-XLIB galloc_callee
-XDEF asm_galloc
+XLIB _galloc_callee
+XDEF asm__galloc
 
 LIB asm_HeapGalloc
 
-galloc_callee:
+_galloc_callee:
 
    pop hl
    pop bc
    pop de
    push hl
 
-asm_galloc:
+asm__galloc:
 
    ; enter : de = void *p
    ;         bc = int resize (signed)

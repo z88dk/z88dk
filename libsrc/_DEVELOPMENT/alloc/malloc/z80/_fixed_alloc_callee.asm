@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *fixed_alloc(void *p, size_t size)
+; void *_fixed_alloc(void *p, size_t size)
 ;
 ; Attempt to allocate size bytes from the thread's heap at
 ; fixed address p.  Returns p or 0 on failure.
@@ -14,19 +14,19 @@
 
 INCLUDE "../../../crt_vars.inc"
 
-XLIB fixed_alloc_callee
-XDEF asm_fixed_alloc
+XLIB _fixed_alloc_callee
+XDEF asm__fixed_alloc
 
 LIB asm_HeapAllocFixed
 
-fixed_alloc_callee:
+_fixed_alloc_callee:
 
    pop de
    pop hl
    pop bc
    push de
 
-asm_fixed_alloc:
+asm__fixed_alloc:
 
    ; enter : bc = void *p
    ;         hl = size_t size
