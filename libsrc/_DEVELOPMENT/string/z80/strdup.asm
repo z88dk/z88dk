@@ -16,7 +16,7 @@ INCLUDE "../../crt_vars.inc"
 XLIB strdup
 XDEF asm_strdup, asm0_strdup
 
-LIB asm_strlen, asm_HeapAlloc, error_enomem_zc
+LIB asm_strlen, malloc, error_enomem_zc
 
 strdup:
 asm_strdup:
@@ -45,11 +45,9 @@ asm_strdup:
    inc hl                      ; include space for NUL
 
 asm0_strdup:
-
-   ld de,__heap                ; use thread's heap
-   
+ 
    push hl
-   call asm_HeapAlloc          ; malloc(hl bytes)
+   call malloc                 ; malloc(hl bytes)
    pop bc                      ; bc = length
    
    pop de                      ; de = char *s
