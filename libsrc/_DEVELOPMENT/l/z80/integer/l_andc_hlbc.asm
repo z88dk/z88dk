@@ -6,6 +6,7 @@ l_andc_hlbc:
    ; enter : hl, bc
    ;
    ; exit  : hl = hl & (~bc)
+   ;         carry reset
    ;
    ; uses  : af, hl
 
