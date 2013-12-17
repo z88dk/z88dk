@@ -166,6 +166,7 @@ int main()
         ptr = skip_ws(buf);
 
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
+            int  ol = 1;
             ptr = skip_ws(ptr + 7);
          
             if ( strncmp(ptr, "output",6) == 0 ) {
@@ -185,8 +186,10 @@ int main()
                 write_bytes(ptr + 4, 0);
             } else if ( strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
+                ol = 0;
             } else if ( strncmp(ptr, "endasm", 6) == 0 ) {
                 fputs("__endasm;\n",stdout);
+                ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */
                 write_defined("myzorg", atoi(ptr+6));
@@ -206,6 +209,9 @@ int main()
                 write_need("expanded", 1);
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
                 write_need("expanded", 0);
+            }
+            if ( ol ) {
+                fputs("\n",stdout);
             }
         } else if ( strncmp(ptr, "#asm", 4) == 0 ) {
             fputs("__asm\n",stdout);
