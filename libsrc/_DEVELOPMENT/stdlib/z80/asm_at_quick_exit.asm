@@ -12,10 +12,10 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB at_quick_exit
+XLIB asm_at_quick_exit
+
 LIB asm0_atexit
 
-at_quick_exit:
 asm_at_quick_exit:
 
    ; enter : hl = func

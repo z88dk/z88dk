@@ -3,26 +3,24 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; int atoi(const char *buf)
+; long atol(const char *buf)
 ;
-; Read the initial portion of the string as decimal integer and
+; Read the initial portion of the string as decimal long and
 ; return value read.  Any initial whitespace is skipped.
 ;
 ; ===============================================================
 
-XLIB atoi
-XDEF asm_atoi
+XLIB asm_atol
 
-LIB l_eat_ws, l_eat_sign, l_neg_hl, l_atou
+LIB l_eat_ws, l_eat_sign, l_neg_dehl, l_atoul
 
-atoi:
-asm_atoi:
+asm_atol:
 
    ; enter : hl = char *buf
    ;
-   ; exit  : de = char *buf (next unprocessed char, could be digit on overflow)
-   ;         hl = int result
-   ;         carry set on overflow (hl clamped to INT_MAX or INT_MIN)
+   ; exit  : bc = char *buf (next unprocessed char, could be digit on overflow)
+   ;         dehl = long result
+   ;         carry set on overflow (dehl clamped to LONG_MAX or LONG_MIN)
    ;
    ; uses  : af, bc, de, hl
 
@@ -33,23 +31,26 @@ asm_atoi:
    ; negative sign found
    
    call not_negative           ; convert numerical part
-   jp nc, l_neg_hl             ; if no overflow, negate result
-   
-   inc hl                      ; hl = $8000 = INT_MIN
+   jp nc, l_neg_dehl           ; if no overflow, negate result
+      
+   inc de
+   inc hl                      ; dehl = LONG_MIN = $80000000
    ret
 
 not_negative:
 
    ex de,hl
-   call l_atou                 ; unsigned int conversion
+   call l_atoul                ; unsigned long conversion
    jr c, overflow              ; unsigned overflow
    
-   bit 7,h                     ; check for signed overflow
+   bit 7,d                     ; check for signed overflow
    ret z
    
    scf                         ; indicate signed overflow
 
 overflow:
 
-   ld hl,$7fff                 ; hl = $7fff = INT_MAX
+   ld de,$7fff
+   ld h,e
+   ld l,e                      ; dehl = LONG_MAX = $7fffffff
    ret

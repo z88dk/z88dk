@@ -9,12 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB abs
-XDEF asm_abs
+XLIB asm_abs
 
 LIB l_neg_hl
 
-abs:
 asm_abs:
 
    ; enter : hl = int j

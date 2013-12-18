@@ -13,12 +13,10 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB system
-XDEF asm_system
+XLIB asm_system
 
 LIB l_inc_sp
 
-system:
 asm_system:
 
    ; enter : hl = char *string
@@ -38,4 +36,3 @@ asm_system:
    push hl                     ; parameter on stack in case of c linkage
    call __ch_system
    jp l_inc_sp - 2             ; do not disturb any return values
-

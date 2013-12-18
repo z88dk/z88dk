@@ -12,12 +12,11 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB atexit
-XDEF asm_atexit, asm0_atexit
+XLIB asm_atexit
+XDEF asm0_atexit
 
 LIB error_mc, error_znc
 
-atexit:
 asm_atexit:
 
    ; enter : hl = func

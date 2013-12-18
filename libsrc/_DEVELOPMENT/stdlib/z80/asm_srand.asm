@@ -11,10 +11,8 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB srand
-XDEF asm_srand
+XLIB asm_srand
 
-srand:
 asm_srand:
 
    ; enter : hl = seed

@@ -9,12 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB labs
-XDEF asm_labs
+XLIB asm_labs
 
 LIB l_neg_dehl
 
-labs:
 asm_labs:
 
    ; enter : dehl = long

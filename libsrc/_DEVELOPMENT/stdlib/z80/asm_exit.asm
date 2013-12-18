@@ -12,12 +12,11 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB exit
-XDEF asm_exit, asm0_exit
+XLIB asm_exit
+XDEF asm0_exit
 
 LIB _Exit, l_jphl
 
-exit:
 asm_exit:
 
    ; enter : hl = status

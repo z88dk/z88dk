@@ -12,12 +12,10 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB quick_exit
-XDEF asm_quick_exit
+XLIB asm_quick_exit
 
 LIB asm0_exit
 
-quick_exit:
 asm_quick_exit:
 
    ; enter : hl = status
