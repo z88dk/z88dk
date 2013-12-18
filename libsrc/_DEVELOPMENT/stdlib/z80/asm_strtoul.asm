@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
+; unsigned long strtoul( const char * restrict nptr, char ** restrict endptr, int base)
 ;
 ; Read number encoded in given radix from string; if base == 0,
 ; radix is auto-detected as decimal, octal or hex.
@@ -12,19 +12,11 @@
 ;
 ; ===============================================================
 
-XLIB strtol_callee
-XDEF asm_strtol
+XLIB asm_strtoul
 
-LIB __strtoul, error_erange_mc, error_erange_zc, error_einval_zc
+LIB __strtoul, error_einval_zc, error_erange_mc, error_erange_zc
 
-strtol_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
-
-asm_strtol:
+asm_strtoul:
 
    ; enter : bc = int base
    ;         de = char **endp
@@ -35,7 +27,7 @@ asm_strtol:
    ;         no error:
    ;
    ;           carry reset
-   ;           dehl = long result
+   ;           dehl = unsigned long result
    ;             bc = char *nptr (& next unconsumed char)
    ;            ixl = base
    ;
@@ -43,47 +35,35 @@ asm_strtol:
    ;
    ;           carry set
    ;             bc = initial char *nptr
-   ;           dehl = 0
    ;            ixl = base
+   ;           dehl = 0
    ;           errno set to EINVAL
-   ;
+   ;           
    ;         overflow:
    ;
-   ;           carry set
+   ;            carry set
    ;             bc = char *nptr (& next unconsumed char following oversized number)
    ;            ixl = base
-   ;           dehl = $7fffffff (LONG_MAX) or $80000000 (LONG_MIN)
+   ;           dehl = $ffffffff (ULONG_MAX) or $80000000 (LONG_MIN)
    ;           errno set to ERANGE
    ;
    ; uses  : af, bc, de, hl, ix
-   
-   call __strtoul
-   jr c, check_errors
-   
-   ; unsigned conversion was successful but signed
-   ; number range is narrower so must check again
-   
-   dec a
-   ret z                       ; negative result is in range
-   
-   bit 7,d                     ; if most significant bit of positive number
-   ret z                       ;   is set we are out of range
-   
-positive_overflow:
-   
-   ld de,$7fff
-   jp error_erange_mc          ; dehl = $7fffffff = LONG_MAX
-   
-check_errors:
 
+   call __strtoul
+   ret nc                      ; no errors
+   
    ; what kind of error was it
    
    dec a
    jp m, error_einval_zc       ; on invalid base or invalid string
-
-   ; overflow occurred
+   jr z, signed_overflow
    
-   jr nz, positive_overflow
-      
+unsigned_overflow:
+   
+   ld de,$ffff
+   jp error_erange_mc          ; dehl = $ffffffff = ULONG_MAX
+
+signed_overflow:
+
    ld de,$8000
-   jp error_erange_zc          ; dehl = $80000000 = LONG_MIN
+   jp error_erange_zc          ; dehl = $800000000 = LONG_MIN

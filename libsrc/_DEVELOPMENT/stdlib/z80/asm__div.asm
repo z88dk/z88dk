@@ -16,18 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB _div_callee
-XDEF asm__div
+XLIB asm__div
 
 LIB l_divs_16_16x16
-
-_div_callee:
-
-   pop af
-   pop hl
-   pop de
-   pop bc
-   push af
 
 asm__div:
 

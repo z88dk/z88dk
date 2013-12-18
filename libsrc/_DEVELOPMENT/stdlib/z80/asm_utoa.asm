@@ -10,18 +10,8 @@
 ;
 ; ===============================================================
 
-XLIB utoa_callee
-XDEF asm_utoa, asm0_utoa, asm1_utoa
-
-LIB error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x16
-LIB l_num2char, l_utoa, l_utoh, l_utoo, l_utob
-
-utoa_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
+XLIB asm_utoa
+XDEF asm0_utoa, asm1_utoa
 
 asm_utoa:
 

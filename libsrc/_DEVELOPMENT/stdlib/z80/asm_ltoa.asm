@@ -13,19 +13,10 @@
 ;
 ; ===============================================================
 
-XLIB ltoa_callee
-XDEF asm_ltoa, asm0_ltoa
+XLIB asm_ltoa
+XDEF asm0_ltoa
 
 LIB error_zero_de, error_zc, l_valid_base, asm1_ultoa, l_neg_dehl
-
-ltoa_callee:
-
-   pop af
-   pop bc
-   pop ix
-   pop hl
-   pop de
-   push af
 
 asm_ltoa:
 

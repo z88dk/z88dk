@@ -11,24 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB bsearch_callee
-XDEF asm_bsearch
+XLIB asm_bsearch
 
 LIB error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
-
-bsearch_callee:
-
-   pop hl
-   pop ix
-   pop de
-   pop af
-   pop bc
-   ex (sp),hl
-   
-   push hl
-   push af
-   pop hl
-   pop af
 
 asm_bsearch:
 

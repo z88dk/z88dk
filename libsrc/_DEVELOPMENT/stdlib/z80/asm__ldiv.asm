@@ -16,21 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB _ldiv_callee
-XDEF asm__ldiv
+XLIB asm__ldiv
 
 LIB l_divs_32_32x32
-
-_ldiv_callee:
-
-   pop af
-   pop hl
-   pop de
-   exx
-   pop hl
-   pop de
-   pop bc
-   push af
 
 asm__ldiv:
 

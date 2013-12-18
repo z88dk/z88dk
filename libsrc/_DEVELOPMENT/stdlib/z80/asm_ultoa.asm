@@ -10,20 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB ultoa_callee
-XDEF asm_ultoa, asm0_ultoa, asm1_utoa
+XLIB asm_ultoa
+XDEF asm0_ultoa, asm1_utoa
 
 LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x32
 LIB l_num2char, l_ultoa, l_ultoh, l_ultoo, l_ultob
-
-ultoa_callee:
-
-   pop af
-   pop bc
-   pop ix
-   pop hl
-   pop de
-   push af
 
 asm_ultoa:
 

@@ -13,17 +13,10 @@
 ;
 ; ===============================================================
 
-XLIB itoa_callee
-XDEF asm_itoa, asm0_itoa
+XLIB asm_itoa
+XDEF asm0_itoa
 
 LIB error_zc, l_valid_base, asm1_utoa, l_neg_hl
-
-itoa_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
 
 asm_itoa:
 
