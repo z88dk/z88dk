@@ -12,10 +12,8 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_free
-XDEF asm_ba_free
+XLIB asm_ba_free
 
-ba_free:
 asm_ba_free:
 
    ; enter : hl = address of block to free

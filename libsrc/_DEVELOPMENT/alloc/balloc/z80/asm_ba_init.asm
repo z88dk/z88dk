@@ -11,12 +11,10 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_init
-XDEF asm_ba_init
+XLIB asm_ba_init
 
 LIB asm_memset
 
-ba_init:
 asm_ba_init:
 
    ; enter : hl = number of queues

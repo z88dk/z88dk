@@ -11,12 +11,10 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_malloc
-XDEF asm_ba_malloc
+XLIB asm_ba_malloc
 
 LIB error_enomem_zc
 
-ba_malloc:
 asm_ba_malloc:
 
    ; enter : hl = queue to allocate from

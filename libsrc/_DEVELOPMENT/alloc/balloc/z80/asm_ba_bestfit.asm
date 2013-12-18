@@ -12,17 +12,9 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_bestfit_callee
-XDEF asm_ba_bestfit
+XLIB asm_ba_bestfit
 
 LIB error_enomem_zc
-
-ba_bestfit_callee:
-
-   pop hl
-   pop de
-   ex (sp),hl
-   ld a,e
 
 asm_ba_bestfit:
 

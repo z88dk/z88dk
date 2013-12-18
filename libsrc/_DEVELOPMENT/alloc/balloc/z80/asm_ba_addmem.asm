@@ -16,21 +16,9 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_addmem_callee
-XDEF asm_ba_addmem
+XLIB asm_ba_addmem
 
 LIB asm_ba_free
-
-ba_addmem_callee:
-
-   pop af
-   pop hl
-   pop de
-   pop bc
-   pop ix
-   push af
-   
-   ld a,ixl
 
 asm_ba_addmem:
 

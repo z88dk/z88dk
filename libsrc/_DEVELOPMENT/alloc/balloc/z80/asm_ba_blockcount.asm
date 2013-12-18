@@ -11,10 +11,8 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB ba_blockcount
-XDEF asm_ba_blockcount
+XLIB asm_ba_blockcount
 
-ba_blockcount:
 asm_ba_blockcount:
 
    ; enter : hl = queue
