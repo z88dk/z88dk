@@ -14,7 +14,7 @@
 XLIB bsearch_callee
 XDEF asm_bsearch
 
-LIB l_mulu_16_16x16, l_jpix, l_inc_sp
+LIB error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
 
 bsearch_callee:
 
