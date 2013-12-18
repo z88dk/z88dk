@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.2 2013-12-15 23:51:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.3 2013-12-18 01:16:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -79,6 +79,11 @@ DEFINE_init()
 	/* break on allocation Nr. XX */
 	/* _CrtSetBreakAlloc(86); */
 #endif
+}
+
+void xmalloc_init( void )
+{
+	init();
 }
 
 /*-----------------------------------------------------------------------------
@@ -337,7 +342,11 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
 /* 
 * $Log: xmalloc.c,v $
-* Revision 1.2  2013-12-15 23:51:25  pauloscustodio
+* Revision 1.3  2013-12-18 01:16:36  pauloscustodio
+* Add xmalloc_init() to be called by the init() function of any module that needs
+* malloc to terminate after itself.
+*
+* Revision 1.2  2013/12/15 23:51:25  pauloscustodio
 * Use init.h
 *
 * Revision 1.1  2013/12/15 13:18:43  pauloscustodio

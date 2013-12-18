@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.1 2013-12-15 13:18:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.2 2013-12-18 01:16:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,6 +26,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.1 2013
 *   alloc memory
 *   dies on allocation failure or buffer overruns
 *----------------------------------------------------------------------------*/
+
+/* initialize module; called automatically, but may be needed to force
+   initialization before user module is initialized
+*/
+extern void xmalloc_init( void );
+
 
 extern void *_xmalloc( size_t size, char *file, int lineno );
 #define xmalloc(size)   _xmalloc((size), __FILE__, __LINE__)
@@ -47,7 +53,11 @@ extern void _xfree( void *memptr, char *file, int lineno );
 
 /*
 * $Log: xmalloc.h,v $
-* Revision 1.1  2013-12-15 13:18:43  pauloscustodio
+* Revision 1.2  2013-12-18 01:16:36  pauloscustodio
+* Add xmalloc_init() to be called by the init() function of any module that needs
+* malloc to terminate after itself.
+*
+* Revision 1.1  2013/12/15 13:18:43  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *

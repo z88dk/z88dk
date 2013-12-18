@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.2 2013-12-15 23:51:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.3 2013-12-18 01:16:36 pauloscustodio Exp $
 #
 # Test xmalloc.c
 
@@ -44,8 +44,8 @@ int main()
 END
 ok !system $nodebug;
 is_deeply [capture {system "test"}], ["", <<'ERR', 0];
-xmalloc xmalloc.c(104): leak (2) allocated at test.c(5)
-xmalloc xmalloc.c(104): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
+xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
 ERR
 
 
@@ -68,10 +68,10 @@ xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (2) allocated at test.c(5)
-xmalloc xmalloc.c(106): free (2) allocated at test.c(5)
-xmalloc xmalloc.c(104): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(5)
+xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
 ERR
 
 
@@ -191,10 +191,10 @@ xmalloc: init
 xmalloc test.c(4): alloc (0)
 xmalloc test.c(5): alloc (1)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (1) allocated at test.c(5)
-xmalloc xmalloc.c(106): free (1) allocated at test.c(5)
-xmalloc xmalloc.c(104): leak (0) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (0) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (1) allocated at test.c(5)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(5)
+xmalloc xmalloc.c(109): leak (0) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (0) allocated at test.c(4)
 ERR
 
 
@@ -214,8 +214,8 @@ is_deeply [capture {system "test"}], ["", <<'ERR', 0];
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
 ERR
 
 
@@ -235,8 +235,8 @@ is_deeply [capture {system "test"}], ["", <<'ERR', 0];
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
 ERR
 
 
@@ -256,8 +256,8 @@ is_deeply [capture {system "test"}], ["", <<'ERR', 0];
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
 ERR
 
 
@@ -278,8 +278,8 @@ is_deeply [capture {system "test"}], ["", <<'ERR', 0];
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (2) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (2) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (2) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(4)
 ERR
 
 
@@ -307,8 +307,8 @@ xmalloc test.c(7): alloc (1)
 xmalloc test.c(9): free (1) allocated at test.c(7)
 xmalloc test.c(9): alloc (0)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (0) allocated at test.c(9)
-xmalloc xmalloc.c(106): free (0) allocated at test.c(9)
+xmalloc xmalloc.c(109): leak (0) allocated at test.c(9)
+xmalloc xmalloc.c(111): free (0) allocated at test.c(9)
 ERR
 
 
@@ -333,8 +333,8 @@ xmalloc test.c(4): alloc (1)
 xmalloc test.c(7): free (1) allocated at test.c(4)
 xmalloc test.c(7): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (2) allocated at test.c(7)
-xmalloc xmalloc.c(106): free (2) allocated at test.c(7)
+xmalloc xmalloc.c(109): leak (2) allocated at test.c(7)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(7)
 ERR
 
 
@@ -353,8 +353,8 @@ is_deeply [capture {system "test"}], ["", <<'ERR', 0];
 xmalloc: init
 xmalloc test.c(4): alloc (6)
 xmalloc: cleanup
-xmalloc xmalloc.c(104): leak (6) allocated at test.c(4)
-xmalloc xmalloc.c(106): free (6) allocated at test.c(4)
+xmalloc xmalloc.c(109): leak (6) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (6) allocated at test.c(4)
 ERR
 
 
@@ -380,7 +380,11 @@ done_testing;
 
 
 # $Log: xmalloc.t,v $
-# Revision 1.2  2013-12-15 23:51:24  pauloscustodio
+# Revision 1.3  2013-12-18 01:16:36  pauloscustodio
+# Add xmalloc_init() to be called by the init() function of any module that needs
+# malloc to terminate after itself.
+#
+# Revision 1.2  2013/12/15 23:51:24  pauloscustodio
 # Use init.h
 #
 # Revision 1.1  2013/12/15 13:18:35  pauloscustodio
