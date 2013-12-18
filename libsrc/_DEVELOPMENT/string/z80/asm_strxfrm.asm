@@ -30,7 +30,7 @@ asm_strxfrm:
    ;
    ; exit  : 
    ;         if s1 == 0:
-   :
+   ;
    ;           hl = strlen of would-be result
    ;           carry reset
    ;

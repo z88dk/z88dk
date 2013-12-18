@@ -33,7 +33,7 @@ asm_strsep:
    ;
    ;           carry set
    ;           hl = char *token
-   '
+   ;
    ;         no more tokens
    ;
    ;           carry reset

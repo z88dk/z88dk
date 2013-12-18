@@ -14,14 +14,6 @@ XLIB asm_memmove
 
 LIB asm0_memcpy, asm1_memcpy
 
-memmove_callee:
-
-   pop af
-   pop bc
-   pop hl
-   pop de
-   push af
-
 asm_memmove:
 
    ; enter : bc = uint n
