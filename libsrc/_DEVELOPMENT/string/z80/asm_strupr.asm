@@ -3,19 +3,17 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; char *strlwr(char *s)
+; char *strupr(char *s)
 ;
-; Change letters in string s to lowercase.
+; Change letters in string s to uppercase.
 ;
 ; ===============================================================
 
-XLIB strlwr
-XDEF asm_strlwr
+XLIB asm_strupr
 
-LIB asm_tolower
+LIB asm_toupper
 
-strlwr:
-asm_strlwr:
+asm_strupr:
 
    ; enter: hl = char *s
    ;
@@ -31,7 +29,7 @@ loop:
    or a
    jr z, exit
 
-   call asm_tolower
+   call asm_toupper
    ld (hl),a
    
    inc hl

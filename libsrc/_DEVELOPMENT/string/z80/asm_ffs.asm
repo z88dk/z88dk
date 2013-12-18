@@ -11,10 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB ffs
-XDEF asm_ffs, asm0_ffs, asm1_ffs, asm2_ffs
+XLIB asm_ffs
+XDEF asm0_ffs, asm1_ffs, asm2_ffs
 
-ffs:
 asm_ffs:
 
    ; enter : hl = int

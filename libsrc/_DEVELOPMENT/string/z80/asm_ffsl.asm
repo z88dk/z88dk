@@ -11,12 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB ffsl
-XDEF asm_ffsl
+XLIB asm_ffsl
 
 LIB asm0_ffs, asm1_ffs, asm2_ffs
 
-ffsl:
 asm_ffsl:
 
    ; enter : dehl = long

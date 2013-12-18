@@ -12,12 +12,10 @@
 ;
 ; ===============================================================
 
-XLIB strstrip
-XDEF asm_strstrip
+XLIB asm_strstrip
 
 LIB asm_isspace
 
-strstrip:
 asm_strstrip:
 
    ; enter : hl = char *s

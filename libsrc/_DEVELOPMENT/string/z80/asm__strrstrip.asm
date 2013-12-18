@@ -14,14 +14,11 @@
 ;
 ; ===============================================================
 
-XLIB _strrstrip
-XDEF asm__strrstrip
+XLIB asm__strrstrip
 
 LIB asm_strlen, asm_isspace
 
-_strrstrip:
 asm__strrstrip:
-
 
    ; enter : hl = char *s
    ;

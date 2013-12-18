@@ -9,10 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB strlen
-XDEF asm_strlen
+XLIB asm_strlen
 
-strlen:
 asm_strlen:
 
    ; enter: hl = char *s

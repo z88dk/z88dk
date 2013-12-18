@@ -9,12 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB strrev
-XDEF asm_strrev
+XLIB asm_strrev
 
 LIB __str_locate_nul
 
-strrev:
 asm_strrev:
 
    ; enter: hl = char *s

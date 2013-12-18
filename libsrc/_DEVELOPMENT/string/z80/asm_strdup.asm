@@ -13,12 +13,11 @@
 
 INCLUDE "../../crt_vars.inc"
 
-XLIB strdup
-XDEF asm_strdup, asm0_strdup
+XLIB asm_strdup
+XDEF asm0_strdup
 
 LIB asm_strlen, malloc, error_enomem_zc
 
-strdup:
 asm_strdup:
 
    ; enter: hl = char *s
