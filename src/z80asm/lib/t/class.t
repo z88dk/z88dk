@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.1 2013-12-18 23:05:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -120,12 +120,12 @@ is_deeply [capture {system "test 1"}], ["", <<'END', 0];
 Person_init
 Name_init
 class: init
-class test.c(7): new class Name
-class test.c(32): new class Person
+class: new class Name
+class: new class Person
 class: cleanup
-class test.c(32): delete class Person created at test.c(32)
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
 END
 
@@ -134,20 +134,20 @@ is_deeply [capture {system "test 2"}], ["", <<'END', 0];
 Person_init
 Name_init
 class: init
-class test.c(7): new class Name
-class test.c(32): new class Person
+class: new class Name
+class: new class Person
 Person_copy
 Name_copy
-class test.c(7): new class Name
-class test.c(32): new class Person
+class: new class Name
+class: new class Person
 class: cleanup
-class test.c(32): delete class Person created at test.c(32)
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
-class test.c(32): delete class Person created at test.c(32)
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
 END
 
@@ -156,20 +156,20 @@ is_deeply [capture {system "test 3"}], ["", <<'END', 0];
 Person_init
 Name_init
 class: init
-class test.c(7): new class Name
-class test.c(32): new class Person
+class: new class Name
+class: new class Person
 Person_copy
 Name_copy
-class test.c(7): new class Name
-class test.c(32): new class Person
-class test.c(32): delete class Person created at test.c(32)
+class: new class Name
+class: new class Person
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
 class: cleanup
-class test.c(32): delete class Person created at test.c(32)
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
 END
 
@@ -178,19 +178,19 @@ is_deeply [capture {system "test 4"}], ["", <<'END', 0];
 Person_init
 Name_init
 class: init
-class test.c(7): new class Name
-class test.c(32): new class Person
+class: new class Name
+class: new class Person
 Person_copy
 Name_copy
-class test.c(7): new class Name
-class test.c(32): new class Person
-class test.c(32): delete class Person created at test.c(32)
+class: new class Name
+class: new class Person
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
-class test.c(32): delete class Person created at test.c(32)
+class: delete class Person
 Person_fini
-class test.c(7): delete class Name created at test.c(7)
+class: delete class Name
 Name_fini
 class: cleanup
 END
@@ -198,9 +198,12 @@ END
 unlink <test.*>;
 done_testing;
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.1 2013-12-18 23:05:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
 # $Log: class.t,v $
-# Revision 1.1  2013-12-18 23:05:53  pauloscustodio
+# Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+# Remove file and lineno from class defintion - not useful
+#
+# Revision 1.1  2013/12/18 23:05:53  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.13  2013/12/15 13:18:35  pauloscustodio

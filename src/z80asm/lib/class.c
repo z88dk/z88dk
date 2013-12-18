@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.1 2013-12-18 23:05:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -87,48 +87,46 @@ static void init( void )
 *----------------------------------------------------------------------------*/
 void _register_obj( ObjRegister *obj,
                     void ( *delete_ptr )( ObjRegister * ),
-                    char *name,
-                    char *file, int lineno )
+                    char *name )
 {
     init();
     obj->_class.delete_ptr = delete_ptr;
     obj->_class.name       = name;
 
-    _update_register_obj( obj, file, lineno );
+    _update_register_obj( obj );
 }
 
-void _update_register_obj( ObjRegister *obj, char *file, int lineno )
+void _update_register_obj( ObjRegister *obj )
 {
     init();
-    obj->_class.file       = file;
-    obj->_class.lineno     = lineno;
 
     LIST_INSERT_HEAD( &objects, obj, _class.entries );
 
 #ifdef CLASS_DEBUG
-    warn( "class %s(%d): new class %s\n", file, lineno, obj->_class.name );
+    warn( "class: new class %s\n", obj->_class.name );
 #endif
 }
 
 /*-----------------------------------------------------------------------------
 *   Deregister an object
 *----------------------------------------------------------------------------*/
-void _deregister_obj( ObjRegister *obj, char *file, int lineno )
+void _deregister_obj( ObjRegister *obj )
 {
     init();
     LIST_REMOVE( obj, _class.entries );
 
 #ifdef CLASS_DEBUG
-    warn( "class %s(%d): delete class %s created at %s(%d)\n", file, lineno, 
-		  obj->_class.name, 
-          obj->_class.file, obj->_class.lineno );
+    warn( "class: delete class %s\n", obj->_class.name );
 #endif
 }
 
 
 /* 
 * $Log: class.c,v $
-* Revision 1.1  2013-12-18 23:05:52  pauloscustodio
+* Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+* Remove file and lineno from class defintion - not useful
+*
+* Revision 1.1  2013/12/18 23:05:52  pauloscustodio
 * Move class.c to the z80asm/lib directory
 *
 * Revision 1.3  2013/12/15 13:18:33  pauloscustodio

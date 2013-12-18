@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.1 2013-12-18 23:05:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -72,7 +72,6 @@ struct ObjRegister;
             void (*delete_ptr)(struct ObjRegister *);                       \
             /* destructor function */       \
             char *name;                     /* class name */                \
-            char *file; int lineno;         /* where defined */             \
             BOOL autodelete;                /* false to skip cleanup */     \
             LIST_ENTRY(T) entries;          /* D-Linked list of objs */     \
         } _class;                                                           \
@@ -95,8 +94,7 @@ struct ObjRegister;
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
         _register_obj((struct ObjRegister *) self,                          \
-                      (void (*)(struct ObjRegister *)) T##_delete,          \
-                      ""#T, __FILE__, __LINE__);                            \
+                      (void (*)(struct ObjRegister *)) T##_delete, ""#T );	\
         /* register for cleanup */      \
         return self;                                                        \
     }                                                                       \
@@ -106,16 +104,15 @@ struct ObjRegister;
         T * self = xnew(T);					/* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self, other);              /* alloc memory if needed */    \
-        _update_register_obj((struct ObjRegister *) self,                   \
-                             __FILE__, __LINE__);                           \
-        /* register for cleanup */      \
+        _update_register_obj((struct ObjRegister *) self );					\
+        /* register for cleanup */      									\
         return self;                                                        \
     }                                                                       \
     /* destructor */                                                        \
     void T##_delete (T * self)                                              \
     {                                                                       \
-        _deregister_obj((struct ObjRegister *) self, __FILE__, __LINE__);   \
-        /* remove from cleanup list */  \
+        _deregister_obj((struct ObjRegister *) self );						\
+        /* remove from cleanup list */  									\
         T##_fini(self);                     /* call user cleanup */         \
         xfree(self);                        /* reclaim memory */            \
     }
@@ -136,15 +133,17 @@ struct ObjRegister;
 *----------------------------------------------------------------------------*/
 extern void _register_obj( struct ObjRegister *obj,
                            void ( *delete_ptr )( struct ObjRegister * ),
-                           char *name,
-                           char *file, int lineno );
-extern void _update_register_obj( struct ObjRegister *obj, char *file, int lineno );
-extern void _deregister_obj( struct ObjRegister *obj, char *file, int lineno );
+                           char *name );
+extern void _update_register_obj( struct ObjRegister *obj );
+extern void _deregister_obj( struct ObjRegister *obj );
 
 	
 /* 
 * $Log: class.h,v $
-* Revision 1.1  2013-12-18 23:05:52  pauloscustodio
+* Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+* Remove file and lineno from class defintion - not useful
+*
+* Revision 1.1  2013/12/18 23:05:52  pauloscustodio
 * Move class.c to the z80asm/lib directory
 *
 * Revision 1.10  2013/12/15 13:18:33  pauloscustodio
