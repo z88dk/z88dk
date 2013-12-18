@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.118 2013-12-15 23:05:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.119 2013-12-18 01:46:22 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.118  2013-12-15 23:05:54  pauloscustodio
+/* Revision 1.119  2013-12-18 01:46:22  pauloscustodio
+/* Move strpool.c to the z80asm/lib directory
+/*
+/* Revision 1.118  2013/12/15 23:05:54  pauloscustodio
 /* Remove code-generation for init() functions, do a plain call from main().
 /* Complicates maintenance, as all the modules with init() functions
 /* are coupled together, and it may not be clear how the init() module
@@ -1316,8 +1319,6 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
 int main( int argc, char *argv[] )
 {
 	/* init modules */
-	init_strpool();
-	atexit(fini_strpool);
 	init_errors();
 	atexit(fini_errors);
 	init_options();

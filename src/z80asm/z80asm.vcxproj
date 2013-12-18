@@ -98,11 +98,12 @@
     <ClInclude Include="errors_def.h" />
     <ClInclude Include="file.h" />
     <ClInclude Include="hist.h" />
-    <ClInclude Include="init.h" />
     <ClInclude Include="legacy.h" />
     <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\except.h" />
+    <ClInclude Include="lib\init.h" />
     <ClInclude Include="lib\queue.h" />
+    <ClInclude Include="lib\strpool.h" />
     <ClInclude Include="lib\types.h" />
     <ClInclude Include="lib\uthash.h" />
     <ClInclude Include="lib\xmalloc.h" />
@@ -118,7 +119,6 @@
     <ClInclude Include="scan.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="strhash.h" />
-    <ClInclude Include="strpool.h" />
     <ClInclude Include="strutil.h" />
     <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
@@ -137,10 +137,10 @@
     <ClCompile Include="exprprsr.c" />
     <ClCompile Include="file.c" />
     <ClCompile Include="hist.c" />
-    <ClCompile Include="init.c" />
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\except.c" />
+    <ClCompile Include="lib\strpool.c" />
     <ClCompile Include="lib\xmalloc.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />
@@ -156,7 +156,6 @@
     <ClCompile Include="scan.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="strhash.c" />
-    <ClCompile Include="strpool.c" />
     <ClCompile Include="strutil.c" />
     <ClCompile Include="sym.c" />
     <ClCompile Include="symref.c" />
