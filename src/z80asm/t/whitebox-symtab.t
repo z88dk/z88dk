@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o options.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o lib/class.o safestr.o strhash.o errors.o strutil.o file.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -322,9 +322,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.23 2013-12-15 13:18:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.24 2013-12-18 23:05:52 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.23  2013-12-15 13:18:35  pauloscustodio
+# Revision 1.24  2013-12-18 23:05:52  pauloscustodio
+# Move class.c to the z80asm/lib directory
+#
+# Revision 1.23  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #

@@ -27,9 +27,6 @@
     <ClInclude Include="symbol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="class.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="codearea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,6 +138,9 @@
     <ClInclude Include="lib\strpool.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\class.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -171,9 +171,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="z80pass.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="class.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="codearea.c">
@@ -246,6 +243,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strpool.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\class.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>

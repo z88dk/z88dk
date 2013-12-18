@@ -18,7 +18,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "class.o";
+my $objs = "lib/class.o";
 
 t_compile_module(<<'END_INIT', <<'END', $objs);
 
@@ -742,9 +742,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.10 2013-12-15 19:01:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.11 2013-12-18 23:05:52 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.10  2013-12-15 19:01:07  pauloscustodio
+# Revision 1.11  2013-12-18 23:05:52  pauloscustodio
+# Move class.c to the z80asm/lib directory
+#
+# Revision 1.10  2013/12/15 19:01:07  pauloscustodio
 # Move platform specific defines from types.h to config.h.
 # Remove dependency of types.h from glib.h.
 # Use NUM_ELEMS() instead of glib G_N_ELEMENTS().

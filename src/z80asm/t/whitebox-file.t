@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o scan.o class.o safestr.o errors.o strutil.o options.o hist.o";
+my $objs = "file.o scan.o lib/class.o safestr.o errors.o strutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -743,9 +743,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.25 2013-12-15 13:18:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.26 2013-12-18 23:05:52 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.25  2013-12-15 13:18:35  pauloscustodio
+# Revision 1.26  2013-12-18 23:05:52  pauloscustodio
+# Move class.c to the z80asm/lib directory
+#
+# Revision 1.25  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #

@@ -86,7 +86,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="class.h" />
     <ClInclude Include="classhash.h" />
     <ClInclude Include="classlist.h" />
     <ClInclude Include="classring.h" />
@@ -99,6 +98,7 @@
     <ClInclude Include="file.h" />
     <ClInclude Include="hist.h" />
     <ClInclude Include="legacy.h" />
+    <ClInclude Include="lib\class.h" />
     <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\except.h" />
     <ClInclude Include="lib\init.h" />
@@ -129,7 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c" />
-    <ClCompile Include="class.c" />
     <ClCompile Include="codearea.c" />
     <ClCompile Include="deffile.c" />
     <ClCompile Include="dynstr.c" />
@@ -138,6 +137,7 @@
     <ClCompile Include="file.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />
+    <ClCompile Include="lib\class.c" />
     <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\except.c" />
     <ClCompile Include="lib\strpool.c" />
