@@ -15,4 +15,4 @@ bsearch_callee:
    pop hl
    pop af
 
-INCLUDE "../../z80/asm_bsearch.asm"
+INCLUDE "../../z80/asm_bsearch_lr.asm"

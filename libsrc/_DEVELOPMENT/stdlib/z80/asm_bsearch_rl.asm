@@ -71,11 +71,11 @@ bsearch_loop:
    pop de                      ; de = key
    
    push ix
-   push de
    push hl
-   call l_jpix                 ; (compar)(de = void *key, hl = void *p)
-   pop bc
+   push de
+   call l_jpix                 ; (compar)(de = void *key, hl = void *p) R->L
    pop de
+   pop bc
    pop ix
 
    ; bc = p
