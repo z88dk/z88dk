@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.3 2013-12-19 00:18:23 pauloscustodio Exp $
 */
 
 #pragma once
@@ -48,7 +48,7 @@ OBJ_AUTODELETE(obj1) = FALSE;   // if object is destroyed by another
 *----------------------------------------------------------------------------*/
 
 /* declare object registry for use in class definition */
-struct ObjRegister;
+struct Object;
 
 /*-----------------------------------------------------------------------------
 *   Start class declaration
@@ -69,7 +69,7 @@ struct ObjRegister;
     struct T {                                                              \
         /* header, equal in all classes */                                  \
         struct {                            /* private attributes */        \
-            void (*delete_ptr)(struct ObjRegister *);                       \
+            void (*delete_ptr)(struct Object *);                       		\
             /* destructor function */       \
             char *name;                     /* class name */                \
             BOOL autodelete;                /* false to skip cleanup */     \
@@ -93,9 +93,9 @@ struct ObjRegister;
         T * self = xnew(T);		            /* allocate object */           \
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
-        _register_obj((struct ObjRegister *) self,                          \
-                      (void (*)(struct ObjRegister *)) T##_delete, ""#T );	\
-        /* register for cleanup */      \
+        _register_obj((struct Object *) self,                          		\
+                      (void (*)(struct Object *)) T##_delete, ""#T );		\
+        /* register for cleanup */      									\
         return self;                                                        \
     }                                                                       \
     /* copy-constructor */                                                  \
@@ -104,14 +104,14 @@ struct ObjRegister;
         T * self = xnew(T);					/* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self, other);              /* alloc memory if needed */    \
-        _update_register_obj((struct ObjRegister *) self );					\
+        _update_register_obj((struct Object *) self );						\
         /* register for cleanup */      									\
         return self;                                                        \
     }                                                                       \
     /* destructor */                                                        \
     void T##_delete (T * self)                                              \
     {                                                                       \
-        _deregister_obj((struct ObjRegister *) self );						\
+        _deregister_obj((struct Object *) self );							\
         /* remove from cleanup list */  									\
         T##_fini(self);                     /* call user cleanup */         \
         xfree(self);                        /* reclaim memory */            \
@@ -124,23 +124,26 @@ struct ObjRegister;
 #define OBJ_DELETE(obj) ( (obj) == NULL ? \
 								NULL : \
 								( ( (*(obj)->_class.delete_ptr)( \
-											(struct ObjRegister *) (obj) ) ), \
+											(struct Object *) (obj) ) ), \
 								  (obj) = NULL ) )
 #define OBJ_AUTODELETE(obj) ((obj)->_class.autodelete)
 
 /*-----------------------------------------------------------------------------
 *   Private interface
 *----------------------------------------------------------------------------*/
-extern void _register_obj( struct ObjRegister *obj,
-                           void ( *delete_ptr )( struct ObjRegister * ),
+extern void _register_obj( struct Object *obj,
+                           void ( *delete_ptr )( struct Object * ),
                            char *name );
-extern void _update_register_obj( struct ObjRegister *obj );
-extern void _deregister_obj( struct ObjRegister *obj );
+extern void _update_register_obj( struct Object *obj );
+extern void _deregister_obj( struct Object *obj );
 
 	
 /* 
 * $Log: class.h,v $
-* Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+* Revision 1.3  2013-12-19 00:18:23  pauloscustodio
+* Use init.h mechanism for intialization code; rename object structure
+*
+* Revision 1.2  2013/12/18 23:50:36  pauloscustodio
 * Remove file and lineno from class defintion - not useful
 *
 * Revision 1.1  2013/12/18 23:05:52  pauloscustodio
@@ -175,7 +178,7 @@ extern void _deregister_obj( struct ObjRegister *obj );
 *
 * Revision 1.2  2012/05/25 21:43:55  pauloscustodio
 * compile error in cygwin gcc 3.4.5 with forward declaration of
-* typedef struct ObjRegister ObjRegister
+* typedef struct Object Object
 *
 * Revision 1.1  2012/05/24 17:01:45  pauloscustodio
 * CH_0009 : new CLASS to define simple classes

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.100 2013-12-18 23:05:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.101 2013-12-19 00:18:23 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.100  2013-12-18 23:05:51  pauloscustodio
+# Revision 1.101  2013-12-19 00:18:23  pauloscustodio
+# Use init.h mechanism for intialization code; rename object structure
+#
+# Revision 1.100  2013/12/18 23:05:51  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.99  2013/12/18 01:46:22  pauloscustodio
@@ -676,6 +679,7 @@ ldinstr.o: objfile.h symtab.h classhash.h strhash.h lib/uthash.h lib/die.h
 ldinstr.o: token_def.h errors.h errors_def.h codearea.h options.h strutil.h
 ldinstr.o: options_def.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
+lib/class.o: lib/init.h
 lib/die.o: lib/die.h
 lib/except.o: lib/xmalloc.h lib/except.h lib/die.h lib/types.h
 lib/strpool.o: lib/xmalloc.h lib/die.h lib/init.h lib/types.h lib/queue.h

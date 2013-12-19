@@ -7,45 +7,58 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.3 2013-12-19 00:18:23 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 #include "class.h"
-#include "types.h"
 #include "die.h"
+#include "init.h"
+#include "types.h"
 
 /*-----------------------------------------------------------------------------
 *   Object register - just the pointers defined by CLASS()
 *----------------------------------------------------------------------------*/
-CLASS( ObjRegister )
+CLASS( Object )
 /* no user fields */
 END_CLASS;
 
 /* list of all created objects */
-typedef LIST_HEAD( ObjRegisterList, ObjRegister ) ObjRegisterList;
-static ObjRegisterList objects = LIST_HEAD_INITIALIZER( objects );
+typedef LIST_HEAD( ObjectList, Object ) ObjectList;
+static ObjectList objects = LIST_HEAD_INITIALIZER( objects );
 
 /*-----------------------------------------------------------------------------
-*   Destruct all objects from the stack, to be called atexit
+*   Search next object to be deleted
 *----------------------------------------------------------------------------*/
-static ObjRegister *next_autodelete( ObjRegisterList *headp )
+static Object *next_autodelete( ObjectList *headp )
 {
-    ObjRegister *obj;
+    Object *obj;
 
     LIST_FOREACH( obj, headp, _class.entries )
-    {
         if ( OBJ_AUTODELETE( obj ) )
-        {
             return obj;
-        }
-    }
-    return NULL;
+
+	return NULL;
 }
 
-static void cleanup( void )
+/*-----------------------------------------------------------------------------
+*   Initialize
+*----------------------------------------------------------------------------*/
+DEFINE_init()
 {
-    ObjRegister *obj;
+	xmalloc_init();
+	
+#ifdef CLASS_DEBUG
+	warn( "class: init\n" );
+#endif
+}
+
+/*-----------------------------------------------------------------------------
+*   Destruct all objects from the stack
+*----------------------------------------------------------------------------*/
+DEFINE_fini()
+{
+    Object *obj;
 
 #ifdef CLASS_DEBUG
     warn( "class: cleanup\n" );
@@ -53,9 +66,7 @@ static void cleanup( void )
 
     /* delete all objects that are not deleted by the respective parent */
     while ( ( obj = next_autodelete( &objects ) ) != NULL )
-    {
         OBJ_DELETE( obj );          /* delete obj, set to NULL */
-    }
 
     /* safety net - should not come here - delete any remaining objects */
     while ( ! LIST_EMPTY( &objects ) )
@@ -66,37 +77,21 @@ static void cleanup( void )
 }
 
 /*-----------------------------------------------------------------------------
-*   setup atexit()
-*----------------------------------------------------------------------------*/
-static void init( void )
-{
-    static BOOL initialized = FALSE;
-
-    if ( ! initialized )
-    {
-#ifdef CLASS_DEBUG
-        warn( "class: init\n" );
-#endif
-        atexit( cleanup );
-        initialized = TRUE;
-    }
-}
-
-/*-----------------------------------------------------------------------------
 *   Register an object
 *----------------------------------------------------------------------------*/
-void _register_obj( ObjRegister *obj,
-                    void ( *delete_ptr )( ObjRegister * ),
+void _register_obj( Object *obj,
+                    void ( *delete_ptr )( Object * ),
                     char *name )
 {
     init();
+	
     obj->_class.delete_ptr = delete_ptr;
     obj->_class.name       = name;
 
     _update_register_obj( obj );
 }
 
-void _update_register_obj( ObjRegister *obj )
+void _update_register_obj( Object *obj )
 {
     init();
 
@@ -110,9 +105,10 @@ void _update_register_obj( ObjRegister *obj )
 /*-----------------------------------------------------------------------------
 *   Deregister an object
 *----------------------------------------------------------------------------*/
-void _deregister_obj( ObjRegister *obj )
+void _deregister_obj( Object *obj )
 {
     init();
+	
     LIST_REMOVE( obj, _class.entries );
 
 #ifdef CLASS_DEBUG
@@ -123,7 +119,10 @@ void _deregister_obj( ObjRegister *obj )
 
 /* 
 * $Log: class.c,v $
-* Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+* Revision 1.3  2013-12-19 00:18:23  pauloscustodio
+* Use init.h mechanism for intialization code; rename object structure
+*
+* Revision 1.2  2013/12/18 23:50:36  pauloscustodio
 * Remove file and lineno from class defintion - not useful
 *
 * Revision 1.1  2013/12/18 23:05:52  pauloscustodio
