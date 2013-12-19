@@ -17,7 +17,17 @@ asm_srand:
 
    ; enter : hl = seed
    ;
-   ; uses  : none
+   ; uses  : af
+
+   ld a,h
+   or l
+   jr nz, seed_ok              ; treat seed == 0 as seed == 1
+   
+   inc l
+
+seed_ok:
 
    ld (__seed),hl
+   ld (__seed + 2),hl
+
    ret
