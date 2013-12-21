@@ -16,7 +16,7 @@
 XLIB asm_itoa
 XDEF asm0_itoa
 
-LIB error_zc, l_valid_base, asm1_utoa, l_neg_hl
+LIB error_zc, l_valid_base, error_einval_zc, asm1_utoa, l_neg_hl
 
 asm_itoa:
 

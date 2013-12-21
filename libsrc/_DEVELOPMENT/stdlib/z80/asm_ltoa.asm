@@ -16,7 +16,8 @@
 XLIB asm_ltoa
 XDEF asm0_ltoa
 
-LIB error_zero_de, error_zc, l_valid_base, asm1_ultoa, l_neg_dehl
+LIB error_zero_de, error_zc, error_einval_zc
+LIB l_valid_base, asm1_ultoa, l_neg_dehl
 
 asm_ltoa:
 
@@ -40,7 +41,7 @@ asm_ltoa:
    call z, error_zero_de
    jp z, error_zc
 
-asm0_ultoa:                    ; bypasses NULL check of buf
+asm0_ltoa:                     ; bypasses NULL check of buf
 
    call l_valid_base           ; radix in [2,36]?
    call nc, error_zero_de

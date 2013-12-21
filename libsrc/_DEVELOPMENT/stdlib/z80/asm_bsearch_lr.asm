@@ -12,6 +12,7 @@
 ; ===============================================================
 
 XLIB asm_bsearch
+XDEF asm0_bsearch
 
 LIB error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
 
@@ -37,6 +38,7 @@ asm_bsearch:
 
    push af
 
+asm0_bsearch:
 bsearch_loop:
 
    ld a,h

@@ -13,6 +13,9 @@
 XLIB asm_utoa
 XDEF asm0_utoa, asm1_utoa
 
+LIB error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x16
+LIB l_num2char, l_utoa, l_utoh, l_utoo, l_utob
+
 asm_utoa:
 
    ; enter : hl = uint num

@@ -21,7 +21,7 @@ INCLUDE "../../crt_vars.inc"
 
 XLIB asm_rand
 
-rand:
+asm_rand:
 
    ; XorShift RNG using triple (8,9,23)
    ;
