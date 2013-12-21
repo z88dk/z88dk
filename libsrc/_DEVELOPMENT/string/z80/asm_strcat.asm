@@ -26,15 +26,13 @@ asm_strcat:
    push de                     ; save dst
 
    ex de,hl
-   call __str_locate_nul
+   call __str_locate_nul       ; a = 0
    ex de,hl
-   
+      
 loop:                          ; append s2 to s1
 
-   ld a,(hl)
+   cp (hl)
    ldi
-   
-   or a
    jp nz, loop
    
    pop hl                      ; hl = dst

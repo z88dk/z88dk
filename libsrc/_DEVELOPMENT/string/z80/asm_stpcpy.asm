@@ -21,12 +21,12 @@ asm_stpcpy:
    ;
    ; uses  : af, bc, de, hl
 
+   xor a
+   
 loop:
 
-   ld a,(hl)
+   cp (hl)
    ldi
-   
-   or a
    jp nz, loop
    
    dec de

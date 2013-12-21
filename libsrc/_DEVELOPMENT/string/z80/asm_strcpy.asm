@@ -22,13 +22,12 @@ asm_strcpy:
    ; uses  : af, bc, de, hl
 
    push de
+   xor a
 
 loop:
 
-   ld a,(hl)
+   cp (hl)
    ldi
-   
-   or a
    jp nz, loop
    
    pop hl

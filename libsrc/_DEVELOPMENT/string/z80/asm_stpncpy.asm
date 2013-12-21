@@ -35,13 +35,13 @@ asm_stpncpy:
       
    ; copy src to dst
    
+   xor a
+   
 loop:
 
-   ld a,(hl)
+   cp (hl)
    ldi
    jp po, done                 ; reached max number of chars
-   
-   or a
    jp nz, loop
    
    ; now pad with zeroes
@@ -58,9 +58,7 @@ loop:
 
 done:
 
-   or a                       ; was last char written a NUL?
-   jr nz, exit                ; if no, return &s1[n]
-   
+   jr nz, exit                ; if last char was not NUL
    dec de                     ; move back to NUL
 
 exit:

@@ -35,13 +35,13 @@ asm_strncpy:
       
    ; first copy src to dst
 
+   xor a
+
 loop:
 
-   ld a,(hl)
+   cp (hl)
    ldi
    jp po, done                 ; reached max number of chars
-   
-   or a
    jp nz, loop
    
    ; now pad with zeroes

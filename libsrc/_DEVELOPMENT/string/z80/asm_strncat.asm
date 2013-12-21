@@ -38,25 +38,23 @@ asm0_strncat:
    push de                     ; save dst
    
    ex de,hl
-   call __str_locate_nul
+   call __str_locate_nul       ; a = 0
    ex de,hl
 
 loop:                          ; append src to dst
 
-   ld a,(hl)
-   or a
+   cp (hl)
    jr z, done
-   
+      
    ldi
    jp pe, loop
 
-   xor a
    scf
 
 done:                          ; terminate dst
 
    ld (de),a
-   
+
    pop hl
    ret
 
