@@ -46,9 +46,9 @@ asm_strlcat:
 
 cpyloop:
 
-   ld a,(hl)
-   or a
+   cp (hl)
    jr z, success
+   
    ldi
    jp pe, cpyloop
    
@@ -88,9 +88,10 @@ szexceeded0:
    ; hl = nth char in s1
    ; de = char *s2
    ; bc = 0
+   ;  a = 0
+   ; carry reset
    ; stack = char *s1
 
-   xor a
    cpir
    dec hl                      ; hl = end of char *s1 (pointing at NUL)
    

@@ -35,10 +35,11 @@ asm_strlcpy:
    or c
    jr z, szexceeded1
    
+   xor a
+   
 cpyloop:
 
-   ld a,(hl)                   ; end of src?
-   or a
+   cp (hl)                     ; end of src ?
    jr z, done
    
    ldi                         ; copy src byte to dst
