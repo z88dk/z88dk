@@ -15,10 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.19 2013-10-07 00:12:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.20 2013-12-23 18:27:11 pauloscustodio Exp $
 */
 
+#ifndef _C_
 #define _C_ ,		/* trick to pass comma-separated values as macro argument */
+#endif
 
 /* information */
 ERR(ErrInfo,	info_total_errors(void),				"%d errors occurred during assembly" _C_ get_num_errors() ) 
@@ -79,7 +81,10 @@ ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
 
 /* */
 /* $Log: errors_def.h,v $
-/* Revision 1.19  2013-10-07 00:12:33  pauloscustodio
+/* Revision 1.20  2013-12-23 18:27:11  pauloscustodio
+/* Protect _C_ definition by ifndef
+/*
+/* Revision 1.19  2013/10/07 00:12:33  pauloscustodio
 /* New error message for single-quoted character
 /*
 /* Revision 1.18  2013/10/05 13:43:05  pauloscustodio
