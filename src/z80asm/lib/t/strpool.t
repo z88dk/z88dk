@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.1 2013-12-18 01:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.2 2013-12-23 19:19:52 pauloscustodio Exp $
 #
 # Test strpool.c
 
@@ -10,6 +10,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Capture::Tiny 'capture';
+use Test::Differences; 
 
 my $compile = "cc -Wall -DSTRPOOL_DEBUG -otest test.c strpool.c die.c xmalloc.c";
 
@@ -61,9 +62,9 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
+system($compile) and die "compile failed: $compile\n";
 
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+t_capture("test", "", <<'ERR', 0);
 first run - create pool for all strings
 strpool: add HELLO
 strpool: add WORLD
@@ -77,11 +78,22 @@ ERR
 unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
-__END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.1 2013-12-18 01:46:22 pauloscustodio Exp $
 # $Log: strpool.t,v $
-# Revision 1.1  2013-12-18 01:46:22  pauloscustodio
+# Revision 1.2  2013-12-23 19:19:52  pauloscustodio
+# Show difference in command output in case of test failure
+#
+# Revision 1.1  2013/12/18 01:46:22  pauloscustodio
 # Move strpool.c to the z80asm/lib directory
 #
 # Revision 1.11  2013/12/15 13:18:35  pauloscustodio

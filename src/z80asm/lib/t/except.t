@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.1 2013-12-15 20:30:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.2 2013-12-23 19:19:52 pauloscustodio Exp $
 #
 # Test except.c
 
@@ -10,6 +10,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Capture::Tiny 'capture';
+use Test::Differences; 
 
 my $compile = "cc -Wall -otest test.c except.c die.c";
 
@@ -84,16 +85,16 @@ int main(int argc, char *argv[])
 	return 0;
 }
 END
-ok !system $compile;
+system($compile) and die "compile failed: $compile\n";
 
 # THROW outside of TRY
-is_deeply [capture {system "test 0"}], ["", <<'ERR', 256];
+t_capture("test 0", "", <<'ERR', 1);
 Throw without try
 Uncaught runtime exception at test.c(13)
 ERR
 
 # run FatalErrorException
-is_deeply [capture {system "test 1"}], ["", <<'ERR', 0];
+t_capture("test 1", "", <<'ERR', 0);
 Before try
 In try
 Throw FatalErrorException
@@ -102,7 +103,7 @@ End of main
 ERR
 
 # run AssertionException
-is_deeply [capture {system "test 2"}], ["", <<'ERR', 0];
+t_capture("test 2", "", <<'ERR', 0);
 Before try
 In try
 Throw AssertionException
@@ -112,7 +113,7 @@ End of main
 ERR
 
 # run second-level try and rethrow
-is_deeply [capture {system "test 3"}], ["", <<'ERR', 0];
+t_capture("test 3", "", <<'ERR', 0);
 Before try
 In try
 In test 3, new try
@@ -127,9 +128,22 @@ ERR
 unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
 # $Log: except.t,v $
-# Revision 1.1  2013-12-15 20:30:39  pauloscustodio
+# Revision 1.2  2013-12-23 19:19:52  pauloscustodio
+# Show difference in command output in case of test failure
+#
+# Revision 1.1  2013/12/15 20:30:39  pauloscustodio
 # Move except.c to the z80asm/lib directory
 #
 # Revision 1.11  2013/12/15 13:18:35  pauloscustodio

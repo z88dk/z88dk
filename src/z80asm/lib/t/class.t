@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.3 2013-12-23 19:19:52 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -10,6 +10,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Capture::Tiny 'capture';
+use Test::Differences; 
 
 my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c xmalloc.c die.c";
 
@@ -48,7 +49,7 @@ END_CLASS;
 DEF_CLASS(Person);
 
 void Person_init (Person *self) 	
-{ 
+{
 	fprintf(stderr, "Person_init\n");
 	self->name = OBJ_NEW(Name); 
 	self->age = 31; 
@@ -110,13 +111,13 @@ int main(int argc, char *argv[])
 	return 0;
 }
 END
-ok !system $compile;
+system($compile) and die "compile failed: $compile\n";
 
 # no allocation
-is_deeply [capture {system "test 0"}], ["", "", 0];
+t_capture("test 0", "", "", 0);
 
 # alloc one, no free
-is_deeply [capture {system "test 1"}], ["", <<'END', 0];
+t_capture("test 1", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -130,7 +131,7 @@ Name_fini
 END
 
 # alloc one, clone another, no free
-is_deeply [capture {system "test 2"}], ["", <<'END', 0];
+t_capture("test 2", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -152,7 +153,7 @@ Name_fini
 END
 
 # alloc one, clone another, free first
-is_deeply [capture {system "test 3"}], ["", <<'END', 0];
+t_capture("test 3", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -174,7 +175,7 @@ Name_fini
 END
 
 # alloc one, clone another, free first and then second
-is_deeply [capture {system "test 4"}], ["", <<'END', 0];
+t_capture("test 4", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -198,9 +199,22 @@ END
 unlink <test.*>;
 done_testing;
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.2 2013-12-18 23:50:36 pauloscustodio Exp $
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
+
 # $Log: class.t,v $
-# Revision 1.2  2013-12-18 23:50:36  pauloscustodio
+# Revision 1.3  2013-12-23 19:19:52  pauloscustodio
+# Show difference in command output in case of test failure
+#
+# Revision 1.2  2013/12/18 23:50:36  pauloscustodio
 # Remove file and lineno from class defintion - not useful
 #
 # Revision 1.1  2013/12/18 23:05:53  pauloscustodio

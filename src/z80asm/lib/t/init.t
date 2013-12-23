@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/init.t,v 1.1 2013-12-15 23:31:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/init.t,v 1.2 2013-12-23 19:19:52 pauloscustodio Exp $
 #
 # Test init.h
 
@@ -10,6 +10,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Capture::Tiny 'capture';
+use Test::Differences; 
 
 my $compile = "cc -Wall -otest test.c die.c";
 
@@ -52,8 +53,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 main started
 init called
 func1 called
@@ -68,9 +69,22 @@ ERR
 unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
 # $Log: init.t,v $
-# Revision 1.1  2013-12-15 23:31:04  pauloscustodio
+# Revision 1.2  2013-12-23 19:19:52  pauloscustodio
+# Show difference in command output in case of test failure
+#
+# Revision 1.1  2013/12/15 23:31:04  pauloscustodio
 # Replace code-generation for init() functions by macros in init.h
 # to help define init() and fini() functions per module.
 # Code generation complicates maintenance, as all the modules with init()

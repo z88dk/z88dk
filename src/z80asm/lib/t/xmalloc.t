@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.3 2013-12-18 01:16:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.4 2013-12-23 19:19:52 pauloscustodio Exp $
 #
 # Test xmalloc.c
 
@@ -10,6 +10,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Capture::Tiny 'capture';
+use Test::Differences; 
 
 my $compile = "cc -Wall -DXMALLOC_DEBUG -otest test.c xmalloc.c die.c";
 my $nodebug = "cc -Wall -UXMALLOC_DEBUG -otest test.c xmalloc.c die.c";
@@ -23,8 +24,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", "", 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", "", 0);
 
 
 # allocate and no free no debug
@@ -42,8 +43,8 @@ int main()
 		return 1;
 }
 END
-ok !system $nodebug;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($nodebug) and die "compile failed: $nodebug\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
 xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
 ERR
@@ -62,8 +63,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): alloc (2)
@@ -86,8 +87,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): free (1) allocated at test.c(4)
@@ -104,8 +105,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0x100];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(4): alloc (2147483680) failed
 xmalloc: cleanup
@@ -122,8 +123,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0x100];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(5): block not found
 xmalloc: cleanup
@@ -141,8 +142,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0x100];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(6): free (1) allocated at test.c(4)
@@ -162,8 +163,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0x100];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(6): free (1) allocated at test.c(4)
@@ -185,8 +186,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (0)
 xmalloc test.c(5): alloc (1)
@@ -209,8 +210,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
@@ -230,8 +231,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc: cleanup
@@ -251,8 +252,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
@@ -273,8 +274,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc: cleanup
@@ -298,8 +299,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc test.c(7): free (2) allocated at test.c(4)
@@ -326,8 +327,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(7): free (1) allocated at test.c(4)
@@ -348,8 +349,8 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (6)
 xmalloc: cleanup
@@ -368,19 +369,31 @@ int main()
 	return 0;
 }
 END
-ok !system $compile;
-is_deeply [capture {system "test"}], ["", <<'ERR', 0];
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc: cleanup
 ERR
 
-
 unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
 # $Log: xmalloc.t,v $
-# Revision 1.3  2013-12-18 01:16:36  pauloscustodio
+# Revision 1.4  2013-12-23 19:19:52  pauloscustodio
+# Show difference in command output in case of test failure
+#
+# Revision 1.3  2013/12/18 01:16:36  pauloscustodio
 # Add xmalloc_init() to be called by the init() function of any module that needs
 # malloc to terminate after itself.
 #
