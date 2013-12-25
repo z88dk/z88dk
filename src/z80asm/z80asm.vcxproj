@@ -86,8 +86,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="classhash.h" />
-    <ClInclude Include="classlist.h" />
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="deffile.h" />
@@ -98,6 +96,8 @@
     <ClInclude Include="hist.h" />
     <ClInclude Include="legacy.h" />
     <ClInclude Include="lib\class.h" />
+    <ClInclude Include="lib\classhash.h" />
+    <ClInclude Include="lib\classlist.h" />
     <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\except.h" />
     <ClInclude Include="lib\init.h" />

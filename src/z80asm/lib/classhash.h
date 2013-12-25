@@ -1,40 +1,15 @@
 /*
-     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-                ZZZZZ      888           888  0000         0000
-              ZZZZZ        88888888888888888  0000         0000
-            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
-
-Copyright (C) Paulo Custodio, 2011-2013
-
 Hash of strings to objects defined by CLASS(), including doubly-linked list of all strings to be
 able to retrieve in the order added.
 Keys are kept in strpool, no need to release memory.
 Uses StrHash to keep the keys, takes care of memory allocation of values.
+
+Copyright (C) Paulo Custodio, 2011-2013
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.1 2013-12-25 17:37:13 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classhash.h,v 1.3 2013-12-15 13:18:33 pauloscustodio Exp $ */
-/* $Log: classhash.h,v $
-/* Revision 1.3  2013-12-15 13:18:33  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.2  2013/02/25 21:36:17  pauloscustodio
-/* Uniform the APIs of classhash, classlist, strhash, strlist
-/*
-/* Revision 1.1  2013/02/02 00:08:26  pauloscustodio
-/* New CLASS_HASH() to create hash tables of objects defined by CLASS()
-/*
-/*
-/* */
-
-#ifndef CLASSHASH_H
-#define CLASSHASH_H
+#pragma once
 
 #include "xmalloc.h"   /* before any other include */
 #include "queue.h"
@@ -177,7 +152,7 @@ DEF_CLASS_HASH(T);
 	{																		\
 		T##HashElem *elem;													\
 																			\
-		while ( elem = T##Hash_first( self ) )								\
+		while ( ( elem = T##Hash_first( self ) ) != NULL )					\
 		{																	\
 			T##Hash_remove_elem( self, elem );								\
 		}																	\
@@ -227,4 +202,19 @@ DEF_CLASS_HASH(T);
 	}																		\
 
 
-#endif /* ndef CLASSHASH_H */
+/* 
+* $Log: classhash.h,v $
+* Revision 1.1  2013-12-25 17:37:13  pauloscustodio
+* Move classlist and classhash to the z80asm/lib directory
+*
+* Revision 1.3  2013/12/15 13:18:33  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.2  2013/02/25 21:36:17  pauloscustodio
+* Uniform the APIs of classhash, classlist, strhash, strlist
+*
+* Revision 1.1  2013/02/02 00:08:26  pauloscustodio
+* New CLASS_HASH() to create hash tables of objects defined by CLASS()
+*
+*/

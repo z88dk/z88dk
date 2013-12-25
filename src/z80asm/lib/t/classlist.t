@@ -1,29 +1,23 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
-#
 # Copyright (C) Paulo Custodio, 2011-2013
+#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.1 2013-12-25 17:37:13 pauloscustodio Exp $
+#
+# Test classlist.c
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+use File::Slurp;
+use Capture::Tiny 'capture';
+use Test::Differences; 
 
-my $objs = "lib/class.o"; 
+my $compile = "cc -Wall -otest test.c class.c xmalloc.c die.c";
 
-t_compile_module(<<'END_INIT', <<'END', $objs);
+write_file("test.c", <<'END');
+#include "classlist.h"
 
 #define ERROR return __LINE__
-
-#include "classlist.h"
 
 CLASS(Obj)
 	char *string;
@@ -60,9 +54,8 @@ Obj *new_obj( char *text )
 	return obj;
 }
 
-	
-END_INIT
-	/* main */
+int main()
+{
 	Obj *obj;
 	ObjList *list, *list2;
 	ObjListElem *iter, *_iter;
@@ -456,19 +449,33 @@ END_INIT
 	if (ObjList_empty(list)) ERROR;
 	
 	return 0;
+}
 END
 
-t_run_module([], '', '', 0);
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", "", 0);
 
 
-unlink_testfiles();
+unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
-__END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.12 2013-12-18 23:05:52 pauloscustodio Exp $
-# $Log: whitebox-classlist.t,v $
-# Revision 1.12  2013-12-18 23:05:52  pauloscustodio
+
+# $Log: classlist.t,v $
+# Revision 1.1  2013-12-25 17:37:13  pauloscustodio
+# Move classlist and classhash to the z80asm/lib directory
+#
+# Revision 1.12  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.11  2013/12/15 13:18:35  pauloscustodio

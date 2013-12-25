@@ -66,12 +66,6 @@
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="classhash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="classlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="srcfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -136,6 +130,12 @@
       <Filter>Header Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\strhash.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\classhash.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\classlist.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
   </ItemGroup>

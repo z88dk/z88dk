@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.103 2013-12-25 17:02:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.104 2013-12-25 17:37:13 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.103  2013-12-25 17:02:10  pauloscustodio
+# Revision 1.104  2013-12-25 17:37:13  pauloscustodio
+# Move classlist and classhash to the z80asm/lib directory
+#
+# Revision 1.103  2013/12/25 17:02:10  pauloscustodio
 # Move strhash.c to the z80asm/lib directory
 #
 # Revision 1.102  2013/12/25 14:39:50  pauloscustodio
@@ -650,19 +653,19 @@ depend:
 
 asmdrctv.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 asmdrctv.o: errors.h errors_def.h file.h lib/strutil.h safestr.h listfile.h
-asmdrctv.o: lib/class.h lib/queue.h dynstr.h symref.h classlist.h options.h
-asmdrctv.o: options_def.h srcfile.h symbol.h model.h objfile.h symtab.h
-asmdrctv.o: classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
-asmdrctv.o: token_def.h z80asm.h
+asmdrctv.o: lib/class.h lib/queue.h dynstr.h symref.h lib/classlist.h
+asmdrctv.o: options.h options_def.h srcfile.h symbol.h model.h objfile.h
+asmdrctv.o: symtab.h lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h
+asmdrctv.o: sym.h token_def.h z80asm.h
 codearea.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 codearea.o: errors.h errors_def.h symbol.h model.h objfile.h lib/class.h
-codearea.o: lib/queue.h symtab.h classhash.h lib/strhash.h lib/uthash.h
-codearea.o: lib/die.h sym.h symref.h classlist.h token_def.h z80asm.h file.h
-codearea.o: lib/strutil.h safestr.h listfile.h dynstr.h
+codearea.o: lib/queue.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
+codearea.o: lib/die.h sym.h symref.h lib/classlist.h token_def.h z80asm.h
+codearea.o: file.h lib/strutil.h safestr.h listfile.h dynstr.h
 deffile.o: lib/xmalloc.h deffile.h file.h lib/strutil.h lib/types.h config.h
 deffile.o:  safestr.h listfile.h lib/class.h lib/queue.h dynstr.h
-deffile.o: symref.h classlist.h options.h options_def.h symbol.h model.h
-deffile.o: objfile.h symtab.h classhash.h lib/strhash.h lib/uthash.h
+deffile.o: symref.h lib/classlist.h options.h options_def.h symbol.h model.h
+deffile.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 deffile.o: lib/die.h sym.h token_def.h z80asm.h
 dynstr.o: lib/xmalloc.h dynstr.h lib/class.h lib/queue.h lib/types.h
 dynstr.o: lib/strutil.h
@@ -672,17 +675,17 @@ errors.o: lib/strpool.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h file.h lib/strutil.h safestr.h legacy.h
 exprprsr.o: options.h options_def.h symbol.h model.h objfile.h lib/class.h
-exprprsr.o: lib/queue.h symtab.h classhash.h lib/strhash.h lib/uthash.h
-exprprsr.o: lib/die.h sym.h symref.h classlist.h token_def.h lib/except.h
+exprprsr.o: lib/queue.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
+exprprsr.o: lib/die.h sym.h symref.h lib/classlist.h token_def.h lib/except.h
 exprprsr.o: z80asm.h
 file.o: lib/xmalloc.h file.h lib/strutil.h lib/types.h config.h 
 file.o: safestr.h listfile.h lib/class.h lib/queue.h dynstr.h symref.h
-file.o: classlist.h options.h options_def.h lib/strpool.h errors.h
+file.o: lib/classlist.h options.h options_def.h lib/strpool.h errors.h
 file.o: errors_def.h lib/uthash.h lib/die.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h config.h  z80asm.h lib/types.h sym.h
-ldinstr.o: lib/class.h lib/queue.h symref.h classlist.h symbol.h model.h
-ldinstr.o: objfile.h symtab.h classhash.h lib/strhash.h lib/uthash.h
+ldinstr.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
+ldinstr.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 ldinstr.o: lib/die.h token_def.h errors.h errors_def.h codearea.h options.h
 ldinstr.o: lib/strutil.h options_def.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
@@ -696,75 +699,76 @@ lib/strpool.o: lib/strpool.h lib/uthash.h
 lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h
 lib/xmalloc.o: lib/xmalloc.h lib/die.h lib/queue.h lib/init.h lib/types.h
 listfile.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
-listfile.o: dynstr.h symref.h classlist.h file.h lib/strutil.h config.h
+listfile.o: dynstr.h symref.h lib/classlist.h file.h lib/strutil.h config.h
 listfile.o:  safestr.h options.h options_def.h z80asm.h sym.h
 listfile.o: errors.h errors_def.h hist.h lib/strpool.h codearea.h
 mapfile.o: lib/xmalloc.h file.h lib/strutil.h lib/types.h config.h
 mapfile.o:  safestr.h listfile.h lib/class.h lib/queue.h dynstr.h
-mapfile.o: symref.h classlist.h mapfile.h options.h options_def.h
-mapfile.o: lib/strpool.h symbol.h model.h objfile.h symtab.h classhash.h
+mapfile.o: symref.h lib/classlist.h mapfile.h options.h options_def.h
+mapfile.o: lib/strpool.h symbol.h model.h objfile.h symtab.h lib/classhash.h
 mapfile.o: lib/strhash.h lib/uthash.h lib/die.h sym.h token_def.h z80asm.h
 modlink.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
 modlink.o: errors_def.h file.h lib/strutil.h safestr.h listfile.h lib/class.h
-modlink.o: lib/queue.h dynstr.h symref.h classlist.h options.h options_def.h
-modlink.o: lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
-modlink.o: classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
-modlink.o: lib/except.h z80asm.h
+modlink.o: lib/queue.h dynstr.h symref.h lib/classlist.h options.h
+modlink.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h
+modlink.o: symtab.h lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h
+modlink.o: token_def.h lib/except.h z80asm.h
 module.o: lib/xmalloc.h module.h lib/class.h lib/queue.h lib/types.h
-module.o: classlist.h dynstr.h symtab.h classhash.h lib/strhash.h
+module.o: lib/classlist.h dynstr.h symtab.h lib/classhash.h lib/strhash.h
 module.o: lib/uthash.h lib/die.h sym.h symref.h
 objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h errors.h
 objfile.o: errors_def.h file.h lib/strutil.h config.h  safestr.h
 objfile.o: objfile.h lib/strpool.h legacy.h
 options.o: lib/xmalloc.h errors.h errors_def.h scan.h lib/class.h lib/queue.h
 options.o: lib/types.h file.h lib/strutil.h config.h  safestr.h
-options.o: hist.h options.h options_def.h lib/strpool.h symtab.h classhash.h
-options.o: lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h classlist.h
-options.o: z80asm.h
+options.o: hist.h options.h options_def.h lib/strpool.h symtab.h
+options.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+options.o: symref.h lib/classlist.h z80asm.h
 prsident.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 prsident.o: errors.h errors_def.h listfile.h lib/class.h lib/queue.h dynstr.h
-prsident.o: symref.h classlist.h options.h lib/strutil.h options_def.h
-prsident.o: symbol.h model.h objfile.h symtab.h classhash.h lib/strhash.h
+prsident.o: symref.h lib/classlist.h options.h lib/strutil.h options_def.h
+prsident.o: symbol.h model.h objfile.h symtab.h lib/classhash.h lib/strhash.h
 prsident.o: lib/uthash.h lib/die.h sym.h token_def.h z80asm.h
 prsline.o: lib/xmalloc.h config.h  z80asm.h lib/types.h sym.h
-prsline.o: lib/class.h lib/queue.h symref.h classlist.h symbol.h model.h
-prsline.o: objfile.h symtab.h classhash.h lib/strhash.h lib/uthash.h
+prsline.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
+prsline.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 prsline.o: lib/die.h token_def.h options.h lib/strutil.h options_def.h
 prsline.o: errors.h errors_def.h
 safestr.o: lib/xmalloc.h safestr.h lib/types.h lib/strutil.h
 scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h codearea.h
 scan.o: errors.h errors_def.h file.h lib/strutil.h config.h 
-scan.o: safestr.h legacy.h listfile.h dynstr.h symref.h classlist.h options.h
-scan.o: options_def.h lib/strpool.h
+scan.o: safestr.h legacy.h listfile.h dynstr.h symref.h lib/classlist.h
+scan.o: options.h options_def.h lib/strpool.h
 srcfile.o: lib/xmalloc.h codearea.h lib/types.h errors.h errors_def.h file.h
 srcfile.o: lib/strutil.h config.h  safestr.h listfile.h
-srcfile.o: lib/class.h lib/queue.h dynstr.h symref.h classlist.h options.h
-srcfile.o: options_def.h srcfile.h lib/strpool.h
+srcfile.o: lib/class.h lib/queue.h dynstr.h symref.h lib/classlist.h
+srcfile.o: options.h options_def.h srcfile.h lib/strpool.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h dynstr.h
-sym.o: symref.h classlist.h options.h lib/strutil.h options_def.h safestr.h
-sym.o: lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h classhash.h
-sym.o: lib/strhash.h lib/uthash.h lib/die.h token_def.h
+sym.o: symref.h lib/classlist.h options.h lib/strutil.h options_def.h
+sym.o: safestr.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
+sym.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
 symref.o: lib/xmalloc.h options.h lib/types.h lib/strutil.h options_def.h
-symref.o: symref.h lib/class.h lib/queue.h classlist.h
+symref.o: symref.h lib/class.h lib/queue.h lib/classlist.h
 symtab.o: lib/xmalloc.h errors.h errors_def.h listfile.h lib/class.h
-symtab.o: lib/queue.h lib/types.h dynstr.h symref.h classlist.h options.h
+symtab.o: lib/queue.h lib/types.h dynstr.h symref.h lib/classlist.h options.h
 symtab.o: lib/strutil.h options_def.h symbol.h model.h objfile.h symtab.h
-symtab.o: classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h token_def.h
-symtab.o: z80asm.h config.h 
+symtab.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+symtab.o: token_def.h z80asm.h config.h 
 z80asm.o: lib/xmalloc.h codearea.h lib/types.h config.h  deffile.h
 z80asm.o: errors.h errors_def.h file.h lib/strutil.h safestr.h hist.h
 z80asm.o: legacy.h listfile.h lib/class.h lib/queue.h dynstr.h symref.h
-z80asm.o: classlist.h mapfile.h objfile.h options.h options_def.h scan.h
-z80asm.o: lib/strpool.h symbol.h model.h symtab.h classhash.h lib/strhash.h
-z80asm.o: lib/uthash.h lib/die.h sym.h token_def.h lib/except.h z80asm.h
+z80asm.o: lib/classlist.h mapfile.h objfile.h options.h options_def.h scan.h
+z80asm.o: lib/strpool.h symbol.h model.h symtab.h lib/classhash.h
+z80asm.o: lib/strhash.h lib/uthash.h lib/die.h sym.h token_def.h lib/except.h
+z80asm.o: z80asm.h
 z80instr.o: lib/xmalloc.h config.h  z80asm.h lib/types.h sym.h
-z80instr.o: lib/class.h lib/queue.h symref.h classlist.h symbol.h model.h
-z80instr.o: objfile.h symtab.h classhash.h lib/strhash.h lib/uthash.h
+z80instr.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
+z80instr.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 z80instr.o: lib/die.h token_def.h options.h lib/strutil.h options_def.h
 z80instr.o: errors.h errors_def.h codearea.h
 z80pass.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
 z80pass.o: errors_def.h file.h lib/strutil.h safestr.h hist.h listfile.h
-z80pass.o: lib/class.h lib/queue.h dynstr.h symref.h classlist.h model.h
+z80pass.o: lib/class.h lib/queue.h dynstr.h symref.h lib/classlist.h model.h
 z80pass.o: options.h options_def.h scan.h sym.h symbol.h objfile.h symtab.h
-z80pass.o: classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
+z80pass.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
 z80pass.o: z80asm.h
