@@ -1,31 +1,29 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
-#
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.14 2013-12-15 13:18:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.1 2013-12-25 14:39:51 pauloscustodio Exp $
 #
-# Test strutil
+# Test strutil.c
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+use File::Slurp;
+use Capture::Tiny 'capture';
+use Test::Differences; 
 
-my $objs = "strutil.o";
+my $compile = "cc -Wall -mms-bitfields -IC:/MinGW/msys/1.0/include/glib-2.0 -IC:/MinGW/msys/1.0/lib/glib-2.0/include -otest test.c strutil.c strpool.c die.c xmalloc.c -LC:/MinGW/msys/1.0/lib -lglib-2.0 -lintl";
 
-t_compile_module('', <<'END', $objs);
+warn "-mms-bitfields -IC:/MinGW/msys/1.0/include/glib-2.0 -IC:/MinGW/msys/1.0/lib/glib-2.0/include -LC:/MinGW/msys/1.0/lib -lglib-2.0 -lintl";
+
+write_file("test.c", <<'END');
+#include "die.h"
+#include "strutil.h"
+
 #define ERROR return __LINE__
 
+int main()
+{
 	char s[255];
 	char * p;
 	StringList *list1 = NULL;
@@ -37,22 +35,22 @@ t_compile_module('', <<'END', $objs);
 	add_StringList(&list1, "three");
 	add_StringList(&list1, "four");
 	
-	printf("List1\n");
+	warn("List1\n");
 	FOR_StringList(list1, p)
-		printf("->%s\n", p);
+		warn("->%s\n", p);
 	ENDFOR_StringList;
 	
-	printf("List1, break at two\n");
+	warn("List1, break at two\n");
 	FOR_StringList(list1, p)
 	{
-		printf("->%s\n", p);
+		warn("->%s\n", p);
 		if (strcmp(p, "two") == 0) break;
 	}
 	ENDFOR_StringList;
 	
-	printf("List2\n");
+	warn("List2\n");
 	FOR_StringList(list2, p)
-		printf("->%s\n", p);
+		warn("->%s\n", p);
 	ENDFOR_StringList;
 	
 	// strtoupper, strtolower
@@ -89,9 +87,11 @@ t_compile_module('', <<'END', $objs);
 	if(strcmp(s, ""))					ERROR;
 	
 	return 0;
+}
 END
+system($compile) and die "compile failed: $compile\n";
 
-t_run_module([], <<'OUT', "", 0);
+t_capture("test", "", <<'ERR', 0);
 List1
 ->one
 ->two
@@ -101,15 +101,29 @@ List1, break at two
 ->one
 ->two
 List2
-OUT
+ERR
 
-unlink_testfiles();
+
+unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
-__END__
-# $Log: whitebox-strutil.t,v $
-# Revision 1.14  2013-12-15 13:18:35  pauloscustodio
+
+# $Log: strutil.t,v $
+# Revision 1.1  2013-12-25 14:39:51  pauloscustodio
+# Move strutil.c to the z80asm/lib directory
+#
+# Revision 1.14  2013/12/15 13:18:35  pauloscustodio
 # Move memory allocation routines to lib/xmalloc, instead of glib,
 # introduce memory leak report on exit and memory fence check.
 #

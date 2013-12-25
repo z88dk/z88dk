@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o file.o lib/class.o safestr.o strutil.o options.o hist.o";
+my $objs = "scan.o errors.o file.o lib/class.o safestr.o lib/strutil.o options.o hist.o";
 
 # build list of case TOKEN: return "TOKEN" from scan.h
 my @token_case;
@@ -1303,9 +1303,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.24 2013-12-18 23:05:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.25 2013-12-25 14:39:50 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.24  2013-12-18 23:05:52  pauloscustodio
+# Revision 1.25  2013-12-25 14:39:50  pauloscustodio
+# Move strutil.c to the z80asm/lib directory
+#
+# Revision 1.24  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.23  2013/12/15 13:18:35  pauloscustodio

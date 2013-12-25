@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o lib/class.o file.o safestr.o errors.o strutil.o scan.o options.o hist.o";
+my $objs = "objfile.o lib/class.o file.o safestr.o errors.o lib/strutil.o scan.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -200,9 +200,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.13 2013-12-18 23:05:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.14 2013-12-25 14:39:50 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.13  2013-12-18 23:05:52  pauloscustodio
+# Revision 1.14  2013-12-25 14:39:50  pauloscustodio
+# Move strutil.c to the z80asm/lib directory
+#
+# Revision 1.13  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.12  2013/12/15 13:18:35  pauloscustodio

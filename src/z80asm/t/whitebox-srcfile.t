@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "srcfile.o lib/class.o file.o errors.o dynstr.o safestr.o strutil.o scan.o options.o hist.o";
+my $objs = "srcfile.o lib/class.o file.o errors.o dynstr.o safestr.o lib/strutil.o scan.o options.o hist.o";
 
 my $init_code = <<'END';
 #include "symbol.h"
@@ -475,9 +475,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.21 2013-12-18 23:05:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.22 2013-12-25 14:39:50 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.21  2013-12-18 23:05:52  pauloscustodio
+# Revision 1.22  2013-12-25 14:39:50  pauloscustodio
+# Move strutil.c to the z80asm/lib directory
+#
+# Revision 1.21  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.20  2013/12/15 13:18:35  pauloscustodio

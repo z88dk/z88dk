@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "lib/class.o dynstr.o strutil.o";
+my $objs = "lib/class.o dynstr.o lib/strutil.o";
 
 write_file(asm1_file(), {binmode => ':raw'}, "");
 write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -322,9 +322,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.13 2013-12-18 23:05:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.14 2013-12-25 14:39:50 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.13  2013-12-18 23:05:52  pauloscustodio
+# Revision 1.14  2013-12-25 14:39:50  pauloscustodio
+# Move strutil.c to the z80asm/lib directory
+#
+# Revision 1.13  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.12  2013/12/15 13:18:35  pauloscustodio
