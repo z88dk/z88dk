@@ -1,27 +1,21 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
-#
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# Test strlist
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.1 2013-12-25 17:02:10 pauloscustodio Exp $
+#
+# Test strhash.c
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+use File::Slurp;
+use Capture::Tiny 'capture';
+use Test::Differences; 
 
-my $objs = "strhash.o lib/class.o";
+my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c strpool.c die.c";
 
-t_compile_module(<<'END_INIT', <<'END', $objs);
+write_file("test.c", <<'END');
+#include "strhash.h"
 #include "die.h"
 
 #define ERROR return __LINE__
@@ -158,12 +152,12 @@ char *S(char *str)
 	return buffer;
 }
 
-END_INIT
+int main()
+{
 	/* main */
 	StrHash *hash1, *hash2;
 	StrHashElem *elem;
 	
-	warn("init\n");
 	hash1 = OBJ_NEW(StrHash);
 	if (StrHash_first(hash1) != NULL)			ERROR;
 	check_list(hash1, "");
@@ -298,21 +292,33 @@ END_INIT
 	check_list(hash1, "ghi 789 def 457 abc 123");
 	
 	return 0;
+}
 END
 
-t_run_module([], '', <<'ERR', 0);
-init
-ERR
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", "", 0);
 
 
-unlink_testfiles();
+unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
-__END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.16 2013-12-18 23:05:52 pauloscustodio Exp $
-# $Log: whitebox-strhash.t,v $
-# Revision 1.16  2013-12-18 23:05:52  pauloscustodio
+
+# $Log: strhash.t,v $
+# Revision 1.1  2013-12-25 17:02:10  pauloscustodio
+# Move strhash.c to the z80asm/lib directory
+#
+# Revision 1.16  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.15  2013/12/15 13:18:35  pauloscustodio

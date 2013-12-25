@@ -57,9 +57,6 @@
     <ClInclude Include="z80asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="strhash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -138,6 +135,9 @@
     <ClInclude Include="lib\strutil.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\strhash.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -191,9 +191,6 @@
     <ClCompile Include="safestr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="strhash.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="listfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -243,6 +240,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strutil.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\strhash.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>

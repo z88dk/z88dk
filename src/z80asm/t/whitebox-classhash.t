@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "strhash.o lib/class.o "; 
+my $objs = "lib/strhash.o lib/class.o "; 
 
 t_compile_module(<<'END_INIT', <<'END', $objs);
 
@@ -364,9 +364,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.11 2013-12-18 23:05:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.12 2013-12-25 17:02:10 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.11  2013-12-18 23:05:52  pauloscustodio
+# Revision 1.12  2013-12-25 17:02:10  pauloscustodio
+# Move strhash.c to the z80asm/lib directory
+#
+# Revision 1.11  2013/12/18 23:05:52  pauloscustodio
 # Move class.c to the z80asm/lib directory
 #
 # Revision 1.10  2013/12/15 13:18:35  pauloscustodio
