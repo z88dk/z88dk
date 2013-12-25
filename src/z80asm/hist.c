@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.55 2013-12-15 23:31:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.56 2013-12-25 16:29:34 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.55  2013-12-15 23:31:04  pauloscustodio
+/* Revision 1.56  2013-12-25 16:29:34  pauloscustodio
+/* classring deleted, not used
+/*
+/* Revision 1.55  2013/12/15 23:31:04  pauloscustodio
 /* Replace code-generation for init() functions by macros in init.h
 /* to help define init() and fini() functions per module.
 /* Code generation complicates maintenance, as all the modules with init()
@@ -1297,9 +1300,6 @@ Based on 1.0.31
 	- Move default asm and obj extension handling to file.c.
 	- srcfilename and objfilename are now pointers to static variables in file.c
 	- Removed global variable smallc_source, no longer used
-	- New CLASS_RING for circular queue of tokens pre-allocated to spare the
-	  alloc/free for each token received from the lexer, and to allow quick
-	  look-ahead for the parser without the need to push back tokens.
 	- ENDIAN not used and logic to define it was causing Deprecated warnings - removed
 	- Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 	- Add utility functions to get N characters from input, return FALSE on EOF

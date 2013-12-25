@@ -84,9 +84,6 @@
     <ClInclude Include="parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="classring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sym.h">
       <Filter>Header Files</Filter>
     </ClInclude>

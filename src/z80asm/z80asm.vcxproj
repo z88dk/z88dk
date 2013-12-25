@@ -88,7 +88,6 @@
   <ItemGroup>
     <ClInclude Include="classhash.h" />
     <ClInclude Include="classlist.h" />
-    <ClInclude Include="classring.h" />
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="deffile.h" />
