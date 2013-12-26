@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.3 2013-12-19 00:18:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.4 2013-12-26 23:37:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,6 +45,10 @@ OBJ_DELETE(obj2);       // same as T_delete(obj2); obj2 = NULL;
 OBJ_AUTODELETE(obj1) = FALSE;   // if object is destroyed by another
                                 // object that owns it
 
+// usage for static objects
+T * obj = NULL;
+T * alias = INIT_OBJ( T, &obj );	// calls OBJ_NEW on first call
+									// returns alias == obj
 *----------------------------------------------------------------------------*/
 
 /* declare object registry for use in class definition */
@@ -121,6 +125,11 @@ struct Object;
 *   Helper macros
 *----------------------------------------------------------------------------*/
 #define OBJ_NEW(T)      T##_new()
+#define INIT_OBJ(T, pobj)	\
+	( *(pobj) != NULL ?			\
+		*(pobj) :				\
+		( *(pobj) = T##_new() ) \
+	)
 #define OBJ_DELETE(obj) ( (obj) == NULL ? \
 								NULL : \
 								( ( (*(obj)->_class.delete_ptr)( \
@@ -140,7 +149,11 @@ extern void _deregister_obj( struct Object *obj );
 	
 /* 
 * $Log: class.h,v $
-* Revision 1.3  2013-12-19 00:18:23  pauloscustodio
+* Revision 1.4  2013-12-26 23:37:34  pauloscustodio
+* New INIT_OBJ macro to call OBJ_NEW only if object pointer is NULL.
+* Used to initialize an object on the first use.
+*
+* Revision 1.3  2013/12/19 00:18:23  pauloscustodio
 * Use init.h mechanism for intialization code; rename object structure
 *
 * Revision 1.2  2013/12/18 23:50:36  pauloscustodio

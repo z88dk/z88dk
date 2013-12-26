@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.3 2013-12-23 19:19:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.4 2013-12-26 23:37:34 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -67,6 +67,8 @@ void Person_fini (Person *self)
 	OBJ_DELETE(self->name); 
 }
 
+static Person *the_person = NULL;
+
 int main(int argc, char *argv[])
 {
 	Person *p1, *p2;
@@ -106,6 +108,14 @@ int main(int argc, char *argv[])
 		if (p2)								return 15;
 		OBJ_DELETE(p2);		/* test double delete */
 		if (p2)								return 16;
+	}
+	
+	if (test >= 5) {
+		if (the_person != NULL)				return 17;
+		p1 = INIT_OBJ(Person, &the_person);
+		if (p1 != the_person)				return 18;
+		p2 = INIT_OBJ(Person, &the_person);
+		if (p2 != the_person)				return 19;
 	}
 	
 	return 0;
@@ -196,6 +206,36 @@ Name_fini
 class: cleanup
 END
 
+# INIT_OBJ
+t_capture("test 5", "", <<'END', 0);
+Person_init
+Name_init
+class: init
+class: new class Name
+class: new class Person
+Person_copy
+Name_copy
+class: new class Name
+class: new class Person
+class: delete class Person
+Person_fini
+class: delete class Name
+Name_fini
+class: delete class Person
+Person_fini
+class: delete class Name
+Name_fini
+Person_init
+Name_init
+class: new class Name
+class: new class Person
+class: cleanup
+class: delete class Person
+Person_fini
+class: delete class Name
+Name_fini
+END
+
 unlink <test.*>;
 done_testing;
 
@@ -211,7 +251,11 @@ sub t_capture {
 }
 
 # $Log: class.t,v $
-# Revision 1.3  2013-12-23 19:19:52  pauloscustodio
+# Revision 1.4  2013-12-26 23:37:34  pauloscustodio
+# New INIT_OBJ macro to call OBJ_NEW only if object pointer is NULL.
+# Used to initialize an object on the first use.
+#
+# Revision 1.3  2013/12/23 19:19:52  pauloscustodio
 # Show difference in command output in case of test failure
 #
 # Revision 1.2  2013/12/18 23:50:36  pauloscustodio
