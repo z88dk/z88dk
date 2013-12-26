@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o lib/class.o safestr.o lib/strutil.o options.o hist.o";
+my $objs = "errors.o scan.o file.o lib/class.o safestr.o lib/strutil.o lib/strlist.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -184,9 +184,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.18 2013-12-25 14:39:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.19 2013-12-26 23:42:28 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.18  2013-12-25 14:39:50  pauloscustodio
+# Revision 1.19  2013-12-26 23:42:28  pauloscustodio
+# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+#
+# Revision 1.18  2013/12/25 14:39:50  pauloscustodio
 # Move strutil.c to the z80asm/lib directory
 #
 # Revision 1.17  2013/12/18 23:05:52  pauloscustodio

@@ -14,14 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.24 2013-12-15 13:18:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.25 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "strutil.h"
+#include "strlist.h"
 #include "types.h"
 #include <glib.h>
 
@@ -57,7 +57,7 @@ extern char *path_basename( char *dest, const char *source );
 
 /* search for a file on the given directory list, return full path name
  * pathname is stored in strpool, no need to remove */
-extern char *search_file( char *filename, StringList *dir_list );
+extern char *search_file( char *filename, StrList *dir_list );
 
 
 
@@ -115,7 +115,10 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.24  2013-12-15 13:18:33  pauloscustodio
+Revision 1.25  2013-12-26 23:42:27  pauloscustodio
+Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+
+Revision 1.24  2013/12/15 13:18:33  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 

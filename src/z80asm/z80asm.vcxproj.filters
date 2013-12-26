@@ -138,6 +138,9 @@
     <ClInclude Include="lib\classlist.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\strlist.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -243,6 +246,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strhash.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\strlist.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>

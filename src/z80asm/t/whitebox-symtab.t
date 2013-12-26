@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o lib/class.o safestr.o lib/strhash.o errors.o lib/strutil.o file.o options.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o lib/class.o safestr.o lib/strhash.o errors.o lib/strutil.o lib/strlist.o file.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -322,9 +322,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.26 2013-12-25 17:02:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.27 2013-12-26 23:42:28 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.26  2013-12-25 17:02:10  pauloscustodio
+# Revision 1.27  2013-12-26 23:42:28  pauloscustodio
+# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+#
+# Revision 1.26  2013/12/25 17:02:10  pauloscustodio
 # Move strhash.c to the z80asm/lib directory
 #
 # Revision 1.25  2013/12/25 14:39:50  pauloscustodio

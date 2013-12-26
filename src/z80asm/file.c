@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.36 2013-12-15 13:18:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.37 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.36 2013-12-15
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
+#include "strlist.h"
 #include "errors.h"
 
 /*-----------------------------------------------------------------------------
@@ -155,11 +156,11 @@ char *path_basename( char *dest, const char *source )
 *  Search for a file on the given directory list, return full path name
 *  pathname is stored in strpool, no need to remove
 *----------------------------------------------------------------------------*/
-char *search_file( char *filename, StringList *dir_list )
+char *search_file( char *filename, StrList *dir_list )
 {
-    char        *dir;
-    struct stat sb;
-    char		pathname[ FILENAME_MAX ];
+    struct stat  sb;
+    char		 pathname[ FILENAME_MAX ];
+	StrListElem	*iter;
 
 	/* if no dir_list, return file */
 	if ( dir_list == NULL )
@@ -170,13 +171,12 @@ char *search_file( char *filename, StringList *dir_list )
         return strpool_add( filename );
 
     /* search in dir_list */
-	FOR_StringList( dir_list, dir )
+	for ( iter = StrList_first(dir_list); iter != NULL; iter = StrList_next(iter) )
 	{
-		g_snprintf( pathname, sizeof(pathname), "%s/%s", dir, filename );
+		g_snprintf( pathname, sizeof(pathname), "%s/%s", iter->string, filename );
         if ( stat( pathname, &sb ) == 0 )
             return strpool_add( pathname );
 	}
-	ENDFOR_StringList;
 
     /* return unchanged pathname if not found */
     return strpool_add( filename );
@@ -487,7 +487,10 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.36  2013-12-15 13:18:33  pauloscustodio
+Revision 1.37  2013-12-26 23:42:27  pauloscustodio
+Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+
+Revision 1.36  2013/12/15 13:18:33  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 

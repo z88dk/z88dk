@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.1 2013-12-25 14:39:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.2 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -12,17 +12,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.1 2013
 #include "strutil.h"
 #include <ctype.h>
 #include <string.h>
-
-/*-----------------------------------------------------------------------------
-*   Append a string to the string-list, return the new string-list. 
-*   The string is added to strpool and not freed.
-*   Traverses the whole list searching for last item
-*----------------------------------------------------------------------------*/
-void add_StringList( StringList **plist, char *string )
-{
-	*plist = g_slist_append( *plist, strpool_add(string) );
-}
-
 
 /*-----------------------------------------------------------------------------
 *   convert string to upper/lower case
@@ -50,7 +39,10 @@ char *strtolower( char *string )
 
 /* 
 * $Log: strutil.c,v $
-* Revision 1.1  2013-12-25 14:39:51  pauloscustodio
+* Revision 1.2  2013-12-26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.1  2013/12/25 14:39:51  pauloscustodio
 * Move strutil.c to the z80asm/lib directory
 *
 * Revision 1.19  2013/12/15 13:18:34  pauloscustodio

@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.1 2013-12-25 14:39:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.2 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -11,31 +11,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.1 2013
 #include "xmalloc.h"				/* before any other include */
 
 #include <glib.h>
-
-/*-----------------------------------------------------------------------------
-*   List of fixed strings (e.g. include path); 
-*	strings kept in strpool.h and list is never freed.
-*----------------------------------------------------------------------------*/
-typedef GSList StringList;			/* singly-linked list of strings, NULL if empty */
-
-/* Append a string to the string-list. 
-   The string is added to strpool and not freed.
-   Traverses the whole list searching for last item */
-extern void add_StringList( StringList **plist, char *string );
-
-/* Traverses the string-list, setting string to each string in turn
-   (StringList *list, char *string) */
-#define FOR_StringList( list, string )	\
-	do { \
-		StringList *iter; \
-		for ( iter = (list) ; iter ; iter = iter->next ) \
-		{ \
-			(string) = (char *) iter->data; \
-
-#define ENDFOR_StringList \
-		} \
-	} while(0)
-
 
 /*-----------------------------------------------------------------------------
 *   Utilities
@@ -49,7 +24,10 @@ extern char *strtolower( char *string );
 
 /* 
 * $Log: strutil.h,v $
-* Revision 1.1  2013-12-25 14:39:51  pauloscustodio
+* Revision 1.2  2013-12-26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.1  2013/12/25 14:39:51  pauloscustodio
 * Move strutil.c to the z80asm/lib directory
 *
 * Revision 1.17  2013/12/15 13:18:34  pauloscustodio

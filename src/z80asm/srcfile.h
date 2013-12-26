@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.4 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.5 2013-12-26 23:42:27 pauloscustodio Exp $ */
 /* $Log: srcfile.h,v $
-/* Revision 1.4  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.5  2013-12-26 23:42:27  pauloscustodio
+/* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+/*
+/* Revision 1.4  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -48,6 +51,7 @@ Allows pushing back of lines, for example to expand macros.
 #include "dynstr.h"
 #include "types.h"
 
+#if 0
 /*-----------------------------------------------------------------------------
 *   Class to hold stack of input lines to read next
 *----------------------------------------------------------------------------*/
@@ -122,6 +126,8 @@ extern void  source_ungetline( char *line );
 extern char *source_filename( void );
 extern char *source_line( void );
 extern int   source_line_nr( void );
+
+#endif
 
 
 #endif /* ndef SRCFILE_H */

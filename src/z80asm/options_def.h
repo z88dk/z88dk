@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.27 2013-10-05 13:43:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.28 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -49,8 +49,8 @@ OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
 OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 OPT_VAR(	char *,	lib_file,	NULL 			)	/* set by -x */
 
-OPT_VAR(	StringList *,	inc_path,	NULL )		/* path for include files */
-OPT_VAR(	StringList *,	lib_path,	NULL )		/* path for library files */
+OPT_VAR(	StrList *,	inc_path,	NULL )			/* path for include files */
+OPT_VAR(	StrList *,	lib_path,	NULL )			/* path for library files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
@@ -186,7 +186,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.27  2013-10-05 13:43:05  pauloscustodio
+* Revision 1.28  2013-12-26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.27  2013/10/05 13:43:05  pauloscustodio
 * Parse command line options via look-up tables:
 * -i, --use-lib
 * -x, --make-lib

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.1 2013-12-25 14:39:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.2 2013-12-26 23:42:27 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -26,33 +26,7 @@ int main()
 {
 	char s[255];
 	char * p;
-	StringList *list1 = NULL;
-	StringList *list2 = NULL;
 
-	// StringList
-	add_StringList(&list1, "one");
-	add_StringList(&list1, "two");
-	add_StringList(&list1, "three");
-	add_StringList(&list1, "four");
-	
-	warn("List1\n");
-	FOR_StringList(list1, p)
-		warn("->%s\n", p);
-	ENDFOR_StringList;
-	
-	warn("List1, break at two\n");
-	FOR_StringList(list1, p)
-	{
-		warn("->%s\n", p);
-		if (strcmp(p, "two") == 0) break;
-	}
-	ENDFOR_StringList;
-	
-	warn("List2\n");
-	FOR_StringList(list2, p)
-		warn("->%s\n", p);
-	ENDFOR_StringList;
-	
 	// strtoupper, strtolower
 	strcpy(s, "Abc1");
 	p = strtolower(s);
@@ -91,17 +65,7 @@ int main()
 END
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("test", "", <<'ERR', 0);
-List1
-->one
-->two
-->three
-->four
-List1, break at two
-->one
-->two
-List2
-ERR
+t_capture("test", "", "", 0);
 
 
 unlink <test.*>;
@@ -120,7 +84,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.1  2013-12-25 14:39:51  pauloscustodio
+# Revision 1.2  2013-12-26 23:42:27  pauloscustodio
+# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+#
+# Revision 1.1  2013/12/25 14:39:51  pauloscustodio
 # Move strutil.c to the z80asm/lib directory
 #
 # Revision 1.14  2013/12/15 13:18:35  pauloscustodio

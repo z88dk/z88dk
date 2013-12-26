@@ -103,6 +103,7 @@
     <ClInclude Include="lib\init.h" />
     <ClInclude Include="lib\queue.h" />
     <ClInclude Include="lib\strhash.h" />
+    <ClInclude Include="lib\strlist.h" />
     <ClInclude Include="lib\strpool.h" />
     <ClInclude Include="lib\strutil.h" />
     <ClInclude Include="lib\types.h" />
@@ -140,6 +141,7 @@
     <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\except.c" />
     <ClCompile Include="lib\strhash.c" />
+    <ClCompile Include="lib\strlist.c" />
     <ClCompile Include="lib\strpool.c" />
     <ClCompile Include="lib\strutil.c" />
     <ClCompile Include="lib\xmalloc.c" />

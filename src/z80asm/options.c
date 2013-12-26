@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.62 2013-12-15 19:01:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.63 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.62 2013-12-15 19
 #include "hist.h"
 #include "options.h"
 #include "strpool.h"
+#include "strutil.h"
 #include "symtab.h"
 #include "z80asm.h"
 #include <ctype.h>
@@ -104,7 +105,7 @@ void init_options(void)
 {
     char *directory = getenv("Z80_OZFILES");
     if ( directory )
-		add_StringList( &opts.inc_path, directory );
+		StrList_push( & opts.inc_path, directory );
 }
 
 
@@ -207,7 +208,7 @@ static void process_opt(int *parg, int argc, char *argv[])
 
 			case OptStringList:
 				if ( *opt_arg_ptr )
-					add_StringList( (StringList **)(opts_lu[j].arg), opt_arg_ptr );
+					StrList_push( (StrList **) opts_lu[j].arg, opt_arg_ptr );
 				else
 					error_illegal_option( argv[i] );
 				break;
@@ -538,7 +539,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.62  2013-12-15 19:01:07  pauloscustodio
+* Revision 1.63  2013-12-26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.62  2013/12/15 19:01:07  pauloscustodio
 * Move platform specific defines from types.h to config.h.
 * Remove dependency of types.h from glib.h.
 * Use NUM_ELEMS() instead of glib G_N_ELEMENTS().

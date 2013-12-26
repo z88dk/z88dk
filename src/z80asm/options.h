@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.35 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.36 2013-12-26 23:42:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.35 2013-12-15 13
 #include "xmalloc.h"   /* before any other include */
 
 #include "types.h"
-#include "strutil.h"
+#include "strlist.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type
@@ -80,7 +80,10 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.35  2013-12-15 13:18:34  pauloscustodio
+* Revision 1.36  2013-12-26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.35  2013/12/15 13:18:34  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *
