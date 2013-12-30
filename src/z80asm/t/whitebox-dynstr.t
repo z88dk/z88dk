@@ -321,10 +321,12 @@ unlink_testfiles();
 done_testing;
 
 
-__END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.14 2013-12-25 14:39:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.15 2013-12-30 00:00:59 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.14  2013-12-25 14:39:50  pauloscustodio
+# Revision 1.15  2013-12-30 00:00:59  pauloscustodio
+# Replace g_strchomp by chomp.
+#
+# Revision 1.14  2013/12/25 14:39:50  pauloscustodio
 # Move strutil.c to the z80asm/lib directory
 #
 # Revision 1.13  2013/12/18 23:05:52  pauloscustodio
@@ -335,9 +337,6 @@ __END__
 # introduce memory leak report on exit and memory fence check.
 #
 # Revision 1.11  2013/09/24 00:05:36  pauloscustodio
-# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
-# Removed normalize_eol.
 #
 # Revision 1.10  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:

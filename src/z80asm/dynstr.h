@@ -17,16 +17,16 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.9 2013-12-15 13:18:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.10 2013-12-30 00:00:59 pauloscustodio Exp $ */
 /* $Log: dynstr.h,v $
-/* Revision 1.9  2013-12-15 13:18:33  pauloscustodio
+/* Revision 1.10  2013-12-30 00:00:59  pauloscustodio
+/* Replace g_strchomp by chomp.
+/*
+/* Revision 1.9  2013/12/15 13:18:33  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
 /* Revision 1.8  2013/09/24 00:05:35  pauloscustodio
-/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
-/* Removed normalize_eol.
 /*
 /* Revision 1.7  2013/05/01 21:10:49  pauloscustodio
 /* Add getline to Str, converting EOL sequences to LF.

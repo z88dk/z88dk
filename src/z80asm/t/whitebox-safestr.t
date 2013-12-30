@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.10 2013-12-25 14:39:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.11 2013-12-30 00:00:59 pauloscustodio Exp $
 #
 # Test safestr
 
@@ -249,9 +249,7 @@ INIT
 		
 		fclose( fp );
 	}
-	
-	
-	
+
 	return 0;
 END
 
@@ -305,9 +303,11 @@ unlink_testfiles();
 done_testing;
 
 
-__END__
 # $Log: whitebox-safestr.t,v $
-# Revision 1.10  2013-12-25 14:39:50  pauloscustodio
+# Revision 1.11  2013-12-30 00:00:59  pauloscustodio
+# Replace g_strchomp by chomp.
+#
+# Revision 1.10  2013/12/25 14:39:50  pauloscustodio
 # Move strutil.c to the z80asm/lib directory
 #
 # Revision 1.9  2013/12/15 13:18:35  pauloscustodio
@@ -315,9 +315,6 @@ __END__
 # introduce memory leak report on exit and memory fence check.
 #
 # Revision 1.8  2013/09/24 00:05:36  pauloscustodio
-# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
-# Removed normalize_eol.
 #
 # Revision 1.7  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
