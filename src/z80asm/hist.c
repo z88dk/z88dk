@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.57 2013-12-30 02:05:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.58 2013-12-30 02:07:32 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.57  2013-12-30 02:05:32  pauloscustodio
+/* Revision 1.58  2013-12-30 02:07:32  pauloscustodio
+/* Version 2.1.1
+/*
+/* Revision 1.57  2013/12/30 02:05:32  pauloscustodio
 /* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 /* handles both dynamically allocated strings and fixed-size strings.
 /* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -1478,7 +1481,7 @@ Based on 1.0.31
 	  introduce memory leak report on exit and memory fence check.
 
 -------------------------------------------------------------------------------
-xx.xx.201x [2.1.1] (pauloscustodio)
+30.12.2013 [2.1.1] (pauloscustodio)
 -------------------------------------------------------------------------------
 	- Replace code-generation for init() functions by macros in init.h 
 	  to help define init() and fini() functions per module.
@@ -1527,7 +1530,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.0a"
+#define VERSION     "2.1.1"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
