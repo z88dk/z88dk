@@ -3,11 +3,12 @@ List of fixed strings (e.g. include path)
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strlist.c,v 1.1 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strlist.c,v 1.2 2013-12-30 15:21:10 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
 #include "strlist.h"
+#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class
@@ -16,6 +17,8 @@ DEF_CLASS( StrList );
 
 void StrList_init( StrList *self )
 {
+	strpool_init();
+	
     TAILQ_INIT( &self->head );
 }
 
@@ -39,7 +42,6 @@ void StrList_fini( StrList *self )
     while ( ( elem = TAILQ_FIRST( &self->head ) ) != NULL )
     {
         TAILQ_REMOVE( &self->head, elem, entries );
-		xfree( elem->string );
         xfree( elem );
     }
 }
@@ -53,7 +55,7 @@ void StrList_push( StrList **pself, char *string )
 
 	INIT_OBJ( StrList, pself ); 
     elem = xnew( StrListElem );
-    elem->string = xstrdup( string );
+    elem->string = strpool_add( string );
     TAILQ_INSERT_TAIL( & ((*pself)->head), elem, entries );
 }
 
@@ -81,7 +83,10 @@ BOOL StrList_empty( StrList *self )
 
 /*
 * $Log: strlist.c,v $
-* Revision 1.1  2013-12-26 23:42:27  pauloscustodio
+* Revision 1.2  2013-12-30 15:21:10  pauloscustodio
+* Keep strings in strpool
+*
+* Revision 1.1  2013/12/26 23:42:27  pauloscustodio
 * Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 *
 * Revision 1.3  2013/02/25 21:36:17  pauloscustodio
