@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o scan.o lib/class.o safestr.o errors.o lib/strutil.o lib/strlist.o options.o hist.o";
+my $objs = "file.o scan.o lib/class.o errors.o lib/strutil.o lib/strlist.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -277,8 +277,8 @@ t_compile_module($init, <<'END', $objs);
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"123456" 
-	SSTR_DEFINE( small, 5 );
-	SSTR_DEFINE( large, 1024 );
+	DEFINE_STR( small, 5 );
+	DEFINE_STR( large, 1024 );
 	char buffer[1024];
 	FILE *file;
 	long fpos;
@@ -300,43 +300,43 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( filestat.st_size == 0 );
 
 	TITLE("xfwrite");
-	sstr_set( small, BIG_STR );
+	Str_set( small, BIG_STR );
 	TRY_OK( file = xfopen("test1.bin", "wb") );
-	TRY_OK( xfwrite( sstr_data(small), sizeof(char), sstr_len(small), file ) );
+	TRY_OK( xfwrite( small->str, sizeof(char), small->len, file ) );
 	TRY_OK( xfclose(file) );
 	dump_file("test1.bin");
 
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	TRY_NOK( xfwrite( sstr_data(small), sizeof(char), sstr_len(small), file ) );
+	TRY_NOK( xfwrite( small->str, sizeof(char), small->len, file ) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfread");
 	memset(buffer, 0, sizeof(buffer));
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	TRY_OK( xfread( buffer, sizeof(char), sstr_len(small), file ) );
-	ASSERT( 0 == memcmp(buffer, sstr_data(small), sstr_len(small)) );
+	TRY_OK( xfread( buffer, sizeof(char), small->len, file ) );
+	ASSERT( 0 == memcmp(buffer, small->str, small->len) );
 	fseek(file, 1, SEEK_SET);
-	TRY_NOK( xfread( buffer, sizeof(char), sstr_len(small), file ) );
+	TRY_NOK( xfread( buffer, sizeof(char), small->len, file ) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfput_char");
-	sstr_set( small, BIG_STR );
+	Str_set( small, BIG_STR );
 	TRY_OK( file = xfopen("test1.bin", "wb") );
-	TRY_OK( xfput_char( sstr_data(small), sstr_len(small), file ) );
+	TRY_OK( xfput_char( small->str, small->len, file ) );
 	TRY_OK( xfclose(file) );
 	dump_file("test1.bin");
 
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	TRY_NOK( xfput_char( sstr_data(small), sstr_len(small), file ) );
+	TRY_NOK( xfput_char( small->str, small->len, file ) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfget_char");
 	memset(buffer, 0, sizeof(buffer));
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	TRY_OK( xfget_char( buffer, sstr_len(small), file ) );
-	ASSERT( 0 == memcmp(buffer, sstr_data(small), sstr_len(small)) );
+	TRY_OK( xfget_char( buffer, small->len, file ) );
+	ASSERT( 0 == memcmp(buffer, small->str, small->len) );
 	fseek(file, 1, SEEK_SET);
-	TRY_NOK( xfget_char( buffer, sstr_len(small), file ) );
+	TRY_NOK( xfget_char( buffer, small->len, file ) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfput_u8");
@@ -467,7 +467,7 @@ t_compile_module($init, <<'END', $objs);
 	TRY_OK( xfclose(file) );
 	
 	TITLE("xfput_sstr");
-	sstr_set( small, BIG_STR );
+	Str_set( small, BIG_STR );
 	TRY_OK( file = xfopen("test1.bin", "wb") );
 	TRY_OK( xfput_sstr( small, file ) );
 	TRY_OK( xfclose(file) );
@@ -480,7 +480,7 @@ t_compile_module($init, <<'END', $objs);
 	TITLE("xfget_sstr");
 	TRY_OK( file = xfopen("test1.bin", "rb") );
 	TRY_OK( xfget_sstr( small, small->size-1, file ) );
-	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	ASSERT( 0 == memcmp(small->str, BIG_STR, small->len) );
 	TRY_NOK( xfget_u8( file ) );
 	fseek(file, 1, SEEK_SET);
 	TRY_NOK( xfget_sstr( small, small->size-1, file ) );
@@ -490,84 +490,84 @@ t_compile_module($init, <<'END', $objs);
 
 	TITLE("xfput_c1sstr");
 	TRY_OK( file = xfopen("test1.bin", "wb") );
-	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[0] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c1sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[1] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[1] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c1sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[255] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[255] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c1sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[256] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[256] = '\0'; Str_sync_len(large);
 	TRY_NOK( xfput_c1sstr(large, file) );
 	TRY_OK( xfclose(file) );
 	dump_file("test1.bin");
 
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[0] = '\0'; Str_sync_len(large);
 	TRY_NOK( xfput_c1sstr(large, file) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfget_c1sstr");
 	TRY_OK( file = xfopen("test1.bin", "rb") );
 	TRY_OK( xfget_c1sstr( large, file ) );
-	ASSERT( 0 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 0 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_OK( xfget_c1sstr( large, file ) );
-	ASSERT( 1 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 1 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_OK( xfget_c1sstr( large, file ) );
-	ASSERT( 255 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 255 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_NOK( xfget_u8( file ) );
 	fseek(file, 0, SEEK_SET);
 	TRY_OK( xfget_c1sstr( small, file ) );
-	ASSERT( 0 == sstr_len(small) );
-	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	ASSERT( 0 == small->len );
+	ASSERT( 0 == memcmp(small->str, BIG_STR, small->len) );
 	TRY_OK( xfget_c1sstr( small, file ) );
-	ASSERT( 1 == sstr_len(small) );
-	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	ASSERT( 1 == small->len );
+	ASSERT( 0 == memcmp(small->str, BIG_STR, small->len) );
 	TRY_NOK( xfget_c1sstr(small, file) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfput_c2sstr");
 	TRY_OK( file = xfopen("test1.bin", "wb") );
-	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[0] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c2sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[1] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[1] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c2sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[255] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[255] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c2sstr(large, file) );
-	sstr_set(large, BIG_STR); sstr_data(large)[256] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[256] = '\0'; Str_sync_len(large);
 	TRY_OK( xfput_c2sstr(large, file) );
 	TRY_OK( xfclose(file) );
 	dump_file("test1.bin");
 
 	TRY_OK( file = xfopen("test1.bin", "rb") );
-	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	Str_set(large, BIG_STR); large->str[0] = '\0'; Str_sync_len(large);
 	TRY_NOK( xfput_c2sstr(large, file) );
 	TRY_OK( xfclose(file) );
 
 	TITLE("xfget_c2sstr");
 	TRY_OK( file = xfopen("test1.bin", "rb") );
 	TRY_OK( xfget_c2sstr( large, file ) );
-	ASSERT( 0 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 0 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_OK( xfget_c2sstr( large, file ) );
-	ASSERT( 1 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 1 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_OK( xfget_c2sstr( large, file ) );
-	ASSERT( 255 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 255 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_OK( xfget_c2sstr( large, file ) );
-	ASSERT( 256 == sstr_len(large) );
-	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	ASSERT( 256 == large->len );
+	ASSERT( 0 == memcmp(large->str, BIG_STR, large->len) );
 	TRY_NOK( xfget_u8( file ) );
 	fseek(file, 0, SEEK_SET);
 	TRY_OK( xfget_c2sstr( small, file ) );
-	ASSERT( 0 == sstr_len(small) );
-	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	ASSERT( 0 == small->len );
+	ASSERT( 0 == memcmp(small->str, BIG_STR, small->len) );
 	TRY_OK( xfget_c2sstr( small, file ) );
-	ASSERT( 1 == sstr_len(small) );
-	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	ASSERT( 1 == small->len );
+	ASSERT( 0 == memcmp(small->str, BIG_STR, small->len) );
 	TRY_NOK( xfget_c2sstr(small, file) );
 	TRY_OK( xfclose(file) );
 
@@ -743,9 +743,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.28 2013-12-26 23:42:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.29 2013-12-30 02:05:34 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.28  2013-12-26 23:42:28  pauloscustodio
+# Revision 1.29  2013-12-30 02:05:34  pauloscustodio
+# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+# handles both dynamically allocated strings and fixed-size strings.
+# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+#
+# Revision 1.28  2013/12/26 23:42:28  pauloscustodio
 # Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 #
 # Revision 1.27  2013/12/25 14:39:50  pauloscustodio

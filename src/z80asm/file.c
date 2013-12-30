@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.37 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.38 2013-12-30 02:05:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.37 2013-12-26
 #include "strlist.h"
 #include "errors.h"
 
+#if 0
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate functions called by init()
 *----------------------------------------------------------------------------*/
@@ -73,6 +74,7 @@ void close_File(struct File *self)
 		self->fp = NULL;
 	}
 }
+#endif
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -200,7 +202,6 @@ char *search_file( char *filename, StrList *dir_list )
 #include "class.h"
 #include "config.h"
 #include "file.h"
-#include "safestr.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "uthash.h"
@@ -433,52 +434,52 @@ long xfget_i32( FILE *file )
 }
 
 /*-----------------------------------------------------------------------------
-*   Read / write sstr_t
+*   Read / write Str
 *----------------------------------------------------------------------------*/
-void xfput_sstr( sstr_t *str, FILE *file )
+void xfput_sstr( Str *str, FILE *file )
 {
-	xfput_char( sstr_data(str), sstr_len(str), file );
+	xfput_char( str->str, str->len, file );
 }
 
-void xfget_sstr( sstr_t *str, size_t len, FILE *file )
+void xfget_sstr( Str *str, size_t len, FILE *file )
 {
 	if ( len + 1 > str->size )
 		fatal_read_file( get_filename(file) );/* too long */
 	
-	xfget_char( sstr_data(str), len, file );				/* characters */
-	sstr_data(str)[len] = '\0';								/* terminate string */
-	sstr_sync_len(str);
+	xfget_char( str->str, len, file );				/* characters */
+	str->str[len] = '\0';								/* terminate string */
+	Str_sync_len(str);
 }
 
 /*-----------------------------------------------------------------------------
 *   Read / write Counted strings
 *----------------------------------------------------------------------------*/
 
-/* read/write sstr_t byte-counted strings (1 byte size + string chars) with error check */
-void xfput_c1sstr( sstr_t *str, FILE *file )
+/* read/write Str byte-counted strings (1 byte size + string chars) with error check */
+void xfput_c1sstr( Str *str, FILE *file )
 {
-	if ( sstr_len(str) > 0xFF )
+	if ( str->len > 0xFF )
 		fatal_write_file( get_filename(file) );					/* too long */
-	xfput_u8( sstr_len(str), file );							/* byte count */
+	xfput_u8( str->len, file );							/* byte count */
 	xfput_sstr( str, file );									/* characters */
 }
 
-void xfget_c1sstr( sstr_t *str, FILE *file )
+void xfget_c1sstr( Str *str, FILE *file )
 {
 	size_t len = xfget_u8( file );								/* byte count */
 	xfget_sstr( str, len, file );
 }
 
-/* read/write sstr_t word-counted strings (2 bytes size + string chars) with error check */
-void xfput_c2sstr( sstr_t *str, FILE *file )
+/* read/write Str word-counted strings (2 bytes size + string chars) with error check */
+void xfput_c2sstr( Str *str, FILE *file )
 {
-	if ( sstr_len(str) > 0xFFFF )
+	if ( str->len > 0xFFFF )
 		fatal_write_file( get_filename(file) );					/* too long */
-	xfput_u16( sstr_len(str), file );							/* word count */
+	xfput_u16( str->len, file );							/* word count */
 	xfput_sstr( str, file );									/* characters */
 }
 
-void xfget_c2sstr( sstr_t *str, FILE *file )
+void xfget_c2sstr( Str *str, FILE *file )
 {
 	size_t len = xfget_u16( file );								/* word count */
 	xfget_sstr( str, len, file );
@@ -487,7 +488,13 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.37  2013-12-26 23:42:27  pauloscustodio
+Revision 1.38  2013-12-30 02:05:32  pauloscustodio
+Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+handles both dynamically allocated strings and fixed-size strings.
+Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+
+Revision 1.37  2013/12/26 23:42:27  pauloscustodio
 Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 
 Revision 1.36  2013/12/15 13:18:33  pauloscustodio

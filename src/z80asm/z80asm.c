@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.119 2013-12-18 01:46:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.120 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.119  2013-12-18 01:46:22  pauloscustodio
+/* Revision 1.120  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.119  2013/12/18 01:46:22  pauloscustodio
 /* Move strpool.c to the z80asm/lib directory
 /*
 /* Revision 1.118  2013/12/15 23:05:54  pauloscustodio
@@ -681,7 +687,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "mapfile.h"
 #include "objfile.h"
 #include "options.h"
-#include "safestr.h"
 #include "scan.h"
 #include "strpool.h"
 #include "strutil.h"

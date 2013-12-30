@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o lib/class.o file.o safestr.o errors.o lib/strutil.o lib/strlist.o scan.o options.o hist.o";
+my $objs = "objfile.o lib/class.o file.o errors.o lib/strutil.o lib/strlist.o scan.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -200,9 +200,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.15 2013-12-26 23:42:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.16 2013-12-30 02:05:34 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.15  2013-12-26 23:42:28  pauloscustodio
+# Revision 1.16  2013-12-30 02:05:34  pauloscustodio
+# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+# handles both dynamically allocated strings and fixed-size strings.
+# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+#
+# Revision 1.15  2013/12/26 23:42:28  pauloscustodio
 # Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 #
 # Revision 1.14  2013/12/25 14:39:50  pauloscustodio

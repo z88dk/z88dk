@@ -23,7 +23,7 @@ require 't/test_utils.pl';
 SKIP: {
 	skip "SourceFile and SourceFileList not implemented";
 	
-my $objs = "srcfile.o lib/class.o file.o errors.o dynstr.o safestr.o lib/strutil.o scan.o options.o hist.o";
+my $objs = "srcfile.o lib/class.o file.o errors.o dynstr.o lib/strutil.o scan.o options.o hist.o";
 
 my $init_code = <<'END';
 #include "symbol.h"
@@ -479,9 +479,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.23 2013-12-26 23:42:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.24 2013-12-30 02:05:34 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.23  2013-12-26 23:42:28  pauloscustodio
+# Revision 1.24  2013-12-30 02:05:34  pauloscustodio
+# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+# handles both dynamically allocated strings and fixed-size strings.
+# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+#
+# Revision 1.23  2013/12/26 23:42:28  pauloscustodio
 # Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 #
 # Revision 1.22  2013/12/25 14:39:50  pauloscustodio

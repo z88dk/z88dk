@@ -14,9 +14,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.9 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.10 2013-12-30 02:05:32 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.9  2013-12-15 13:18:34  pauloscustodio
+Revision 1.10  2013-12-30 02:05:32  pauloscustodio
+Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+handles both dynamically allocated strings and fixed-size strings.
+Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+
+Revision 1.9  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -61,8 +67,8 @@ Move mapfile writing to mapfile.c.
 #include "listfile.h"
 #include "mapfile.h"
 #include "options.h"
-#include "safestr.h"
 #include "strpool.h"
+#include "strutil.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"

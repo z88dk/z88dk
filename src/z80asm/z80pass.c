@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.64 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.65 2013-12-30 02:05:33 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.64  2013-12-15 13:18:34  pauloscustodio
+Revision 1.65  2013-12-30 02:05:33  pauloscustodio
+Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+handles both dynamically allocated strings and fixed-size strings.
+Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+
+Revision 1.64  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -45,9 +51,6 @@ Parse command line options via look-up tables:
 --help, --verbose
 
 Revision 1.57  2013/09/24 00:05:36  pauloscustodio
-Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
-Removed normalize_eol.
 
 Revision 1.56  2013/09/22 21:34:48  pauloscustodio
 Remove legacy xxx_err() interface
@@ -1098,7 +1101,7 @@ FindFile( struct sourcefile *srcfile, char *flnm )
             return foundfile;    /* trying to include an already included file recursively! */
         }
 
-        if ( g_ascii_strcasecmp( srcfile->fname, flnm ) == 0 )
+        if ( stricompare( srcfile->fname, flnm ) == 0 )
         {
             return srcfile;    /* this include file already used! */
         }

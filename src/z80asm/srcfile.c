@@ -17,9 +17,15 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.14 2013-12-26 23:42:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.15 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.14  2013-12-26 23:42:27  pauloscustodio
+/* Revision 1.15  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.14  2013/12/26 23:42:27  pauloscustodio
 /* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 /*
 /* Revision 1.13  2013/12/15 13:18:34  pauloscustodio
@@ -300,7 +306,7 @@ static void do_ungetline( SourceFile *self, char *line )
 
 	/* now there is no next line - push to stack and finish */
 	str = OBJ_NEW( Str );
-	Str_szset( str, line );
+	Str_set( str, line );
 	Str_unreserve( str );					/* reclaim unused space in line */
 	StrList_push( self->line_stack, str );	/* put on stack, stack will release memory */
 }

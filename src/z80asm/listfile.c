@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.9 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.10 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.9  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.10  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.9  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -65,7 +71,6 @@ Handle assembly listing and symbol table listing.
 #include "hist.h"
 #include "strpool.h"
 #include "types.h"
-#include "safestr.h"
 #include "strutil.h"
 #include "codearea.h"
 
@@ -127,7 +132,7 @@ void ListFile_fini ( ListFile *self )
 static void ListFile_write_header( ListFile *self );
 static void ListFile_fprintf( ListFile *self, char *msg, ... )
 {
-    SSTR_DEFINE( str, MAXLINE );
+    DEFINE_STR( str, MAXLINE );
 	char *p;
     va_list argptr;
 
@@ -136,10 +141,10 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
 
 	if ( self->file != NULL ) 
 	{
-		sstr_vfset( str, msg, argptr );			/* build list line */
+		Str_vsprintf( str, msg, argptr );			/* build list line */
 
 		/* output to list file, advance line if newline, insert header on new page */
-		for ( p = sstr_data(str) ; *p ; p++ ) 
+		for ( p = str->str ; *p ; p++ ) 
 		{
 			xfput_u8( *p, self->file );
 			if ( *p == '\n' ) 
@@ -310,9 +315,9 @@ void ListFile_start_line( ListFile *self, size_t address,
 		self->source_line_nr = source_line_nr;
 
 		/* normalize the line end (BUG_0031) */
-		Str_szset( self->line, line );
+		Str_set( self->line, line );
 		Str_chomp( self->line );
-		Str_szcat( self->line, "\n" );
+		Str_append_char( self->line, '\n' );
 	}
 }
 
@@ -338,7 +343,7 @@ void ListFile_append( ListFile *self, long value, int num_bytes )
 		while ( num_bytes-- > 0 ) 
 		{
 			byte = value & 0xFF;
-			Str_bcat( self->bytes, &byte, sizeof(byte) );
+			Str_append_char( self->bytes, byte );
 			value >>= 8;
 		}
 	}
@@ -440,8 +445,8 @@ void ListFile_end_line( ListFile *self )
 	if ( self->file != NULL && self->line_started && ! self->source_list_ended )
 	{
 		/* get length of hex dump and pointer to data bytes (BUG_0015) */
-		len     = Str_len( self->bytes );
-		byteptr = Str_data( self->bytes );
+		len     = self->bytes->len;
+		byteptr = self->bytes->str;
 
 		/* output line number and address */
 		ListFile_fprintf( self, "%-5d %04X  ", self->source_line_nr, self->address );
@@ -467,7 +472,7 @@ void ListFile_end_line( ListFile *self )
 			ListFile_fprintf( self, "\n%*s", 5 + 1 + 4 + 2 + (4 * 3), "" );
 		}
 
-		ListFile_fprintf( self, "%s", Str_data( self->line ) );
+		ListFile_fprintf( self, "%s", self->line->str );
 
 		self->line_started = FALSE;				/* no longer in line */
 	}

@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.14 2013-12-26 23:42:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.15 2013-12-30 02:05:34 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.14  2013-12-26 23:42:28  pauloscustodio
+# Revision 1.15  2013-12-30 02:05:34  pauloscustodio
+# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+# handles both dynamically allocated strings and fixed-size strings.
+# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+#
+# Revision 1.14  2013/12/26 23:42:28  pauloscustodio
 # Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 #
 # Revision 1.13  2013/12/25 17:02:10  pauloscustodio
@@ -74,7 +80,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o safestr.o lib/strutil.o lib/strlist.o  errors.o strpool.o lib/strhash.o lib/class.o file.o";
+my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o lib/strutil.o lib/strlist.o  errors.o strpool.o lib/strhash.o lib/class.o file.o";
 my $src = "t/data/zx48.asm";
 my @words;
 

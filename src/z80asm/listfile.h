@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.7 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.8 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.7  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.8  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.7  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -57,7 +63,7 @@ Handle assembly listing and symbol table listing.
 #include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
-#include "dynstr.h"
+#include "strutil.h"
 #include "symref.h"
 #include "types.h"
 

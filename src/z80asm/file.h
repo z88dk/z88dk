@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.25 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.26 2013-12-30 02:05:32 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,8 +23,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.25 2013-12-26
 
 #include "strlist.h"
 #include "types.h"
-#include <glib.h>
 
+#if 0
+#include <glib.h>
 /*-----------------------------------------------------------------------------
 *   Object representing an open file
 *	Files open for writing and not closed are removed on exit, to avoid 
@@ -45,6 +46,7 @@ extern void struct_File_fini(File *self);
 /* close an open file
    if not called, delete_File() will delete a file open for writing */
 extern void close_File(File *self);
+#endif
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -70,7 +72,7 @@ extern char *search_file( char *filename, StrList *dir_list );
 
 
 #include "config.h"
-#include "safestr.h"
+#include "strutil.h"
 #include "types.h"
 #include <stdio.h>
 #include <sys/stat.h>
@@ -101,21 +103,27 @@ extern void  xfput_u32( long value, FILE *file );
 extern long  xfget_u32( FILE *file );   /* EOF is fatal */
 extern long  xfget_i32( FILE *file );   /* EOF is fatal */
 
-/* read/write sstr_t */
-extern void  xfput_sstr( sstr_t *str, FILE *file );
-extern void  xfget_sstr( sstr_t *str, size_t len, FILE *file );
+/* read/write Str */
+extern void  xfput_sstr( Str *str, FILE *file );
+extern void  xfget_sstr( Str *str, size_t len, FILE *file );
 
-/* read/write sstr_t byte-counted strings (1 byte size + string chars) */
-extern void   xfput_c1sstr( sstr_t *str, FILE *file );
-extern void   xfget_c1sstr( sstr_t *str, FILE *file );
+/* read/write Str byte-counted strings (1 byte size + string chars) */
+extern void   xfput_c1sstr( Str *str, FILE *file );
+extern void   xfget_c1sstr( Str *str, FILE *file );
 
-/* read/write sstr_t word-counted strings (2 bytes size + string chars) */
-extern void   xfput_c2sstr( sstr_t *str, FILE *file );
-extern void   xfget_c2sstr( sstr_t *str, FILE *file );
+/* read/write Str word-counted strings (2 bytes size + string chars) */
+extern void   xfput_c2sstr( Str *str, FILE *file );
+extern void   xfget_c2sstr( Str *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.25  2013-12-26 23:42:27  pauloscustodio
+Revision 1.26  2013-12-30 02:05:32  pauloscustodio
+Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+handles both dynamically allocated strings and fixed-size strings.
+Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+
+Revision 1.25  2013/12/26 23:42:27  pauloscustodio
 Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 
 Revision 1.24  2013/12/15 13:18:33  pauloscustodio

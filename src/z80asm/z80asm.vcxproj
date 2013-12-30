@@ -89,7 +89,6 @@
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="deffile.h" />
-    <ClInclude Include="dynstr.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />
     <ClInclude Include="file.h" />
@@ -117,7 +116,6 @@
     <ClInclude Include="options.h" />
     <ClInclude Include="options_def.h" />
     <ClInclude Include="parse.h" />
-    <ClInclude Include="safestr.h" />
     <ClInclude Include="scan.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="sym.h" />
@@ -131,7 +129,6 @@
     <ClCompile Include="asmdrctv.c" />
     <ClCompile Include="codearea.c" />
     <ClCompile Include="deffile.c" />
-    <ClCompile Include="dynstr.c" />
     <ClCompile Include="errors.c" />
     <ClCompile Include="exprprsr.c" />
     <ClCompile Include="file.c" />
@@ -155,7 +152,6 @@
     <ClCompile Include="options.c" />
     <ClCompile Include="prsident.c" />
     <ClCompile Include="prsline.c" />
-    <ClCompile Include="safestr.c" />
     <ClCompile Include="scan.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="sym.c" />

@@ -15,10 +15,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.11 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.12 2013-12-30 02:05:32 pauloscustodio Exp $
 
 $Log: objfile.c,v $
-Revision 1.11  2013-12-15 13:18:34  pauloscustodio
+Revision 1.12  2013-12-30 02:05:32  pauloscustodio
+Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+handles both dynamically allocated strings and fixed-size strings.
+Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+
+Revision 1.11  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -91,8 +97,8 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
 #include "errors.h"
 #include "file.h"
 #include "objfile.h"
-#include "safestr.h"
 #include "strpool.h"
+#include "strutil.h"
 #include "legacy.h"
 
 /*-----------------------------------------------------------------------------
@@ -167,7 +173,7 @@ static BOOL test_header( FILE *file )
 *----------------------------------------------------------------------------*/
 ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
 {
-	SSTR_DEFINE( buffer, MAXLINE );
+	DEFINE_STR( buffer, MAXLINE );
 	ObjFile *self;
 	FILE    *file;
 	long	 start_ptr;
@@ -222,7 +228,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
 	/* read module name */
 	fseek( self->file, self->start_ptr + self->modname_ptr, SEEK_SET );
 	xfget_c1sstr( buffer, self->file );
-	self->modname = strpool_add( sstr_data(buffer) );
+	self->modname = strpool_add( buffer->str );
 
 	/* read code size */
 	if ( self->code_ptr < 0 )

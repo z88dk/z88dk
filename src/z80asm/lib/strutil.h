@@ -3,12 +3,16 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.2 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.3 2013-12-30 02:05:34 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"				/* before any other include */
+#include "class.h"
+#include "types.h"
+#include <stdarg.h>
+#include <stdlib.h>
 
 #include <glib.h>
 
@@ -21,10 +25,99 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.2 2013
 extern char *strtoupper( char *string );
 extern char *strtolower( char *string );
 
+/* case insensitive compare */
+extern int stricompare( char *s1, char *s2 );
+
+/* remove end newline and whitespace - modify in place, return address of string */
+extern char *chomp( char *string );
+
+/*-----------------------------------------------------------------------------
+*   String class - dual use
+*
+*	- dynamically allocated strings that grow as needed
+*		Str *s1 = OBJ_NEW(String);
+*		OBJ_DELETE(s1);
+*
+*	- fixed max-size strings for usage as auto variables
+*		char buffer[MAXLINE] = "";
+*		Str _s2 = INIT_STR( buffer );
+*		Str *s2 = &_s2;
+*		// or
+*		DEFINE_STR( s3, MAXLINE );
+*
+*	s2.str				// data bytes
+*	s2.len				// length excluding zero terminator
+*	Str_sync_len(&s2)	// syncronize s2.len after s2.str is manipulated
+*----------------------------------------------------------------------------*/
+CLASS( Str )
+	char	*str;		/* string - may contain zero bytes */
+	size_t	 size;		/* allocated size */
+	size_t	 len;		/* sring length (excluding zero terminator) */
+	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
+						   FALSE if str is in user supplied buffer and cannot grow */
+END_CLASS;
+
+/* define Str with user supplied buffer */
+#define INIT_STR( buffer )	\
+			{ CLASS_INITIALIZER, buffer, sizeof(buffer), 0, FALSE }
+
+#define DEFINE_STR( str, maxsize )	\
+			char	str##_data [ maxsize ] = "";	\
+			Str		_##str = INIT_STR( str##_data );	\
+			Str		* str = & _##str
+
+/* clear the string, keep allocated space */
+#define Str_clear(self)     ((self)->str[0] = 0, (self)->len = 0)
+
+/* sync length in case string was modified in place */
+#define Str_sync_len(self)  ((self)->len = strlen((self)->str))
+
+/* expand if needed to store at least more num_chars plus a zero byte */
+extern void Str_reserve( Str *self, size_t num_chars );
+
+/* delete extra unused space */
+extern void Str_unreserve( Str *self );
+
+/* set / append string */
+extern void Str_set( Str *self, char *source );
+extern void Str_append( Str *self, char *source );
+
+/* set / append bytes */
+extern void Str_set_bytes( Str *self, char *source, size_t size );
+extern void Str_append_bytes( Str *self, char *source, size_t size );
+
+/* set / append char */
+extern void Str_set_char( Str *self, char ch );
+extern void Str_append_char( Str *self, char ch );
+
+/* set / append with printf-like parameters */
+extern void Str_sprintf( Str *self, char *format, ... );
+extern void Str_append_sprintf( Str *self, char *format, ... );
+
+extern void Str_vsprintf( Str *self, char *format, va_list argptr );
+extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
+
+/* chomp */
+#define Str_chomp(self)		( chomp( (self)->str ), Str_sync_len(self) )
+
+/* get N characters from input, return FALSE on EOF */
+extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
+
+/* get one line from input, convert end-of-line sequences, 
+   return string including one LF character
+   return FALSE on end of input */
+extern BOOL Str_getline( Str *self, FILE *fp );
+ 
 
 /* 
 * $Log: strutil.h,v $
-* Revision 1.2  2013-12-26 23:42:27  pauloscustodio
+* Revision 1.3  2013-12-30 02:05:34  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+*
+* Revision 1.2  2013/12/26 23:42:27  pauloscustodio
 * Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 *
 * Revision 1.1  2013/12/25 14:39:51  pauloscustodio
@@ -35,9 +128,6 @@ extern char *strtolower( char *string );
 * introduce memory leak report on exit and memory fence check.
 *
 * Revision 1.16  2013/09/24 00:05:36  pauloscustodio
-* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
-* Removed normalize_eol.
 *
 * Revision 1.15  2013/09/23 23:14:10  pauloscustodio
 * Renamed SzList to StringList, simplified interface by assuming that

@@ -17,9 +17,15 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.5 2013-12-26 23:42:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.6 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: srcfile.h,v $
-/* Revision 1.5  2013-12-26 23:42:27  pauloscustodio
+/* Revision 1.6  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.5  2013/12/26 23:42:27  pauloscustodio
 /* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 /*
 /* Revision 1.4  2013/12/15 13:18:34  pauloscustodio
@@ -48,7 +54,7 @@ Allows pushing back of lines, for example to expand macros.
 
 #include "class.h"
 #include "classlist.h"
-#include "dynstr.h"
+#include "strutil.h"
 #include "types.h"
 
 #if 0

@@ -20,9 +20,15 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.56 2013-12-25 16:29:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.57 2013-12-30 02:05:32 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.56  2013-12-25 16:29:34  pauloscustodio
+/* Revision 1.57  2013-12-30 02:05:32  pauloscustodio
+/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+/* handles both dynamically allocated strings and fixed-size strings.
+/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+/*
+/* Revision 1.56  2013/12/25 16:29:34  pauloscustodio
 /* classring deleted, not used
 /*
 /* Revision 1.55  2013/12/15 23:31:04  pauloscustodio
@@ -1295,7 +1301,7 @@ Based on 1.0.31
 	- Move libfilename to options.c, keep it in strpool
 	- Helper functions to create file names of each of the extensions used in z80asm
 	- Remove global variable errfilename
-	- SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" 
+	- DEFINE_STR() caused compilation error "C2099: initializer is not a constant" 
 	  when used to define global variables
 	- Move default asm and obj extension handling to file.c.
 	- srcfilename and objfilename are now pointers to static variables in file.c
@@ -1434,8 +1440,6 @@ Based on 1.0.31
 	- Renamed SzList to StringList, simplified interface by assuming that
 	  list lives in memory util program ends; it is used for directory searches
 	  only. Moved interface to strutil.c, removed strlist.c.
-	- Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
-	  toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 	- Removed normalize_eol.
 	- Parse command line options via look-up tables.
 
@@ -1481,6 +1485,10 @@ xx.xx.201x [2.1.1] (pauloscustodio)
 	  Code generation complicates maintenance, as all the modules with init() 
 	  functions are coupled together, and it may not be clear how the init() 
 	  module appears.
+	- Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type 
+	  handles both dynamically allocated strings and fixed-size strings.
+	- Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+	  g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1519,7 +1527,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.0"
+#define VERSION     "2.1.0a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

@@ -30,9 +30,6 @@
     <ClInclude Include="codearea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dynstr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="errors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,9 +46,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="safestr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="z80asm.h">
@@ -176,9 +170,6 @@
     <ClCompile Include="codearea.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dynstr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="errors.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -189,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="options.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="safestr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="listfile.c">
