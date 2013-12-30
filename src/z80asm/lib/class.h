@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.4 2013-12-26 23:37:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.5 2013-12-30 01:58:24 pauloscustodio Exp $
 */
 
 #pragma once
@@ -88,6 +88,11 @@ struct Object;
     }; /* end of struct T definition */
 
 /*-----------------------------------------------------------------------------
+*   Empty _class initializer
+*----------------------------------------------------------------------------*/
+#define CLASS_INITIALIZER	{ 0, 0, 0, { 0, 0 } }
+
+/*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
 #define DEF_CLASS(T)                                                        \
@@ -149,7 +154,11 @@ extern void _deregister_obj( struct Object *obj );
 	
 /* 
 * $Log: class.h,v $
-* Revision 1.4  2013-12-26 23:37:34  pauloscustodio
+* Revision 1.5  2013-12-30 01:58:24  pauloscustodio
+* Add class initializer macro to help define static CLASS objects that
+* do not need to be added to the object register.
+*
+* Revision 1.4  2013/12/26 23:37:34  pauloscustodio
 * New INIT_OBJ macro to call OBJ_NEW only if object pointer is NULL.
 * Used to initialize an object on the first use.
 *
