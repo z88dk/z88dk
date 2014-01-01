@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.3 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.4 2014-01-01 21:16:20 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -29,7 +29,7 @@ write_file("test.c", <<'END');
 #include "die.h"
 #include "strutil.h"
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 #define FOPEN(file)		fp = fopen((file), "rb"); if (fp == NULL) ERROR;
 #define GETLINE(s,exp_text,exp_ret) \
 						{ BOOL ret = Str_getline((s), fp); \
@@ -511,7 +511,7 @@ int main()
 	{
 		Str *s1 = OBJ_NEW(Str);
 		DEFINE_STR( s2, 10 );
-		DEFINE_STR( s3,  2 );
+		DEFINE_STR( s3,  3 );
 		FILE *fp;
 
 		FOPEN("test.8.asm");
@@ -547,7 +547,7 @@ int main()
 		GETCHARS( s3, 3, "\n",  FALSE );
 		FCLOSE();
 	}
-		
+	
 	return 0;
 }
 END
@@ -571,7 +571,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.3  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.4  2014-01-01 21:16:20  pauloscustodio
+# Of-by-one error
+#
+# Revision 1.3  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
