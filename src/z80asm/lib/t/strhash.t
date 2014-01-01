@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.1 2013-12-25 17:02:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.2 2014-01-01 21:19:18 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -18,7 +18,7 @@ write_file("test.c", <<'END');
 #include "strhash.h"
 #include "die.h"
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 
 void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 {
@@ -154,7 +154,6 @@ char *S(char *str)
 
 int main()
 {
-	/* main */
 	StrHash *hash1, *hash2;
 	StrHashElem *elem;
 	
@@ -315,7 +314,10 @@ sub t_capture {
 
 
 # $Log: strhash.t,v $
-# Revision 1.1  2013-12-25 17:02:10  pauloscustodio
+# Revision 1.2  2014-01-01 21:19:18  pauloscustodio
+# Show error line in case of test failure
+#
+# Revision 1.1  2013/12/25 17:02:10  pauloscustodio
 # Move strhash.c to the z80asm/lib directory
 #
 # Revision 1.16  2013/12/18 23:05:52  pauloscustodio

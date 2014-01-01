@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.2 2013-12-23 19:19:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.3 2014-01-01 21:20:29 pauloscustodio Exp $
 #
 # Test strpool.c
 
@@ -29,7 +29,7 @@ strings[] = {
 	{ NULL,		NULL },
 };
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 
 int main()
 {
@@ -90,7 +90,10 @@ sub t_capture {
 }
 
 # $Log: strpool.t,v $
-# Revision 1.2  2013-12-23 19:19:52  pauloscustodio
+# Revision 1.3  2014-01-01 21:20:29  pauloscustodio
+# Show error line in case of test failure
+#
+# Revision 1.2  2013/12/23 19:19:52  pauloscustodio
 # Show difference in command output in case of test failure
 #
 # Revision 1.1  2013/12/18 01:46:22  pauloscustodio

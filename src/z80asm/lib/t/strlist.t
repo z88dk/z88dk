@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strlist.t,v 1.1 2013-12-26 23:42:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strlist.t,v 1.2 2014-01-01 21:19:51 pauloscustodio Exp $
 #
 # Test strlist.c
 
@@ -18,7 +18,7 @@ write_file("test.c", <<'END');
 #include "strlist.h"
 #include "die.h"
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 
 #define T_START(list)							\
 	iter = StrList_first(list);
@@ -160,7 +160,10 @@ sub t_capture {
 
 
 # $Log: strlist.t,v $
-# Revision 1.1  2013-12-26 23:42:27  pauloscustodio
+# Revision 1.2  2014-01-01 21:19:51  pauloscustodio
+# Show error line in case of test failure
+#
+# Revision 1.1  2013/12/26 23:42:27  pauloscustodio
 # Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 #
 # Revision 1.8  2013/02/25 21:36:17  pauloscustodio

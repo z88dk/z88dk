@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.1 2013-12-25 17:37:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.2 2014-01-01 21:18:37 pauloscustodio Exp $
 #
 # Test classlist.c
 
@@ -16,8 +16,9 @@ my $compile = "cc -Wall -otest test.c class.c xmalloc.c die.c";
 
 write_file("test.c", <<'END');
 #include "classlist.h"
+#include "die.h"
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 
 CLASS(Obj)
 	char *string;
@@ -472,7 +473,10 @@ sub t_capture {
 
 
 # $Log: classlist.t,v $
-# Revision 1.1  2013-12-25 17:37:13  pauloscustodio
+# Revision 1.2  2014-01-01 21:18:37  pauloscustodio
+# Show error line in case of test failure
+#
+# Revision 1.1  2013/12/25 17:37:13  pauloscustodio
 # Move classlist and classhash to the z80asm/lib directory
 #
 # Revision 1.12  2013/12/18 23:05:52  pauloscustodio

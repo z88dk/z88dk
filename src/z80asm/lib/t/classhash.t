@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.1 2013-12-25 17:37:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.2 2014-01-01 21:17:55 pauloscustodio Exp $
 #
 # Test classhash.c
 
@@ -18,7 +18,7 @@ write_file("test.c", <<'END');
 #include "classhash.h"
 #include "die.h"
 
-#define ERROR return __LINE__
+#define ERROR die("Test failed at line %d\n", __LINE__)
 
 CLASS(Obj)
 	char *string;
@@ -363,7 +363,10 @@ sub t_capture {
 
 
 # $Log: classhash.t,v $
-# Revision 1.1  2013-12-25 17:37:13  pauloscustodio
+# Revision 1.2  2014-01-01 21:17:55  pauloscustodio
+# Show error line in case of test failure
+#
+# Revision 1.1  2013/12/25 17:37:13  pauloscustodio
 # Move classlist and classhash to the z80asm/lib directory
 #
 # Revision 1.12  2013/12/25 17:02:10  pauloscustodio
