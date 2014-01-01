@@ -14,10 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.60 2013-12-15 13:18:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.61 2014-01-01 21:23:48 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.60  2013-12-15 13:18:33  pauloscustodio
+ * Revision 1.61  2014-01-01 21:23:48  pauloscustodio
+ * Move generic file utility functions to lib/fileutil.c
+ *
+ * Revision 1.60  2013/12/15 13:18:33  pauloscustodio
  * Move memory allocation routines to lib/xmalloc, instead of glib,
  * introduce memory leak report on exit and memory fence check.
  *
@@ -354,6 +357,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "config.h"
 #include "errors.h"
 #include "file.h"
+#include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
 #include "srcfile.h"

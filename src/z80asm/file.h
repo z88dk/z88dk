@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.26 2013-12-30 02:05:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.27 2014-01-01 21:23:48 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,19 +47,6 @@ extern void struct_File_fini(File *self);
    if not called, delete_File() will delete a file open for writing */
 extern void close_File(File *self);
 #endif
-
-/*-----------------------------------------------------------------------------
-*   Pathname manipulation
-*   All filenames are passed as char file[FILENAME_MAX] elements
-*   return string is written to passed buffer and returned by the function
-*----------------------------------------------------------------------------*/
-extern char *path_remove_ext( char *filename );
-extern char *path_replace_ext( char *dest, const char *source, const char *new_ext );
-extern char *path_basename( char *dest, const char *source );
-
-/* search for a file on the given directory list, return full path name
- * pathname is stored in strpool, no need to remove */
-extern char *search_file( char *filename, StrList *dir_list );
 
 
 
@@ -117,7 +104,10 @@ extern void   xfget_c2sstr( Str *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.26  2013-12-30 02:05:32  pauloscustodio
+Revision 1.27  2014-01-01 21:23:48  pauloscustodio
+Move generic file utility functions to lib/fileutil.c
+
+Revision 1.26  2013/12/30 02:05:32  pauloscustodio
 Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 handles both dynamically allocated strings and fixed-size strings.
 Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

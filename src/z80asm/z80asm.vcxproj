@@ -99,6 +99,7 @@
     <ClInclude Include="lib\classlist.h" />
     <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\except.h" />
+    <ClInclude Include="lib\fileutil.h" />
     <ClInclude Include="lib\init.h" />
     <ClInclude Include="lib\queue.h" />
     <ClInclude Include="lib\strhash.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="lib\class.c" />
     <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\except.c" />
+    <ClCompile Include="lib\fileutil.c" />
     <ClCompile Include="lib\strhash.c" />
     <ClCompile Include="lib\strlist.c" />
     <ClCompile Include="lib\strpool.c" />

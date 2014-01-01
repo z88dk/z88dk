@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.58 2013-12-30 02:07:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.59 2014-01-01 21:23:48 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.58  2013-12-30 02:07:32  pauloscustodio
+/* Revision 1.59  2014-01-01 21:23:48  pauloscustodio
+/* Move generic file utility functions to lib/fileutil.c
+/*
+/* Revision 1.58  2013/12/30 02:07:32  pauloscustodio
 /* Version 2.1.1
 /*
 /* Revision 1.57  2013/12/30 02:05:32  pauloscustodio
@@ -1494,6 +1497,11 @@ Based on 1.0.31
 	  g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
 
 -------------------------------------------------------------------------------
+xx.xx.2014 [2.1.2] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Move generic file utility functions to lib/fileutil.c
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1530,7 +1538,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.1"
+#define VERSION     "2.1.2a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

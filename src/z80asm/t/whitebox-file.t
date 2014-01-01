@@ -17,10 +17,9 @@
 
 use Modern::Perl;
 use Test::More;
-use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o scan.o lib/class.o errors.o lib/strutil.o lib/strlist.o options.o hist.o";
+my $objs = "file.o scan.o lib/class.o errors.o lib/strutil.o lib/strlist.o lib/fileutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -186,87 +185,8 @@ is read_file("test2.asm"), "write file ok\n";
 
 # TEST OLD INTERFACE
 
-t_compile_module($init, <<'END', $objs);
-	StrList *list = NULL;
-	
-	if (argv[2][0] != '0')
-	{
-		StrList_push(&list, "x1");
-		StrList_push(&list, "x2");
-		StrList_push(&list, "x3");
-	}
-	
-	puts( search_file(argv[1], list) );
-END
-
-# create directories and files
-make_path(qw( x1 x2 x3 ));
-write_file('f0', "");
-write_file('x1/f0', "");
-write_file('x1/f1', "");
-write_file('x2/f1', "");
-write_file('x2/f2', "");
-write_file('x3/f2', "");
-write_file('x3/f3', "");
-
-t_run_module(['f0', '0'], "f0\n", '', 0);
-t_run_module(['f1', '0'], "f1\n", '', 0);
-t_run_module(['f2', '0'], "f2\n", '', 0);
-t_run_module(['f3', '0'], "f3\n", '', 0);
-t_run_module(['f4', '0'], "f4\n", '', 0);
-t_run_module(['f0', '1'], "f0\n", '', 0);
-t_run_module(['f1', '1'], "x1/f1\n", '', 0);
-t_run_module(['f2', '1'], "x2/f2\n", '', 0);
-t_run_module(['f3', '1'], "x3/f3\n", '', 0);
-t_run_module(['f4', '1'], "f4\n", '', 0);
 
 
-# test file manipulation
-t_compile_module($init, <<'END', $objs);
-#define T1(init, func, result) \
-		strcpy( file, init); \
-		p = func; \
-		ASSERT( p == file ); \
-		ASSERT( strcmp(file, result) == 0 )
-
-#define T2(func, result) \
-		p = func; \
-		ASSERT( strcmp(p, result) == 0 )
-	
-	char file[FILENAME_MAX];
-	char *p;
-	
-	T1("abc", 			(path_remove_ext(file)), "abc");
-	T1("abc.", 			(path_remove_ext(file)), "abc");
-	T1("abc.xpt", 		(path_remove_ext(file)), "abc");
-	T1("abc.xpt.obj", 	(path_remove_ext(file)), "abc.xpt");
-	T1("./abc", 		(path_remove_ext(file)), "./abc");
-	T1(".\\abc",		(path_remove_ext(file)), ".\\abc");
-	T1("./abc.", 		(path_remove_ext(file)), "./abc");
-	T1(".\\abc.",		(path_remove_ext(file)), ".\\abc");
-	T1("./abc.xpt", 	(path_remove_ext(file)), "./abc");
-	T1(".\\abc.xpt",	(path_remove_ext(file)), ".\\abc");
-
-	T1("", (path_replace_ext(file, "abc", 			".obj")),	"abc.obj");
-	T1("", (path_replace_ext(file, "abc.", 			".obj")),	"abc.obj");
-	T1("", (path_replace_ext(file, "abc.xpt.zz",	".obj")),	"abc.xpt.obj");
-	T1("", (path_replace_ext(file, "./abc", 		".obj")),	"./abc.obj");
-	T1("", (path_replace_ext(file, ".\\abc", 		".obj")),	".\\abc.obj");
-	T1("", (path_replace_ext(file, "./abc.", 		".obj")),	"./abc.obj");
-	T1("", (path_replace_ext(file, ".\\abc.", 		".obj")),	".\\abc.obj");
-	T1("", (path_replace_ext(file, "./abc.xpt", 	".obj")),	"./abc.obj");
-	T1("", (path_replace_ext(file, ".\\abc.xpt", 	".obj")),	".\\abc.obj");
-	
-	T1("", (path_basename(file, "abc")),			"abc");
-	T1("", (path_basename(file, "abc.zz")),			"abc.zz");
-	T1("", (path_basename(file, "./abc")),			"abc");
-	T1("", (path_basename(file, ".\\abc")),			"abc");
-	T1("", (path_basename(file, "/a/b/c/abc")),		"abc");
-	T1("", (path_basename(file, "\\a\\b\\c\\abc")),	"abc");
-	
-END
-
-t_run_module([], '', '', 0);
 
 # test file IO
 t_compile_module($init, <<'END', $objs);
@@ -737,15 +657,17 @@ Error: cannot read file 'test1.bin'
 END
 
 # delete directories and files
-remove_tree(qw( x1 x2 x3 ));
-unlink_testfiles('f0');
+unlink_testfiles();
 done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.29 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.30 2014-01-01 21:23:48 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.29  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.30  2014-01-01 21:23:48  pauloscustodio
+# Move generic file utility functions to lib/fileutil.c
+#
+# Revision 1.29  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

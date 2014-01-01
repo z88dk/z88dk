@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.120 2013-12-30 02:05:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.121 2014-01-01 21:23:48 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.120  2013-12-30 02:05:32  pauloscustodio
+/* Revision 1.121  2014-01-01 21:23:48  pauloscustodio
+/* Move generic file utility functions to lib/fileutil.c
+/*
+/* Revision 1.120  2013/12/30 02:05:32  pauloscustodio
 /* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 /* handles both dynamically allocated strings and fixed-size strings.
 /* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -681,6 +684,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "deffile.h"
 #include "errors.h"
 #include "file.h"
+#include "fileutil.h"
 #include "hist.h"
 #include "legacy.h"
 #include "listfile.h"
@@ -850,7 +854,8 @@ static void query_assemble( char *src_filename, char *obj_filename )
 *----------------------------------------------------------------------------*/
 static void do_assemble( char *src_filename, char *obj_filename )
 {
-	char module_name[FILENAME_MAX];
+	DEFINE_FILE_STR( basename );
+	DEFINE_FILE_STR( module_name );
     int start_errors = get_num_errors();     /* count errors in this source file */
 
     /* try-catch to delete incomplete files in case of fatal error */
@@ -894,10 +899,10 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
         {
-            path_basename( module_name, src_filename );
-            path_remove_ext( module_name );
-            strtoupper( module_name );
-            CURRENTMODULE->mname = xstrdup( module_name );
+            path_basename( basename, src_filename );
+            path_remove_ext( module_name, basename->str );
+            strtoupper( module_name->str );
+            CURRENTMODULE->mname = xstrdup( module_name->str );
         }
 
         set_error_null();

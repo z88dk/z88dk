@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o lib/class.o lib/strutil.o lib/strlist.o options.o hist.o";
+my $objs = "errors.o scan.o file.o lib/class.o lib/strutil.o lib/strlist.o lib/fileutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -184,9 +184,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.20 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.21 2014-01-01 21:23:48 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.20  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.21  2014-01-01 21:23:48  pauloscustodio
+# Move generic file utility functions to lib/fileutil.c
+#
+# Revision 1.20  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

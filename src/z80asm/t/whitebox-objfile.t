@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o lib/class.o file.o errors.o lib/strutil.o lib/strlist.o scan.o options.o hist.o";
+my $objs = "objfile.o lib/class.o file.o errors.o lib/strutil.o lib/strlist.o lib/fileutil.o scan.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -200,9 +200,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.16 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.17 2014-01-01 21:23:48 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.16  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.17  2014-01-01 21:23:48  pauloscustodio
+# Move generic file utility functions to lib/fileutil.c
+#
+# Revision 1.16  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

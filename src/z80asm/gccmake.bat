@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.29 2013-12-30 02:05:32 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.30 2014-01-01 21:23:48 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -16,6 +16,7 @@ gcc -c -o ldinstr.o              ldinstr.c
 gcc -c -o lib/class.o            lib/class.c
 gcc -c -o lib/die.o              lib/die.c
 gcc -c -o lib/except.o           lib/except.c
+gcc -c -o lib/fileutil.o         lib/fileutil.c
 gcc -c -o lib/strhash.o          lib/strhash.c
 gcc -c -o lib/strlist.o          lib/strlist.c
 gcc -c -o lib/strpool.o          lib/strpool.c

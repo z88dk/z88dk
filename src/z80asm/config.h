@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.29 2013-12-15 19:01:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.30 2014-01-01 21:23:48 pauloscustodio Exp $
 */
 
 #pragma once
@@ -69,13 +69,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.29 2013-12-
 #define MAXCODESIZE 65536
 #endif
 
-/* File name extension separator */
-#ifdef QDOS
-#define FILEEXT_SEPARATOR "_"
-#else
-#define FILEEXT_SEPARATOR "."
-#endif
-
 /* snprintf is _snprintf in _MSC_VER */
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -90,7 +83,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.29 2013-12-
 
 /*
 * $Log: config.h,v $
-* Revision 1.29  2013-12-15 19:01:07  pauloscustodio
+* Revision 1.30  2014-01-01 21:23:48  pauloscustodio
+* Move generic file utility functions to lib/fileutil.c
+*
+* Revision 1.29  2013/12/15 19:01:07  pauloscustodio
 * Move platform specific defines from types.h to config.h.
 * Remove dependency of types.h from glib.h.
 * Use NUM_ELEMS() instead of glib G_N_ELEMENTS().

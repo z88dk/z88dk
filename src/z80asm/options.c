@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.63 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.64 2014-01-01 21:23:48 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.63 2013-12-26 23
 #include "errors.h"
 #include "scan.h"
 #include "file.h"
+#include "fileutil.h"
 #include "hist.h"
 #include "options.h"
 #include "strpool.h"
@@ -494,8 +495,9 @@ static void option_cpu_RCM2000(void)
 
 static char *replace_ext( char *filename, char *ext )
 {
-	char new_filename[ FILENAME_MAX ];
-	return strpool_add( path_replace_ext( new_filename, filename, ext ));
+	DEFINE_FILE_STR( new_filename );
+	path_replace_ext( new_filename, filename, ext );
+	return strpool_add( new_filename->str );
 }
 
 char *get_lst_filename( char *filename ) { return replace_ext( filename, FILEEXT_LST ); }
@@ -539,7 +541,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.63  2013-12-26 23:42:27  pauloscustodio
+* Revision 1.64  2014-01-01 21:23:48  pauloscustodio
+* Move generic file utility functions to lib/fileutil.c
+*
+* Revision 1.63  2013/12/26 23:42:27  pauloscustodio
 * Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 *
 * Revision 1.62  2013/12/15 19:01:07  pauloscustodio

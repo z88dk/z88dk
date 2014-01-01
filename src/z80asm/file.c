@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.38 2013-12-30 02:05:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.39 2014-01-01 21:23:48 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -75,120 +75,6 @@ void close_File(struct File *self)
 	}
 }
 #endif
-
-/*-----------------------------------------------------------------------------
-*   Pathname manipulation
-*   All filenames are passed as char file[FILENAME_MAX] elements
-*   return string is written to passed buffer and returned by the function
-*----------------------------------------------------------------------------*/
-
-/* remove the extension of the passed filename, modifies the string in place */
-char *path_remove_ext( char *filename )
-{
-    char *dot_pos = strrchr( filename, FILEEXT_SEPARATOR[0] );
-    char *dir_pos;
-
-    if ( dot_pos != NULL )
-    {
-        /* BUG_0014 : need to ignore dot if before a directory separator */
-        dir_pos = strrchr( filename, '/' );
-
-        if ( dir_pos != NULL && dot_pos < dir_pos )
-        {
-            return filename;    /* dot before slash */
-        }
-
-        dir_pos = strrchr( filename, '\\' );
-
-        if ( dir_pos != NULL && dot_pos < dir_pos )
-        {
-            return filename;    /* dot before backslash */
-        }
-
-        *dot_pos = '\0';                /* terminate the string */
-    }
-
-    return filename;
-}
-
-/* make a copy of the file name, replacing the extension */
-char *path_replace_ext( char *dest, const char *source, const char *new_ext )
-{
-	g_strlcpy( dest, source, FILENAME_MAX );
-    path_remove_ext( dest );						/* file without extension */
-	g_strlcat( dest, new_ext, FILENAME_MAX );		/* copy new extension */
-
-    return dest;
-}
-
-/* make a copy of the file basename, skipping the directory part */
-char *path_basename( char *dest, const char *source )
-{
-    const char *path_sep1, *path_sep2, *basename;
-
-    path_sep1 = strrchr( source, '/' );
-
-    if ( path_sep1 == NULL )
-    {
-        path_sep1 = source - 1;
-    }
-
-    path_sep2 = strrchr( source, '\\' );
-
-    if ( path_sep2 == NULL )
-    {
-        path_sep2 = source - 1;
-    }
-
-    if ( path_sep1 > path_sep2 )
-    {
-        basename = path_sep1 + 1;
-    }
-    else
-    {
-        basename = path_sep2 + 1;
-    }
-
-	g_strlcpy( dest, basename, FILENAME_MAX );
-
-    return dest;
-}
-
-/*-----------------------------------------------------------------------------
-*  Search for a file on the given directory list, return full path name
-*  pathname is stored in strpool, no need to remove
-*----------------------------------------------------------------------------*/
-char *search_file( char *filename, StrList *dir_list )
-{
-    struct stat  sb;
-    char		 pathname[ FILENAME_MAX ];
-	StrListElem	*iter;
-
-	/* if no dir_list, return file */
-	if ( dir_list == NULL )
-        return strpool_add( filename );
-
-    /* check if file exists in current directory */
-    if ( stat( filename, &sb ) == 0 )
-        return strpool_add( filename );
-
-    /* search in dir_list */
-	for ( iter = StrList_first(dir_list); iter != NULL; iter = StrList_next(iter) )
-	{
-		g_snprintf( pathname, sizeof(pathname), "%s/%s", iter->string, filename );
-        if ( stat( pathname, &sb ) == 0 )
-            return strpool_add( pathname );
-	}
-
-    /* return unchanged pathname if not found */
-    return strpool_add( filename );
-}
-
-
-
-
-
-
 
 /*-----------------------------------------------------------------------------
 *   TODO: remove old interface down this line
@@ -488,7 +374,10 @@ void xfget_c2sstr( Str *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.38  2013-12-30 02:05:32  pauloscustodio
+Revision 1.39  2014-01-01 21:23:48  pauloscustodio
+Move generic file utility functions to lib/fileutil.c
+
+Revision 1.38  2013/12/30 02:05:32  pauloscustodio
 Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 handles both dynamically allocated strings and fixed-size strings.
 Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

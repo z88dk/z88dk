@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/strlist.o file.o options.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/strlist.o lib/fileutil.o file.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -321,9 +321,12 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.28 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.29 2014-01-01 21:23:48 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.28  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.29  2014-01-01 21:23:48  pauloscustodio
+# Move generic file utility functions to lib/fileutil.c
+#
+# Revision 1.28  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
