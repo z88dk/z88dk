@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.4 2014-01-01 21:16:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.5 2014-01-01 21:36:38 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -12,9 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -mms-bitfields -IC:/MinGW/msys/1.0/include/glib-2.0 -IC:/MinGW/msys/1.0/lib/glib-2.0/include -otest test.c strutil.c class.c die.c xmalloc.c -LC:/MinGW/msys/1.0/lib -lglib-2.0 -lintl";
-
-warn "-mms-bitfields -IC:/MinGW/msys/1.0/include/glib-2.0 -IC:/MinGW/msys/1.0/lib/glib-2.0/include -LC:/MinGW/msys/1.0/lib -lglib-2.0 -lintl";
+my $compile = "cc -Wall -otest test.c strutil.c class.c die.c xmalloc.c";
 
 write_file("test.1.asm", {binmode => ':raw'}, "");
 write_file("test.2.asm", {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -571,7 +569,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.4  2014-01-01 21:16:20  pauloscustodio
+# Revision 1.5  2014-01-01 21:36:38  pauloscustodio
+# No dependency on glib
+#
+# Revision 1.4  2014/01/01 21:16:20  pauloscustodio
 # Of-by-one error
 #
 # Revision 1.3  2013/12/30 02:05:34  pauloscustodio

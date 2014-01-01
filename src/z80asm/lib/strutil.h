@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.3 2013-12-30 02:05:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.4 2014-01-01 21:36:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -13,8 +13,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.3 2013
 #include "types.h"
 #include <stdarg.h>
 #include <stdlib.h>
-
-#include <glib.h>
 
 /*-----------------------------------------------------------------------------
 *   Utilities
@@ -107,11 +105,14 @@ extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
    return string including one LF character
    return FALSE on end of input */
 extern BOOL Str_getline( Str *self, FILE *fp );
- 
+
 
 /* 
 * $Log: strutil.h,v $
-* Revision 1.3  2013-12-30 02:05:34  pauloscustodio
+* Revision 1.4  2014-01-01 21:36:38  pauloscustodio
+* No dependency on glib
+*
+* Revision 1.3  2013/12/30 02:05:34  pauloscustodio
 * Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 * handles both dynamically allocated strings and fixed-size strings.
 * Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
