@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.121 2014-01-01 21:23:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.122 2014-01-02 02:31:42 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.121  2014-01-01 21:23:48  pauloscustodio
+/* Revision 1.122  2014-01-02 02:31:42  pauloscustodio
+/* parse_argv() collects all files from command line in opts.files, expanding @lists;
+/* main() iterates through opts.files, eliminating the call-back.
+/*
+/* Revision 1.121  2014/01/01 21:23:48  pauloscustodio
 /* Move generic file utility functions to lib/fileutil.c
 /*
 /* Revision 1.120  2013/12/30 02:05:32  pauloscustodio
@@ -1328,6 +1332,8 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
+	StrListElem *iter;
+
 	/* init modules */
 	init_errors();
 	atexit(fini_errors);
@@ -1350,26 +1356,22 @@ int main( int argc, char *argv[] )
         TOTALLINES = 0;
 
 		/* parse command line and call-back via assemble_file() */
-		parse_argv(argc, argv, assemble_file);
+		parse_argv(argc, argv);
+		for ( iter = StrList_first( opts.files ); iter != NULL; iter = StrList_next( iter ) )
+			assemble_file( iter->string );
 
         /* Link */
         CloseFiles();
 
         /* Create library */
         if ( opts.lib_file && ! get_num_errors() )
-        {
             CreateLib( opts.lib_file );
-        }
 
         if ( ! get_num_errors() && opts.verbose )
-        {
             printf( "Total of %ld lines assembled.\n", TOTALLINES );
-        }
 
         if ( ! get_num_errors() && opts.make_bin )
-        {
             LinkModules();
-        }
 
         if ( ! get_num_errors() && opts.make_bin )
         {
@@ -1393,21 +1395,15 @@ int main( int argc, char *argv[] )
 
 #ifndef QDOS
         if ( modulehdr != NULL )
-        {
             ReleaseModules();    /* Release module information (symbols, etc.) */
-        }
 
         if ( libraryhdr != NULL )
-        {
             ReleaseLibraries();    /* Release library information */
-        }
 
         if ( opts.relocatable )
         {
             if ( reloctable != NULL )
-            {
                 xfree( reloctable );
-            }
         }
 
 #endif

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.64 2014-01-01 21:23:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.65 2014-01-02 02:31:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -67,8 +67,7 @@ static void option_use_lib(char *library);
 static void option_cpu_RCM2000(void);
 
 static void parse_options(int *parg, int argc, char *argv[]);
-static void parse_files(int arg, int argc, char *argv[], 
- 			            void (*process_file)(char *filename) );
+static void parse_files(int arg, int argc, char *argv[] );
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -111,11 +110,10 @@ void init_options(void)
 
 
 /*-----------------------------------------------------------------------------
-*   Parse command line, set options, call back for each non-option, 
-*	process @lists
+*   Parse command line, set options, including opts.files with list of 
+*	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-void parse_argv(int argc, char *argv[], 
- 			    void (*process_file)(char *filename) )
+void parse_argv( int argc, char *argv[] )
 {
 	int arg;
 
@@ -131,7 +129,7 @@ void parse_argv(int argc, char *argv[],
         display_options();				/* display status messages of select assembler options */
 
 	if ( ! get_num_errors() )
-		parse_files(arg, argc, argv, process_file);		/* process each source file */
+		parse_files(arg, argc, argv);	/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -246,7 +244,7 @@ static void parse_options(int *parg, int argc, char *argv[])
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
-static void parse_file( char *filename, void (*process_file)(char *filename) )
+static void parse_file( char *filename )
 {
 	g_strstrip(filename);
 	switch ( filename[0] )
@@ -259,15 +257,14 @@ static void parse_file( char *filename, void (*process_file)(char *filename) )
 			break;
 
         default:
-            process_file( filename );
+            StrList_push( &opts.files, filename );
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   process a @list file or a simple file
 *----------------------------------------------------------------------------*/
-static void parse_file_list( Scan *files, 
-						     char *filename, void (*process_file)(char *filename) )
+static void parse_file_list( Scan *files, char *filename )
 {
 	char *line;
 
@@ -287,21 +284,20 @@ static void parse_file_list( Scan *files,
 			}
 			else 
 			{
-				parse_file( line, process_file );
+				parse_file( line );
 			}
 		}
 	}
 	else 
 	{
-		parse_file( filename, process_file );
+		parse_file( filename );
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   process all files
 *----------------------------------------------------------------------------*/
-static void parse_files(int arg, int argc, char *argv[], 
-						void (*process_file)(char *filename) )
+static void parse_files(int arg, int argc, char *argv[])
 {
 	Scan *files = OBJ_NEW(Scan);
 	{
@@ -309,7 +305,7 @@ static void parse_files(int arg, int argc, char *argv[],
 
 		/* Assemble file list */
 		for ( i = arg; i < argc; i++ )
-			parse_file_list( files, argv[i], process_file );
+			parse_file_list( files, argv[i] );
 	}
 	OBJ_DELETE(files);
 }
@@ -541,7 +537,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.64  2014-01-01 21:23:48  pauloscustodio
+* Revision 1.65  2014-01-02 02:31:42  pauloscustodio
+* parse_argv() collects all files from command line in opts.files, expanding @lists;
+* main() iterates through opts.files, eliminating the call-back.
+*
+* Revision 1.64  2014/01/01 21:23:48  pauloscustodio
 * Move generic file utility functions to lib/fileutil.c
 *
 * Revision 1.63  2013/12/26 23:42:27  pauloscustodio

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.36 2013-12-26 23:42:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.37 2014-01-02 02:31:42 pauloscustodio Exp $
 */
 
 #pragma once
@@ -55,11 +55,10 @@ Opts;
 extern Opts opts;
 
 /*-----------------------------------------------------------------------------
-*   Parse command line, set options, call back for each non-option, 
-*	process @lists
+*   Parse command line, set options, including opts.files with list of 
+*	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-extern void parse_argv(int argc, char *argv[], 
-					   void (*process_file)(char *filename) );
+extern void parse_argv( int argc, char *argv[] );
 
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
@@ -80,7 +79,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.36  2013-12-26 23:42:27  pauloscustodio
+* Revision 1.37  2014-01-02 02:31:42  pauloscustodio
+* parse_argv() collects all files from command line in opts.files, expanding @lists;
+* main() iterates through opts.files, eliminating the call-back.
+*
+* Revision 1.36  2013/12/26 23:42:27  pauloscustodio
 * Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
 *
 * Revision 1.35  2013/12/15 13:18:34  pauloscustodio
