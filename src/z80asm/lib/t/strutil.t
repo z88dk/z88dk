@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.5 2014-01-01 21:36:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.6 2014-01-02 02:46:42 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -120,17 +120,17 @@ int main()
 	{
 		Str *s1 = OBJ_NEW(Str);
 		
-		strcpy(s, "\r\n \t\fx\r\n \t\f");
+		strcpy(s, "\r\n \t\fxxxxxxxx\r\n \t\f\v");
 		Str_set( s1, s );
 		
 		p = chomp(s);
 		if (p != s)							ERROR;
-		if(strcmp(s, "\r\n \t\fx"))			ERROR;
+		if(strcmp(s, "\r\n \t\fxxxxxxxx"))	ERROR;
 		
 		Str_chomp(s1);
 		if(strcmp(s, s1->str))				ERROR;
 	
-		strcpy(s, "\r\n \t\f \r\n \t\f");
+		strcpy(s, "\r\n \t\f \r\n \t\f\v");
 		Str_set( s1, s );
 
 		p = chomp(s);
@@ -138,6 +138,31 @@ int main()
 		if(strcmp(s, ""))					ERROR;
 
 		Str_chomp(s1);
+		if(strcmp(s, s1->str))				ERROR;
+	}
+	
+	/* strip, Str_strip */
+	{
+		Str *s1 = OBJ_NEW(Str);
+		
+		strcpy(s, "\r\n \t\fxxxxxxxx\r\n \t\f\v");
+		Str_set( s1, s );
+		
+		p = strip(s);
+		if (p != s)							ERROR;
+		if(strcmp(s, "xxxxxxxx"))			ERROR;
+		
+		Str_strip(s1);
+		if(strcmp(s, s1->str))				ERROR;
+	
+		strcpy(s, "\r\n \t\f \r\n \t\f\v");
+		Str_set( s1, s );
+
+		p = strip(s);
+		if (p != s)							ERROR;
+		if(strcmp(s, ""))					ERROR;
+
+		Str_strip(s1);
 		if(strcmp(s, s1->str))				ERROR;
 	}
 	
@@ -569,7 +594,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.5  2014-01-01 21:36:38  pauloscustodio
+# Revision 1.6  2014-01-02 02:46:42  pauloscustodio
+# new strip() function to eliminate start and end blanks from string
+#
+# Revision 1.5  2014/01/01 21:36:38  pauloscustodio
 # No dependency on glib
 #
 # Revision 1.4  2014/01/01 21:16:20  pauloscustodio

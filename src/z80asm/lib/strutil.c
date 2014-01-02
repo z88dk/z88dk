@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.3 2013-12-30 02:05:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.4 2014-01-02 02:46:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -72,12 +72,26 @@ char *chomp( char *string )
 	char *p;
 
 	p = string + strlen(string) - 1;	/* point at last char */
-	while (p >= string && (*p == '\n' || *p == '\r' || *p == '\f' || *p == '\t' || *p == ' '))
+	while (p >= string && isspace(*p))
 	{
 		*p = '\0';
 		p--;
 	}
 	return string;
+}
+
+char *strip( char *string )
+{
+	char *p;
+	
+	/* remove start spaces */
+	p = string;
+	while ( *p != '\0' && isspace(*p) )
+		p++;
+	memmove( string, p, strlen(p) + 1 );	/* copy also '\0' */
+	
+	/* remove end spaces */
+	return chomp( string );
 }
 
 /*-----------------------------------------------------------------------------
@@ -344,7 +358,10 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /* 
 * $Log: strutil.c,v $
-* Revision 1.3  2013-12-30 02:05:34  pauloscustodio
+* Revision 1.4  2014-01-02 02:46:42  pauloscustodio
+* new strip() function to eliminate start and end blanks from string
+*
+* Revision 1.3  2013/12/30 02:05:34  pauloscustodio
 * Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 * handles both dynamically allocated strings and fixed-size strings.
 * Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;

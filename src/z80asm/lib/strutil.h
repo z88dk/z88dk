@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.4 2014-01-01 21:36:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.5 2014-01-02 02:46:42 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,6 +28,9 @@ extern int stricompare( char *s1, char *s2 );
 
 /* remove end newline and whitespace - modify in place, return address of string */
 extern char *chomp( char *string );
+
+/* remove begin and end whitespace - modify in place, return address of string */
+extern char *strip( char *string );
 
 /*-----------------------------------------------------------------------------
 *   String class - dual use
@@ -95,8 +98,9 @@ extern void Str_append_sprintf( Str *self, char *format, ... );
 extern void Str_vsprintf( Str *self, char *format, va_list argptr );
 extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
 
-/* chomp */
+/* chomp, strip */
 #define Str_chomp(self)		( chomp( (self)->str ), Str_sync_len(self) )
+#define Str_strip(self)		( strip( (self)->str ), Str_sync_len(self) )
 
 /* get N characters from input, return FALSE on EOF */
 extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
@@ -109,7 +113,10 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /* 
 * $Log: strutil.h,v $
-* Revision 1.4  2014-01-01 21:36:38  pauloscustodio
+* Revision 1.5  2014-01-02 02:46:42  pauloscustodio
+* new strip() function to eliminate start and end blanks from string
+*
+* Revision 1.4  2014/01/01 21:36:38  pauloscustodio
 * No dependency on glib
 *
 * Revision 1.3  2013/12/30 02:05:34  pauloscustodio
