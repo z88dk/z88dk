@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.2 2014-01-01 21:18:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.3 2014-01-02 23:33:11 pauloscustodio Exp $
 #
 # Test classlist.c
 
@@ -66,13 +66,13 @@ int main()
 	
 	
 	/* unshift */
-	ObjList_unshift( list, new_obj("abc") );
+	ObjList_unshift( &list, new_obj("abc") );
 	
 	T_START(list);
 	T_NEXT(list, "abc");
 	T_END(list);
 	
-	ObjList_unshift( list, new_obj("def") );
+	ObjList_unshift( &list, new_obj("def") );
 	
 	T_START(list);
 	T_NEXT(list, "def");
@@ -81,7 +81,7 @@ int main()
 	
 	
 	/* push */
-	ObjList_push( list, new_obj("ghi") );
+	ObjList_push( &list, new_obj("ghi") );
 	
 	T_START(list);
 	T_NEXT(list, "def");
@@ -89,7 +89,7 @@ int main()
 	T_NEXT(list, "ghi");
 	T_END(list);
 
-	ObjList_push( list, new_obj("jkl") );
+	ObjList_push( &list, new_obj("jkl") );
 	
 	T_START(list);
 	T_NEXT(list, "def");
@@ -281,8 +281,7 @@ int main()
 
 	/* insert after */
 	iter = ObjList_first(list);
-	iter = ObjList_insert_after(list, iter, new_obj("AAA") );
-	if (strcmp(iter->obj->string, "AAA")) ERROR;
+	ObjList_insert_after( &list, iter, new_obj("AAA") );
 	
 	T_START(list);
 	T_NEXT(list, "def");
@@ -293,8 +292,7 @@ int main()
 	T_END(list);
 	
 	iter = ObjList_last(list);
-	iter = ObjList_insert_after(list, iter, new_obj("ZZZ") );
-	if (strcmp(iter->obj->string, "ZZZ")) ERROR;
+	ObjList_insert_after( &list, iter, new_obj("ZZZ") );
 	
 	T_START(list);
 	T_NEXT(list, "def");
@@ -308,8 +306,7 @@ int main()
 
 	/* insert before */
 	iter = ObjList_first(list);
-	iter = ObjList_insert_before(list, iter, new_obj("BBB") );
-	if (strcmp(iter->obj->string, "BBB")) ERROR;
+	ObjList_insert_before( &list, iter, new_obj("BBB") );
 	
 	T_START(list);
 	T_NEXT(list, "BBB");
@@ -322,8 +319,7 @@ int main()
 	T_END(list);
 
 	iter = ObjList_last(list);
-	iter = ObjList_insert_before(list, iter, new_obj("XXX") );
-	if (strcmp(iter->obj->string, "XXX")) ERROR;
+	ObjList_insert_before( &list, iter, new_obj("XXX") );
 	
 	T_START(list);
 	T_NEXT(list, "BBB");
@@ -424,9 +420,9 @@ int main()
 	T_START(list);
 	T_END(list);
 	
-	ObjList_push( list, new_obj("abc") );
-	ObjList_push( list, new_obj("def") );
-	ObjList_push( list, new_obj("ghi") );
+	ObjList_push( &list, new_obj("abc") );
+	ObjList_push( &list, new_obj("def") );
+	ObjList_push( &list, new_obj("ghi") );
 	
 	T_START(list);
 	T_NEXT(list, "abc");
@@ -445,7 +441,7 @@ int main()
 
 	if (! ObjList_empty(list)) ERROR;
 	
-	ObjList_push( list, new_obj("abc") );
+	ObjList_push( &list, new_obj("abc") );
 	
 	if (ObjList_empty(list)) ERROR;
 	
@@ -473,7 +469,10 @@ sub t_capture {
 
 
 # $Log: classlist.t,v $
-# Revision 1.2  2014-01-01 21:18:37  pauloscustodio
+# Revision 1.3  2014-01-02 23:33:11  pauloscustodio
+# Unify interface of classlist and list.
+#
+# Revision 1.2  2014/01/01 21:18:37  pauloscustodio
 # Show error line in case of test failure
 #
 # Revision 1.1  2013/12/25 17:37:13  pauloscustodio

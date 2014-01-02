@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.60 2014-01-02 17:18:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.61 2014-01-02 23:33:11 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.60  2014-01-02 17:18:45  pauloscustodio
+/* Revision 1.61  2014-01-02 23:33:11  pauloscustodio
+/* Unify interface of classlist and list.
+/*
+/* Revision 1.60  2014/01/02 17:18:45  pauloscustodio
 /* StrList removed, replaced by List
 /*
 /* Revision 1.59  2014/01/01 21:23:48  pauloscustodio
@@ -1502,8 +1505,9 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 xx.xx.2014 [2.1.2] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Move generic file utility functions to lib/fileutil.c
-	- lib/strlist.c removed, replaced by lib/list.c
+	- Move generic file utility functions to lib/fileutil.c.
+	- lib/strlist.c removed, replaced by lib/list.c.
+	- Unify interface of classlist and list.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

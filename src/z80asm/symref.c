@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.5 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.6 2014-01-02 23:33:11 pauloscustodio Exp $
 $Log: symref.c,v $
-Revision 1.5  2013-12-15 13:18:34  pauloscustodio
+Revision 1.6  2014-01-02 23:33:11  pauloscustodio
+Unify interface of classlist and list.
+
+Revision 1.5  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -99,11 +102,11 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 
 			if ( defined ) 
 			{
-				SymbolRefList_unshift( list, obj );		/* add at start */
+				SymbolRefList_unshift( &list, obj );		/* add at start */
 			}
 			else 
 			{
-				SymbolRefList_push( list, obj );			/* add at end */
+				SymbolRefList_push( &list, obj );			/* add at end */
 			}
 		}
 		else if ( ! SymbolRefList_empty(list) &&
@@ -112,7 +115,7 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 		{
 			/* move the reference from end of list to start of list, set defined flag */
 			obj = SymbolRefList_pop( list );
-			SymbolRefList_unshift( list, obj );
+			SymbolRefList_unshift( &list, obj );
 		}
 	}
 }
