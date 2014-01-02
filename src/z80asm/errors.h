@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.20 2014-01-02 18:59:04 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.21 2014-01-02 19:42:48 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -59,14 +59,18 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 /*-----------------------------------------------------------------------------
 *   declare error functions 
 *----------------------------------------------------------------------------*/
-#define ERR(err_type,func,args)	extern func;
+#define ERR(err_type,func,args)	extern void func;
 #include "errors_def.h"
 #undef ERR
 
 
 /*
 * $Log: errors.h,v $
-* Revision 1.20  2014-01-02 18:59:04  pauloscustodio
+* Revision 1.21  2014-01-02 19:42:48  pauloscustodio
+* warning: "/","*" within comment [-Wcomment]
+* warning: type defaults to 'int' in declaration of '...' [-Wimplicit-int]
+*
+* Revision 1.20  2014/01/02 18:59:04  pauloscustodio
 * warning: "/","*" within comment [-Wcomment]
 *
 * Revision 1.19  2014/01/02 18:57:20  pauloscustodio

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.30 2013-12-15 13:18:33 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.31 2014-01-02 19:42:48 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -242,7 +242,7 @@ static void do_error( enum ErrType err_type, char *message )
 *   define error functions 
 *----------------------------------------------------------------------------*/
 #define ERR(err_type,func,args)	\
-	func \
+	void func \
 	{ \
 		char message[ MAXLINE ]; \
 		g_snprintf( message, sizeof(message), args ); \
@@ -254,7 +254,11 @@ static void do_error( enum ErrType err_type, char *message )
 
 /* */
 /* $Log: errors.c,v $
-/* Revision 1.30  2013-12-15 13:18:33  pauloscustodio
+/* Revision 1.31  2014-01-02 19:42:48  pauloscustodio
+/* warning: "/","*" within comment [-Wcomment]
+/* warning: type defaults to 'int' in declaration of '...' [-Wimplicit-int]
+/*
+/* Revision 1.30  2013/12/15 13:18:33  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
