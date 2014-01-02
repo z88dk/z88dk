@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.9 2014-01-02 18:54:56 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.10 2014-01-02 18:59:04 pauloscustodio Exp $
 
 */
 
@@ -122,8 +122,11 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.9  2014-01-02 18:54:56  pauloscustodio
-* warning: "/*" within comment [-Wcomment]
+* Revision 1.10  2014-01-02 18:59:04  pauloscustodio
+* warning: "/","*" within comment [-Wcomment]
+*
+* Revision 1.9  2014/01/02 18:54:56  pauloscustodio
+* warning: "/","*" within comment [-Wcomment]
 *
 * Revision 1.8  2013/12/30 02:05:32  pauloscustodio
 * Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type

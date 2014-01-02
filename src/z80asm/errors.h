@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.19 2014-01-02 18:57:20 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.20 2014-01-02 18:59:04 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -66,8 +66,11 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.19  2014-01-02 18:57:20  pauloscustodio
-* warning: "/*" within comment [-Wcomment]
+* Revision 1.20  2014-01-02 18:59:04  pauloscustodio
+* warning: "/","*" within comment [-Wcomment]
+*
+* Revision 1.19  2014/01/02 18:57:20  pauloscustodio
+* warning: "/","*" within comment [-Wcomment]
 *
 * Revision 1.18  2013/12/15 13:18:33  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
