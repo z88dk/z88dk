@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.1 2014-01-02 12:48:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.2 2014-01-02 16:02:28 pauloscustodio Exp $
 #
 # Test list.c
 
@@ -72,7 +72,7 @@ int main()
 	List_push(&list, "c");
 	check_list(list, "a", "b", "c", NULL);
 	
-	List_remove_all(list, NULL);
+	List_remove_all(list);
 	if (list == NULL)							ERROR;
 	check_list(list, NULL);
 
@@ -118,7 +118,7 @@ int main()
 	List_unshift(&list, "c");
 	check_list(list, "c", "b", "a", NULL);
 	
-	List_remove_all(list, NULL);
+	List_remove_all(list);
 	if (list == NULL)							ERROR;
 	check_list(list, NULL);
 
@@ -167,7 +167,7 @@ int main()
 	if (List_first(list) == NULL)				ERROR;
 	if (strcmp(List_first(list)->data, "a"))	ERROR;
 	
-	List_remove_all(list, NULL);
+	List_remove_all(list);
 	if (list == NULL)							ERROR;
 	check_list(list, NULL);
 
@@ -190,7 +190,7 @@ int main()
 	if (List_last(list) == NULL)				ERROR;
 	if (strcmp(List_last(list)->data, "c"))		ERROR;
 	
-	List_remove_all(list, NULL);
+	List_remove_all(list);
 	if (list == NULL)							ERROR;
 	check_list(list, NULL);
 
@@ -325,7 +325,7 @@ int main()
 	List_push(&list, "c");
 	check_list(list, "a", "b", "c", NULL);
 
-	List_remove_all(list, NULL);
+	List_remove_all(list);
 	check_list(list, NULL);
 	
 
@@ -336,8 +336,9 @@ int main()
 	List_push(&list, xstrdup("b"));
 	List_push(&list, xstrdup("c"));
 	check_list(list, "a", "b", "c", NULL);
-
-	List_remove_all(list, xfreef);
+	list->free_data = xfreef;
+	
+	List_remove_all(list);
 	check_list(list, NULL);
 	
 
@@ -386,6 +387,9 @@ sub t_capture {
 
 
 # $Log: list.t,v $
-# Revision 1.1  2014-01-02 12:48:40  pauloscustodio
+# Revision 1.2  2014-01-02 16:02:28  pauloscustodio
+# Register free() function to be used by remove_all() to delete each element
+#
+# Revision 1.1  2014/01/02 12:48:40  pauloscustodio
 # Generic doubly-linked lists lists
 #

@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.1 2014-01-02 12:48:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.2 2014-01-02 16:02:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -33,6 +33,8 @@ typedef struct ListElem
 
 CLASS( List )
 	size_t count;							/* number of objects */
+	void (*free_data)(void *);				/* function to free an element
+											   called by List_remove_all() */
 	TAILQ_HEAD( ListHead, ListElem ) head;	/* head of queue */
 END_CLASS;
 
@@ -60,8 +62,8 @@ extern void List_insert_before( List **pself, ListElem *iter, void *data );
    advance iterator to next element */
 extern void *List_remove( List *self, ListElem **piter );
 
-/* remove all list; free if not NULL is called to free each element */
-extern void List_remove_all( List *self, void (*free_data)(void *) );
+/* remove all list; free_data if not NULL is called to free each element */
+extern void List_remove_all( List *self );
 
 /* check if list is empty */
 extern BOOL List_empty( List *self );
@@ -69,7 +71,10 @@ extern BOOL List_empty( List *self );
 
 /*
 * $Log: list.h,v $
-* Revision 1.1  2014-01-02 12:48:39  pauloscustodio
+* Revision 1.2  2014-01-02 16:02:28  pauloscustodio
+* Register free() function to be used by remove_all() to delete each element
+*
+* Revision 1.1  2014/01/02 12:48:39  pauloscustodio
 * Generic doubly-linked lists lists
 *
 *

@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.1 2014-01-02 12:48:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.2 2014-01-02 16:02:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -39,7 +39,7 @@ void List_copy ( List *self, List *other )
 
 void List_fini ( List *self )
 {
-	List_remove_all( self, NULL );
+	List_remove_all( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void *List_remove( List *self, ListElem **piter )
 /*-----------------------------------------------------------------------------
 *   remove all list; free if not NULL is called to free each element
 *----------------------------------------------------------------------------*/
-void List_remove_all( List *self, void (*free_data)(void *) )
+void List_remove_all( List *self )
 {
 	ListElem *elem;
 
@@ -190,8 +190,8 @@ void List_remove_all( List *self, void (*free_data)(void *) )
 
 	while ( ( elem = List_first(self) ) != NULL )
 	{
-		if ( free_data != NULL && elem->data != NULL )
-			free_data( elem->data );
+		if ( self->free_data != NULL && elem->data != NULL )
+			self->free_data( elem->data );
 		List_remove( self, &elem );
 	}
 }
@@ -205,7 +205,10 @@ BOOL List_empty( List *self )
 
 /* 
 * $Log: list.c,v $
-* Revision 1.1  2014-01-02 12:48:39  pauloscustodio
+* Revision 1.2  2014-01-02 16:02:28  pauloscustodio
+* Register free() function to be used by remove_all() to delete each element
+*
+* Revision 1.1  2014/01/02 12:48:39  pauloscustodio
 * Generic doubly-linked lists lists
 *
 *
