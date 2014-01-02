@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.37 2014-01-02 02:31:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.38 2014-01-02 17:18:16 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.37 2014-01-02 02
 #include "xmalloc.h"   /* before any other include */
 
 #include "types.h"
-#include "strlist.h"
+#include "list.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type
@@ -79,7 +79,10 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.37  2014-01-02 02:31:42  pauloscustodio
+* Revision 1.38  2014-01-02 17:18:16  pauloscustodio
+* StrList removed, replaced by List
+*
+* Revision 1.37  2014/01/02 02:31:42  pauloscustodio
 * parse_argv() collects all files from command line in opts.files, expanding @lists;
 * main() iterates through opts.files, eliminating the call-back.
 *

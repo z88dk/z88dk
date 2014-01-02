@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.2 2014-01-01 21:36:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.3 2014-01-02 17:18:17 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -13,7 +13,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c fileutil.c strutil.c xmalloc.c class.c strlist.c strpool.c die.c";
+my $compile = "cc -Wall -otest test.c fileutil.c strutil.c xmalloc.c class.c list.c strpool.c die.c";
 
 # create directories and files
 make_path('test.x1', 'test.x2', 'test.x3');
@@ -29,6 +29,7 @@ write_file('test.x3/test.f3', "");
 write_file("test.c", <<'END');
 #include "fileutil.h"
 #include "strutil.h"
+#include "strpool.h"
 #include "die.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
@@ -55,7 +56,7 @@ int main()
 {
 	DEFINE_FILE_STR( s );
 	char *p;
-	StrList *path = NULL;
+	List *path = NULL;
 	
 	/* path_remove_ext */
 	T_REMOVE_EXT("abc", 			"abc");
@@ -95,9 +96,9 @@ int main()
 	T_BASENAME("\\a\\b\\c\\abc","abc");
 	
 	/* path_search */
-	StrList_push(&path, "test.x1");
-	StrList_push(&path, "test.x2");
-	StrList_push(&path, "test.x3");
+	List_push(&path, strpool_add("test.x1"));
+	List_push(&path, strpool_add("test.x2"));
+	List_push(&path, strpool_add("test.x3"));
 	
 	T_SEARCH("test.f0", NULL, "test.f0");
 	T_SEARCH("test.f1", NULL, "test.f1");
@@ -134,7 +135,10 @@ sub t_capture {
 
 
 # $Log: fileutil.t,v $
-# Revision 1.2  2014-01-01 21:36:38  pauloscustodio
+# Revision 1.3  2014-01-02 17:18:17  pauloscustodio
+# StrList removed, replaced by List
+#
+# Revision 1.2  2014/01/01 21:36:38  pauloscustodio
 # No dependency on glib
 #
 # Revision 1.1  2014/01/01 21:23:49  pauloscustodio

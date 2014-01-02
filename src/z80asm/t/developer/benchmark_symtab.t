@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.15 2013-12-30 02:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.16 2014-01-02 17:18:17 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.15  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.16  2014-01-02 17:18:17  pauloscustodio
+# StrList removed, replaced by List
+#
+# Revision 1.15  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -80,7 +83,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o lib/strutil.o lib/strlist.o  errors.o strpool.o lib/strhash.o lib/class.o file.o";
+my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o lib/strutil.o lib/list.o  errors.o strpool.o lib/strhash.o lib/class.o file.o";
 my $src = "t/data/zx48.asm";
 my @words;
 

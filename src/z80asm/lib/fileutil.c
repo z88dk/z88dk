@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.1 2014-01-01 21:23:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.2 2014-01-02 17:18:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -60,11 +60,11 @@ void path_basename( Str *dest, char *filename )
 }
 
 /* search for a file on the given directory list, return full path name */
-extern void path_search( Str *dest, char *filename, StrList *dir_list )
+extern void path_search( Str *dest, char *filename, List *dir_list )
 {
 	DEFINE_FILE_STR( pathname );
     struct stat  sb;
-	StrListElem	*iter;
+	ListElem	*iter;
 
 	Str_set( dest, filename );		/* default return: input file name */
 
@@ -77,9 +77,9 @@ extern void path_search( Str *dest, char *filename, StrList *dir_list )
         return;
 
     /* search in dir_list */
-	for ( iter = StrList_first(dir_list); iter != NULL; iter = StrList_next(iter) )
+	for ( iter = List_first(dir_list); iter != NULL; iter = List_next(iter) )
 	{
-		Str_set( pathname, iter->string ); 
+		Str_set( pathname, iter->data ); 
 		Str_append_char( pathname, '/' );
 		Str_append( pathname, filename );
 		
@@ -94,7 +94,7 @@ extern void path_search( Str *dest, char *filename, StrList *dir_list )
     return;
 }
 
-char *search_file ( char *filename, StrList *dir_list )
+char *search_file ( char *filename, List *dir_list )
 {
 	DEFINE_FILE_STR( dest );
 	path_search( dest, filename, dir_list );
@@ -103,7 +103,10 @@ char *search_file ( char *filename, StrList *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.1  2014-01-01 21:23:48  pauloscustodio
+* Revision 1.2  2014-01-02 17:18:16  pauloscustodio
+* StrList removed, replaced by List
+*
+* Revision 1.1  2014/01/01 21:23:48  pauloscustodio
 * Move generic file utility functions to lib/fileutil.c
 *
 *

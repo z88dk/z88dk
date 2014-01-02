@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o file.o lib/class.o lib/strutil.o lib/strlist.o lib/fileutil.o options.o hist.o";
+my $objs = "scan.o errors.o file.o lib/class.o lib/strutil.o lib/list.o lib/fileutil.o options.o hist.o";
 
 # build list of case TOKEN: return "TOKEN" from scan.h
 my @token_case;
@@ -1302,9 +1302,12 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.28 2014-01-01 21:23:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.29 2014-01-02 17:18:17 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.28  2014-01-01 21:23:48  pauloscustodio
+# Revision 1.29  2014-01-02 17:18:17  pauloscustodio
+# StrList removed, replaced by List
+#
+# Revision 1.28  2014/01/01 21:23:48  pauloscustodio
 # Move generic file utility functions to lib/fileutil.c
 #
 # Revision 1.27  2013/12/30 02:05:34  pauloscustodio

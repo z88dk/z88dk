@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.65 2014-01-02 02:31:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.66 2014-01-02 17:18:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -105,7 +105,7 @@ void init_options(void)
 {
     char *directory = getenv("Z80_OZFILES");
     if ( directory )
-		StrList_push( & opts.inc_path, directory );
+		List_push( &opts.inc_path, strpool_add(directory) );
 }
 
 
@@ -207,7 +207,7 @@ static void process_opt(int *parg, int argc, char *argv[])
 
 			case OptStringList:
 				if ( *opt_arg_ptr )
-					StrList_push( (StrList **) opts_lu[j].arg, opt_arg_ptr );
+					List_push( (List **) opts_lu[j].arg, strpool_add(opt_arg_ptr) );
 				else
 					error_illegal_option( argv[i] );
 				break;
@@ -257,7 +257,7 @@ static void parse_file( char *filename )
 			break;
 
         default:
-            StrList_push( &opts.files, filename );
+            List_push( &opts.files, strpool_add(filename) );
 	}
 }
 
@@ -537,7 +537,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.65  2014-01-02 02:31:42  pauloscustodio
+* Revision 1.66  2014-01-02 17:18:16  pauloscustodio
+* StrList removed, replaced by List
+*
+* Revision 1.65  2014/01/02 02:31:42  pauloscustodio
 * parse_argv() collects all files from command line in opts.files, expanding @lists;
 * main() iterates through opts.files, eliminating the call-back.
 *

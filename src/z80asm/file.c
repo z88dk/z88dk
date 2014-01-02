@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.39 2014-01-01 21:23:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.40 2014-01-02 17:18:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,7 +23,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.39 2014-01-01
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
-#include "strlist.h"
 #include "errors.h"
 
 #if 0
@@ -374,7 +373,10 @@ void xfget_c2sstr( Str *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.39  2014-01-01 21:23:48  pauloscustodio
+Revision 1.40  2014-01-02 17:18:16  pauloscustodio
+StrList removed, replaced by List
+
+Revision 1.39  2014/01/01 21:23:48  pauloscustodio
 Move generic file utility functions to lib/fileutil.c
 
 Revision 1.38  2013/12/30 02:05:32  pauloscustodio

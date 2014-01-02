@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.122 2014-01-02 02:31:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.123 2014-01-02 17:18:16 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.122  2014-01-02 02:31:42  pauloscustodio
+/* Revision 1.123  2014-01-02 17:18:16  pauloscustodio
+/* StrList removed, replaced by List
+/*
+/* Revision 1.122  2014/01/02 02:31:42  pauloscustodio
 /* parse_argv() collects all files from command line in opts.files, expanding @lists;
 /* main() iterates through opts.files, eliminating the call-back.
 /*
@@ -1332,7 +1335,7 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
-	StrListElem *iter;
+	ListElem *iter;
 
 	/* init modules */
 	init_errors();
@@ -1357,8 +1360,8 @@ int main( int argc, char *argv[] )
 
 		/* parse command line and call-back via assemble_file() */
 		parse_argv(argc, argv);
-		for ( iter = StrList_first( opts.files ); iter != NULL; iter = StrList_next( iter ) )
-			assemble_file( iter->string );
+		for ( iter = List_first( opts.files ); iter != NULL; iter = List_next( iter ) )
+			assemble_file( iter->data );
 
         /* Link */
         CloseFiles();

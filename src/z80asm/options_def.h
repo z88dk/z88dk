@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.29 2014-01-02 02:31:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.30 2014-01-02 17:18:16 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -26,8 +26,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.29 2014-01-0
 
 OPT_VAR( BOOL,		verbose,	FALSE	)
 OPT_VAR( BOOL,		symtable,	TRUE 	)
-OPT_VAR( BOOL,		list,		FALSE 	)			/* -l flag */
-OPT_VAR( BOOL,		cur_list,	FALSE 	)			/* current LSTON/LSTOFF status */
+OPT_VAR( BOOL,		list,		FALSE 	)	/* -l flag */
+OPT_VAR( BOOL,		cur_list,	FALSE 	)	/* current LSTON/LSTOFF status */
 OPT_VAR( BOOL,		map,		TRUE 	)
 OPT_VAR( BOOL,		sdcc,		FALSE	)
 OPT_VAR( BOOL,		ti83plus,	FALSE	)
@@ -39,9 +39,9 @@ OPT_VAR( BOOL,		make_bin,	FALSE	)
 OPT_VAR( BOOL,		date_stamp,	FALSE	)
 OPT_VAR( BOOL,		code_seg,	FALSE	)
 OPT_VAR( BOOL,		relocatable,FALSE	)
-OPT_VAR( BOOL,		library,	FALSE	)			/* true if linking with libs */
+OPT_VAR( BOOL,		library,	FALSE	)	/* true if linking with libs */
 
-OPT_VAR( int, 		origin,		-1		)			/* -1 == not defined */
+OPT_VAR( int, 		origin,		-1		)	/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
@@ -49,10 +49,10 @@ OPT_VAR( char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
 OPT_VAR( char *,	bin_file,	NULL 			)	/* set by -o */
 OPT_VAR( char *,	lib_file,	NULL 			)	/* set by -x */
 
-OPT_VAR( StrList *,	inc_path,	NULL )			/* path for include files */
-OPT_VAR( StrList *,	lib_path,	NULL )			/* path for library files */
+OPT_VAR( List *,	inc_path,	NULL )		/* path for include files */
+OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
 
-OPT_VAR( StrList *, files,		NULL )			/* list of input files */
+OPT_VAR( List *,	files,		NULL )		/* list of input files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
@@ -188,7 +188,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.29  2014-01-02 02:31:42  pauloscustodio
+* Revision 1.30  2014-01-02 17:18:16  pauloscustodio
+* StrList removed, replaced by List
+*
+* Revision 1.29  2014/01/02 02:31:42  pauloscustodio
 * parse_argv() collects all files from command line in opts.files, expanding @lists;
 * main() iterates through opts.files, eliminating the call-back.
 *
