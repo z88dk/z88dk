@@ -132,10 +132,10 @@
     <ClInclude Include="lib\classlist.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\strlist.h">
+    <ClInclude Include="lib\fileutil.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\fileutil.h">
+    <ClInclude Include="lib\list.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -239,10 +239,10 @@
     <ClCompile Include="lib\strhash.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\strlist.c">
+    <ClCompile Include="lib\fileutil.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\fileutil.c">
+    <ClCompile Include="lib\list.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
