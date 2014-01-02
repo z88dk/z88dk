@@ -13,52 +13,12 @@
 Copyright (C) Paulo Custodio, 2011-2013
 
 Handle assembly listing and symbol table listing.
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.9 2014-01-02 18:54:56 pauloscustodio Exp $
+
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.8 2013-12-30 02:05:32 pauloscustodio Exp $ */
-/* $Log: listfile.h,v $
-/* Revision 1.8  2013-12-30 02:05:32  pauloscustodio
-/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-/* handles both dynamically allocated strings and fixed-size strings.
-/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-/*
-/* Revision 1.7  2013/12/15 13:18:34  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.6  2013/09/30 00:24:25  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -e, --asm-ext
-/* -M, --obj-ext
-/* Move filename extension functions to options.c
-/*
-/* Revision 1.5  2013/05/16 23:39:48  pauloscustodio
-/* Move struct node to sym.c, rename to Symbol
-/* Move SymbolRef to symref.c
-/*
-/* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
-/* Removed pass1 that was used to skip creating page references of created
-/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
-/* modified list_get_page_nr() to return -1 after the whole source is
-/* processed.
-/*
-/* Revision 1.3  2013/02/26 02:36:54  pauloscustodio
-/* Simplified symbol output to listfile by using SymbolRefList argument
-/*
-/* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
-/* Decouple assembler from listfile handling
-/*
-/* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
-/* BUG_0030 : List bytes patching overwrites header
-/* BUG_0031 : List file garbled with input lines with 255 chars
-/* New listfile.c with all the listing related code
-/*
-/*
-/* */
-
-#ifndef LISTFILE_H
-#define LISTFILE_H
+#pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
@@ -160,5 +120,47 @@ extern void list_symbol( char *symbol_name, long symbol_value,
 						 SymbolRefList *references );
 extern int  list_get_page_nr( void );
 
-#endif /* ndef LISTFILE_H */
+/*
+* $Log: listfile.h,v $
+* Revision 1.9  2014-01-02 18:54:56  pauloscustodio
+* warning: "/*" within comment [-Wcomment]
+*
+* Revision 1.8  2013/12/30 02:05:32  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+*
+* Revision 1.7  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.6  2013/09/30 00:24:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -e, --asm-ext
+* -M, --obj-ext
+* Move filename extension functions to options.c
+*
+* Revision 1.5  2013/05/16 23:39:48  pauloscustodio
+* Move struct node to sym.c, rename to Symbol
+* Move SymbolRef to symref.c
+*
+* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
+* Removed pass1 that was used to skip creating page references of created
+* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+* modified list_get_page_nr() to return -1 after the whole source is
+* processed.
+*
+* Revision 1.3  2013/02/26 02:36:54  pauloscustodio
+* Simplified symbol output to listfile by using SymbolRefList argument
+*
+* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
+* Decouple assembler from listfile handling
+*
+* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
+* BUG_0030 : List bytes patching overwrites header
+* BUG_0031 : List file garbled with input lines with 255 chars
+* New listfile.c with all the listing related code
+*
+*/
 
