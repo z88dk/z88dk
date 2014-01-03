@@ -1,8 +1,6 @@
 
 XLIB l_ultob
 LIB l_utob
-
-   scf
    
 l_ultob:
 

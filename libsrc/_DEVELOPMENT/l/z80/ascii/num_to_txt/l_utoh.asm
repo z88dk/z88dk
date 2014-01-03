@@ -2,8 +2,6 @@
 XLIB l_utoh
 LIB l_hex_nibble_hi, l_hex_nibble_lo
 
-   scf
-
 l_utoh:
 
    ; write unsigned hexadecimal integer to ascii buffer in lowercase

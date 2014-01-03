@@ -2,8 +2,6 @@
 XLIB l_utob
 LIB l_setmem_de
 
-   scf
-
 l_utob:
 
    ; write unsigned binary number to ascii buffer

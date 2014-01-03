@@ -2,8 +2,6 @@
 XLIB l_ultoh
 LIB l_utoh
 
-   scf
-
 l_ultoh:
 
    ; write unsigned hexadecimal long to ascii buffer in lowercase

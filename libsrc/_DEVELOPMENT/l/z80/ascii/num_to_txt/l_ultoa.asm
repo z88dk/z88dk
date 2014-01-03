@@ -2,8 +2,6 @@
 XLIB l_ultoa
 LIB l_utoa, l0_utoa, l_setmem_de
 
-   scf
-
 l_ultoa:
 
    ; write unsigned long decimal to ascii buffer

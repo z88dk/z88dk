@@ -7,8 +7,6 @@ XDEF l3_utoo_lz, l3_utoo_nlz
 
 LIB l_setmem_de
 
-   scf
-
 l_utoo:
 
    ; write unsigned octal number to ascii buffer

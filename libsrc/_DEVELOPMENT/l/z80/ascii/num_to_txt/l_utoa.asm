@@ -2,8 +2,6 @@
 XLIB l_utoa
 XDEF l0_utoa
 
-   scf
-
 l_utoa:
 
    ; write unsigned decimal integer to ascii buffer

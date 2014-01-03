@@ -6,8 +6,6 @@ LIB l1_utoo_lz, l1_utoo_nlz
 LIB l2_utoo_lz, l2_utoo_nlz
 LIB l3_utoo_lz, l3_utoo_nlz
 
-   scf
-
 l_ultoo:
 
    ; write unsigned octal long to ascii buffer
