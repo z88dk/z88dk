@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void ba_init(int num)
+; void ba_init(unsigned char num)
 ;
 ; Clear all queues to empty.
 ;
@@ -13,20 +13,26 @@ INCLUDE "../../crt_vars.inc"
 
 XLIB asm_ba_init
 
-LIB asm_memset
+LIB asm_forward_list_init
 
 asm_ba_init:
 
-   ; enter : hl = number of queues
+   ; enter : l = number of queues
    ;
-   ; exit  : none
+   ; exit  : hl = address of byte following queue table
    ;
-   ; uses  :
+   ; uses  : af, b, de, hl
+
+   ld a,l
+   or a
+   ret z                       ; if num == 0
    
-   add hl,hl
-   ld c,l
-   ld b,h                      ; bc = sizeof qtbl in bytes
-   
+   ld b,l
    ld hl,(__qtbl)
-   ld e,0
-   jp asm_memset
+
+loop:
+
+   call asm_forward_list_init  ; initialize a forward_list at address hl
+   djnz loop
+   
+   ret

@@ -3,14 +3,14 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *ba_addmem(int queue, int numblocks, uint size, void *addr)
+; void *ba_addmem(unsigned char q, size_t num, size_t size, void *addr)
 ;
-; Add numblocks memory blocks to queue.  Each block is size bytes
+; Add num memory blocks to queue.  Each block is size bytes
 ; large and uses memory starting at address addr.
 ;
 ; size must be >= 2 but is not checked.  The actual memory space
-; occupied by each block is (size + 1) bytes, the single byte
-; being a hidden queue identifier.
+; occupied by each block is (size + 1) bytes, the single extra
+; byte being a hidden queue identifier.
 ;
 ; ===============================================================
 
@@ -18,48 +18,94 @@ INCLUDE "../../crt_vars.inc"
 
 XLIB asm_ba_addmem
 
-LIB asm_ba_free
+LIB asm_forward_list_insert_after
 
 asm_ba_addmem:
 
-   ; enter :  a = queue
-   ;         bc = numblocks
+   ; enter :  a = unsigned char q
+   ;         bc = size_t num
+   ;         de = void *addr
+   ;         hl = size_t size
+   ;
+   ; exit  : hl = address of next free byte
    ;         de = size
-   ;         hl = addr
    ;
-   ; exit  : hl = address of next free byte of memory
-   ;         bc = 0
-   ;
-   ; uses  : bc, hl
-   
-   inc de                      ; size++, space for q id
-   push af
-   
-loop:
+   ; uses  : af, bc, de, hl
 
-   ld a,b
-   or c
-   jr z, done
-   
-   pop af
-   ld (hl),a                   ; block belongs to queue a
-   
-   push af
-   push bc
-   push de
    push hl
+   push bc
    
-   inc hl
-   call asm_ba_free            ; put block into queue
+   ld l,a
+   ld h,0
+   add hl,hl
+   
+   ld bc,(__qtbl)
+   add hl,bc
+   ld c,l
+   ld b,h                      ; bc = forward_list *q
    
    pop hl
-   pop de
-   pop bc
+
+loop:
+
+   ; bc = forward_list *q
+   ; de = void *next_addr
+   ; hl = num
+   ;  a = queue
+   ; stack = size
+
+   inc l
+   dec l
+   jp nz, continue
    
-   dec bc
-   jp loop
+   inc h
+   dec h
+   jr nz, continue
 
 done:
 
-   pop af
+   ; de = void *next_addr
+   ; stack = size
+
+   pop hl
+
+   ex de,hl
    ret
+
+continue:
+
+   ; bc = forward_list *q
+   ; de = void *next_addr
+   ; hl = num
+   ;  a = queue
+   ; stack = size
+   
+   ld (de),a                   ; record queue number in block
+   inc de
+   
+   ex (sp),hl
+   push af
+   push hl
+
+   ; bc = forward_list *q
+   ; de = void *addr
+   ; stack = num, queue, size
+   
+   ld l,c
+   ld h,b
+   call asm_forward_list_insert_after  ; push memory block to front of list
+   
+   ; bc = forward_list *q
+   ; hl = void *addr
+   ; stack = num, queue, size
+   
+   pop de
+   add hl,de
+   ex de,hl                    ; de = void *next_addr, hl = size
+   
+   pop af
+   ex (sp),hl
+   
+   dec hl                      ; hl = num--
+   
+   jp loop

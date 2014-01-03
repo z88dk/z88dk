@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *ba_bestfit(int queue, int num)
+; void *ba_bestfit(unsigned int queue, unsigned char num)
 ;
 ; Allocate a block from the first queue in [queue, queue+num-1]
 ; that has a block available.
@@ -37,7 +37,8 @@ asm_ba_bestfit:
    jp z, error_enomem_zc       ; zero queues to search
    
    add hl,hl
-   ld de,(__qbtl)              ; current queue table
+   ld de,(__qbtl)
+   add hl,de                   ; forward_list *q
    
    ld b,a
 

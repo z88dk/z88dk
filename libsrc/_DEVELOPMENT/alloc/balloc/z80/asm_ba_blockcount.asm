@@ -3,9 +3,9 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *ba_blockcount(int queue)
+; size_t ba_blockcount(forward_list *q)
 ;
-; Return number of free blocks in queue.  O(n).
+; Return number of free blocks in the queue.  O(n).
 ;
 ; ===============================================================
 
@@ -13,38 +13,14 @@ INCLUDE "../../crt_vars.inc"
 
 XLIB asm_ba_blockcount
 
+LIB asm_forward_list_size
+
 asm_ba_blockcount:
 
-   ; enter : hl = queue
+   ; enter : hl = forward_list *q
    ;
    ; exit  : hl = number of available blocks
-   ;         bc = number of available blocks (also)
    ;
    ; uses  : af, de, hl
    
-   add hl,hl
-   ld de,(__qtbl)              ; current queue table
-   add hl,de                   ; hl = q
-   
-   ld bc,0
-
-count_loop:
-
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   
-   ld a,d
-   or e
-   jr z, end_q
-
-   inc bc
-   ex de,hl
-   
-   jp loop
-
-end_q:
-
-   ld l,c
-   ld h,b
-   ret
+   jp asm_forward_list_size
