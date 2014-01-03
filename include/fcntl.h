@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.14 2013-12-11 12:03:23 dom Exp $
+ *	$Id: fcntl.h,v 1.15 2014-01-03 15:20:42 stefano Exp $
  */
 
 
@@ -23,6 +23,10 @@
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
+
+/* unsupported flags */
+#define O_RDWR    2
+#define O_ACCMODE 3
 
 
 /* O_BINARY has no significence */
@@ -58,5 +62,46 @@ extern char __LIB__ *getcwd(char *buf, size_t maxlen) __SMALLCDECL;
 extern int  __LIB__ rmdir(char *);
 extern char __LIB__ *getwd(char *buf);
 
+
+/* ********************************************************* */
+
+/*
+* Default block size for "gendos.lib"
+* every single block (up to 36) is written in a separate file
+* the bigger RND_BLOCKSIZE, bigger can be the output file size,
+* but this comes at the cost of the malloc'd space for the internal buffer.
+* The current block size is kept in a control block (just the RND_FILE structure saved in a separate file),
+* so changing this value at runtime before creating a file is perfectly legal.
+
+In the target's CRT0 stubs the following lines must exist:
+
+XDEF _RND_BLOCKSIZE
+_RND_BLOCKSIZE:	defw	1000
+
+*/
+
+extern unsigned int   RND_BLOCKSIZE;
+
+/* Used in the generic random file access library only */
+/* file will be split into blocks */
+
+struct RND_FILE {
+	char    name_prefix;   /* block name, including prefix char */
+	char    name[15];         /* file name */
+	u16_t	blocksize;
+	unsigned char *blockptr;
+	long    size;             /* file size */
+	long    position;         /* current position in file */
+	u16_t	pos_in_block;
+	mode_t  mode;
+};
+
+
+/* The following three functions are target specific */
+extern int  __LIB__ rnd_loadblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
+extern int  __LIB__ rnd_saveblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
+extern int  __LIB__ __FASTCALL__ rnd_erase(char *name);
+
+/* ********************************************************* */
 
 #endif /* _FCNTL_H */

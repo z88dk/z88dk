@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open_di.asm,v 1.5 2014-01-03 15:20:43 stefano Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -23,7 +23,7 @@
         ld (bit_irqstatus),hl
         pop hl
         
-        ld a,(23693)
+        ld a,(23624)
         rra
         rra
         rra
@@ -36,6 +36,4 @@
         or e
         pop de
         ld	(snd_tick),a
-        
-          ;ld  a,(snd_tick)
         ret

@@ -12,26 +12,24 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2014-01-03 15:20:43 stefano Exp $
 ;
 
 	XLIB	ansi_attr
-
 	XREF	INVRS
+
 
 .ansi_attr
         and     a
         jr      nz,noreset
         ld      a,7
-        ld      (23693),a
-        ret
+        jr		setbk
 .noreset
         cp      1
         jr      nz,nobold
         ld      a,(23693)
         or      @01000000
-        ld      (23693),a
-        ret
+        jr		setbk
 .nobold
         cp      2
         jr      z,dim
@@ -40,8 +38,7 @@
 .dim
         ld      a,(23693)
         and     @10111111
-        ld      (23693),a
-        ret
+        jr		setbk
 .nodim
         cp      4
         jr      nz,nounderline
@@ -59,15 +56,13 @@
         jr      nz,noblink
         ld      a,(23693)
         or      @10000000
-        ld      (23693),a
-        ret
+        jr		setbk
 .noblink
         cp      25
         jr      nz,nocblink
         ld      a,(23693)
         and     @01111111
-        ld      (23693),a
-        ret
+        jr		setbk
 .nocblink
         cp      7
         jr      nz,noreverse
@@ -91,7 +86,9 @@
         rra
         rra
         or      e
-        ld      (23693),a
+.setbk
+        ld      (23624),a
+		ld      (23693),a
         ret
 .oldattr
         defb     0
@@ -99,8 +96,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (23693),a
-        ret
+        jr		setbk
 .nocinvis
         cp      30
         jp      m,nofore
@@ -119,8 +115,7 @@
         ld      a,(23693)
         and     @11111000
         or      e
-        ld      (23693),a
-        ret
+        jr		setbk
 .nofore
         cp      40
         jp      m,noback
@@ -142,6 +137,6 @@
         ld      a,(23693)
         and     @11000111
         or      e
-        ld      (23693),a 
+        jr		setbk
 .noback
         ret

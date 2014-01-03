@@ -1,4 +1,5 @@
 ; 04.2006 aralbrec
+; 01.2014 stefano
 
 ; void __FASTCALL__ zx_border(uchar colour)
 
@@ -14,11 +15,14 @@ zx_border:
    or l
    
    out (254),a
-   
-   ld a,l
-   add a,a
-   add a,a
-   add a,a
-   ld (23624),a   ; system var bordcr is where we are storing border colour for now
+   and 7
+   rla
+   rla
+   rla
+   ld	e,a
+   ld	a,(23624)
+   and	$c7
+   or	e
+   ld  (23624),a
    
    ret

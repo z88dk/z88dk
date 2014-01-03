@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.9 2012-08-01 21:13:29 dom Exp $
+;	$Id: fputc_cons.asm,v 1.10 2014-01-03 15:20:43 stefano Exp $
 ;
 
 
@@ -218,9 +218,16 @@
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
-        call    call_rom3
-        defw	3582
-        ret
+	 ld		a,($dff)
+	 cp		$17
+	 jr		nz,ts2068_rom
+	 call    call_rom3
+	 defw	3582	;scrollup
+	 ret
+.ts2068_rom
+	 call    call_rom3
+     defw	$939	; TS2068 scrollup
+     ret
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion

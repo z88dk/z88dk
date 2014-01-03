@@ -29,7 +29,7 @@ games/bit_fx4
 games/bit_synth
 games/bit_frequency
 games/bit_beep
-games/spectrum/beeper
+games/beeper
 @spectrum/spectrum.lst
 psg/spectrum/set_psg
 psg/spectrum/set_psg_callee

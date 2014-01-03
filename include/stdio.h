@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.28 2013-12-11 12:03:23 dom Exp $ */
+/* $Id: stdio.h,v 1.29 2014-01-03 15:20:42 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -50,6 +50,20 @@
 
 #ifdef ZXVGS
 #include <zxvgs.h>
+#endif
+
+
+#ifdef AMALLOC
+#include <malloc.h>
+#endif
+#ifdef AMALLOC1
+#include <malloc.h>
+#endif
+#ifdef AMALLOC2
+#include <malloc.h>
+#endif
+#ifdef AMALLOC3
+#include <malloc.h>
 #endif
 
 

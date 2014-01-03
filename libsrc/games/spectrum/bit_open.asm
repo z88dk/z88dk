@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.4 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open.asm,v 1.5 2014-01-03 15:20:43 stefano Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -13,8 +13,7 @@
     XREF     snd_tick
 
 .bit_open
-;	  ld a,(snd_tick)
-        ld a,(23693)
+        ld a,(23624)
         rra
         rra
         rra
@@ -24,7 +23,7 @@
         ld	e,a
         ld  a,(snd_tick)
         and sndbit_mask
-        pop de
         or e
-        ld	a,(snd_tick)
+        pop de
+        ld	(snd_tick),a
 	  ret
