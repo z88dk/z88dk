@@ -12,7 +12,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2014-01-03 15:20:43 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2014-01-03 20:49:42 stefano Exp $
 ;
 
 	XLIB	ansi_attr
@@ -87,7 +87,7 @@
         rra
         or      e
 .setbk
-        ld      (23624),a
+        ;ld      (23624),a
 		ld      (23693),a
         ret
 .oldattr

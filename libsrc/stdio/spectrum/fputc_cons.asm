@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.10 2014-01-03 15:20:43 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.11 2014-01-03 20:49:42 stefano Exp $
 ;
 
 
@@ -24,6 +24,7 @@
 ; Entry:        a= char to print
 ;
 
+defc attr = 23693
 
 .fputc_cons
 	ld	hl,2
@@ -511,7 +512,7 @@
         defw    0
 
 ; Attribute to use
-.attr	defb	56
+;.attr	defb	56
 
 ; Flags..used for incoming bit sequences
 .flags

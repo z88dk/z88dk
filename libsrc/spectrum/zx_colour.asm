@@ -10,6 +10,9 @@ XLIB zx_colour
         di
 
 		ld 	a,l
+        ;ld  (23624),a
+		ld  (23693),a
+
 		ld	d,l
 		ld	e,l
 		ld	hl,0
