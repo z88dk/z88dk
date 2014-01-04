@@ -1,7 +1,7 @@
 /*
  *	WildCard matching
  *
- *	$Id: wcmatch.c,v 1.2 2013-11-13 15:34:46 stefano Exp $
+ *	$Id: wcmatch.c,v 1.3 2014-01-04 18:52:59 aralbrec Exp $
  */
 
 #include <stdlib.h>
@@ -10,10 +10,10 @@
 // Found in the BDS C sources, (wildexp..),written by Leor Zolman.
 // contributed by: W. Earnest, Dave Hardy, Gary P. Novosielski, Bob Mathias and others
 
-int c;
-
 int wcmatch(char *wildnam, char *filnam)
 {
+   static int c;
+   
    while (c = *wildnam++)
 	if (c == '?')
 		if ((c = *filnam++) && c != '.')
