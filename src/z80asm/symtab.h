@@ -18,9 +18,18 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.10 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.11 2014-01-05 23:20:39 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.10  2013-12-15 13:18:34  pauloscustodio
+Revision 1.11  2014-01-05 23:20:39  pauloscustodio
+List, StrHash classlist and classhash receive the address of the container
+object in all functions that add items to the container, and create the
+container on first use. This allows a container to be staticaly
+initialized with NULL and instantiated on first push/unshift/set.
+Add count attribute to StrHash, classhash to count elements in container.
+Add free_data attribute in StrHash to register a free fucntion to delete
+the data container when the hash is removed or a key is overwritten.
+
+Revision 1.10  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -77,7 +86,7 @@ CLASS_HASH(Symbol);				/* defines SymbolHash */
 /* join two symbol tables, adding all symbols from source to the target 
    symbol table; if symbols with the same name exist, the one from source 
    overwrites the one at target */
-extern void SymbolHash_cat( SymbolHash *target, SymbolHash *source );
+extern void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source );
 
 /*-----------------------------------------------------------------------------
 *   API
@@ -112,7 +121,7 @@ extern Symbol *define_library_sym( char *name, long value, byte_t type );
    Selects symbols where (type & type_mask) == type_value */
 extern SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value );
 
-/* copy the static symbols to CURRENTMODULE->local_tab */
+/* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
 
 /* delete the local, static and global symbols */
@@ -123,7 +132,8 @@ extern void remove_all_global_syms( void );
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
 *----------------------------------------------------------------------------*/
-extern SymbolHash *get_global_tab(void);
+extern SymbolHash * global_symtab;
+extern SymbolHash * static_symtab;
 
 /* create a symbol in the local or global tree:
    a) if not already global/extern, create in the local (CURRENTMODULE) symbol table

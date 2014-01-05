@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.2 2014-01-01 21:17:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.3 2014-01-05 23:20:39 pauloscustodio Exp $
 #
 # Test classhash.c
 
@@ -41,8 +41,10 @@ Obj *new_obj(char *text)
 CLASS_HASH(Obj);
 DEF_CLASS_HASH(Obj);
 
+int _count;
 #define T_START(hash)							\
-	iter = ObjHash_first(hash);
+	iter = ObjHash_first(hash);					\
+	_count = 0;
 
 #define T_NEXT(hash, akey, atext)				\
 	if (! iter)							ERROR;	\
@@ -58,10 +60,12 @@ DEF_CLASS_HASH(Obj);
 	if (obj) 							ERROR;	\
 	if (! ObjHash_exists(hash, akey))	ERROR;	\
 	if (ObjHash_exists(hash, "nokey"))	ERROR;	\
-	iter = ObjHash_next(iter);
+	iter = ObjHash_next(iter);					\
+	_count++;
 
 #define T_END(hash)								\
-	if (iter != NULL)					ERROR;
+	if (iter != NULL)					ERROR;	\
+	if (hash != NULL && _count != hash->count) ERROR;
 
 
 int ascending (ObjHashElem *a, ObjHashElem *b)
@@ -89,12 +93,27 @@ int main()
 	ObjHash *hash, *hash2;
 	ObjHashElem *iter, *elem;
 	
+	/* not initialized */
+	hash = NULL;
+
+	T_START(hash);
+	T_END(hash);
+
+	ObjHash_set(&hash, S("abc"), new_obj("321"));
+
+	T_START(hash);
+	T_NEXT(hash, "abc", "321");
+	T_END(hash);
+	
+
+	/* initialized */
+	OBJ_DELETE(hash);
 	hash = OBJ_NEW(ObjHash);
 	
 	T_START(hash);
 	T_END(hash);
 
-	ObjHash_set(hash, S("abc"), new_obj("321"));
+	ObjHash_set(&hash, S("abc"), new_obj("321"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
@@ -104,14 +123,14 @@ int main()
 	T_NEXT(hash, "abc", "321");
 	T_END(hash);
 
-	ObjHash_set(hash, S("def"), new_obj("456"));
+	ObjHash_set(&hash, S("def"), new_obj("456"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
 	T_NEXT(hash, "def", "456");
 	T_END(hash);
 
-	ObjHash_set(hash, S("ghi"), new_obj("789"));
+	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
@@ -120,7 +139,7 @@ int main()
 	T_END(hash);
 
 	/* set new object, old is deleted */
-	ObjHash_set(hash, S("abc"), new_obj("123"));
+	ObjHash_set(&hash, S("abc"), new_obj("123"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -212,9 +231,9 @@ int main()
 	T_END(hash2);
 
 	/* first / remove_elem */
-	ObjHash_set(hash, S("abc"), new_obj("123"));
-	ObjHash_set(hash, S("def"), new_obj("456"));
-	ObjHash_set(hash, S("ghi"), new_obj("789"));
+	ObjHash_set(&hash, S("abc"), new_obj("123"));
+	ObjHash_set(&hash, S("def"), new_obj("456"));
+	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -256,9 +275,9 @@ int main()
 	T_END(hash);
 
 	/* find / remove_elem */
-	ObjHash_set(hash, S("abc"), new_obj("123"));
-	ObjHash_set(hash, S("def"), new_obj("456"));
-	ObjHash_set(hash, S("ghi"), new_obj("789"));
+	ObjHash_set(&hash, S("abc"), new_obj("123"));
+	ObjHash_set(&hash, S("def"), new_obj("456"));
+	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -305,7 +324,7 @@ int main()
 
 	if (! ObjHash_empty(hash)) ERROR;
 	
-	ObjHash_set(hash, S("abc"), new_obj("123"));
+	ObjHash_set(&hash, S("abc"), new_obj("123"));
 	
 	if (ObjHash_empty(hash)) ERROR;
 
@@ -313,9 +332,9 @@ int main()
 	OBJ_DELETE(hash);
 	hash = OBJ_NEW(ObjHash);
 	
-	ObjHash_set(hash, S("def"), new_obj("456"));
-	ObjHash_set(hash, S("abc"), new_obj("321"));
-	ObjHash_set(hash, S("ghi"), new_obj("789"));
+	ObjHash_set(&hash, S("def"), new_obj("456"));
+	ObjHash_set(&hash, S("abc"), new_obj("321"));
+	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "def", "456");
@@ -363,7 +382,16 @@ sub t_capture {
 
 
 # $Log: classhash.t,v $
-# Revision 1.2  2014-01-01 21:17:55  pauloscustodio
+# Revision 1.3  2014-01-05 23:20:39  pauloscustodio
+# List, StrHash classlist and classhash receive the address of the container
+# object in all functions that add items to the container, and create the
+# container on first use. This allows a container to be staticaly
+# initialized with NULL and instantiated on first push/unshift/set.
+# Add count attribute to StrHash, classhash to count elements in container.
+# Add free_data attribute in StrHash to register a free fucntion to delete
+# the data container when the hash is removed or a key is overwritten.
+#
+# Revision 1.2  2014/01/01 21:17:55  pauloscustodio
 # Show error line in case of test failure
 #
 # Revision 1.1  2013/12/25 17:37:13  pauloscustodio

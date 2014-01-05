@@ -14,9 +14,18 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.28 2013-12-15 13:18:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.29 2014-01-05 23:20:39 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.28  2013-12-15 13:18:34  pauloscustodio
+/* Revision 1.29  2014-01-05 23:20:39  pauloscustodio
+/* List, StrHash classlist and classhash receive the address of the container
+/* object in all functions that add items to the container, and create the
+/* container on first use. This allows a container to be staticaly
+/* initialized with NULL and instantiated on first push/unshift/set.
+/* Add count attribute to StrHash, classhash to count elements in container.
+/* Add free_data attribute in StrHash to register a free fucntion to delete
+/* the data container when the hash is removed or a key is overwritten.
+/*
+/* Revision 1.28  2013/12/15 13:18:34  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*
@@ -259,15 +268,15 @@ struct modules
 
 struct module
 {
-    struct module      *nextmodule;       /* pointer to next module */
-    char               *mname;            /* pointer to string of module name */
-    size_t             startoffset;       /* this module's start offset from start of code buffer */
-    long               origin;            /* Address Origin of current machine code module during linking */
-    struct sourcefile  *cfile;            /* pointer to current file record */
-    SymbolHash        *local_tab;         /* pointer to root of local symbols tree */
-    struct expression  *mexpr;            /* pointer to expressions in this module */
-    struct JRPC_Hdr    *JRaddr;           /* pointer to list of JR PC addresses */
-	ObjFile			   *obj_file;		  /* ObjFile structure describing the object file */
+    struct module     *nextmodule;      /* pointer to next module */
+    char              *mname;           /* pointer to string of module name */
+    size_t             startoffset;     /* this module's start offset from start of code buffer */
+    long               origin;          /* Address Origin of current machine code module during linking */
+    struct sourcefile *cfile;           /* pointer to current file record */
+    SymbolHash        *local_symtab;    /* pointer to root of local symbols tree */
+    struct expression *mexpr;           /* pointer to expressions in this module */
+    struct JRPC_Hdr   *JRaddr;          /* pointer to list of JR PC addresses */
+	ObjFile			  *obj_file;		/* ObjFile structure describing the object file */
 };
 
 struct liblist

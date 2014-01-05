@@ -18,9 +18,18 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.17 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.18 2014-01-05 23:20:39 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.17  2013-12-15 13:18:34  pauloscustodio
+Revision 1.18  2014-01-05 23:20:39  pauloscustodio
+List, StrHash classlist and classhash receive the address of the container
+object in all functions that add items to the container, and create the
+container on first use. This allows a container to be staticaly
+initialized with NULL and instantiated on first push/unshift/set.
+Add count attribute to StrHash, classhash to count elements in container.
+Add free_data attribute in StrHash to register a free fucntion to delete
+the data container when the hash is removed or a key is overwritten.
+
+Revision 1.17  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -103,6 +112,12 @@ Move symbol to sym.c, rename to Symbol
 #include "z80asm.h"
 
 /*-----------------------------------------------------------------------------
+*   Global Symbol Tables
+*----------------------------------------------------------------------------*/
+SymbolHash * global_symtab = NULL;
+SymbolHash * static_symtab = NULL;
+
+/*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
 DEF_CLASS_HASH(Symbol);				/* defines SymbolHash */
@@ -112,7 +127,7 @@ DEF_CLASS_HASH(Symbol);				/* defines SymbolHash */
 *   symbol table; if symbols with the same name exist, the one from source 
 *   overwrites the one at target
 *----------------------------------------------------------------------------*/
-void SymbolHash_cat( SymbolHash *target, SymbolHash *source )
+void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source )
 {
 	SymbolHashElem *iter;
 	Symbol         *sym;
@@ -120,27 +135,9 @@ void SymbolHash_cat( SymbolHash *target, SymbolHash *source )
 	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
 	{
 		sym = (Symbol *)iter->value;
-		SymbolHash_set( target, sym->name, Symbol_clone(sym) );
+		SymbolHash_set( ptarget, sym->name, Symbol_clone(sym) );
 	}	
 }
-
-/*-----------------------------------------------------------------------------
-*   Global Symbol Tables
-*----------------------------------------------------------------------------*/
-#define DEF_GET_TAB(func)						\
-	SymbolHash *func(void)						\
-	{											\
-		static SymbolHash *symtab = NULL;		\
-												\
-		if (symtab == NULL)						\
-			symtab = OBJ_NEW(SymbolHash);		\
-												\
-		return symtab;							\
-	}											\
-
-DEF_GET_TAB(get_global_tab)
-DEF_GET_TAB(get_static_tab)
-#undef DEF_GET_TAB
 
 /*-----------------------------------------------------------------------------
 *   return pointer to found symbol in a symbol tree, otherwise NULL if not found
@@ -164,27 +161,27 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 
 Symbol *find_local_symbol( char *name )  
 { 
-	return find_symbol( name, CURRENTMODULE->local_tab ); 
+	return find_symbol( name, CURRENTMODULE->local_symtab ); 
 }
 	
 Symbol *find_global_symbol( char *name ) 
 { 
-	return find_symbol( name, get_global_tab() ); 
+	return find_symbol( name, global_symtab ); 
 }
 
 /*-----------------------------------------------------------------------------
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
 Symbol *_define_sym( char *name, long value, byte_t type, 
-					 struct module *owner, SymbolHash *symtab )
+					 struct module *owner, SymbolHash **psymtab )
 {
     Symbol *sym;
 
-	sym = find_symbol( name, symtab );
+	sym = find_symbol( name, *psymtab );
 	if ( sym == NULL )						/* new symbol */
 	{
 		sym = Symbol_create( name, value, type | SYMDEFINED, owner );
-		SymbolHash_set( symtab, name, sym );
+		SymbolHash_set( psymtab, name, sym );
 	}
 	else if ( ! (sym->type & SYMDEFINED) )	/* already declared but not defined */
 	{
@@ -213,18 +210,17 @@ Symbol *_define_sym( char *name, long value, byte_t type,
 *----------------------------------------------------------------------------*/
 Symbol *get_used_symbol( char *name )
 {
-	SymbolHash *global_tab = get_global_tab();
     Symbol     *sym;
 
-	sym = find_symbol( name, CURRENTMODULE->local_tab );	/* search in local tab */
+	sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
     if ( sym == NULL )
     {
 		/* not local */
-		sym = find_symbol( name, global_tab );				/* search in global tab */
+		sym = find_symbol( name, global_symtab );			/* search in global tab */
         if ( sym == NULL )
         {
             sym = Symbol_create( name, 0, SYM_NOTDEFINED, CURRENTMODULE );
-			SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
+			SymbolHash_set( & CURRENTMODULE->local_symtab, name, sym );
 		}
 	}
 
@@ -239,7 +235,7 @@ Symbol *get_used_symbol( char *name )
 *----------------------------------------------------------------------------*/
 Symbol *define_static_def_sym( char *name, long value )
 {
-	return _define_sym( name, value, SYMDEF, NULL, get_static_tab() );
+	return _define_sym( name, value, SYMDEF, NULL, &static_symtab );
 }
 
 /*-----------------------------------------------------------------------------
@@ -247,7 +243,7 @@ Symbol *define_static_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_global_def_sym( char *name, long value )
 {
-	return _define_sym( name, value, SYMDEF, NULL, get_global_tab() );
+	return _define_sym( name, value, SYMDEF, NULL, &global_symtab );
 }
 
 /*-----------------------------------------------------------------------------
@@ -255,7 +251,7 @@ Symbol *define_global_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_local_def_sym( char *name, long value )
 {
-	return _define_sym( name, value, SYMDEF, CURRENTMODULE, CURRENTMODULE->local_tab );
+	return _define_sym( name, value, SYMDEF, CURRENTMODULE, & CURRENTMODULE->local_symtab );
 }
 
 /*-----------------------------------------------------------------------------
@@ -263,23 +259,23 @@ Symbol *define_local_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_local_sym( char *name, long value, byte_t type )
 {
-	return _define_sym( name, value, type | SYMLOCAL, CURRENTMODULE, CURRENTMODULE->local_tab );
+	return _define_sym( name, value, type | SYMLOCAL, CURRENTMODULE, & CURRENTMODULE->local_symtab );
 }
 
 Symbol *define_global_sym( char *name, long value, byte_t type )
 {
-	return _define_sym( name, value, type | SYMXDEF, CURRENTMODULE, get_global_tab() );
+	return _define_sym( name, value, type | SYMXDEF, CURRENTMODULE, &global_symtab );
 }
 
 Symbol *define_library_sym( char *name, long value, byte_t type )
 {
-	return _define_sym( name, value, type | SYMXDEF | SYMDEF, CURRENTMODULE, get_global_tab() );
+	return _define_sym( name, value, type | SYMXDEF | SYMDEF, CURRENTMODULE, &global_symtab );
 }
 
 /*-----------------------------------------------------------------------------
 *   copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
-static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, 
+static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source, 
 								 byte_t type_mask, byte_t type_value )
 {
 	SymbolHashElem *iter;
@@ -290,7 +286,7 @@ static void copy_full_sym_names( SymbolHash *target, SymbolHash *source,
 		sym = (Symbol *)iter->value;
 			
 		if ( (sym->type & type_mask) == (type_value & type_mask) )
-			SymbolHash_set( target, Symbol_fullname(sym), Symbol_clone(sym) );
+			SymbolHash_set( ptarget, Symbol_fullname(sym), Symbol_clone(sym) );
 	}	
 }
 
@@ -306,35 +302,35 @@ SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value )
 	
 	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
     {
-	    copy_full_sym_names( all_syms, cmodule->local_tab, type_mask, type_value );
+	    copy_full_sym_names( &all_syms, cmodule->local_symtab, type_mask, type_value );
     }
 
-    copy_full_sym_names( all_syms, get_global_tab(), type_mask, type_value );
+    copy_full_sym_names( &all_syms, global_symtab, type_mask, type_value );
 	
 	return all_syms;
 }
 
 /*-----------------------------------------------------------------------------
-*   copy the static symbols to CURRENTMODULE->local_tab
+*   copy the static symbols to CURRENTMODULE->local_symtab
 *----------------------------------------------------------------------------*/
 void copy_static_syms( void )
 {
 	SymbolHashElem *iter;
 	Symbol         *sym;
 
-	for ( iter = SymbolHash_first( get_static_tab() ); iter; iter = SymbolHash_next( iter ) )
+	for ( iter = SymbolHash_first( static_symtab ); iter; iter = SymbolHash_next( iter ) )
 	{
 		sym = (Symbol *)iter->value;
-		_define_sym( sym->name, sym->value, sym->type, CURRENTMODULE, CURRENTMODULE->local_tab );
+		_define_sym( sym->name, sym->value, sym->type, CURRENTMODULE, & CURRENTMODULE->local_symtab );
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   delete the static and global symbols
 *----------------------------------------------------------------------------*/
-void remove_all_local_syms( void )	{ SymbolHash_remove_all( CURRENTMODULE->local_tab ); }
-void remove_all_static_syms( void )	{ SymbolHash_remove_all( get_static_tab() ); }
-void remove_all_global_syms( void )	{ SymbolHash_remove_all( get_global_tab() ); }
+void remove_all_local_syms( void )	{ SymbolHash_remove_all( CURRENTMODULE->local_symtab ); }
+void remove_all_static_syms( void )	{ SymbolHash_remove_all( static_symtab ); }
+void remove_all_global_syms( void )	{ SymbolHash_remove_all( global_symtab ); }
 
 /*-----------------------------------------------------------------------------
 *   create a local symbol:
@@ -346,12 +342,12 @@ static void define_local_symbol( char *name, long value, byte_t type )
 {
     Symbol *sym;
 
-	sym = find_symbol( name, CURRENTMODULE->local_tab );
+	sym = find_symbol( name, CURRENTMODULE->local_symtab );
 	if ( sym == NULL )					/* Symbol not declared as local */
 	{
 		/* create symbol */
         sym = Symbol_create( name, value, type | SYMLOCAL | SYMDEFINED, CURRENTMODULE );
-		SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
+		SymbolHash_set( & CURRENTMODULE->local_symtab, name, sym );
 
         /* First element in list is definition of symbol */
 		add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
@@ -380,10 +376,9 @@ static void define_local_symbol( char *name, long value, byte_t type )
 *----------------------------------------------------------------------------*/
 void define_symbol( char *name, long value, byte_t type )
 {
-	SymbolHash *global_tab = get_global_tab();
 	Symbol     *sym;
 
-	sym = find_symbol( name, global_tab );
+	sym = find_symbol( name, global_symtab );
 	if ( sym == NULL )					/* Symbol not declared as global/extern */
 	{
         define_local_symbol( name, value, type );
@@ -415,19 +410,18 @@ void define_symbol( char *name, long value, byte_t type )
 *----------------------------------------------------------------------------*/
 static void declare_global_symbol( char *name, byte_t type )
 {
-	SymbolHash *global_tab = get_global_tab();
     Symbol     *sym, *cloned_sym;
 
-	sym = find_symbol( name, CURRENTMODULE->local_tab );	/* search in local tab */
+	sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
     if ( sym == NULL )
     {
 		/* not local */
-		sym = find_symbol( name, global_tab );				/* search in global tab */
+		sym = find_symbol( name, global_symtab );			/* search in global tab */
         if ( sym == NULL )
         {
 			/* not local, not global -> declare symbol as global */
             sym = Symbol_create( name, 0, SYMXDEF | type, CURRENTMODULE );
-			SymbolHash_set( global_tab, name, sym );
+			SymbolHash_set( &global_symtab, name, sym );
         }
         else
         {
@@ -458,7 +452,7 @@ static void declare_global_symbol( char *name, byte_t type )
     else
     {
         /* local */
-		cloned_sym = find_symbol( name, global_tab );
+		cloned_sym = find_symbol( name, global_symtab );
         if ( cloned_sym == NULL )
         {
             /* local, not global */
@@ -466,10 +460,10 @@ static void declare_global_symbol( char *name, byte_t type )
             sym->type &= SYMLOCAL_OFF;
             sym->type |= SYMXDEF;
             cloned_sym = Symbol_create( sym->name, sym->value, sym->type, CURRENTMODULE );
-			SymbolHash_set( global_tab, name, cloned_sym );
+			SymbolHash_set( &global_symtab, name, cloned_sym );
 
             /* original local symbol cloned as global symbol, now delete old local ... */
-			SymbolHash_remove( CURRENTMODULE->local_tab, name );
+			SymbolHash_remove( CURRENTMODULE->local_symtab, name );
         }
         else
         {
@@ -488,19 +482,18 @@ void declare_global_lib_symbol( char *name ) { declare_global_symbol(name, SYMDE
 *----------------------------------------------------------------------------*/
 static void declare_extern_symbol( char *name, byte_t type )
 {
-	SymbolHash *global_tab = get_global_tab();
     Symbol     *sym, *ext_sym;
 
-	sym = find_symbol( name, CURRENTMODULE->local_tab );	/* search in local tab */
+	sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
     if ( sym == NULL )
     {
 		/* not local */
-		sym = find_symbol( name, global_tab );				/* search in global tab */
+		sym = find_symbol( name, global_symtab );			/* search in global tab */
         if ( sym == NULL )
         {
 			/* not local, not global -> declare symbol as extern */
             sym = Symbol_create( name, 0, SYMXREF | type, CURRENTMODULE );
-			SymbolHash_set( global_tab, name, sym );
+			SymbolHash_set( &global_symtab, name, sym );
         }
         else
         {
@@ -525,7 +518,7 @@ static void declare_extern_symbol( char *name, byte_t type )
     else
     {
         /* local */
-		ext_sym = find_symbol( name, global_tab );
+		ext_sym = find_symbol( name, global_symtab );
         if ( ext_sym == NULL )
         {
             /* If no external symbol of identical name has been declared, then re-declare local
@@ -535,10 +528,10 @@ static void declare_extern_symbol( char *name, byte_t type )
                 sym->type &= SYMLOCAL_OFF;
                 sym->type |= ( SYMXREF | type );
                 ext_sym = Symbol_create( name, 0, sym->type, CURRENTMODULE );
-				SymbolHash_set( global_tab, name, ext_sym );
+				SymbolHash_set( &global_symtab, name, ext_sym );
 
                 /* original local symbol cloned as external symbol, now delete old local ... */
-				SymbolHash_remove( CURRENTMODULE->local_tab, name );
+				SymbolHash_remove( CURRENTMODULE->local_symtab, name );
             }
             else
             {

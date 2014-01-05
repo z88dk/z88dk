@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.1 2013-12-25 17:02:10 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -30,6 +30,9 @@ typedef struct StrHashElem
 } StrHashElem;
 
 CLASS( StrHash )
+	size_t count;					/* number of objects */
+	void (*free_data)(void *);		/* function to free an element
+									   called by StrHash_remove_all() */
 	StrHashElem		*hash;			/* hash table of all keys */
 END_CLASS;
 
@@ -38,7 +41,7 @@ typedef int (*StrHash_compare_func)(StrHashElem *a, StrHashElem *b);
 
 /* add new key/value to the list, create new entry if new key, 
    overwrite if key exists */
-extern void StrHash_set( StrHash *self, char *key, void *value );
+extern void StrHash_set( StrHash **pself, char *key, void *value );
 
 /* retrive value for a given key, return NULL if not found */
 extern void *StrHash_get( StrHash *self, char *key );
@@ -73,7 +76,16 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /* 
 * $Log: strhash.h,v $
-* Revision 1.1  2013-12-25 17:02:10  pauloscustodio
+* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+*
+* Revision 1.1  2013/12/25 17:02:10  pauloscustodio
 * Move strhash.c to the z80asm/lib directory
 *
 * Revision 1.8  2013/12/15 13:18:34  pauloscustodio

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.108 2014-01-02 17:18:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.109 2014-01-05 23:20:39 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,16 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.108  2014-01-02 17:18:16  pauloscustodio
+# Revision 1.109  2014-01-05 23:20:39  pauloscustodio
+# List, StrHash classlist and classhash receive the address of the container
+# object in all functions that add items to the container, and create the
+# container on first use. This allows a container to be staticaly
+# initialized with NULL and instantiated on first push/unshift/set.
+# Add count attribute to StrHash, classhash to count elements in container.
+# Add free_data attribute in StrHash to register a free fucntion to delete
+# the data container when the hash is removed or a key is overwritten.
+#
+# Revision 1.108  2014/01/02 17:18:16  pauloscustodio
 # StrList removed, replaced by List
 #
 # Revision 1.107  2014/01/01 21:23:48  pauloscustodio
@@ -755,10 +764,10 @@ scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h codearea.h
 scan.o: errors.h errors_def.h file.h config.h  lib/strutil.h
 scan.o: legacy.h listfile.h symref.h lib/classlist.h options.h lib/list.h
 scan.o: options_def.h lib/strpool.h
-srcfile.o: lib/xmalloc.h codearea.h lib/types.h errors.h errors_def.h file.h
-srcfile.o: config.h  lib/strutil.h lib/class.h lib/queue.h
-srcfile.o: listfile.h symref.h lib/classlist.h options.h lib/list.h
-srcfile.o: options_def.h srcfile.h lib/strpool.h
+srcfile.o: lib/xmalloc.h lib/die.h options.h lib/types.h lib/list.h
+srcfile.o: lib/class.h lib/queue.h options_def.h srcfile.h lib/strutil.h
+srcfile.o: lib/classlist.h lib/strpool.h codearea.h errors.h errors_def.h
+srcfile.o: file.h config.h  listfile.h symref.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h

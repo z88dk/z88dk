@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.65 2013-12-30 02:05:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.66 2014-01-05 23:20:39 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.65  2013-12-30 02:05:33  pauloscustodio
+Revision 1.66  2014-01-05 23:20:39  pauloscustodio
+List, StrHash classlist and classhash receive the address of the container
+object in all functions that add items to the container, and create the
+container on first use. This allows a container to be staticaly
+initialized with NULL and instantiated on first push/unshift/set.
+Add count attribute to StrHash, classhash to count elements in container.
+Add free_data attribute in StrHash to register a free fucntion to delete
+the data container when the hash is removed or a key is overwritten.
+
+Revision 1.65  2013/12/30 02:05:33  pauloscustodio
 Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 handles both dynamically allocated strings and fixed-size strings.
 Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -935,22 +944,22 @@ Z80pass2( void )
 
     if ( ! get_num_errors() && opts.symtable )
     {
-        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_tab );
-        WriteSymbolTable( "Global Module Symbols:", get_global_tab() );
+        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_symtab );
+        WriteSymbolTable( "Global Module Symbols:", global_symtab );
     }
 
     fptr_namedecl = ftell( objfile );
 
 	/* Store Local Name declarations to relocatable file */
-	StoreLocalNames( CURRENTMODULE->local_tab ); 
+	StoreLocalNames( CURRENTMODULE->local_symtab ); 
 
 	/* Store Global name declarations to relocatable file */
-	StoreGlobalNames( get_global_tab() ); 
+	StoreGlobalNames( global_symtab ); 
 
     fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
 
 	/* Store library reference name declarations to relocatable file */
-	StoreExternReferences( get_global_tab() );
+	StoreExternReferences( global_symtab );
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );

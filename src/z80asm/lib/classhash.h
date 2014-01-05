@@ -6,7 +6,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.1 2013-12-25 17:37:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,6 +34,7 @@ DEF_CLASS_HASH(T);
 #define CLASS_HASH(T)														\
 	/* hash class */														\
 	CLASS( T##Hash )														\
+		size_t   count;		/* number of objects */							\
 		StrHash *hash;		/* map keys to T* */							\
 	END_CLASS;																\
 																			\
@@ -45,7 +46,7 @@ DEF_CLASS_HASH(T);
 																			\
 	/* add new key/value to the list, create new entry if new key, */		\
 	/* overwrite if key exists */											\
-	extern void T##Hash_set( T##Hash *self, char *key, T *obj );			\
+	extern void T##Hash_set( T##Hash **pself, char *key, T *obj );			\
 																			\
 	/* retrive value for a given key, return NULL if not found */			\
 	extern T *T##Hash_get( T##Hash *self, char *key );						\
@@ -87,6 +88,7 @@ DEF_CLASS_HASH(T);
 	void T##Hash_init ( T##Hash *self )										\
 	{																		\
 		self->hash = OBJ_NEW(StrHash);										\
+		self->count = 0;													\
 	}																		\
 																			\
 	void T##Hash_copy ( T##Hash *self, T##Hash *other )						\
@@ -95,11 +97,12 @@ DEF_CLASS_HASH(T);
 																			\
 		/* create new hash and copy element by element from other */		\
 		self->hash = OBJ_NEW(StrHash);										\
+		self->count = 0;													\
 																			\
 		for ( iter = StrHash_first(other->hash) ; iter != NULL ;			\
 		      iter = StrHash_next(iter) )		 							\
 		{																	\
-			T##Hash_set( self,		 										\
+			T##Hash_set( &self,		 										\
 						 iter->key, T##_clone( (T *) iter->value ) );		\
 		}																	\
 	}																		\
@@ -109,33 +112,74 @@ DEF_CLASS_HASH(T);
 		T##Hash_remove_all( self );											\
 	}																		\
 																			\
+	/* remove all elements */												\
+	void T##Hash_remove_all( T##Hash *self )								\
+	{																		\
+		T##HashElem *elem;													\
+																			\
+		if ( self == NULL )													\
+			return;															\
+																			\
+		while ( ( elem = T##Hash_first( self ) ) != NULL )					\
+		{																	\
+			T##Hash_remove_elem( self, elem );								\
+		}																	\
+	}																		\
+																			\
+	/* find a hash entry */													\
+	T##HashElem *T##Hash_find( T##Hash *self, char *key )					\
+	{																		\
+		if ( self == NULL || key == NULL )									\
+			return NULL;													\
+																			\
+		return StrHash_find( self->hash, key );								\
+	}																		\
+																			\
+	/* delete a hash entry if not NULL */									\
+	void T##Hash_remove_elem( T##Hash *self, T##HashElem *elem )			\
+	{																		\
+		T *obj;																\
+																			\
+		if ( self == NULL || elem == NULL )									\
+			return;															\
+																			\
+		obj = (T *)elem->value;												\
+		OBJ_DELETE( obj );													\
+		StrHash_remove_elem( self->hash, elem );							\
+																			\
+		self->count = self->hash->count;									\
+	}																		\
+																			\
 	/* set key/value, delete old value if any */							\
-	void T##Hash_set( T##Hash *self, char *key, T *obj )					\
+	void T##Hash_set( T##Hash **pself, char *key, T *obj )					\
 	{																		\
 		T *old;																\
 																			\
+		INIT_OBJ( T##Hash, pself );											\
+																			\
 		/* delete old, if any */											\
-		old = (T *) StrHash_get( self->hash, key );							\
+		old = (T *) StrHash_get( (*pself)->hash, key );						\
 		if ( old ) 															\
 		{																	\
 			OBJ_DELETE( old );												\
 		}																	\
 																			\
 		/* set new value */													\
-		StrHash_set( self->hash, key, (void *) obj );						\
+		StrHash_set( & ((*pself)->hash), key, (void *) obj );				\
 		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by hash */			\
+		(*pself)->count = (*pself)->hash->count;							\
 	}																		\
 																			\
 	/* get value, NULL if not defined */									\
 	T *T##Hash_get( T##Hash *self, char *key )								\
 	{																		\
-		return (T *) StrHash_get( self->hash, key );						\
+		return self == NULL ? NULL : (T *) StrHash_get( self->hash, key );	\
 	}																		\
 																			\
 	/* check if element exists */											\
 	BOOL T##Hash_exists( T##Hash *self, char *key )							\
 	{																		\
-		return StrHash_exists( self->hash, key );							\
+		return self == NULL ? FALSE : StrHash_exists( self->hash, key );	\
 	}																		\
 																			\
 	/* remove element if it exists */										\
@@ -147,40 +191,10 @@ DEF_CLASS_HASH(T);
 		T##Hash_remove_elem( self, elem );									\
 	}																		\
 																			\
-	/* remove all elements */												\
-	void T##Hash_remove_all( T##Hash *self )								\
-	{																		\
-		T##HashElem *elem;													\
-																			\
-		while ( ( elem = T##Hash_first( self ) ) != NULL )					\
-		{																	\
-			T##Hash_remove_elem( self, elem );								\
-		}																	\
-	}																		\
-																			\
-	/* find a hash entry */													\
-	T##HashElem *T##Hash_find( T##Hash *self, char *key )					\
-	{																		\
-		return StrHash_find( self->hash, key );								\
-	}																		\
-																			\
-	/* delete a hash entry if not NULL */									\
-	void T##Hash_remove_elem( T##Hash *self, T##HashElem *elem )			\
-	{																		\
-		T *obj;																\
-																			\
-		if ( elem )															\
-		{																	\
-			obj = (T *)elem->value;											\
-			OBJ_DELETE( obj );												\
-			StrHash_remove_elem( self->hash, elem );						\
-		}																	\
-	}																		\
-																			\
 	/* get first hash entry, maybe NULL */									\
 	T##HashElem *T##Hash_first( T##Hash *self )								\
 	{																		\
-		return StrHash_first( self->hash );									\
+		return self == NULL ? NULL : StrHash_first( self->hash );			\
 	}																		\
 																			\
 	/* get the iterator of the next element in the list, NULL at end */		\
@@ -198,13 +212,25 @@ DEF_CLASS_HASH(T);
 	/* sort the items in the hash */										\
 	void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare )		\
 	{																		\
+		if ( self == NULL )													\
+			return;															\
+																			\
 		StrHash_sort( self->hash, compare );								\
 	}																		\
 
 
 /* 
 * $Log: classhash.h,v $
-* Revision 1.1  2013-12-25 17:37:13  pauloscustodio
+* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+*
+* Revision 1.1  2013/12/25 17:37:13  pauloscustodio
 * Move classlist and classhash to the z80asm/lib directory
 *
 * Revision 1.3  2013/12/15 13:18:33  pauloscustodio

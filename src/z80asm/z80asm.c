@@ -14,9 +14,18 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.123 2014-01-02 17:18:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.124 2014-01-05 23:20:39 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.123  2014-01-02 17:18:16  pauloscustodio
+/* Revision 1.124  2014-01-05 23:20:39  pauloscustodio
+/* List, StrHash classlist and classhash receive the address of the container
+/* object in all functions that add items to the container, and create the
+/* container on first use. This allows a container to be staticaly
+/* initialized with NULL and instantiated on first push/unshift/set.
+/* Add count attribute to StrHash, classhash to count elements in container.
+/* Add free_data attribute in StrHash to register a free fucntion to delete
+/* the data container when the hash is removed or a key is overwritten.
+/*
+/* Revision 1.123  2014/01/02 17:18:16  pauloscustodio
 /* StrList removed, replaced by List
 /*
 /* Revision 1.122  2014/01/02 02:31:42  pauloscustodio
@@ -1125,7 +1134,7 @@ NewModule( void )
     newm->startoffset = get_codesize();
     newm->origin = 65535;
     newm->cfile = NULL;
-    newm->local_tab   = OBJ_NEW(SymbolHash);
+    newm->local_symtab = OBJ_NEW(SymbolHash);
 
     newm->mexpr = xnew(struct expression);
 
@@ -1211,7 +1220,7 @@ ReleaseModules( void )
             ReleaseFile( curptr->cfile );
         }
 
-        OBJ_DELETE( curptr->local_tab );
+        OBJ_DELETE( curptr->local_symtab );
 
         if ( curptr->mexpr != NULL )
         {

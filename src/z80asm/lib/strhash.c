@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.1 2013-12-25 17:02:10 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,6 +21,7 @@ DEF_CLASS( StrHash );
 void StrHash_init( StrHash *self )
 {
 	self->hash = NULL;
+	self->count = 0;
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
@@ -29,10 +30,11 @@ void StrHash_copy( StrHash *self, StrHash *other )
 
     /* create new hash and copy element by element from other */
 	self->hash = NULL;
+	self->count = 0;
 
     HASH_ITER( hh, other->hash, elem, tmp )
     {
-		StrHash_set( self, elem->key, elem->value );
+		StrHash_set( &self, elem->key, elem->value );
     }
 }
 
@@ -48,6 +50,9 @@ void StrHash_remove_all( StrHash *self )
 {
     StrHashElem *elem, *tmp;
 
+	if ( self == NULL )
+		return;
+
     HASH_ITER( hh, self->hash, elem, tmp )
     {
         StrHash_remove_elem( self, elem );
@@ -60,8 +65,12 @@ void StrHash_remove_all( StrHash *self )
 StrHashElem *StrHash_find( StrHash *self, char *key )
 {
     StrHashElem *elem;
-    size_t  	num_chars = strlen( key );
+    size_t  	 num_chars;
 
+	if ( self == NULL || key == NULL)
+		return NULL;
+
+	num_chars = strlen( key );
     HASH_FIND( hh, self->hash, key, num_chars, elem );
 	return elem;
 }
@@ -71,22 +80,30 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
 *----------------------------------------------------------------------------*/
 void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 {
-	if ( elem )
-	{
-		HASH_DEL( self->hash, elem );
-		xfree( elem );
-	}
+	if ( self == NULL || elem == NULL)
+		return;
+
+	HASH_DEL( self->hash, elem );
+
+	self->count--;
+
+	if ( self->free_data != NULL )
+		self->free_data( elem->value );
+
+	xfree( elem );
 }
 
 /*-----------------------------------------------------------------------------
 *	Create the element if the key is not found, update the value if found
 *----------------------------------------------------------------------------*/
-void StrHash_set( StrHash *self, char *key, void *value )
+void StrHash_set( StrHash **pself, char *key, void *value )
 {
     StrHashElem *elem;
 	size_t num_chars;
 
-	elem = StrHash_find( self, key );
+	INIT_OBJ( StrHash, pself );
+	
+	elem = StrHash_find( *pself, key );
 	
 	/* create new element if not found, value is updated at the end */
 	if (elem == NULL) 
@@ -96,7 +113,14 @@ void StrHash_set( StrHash *self, char *key, void *value )
 		
 		/* add to hash, need to store elem->key instead of key, as it is invariant */
 		num_chars = strlen( key );
-		HASH_ADD_KEYPTR( hh, self->hash, elem->key, num_chars, elem );
+		HASH_ADD_KEYPTR( hh, (*pself)->hash, elem->key, num_chars, elem );
+		
+		(*pself)->count++;
+	}
+	else 					/* element exists, free data of old value */
+	{	
+		if ( (*pself)->free_data != NULL )
+			(*pself)->free_data( elem->value );
 	}
 	
 	/* update value */
@@ -111,7 +135,7 @@ void *StrHash_get( StrHash *self, char *key )
     StrHashElem *elem;
 	
 	elem = StrHash_find( self, key );
-	if (elem) 
+	if ( elem != NULL ) 
 		return elem->value;
 	else
 		return NULL;
@@ -125,7 +149,7 @@ BOOL StrHash_exists( StrHash *self, char *key )
     StrHashElem *elem;
 	
 	elem = StrHash_find( self, key );
-	if (elem) 
+	if ( elem != NULL ) 
 		return TRUE;
 	else
 		return FALSE;
@@ -147,7 +171,7 @@ void StrHash_remove( StrHash *self, char *key )
 *----------------------------------------------------------------------------*/
 StrHashElem *StrHash_first( StrHash *self )
 {
-    return (StrHashElem *)self->hash;
+    return self == NULL ? NULL : (StrHashElem *)self->hash;
 }
 
 /*-----------------------------------------------------------------------------
@@ -171,13 +195,25 @@ BOOL StrHash_empty( StrHash *self )
 *----------------------------------------------------------------------------*/
 void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 {
+	if ( self == NULL )
+		return;
+
 	HASH_SORT( self->hash, compare );
 }
 
 
 /*
 * $Log: strhash.c,v $
-* Revision 1.1  2013-12-25 17:02:10  pauloscustodio
+* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+*
+* Revision 1.1  2013/12/25 17:02:10  pauloscustodio
 * Move strhash.c to the z80asm/lib directory
 *
 * Revision 1.13  2013/12/15 13:18:34  pauloscustodio

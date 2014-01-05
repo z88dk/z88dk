@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.2 2014-01-01 21:19:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.3 2014-01-05 23:20:39 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -129,6 +129,10 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 			    file, lineno, wrong_key);
 		}
 	}
+	
+	/* check count */
+	if ( hash != NULL && (size_t) i != hash->count )
+		die("%s %d : count is %d, expected %d\n", file, lineno, hash->count, i);
 }
 
 #define check_list(hash,expected) _check_list(hash,expected,__FILE__,__LINE__)
@@ -157,20 +161,41 @@ int main()
 	StrHash *hash1, *hash2;
 	StrHashElem *elem;
 	
+	/* no init */
+	hash1 = NULL;
+
+	if (StrHash_first(hash1) != NULL)			ERROR;
+	check_list(hash1, "");
+	
+	StrHash_set(&hash1, S("abc"), "123");
+	check_list(hash1, "abc 123");
+	
+	StrHash_set(&hash1, S("def"), "456");
+	check_list(hash1, "abc 123 def 456");
+	
+	StrHash_set(&hash1, S("ghi"), "789");
+	check_list(hash1, "abc 123 def 456 ghi 789");
+	
+	StrHash_set(&hash1, S("def"), "456");
+	check_list(hash1, "abc 123 def 456 ghi 789");
+
+	OBJ_DELETE( hash1 );
+	
+	/* init object */
 	hash1 = OBJ_NEW(StrHash);
 	if (StrHash_first(hash1) != NULL)			ERROR;
 	check_list(hash1, "");
 	
-	StrHash_set(hash1, S("abc"), "123");
+	StrHash_set(&hash1, S("abc"), "123");
 	check_list(hash1, "abc 123");
 	
-	StrHash_set(hash1, S("def"), "456");
+	StrHash_set(&hash1, S("def"), "456");
 	check_list(hash1, "abc 123 def 456");
 	
-	StrHash_set(hash1, S("ghi"), "789");
+	StrHash_set(&hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	
-	StrHash_set(hash1, S("def"), "456");
+	StrHash_set(&hash1, S("def"), "456");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	
 	/* clone */
@@ -204,9 +229,9 @@ int main()
 	
 	
 	/* head / remove_elem */
-	StrHash_set(hash1, S("abc"), "123");
-	StrHash_set(hash1, S("def"), "456");
-	StrHash_set(hash1, S("ghi"), "789");
+	StrHash_set(&hash1, S("abc"), "123");
+	StrHash_set(&hash1, S("def"), "456");
+	StrHash_set(&hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 
 	elem = StrHash_first(hash1); 
@@ -231,9 +256,9 @@ int main()
 	if (elem != NULL) ERROR;
 	check_list(hash1, "");
 
-	StrHash_set(hash1, S("abc"), "123");
-	StrHash_set(hash1, S("def"), "456");
-	StrHash_set(hash1, S("ghi"), "789");
+	StrHash_set(&hash1, S("abc"), "123");
+	StrHash_set(&hash1, S("def"), "456");
+	StrHash_set(&hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 
 	elem = StrHash_find(hash1, S("def")); 
@@ -264,7 +289,7 @@ int main()
 	
 	if (! StrHash_empty(hash1)) ERROR;
 	
-	StrHash_set(hash1, S("abc"), "123");
+	StrHash_set(&hash1, S("abc"), "123");
 	
 	if (StrHash_empty(hash1)) ERROR;
 	
@@ -272,16 +297,16 @@ int main()
 	OBJ_DELETE(hash1);
 	hash1 = OBJ_NEW(StrHash);
 	
-	StrHash_set(hash1, S("def"), "456");
+	StrHash_set(&hash1, S("def"), "456");
 	check_list(hash1, "def 456");
 	
-	StrHash_set(hash1, S("abc"), "123");
+	StrHash_set(&hash1, S("abc"), "123");
 	check_list(hash1, "def 456 abc 123");
 	
-	StrHash_set(hash1, S("ghi"), "789");
+	StrHash_set(&hash1, S("ghi"), "789");
 	check_list(hash1, "def 456 abc 123 ghi 789");
 	
-	StrHash_set(hash1, S("def"), "457");
+	StrHash_set(&hash1, S("def"), "457");
 	check_list(hash1, "def 457 abc 123 ghi 789");
 	
 	StrHash_sort(hash1, ascending);
@@ -289,6 +314,27 @@ int main()
 	
 	StrHash_sort(hash1, descending);
 	check_list(hash1, "ghi 789 def 457 abc 123");
+	
+	
+	/* free_data */
+	OBJ_DELETE(hash1);
+	hash1 = OBJ_NEW(StrHash);
+	hash1->free_data = xfreef;
+	
+	StrHash_set(&hash1, "abc", xstrdup("123"));
+	check_list(hash1, "abc 123");
+
+	StrHash_set(&hash1, "def", xstrdup("456"));
+	check_list(hash1, "abc 123 def 456");
+
+	StrHash_set(&hash1, "abc", xstrdup("789"));
+	check_list(hash1, "abc 789 def 456");
+	
+	StrHash_set(&hash1, "ghi", xstrdup("012"));
+	check_list(hash1, "abc 789 def 456 ghi 012");
+	
+	StrHash_remove(hash1, "ghi");
+	check_list(hash1, "abc 789 def 456");
 	
 	return 0;
 }
@@ -314,7 +360,16 @@ sub t_capture {
 
 
 # $Log: strhash.t,v $
-# Revision 1.2  2014-01-01 21:19:18  pauloscustodio
+# Revision 1.3  2014-01-05 23:20:39  pauloscustodio
+# List, StrHash classlist and classhash receive the address of the container
+# object in all functions that add items to the container, and create the
+# container on first use. This allows a container to be staticaly
+# initialized with NULL and instantiated on first push/unshift/set.
+# Add count attribute to StrHash, classhash to count elements in container.
+# Add free_data attribute in StrHash to register a free fucntion to delete
+# the data container when the hash is removed or a key is overwritten.
+#
+# Revision 1.2  2014/01/01 21:19:18  pauloscustodio
 # Show error line in case of test failure
 #
 # Revision 1.1  2013/12/25 17:02:10  pauloscustodio

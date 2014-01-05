@@ -44,7 +44,7 @@ struct modules *modulehdr = &the_modules;
 
 extern SymbolHash *get_static_tab(void);
 
-extern Symbol *_define_sym( char *name, long value, byte_t type, struct module *owner, SymbolHash *symtab );
+extern Symbol *_define_sym( char *name, long value, byte_t type, struct module *owner, SymbolHash **psymtab );
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
@@ -96,9 +96,9 @@ void dump_SymbolHash ( SymbolHash *symtab, char *name )
 
 void dump_symtab ( void ) 
 {
-	dump_SymbolHash(get_global_tab(), "global tab");
-	dump_SymbolHash(get_static_tab(), "static tab");
-	dump_SymbolHash(CURRENTMODULE->local_tab, "local tab");
+	dump_SymbolHash(global_symtab, "global tab");
+	dump_SymbolHash(static_symtab, "static tab");
+	dump_SymbolHash(CURRENTMODULE->local_symtab, "local tab");
 }	
 
 /* reuse string - test saving of keys by hash */
@@ -121,7 +121,7 @@ t_compile_module($init, <<'END', $objs);
 	opts.list     = TRUE;
 	
 	TITLE("Create current module");	
-    CURRENTMODULE->local_tab   = OBJ_NEW(SymbolHash);
+    CURRENTMODULE->local_symtab   = OBJ_NEW(SymbolHash);
 	modulehdr->first = CURRENTMODULE;
 	CURRENTMODULE->nextmodule = NULL;
 
@@ -139,32 +139,23 @@ t_compile_module($init, <<'END', $objs);
 	OBJ_DELETE(sym);
 	
 	TITLE("Global symtab");	
-	ASSERT( symtab  = get_global_tab() );
-	ASSERT( symtab == get_global_tab() );
-	ASSERT( symtab == get_global_tab() );
-	dump_SymbolHash(symtab, "global");
-
-	ASSERT( symtab  = get_static_tab() );
-	ASSERT( symtab == get_static_tab() );
-	ASSERT( symtab == get_static_tab() );
-	dump_SymbolHash(symtab, "static");
-	
-	ASSERT( get_global_tab() != get_static_tab() );
+	dump_SymbolHash(global_symtab, "global");
+	dump_SymbolHash(static_symtab, "static");
 	
 	TITLE("Concat symbol tables");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	_define_sym(S("VAR1"),  1, 0, NULL, symtab); page_nr++;
-	_define_sym(S("VAR2"),  2, 0, NULL, symtab); page_nr++; 
-	_define_sym(S("VAR3"), -3, 0, NULL, symtab); page_nr++;
+	_define_sym(S("VAR1"),  1, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("VAR2"),  2, 0, NULL, &symtab); page_nr++; 
+	_define_sym(S("VAR3"), -3, 0, NULL, &symtab); page_nr++;
 	dump_SymbolHash(symtab, "tab1");
 	
 	ASSERT( symtab2 = OBJ_NEW(SymbolHash) );
-	_define_sym(S("VAR3"), 3, 0, NULL, symtab2); page_nr++;
-	_define_sym(S("VAR4"), 4, 0, NULL, symtab2); page_nr++;
-	_define_sym(S("VAR5"), 5, 0, NULL, symtab2); page_nr++;
+	_define_sym(S("VAR3"), 3, 0, NULL, &symtab2); page_nr++;
+	_define_sym(S("VAR4"), 4, 0, NULL, &symtab2); page_nr++;
+	_define_sym(S("VAR5"), 5, 0, NULL, &symtab2); page_nr++;
 	dump_SymbolHash(symtab2, "tab2");
 	
-	SymbolHash_cat( symtab, symtab2 );
+	SymbolHash_cat( &symtab, symtab2 );
 	dump_SymbolHash(symtab, "merged_tab");
 	
 	OBJ_DELETE( symtab );
@@ -172,10 +163,10 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Sort");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	_define_sym(S("ONE"), 	1, 0, NULL, symtab); page_nr++;
-	_define_sym(S("TWO"),	2, 0, NULL, symtab); page_nr++; 
-	_define_sym(S("THREE"),	3, 0, NULL, symtab); page_nr++;
-	_define_sym(S("FOUR"),	4, 0, NULL, symtab); page_nr++;
+	_define_sym(S("ONE"), 	1, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("TWO"),	2, 0, NULL, &symtab); page_nr++; 
+	_define_sym(S("THREE"),	3, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("FOUR"),	4, 0, NULL, &symtab); page_nr++;
 
 	dump_SymbolHash(symtab, "tab");
 	
@@ -189,20 +180,20 @@ t_compile_module($init, <<'END', $objs);
 
 	TITLE("Use local symbol before definition");
 	page_nr = 1;
-	_define_sym(S("WIN32"), 1, 0, NULL, get_static_tab()); page_nr++;
-	SymbolHash_cat( CURRENTMODULE->local_tab, get_static_tab() ); page_nr++;
-	_define_sym(S(ASMPC_KW), 0, 0, NULL, get_global_tab()); page_nr++;
-	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
-	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
+	_define_sym(S("WIN32"), 1, 0, NULL, &static_symtab); page_nr++;
+	SymbolHash_cat( & CURRENTMODULE->local_symtab, static_symtab ); page_nr++;
+	_define_sym(S(ASMPC_KW), 0, 0, NULL, &global_symtab); page_nr++;
+	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
+	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
 	ASSERT( ! (sym->type & SYMDEFINED) );
-	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
+	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
 	ASSERT( ! (sym->type & SYMDEFINED) );
-	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
-	define_symbol(S("NN"), find_symbol( S(ASMPC_KW), get_global_tab() )->value, SYMADDR | SYMTOUCHED ); 
+	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
+	define_symbol(S("NN"), find_symbol( S(ASMPC_KW), global_symtab )->value, SYMADDR | SYMTOUCHED ); 
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
 	ASSERT( sym->type & SYMDEFINED );
@@ -321,9 +312,18 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.30 2014-01-02 17:18:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.31 2014-01-05 23:20:39 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.30  2014-01-02 17:18:17  pauloscustodio
+# Revision 1.31  2014-01-05 23:20:39  pauloscustodio
+# List, StrHash classlist and classhash receive the address of the container
+# object in all functions that add items to the container, and create the
+# container on first use. This allows a container to be staticaly
+# initialized with NULL and instantiated on first push/unshift/set.
+# Add count attribute to StrHash, classhash to count elements in container.
+# Add free_data attribute in StrHash to register a free fucntion to delete
+# the data container when the hash is removed or a key is overwritten.
+#
+# Revision 1.30  2014/01/02 17:18:17  pauloscustodio
 # StrList removed, replaced by List
 #
 # Revision 1.29  2014/01/01 21:23:48  pauloscustodio
