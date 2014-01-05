@@ -1,7 +1,7 @@
 
 XLIB __stdio_printf_c
 
-LIB __stdio_nextarg_hl
+LIB __stdio_nextarg_hl, __stdio_send_output
 
 __stdio_printf_c:
 
@@ -59,8 +59,9 @@ width_padding:
    or l
    ret z                       ; if width == 0
    
-   dec a
+   dec l
    ret z                       ; if width == 1
+   inc l
 
 need_padding:
 
