@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.1 2013-12-15 19:04:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.2 2014-01-05 23:22:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -14,7 +14,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.1 2013-12-15 1
 #include <stdlib.h>					/* size_t */
 
 /* BOOL type and constants */
-typedef int BOOL;					/* FALSE and TRUE defined in glib.h */
+typedef int BOOL;
 
 #ifndef	FALSE
 #define	FALSE	(0)
@@ -49,7 +49,10 @@ typedef unsigned char byte_t;		/*  8-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.1  2013-12-15 19:04:32  pauloscustodio
+* Revision 1.2  2014-01-05 23:22:58  pauloscustodio
+* comment
+*
+* Revision 1.1  2013/12/15 19:04:32  pauloscustodio
 * Move types.h to the z80asm/lib directory
 *
 * Revision 1.14  2013/12/15 19:01:07  pauloscustodio
