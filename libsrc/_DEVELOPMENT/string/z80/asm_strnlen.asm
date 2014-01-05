@@ -23,6 +23,7 @@ asm_strnlen:
    ;        de = char *s
    ;        bc = 0
    ;        z flag set if hl=min is 0
+   ;        carry reset
    ;
    ; uses : af, bc, de, hl
 
