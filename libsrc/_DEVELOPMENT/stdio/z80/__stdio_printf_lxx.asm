@@ -1,9 +1,9 @@
 *** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_PRINTF_LD
+*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_PRINTF_X
 
-__stdio_printf_li:
+__stdio_printf_lX:
 
-   ; %ld, %li converter called from vfprintf()
+   ; %lx, %lX converter called from vfprintf()
    ;
    ; enter : ix = FILE *
    ;         hl = void *stack_param

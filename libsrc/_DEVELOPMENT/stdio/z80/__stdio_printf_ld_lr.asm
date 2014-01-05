@@ -1,13 +1,13 @@
 
-XLIB __stdio_printf_d
-XDEF __stdio_printf_i
+XLIB __stdio_printf_ld
+XDEF __stdio_printf_li
 
-LIB __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_neg_hl, l_utoa
+LIB __stdio_nextarg_de, __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_neg_dehl, l_ultoa
 
-__stdio_printf_d:
-__stdio_printf_i:
+__stdio_printf_ld:
+__stdio_printf_li:
 
-   ; %d, %i converter called from vfprintf()
+   ; %ld, %li converter called from vfprintf()
    ;
    ; enter : ix = FILE *
    ;         hl = void *stack_param
@@ -18,28 +18,34 @@ __stdio_printf_i:
    ;
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
 
-   ; read integer to convert
+   ld c,e
+   ld b,d                      ; bc = void *buffer_digits
+
+   ; read long to convert
    
-   call __stdio_nextarg_hl     ; hl = int
-   
+   call __stdio_nextarg_de     ; de = MSW of long
+   call __stdio_nextarg_hl     ; hl = LSW of long
+      
    or h
+   or e
+   or d
    jp z, __stdio_printf_number_zero  ; if integer is zero
    
    ; integer negative ?
    
-   bit 7,h
+   bit 7,d
    jr z, positive              ; if integer is positive
    
    set 7,(ix+5)                ; set negative flag
-   call l_neg_hl               ; change to positive for conversion
+   call l_neg_dehl             ; change to positive for conversion
    
 positive:
 
    ; convert integer to ascii buffer
    
-   push de                     ; save buffer_digits
+   push bc                     ; save buffer_digits
    
-   call l_utoa                 ; convert integer in hl to ascii digits in buffer at de
+   call l_ultoa                ; convert integer in dehl to ascii digits in buffer at bc
    
    pop hl
    ex de,hl                    ; de = buffer_digits

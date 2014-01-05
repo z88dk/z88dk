@@ -1,7 +1,7 @@
 
 XLIB __stdio_printf_u
 
-LIB __stdio_printf_number_tail, __stdio_printf_number_zero, l_utoa
+LIB __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_utoa
 
 __stdio_printf_u:
 
@@ -18,10 +18,7 @@ __stdio_printf_u:
 
    ; read uint to convert
    
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a                      ; hl = uint to convert
+   call __stdio_nextarg_hl     ; hl = uint
    
    or h
    jp z, __stdio_printf_number_zero  ; if uint is zero
