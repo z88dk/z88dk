@@ -1,6 +1,5 @@
 
 XLIB l_minu_bc_hl
-LIB l_exx_bc_hl
 
 l_minu_bc_hl:
 
@@ -10,7 +9,8 @@ l_minu_bc_hl:
    ;         bc = unsigned 16 bit number
    ;
    ; exit  : hl = smaller of the two unsigned numbers
-   ;         bc = larger of the two unsigned numbers
+   ;         bc = unchanged
+   ;         carry set if hl was smaller
    ;
    ; uses  : af, hl
 
@@ -18,10 +18,15 @@ l_minu_bc_hl:
    cp b
    ret c
    
-   jp nz, l_exx_bc_hl
+   jr nz, bc_smaller
    
    ld a,l
    cp c
    ret c
 
-   jp l_exx_bc_hl
+bc_smaller:
+
+   ld l,c
+   ld h,b
+
+   ret
