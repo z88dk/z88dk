@@ -11,6 +11,7 @@ l_ultoa:
    ;         carry set to write leading zeroes
    ;
    ; exit  :   de = char *buffer (one byte past last char written)
+   ;         carry reset
    ;
    ; uses  : af, bc, de, hl, bc', hl'
 
