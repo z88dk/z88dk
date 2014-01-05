@@ -1,0 +1,42 @@
+
+; ===============================================================
+; Jan 2014
+; ===============================================================
+; 
+; char *_strnupr(void *p, size_t n)
+;
+; Change letters in buffer p to upper case.
+;
+; ===============================================================
+
+XLIB asm__strnupr
+
+LIB asm_toupper
+
+asm__strnupr:
+
+   ; enter : hl = void *p
+   ;         bc = size_t n
+   ;
+   ; exit  : hl = void *p
+   ;         bc = 0
+   ;
+   ; uses  : af, bc
+
+   ld a,b
+   or c
+   ret z
+   
+   push hl
+
+loop:
+
+   ld a,(hl)
+   call asm_toupper
+   ld (hl),a
+   
+   cpd                         ; hl++, bc--
+   jp pe, loop
+
+   pop hl
+   ret
