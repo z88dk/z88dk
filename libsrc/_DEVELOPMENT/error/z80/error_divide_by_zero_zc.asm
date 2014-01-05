@@ -1,6 +1,5 @@
-
-XLIB error_divide_by_zero_zc
-LIB error_edom_zc
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ERROR_EDOM_ZC
 
 error_divide_by_zero_zc:
 
@@ -8,5 +7,3 @@ error_divide_by_zero_zc:
    ;
    ; default behaviour is to carry on and
    ; record error in errno
-   
-   jp error_edom_zc

@@ -12,8 +12,10 @@
 ; ===============================================================
 
 XLIB asm_forward_list_insert_after
+XDEF asm_forward_list_push_front
 
 asm_forward_list_insert_after:
+asm_forward_list_push_front:
 
    ; enter : hl = void *list_item (insert after this item)
    ;         de = void *item (item to be added to list)

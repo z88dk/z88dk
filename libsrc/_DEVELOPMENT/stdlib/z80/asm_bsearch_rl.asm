@@ -24,7 +24,9 @@ asm_bsearch:
    ;         af = key
    ;         ix = compare
    ;
-   ; exit  : success
+   ; exit  : ix = compare
+   ;
+   ;         success
    ;
    ;           carry reset
    ;           hl = address of item in array = p

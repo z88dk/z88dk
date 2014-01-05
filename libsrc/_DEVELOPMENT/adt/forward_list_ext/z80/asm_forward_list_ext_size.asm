@@ -1,3 +1,5 @@
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_SIZE()
 
 ; ===============================================================
 ; Dec 2013
@@ -9,10 +11,6 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_size
-
-LIB asm_forward_list_size
-
 asm_forward_list_ext_size:
 
    ; enter : hl = forward_list_ext *list
@@ -20,5 +18,4 @@ asm_forward_list_ext_size:
    ; exit  : hl = number of items in list
    ;
    ; uses  : af, de, hl
-   
-   jp asm_forward_list_size
+

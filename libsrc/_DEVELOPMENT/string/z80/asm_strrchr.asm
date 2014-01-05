@@ -12,7 +12,7 @@
 
 XLIB asm_strrchr
 
-LIB __str_locate_nul, l_neg_bc
+LIB __str_locate_nul, l_neg_bc, error_zc
 
 asm_strrchr:
    
@@ -39,17 +39,9 @@ asm_strrchr:
    
    ld a,e                      ; a = char
    cpdr                        ; search backwards
-   jr nz, not_found
+   jp nz, error_zc
 
 found_char:
 
    inc hl
-   ret
-
-not_found:
-
-   ld l,c
-   ld h,b
-   
-   scf
    ret

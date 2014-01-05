@@ -16,7 +16,7 @@
 XLIB asm_ltoa
 XDEF asm0_ltoa
 
-LIB error_zero_de, error_zc, error_einval_zc
+LIB asm2_ultoa, asm3_ultoa
 LIB l_valid_base, asm1_ultoa, l_neg_dehl
 
 asm_ltoa:
@@ -25,7 +25,8 @@ asm_ltoa:
    ;           ix = char *buf
    ;           bc = int radix
    ;
-   ; exit  : hl = address of terminating 0 in buf
+   ; exit  : ix = char *buf
+   ;         hl = address of terminating 0 in buf
    ;         carry reset no errors
    ;
    ; error : (*) if buf == 0
@@ -38,14 +39,12 @@ asm_ltoa:
 
    ld a,ixh                    ; check for NULL buf
    or ixl
-   call z, error_zero_de
-   jp z, error_zc
+   jp z, asm2_ultoa
 
 asm0_ltoa:                     ; bypasses NULL check of buf
 
    call l_valid_base           ; radix in [2,36]?
-   call nc, error_zero_de
-   jp nc, error_einval_zc  
+   jp nc, asm3_ultoa
 
    ; base 10 is signed
    

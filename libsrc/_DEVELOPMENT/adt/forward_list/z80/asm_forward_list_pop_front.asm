@@ -1,3 +1,5 @@
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_REMOVE_AFTER()
 
 ; ===============================================================
 ; Dec 2013
@@ -9,10 +11,6 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_pop_front
-
-LIB asm_forward_list_remove_after
-
 asm_forward_list_pop_front:
 
    ; enter : hl = forward_list *list
@@ -22,5 +20,3 @@ asm_forward_list_pop_front:
    ;         carry reset if list was empty
    ;
    ; uses  : af, de, hl
-   
-   jp asm_forward_list_remove_after

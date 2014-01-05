@@ -12,13 +12,16 @@
 XLIB asm_memrchr
 XDEF asm0_memrchr
 
+LIB error_zc
+
 asm_memrchr:
 
    ; enter :  a = char c
    ;         hl = char *s
    ;         bc = size_t n
    ;
-   ; exit  : 
+   ; exit  :  a = char c
+   ;
    ;         found
    ;
    ;            carry reset, z flag set
@@ -48,12 +51,8 @@ loop:
 
 notfound:
 
-   ld l,c
-   ld h,b
+   jp error_zc
    
-   scf
-   ret
-
 test0:
 
    inc b

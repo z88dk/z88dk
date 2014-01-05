@@ -12,6 +12,8 @@
 
 XLIB asm_strstr
 
+LIB error_zc
+
 asm_strstr:
 
    ; enter : de = char *s1 = string
@@ -51,12 +53,7 @@ match_1:
 not_found:
 
    ex de,hl                    ; de = char *s2 = substring
-   
-   ld l,a
-   ld h,a                      ; hl = 0
-   
-   scf
-   ret
+   jp error_zc
 
 match_rest:
 

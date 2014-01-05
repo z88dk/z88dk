@@ -12,6 +12,8 @@
 
 XLIB asm_strnlen
 
+LIB error_znc
+
 asm_strnlen:
 
    ; enter: hl = char *s
@@ -29,7 +31,7 @@ asm_strnlen:
 
    ld a,b
    or c
-   jr z, zerolen
+   jp z, error_znc
    
    xor a
    cpir                        ; find end of s, maxlen chars examined
@@ -40,10 +42,4 @@ asm_strnlen:
 notend:
 
    sbc hl,de                   ; hl = min(strlen, maxlen)
-   ret
-
-zerolen:
-
-   ld l,c
-   ld h,b
    ret

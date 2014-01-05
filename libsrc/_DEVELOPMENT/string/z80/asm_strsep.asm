@@ -28,7 +28,9 @@ asm_strsep:
    ; enter : de = char *delim
    ;         bc = char **stringp
    ;
-   ; exit  : 
+   ; exit  : de = char *delim
+   ;         bc = char **stringp
+   ;
    ;         token found
    ;
    ;           carry set

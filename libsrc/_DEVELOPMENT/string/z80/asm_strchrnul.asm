@@ -17,7 +17,8 @@ asm_strchrnul:
    ; enter :  c = char c
    ;         hl = char *s
    ;
-   ; exit  : 
+   ; exit  :  c = char c
+   ;
    ;         found
    ;
    ;           carry reset

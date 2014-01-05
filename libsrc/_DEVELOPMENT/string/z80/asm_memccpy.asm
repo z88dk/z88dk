@@ -15,6 +15,8 @@
 
 XLIB asm_memccpy
 
+LIB error_zc
+
 asm_memccpy:
 
    ; enter : hl = void *s2 = src
@@ -22,7 +24,8 @@ asm_memccpy:
    ;         bc = size_t n
    ;          a = char c
    ;
-   ; exit  : de = ptr in dst following last char copied  
+   ; exit  :  a = char c
+   ;         de = ptr in dst following last char copied  
    ; 
    ;         char c found
    ;
@@ -50,11 +53,7 @@ loop:
 
 nomatch:
 
-   ld l,c                      ; hl = 0
-   ld h,b
-   
-   scf
-   ret
+   jp error_zc
 
 match:
 

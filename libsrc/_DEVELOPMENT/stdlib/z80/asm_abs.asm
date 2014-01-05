@@ -10,8 +10,7 @@
 ; ===============================================================
 
 XLIB asm_abs
-
-LIB l_neg_hl
+XDEF l_neg_hl
 
 asm_abs:
 
@@ -19,9 +18,28 @@ asm_abs:
    ;
    ; exit  : hl = abs(j)
    ;
-   ; uses  : af, hl
+   ; uses  : af, hl, carry unaffected
    
    bit 7,h
    ret z
+
+l_neg_hl:
+
+   ; negate hl
+   ;
+   ; enter : hl = int
+   ;
+   ; exit  : hl = -hl
+   ;
+   ; uses  : af, hl, carry unaffected
+
+   ld a,l
+   cpl
+   ld l,a
    
-   jp l_neg_hl
+   ld a,h
+   cpl
+   ld h,a
+   
+   inc hl
+   ret

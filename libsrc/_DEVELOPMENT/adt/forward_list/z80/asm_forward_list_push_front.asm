@@ -1,3 +1,5 @@
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_INSERT_AFTER()
 
 ; ===============================================================
 ; Dec 2013
@@ -11,10 +13,6 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_push_front
-
-LIB asm_forward_list_insert_after
-
 asm_forward_list_push_front:
 
    ; enter : hl = forward_list *list
@@ -25,5 +23,3 @@ asm_forward_list_push_front:
    ;         z flag set if new item is only one in list
    ;
    ; uses  : af, de, hl
-   
-   jp asm_forward_list_insert_after

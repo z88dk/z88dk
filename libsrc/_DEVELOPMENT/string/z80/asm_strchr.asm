@@ -12,12 +12,15 @@
 
 XLIB asm_strchr
 
+LIB error_zc
+
 asm_strchr:
 
    ; enter :  c = char c
    ;         hl = char *s
    ;
-   ; exit  : 
+   ; exit  :  c = char c
+   ;
    ;         found
    ;
    ;           carry reset
@@ -41,8 +44,4 @@ loop:
    or a
    jp nz, loop
    
-   ld l,a
-   ld h,a
-   
-   scf
-   ret
+   jp error_zc

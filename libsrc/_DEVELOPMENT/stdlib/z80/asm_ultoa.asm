@@ -11,7 +11,7 @@
 ; ===============================================================
 
 XLIB asm_ultoa
-XDEF asm0_ultoa, asm1_utoa
+XDEF asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
 
 LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x32
 LIB l_num2char, l_ultoa, l_ultoh, l_ultoo, l_ultob
@@ -35,14 +35,12 @@ asm_ultoa:
 
    ld a,ixh                    ; check for NULL buf
    or ixl
-   call z, error_zero_de
-   jp z, error_zc
+   jr z, exit_buf_is_null
 
 asm0_ultoa:                    ; bypasses NULL check of buf
 
    call l_valid_base           ; radix in [2,36]?
-   call nc, error_zero_de
-   jp nc, error_einval_zc  
+   jr nc, exit_radix_no_good
       
    ; there is special code for base 2, 8, 10, 16
 
@@ -120,6 +118,18 @@ write_lp:
    dec de
    ex de,hl
    ret
+
+asm2_ultoa:
+exit_buf_is_null:
+
+   ld de,0
+   jp error_zc
+
+asm3_ultoa:
+exit_radix_no_good:
+
+   ld de,0
+   jp error_einval_zc
 
 
 decimal:

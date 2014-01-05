@@ -1,5 +1,5 @@
-
-XLIB l_neg_hl
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ABS()
 
 l_neg_hl:
 
@@ -11,13 +11,3 @@ l_neg_hl:
    ;
    ; uses  : af, hl, carry unaffected
    
-   ld a,l
-   cpl
-   ld l,a
-   
-   ld a,h
-   cpl
-   ld h,a
-   
-   inc hl
-   ret

@@ -10,8 +10,10 @@
 ; ===============================================================
 
 XLIB asm_forward_list_remove_after
+XDEF asm_forward_list_pop_front
 
 asm_forward_list_remove_after:
+asm_forward_list_pop_front:
 
    ; enter : hl = void *list_item (remove item after this one)
    ;

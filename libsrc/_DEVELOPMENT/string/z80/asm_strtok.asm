@@ -34,7 +34,8 @@ asm_strtok:
    ; enter : de = char *s2 = delimiters
    ;         hl = char *s1 = string to tokenize
    ;
-   ; exit  : 
+   ; exit  : de = char *s2 = delimiters
+   ;
    ;         found
    ; 
    ;           carry set

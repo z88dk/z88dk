@@ -1,6 +1,7 @@
 INCLUDE "../../crt_vars.inc"
 
 XLIB errno_zc
+
 LIB error_zc
 
 errno_zc:

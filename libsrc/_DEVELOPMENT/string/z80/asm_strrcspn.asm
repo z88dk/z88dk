@@ -38,6 +38,7 @@ asm_strrcspn:
    ;
    ; exit  : hl = position of last char of str in cset
    ;         bc = char *str = string
+   ;         de = char *cset = matching set
    ;
    ;         carry set if str contains no chars from cset
    ;

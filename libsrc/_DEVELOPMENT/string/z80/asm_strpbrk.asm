@@ -11,14 +11,15 @@
 
 XLIB asm_strpbrk
 
-LIB asm_strchr
+LIB asm_strchr, error_zc
 
 asm_strpbrk:
 
    ; enter : hl = char *s1 = string
    ;         de = char *s2 = needles
    ;
-   ; exit  : 
+   ; exit  : de = char *s2 = needles
+   ;
    ;         found
    ;
    ;           carry reset
@@ -35,7 +36,7 @@ loop:
 
    ld a,(hl)
    or a
-   jr z, not_found
+   jp z, error_zc
    
    ; see if this char from string is in needles
    
@@ -51,11 +52,3 @@ loop:
 
    inc hl
    jp loop
-
-not_found:
-
-   ld l,a
-   ld h,a
-   
-   scf
-   ret

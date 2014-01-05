@@ -22,7 +22,9 @@ asm_strtok_r:
    ;         hl = char *s = string to tokenize
    ;         bc = char **lasts (state)
    ;
-   ; exit  : 
+   ; exit  : de = char *swp = delimiters
+   ;         bc = char **lasts (state)
+   ;
    ;         found
    ;
    ;           carry set

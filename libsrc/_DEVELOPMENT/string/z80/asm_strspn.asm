@@ -20,6 +20,7 @@ asm_strspn:
    ;
    ; exit  : hl = max prefix length
    ;         bc = char *s1 = string
+   ;         de = char *s2 = prefix chars
    ;
    ;         z flag set if prefix length == 0
    ;         carry set if all of s1 contains chars only from s2
