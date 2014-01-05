@@ -41,6 +41,7 @@ l0_divu_32_32x32:
    pop bc
    ld hl,0
    exx
+   ld hl,0
    pop bc
    
    push af                     ; save return address

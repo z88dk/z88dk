@@ -71,7 +71,7 @@ defvars __crt_vars_thread
    _errno             ds.w  1
    __heap             ds.w  1      ;; current malloc heap
    __qtbl             ds.w  1      ;; current balloc table
-   __seed             ds.w  1      ;; initialize to 1
+   __seed             ds.l  1      ;; initialize to $00010001
    __strtok_ptr       ds.w  1
    
    ;;;;;;;;;;;;;;;;;;;;;;;

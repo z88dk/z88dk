@@ -2,3 +2,7 @@ utoa
 ultoa
 __strtoul
 HeapCalloc
+bsearch
+qsort
+_div
+_ldiv
