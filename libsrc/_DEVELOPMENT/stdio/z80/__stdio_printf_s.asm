@@ -16,6 +16,14 @@ __stdio_printf_s:
 
    call __stdio_nextarg_hl     ; hl = char *s
    pop bc                      ; bc = precision
+   
+   ld a,h
+   or l
+   jr nz, string_valid         ; if s != 0
+   
+   ld hl,null_s                ; output special string for NULL
+
+string_valid:
 
    bit 0,(ix+5)
    jr nz, precision_specified
@@ -118,3 +126,7 @@ string_only:
    
    jr output_string
 
+null_s:
+
+   defm "(null)"
+   defb 0
