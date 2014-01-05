@@ -1,3 +1,5 @@
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_SIZE()
 
 ; ===============================================================
 ; Dec 2013
@@ -9,12 +11,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
-XLIB asm_ba_blockcount
-
-LIB asm_forward_list_size
-
 asm_ba_blockcount:
 
    ; enter : hl = forward_list *q
@@ -22,5 +18,3 @@ asm_ba_blockcount:
    ; exit  : hl = number of available blocks
    ;
    ; uses  : af, de, hl
-   
-   jp asm_forward_list_size
