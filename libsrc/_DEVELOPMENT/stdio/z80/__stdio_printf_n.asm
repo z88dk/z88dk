@@ -1,7 +1,7 @@
 
 XLIB __stdio_printf_n
 
-LIB __stdio_nextarg_hl
+LIB __stdio_nextarg_hl, l_utod_de
 
 __stdio_printf_n:
 
@@ -25,17 +25,12 @@ __stdio_printf_n:
    exx
    push hl
    exx
-   pop bc                      ; bc = count of chars output thus far
+   pop de                      ; de = count of chars output thus far
    
-   bit 7,b
-   jr z, count_ok              ; if count hasn't caused signed overflow
-   
-   ld bc,$7fff                 ; saturate at signed max
+   call l_utod_de              ; de = (int)(unsigned int de)
 
-count_ok:
-
-   ld (hl),c
+   ld (hl),e
    inc hl
-   ld (hl),b                   ; store count
+   ld (hl),d                   ; store count
    
    ret                         ; carry reset
