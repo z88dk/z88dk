@@ -178,9 +178,9 @@ divloop:
    
    jp c, divloop
    
-   sbc hl,de
+   sbc hl,bc
    exx
-   sbc hl,de
+   sbc hl,bc
    exx
    
    ret
