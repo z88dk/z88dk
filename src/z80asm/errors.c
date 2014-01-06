@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.31 2014-01-02 19:42:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.32 2014-01-06 00:33:36 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -24,8 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.31 2014-01-02 19:
 #include "except.h"
 #include "file.h"
 #include "strpool.h"
+#include "strutil.h"
+#include "strhash.h"
 #include "types.h"
-#include <glib.h>
+#include "init.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -45,8 +47,8 @@ static Errors errors;				/* count errors and locations */
 typedef struct ErrorFile
 {
 	FILE		*file;				/* currently open error file */
-	char		*filename;			/* name of errror file */
-	GHashTable	*errors;			/* set if errors per file, do delete file if empty */
+	char		*filename;			/* name of error file */
+	StrHash		*errors;			/* set if errors per file, do delete file if empty */
 } ErrorFile;
 
 static ErrorFile error_file;		/* currently open error file */
@@ -54,24 +56,23 @@ static ErrorFile error_file;		/* currently open error file */
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-void init_errors(void)
+DEFINE_init()
 {
 	/* init Errors */
 	reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
 
 	/* init ErrorFile */
-	/* create hash table of used error files */
-	error_file.errors = g_hash_table_new( g_str_hash, g_str_equal );
+	error_file.errors = OBJ_NEW( StrHash );	/* initialize, force StrHash to init before */
 }
 
-void fini_errors(void)
+DEFINE_fini()
 {
 	/* close error file, delete it if no errors */
 	close_error_file();
 
 	/* delete hash table */
-	g_hash_table_destroy( error_file.errors );
+	OBJ_DELETE( error_file.errors );
 }
 
 /*-----------------------------------------------------------------------------
@@ -80,22 +81,26 @@ void fini_errors(void)
 *----------------------------------------------------------------------------*/
 void set_error_null( void )
 {
+	init();
     errors.filename = errors.module = NULL;
     errors.line = 0;
 }
 
 void set_error_file( char *filename )
 {
+	init();
     errors.filename = strpool_add( filename );	/* may be NULL */
 }
 
 void set_error_module( char *modulename )
 {
+	init();
     errors.module = strpool_add( modulename );	/* may be NULL */
 }
 
 void set_error_line( int lineno )
 {
+	init();
     errors.line = lineno;
 }
 
@@ -104,11 +109,13 @@ void set_error_line( int lineno )
 *----------------------------------------------------------------------------*/
 void reset_error_count( void )
 {
+	init();
     errors.count = 0;
 }
 
 int get_num_errors( void )
 {
+	init();
     return errors.count;
 }
 
@@ -121,6 +128,8 @@ void open_error_file( char *filename )
 {
 	char *mode;
 
+	init();
+
 	/* close current file if any */
 	close_error_file();
 
@@ -128,7 +137,7 @@ void open_error_file( char *filename )
 
     /* open new file for write or append depending on previous errors 
 	   written to file (BUG_0023, CH_0012) */
-	if ( g_hash_table_lookup( error_file.errors, error_file.filename ) )
+	if ( StrHash_get( error_file.errors, error_file.filename ) )
 		mode = "a";
 	else
 		mode = "w";
@@ -138,14 +147,16 @@ void open_error_file( char *filename )
 
 void close_error_file( void )
 {
-    /* close current file if any */
+	init();
+
+	/* close current file if any */
 	if ( error_file.file != NULL )
 		xfclose( error_file.file );
 
     /* delete file if no errors found */
     if ( error_file.filename != NULL )
     {
-		if ( ! g_hash_table_lookup( error_file.errors, error_file.filename ) )
+		if ( ! StrHash_get( error_file.errors, error_file.filename ) )
 			remove( error_file.filename );
     }
 
@@ -156,15 +167,17 @@ void close_error_file( void )
 
 static void puts_error_file( char *string )
 {
-    if ( error_file.file != NULL )
+	init();
+
+	if ( error_file.file != NULL )
     {
         fputs( string, error_file.file );
 
 		/* signal errors in file */
 		if ( error_file.filename != NULL )
-			g_hash_table_insert( error_file.errors, 
-								 error_file.filename,	/* key */
-								 error_file.filename );	/* value */
+			StrHash_set( & error_file.errors, 
+						 error_file.filename,	/* key */
+						 error_file.filename );	/* value */
     }
 }
 
@@ -173,59 +186,55 @@ static void puts_error_file( char *string )
 *----------------------------------------------------------------------------*/
 static void do_error( enum ErrType err_type, char *message )
 {
-	char msg[ MAXLINE ];
-	char *p_at, *p_prefix;
+	DEFINE_STR( msg, MAXLINE );
+	size_t len_at, len_prefix;
+
+	init();
 
 	/* init empty message */
-	msg[0] = '\0';
+	Str_clear( msg );
 
 	/* Information messages have no prefix */
 	if ( err_type != ErrInfo ) 
 	{
-		g_strlcat( msg, err_type == ErrWarn ? "Warning" : "Error", sizeof(msg) );
+		Str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
 
 		/* prepare to remove " at" if no prefix */
-		p_at = msg + strlen(msg);
-		g_strlcat( msg, " at", sizeof(msg) );
-		p_prefix = msg + strlen(msg);
+		len_at = msg->len;
+		Str_append( msg, " at" );
+		len_prefix = msg->len;
 
 		/* output filename */
 		if ( errors.filename && *errors.filename ) 
-		{
-			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-						" file '%s'", errors.filename );
-		}
+			Str_append_sprintf( msg, " file '%s'", errors.filename );
 
 		/* output module */
 		if ( errors.module != NULL && *errors.module )
-		{
-			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-						" module '%s'", errors.module );
-		}
+			Str_append_sprintf( msg, " module '%s'", errors.module );
 
 		/* output line number */
 		if ( errors.line > 0 )
-		{
-			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-						" line %d", errors.line );
-		}
+			Str_append_sprintf( msg, " line %d", errors.line );
 
 		/* remove at if no prefix */
-		if ( *p_prefix == '\0' )	/* no prefix loaded to string */
-			*p_at = '\0';			/* go back 3 chars to before at */
+		if ( len_prefix == msg->len )	/* no prefix loaded to string */
+		{
+			msg->str[ len_at ] = '\0';	/* go back 3 chars to before at */
+			Str_sync_len(msg);
+		}
 
-		g_strlcat( msg, ": ", sizeof(msg) );
+		Str_append( msg, ": " );
 	}
 
     /* output error message */
-	g_strlcat( msg, message, sizeof(msg) );
-	g_strlcat( msg, "\n", sizeof(msg) );
+	Str_append( msg, message );
+	Str_append_char( msg, '\n' );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( msg, stderr );
+    fputs( msg->str, stderr );
 
     /* send to error file */
-    puts_error_file( msg );
+    puts_error_file( msg->str );
 
 	if (err_type == ErrError || err_type == ErrFatal)
 	{
@@ -244,9 +253,11 @@ static void do_error( enum ErrType err_type, char *message )
 #define ERR(err_type,func,args)	\
 	void func \
 	{ \
-		char message[ MAXLINE ]; \
-		g_snprintf( message, sizeof(message), args ); \
-		do_error(err_type, message); \
+		DEFINE_STR( msg, MAXLINE ); \
+		\
+		init(); \
+		Str_append_sprintf( msg, args ); \
+		do_error( err_type, msg->str ); \
 	}
 #include "errors_def.h"
 #undef ERR
@@ -254,7 +265,11 @@ static void do_error( enum ErrType err_type, char *message )
 
 /* */
 /* $Log: errors.c,v $
-/* Revision 1.31  2014-01-02 19:42:48  pauloscustodio
+/* Revision 1.32  2014-01-06 00:33:36  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_errors
+/* and atexit(fini_errors); use Str and StrHash instead of glib.
+/*
+/* Revision 1.31  2014/01/02 19:42:48  pauloscustodio
 /* warning: "/","*" within comment [-Wcomment]
 /* warning: type defaults to 'int' in declaration of '...' [-Wimplicit-int]
 /*

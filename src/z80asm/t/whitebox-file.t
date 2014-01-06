@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "file.o scan.o lib/class.o errors.o lib/strutil.o lib/list.o lib/fileutil.o options.o hist.o";
+my $objs = "file.o scan.o lib/class.o errors.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -662,9 +662,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.31 2014-01-02 17:18:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.32 2014-01-06 00:33:36 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.31  2014-01-02 17:18:17  pauloscustodio
+# Revision 1.32  2014-01-06 00:33:36  pauloscustodio
+# Use init.h mechanism, no need for main() calling init_errors
+# and atexit(fini_errors); use Str and StrHash instead of glib.
+#
+# Revision 1.31  2014/01/02 17:18:17  pauloscustodio
 # StrList removed, replaced by List
 #
 # Revision 1.30  2014/01/01 21:23:48  pauloscustodio

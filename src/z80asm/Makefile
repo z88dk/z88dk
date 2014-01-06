@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.109 2014-01-05 23:20:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.110 2014-01-06 00:33:36 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.109  2014-01-05 23:20:39  pauloscustodio
+# Revision 1.110  2014-01-06 00:33:36  pauloscustodio
+# Use init.h mechanism, no need for main() calling init_errors
+# and atexit(fini_errors); use Str and StrHash instead of glib.
+#
+# Revision 1.109  2014/01/05 23:20:39  pauloscustodio
 # List, StrHash classlist and classhash receive the address of the container
 # object in all functions that add items to the container, and create the
 # container on first use. This allows a container to be staticaly
@@ -693,7 +697,7 @@ deffile.o: model.h objfile.h symtab.h lib/classhash.h lib/strhash.h
 deffile.o: lib/uthash.h lib/die.h sym.h token_def.h z80asm.h
 errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/die.h
 errors.o: lib/types.h file.h config.h  lib/strutil.h lib/class.h
-errors.o: lib/queue.h lib/strpool.h
+errors.o: lib/queue.h lib/strpool.h lib/strhash.h lib/uthash.h lib/init.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h file.h lib/strutil.h lib/class.h
 exprprsr.o: lib/queue.h legacy.h options.h lib/list.h options_def.h symbol.h

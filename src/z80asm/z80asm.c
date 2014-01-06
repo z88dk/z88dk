@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.124 2014-01-05 23:20:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.125 2014-01-06 00:33:36 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.124  2014-01-05 23:20:39  pauloscustodio
+/* Revision 1.125  2014-01-06 00:33:36  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_errors
+/* and atexit(fini_errors); use Str and StrHash instead of glib.
+/*
+/* Revision 1.124  2014/01/05 23:20:39  pauloscustodio
 /* List, StrHash classlist and classhash receive the address of the container
 /* object in all functions that add items to the container, and create the
 /* container on first use. This allows a container to be staticaly
@@ -1347,8 +1351,6 @@ int main( int argc, char *argv[] )
 	ListElem *iter;
 
 	/* init modules */
-	init_errors();
-	atexit(fini_errors);
 	init_options();
 	init_scan();
 	atexit(fini_scan);

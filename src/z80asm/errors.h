@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.21 2014-01-02 19:42:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.22 2014-01-06 00:33:36 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -26,12 +26,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.21 2014-01-02 19:
 #include <stdio.h>
 
 enum ErrType { ErrInfo, ErrWarn, ErrError, ErrFatal };
-
-/*-----------------------------------------------------------------------------
-*   Initialize and Terminate module
-*----------------------------------------------------------------------------*/
-extern void init_errors(void);
-extern void fini_errors(void);
 
 /*-----------------------------------------------------------------------------
 *	define the next FILE, LINENO, MODULE to use in error messages 
@@ -66,7 +60,11 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.21  2014-01-02 19:42:48  pauloscustodio
+* Revision 1.22  2014-01-06 00:33:36  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_errors
+* and atexit(fini_errors); use Str and StrHash instead of glib.
+*
+* Revision 1.21  2014/01/02 19:42:48  pauloscustodio
 * warning: "/","*" within comment [-Wcomment]
 * warning: type defaults to 'int' in declaration of '...' [-Wimplicit-int]
 *

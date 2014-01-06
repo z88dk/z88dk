@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o lib/class.o lib/strutil.o lib/list.o lib/fileutil.o options.o hist.o";
+my $objs = "errors.o scan.o file.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -38,8 +38,8 @@ void list_start_line( size_t address, char *source_file, int source_line_nr, cha
 {	
 	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
 }
-char *CreateLibfile( char *filename ) {}
-char *GetLibfile( char *filename ) {}
+char *CreateLibfile( char *filename ) {return NULL;}
+char *GetLibfile( char *filename ) {return NULL;}
 Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
 char ident[MAXLINE];
 char separators[MAXLINE];
@@ -49,8 +49,6 @@ END
 t_compile_module($init, <<'END', $objs);
 #define ERROR return __LINE__
 #define check_count(e) if (get_num_errors() != e) ERROR;
-
-	init_errors(); atexit( fini_errors );
 
 	check_count(0);
 	
@@ -97,8 +95,6 @@ t_compile_module($init, <<'END', $objs);
 	
 #define DOUBLE(x) #x #x
 	int _count;
-
-	init_errors(); atexit( fini_errors );
 
 	check_count(0);
 	
@@ -184,9 +180,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.22 2014-01-02 17:18:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.23 2014-01-06 00:33:36 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.22  2014-01-02 17:18:17  pauloscustodio
+# Revision 1.23  2014-01-06 00:33:36  pauloscustodio
+# Use init.h mechanism, no need for main() calling init_errors
+# and atexit(fini_errors); use Str and StrHash instead of glib.
+#
+# Revision 1.22  2014/01/02 17:18:17  pauloscustodio
 # StrList removed, replaced by List
 #
 # Revision 1.21  2014/01/01 21:23:48  pauloscustodio
