@@ -47,7 +47,17 @@ positive:
    
    push bc                     ; save buffer_digits
    
+   exx
+   push bc
+   push hl
+   exx
+   
    call l_ultoa                ; convert integer in dehl to ascii digits in buffer at bc
+   
+   exx
+   pop hl
+   pop bc
+   exx
    
    pop hl
    ex de,hl                    ; de = buffer_digits
