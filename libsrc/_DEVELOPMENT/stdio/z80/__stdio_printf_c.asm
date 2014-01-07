@@ -1,7 +1,8 @@
 
 XLIB __stdio_printf_c
 
-LIB __stdio_nextarg_hl, __stdio_send_output
+LIB __stdio_nextarg_hl
+LIB __stdio_send_output_chars, __stdio_printf_padding_width_hl
 
 __stdio_printf_c:
 
@@ -32,11 +33,7 @@ right_justify:
 output_char:
 
    ld bc,1
-
-output_bytes:
-
-   ld a,STDIO_MSG_PUTC   
-   jp __stdio_send_output
+   jp __stdio_send_output_chars
 
 left_justify:
 
@@ -50,25 +47,9 @@ left_justify:
    
 width_padding:
 
-   ; hl = width
-   
    ld a,h
-   or a
-   jr nz, need_padding
-   
    or l
-   ret z                       ; if width == 0
+   ret z
    
-   dec l
-   ret z                       ; if width == 1
-   inc l
-
-need_padding:
-
    dec hl
-   
-   ld e,' '
-   ld c,l
-   ld b,h                      ; bc = number of padding chars
-   
-   jr output_bytes
+   jp __stdio_printf_padding_width_hl

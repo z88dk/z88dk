@@ -4,8 +4,11 @@ XDEF __stdio_printf_lX
 
 LIB __stdio_nextarg_de, __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_ultoh
 
-__stdio_printf_lx:
 __stdio_printf_lX:
+
+   set 7,(ix+4)                ; set capitalize flag
+
+__stdio_printf_lx:
 
    ; %lx, %lX converter called from vfprintf()
    ;

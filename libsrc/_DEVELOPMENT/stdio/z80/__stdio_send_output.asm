@@ -1,7 +1,134 @@
 
 XLIB __stdio_send_output
+XDEF __stdio_send_output_buffer, __stdio_send_output_chars
+
+XDEF __stdio_printf_padding_width
+XDEF __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
+
+XDEF __stdio_printf_padding_precision
+XDEF __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
 LIB l_jpix
+
+__stdio_printf_padding_precision_hl:
+
+   ; output length zeroes on stream
+   ;
+   ; enter : ix  = FILE *
+   ;         hl  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+
+   ld c,l
+   ld b,h
+   
+   ; fall through
+
+__stdio_printf_padding_precision:
+__stdio_printf_padding_precision_bc:
+
+   ; output length zeroes on stream
+   ;
+   ; enter : ix  = FILE *
+   ;         bc  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+
+   ld e,'0'
+   jr __stdio_send_output_chars
+
+__stdio_printf_padding_width_hl:
+
+   ; output length spaces on stream
+   ;
+   ; enter : ix  = FILE *
+   ;         hl  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+
+   ld c,l
+   ld b,h
+   
+   ; fall through
+
+__stdio_printf_padding_width:
+__stdio_printf_padding_width_bc:
+
+   ; output length spaces on stream
+   ;
+   ; enter : ix  = FILE *
+   ;         bc  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+
+   ld e,' '
+
+   ; fall through
+
+__stdio_send_output_chars:
+
+   ; write char to output length times
+   ;
+   ; enter : ix  = FILE *
+   ;          e  = char c
+   ;         bc  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+   
+   ld a,b
+   or c
+   ret z
+   
+   ld a,STDIO_MSG_PUTC
+   jr __stdio_send_output
+
+__stdio_send_output_buffer:
+
+   ; write buffer to stream
+   ;
+   ; enter : ix  = FILE *
+   ;         hl  = char *buffer
+   ;         bc  = length (0 means no output)
+   ;         hl' = output tally (num chars output so far)
+   ;
+   ; exit  : ix  = FILE *
+   ;         hl' = output tally (updated)
+   ;         carry set indicates stream error
+   ;
+   ; uses  : possibly all except ix
+   
+   ld a,b
+   or c
+   ret z
+   
+   ld a,STDIO_MSG_WRIT
+   
+   ; fall through
 
 __stdio_send_output:
 

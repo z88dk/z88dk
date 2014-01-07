@@ -1,7 +1,8 @@
 
 XLIB __stdio_printf_s
 
-LIB __stdio_nextarg_hl, asm_strnlen, __stdio_send_output
+LIB __stdio_nextarg_hl, asm_strnlen
+LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_width_bc
 
 __stdio_printf_s:
 
@@ -33,22 +34,23 @@ string_valid:
 precision_specified:
 
    call asm_strnlen
-   jr z, empty_string
    
    ; hl = min(strlen(s), precision) = string_length
    ; de = char *s
    ; stack = buffer_digits, width
+   ; carry reset
 
    ex de,hl                    ; de = string_length
    ex (sp),hl                  ; hl = width
    
-   scf
-   sbc hl,de                   ; hl = necessary padding - 1
-   jr c, string_only 
+   sbc hl,de                   ; hl = required padding
+   jr nc, padding_required
+   
+   ld hl,0
 
-   inc hl
+padding_required:
 
-   ; hl = necessary padding
+   ; hl = required padding
    ; de = string_length
    ; stack = buffer_digits, char *s
    
@@ -59,23 +61,14 @@ right_justify:
 
    push de                     ; save string_length
    
-   ld c,l
-   ld b,h
-   call width_padding
+   call __stdio_printf_padding_width_hl
    
    pop bc                      ; bc = string_length
    pop hl                      ; hl = char *s
    pop de                      ; junk buffer_digits
    
-   ret c                       ; if stream error
-   
-output_string:
-
-   ; hl = char *s
-   ; bc = string_length > 0
-   
-   ld a,STDIO_MSG_WRIT
-   jp __stdio_send_output
+   jp nc, __stdio_send_output_buffer  ; if no stream error
+   ret
 
 left_justify:
 
@@ -84,47 +77,13 @@ left_justify:
    ld c,e
    ld b,d                      ; bc = string_length
    
-   call output_string
+   call __stdio_send_output_buffer
    
    pop bc                      ; bc = necessary padding
    pop de                      ; junk buffer_digits
    
-   ret c                       ; if stream error
-
-width_padding:
-
-   ; bc = necessary padding > 0
-   
-   ld e,' '
-   
-   ld a,STDIO_MSG_PUTC
-   jp __stdio_send_output
-
-empty_string:
-
-   ; stack = buffer_digits, width
-   
-   pop bc                      ; bc = width
-   pop de                      ; junk buffer_digits
-   
-   ld a,b
-   or c
-   jr nz, width_padding
-   
+   jp nc, __stdio_printf_padding_width_bc  ; if no stream error
    ret
-
-string_only:
-
-   ; de = string_length
-   ; stack = buffer_digits, char *s
-
-   ld c,e
-   ld b,d                      ; bc = string_length
-   
-   pop hl                      ; hl = char *s
-   pop de                      ; junk buffer_digits
-   
-   jr output_string
 
 null_s:
 

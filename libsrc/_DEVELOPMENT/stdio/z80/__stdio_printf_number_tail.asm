@@ -1,7 +1,9 @@
 
 XLIB __stdio_printf_number_tail
 
-LIB __stdio_send_output, __stdio_printf_sign, asm__strnupr, l_maxu_bc_hl
+LIB __stdio_printf_sign, asm__strnupr, l_maxu_bc_hl
+LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_precision_bc
+LIB __stdio_printf_padding_precision_hl, __stdio_printf_padding_width_bc
 
 __stdio_printf_number_tail:
 
@@ -119,16 +121,12 @@ spacing_ok:
    bit 2,(ix+5)
    jr nz, left_justify         ; if left justify flag selected
    
-   ; right justify output
+right_justify:
    
    push bc                     ; save num_sz
    
-   ld e,' '
-   
-   ld a,h                      ; test if external_spacing == 0
-   or l
-   call nz, out_repeated_char  ; output spaces to fill field width
-   
+   call __stdio_printf_padding_width_hl  ; fill width with spaces
+  
    pop bc                      ; bc = num_sz
    pop de                      ; de = internal_spacing
    pop hl                      ; hl = void *buffer_digits
@@ -136,6 +134,10 @@ spacing_ok:
    ret c                       ; if stream error
 
 out_internal:
+
+   ; bc = num_sz
+   ; de = internal_spacing
+   ; hl = void *buffer_digits
 
    ld a,b
    or c
@@ -172,6 +174,7 @@ out_internal:
 
 hex_base:
 
+   inc hl
    ld (hl),'x'
    
    bit 7,(ix+4)
@@ -190,19 +193,15 @@ no_base_indicator:
    ; stack = num_sz, internal_spacing
    
    or a
-   sbc hl,de                   ; hl = number of chars in buffer to output
-   jr z, no_prefix_chars
-
-   ; there are prefix chars in the buffer
+   sbc hl,de
    
    ld c,l
    ld b,h                      ; bc = number of prefix chars
+
    ex de,hl                    ; hl = void *buffer
-   
    push hl                     ; save buffer
    
-   ld a,STDIO_MSG_WRIT
-   call __stdio_send_output
+   call __stdio_send_output_buffer
    
    pop de                      ; de = void *buffer
    jr c, stream_error
@@ -212,14 +211,10 @@ no_prefix_chars:
    ; de = void *buffer
    ; stack = num_sz, internal_spacing
    
-   pop hl                      ; hl = internal_spacing
+   pop bc                      ; bc = internal_spacing
    push de                     ; save buffer
    
-   ld e,'0'
-   
-   ld a,h                      ; test if internal_spacing == 0
-   or l
-   call nz, out_repeated_char  ; output 0s to fulfill precision
+   call __stdio_printf_padding_precision_bc  ; output 0s to fulfill precision
 
 stream_error:
 
@@ -232,34 +227,24 @@ stream_error:
    inc hl
    inc hl                      ; hl = void *buffer_digits
    
-   ld a,STDIO_MSG_WRIT
-   
    bit 7,(ix+4)
-   jp z, __stdio_send_output   ; if lower case
+   jp z, __stdio_send_output_buffer  ; if lower case
 
    push bc                     ; save num_sz
    
    call asm__strnupr           ; capitalize buffer
    
    pop bc                      ; bc = num_sz
-   
-   ld a,STDIO_MSG_WRIT
-   jp __stdio_send_output
+   jp __stdio_send_output_buffer
 
 num_is_zero:
 
-   ; for zero only the precision filler is output
+   ; for zero, only the precision filler is output
    
    ; de = internal_spacing = number of 0s to fulfill precision
 
-   ld a,d
-   or e
-   ret z                       ; no precision filler
-   
    ex de,hl
-   ld e,'0'
-   
-   jr out_repeated_char
+   jp __stdio_printf_padding_precision_hl
 
 left_justify:
 
@@ -273,25 +258,7 @@ left_justify:
    
    call out_internal           ; output precision field
       
-   pop hl                      ; hl = external_spacing
+   pop bc                      ; bc = external_spacing
    ret c                       ; if stream error
    
-   ld e,' '
-   
-   ld a,h                      ; test if external_spacing == 0
-   or l
-   ret z
-
-   ; fall through to output spaces
-   
-out_repeated_char:
-
-   ; hl = number of chars to output
-   ;  e = char to output
-   
-   ld a,STDIO_MSG_PUTC
-   
-   ld c,l
-   ld b,h                      ; bc = num chars
-   
-   jp __stdio_send_output
+   jp __stdio_printf_padding_width_bc  ; output spaces to satisfy width field
