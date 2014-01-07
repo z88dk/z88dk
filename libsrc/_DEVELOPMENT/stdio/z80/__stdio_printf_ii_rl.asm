@@ -1,7 +1,9 @@
 
 XLIB __stdio_printf_I
 
-LIB __stdio_nextarg_de, __stdio_nextarg_hl, l_utoa, __stdio_send_output
+LIB __stdio_nextarg_de, __stdio_nextarg_hl, l_utoa
+LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl
+LIB __stdio_printf_padding_width_bc
 
 __stdio_printf_I:
 
@@ -20,12 +22,11 @@ __stdio_printf_I:
    
    ; read host order IPv4 address
    
-   call __stdio_nextarg_de     ; de = MSW of long
-   call __stdio_nextarg_hl     ; hl = LSW of long
+   call __stdio_nextarg_de     ; de = LSW of long
+   call __stdio_nextarg_hl     ; hl = MSW of long
    
    ; write octets to buffer
 
-   ex de,hl                    ; hl = MSW
    push de                     ; save LSW of long
    
    ld e,c
@@ -65,42 +66,35 @@ __stdio_printf_I:
    call write_octet
    
    dec de                      ; remove last '.'
+   ex de,hl
 
-   ; de = char *buffer_end
+   ; hl = char *buffer_end
    ; stack = buffer_digits, width, precision
-   
+   ; carry reset
+
    pop bc                      ; junk precision
-   pop bc                      ; bc = width
-   pop hl                      ; hl = buffer_digits
+   pop de                      ; de = width
+   pop bc                      ; bc = buffer_digits
    
+   sbc hl,bc                   ; hl = num_chars = buffer_end - buffer_digits
    ex de,hl
-   sbc hl,de                   ; hl = num_chars
+
+   ; de = num_chars in buffer
+   ; bc = buffer_digits
+   ; hl = width
+   ; carry reset
    
-   ; hl = num_chars in buffer
-   ; de = buffer_digits
-   ; bc = width
+   sbc hl,de                   ; hl = width - num_chars = padding required
+   jr nc, padding_required
    
-   ld a,l
-   ld l,c
-   ld c,a
-   
-   ld a,h
-   ld h,b                      ; hl = width
-   ld b,a                      ; bc = num_chars
-   
-   scf
-   sbc hl,bc                   ; hl = required padding
-   
-   ex de,hl
-   jr c, output_buffer         ; if width exceeded
-   ex de,hl
-   
-   inc hl
-   
+   ld hl,0
+
+padding_required:
+
    ; hl = required padding
-   ; bc = num_chars
-   ; de = buffer_digits
-   
+   ; de = num_chars
+   ; bc = buffer_digits
+
    bit 2,(ix+5)
    jr nz, left_justify
 
@@ -108,42 +102,33 @@ right_justify:
 
    push bc
    push de
-   
-   ld c,l
-   ld b,h
-   call width_padding
-   
-   pop hl                      ; hl = buffer_digits
-   pop bc                      ; bc = num_chars
-   
-   ret c                       ; if stream error
-   
-output_buffer:
 
-   ; hl = buffer
-   ; bc = length > 0
+   call __stdio_printf_padding_width_hl
    
-   ld a,STDIO_MSG_WRIT
-   jp __stdio_send_output
+   pop bc                      ; bc = num_chars
+   pop hl                      ; hl = buffer_digits
+
+   jp nc, __stdio_send_output_buffer  ; if no stream error
+   
+   ret
 
 left_justify:
 
-   ex hl,de
-   push de                     ; save required padding
+   push hl                     ; save required padding
    
-   call output_buffer
+   ld l,c
+   ld h,b                      ; hl = buffer_digits
+   
+   ld c,e
+   ld b,d                      ; bc = num_chars
+   
+   call __stdio_send_output_buffer
    
    pop bc                      ; bc = required padding
-   ret c                       ; if stream error
-
-width_padding:
-
-   ; bc = required padding > 0
    
-   ld e,' '
+   jp nc, __stdio_printf_padding_width_bc  ; if no stream error
    
-   ld a,STDIO_MSG_PUTC
-   jp __stdio_send_output
+   ret
 
 write_octet:
 
