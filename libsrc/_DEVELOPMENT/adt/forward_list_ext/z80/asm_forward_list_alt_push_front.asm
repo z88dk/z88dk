@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void forward_list_ext_push_front(forward_list_ext *list, void *item)
+; void forward_list_alt_push_front(forward_list_alt *list, void *item)
 ;
 ; The address of the item's forward pointer is passed as param.
 ;
@@ -11,16 +11,16 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_push_front
+XLIB asm_forward_list_alt_push_front
 
-LIB asm_forward_list_ext_insert_after
+LIB asm_forward_list_alt_insert_after
 
-asm_forward_list_push_front:
+asm_forward_list_alt_push_front:
 
-   ; enter : bc = forward_list_ext *lst
+   ; enter : bc = forward_list_alt *lst
    ;         de = void *item
    ;
-   ; exit  : bc = forward_list_ext *list
+   ; exit  : bc = forward_list_alt *list
    ;         hl = void *item
    ;         z flag set if new item is only one in list
    ;
@@ -29,4 +29,4 @@ asm_forward_list_push_front:
    ld l,c
    ld h,b
    
-   jp asm_forward_list_ext_insert_after
+   jp asm_forward_list_alt_insert_after

@@ -3,23 +3,23 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void forward_list_init(void *p)
+; void forward_list_alt_init(void *p)
 ;
 ; Create an empty forward_list_ext in the four bytes of memory
 ; provided.
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_init
+XLIB asm_forward_list_alt_init
 
 LIB asm_forward_list_init
 
-asm_forward_list_ext_init:
+asm_forward_list_alt_init:
 
    ; enter : hl = void *p
    ;
    ; exit  : hl = void *p + 4
-   ;         de = void *p = forward_list_ext *list
+   ;         de = void *p = forward_list_alt *list
    ;
    ; uses  : af, de, hl
 
@@ -27,7 +27,7 @@ asm_forward_list_ext_init:
 
    ld (hl),e
    inc hl
-   ld (hl),d                   ; forward_list_ext->tail = & forward_list_ext->head
+   ld (hl),d                   ; forward_list_alt->tail = & forward_list_alt->head
    inc hl
    
    ret

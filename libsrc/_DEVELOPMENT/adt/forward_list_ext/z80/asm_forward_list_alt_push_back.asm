@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void forward_list_ext_push_back(forward_list_ext *list, void *item)
+; void forward_list_alt_push_back(forward_list_alt *list, void *item)
 ;
 ; The address of the item's forward pointer is passed as param.
 ;
@@ -11,16 +11,16 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_push_back
+XLIB asm_forward_list_alt_push_back
 
-LIB asm_forward_list_ext_insert_after
+LIB asm_forward_list_alt_insert_after
 
-asm_forward_list_ext_push_back:
+asm_forward_list_alt_push_back:
 
-   ; enter : bc = forward_list_ext *list
+   ; enter : bc = forward_list_alt *list
    ;         de = void *item
    ;
-   ; exit  : bc = forward_list_ext *list
+   ; exit  : bc = forward_list_alt *list
    ;         hl = void *item
    ;
    ; uses  : af, de, hl
@@ -38,4 +38,4 @@ asm_forward_list_ext_push_back:
    dec bc
    dec bc                      ; bc = list
    
-   jp asm_forward_list_ext_insert_after
+   jp asm_forward_list_alt_insert_after

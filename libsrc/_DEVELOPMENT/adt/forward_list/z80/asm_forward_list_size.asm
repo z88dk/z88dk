@@ -10,10 +10,10 @@
 ; ===============================================================
 
 XLIB asm_forward_list_size
-XDEF asm_ba_blockcount, asm_forward_list_ext_size
+XDEF asm_ba_blockcount, asm_forward_list_alt_size
 
 asm_forward_list_size:
-asm_forward_list_ext_size:
+asm_forward_list_alt_size:
 asm_ba_blockcount:
 
    ; enter : hl = forward_list *list

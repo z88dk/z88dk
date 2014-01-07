@@ -3,21 +3,21 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *forward_list_ext_pop_front(forward_list_ext *list)
+; void *forward_list_alt_pop_front(forward_list_ext *list)
 ;
 ; Pop item from front of list.
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_pop_front
+XLIB asm_forward_list_alt_pop_front
 
-LIB asm_forward_list_ext_remove_after
+LIB asm_forward_list_alt_remove_after
 
-asm_forward_list_ext_pop_front:
+asm_forward_list_alt_pop_front:
 
-   ; enter : hl = forward_list_ext *list
+   ; enter : hl = forward_list_alt *list
    ;
-   ; exit  : bc = forward_list_ext *list
+   ; exit  : bc = forward_list_alt *list
    ;         hl = void *item (item popped, 0 if none)
    ;         carry reset if list was empty
    ;
@@ -26,4 +26,4 @@ asm_forward_list_ext_pop_front:
    ld c,l
    ld b,h
    
-   jp asm_forward_list_ext_remove_after
+   jp asm_forward_list_alt_remove_after

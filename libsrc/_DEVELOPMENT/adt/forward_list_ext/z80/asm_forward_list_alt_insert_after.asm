@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *forward_list_ext_insert_after(forward_list_ext *list, void *list_item, void *item)
+; void *forward_list_alt_insert_after(forward_list_alt *list, void *list_item, void *item)
 ;
 ; The address of the item's forward pointer is passed as param.
 ;
@@ -11,17 +11,17 @@
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_insert_after
+XLIB asm_forward_list_alt_insert_after
 
 LIB asm_forward_list_insert_after
 
-asm_forward_list_ext_insert_after:
+asm_forward_list_alt_insert_after:
 
-   ; enter : bc = forward_list_ext *list
+   ; enter : bc = forward_list_alt *list
    ;         hl = void *list_item (insert after this item)
    ;         de = void *item (item to be added to list)
    ;
-   ; exit  : bc = forward_list_ext *list
+   ; exit  : bc = forward_list_alt *list
    ;         hl = void *item
    ;         de = void *list_item
    ;         z flag set if item is new end of list

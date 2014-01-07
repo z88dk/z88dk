@@ -3,17 +3,17 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *forward_list_ext_remove_after(forward_list_ext *list, void *list_item)
+; void *forward_list_alt_remove_after(forward_list_alt *list, void *list_item)
 ;
 ; Remove item following list_item in the list, return removed item.
 ;
 ; ===============================================================
 
-XLIB asm_forward_list_ext_remove_after
+XLIB asm_forward_list_alt_remove_after
 
 LIB asm_forward_list_remove_after
 
-asm_forward_list_ext_remove_after:
+asm_forward_list_alt_remove_after:
 
    ; enter : bc = forward_list_ext *list
    ;         hl = void *list_item (remove item after this one)
