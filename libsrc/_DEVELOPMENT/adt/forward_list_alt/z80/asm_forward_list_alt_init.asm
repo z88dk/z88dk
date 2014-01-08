@@ -11,10 +11,12 @@
 ; ===============================================================
 
 XLIB asm_forward_list_alt_init
+XDEF asm_forward_list_alt_clear
 
 LIB asm_forward_list_init
 
 asm_forward_list_alt_init:
+asm_forward_list_alt_clear:
 
    ; enter : hl = void *p
    ;

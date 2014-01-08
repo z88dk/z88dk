@@ -15,10 +15,10 @@ LIB asm_forward_list_remove_after
 
 asm_forward_list_alt_remove_after:
 
-   ; enter : bc = forward_list_ext *list
+   ; enter : bc = forward_list_alt *list
    ;         hl = void *list_item (remove item after this one)
    ;
-   ; exit  : bc = forward_list_ext *list
+   ; exit  : bc = forward_list_alt *list
    ;         hl = void *item (item removed, 0 if none)
    ;         de = void *list_item
    ;         carry reset if no next item to remove (hl=0)

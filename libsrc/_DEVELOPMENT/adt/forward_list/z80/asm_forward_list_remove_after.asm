@@ -20,6 +20,7 @@ asm_forward_list_pop_front:
    ; exit  : hl = void *item (item removed, 0 if none)
    ;         de = void *list_item
    ;         carry reset if no next item to remove (hl=0)
+   ;         if carry set, z flag set if removed item was last in list
    ;
    ; uses  : af, de, hl
    
@@ -37,7 +38,7 @@ asm_forward_list_pop_front:
    ldi
    inc bc                      ; undo changes to bc
    ld a,(hl)
-   ld (de),a                   ; iter->next = item_removed->next
+   ld (de),a                   ; list_item->next = item->next
    
    dec de
    dec hl

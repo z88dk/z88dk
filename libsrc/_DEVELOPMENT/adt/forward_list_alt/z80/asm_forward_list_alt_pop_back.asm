@@ -11,7 +11,7 @@
 
 XLIB asm_forward_list_alt_pop_back
 
-LIB asm_forward_list_alt_remove_after
+LIB asm_forward_list_alt_remove_after, __forward_list_locate_item
 
 asm_forward_list_alt_pop_back:
 
@@ -21,39 +21,14 @@ asm_forward_list_alt_pop_back:
    ;         hl = void *item (item popped, 0 if none)
    ;         carry reset if list is empty
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
    
-   ld e,l
-   ld d,h
-   
-   ld c,l
-   ld b,h
-   
-loop:
-   
-   ; de = void *lagger
-   ; hl = void *current
-   
-   ld a,(hl)
-   inc hl
-   
-   or (hl)
-   jr z, list_end
-   
-   ld a,(hl)
-   dec hl
-   
-   ld e,l
-   ld d,h                      ; de = new lagger
-   
-   ld l,(hl)
-   ld h,a                      ; hl = new current
-   
-   jp loop
-   
-list_end:
+   push hl                     ; save list
 
-   ; de = void *lagger
+   ld bc,0                     ; locate end of list
+   call __forward_list_locate_item
+   
+   pop bc                      ; bc = list
    
    ex de,hl
    jp asm_forward_list_alt_remove_after
