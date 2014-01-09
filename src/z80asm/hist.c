@@ -20,9 +20,13 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.62 2014-01-05 23:20:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.63 2014-01-09 23:13:03 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.62  2014-01-05 23:20:39  pauloscustodio
+/* Revision 1.63  2014-01-09 23:13:03  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_options.
+/* Use Str instead of glib.
+/*
+/* Revision 1.62  2014/01/05 23:20:39  pauloscustodio
 /* List, StrHash classlist and classhash receive the address of the container
 /* object in all functions that add items to the container, and create the
 /* container on first use. This allows a container to be staticaly
@@ -1524,6 +1528,10 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	- Add count attribute to StrHash, classhash to count elements in container.
 	- Add free_data attribute in StrHash to register a free fucntion to delete
 	  the data container when the hash is removed or a key is overwritten.
+	- errors.c: Use init.h mechanism, no need for main() calling init_errors 
+	  and atexit(fini_errors); use Str and StrHash instead of glib.
+	- options.c: Use init.h mechanism, no need for main() calling init_options.
+	  Use Str instead of glib.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

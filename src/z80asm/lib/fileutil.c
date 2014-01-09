@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.2 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.3 2014-01-09 23:13:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -14,7 +14,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.2 2014-01-0
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
 *   All filenames are returned in fixed length Str defined by
-*	DEFINE_STR( dest, FILENAME_MAX ).
+*	DEFINE_STR( dest, FILENAME_MAX ) or DEFINE_FILE_STR( dest )
 *	Input string is unchanged.
 *	Basename is file name removing all directories.
 *	Extension is the final "." followed by sequence of letters or digits
@@ -103,7 +103,11 @@ char *search_file ( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.2  2014-01-02 17:18:16  pauloscustodio
+* Revision 1.3  2014-01-09 23:13:04  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_options.
+* Use Str instead of glib.
+*
+* Revision 1.2  2014/01/02 17:18:16  pauloscustodio
 * StrList removed, replaced by List
 *
 * Revision 1.1  2014/01/01 21:23:48  pauloscustodio

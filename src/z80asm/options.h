@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.38 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.39 2014-01-09 23:13:04 pauloscustodio Exp $
 */
 
 #pragma once
@@ -36,11 +36,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.38 2014-01-02 17
 #define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
 #define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
 #define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
-
-/*-----------------------------------------------------------------------------
-*   Initialize module
-*----------------------------------------------------------------------------*/
-extern void init_options(void);
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -79,7 +74,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.38  2014-01-02 17:18:16  pauloscustodio
+* Revision 1.39  2014-01-09 23:13:04  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_options.
+* Use Str instead of glib.
+*
+* Revision 1.38  2014/01/02 17:18:16  pauloscustodio
 * StrList removed, replaced by List
 *
 * Revision 1.37  2014/01/02 02:31:42  pauloscustodio

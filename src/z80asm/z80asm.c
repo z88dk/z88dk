@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.125 2014-01-06 00:33:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.126 2014-01-09 23:13:04 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.125  2014-01-06 00:33:36  pauloscustodio
+/* Revision 1.126  2014-01-09 23:13:04  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_options.
+/* Use Str instead of glib.
+/*
+/* Revision 1.125  2014/01/06 00:33:36  pauloscustodio
 /* Use init.h mechanism, no need for main() calling init_errors
 /* and atexit(fini_errors); use Str and StrHash instead of glib.
 /*
@@ -718,7 +722,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "except.h"
 #include "z80asm.h"
 #include <ctype.h>
-#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1351,7 +1354,6 @@ int main( int argc, char *argv[] )
 	ListElem *iter;
 
 	/* init modules */
-	init_options();
 	init_scan();
 	atexit(fini_scan);
 	init_codearea();

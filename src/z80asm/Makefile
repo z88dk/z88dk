@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.110 2014-01-06 00:33:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.111 2014-01-09 23:13:03 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.110  2014-01-06 00:33:36  pauloscustodio
+# Revision 1.111  2014-01-09 23:13:03  pauloscustodio
+# Use init.h mechanism, no need for main() calling init_options.
+# Use Str instead of glib.
+#
+# Revision 1.110  2014/01/06 00:33:36  pauloscustodio
 # Use init.h mechanism, no need for main() calling init_errors
 # and atexit(fini_errors); use Str and StrHash instead of glib.
 #
@@ -751,9 +755,9 @@ objfile.o: errors_def.h file.h config.h  lib/strutil.h objfile.h
 objfile.o: lib/strpool.h legacy.h
 options.o: lib/xmalloc.h errors.h errors_def.h scan.h lib/class.h lib/queue.h
 options.o: lib/types.h file.h config.h  lib/strutil.h
-options.o: lib/fileutil.h lib/list.h hist.h options.h options_def.h
-options.o: lib/strpool.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
-options.o: lib/die.h sym.h symref.h lib/classlist.h z80asm.h
+options.o: lib/fileutil.h lib/list.h hist.h lib/init.h lib/die.h options.h
+options.o: options_def.h lib/strpool.h symtab.h lib/classhash.h lib/strhash.h
+options.o: lib/uthash.h sym.h symref.h lib/classlist.h z80asm.h
 prsident.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 prsident.o: errors.h errors_def.h listfile.h lib/class.h lib/queue.h
 prsident.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h

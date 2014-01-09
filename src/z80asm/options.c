@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.66 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.67 2014-01-09 23:13:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -25,13 +25,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.66 2014-01-02 17
 #include "file.h"
 #include "fileutil.h"
 #include "hist.h"
+#include "init.h"
 #include "options.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "symtab.h"
 #include "z80asm.h"
 #include <ctype.h>
-#include <glib.h>
 #include <string.h>
 
 /* default file name extensions */
@@ -41,7 +41,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.66 2014-01-02 17
 #define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
 #define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
 #define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
+#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn"     /* ".bn0" / "_bn0" */
 #define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
 #define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
@@ -101,13 +101,16 @@ static OptsLU opts_lu[] =
 /*-----------------------------------------------------------------------------
 *   Initialize module
 *----------------------------------------------------------------------------*/
-void init_options(void)
+DEFINE_init()
 {
     char *directory = getenv("Z80_OZFILES");
     if ( directory )
 		List_push( &opts.inc_path, strpool_add(directory) );
 }
 
+DEFINE_fini()
+{
+}
 
 /*-----------------------------------------------------------------------------
 *   Parse command line, set options, including opts.files with list of 
@@ -116,6 +119,8 @@ void init_options(void)
 void parse_argv( int argc, char *argv[] )
 {
 	int arg;
+
+	init();
 
 	if ( argc == 1 )
 		exit_copyright();				/* exit if no arguments */
@@ -235,7 +240,7 @@ static void parse_options(int *parg, int argc, char *argv[])
 {
 #define i (*parg)
 
-    for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
+	for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
 		process_opt( &i, argc, argv );
 
 #undef i
@@ -246,7 +251,7 @@ static void parse_options(int *parg, int argc, char *argv[])
 *----------------------------------------------------------------------------*/
 static void parse_file( char *filename )
 {
-	g_strstrip(filename);
+	strip(filename);
 	switch ( filename[0] )
 	{
         case '-':		/* Illegal source file name */
@@ -268,18 +273,18 @@ static void parse_file_list( Scan *files, char *filename )
 {
 	char *line;
 
-	g_strstrip(filename);
+	strip(filename);
 	if ( filename[0] == '@' )
 	{
-		g_strstrip(filename+1);
+		strip(filename+1);
 		scan_file_Scan( files, filename+1 );
 
 		while ( (line = get_line_Scan( files )) != NULL )
 		{
-			g_strstrip(line);
+			strip(line);
 			if ( line[0] == '@' )
 			{
-				g_strstrip(line+1);
+				strip(line+1);
 				scan_file_Scan( files, line+1 );		/* recurse */
 			}
 			else 
@@ -323,7 +328,7 @@ static void parse_files(int arg, int argc, char *argv[])
 static void show_option(enum OptType type, BOOL *pflag, 
 						char *short_opt, char *long_opt, char *help_text, char *help_arg)
 {
-	char msg[ MAXLINE ];
+	DEFINE_STR( msg, MAXLINE );
 	int count_opts = 0;
 
 	if ( type == OptDeprecated )
@@ -332,9 +337,9 @@ static void show_option(enum OptType type, BOOL *pflag,
 	/* show default option */
 	if ( type == OptSet   &&   *pflag ||
 		 type == OptClear && ! *pflag )
-		g_snprintf( msg, sizeof(msg), "* " );
+		Str_set( msg, "* " );
 	else
-		g_snprintf( msg, sizeof(msg), "  " );
+		Str_set( msg, "  " );
 
 	if ( *short_opt )
 	{
@@ -342,8 +347,7 @@ static void show_option(enum OptType type, BOOL *pflag,
 		   e.g. -sdcc and --sdcc */
 		if ( ! (*long_opt && strcmp(short_opt, long_opt+1) == 0) )
 		{
-			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-						"%s", short_opt );
+			Str_append_sprintf( msg, "%s", short_opt );
 			count_opts++;
 		}
 	}
@@ -351,29 +355,26 @@ static void show_option(enum OptType type, BOOL *pflag,
 	if ( *long_opt )
 	{
 		if ( count_opts )
-			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-						", " );
-		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-					"%s", long_opt );
+			Str_append( msg, ", " );
+		Str_append_sprintf( msg, "%s", long_opt );
 		count_opts++;
 	}
 
 	if ( *help_arg )
 	{
-		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-					"=%s", help_arg );
+		Str_append_sprintf( msg, "=%s", help_arg );
 	}
 
-	if ( strlen(msg) > ALIGN_HELP )
-		printf("%s\n%-*s %s\n", msg, ALIGN_HELP, "",  help_text );
+	if ( msg->len > ALIGN_HELP )
+		printf("%s\n%-*s %s\n", msg->str, ALIGN_HELP, "",       help_text );
 	else
-		printf(    "%-*s %s\n",      ALIGN_HELP, msg, help_text );
+		printf(    "%-*s %s\n",           ALIGN_HELP, msg->str, help_text );
 }
 #undef ALIGN_HELP
 
 static void exit_help(void)
 {
-    puts(  copyrightmsg );
+	puts(  copyrightmsg );
 	puts(  "" );
 	puts(  "Usage:" );
     puts(  "  z80asm [options] { @<modulefile> | <filename> }" );
@@ -492,8 +493,22 @@ static void option_cpu_RCM2000(void)
 static char *replace_ext( char *filename, char *ext )
 {
 	DEFINE_FILE_STR( new_filename );
+
+	init();
+
 	path_replace_ext( new_filename, filename, ext );
 	return strpool_add( new_filename->str );
+}
+
+static char *get_opts_ext_filename( char *filename, char *opts_ext )
+{
+	DEFINE_FILE_STR( ext );
+
+	init();
+
+	Str_set( ext, FILEEXT_SEPARATOR );
+	Str_append( ext, opts_ext );
+	return replace_ext( filename, ext->str ); 
 }
 
 char *get_lst_filename( char *filename ) { return replace_ext( filename, FILEEXT_LST ); }
@@ -503,41 +518,28 @@ char *get_bin_filename( char *filename ) { return replace_ext( filename, FILEEXT
 char *get_lib_filename( char *filename ) { return replace_ext( filename, FILEEXT_LIB ); }
 char *get_sym_filename( char *filename ) { return replace_ext( filename, FILEEXT_SYM ); }
 char *get_map_filename( char *filename ) { return replace_ext( filename, FILEEXT_MAP ); }
-
-char *get_asm_filename( char *filename ) 
-{ 
-	char ext[ FILENAME_MAX ];
-	g_snprintf( ext, sizeof(ext), "%s%s", FILEEXT_SEPARATOR, opts.asm_ext );
-	return replace_ext( filename, ext ); 
-}
-
-char *get_obj_filename( char *filename ) 
-{ 
-	char ext[ FILENAME_MAX ];
-	g_snprintf( ext, sizeof(ext), "%s%s", FILEEXT_SEPARATOR, opts.obj_ext );
-	return replace_ext( filename, ext ); 
-}
+char *get_asm_filename( char *filename ) { return get_opts_ext_filename( filename, opts.asm_ext ); }
+char *get_obj_filename( char *filename ) { return get_opts_ext_filename( filename, opts.obj_ext ); }
 
 char *get_segbin_filename( char *filename, int segment ) 
 {
-	char ext[ FILENAME_MAX ];
-	int len;
+	DEFINE_FILE_STR( ext );
 
-	g_strlcpy( ext, FILEEXT_SEGBIN, sizeof(ext) );
-	len = strlen(ext);
-	g_snprintf( ext + len - 1, sizeof(ext) - (len-1), "%d", segment );
-	return replace_ext( filename, ext ); 
+	init();
+
+	Str_set( ext, FILEEXT_SEGBIN );
+	Str_append_sprintf( ext, "%d", segment );
+	return replace_ext( filename, ext->str ); 
 }
-
-
-
-
-
 
 
 /* 
 * $Log: options.c,v $
-* Revision 1.66  2014-01-02 17:18:16  pauloscustodio
+* Revision 1.67  2014-01-09 23:13:04  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_options.
+* Use Str instead of glib.
+*
+* Revision 1.66  2014/01/02 17:18:16  pauloscustodio
 * StrList removed, replaced by List
 *
 * Revision 1.65  2014/01/02 02:31:42  pauloscustodio
