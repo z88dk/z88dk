@@ -11,11 +11,11 @@
 
 INCLUDE "../mutex.inc"
 
-XLIB mtx_trylock
+XLIB asm_mtx_trylock
 
 LIB __mutex_acquire_spinlock
 
-mtx_trylock:
+asm_mtx_trylock:
 
    ; enter : hl = mtx_t *m
    ;

@@ -11,11 +11,11 @@
 
 INCLUDE "../mutex.inc"
 
-XLIB mtx_init
+XLIB asm_mtx_init
 
 LIB l_setmem_hl
 
-mtx_init:
+asm_mtx_init:
 
    ; enter : hl = mtx_t *m
    ;          c = mutex_type
@@ -44,7 +44,7 @@ mtx_init:
    dec hl
    dec hl
    dec hl
-   ld (hl),$fe                 ; unlock(m->_mutex)
+   ld (hl),$fe                 ; unlock(m->spinlock)
    dec hl
    dec hl
    ld (hl),c                   ; m->mutex_type = c
