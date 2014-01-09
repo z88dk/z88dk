@@ -1,5 +1,4 @@
 
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -11,12 +10,12 @@
 ; ===============================================================
 
 XLIB asm_forward_list_alt_back
-XDEF asm_list_back
 
 LIB asm_forward_list_alt_front
 
+LIB error_znc
+
 asm_forward_list_alt_back:
-asm_list_back:
 
    ; enter : hl = forward_list_alt *list
    ;
@@ -25,7 +24,10 @@ asm_list_back:
    ;
    ; uses  : af, hl
 
+   ld a,(hl)
    inc hl
-   inc hl
+   or (hl)
+   jp z, error_znc
    
+   inc hl
    jp asm_forward_list_alt_front

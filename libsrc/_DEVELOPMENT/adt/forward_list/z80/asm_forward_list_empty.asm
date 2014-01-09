@@ -12,6 +12,8 @@
 XLIB asm_forward_list_empty
 XDEF asm_forward_list_alt_empty, asm_list_empty
 
+LIB error_zc, error_mnc
+
 asm_forward_list_empty:
 asm_forward_list_alt_empty:
 asm_list_empty:
@@ -20,13 +22,13 @@ asm_list_empty:
    ;
    ; exit  : if list is empty
    ;
-   ;           hl = 1
-   ;           carry set
+   ;           hl = -1
+   ;           carry reset
    ;
    ;         if list is not empty
    ;
    ;           hl = 0
-   ;           carry reset
+   ;           carry set
    ;
    ; uses  : af, hl
    
@@ -34,10 +36,5 @@ asm_list_empty:
    inc hl
    or (hl)
    
-   ld hl,0
-   ret nz
-   
-   inc l
-
-   scf
-   ret
+   jp nz, error_zc             ; if list is not empty
+   jp error_mnc

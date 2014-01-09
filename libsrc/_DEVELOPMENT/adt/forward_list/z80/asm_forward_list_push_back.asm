@@ -7,7 +7,7 @@
 ;
 ; The address of the item's forward pointer is passed as param.
 ;
-; Add item to the front of the list.  O(n).
+; Add item to the back of the list.  O(n).
 ;
 ; ===============================================================
 

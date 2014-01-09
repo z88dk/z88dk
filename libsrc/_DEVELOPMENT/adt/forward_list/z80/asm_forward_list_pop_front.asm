@@ -1,5 +1,6 @@
+
 *** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_REMOVE_AFTER()
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FORWARD_LIST_REMOVE_AFTER
 
 ; ===============================================================
 ; Dec 2013
