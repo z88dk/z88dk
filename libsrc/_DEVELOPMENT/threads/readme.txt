@@ -12,10 +12,10 @@ __thread_sleep(bc = struct timespec *ts)
 
 * block thread for time specified in ts
 * if ts == 0, equivalent to __thread_context_switch
-* if scheduler wakes, set hl = thrd_error before return
-
+* when scheduler wakes, set hl = thrd_error before return
+  (if __thread_block_timeout uses sleep queue)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-__thread_block(de = locked_forward_list *q)
+__thread_block(hl = locked_forward_list *q)
 
 * q->spinlock owned, unlock q->spinlock
 * block thread on locked_forward_list *q indefinitely
@@ -23,15 +23,19 @@ __thread_block(de = locked_forward_list *q)
   set hl = thrd_error
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-__thread_block_timeout(de = locked_forward_list *q, bc = struct timespec *ts)
+__thread_block_timeout(hl = locked_forward_list *q, bc = struct timespec *ts)
+
+* if ts == 0, same as __thread_block
 
 * q->spinlock owned, unlock q->spinlock
 * block thread on locked_forward_list *q for max time specified in ts
-* if ts == 0, equivalent to __thread_context_switch
 * if time expires, set hl = thrd_error before return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 __thread_unblock(hl = locked_forward_list *q)
 
 * q->spinlock is owned, do not unlock
-* unblock thread at front of q, return thread's id in A (0 if none), hl unchanged
+* unblock thread at front of q, hl unchanged
+* set hl of unblocked thread to thrd_success
+* carry reset if no waiting thread
+
