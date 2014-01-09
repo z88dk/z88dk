@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.111 2014-01-09 23:13:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.112 2014-01-09 23:26:24 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.111  2014-01-09 23:13:03  pauloscustodio
+# Revision 1.112  2014-01-09 23:26:24  pauloscustodio
+# Use init.h mechanism, no need for main() calling init_codearea
+#
+# Revision 1.111  2014/01/09 23:13:03  pauloscustodio
 # Use init.h mechanism, no need for main() calling init_options.
 # Use Str instead of glib.
 #
@@ -690,10 +693,11 @@ asmdrctv.o: lib/classlist.h options.h options_def.h srcfile.h symbol.h
 asmdrctv.o: model.h objfile.h symtab.h lib/classhash.h lib/strhash.h
 asmdrctv.o: lib/uthash.h lib/die.h sym.h token_def.h z80asm.h
 codearea.o: lib/xmalloc.h codearea.h lib/types.h config.h 
-codearea.o: errors.h errors_def.h symbol.h model.h objfile.h lib/class.h
-codearea.o: lib/queue.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
-codearea.o: lib/die.h sym.h symref.h lib/classlist.h token_def.h z80asm.h
-codearea.o: file.h lib/strutil.h listfile.h
+codearea.o: errors.h errors_def.h file.h lib/strutil.h lib/class.h
+codearea.o: lib/queue.h lib/init.h lib/die.h listfile.h symref.h
+codearea.o: lib/classlist.h symbol.h model.h objfile.h symtab.h
+codearea.o: lib/classhash.h lib/strhash.h lib/uthash.h sym.h token_def.h
+codearea.o: z80asm.h
 deffile.o: lib/xmalloc.h deffile.h file.h lib/types.h config.h 
 deffile.o: lib/strutil.h lib/class.h lib/queue.h listfile.h symref.h
 deffile.o: lib/classlist.h options.h lib/list.h options_def.h symbol.h

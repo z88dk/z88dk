@@ -15,20 +15,21 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.19 2013-12-15 13:18:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.20 2014-01-09 23:26:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include <assert.h>
-#include <memory.h>
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
+#include "file.h"
+#include "init.h"
+#include "listfile.h"
 #include "symbol.h"
 #include "z80asm.h"
-#include "file.h"
-#include "listfile.h"
+#include <assert.h>
+#include <memory.h>
 
 /*-----------------------------------------------------------------------------
 *   global data
@@ -43,7 +44,7 @@ static size_t PC;		                /* Program Counter */
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-void init_codearea(void)
+DEFINE_init()
 {
     /* allocate memory for Z80 machine code */
     codearea = xnew_n( char, MAXCODESIZE );
@@ -52,7 +53,7 @@ void init_codearea(void)
     codesize  = 0;		/* marks start of each new module, always incremented, BUG_0015 */
 }
 
-void fini_codearea(void)
+DEFINE_fini()
 {
 	xfree( codearea );
 }
@@ -62,16 +63,19 @@ void fini_codearea(void)
 *----------------------------------------------------------------------------*/
 size_t set_PC( size_t n )
 {
-    return PC = n;
+    init();
+	return PC = n;
 }
 
 size_t inc_PC( size_t n )
 {
+    init();
     return PC += n;
 }
 
 size_t get_PC( void )
 {
+    init();
     return PC;
 }
 
@@ -80,6 +84,7 @@ size_t get_PC( void )
 *----------------------------------------------------------------------------*/
 void reset_codearea( void )
 {
+    init();
     codeindex = 0;                      /* where to store next opcode byte */
     set_PC( 0 );
     memset( codearea, 0, MAXCODESIZE );
@@ -87,16 +92,19 @@ void reset_codearea( void )
 
 size_t get_codeindex( void ) /* BUG_0015 */
 {
+    init();
     return codeindex;
 }
 
 size_t get_codesize( void ) /* BUG_0015 */
 {
+    init();
     return codesize;
 }
 
 size_t inc_codesize( size_t n ) /* BUG_0015 */
 {
+    init();
     return codesize += n;
 }
 
@@ -113,11 +121,13 @@ static void check_space( size_t addr, size_t n )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( FILE *stream )
 {
+    init();
     xfput_char( codearea, codeindex, stream );
 }
 
 void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 {
+    init();
     if ( addr < codeindex )
     {
         if ( addr + size > codeindex )
@@ -132,6 +142,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 /* append data read from file to the current code area */
 void fread_codearea( FILE *stream, size_t size )
 {
+    init();
     check_space( codeindex, size );
     xfget_char( codearea + codeindex, size, stream );
     codeindex += size;
@@ -140,6 +151,7 @@ void fread_codearea( FILE *stream, size_t size )
 /* read to codearea at offset - BUG_0015 */
 void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 {
+    init();
     check_space( offset, size );
     xfget_char( codearea + offset, size, stream );
 
@@ -155,18 +167,21 @@ void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 *----------------------------------------------------------------------------*/
 void patch_byte( size_t *paddr, byte_t byte )
 {
+    init();
     check_space( *paddr, 1 );
     codearea[( *paddr )++] = byte;
 }
 
 void append_byte( byte_t byte )
 {
+    init();
     patch_byte( &codeindex, byte );
 	list_append_byte( byte );
 }
 
 void patch_word( size_t *paddr, int word )
 {
+    init();
     check_space( *paddr, 2 );
     codearea[( *paddr )++] = word & 0xFF;
     word >>= 8;
@@ -176,12 +191,14 @@ void patch_word( size_t *paddr, int word )
 
 void append_word( int word )
 {
+    init();
     patch_word( &codeindex, word );
 	list_append_word( word );
 }
 
 void patch_long( size_t *paddr, long dword )
 {
+    init();
     check_space( *paddr, 4 );
     codearea[( *paddr )++] = dword & 0xFF;
     dword >>= 8;
@@ -195,6 +212,7 @@ void patch_long( size_t *paddr, long dword )
 
 void append_long( long dword )
 {
+    init();
     patch_long( &codeindex, dword );
 	list_append_long( dword );
 }
@@ -203,6 +221,7 @@ byte_t get_byte( size_t *paddr )
 {
     byte_t byte;
 
+    init();
     assert( *paddr < codeindex );
     byte = codearea[( *paddr )++];
     return byte;
@@ -211,7 +230,10 @@ byte_t get_byte( size_t *paddr )
 
 /* */
 /* $Log: codearea.c,v $
-/* Revision 1.19  2013-12-15 13:18:33  pauloscustodio
+/* Revision 1.20  2014-01-09 23:26:24  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_codearea
+/*
+/* Revision 1.19  2013/12/15 13:18:33  pauloscustodio
 /* Move memory allocation routines to lib/xmalloc, instead of glib,
 /* introduce memory leak report on exit and memory fence check.
 /*

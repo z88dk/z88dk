@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.126 2014-01-09 23:13:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.127 2014-01-09 23:26:24 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.126  2014-01-09 23:13:04  pauloscustodio
+/* Revision 1.127  2014-01-09 23:26:24  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_codearea
+/*
+/* Revision 1.126  2014/01/09 23:13:04  pauloscustodio
 /* Use init.h mechanism, no need for main() calling init_options.
 /* Use Str instead of glib.
 /*
@@ -1356,8 +1359,6 @@ int main( int argc, char *argv[] )
 	/* init modules */
 	init_scan();
 	atexit(fini_scan);
-	init_codearea();
-	atexit(fini_codearea);
 
 	/* start try..catch with finally to cleanup any allocated memory */
     TRY

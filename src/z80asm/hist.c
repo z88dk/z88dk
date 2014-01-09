@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.63 2014-01-09 23:13:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.64 2014-01-09 23:26:24 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.63  2014-01-09 23:13:03  pauloscustodio
+/* Revision 1.64  2014-01-09 23:26:24  pauloscustodio
+/* Use init.h mechanism, no need for main() calling init_codearea
+/*
+/* Revision 1.63  2014/01/09 23:13:03  pauloscustodio
 /* Use init.h mechanism, no need for main() calling init_options.
 /* Use Str instead of glib.
 /*
@@ -1532,7 +1535,8 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	  and atexit(fini_errors); use Str and StrHash instead of glib.
 	- options.c: Use init.h mechanism, no need for main() calling init_options.
 	  Use Str instead of glib.
-
+	- codearea.c: Use init.h mechanism, no need for main() calling init_codearea.
+	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
