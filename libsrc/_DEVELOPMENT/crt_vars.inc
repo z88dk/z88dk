@@ -68,6 +68,8 @@ defvars __crt_vars_process
 
 defvars __crt_vars_thread
 {
+   __thrd_id          ds.b  1      ;; thread id of current thread
+
    _errno             ds.w  1
    __heap             ds.w  1      ;; current malloc heap
    __qtbl             ds.w  1      ;; current balloc table
