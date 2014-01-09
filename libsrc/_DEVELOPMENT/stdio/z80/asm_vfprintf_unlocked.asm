@@ -1,11 +1,44 @@
 
-XLIB asm_vfprintf_unlocked
+XLIB asm_vfprintf
+XDEF asm_vfprintf_unlocked
 
 LIB asm_strchrnul, l_atou, l_neg_hl, l_jphl
 LIB __stdio_nextarg_de, __stdio_send_output_buffer
-LIB __PRINTF_CONVERTER_JUMPTABLE
+LIB __stdio_lock_acquire, __stdio_lock_release, __stdio_verify_output
+
+asm_vfprintf:
+
+   ; enter : ix = FILE *
+   ;         de = char *format
+   ;         bc = void *stack_param
+   ;
+   ; exit  :
+   ;
+   ; uses  : all except ix
+
+   call __stdio_lock_acquire
+   jp c, error_enolck_mc
+   
+   call asm_vfprintf_unlocked
+   jp __stdio_lock_release
 
 asm_vfprintf_unlocked:
+
+   ; enter : ix = FILE *
+   ;         de = char *format
+   ;         bc = void *stack_param
+   ;
+   ; exit  :
+   ;
+   ; uses  : all except ix
+
+   call __stdio_verify_output  ; check that output on stream is ok
+   ret c                       ; if problem with output
+   
+   
+
+
+
 
 
 
@@ -25,7 +58,7 @@ format_loop:
    ld c,'%'
    call asm_strchrnul
    
-   jr c, format_end            ; if end of format string reached
+***jr c, format_end            ; if end of format string reached
    
    ; output format string chars up to '%'
    
@@ -264,7 +297,6 @@ lm_loop:
 converter_specifier:
 
    ; identify conversion "bcdinopsuxIX"
-   ; "dsucxXinIpob" <- check most common to least common
 
    ; de = address of next format char to examine
    ;  c = length modifier id
@@ -274,7 +306,7 @@ converter_specifier:
    inc de                      ; consume converter spec
    
    ld b,a                      ; b = conversion spec sought
-   ld hl,__PRINTF_CONVERTER_JUMPTABLE
+   ld hl,__PRINTF_CONVERTER_TABLE
   
 spec_loop:
 
@@ -285,13 +317,22 @@ spec_loop:
    inc hl
    
    cp b
-   jp z, l_jphl                ; if spec found
+   jr z, spec_found
 
    inc hl
    inc hl
    inc hl
    
    jr spec_loop
+
+spec_found:
+
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   
+   jp (hl)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -336,21 +377,80 @@ flag_chars:
 
 lm_chars:
 
-   defb 'L', lm_L
-   defb 'h', lm_h
-   defb 'j', lm_j
-   defb 'l', lm_l
-   defb 't', lm_t
-   defb 'z', lm_z
+   defb 'l', __lm_l
+   defb 'L', __lm_L
+   defb 'h', __lm_h
+   defb 'j', __lm_j
+   defb 't', __lm_t
+   defb 'z', __lm_z
 
-   defc lm_L = $01
-   defc lm_h = $02
-   defc lm_j = $08
-   defc lm_l = $10
-   defc lm_t = $40
-   defc lm_z = $80
+   defc __lm_L = $01
+   defc __lm_h = $02
+   defc __lm_j = $08
+   defc __lm_l = $10
+   defc __lm_t = $40
+   defc __lm_z = $80
    
-   defc lm_ll = $20
-   defc lm_hh = $04
+   defc __lm_ll = $20
+   defc __lm_hh = $04
+
+;******************************
+; * PRINTF CONVERTERS *********
+
+__PRINTF_CONVERTER_TABLE:
+
+   defb 'd'
+   defw _printf_d
+   
+   defb 's'
+   defw _printf_s
+
+   defb 'c'
+   defw _printf_c
+   
+   defb 'u'
+   defw _printf_u
+   
+   defb 'x'
+   defw _printf_x
+
+   defb 'X'
+   defw _printf_X
+   
+   defb 'i'
+   defw _printf_i
+   
+   defb 'n'
+   defw _printf_n
+   
+   defb 'I'
+   defw _printf_I
+   
+   defb 'p'
+   defw _printf_p
+   
+   defb 'o'
+   defw _printf_o
+   
+   defb 'b'
+   defw _printf_b
+   
+   defb 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;IN:
+
+   ; de = address of next format char to examine
+   ;  c = length modifier id
+   ; stack = width, precision, stack_param
+
+;;;OUT:
+
+   ; ix = FILE *
+   ; hl = void *stack_param
+   ; de = void *buffer_digits
+   ; stack = buffer_digits, width, precision
+
+"bcdinopsuxIX"
