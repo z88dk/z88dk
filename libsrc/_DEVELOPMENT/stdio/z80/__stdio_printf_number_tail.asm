@@ -259,6 +259,6 @@ left_justify:
    call out_internal           ; output precision field
       
    pop bc                      ; bc = external_spacing
-   ret c                       ; if stream error
    
-   jp __stdio_printf_padding_width_bc  ; output spaces to satisfy width field
+   jp nc, __stdio_printf_padding_width_bc  ; if no stream error
+   ret
