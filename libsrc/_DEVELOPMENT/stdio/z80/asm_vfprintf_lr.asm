@@ -10,7 +10,7 @@
 ; ===============================================================
 
 XLIB asm_vfprintf
-XDEF asm_vfprintf_unlocked
+XDEF asm_vfprintf_unlocked, asm0_vfprintf_unlocked
 
 LIB asm_strchrnul, l_atou, l_neg_hl, l_jphl, l_utod_hl
 LIB __stdio_nextarg_de, __stdio_send_output_buffer
@@ -84,11 +84,17 @@ asm_vfprintf_unlocked:
    call __stdio_verify_output  ; check that output on stream is ok
    ret c                       ; if output on stream not possible
 
+asm0_vfprintf_unlocked:
+
    ld hl,-44
    add hl,sp
    ld sp,hl                    ; create 44 bytes of workspace
 
    push bc
+   
+   exx
+   ld hl,0                     ; initial output count is zero
+   exx
    
 ;******************************
 ; * FORMAT STRING LOOP ********
