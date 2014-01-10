@@ -34,6 +34,9 @@ asm_vsprintf:
    ;
    ;            erange = width or precision out of range
    ;            einval = unknown printf conversion
+   ;
+   ; note  : High level stdio uses hl' to track number of chars
+   ;         written to the stream but modifies no other exx registers
    ;            
    ; uses  : all
 
@@ -52,6 +55,12 @@ asm_vsprintf:
    ; print to string
    
    call asm0_vfprintf_unlocked
+   
+   ; repair stack
+   
+   pop bc
+   pop bc
+   pop bc
    
    ; terminate string
    
