@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.112 2014-01-09 23:26:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.113 2014-01-10 00:15:25 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -57,8 +57,8 @@ INSTALL ?= install
 #		make install
 #	4) Setup environment variable PKG_CONFIG_PATH to C:\MinGW\msys\1.0\lib\pkgconfig
 #------------------------------------------------------------------------------
-CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
-LDFLAGS += $(shell pkg-config --libs   glib-2.0)
+#CFLAGS		+= $(shell pkg-config --cflags glib-2.0)
+#LDFLAGS	+= $(shell pkg-config --libs   glib-2.0)
 
 #------------------------------------------------------------------------------
 # Object files
@@ -119,7 +119,7 @@ TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-I$(LOCAL_LIB) -W -Wformat -Werror=format-security
+CFLAGS +=		-I$(LOCAL_LIB) -W -Wformat -Werror=format-security 
 
 #------------------------------------------------------------------------------
 # main
@@ -243,7 +243,12 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.112  2014-01-09 23:26:24  pauloscustodio
+# Revision 1.113  2014-01-10 00:15:25  pauloscustodio
+# Use Str instead of glib, List instead of GSList.
+# Use init.h mechanism, no need for main() calling init_scan.
+# glib dependency removed from code and Makefile
+#
+# Revision 1.112  2014/01/09 23:26:24  pauloscustodio
 # Use init.h mechanism, no need for main() calling init_codearea
 #
 # Revision 1.111  2014/01/09 23:13:03  pauloscustodio
@@ -758,10 +763,10 @@ objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h errors.h
 objfile.o: errors_def.h file.h config.h  lib/strutil.h objfile.h
 objfile.o: lib/strpool.h legacy.h
 options.o: lib/xmalloc.h errors.h errors_def.h scan.h lib/class.h lib/queue.h
-options.o: lib/types.h file.h config.h  lib/strutil.h
-options.o: lib/fileutil.h lib/list.h hist.h lib/init.h lib/die.h options.h
-options.o: options_def.h lib/strpool.h symtab.h lib/classhash.h lib/strhash.h
-options.o: lib/uthash.h sym.h symref.h lib/classlist.h z80asm.h
+options.o: lib/types.h lib/strutil.h lib/list.h file.h config.h 
+options.o: lib/fileutil.h hist.h lib/init.h lib/die.h options.h options_def.h
+options.o: lib/strpool.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
+options.o: sym.h symref.h lib/classlist.h z80asm.h
 prsident.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 prsident.o: errors.h errors_def.h listfile.h lib/class.h lib/queue.h
 prsident.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
@@ -772,10 +777,10 @@ prsline.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
 prsline.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 prsline.o: lib/die.h token_def.h options.h lib/list.h options_def.h errors.h
 prsline.o: errors_def.h
-scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h codearea.h
-scan.o: errors.h errors_def.h file.h config.h  lib/strutil.h
-scan.o: legacy.h listfile.h symref.h lib/classlist.h options.h lib/list.h
-scan.o: options_def.h lib/strpool.h
+scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h
+scan.o: lib/strutil.h lib/list.h codearea.h errors.h errors_def.h file.h
+scan.o: config.h  lib/init.h lib/die.h legacy.h listfile.h
+scan.o: symref.h lib/classlist.h options.h options_def.h lib/strpool.h
 srcfile.o: lib/xmalloc.h lib/die.h options.h lib/types.h lib/list.h
 srcfile.o: lib/class.h lib/queue.h options_def.h srcfile.h lib/strutil.h
 srcfile.o: lib/classlist.h lib/strpool.h codearea.h errors.h errors_def.h

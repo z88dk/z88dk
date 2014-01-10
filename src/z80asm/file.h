@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.28 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.29 2014-01-10 00:15:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.28 2014-01-02
 #include "types.h"
 
 #if 0
-#include <glib.h>
 /*-----------------------------------------------------------------------------
 *   Object representing an open file
 *	Files open for writing and not closed are removed on exit, to avoid 
@@ -103,7 +102,12 @@ extern void   xfget_c2sstr( Str *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.28  2014-01-02 17:18:16  pauloscustodio
+Revision 1.29  2014-01-10 00:15:25  pauloscustodio
+Use Str instead of glib, List instead of GSList.
+Use init.h mechanism, no need for main() calling init_scan.
+glib dependency removed from code and Makefile
+
+Revision 1.28  2014/01/02 17:18:16  pauloscustodio
 StrList removed, replaced by List
 
 Revision 1.27  2014/01/01 21:23:48  pauloscustodio

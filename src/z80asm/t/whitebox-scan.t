@@ -123,11 +123,9 @@ void get_tokens( Scan *scan, int n, BOOL by_lines )
 END
 
 t_compile_module($init, <<'END', $objs);
-	GString *input = g_string_new("");
+	Str *input = OBJ_NEW(Str);
 	Scan *scan = OBJ_NEW(Scan);
 	int i, j;
-	
-	init_scan(); atexit(fini_scan);
 	
 	/* scan each argv */
 	for ( i = 1; i < argc; i++ )
@@ -159,7 +157,7 @@ t_compile_module($init, <<'END', $objs);
 	}
 	
 	warn("Test scan stack\n");
-	g_string_assign( input, "start:ld a,25\n");
+	Str_set( input, "start:ld a,25\n");
 	warn("Text: %s", input->str );
 	scan_string( input->str );
 	get_tokens( NULL, 4, FALSE );
@@ -167,7 +165,7 @@ t_compile_module($init, <<'END', $objs);
 	warn("Insert text: 2*\n" );
 	get_tokens( NULL, -1, FALSE );
 	
-	g_string_free( input, TRUE );
+	OBJ_DELETE(input);
 	OBJ_DELETE(scan);
 END
 
@@ -988,8 +986,6 @@ ERR
 t_compile_module($init, <<'END', $objs);
 	int i, j;
 	
-	init_scan(); atexit(fini_scan);
-	
 	for ( j = 0; j < 2; j++ )
 	{
 		for ( i = 1; i < argc; i++ )
@@ -1052,8 +1048,6 @@ t_compile_module($init, <<'END', $objs);
 					 "test5.asm", "test6.asm", "test7.asm", NULL};
 	int i;
 	char *text;
-	
-	init_scan(); atexit(fini_scan);
 	
 	if (argc == 2 && strcmp(argv[1], "-C") == 0) opts.line_mode = TRUE;
 	if (argc == 2 && strcmp(argv[1], "-l") == 0) opts.list = opts.cur_list = TRUE;
@@ -1302,9 +1296,14 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.30 2014-01-06 00:33:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.31 2014-01-10 00:15:27 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.30  2014-01-06 00:33:36  pauloscustodio
+# Revision 1.31  2014-01-10 00:15:27  pauloscustodio
+# Use Str instead of glib, List instead of GSList.
+# Use init.h mechanism, no need for main() calling init_scan.
+# glib dependency removed from code and Makefile
+#
+# Revision 1.30  2014/01/06 00:33:36  pauloscustodio
 # Use init.h mechanism, no need for main() calling init_errors
 # and atexit(fini_errors); use Str and StrHash instead of glib.
 #

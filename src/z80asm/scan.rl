@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.7 2013-12-15 13:18:34 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.8 2014-01-10 00:15:27 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -25,10 +25,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.7 2013-12-15
 #include "ctype.h"
 #include "errors.h"
 #include "file.h"
+#include "init.h"
 #include "legacy.h"
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
+#include "strutil.h"
 #include "types.h"
 
 static int scan_num(char *text, int num_suffix_chars, int base);
@@ -38,7 +40,7 @@ static int scan_num(char *text, int num_suffix_chars, int base);
 *----------------------------------------------------------------------------*/
 enum token last_token;
 int		   last_token_num;
-GString	  *last_token_str;
+Str		  *last_token_str;
 
 static Scan *the_scan;
 
@@ -165,8 +167,8 @@ static Scan *the_scan;
 	( name | "af'"i ) when by_tokens
 	{
 		c = *(ctx->te); *(ctx->te) = '\0';			/* make substring */
-		g_string_assign( last_token_str, ctx->ts );
-		g_string_ascii_up( last_token_str );
+		Str_set( last_token_str, ctx->ts );
+		strtoupper( last_token_str->str );
 		*(ctx->te) = c;								/* recover input */
 		last_token = t_name;
 		fbreak;
@@ -181,8 +183,8 @@ static Scan *the_scan;
 		
 		/* copy token */
 		c = *(ctx->te); *(ctx->te) = '\0';		/* make substring */
-		g_string_assign( last_token_str, ctx->ts );
-		g_string_ascii_up( last_token_str );
+		Str_set( last_token_str, ctx->ts );
+		strtoupper( last_token_str->str );
 		*(ctx->te) = c;							/* recover input */
 		last_token = t_label;
 		fbreak;
@@ -206,7 +208,7 @@ static Scan *the_scan;
 	( '"' [^"\n]* '"' ) when by_tokens
 	{
 		c = *(ctx->te-1); *(ctx->te-1) = '\0';		/* make substring */
-		g_string_assign( last_token_str, ctx->ts+1 );
+		Str_set( last_token_str, ctx->ts+1 );
 		*(ctx->te-1) = c;							/* recover input */
 		last_token = t_string;
 		fbreak;
@@ -220,7 +222,7 @@ static Scan *the_scan;
 	( [^\n]* '\n'? ) when by_lines
 	{
 		c = *(ctx->te); *(ctx->te) = '\0';			/* make substring */
-		g_string_assign( last_token_str, ctx->ts );
+		Str_set( last_token_str, ctx->ts );
 		*(ctx->te) = c;								/* recover input */
 		last_token = t_string;
 		fbreak;
@@ -282,15 +284,15 @@ static int scan_num (char *text, int length, int base)
 /*-----------------------------------------------------------------------------
 * Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-void init_scan(void)
+DEFINE_init()
 {
-	last_token_str = g_string_new("");
-	the_scan = OBJ_NEW(Scan);
+	last_token_str	= OBJ_NEW(Str);
+	the_scan 		= OBJ_NEW(Scan);
 }
 	
-void fini_scan(void)
+DEFINE_fini()
 {
-	g_string_free( last_token_str, TRUE );
+	OBJ_DELETE(last_token_str);
 	OBJ_DELETE(the_scan);
 }
 
@@ -301,13 +303,15 @@ DEF_CLASS(ScanContext);
 
 void ScanContext_init(ScanContext *self)
 {
-	self->input = g_string_new("");
+	init();
+	self->input = OBJ_NEW(Str);
+	OBJ_AUTODELETE(self->input) = FALSE;
 }
 
 void ScanContext_fini(ScanContext *self)
 {
-	if ( self->input )
-		g_string_free( self->input, TRUE );
+	init();
+	OBJ_DELETE(self->input);
 	
 	if ( self->file )
 		xfclose( self->file );
@@ -315,6 +319,7 @@ void ScanContext_fini(ScanContext *self)
 
 void ScanContext_copy(ScanContext *self, ScanContext *other)
 {
+	init();
 }
 
 
@@ -325,19 +330,29 @@ DEF_CLASS(Scan);
 
 void Scan_init(Scan *self)
 {
+	init();
+	self->ctx = NULL;		/* init by push_context() */
+	self->stack = OBJ_NEW(List);
+	OBJ_AUTODELETE(self->stack) = FALSE;
 }
 
 void Scan_fini(Scan *self)
 {
-	/* delete all list elements */
-	g_slist_foreach( self->stack, (GFunc) ScanContext_delete, 0 );
-	g_slist_free( self->stack );
+	ScanContext *ctx;
 	
+	init();
+	
+	/* delete all list elements */
+	while ( (ctx = List_pop( self->stack )) != NULL )
+		OBJ_DELETE( ctx );
+
 	OBJ_DELETE(self->ctx);
+	OBJ_DELETE(self->stack);
 }
 
 void Scan_copy(Scan *self, Scan *other)
 {
+	init();
 }
 
 
@@ -348,7 +363,7 @@ static void reset_last_token(void)
 {
 	last_token = t_end;
 	last_token_num = 0;
-	g_string_truncate( last_token_str, 0 );
+	Str_clear( last_token_str );
 }
 
 /*-----------------------------------------------------------------------------
@@ -385,18 +400,18 @@ static BOOL read_next_line( ScanContext *ctx )
 {
 	int c1, c2;
 	
-	g_string_truncate( ctx->input, 0 );
+	Str_clear( ctx->input );
 	while ( (c1 = getc( ctx->file )) != EOF && c1 != '\n' && c1 != '\r' )
-		g_string_append_c( ctx->input, c1 );
+		Str_append_char( ctx->input, c1 );
 	
 	if ( c1 == EOF )
 	{
 		if ( ctx->input->len > 0 )					/* read some chars */
-			g_string_append_c( ctx->input, '\n' );	/* missing newline at end of line */
+			Str_append_char( ctx->input, '\n' );	/* missing newline at end of line */
 	}
 	else 						
 	{
-		g_string_append_c( ctx->input, '\n' );		/* end of line */
+		Str_append_char( ctx->input, '\n' );		/* end of line */
 		
 		if ( (c2 = getc( ctx->file )) != EOF &&
 			 ! ( c1 == '\n' && c2 == '\r' ||
@@ -442,7 +457,7 @@ static void push_context( Scan *self )
 		line_nr  = self->ctx->line_nr;
 
 		/* push current top context to stack */
-		self->stack = g_slist_prepend( self->stack, self->ctx );
+		List_push( & self->stack, self->ctx );
 	}
 
 	/* create the new context */
@@ -459,17 +474,16 @@ static void push_context( Scan *self )
 *----------------------------------------------------------------------------*/
 static void pop_context( Scan *self )
 {
-	OBJ_DELETE(self->ctx);
-	if ( self->stack )
+	OBJ_DELETE( self->ctx );
+	if ( ! List_empty( self->stack ) )
 	{
 		/* pop one */
-		self->ctx = self->stack->data;
-		self->stack = g_slist_remove( self->stack, self->ctx );
-
+		self->ctx = List_pop( self->stack );
 		set_error_location( self->ctx );
 	}
 	else
 	{
+		self->ctx = NULL;
 		set_error_null();
 	}
 }
@@ -479,13 +493,15 @@ static void pop_context( Scan *self )
 *----------------------------------------------------------------------------*/
 void scan_string( char *text )
 {
+	init();
 	scan_string_Scan( the_scan, text );
 }
 
 void scan_string_Scan( Scan *self, char *text )
 {
+	init();
 	push_context( self );
-	g_string_assign( self->ctx->input, text );
+	Str_set( self->ctx->input, text );
 	reset_scan( self->ctx );
 }
 
@@ -494,21 +510,24 @@ void scan_string_Scan( Scan *self, char *text )
 *----------------------------------------------------------------------------*/
 void scan_file( char *filename )
 {
+	init();
 	scan_file_Scan( the_scan, filename );
 }
 
 void scan_file_Scan( Scan *self, char *filename )
 {
-	GSList		*i;
+	ListElem	*iter;
 	ScanContext *ctx;
+
+	init();
 
 	/* create the context */
 	push_context( self );
 	
 	/* check for recursive includes */
-	for ( i = self->stack; i; i = g_slist_next(i) )
+	for ( iter = List_first(self->stack); iter; iter = List_next(iter) )
 	{
-		ctx = i->data;
+		ctx = iter->data;
 		if ( ctx->file && ctx->filename &&
 		     strcmp(filename, ctx->filename) == 0 )
 			fatal_include_recursion( filename );
@@ -558,11 +577,13 @@ static enum token _get_token_Scan( Scan *self, BOOL by_lines )
 *----------------------------------------------------------------------------*/
 enum token get_token( void )
 {
+	init();
 	return get_token_Scan( the_scan );
 }
 
 enum token get_token_Scan( Scan *self )
 {
+	init();
 	return _get_token_Scan( self, FALSE );	/* by tokens */
 }
 
@@ -572,12 +593,16 @@ enum token get_token_Scan( Scan *self )
 *----------------------------------------------------------------------------*/
 char *get_line( void )
 {
+	init();
 	return get_line_Scan( the_scan );
 }
 
 char *get_line_Scan( Scan *self )
 {
-	enum token token = _get_token_Scan( self, TRUE );	/* by lines */
+	enum token token;
+	
+	init();
+	token = _get_token_Scan( self, TRUE );	/* by lines */
 	if ( token == t_string )
 		return last_token_str->str;
 	else
@@ -655,6 +680,7 @@ static enum symbols map_sym( enum token token )
 /* get the next token */
 enum symbols GetSym( void )
 {
+	init();
 	/* call lexer, set token, ident */
 	sym = map_sym( get_token() );
 	g_strlcpy( ident, last_token_str->str, sizeof(ident) );
@@ -665,6 +691,7 @@ enum symbols GetSym( void )
 /* skip to end of line */
 void Skipline( void )
 {
+	init();
 	while ( sym != newline && sym != nil )
 		GetSym();
 }
@@ -674,7 +701,12 @@ void Skipline( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.7  2013-12-15 13:18:34  pauloscustodio
+* Revision 1.8  2014-01-10 00:15:27  pauloscustodio
+* Use Str instead of glib, List instead of GSList.
+* Use init.h mechanism, no need for main() calling init_scan.
+* glib dependency removed from code and Makefile
+*
+* Revision 1.7  2013/12/15 13:18:34  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *

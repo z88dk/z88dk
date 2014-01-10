@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.127 2014-01-09 23:26:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.128 2014-01-10 00:15:27 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.127  2014-01-09 23:26:24  pauloscustodio
+/* Revision 1.128  2014-01-10 00:15:27  pauloscustodio
+/* Use Str instead of glib, List instead of GSList.
+/* Use init.h mechanism, no need for main() calling init_scan.
+/* glib dependency removed from code and Makefile
+/*
+/* Revision 1.127  2014/01/09 23:26:24  pauloscustodio
 /* Use init.h mechanism, no need for main() calling init_codearea
 /*
 /* Revision 1.126  2014/01/09 23:13:04  pauloscustodio
@@ -1355,10 +1360,6 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
 int main( int argc, char *argv[] )
 {
 	ListElem *iter;
-
-	/* init modules */
-	init_scan();
-	atexit(fini_scan);
 
 	/* start try..catch with finally to cleanup any allocated memory */
     TRY

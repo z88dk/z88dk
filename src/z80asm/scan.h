@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.22 2013-12-15 13:18:34 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.23 2014-01-10 00:15:26 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -23,7 +23,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.22 2013-12-15 13:18
 
 #include "class.h"
 #include "types.h"
-#include <glib.h>
+#include "strutil.h"
+#include "list.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -91,19 +92,13 @@ enum token {
 *----------------------------------------------------------------------------*/
 extern enum token last_token;
 extern int		  last_token_num;
-extern GString	 *last_token_str;
-
-/*-----------------------------------------------------------------------------
-*   Initialize and Terminate module
-*----------------------------------------------------------------------------*/
-extern void init_scan(void);
-extern void fini_scan(void);
+extern Str		 *last_token_str;
 
 /*-----------------------------------------------------------------------------
 * State of one scan context
 *----------------------------------------------------------------------------*/
 CLASS(ScanContext)
-	GString	*input;				/* text being scanned */
+	Str		*input;				/* text being scanned */
 	
 	FILE	*file;				/* file being scanned, if any */
 	char	*filename;			/* name of file, kept in strpool */
@@ -120,7 +115,7 @@ END_CLASS;
 *----------------------------------------------------------------------------*/
 CLASS(Scan)
 	ScanContext	*ctx;			/* current context */
-	GSList		*stack;			/* stack of previous contexts */
+	List		*stack;			/* stack of previous contexts */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -164,7 +159,12 @@ extern void Skipline( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.22  2013-12-15 13:18:34  pauloscustodio
+* Revision 1.23  2014-01-10 00:15:26  pauloscustodio
+* Use Str instead of glib, List instead of GSList.
+* Use init.h mechanism, no need for main() calling init_scan.
+* glib dependency removed from code and Makefile
+*
+* Revision 1.22  2013/12/15 13:18:34  pauloscustodio
 * Move memory allocation routines to lib/xmalloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *
