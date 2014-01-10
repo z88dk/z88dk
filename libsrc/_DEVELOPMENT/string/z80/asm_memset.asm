@@ -20,6 +20,7 @@ asm_memset:
    ; exit  : hl = void *s
    ;         de = ptr in s to byte after last one written
    ;         bc = 0
+   ;         carry reset
    ;
    ; uses  : af, bc, de
 
