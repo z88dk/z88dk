@@ -1,12 +1,7 @@
 
 XLIB __stdio_printf_x
-XDEF __stdio_printf_X
 
 LIB __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_utoh
-
-__stdio_printf_X:
-
-   set 7,(ix+4)                ; set capitalize flag
 
 __stdio_printf_x:
 
