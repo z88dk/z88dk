@@ -1,13 +1,11 @@
 
-XLIB __stdio_lock_acquire
-XDEF asm_flockfile
+XLIB __stdio_lock_tryacquire
 
 LIB asm_mtx_lock
 
-__stdio_lock_acquire:
-asm_flockfile:
+__stdio_lock_tryacquire:
 
-   ; Acquire the FILE lock
+   ; Try to acquire the FILE lock but don't block
    ;
    ; enter : ix = FILE *
    ;
@@ -26,7 +24,7 @@ asm_flockfile:
    ld hl,7
    add hl,de                   ; hl = & FILE->mtx_t
    
-   call asm_mtx_lock           ; lock stream
+   call asm_mtx_trylock        ; lock stream
    
    pop hl
    pop de

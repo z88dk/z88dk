@@ -1,9 +1,11 @@
 
 XLIB __stdio_lock_release
+XDEF asm_funlockfile
 
 LIB asm_mtx_unlock
 
 __stdio_lock_release:
+asm_funlockfile:
 
    ; Release the FILE lock
    ;
