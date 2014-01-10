@@ -5,5 +5,7 @@ defgroup
    __EDOM,
    __EINVAL,
    __ENOMEM,
-   __ERANGE
+   __ERANGE,
+   __EACCES,
+   __ENOLCK
 }
