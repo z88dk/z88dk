@@ -14,7 +14,7 @@
 XLIB asm_fwrite
 XDEF asm_fwrite_unlocked
 
-LIB __stdio_verify_output, error_znc, error_zc, __stdio_send_output_raw_buffer_unchecked
+LIB __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_zc
 
 asm_fwrite:
