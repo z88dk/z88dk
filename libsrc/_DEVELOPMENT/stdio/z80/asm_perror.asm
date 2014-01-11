@@ -12,8 +12,8 @@
 XLIB asm_perror
 
 LIB asm_strerror, asm_fputs_unlocked, asm_fputc_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release
-XREF __FILE_STDERR, _errno, error_enolck_mc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_mc
+XREF __FILE_STDERR, _errno
 
 asm_perror:
 
@@ -26,7 +26,7 @@ asm_perror:
    ld ix,__FILE_STDERR
    
    call __stdio_lock_acquire   ; so that output is contiguous
-   jp c, error_enolck_mc       ; if lock could not be acquired
+   jp c, error_mc              ; if lock could not be acquired, do not overwrite errno
    
    ld a,h
    or l
