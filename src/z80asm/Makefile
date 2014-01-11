@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.114 2014-01-11 00:10:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.115 2014-01-11 00:16:01 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -217,7 +217,7 @@ gccmake.bat : Makefile
 				'del *.o $(LOCAL_LIB)\\*.o', qq(\n); \
 			for (@ARGV) { \
 				s/\.o$$//; \
-				print 'gcc -c -o '; \
+				print 'gcc -Ilib -Wall -c -o '; \
 				print; \
 				print '.o ', ' ' x (20 - length); \
 				print; \
@@ -241,7 +241,15 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.114  2014-01-11 00:10:38  pauloscustodio
+# Revision 1.115  2014-01-11 00:16:01  pauloscustodio
+# Reported by Stefan Drissen (stefan.drissen@gmail.com) 2013-01-11:
+# z80asm however does not compile - xmalloc.h cannot be found. The header is in the lib directory, but there is nothing telling gcc to look in the lib directory. I see that the Linux makefile is adding -I lib to also look in the lib directory.
+#
+# If I add -I lib to all the gcc -c lines in gccmake.bat then z80asm also compiles fine.
+#
+# So gccmake.bat needs an update?
+#
+# Revision 1.114  2014/01/11 00:10:38  pauloscustodio
 # Astyle - format C code
 # Add -Wall option to CFLAGS, remove all warnings
 #
