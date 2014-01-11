@@ -19,6 +19,7 @@ asm_strlen:
    ;        bc = -(length + 1)
    ;         a = 0
    ;        z flag set if 0 length
+   ;        carry reset
    ;
    ; uses : af, bc, hl
 
