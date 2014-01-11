@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.2 2013-12-23 19:19:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.3 2014-01-11 01:29:41 pauloscustodio Exp $
 #
 # Test except.c
 
@@ -140,7 +140,11 @@ sub t_capture {
 }
 
 # $Log: except.t,v $
-# Revision 1.2  2013-12-23 19:19:52  pauloscustodio
+# Revision 1.3  2014-01-11 01:29:41  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.2  2013/12/23 19:19:52  pauloscustodio
 # Show difference in command output in case of test failure
 #
 # Revision 1.1  2013/12/15 20:30:39  pauloscustodio

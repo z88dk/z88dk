@@ -10,13 +10,13 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.7 2014-01-11 01:06:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.8 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,7 +45,11 @@ END_CLASS;
 
 /*
 * $Log: srcfile.h,v $
-* Revision 1.7  2014-01-11 01:06:33  pauloscustodio
+* Revision 1.8  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.7  2014/01/11 01:06:33  pauloscustodio
 * -Wall comments
 *
 * Revision 1.6  2013/12/30 02:05:32  pauloscustodio

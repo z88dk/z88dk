@@ -4,9 +4,9 @@ able to retrieve in the order added.
 Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.4 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -76,7 +76,11 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /*
 * $Log: strhash.h,v $
-* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Revision 1.4  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.3  2014/01/11 00:10:39  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings
 *

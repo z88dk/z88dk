@@ -11,7 +11,7 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
 # Test file
 
@@ -652,9 +652,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.34 2014-01-11 00:40:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.35 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.34  2014-01-11 00:40:31  pauloscustodio
+# Revision 1.35  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.34  2014/01/11 00:40:31  pauloscustodio
 # Remove xstat(); stat() can be used to detect non-existent files
 #
 # Revision 1.33  2014/01/11 00:10:40  pauloscustodio

@@ -11,11 +11,11 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.22 2014-01-11 00:10:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.23 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -81,7 +81,11 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.22  2014-01-11 00:10:38  pauloscustodio
+* Revision 1.23  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.22  2014/01/11 00:10:38  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings
 *

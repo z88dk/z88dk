@@ -11,11 +11,15 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.8 2013-08-30 01:07:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.9 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: eol_format.t,v $
-# Revision 1.8  2013-08-30 01:07:27  pauloscustodio
+# Revision 1.9  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.8  2013/08/30 01:07:27  pauloscustodio
 # Convert eol of files but do not fail test if convertion is done
 #
 # Revision 1.7  2013/03/10 17:56:12  pauloscustodio

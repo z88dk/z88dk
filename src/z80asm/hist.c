@@ -11,9 +11,9 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.66 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.67 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.66 2014-01-11 00:10
 
 /*
 * $Log: hist.c,v $
-* Revision 1.66  2014-01-11 00:10:39  pauloscustodio
+* Revision 1.67  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.66  2014/01/11 00:10:39  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings
 *
@@ -1589,7 +1593,7 @@ FUTURE CHANGES - require change of the object file format
 #include "hist.h"
 
 #define VERSION     "2.1.2a"
-#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
 #include <qdos.h>

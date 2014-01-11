@@ -11,9 +11,9 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.25 2014-01-11 01:06:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.26 2014-01-11 01:29:46 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -532,7 +532,11 @@ done_testing;
 
 
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.25  2014-01-11 01:06:33  pauloscustodio
+# Revision 1.26  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.25  2014/01/11 01:06:33  pauloscustodio
 # -Wall comments
 #
 # Revision 1.24  2013/12/30 02:05:34  pauloscustodio

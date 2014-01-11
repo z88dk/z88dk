@@ -4,9 +4,9 @@ Simple fence mechanism and exception thrown on out of memory.
 Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.4 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.5 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -55,7 +55,11 @@ extern void xfreef( void *memptr );
 
 /*
 * $Log: xmalloc.h,v $
-* Revision 1.4  2014-01-11 00:10:39  pauloscustodio
+* Revision 1.5  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.4  2014/01/11 00:10:39  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings
 *

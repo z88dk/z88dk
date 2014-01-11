@@ -11,13 +11,17 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.4 2013-12-11 23:33:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.5 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: objfile.t,v $
-# Revision 1.4  2013-12-11 23:33:55  pauloscustodio
+# Revision 1.5  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.4  2013/12/11 23:33:55  pauloscustodio
 # BUG_0039: library not pulled in if XLIB symbol not referenced in expression
 #
 # Revision 1.3  2013/06/04 21:40:21  pauloscustodio

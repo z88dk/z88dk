@@ -11,11 +11,15 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0017.t,v 1.1 2013-02-12 00:55:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0017.t,v 1.2 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: CH_0017.t,v $
-# Revision 1.1  2013-02-12 00:55:00  pauloscustodio
+# Revision 1.2  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.1  2013/02/12 00:55:00  pauloscustodio
 # CH_0017 : Align with spaces, deprecate -t option
 #
 #

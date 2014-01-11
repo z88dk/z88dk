@@ -11,55 +11,11 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.11 2014-01-11 00:10:39 pauloscustodio Exp $
-$Log: sym.c,v $
-Revision 1.11  2014-01-11 00:10:39  pauloscustodio
-Astyle - format C code
-Add -Wall option to CFLAGS, remove all warnings
-
-Revision 1.10  2013/12/30 02:05:32  pauloscustodio
-Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-handles both dynamically allocated strings and fixed-size strings.
-Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-
-Revision 1.9  2013/12/15 13:18:34  pauloscustodio
-Move memory allocation routines to lib/xmalloc, instead of glib,
-introduce memory leak report on exit and memory fence check.
-
-Revision 1.8  2013/10/05 13:43:05  pauloscustodio
-Parse command line options via look-up tables:
--i, --use-lib
--x, --make-lib
-
-Revision 1.7  2013/10/01 22:50:26  pauloscustodio
-Parse command line options via look-up tables:
--s, --symtable
--ns, --no-symtable
-
-Revision 1.6  2013/09/01 18:46:01  pauloscustodio
-Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
-
-Revision 1.5  2013/06/16 16:49:20  pauloscustodio
-Symbol_fullname() to return full symbol name NAME@MODULE
-
-Revision 1.4  2013/06/08 23:08:38  pauloscustodio
-comments
-
-Revision 1.3  2013/06/01 01:21:02  pauloscustodio
-Symbol references were being created twice
-
-Revision 1.2  2013/05/23 22:22:23  pauloscustodio
-Move symbol to sym.c, rename to Symbol
-
-Revision 1.1  2013/05/16 23:39:48  pauloscustodio
-Move struct node to sym.c, rename to Symbol
-Move SymbolRef to symref.c
-
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.12 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -130,4 +86,53 @@ char *Symbol_fullname( Symbol *sym )
 }
 
 
-
+/*
+* $Log: sym.c,v $
+* Revision 1.12  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.11  2014/01/11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+* 
+* Revision 1.10  2013/12/30 02:05:32  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+* 
+* Revision 1.9  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+* 
+* Revision 1.8  2013/10/05 13:43:05  pauloscustodio
+* Parse command line options via look-up tables:
+* -i, --use-lib
+* -x, --make-lib
+* 
+* Revision 1.7  2013/10/01 22:50:26  pauloscustodio
+* Parse command line options via look-up tables:
+* -s, --symtable
+* -ns, --no-symtable
+* 
+* Revision 1.6  2013/09/01 18:46:01  pauloscustodio
+* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+* 
+* Revision 1.5  2013/06/16 16:49:20  pauloscustodio
+* Symbol_fullname() to return full symbol name NAME@MODULE
+* 
+* Revision 1.4  2013/06/08 23:08:38  pauloscustodio
+* comments
+* 
+* Revision 1.3  2013/06/01 01:21:02  pauloscustodio
+* Symbol references were being created twice
+* 
+* Revision 1.2  2013/05/23 22:22:23  pauloscustodio
+* Move symbol to sym.c, rename to Symbol
+* 
+* Revision 1.1  2013/05/16 23:39:48  pauloscustodio
+* Move struct node to sym.c, rename to Symbol
+* Move SymbolRef to symref.c
+* 
+*/

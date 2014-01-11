@@ -5,9 +5,9 @@ All objects that were not deleted during the program execution
 are orderly destroyed at the exit, i.e. by calling the destructor of
 each object, which in turn may call destructors of contained objects.
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.6 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.7 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -154,7 +154,11 @@ extern void _deregister_obj( struct Object *obj );
 
 /*
 * $Log: class.h,v $
-* Revision 1.6  2014-01-11 00:10:39  pauloscustodio
+* Revision 1.7  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.6  2014/01/11 00:10:39  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings
 *

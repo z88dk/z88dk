@@ -11,11 +11,11 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.13 2014-01-09 23:26:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.14 2014-01-11 01:29:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -72,7 +72,11 @@ extern byte_t get_byte( size_t *paddr );
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.13  2014-01-09 23:26:24  pauloscustodio
+* Revision 1.14  2014-01-11 01:29:39  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.13  2014/01/09 23:26:24  pauloscustodio
 * Use init.h mechanism, no need for main() calling init_codearea
 *
 * Revision 1.12  2014/01/02 19:44:39  pauloscustodio

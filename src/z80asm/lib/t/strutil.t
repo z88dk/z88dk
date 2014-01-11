@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.6 2014-01-02 02:46:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.7 2014-01-11 01:29:41 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -594,7 +594,11 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.6  2014-01-02 02:46:42  pauloscustodio
+# Revision 1.7  2014-01-11 01:29:41  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.6  2014/01/02 02:46:42  pauloscustodio
 # new strip() function to eliminate start and end blanks from string
 #
 # Revision 1.5  2014/01/01 21:36:38  pauloscustodio

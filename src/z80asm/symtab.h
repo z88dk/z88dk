@@ -10,7 +10,7 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Symbol table
 Replaced avltree from original assembler by hash table because:
@@ -18,64 +18,10 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.12 2014-01-11 00:10:39 pauloscustodio Exp $
-$Log: symtab.h,v $
-Revision 1.12  2014-01-11 00:10:39  pauloscustodio
-Astyle - format C code
-Add -Wall option to CFLAGS, remove all warnings
-
-Revision 1.11  2014/01/05 23:20:39  pauloscustodio
-List, StrHash classlist and classhash receive the address of the container
-object in all functions that add items to the container, and create the
-container on first use. This allows a container to be staticaly
-initialized with NULL and instantiated on first push/unshift/set.
-Add count attribute to StrHash, classhash to count elements in container.
-Add free_data attribute in StrHash to register a free fucntion to delete
-the data container when the hash is removed or a key is overwritten.
-
-Revision 1.10  2013/12/15 13:18:34  pauloscustodio
-Move memory allocation routines to lib/xmalloc, instead of glib,
-introduce memory leak report on exit and memory fence check.
-
-Revision 1.9  2013/06/16 22:25:39  pauloscustodio
-New remove_all_{local,static,global}_syms( void ) functions
-to encapsulate calls to get_global_tab().
-
-Revision 1.8  2013/06/16 20:14:39  pauloscustodio
-Move deffile writing to deffile.c, remove global variable deffile
-
-Revision 1.7  2013/06/16 17:51:57  pauloscustodio
-get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
-it from get_global_tab()
-
-Revision 1.6  2013/06/14 22:14:36  pauloscustodio
-find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
-
-Revision 1.5  2013/06/11 23:16:06  pauloscustodio
-Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
-Add error message for invalid symbol and scope chars in object file.
-
-Revision 1.4  2013/06/08 23:37:32  pauloscustodio
-Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
- define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
-
-Revision 1.3  2013/06/08 23:07:53  pauloscustodio
-Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
- and define_global_def_sym().
-
-Revision 1.2  2013/06/01 01:24:22  pauloscustodio
-CH_0022 : Replace avltree by hash table for symbol table
-
-Revision 1.1  2013/05/23 22:22:24  pauloscustodio
-Move symbol to sym.c, rename to Symbol
-
-
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.13 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
-#ifndef SYMTAB_H
-#define SYMTAB_H
+#pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
@@ -158,5 +104,63 @@ extern void declare_extern_lib_symbol( char *name );
 extern int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b );
 extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
-#endif /* ndef SYMTAB_H */
 
+/*
+* $Log: symtab.h,v $
+* Revision 1.13  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.12  2014/01/11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+* 
+* Revision 1.11  2014/01/05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+* 
+* Revision 1.10  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+* 
+* Revision 1.9  2013/06/16 22:25:39  pauloscustodio
+* New remove_all_{local,static,global}_syms( void ) functions
+* to encapsulate calls to get_global_tab().
+* 
+* Revision 1.8  2013/06/16 20:14:39  pauloscustodio
+* Move deffile writing to deffile.c, remove global variable deffile
+* 
+* Revision 1.7  2013/06/16 17:51:57  pauloscustodio
+* get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+* it from get_global_tab()
+* 
+* Revision 1.6  2013/06/14 22:14:36  pauloscustodio
+* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+* 
+* Revision 1.5  2013/06/11 23:16:06  pauloscustodio
+* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+* Add error message for invalid symbol and scope chars in object file.
+* 
+* Revision 1.4  2013/06/08 23:37:32  pauloscustodio
+* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* 
+* Revision 1.3  2013/06/08 23:07:53  pauloscustodio
+* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+*  and define_global_def_sym().
+* 
+* Revision 1.2  2013/06/01 01:24:22  pauloscustodio
+* CH_0022 : Replace avltree by hash table for symbol table
+* 
+* Revision 1.1  2013/05/23 22:22:24  pauloscustodio
+* Move symbol to sym.c, rename to Symbol
+* 
+* 
+*/

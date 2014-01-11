@@ -10,28 +10,30 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.h,v 1.2 2013-12-15 13:18:34 pauloscustodio Exp $
-$Log: mapfile.h,v $
-Revision 1.2  2013-12-15 13:18:34  pauloscustodio
-Move memory allocation routines to lib/xmalloc, instead of glib,
-introduce memory leak report on exit and memory fence check.
-
-Revision 1.1  2013/06/15 00:26:23  pauloscustodio
-Move mapfile writing to mapfile.c.
-
-
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
-#ifndef MAPFILE_H
-#define MAPFILE_H
+#pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
 extern void write_map_file( void );
 
-#endif /* ndef MAPFILE_H */
-
+/*
+* $Log: mapfile.h,v $
+* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.2  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+* 
+* Revision 1.1  2013/06/15 00:26:23  pauloscustodio
+* Move mapfile writing to mapfile.c.
+* 
+*/

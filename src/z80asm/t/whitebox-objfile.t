@@ -11,7 +11,7 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
 # Test file
 
@@ -200,9 +200,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.20 2014-01-11 00:10:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.21 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.20  2014-01-11 00:10:40  pauloscustodio
+# Revision 1.21  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.20  2014/01/11 00:10:40  pauloscustodio
 # Astyle - format C code
 # Add -Wall option to CFLAGS, remove all warnings
 #

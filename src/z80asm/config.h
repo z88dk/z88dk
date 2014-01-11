@@ -11,9 +11,9 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.30 2014-01-01 21:23:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.31 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -83,7 +83,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.30 2014-01-
 
 /*
 * $Log: config.h,v $
-* Revision 1.30  2014-01-01 21:23:48  pauloscustodio
+* Revision 1.31  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.30  2014/01/01 21:23:48  pauloscustodio
 * Move generic file utility functions to lib/fileutil.c
 *
 * Revision 1.29  2013/12/15 19:01:07  pauloscustodio

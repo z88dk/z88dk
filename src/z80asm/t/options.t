@@ -11,9 +11,9 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.31 2013-12-11 23:33:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.32 2014-01-11 01:29:46 pauloscustodio Exp $
 #
 # Test options
 
@@ -1107,7 +1107,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.31  2013-12-11 23:33:55  pauloscustodio
+# Revision 1.32  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.31  2013/12/11 23:33:55  pauloscustodio
 # BUG_0039: library not pulled in if XLIB symbol not referenced in expression
 #
 # Revision 1.30  2013/11/22 00:21:43  pauloscustodio

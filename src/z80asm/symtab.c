@@ -10,7 +10,7 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
 Symbol table
 Replaced avltree from original assembler by hash table because:
@@ -18,92 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.19 2014-01-11 00:10:39 pauloscustodio Exp $
-$Log: symtab.c,v $
-Revision 1.19  2014-01-11 00:10:39  pauloscustodio
-Astyle - format C code
-Add -Wall option to CFLAGS, remove all warnings
-
-Revision 1.18  2014/01/05 23:20:39  pauloscustodio
-List, StrHash classlist and classhash receive the address of the container
-object in all functions that add items to the container, and create the
-container on first use. This allows a container to be staticaly
-initialized with NULL and instantiated on first push/unshift/set.
-Add count attribute to StrHash, classhash to count elements in container.
-Add free_data attribute in StrHash to register a free fucntion to delete
-the data container when the hash is removed or a key is overwritten.
-
-Revision 1.17  2013/12/15 13:18:34  pauloscustodio
-Move memory allocation routines to lib/xmalloc, instead of glib,
-introduce memory leak report on exit and memory fence check.
-
-Revision 1.16  2013/10/05 13:43:05  pauloscustodio
-Parse command line options via look-up tables:
--i, --use-lib
--x, --make-lib
-
-Revision 1.15  2013/10/01 22:50:27  pauloscustodio
-Parse command line options via look-up tables:
--s, --symtable
--ns, --no-symtable
-
-Revision 1.14  2013/10/01 22:09:33  pauloscustodio
-Parse command line options via look-up tables:
--sdcc
-
-Revision 1.13  2013/09/08 00:43:59  pauloscustodio
-New error module with one error function per error, no need for the error
-constants. Allows compiler to type-check error message arguments.
-Included the errors module in the init() mechanism, no need to call
-error initialization from main(). Moved all error-testing scripts to
-one file errors.t.
-
-Revision 1.12  2013/09/01 00:18:28  pauloscustodio
-- Replaced e4c exception mechanism by a much simpler one based on a few
-  macros. The former did not allow an exit(1) to be called within a
-  try-catch block.
-
-Revision 1.11  2013/06/16 22:25:39  pauloscustodio
-New remove_all_{local,static,global}_syms( void ) functions
-to encapsulate calls to get_global_tab().
-
-Revision 1.10  2013/06/16 20:14:39  pauloscustodio
-Move deffile writing to deffile.c, remove global variable deffile
-
-Revision 1.9  2013/06/16 17:51:57  pauloscustodio
-get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
-it from get_global_tab()
-
-Revision 1.8  2013/06/15 22:10:01  pauloscustodio
-BUG_0037 : Symbol already defined error when symbol used in IF expression
-
-Revision 1.7  2013/06/14 22:14:36  pauloscustodio
-find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
-
-Revision 1.6  2013/06/11 23:16:06  pauloscustodio
-Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
-Add error message for invalid symbol and scope chars in object file.
-
-Revision 1.5  2013/06/10 23:11:33  pauloscustodio
-CH_0023 : Remove notdecl_tab
-
-Revision 1.4  2013/06/08 23:37:32  pauloscustodio
-Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
- define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
-
-Revision 1.3  2013/06/08 23:07:53  pauloscustodio
-Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
- and define_global_def_sym().
-
-Revision 1.2  2013/06/01 01:24:22  pauloscustodio
-CH_0022 : Replace avltree by hash table for symbol table
-
-Revision 1.1  2013/05/23 22:22:23  pauloscustodio
-Move symbol to sym.c, rename to Symbol
-
-
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.20 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -601,3 +516,96 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 {
     return ( ( Symbol * )( a->value ) )->value - ( ( Symbol * )( b->value ) )->value;
 }
+
+
+/*
+* $Log: symtab.c,v $
+* Revision 1.20  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.19  2014/01/11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+* 
+* Revision 1.18  2014/01/05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+* 
+* Revision 1.17  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+* 
+* Revision 1.16  2013/10/05 13:43:05  pauloscustodio
+* Parse command line options via look-up tables:
+* -i, --use-lib
+* -x, --make-lib
+* 
+* Revision 1.15  2013/10/01 22:50:27  pauloscustodio
+* Parse command line options via look-up tables:
+* -s, --symtable
+* -ns, --no-symtable
+* 
+* Revision 1.14  2013/10/01 22:09:33  pauloscustodio
+* Parse command line options via look-up tables:
+* -sdcc
+* 
+* Revision 1.13  2013/09/08 00:43:59  pauloscustodio
+* New error module with one error function per error, no need for the error
+* constants. Allows compiler to type-check error message arguments.
+* Included the errors module in the init() mechanism, no need to call
+* error initialization from main(). Moved all error-testing scripts to
+* one file errors.t.
+* 
+* Revision 1.12  2013/09/01 00:18:28  pauloscustodio
+* - Replaced e4c exception mechanism by a much simpler one based on a few
+*   macros. The former did not allow an exit(1) to be called within a
+*   try-catch block.
+* 
+* Revision 1.11  2013/06/16 22:25:39  pauloscustodio
+* New remove_all_{local,static,global}_syms( void ) functions
+* to encapsulate calls to get_global_tab().
+* 
+* Revision 1.10  2013/06/16 20:14:39  pauloscustodio
+* Move deffile writing to deffile.c, remove global variable deffile
+* 
+* Revision 1.9  2013/06/16 17:51:57  pauloscustodio
+* get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+* it from get_global_tab()
+* 
+* Revision 1.8  2013/06/15 22:10:01  pauloscustodio
+* BUG_0037 : Symbol already defined error when symbol used in IF expression
+* 
+* Revision 1.7  2013/06/14 22:14:36  pauloscustodio
+* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+* 
+* Revision 1.6  2013/06/11 23:16:06  pauloscustodio
+* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+* Add error message for invalid symbol and scope chars in object file.
+* 
+* Revision 1.5  2013/06/10 23:11:33  pauloscustodio
+* CH_0023 : Remove notdecl_tab
+* 
+* Revision 1.4  2013/06/08 23:37:32  pauloscustodio
+* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* 
+* Revision 1.3  2013/06/08 23:07:53  pauloscustodio
+* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+*  and define_global_def_sym().
+* 
+* Revision 1.2  2013/06/01 01:24:22  pauloscustodio
+* CH_0022 : Replace avltree by hash table for symbol table
+* 
+* Revision 1.1  2013/05/23 22:22:23  pauloscustodio
+* Move symbol to sym.c, rename to Symbol
+* 
+* 
+*/

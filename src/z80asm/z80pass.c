@@ -11,395 +11,10 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.67 2014-01-11 00:10:39 pauloscustodio Exp $
-$Log: z80pass.c,v $
-Revision 1.67  2014-01-11 00:10:39  pauloscustodio
-Astyle - format C code
-Add -Wall option to CFLAGS, remove all warnings
-
-Revision 1.66  2014/01/05 23:20:39  pauloscustodio
-List, StrHash classlist and classhash receive the address of the container
-object in all functions that add items to the container, and create the
-container on first use. This allows a container to be staticaly
-initialized with NULL and instantiated on first push/unshift/set.
-Add count attribute to StrHash, classhash to count elements in container.
-Add free_data attribute in StrHash to register a free fucntion to delete
-the data container when the hash is removed or a key is overwritten.
-
-Revision 1.65  2013/12/30 02:05:33  pauloscustodio
-Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-handles both dynamically allocated strings and fixed-size strings.
-Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-
-Revision 1.64  2013/12/15 13:18:34  pauloscustodio
-Move memory allocation routines to lib/xmalloc, instead of glib,
-introduce memory leak report on exit and memory fence check.
-
-Revision 1.63  2013/12/11 23:33:55  pauloscustodio
-BUG_0039: library not pulled in if XLIB symbol not referenced in expression
-
-Revision 1.62  2013/10/05 08:14:43  pauloscustodio
-Parse command line options via look-up tables:
--C, --line-mode
-
-Revision 1.61  2013/10/03 23:48:31  pauloscustodio
-Parse command line options via look-up tables:
--r, --origin=ORG_HEX
-
-Revision 1.60  2013/10/01 23:23:53  pauloscustodio
-Parse command line options via look-up tables:
--l, --list
--nl, --no-list
-
-Revision 1.59  2013/10/01 22:50:27  pauloscustodio
-Parse command line options via look-up tables:
--s, --symtable
--ns, --no-symtable
-
-Revision 1.58  2013/09/27 01:14:33  pauloscustodio
-Parse command line options via look-up tables:
---help, --verbose
-
-Revision 1.57  2013/09/24 00:05:36  pauloscustodio
-
-Revision 1.56  2013/09/22 21:34:48  pauloscustodio
-Remove legacy xxx_err() interface
-
-Revision 1.55  2013/09/12 00:10:02  pauloscustodio
-Create xfree() macro that NULLs the pointer after free, required
-by z80asm to find out if a pointer was already freed.
-
-Revision 1.54  2013/09/08 08:29:21  pauloscustodio
-Replaced xmalloc et al with glib functions
-
-Revision 1.53  2013/09/08 00:43:59  pauloscustodio
-New error module with one error function per error, no need for the error
-constants. Allows compiler to type-check error message arguments.
-Included the errors module in the init() mechanism, no need to call
-error initialization from main(). Moved all error-testing scripts to
-one file errors.t.
-
-Revision 1.52  2013/06/15 00:26:23  pauloscustodio
-Move mapfile writing to mapfile.c.
-
-Revision 1.51  2013/06/08 23:37:32  pauloscustodio
-Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
- define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
-
-Revision 1.50  2013/06/08 23:07:53  pauloscustodio
-Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
- and define_global_def_sym().
-
-Revision 1.49  2013/06/01 01:24:22  pauloscustodio
-CH_0022 : Replace avltree by hash table for symbol table
-
-Revision 1.48  2013/05/23 22:22:23  pauloscustodio
-Move symbol to sym.c, rename to Symbol
-
-Revision 1.47  2013/04/07 23:34:19  pauloscustodio
-CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
-z80asm no longer asks for an ORG address from the standard input
-if one is not given either by an ORG statement or a -r option;
-it exists with an error message instead.
-The old behaviour was causing wrong build scripts to hang waiting
-for input.
-
-Revision 1.46  2013/04/06 13:15:04  pauloscustodio
-Move default asm and obj extension handling to file.c.
-srcfilename and objfilename are now pointers to static variables in file.c
-
-Revision 1.45  2013/03/31 18:33:55  pauloscustodio
-Comments
-
-Revision 1.44  2013/03/04 23:23:37  pauloscustodio
-Removed writeline, that was used to cancel listing of multi-line
-constructs, as only the first line was shown on the list file. Fixed
-the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-
-Revision 1.43  2013/02/27 20:47:53  pauloscustodio
-comments
-
-Revision 1.42  2013/02/26 02:36:54  pauloscustodio
-Simplified symbol output to listfile by using SymbolRefList argument
-
-Revision 1.41  2013/02/26 02:11:32  pauloscustodio
-New model_symref.c with all symbol cross-reference list handling
-
-Revision 1.40  2013/02/22 17:26:34  pauloscustodio
-Decouple assembler from listfile handling
-
-Revision 1.39  2013/02/19 22:52:40  pauloscustodio
-BUG_0030 : List bytes patching overwrites header
-BUG_0031 : List file garbled with input lines with 255 chars
-New listfile.c with all the listing related code
-
-Revision 1.38  2013/02/16 09:46:55  pauloscustodio
-BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
-
-Revision 1.37  2013/02/12 00:58:13  pauloscustodio
-BUG_0027 : Incorrect tabulation in symbol list
-BUG_0028 : Not aligned page list in symbol list with more that 18 references
-CH_0017 : Align with spaces, deprecate -t option
-
-Revision 1.36  2013/02/11 21:54:38  pauloscustodio
-BUG_0026 : Incorrect paging in symbol list
-
-Revision 1.35  2013/01/24 23:03:03  pauloscustodio
-Replaced (unsigned char) by (byte_t)
-Replaced (unisigned int) by (size_t)
-Replaced (short) by (int)
-
-Revision 1.34  2013/01/20 13:18:10  pauloscustodio
-BUG_0024 : (ix+128) should show warning message
-Signed integer range was wrongly checked to -128..255 instead
-of -128..127
-
-Revision 1.33  2013/01/14 00:29:37  pauloscustodio
-CH_0015 : integer out of range error replaced by warning
-
-Revision 1.32  2012/11/03 17:39:36  pauloscustodio
-astyle, comments
-
-Revision 1.31  2012/11/01 23:20:56  pauloscustodio
-Warinings due to missing include
-
-Revision 1.30  2012/06/07 11:49:59  pauloscustodio
-stricompare() instead of Flncmp()
-
-Revision 1.29  2012/05/26 18:51:10  pauloscustodio
-CH_0012 : wrappers on OS calls to raise fatal error
-CH_0013 : new errors interface to decouple calling code from errors.c
-
-Revision 1.28  2012/05/24 17:09:27  pauloscustodio
-Unify copyright header
-
-Revision 1.27  2012/05/20 06:39:27  pauloscustodio
-astyle
-
-Revision 1.26  2012/05/20 06:02:09  pauloscustodio
-Garbage collector
-Added automatic garbage collection on exit and simple fence mechanism
-to detect buffer underflow and overflow, to xmalloc functions.
-No longer needed to call init_malloc().
-No longer need to try/catch during creation of memory structures to
-free partially created data - all not freed data is freed atexit().
-Renamed xfree0() to xfree().
-
-Revision 1.25  2012/05/17 17:42:14  pauloscustodio
-define_symbol() defined as void, a fatal error is
-always raised on error.
-
-Revision 1.24  2012/05/12 16:57:33  pauloscustodio
-    BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
-        The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
-        This is implemented by calling SetTemporaryLine() to insert new code
-        at the current input position.
-        When LIST is ON, getasmline() remembers the input file position, reads
-        the next line and restores the file position. It ignores the buffer
-        set by SetTemporaryLine(), causing the assembler to skip
-        the "call rcmx_cpi" line.
-        Also added registry of rcmx_cpi as external library routine.
-
-Revision 1.23  2012/05/11 19:29:49  pauloscustodio
-Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
-indenting style, space padding in parentheses and operators. Options written in the makefile,
-target astyle.
-        --mode=c
-        --lineend=linux
-        --indent=spaces=4
-        --style=ansi --add-brackets
-        --indent-switches --indent-classes
-        --indent-preprocessor --convert-tabs
-        --break-blocks
-        --pad-oper --pad-paren-in --pad-header --unpad-paren
-        --align-pointer=name
-
-Revision 1.22  2011/10/14 14:46:03  pauloscustodio
--  BUG_0013 : defm check for MAX_CODESIZE incorrect
- - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space()
- from codearea.c.
-
-Revision 1.21  2011/10/07 17:53:04  pauloscustodio
-BUG_0015 : Relocation issue - dubious addresses come out of linking
-(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-- Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-- This caused the problem because CODESIZE keeps track of the start offset of each module in the
-  sequence they will appear in the object file, and codeptr is reset to the start of the codearea
-  for each module.
-  The effect was that all address calculations at link phase were considering a start offset of zero
-  for all modules.
-- Moreover, when linking modules from a libary, the modules are pulled in to the code area as they
-  are needed, and not in the sequence they will be in the object file. The start offset was being
-  ignored and the modules were being loaded in the incorrect order
-- Consequence of these two issues were all linked addresses wrong.
-
-Revision 1.20  2011/08/21 20:37:20  pauloscustodio
-CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
-- Factor all pathname manipulation into module file.c.
-- Make default extensions constants.
-- Move asm_ext[] and obj_ext[] to the options.c module.
-
-Revision 1.19  2011/08/19 15:53:58  pauloscustodio
-BUG_0010 : heap corruption when reaching MAXCODESIZE
-- test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte
-  is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the
-  exception is raised.
-- Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on
-  every write.
-
-Revision 1.18  2011/08/19 10:20:32  pauloscustodio
-- Factored code to read/write word from file into xfget_u16/xfput_u16.
-- Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
-
-Revision 1.17  2011/08/18 23:27:54  pauloscustodio
-BUG_0009 : file read/write not tested for errors
-- In case of disk full file write fails, but assembler does not detect the error
-  and leaves back corruped object/binary files
-- Created new exception FileIOException and ERR_FILE_IO error.
-- Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
-
-Revision 1.16  2011/08/14 19:37:43  pauloscustodio
-Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
-
-Revision 1.15  2011/08/05 20:20:45  pauloscustodio
-CH_0004 : Exception mechanism to handle fatal errors
-Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
-Replaced all the memory allocation functions malloc, calloc, ... by corresponding
-macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
-removing all the test code after each memory allocation.
-Replaced all functions that allocated memory structures by the new xcalloc_struct().
-Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
-sets the poiter to NULL afterwards, to avoid any used of the freed memory.
-Created try/catch sequences to clean-up partially created memory structures and rethrow the
-exception, to cleanup memory leaks.
-Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
-
-Revision 1.14  2011/07/18 00:48:25  pauloscustodio
-Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-
-Revision 1.13  2011/07/14 01:32:08  pauloscustodio
-    - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-    - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-    CH_0003 : Error messages should be more informative
-        - Added printf-args to error messages, added "Error:" prefix.
-    BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-        - Raise ERR_UNBALANCED_PAREN instead
-
-Revision 1.12  2011/07/12 22:47:59  pauloscustodio
-- Moved all error variables and error reporting code to a separate module errors.c,
-  replaced all extern declarations of these variables by include errors.h,
-  created symbolic constants for error codes.
-- Added test scripts for error messages.
-
-Revision 1.11  2011/07/11 16:19:37  pauloscustodio
-Moved all option variables and option handling code to a separate module options.c,
-replaced all extern declarations of these variables by include options.h.
-Created declarations in z80asm.h of objects defined in z80asm.c.
-
-Revision 1.10  2011/07/09 18:25:35  pauloscustodio
-Log keyword in checkin comment was expanded inside Log expansion... recursive
-Added Z80asm banner to all source files
-
-Revision 1.9  2011/07/09 17:36:09  pauloscustodio
-Copied cvs log into Log history
-
-Revision 1.8  2011/07/09 01:46:00  pauloscustodio
-Added Log keyword
-
-Revision 1.7  2011/07/09 01:34:12  pauloscustodio
-added casts to clean up warnings
-BUG_0004 : 8bit unsigned constants are not checked for out-of-range
-     Added the check to ExprUnsigned8() and Z80pass2().
-
-Revision 1.6  2010/04/16 17:34:37  dom
-Make line number an int - 32768 lines isn't big enough...
-
-Revision 1.5  2009/09/03 17:54:55  dom
-Fix name conflict with the getline function in POSIX 2008
-
-Nabbed via Fedora/Kevin Kofler
-
-Revision 1.4  2009/08/14 22:23:12  dom
-clean up some compiler warnings
-
-Revision 1.3  2002/05/11 20:09:38  dom
-A patch around the appalling IF ELSE ENDIF handling of z80asm where it
-tries to evaluate FALSE clauses and gets completely in a twist.
-
-These patches turn off the output to the two errors that I've seen pop
-up in this state: Syntax error and unknown identifier. Please test this
-one quite hard if you get a change... - it was done to allow even more
-complicated logic in the z88 app startup to actually work - as soon as I'm
-happy with that I'll commit it as well
-
-Revision 1.2  2001/03/21 16:34:01  dom
-Added changes to allow labels to end in ':' and the prefix '.' isn't
-necessarily needed..this isn't guaranteed to be perfect so let me know
-of any problems and drop back to 1.0.18
-
-Revision 1.1  2000/07/04 15:33:29  dom
-branches:  1.1.1;
-Initial revision
-
-Revision 1.1.1.1  2000/07/04 15:33:29  dom
-First import of z88dk into the sourceforge system <gulp>
-
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.68 2014-01-11 01:29:40 pauloscustodio Exp $
 */
-
-/* $History: Z80PASS.C $ */
-/*  */
-/* *****************  Version 14  ***************** */
-/* User: Gbs          Date: 26-01-00   Time: 22:10 */
-/* Updated in $/Z80asm */
-/* Expression range validation removed from 8bit unsigned (redundant). */
-/*  */
-/* *****************  Version 12  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 20:07 */
-/* Updated in $/Z80asm */
-/* "PC" program counter changed to long (from unsigned short). */
-/*  */
-/* *****************  Version 10  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 12:13 */
-/* Updated in $/Z80asm */
-/* Added Ascii Art "Z80asm" at top of source file. */
-/*  */
-/* *****************  Version 8  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 11:39 */
-/* Updated in $/Z80asm */
-/* parseline() bug fix: code size may reach <= MAXCODESIZE. */
-/*  */
-/* *****************  Version 7  ***************** */
-/* User: Gbs          Date: 30-05-99   Time: 1:06 */
-/* Updated in $/Z80asm */
-/* New function, Flncmp() to compare two filenames after internal lower */
-/* case conversion (used by Include file mutual recursion validation). */
-/*  */
-/* *****************  Version 6  ***************** */
-/* User: Gbs          Date: 2-05-99    Time: 18:16 */
-/* Updated in $/Z80asm */
-/* New function, FindFile(), to validate whether an include file already */
-/* has been included in a previous include level. */
-/* Z80pass2() bug fix: Expressions that are saved to object file */
-/* (typically containing external symbols) shouldn't get evaluated - this */
-/* can create unnecessary error messages. */
-/*  */
-/* *****************  Version 4  ***************** */
-/* User: Gbs          Date: 17-04-99   Time: 0:30 */
-/* Updated in $/Z80asm */
-/* New GNU programming style C format. Improved ANSI C coding style */
-/* eliminating previous compiler warnings. New -o option. Asm sources file */
-/* now parsed even though any line feed standards (CR,LF or CRLF) are */
-/* used. */
-/*  */
-/* *****************  Version 2  ***************** */
-/* User: Gbs          Date: 20-06-98   Time: 15:10 */
-/* Updated in $/Z80asm */
-/* SourceSafe Version History Comment Block added. */
 
 #include "xmalloc.h"   /* before any other include */
 
@@ -1162,3 +777,397 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
     }
 }
+
+
+/*
+* $Log: z80pass.c,v $
+* Revision 1.68  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.67  2014/01/11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+* 
+* Revision 1.66  2014/01/05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+* 
+* Revision 1.65  2013/12/30 02:05:33  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+* 
+* Revision 1.64  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+* 
+* Revision 1.63  2013/12/11 23:33:55  pauloscustodio
+* BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+* 
+* Revision 1.62  2013/10/05 08:14:43  pauloscustodio
+* Parse command line options via look-up tables:
+* -C, --line-mode
+* 
+* Revision 1.61  2013/10/03 23:48:31  pauloscustodio
+* Parse command line options via look-up tables:
+* -r, --origin=ORG_HEX
+* 
+* Revision 1.60  2013/10/01 23:23:53  pauloscustodio
+* Parse command line options via look-up tables:
+* -l, --list
+* -nl, --no-list
+* 
+* Revision 1.59  2013/10/01 22:50:27  pauloscustodio
+* Parse command line options via look-up tables:
+* -s, --symtable
+* -ns, --no-symtable
+* 
+* Revision 1.58  2013/09/27 01:14:33  pauloscustodio
+* Parse command line options via look-up tables:
+* --help, --verbose
+* 
+* Revision 1.57  2013/09/24 00:05:36  pauloscustodio
+* 
+* Revision 1.56  2013/09/22 21:34:48  pauloscustodio
+* Remove legacy xxx_err() interface
+* 
+* Revision 1.55  2013/09/12 00:10:02  pauloscustodio
+* Create xfree() macro that NULLs the pointer after free, required
+* by z80asm to find out if a pointer was already freed.
+* 
+* Revision 1.54  2013/09/08 08:29:21  pauloscustodio
+* Replaced xmalloc et al with glib functions
+* 
+* Revision 1.53  2013/09/08 00:43:59  pauloscustodio
+* New error module with one error function per error, no need for the error
+* constants. Allows compiler to type-check error message arguments.
+* Included the errors module in the init() mechanism, no need to call
+* error initialization from main(). Moved all error-testing scripts to
+* one file errors.t.
+* 
+* Revision 1.52  2013/06/15 00:26:23  pauloscustodio
+* Move mapfile writing to mapfile.c.
+* 
+* Revision 1.51  2013/06/08 23:37:32  pauloscustodio
+* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* 
+* Revision 1.50  2013/06/08 23:07:53  pauloscustodio
+* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+*  and define_global_def_sym().
+* 
+* Revision 1.49  2013/06/01 01:24:22  pauloscustodio
+* CH_0022 : Replace avltree by hash table for symbol table
+* 
+* Revision 1.48  2013/05/23 22:22:23  pauloscustodio
+* Move symbol to sym.c, rename to Symbol
+* 
+* Revision 1.47  2013/04/07 23:34:19  pauloscustodio
+* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
+* z80asm no longer asks for an ORG address from the standard input
+* if one is not given either by an ORG statement or a -r option;
+* it exists with an error message instead.
+* The old behaviour was causing wrong build scripts to hang waiting
+* for input.
+* 
+* Revision 1.46  2013/04/06 13:15:04  pauloscustodio
+* Move default asm and obj extension handling to file.c.
+* srcfilename and objfilename are now pointers to static variables in file.c
+* 
+* Revision 1.45  2013/03/31 18:33:55  pauloscustodio
+* Comments
+* 
+* Revision 1.44  2013/03/04 23:23:37  pauloscustodio
+* Removed writeline, that was used to cancel listing of multi-line
+* constructs, as only the first line was shown on the list file. Fixed
+* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+* 
+* Revision 1.43  2013/02/27 20:47:53  pauloscustodio
+* comments
+* 
+* Revision 1.42  2013/02/26 02:36:54  pauloscustodio
+* Simplified symbol output to listfile by using SymbolRefList argument
+* 
+* Revision 1.41  2013/02/26 02:11:32  pauloscustodio
+* New model_symref.c with all symbol cross-reference list handling
+* 
+* Revision 1.40  2013/02/22 17:26:34  pauloscustodio
+* Decouple assembler from listfile handling
+* 
+* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
+* BUG_0030 : List bytes patching overwrites header
+* BUG_0031 : List file garbled with input lines with 255 chars
+* New listfile.c with all the listing related code
+* 
+* Revision 1.38  2013/02/16 09:46:55  pauloscustodio
+* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+* 
+* Revision 1.37  2013/02/12 00:58:13  pauloscustodio
+* BUG_0027 : Incorrect tabulation in symbol list
+* BUG_0028 : Not aligned page list in symbol list with more that 18 references
+* CH_0017 : Align with spaces, deprecate -t option
+* 
+* Revision 1.36  2013/02/11 21:54:38  pauloscustodio
+* BUG_0026 : Incorrect paging in symbol list
+* 
+* Revision 1.35  2013/01/24 23:03:03  pauloscustodio
+* Replaced (unsigned char) by (byte_t)
+* Replaced (unisigned int) by (size_t)
+* Replaced (short) by (int)
+* 
+* Revision 1.34  2013/01/20 13:18:10  pauloscustodio
+* BUG_0024 : (ix+128) should show warning message
+* Signed integer range was wrongly checked to -128..255 instead
+* of -128..127
+* 
+* Revision 1.33  2013/01/14 00:29:37  pauloscustodio
+* CH_0015 : integer out of range error replaced by warning
+* 
+* Revision 1.32  2012/11/03 17:39:36  pauloscustodio
+* astyle, comments
+* 
+* Revision 1.31  2012/11/01 23:20:56  pauloscustodio
+* Warinings due to missing include
+* 
+* Revision 1.30  2012/06/07 11:49:59  pauloscustodio
+* stricompare() instead of Flncmp()
+* 
+* Revision 1.29  2012/05/26 18:51:10  pauloscustodio
+* CH_0012 : wrappers on OS calls to raise fatal error
+* CH_0013 : new errors interface to decouple calling code from errors.c
+* 
+* Revision 1.28  2012/05/24 17:09:27  pauloscustodio
+* Unify copyright header
+* 
+* Revision 1.27  2012/05/20 06:39:27  pauloscustodio
+* astyle
+* 
+* Revision 1.26  2012/05/20 06:02:09  pauloscustodio
+* Garbage collector
+* Added automatic garbage collection on exit and simple fence mechanism
+* to detect buffer underflow and overflow, to xmalloc functions.
+* No longer needed to call init_malloc().
+* No longer need to try/catch during creation of memory structures to
+* free partially created data - all not freed data is freed atexit().
+* Renamed xfree0() to xfree().
+* 
+* Revision 1.25  2012/05/17 17:42:14  pauloscustodio
+* define_symbol() defined as void, a fatal error is
+* always raised on error.
+* 
+* Revision 1.24  2012/05/12 16:57:33  pauloscustodio
+*     BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
+*         The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
+*         This is implemented by calling SetTemporaryLine() to insert new code
+*         at the current input position.
+*         When LIST is ON, getasmline() remembers the input file position, reads
+*         the next line and restores the file position. It ignores the buffer
+*         set by SetTemporaryLine(), causing the assembler to skip
+*         the "call rcmx_cpi" line.
+*         Also added registry of rcmx_cpi as external library routine.
+* 
+* Revision 1.23  2012/05/11 19:29:49  pauloscustodio
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
+* indenting style, space padding in parentheses and operators. Options written in the makefile,
+* target astyle.
+*         --mode=c
+*         --lineend=linux
+*         --indent=spaces=4
+*         --style=ansi --add-brackets
+*         --indent-switches --indent-classes
+*         --indent-preprocessor --convert-tabs
+*         --break-blocks
+*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+*         --align-pointer=name
+* 
+* Revision 1.22  2011/10/14 14:46:03  pauloscustodio
+* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
+*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space()
+*  from codearea.c.
+* 
+* Revision 1.21  2011/10/07 17:53:04  pauloscustodio
+* BUG_0015 : Relocation issue - dubious addresses come out of linking
+* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+* - This caused the problem because CODESIZE keeps track of the start offset of each module in the
+*   sequence they will appear in the object file, and codeptr is reset to the start of the codearea
+*   for each module.
+*   The effect was that all address calculations at link phase were considering a start offset of zero
+*   for all modules.
+* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they
+*   are needed, and not in the sequence they will be in the object file. The start offset was being
+*   ignored and the modules were being loaded in the incorrect order
+* - Consequence of these two issues were all linked addresses wrong.
+* 
+* Revision 1.20  2011/08/21 20:37:20  pauloscustodio
+* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+* - Factor all pathname manipulation into module file.c.
+* - Make default extensions constants.
+* - Move asm_ext[] and obj_ext[] to the options.c module.
+* 
+* Revision 1.19  2011/08/19 15:53:58  pauloscustodio
+* BUG_0010 : heap corruption when reaching MAXCODESIZE
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte
+*   is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the
+*   exception is raised.
+* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on
+*   every write.
+* 
+* Revision 1.18  2011/08/19 10:20:32  pauloscustodio
+* - Factored code to read/write word from file into xfget_u16/xfput_u16.
+* - Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
+* 
+* Revision 1.17  2011/08/18 23:27:54  pauloscustodio
+* BUG_0009 : file read/write not tested for errors
+* - In case of disk full file write fails, but assembler does not detect the error
+*   and leaves back corruped object/binary files
+* - Created new exception FileIOException and ERR_FILE_IO error.
+* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
+* 
+* Revision 1.16  2011/08/14 19:37:43  pauloscustodio
+* Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
+* 
+* Revision 1.15  2011/08/05 20:20:45  pauloscustodio
+* CH_0004 : Exception mechanism to handle fatal errors
+* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+* removing all the test code after each memory allocation.
+* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+* Created try/catch sequences to clean-up partially created memory structures and rethrow the
+* exception, to cleanup memory leaks.
+* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+* 
+* Revision 1.14  2011/07/18 00:48:25  pauloscustodio
+* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+* 
+* Revision 1.13  2011/07/14 01:32:08  pauloscustodio
+*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+*     CH_0003 : Error messages should be more informative
+*         - Added printf-args to error messages, added "Error:" prefix.
+*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+*         - Raise ERR_UNBALANCED_PAREN instead
+* 
+* Revision 1.12  2011/07/12 22:47:59  pauloscustodio
+* - Moved all error variables and error reporting code to a separate module errors.c,
+*   replaced all extern declarations of these variables by include errors.h,
+*   created symbolic constants for error codes.
+* - Added test scripts for error messages.
+* 
+* Revision 1.11  2011/07/11 16:19:37  pauloscustodio
+* Moved all option variables and option handling code to a separate module options.c,
+* replaced all extern declarations of these variables by include options.h.
+* Created declarations in z80asm.h of objects defined in z80asm.c.
+* 
+* Revision 1.10  2011/07/09 18:25:35  pauloscustodio
+* Log keyword in checkin comment was expanded inside Log expansion... recursive
+* Added Z80asm banner to all source files
+* 
+* Revision 1.9  2011/07/09 17:36:09  pauloscustodio
+* Copied cvs log into Log history
+* 
+* Revision 1.8  2011/07/09 01:46:00  pauloscustodio
+* Added Log keyword
+* 
+* Revision 1.7  2011/07/09 01:34:12  pauloscustodio
+* added casts to clean up warnings
+* BUG_0004 : 8bit unsigned constants are not checked for out-of-range
+*      Added the check to ExprUnsigned8() and Z80pass2().
+* 
+* Revision 1.6  2010/04/16 17:34:37  dom
+* Make line number an int - 32768 lines isn't big enough...
+* 
+* Revision 1.5  2009/09/03 17:54:55  dom
+* Fix name conflict with the getline function in POSIX 2008
+* 
+* Nabbed via Fedora/Kevin Kofler
+* 
+* Revision 1.4  2009/08/14 22:23:12  dom
+* clean up some compiler warnings
+* 
+* Revision 1.3  2002/05/11 20:09:38  dom
+* A patch around the appalling IF ELSE ENDIF handling of z80asm where it
+* tries to evaluate FALSE clauses and gets completely in a twist.
+* 
+* These patches turn off the output to the two errors that I've seen pop
+* up in this state: Syntax error and unknown identifier. Please test this
+* one quite hard if you get a change... - it was done to allow even more
+* complicated logic in the z88 app startup to actually work - as soon as I'm
+* happy with that I'll commit it as well
+* 
+* Revision 1.2  2001/03/21 16:34:01  dom
+* Added changes to allow labels to end in ':' and the prefix '.' isn't
+* necessarily needed..this isn't guaranteed to be perfect so let me know
+* of any problems and drop back to 1.0.18
+* 
+* Revision 1.1  2000/07/04 15:33:29  dom
+* branches:  1.1.1;
+* Initial revision
+* 
+* Revision 1.1.1.1  2000/07/04 15:33:29  dom
+* First import of z88dk into the sourceforge system <gulp>
+* 
+*/
+
+/* $History: Z80PASS.C $ */
+/*  */
+/* *****************  Version 14  ***************** */
+/* User: Gbs          Date: 26-01-00   Time: 22:10 */
+/* Updated in $/Z80asm */
+/* Expression range validation removed from 8bit unsigned (redundant). */
+/*  */
+/* *****************  Version 12  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 20:07 */
+/* Updated in $/Z80asm */
+/* "PC" program counter changed to long (from unsigned short). */
+/*  */
+/* *****************  Version 10  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 12:13 */
+/* Updated in $/Z80asm */
+/* Added Ascii Art "Z80asm" at top of source file. */
+/*  */
+/* *****************  Version 8  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 11:39 */
+/* Updated in $/Z80asm */
+/* parseline() bug fix: code size may reach <= MAXCODESIZE. */
+/*  */
+/* *****************  Version 7  ***************** */
+/* User: Gbs          Date: 30-05-99   Time: 1:06 */
+/* Updated in $/Z80asm */
+/* New function, Flncmp() to compare two filenames after internal lower */
+/* case conversion (used by Include file mutual recursion validation). */
+/*  */
+/* *****************  Version 6  ***************** */
+/* User: Gbs          Date: 2-05-99    Time: 18:16 */
+/* Updated in $/Z80asm */
+/* New function, FindFile(), to validate whether an include file already */
+/* has been included in a previous include level. */
+/* Z80pass2() bug fix: Expressions that are saved to object file */
+/* (typically containing external symbols) shouldn't get evaluated - this */
+/* can create unnecessary error messages. */
+/*  */
+/* *****************  Version 4  ***************** */
+/* User: Gbs          Date: 17-04-99   Time: 0:30 */
+/* Updated in $/Z80asm */
+/* New GNU programming style C format. Improved ANSI C coding style */
+/* eliminating previous compiler warnings. New -o option. Asm sources file */
+/* now parsed even though any line feed standards (CR,LF or CRLF) are */
+/* used. */
+/*  */
+/* *****************  Version 2  ***************** */
+/* User: Gbs          Date: 20-06-98   Time: 15:10 */
+/* Updated in $/Z80asm */
+/* SourceSafe Version History Comment Block added. */
+

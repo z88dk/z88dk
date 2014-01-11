@@ -11,11 +11,15 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0032.t,v 1.1 2013-03-06 00:02:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0032.t,v 1.2 2014-01-11 01:29:46 pauloscustodio Exp $
 # $Log: BUG_0032.t,v $
-# Revision 1.1  2013-03-06 00:02:17  pauloscustodio
+# Revision 1.2  2014-01-11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.1  2013/03/06 00:02:17  pauloscustodio
 # 	BUG_0032 : DEFGROUP ignores name after assignment
 # 		The code
 # DEFGROUP {

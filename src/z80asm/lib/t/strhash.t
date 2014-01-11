@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.3 2014-01-05 23:20:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.4 2014-01-11 01:29:41 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -360,7 +360,11 @@ sub t_capture {
 
 
 # $Log: strhash.t,v $
-# Revision 1.3  2014-01-05 23:20:39  pauloscustodio
+# Revision 1.4  2014-01-11 01:29:41  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.3  2014/01/05 23:20:39  pauloscustodio
 # List, StrHash classlist and classhash receive the address of the container
 # object in all functions that add items to the container, and create the
 # container on first use. This allows a container to be staticaly

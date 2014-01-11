@@ -1,9 +1,9 @@
 /*
 Common types and macros
 
-Copyright (C) Paulo Custodio, 2011-2013
+Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.2 2014-01-05 23:22:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -49,7 +49,11 @@ typedef unsigned char byte_t;		/*  8-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.2  2014-01-05 23:22:58  pauloscustodio
+* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
+* Revision 1.2  2014/01/05 23:22:58  pauloscustodio
 * comment
 *
 * Revision 1.1  2013/12/15 19:04:32  pauloscustodio
