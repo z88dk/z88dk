@@ -31,7 +31,7 @@ asm_vasprintf:
    ;
    ;         fail
    ;
-   ;            *ptr = 0
+   ;            *ptr = 0 (if ptr != 0)
    ;            hl   = -1
    ;            carry set, errno as below
    ;
@@ -74,14 +74,12 @@ asm_vasprintf:
    ; no errors to here so can assume no more errors will occur
    
    ; hl  = char *s
-   ; de' = char **ptr
+   ; hl' = char **ptr
    ; stack = arg, format, length
    
    push hl
    exx
-   pop hl
-   
-   ex de,hl                    ; de = char *s, hl = char **ptr
+   pop de                      ; de = char *s
 
    ld (hl),e
    inc hl
@@ -111,7 +109,6 @@ error_2:
    pop bc
    
    exx
-   ex de,hl                    ; hl = char **ptr
 
    ld (hl),0
    inc hl
