@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.115 2014-01-11 00:16:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.116 2014-01-11 00:24:39 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -155,8 +155,10 @@ install:
 # clean
 #------------------------------------------------------------------------------
 clean :
-	$(RM) *.o $(LOCAL_LIB)/*.o *.exe *~ *.bak *.orig core $(TARGET) test* 
-	$(RM) t/*.tmp t/developer/*.tmp 
+	$(RM) *.o $(LOCAL_LIB)/*.o *.exe $(LOCAL_LIB)/*.exe *~ $(LOCAL_LIB)/*~
+	$(RM) *.bak $(LOCAL_LIB)/*.bak *.orig $(LOCAL_LIB)/*.orig core $(LOCAL_LIB)/core
+	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
+	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
 	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 	$(RM) -rf Debug Release x1 x2 x3
 
@@ -241,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.115  2014-01-11 00:16:01  pauloscustodio
+# Revision 1.116  2014-01-11 00:24:39  pauloscustodio
+# Clean temp files in lib
+#
+# Revision 1.115  2014/01/11 00:16:01  pauloscustodio
 # Reported by Stefan Drissen (stefan.drissen@gmail.com) 2013-01-11:
 # z80asm however does not compile - xmalloc.h cannot be found. The header is in the lib directory, but there is nothing telling gcc to look in the lib directory. I see that the Linux makefile is adding -I lib to also look in the lib directory.
 #
