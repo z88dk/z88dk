@@ -213,12 +213,6 @@ t_compile_module($init, <<'END', $objs);
 	TRY_OK( xfclose(file) );
 	TRY_NOK( xfclose(file) );
 	
-	TITLE("xstat");
-	TRY_NOK( xstat("test1xxxx.bin", &filestat) );
-	memset( &filestat, 0, sizeof(filestat) );
-	TRY_OK(  xstat("test1.bin",     &filestat) );
-	ASSERT( filestat.st_size == 0 );
-
 	TITLE("xfwrite");
 	Str_set( small, BIG_STR );
 	TRY_OK( file = xfopen("test1.bin", "wb") );
@@ -504,10 +498,6 @@ Error: cannot write file 'x/x/x/x/test1.bin'
 
 Error: cannot close file 'test1.bin'
 
----- TEST: xstat ----
-
-Error: cannot read file 'test1xxxx.bin'
-
 ---- TEST: xfwrite ----
 
 File: test1.bin:
@@ -662,9 +652,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.33 2014-01-11 00:10:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.34 2014-01-11 00:40:31 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.33  2014-01-11 00:10:40  pauloscustodio
+# Revision 1.34  2014-01-11 00:40:31  pauloscustodio
+# Remove xstat(); stat() can be used to detect non-existent files
+#
+# Revision 1.33  2014/01/11 00:10:40  pauloscustodio
 # Astyle - format C code
 # Add -Wall option to CFLAGS, remove all warnings
 #

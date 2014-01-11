@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.41 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.42 2014-01-11 00:40:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -171,14 +171,6 @@ static char *get_filename( FILE *file )
 /*-----------------------------------------------------------------------------
 *   File open and close
 *----------------------------------------------------------------------------*/
-void xstat( char *filename, struct stat *filestat )
-{
-    int result = stat( filename, filestat );
-
-    if ( result < 0 )
-        fatal_read_file( filename );
-}
-
 FILE *xfopen( char *filename, char *mode )
 {
     FILE *file = fopen( filename, mode );
@@ -389,7 +381,10 @@ void xfget_c2sstr( Str *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.41  2014-01-11 00:10:39  pauloscustodio
+Revision 1.42  2014-01-11 00:40:31  pauloscustodio
+Remove xstat(); stat() can be used to detect non-existent files
+
+Revision 1.41  2014/01/11 00:10:39  pauloscustodio
 Astyle - format C code
 Add -Wall option to CFLAGS, remove all warnings
 

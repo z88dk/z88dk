@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.30 2014-01-11 00:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.31 2014-01-11 00:40:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -64,7 +64,6 @@ extern void close_File( File *self );
 
 
 /* OS interface with fatal errors on failure */
-extern void  xstat( char *filename, struct stat *filestat );
 extern FILE *xfopen( char *filename, char *mode );
 extern void  xfclose( FILE *file );
 
@@ -102,7 +101,10 @@ extern void   xfget_c2sstr( Str *str, FILE *file );
 
 /*
 $Log: file.h,v $
-Revision 1.30  2014-01-11 00:10:39  pauloscustodio
+Revision 1.31  2014-01-11 00:40:31  pauloscustodio
+Remove xstat(); stat() can be used to detect non-existent files
+
+Revision 1.30  2014/01/11 00:10:39  pauloscustodio
 Astyle - format C code
 Add -Wall option to CFLAGS, remove all warnings
 
