@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.116 2014-01-11 00:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.117 2014-01-11 00:28:30 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -72,15 +72,6 @@ OBJS = 	\
 	file.o			\
 	hist.o			\
 	ldinstr.o		\
-	lib/class.o		\
-	lib/die.o		\
-	lib/except.o	\
-	lib/fileutil.o	\
-	lib/list.o		\
-	lib/strhash.o	\
-	lib/strpool.o	\
-	lib/strutil.o	\
-	lib/xmalloc.o	\
 	listfile.o		\
 	mapfile.o		\
 	model.o			\
@@ -99,6 +90,16 @@ OBJS = 	\
 	z80asm.o		\
 	z80instr.o		\
 	z80pass.o		\
+	\
+	lib/class.o		\
+	lib/die.o		\
+	lib/except.o	\
+	lib/fileutil.o	\
+	lib/list.o		\
+	lib/strhash.o	\
+	lib/strpool.o	\
+	lib/strutil.o	\
+	lib/xmalloc.o	\
 
 #------------------------------------------------------------------------------
 # variables
@@ -243,7 +244,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.116  2014-01-11 00:24:39  pauloscustodio
+# Revision 1.117  2014-01-11 00:28:30  pauloscustodio
+# Link sequence: lib at the end
+#
+# Revision 1.116  2014/01/11 00:24:39  pauloscustodio
 # Clean temp files in lib
 #
 # Revision 1.115  2014/01/11 00:16:01  pauloscustodio
@@ -742,20 +746,6 @@ ldinstr.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
 ldinstr.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
 ldinstr.o: lib/die.h token_def.h errors.h errors_def.h codearea.h options.h
 ldinstr.o: lib/list.h options_def.h
-lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
-lib/class.o: lib/init.h
-lib/die.o: lib/die.h
-lib/except.o: lib/xmalloc.h lib/except.h lib/die.h lib/types.h
-lib/fileutil.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h
-lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/strpool.h
-lib/list.o: lib/xmalloc.h lib/list.h lib/class.h lib/queue.h lib/types.h
-lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
-lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h
-lib/strpool.o: lib/xmalloc.h lib/die.h lib/init.h lib/types.h lib/queue.h
-lib/strpool.o: lib/strpool.h lib/uthash.h
-lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h lib/class.h
-lib/strutil.o: lib/queue.h lib/types.h
-lib/xmalloc.o: lib/xmalloc.h lib/die.h lib/queue.h lib/init.h lib/types.h
 listfile.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 listfile.o: lib/strutil.h symref.h lib/classlist.h file.h config.h
 listfile.o:  options.h lib/list.h options_def.h z80asm.h sym.h
@@ -829,3 +819,17 @@ z80pass.o: listfile.h symref.h lib/classlist.h model.h options.h lib/list.h
 z80pass.o: options_def.h scan.h sym.h symbol.h objfile.h symtab.h
 z80pass.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
 z80pass.o: z80asm.h
+lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
+lib/class.o: lib/init.h
+lib/die.o: lib/die.h
+lib/except.o: lib/xmalloc.h lib/except.h lib/die.h lib/types.h
+lib/fileutil.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h
+lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/strpool.h
+lib/list.o: lib/xmalloc.h lib/list.h lib/class.h lib/queue.h lib/types.h
+lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
+lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h
+lib/strpool.o: lib/xmalloc.h lib/die.h lib/init.h lib/types.h lib/queue.h
+lib/strpool.o: lib/strpool.h lib/uthash.h
+lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h lib/class.h
+lib/strutil.o: lib/queue.h lib/types.h
+lib/xmalloc.o: lib/xmalloc.h lib/die.h lib/queue.h lib/init.h lib/types.h
