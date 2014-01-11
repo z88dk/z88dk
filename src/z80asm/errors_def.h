@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.21 2014-01-02 19:42:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.22 2014-01-11 00:10:38 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -23,65 +23,69 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.21 2014
 #endif
 
 /* information */
-ERR(ErrInfo,	info_total_errors(void),				"%d errors occurred during assembly" _C_ get_num_errors() ) 
+ERR( ErrInfo,	info_total_errors( void ),				"%d errors occurred during assembly" _C_ get_num_errors() )
 
 /* fatal errors */
-ERR(ErrFatal,	fatal_read_file(char *filename),		"cannot read file '%s'" _C_ filename )
-ERR(ErrFatal,	fatal_write_file(char *filename),		"cannot write file '%s'" _C_ filename )
-ERR(ErrFatal,	fatal_close_file(char *filename),		"cannot close file '%s'" _C_ filename )
-ERR(ErrFatal,	fatal_include_recursion(char *filename),"cannot include file '%s' recursively" _C_ filename )
+ERR( ErrFatal,	fatal_read_file( char *filename ),		"cannot read file '%s'" _C_ filename )
+ERR( ErrFatal,	fatal_write_file( char *filename ),		"cannot write file '%s'" _C_ filename )
+ERR( ErrFatal,	fatal_close_file( char *filename ),		"cannot close file '%s'" _C_ filename )
+ERR( ErrFatal,	fatal_include_recursion( char *filename ), "cannot include file '%s' recursively" _C_ filename )
 
 /* command line parsing errors */
-ERR(ErrWarn,	warn_option_deprecated(char *option),	"option '%s' is deprecated" _C_ option )
-ERR(ErrError,	error_no_src_file(void),				"source filename missing" )
-ERR(ErrError,	error_illegal_option(char *option),		"illegal option '%s'" _C_ option )
-ERR(ErrError,	error_illegal_src_filename(char *filename),
-														"illegal source filename '%s'" _C_ filename )
+ERR( ErrWarn,	warn_option_deprecated( char *option ),	"option '%s' is deprecated" _C_ option )
+ERR( ErrError,	error_no_src_file( void ),				"source filename missing" )
+ERR( ErrError,	error_illegal_option( char *option ),		"illegal option '%s'" _C_ option )
+ERR( ErrError,	error_illegal_src_filename( char *filename ),
+     "illegal source filename '%s'" _C_ filename )
 
 /* assembly errors */
-ERR(ErrError,	error_syntax(void),						"syntax error")
-ERR(ErrError,	error_syntax_expr(void),				"syntax error in expression")
-ERR(ErrError,	error_expr(char *expr),					"error in expression '%s'" _C_ expr )
-ERR(ErrError,	error_invalid_squoted_string(void),		"invalid single quoted character")
-ERR(ErrError,	error_unclosed_string(void),			"unclosed quoted string")
-ERR(ErrError,	error_unbanlanced_paren(void),			"unbalanced parenthesis" )
+ERR( ErrError,	error_syntax( void ),						"syntax error" )
+ERR( ErrError,	error_syntax_expr( void ),				"syntax error in expression" )
+ERR( ErrError,	error_expr( char *expr ),					"error in expression '%s'" _C_ expr )
+ERR( ErrError,	error_invalid_squoted_string( void ),		"invalid single quoted character" )
+ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
+ERR( ErrError,	error_unbanlanced_paren( void ),			"unbalanced parenthesis" )
 
-ERR(ErrError,	error_not_defined(void),				"symbol not defined" )
-ERR(ErrError,	error_not_defined_expr(char *expr),		"symbol not defined in expression '%s'" _C_ expr )
+ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
+ERR( ErrError,	error_not_defined_expr( char *expr ),		"symbol not defined in expression '%s'" _C_ expr )
 
-ERR(ErrError,	error_unknown_ident(void),		        "unknown identifier" )
-ERR(ErrError,	error_illegal_ident(void),				"illegal identifier" )
-ERR(ErrError,	error_jr_not_local(void),				"relative jump address must be local" )
+ERR( ErrError,	error_unknown_ident( void ),		        "unknown identifier" )
+ERR( ErrError,	error_illegal_ident( void ),				"illegal identifier" )
+ERR( ErrError,	error_jr_not_local( void ),				"relative jump address must be local" )
 
 /* symbol errors */
-ERR(ErrError,	error_symbol_redefined(char *symbol),	"symbol '%s' already defined" _C_ symbol )
-ERR(ErrError,	error_symbol_redefined_module(char *symbol, char *module),	
-														"symbol '%s' already defined in module '%s'" _C_ symbol _C_ module )
-ERR(ErrError,	error_symbol_decl_local(char *symbol),	"symbol '%s' already declared local" _C_ symbol )
-ERR(ErrError,	error_symbol_redecl(char *symbol),		"re-declaration of '%s' not allowed" _C_ symbol )
+ERR( ErrError,	error_symbol_redefined( char *symbol ),	"symbol '%s' already defined" _C_ symbol )
+ERR( ErrError,	error_symbol_redefined_module( char *symbol, char *module ),
+     "symbol '%s' already defined in module '%s'" _C_ symbol _C_ module )
+ERR( ErrError,	error_symbol_decl_local( char *symbol ),	"symbol '%s' already declared local" _C_ symbol )
+ERR( ErrError,	error_symbol_redecl( char *symbol ),		"re-declaration of '%s' not allowed" _C_ symbol )
 
 /* link errors */
-ERR(ErrFatal,	fatal_max_codesize(long size),			"max. code size of %ld bytes reached" _C_ size )
-ERR(ErrError,	error_module_redefined(void),			"module name already defined" )
-ERR(ErrError,	error_org_not_defined(void),			"ORG not defined" )
-ERR(ErrError,	error_env_not_defined(char *var),		"environment variable '%s' not defined" _C_ var )
+ERR( ErrFatal,	fatal_max_codesize( long size ),			"max. code size of %ld bytes reached" _C_ size )
+ERR( ErrError,	error_module_redefined( void ),			"module name already defined" )
+ERR( ErrError,	error_org_not_defined( void ),			"ORG not defined" )
+ERR( ErrError,	error_env_not_defined( char *var ),		"environment variable '%s' not defined" _C_ var )
 
-ERR(ErrError,	error_not_obj_file(char *filename),		"file '%s' not an object file" _C_ filename )
-ERR(ErrError,	error_not_lib_file(char *filename),		"file '%s' not a library file" _C_ filename )
+ERR( ErrError,	error_not_obj_file( char *filename ),		"file '%s' not an object file" _C_ filename )
+ERR( ErrError,	error_not_lib_file( char *filename ),		"file '%s' not a library file" _C_ filename )
 
 
 /* range error or warning */
-ERR(ErrWarn,	warn_int_range(long value),				"integer '%ld' out of range" _C_ value )
-ERR(ErrError,	error_int_range(long value),			"integer '%ld' out of range" _C_ value )
-ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
-														"integer '%ld' out of range in expression '%s'" _C_ value _C_ expr )
+ERR( ErrWarn,	warn_int_range( long value ),				"integer '%ld' out of range" _C_ value )
+ERR( ErrError,	error_int_range( long value ),			"integer '%ld' out of range" _C_ value )
+ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
+     "integer '%ld' out of range in expression '%s'" _C_ value _C_ expr )
 
 #undef _C_
 
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.21  2014-01-02 19:42:48  pauloscustodio
+* Revision 1.22  2014-01-11 00:10:38  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.21  2014/01/02 19:42:48  pauloscustodio
 * warning: "/","*" within comment [-Wcomment]
 * warning: type defaults to 'int' in declaration of '...' [-Wimplicit-int]
 *

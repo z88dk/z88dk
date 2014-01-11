@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.39 2014-01-09 23:13:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.40 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,7 +50,7 @@ Opts;
 extern Opts opts;
 
 /*-----------------------------------------------------------------------------
-*   Parse command line, set options, including opts.files with list of 
+*   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
 extern void parse_argv( int argc, char *argv[] );
@@ -72,9 +72,13 @@ extern char *get_sym_filename( char *filename );
 extern char *get_map_filename( char *filename );
 
 
-/* 
+/*
 * $Log: options.h,v $
-* Revision 1.39  2014-01-09 23:13:04  pauloscustodio
+* Revision 1.40  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.39  2014/01/09 23:13:04  pauloscustodio
 * Use init.h mechanism, no need for main() calling init_options.
 * Use Str instead of glib.
 *

@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.2 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,9 +34,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.2 2014-01-0
 *	Basename is file name removing all directories.
 *	Extension is the final "." followed by sequence of letters or digits
 *----------------------------------------------------------------------------*/
-extern void path_remove_ext ( Str *dest, char *filename );
+extern void path_remove_ext( Str *dest, char *filename );
 extern void path_replace_ext( Str *dest, char *filename, char *new_ext );
-extern void path_basename   ( Str *dest, char *filename );
+extern void path_basename( Str *dest, char *filename );
 
 /* search for a file on the given directory list, return full path name */
 extern void path_search( Str *dest, char *filename, List *dir_list );
@@ -44,7 +44,11 @@ extern char *search_file( char *filename, List *dir_list );	/* returned string i
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.2  2014-01-02 17:18:16  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/02 17:18:16  pauloscustodio
 * StrList removed, replaced by List
 *
 * Revision 1.1  2014/01/01 21:23:49  pauloscustodio

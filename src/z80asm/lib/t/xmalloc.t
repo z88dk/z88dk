@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.4 2013-12-23 19:19:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.5 2014-01-11 00:10:39 pauloscustodio Exp $
 #
 # Test xmalloc.c
 
@@ -70,9 +70,9 @@ xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): alloc (2)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
-xmalloc xmalloc.c(111): free (2) allocated at test.c(5)
+xmalloc xmalloc.c(112): free (2) allocated at test.c(5)
 xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (1) allocated at test.c(4)
 ERR
 
 
@@ -193,9 +193,9 @@ xmalloc test.c(4): alloc (0)
 xmalloc test.c(5): alloc (1)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (1) allocated at test.c(5)
-xmalloc xmalloc.c(111): free (1) allocated at test.c(5)
+xmalloc xmalloc.c(112): free (1) allocated at test.c(5)
 xmalloc xmalloc.c(109): leak (0) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (0) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (0) allocated at test.c(4)
 ERR
 
 
@@ -216,7 +216,7 @@ xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (5) allocated at test.c(4)
 ERR
 
 
@@ -237,7 +237,7 @@ xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (1) allocated at test.c(4)
 ERR
 
 
@@ -258,7 +258,7 @@ xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (5) allocated at test.c(4)
 ERR
 
 
@@ -280,7 +280,7 @@ xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (2) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (2) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (2) allocated at test.c(4)
 ERR
 
 
@@ -309,7 +309,7 @@ xmalloc test.c(9): free (1) allocated at test.c(7)
 xmalloc test.c(9): alloc (0)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (0) allocated at test.c(9)
-xmalloc xmalloc.c(111): free (0) allocated at test.c(9)
+xmalloc xmalloc.c(112): free (0) allocated at test.c(9)
 ERR
 
 
@@ -335,7 +335,7 @@ xmalloc test.c(7): free (1) allocated at test.c(4)
 xmalloc test.c(7): alloc (2)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (2) allocated at test.c(7)
-xmalloc xmalloc.c(111): free (2) allocated at test.c(7)
+xmalloc xmalloc.c(112): free (2) allocated at test.c(7)
 ERR
 
 
@@ -355,7 +355,7 @@ xmalloc: init
 xmalloc test.c(4): alloc (6)
 xmalloc: cleanup
 xmalloc xmalloc.c(109): leak (6) allocated at test.c(4)
-xmalloc xmalloc.c(111): free (6) allocated at test.c(4)
+xmalloc xmalloc.c(112): free (6) allocated at test.c(4)
 ERR
 
 
@@ -380,17 +380,30 @@ done_testing;
 
 sub t_capture {
 	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
-	my $line = "[line ".((caller)[2])."]";
+	my $line_nr = (caller)[2];
+	my $line = "[line $line_nr]";
 	ok 1, "$line command: $cmd";
 	
 	my($out, $err, $exit) = capture { system $cmd; };
 	eq_or_diff_text $out, $exp_out, "$line out";
 	eq_or_diff_text $err, $exp_err, "$line err";
+	if ($ENV{DEBUG} && ($out ne $exp_out || $err ne $exp_err)) {
+		write_file("$0.tmp", 
+					(read_file($0))[0..$line_nr-1],
+					$out, "OUT\n", 
+					$err, "ERR\n");
+		system "wdiff $0.tmp $0";
+		die;
+	}
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
 
 # $Log: xmalloc.t,v $
-# Revision 1.4  2013-12-23 19:19:52  pauloscustodio
+# Revision 1.5  2014-01-11 00:10:39  pauloscustodio
+# Astyle - format C code
+# Add -Wall option to CFLAGS, remove all warnings
+#
+# Revision 1.4  2013/12/23 19:19:52  pauloscustodio
 # Show difference in command output in case of test failure
 #
 # Revision 1.3  2013/12/18 01:16:36  pauloscustodio

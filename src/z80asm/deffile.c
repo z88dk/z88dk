@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.5 2013-12-15 13:18:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.6 2014-01-11 00:10:38 pauloscustodio Exp $
 $Log: deffile.c,v $
-Revision 1.5  2013-12-15 13:18:33  pauloscustodio
+Revision 1.6  2014-01-11 00:10:38  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.5  2013/12/15 13:18:33  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -55,26 +59,26 @@ Move deffile writing to deffile.c, remove global variable deffile
 *----------------------------------------------------------------------------*/
 static void write_def_syms( FILE *file, SymbolHash *symtab )
 {
-	SymbolHashElem *iter;
-	Symbol         *sym;
+    SymbolHashElem *iter;
+    Symbol         *sym;
 
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
 
-		/* CH_0017 */
-		fprintf( file, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
+        /* CH_0017 */
+        fprintf( file, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
 
-		if ( opts.relocatable )
-		{
-			fprintf( file, "= $%04lX ; ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
-		}
-		else
-		{
-			fprintf( file, "= $%04lX ; ", sym->value );
-		}
+        if ( opts.relocatable )
+        {
+            fprintf( file, "= $%04lX ; ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
+        }
+        else
+        {
+            fprintf( file, "= $%04lX ; ", sym->value );
+        }
 
-		fprintf( file, "Module %s\n", sym->owner->mname );
+        fprintf( file, "Module %s\n", sym->owner->mname );
     }
 }
 
@@ -85,11 +89,11 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
 void write_def_file( void )
 {
     char *filename;
-	FILE *file;
-	SymbolHash *def_symtab;
+    FILE *file;
+    SymbolHash *def_symtab;
 
-	/* use first module filename to create global def file */
-	filename = get_def_filename( modulehdr->first->cfile->fname ); /* set '.def' extension */
+    /* use first module filename to create global def file */
+    filename = get_def_filename( modulehdr->first->cfile->fname ); /* set '.def' extension */
 
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
@@ -99,14 +103,14 @@ void write_def_file( void )
         puts( "Creating global definition file..." );
     }
 
-	def_symtab = get_all_syms( SYMADDR | SYMLOCAL | SYMXDEF | SYMDEF, 
-							   SYMADDR | 0        | SYMXDEF | 0      );
+    def_symtab = get_all_syms( SYMADDR | SYMLOCAL | SYMXDEF | SYMDEF,
+                               SYMADDR | 0        | SYMXDEF | 0 );
 
-	/* Write symbols by address */
-	SymbolHash_sort( def_symtab, SymbolHash_by_value );
-	write_def_syms( file, def_symtab );
+    /* Write symbols by address */
+    SymbolHash_sort( def_symtab, SymbolHash_by_value );
+    write_def_syms( file, def_symtab );
 
-	OBJ_DELETE(def_symtab);
+    OBJ_DELETE( def_symtab );
 
     xfclose( file );
 }

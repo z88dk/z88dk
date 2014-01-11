@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.3 2013-12-19 00:18:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.4 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -35,10 +35,11 @@ static Object *next_autodelete( ObjectList *headp )
     Object *obj;
 
     LIST_FOREACH( obj, headp, _class.entries )
-        if ( OBJ_AUTODELETE( obj ) )
-            return obj;
 
-	return NULL;
+    if ( OBJ_AUTODELETE( obj ) )
+        return obj;
+
+    return NULL;
 }
 
 /*-----------------------------------------------------------------------------
@@ -46,10 +47,10 @@ static Object *next_autodelete( ObjectList *headp )
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
-	xmalloc_init();
-	
+    xmalloc_init();
+
 #ifdef CLASS_DEBUG
-	warn( "class: init\n" );
+    warn( "class: init\n" );
 #endif
 }
 
@@ -84,7 +85,7 @@ void _register_obj( Object *obj,
                     char *name )
 {
     init();
-	
+
     obj->_class.delete_ptr = delete_ptr;
     obj->_class.name       = name;
 
@@ -108,7 +109,7 @@ void _update_register_obj( Object *obj )
 void _deregister_obj( Object *obj )
 {
     init();
-	
+
     LIST_REMOVE( obj, _class.entries );
 
 #ifdef CLASS_DEBUG
@@ -117,9 +118,13 @@ void _deregister_obj( Object *obj )
 }
 
 
-/* 
+/*
 * $Log: class.c,v $
-* Revision 1.3  2013-12-19 00:18:23  pauloscustodio
+* Revision 1.4  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.3  2013/12/19 00:18:23  pauloscustodio
 * Use init.h mechanism for intialization code; rename object structure
 *
 * Revision 1.2  2013/12/18 23:50:36  pauloscustodio

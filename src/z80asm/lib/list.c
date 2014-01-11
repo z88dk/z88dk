@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.2 2014-01-02 16:02:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -17,29 +17,29 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.2 2014-01-02 16
 
 DEF_CLASS( List );
 
-void List_init ( List *self )
+void List_init( List *self )
 {
-	self->count = 0;
-	TAILQ_INIT( &self->head );
+    self->count = 0;
+    TAILQ_INIT( &self->head );
 }
 
-void List_copy ( List *self, List *other )
+void List_copy( List *self, List *other )
 {
-	ListElem *elem;
+    ListElem *elem;
 
-	/* create new list and copy element by element from other */
-	self->count = 0;
-	TAILQ_INIT( &self->head );
+    /* create new list and copy element by element from other */
+    self->count = 0;
+    TAILQ_INIT( &self->head );
 
-	TAILQ_FOREACH( elem, &other->head, entries )
-	{
-		List_push( &self, elem->data );
-	}
+    TAILQ_FOREACH( elem, &other->head, entries )
+    {
+        List_push( &self, elem->data );
+    }
 }
 
-void List_fini ( List *self )
+void List_fini( List *self )
 {
-	List_remove_all( self );
+    List_remove_all( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -47,15 +47,15 @@ void List_fini ( List *self )
 *----------------------------------------------------------------------------*/
 static ListElem *List_new_elem( List **pself, void *data )
 {
-	ListElem *elem;
+    ListElem *elem;
 
-	INIT_OBJ( List, pself );			/* init object */
+    INIT_OBJ( List, pself );			/* init object */
 
-	elem = xnew( ListElem );
-	elem->data = data;
+    elem = xnew( ListElem );
+    elem->data = data;
 
-	(*pself)->count++;
-	return elem;
+    ( *pself )->count++;
+    return elem;
 }
 
 /*-----------------------------------------------------------------------------
@@ -63,18 +63,18 @@ static ListElem *List_new_elem( List **pself, void *data )
 *----------------------------------------------------------------------------*/
 static void *List_remove_elem( List *self, ListElem *elem )
 {
-	void *data;
+    void *data;
 
-	if ( self == NULL || elem == NULL )
-		return NULL;
+    if ( self == NULL || elem == NULL )
+        return NULL;
 
-	data = elem->data;
+    data = elem->data;
 
-	TAILQ_REMOVE( &self->head, elem, entries);
-	xfree( elem );
+    TAILQ_REMOVE( &self->head, elem, entries );
+    xfree( elem );
 
-	self->count--;
-	return data;
+    self->count--;
+    return data;
 }
 
 /*-----------------------------------------------------------------------------
@@ -82,14 +82,14 @@ static void *List_remove_elem( List *self, ListElem *elem )
 *----------------------------------------------------------------------------*/
 void List_push( List **pself, void *data )
 {
-	ListElem *elem = List_new_elem( pself, data );
-	TAILQ_INSERT_TAIL( &(*pself)->head, elem, entries );
+    ListElem *elem = List_new_elem( pself, data );
+    TAILQ_INSERT_TAIL( &( *pself )->head, elem, entries );
 }
 
 void *List_pop( List *self )
 {
-	ListElem *elem = List_last( self );
-	return List_remove_elem( self, elem );
+    ListElem *elem = List_last( self );
+    return List_remove_elem( self, elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -97,14 +97,14 @@ void *List_pop( List *self )
 *----------------------------------------------------------------------------*/
 void List_unshift( List **pself, void *data )
 {
-	ListElem *elem = List_new_elem( pself, data );
-	TAILQ_INSERT_HEAD( &(*pself)->head, elem, entries );
+    ListElem *elem = List_new_elem( pself, data );
+    TAILQ_INSERT_HEAD( &( *pself )->head, elem, entries );
 }
 
 void *List_shift( List *self )
 {
-	ListElem *elem = List_first( self );
-	return List_remove_elem( self, elem );
+    ListElem *elem = List_first( self );
+    return List_remove_elem( self, elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -112,12 +112,12 @@ void *List_shift( List *self )
 *----------------------------------------------------------------------------*/
 ListElem *List_first( List *self )
 {
-	return self == NULL ? NULL : TAILQ_FIRST( &self->head );
+    return self == NULL ? NULL : TAILQ_FIRST( &self->head );
 }
 
 ListElem *List_last( List *self )
 {
-	return self == NULL ? NULL : TAILQ_LAST( &self->head, ListHead );
+    return self == NULL ? NULL : TAILQ_LAST( &self->head, ListHead );
 }
 
 /*-----------------------------------------------------------------------------
@@ -125,12 +125,12 @@ ListElem *List_last( List *self )
 *----------------------------------------------------------------------------*/
 ListElem *List_next( ListElem *iter )
 {
-	return iter == NULL ? NULL : TAILQ_NEXT( iter, entries );
+    return iter == NULL ? NULL : TAILQ_NEXT( iter, entries );
 }
 
 ListElem *List_prev( ListElem *iter )
 {
-	return iter == NULL ? NULL : TAILQ_PREV( iter, ListHead, entries );
+    return iter == NULL ? NULL : TAILQ_PREV( iter, ListHead, entries );
 }
 
 /*-----------------------------------------------------------------------------
@@ -138,44 +138,44 @@ ListElem *List_prev( ListElem *iter )
 *----------------------------------------------------------------------------*/
 void List_insert_after( List **pself, ListElem *iter, void *data )
 {
-	ListElem *elem;
+    ListElem *elem;
 
-	if ( iter == NULL )
-		List_push( pself, data );
-	else
-	{
-		elem = List_new_elem( pself, data );
-		TAILQ_INSERT_AFTER( &(*pself)->head, iter, elem, entries );
-	}
+    if ( iter == NULL )
+        List_push( pself, data );
+    else
+    {
+        elem = List_new_elem( pself, data );
+        TAILQ_INSERT_AFTER( &( *pself )->head, iter, elem, entries );
+    }
 }
 
 void List_insert_before( List **pself, ListElem *iter, void *data )
 {
-	ListElem *elem;
+    ListElem *elem;
 
-	if ( iter == NULL )
-		List_unshift( pself, data );
-	else
-	{
-		elem = List_new_elem( pself, data );
-		TAILQ_INSERT_BEFORE( iter, elem, entries );
-	}
+    if ( iter == NULL )
+        List_unshift( pself, data );
+    else
+    {
+        elem = List_new_elem( pself, data );
+        TAILQ_INSERT_BEFORE( iter, elem, entries );
+    }
 }
 
 /*-----------------------------------------------------------------------------
-*   remove and return data pointed by iterator,  
+*   remove and return data pointed by iterator,
 *	advance iterator to next element
 *----------------------------------------------------------------------------*/
 void *List_remove( List *self, ListElem **piter )
 {
-	ListElem *old_iter;
+    ListElem *old_iter;
 
-	if ( self == NULL )
-		return NULL;
+    if ( self == NULL )
+        return NULL;
 
-	old_iter = *piter;
-	*piter = List_next(*piter);
-	return List_remove_elem( self, old_iter );
+    old_iter = *piter;
+    *piter = List_next( *piter );
+    return List_remove_elem( self, old_iter );
 }
 
 /*-----------------------------------------------------------------------------
@@ -183,29 +183,34 @@ void *List_remove( List *self, ListElem **piter )
 *----------------------------------------------------------------------------*/
 void List_remove_all( List *self )
 {
-	ListElem *elem;
+    ListElem *elem;
 
-	if ( self == NULL )
-		return;
+    if ( self == NULL )
+        return;
 
-	while ( ( elem = List_first(self) ) != NULL )
-	{
-		if ( self->free_data != NULL && elem->data != NULL )
-			self->free_data( elem->data );
-		List_remove( self, &elem );
-	}
+    while ( ( elem = List_first( self ) ) != NULL )
+    {
+        if ( self->free_data != NULL && elem->data != NULL )
+            self->free_data( elem->data );
+
+        List_remove( self, &elem );
+    }
 }
 
 /* check if list is empty */
 BOOL List_empty( List *self )
 {
-	return List_first(self) == NULL ? TRUE : FALSE;
+    return List_first( self ) == NULL ? TRUE : FALSE;
 }
 
 
-/* 
+/*
 * $Log: list.c,v $
-* Revision 1.2  2014-01-02 16:02:28  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/02 16:02:28  pauloscustodio
 * Register free() function to be used by remove_all() to delete each element
 *
 * Revision 1.1  2014/01/02 12:48:39  pauloscustodio

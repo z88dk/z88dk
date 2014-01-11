@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.67 2014-01-09 23:13:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.68 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,27 +47,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.67 2014-01-09 23
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
 /* types */
-enum OptType 
-{ 
-	OptClear, OptSet, 
-	OptCall, OptCallArg, OptCallOptArg, 
-	OptString, OptStringList, 
-	OptDeprecated,
+enum OptType
+{
+    OptClear, OptSet,
+    OptCall, OptCallArg, OptCallOptArg,
+    OptString, OptStringList,
+    OptDeprecated,
 };
 
 /* declare functions */
-static void exit_help(void);
-static void exit_copyright(void);
-static void display_options(void);
-static void option_make_updated_bin(void);
-static void option_origin(char *origin_hex);
-static void option_define(char *symbol);
-static void option_make_lib(char *library);
-static void option_use_lib(char *library);
-static void option_cpu_RCM2000(void);
+static void exit_help( void );
+static void exit_copyright( void );
+static void display_options( void );
+static void option_make_updated_bin( void );
+static void option_origin( char *origin_hex );
+static void option_define( char *symbol );
+static void option_make_lib( char *library );
+static void option_use_lib( char *library );
+static void option_cpu_RCM2000( void );
 
-static void parse_options(int *parg, int argc, char *argv[]);
-static void parse_files(int arg, int argc, char *argv[] );
+static void parse_options( int *parg, int argc, char *argv[] );
+static void parse_files( int arg, int argc, char *argv[] );
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -83,11 +83,11 @@ Opts opts =
 *----------------------------------------------------------------------------*/
 typedef struct OptsLU
 {
-	enum OptType	 type;		/* type of option */
-	void			*arg;		/* option argument */
-	char			*short_opt;	/* option text, including starting "-" */
-	char			*long_opt;	/* option text, including starting "--" */
-} 
+    enum OptType	 type;		/* type of option */
+    void			*arg;		/* option argument */
+    char			*short_opt;	/* option text, including starting "-" */
+    char			*long_opt;	/* option text, including starting "--" */
+}
 OptsLU;
 
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
@@ -103,9 +103,10 @@ static OptsLU opts_lu[] =
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
-    char *directory = getenv("Z80_OZFILES");
+    char *directory = getenv( "Z80_OZFILES" );
+
     if ( directory )
-		List_push( &opts.inc_path, strpool_add(directory) );
+        List_push( &opts.inc_path, strpool_add( directory ) );
 }
 
 DEFINE_fini()
@@ -113,19 +114,19 @@ DEFINE_fini()
 }
 
 /*-----------------------------------------------------------------------------
-*   Parse command line, set options, including opts.files with list of 
+*   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
 void parse_argv( int argc, char *argv[] )
 {
-	int arg;
+    int arg;
 
-	init();
+    init();
 
-	if ( argc == 1 )
-		exit_copyright();				/* exit if no arguments */
+    if ( argc == 1 )
+        exit_copyright();				/* exit if no arguments */
 
-	parse_options(&arg, argc, argv);	/* process all options, set arg to next */
+    parse_options( &arg, argc, argv );	/* process all options, set arg to next */
 
     if ( arg >= argc )
         error_no_src_file();			/* no source file */
@@ -133,8 +134,8 @@ void parse_argv( int argc, char *argv[] )
     if ( opts.verbose )
         display_options();				/* display status messages of select assembler options */
 
-	if ( ! get_num_errors() )
-		parse_files(arg, argc, argv);	/* process each source file */
+    if ( ! get_num_errors() )
+        parse_files( arg, argc, argv );	/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -142,106 +143,116 @@ void parse_argv( int argc, char *argv[] )
 *----------------------------------------------------------------------------*/
 /* check if this oprion is matched, return char pointer after option, ready
    to retrieve an argument, if any */
-static char *check_option(char *arg, char *opt)
+static char *check_option( char *arg, char *opt )
 {
-	size_t len = strlen(opt);
-	if ( *opt &&				/* ignore empty option strings */
-		 strncmp( arg, opt, len ) == 0 )
-	{
-		if ( arg[len] == '=' )	
-			len++;				/* skip '=' after option, to point at argument */
-		return arg + len;		/* point to after argument */
-	}
-	else
-		return NULL;			/* not found */
+    size_t len = strlen( opt );
+
+    if ( *opt &&				/* ignore empty option strings */
+            strncmp( arg, opt, len ) == 0 )
+    {
+        if ( arg[len] == '=' )
+            len++;				/* skip '=' after option, to point at argument */
+
+        return arg + len;		/* point to after argument */
+    }
+    else
+        return NULL;			/* not found */
 }
 
-static void process_opt(int *parg, int argc, char *argv[])
+static void process_opt( int *parg, int argc, char *argv[] )
 {
 #define i (*parg)
-	int		 j;
-	char	*opt_arg_ptr;
+    int		 j;
+    char	*opt_arg_ptr;
 
-	/* search opts_lu[] */
-	for ( j = 0; j < NUM_ELEMS(opts_lu); j++ )
-	{
-		if ( (opt_arg_ptr = check_option( argv[i], opts_lu[j].long_opt )) != NULL ||
-			 (opt_arg_ptr = check_option( argv[i], opts_lu[j].short_opt )) != NULL )
-		{
-			/* found option, opt_arg_ptr points to after option */
-			switch ( opts_lu[j].type )
-			{
-			case OptClear:
-				if ( *opt_arg_ptr )
-					error_illegal_option( argv[i] );
-				else
-					*((BOOL *)(opts_lu[j].arg)) = FALSE;
-				break;
+    /* search opts_lu[] */
+    for ( j = 0; j < NUM_ELEMS( opts_lu ); j++ )
+    {
+        if ( ( opt_arg_ptr = check_option( argv[i], opts_lu[j].long_opt ) ) != NULL ||
+                ( opt_arg_ptr = check_option( argv[i], opts_lu[j].short_opt ) ) != NULL )
+        {
+            /* found option, opt_arg_ptr points to after option */
+            switch ( opts_lu[j].type )
+            {
+            case OptClear:
+                if ( *opt_arg_ptr )
+                    error_illegal_option( argv[i] );
+                else
+                    *( ( BOOL * )( opts_lu[j].arg ) ) = FALSE;
 
-			case OptSet:
-				if ( *opt_arg_ptr )
-					error_illegal_option( argv[i] );
-				else
-					*((BOOL *)(opts_lu[j].arg)) = TRUE;
-				break;
+                break;
 
-			case OptCall:
-				if ( *opt_arg_ptr )
-					error_illegal_option( argv[i] );
-				else
-					((void (*)(void))(opts_lu[j].arg)) ();
-				break;
+            case OptSet:
+                if ( *opt_arg_ptr )
+                    error_illegal_option( argv[i] );
+                else
+                    *( ( BOOL * )( opts_lu[j].arg ) ) = TRUE;
 
-			case OptCallArg:
-				if ( *opt_arg_ptr )
-					((void (*)(char *))(opts_lu[j].arg)) ( opt_arg_ptr );
-				else
-					error_illegal_option( argv[i] );
-				break;
+                break;
 
-			case OptCallOptArg:
-				((void (*)(char *))(opts_lu[j].arg)) ( opt_arg_ptr );
-				break;
+            case OptCall:
+                if ( *opt_arg_ptr )
+                    error_illegal_option( argv[i] );
+                else
+                    ( ( void ( * )( void ) )( opts_lu[j].arg ) )();
 
-			case OptString:
-				if ( *opt_arg_ptr )
-					*((char **)(opts_lu[j].arg)) = opt_arg_ptr;
-				else
-					error_illegal_option( argv[i] );
-				break;
+                break;
 
-			case OptStringList:
-				if ( *opt_arg_ptr )
-					List_push( (List **) opts_lu[j].arg, strpool_add(opt_arg_ptr) );
-				else
-					error_illegal_option( argv[i] );
-				break;
+            case OptCallArg:
+                if ( *opt_arg_ptr )
+                    ( ( void ( * )( char * ) )( opts_lu[j].arg ) )( opt_arg_ptr );
+                else
+                    error_illegal_option( argv[i] );
 
-			case OptDeprecated:
-				if ( *opt_arg_ptr )
-					*opt_arg_ptr = '\0';		/* delete option argument for warning message */
-				warn_option_deprecated( argv[i] );
-				break;
+                break;
 
-			default:
-				die( "missing case at %s:%d\n", __FILE__, __LINE__ );
-			}
-			return;
-		}
-	}
+            case OptCallOptArg:
+                ( ( void ( * )( char * ) )( opts_lu[j].arg ) )( opt_arg_ptr );
+                break;
 
-	/* not found */
-	error_illegal_option( argv[i] );
+            case OptString:
+                if ( *opt_arg_ptr )
+                    *( ( char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
+                else
+                    error_illegal_option( argv[i] );
+
+                break;
+
+            case OptStringList:
+                if ( *opt_arg_ptr )
+                    List_push( ( List ** ) opts_lu[j].arg, strpool_add( opt_arg_ptr ) );
+                else
+                    error_illegal_option( argv[i] );
+
+                break;
+
+            case OptDeprecated:
+                if ( *opt_arg_ptr )
+                    *opt_arg_ptr = '\0';		/* delete option argument for warning message */
+
+                warn_option_deprecated( argv[i] );
+                break;
+
+            default:
+                die( "missing case at %s:%d\n", __FILE__, __LINE__ );
+            }
+
+            return;
+        }
+    }
+
+    /* not found */
+    error_illegal_option( argv[i] );
 
 #undef i
 }
 
-static void parse_options(int *parg, int argc, char *argv[])
+static void parse_options( int *parg, int argc, char *argv[] )
 {
 #define i (*parg)
 
-	for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
-		process_opt( &i, argc, argv );
+    for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
+        process_opt( &i, argc, argv );
 
 #undef i
 }
@@ -251,19 +262,20 @@ static void parse_options(int *parg, int argc, char *argv[])
 *----------------------------------------------------------------------------*/
 static void parse_file( char *filename )
 {
-	strip(filename);
-	switch ( filename[0] )
-	{
-        case '-':		/* Illegal source file name */
-            error_illegal_src_filename( filename );
-            break;
+    strip( filename );
 
-        case '\0':		/* no file */
-			break;
+    switch ( filename[0] )
+    {
+    case '-':		/* Illegal source file name */
+        error_illegal_src_filename( filename );
+        break;
 
-        default:
-            List_push( &opts.files, strpool_add(filename) );
-	}
+    case '\0':		/* no file */
+        break;
+
+    default:
+        List_push( &opts.files, strpool_add( filename ) );
+    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -271,48 +283,50 @@ static void parse_file( char *filename )
 *----------------------------------------------------------------------------*/
 static void parse_file_list( Scan *files, char *filename )
 {
-	char *line;
+    char *line;
 
-	strip(filename);
-	if ( filename[0] == '@' )
-	{
-		strip(filename+1);
-		scan_file_Scan( files, filename+1 );
+    strip( filename );
 
-		while ( (line = get_line_Scan( files )) != NULL )
-		{
-			strip(line);
-			if ( line[0] == '@' )
-			{
-				strip(line+1);
-				scan_file_Scan( files, line+1 );		/* recurse */
-			}
-			else 
-			{
-				parse_file( line );
-			}
-		}
-	}
-	else 
-	{
-		parse_file( filename );
-	}
+    if ( filename[0] == '@' )
+    {
+        strip( filename + 1 );
+        scan_file_Scan( files, filename + 1 );
+
+        while ( ( line = get_line_Scan( files ) ) != NULL )
+        {
+            strip( line );
+
+            if ( line[0] == '@' )
+            {
+                strip( line + 1 );
+                scan_file_Scan( files, line + 1 );		/* recurse */
+            }
+            else
+            {
+                parse_file( line );
+            }
+        }
+    }
+    else
+    {
+        parse_file( filename );
+    }
 }
 
 /*-----------------------------------------------------------------------------
 *   process all files
 *----------------------------------------------------------------------------*/
-static void parse_files(int arg, int argc, char *argv[])
+static void parse_files( int arg, int argc, char *argv[] )
 {
-	Scan *files = OBJ_NEW(Scan);
-	{
-		int i; 
+    Scan *files = OBJ_NEW( Scan );
+    {
+        int i;
 
-		/* Assemble file list */
-		for ( i = arg; i < argc; i++ )
-			parse_file_list( files, argv[i] );
-	}
-	OBJ_DELETE(files);
+        /* Assemble file list */
+        for ( i = arg; i < argc; i++ )
+            parse_file_list( files, argv[i] );
+    }
+    OBJ_DELETE( files );
 }
 
 /*-----------------------------------------------------------------------------
@@ -325,104 +339,114 @@ static void parse_files(int arg, int argc, char *argv[])
 
 #define ALIGN_HELP	24
 
-static void show_option(enum OptType type, BOOL *pflag, 
-						char *short_opt, char *long_opt, char *help_text, char *help_arg)
+static void show_option( enum OptType type, BOOL *pflag,
+                         char *short_opt, char *long_opt, char *help_text, char *help_arg )
 {
-	DEFINE_STR( msg, MAXLINE );
-	int count_opts = 0;
+    DEFINE_STR( msg, MAXLINE );
+    int count_opts = 0;
 
-	if ( type == OptDeprecated )
-		return;							/* skip deprecated options */
+    if ( type == OptDeprecated )
+        return;							/* skip deprecated options */
 
-	/* show default option */
-	if ( type == OptSet   &&   *pflag ||
-		 type == OptClear && ! *pflag )
-		Str_set( msg, "* " );
-	else
-		Str_set( msg, "  " );
+    /* show default option */
+    if ( ( type == OptSet   &&   *pflag ) ||
+            ( type == OptClear && ! *pflag ) )
+        Str_set( msg, "* " );
+    else
+        Str_set( msg, "  " );
 
-	if ( *short_opt )
-	{
-		/* dont show short_opt if short_opt is same as long_opt, except for extra '-',
-		   e.g. -sdcc and --sdcc */
-		if ( ! (*long_opt && strcmp(short_opt, long_opt+1) == 0) )
-		{
-			Str_append_sprintf( msg, "%s", short_opt );
-			count_opts++;
-		}
-	}
-	
-	if ( *long_opt )
-	{
-		if ( count_opts )
-			Str_append( msg, ", " );
-		Str_append_sprintf( msg, "%s", long_opt );
-		count_opts++;
-	}
+    if ( *short_opt )
+    {
+        /* dont show short_opt if short_opt is same as long_opt, except for extra '-',
+           e.g. -sdcc and --sdcc */
+        if ( !( *long_opt && strcmp( short_opt, long_opt + 1 ) == 0 ) )
+        {
+            Str_append_sprintf( msg, "%s", short_opt );
+            count_opts++;
+        }
+    }
 
-	if ( *help_arg )
-	{
-		Str_append_sprintf( msg, "=%s", help_arg );
-	}
+    if ( *long_opt )
+    {
+        if ( count_opts )
+            Str_append( msg, ", " );
 
-	if ( msg->len > ALIGN_HELP )
-		printf("%s\n%-*s %s\n", msg->str, ALIGN_HELP, "",       help_text );
-	else
-		printf(    "%-*s %s\n",           ALIGN_HELP, msg->str, help_text );
+        Str_append_sprintf( msg, "%s", long_opt );
+        count_opts++;
+    }
+
+    if ( *help_arg )
+    {
+        Str_append_sprintf( msg, "=%s", help_arg );
+    }
+
+    if ( msg->len > ALIGN_HELP )
+        printf( "%s\n%-*s %s\n", msg->str, ALIGN_HELP, "",       help_text );
+    else
+        printf( "%-*s %s\n",           ALIGN_HELP, msg->str, help_text );
 }
 #undef ALIGN_HELP
 
-static void exit_help(void)
+static void exit_help( void )
 {
-	puts(  copyrightmsg );
-	puts(  "" );
-	puts(  "Usage:" );
-    puts(  "  z80asm [options] { @<modulefile> | <filename> }" );
-	puts(  "" );
-    puts(  "  [] = optional, {} = may be repeated, | = OR clause." );
-	puts(  "" );
-    printf("  To assemble 'fred%s%s' use 'fred' or 'fred%s%s'\n", 
-		   FILEEXT_SEPARATOR, opts.asm_ext, 
-		   FILEEXT_SEPARATOR, opts.asm_ext );
-	puts(  "" );
-    puts(  "  <modulefile> contains list of file names of all modules to be linked," );
-	puts(  "  one module per line." );
-	puts(  "" );
-    puts(  "  File types recognized or created by z80asm:" );
-    printf("    %s%s = source file (default), or alternative -e<ext>\n", 
-		   FILEEXT_SEPARATOR, opts.asm_ext );
-    printf("    %s%s = object file (default), or alternative -M<ext>\n", 
-		   FILEEXT_SEPARATOR, opts.obj_ext );
-    printf("    %s = list file\n", FILEEXT_LST );
-    printf("    %s = Z80 binary file\n", FILEEXT_BIN );
-    printf("    %s = symbols file\n", FILEEXT_SYM );
-    printf("    %s = map file\n", FILEEXT_MAP );
-    printf("    %s = global address definition file\n", FILEEXT_DEF );
-    printf("    %s = error file\n", FILEEXT_ERR );
+    puts( copyrightmsg );
+    puts( "" );
+    puts( "Usage:" );
+    puts( "  z80asm [options] { @<modulefile> | <filename> }" );
+    puts( "" );
+    puts( "  [] = optional, {} = may be repeated, | = OR clause." );
+    puts( "" );
+    printf( "  To assemble 'fred%s%s' use 'fred' or 'fred%s%s'\n",
+            FILEEXT_SEPARATOR, opts.asm_ext,
+            FILEEXT_SEPARATOR, opts.asm_ext );
+    puts( "" );
+    puts( "  <modulefile> contains list of file names of all modules to be linked," );
+    puts( "  one module per line." );
+    puts( "" );
+    puts( "  File types recognized or created by z80asm:" );
+    printf( "    %s%s = source file (default), or alternative -e<ext>\n",
+            FILEEXT_SEPARATOR, opts.asm_ext );
+    printf( "    %s%s = object file (default), or alternative -M<ext>\n",
+            FILEEXT_SEPARATOR, opts.obj_ext );
+    printf( "    %s = list file\n", FILEEXT_LST );
+    printf( "    %s = Z80 binary file\n", FILEEXT_BIN );
+    printf( "    %s = symbols file\n", FILEEXT_SYM );
+    printf( "    %s = map file\n", FILEEXT_MAP );
+    printf( "    %s = global address definition file\n", FILEEXT_DEF );
+    printf( "    %s = error file\n", FILEEXT_ERR );
 
 #include "options_def.h"
 
-	exit(0);
+    exit( 0 );
 }
 
-static void exit_copyright(void)
+static void exit_copyright( void )
 {
-    printf("%s\n", copyrightmsg);
-	exit(0);
+    printf( "%s\n", copyrightmsg );
+    exit( 0 );
 }
 
-static void display_options(void)
+static void display_options( void )
 {
     if ( opts.date_stamp )						puts( OPT_HELP_DATE_STAMP );
-    else										puts( OPT_HELP_NO_DATE_STAMP );	
+    else										puts( OPT_HELP_NO_DATE_STAMP );
+
     if ( opts.symtable )						puts( OPT_HELP_SYMTABLE );
+
     if ( opts.list )							puts( OPT_HELP_LIST );
+
     if ( opts.globaldef )    					puts( OPT_HELP_GLOBALDEF );
+
     if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );
+
     if ( opts.make_bin )						puts( OPT_HELP_MAKE_BIN );
+
     if ( opts.library )							puts( OPT_HELP_USE_LIB );
+
     if ( opts.make_bin && opts.map )			puts( OPT_HELP_MAP );
+
     if ( opts.code_seg && ! opts.relocatable )	puts( OPT_HELP_CODE_SEG );
+
     if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
 
     putchar( '\n' );
@@ -431,57 +455,59 @@ static void display_options(void)
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-static void option_make_updated_bin(void)
+static void option_make_updated_bin( void )
 {
     opts.make_bin = opts.date_stamp = TRUE;
 }
 
-static void option_origin(char *origin_hex)
+static void option_origin( char *origin_hex )
 {
-	long origin = strtol( origin_hex, NULL, 16 );
-	if ( origin < 0 || origin > 0xFFFF )
-		error_int_range(origin);
-	opts.origin = (int) origin;
+    long origin = strtol( origin_hex, NULL, 16 );
+
+    if ( origin < 0 || origin > 0xFFFF )
+        error_int_range( origin );
+
+    opts.origin = ( int ) origin;
 }
 
-static void option_define(char *symbol)
+static void option_define( char *symbol )
 {
-	int i;
+    int i;
 
-	strtoupper(symbol);			/* convert to upper case */
+    strtoupper( symbol );			/* convert to upper case */
 
-	/* check syntax */
-	if ( ! isalpha( symbol[0] ) )
-	{
-		error_illegal_ident();
-		return;
-	}
+    /* check syntax */
+    if ( ! isalpha( symbol[0] ) )
+    {
+        error_illegal_ident();
+        return;
+    }
 
-	for ( i = 1; symbol[i]; i++ )
-	{
-		if ( ! isalnum( symbol[i] ) && symbol[i] != '_' )
-		{
-			error_illegal_ident();
-			return;
-		}
-	}
+    for ( i = 1; symbol[i]; i++ )
+    {
+        if ( ! isalnum( symbol[i] ) && symbol[i] != '_' )
+        {
+            error_illegal_ident();
+            return;
+        }
+    }
 
     define_static_def_sym( symbol, 1 );
 }
 
-static void option_make_lib(char *library)
+static void option_make_lib( char *library )
 {
-	opts.lib_file = CreateLibfile( library );
+    opts.lib_file = CreateLibfile( library );
 }
 
-static void option_use_lib(char *library)
+static void option_use_lib( char *library )
 {
-	GetLibfile( library );
+    GetLibfile( library );
 }
 
-static void option_cpu_RCM2000(void)
+static void option_cpu_RCM2000( void )
 {
-	opts.cpu = CPU_RCM2000;
+    opts.cpu = CPU_RCM2000;
 }
 
 /*-----------------------------------------------------------------------------
@@ -492,50 +518,81 @@ static void option_cpu_RCM2000(void)
 
 static char *replace_ext( char *filename, char *ext )
 {
-	DEFINE_FILE_STR( new_filename );
+    DEFINE_FILE_STR( new_filename );
 
-	init();
+    init();
 
-	path_replace_ext( new_filename, filename, ext );
-	return strpool_add( new_filename->str );
+    path_replace_ext( new_filename, filename, ext );
+    return strpool_add( new_filename->str );
 }
 
 static char *get_opts_ext_filename( char *filename, char *opts_ext )
 {
-	DEFINE_FILE_STR( ext );
+    DEFINE_FILE_STR( ext );
 
-	init();
+    init();
 
-	Str_set( ext, FILEEXT_SEPARATOR );
-	Str_append( ext, opts_ext );
-	return replace_ext( filename, ext->str ); 
+    Str_set( ext, FILEEXT_SEPARATOR );
+    Str_append( ext, opts_ext );
+    return replace_ext( filename, ext->str );
 }
 
-char *get_lst_filename( char *filename ) { return replace_ext( filename, FILEEXT_LST ); }
-char *get_def_filename( char *filename ) { return replace_ext( filename, FILEEXT_DEF ); }
-char *get_err_filename( char *filename ) { return replace_ext( filename, FILEEXT_ERR ); }
-char *get_bin_filename( char *filename ) { return replace_ext( filename, FILEEXT_BIN ); }
-char *get_lib_filename( char *filename ) { return replace_ext( filename, FILEEXT_LIB ); }
-char *get_sym_filename( char *filename ) { return replace_ext( filename, FILEEXT_SYM ); }
-char *get_map_filename( char *filename ) { return replace_ext( filename, FILEEXT_MAP ); }
-char *get_asm_filename( char *filename ) { return get_opts_ext_filename( filename, opts.asm_ext ); }
-char *get_obj_filename( char *filename ) { return get_opts_ext_filename( filename, opts.obj_ext ); }
-
-char *get_segbin_filename( char *filename, int segment ) 
+char *get_lst_filename( char *filename )
 {
-	DEFINE_FILE_STR( ext );
+    return replace_ext( filename, FILEEXT_LST );
+}
+char *get_def_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_DEF );
+}
+char *get_err_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_ERR );
+}
+char *get_bin_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_BIN );
+}
+char *get_lib_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_LIB );
+}
+char *get_sym_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_SYM );
+}
+char *get_map_filename( char *filename )
+{
+    return replace_ext( filename, FILEEXT_MAP );
+}
+char *get_asm_filename( char *filename )
+{
+    return get_opts_ext_filename( filename, opts.asm_ext );
+}
+char *get_obj_filename( char *filename )
+{
+    return get_opts_ext_filename( filename, opts.obj_ext );
+}
 
-	init();
+char *get_segbin_filename( char *filename, int segment )
+{
+    DEFINE_FILE_STR( ext );
 
-	Str_set( ext, FILEEXT_SEGBIN );
-	Str_append_sprintf( ext, "%d", segment );
-	return replace_ext( filename, ext->str ); 
+    init();
+
+    Str_set( ext, FILEEXT_SEGBIN );
+    Str_append_sprintf( ext, "%d", segment );
+    return replace_ext( filename, ext->str );
 }
 
 
-/* 
+/*
 * $Log: options.c,v $
-* Revision 1.67  2014-01-09 23:13:04  pauloscustodio
+* Revision 1.68  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.67  2014/01/09 23:13:04  pauloscustodio
 * Use init.h mechanism, no need for main() calling init_options.
 * Use Str instead of glib.
 *

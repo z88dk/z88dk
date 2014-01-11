@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.62 2014-01-05 23:20:39 pauloscustodio Exp $ */
-/* 
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.63 2014-01-11 00:10:38 pauloscustodio Exp $ */
+/*
  * $Log: asmdrctv.c,v $
- * Revision 1.62  2014-01-05 23:20:39  pauloscustodio
+ * Revision 1.63  2014-01-11 00:10:38  pauloscustodio
+ * Astyle - format C code
+ * Add -Wall option to CFLAGS, remove all warnings
+ *
+ * Revision 1.62  2014/01/05 23:20:39  pauloscustodio
  * List, StrHash classlist and classhash receive the address of the container
  * object in all functions that add items to the container, and create the
  * container on first use. This allows a container to be staticaly
@@ -421,20 +425,20 @@ DEFSP( void )
         if ( GetSym() == name )
             switch ( ident[0] )
             {
-                case 'B':
-                    return 1;
+            case 'B':
+                return 1;
 
-                case 'W':
-                    return 2;
+            case 'W':
+                return 2;
 
-                case 'P':
-                    return 3;
+            case 'P':
+                return 3;
 
-                case 'L':
-                    return 4;
+            case 'L':
+                return 4;
 
-                default:
-                    return -1;
+            default:
+                return -1;
             }
         else
         {
@@ -509,22 +513,22 @@ Parsedefvarsize( long offset )
 
     switch ( sym )
     {
-        case name:
-            if ( strcmp( ident, "DS" ) != 0 )
-            {
-                define_symbol( ident, offset, 0 );
-                GetSym();
-            }
+    case name:
+        if ( strcmp( ident, "DS" ) != 0 )
+        {
+            define_symbol( ident, offset, 0 );
+            GetSym();
+        }
 
-            if ( sym == name )
-            {
-                varoffset = Parsevarsize();
-            }
+        if ( sym == name )
+        {
+            varoffset = Parsevarsize();
+        }
 
-            break;
+        break;
 
-        default:
-            error_syntax();
+    default:
+        error_syntax();
     }
 
     return varoffset;
@@ -559,7 +563,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = (size_t)offset;
+            DEFVPC = ( size_t )offset;
             globaldefv = ON;
         }
         else
@@ -593,11 +597,11 @@ DEFVARS( void )
             set_error_line( CURRENTFILE->line );    /* error location */
         }
 
-		if ( opts.cur_list )
-		{
-			getasmline();    /* get a copy of current source line */
-			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-		}
+        if ( opts.cur_list )
+        {
+            getasmline();    /* get a copy of current source line */
+            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+        }
 
         GetSym();
     }
@@ -615,11 +619,11 @@ DEFVARS( void )
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
 
-				if ( opts.cur_list )
-				{
-					getasmline();    /* get a copy of current source line */
-					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-				}
+                if ( opts.cur_list )
+                {
+                    getasmline();    /* get a copy of current source line */
+                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+                }
 
                 EOL = OFF;
             }
@@ -631,7 +635,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = (size_t)offset;
+            DEFVPC = ( size_t )offset;
         }
     }
 }
@@ -655,11 +659,11 @@ DEFGROUP( void )
             set_error_line( CURRENTFILE->line );    /* error location */
         }
 
-		if ( opts.cur_list )
-		{
-			getasmline();    /* get a copy of current source line */
-			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-		}
+        if ( opts.cur_list )
+        {
+            getasmline();    /* get a copy of current source line */
+            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+        }
 
 
     }
@@ -677,11 +681,11 @@ DEFGROUP( void )
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
 
-				if ( opts.cur_list )
-				{
-					getasmline();    /* get a copy of current source line */
-					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-				}
+                if ( opts.cur_list )
+                {
+                    getasmline();    /* get a copy of current source line */
+                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+                }
 
                 EOL = OFF;
             }
@@ -693,46 +697,46 @@ DEFGROUP( void )
 
                     switch ( sym )
                     {
-                        case rcurly:
-                        case semicolon:
-                        case newline:
-                            break;
+                    case rcurly:
+                    case semicolon:
+                    case newline:
+                        break;
 
-                        case name:
-                            strcpy( stringconst, ident );     /* remember name */
+                    case name:
+                        strcpy( stringconst, ident );     /* remember name */
 
-                            if ( GetSym() == assign )
+                        if ( GetSym() == assign )
+                        {
+                            GetSym();
+
+                            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
                             {
-                                GetSym();
-
-                                if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+                                if ( postfixexpr->rangetype & NOTEVALUABLE )
                                 {
-                                    if ( postfixexpr->rangetype & NOTEVALUABLE )
-                                    {
-                                        error_not_defined();
-                                    }
-                                    else
-                                    {
-                                        constant = EvalPfixExpr( postfixexpr );
-                                        enumconst = constant;
-                                        define_symbol( stringconst, enumconst++, 0 );
-                                    }
-
-                                    RemovePfixlist( postfixexpr );
+                                    error_not_defined();
+                                }
+                                else
+                                {
+                                    constant = EvalPfixExpr( postfixexpr );
+                                    enumconst = constant;
+                                    define_symbol( stringconst, enumconst++, 0 );
                                 }
 
-                                /* BUG_0032 - removed: GetSym(); */
-                            }
-                            else
-                            {
-                                define_symbol( stringconst, enumconst++, 0 );
+                                RemovePfixlist( postfixexpr );
                             }
 
-                            break;
+                            /* BUG_0032 - removed: GetSym(); */
+                        }
+                        else
+                        {
+                            define_symbol( stringconst, enumconst++, 0 );
+                        }
 
-                        default:
-                            error_syntax();
-                            break;
+                        break;
+
+                    default:
+                        error_syntax();
+                        break;
                     }
                 }
                 while ( sym == comma );   /* get enum definitions separated by comma in current line */
@@ -796,7 +800,7 @@ DEFS()
 
                 while ( constant-- )
                 {
-                    append_byte( (byte_t) val );
+                    append_byte( ( byte_t ) val );
                 }
             }
             else
@@ -1109,11 +1113,11 @@ DEFM( void )
                 }
                 else
                 {
-                    if ( constant != '\"' ) /* NOTE: should be dquote, but dquote is index in 
-											   enum symbols (=2) computed by GetSym(), 
+                    if ( constant != '\"' ) /* NOTE: should be dquote, but dquote is index in
+											   enum symbols (=2) computed by GetSym(),
 											   different from char retrieved by GetChar() */
                     {
-                        append_byte( (byte_t) constant );
+                        append_byte( ( byte_t ) constant );
                         ++bytepos;
                         inc_PC( 1 );
                     }
@@ -1286,10 +1290,12 @@ Fetchfilename( FILE *fptr )
     ptr = ident;
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
+
     if ( *ptr == '#' )
     {
         ptr++;
     }
+
 #endif
 
     return strlen( ptr ) ? search_file( ptr, opts.inc_path ) : "";

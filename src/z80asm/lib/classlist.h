@@ -3,7 +3,7 @@ Lists of objects defined by class.h
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.2 2014-01-02 23:33:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -76,7 +76,7 @@ DEF_CLASS_LIST(T);
 																			\
 	/* check if list is empty */											\
 	extern BOOL T##List_empty( T##List *self );								\
-
+ 
 /*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
@@ -257,11 +257,15 @@ DEF_CLASS_LIST(T);
 	{																		\
 		return T##List_first(self) == NULL ? TRUE : FALSE;					\
 	}																		\
+ 
 
-
-/* 
+/*
 * $Log: classlist.h,v $
-* Revision 1.2  2014-01-02 23:33:11  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/02 23:33:11  pauloscustodio
 * Unify interface of classlist and list.
 *
 * Revision 1.1  2013/12/25 17:37:13  pauloscustodio

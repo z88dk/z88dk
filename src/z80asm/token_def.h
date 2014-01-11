@@ -15,19 +15,19 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.7 2013-10-15 23:24:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.8 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #ifndef TOKEN
 #define TOKEN(name, str_legacy, str_new)
 #endif
 
-/* define list of tokens with corresponding string representation, 
-   use a " " when not single-char token 
+/* define list of tokens with corresponding string representation,
+   use a " " when not single-char token
    newline must be the last token so that it is returned when a '\0' char is searched */
 TOKEN(	nil,		" ", " " )
 TOKEN(	space, 		" ", " " )
-TOKEN(	dquote, 	"\"","\"")
+TOKEN(	dquote, 	"\"", "\"" )
 TOKEN(	squote, 	"'", "'" )
 TOKEN(	colon,		" ", ":" )
 TOKEN(	semicolon, 	";", ";" )
@@ -74,7 +74,7 @@ TOKEN(	label,		" ", " " )
 TOKEN(	string,		" ", " " )
 
 /* must be last and empty string to match '\0' */
-TOKEN(	newline,	"",  ""  )
+TOKEN(	newline,	"",  "" )
 
 
 
@@ -82,7 +82,11 @@ TOKEN(	newline,	"",  ""  )
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.7  2013-10-15 23:24:33  pauloscustodio
+* Revision 1.8  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.7  2013/10/15 23:24:33  pauloscustodio
 * Move reading by lines or tokens and file reading interface to scan.rl
 * to decouple file.c from scan.c.
 * Add singleton interface to scan to be used by parser.

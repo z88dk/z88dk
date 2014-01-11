@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.113 2014-01-10 00:15:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.114 2014-01-11 00:10:38 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -108,8 +108,6 @@ ASTYLE = astyle \
 	--lineend=linux \
 	--indent=spaces=4 \
 	--style=ansi \
-	--indent-switches --indent-classes \
-	--indent-preprocessor --convert-tabs \
 	--break-blocks \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name \
@@ -119,7 +117,7 @@ TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-I$(LOCAL_LIB) -W -Wformat -Werror=format-security 
+CFLAGS +=		-I$(LOCAL_LIB) -Wall
 
 #------------------------------------------------------------------------------
 # main
@@ -192,7 +190,7 @@ $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 # formatting style
 #------------------------------------------------------------------------------
 astyle:
-	$(ASTYLE) *.c *.h
+	$(ASTYLE) *.c *.h $(LOCAL_LIB)/*.c $(LOCAL_LIB)/*.h
 
 #------------------------------------------------------------------------------
 # gccmake.bat - work arround impossibility of writing a '$' in the perl code
@@ -243,7 +241,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.113  2014-01-10 00:15:25  pauloscustodio
+# Revision 1.114  2014-01-11 00:10:38  pauloscustodio
+# Astyle - format C code
+# Add -Wall option to CFLAGS, remove all warnings
+#
+# Revision 1.113  2014/01/10 00:15:25  pauloscustodio
 # Use Str instead of glib, List instead of GSList.
 # Use init.h mechanism, no need for main() calling init_scan.
 # glib dependency removed from code and Makefile

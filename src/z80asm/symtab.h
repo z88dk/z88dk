@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.11 2014-01-05 23:20:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.12 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.11  2014-01-05 23:20:39  pauloscustodio
+Revision 1.12  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.11  2014/01/05 23:20:39  pauloscustodio
 List, StrHash classlist and classhash receive the address of the container
 object in all functions that add items to the container, and create the
 container on first use. This allows a container to be staticaly
@@ -81,10 +85,10 @@ Move symbol to sym.c, rename to Symbol
 /*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
-CLASS_HASH(Symbol);				/* defines SymbolHash */
+CLASS_HASH( Symbol );				/* defines SymbolHash */
 
-/* join two symbol tables, adding all symbols from source to the target 
-   symbol table; if symbols with the same name exist, the one from source 
+/* join two symbol tables, adding all symbols from source to the target
+   symbol table; if symbols with the same name exist, the one from source
    overwrites the one at target */
 extern void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source );
 
@@ -98,7 +102,7 @@ extern Symbol *find_local_symbol( char *name );
 extern Symbol *find_global_symbol( char *name );
 
 /* refer to a symbol in an expression
-   search for symbol in either local tree or global table, 
+   search for symbol in either local tree or global table,
    create undefined symbol if not found, return symbol */
 extern Symbol *get_used_symbol( char *name );
 
@@ -116,7 +120,7 @@ extern Symbol *define_local_sym( char *name, long value, byte_t type );
 extern Symbol *define_global_sym( char *name, long value, byte_t type );
 extern Symbol *define_library_sym( char *name, long value, byte_t type );
 
-/* get the list of symbols that match the given type mask, 
+/* get the list of symbols that match the given type mask,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
    Selects symbols where (type & type_mask) == type_value */
 extern SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value );
@@ -132,8 +136,8 @@ extern void remove_all_global_syms( void );
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
 *----------------------------------------------------------------------------*/
-extern SymbolHash * global_symtab;
-extern SymbolHash * static_symtab;
+extern SymbolHash *global_symtab;
+extern SymbolHash *static_symtab;
 
 /* create a symbol in the local or global tree:
    a) if not already global/extern, create in the local (CURRENTMODULE) symbol table
@@ -151,8 +155,8 @@ extern void declare_extern_obj_symbol( char *name );
 extern void declare_extern_lib_symbol( char *name );
 
 /* sort functions for SymbolHash_sort */
-extern int SymbolHash_by_name(  SymbolHashElem *a, SymbolHashElem *b);
-extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b);
+extern int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b );
+extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 #endif /* ndef SYMTAB_H */
 

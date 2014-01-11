@@ -33,8 +33,8 @@ void list_start_line( size_t address, char *source_file, int source_line_nr, cha
 {	
 	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
 }
-char *CreateLibfile( char *filename ) {}
-char *GetLibfile( char *filename ) {}
+char *CreateLibfile( char *filename ) {return NULL;}
+char *GetLibfile( char *filename ) {return NULL;}
 Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
 char ident[MAXLINE];
 char separators[MAXLINE];
@@ -662,9 +662,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.32 2014-01-06 00:33:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.33 2014-01-11 00:10:40 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.32  2014-01-06 00:33:36  pauloscustodio
+# Revision 1.33  2014-01-11 00:10:40  pauloscustodio
+# Astyle - format C code
+# Add -Wall option to CFLAGS, remove all warnings
+#
+# Revision 1.32  2014/01/06 00:33:36  pauloscustodio
 # Use init.h mechanism, no need for main() calling init_errors
 # and atexit(fini_errors); use Str and StrHash instead of glib.
 #

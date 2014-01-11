@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.3 2014-01-02 12:54:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.4 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -15,7 +15,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.3 2014
 #include <stdlib.h>
 
 /* MS Visual Studio malloc debug */
-#ifdef _CRTDBG_MAP_ALLOC        
+#ifdef _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
 #include <string.h>
@@ -55,7 +55,11 @@ extern void xfreef( void *memptr );
 
 /*
 * $Log: xmalloc.h,v $
-* Revision 1.3  2014-01-02 12:54:39  pauloscustodio
+* Revision 1.4  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.3  2014/01/02 12:54:39  pauloscustodio
 * Add xfreef() function compatible with free() for use as function pointer.
 *
 * Revision 1.2  2013/12/18 01:16:36  pauloscustodio
@@ -94,7 +98,7 @@ extern void xfreef( void *memptr );
 * Renamed xfree0() to xfree().
 *
 * Revision 1.3  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
 * indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux

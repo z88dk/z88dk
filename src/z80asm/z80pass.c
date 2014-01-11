@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.66 2014-01-05 23:20:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.67 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.66  2014-01-05 23:20:39  pauloscustodio
+Revision 1.67  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.66  2014/01/05 23:20:39  pauloscustodio
 List, StrHash classlist and classhash receive the address of the container
 object in all functions that add items to the container, and create the
 container on first use. This allows a container to be staticaly
@@ -202,8 +206,8 @@ Revision 1.24  2012/05/12 16:57:33  pauloscustodio
         Also added registry of rcmx_cpi as external library routine.
 
 Revision 1.23  2012/05/11 19:29:49  pauloscustodio
-Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
-indenting style, space padding in parentheses and operators. Options written in the makefile, 
+Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
+indenting style, space padding in parentheses and operators. Options written in the makefile,
 target astyle.
         --mode=c
         --lineend=linux
@@ -217,20 +221,20 @@ target astyle.
 
 Revision 1.22  2011/10/14 14:46:03  pauloscustodio
 -  BUG_0013 : defm check for MAX_CODESIZE incorrect
- - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() 
+ - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space()
  from codearea.c.
 
 Revision 1.21  2011/10/07 17:53:04  pauloscustodio
 BUG_0015 : Relocation issue - dubious addresses come out of linking
 (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-- This caused the problem because CODESIZE keeps track of the start offset of each module in the 
-  sequence they will appear in the object file, and codeptr is reset to the start of the codearea 
+- This caused the problem because CODESIZE keeps track of the start offset of each module in the
+  sequence they will appear in the object file, and codeptr is reset to the start of the codearea
   for each module.
-  The effect was that all address calculations at link phase were considering a start offset of zero 
+  The effect was that all address calculations at link phase were considering a start offset of zero
   for all modules.
-- Moreover, when linking modules from a libary, the modules are pulled in to the code area as they 
-  are needed, and not in the sequence they will be in the object file. The start offset was being 
+- Moreover, when linking modules from a libary, the modules are pulled in to the code area as they
+  are needed, and not in the sequence they will be in the object file. The start offset was being
   ignored and the modules were being loaded in the incorrect order
 - Consequence of these two issues were all linked addresses wrong.
 
@@ -242,10 +246,10 @@ CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operati
 
 Revision 1.19  2011/08/19 15:53:58  pauloscustodio
 BUG_0010 : heap corruption when reaching MAXCODESIZE
-- test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte 
-  is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the 
+- test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte
+  is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the
   exception is raised.
-- Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on 
+- Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on
   every write.
 
 Revision 1.18  2011/08/19 10:20:32  pauloscustodio
@@ -518,7 +522,7 @@ parseline( enum flag interpret )
     if ( opts.cur_list )
     {
         getasmline();    /* get a copy of current source line */
-		list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+        list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
     }
 
     EOL = OFF;                /* reset END OF LINE flag */
@@ -531,10 +535,10 @@ parseline( enum flag interpret )
             /* Generate only possible label declaration if line parsing is allowed */
             if ( sym == label || GetSym() == name )
             {
-				/* labels must always be touched due to forward referencing problems in expressions */
-                define_symbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); 
-                                                                         
-                GetSym();      /* check for another identifier */				
+                /* labels must always be touched due to forward referencing problems in expressions */
+                define_symbol( ident, get_PC(), SYMADDR | SYMTOUCHED );
+
+                GetSym();      /* check for another identifier */
             }
             else
             {
@@ -551,18 +555,18 @@ parseline( enum flag interpret )
 
     switch ( sym )
     {
-        case name:
-            ParseIdent( interpret );
-            break;
+    case name:
+        ParseIdent( interpret );
+        break;
 
-        case newline:
-            break;                /* empty line, get next... */
+    case newline:
+        break;                /* empty line, get next... */
 
-        default:
-            if ( interpret == ON )
-            {
-                error_syntax();    /* Syntax error */
-            }
+    default:
+        if ( interpret == ON )
+        {
+            error_syntax();    /* Syntax error */
+        }
     }
 
     list_end_line();				/* Write current source line to list file */
@@ -694,21 +698,21 @@ StoreName( Symbol *node, byte_t scope )
 
     switch ( scope )
     {
-        case SYMLOCAL:
-            xfput_u8( 'L', objfile );
-            break;
+    case SYMLOCAL:
+        xfput_u8( 'L', objfile );
+        break;
 
-        case SYMXDEF:
-            if ( node->type & SYMDEF )
-            {
-                xfput_u8( 'X', objfile );
-            }
-            else
-            {
-                xfput_u8( 'G', objfile );
-            }
+    case SYMXDEF:
+        if ( node->type & SYMDEF )
+        {
+            xfput_u8( 'X', objfile );
+        }
+        else
+        {
+            xfput_u8( 'G', objfile );
+        }
 
-            break;
+        break;
     }
 
     if ( node->type & SYMADDR )   /* then write type of symbol */
@@ -731,38 +735,40 @@ StoreName( Symbol *node, byte_t scope )
 void
 StoreGlobalNames( SymbolHash *symtab )
 {
-	SymbolHashElem *iter;
-	Symbol         *sym;
+    SymbolHashElem *iter;
+    Symbol         *sym;
 
-	SymbolHash_sort( symtab, SymbolHash_by_name );
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
+    SymbolHash_sort( symtab, SymbolHash_by_name );
 
-		if ( ( sym->type & SYMXDEF ) && ( sym->type & SYMTOUCHED ) )
-		{
-			StoreName( sym, SYMXDEF );
-		}
-	}
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+        if ( ( sym->type & SYMXDEF ) && ( sym->type & SYMTOUCHED ) )
+        {
+            StoreName( sym, SYMXDEF );
+        }
+    }
 }
 
 
 void
 StoreLocalNames( SymbolHash *symtab )
 {
-	SymbolHashElem *iter;
-	Symbol         *sym;
+    SymbolHashElem *iter;
+    Symbol         *sym;
 
-	SymbolHash_sort( symtab, SymbolHash_by_name );
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
+    SymbolHash_sort( symtab, SymbolHash_by_name );
 
-		if ( ( sym->type & SYMLOCAL ) && ( sym->type & SYMTOUCHED ) )
-		{
-			StoreName( sym, SYMLOCAL );
-		}
-	}
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+        if ( ( sym->type & SYMLOCAL ) && ( sym->type & SYMTOUCHED ) )
+        {
+            StoreName( sym, SYMLOCAL );
+        }
+    }
 }
 
 
@@ -773,21 +779,22 @@ StoreExternReferences( SymbolHash *symtab )
 {
     size_t b;
 
-	SymbolHashElem *iter;
-	Symbol         *sym;
+    SymbolHashElem *iter;
+    Symbol         *sym;
 
-	SymbolHash_sort( symtab, SymbolHash_by_name );
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
+    SymbolHash_sort( symtab, SymbolHash_by_name );
 
-		if ( ( sym->type & SYMXREF ) && ( sym->type & SYMTOUCHED ) )
-		{
-			b = strlen( sym->name );
-			xfput_u8( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-			xfput_char( sym->name, b, objfile );    /* write symbol name to relocatable file */
-		}
-	}
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+        if ( ( sym->type & SYMXREF ) && ( sym->type & SYMTOUCHED ) )
+        {
+            b = strlen( sym->name );
+            xfput_u8( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
+            xfput_char( sym->name, b, objfile );    /* write symbol name to relocatable file */
+        }
+    }
 }
 
 
@@ -810,9 +817,9 @@ Z80pass2( void )
 
         do
         {
-			/* set error location */
-			set_error_file( pass2expr->srcfile );
-			set_error_line( pass2expr->curline );
+            /* set error location */
+            set_error_file( pass2expr->srcfile );
+            set_error_line( pass2expr->curline );
 
             constant = EvalPfixExpr( pass2expr );
 
@@ -827,21 +834,21 @@ Z80pass2( void )
                     /* store expression in relocatable file */
                     switch ( pass2expr->rangetype & RANGE )
                     {
-                        case RANGE_32SIGN:
-                            StoreExpr( pass2expr, 'L' );
-                            break;
+                    case RANGE_32SIGN:
+                        StoreExpr( pass2expr, 'L' );
+                        break;
 
-                        case RANGE_16CONST:
-                            StoreExpr( pass2expr, 'C' );
-                            break;
+                    case RANGE_16CONST:
+                        StoreExpr( pass2expr, 'C' );
+                        break;
 
-                        case RANGE_8UNSIGN:
-                            StoreExpr( pass2expr, 'U' );
-                            break;
+                    case RANGE_8UNSIGN:
+                        StoreExpr( pass2expr, 'U' );
+                        break;
 
-                        case RANGE_8SIGN:
-                            StoreExpr( pass2expr, 'S' );
-                            break;
+                    case RANGE_8SIGN:
+                        StoreExpr( pass2expr, 'S' );
+                        break;
                     }
                 }
             }
@@ -852,9 +859,9 @@ Z80pass2( void )
                 {
                     if ( pass2expr->rangetype & EXPREXTERN )
                     {
-						/* JR, DJNZ used an external label - */
-                        error_jr_not_local();	
-                    }     
+                        /* JR, DJNZ used an external label - */
+                        error_jr_not_local();
+                    }
                     else
                     {
                         error_not_defined();
@@ -875,57 +882,57 @@ Z80pass2( void )
 
                 switch ( pass2expr->rangetype & RANGE )
                 {
-                    case RANGE_JROFFSET:
-                        constant -= curJR->PCaddr;    /* get module PC at JR instruction */
+                case RANGE_JROFFSET:
+                    constant -= curJR->PCaddr;    /* get module PC at JR instruction */
 
-                        if ( constant >= -128 && constant <= 127 )
-                        {
-                            patch_byte( &patchptr, (byte_t) constant );
-                            /* opcode is stored, now store relative jump */
-                        }
-                        else
-                        {
-                            error_int_range( constant );
-                        }
+                    if ( constant >= -128 && constant <= 127 )
+                    {
+                        patch_byte( &patchptr, ( byte_t ) constant );
+                        /* opcode is stored, now store relative jump */
+                    }
+                    else
+                    {
+                        error_int_range( constant );
+                    }
 
-                        prevJR = curJR;
-                        curJR = curJR->nextref;       /* get ready for JR instruction */
-                        xfree( prevJR );
-                        break;
+                    prevJR = curJR;
+                    curJR = curJR->nextref;       /* get ready for JR instruction */
+                    xfree( prevJR );
+                    break;
 
-                    case RANGE_8UNSIGN:
-                        if ( constant < -128 || constant > 255 )
-                            warn_int_range( constant );
+                case RANGE_8UNSIGN:
+                    if ( constant < -128 || constant > 255 )
+                        warn_int_range( constant );
 
-						patch_byte( &patchptr, (byte_t) constant );
-                        break;
+                    patch_byte( &patchptr, ( byte_t ) constant );
+                    break;
 
-                    case RANGE_8SIGN:
-                        if ( constant < -128 || constant > 127 )
-                            warn_int_range( constant );
+                case RANGE_8SIGN:
+                    if ( constant < -128 || constant > 127 )
+                        warn_int_range( constant );
 
-						patch_byte( &patchptr, (byte_t) constant );
-                        break;
+                    patch_byte( &patchptr, ( byte_t ) constant );
+                    break;
 
-                    case RANGE_16CONST:
-                        if ( constant < -32768 || constant > 65535 )
-                            warn_int_range( constant );
+                case RANGE_16CONST:
+                    if ( constant < -32768 || constant > 65535 )
+                        warn_int_range( constant );
 
-						patch_word( &patchptr, ( int ) constant );
-                        break;
+                    patch_word( &patchptr, ( int ) constant );
+                    break;
 
-                    case RANGE_32SIGN:
-                        if ( constant < LONG_MIN || constant > LONG_MAX )
-                            warn_int_range( constant );
+                case RANGE_32SIGN:
+                    if ( constant < LONG_MIN || constant > LONG_MAX )
+                        warn_int_range( constant );
 
-						patch_long( &patchptr, constant );
-                        break;
+                    patch_long( &patchptr, constant );
+                    break;
                 }
             }
 
             if ( opts.list )
             {
-				list_patch_data( pass2expr->listpos, constant, RANGE_SIZE(pass2expr->rangetype) );
+                list_patch_data( pass2expr->listpos, constant, RANGE_SIZE( pass2expr->rangetype ) );
             }
 
             prevexpr = pass2expr;
@@ -934,11 +941,11 @@ Z80pass2( void )
         }
         while ( pass2expr != NULL );      /* re-evaluate expressions and patch in code */
 
-		/* clean error location */
-		set_error_file( NULL );
-		set_error_line( 0 );
+        /* clean error location */
+        set_error_file( NULL );
+        set_error_line( 0 );
 
-		xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
         xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
     }
 
@@ -950,16 +957,16 @@ Z80pass2( void )
 
     fptr_namedecl = ftell( objfile );
 
-	/* Store Local Name declarations to relocatable file */
-	StoreLocalNames( CURRENTMODULE->local_symtab ); 
+    /* Store Local Name declarations to relocatable file */
+    StoreLocalNames( CURRENTMODULE->local_symtab );
 
-	/* Store Global name declarations to relocatable file */
-	StoreGlobalNames( global_symtab ); 
+    /* Store Global name declarations to relocatable file */
+    StoreGlobalNames( global_symtab );
 
     fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
 
-	/* Store library reference name declarations to relocatable file */
-	StoreExternReferences( global_symtab );
+    /* Store library reference name declarations to relocatable file */
+    StoreExternReferences( global_symtab );
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );
@@ -1030,8 +1037,8 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
     pfixexpr->rangetype = constrange;
     pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
     pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
-    pfixexpr->listpos = list_patch_pos(byteoffset);
-												  /* now calculated as absolute file pointer */
+    pfixexpr->listpos = list_patch_pos( byteoffset );
+    /* now calculated as absolute file pointer */
 
     if ( CURRENTMODULE->mexpr->firstexpr == NULL )
     {
@@ -1054,7 +1061,7 @@ Prevfile( void )
     struct usedfile *newusedfile;
     struct sourcefile *ownedfile;
 
-    newusedfile = xnew(struct usedfile);
+    newusedfile = xnew( struct usedfile );
     ownedfile = CURRENTFILE;
     CURRENTFILE = CURRENTFILE->prevsourcefile;    /* get back to owner file - now the current */
     CURRENTFILE->newsourcefile = NULL;    /* current file is now the last in the list */
@@ -1075,7 +1082,7 @@ Newfile( struct sourcefile *curfile, char *fname )
     struct sourcefile *nfile;
     struct sourcefile *ret;
 
-    nfile = xnew(struct sourcefile);
+    nfile = xnew( struct sourcefile );
     ret = Setfile( curfile, nfile, fname );
 
     return ret;
@@ -1129,27 +1136,29 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 void
 WriteSymbolTable( char *msg, SymbolHash *symtab )
 {
-	SymbolHashElem *iter;
-	Symbol         *sym;
+    SymbolHashElem *iter;
+    Symbol         *sym;
 
-	/* dump all symbols sorted by name */
-	list_start_table( msg );
+    /* dump all symbols sorted by name */
+    list_start_table( msg );
 
-	SymbolHash_sort( symtab, SymbolHash_by_name );
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
-		if ( sym->owner == CURRENTMODULE )
-		{
-			/* Write only symbols related to current module */
-			if ( ( sym->type & SYMLOCAL ) || ( sym->type & SYMXDEF ) )
-			{
-				if ( ( sym->type & SYMTOUCHED ) )
-				{
-					list_symbol( sym->name, sym->value, sym->references );
-				}
-			}
-		}
+    SymbolHash_sort( symtab, SymbolHash_by_name );
 
-	}
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+        if ( sym->owner == CURRENTMODULE )
+        {
+            /* Write only symbols related to current module */
+            if ( ( sym->type & SYMLOCAL ) || ( sym->type & SYMXDEF ) )
+            {
+                if ( ( sym->type & SYMTOUCHED ) )
+                {
+                    list_symbol( sym->name, sym->value, sym->references );
+                }
+            }
+        }
+
+    }
 }

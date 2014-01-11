@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.3 2013-12-30 02:05:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.4 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: module.h,v $
-Revision 1.3  2013-12-30 02:05:32  pauloscustodio
+Revision 1.4  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.3  2013/12/30 02:05:32  pauloscustodio
 Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 handles both dynamically allocated strings and fixed-size strings.
 Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -45,10 +49,10 @@ Embryo of Module structure
 /*-----------------------------------------------------------------------------
 *   Code section, one assembly instruction
 *----------------------------------------------------------------------------*/
-CLASS(CodeSection)
-	char    *source_filename;		/* input file name, kept in strpool */
-	int		line_nr;				/* input line number */
-	Str    *bytes;					/* bytes of this opcode */
+CLASS( CodeSection )
+char    *source_filename;		/* input file name, kept in strpool */
+int		line_nr;				/* input line number */
+Str    *bytes;					/* bytes of this opcode */
 END_CLASS;
 
 

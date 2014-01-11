@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.10 2013-12-30 02:05:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.11 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.10  2013-12-30 02:05:32  pauloscustodio
+Revision 1.11  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.10  2013/12/30 02:05:32  pauloscustodio
 Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 handles both dynamically allocated strings and fixed-size strings.
 Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
@@ -72,20 +76,20 @@ Move SymbolRef to symref.c
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Symbol )
 
-void Symbol_init( Symbol *self ) 
+void Symbol_init( Symbol *self )
 {
-	self->references = OBJ_NEW(SymbolRefList);
-	OBJ_AUTODELETE(self->references) = FALSE;
+    self->references = OBJ_NEW( SymbolRefList );
+    OBJ_AUTODELETE( self->references ) = FALSE;
 }
 
-void Symbol_copy( Symbol *self, Symbol *other ) 
+void Symbol_copy( Symbol *self, Symbol *other )
 {
-	self->references = SymbolRefList_clone(other->references);
+    self->references = SymbolRefList_clone( other->references );
 }
 
-void Symbol_fini( Symbol *self ) 
+void Symbol_fini( Symbol *self )
 {
-	OBJ_DELETE(self->references);
+    OBJ_DELETE( self->references );
 }
 
 /*-----------------------------------------------------------------------------
@@ -94,15 +98,15 @@ void Symbol_fini( Symbol *self )
 *----------------------------------------------------------------------------*/
 Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner )
 {
-    Symbol *self 	= OBJ_NEW(Symbol);
+    Symbol *self 	= OBJ_NEW( Symbol );
 
     self->name 		= strpool_add( name );			/* name in strpool, not freed */
     self->value 	= value;
     self->type 		= type;
     self->owner 	= owner;
-	
-	/* add reference */
-	add_symbol_ref( self->references, list_get_page_nr(), FALSE );
+
+    /* add reference */
+    add_symbol_ref( self->references, list_get_page_nr(), FALSE );
 
     return self;              						/* pointer to new symbol */
 }
@@ -112,16 +116,17 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
 *----------------------------------------------------------------------------*/
 char *Symbol_fullname( Symbol *sym )
 {
-	DEFINE_STR(name, MAXLINE);
+    DEFINE_STR( name, MAXLINE );
 
-	Str_set(name, sym->name);
-	if ( sym->owner && sym->owner->mname ) 
-	{
-		Str_append_char(name, '@');
-		Str_append(name, sym->owner->mname);
-	}
+    Str_set( name, sym->name );
 
-	return strpool_add(name->str);
+    if ( sym->owner && sym->owner->mname )
+    {
+        Str_append_char( name, '@' );
+        Str_append( name, sym->owner->mname );
+    }
+
+    return strpool_add( name->str );
 }
 
 

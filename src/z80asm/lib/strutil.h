@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.5 2014-01-02 02:46:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.6 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -51,10 +51,10 @@ extern char *strip( char *string );
 *	Str_sync_len(&s2)	// syncronize s2.len after s2.str is manipulated
 *----------------------------------------------------------------------------*/
 CLASS( Str )
-	char	*str;		/* string - may contain zero bytes */
-	size_t	 size;		/* allocated size */
-	size_t	 len;		/* sring length (excluding zero terminator) */
-	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
+char	*str;		/* string - may contain zero bytes */
+size_t	 size;		/* allocated size */
+size_t	 len;		/* sring length (excluding zero terminator) */
+BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
 						   FALSE if str is in user supplied buffer and cannot grow */
 END_CLASS;
 
@@ -105,15 +105,19 @@ extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
 /* get N characters from input, return FALSE on EOF */
 extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
 
-/* get one line from input, convert end-of-line sequences, 
+/* get one line from input, convert end-of-line sequences,
    return string including one LF character
    return FALSE on end of input */
 extern BOOL Str_getline( Str *self, FILE *fp );
 
 
-/* 
+/*
 * $Log: strutil.h,v $
-* Revision 1.5  2014-01-02 02:46:42  pauloscustodio
+* Revision 1.6  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.5  2014/01/02 02:46:42  pauloscustodio
 * new strip() function to eliminate start and end blanks from string
 *
 * Revision 1.4  2014/01/01 21:36:38  pauloscustodio

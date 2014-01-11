@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.54 2013-12-18 01:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.55 2014-01-11 00:10:40 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -1004,6 +1004,8 @@ sub get_gcc_options {
 			}
 		}
 		close($pipe) or die;
+		$FLAGS{CFLAGS}  ||= '';
+		$FLAGS{LDFLAGS} ||= '';
 	}
 	
 	return @FLAGS{qw( CFLAGS LDFLAGS )};
@@ -1014,7 +1016,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.54  2013-12-18 01:46:22  pauloscustodio
+# Revision 1.55  2014-01-11 00:10:40  pauloscustodio
+# Astyle - format C code
+# Add -Wall option to CFLAGS, remove all warnings
+#
+# Revision 1.54  2013/12/18 01:46:22  pauloscustodio
 # Move strpool.c to the z80asm/lib directory
 #
 # Revision 1.53  2013/12/15 20:30:38  pauloscustodio

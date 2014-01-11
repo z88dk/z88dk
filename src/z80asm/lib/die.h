@@ -3,7 +3,7 @@ Exit with a fatal error, warn on stderr
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.2 2013-12-15 13:01:40 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,11 @@ extern void warn( char *msg, ... );
 
 /*
 * $Log: die.h,v $
-* Revision 1.2  2013-12-15 13:01:40  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2013/12/15 13:01:40  pauloscustodio
 * Replace "if(1) { ... } else" in macro with "do { ... } while (0)" to avoid warning
 * "suggest braces around empty body in an 'else' statement [-Wempty-body]"
 *

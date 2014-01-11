@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.7 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.8 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.7  2013-12-15 13:18:34  pauloscustodio
+Revision 1.8  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.7  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -58,11 +62,11 @@ Move SymbolRef to symref.c
 *   Symbol
 *----------------------------------------------------------------------------*/
 CLASS( Symbol )
-	char		   *name;				/* name, kept in strpool */
-	long			value;				/* computed value of symbol */
-    byte_t			type;				/* type of symbol */
-    SymbolRefList  *references;			/* pointer to all found references of symbol */
-    struct module  *owner;				/* weak pointer to module which owns symbol */
+char		   *name;				/* name, kept in strpool */
+long			value;				/* computed value of symbol */
+byte_t			type;				/* type of symbol */
+SymbolRefList  *references;			/* pointer to all found references of symbol */
+struct module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -70,21 +74,21 @@ END_CLASS;
 *----------------------------------------------------------------------------*/
 #define SYMDEFINED      1       /* 00000001 symbol is defined */
 #define SYMTOUCHED      2       /* 00000010 symbol was used, e.g. returned by 
-											a symbol table search */
+a symbol table search */
 #define SYMDEF          4       /* 00000100 DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, 
-											global library; not output in sym list */
+global library; not output in sym list */
 #define SYMADDR         8       /* 00001000 symbol is address */
 #define SYMLOCAL        16      /* 00010000 symbol is local */
 #define SYMXDEF         32      /* 00100000 symbol is global (SYMXDEF) 
-											or global library (SYMXDEF|SYMDEF) */
+or global library (SYMXDEF|SYMDEF) */
 #define SYMXREF         64      /* 01000000 symbol is external (SYMXREF) 
-											or external library (SYMXREF|SYMDEF) */
+or external library (SYMXREF|SYMDEF) */
 
 #define XDEF_OFF        223     /* 11011111 */
 #define XREF_OFF        191     /* 10111111 */
 #define SYMLOCAL_OFF    239     /* 11101111 */
 #define SYMTYPE         120     /* 01111000 */
-#define SYM_NOTDEFINED  0		
+#define SYM_NOTDEFINED  0
 
 /*-----------------------------------------------------------------------------
 *   Special symbols

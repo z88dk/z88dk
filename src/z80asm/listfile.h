@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.10 2014-01-02 18:59:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.11 2014-01-11 00:10:39 pauloscustodio Exp $
 
 */
 
@@ -38,28 +38,28 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.10 2014-01-02 1
 *   Class to hold current list file
 *----------------------------------------------------------------------------*/
 CLASS( ListFile )
-	char	*filename;				/* list file name, held in strpool */
-	FILE	*file;					/* open file */
+char	*filename;				/* list file name, held in strpool */
+FILE	*file;					/* open file */
 
-	int		page_nr;				/* current page number */
-	int		line_nr;				/* current line number in page */
+int		page_nr;				/* current page number */
+int		line_nr;				/* current line number in page */
 
-	BOOL	source_list_ended;		/* end of source listing, from now on no source lines */
+BOOL	source_list_ended;		/* end of source listing, from now on no source lines */
 
-	/* current line being output */
-	BOOL	line_started;			/* true if a line was started but not ended */
-	long	start_line_pos;			/* ftell() position at start of next list line */
-	size_t	address;				/* address of start of line */
-	Str		*bytes;					/* list of bytes output for this line */
+/* current line being output */
+BOOL	line_started;			/* true if a line was started but not ended */
+long	start_line_pos;			/* ftell() position at start of next list line */
+size_t	address;				/* address of start of line */
+Str		*bytes;					/* list of bytes output for this line */
 
-	char	*source_file;			/* source file, kept in strpool */
-	int		source_line_nr;			/* line number of source */
-	Str		*line;					/* input line being output */
+char	*source_file;			/* source file, kept in strpool */
+int		source_line_nr;			/* line number of source */
+Str		*line;					/* input line being output */
 
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
-*	Object API  
+*	Object API
 *----------------------------------------------------------------------------*/
 
 /* open the list file for writing, given the list file name */
@@ -73,8 +73,8 @@ extern void ListFile_close( ListFile *self, BOOL keep_file );
    2.1. append bytes, words, longs
    2.2. collect patch position in list file for expressions
    3. output the full line */
-extern void ListFile_start_line( ListFile *self, size_t address, 
-								 char *source_file, int source_line_nr, char *line );
+extern void ListFile_start_line( ListFile *self, size_t address,
+                                 char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
 extern void ListFile_append_byte( ListFile *self, byte_t byte );
 extern void ListFile_append_word( ListFile *self, int word );
@@ -93,8 +93,8 @@ extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int
    2. output symbol name, reference, output reference, ...
 */
 extern void ListFile_start_table( ListFile *self, char *title );
-extern void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value, 
-						     SymbolRefList *references );
+extern void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
+                             SymbolRefList *references );
 
 /* return current page number */
 extern int ListFile_get_page_nr( ListFile *self );
@@ -105,8 +105,8 @@ extern int ListFile_get_page_nr( ListFile *self );
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
 extern void list_close( BOOL keep_file );
-extern void list_start_line( size_t address, 
-							 char *source_file, int source_line_nr, char *line );
+extern void list_start_line( size_t address,
+                             char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
 extern void list_append_byte( byte_t byte );
 extern void list_append_word( int word );
@@ -116,13 +116,17 @@ extern void list_end_line( void );
 extern void list_end( void );
 extern void list_patch_data( long patch_pos, long value, int num_bytes );
 extern void list_start_table( char *title );
-extern void list_symbol( char *symbol_name, long symbol_value, 
-						 SymbolRefList *references );
+extern void list_symbol( char *symbol_name, long symbol_value,
+                         SymbolRefList *references );
 extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.10  2014-01-02 18:59:04  pauloscustodio
+* Revision 1.11  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.10  2014/01/02 18:59:04  pauloscustodio
 * warning: "/","*" within comment [-Wcomment]
 *
 * Revision 1.9  2014/01/02 18:54:56  pauloscustodio

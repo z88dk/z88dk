@@ -12,6 +12,8 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.66 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 /*
@@ -20,266 +22,270 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.65 2014-01-10 00:15:26 pauloscustodio Exp $ */
-/* $Log: hist.c,v $
-/* Revision 1.65  2014-01-10 00:15:26  pauloscustodio
-/* Use Str instead of glib, List instead of GSList.
-/* Use init.h mechanism, no need for main() calling init_scan.
-/* glib dependency removed from code and Makefile
 /*
-/* Revision 1.64  2014/01/09 23:26:24  pauloscustodio
-/* Use init.h mechanism, no need for main() calling init_codearea
-/*
-/* Revision 1.63  2014/01/09 23:13:03  pauloscustodio
-/* Use init.h mechanism, no need for main() calling init_options.
-/* Use Str instead of glib.
-/*
-/* Revision 1.62  2014/01/05 23:20:39  pauloscustodio
-/* List, StrHash classlist and classhash receive the address of the container
-/* object in all functions that add items to the container, and create the
-/* container on first use. This allows a container to be staticaly
-/* initialized with NULL and instantiated on first push/unshift/set.
-/* Add count attribute to StrHash, classhash to count elements in container.
-/* Add free_data attribute in StrHash to register a free fucntion to delete
-/* the data container when the hash is removed or a key is overwritten.
-/*
-/* Revision 1.61  2014/01/02 23:33:11  pauloscustodio
-/* Unify interface of classlist and list.
-/*
-/* Revision 1.60  2014/01/02 17:18:45  pauloscustodio
-/* StrList removed, replaced by List
-/*
-/* Revision 1.59  2014/01/01 21:23:48  pauloscustodio
-/* Move generic file utility functions to lib/fileutil.c
-/*
-/* Revision 1.58  2013/12/30 02:07:32  pauloscustodio
-/* Version 2.1.1
-/*
-/* Revision 1.57  2013/12/30 02:05:32  pauloscustodio
-/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-/* handles both dynamically allocated strings and fixed-size strings.
-/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-/*
-/* Revision 1.56  2013/12/25 16:29:34  pauloscustodio
-/* classring deleted, not used
-/*
-/* Revision 1.55  2013/12/15 23:31:04  pauloscustodio
-/* Replace code-generation for init() functions by macros in init.h
-/* to help define init() and fini() functions per module.
-/* Code generation complicates maintenance, as all the modules with init()
-/* functions are coupled together, and it may not be clear how the init()
-/* module appears.
-/*
-/* Revision 1.54  2013/12/15 13:18:33  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.53  2013/11/26 22:59:08  pauloscustodio
-/* Version 2.0.0: new C-like expression syntax, incompatible object file format with previous version
-/*
-/* Revision 1.52  2013/11/26 22:46:03  pauloscustodio
-/* Version 1.2.10
-/*
-/* Revision 1.51  2013/10/05 13:45:19  pauloscustodio
-/* Version 1.2.9
-/*
-/* Revision 1.50  2013/09/12 00:10:02  pauloscustodio
-/* Create xfree() macro that NULLs the pointer after free, required
-/* by z80asm to find out if a pointer was already freed.
-/*
-/* Revision 1.49  2013/09/01 00:18:28  pauloscustodio
-/* - Replaced e4c exception mechanism by a much simpler one based on a few
-/*   macros. The former did not allow an exit(1) to be called within a
-/*   try-catch block.
-/*
-/* Revision 1.48  2013/08/30 21:50:43  pauloscustodio
-/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-/* as an identifier reserved by the C standard for implementation-defined behaviour
-/* starting with two underscores.
-/*
-/* Revision 1.47  2013/08/30 01:06:08  pauloscustodio
-/* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
-/* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
-/*
-/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
-/* - Expressions now use more standard C-like operators
-/* - Object and library files changed signature to
-/*   "Z80RMF02", "Z80LMF02", to avoid usage of old
-/*   object files with expressions inside in the old format
-/*
-/* Detail:
-/* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
-/* - Power:                        changed from '^' to '**'; '^' will be XOR
-/* - XOR:                          changed from ':' to '^';
-/* - AND:                          changed from '~' to '&';  '~' will be NOT
-/* - NOT:                          '~' added as binary not
-/*
-/* Revision 1.46  2013/08/26 21:49:39  pauloscustodio
-/* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
-/*
-/* Revision 1.45  2013/08/26 21:18:03  pauloscustodio
-/* Version 1.2.4
-/*
-/* Revision 1.44  2013/06/15 22:10:01  pauloscustodio
-/* BUG_0037 : Symbol already defined error when symbol used in IF expression
-/*
-/* Revision 1.43  2013/06/14 23:49:15  pauloscustodio
-/* Version 1.2.2
-/*
-/* Revision 1.42  2013/06/10 23:11:33  pauloscustodio
-/* CH_0023 : Remove notdecl_tab
-/*
-/* Revision 1.41  2013/06/08 23:37:32  pauloscustodio
-/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
-/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
-/*
-/* Revision 1.40  2013/06/01 01:26:26  pauloscustodio
-/* Version 1.2.0
-/*
-/* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
-/* BUG_0030 : List bytes patching overwrites header
-/* BUG_0031 : List file garbled with input lines with 255 chars
-/* New listfile.c with all the listing related code
-/*
-/* Revision 1.38  2013/02/16 09:46:55  pauloscustodio
-/* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
-/*
-/* Revision 1.37  2013/02/12 00:59:14  pauloscustodio
-/* Version 1.1.21
-/*
-/* Revision 1.36  2013/01/20 13:45:49  pauloscustodio
-/* Version 1.1.20
-/*
-/* Revision 1.35  2012/11/03 17:41:11  pauloscustodio
-/* Version 1.1.19
-/*
-/* Revision 1.34  2012/11/01 23:21:49  pauloscustodio
-/* Version 1.1.18
-/*
-/* Revision 1.33  2012/06/05 22:24:47  pauloscustodio
-/* BUG_0020 : Segmentation fault in ParseIdent for symbol not found with interpret OFF
-/*
-/* Revision 1.32  2012/05/30 22:06:48  pauloscustodio
-/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
-/*
-/* Revision 1.31  2012/05/29 21:03:39  pauloscustodio
-/* Version 1.1.16
-/*
-/* Revision 1.30  2012/05/26 18:56:02  pauloscustodio
-/* Version 1.1.15
-/*
-/* Revision 1.29  2012/05/22 20:37:47  pauloscustodio
-/* Version 1.1.14
-/*
-/* Revision 1.28  2012/05/12 17:15:57  pauloscustodio
-/* Version 1.1.13
-/*
-/* Revision 1.27  2012/01/12 18:53:58  pauloscustodio
-/* comment
-/*
-/* Revision 1.26  2011/10/14 15:02:39  pauloscustodio
-/* Version 1.1.12
-/*
-/* Revision 1.25  2011/10/07 17:56:02  pauloscustodio
-/* Version 1.1.11
-/*
-/* Revision 1.24  2011/09/30 10:30:06  pauloscustodio
-/* Version 1.1.10
-/*
-/* Revision 1.23  2011/09/29 21:26:43  pauloscustodio
-/* Version 1.1.9
-/*
-/* Revision 1.22  2011/08/19 19:22:28  pauloscustodio
-/* Version 1.1.8
-/*
-/* Revision 1.21  2011/08/14 19:50:31  pauloscustodio
-/* Version 1.1.7
-/*
-/* Revision 1.20  2011/08/05 20:26:42  pauloscustodio
-/* Version 1.1.6
-/*
-/* Revision 1.19  2011/07/18 00:54:01  pauloscustodio
-/* Version 1.1.5
-/*
-/* Revision 1.18  2011/07/14 23:49:55  pauloscustodio
-/* 15.07.2011 [1.1.4]
-/*
-/* Revision 1.17  2011/07/14 01:36:17  pauloscustodio
-/* Version 1.1.3
-/*
-/* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
-/* - Moved all error variables and error reporting code to a separate module errors.c,
-/*   replaced all extern declarations of these variables by include errors.h,
-/*   created symbolic constants for error codes.
-/* - Added test scripts for error messages.
-/*
-/* Revision 1.15  2011/07/11 16:27:44  pauloscustodio
-/* Version 1.1.2
-/*
-/* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
-/* Log keyword in checkin comment was expanded inside Log expansion... recursive
-/* Added Z80asm banner to all source files
-/*
-/* Revision 1.13  2011/07/09 17:40:37  pauloscustodio
-/* fix version 1.1.1 date
-/*
-/* Revision 1.12  2011/07/09 17:36:09  pauloscustodio
-/* Copied cvs log into history
-/*
-/* Revision 1.11  2011/07/09 01:46:00  pauloscustodio
-/* Added Log keyword
-/*
-/* Revision 1.10  2011/07/09 01:08:47  pauloscustodio
-/* Moved version strings to hist.c, created hist.h, for easy maintenance.
-/*
-/* Revision 1.9  2002/04/22 14:45:51  stefano
-/* Removed the SLL L undocumented instructions from the Graph library.
-/* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
-/* MS Visual C compiler related fixes
-/* -IXIY option on Z80ASM to swap the IX and IY registers
-/*
-/* Revision 1.8  2002/01/18 21:12:17  dom
-/* 0x prefix allowed for hex constants
-/*
-/* Revision 1.7  2002/01/18 16:53:13  dom
-/* added 'd' and 'b' identifiers for constants - decimal and binary
-/* respectively.
-/*
-/* Revision 1.6  2002/01/18 16:30:19  dom
-/* *** empty log message ***
-/*
-/* Revision 1.5  2001/06/27 08:53:29  dom
-/* Added a second parameter to defs to indicate what the filler byte should be
-/*
-/* Revision 1.4  2001/03/21 16:34:01  dom
-/* Added changes to allow labels to end in ':' and the prefix '.' isn't
-/* necessarily needed..this isn't guaranteed to be perfect so let me know
-/* of any problems and drop back to 1.0.18
-/*
-/* Revision 1.3  2001/02/28 18:19:24  dom
-/* Fixed size of Z80ident table <grrr>
-/*
-/* Revision 1.2  2001/01/23 10:00:09  dom
-/* Changes by x1cygnus:
-/*
-/* just added a harcoded macro Invoke, similar to callpkg except that the
-/* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
-/* the parameter -plus is specified on the command line.
-/*
-/* Changes by dom:
-/* Added in a rudimentary default directory set up (Defined at compile time)
-/* a bit kludgy and not very nice!
-/*
-/* Revision 1.1  2000/07/04 15:33:30  dom
-/* branches:  1.1.1;
-/* Initial revision
-/*
-/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
-/* First import of z88dk into the sourceforge system <gulp>
-/*
-/* */
+* $Log: hist.c,v $
+* Revision 1.66  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.65  2014/01/10 00:15:26  pauloscustodio
+* Use Str instead of glib, List instead of GSList.
+* Use init.h mechanism, no need for main() calling init_scan.
+* glib dependency removed from code and Makefile
+*
+* Revision 1.64  2014/01/09 23:26:24  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_codearea
+*
+* Revision 1.63  2014/01/09 23:13:03  pauloscustodio
+* Use init.h mechanism, no need for main() calling init_options.
+* Use Str instead of glib.
+*
+* Revision 1.62  2014/01/05 23:20:39  pauloscustodio
+* List, StrHash classlist and classhash receive the address of the container
+* object in all functions that add items to the container, and create the
+* container on first use. This allows a container to be staticaly
+* initialized with NULL and instantiated on first push/unshift/set.
+* Add count attribute to StrHash, classhash to count elements in container.
+* Add free_data attribute in StrHash to register a free fucntion to delete
+* the data container when the hash is removed or a key is overwritten.
+*
+* Revision 1.61  2014/01/02 23:33:11  pauloscustodio
+* Unify interface of classlist and list.
+*
+* Revision 1.60  2014/01/02 17:18:45  pauloscustodio
+* StrList removed, replaced by List
+*
+* Revision 1.59  2014/01/01 21:23:48  pauloscustodio
+* Move generic file utility functions to lib/fileutil.c
+*
+* Revision 1.58  2013/12/30 02:07:32  pauloscustodio
+* Version 2.1.1
+*
+* Revision 1.57  2013/12/30 02:05:32  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+*
+* Revision 1.56  2013/12/25 16:29:34  pauloscustodio
+* classring deleted, not used
+*
+* Revision 1.55  2013/12/15 23:31:04  pauloscustodio
+* Replace code-generation for init() functions by macros in init.h
+* to help define init() and fini() functions per module.
+* Code generation complicates maintenance, as all the modules with init()
+* functions are coupled together, and it may not be clear how the init()
+* module appears.
+*
+* Revision 1.54  2013/12/15 13:18:33  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.53  2013/11/26 22:59:08  pauloscustodio
+* Version 2.0.0: new C-like expression syntax, incompatible object file format with previous version
+*
+* Revision 1.52  2013/11/26 22:46:03  pauloscustodio
+* Version 1.2.10
+*
+* Revision 1.51  2013/10/05 13:45:19  pauloscustodio
+* Version 1.2.9
+*
+* Revision 1.50  2013/09/12 00:10:02  pauloscustodio
+* Create xfree() macro that NULLs the pointer after free, required
+* by z80asm to find out if a pointer was already freed.
+*
+* Revision 1.49  2013/09/01 00:18:28  pauloscustodio
+* - Replaced e4c exception mechanism by a much simpler one based on a few
+*   macros. The former did not allow an exit(1) to be called within a
+*   try-catch block.
+*
+* Revision 1.48  2013/08/30 21:50:43  pauloscustodio
+* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+* as an identifier reserved by the C standard for implementation-defined behaviour
+* starting with two underscores.
+*
+* Revision 1.47  2013/08/30 01:06:08  pauloscustodio
+* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
+*
+* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
+* - Expressions now use more standard C-like operators
+* - Object and library files changed signature to
+*   "Z80RMF02", "Z80LMF02", to avoid usage of old
+*   object files with expressions inside in the old format
+*
+* Detail:
+* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+* - Power:                        changed from '^' to '**'; '^' will be XOR
+* - XOR:                          changed from ':' to '^';
+* - AND:                          changed from '~' to '&';  '~' will be NOT
+* - NOT:                          '~' added as binary not
+*
+* Revision 1.46  2013/08/26 21:49:39  pauloscustodio
+* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
+*
+* Revision 1.45  2013/08/26 21:18:03  pauloscustodio
+* Version 1.2.4
+*
+* Revision 1.44  2013/06/15 22:10:01  pauloscustodio
+* BUG_0037 : Symbol already defined error when symbol used in IF expression
+*
+* Revision 1.43  2013/06/14 23:49:15  pauloscustodio
+* Version 1.2.2
+*
+* Revision 1.42  2013/06/10 23:11:33  pauloscustodio
+* CH_0023 : Remove notdecl_tab
+*
+* Revision 1.41  2013/06/08 23:37:32  pauloscustodio
+* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+*
+* Revision 1.40  2013/06/01 01:26:26  pauloscustodio
+* Version 1.2.0
+*
+* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
+* BUG_0030 : List bytes patching overwrites header
+* BUG_0031 : List file garbled with input lines with 255 chars
+* New listfile.c with all the listing related code
+*
+* Revision 1.38  2013/02/16 09:46:55  pauloscustodio
+* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+*
+* Revision 1.37  2013/02/12 00:59:14  pauloscustodio
+* Version 1.1.21
+*
+* Revision 1.36  2013/01/20 13:45:49  pauloscustodio
+* Version 1.1.20
+*
+* Revision 1.35  2012/11/03 17:41:11  pauloscustodio
+* Version 1.1.19
+*
+* Revision 1.34  2012/11/01 23:21:49  pauloscustodio
+* Version 1.1.18
+*
+* Revision 1.33  2012/06/05 22:24:47  pauloscustodio
+* BUG_0020 : Segmentation fault in ParseIdent for symbol not found with interpret OFF
+*
+* Revision 1.32  2012/05/30 22:06:48  pauloscustodio
+* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+*
+* Revision 1.31  2012/05/29 21:03:39  pauloscustodio
+* Version 1.1.16
+*
+* Revision 1.30  2012/05/26 18:56:02  pauloscustodio
+* Version 1.1.15
+*
+* Revision 1.29  2012/05/22 20:37:47  pauloscustodio
+* Version 1.1.14
+*
+* Revision 1.28  2012/05/12 17:15:57  pauloscustodio
+* Version 1.1.13
+*
+* Revision 1.27  2012/01/12 18:53:58  pauloscustodio
+* comment
+*
+* Revision 1.26  2011/10/14 15:02:39  pauloscustodio
+* Version 1.1.12
+*
+* Revision 1.25  2011/10/07 17:56:02  pauloscustodio
+* Version 1.1.11
+*
+* Revision 1.24  2011/09/30 10:30:06  pauloscustodio
+* Version 1.1.10
+*
+* Revision 1.23  2011/09/29 21:26:43  pauloscustodio
+* Version 1.1.9
+*
+* Revision 1.22  2011/08/19 19:22:28  pauloscustodio
+* Version 1.1.8
+*
+* Revision 1.21  2011/08/14 19:50:31  pauloscustodio
+* Version 1.1.7
+*
+* Revision 1.20  2011/08/05 20:26:42  pauloscustodio
+* Version 1.1.6
+*
+* Revision 1.19  2011/07/18 00:54:01  pauloscustodio
+* Version 1.1.5
+*
+* Revision 1.18  2011/07/14 23:49:55  pauloscustodio
+* 15.07.2011 [1.1.4]
+*
+* Revision 1.17  2011/07/14 01:36:17  pauloscustodio
+* Version 1.1.3
+*
+* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
+* - Moved all error variables and error reporting code to a separate module errors.c,
+*   replaced all extern declarations of these variables by include errors.h,
+*   created symbolic constants for error codes.
+* - Added test scripts for error messages.
+*
+* Revision 1.15  2011/07/11 16:27:44  pauloscustodio
+* Version 1.1.2
+*
+* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
+* Log keyword in checkin comment was expanded inside Log expansion... recursive
+* Added Z80asm banner to all source files
+*
+* Revision 1.13  2011/07/09 17:40:37  pauloscustodio
+* fix version 1.1.1 date
+*
+* Revision 1.12  2011/07/09 17:36:09  pauloscustodio
+* Copied cvs log into history
+*
+* Revision 1.11  2011/07/09 01:46:00  pauloscustodio
+* Added Log keyword
+*
+* Revision 1.10  2011/07/09 01:08:47  pauloscustodio
+* Moved version strings to hist.c, created hist.h, for easy maintenance.
+*
+* Revision 1.9  2002/04/22 14:45:51  stefano
+* Removed the SLL L undocumented instructions from the Graph library.
+* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
+* MS Visual C compiler related fixes
+* -IXIY option on Z80ASM to swap the IX and IY registers
+*
+* Revision 1.8  2002/01/18 21:12:17  dom
+* 0x prefix allowed for hex constants
+*
+* Revision 1.7  2002/01/18 16:53:13  dom
+* added 'd' and 'b' identifiers for constants - decimal and binary
+* respectively.
+*
+* Revision 1.6  2002/01/18 16:30:19  dom
+* *** empty log message ***
+*
+* Revision 1.5  2001/06/27 08:53:29  dom
+* Added a second parameter to defs to indicate what the filler byte should be
+*
+* Revision 1.4  2001/03/21 16:34:01  dom
+* Added changes to allow labels to end in ':' and the prefix '.' isn't
+* necessarily needed..this isn't guaranteed to be perfect so let me know
+* of any problems and drop back to 1.0.18
+*
+* Revision 1.3  2001/02/28 18:19:24  dom
+* Fixed size of Z80ident table <grrr>
+*
+* Revision 1.2  2001/01/23 10:00:09  dom
+* Changes by x1cygnus:
+*
+* just added a harcoded macro Invoke, similar to callpkg except that the
+* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
+* the parameter -plus is specified on the command line.
+*
+* Changes by dom:
+* Added in a rudimentary default directory set up (Defined at compile time)
+* a bit kludgy and not very nice!
+*
+* Revision 1.1  2000/07/04 15:33:30  dom
+* branches:  1.1.1;
+* Initial revision
+*
+* Revision 1.1.1.1  2000/07/04 15:33:30  dom
+* First import of z88dk into the sourceforge system <gulp>
+*
+*/
 
 /*
 Main Source file - definition of global identifiers etc.
@@ -1189,7 +1195,7 @@ Based on 1.0.31
     CH_0016 : StrHash class to create maps from string to void*
 		Created the StrHash to create hash tables mapping string keys kept in
 		strpool to void* user pointer. This will be used to solve BUG_0023.
-	
+
 	BUG_0023 : Error file with warning is removed in link phase
 		z80asm -b f1.asm
 		If assembling f1.asm produces a warning, the link phase removes the f1.err
@@ -1198,7 +1204,7 @@ Based on 1.0.31
 	BUG_0024 : (ix+128) should show warning message
 		Signed integer range was wrongly checked to -128..255 instead
 		of -128..127
-		
+
 	BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 		jr instruction on address 0, with out of range argument ->
 		jr calls error and writes incomplete opcode (only one byte);
@@ -1210,12 +1216,12 @@ Based on 1.0.31
 	BUG_0026 : Incorrect paging in symbol list
 		The pages including the header of each symbol list had one line less
 		than the others - incorrect call of LineCounter().
-		
+
 	BUG_0027 : Incorrect tabulation in symbol list
-		When symbols are longer than COLUMN_WIDTH by 1, one extra tab is 
+		When symbols are longer than COLUMN_WIDTH by 1, one extra tab is
 		output between symbol name and '=' sign.
 		See CH_0017.
-		
+
 	BUG_0028 : Not aligned page list in symbol list with more that 18 references
 		The page list of each symbol at the end of the list file is not aligned
 		when there are more than 18 references of a symbol.
@@ -1225,10 +1231,10 @@ Based on 1.0.31
 	CH_0017 : Align with spaces, deprecate -t option
 		Replace TAB-printing logic by printf() field length specifier.
 		Simpler code at the expense of longer output files, using spaces instead
-		of TABs. 
+		of TABs.
 		Change list file, sym file, map file and def file.
 		Change page metrics variables into constants.
-		
+
     Internal cleanup:
 	- Unified usage of integer types: int, char, byte_t, size_t
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
@@ -1240,8 +1246,8 @@ Based on 1.0.31
 	BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
 		When the instruction assembles more than 4 bytes (e.g. defb), the
 		assembly line is not aligned in the list file.
-		The size of the EOL character was not taken into account in 
-		computing the list file patch address for the assembly bytes on the 
+		The size of the EOL character was not taken into account in
+		computing the list file patch address for the assembly bytes on the
 		second and next lines, for more than 32 bytes instructions.
 
 -------------------------------------------------------------------------------
@@ -1250,9 +1256,9 @@ Based on 1.0.31
 	BUG_0030 : List bytes patching overwrites header
 		When instruction is more than 32 bytes and second line of bytes is
 		on a different page, the expression bytes are patched on the header
-		line, because the offsets to the start of the list line stored in the 
+		line, because the offsets to the start of the list line stored in the
 		expression are no longer true.
-		
+
 	BUG_0031 : List file garbled with input lines with 255 chars
 		When the input line is the maximum size, the newline character is not
 		read from file and the list output is garbled - missing newline.
@@ -1264,32 +1270,32 @@ Based on 1.0.31
 01.06.2013 [1.2.0] (pauloscustodio)
 -------------------------------------------------------------------------------
 	BUG_0032 : DEFGROUP ignores name after assignment
-		The code 
+		The code
 			DEFGROUP {
 				f10 = 10, f11
 			}
 		did not define f11 - all text after the expression was discarded.
-		
+
 	BUG_0033 : -d option fails if .asm does not exist
 		When building test.o from test.c, the test.asm file is removed by zcc.
-		If the .o is then linked into a library with the -d option to skip 
-		assembling, z80asm fails with error 
+		If the .o is then linked into a library with the -d option to skip
+		assembling, z80asm fails with error
 		"Cannot open file 'test.asm' for reading".
-		Bug introduced when replaced TestAsmFile() by query_assemble() in 
+		Bug introduced when replaced TestAsmFile() by query_assemble() in
 		z80asm.c 1.78.
-		
+
 	BUG_0034 : If assembly process fails with fatal error, invalid library is kept
-		Option -x creates an empty library file (just the header). If the 
-		assembly process fails with a fatal errror afterwards, the library file 
+		Option -x creates an empty library file (just the header). If the
+		assembly process fails with a fatal errror afterwards, the library file
 		is not deleted.
 
 	CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
 		z80asm no longer asks for an ORG address from the standard input
-		if one is not given either by an ORG statement or a -r option; 
+		if one is not given either by an ORG statement or a -r option;
 		it exists with an error message instead.
 		The old behaviour was causing wrong build scripts to hang waiting
 		for input.
-		
+
 	CH_0021 : Exceptions on file IO show file name
 		Keep a hash table of all opened file names, so that the file name
 		is shown on a fatal error.
@@ -1298,13 +1304,13 @@ Based on 1.0.31
 	CH_0022 : Replace avltree by hash table for symbol table
 		Replaced avltree from original assembler by hash table because:
 		a) code simplicity
-		b) performance - avltree 50% slower when loading the symbols from the 
+		b) performance - avltree 50% slower when loading the symbols from the
 		   ZX 48 ROM assembly, see t\developer\benchmark_symtab.t
 		Removed unused errors, replaced by assertion, code not reached:
 		ERR_SYMBOL_DECL_GLOBAL, ERR_SYMBOL_DECL_EXTERN.
 		Replaced error ERR_SYMBOL_REDECL_GLOBAL (not reached in compile phase)
 		by ERR_SYMBOL_REDEFINED_MODULE (was printf).
-	
+
     Internal cleanup:
 	- Decouple assembler from listfile handling
 	- Uniform the APIs of classhash, classlist, strhash, strlist
@@ -1315,26 +1321,26 @@ Based on 1.0.31
 	- New srcfile.c to handle reading lines from source files
 	- Move include path search to srcfile.c
 	- New interface to Str to copy characters to string
-	- New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept 
+	- New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept
 	  to keep backwards compatibility
-	- Removed writeline, that was used to cancel listing of multi-line 
+	- Removed writeline, that was used to cancel listing of multi-line
 	  constructs, as only the first line was shown on the list file. Fixed
 	  the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
 	- Removed pass1 that was used to skip creating page references of created
-	  symbols in pass2. Modified add_symbol_ref() to ignore pages < 1, 
-	  modified list_get_page_nr() to return -1 after the whole source is 
+	  symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+	  modified list_get_page_nr() to return -1 after the whole source is
 	  processed.
 	- Added flex-based scanner, not yet integrated into assembler
 	- Decouple module name creation from parsing, define CURRENTMODULE->mname
 	  directly instead of calling DeclModuleName()
-	- GetLibfile(), ReadName(), ReadNames(), CheckIfModuleWanted(), 
-	  LinkLibModules(), SearchLibFile() were using global z80asmfile instead 
+	- GetLibfile(), ReadName(), ReadNames(), CheckIfModuleWanted(),
+	  LinkLibModules(), SearchLibFile() were using global z80asmfile instead
 	  of a local FILE* variable - fixed
 	- CreateDeffile() : no need to allocate file name dynamically, use a stack variable
 	- Move libfilename to options.c, keep it in strpool
 	- Helper functions to create file names of each of the extensions used in z80asm
 	- Remove global variable errfilename
-	- DEFINE_STR() caused compilation error "C2099: initializer is not a constant" 
+	- DEFINE_STR() caused compilation error "C2099: initializer is not a constant"
 	  when used to define global variables
 	- Move default asm and obj extension handling to file.c.
 	- srcfilename and objfilename are now pointers to static variables in file.c
@@ -1343,19 +1349,19 @@ Based on 1.0.31
 	- Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 	- Add utility functions to get N characters from input, return FALSE on EOF
 	- New module for object file handling
-	- New MAXIDENT for maximum identifier length - set at 255 because of 
+	- New MAXIDENT for maximum identifier length - set at 255 because of
 	  object file format with one byte string length
 	- New MIN and MAX macros
 	- Move symbol to sym.c, rename to Symbol
 	- StrHash_set failed when the key string buffer was reused later in the code.
-	  StrHash_get failed to retrieve object after the key used by StrHash_set 
+	  StrHash_get failed to retrieve object after the key used by StrHash_set
 	  was reused.
 
 -------------------------------------------------------------------------------
 11.06.2013 [1.2.1] (pauloscustodio)
 -------------------------------------------------------------------------------
 	BUG_0035 : Symbol not defined in forward references
-		Symbol not defined error when a symbol is used more than once before 
+		Symbol not defined error when a symbol is used more than once before
 		being defined. Consequence of removal of notdecl_tab symbol table.
 
 	CH_0023 : Remove notdecl_tab
@@ -1388,22 +1394,22 @@ Based on 1.0.31
 
     Internal cleanup:
 	- Move mapfile writing to mapfile.c.
-	
+
 -------------------------------------------------------------------------------
 26.08.2013 [1.2.4] (pauloscustodio)
 -------------------------------------------------------------------------------
     Internal cleanup:
 	- Symbol_fullname() to return full symbol name NAME@MODULE.
-	- get_all_syms() to get list of symbols matching a type mask, 
+	- get_all_syms() to get list of symbols matching a type mask,
 	  use in mapfile to decouple it from get_global_tab()
 	- Move deffile writing to deffile.c, remove global variable deffile.
-	- New remove_all_{local,static,global}_syms( void ) functions 
+	- New remove_all_{local,static,global}_syms( void ) functions
 	  to encapsulate calls to get_global_tab().
 
 -------------------------------------------------------------------------------
 26.08.2013 [1.2.5] (pauloscustodio)
 -------------------------------------------------------------------------------
-	Bug report 2013-07-27 10:50:27 by rkd77 
+	Bug report 2013-07-27 10:50:27 by rkd77
 	-Wformat -Werror=format-security
 		Some distributions build packages with -Wformat -Werror=format-security.
 		Build of z88dk fails with these options.
@@ -1413,10 +1419,10 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 	BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
 	- Expressions now use more standard C-like operators
-	- Object and library files changed signature to 
+	- Object and library files changed signature to
 	  "Z80RMF02", "Z80LMF02", to avoid usage of old
 	  object files with expressions inside in the old format
-	
+
 	Detail:
 	- String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
 	- Power:                        changed from '^' to '**'; '^' will be XOR
@@ -1425,9 +1431,9 @@ Based on 1.0.31
 	- NOT:                          '~' added as binary not
 
 	CH_0018 : Remove legacy '#' in include file
-		According to the z80asm manual, the # sign is used to insert the 
-		Z80_OZFILES environment variable before the file name, but this 
-		is not done as the assembler searches for the include file in all 
+		According to the z80asm manual, the # sign is used to insert the
+		Z80_OZFILES environment variable before the file name, but this
+		is not done as the assembler searches for the include file in all
 		the include path, which includes the Z80_OZFILES environment variable.
 		Handling of '#' in INCLUDE removed.
 
@@ -1441,25 +1447,25 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 12.09.2013 [1.2.8] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Included GLIB in the Makefile options. Setup GLib memory allocation 
-	  functions to use xmalloc functions. Unified glib compilation options 
+	- Included GLIB in the Makefile options. Setup GLib memory allocation
+	  functions to use xmalloc functions. Unified glib compilation options
 	  between MinGW and Linux.
 	- Replaced xmalloc et al with glib functions
 	- Replaced e4c exception mechanism by a much simpler one based on a few
 	  macros. The former did not allow an exit(1) to be called within a
 	  try-catch block.
-	- Created a code-generation mechanism for automatic execution of initialize 
+	- Created a code-generation mechanism for automatic execution of initialize
 	  code before the main() function starts, and methods for struct malloc
 	  and free calling constructors and destructors.
-	- Force xmalloc to be the first include, to be able to use MSVC 
+	- Force xmalloc to be the first include, to be able to use MSVC
 	  memory debug tools
 	- Removed xmalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 	  Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 	- Replaced strpool code by GLib String Chunks.
 	- New error module with one error function per error, no need for the error
-	  constants. Allows compiler to type-check error message arguments. 
-	  Included the errors module in the init() mechanism, no need to call 
-	  error initialization from main(). Moved all error-testing scripts to 
+	  constants. Allows compiler to type-check error message arguments.
+	  Included the errors module in the init() mechanism, no need to call
+	  error initialization from main(). Moved all error-testing scripts to
 	  one file errors.t.
 	- Integrate codearea in init() mechanism.
 	- Create xfree() macro that NULLs the pointer after free, required
@@ -1485,7 +1491,7 @@ Based on 1.0.31
 	- Move FileStack implementation to scan.c, remove FileStack.
 	- Move getline_File() to scan.c.
 	- Move source code generation tools to dev/Makefile, only called on request,
-	  and keep the generated files in z80asm directory, so that build does 
+	  and keep the generated files in z80asm directory, so that build does
 	  not require tools used for the code generation (ragel, perl).
 	- Remove code generation for structs - use CLASS macro instead.
 
@@ -1503,22 +1509,22 @@ Based on 1.0.31
 		A library must define one XLIB symbol and zero or more XDEF symbols.
 		For the library to be pulled in to the linked binary, the XLIB
 		symbol needs to be referenced by LIB and used in some expression.
-		If one of the XDEF symbols is referenced by XREF and used in an 
+		If one of the XDEF symbols is referenced by XREF and used in an
 		expression, the library is not pulled in and the symbol is not found.
 
 	- Move library modules independent from z80asm to the lib subdirectory.
-	- Move memory allocation routines to lib/xmalloc, instead of glib, 
+	- Move memory allocation routines to lib/xmalloc, instead of glib,
 	  introduce memory leak report on exit and memory fence check.
 
 -------------------------------------------------------------------------------
 30.12.2013 [2.1.1] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Replace code-generation for init() functions by macros in init.h 
+	- Replace code-generation for init() functions by macros in init.h
 	  to help define init() and fini() functions per module.
-	  Code generation complicates maintenance, as all the modules with init() 
-	  functions are coupled together, and it may not be clear how the init() 
+	  Code generation complicates maintenance, as all the modules with init()
+	  functions are coupled together, and it may not be clear how the init()
 	  module appears.
-	- Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type 
+	- Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 	  handles both dynamically allocated strings and fixed-size strings.
 	- Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
 	  g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
@@ -1531,17 +1537,17 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	- Unify interface of classlist and list.
 	- List, StrHash classlist and classhash receive the address of the container
 	  object in all functions that add items to the container, and create the
-	  container on first use. This allows a container to be staticaly 
+	  container on first use. This allows a container to be staticaly
 	  initialized with NULL and instantiated on first push/unshift/set.
 	- Add count attribute to StrHash, classhash to count elements in container.
 	- Add free_data attribute in StrHash to register a free fucntion to delete
 	  the data container when the hash is removed or a key is overwritten.
-	- errors.c: Use init.h mechanism, no need for main() calling init_errors 
+	- errors.c: Use init.h mechanism, no need for main() calling init_errors
 	  and atexit(fini_errors); use Str and StrHash instead of glib.
 	- options.c: Use init.h mechanism, no need for main() calling init_options.
 	  Use Str instead of glib.
 	- codearea.c: Use init.h mechanism, no need for main() calling init_codearea.
-	- scan.c: Use Str instead of glib, List instead of GSList. Use init.h 
+	- scan.c: Use Str instead of glib, List instead of GSList. Use init.h
 	  mechanism, no need for main() calling init_scan.
 	- glib dependency removed from code and Makefile
 
@@ -1556,21 +1562,21 @@ FUTURE CHANGES - require change of the object file format
           address of instruction start.
 
 	BUG_0038: library modules not loaded in sequence
-		The library modules loaded to the linked binary file should respect 
+		The library modules loaded to the linked binary file should respect
 		the order given on the command line.
 		"z80asm -ilib1 -ilib2 obj1.o obj2.o"
-		should load obj1, obj2, objects from lib1, objects from lib2 in this 
+		should load obj1, obj2, objects from lib1, objects from lib2 in this
 		order.
-		The load order is today: obj1, obj2, and then all library modules 
-		required by obj1, and then library modules required by obj2, 
+		The load order is today: obj1, obj2, and then all library modules
+		required by obj1, and then library modules required by obj2,
 		independently of the -i sequence.
-		This poses problems when trying to keep all data at the end of the 
+		This poses problems when trying to keep all data at the end of the
 		binary code by defining a library with all the data and linking it
 		last in the command line - the -i sequence is not respected and the
 		data appears in the middle of other library modules.
 
 	CH_0019 : Replaced tokenizer with Flex based scanner
-		Simplified code by using flex instead of special-built scanner and 
+		Simplified code by using flex instead of special-built scanner and
 		tokenizer.
 
     - Sections

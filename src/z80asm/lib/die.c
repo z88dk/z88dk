@@ -3,7 +3,7 @@ Exit with a fatal error, warn on stderr
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.c,v 1.1 2013-12-15 04:02:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.c,v 1.2 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "die.h"
@@ -21,7 +21,7 @@ void die( char *msg, ... )
     va_start( argptr, msg ); /* init variable args */
 
     vfprintf( stderr, msg, argptr );
-	exit(1);
+    exit( 1 );
 }
 
 /*-----------------------------------------------------------------------------
@@ -35,9 +35,13 @@ void warn( char *msg, ... )
     vfprintf( stderr, msg, argptr );
 }
 
-/* 
+/*
 * $Log: die.c,v $
-* Revision 1.1  2013-12-15 04:02:26  pauloscustodio
+* Revision 1.2  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.1  2013/12/15 04:02:26  pauloscustodio
 * Move the die and queue modules to the z80asm/lib directory
 *
 * Revision 1.12  2013/09/01 18:45:48  pauloscustodio

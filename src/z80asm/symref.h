@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.3 2013-12-15 13:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.4 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: symref.h,v $
-Revision 1.3  2013-12-15 13:18:34  pauloscustodio
+Revision 1.4  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.3  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -46,10 +50,10 @@ Move SymbolRef to symref.c
 *   Cross reference list of symbol usage
 *----------------------------------------------------------------------------*/
 CLASS( SymbolRef )
-	int		page_nr;			/* page where symbol used/defined */
+int		page_nr;			/* page where symbol used/defined */
 END_CLASS;
 
-CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with 
+CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with
 								   definition reference at head of list */
 
 /* add a symbol reference, create the list if NULL */

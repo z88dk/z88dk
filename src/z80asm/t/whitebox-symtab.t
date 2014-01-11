@@ -34,8 +34,8 @@ int list_get_page_nr() { return page_nr; }
 char ident[MAXLINE];
 char separators[MAXLINE];
 
-char *CreateLibfile( char *filename ) {}
-char *GetLibfile( char *filename ) {}
+char *CreateLibfile( char *filename ) {return NULL;}
+char *GetLibfile( char *filename ) {return NULL;}
 
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
@@ -312,9 +312,13 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.31 2014-01-05 23:20:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.32 2014-01-11 00:10:40 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.31  2014-01-05 23:20:39  pauloscustodio
+# Revision 1.32  2014-01-11 00:10:40  pauloscustodio
+# Astyle - format C code
+# Add -Wall option to CFLAGS, remove all warnings
+#
+# Revision 1.31  2014/01/05 23:20:39  pauloscustodio
 # List, StrHash classlist and classhash receive the address of the container
 # object in all functions that add items to the container, and create the
 # container on first use. This allows a container to be staticaly

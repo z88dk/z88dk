@@ -12,227 +12,9 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.39 2014-01-11 00:10:39 pauloscustodio Exp $
 */
-
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.38 2013-12-15 13:18:34 pauloscustodio Exp $ */
-/* $Log: z80instr.c,v $
-/* Revision 1.38  2013-12-15 13:18:34  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.37  2013/10/04 23:20:21  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -plus, --ti83plus
-/*
-/* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -R, --relocatable
-/* --RCMX000
-/*
-/* Revision 1.35  2013/09/08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with glib functions
-/*
-/* Revision 1.34  2013/09/08 00:43:59  pauloscustodio
-/* New error module with one error function per error, no need for the error
-/* constants. Allows compiler to type-check error message arguments.
-/* Included the errors module in the init() mechanism, no need to call
-/* error initialization from main(). Moved all error-testing scripts to
-/* one file errors.t.
-/*
-/* Revision 1.33  2013/01/24 23:03:03  pauloscustodio
-/* Replaced (unsigned char) by (byte_t)
-/* Replaced (unisigned int) by (size_t)
-/* Replaced (short) by (int)
-/*
-/* Revision 1.32  2013/01/20 12:50:05  pauloscustodio
-/* BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
-/* jr instruction on address 0, with out of range argument ->
-/* jr calls error and writes incomplete opcode (only one byte);
-/* WriteListFile tries to list bytes from -1 to 1 -> crash
-/*
-/* Revision 1.31  2012/11/03 17:39:36  pauloscustodio
-/* astyle, comments
-/*
-/* Revision 1.30  2012/05/26 18:51:10  pauloscustodio
-/* CH_0012 : wrappers on OS calls to raise fatal error
-/* CH_0013 : new errors interface to decouple calling code from errors.c
-/*
-/* Revision 1.29  2012/05/24 17:09:27  pauloscustodio
-/* Unify copyright header
-/*
-/* Revision 1.28  2012/05/18 00:28:45  pauloscustodio
-/* astyle
-/*
-/* Revision 1.27  2012/05/18 00:20:32  pauloscustodio
-/* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
-/* Z80ident[]: make always handling function the same name as assembler ident.
-/*
-/* Revision 1.26  2012/05/11 19:29:49  pauloscustodio
-/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-/*         --mode=c
-/*         --lineend=linux
-/*         --indent=spaces=4
-/*         --style=ansi --add-brackets
-/*         --indent-switches --indent-classes
-/*         --indent-preprocessor --convert-tabs
-/*         --break-blocks
-/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-/*         --align-pointer=name
-/*
-/* Revision 1.25  2011/10/14 14:51:15  pauloscustodio
-/* - Silence warnings with casts.
-/*
-/* Revision 1.24  2011/08/19 15:53:58  pauloscustodio
-/* BUG_0010 : heap corruption when reaching MAXCODESIZE
-/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
-/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-/*
-/* Revision 1.23  2011/08/05 20:11:02  pauloscustodio
-/* CH_0004 : Exception mechanism to handle fatal errors
-/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
-/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
-/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
-/* removing all the test code after each memory allocation.
-/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
-/*
-/* Revision 1.22  2011/07/18 00:48:25  pauloscustodio
-/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-/*
-/* Revision 1.21  2011/07/14 01:32:08  pauloscustodio
-/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-/*     CH_0003 : Error messages should be more informative
-/*         - Added printf-args to error messages, added "Error:" prefix.
-/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-/*         - Raise ERR_UNBALANCED_PAREN instead
-/*
-/* Revision 1.20  2011/07/12 22:47:59  pauloscustodio
-/* - Moved all error variables and error reporting code to a separate module errors.c,
-/*   replaced all extern declarations of these variables by include errors.h,
-/*   created symbolic constants for error codes.
-/* - Added test scripts for error messages.
-/*
-/* Revision 1.19  2011/07/11 16:21:12  pauloscustodio
-/* Removed references to dead variable 'relocfile'.
-/*
-/* Revision 1.18  2011/07/11 16:19:37  pauloscustodio
-/* Moved all option variables and option handling code to a separate module options.c,
-/* replaced all extern declarations of these variables by include options.h.
-/* Created declarations in z80asm.h of objects defined in z80asm.c.
-/*
-/* Revision 1.17  2011/07/09 18:25:35  pauloscustodio
-/* Log keyword in checkin comment was expanded inside Log expansion... recursive
-/* Added Z80asm banner to all source files
-/*
-/* Revision 1.16  2011/07/09 17:36:09  pauloscustodio
-/* Copied cvs log into Log history
-/*
-/* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
-/* Added Log keyword
-/*
-/* Revision 1.14  2011/07/09 01:32:27  pauloscustodio
-/* added casts to clean up warnings
-/*
-/* Revision 1.13  2011/02/27 11:58:46  stefano
-/* Rolled back z80asm changes (I must have messed up something!!)
-/* Slightly updated console output for Enterprise..
-/*
-/* Revision 1.12  2011/02/25 17:14:43  stefano
-/* EXOS directive fixed on z80asm
-/*
-/* Revision 1.11  2011/02/23 16:27:39  stefano
-/* *** empty log message ***
-/*
-/* Revision 1.10  2010/04/16 17:34:37  dom
-/* Make line number an int - 32768 lines isn't big enough...
-/*
-/* Revision 1.9  2009/08/14 22:23:12  dom
-/* clean up some compiler warnings
-/*
-/* Revision 1.8  2009/07/18 23:23:15  dom
-/* clean up the code a bit more (Formatting and a fewer magic numbers)
-/*
-/* Revision 1.7  2009/05/28 19:20:16  dom
-/* For the RCM SLL isn't a valid opcode, neither is anything using ixh,ixl,iyh
-/* or iyl.
-/*
-/* Revision 1.6  2007/06/24 14:46:24  dom
-/* remove the erroneous debug line
-/*
-/* Revision 1.5  2007/06/17 12:07:43  dom
-/* Commit the rabbit emulation code including rrd, rld
-/*
-/* Add a .vcproj for visual studio
-/*
-/* Revision 1.4  2007/02/28 11:23:24  stefano
-/* New platform !
-/* Rabbit Control Module 2000/3000.
-/*
-/* Revision 1.3  2002/01/18 16:22:11  dom
-/* for add,adc,sbc the a, for 8 bit operations is optional
-/*
-/* Revision 1.2  2001/01/23 10:00:09  dom
-/* Changes by x1cygnus:
-/*
-/* just added a harcoded macro Invoke, similar to callpkg except that the
-/* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
-/* the parameter -plus is specified on the command line.
-/*
-/* Changes by dom:
-/* Added in a rudimentary default directory set up (Defined at compile time)
-/* a bit kludgy and not very nice!
-/*
-/* Revision 1.1  2000/07/04 15:33:29  dom
-/* branches:  1.1.1;
-/* Initial revision
-/*
-/* Revision 1.1.1.1  2000/07/04 15:33:29  dom
-/* First import of z88dk into the sourceforge system <gulp>
-/*
-/* */
-
-/* $History: Z80INSTR.C $ */
-/*  */
-/* *****************  Version 13  ***************** */
-/* User: Gbs          Date: 3-10-99    Time: 12:59 */
-/* Updated in $/Z80asm */
-/* Change in CALL_PKG():  */
-/* 0 is allowed as parameter. 16 bit address 8bi split using % 256 and  / */
-/* 256. */
-/*  */
-/* *****************  Version 12  ***************** */
-/* User: Gbs          Date: 30-09-99   Time: 22:39 */
-/* Updated in $/Z80asm */
-/* CALL_PKG hard coded macro implemented for Garry Lancaster's Package */
-/* System. */
-/*  */
-/* *****************  Version 10  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 20:07 */
-/* Updated in $/Z80asm */
-/* "PC" program counter changed to long (from unsigned short). */
-/*  */
-/* *****************  Version 8  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 12:13 */
-/* Updated in $/Z80asm */
-/* Added Ascii Art "Z80asm" at top of source file. */
-/*  */
-/* *****************  Version 6  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 11:31 */
-/* Updated in $/Z80asm */
-/* "config.h" included before "symbol.h" */
-/*  */
-/* *****************  Version 4  ***************** */
-/* User: Gbs          Date: 17-04-99   Time: 0:30 */
-/* Updated in $/Z80asm */
-/* New GNU programming style C format. Improved ANSI C coding style */
-/* eliminating previous compiler warnings. New -o option. Asm sources file */
-/* now parsed even though any line feed standards (CR,LF or CRLF) are */
-/* used. */
-/*  */
-/* *****************  Version 2  ***************** */
-/* User: Gbs          Date: 20-06-98   Time: 14:59 */
-/* Updated in $/Z80asm */
-/* SourceSafe version history comment block added. */
 
 #include "xmalloc.h"   /* before any other include */
 
@@ -286,32 +68,32 @@ PushPop_instr( int opcode )
     if ( GetSym() == name )
         switch ( qq = CheckRegister16() )
         {
-            case REG16_BC:
-            case REG16_DE:
-            case REG16_HL:
-                append_byte( (byte_t)( opcode + qq * 0x10 ) );
-                inc_PC( 1 );
-                break;
+        case REG16_BC:
+        case REG16_DE:
+        case REG16_HL:
+            append_byte( ( byte_t )( opcode + qq * 0x10 ) );
+            inc_PC( 1 );
+            break;
 
-            case REG16_AF:
-                append_byte( (byte_t)( opcode + 0x30 ) );
-                inc_PC( 1 );
-                break;
+        case REG16_AF:
+            append_byte( ( byte_t )( opcode + 0x30 ) );
+            inc_PC( 1 );
+            break;
 
-            case REG16_IX:
-                append_byte( 0xDD );
-                append_byte( (byte_t)( opcode + 0x20 ) );
-                inc_PC( 2 );
-                break;
+        case REG16_IX:
+            append_byte( 0xDD );
+            append_byte( ( byte_t )( opcode + 0x20 ) );
+            inc_PC( 2 );
+            break;
 
-            case REG16_IY:
-                append_byte( 0xFD );
-                append_byte( (byte_t)( opcode + 0x20 ) );
-                inc_PC( 2 );
-                break;
+        case REG16_IY:
+            append_byte( 0xFD );
+            append_byte( ( byte_t )( opcode + 0x20 ) );
+            inc_PC( 2 );
+            break;
 
-            default:
-                error_illegal_ident();
+        default:
+            error_illegal_ident();
         }
     else
     {
@@ -327,25 +109,25 @@ RET( void )
 
     switch ( GetSym() )
     {
-        case name:
-            if ( ( constant = CheckCondition() ) != -1 )
-            {
-                append_byte( (byte_t)( 0xC0 + constant * 0x08 ) );    /* RET cc  instruction opcode */
-            }
-            else
-            {
-                error_illegal_ident();
-            }
+    case name:
+        if ( ( constant = CheckCondition() ) != -1 )
+        {
+            append_byte( ( byte_t )( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
+        }
+        else
+        {
+            error_illegal_ident();
+        }
 
-            break;
+        break;
 
-        case newline:
-            append_byte( 0xC9 );
-            break;
+    case newline:
+        append_byte( 0xC9 );
+        break;
 
-        default:
-            error_syntax();
-            return;
+    default:
+        error_syntax();
+        return;
     }
 
     inc_PC( 1 );
@@ -364,36 +146,36 @@ EX( void )
                         if ( GetSym() == name )
                             switch ( CheckRegister16() )
                             {
-                                case REG16_HL:
-                                    if ( ( opts.cpu & CPU_RABBIT ) )
-                                    {
-                                        /* Instruction code changed */
-                                        append_byte( 0xED );
-                                        append_byte( 0x54 );
-                                        inc_PC( 2 );
-                                    }
-                                    else
-                                    {
-                                        append_byte( 0xE3 );      /* EX  (SP),HL  */
-                                        inc_PC( 1 );
-                                    }
-
-                                    break;
-
-                                case REG16_IX:
-                                    append_byte( 0xDD );
-                                    append_byte( 0xE3 );  /* EX  (SP),IX  */
+                            case REG16_HL:
+                                if ( ( opts.cpu & CPU_RABBIT ) )
+                                {
+                                    /* Instruction code changed */
+                                    append_byte( 0xED );
+                                    append_byte( 0x54 );
                                     inc_PC( 2 );
-                                    break;
+                                }
+                                else
+                                {
+                                    append_byte( 0xE3 );      /* EX  (SP),HL  */
+                                    inc_PC( 1 );
+                                }
 
-                                case REG16_IY:
-                                    append_byte( 0xFD );
-                                    append_byte( 0xE3 );  /* EX  (SP),IY  */
-                                    inc_PC( 2 );
-                                    break;
+                                break;
 
-                                default:
-                                    error_illegal_ident();
+                            case REG16_IX:
+                                append_byte( 0xDD );
+                                append_byte( 0xE3 );  /* EX  (SP),IX  */
+                                inc_PC( 2 );
+                                break;
+
+                            case REG16_IY:
+                                append_byte( 0xFD );
+                                append_byte( 0xE3 );  /* EX  (SP),IY  */
+                                inc_PC( 2 );
+                                break;
+
+                            default:
+                                error_illegal_ident();
                             }
                         else
                         {
@@ -419,54 +201,54 @@ EX( void )
     {
         switch ( CheckRegister16() )
         {
-            case REG16_DE:
-                if ( GetSym() == comma )      /* EX  DE,HL   */
-                    if ( GetSym() == name )
-                        if ( CheckRegister16() == 2 )
-                        {
-                            append_byte( 0xEB );
-                            inc_PC( 1 );
-                        }
-                        else
-                        {
-                            error_illegal_ident();
-                        }
+        case REG16_DE:
+            if ( GetSym() == comma )      /* EX  DE,HL   */
+                if ( GetSym() == name )
+                    if ( CheckRegister16() == 2 )
+                    {
+                        append_byte( 0xEB );
+                        inc_PC( 1 );
+                    }
                     else
                     {
-                        error_syntax();
+                        error_illegal_ident();
                     }
                 else
                 {
                     error_syntax();
                 }
+            else
+            {
+                error_syntax();
+            }
 
-                break;
+            break;
 
-            case 4:
-                if ( GetSym() == comma )      /* EX  AF,AF'   */
-                    if ( GetSym() == name )
-                        if ( CheckRegister16() == 4 )
-                        {
-                            append_byte( 0x08 );
-                            inc_PC( 1 );
-                        }
-                        else
-                        {
-                            error_illegal_ident();
-                        }
+        case 4:
+            if ( GetSym() == comma )      /* EX  AF,AF'   */
+                if ( GetSym() == name )
+                    if ( CheckRegister16() == 4 )
+                    {
+                        append_byte( 0x08 );
+                        inc_PC( 1 );
+                    }
                     else
                     {
-                        error_syntax();
+                        error_illegal_ident();
                     }
                 else
                 {
                     error_syntax();
                 }
+            else
+            {
+                error_syntax();
+            }
 
-                break;
+            break;
 
-            default:
-                error_illegal_ident();
+        default:
+            error_illegal_ident();
         }
     }
     else
@@ -500,18 +282,18 @@ OUT( void )
                     if ( GetSym() == name )
                         switch ( reg = CheckRegister8() )
                         {
-                            case 6:
-                            case 8:
-                            case 9:
-                            case -1:
-                                error_illegal_ident();
-                                break;
+                        case 6:
+                        case 8:
+                        case 9:
+                        case -1:
+                            error_illegal_ident();
+                            break;
 
-                            default:
-                                append_byte( 0xED );
-                                append_byte( (byte_t)( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
-                                inc_PC( 2 );
-                                break;
+                        default:
+                            append_byte( 0xED );
+                            append_byte( ( byte_t )( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
+                            inc_PC( 2 );
+                            break;
                         }
                     else
                     {
@@ -582,61 +364,61 @@ IN( void )
     {
         switch ( inreg = CheckRegister8() )
         {
-            case 8:
-            case 9:
+        case 8:
+        case 9:
+        case -1:
+            error_illegal_ident();
+            break;
+
+        default:
+            if ( GetSym() != comma )
+            {
+                error_syntax();
+                break;
+            }
+
+            if ( GetSym() != lparen )
+            {
+                error_syntax();
+                break;
+            }
+
+            GetSym();
+
+            switch ( CheckRegister8() )
+            {
+            case 1:
+                append_byte( 0xED );
+                append_byte( ( byte_t )( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
+                inc_PC( 2 );
+                break;
+
             case -1:
-                error_illegal_ident();
+                if ( inreg == 7 )
+                {
+                    append_byte( 0xDB );
+
+                    if ( ExprUnsigned8( 1 ) )
+                        if ( sym != rparen )
+                        {
+                            error_syntax();
+                        }
+
+                    inc_PC( 2 );
+                }
+                else
+                {
+                    error_illegal_ident();
+                }
+
                 break;
 
             default:
-                if ( GetSym() != comma )
-                {
-                    error_syntax();
-                    break;
-                }
-
-                if ( GetSym() != lparen )
-                {
-                    error_syntax();
-                    break;
-                }
-
-                GetSym();
-
-                switch ( CheckRegister8() )
-                {
-                    case 1:
-                        append_byte( 0xED );
-                        append_byte( (byte_t)( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
-                        inc_PC( 2 );
-                        break;
-
-                    case -1:
-                        if ( inreg == 7 )
-                        {
-                            append_byte( 0xDB );
-
-                            if ( ExprUnsigned8( 1 ) )
-                                if ( sym != rparen )
-                                {
-                                    error_syntax();
-                                }
-
-                            inc_PC( 2 );
-                        }
-                        else
-                        {
-                            error_illegal_ident();
-                        }
-
-                        break;
-
-                    default:
-                        error_illegal_ident();
-                        break;
-                }
-
+                error_illegal_ident();
                 break;
+            }
+
+            break;
         }
     }
     else
@@ -672,20 +454,20 @@ IM( void )
 
             switch ( constant )
             {
-                case 0:
-                    append_byte( 0xED );
-                    append_byte( 0x46 );      /* IM 0   */
-                    break;
+            case 0:
+                append_byte( 0xED );
+                append_byte( 0x46 );      /* IM 0   */
+                break;
 
-                case 1:
-                    append_byte( 0xED );
-                    append_byte( 0x56 );      /* IM 1  */
-                    break;
+            case 1:
+                append_byte( 0xED );
+                append_byte( 0x56 );      /* IM 1  */
+                break;
 
-                case 2:
-                    append_byte( 0xED );
-                    append_byte( 0x5E );      /* IM 2  */
-                    break;
+            case 2:
+                append_byte( 0xED );
+                append_byte( 0x5E );      /* IM 2  */
+                break;
             }
 
             inc_PC( 2 );
@@ -723,7 +505,7 @@ RST( void )
                 }
                 else
                 {
-                    append_byte( (byte_t)( 0xC7 + constant ) ); /* RST  00H, ... 38H */
+                    append_byte( ( byte_t )( 0xC7 + constant ) ); /* RST  00H, ... 38H */
                     inc_PC( 1 );
                 }
             }
@@ -763,7 +545,7 @@ void CALL_OZ( void )
 
             if ( ( constant > 0 ) && ( constant <= 255 ) )
             {
-                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
+                append_byte( ( byte_t )constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else if ( ( constant > 255 ) && ( constant <= 65535 ) )
@@ -900,7 +682,7 @@ FPP( void )
 
             if ( ( constant > 0 ) && ( constant < 255 ) )
             {
-                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
+                append_byte( ( byte_t )constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else
@@ -948,89 +730,89 @@ Subroutine_addr( int opcode0, int opcode )
 
             switch ( constant )
             {
-                case FLAGS_NZ:  /* nz */
-                    append_byte( 0x28 ); /* jr z */
-                    append_byte( 0x03 );
-                    append_byte( (byte_t)opcode0 );
-                    inc_PC( 2 );
-                    break;
+            case FLAGS_NZ:  /* nz */
+                append_byte( 0x28 ); /* jr z */
+                append_byte( 0x03 );
+                append_byte( ( byte_t )opcode0 );
+                inc_PC( 2 );
+                break;
 
-                case FLAGS_Z:  /* z */
-                    append_byte( 0x20 ); /* jr nz */
-                    append_byte( 0x03 );
-                    append_byte( (byte_t)opcode0 );
-                    inc_PC( 2 );
-                    break;
+            case FLAGS_Z:  /* z */
+                append_byte( 0x20 ); /* jr nz */
+                append_byte( 0x03 );
+                append_byte( ( byte_t )opcode0 );
+                inc_PC( 2 );
+                break;
 
-                case FLAGS_NC:  /* nc */
-                    append_byte( 0x38 ); /* jr c */
-                    append_byte( 0x03 );
-                    append_byte( (byte_t)opcode0 );
-                    inc_PC( 2 );
-                    break;
+            case FLAGS_NC:  /* nc */
+                append_byte( 0x38 ); /* jr c */
+                append_byte( 0x03 );
+                append_byte( ( byte_t )opcode0 );
+                inc_PC( 2 );
+                break;
 
-                case FLAGS_C:  /* c */
-                    append_byte( 0x30 ); /* jr nc */
-                    append_byte( 0x03 );
-                    append_byte( (byte_t)opcode0 );
-                    inc_PC( 2 );
-                    break;
+            case FLAGS_C:  /* c */
+                append_byte( 0x30 ); /* jr nc */
+                append_byte( 0x03 );
+                append_byte( ( byte_t )opcode0 );
+                inc_PC( 2 );
+                break;
 
-                case FLAGS_PO:  /* po */
-                    append_byte( 0xea ); /* jp pe */
-                    sprintf( buffer, "ASMPC+6\n" );
-                    SetTemporaryLine( buffer );
-                    GetSym();
-                    ExprAddress( 1 );
-                    EOL = OFF;
-                    append_byte( 0xCD );
-                    inc_PC( 3 );
-                    break;
+            case FLAGS_PO:  /* po */
+                append_byte( 0xea ); /* jp pe */
+                sprintf( buffer, "ASMPC+6\n" );
+                SetTemporaryLine( buffer );
+                GetSym();
+                ExprAddress( 1 );
+                EOL = OFF;
+                append_byte( 0xCD );
+                inc_PC( 3 );
+                break;
 
-                case FLAGS_PE:  /* pe */
-                    append_byte( 0xe2 ); /* jp po */
-                    sprintf( buffer, "ASMPC+6\n" );
-                    SetTemporaryLine( buffer );
-                    GetSym();
-                    ExprAddress( 1 );
-                    EOL = OFF;
-                    append_byte( 0xCD );
-                    inc_PC( 3 );
-                    break;
+            case FLAGS_PE:  /* pe */
+                append_byte( 0xe2 ); /* jp po */
+                sprintf( buffer, "ASMPC+6\n" );
+                SetTemporaryLine( buffer );
+                GetSym();
+                ExprAddress( 1 );
+                EOL = OFF;
+                append_byte( 0xCD );
+                inc_PC( 3 );
+                break;
 
-                case FLAGS_P:  /* p */
-                    append_byte( 0xfa ); /* jp m */
-                    sprintf( buffer, "ASMPC+6\n" );
-                    SetTemporaryLine( buffer );
-                    GetSym();
-                    ExprAddress( 1 );
-                    EOL = OFF;
-                    append_byte( 0xCD );
-                    inc_PC( 3 );
-                    break;
+            case FLAGS_P:  /* p */
+                append_byte( 0xfa ); /* jp m */
+                sprintf( buffer, "ASMPC+6\n" );
+                SetTemporaryLine( buffer );
+                GetSym();
+                ExprAddress( 1 );
+                EOL = OFF;
+                append_byte( 0xCD );
+                inc_PC( 3 );
+                break;
 
-                case FLAGS_M:  /* m */
-                    append_byte( 0xf2 ); /* jp p */
-                    sprintf( buffer, "ASMPC+6\n" );
-                    SetTemporaryLine( buffer );
-                    GetSym();
-                    ExprAddress( 1 );
-                    EOL = OFF;
-                    append_byte( 0xCD );
-                    inc_PC( 3 );
-                    break;
+            case FLAGS_M:  /* m */
+                append_byte( 0xf2 ); /* jp p */
+                sprintf( buffer, "ASMPC+6\n" );
+                SetTemporaryLine( buffer );
+                GetSym();
+                ExprAddress( 1 );
+                EOL = OFF;
+                append_byte( 0xCD );
+                inc_PC( 3 );
+                break;
             }
         }
         else
         {
-            append_byte( (byte_t)( opcode + constant * 0x08 ) ); /* get instruction opcode */
+            append_byte( ( byte_t )( opcode + constant * 0x08 ) ); /* get instruction opcode */
         }
 
         GetSym();
     }
     else
     {
-        append_byte( (byte_t)opcode0 );    /* JP nn, CALL nn */
+        append_byte( ( byte_t )opcode0 );  /* JP nn, CALL nn */
     }
 
     ExprAddress( 1 );
@@ -1051,30 +833,30 @@ JP_instr( int opc0, int opc )
 
         switch ( CheckRegister16() )
         {
-            case 2:         /* JP (HL) */
-                append_byte( 0xE9 );
-                inc_PC( 1 );
-                break;
+        case 2:         /* JP (HL) */
+            append_byte( 0xE9 );
+            inc_PC( 1 );
+            break;
 
-            case 5:         /* JP (IX) */
-                append_byte( 0xDD );
-                append_byte( 0xE9 );
-                inc_PC( 2 );
-                break;
+        case 5:         /* JP (IX) */
+            append_byte( 0xDD );
+            append_byte( 0xE9 );
+            inc_PC( 2 );
+            break;
 
-            case 6:         /* JP (IY) */
-                append_byte( 0xFD );
-                append_byte( 0xE9 );
-                inc_PC( 2 );
-                break;
+        case 6:         /* JP (IY) */
+            append_byte( 0xFD );
+            append_byte( 0xE9 );
+            inc_PC( 2 );
+            break;
 
-            case -1:
-                error_syntax();
-                break;
+        case -1:
+            error_syntax();
+            break;
 
-            default:
-                error_illegal_ident();
-                break;
+        default:
+            error_illegal_ident();
+            break;
         }
     }
     else
@@ -1095,32 +877,32 @@ JR( void )
     {
         switch ( constant = CheckCondition() )
         {
-                /* check for a condition */
-            case FLAGS_NZ:
-            case FLAGS_Z:
-            case FLAGS_NC:
-            case FLAGS_C:
-                append_byte( (byte_t)( 0x20 + constant * 0x08 ) );
+            /* check for a condition */
+        case FLAGS_NZ:
+        case FLAGS_Z:
+        case FLAGS_NC:
+        case FLAGS_C:
+            append_byte( ( byte_t )( 0x20 + constant * 0x08 ) );
 
-                if ( GetSym() == comma )
-                {
-                    GetSym();         /* point at start of address expression */
-                    break;
-                }
-                else
-                {
-                    error_syntax(); /* comma missing */
-                    return;
-                }
-
-            case -1:
-                append_byte( 0x18 );  /* opcode for JR  e */
-                break;                /* identifier not a condition id - check for legal expression */
-
-            default:
-                error_syntax();      /* illegal condition, syntax
-                                                                     * error  */
+            if ( GetSym() == comma )
+            {
+                GetSym();         /* point at start of address expression */
+                break;
+            }
+            else
+            {
+                error_syntax(); /* comma missing */
                 return;
+            }
+
+        case -1:
+            append_byte( 0x18 );  /* opcode for JR  e */
+            break;                /* identifier not a condition id - check for legal expression */
+
+        default:
+            error_syntax();      /* illegal condition, syntax
+                                                                     * error  */
+            return;
         }
     }
 
@@ -1143,7 +925,7 @@ JR( void )
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
-                append_byte( (byte_t)( constant ) );    /* opcode is stored, now store relative jump */
+                append_byte( ( byte_t )( constant ) );  /* opcode is stored, now store relative jump */
             }
             else
             {
@@ -1187,7 +969,7 @@ DJNZ( void )
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
-                append_byte( (byte_t)( constant ) );    /* opcode is stored, now store relative jump */
+                append_byte( ( byte_t )( constant ) );  /* opcode is stored, now store relative jump */
             }
             else
             {
@@ -1204,9 +986,9 @@ NewJRaddr( void )
 {
     struct JRPC *newJRPC;
 
-    newJRPC = xnew(struct JRPC);
+    newJRPC = xnew( struct JRPC );
     newJRPC->nextref = NULL;
-    newJRPC->PCaddr = (size_t)get_PC();
+    newJRPC->PCaddr = ( size_t )get_PC();
 
     if ( CURRENTMODULE->JRaddr->firstref == NULL )
     {
@@ -1235,89 +1017,89 @@ ADD( void )
 
     switch ( acc16 = CheckRegister16() )
     {
-        case -1:
-            fseek( z80asmfile, fptr, SEEK_SET );
-            ExtAccumulator( 0 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-            break;
+    case -1:
+        fseek( z80asmfile, fptr, SEEK_SET );
+        ExtAccumulator( 0 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
+        break;
 
-        case 2:
-            if ( GetSym() == comma )
+    case 2:
+        if ( GetSym() == comma )
+        {
+            GetSym();
+            reg16 = CheckRegister16();
+
+            if ( reg16 >= 0 && reg16 <= 3 )
             {
-                GetSym();
-                reg16 = CheckRegister16();
+                append_byte( ( byte_t )( 0x09 + 0x10 * reg16 ) ); /* ADD HL,rr */
+                inc_PC( 1 );
+            }
+            else
+            {
+                error_illegal_ident();
+            }
+        }
+        else
+        {
+            error_syntax();
+        }
 
-                if ( reg16 >= 0 && reg16 <= 3 )
+        break;
+
+    case 5:
+    case 6:
+        if ( GetSym() == comma )
+        {
+            GetSym();
+            reg16 = CheckRegister16();
+
+            switch ( reg16 )
+            {
+            case 0:
+            case 1:
+            case 3:
+                break;
+
+            case 5:
+            case 6:
+                if ( acc16 == reg16 )
                 {
-                    append_byte( (byte_t)( 0x09 + 0x10 * reg16 ) );  /* ADD HL,rr */
-                    inc_PC( 1 );
+                    reg16 = 2;
                 }
                 else
                 {
                     error_illegal_ident();
+                    return;
                 }
+
+                break;
+
+            default:
+                error_illegal_ident();
+                return;
+            }
+
+            if ( acc16 == 5 )
+            {
+                append_byte( 0xDD );
             }
             else
             {
-                error_syntax();
+                append_byte( 0xFD );
             }
 
-            break;
+            append_byte( ( byte_t )( 0x09 + 0x10 * reg16 ) );
+            inc_PC( 2 );
+        }
+        else
+        {
+            error_syntax();
+        }
 
-        case 5:
-        case 6:
-            if ( GetSym() == comma )
-            {
-                GetSym();
-                reg16 = CheckRegister16();
+        break;
 
-                switch ( reg16 )
-                {
-                    case 0:
-                    case 1:
-                    case 3:
-                        break;
-
-                    case 5:
-                    case 6:
-                        if ( acc16 == reg16 )
-                        {
-                            reg16 = 2;
-                        }
-                        else
-                        {
-                            error_illegal_ident();
-                            return;
-                        }
-
-                        break;
-
-                    default:
-                        error_illegal_ident();
-                        return;
-                }
-
-                if ( acc16 == 5 )
-                {
-                    append_byte( 0xDD );
-                }
-                else
-                {
-                    append_byte( 0xFD );
-                }
-
-                append_byte( (byte_t)( 0x09 + 0x10 * reg16 ) );
-                inc_PC( 2 );
-            }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-
-        default:
-            error_unknown_ident();
-            break;
+    default:
+        error_unknown_ident();
+        break;
     }
 }
 
@@ -1333,38 +1115,38 @@ SBC( void )
 
     switch ( CheckRegister16() )
     {
-        case -1:
-            fseek( z80asmfile, fptr, SEEK_SET );
-            ExtAccumulator( 3 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-            break;
+    case -1:
+        fseek( z80asmfile, fptr, SEEK_SET );
+        ExtAccumulator( 3 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
+        break;
 
-        case 2:
-            if ( GetSym() == comma )
+    case 2:
+        if ( GetSym() == comma )
+        {
+            GetSym();
+            reg16 = CheckRegister16();
+
+            if ( reg16 >= 0 && reg16 <= 3 )
             {
-                GetSym();
-                reg16 = CheckRegister16();
-
-                if ( reg16 >= 0 && reg16 <= 3 )
-                {
-                    append_byte( 0xED );
-                    append_byte( (byte_t)( 0x42 + 0x10 * reg16 ) );
-                    inc_PC( 2 );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
+                append_byte( 0xED );
+                append_byte( ( byte_t )( 0x42 + 0x10 * reg16 ) );
+                inc_PC( 2 );
             }
             else
             {
-                error_syntax();
+                error_illegal_ident();
             }
+        }
+        else
+        {
+            error_syntax();
+        }
 
-            break;
+        break;
 
-        default:
-            error_illegal_ident();
-            break;
+    default:
+        error_illegal_ident();
+        break;
     }
 }
 
@@ -1381,38 +1163,38 @@ ADC( void )
 
     switch ( CheckRegister16() )
     {
-        case -1:
-            fseek( z80asmfile, fptr, SEEK_SET );
-            ExtAccumulator( 1 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-            break;
+    case -1:
+        fseek( z80asmfile, fptr, SEEK_SET );
+        ExtAccumulator( 1 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
+        break;
 
-        case 2:
-            if ( GetSym() == comma )
+    case 2:
+        if ( GetSym() == comma )
+        {
+            GetSym();
+            reg16 = CheckRegister16();
+
+            if ( reg16 >= 0 && reg16 <= 3 )
             {
-                GetSym();
-                reg16 = CheckRegister16();
-
-                if ( reg16 >= 0 && reg16 <= 3 )
-                {
-                    append_byte( 0xED );
-                    append_byte( (byte_t)( 0x4A + 0x10 * reg16 ) );
-                    inc_PC( 2 );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
+                append_byte( 0xED );
+                append_byte( ( byte_t )( 0x4A + 0x10 * reg16 ) );
+                inc_PC( 2 );
             }
             else
             {
-                error_syntax();
+                error_illegal_ident();
             }
+        }
+        else
+        {
+            error_syntax();
+        }
 
-            break;
+        break;
 
-        default:
-            error_illegal_ident();
-            break;
+    default:
+        error_illegal_ident();
+        break;
     }
 }
 
@@ -1429,30 +1211,30 @@ ArithLog8_instr( int opcode )
     if ( GetSym() == lparen )
         switch ( reg = IndirectRegisters() )
         {
-            case 2:
-                append_byte( (byte_t)( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
-                inc_PC( 1 );
-                break;
+        case 2:
+            append_byte( ( byte_t )( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
+            inc_PC( 1 );
+            break;
 
-            case 5:                   /* xxx A,(IX+d) */
-            case 6:
-                if ( reg == 5 )
-                {
-                    append_byte( 0xDD );
-                }
-                else
-                {
-                    append_byte( 0xFD );    /* xxx A,(IY+d) */
-                }
+        case 5:                   /* xxx A,(IX+d) */
+        case 6:
+            if ( reg == 5 )
+            {
+                append_byte( 0xDD );
+            }
+            else
+            {
+                append_byte( 0xFD );    /* xxx A,(IY+d) */
+            }
 
-                append_byte( (byte_t)( 0x80 + opcode * 0x08 + 0x06 ) );
-                ExprSigned8( 2 );
-                inc_PC( 3 );
-                break;
+            append_byte( ( byte_t )( 0x80 + opcode * 0x08 + 0x06 ) );
+            ExprSigned8( 2 );
+            inc_PC( 3 );
+            break;
 
-            default:
-                error_syntax();
-                break;
+        default:
+            error_syntax();
+            break;
         }
     else
     {
@@ -1461,50 +1243,50 @@ ArithLog8_instr( int opcode )
 
         switch ( reg )
         {
-                /* 8bit register wasn't found, try to evaluate an expression */
-            case -1:
-                append_byte( (byte_t)( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
-                ExprUnsigned8( 1 );
-                inc_PC( 2 );
-                break;
+            /* 8bit register wasn't found, try to evaluate an expression */
+        case -1:
+            append_byte( ( byte_t )( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
+            ExprUnsigned8( 1 );
+            inc_PC( 2 );
+            break;
 
-            case 6:         /* xxx A,F illegal */
-            case 8:         /* xxx A,I illegal */
-            case 9:         /* xxx A,R illegal */
-                error_illegal_ident();
-                break;
+        case 6:         /* xxx A,F illegal */
+        case 8:         /* xxx A,I illegal */
+        case 9:         /* xxx A,R illegal */
+            error_illegal_ident();
+            break;
 
-            default:
-                if ( reg & 8 )
+        default:
+            if ( reg & 8 )
+            {
+                /* IXl or IXh */
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
-                    /* IXl or IXh */
-                    if ( ( opts.cpu & CPU_RABBIT ) )
-                    {
-                        error_illegal_ident();
-                        return;
-                    }
-
-                    append_byte( 0xDD );
-                    inc_PC( 1 );
-                }
-                else if ( reg & 16 )
-                {
-                    /* IYl or IYh */
-                    if ( ( opts.cpu & CPU_RABBIT ) )
-                    {
-                        error_illegal_ident();
-                        return;
-                    }
-
-                    append_byte( 0xFD );
-                    inc_PC( 1 );
+                    error_illegal_ident();
+                    return;
                 }
 
-                reg &= 7;
-
-                append_byte( (byte_t)( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
+                append_byte( 0xDD );
                 inc_PC( 1 );
-                break;
+            }
+            else if ( reg & 16 )
+            {
+                /* IYl or IYh */
+                if ( ( opts.cpu & CPU_RABBIT ) )
+                {
+                    error_illegal_ident();
+                    return;
+                }
+
+                append_byte( 0xFD );
+                inc_PC( 1 );
+            }
+
+            reg &= 7;
+
+            append_byte( ( byte_t )( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
+            inc_PC( 1 );
+            break;
         }
     }
 }
@@ -1520,30 +1302,30 @@ INC( void )
 
     switch ( reg16 = CheckRegister16() )
     {
-        case -1:
-            IncDec_8bit_instr( 4 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
-            break;
+    case -1:
+        IncDec_8bit_instr( 4 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
+        break;
 
-        case 4:
-            error_illegal_ident();
-            break;
+    case 4:
+        error_illegal_ident();
+        break;
 
-        case 5:
-            append_byte( 0xDD );
-            append_byte( 0x23 );
-            inc_PC( 2 );
-            break;
+    case 5:
+        append_byte( 0xDD );
+        append_byte( 0x23 );
+        inc_PC( 2 );
+        break;
 
-        case 6:
-            append_byte( 0xFD );
-            append_byte( 0x23 );
-            inc_PC( 2 );
-            break;
+    case 6:
+        append_byte( 0xFD );
+        append_byte( 0x23 );
+        inc_PC( 2 );
+        break;
 
-        default:
-            append_byte( (byte_t)( 0x03 + reg16 * 0x10 ) );
-            inc_PC( 1 );
-            break;
+    default:
+        append_byte( ( byte_t )( 0x03 + reg16 * 0x10 ) );
+        inc_PC( 1 );
+        break;
     }
 }
 
@@ -1557,30 +1339,30 @@ DEC( void )
 
     switch ( reg16 = CheckRegister16() )
     {
-        case -1:
-            IncDec_8bit_instr( 5 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
-            break;
+    case -1:
+        IncDec_8bit_instr( 5 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
+        break;
 
-        case 4:
-            error_illegal_ident();
-            break;
+    case 4:
+        error_illegal_ident();
+        break;
 
-        case 5:
-            append_byte( 0xDD );
-            append_byte( 0x2B );
-            inc_PC( 2 );
-            break;
+    case 5:
+        append_byte( 0xDD );
+        append_byte( 0x2B );
+        inc_PC( 2 );
+        break;
 
-        case 6:
-            append_byte( 0xFD );
-            append_byte( 0x2B );
-            inc_PC( 2 );
-            break;
+    case 6:
+        append_byte( 0xFD );
+        append_byte( 0x2B );
+        inc_PC( 2 );
+        break;
 
-        default:
-            append_byte( (byte_t)( 0x0B + reg16 * 0x10 ) );
-            inc_PC( 1 );
-            break;
+    default:
+        append_byte( ( byte_t )( 0x0B + reg16 * 0x10 ) );
+        inc_PC( 1 );
+        break;
     }
 }
 
@@ -1594,31 +1376,31 @@ IncDec_8bit_instr( int opcode )
     {
         switch ( reg = IndirectRegisters() )
         {
-            case 2:
-                append_byte( (byte_t)( 0x30 + opcode ) ); /* INC/DEC (HL) */
-                inc_PC( 1 );
-                break;
+        case 2:
+            append_byte( ( byte_t )( 0x30 + opcode ) ); /* INC/DEC (HL) */
+            inc_PC( 1 );
+            break;
 
-            case 5:         /* INC/DEC (IX+d) */
-            case 6:
-                if ( reg == 5 )
-                {
-                    append_byte( 0xDD );
-                }
-                else
-                {
-                    append_byte( 0xFD );    /* INC/DEC (IY+d) */
-                }
+        case 5:         /* INC/DEC (IX+d) */
+        case 6:
+            if ( reg == 5 )
+            {
+                append_byte( 0xDD );
+            }
+            else
+            {
+                append_byte( 0xFD );    /* INC/DEC (IY+d) */
+            }
 
-                append_byte( (byte_t)( 0x30 + opcode ) );
-                ExprSigned8( 2 );
-                inc_PC( 3 );
-                break;
+            append_byte( ( byte_t )( 0x30 + opcode ) );
+            ExprSigned8( 2 );
+            inc_PC( 3 );
+            break;
 
 
-            default:
-                error_syntax();
-                break;
+        default:
+            error_syntax();
+            break;
         }
     }
     else
@@ -1628,43 +1410,43 @@ IncDec_8bit_instr( int opcode )
 
         switch ( reg )
         {
-            case 6:
-            case 8:
-            case 9:
-                error_illegal_ident();       /* INC/DEC I ;  INC/DEC R
+        case 6:
+        case 8:
+        case 9:
+            error_illegal_ident();       /* INC/DEC I ;  INC/DEC R
                                                                      * illegal */
-                break;
+            break;
 
-            case 12:
-            case 13:
-                if ( ( opts.cpu & CPU_RABBIT ) )
-                {
-                    error_illegal_ident();
-                    return;
-                }
+        case 12:
+        case 13:
+            if ( ( opts.cpu & CPU_RABBIT ) )
+            {
+                error_illegal_ident();
+                return;
+            }
 
-                append_byte( 0xDD );
-                append_byte( (byte_t)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
-                inc_PC( 2 );
-                break;
+            append_byte( 0xDD );
+            append_byte( ( byte_t )( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
+            inc_PC( 2 );
+            break;
 
-            case 20:
-            case 21:
-                if ( ( opts.cpu & CPU_RABBIT ) )
-                {
-                    error_illegal_ident();
-                    return;
-                }
+        case 20:
+        case 21:
+            if ( ( opts.cpu & CPU_RABBIT ) )
+            {
+                error_illegal_ident();
+                return;
+            }
 
-                append_byte( 0xFD );
-                append_byte( (byte_t)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
-                inc_PC( 2 );
-                break;
+            append_byte( 0xFD );
+            append_byte( ( byte_t )( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
+            inc_PC( 2 );
+            break;
 
-            default:
-                append_byte( (byte_t)( reg * 0x08 + opcode ) );  /* INC/DEC  r */
-                inc_PC( 1 );
-                break;
+        default:
+            append_byte( ( byte_t )( reg * 0x08 + opcode ) ); /* INC/DEC  r */
+            inc_PC( 1 );
+            break;
         }
     }
 }
@@ -1699,32 +1481,32 @@ BitTest_instr( int opcode )
                     {
                         switch ( ( reg = IndirectRegisters() ) )
                         {
-                            case 2:
-                                append_byte( 0xCB );  /* (HL)  */
-                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + 0x06 ) );
-                                inc_PC( 2 );
-                                break;
+                        case 2:
+                            append_byte( 0xCB );  /* (HL)  */
+                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
+                            inc_PC( 2 );
+                            break;
 
-                            case 5:
-                            case 6:
-                                if ( reg == 5 )
-                                {
-                                    append_byte( 0xDD );
-                                }
-                                else
-                                {
-                                    append_byte( 0xFD );
-                                }
+                        case 5:
+                        case 6:
+                            if ( reg == 5 )
+                            {
+                                append_byte( 0xDD );
+                            }
+                            else
+                            {
+                                append_byte( 0xFD );
+                            }
 
-                                append_byte( 0xCB );
-                                ExprSigned8( 2 );
-                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + 0x06 ) );
-                                inc_PC( 4 );
-                                break;
+                            append_byte( 0xCB );
+                            ExprSigned8( 2 );
+                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
+                            inc_PC( 4 );
+                            break;
 
-                            default:
-                                error_syntax();
-                                break;
+                        default:
+                            error_syntax();
+                            break;
                         }
                     }
                     else
@@ -1734,17 +1516,17 @@ BitTest_instr( int opcode )
 
                         switch ( reg )
                         {
-                            case 6:
-                            case 8:
-                            case 9:
-                            case -1:
-                                error_illegal_ident();
-                                break;
+                        case 6:
+                        case 8:
+                        case 9:
+                        case -1:
+                            error_illegal_ident();
+                            break;
 
-                            default:
-                                append_byte( 0xCB );
-                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + reg ) );
-                                inc_PC( 2 );
+                        default:
+                            append_byte( 0xCB );
+                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + reg ) );
+                            inc_PC( 2 );
                         }
                     }
                 }
@@ -1772,32 +1554,32 @@ RotShift_instr( int opcode )
     if ( GetSym() == lparen )
         switch ( ( reg = IndirectRegisters() ) )
         {
-            case 2:
-                append_byte( 0xCB );
-                append_byte( (byte_t)( opcode * 0x08 + 0x06 ) );
-                inc_PC( 2 );
-                break;
+        case 2:
+            append_byte( 0xCB );
+            append_byte( ( byte_t )( opcode * 0x08 + 0x06 ) );
+            inc_PC( 2 );
+            break;
 
-            case 5:
-            case 6:
-                if ( reg == 5 )
-                {
-                    append_byte( 0xDD );
-                }
-                else
-                {
-                    append_byte( 0xFD );
-                }
+        case 5:
+        case 6:
+            if ( reg == 5 )
+            {
+                append_byte( 0xDD );
+            }
+            else
+            {
+                append_byte( 0xFD );
+            }
 
-                append_byte( 0xCB );
-                ExprSigned8( 2 );
-                append_byte( (byte_t)( opcode * 0x08 + 0x06 ) );
-                inc_PC( 4 );
-                break;
+            append_byte( 0xCB );
+            ExprSigned8( 2 );
+            append_byte( ( byte_t )( opcode * 0x08 + 0x06 ) );
+            inc_PC( 4 );
+            break;
 
-            default:
-                error_syntax();
-                break;
+        default:
+            error_syntax();
+            break;
         }
     else
     {
@@ -1806,20 +1588,244 @@ RotShift_instr( int opcode )
 
         switch ( reg )
         {
-            case 6:
-            case 8:
-            case 9:
-            case -1:
-                error_illegal_ident();
-                break;
+        case 6:
+        case 8:
+        case 9:
+        case -1:
+            error_illegal_ident();
+            break;
 
-            default:
-                append_byte( 0xCB );
-                append_byte( (byte_t)( opcode * 0x08 + reg ) );
-                inc_PC( 2 );
+        default:
+            append_byte( 0xCB );
+            append_byte( ( byte_t )( opcode * 0x08 + reg ) );
+            inc_PC( 2 );
         }
     }
 }
+
+/*
+* $Log: z80instr.c,v $
+* Revision 1.39  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.38  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.37  2013/10/04 23:20:21  pauloscustodio
+* Parse command line options via look-up tables:
+* -plus, --ti83plus
+*
+* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -R, --relocatable
+* --RCMX000
+*
+* Revision 1.35  2013/09/08 08:29:21  pauloscustodio
+* Replaced xmalloc et al with glib functions
+*
+* Revision 1.34  2013/09/08 00:43:59  pauloscustodio
+* New error module with one error function per error, no need for the error
+* constants. Allows compiler to type-check error message arguments.
+* Included the errors module in the init() mechanism, no need to call
+* error initialization from main(). Moved all error-testing scripts to
+* one file errors.t.
+*
+* Revision 1.33  2013/01/24 23:03:03  pauloscustodio
+* Replaced (unsigned char) by (byte_t)
+* Replaced (unisigned int) by (size_t)
+* Replaced (short) by (int)
+*
+* Revision 1.32  2013/01/20 12:50:05  pauloscustodio
+* BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
+* jr instruction on address 0, with out of range argument ->
+* jr calls error and writes incomplete opcode (only one byte);
+* WriteListFile tries to list bytes from -1 to 1 -> crash
+*
+* Revision 1.31  2012/11/03 17:39:36  pauloscustodio
+* astyle, comments
+*
+* Revision 1.30  2012/05/26 18:51:10  pauloscustodio
+* CH_0012 : wrappers on OS calls to raise fatal error
+* CH_0013 : new errors interface to decouple calling code from errors.c
+*
+* Revision 1.29  2012/05/24 17:09:27  pauloscustodio
+* Unify copyright header
+*
+* Revision 1.28  2012/05/18 00:28:45  pauloscustodio
+* astyle
+*
+* Revision 1.27  2012/05/18 00:20:32  pauloscustodio
+* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+* Z80ident[]: make always handling function the same name as assembler ident.
+*
+* Revision 1.26  2012/05/11 19:29:49  pauloscustodio
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+*         --mode=c
+*         --lineend=linux
+*         --indent=spaces=4
+*         --style=ansi --add-brackets
+*         --indent-switches --indent-classes
+*         --indent-preprocessor --convert-tabs
+*         --break-blocks
+*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+*         --align-pointer=name
+*
+* Revision 1.25  2011/10/14 14:51:15  pauloscustodio
+* - Silence warnings with casts.
+*
+* Revision 1.24  2011/08/19 15:53:58  pauloscustodio
+* BUG_0010 : heap corruption when reaching MAXCODESIZE
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+*
+* Revision 1.23  2011/08/05 20:11:02  pauloscustodio
+* CH_0004 : Exception mechanism to handle fatal errors
+* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+* removing all the test code after each memory allocation.
+* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+*
+* Revision 1.22  2011/07/18 00:48:25  pauloscustodio
+* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+*
+* Revision 1.21  2011/07/14 01:32:08  pauloscustodio
+*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+*     CH_0003 : Error messages should be more informative
+*         - Added printf-args to error messages, added "Error:" prefix.
+*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+*         - Raise ERR_UNBALANCED_PAREN instead
+*
+* Revision 1.20  2011/07/12 22:47:59  pauloscustodio
+* - Moved all error variables and error reporting code to a separate module errors.c,
+*   replaced all extern declarations of these variables by include errors.h,
+*   created symbolic constants for error codes.
+* - Added test scripts for error messages.
+*
+* Revision 1.19  2011/07/11 16:21:12  pauloscustodio
+* Removed references to dead variable 'relocfile'.
+*
+* Revision 1.18  2011/07/11 16:19:37  pauloscustodio
+* Moved all option variables and option handling code to a separate module options.c,
+* replaced all extern declarations of these variables by include options.h.
+* Created declarations in z80asm.h of objects defined in z80asm.c.
+*
+* Revision 1.17  2011/07/09 18:25:35  pauloscustodio
+* Log keyword in checkin comment was expanded inside Log expansion... recursive
+* Added Z80asm banner to all source files
+*
+* Revision 1.16  2011/07/09 17:36:09  pauloscustodio
+* Copied cvs log into Log history
+*
+* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
+* Added Log keyword
+*
+* Revision 1.14  2011/07/09 01:32:27  pauloscustodio
+* added casts to clean up warnings
+*
+* Revision 1.13  2011/02/27 11:58:46  stefano
+* Rolled back z80asm changes (I must have messed up something!!)
+* Slightly updated console output for Enterprise..
+*
+* Revision 1.12  2011/02/25 17:14:43  stefano
+* EXOS directive fixed on z80asm
+*
+* Revision 1.11  2011/02/23 16:27:39  stefano
+* *** empty log message ***
+*
+* Revision 1.10  2010/04/16 17:34:37  dom
+* Make line number an int - 32768 lines isn't big enough...
+*
+* Revision 1.9  2009/08/14 22:23:12  dom
+* clean up some compiler warnings
+*
+* Revision 1.8  2009/07/18 23:23:15  dom
+* clean up the code a bit more (Formatting and a fewer magic numbers)
+*
+* Revision 1.7  2009/05/28 19:20:16  dom
+* For the RCM SLL isn't a valid opcode, neither is anything using ixh,ixl,iyh
+* or iyl.
+*
+* Revision 1.6  2007/06/24 14:46:24  dom
+* remove the erroneous debug line
+*
+* Revision 1.5  2007/06/17 12:07:43  dom
+* Commit the rabbit emulation code including rrd, rld
+*
+* Add a .vcproj for visual studio
+*
+* Revision 1.4  2007/02/28 11:23:24  stefano
+* New platform !
+* Rabbit Control Module 2000/3000.
+*
+* Revision 1.3  2002/01/18 16:22:11  dom
+* for add,adc,sbc the a, for 8 bit operations is optional
+*
+* Revision 1.2  2001/01/23 10:00:09  dom
+* Changes by x1cygnus:
+*
+* just added a harcoded macro Invoke, similar to callpkg except that the
+* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
+* the parameter -plus is specified on the command line.
+*
+* Changes by dom:
+* Added in a rudimentary default directory set up (Defined at compile time)
+* a bit kludgy and not very nice!
+*
+* Revision 1.1  2000/07/04 15:33:29  dom
+* branches:  1.1.1;
+* Initial revision
+*
+* Revision 1.1.1.1  2000/07/04 15:33:29  dom
+* First import of z88dk into the sourceforge system <gulp>
+*
+*/
+
+/* $History: Z80INSTR.C $ */
+/*  */
+/* *****************  Version 13  ***************** */
+/* User: Gbs          Date: 3-10-99    Time: 12:59 */
+/* Updated in $/Z80asm */
+/* Change in CALL_PKG():  */
+/* 0 is allowed as parameter. 16 bit address 8bi split using % 256 and  / */
+/* 256. */
+/*  */
+/* *****************  Version 12  ***************** */
+/* User: Gbs          Date: 30-09-99   Time: 22:39 */
+/* Updated in $/Z80asm */
+/* CALL_PKG hard coded macro implemented for Garry Lancaster's Package */
+/* System. */
+/*  */
+/* *****************  Version 10  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 20:07 */
+/* Updated in $/Z80asm */
+/* "PC" program counter changed to long (from unsigned short). */
+/*  */
+/* *****************  Version 8  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 12:13 */
+/* Updated in $/Z80asm */
+/* Added Ascii Art "Z80asm" at top of source file. */
+/*  */
+/* *****************  Version 6  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 11:31 */
+/* Updated in $/Z80asm */
+/* "config.h" included before "symbol.h" */
+/*  */
+/* *****************  Version 4  ***************** */
+/* User: Gbs          Date: 17-04-99   Time: 0:30 */
+/* Updated in $/Z80asm */
+/* New GNU programming style C format. Improved ANSI C coding style */
+/* eliminating previous compiler warnings. New -o option. Asm sources file */
+/* now parsed even though any line feed standards (CR,LF or CRLF) are */
+/* used. */
+/*  */
+/* *****************  Version 2  ***************** */
+/* User: Gbs          Date: 20-06-98   Time: 14:59 */
+/* Updated in $/Z80asm */
+/* SourceSafe version history comment block added. */
 
 /*
  * Local Variables:

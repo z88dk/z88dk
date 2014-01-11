@@ -6,7 +6,7 @@ Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.1 2013-12-18 01:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.2 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.1 2013-12-18
 typedef struct Element
 {
     char *str;					/* xstrdup */
-	
+
     UT_hash_handle hh;      			/* hash table */
 } Element;
 
@@ -36,8 +36,8 @@ static Element *the_pool = NULL;		/* singleton */
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
-	xmalloc_init();			/* force xmalloc to be terminated last */
-	the_pool = NULL;
+    xmalloc_init();			/* force xmalloc to be terminated last */
+    the_pool = NULL;
 }
 
 DEFINE_fini()
@@ -47,7 +47,7 @@ DEFINE_fini()
     HASH_ITER( hh, the_pool, elem, tmp )
     {
 #ifdef STRPOOL_DEBUG
-		warn("strpool: free %s\n", elem->str );
+        warn( "strpool: free %s\n", elem->str );
 #endif
         HASH_DEL( the_pool, elem );
         xfree( elem->str );
@@ -60,7 +60,7 @@ DEFINE_fini()
 *----------------------------------------------------------------------------*/
 void strpool_init( void )
 {
-	init();
+    init();
 }
 
 /*-----------------------------------------------------------------------------
@@ -68,30 +68,30 @@ void strpool_init( void )
 *----------------------------------------------------------------------------*/
 char *strpool_add( char *str )
 {
-	Element *elem;
+    Element *elem;
     size_t num_chars;
-	
-	init();
-	
-	/* special case : NULL string */
-	if ( str == NULL ) 
-		return NULL;
-	
+
+    init();
+
+    /* special case : NULL string */
+    if ( str == NULL )
+        return NULL;
+
     /* check if string exists already */
-	num_chars = strlen( str );
+    num_chars = strlen( str );
     HASH_FIND( hh, the_pool, str, num_chars, elem );
-	
+
     if ( elem )
         return elem->str;    /* found */
 
     /* add to elem */
     elem = xnew( Element );
-    elem->str = xstrdup( (char *) str );   /* alloc string */
+    elem->str = xstrdup( ( char * ) str ); /* alloc string */
 
     HASH_ADD_KEYPTR( hh, the_pool, elem->str, num_chars, elem );
 
 #ifdef STRPOOL_DEBUG
-	warn("strpool: add %s\n", elem->str );
+    warn( "strpool: add %s\n", elem->str );
 #endif
 
     return elem->str;
@@ -99,7 +99,11 @@ char *strpool_add( char *str )
 
 /*
 * $Log: strpool.c,v $
-* Revision 1.1  2013-12-18 01:46:22  pauloscustodio
+* Revision 1.2  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.1  2013/12/18 01:46:22  pauloscustodio
 * Move strpool.c to the z80asm/lib directory
 *
 * Revision 1.6  2013/06/08 23:09:06  pauloscustodio

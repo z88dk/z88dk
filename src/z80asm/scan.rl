@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.8 2014-01-10 00:15:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.9 2014-01-11 00:10:39 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -414,8 +414,8 @@ static BOOL read_next_line( ScanContext *ctx )
 		Str_append_char( ctx->input, '\n' );		/* end of line */
 		
 		if ( (c2 = getc( ctx->file )) != EOF &&
-			 ! ( c1 == '\n' && c2 == '\r' ||
-				 c1 == '\r' && c2 == '\n' ) )
+			 ! ( (c1 == '\n' && c2 == '\r') ||
+				 (c1 == '\r' && c2 == '\n') ) )
 		{
 			ungetc( c2, ctx->file );				/* push back to input */
 		}
@@ -701,7 +701,11 @@ void Skipline( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.8  2014-01-10 00:15:27  pauloscustodio
+* Revision 1.9  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.8  2014/01/10 00:15:27  pauloscustodio
 * Use Str instead of glib, List instead of GSList.
 * Use init.h mechanism, no need for main() calling init_scan.
 * glib dependency removed from code and Makefile

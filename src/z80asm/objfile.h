@@ -14,10 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.8 2013-12-15 13:18:34 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.9 2014-01-11 00:10:39 pauloscustodio Exp $
 
 $Log: objfile.h,v $
-Revision 1.8  2013-12-15 13:18:34  pauloscustodio
+Revision 1.9  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.8  2013/12/15 13:18:34  pauloscustodio
 Move memory allocation routines to lib/xmalloc, instead of glib,
 introduce memory leak report on exit and memory fence check.
 
@@ -69,28 +73,28 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
 *   Object file handle
 *----------------------------------------------------------------------------*/
 CLASS( ObjFile )
-	FILE   *file;				/* file handle, if file open */
-	long	start_ptr;			/* offset in file to start of object file
+FILE   *file;				/* file handle, if file open */
+long	start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
-	
-	char   *filename;			/* object file name, in strpool */
-	char   *modname;			/* module name, in strpool */
-	
-	BOOL	in_library;			/* true if this file is part of a library */
-	BOOL	writing;			/* TRUE if writing a new object file, 
+
+char   *filename;			/* object file name, in strpool */
+char   *modname;			/* module name, in strpool */
+
+BOOL	in_library;			/* true if this file is part of a library */
+BOOL	writing;			/* TRUE if writing a new object file,
 								   FALSE if reading */
-	
-	int		org_addr;			/* defined ORG address, -1 if not defined */
-	
-								/* all file pointers are -1 if not defined */
-	long	modname_ptr;		/* offset in file to Module Name */
-	long	expr_ptr;			/* offset if file to Expression Declaration */
-	long	symbols_ptr;		/* offset if file to Name Definition */
-	long	externsym_ptr;		/* offset if file to External Name Declaration */
-	long	code_ptr;			/* offset if file to Machine Code Block */
-	
-	size_t	code_size;			/* size of code block */
-	
+
+int		org_addr;			/* defined ORG address, -1 if not defined */
+
+/* all file pointers are -1 if not defined */
+long	modname_ptr;		/* offset in file to Module Name */
+long	expr_ptr;			/* offset if file to Expression Declaration */
+long	symbols_ptr;		/* offset if file to Name Definition */
+long	externsym_ptr;		/* offset if file to External Name Declaration */
+long	code_ptr;			/* offset if file to Machine Code Block */
+
+size_t	code_size;			/* size of code block */
+
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -98,14 +102,14 @@ END_CLASS;
 *----------------------------------------------------------------------------*/
 
 /* open object file for reading, return new object that needs to be deleted
-   by OBJ_DELETE() by caller; 
+   by OBJ_DELETE() by caller;
    return NULL and raise error on invalid file or file not found;
    In test_mode does not raise errors - used when deciding if an existent
    object file can be reused or needs to be assembled again */
 extern ObjFile *ObjFile_open_read( char *filename, BOOL test_mode );
 
-/* read an object file from an open library file, return new object that 
-   needs to be deleted by OBJ_DELETE() by caller; 
+/* read an object file from an open library file, return new object that
+   needs to be deleted by OBJ_DELETE() by caller;
    return NULL and raise error on invalid file */
 extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 

@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.6 2014-01-02 23:33:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.7 2014-01-11 00:10:39 pauloscustodio Exp $
 $Log: symref.c,v $
-Revision 1.6  2014-01-02 23:33:11  pauloscustodio
+Revision 1.7  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.6  2014/01/02 23:33:11  pauloscustodio
 Unify interface of classlist and list.
 
 Revision 1.5  2013/12/15 13:18:34  pauloscustodio
@@ -72,51 +76,51 @@ void SymbolRef_fini( SymbolRef *self ) { }
 /* check if reference is repeated and should not be inserted */
 static BOOL ref_repeated( SymbolRefList *list, int page_nr )
 {
-	if ( SymbolRefList_empty(list) )
-		return FALSE;					/* list is empty */
+    if ( SymbolRefList_empty( list ) )
+        return FALSE;					/* list is empty */
 
-	if ( SymbolRefList_first(list)->obj->page_nr == page_nr )
-		return TRUE;					/* used in first */
+    if ( SymbolRefList_first( list )->obj->page_nr == page_nr )
+        return TRUE;					/* used in first */
 
-	if ( SymbolRefList_last(list)->obj->page_nr == page_nr )
-		return TRUE;					/* used in last */
+    if ( SymbolRefList_last( list )->obj->page_nr == page_nr )
+        return TRUE;					/* used in last */
 
-	return FALSE;						/* not used */
+    return FALSE;						/* not used */
 }
 
 
 /* add a symbol reference, create the list if NULL */
 void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 {
-	SymbolRef *obj;
+    SymbolRef *obj;
 
-	if ( opts.symtable && opts.list && 
-		 page_nr > 0 )							/* = -1 in link phase */
-	{
-		/* check if page_nr was already referenced at start (definition) or end (usage) */
-		if ( ! ref_repeated( list, page_nr ) )
-		{
-			/* add the reference */
-			obj = OBJ_NEW( SymbolRef );
-			obj->page_nr = page_nr;
+    if ( opts.symtable && opts.list &&
+            page_nr > 0 )							/* = -1 in link phase */
+    {
+        /* check if page_nr was already referenced at start (definition) or end (usage) */
+        if ( ! ref_repeated( list, page_nr ) )
+        {
+            /* add the reference */
+            obj = OBJ_NEW( SymbolRef );
+            obj->page_nr = page_nr;
 
-			if ( defined ) 
-			{
-				SymbolRefList_unshift( &list, obj );		/* add at start */
-			}
-			else 
-			{
-				SymbolRefList_push( &list, obj );			/* add at end */
-			}
-		}
-		else if ( ! SymbolRefList_empty(list) &&
-				  defined &&
-				  SymbolRefList_last(list)->obj->page_nr == page_nr )
-		{
-			/* move the reference from end of list to start of list, set defined flag */
-			obj = SymbolRefList_pop( list );
-			SymbolRefList_unshift( &list, obj );
-		}
-	}
+            if ( defined )
+            {
+                SymbolRefList_unshift( &list, obj );		/* add at start */
+            }
+            else
+            {
+                SymbolRefList_push( &list, obj );			/* add at end */
+            }
+        }
+        else if ( ! SymbolRefList_empty( list ) &&
+                  defined &&
+                  SymbolRefList_last( list )->obj->page_nr == page_nr )
+        {
+            /* move the reference from end of list to start of list, set defined flag */
+            obj = SymbolRefList_pop( list );
+            SymbolRefList_unshift( &list, obj );
+        }
+    }
 }
 

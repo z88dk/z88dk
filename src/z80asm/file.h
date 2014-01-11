@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.29 2014-01-10 00:15:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.30 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,24 +26,24 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.29 2014-01-10
 #if 0
 /*-----------------------------------------------------------------------------
 *   Object representing an open file
-*	Files open for writing and not closed are removed on exit, to avoid 
+*	Files open for writing and not closed are removed on exit, to avoid
 *	having half-created files left over on errors.
 *----------------------------------------------------------------------------*/
 typedef struct File
 {
-	FILE	*fp;			/* open file handle */
-	char	*filename;		/* name of file, kept in strpool */
-	GString	*text;			/* reading text buffer */
-	BOOL	 writing;		/* TRUE if writing, FALSE if reading */
+    FILE	*fp;			/* open file handle */
+    char	*filename;		/* name of file, kept in strpool */
+    GString	*text;			/* reading text buffer */
+    BOOL	 writing;		/* TRUE if writing, FALSE if reading */
 }
 File;
 
-extern void struct_File_init(File *self, char *filename, char *mode);
-extern void struct_File_fini(File *self);
+extern void struct_File_init( File *self, char *filename, char *mode );
+extern void struct_File_fini( File *self );
 
 /* close an open file
    if not called, delete_File() will delete a file open for writing */
-extern void close_File(File *self);
+extern void close_File( File *self );
 #endif
 
 
@@ -64,16 +64,16 @@ extern void close_File(File *self);
 
 
 /* OS interface with fatal errors on failure */
-extern void  xstat(  char *filename, struct stat *filestat );
-extern FILE *xfopen( char *filename, char *mode ); 
+extern void  xstat( char *filename, struct stat *filestat );
+extern FILE *xfopen( char *filename, char *mode );
 extern void  xfclose( FILE *file );
 
 /* read/write buffers */
 extern void xfwrite( const void *buffer, size_t size, size_t count, FILE *file );
-extern void xfread(        void *buffer, size_t size, size_t count, FILE *file );   /* EOF is fatal */
+extern void xfread( void *buffer, size_t size, size_t count, FILE *file );          /* EOF is fatal */
 
 extern void xfput_char( const char *buffer, size_t len, FILE *file );
-extern void xfget_char(       char *buffer, size_t len, FILE *file );   /* EOF is fatal */
+extern void xfget_char( char *buffer, size_t len, FILE *file );         /* EOF is fatal */
 
 /* read/write numbers */
 extern void  xfput_u8( int value, FILE *file );
@@ -100,9 +100,13 @@ extern void   xfget_c1sstr( Str *str, FILE *file );
 extern void   xfput_c2sstr( Str *str, FILE *file );
 extern void   xfget_c2sstr( Str *str, FILE *file );
 
-/* 
+/*
 $Log: file.h,v $
-Revision 1.29  2014-01-10 00:15:25  pauloscustodio
+Revision 1.30  2014-01-11 00:10:39  pauloscustodio
+Astyle - format C code
+Add -Wall option to CFLAGS, remove all warnings
+
+Revision 1.29  2014/01/10 00:15:25  pauloscustodio
 Use Str instead of glib, List instead of GSList.
 Use init.h mechanism, no need for main() calling init_scan.
 glib dependency removed from code and Makefile

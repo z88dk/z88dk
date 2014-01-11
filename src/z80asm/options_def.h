@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.30 2014-01-02 17:18:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.31 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -25,10 +25,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.30 2014-01-0
 #endif
 
 OPT_VAR( BOOL,		verbose,	FALSE	)
-OPT_VAR( BOOL,		symtable,	TRUE 	)
-OPT_VAR( BOOL,		list,		FALSE 	)	/* -l flag */
-OPT_VAR( BOOL,		cur_list,	FALSE 	)	/* current LSTON/LSTOFF status */
-OPT_VAR( BOOL,		map,		TRUE 	)
+OPT_VAR( BOOL,		symtable,	TRUE	)
+OPT_VAR( BOOL,		list,		FALSE	)	/* -l flag */
+OPT_VAR( BOOL,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
+OPT_VAR( BOOL,		map,		TRUE	)
 OPT_VAR( BOOL,		sdcc,		FALSE	)
 OPT_VAR( BOOL,		ti83plus,	FALSE	)
 OPT_VAR( BOOL,		swap_ix_iy,	FALSE	)
@@ -38,16 +38,16 @@ OPT_VAR( BOOL,		globaldef,	FALSE	)
 OPT_VAR( BOOL,		make_bin,	FALSE	)
 OPT_VAR( BOOL,		date_stamp,	FALSE	)
 OPT_VAR( BOOL,		code_seg,	FALSE	)
-OPT_VAR( BOOL,		relocatable,FALSE	)
+OPT_VAR( BOOL,		relocatable, FALSE	)
 OPT_VAR( BOOL,		library,	FALSE	)	/* true if linking with libs */
 
-OPT_VAR( int, 		origin,		-1		)	/* -1 == not defined */
+OPT_VAR( int, 		origin,		-1	)	/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
-OPT_VAR( char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
-OPT_VAR( char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
-OPT_VAR( char *,	bin_file,	NULL 			)	/* set by -o */
-OPT_VAR( char *,	lib_file,	NULL 			)	/* set by -x */
+OPT_VAR( char *,	asm_ext,	( FILEEXT_ASM ) + 1 )	/* skip "." */
+OPT_VAR( char *,	obj_ext,	( FILEEXT_OBJ ) + 1 )	/* skip "." */
+OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
+OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
 
 OPT_VAR( List *,	inc_path,	NULL )		/* path for include files */
 OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
@@ -128,22 +128,22 @@ OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE" )
 
 OPT_TITLE(	"Code Generation Options:" )
 OPT( OptCall,	option_cpu_RCM2000,
-								"-RCMX000", "--RCMX000",	OPT_HELP_CPU_RCM2000, "" )
-OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",			OPT_HELP_SDCC, "" )
-OPT( OptSet,	&opts.ti83plus,	"-plus","--ti83plus",		OPT_HELP_TI83PLUS, "" )
+     "-RCMX000", "--RCMX000",	OPT_HELP_CPU_RCM2000, "" )
+OPT( OptSet,	&opts.sdcc,		"-sdcc", "--sdcc",			OPT_HELP_SDCC, "" )
+OPT( OptSet,	&opts.ti83plus,	"-plus", "--ti83plus",		OPT_HELP_TI83PLUS, "" )
 OPT( OptSet,	&opts.swap_ix_iy,
-								"-IXIY","--swap-ix-iy",		OPT_HELP_SWAP_IX_IY, "" )
+     "-IXIY", "--swap-ix-iy",		OPT_HELP_SWAP_IX_IY, "" )
 OPT( OptSet,	&opts.force_xlib,
-								"-forcexlib","--forcexlib",	OPT_HELP_FORCE_XLIB, "" )
+     "-forcexlib", "--forcexlib",	OPT_HELP_FORCE_XLIB, "" )
 OPT( OptSet,	&opts.line_mode,
-								"-C",	"--line-mode",		OPT_HELP_LINE_MODE, "" )
+     "-C",	"--line-mode",		OPT_HELP_LINE_MODE, "" )
 
 OPT_TITLE(	"Environment:"	)
 OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PATH" )
 OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
 OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
 
-OPT( OptCallOptArg, option_make_lib,"-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
+OPT( OptCallOptArg, option_make_lib, "-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
 OPT( OptCallOptArg, option_use_lib,	"-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
 
 
@@ -151,16 +151,16 @@ OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin",	OPT_HELP_NO_MAKE_BIN, "" )
 
-OPT( OptSet,	&opts.date_stamp,"-d", 	"--date-stamp", 	OPT_HELP_DATE_STAMP, "" )
-OPT( OptClear,	&opts.date_stamp,"-nd", "--no-date-stamp",	OPT_HELP_NO_DATE_STAMP, "" )
+OPT( OptSet,	&opts.date_stamp, "-d", 	"--date-stamp", 	OPT_HELP_DATE_STAMP, "" )
+OPT( OptClear,	&opts.date_stamp, "-nd", "--no-date-stamp",	OPT_HELP_NO_DATE_STAMP, "" )
 
 OPT( OptCall,	option_make_updated_bin,
-								"-a", 	"--make-updated-bin",
-															OPT_HELP_MAKE_UPDATED_BIN, "" )
-OPT( OptCallArg,option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
+     "-a", 	"--make-updated-bin",
+     OPT_HELP_MAKE_UPDATED_BIN, "" )
+OPT( OptCallArg, option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
 OPT( OptSet,	&opts.code_seg,	"-c", 	"--code-seg",		OPT_HELP_CODE_SEG, "" )
 OPT( OptSet,	&opts.relocatable,
-								"-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
+     "-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
 
 OPT_TITLE(	"Other Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
@@ -172,8 +172,8 @@ OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",		OPT_HELP_NO_LIST, "" )
 OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
 OPT( OptClear,	&opts.map,		"-nm", 	"--no-map",			OPT_HELP_NO_MAP, "" )
 
-OPT( OptSet,	&opts.globaldef,"-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
-OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
+OPT( OptSet,	&opts.globaldef, "-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
+OPT( OptClear,	&opts.globaldef, "-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
 
 
 OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
@@ -188,7 +188,11 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.30  2014-01-02 17:18:16  pauloscustodio
+* Revision 1.31  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.30  2014/01/02 17:18:16  pauloscustodio
 * StrList removed, replaced by List
 *
 * Revision 1.29  2014/01/02 02:31:42  pauloscustodio
@@ -268,44 +272,44 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 *
 * Revision 1.10  2013/10/02 23:43:57  pauloscustodio
 * add log
-* 
+*
 * Revision 1.9  2013/10/02 23:42:09  pauloscustodio
 * Parse command line options via look-up tables:
 * add --sdcc in addition to -sdcc, for consistency
-* 
+*
 * Revision 1.8  2013/10/02 23:20:44  pauloscustodio
 * Parse command line options via look-up tables:
 * -g, --globaldef
 * -ng, --no-globaldef
-* 
+*
 * Revision 1.7  2013/10/01 23:46:28  pauloscustodio
 * Parse command line options via look-up tables:
 * -m, --map
 * -nm, --no-map
-* 
+*
 * Revision 1.6  2013/10/01 23:23:53  pauloscustodio
 * Parse command line options via look-up tables:
 * -l, --list
 * -nl, --no-list
-* 
+*
 * Revision 1.5  2013/10/01 22:50:26  pauloscustodio
 * Parse command line options via look-up tables:
 * -s, --symtable
 * -ns, --no-symtable
-* 
+*
 * Revision 1.4  2013/10/01 22:09:33  pauloscustodio
 * Parse command line options via look-up tables:
 * -sdcc
-* 
+*
 * Revision 1.3  2013/09/30 00:33:11  pauloscustodio
 * help text
-* 
+*
 * Revision 1.2  2013/09/30 00:24:25  pauloscustodio
 * Parse command line options via look-up tables:
 * -e, --asm-ext
 * -M, --obj-ext
 * Move filename extension functions to options.c
-* 
+*
 * Revision 1.1  2013/09/27 01:14:33  pauloscustodio
 * Parse command line options via look-up tables:
 * --help, --verbose

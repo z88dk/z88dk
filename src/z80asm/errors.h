@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.22 2014-01-06 00:33:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.23 2014-01-11 00:10:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,7 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.22 2014-01-06 00:
 enum ErrType { ErrInfo, ErrWarn, ErrError, ErrFatal };
 
 /*-----------------------------------------------------------------------------
-*	define the next FILE, LINENO, MODULE to use in error messages 
+*	define the next FILE, LINENO, MODULE to use in error messages
 *	error_xxx(), fatal_xxx(), warn_xxx()
 *----------------------------------------------------------------------------*/
 extern void set_error_null( void );             /* clear all locations */
@@ -51,7 +51,7 @@ extern void open_error_file( char *filename );
 extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*-----------------------------------------------------------------------------
-*   declare error functions 
+*   declare error functions
 *----------------------------------------------------------------------------*/
 #define ERR(err_type,func,args)	extern void func;
 #include "errors_def.h"
@@ -60,7 +60,11 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.22  2014-01-06 00:33:36  pauloscustodio
+* Revision 1.23  2014-01-11 00:10:38  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.22  2014/01/06 00:33:36  pauloscustodio
 * Use init.h mechanism, no need for main() calling init_errors
 * and atexit(fini_errors); use Str and StrHash instead of glib.
 *

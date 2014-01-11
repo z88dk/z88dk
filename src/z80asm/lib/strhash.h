@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,23 +23,23 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.2 2014-01-05
 typedef struct StrHashElem
 {
     char    *key; 					/* string kept in strpool.h */
-	void	*value;					/* value managed by caller */
+    void	*value;					/* value managed by caller */
 
     UT_hash_handle hh;      		/* hash table */
 
 } StrHashElem;
 
 CLASS( StrHash )
-	size_t count;					/* number of objects */
-	void (*free_data)(void *);		/* function to free an element
+size_t count;					/* number of objects */
+void ( *free_data )( void * );		/* function to free an element
 									   called by StrHash_remove_all() */
-	StrHashElem		*hash;			/* hash table of all keys */
+StrHashElem		*hash;			/* hash table of all keys */
 END_CLASS;
 
 /* compare function used by sort */
-typedef int (*StrHash_compare_func)(StrHashElem *a, StrHashElem *b);
+typedef int ( *StrHash_compare_func )( StrHashElem *a, StrHashElem *b );
 
-/* add new key/value to the list, create new entry if new key, 
+/* add new key/value to the list, create new entry if new key,
    overwrite if key exists */
 extern void StrHash_set( StrHash **pself, char *key, void *value );
 
@@ -74,9 +74,13 @@ extern BOOL StrHash_empty( StrHash *self );
 extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 
-/* 
+/*
 * $Log: strhash.h,v $
-* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/05 23:20:39  pauloscustodio
 * List, StrHash classlist and classhash receive the address of the container
 * object in all functions that add items to the container, and create the
 * container on first use. This allows a container to be staticaly

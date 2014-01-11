@@ -6,7 +6,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -77,7 +77,7 @@ DEF_CLASS_HASH(T);
 																			\
 	/* sort the items in the hash */										\
 	extern void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare );\
-
+ 
 /*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
@@ -217,11 +217,15 @@ DEF_CLASS_HASH(T);
 																			\
 		StrHash_sort( self->hash, compare );								\
 	}																		\
+ 
 
-
-/* 
+/*
 * $Log: classhash.h,v $
-* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/05 23:20:39  pauloscustodio
 * List, StrHash classlist and classhash receive the address of the container
 * object in all functions that add items to the container, and create the
 * container on first use. This allows a container to be staticaly

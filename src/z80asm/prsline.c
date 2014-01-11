@@ -12,209 +12,9 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.40 2014-01-11 00:10:39 pauloscustodio Exp $
 */
-
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.39 2013-12-15 19:01:07 pauloscustodio Exp $ */
-/* $Log: prsline.c,v $
-/* Revision 1.39  2013-12-15 19:01:07  pauloscustodio
-/* Move platform specific defines from types.h to config.h.
-/* Remove dependency of types.h from glib.h.
-/* Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
-/*
-/* Revision 1.38  2013/12/15 13:18:34  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.37  2013/10/04 23:31:50  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -IXIY, --swap-ix-iy
-/*
-/* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -R, --relocatable
-/* --RCMX000
-/*
-/* Revision 1.35  2013/09/08 00:43:59  pauloscustodio
-/* New error module with one error function per error, no need for the error
-/* constants. Allows compiler to type-check error message arguments.
-/* Included the errors module in the init() mechanism, no need to call
-/* error initialization from main(). Moved all error-testing scripts to
-/* one file errors.t.
-/*
-/* Revision 1.34  2013/09/01 18:45:35  pauloscustodio
-/* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
-/* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
-/*
-/* Revision 1.33  2013/08/29 22:01:20  pauloscustodio
-/* Accept ** as power  operator
-/*
-/* Revision 1.32  2013/05/12 19:39:32  pauloscustodio
-/* warnings
-/*
-/* Revision 1.31  2013/01/24 23:03:03  pauloscustodio
-/* Replaced (unsigned char) by (byte_t)
-/* Replaced (unisigned int) by (size_t)
-/* Replaced (short) by (int)
-/*
-/* Revision 1.30  2013/01/20 21:24:28  pauloscustodio
-/* Updated copyright year to 2013
-/*
-/* Revision 1.29  2012/11/03 17:39:36  pauloscustodio
-/* astyle, comments
-/*
-/* Revision 1.28  2012/05/26 18:51:10  pauloscustodio
-/* CH_0012 : wrappers on OS calls to raise fatal error
-/* CH_0013 : new errors interface to decouple calling code from errors.c
-/*
-/* Revision 1.27  2012/05/24 17:09:27  pauloscustodio
-/* Unify copyright header
-/*
-/* Revision 1.26  2012/05/20 06:39:27  pauloscustodio
-/* astyle
-/*
-/* Revision 1.25  2012/05/20 06:37:31  pauloscustodio
-/* Comments on unreachable cases in GetSym()
-/*
-/* Revision 1.24  2012/05/20 05:31:18  pauloscustodio
-/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
-/*
-/* Revision 1.23  2012/05/12 16:54:49  pauloscustodio
-/* temporary_start not used, removed
-/*
-/* Revision 1.22  2012/05/11 19:29:49  pauloscustodio
-/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-/*         --mode=c
-/*         --lineend=linux
-/*         --indent=spaces=4
-/*         --style=ansi --add-brackets
-/*         --indent-switches --indent-classes
-/*         --indent-preprocessor --convert-tabs
-/*         --break-blocks
-/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-/*         --align-pointer=name
-/*
-/* Revision 1.21  2011/08/05 19:59:51  pauloscustodio
-/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
-/*
-/* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
-/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-/*
-/* Revision 1.19  2011/07/12 22:47:59  pauloscustodio
-/* - Moved all error variables and error reporting code to a separate module errors.c,
-/*   replaced all extern declarations of these variables by include errors.h,
-/*   created symbolic constants for error codes.
-/* - Added test scripts for error messages.
-/*
-/* Revision 1.18  2011/07/11 16:07:16  pauloscustodio
-/* Moved all option variables and option handling code to a separate module options.c,
-/* replaced all extern declarations of these variables by include options.h.
-/*
-/* Revision 1.17  2011/07/09 18:25:35  pauloscustodio
-/* Log keyword in checkin comment was expanded inside Log expansion... recursive
-/* Added Z80asm banner to all source files
-/*
-/* Revision 1.16  2011/07/09 17:36:09  pauloscustodio
-/* Copied cvs log into Log history
-/*
-/* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
-/* Added Log keyword
-/*
-/* Revision 1.14  2011/07/09 01:23:13  pauloscustodio
-/* BUG_0001 : Error in expression during link, expression garbled - memory corruption?
-/*      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
-/*      compile with "z80asm -t4 -b test.asm"
-/*      fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
-/*                   Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
-/*      Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
-/*      When the expression is read from the OBJ file at the link phase, the '\0'
-/*      at the end of the expression field is interpreted as a random separator
-/*      because ssym[] contains fewer elements (27) than the separators string (28);
-/*      hence in some cases the expression is parsed correctly, e.g. without -t4
-/*      the program assembles correctly.
-/*      If the random separator is a semicolon, GetSym() calls Skipline() to go past
-/*      the comment, and reads past the end of the expression in the OBJ file,
-/*      causing the parse of the next expression to fail.
-/*
-/* Revision 1.13  2010/04/16 17:34:37  dom
-/* Make line number an int - 32768 lines isn't big enough...
-/*
-/* Revision 1.12  2009/08/14 22:23:12  dom
-/* clean up some compiler warnings
-/*
-/* Revision 1.11  2009/07/18 23:23:15  dom
-/* clean up the code a bit more (Formatting and a fewer magic numbers)
-/*
-/* Revision 1.10  2007/06/17 12:07:43  dom
-/* Commit the rabbit emulation code including rrd, rld
-/*
-/* Add a .vcproj for visual studio
-/*
-/* Revision 1.9  2007/02/28 11:23:24  stefano
-/* New platform !
-/* Rabbit Control Module 2000/3000.
-/*
-/* Revision 1.8  2002/04/22 14:45:51  stefano
-/* Removed the SLL L undocumented instructions from the Graph library.
-/* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
-/* MS Visual C compiler related fixes
-/* -IXIY option on Z80ASM to swap the IX and IY registers
-/*
-/* Revision 1.7  2002/01/18 21:12:17  dom
-/* 0x prefix allowed for hex constants
-/*
-/* Revision 1.6  2002/01/18 16:55:40  dom
-/* minor bug fix on the previous commit
-/*
-/* Revision 1.5  2002/01/18 16:53:13  dom
-/* added 'd' and 'b' identifiers for constants - decimal and binary
-/* respectively.
-/*
-/* Revision 1.4  2002/01/16 21:56:43  dom
-/* we now accept h as a post modifier for hex numbers eg:
-/*      ld      a,20h == ld a,$20 == ld a,32
-/*
-/* Revision 1.3  2001/04/11 09:48:18  dom
-/* Minor fix to allow labels to end in ':'
-/*
-/* Revision 1.2  2001/03/21 16:34:01  dom
-/* Added changes to allow labels to end in ':' and the prefix '.' isn't
-/* necessarily needed..this isn't guaranteed to be perfect so let me know
-/* of any problems and drop back to 1.0.18
-/*
-/* Revision 1.1  2000/07/04 15:33:30  dom
-/* branches:  1.1.1;
-/* Initial revision
-/*
-/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
-/* First import of z88dk into the sourceforge system <gulp>
-/*
-/* */
-
-/* $History: PRSLINE.C $ */
-/*  */
-/* *****************  Version 8  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 12:13 */
-/* Updated in $/Z80asm */
-/* Added Ascii Art "Z80asm" at top of source file. */
-/*  */
-/* *****************  Version 6  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 11:30 */
-/* Updated in $/Z80asm */
-/* "config.h" included before "symbol.h" */
-/*  */
-/* *****************  Version 4  ***************** */
-/* User: Gbs          Date: 17-04-99   Time: 0:30 */
-/* Updated in $/Z80asm */
-/* New GNU programming style C format. Improved ANSI C coding style */
-/* eliminating previous compiler warnings. New -o option. Asm sources file */
-/* now parsed even though any line feed standards (CR,LF or CRLF) are */
-/* used. */
-/*  */
-/* *****************  Version 2  ***************** */
-/* User: Gbs          Date: 20-06-98   Time: 15:02 */
-/* Updated in $/Z80asm */
-/* GetSym() and Skipline() improved with EOF handling. */
-
 
 #include "xmalloc.h"   /* before any other include */
 
@@ -360,27 +160,30 @@ GetSym( void )
         }
     }
 
-	/* special cases for composed separators */
-	switch ( c ) 
-	{
-	case '*':
-		c2 = GetChar( z80asmfile );
-		if ( c2 == '*' )
-		{
-			sym = power;
-			return sym;
-		}
-		else
-		{
-			if ( c2 != EOF )
-				UnGet( c2, z80asmfile );
-			sym = multiply;
-			return sym;
-		}
-	default:
-		/* continue */
-		;
-	}
+    /* special cases for composed separators */
+    switch ( c )
+    {
+    case '*':
+        c2 = GetChar( z80asmfile );
+
+        if ( c2 == '*' )
+        {
+            sym = power;
+            return sym;
+        }
+        else
+        {
+            if ( c2 != EOF )
+                UnGet( c2, z80asmfile );
+
+            sym = multiply;
+            return sym;
+        }
+
+    default:
+        /* continue */
+        ;
+    }
 
     instr = strchr( separators, c );
 
@@ -401,37 +204,37 @@ GetSym( void )
 
     switch ( c )
     {
-        case '$':
-            sym = hexconst;
-            break;
+    case '$':
+        sym = hexconst;
+        break;
 
-        case '@':
-        case '%':       /* not reached, as '%' is a separator */
-            sym = binconst;
-            break;
+    case '@':
+    case '%':       /* not reached, as '%' is a separator */
+        sym = binconst;
+        break;
 
-        case '#':       /* not reached, as '#' is a separator */
-            sym = name;
-            break;
+    case '#':       /* not reached, as '#' is a separator */
+        sym = name;
+        break;
 
-        default:
-            if ( isdigit( c ) )
+    default:
+        if ( isdigit( c ) )
+        {
+            sym = decmconst;      /* a decimal number found */
+        }
+        else
+        {
+            if ( isalpha( c ) || c == '_' )
             {
-                sym = decmconst;      /* a decimal number found */
+                sym = name;       /* an identifier found */
             }
             else
             {
-                if ( isalpha( c ) || c == '_' )
-                {
-                    sym = name;       /* an identifier found */
-                }
-                else
-                {
-                    sym = nil;        /* rubbish ... */
-                }
+                sym = nil;        /* rubbish ... */
             }
+        }
 
-            break;
+        break;
     }
 
     /* Read identifier until space or legal separator is found */
@@ -678,7 +481,7 @@ CheckCondition( void )
     char   *text = ident;
     size_t  len = strlen( text );
 
-    for ( i = 0; i < NUM_ELEMS(flags); i++ )
+    for ( i = 0; i < NUM_ELEMS( flags ); i++ )
     {
         if ( len != strlen( flags[i].name ) )
         {
@@ -709,51 +512,51 @@ CheckRegister8( void )
         {
             switch ( *ident )
             {
-                case 'A':
-                    return 7;
+            case 'A':
+                return 7;
 
-                case 'H':
-                    return 4;
+            case 'H':
+                return 4;
 
-                case 'B':
-                    return 0;
+            case 'B':
+                return 0;
 
-                case 'L':
-                    return 5;
+            case 'L':
+                return 5;
 
-                case 'C':
-                    return 1;
+            case 'C':
+                return 1;
 
-                case 'D':
-                    return 2;
+            case 'D':
+                return 2;
 
-                case 'E':
-                    return 3;
+            case 'E':
+                return 3;
 
-                case 'I':
+            case 'I':
+            {
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
-                    if ( ( opts.cpu & CPU_RABBIT ) )
-                    {
-                        error_illegal_ident();
-                        return -1;
-                    }
-
-                    return 8;
+                    error_illegal_ident();
+                    return -1;
                 }
 
-                case 'R':
-                {
-                    if ( ( opts.cpu & CPU_RABBIT ) )
-                    {
-                        error_illegal_ident();
-                        return -1;
-                    }
+                return 8;
+            }
 
-                    return 9;
+            case 'R':
+            {
+                if ( ( opts.cpu & CPU_RABBIT ) )
+                {
+                    error_illegal_ident();
+                    return -1;
                 }
 
-                case 'F':
-                    return 6;
+                return 9;
+            }
+
+            case 'F':
+                return 6;
             }
         }
         else
@@ -885,32 +688,32 @@ IndirectRegisters( void )
 
     switch ( reg16 )
     {
-        case REG16_BC:
-        case REG16_DE:
-        case REG16_HL:
-            if ( GetSym() == rparen )
-            {
-                /* (BC) | (DE) | (HL) | ? */
-                GetSym();
-                return ( reg16 );     /* indicate (BC), (DE), (HL) */
-            }
-            else
-            {
-                error_syntax();     /* Right bracket missing! */
-                return -1;
-            }
-
-        case REG16_IX:
-        case REG16_IY:
-            GetSym();                 /* prepare expression evaluation */
-            return ( reg16 );
-
-        case -1:                    /* sym could be a '+', '-' or a symbol... */
-            return 7;
-
-        default:
-            error_illegal_ident();
+    case REG16_BC:
+    case REG16_DE:
+    case REG16_HL:
+        if ( GetSym() == rparen )
+        {
+            /* (BC) | (DE) | (HL) | ? */
+            GetSym();
+            return ( reg16 );     /* indicate (BC), (DE), (HL) */
+        }
+        else
+        {
+            error_syntax();     /* Right bracket missing! */
             return -1;
+        }
+
+    case REG16_IX:
+    case REG16_IY:
+        GetSym();                 /* prepare expression evaluation */
+        return ( reg16 );
+
+    case -1:                    /* sym could be a '+', '-' or a symbol... */
+        return 7;
+
+    default:
+        error_illegal_ident();
+        return -1;
     }
 }
 
@@ -940,56 +743,261 @@ GetConstant( char *evalerr )
 
     switch ( ident[0] )
     {
-        case '@':
-        case '%':
-            if ( size > 8 )
+    case '@':
+    case '%':
+        if ( size > 8 )
+        {
+            *evalerr = 1;
+            return ( 0 );         /* max 8 bit */
+        }
+
+        for ( len = 1; len <= size; len++ )
+            if ( strchr( "01", ident[len] ) == NULL )
             {
                 *evalerr = 1;
-                return ( 0 );         /* max 8 bit */
+                return ( 0 );
             }
 
-            for ( len = 1; len <= size; len++ )
-                if ( strchr( "01", ident[len] ) == NULL )
-                {
-                    *evalerr = 1;
-                    return ( 0 );
-                }
-
-            /* convert ASCII binary to integer */
-            for ( len = size; len >= 1; len-- )
+        /* convert ASCII binary to integer */
+        for ( len = size; len >= 1; len-- )
+        {
+            if ( ident[len] == '1' )
             {
-                if ( ident[len] == '1' )
-                {
-                    intresult += bitvalue;
-                }
-
-                bitvalue <<= 1;       /* logical shift left & 16 bit 'adder' */
+                intresult += bitvalue;
             }
 
-            return ( intresult );
+            bitvalue <<= 1;       /* logical shift left & 16 bit 'adder' */
+        }
 
-        case '$':
-            for ( len = 1; len <= size; len++ )
-                if ( isxdigit( ident[len] ) == 0 )
-                {
-                    *evalerr = 1;
-                    return ( 0 );
-                }
+        return ( intresult );
 
-            sscanf( ( char * )( ident + 1 ), "%lx", &intresult );
-            return ( intresult );
+    case '$':
+        for ( len = 1; len <= size; len++ )
+            if ( isxdigit( ident[len] ) == 0 )
+            {
+                *evalerr = 1;
+                return ( 0 );
+            }
 
-        default:
-            for ( len = 0; len <= ( size - 1 ); len++ )
-                if ( isdigit( ident[len] ) == 0 )
-                {
-                    *evalerr = 1;
-                    return ( 0 );
-                }
+        sscanf( ( char * )( ident + 1 ), "%lx", &intresult );
+        return ( intresult );
 
-            return ( atol( ident ) );
+    default:
+        for ( len = 0; len <= ( size - 1 ); len++ )
+            if ( isdigit( ident[len] ) == 0 )
+            {
+                *evalerr = 1;
+                return ( 0 );
+            }
+
+        return ( atol( ident ) );
     }
 }
+
+/*
+* $Log: prsline.c,v $
+* Revision 1.40  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.39  2013/12/15 19:01:07  pauloscustodio
+* Move platform specific defines from types.h to config.h.
+* Remove dependency of types.h from glib.h.
+* Use NUM_ELEMS() instead of glib G_N_ELEMENTS().
+*
+* Revision 1.38  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.37  2013/10/04 23:31:50  pauloscustodio
+* Parse command line options via look-up tables:
+* -IXIY, --swap-ix-iy
+*
+* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -R, --relocatable
+* --RCMX000
+*
+* Revision 1.35  2013/09/08 00:43:59  pauloscustodio
+* New error module with one error function per error, no need for the error
+* constants. Allows compiler to type-check error message arguments.
+* Included the errors module in the init() mechanism, no need to call
+* error initialization from main(). Moved all error-testing scripts to
+* one file errors.t.
+*
+* Revision 1.34  2013/09/01 18:45:35  pauloscustodio
+* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
+* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
+*
+* Revision 1.33  2013/08/29 22:01:20  pauloscustodio
+* Accept ** as power  operator
+*
+* Revision 1.32  2013/05/12 19:39:32  pauloscustodio
+* warnings
+*
+* Revision 1.31  2013/01/24 23:03:03  pauloscustodio
+* Replaced (unsigned char) by (byte_t)
+* Replaced (unisigned int) by (size_t)
+* Replaced (short) by (int)
+*
+* Revision 1.30  2013/01/20 21:24:28  pauloscustodio
+* Updated copyright year to 2013
+*
+* Revision 1.29  2012/11/03 17:39:36  pauloscustodio
+* astyle, comments
+*
+* Revision 1.28  2012/05/26 18:51:10  pauloscustodio
+* CH_0012 : wrappers on OS calls to raise fatal error
+* CH_0013 : new errors interface to decouple calling code from errors.c
+*
+* Revision 1.27  2012/05/24 17:09:27  pauloscustodio
+* Unify copyright header
+*
+* Revision 1.26  2012/05/20 06:39:27  pauloscustodio
+* astyle
+*
+* Revision 1.25  2012/05/20 06:37:31  pauloscustodio
+* Comments on unreachable cases in GetSym()
+*
+* Revision 1.24  2012/05/20 05:31:18  pauloscustodio
+* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+*
+* Revision 1.23  2012/05/12 16:54:49  pauloscustodio
+* temporary_start not used, removed
+*
+* Revision 1.22  2012/05/11 19:29:49  pauloscustodio
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+*         --mode=c
+*         --lineend=linux
+*         --indent=spaces=4
+*         --style=ansi --add-brackets
+*         --indent-switches --indent-classes
+*         --indent-preprocessor --convert-tabs
+*         --break-blocks
+*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+*         --align-pointer=name
+*
+* Revision 1.21  2011/08/05 19:59:51  pauloscustodio
+* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+*
+* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
+* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+*
+* Revision 1.19  2011/07/12 22:47:59  pauloscustodio
+* - Moved all error variables and error reporting code to a separate module errors.c,
+*   replaced all extern declarations of these variables by include errors.h,
+*   created symbolic constants for error codes.
+* - Added test scripts for error messages.
+*
+* Revision 1.18  2011/07/11 16:07:16  pauloscustodio
+* Moved all option variables and option handling code to a separate module options.c,
+* replaced all extern declarations of these variables by include options.h.
+*
+* Revision 1.17  2011/07/09 18:25:35  pauloscustodio
+* Log keyword in checkin comment was expanded inside Log expansion... recursive
+* Added Z80asm banner to all source files
+*
+* Revision 1.16  2011/07/09 17:36:09  pauloscustodio
+* Copied cvs log into Log history
+*
+* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
+* Added Log keyword
+*
+* Revision 1.14  2011/07/09 01:23:13  pauloscustodio
+* BUG_0001 : Error in expression during link, expression garbled - memory corruption?
+*      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
+*      compile with "z80asm -t4 -b test.asm"
+*      fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
+*                   Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
+*      Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
+*      When the expression is read from the OBJ file at the link phase, the '\0'
+*      at the end of the expression field is interpreted as a random separator
+*      because ssym[] contains fewer elements (27) than the separators string (28);
+*      hence in some cases the expression is parsed correctly, e.g. without -t4
+*      the program assembles correctly.
+*      If the random separator is a semicolon, GetSym() calls Skipline() to go past
+*      the comment, and reads past the end of the expression in the OBJ file,
+*      causing the parse of the next expression to fail.
+*
+* Revision 1.13  2010/04/16 17:34:37  dom
+* Make line number an int - 32768 lines isn't big enough...
+*
+* Revision 1.12  2009/08/14 22:23:12  dom
+* clean up some compiler warnings
+*
+* Revision 1.11  2009/07/18 23:23:15  dom
+* clean up the code a bit more (Formatting and a fewer magic numbers)
+*
+* Revision 1.10  2007/06/17 12:07:43  dom
+* Commit the rabbit emulation code including rrd, rld
+*
+* Add a .vcproj for visual studio
+*
+* Revision 1.9  2007/02/28 11:23:24  stefano
+* New platform !
+* Rabbit Control Module 2000/3000.
+*
+* Revision 1.8  2002/04/22 14:45:51  stefano
+* Removed the SLL L undocumented instructions from the Graph library.
+* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
+* MS Visual C compiler related fixes
+* -IXIY option on Z80ASM to swap the IX and IY registers
+*
+* Revision 1.7  2002/01/18 21:12:17  dom
+* 0x prefix allowed for hex constants
+*
+* Revision 1.6  2002/01/18 16:55:40  dom
+* minor bug fix on the previous commit
+*
+* Revision 1.5  2002/01/18 16:53:13  dom
+* added 'd' and 'b' identifiers for constants - decimal and binary
+* respectively.
+*
+* Revision 1.4  2002/01/16 21:56:43  dom
+* we now accept h as a post modifier for hex numbers eg:
+*      ld      a,20h == ld a,$20 == ld a,32
+*
+* Revision 1.3  2001/04/11 09:48:18  dom
+* Minor fix to allow labels to end in ':'
+*
+* Revision 1.2  2001/03/21 16:34:01  dom
+* Added changes to allow labels to end in ':' and the prefix '.' isn't
+* necessarily needed..this isn't guaranteed to be perfect so let me know
+* of any problems and drop back to 1.0.18
+*
+* Revision 1.1  2000/07/04 15:33:30  dom
+* branches:  1.1.1;
+* Initial revision
+*
+* Revision 1.1.1.1  2000/07/04 15:33:30  dom
+* First import of z88dk into the sourceforge system <gulp>
+*
+*/
+
+/* $History: PRSLINE.C $ */
+/*  */
+/* *****************  Version 8  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 12:13 */
+/* Updated in $/Z80asm */
+/* Added Ascii Art "Z80asm" at top of source file. */
+/*  */
+/* *****************  Version 6  ***************** */
+/* User: Gbs          Date: 6-06-99    Time: 11:30 */
+/* Updated in $/Z80asm */
+/* "config.h" included before "symbol.h" */
+/*  */
+/* *****************  Version 4  ***************** */
+/* User: Gbs          Date: 17-04-99   Time: 0:30 */
+/* Updated in $/Z80asm */
+/* New GNU programming style C format. Improved ANSI C coding style */
+/* eliminating previous compiler warnings. New -o option. Asm sources file */
+/* now parsed even though any line feed standards (CR,LF or CRLF) are */
+/* used. */
+/*  */
+/* *****************  Version 2  ***************** */
+/* User: Gbs          Date: 20-06-98   Time: 15:02 */
+/* Updated in $/Z80asm */
+/* GetSym() and Skipline() improved with EOF handling. */
 
 /*
  * Local Variables:

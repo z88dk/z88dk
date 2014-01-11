@@ -3,7 +3,7 @@ Macros to help define init() and fini() functions per module
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.1 2013-12-15 23:31:04 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.2 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -54,7 +54,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.1 2013-12-15 23
 
 /*
 * $Log: init.h,v $
-* Revision 1.1  2013-12-15 23:31:04  pauloscustodio
+* Revision 1.2  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.1  2013/12/15 23:31:04  pauloscustodio
 * Replace code-generation for init() functions by macros in init.h
 * to help define init() and fini() functions per module.
 * Code generation complicates maintenance, as all the modules with init()

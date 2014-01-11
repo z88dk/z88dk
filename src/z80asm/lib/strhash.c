@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.2 2014-01-05 23:20:39 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.3 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -20,8 +20,8 @@ DEF_CLASS( StrHash );
 
 void StrHash_init( StrHash *self )
 {
-	self->hash = NULL;
-	self->count = 0;
+    self->hash = NULL;
+    self->count = 0;
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
@@ -29,18 +29,18 @@ void StrHash_copy( StrHash *self, StrHash *other )
     StrHashElem *elem, *tmp;
 
     /* create new hash and copy element by element from other */
-	self->hash = NULL;
-	self->count = 0;
+    self->hash = NULL;
+    self->count = 0;
 
     HASH_ITER( hh, other->hash, elem, tmp )
     {
-		StrHash_set( &self, elem->key, elem->value );
+        StrHash_set( &self, elem->key, elem->value );
     }
 }
 
 void StrHash_fini( StrHash *self )
 {
-	StrHash_remove_all( self );
+    StrHash_remove_all( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -50,8 +50,8 @@ void StrHash_remove_all( StrHash *self )
 {
     StrHashElem *elem, *tmp;
 
-	if ( self == NULL )
-		return;
+    if ( self == NULL )
+        return;
 
     HASH_ITER( hh, self->hash, elem, tmp )
     {
@@ -67,12 +67,12 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
     StrHashElem *elem;
     size_t  	 num_chars;
 
-	if ( self == NULL || key == NULL)
-		return NULL;
+    if ( self == NULL || key == NULL )
+        return NULL;
 
-	num_chars = strlen( key );
+    num_chars = strlen( key );
     HASH_FIND( hh, self->hash, key, num_chars, elem );
-	return elem;
+    return elem;
 }
 
 /*-----------------------------------------------------------------------------
@@ -80,17 +80,17 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
 *----------------------------------------------------------------------------*/
 void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 {
-	if ( self == NULL || elem == NULL)
-		return;
+    if ( self == NULL || elem == NULL )
+        return;
 
-	HASH_DEL( self->hash, elem );
+    HASH_DEL( self->hash, elem );
 
-	self->count--;
+    self->count--;
 
-	if ( self->free_data != NULL )
-		self->free_data( elem->value );
+    if ( self->free_data != NULL )
+        self->free_data( elem->value );
 
-	xfree( elem );
+    xfree( elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -99,32 +99,32 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 void StrHash_set( StrHash **pself, char *key, void *value )
 {
     StrHashElem *elem;
-	size_t num_chars;
+    size_t num_chars;
 
-	INIT_OBJ( StrHash, pself );
-	
-	elem = StrHash_find( *pself, key );
-	
-	/* create new element if not found, value is updated at the end */
-	if (elem == NULL) 
-	{						
-		elem = xnew(StrHashElem);
-		elem->key = strpool_add( key );
-		
-		/* add to hash, need to store elem->key instead of key, as it is invariant */
-		num_chars = strlen( key );
-		HASH_ADD_KEYPTR( hh, (*pself)->hash, elem->key, num_chars, elem );
-		
-		(*pself)->count++;
-	}
-	else 					/* element exists, free data of old value */
-	{	
-		if ( (*pself)->free_data != NULL )
-			(*pself)->free_data( elem->value );
-	}
-	
-	/* update value */
-	elem->value	     = value;
+    INIT_OBJ( StrHash, pself );
+
+    elem = StrHash_find( *pself, key );
+
+    /* create new element if not found, value is updated at the end */
+    if ( elem == NULL )
+    {
+        elem = xnew( StrHashElem );
+        elem->key = strpool_add( key );
+
+        /* add to hash, need to store elem->key instead of key, as it is invariant */
+        num_chars = strlen( key );
+        HASH_ADD_KEYPTR( hh, ( *pself )->hash, elem->key, num_chars, elem );
+
+        ( *pself )->count++;
+    }
+    else 					/* element exists, free data of old value */
+    {
+        if ( ( *pself )->free_data != NULL )
+            ( *pself )->free_data( elem->value );
+    }
+
+    /* update value */
+    elem->value	     = value;
 }
 
 /*-----------------------------------------------------------------------------
@@ -133,12 +133,13 @@ void StrHash_set( StrHash **pself, char *key, void *value )
 void *StrHash_get( StrHash *self, char *key )
 {
     StrHashElem *elem;
-	
-	elem = StrHash_find( self, key );
-	if ( elem != NULL ) 
-		return elem->value;
-	else
-		return NULL;
+
+    elem = StrHash_find( self, key );
+
+    if ( elem != NULL )
+        return elem->value;
+    else
+        return NULL;
 }
 
 /*-----------------------------------------------------------------------------
@@ -147,12 +148,13 @@ void *StrHash_get( StrHash *self, char *key )
 BOOL StrHash_exists( StrHash *self, char *key )
 {
     StrHashElem *elem;
-	
-	elem = StrHash_find( self, key );
-	if ( elem != NULL ) 
-		return TRUE;
-	else
-		return FALSE;
+
+    elem = StrHash_find( self, key );
+
+    if ( elem != NULL )
+        return TRUE;
+    else
+        return FALSE;
 }
 
 /*-----------------------------------------------------------------------------
@@ -161,9 +163,9 @@ BOOL StrHash_exists( StrHash *self, char *key )
 void StrHash_remove( StrHash *self, char *key )
 {
     StrHashElem *elem;
-	
-	elem = StrHash_find( self, key );
-	StrHash_remove_elem( self, elem );
+
+    elem = StrHash_find( self, key );
+    StrHash_remove_elem( self, elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -171,7 +173,7 @@ void StrHash_remove( StrHash *self, char *key )
 *----------------------------------------------------------------------------*/
 StrHashElem *StrHash_first( StrHash *self )
 {
-    return self == NULL ? NULL : (StrHashElem *)self->hash;
+    return self == NULL ? NULL : ( StrHashElem * )self->hash;
 }
 
 /*-----------------------------------------------------------------------------
@@ -179,7 +181,7 @@ StrHashElem *StrHash_first( StrHash *self )
 *----------------------------------------------------------------------------*/
 StrHashElem *StrHash_next( StrHashElem *iter )
 {
-	return iter == NULL ? NULL : (StrHashElem *)(iter)->hh.next;
+    return iter == NULL ? NULL : ( StrHashElem * )( iter )->hh.next;
 }
 
 /*-----------------------------------------------------------------------------
@@ -187,7 +189,7 @@ StrHashElem *StrHash_next( StrHashElem *iter )
 *----------------------------------------------------------------------------*/
 BOOL StrHash_empty( StrHash *self )
 {
-	return StrHash_first(self) == NULL ? TRUE : FALSE;
+    return StrHash_first( self ) == NULL ? TRUE : FALSE;
 }
 
 /*-----------------------------------------------------------------------------
@@ -195,16 +197,20 @@ BOOL StrHash_empty( StrHash *self )
 *----------------------------------------------------------------------------*/
 void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 {
-	if ( self == NULL )
-		return;
+    if ( self == NULL )
+        return;
 
-	HASH_SORT( self->hash, compare );
+    HASH_SORT( self->hash, compare );
 }
 
 
 /*
 * $Log: strhash.c,v $
-* Revision 1.2  2014-01-05 23:20:39  pauloscustodio
+* Revision 1.3  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.2  2014/01/05 23:20:39  pauloscustodio
 * List, StrHash classlist and classhash receive the address of the container
 * object in all functions that add items to the container, and create the
 * container on first use. This allows a container to be staticaly

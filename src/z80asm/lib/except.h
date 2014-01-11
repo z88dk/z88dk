@@ -1,14 +1,14 @@
-/* Copyright (C) 2009-2013 Francesco Nidito 
+/* Copyright (C) 2009-2013 Francesco Nidito
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
  * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions: 
+ * so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software. 
+ * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -16,19 +16,19 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 
 /* For the full documentation and explanation of the code below, please refer to
  * http://www.di.unipi.it/~nids/docs/longjump_try_trow_catch.html
  */
 
-/* 
+/*
  * Modified to allow THROW() from a called function
  *
  * Copyright (C) Paulo Custodio, 2011-2013
  *
- * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.h,v 1.1 2013-12-15 20:30:39 pauloscustodio Exp $
+ * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.h,v 1.2 2014-01-11 00:10:39 pauloscustodio Exp $
  */
 
 #pragma once
@@ -85,7 +85,11 @@ extern int     except_current_count;
 
 /*
 * $Log: except.h,v $
-* Revision 1.1  2013-12-15 20:30:39  pauloscustodio
+* Revision 1.2  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.1  2013/12/15 20:30:39  pauloscustodio
 * Move except.c to the z80asm/lib directory
 *
 * Revision 1.13  2013/12/15 13:18:33  pauloscustodio
@@ -119,7 +123,7 @@ extern int     except_current_count;
 * New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
 *
 * Revision 1.4  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
 * indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux

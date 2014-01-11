@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.4 2014-01-02 12:54:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.5 2014-01-11 00:10:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,27 +63,27 @@ static LIST_HEAD( MemBlockList, MemBlock ) mem_blocks = LIST_HEAD_INITIALIZER( m
 DEFINE_init()
 {
 #ifdef XMALLOC_DEBUG
-	warn( "xmalloc: init\n" );
+    warn( "xmalloc: init\n" );
 #endif
 
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
 #define REPORT_STDERR(reportType)   \
 			_CrtSetReportMode(reportType, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG); \
 			_CrtSetReportFile(reportType, _CRTDBG_FILE_STDERR )
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	REPORT_STDERR( _CRT_WARN );
-	REPORT_STDERR( _CRT_ERROR );
-	REPORT_STDERR( _CRT_ASSERT );
+    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+    REPORT_STDERR( _CRT_WARN );
+    REPORT_STDERR( _CRT_ERROR );
+    REPORT_STDERR( _CRT_ASSERT );
 #undef REPORT_STDERR
 
-	/* break on allocation Nr. XX */
-	/* _CrtSetBreakAlloc(86); */
+    /* break on allocation Nr. XX */
+    /* _CrtSetBreakAlloc(86); */
 #endif
 }
 
 void xmalloc_init( void )
 {
-	init();
+    init();
 }
 
 /*-----------------------------------------------------------------------------
@@ -102,12 +102,13 @@ DEFINE_fini()
     {
         block = LIST_FIRST( &mem_blocks );
 
-		/* free but do not report memory allocated with NULL file */
-		if ( block->file != NULL )
-		{
-			warn( "xmalloc %s(%d): leak (%u) allocated at %s(%d)\n",  
-				  __FILE__, __LINE__, block->client_size, block->file, block->lineno );
-		}
+        /* free but do not report memory allocated with NULL file */
+        if ( block->file != NULL )
+        {
+            warn( "xmalloc %s(%d): leak (%u) allocated at %s(%d)\n",
+                  __FILE__, __LINE__, block->client_size, block->file, block->lineno );
+        }
+
         _xfree( CLIENT_PTR( block ), __FILE__, __LINE__ );  /* deletes from list */
     }
 }
@@ -180,15 +181,15 @@ static void check_fences( MemBlock *block, char *file, int lineno )
     /* check fences */
     if ( 0 != memcmp( fence, START_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( "xmalloc %s(%d): buffer underflow, allocated at %s(%d)\n", 
-			 file, lineno, block->file, block->lineno );
+        die( "xmalloc %s(%d): buffer underflow, allocated at %s(%d)\n",
+             file, lineno, block->file, block->lineno );
         /* not reached */
     }
 
     if ( 0 != memcmp( fence, END_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( "xmalloc %s(%d): buffer overflow, allocated at %s(%d)\n", 
-			 file, lineno, block->file, block->lineno );
+        die( "xmalloc %s(%d): buffer overflow, allocated at %s(%d)\n",
+             file, lineno, block->file, block->lineno );
         /* not reached */
     }
 }
@@ -200,8 +201,8 @@ void *_xmalloc( size_t client_size, char *file, int lineno )
 {
     MemBlock *block;
 
-	init();
-	
+    init();
+
     block = new_block( client_size, file, lineno );
     return CLIENT_PTR( block );
 }
@@ -213,8 +214,8 @@ void _xfree( void *client_ptr, char *file, int lineno )
 {
     MemBlock *block;
 
-	init();
-	
+    init();
+
     /* if input is NULL, do nothing */
     if ( client_ptr == NULL )
     {
@@ -224,8 +225,8 @@ void _xfree( void *client_ptr, char *file, int lineno )
     block = find_block( client_ptr, file, lineno );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n", 
-		  file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
+    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n",
+          file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
 #endif
 
     /* delete from list to avoid recursion atexit() if overflow */
@@ -241,7 +242,7 @@ void _xfree( void *client_ptr, char *file, int lineno )
 /* to use when a function pointer compatible with free() is expected */
 void xfreef( void *memptr )
 {
-	_xfree( memptr, __FILE__, __LINE__);
+    _xfree( memptr, __FILE__, __LINE__ );
 }
 
 
@@ -254,8 +255,8 @@ void *_xcalloc( int num, size_t size, char *file, int lineno )
     size_t   client_size;
     void     *client_ptr;
 
-	init();
-	
+    init();
+
     client_size = num * size;
     block       = new_block( client_size, file, lineno );
     client_ptr  = CLIENT_PTR( block );
@@ -274,8 +275,8 @@ char *_xstrdup( char *source, char *file, int lineno )
     size_t   client_size;
     void     *client_ptr;
 
-	init();
-	
+    init();
+
     client_size = strlen( source ) + 1;
     block       = new_block( client_size, file, lineno );
     client_ptr  = CLIENT_PTR( block );
@@ -294,8 +295,8 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
     MemBlock *block;
     size_t   block_size;
 
-	init();
-	
+    init();
+
     /* if input is NULL, behave as malloc */
     if ( client_ptr == NULL )
     {
@@ -306,8 +307,8 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
     block = find_block( client_ptr, file, lineno );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n", 
-		  file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
+    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n",
+          file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
 #endif
 
     /* delete from list as realloc may move block */
@@ -347,9 +348,13 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 }
 
 
-/* 
+/*
 * $Log: xmalloc.c,v $
-* Revision 1.4  2014-01-02 12:54:39  pauloscustodio
+* Revision 1.5  2014-01-11 00:10:39  pauloscustodio
+* Astyle - format C code
+* Add -Wall option to CFLAGS, remove all warnings
+*
+* Revision 1.4  2014/01/02 12:54:39  pauloscustodio
 * Add xfreef() function compatible with free() for use as function pointer.
 *
 * Revision 1.3  2013/12/18 01:16:36  pauloscustodio
@@ -395,7 +400,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 * Renamed xfree0() to xfree().
 *
 * Revision 1.3  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs,
 * indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
