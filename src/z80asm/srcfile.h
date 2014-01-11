@@ -12,47 +12,71 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Handles reading lines from source files, allowing recursive inclusion of files.
+Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.7 2014-01-11 01:06:33 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.6 2013-12-30 02:05:32 pauloscustodio Exp $ */
-/* $Log: srcfile.h,v $
-/* Revision 1.6  2013-12-30 02:05:32  pauloscustodio
-/* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-/* handles both dynamically allocated strings and fixed-size strings.
-/* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-/* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-/*
-/* Revision 1.5  2013/12/26 23:42:27  pauloscustodio
-/* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
-/*
-/* Revision 1.4  2013/12/15 13:18:34  pauloscustodio
-/* Move memory allocation routines to lib/xmalloc, instead of glib,
-/* introduce memory leak report on exit and memory fence check.
-/*
-/* Revision 1.3  2013/10/05 10:54:36  pauloscustodio
-/* Parse command line options via look-up tables:
-/* -I, --inc-path
-/* -L, --lib-path
-/*
-/* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
-/* Add API to handle a stack of open sorce files and singleton API
-/*
-/* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
-/* New srcfile.c to handle reading lines from source files
-/*
-/*
-/*
-/* */
-
-#ifndef SRCFILE_H
-#define SRCFILE_H
+#pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
+#include "list.h"
+#include "strutil.h"
+#include <stdio.h>
+
+/*-----------------------------------------------------------------------------
+*   Class to hold current source file
+*----------------------------------------------------------------------------*/
+CLASS( SrcFile )
+FILE	*fp;					/* open file */
+char	*filename;				/* source file name, held in strpool */
+int		 line_nr;				/* current line number, i.e. last returned */
+Str		*line;					/* current input line, i.e. last returned */
+
+List	*line_stack;			/* stack of input lines to read by getline()
+									   before reading next line from the file.
+									   Next line read is on the top of the stack */
+END_CLASS;
+
+
+/*
+* $Log: srcfile.h,v $
+* Revision 1.7  2014-01-11 01:06:33  pauloscustodio
+* -Wall comments
+*
+* Revision 1.6  2013/12/30 02:05:32  pauloscustodio
+* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
+* handles both dynamically allocated strings and fixed-size strings.
+* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
+* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
+*
+* Revision 1.5  2013/12/26 23:42:27  pauloscustodio
+* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
+*
+* Revision 1.4  2013/12/15 13:18:34  pauloscustodio
+* Move memory allocation routines to lib/xmalloc, instead of glib,
+* introduce memory leak report on exit and memory fence check.
+*
+* Revision 1.3  2013/10/05 10:54:36  pauloscustodio
+* Parse command line options via look-up tables:
+* -I, --inc-path
+* -L, --lib-path
+*
+* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
+* Add API to handle a stack of open sorce files and singleton API
+*
+* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
+* New srcfile.c to handle reading lines from source files
+*
+*/
+
+#ifndef SRCFILE_H
+#define SRCFILE_H
+
 #include "classlist.h"
 #include "strutil.h"
 #include "types.h"
@@ -63,19 +87,6 @@ Allows pushing back of lines, for example to expand macros.
 *----------------------------------------------------------------------------*/
 CLASS_LIST( Str );
 
-/*-----------------------------------------------------------------------------
-*   Class to hold current source file
-*----------------------------------------------------------------------------*/
-CLASS( SourceFile )
-	char	*filename;				/* source file name, held in strpool */
-	FILE	*file;					/* open file */
-	Str		*line;					/* current input line, i.e. last returned */
-	int		 line_nr;				/* current line number, i.e. last returned */
-
-	StrList	*line_stack;			/* stack of input lines to read by getline()
-									   before reading next line from the file.
-									   Next line read is on the top of the stack */
-END_CLASS;
 
 
 /*-----------------------------------------------------------------------------
@@ -92,8 +103,8 @@ extern void SourceFile_open( SourceFile *self, char *source_file );
    Returns NULL on end of file, and closes the file */
 extern char *SourceFile_getline( SourceFile *self );
 
-/* push lines to the line_stack, to be read next - they need to be pushed 
-   in reverse order, i.e. last pushed is next to be retrieved 
+/* push lines to the line_stack, to be read next - they need to be pushed
+   in reverse order, i.e. last pushed is next to be retrieved
    line may contain multiple lines separated by '\n', they are split and
    pushed back-to-forth so that first text is first to retrieve from getline() */
 extern void SourceFile_ungetline( SourceFile *self, char *line );

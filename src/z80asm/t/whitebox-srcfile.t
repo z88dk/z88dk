@@ -13,7 +13,60 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.25 2014-01-11 01:06:33 pauloscustodio Exp $
+#
 # Test srcfile
+
+use Modern::Perl;
+use Test::More;
+use File::Slurp;
+use Capture::Tiny 'capture';
+use Test::Differences; 
+
+my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
+	"lib/list.c lib/strutil.c lib/class.c lib/xmalloc.c lib/die.c";
+
+write_file("test.c", <<'END');
+#include "srcfile.h"
+#include "die.h"
+
+#define ERROR die("Test failed at line %d\n", __LINE__)
+
+int main()
+{
+	SrcFile *file;
+	
+	file = OBJ_NEW( SrcFile );
+	
+	OBJ_DELETE( file );
+	
+	return 0;
+}
+END
+
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", "", 0);
+
+
+unlink <test.*>;
+done_testing;
+
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
+
+exit 0;
+
+
+
+
 
 use Modern::Perl;
 use Test::More;
@@ -32,8 +85,8 @@ struct module *CURRENTMODULE;
 FILE *errfile;
 size_t get_PC( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
-char *CreateLibfile( char *filename ) {}
-char *GetLibfile( char *filename ) {}
+char *CreateLibfile( char *filename ) {return NULL;}
+char *GetLibfile( char *filename ) {return NULL;}
 Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
 char ident[MAXLINE];
 char separators[MAXLINE];
@@ -98,9 +151,9 @@ t_compile_module($init_code, <<'END', $objs);
 	SourceFileList *lst;
 	char *line;
 	
-	StrList_push(&opts.inc_path, "x1");
-	StrList_push(&opts.inc_path, "x2");
-	StrList_push(&opts.inc_path, "x3");
+	List_push(&opts.inc_path, "x1");
+	List_push(&opts.inc_path, "x2");
+	List_push(&opts.inc_path, "x3");
 	
 	src = OBJ_NEW( SourceFile );
 	if (strcmp(src->filename, "")) 			ERROR;
@@ -373,9 +426,9 @@ t_compile_module($init_code, <<'END', $objs);
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-		StrList_push(&opts.inc_path, "x1");
-		StrList_push(&opts.inc_path, "x2");
-		StrList_push(&opts.inc_path, "x3");
+		List_push(&opts.inc_path, "x1");
+		List_push(&opts.inc_path, "x2");
+		List_push(&opts.inc_path, "x3");
 		
 		lst = OBJ_NEW( SourceFileList );
 		if (lst->count != 0) ERROR;
@@ -478,10 +531,11 @@ unlink_testfiles('f0');
 done_testing;
 
 
-__END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.24 2013-12-30 02:05:34 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.24  2013-12-30 02:05:34  pauloscustodio
+# Revision 1.25  2014-01-11 01:06:33  pauloscustodio
+# -Wall comments
+#
+# Revision 1.24  2013/12/30 02:05:34  pauloscustodio
 # Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 # handles both dynamically allocated strings and fixed-size strings.
 # Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
