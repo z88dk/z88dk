@@ -17,7 +17,7 @@
 
 XLIB asm_vsnprintf
 
-LIB asm0_vfprintf_unlocked, asm_memset, asm_memcpy, l_minu_bc_hl
+LIB asm0_vfprintf_unlocked, asm_memset, asm_memcpy, l_minu_bc_hl, l_neg_hl
 
 asm_vsnprintf:
 

@@ -32,7 +32,7 @@ __stdio_verify_output:
    push de
    push hl
    
-   call asm0_fflush
+   call asm0_fflush_unlocked
    
    pop hl
    pop de

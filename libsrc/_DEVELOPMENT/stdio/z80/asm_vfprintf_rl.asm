@@ -874,10 +874,9 @@ _error_stream:
    call l_utod_hl              ; hl = max $7fff
 
    inc hl
-   call l_neg_hl               ; hl = - (chars out + 1) < 0
-
+   
    scf                         ; indicate error
-   ret
+   jp l_neg_hl                 ; hl = - (chars out + 1) < 0
 
 error_printf_converter:
 

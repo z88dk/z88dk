@@ -48,7 +48,7 @@ asm_clearerr_unlocked:
    ;         carry reset
    ;
    ; uses  : af, bc, de, hl
-   
+
    ld a,(ix+3)
    and $e7                     ; clear eof and err bits
    ld (ix+3),a

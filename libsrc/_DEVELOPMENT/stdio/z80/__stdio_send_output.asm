@@ -133,7 +133,7 @@ __stdio_send_output_buffer:
 __stdio_send_output:
 
    ; write chars to stream
-   ; all output from high level stdio passes through this function
+   ; all output from vfprintf passes through this function
    ;
    ; enter : ix  = FILE *
    ;         hl' = output tally (num chars output so far) 
