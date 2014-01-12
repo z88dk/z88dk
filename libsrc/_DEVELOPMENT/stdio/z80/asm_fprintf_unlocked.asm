@@ -10,8 +10,14 @@
 ; ===============================================================
 
 XLIB asm_fprintf_unlocked
+XDEF asm_printf_unlocked
 
 LIB asm_vfprintf_unlocked, asm_fprintf_common
+XREF __FILE_STDOUT
+
+asm_printf_unlocked:
+
+   ld ix,__FILE_STDOUT
 
 asm_fprintf_unlocked:
 

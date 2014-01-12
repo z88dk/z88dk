@@ -10,8 +10,14 @@
 ; ===============================================================
 
 XLIB asm_fprintf
+XDEF asm_printf
 
 LIB asm_vfprintf, asm_fprintf_common
+XREF __FILE_STDOUT
+
+asm_printf:
+
+   ld ix,__FILE_STDOUT
 
 asm_fprintf:
 

@@ -24,7 +24,7 @@ asm_obstack_vprintf:
    ;
    ;         success
    ;
-   ;            hl   = strlen(s)
+   ;            hl   = strlen(genrated s)
    ;            hl'  = address of terminating '\0' in obstack
    ;            carry reset
    ;
