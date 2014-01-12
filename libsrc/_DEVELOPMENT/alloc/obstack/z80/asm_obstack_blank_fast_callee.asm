@@ -12,14 +12,7 @@
 ;
 ; ===============================================================
 
-XLIB obstack_blank_fast_callee
-XDEF asm_obstack_blank_fast
-
-obstack_blank_fast_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
+XLIB asm_obstack_blank_fast
 
 asm_obstack_blank_fast:
 

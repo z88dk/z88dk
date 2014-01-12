@@ -15,16 +15,10 @@
 ;
 ; ===============================================================
 
-XLIB obstack_blank_callee
-XDEF asm_obstack_blank, asm0_obstack_blank
+XLIB asm_obstack_blank
+XDEF asm0_obstack_blank
 
 LIB asm_obstack_room, error_enomem_zc
-
-obstack_blank_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
 
 asm_obstack_blank:
 

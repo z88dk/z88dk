@@ -9,10 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB obstack_base
-XDEF asm_obstack_base
+XLIB asm_obstack_base
 
-obstack_base:
 asm_obstack_base:
 
    ; enter : hl = struct obstack *ob

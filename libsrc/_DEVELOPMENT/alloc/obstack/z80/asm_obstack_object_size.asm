@@ -3,23 +3,20 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; size_t obstack_room(struct obstack *ob)
+; size_t obstack_object_size(struct obstack *ob)
 ;
-; Number of free bytes available in the obstack.
+; Return the size in bytes of the currently growing object.
 ;
 ; ===============================================================
 
-XLIB obstack_room
-XDEF asm_obstack_room
+XLIB asm_obstack_object_size
 
-obstack_room:
-asm_obstack_room:
+asm_obstack_object_size:
 
    ; enter : hl = struct obstack *ob
    ;
-   ; exit  : hl = number of bytes available in obstack
-   ;         de = ob->fence
-   ;         carry reset
+   ; exit  : hl = size of currently growing object
+   ;         z flag set if there is no growing object
    ;
    ; uses  : af, de, hl
    
@@ -27,13 +24,14 @@ asm_obstack_room:
    inc hl
    ld d,(hl)                   ; de = ob->fence
    inc hl
-   inc hl
-   inc hl
+   
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a                      ; hl = ob->end
+   ld l,a                      ; hl = ob->object
    
+   ex de,hl
+
    or a
    sbc hl,de
    ret

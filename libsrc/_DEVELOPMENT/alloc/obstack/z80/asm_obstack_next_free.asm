@@ -9,10 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB obstack_next_free
-XDEF asm_obstack_next_free
+XLIB asm_obstack_next_free
 
-obstack_next_free:
 asm_obstack_next_free:
 
    ; enter : hl = struct obstack *ob

@@ -11,17 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB obstack_align_to_callee
-XDEF asm_obstack_align_to
+XLIB asm_obstack_align_to
 
 LIB asm_obstack_align_distance, asm0_obstack_blank
 LIB error_einval_zc, error_enomem_zc, error_zc
-
-obstack_align_to_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
 
 asm_obstack_align_to:
 

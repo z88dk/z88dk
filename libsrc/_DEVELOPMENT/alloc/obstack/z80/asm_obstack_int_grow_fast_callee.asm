@@ -3,40 +3,38 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *obstack_1grow_fast(struct obstack *ob, char c)
+; void *obstack_int_grow_fast(struct obstack *ob, int data)
 ;
-; Append char c to the growing object, no bounds check made.
+; Append int to the growing object, no bounds check is made.
 ;
 ; ===============================================================
 
-XLIB obstack_1grow_fast_callee
-XDEF asm_obstack_1grow_fast
+XLIB asm_obstack_int_grow_fast
 
-obstack_1grow_fast_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
-   ld a,c
-
-asm_obstack_1grow_fast:
+asm_obstack_int_grow_fast:
 
    ; enter : hl = struct obstack *ob
-   ;          a = char c
+   ;         bc = int data
    ;
    ; exit  : hl = struct obstack *ob
    ;
    ; uses  : de
-
+   
    ld e,(hl)
    inc hl
    ld d,(hl)                   ; de = ob->fence
    
-   ld (de),a                   ; write char
-   inc de
+   ex de,hl
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; append int to object
+   inc hl
+   
+   ex de,hl
    
    ld (hl),d
    dec hl
-   ld (hl),e                   ; ob->fence++
+   ld (hl),e                   ; ob->fence += 2
    
    ret

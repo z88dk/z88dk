@@ -3,26 +3,18 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; int obstack_grow(struct obstack *ob, void *data, size_t size)
+; int obstack_grow0(struct obstack *ob, void *data, size_t size)
 ;
 ; Grow the current object by appending size bytes read from
-; address data.
+; address data followed by a NUL char.
 ;
 ; ===============================================================
 
-XLIB obstack_grow_callee
-XDEF asm_obstack_grow
+XLIB asm_obstack_grow0
 
-LIB asm0_obstack_blank, asm_memcpy
+LIB asm0_obstack_blank, error_enomem_zc
 
-obstack_grow_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
-
-asm_obstack_grow:
+asm_obstack_grow0:
 
    ; enter : hl = struct obstack *ob
    ;         bc = size_t size
@@ -32,7 +24,8 @@ asm_obstack_grow:
    ;
    ;            carry reset
    ;            hl = non-zero
-   ;            de = address of byte following grown area
+   ;            de = address of terminating NUL
+   ;
    ;
    ;         fail on insufficient memory
    ;
@@ -41,9 +34,20 @@ asm_obstack_grow:
    ;
    ; uses  : af, bc, de, hl
 
+   inc bc                      ; make space for NUL
+   ld a,b
+   or c
+   jp z, error_enomem_zc       ; we really have to check for this case :(
+   
    push de                     ; save data
    call asm0_obstack_blank     ; de = & allocated bytes
    pop hl                      ; hl = data
    ret c
+
+   call asm_memcpy
    
-   jp asm_memcpy
+   dec de
+   xor a
+   ld (de),a                   ; terminate with NUL
+
+   ret

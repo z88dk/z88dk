@@ -15,16 +15,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_free_callee
-XDEF asm_obstack_free
+XLIB asm_obstack_free
 
 LIB error_einval_zc
-
-obstack_free_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
 
 asm_obstack_free:
 

@@ -10,16 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_alloc_callee
-XDEF asm_obstack_alloc
+XLIB asm_obstack_alloc
 
 LIB asm0_obstack_blank
-
-obstack_alloc_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
 
 asm_obstack_alloc:
 

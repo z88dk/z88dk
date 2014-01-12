@@ -10,17 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_init_callee
-XDEF asm_obstack_init
+XLIB asm_obstack_init
 
 LIB error_einval_zc
-
-obstack_init_callee:
-
-   pop hl
-   pop bc
-   pop de
-   push hl
    
 asm_obstack_init:
 

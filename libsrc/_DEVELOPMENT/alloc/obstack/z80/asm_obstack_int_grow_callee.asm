@@ -3,27 +3,20 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *obstack_1grow(struct obstack *ob, char c)
+; void *obstack_int_grow(struct obstack *ob, int data)
 ;
-; Append char c to the growing object.
+; Append int to the growing object.
 ;
 ; ===============================================================
 
-XLIB obstack_1grow_callee
-XDEF asm_obstack_1grow
+XLIB asm_obstack_int_grow
 
 LIB asm_obstack_room, error_enomem_zc
 
-obstack_1grow_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
-   
-asm_obstack_1grow:
+asm_obstack_int_grow:
 
    ; enter : hl = struct obstack *ob
-   ;          c = char c
+   ;         bc = int data
    ;
    ; exit  : success
    ;
@@ -39,18 +32,31 @@ asm_obstack_1grow:
 
    push hl                     ; save ob
    
-   call asm_obstack_room       ; de = ob->fence
-   jp z, error_enomem_zc - 1
+   call asm_obstack_room       ; de = ob->fence, hl = available bytes
    
-   ld a,c
-   ld (de),a                   ; append char to object
-   inc de
+   ld a,h
+   or a
+   jr nz, enough_space
+
+   ld a,l
+   cp 2
+   jp c, error_enomem_zc - 1
+
+enough_space:
    
+   ex de,hl                    ; hl = ob->fence
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; append int to object
+   inc hl
+   
+   ex de,hl                    ; de = new fence
    pop hl                      ; hl = ob
    
    ld (hl),e
    inc hl
-   ld (hl),d                   ; ob->fence++
+   ld (hl),d                   ; ob->fence = new fence
    dec hl
    
    ret

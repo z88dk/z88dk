@@ -15,10 +15,8 @@
 ;
 ; ===============================================================
 
-XLIB obstack_finish
-XDEF asm_obstack_finish
+XLIB asm_obstack_finish
 
-obstack_finish:
 asm_obstack_finish:
 
    ; enter : hl = struct obstack *ob

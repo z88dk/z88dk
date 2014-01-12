@@ -11,17 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_copy_callee
-XDEF asm_obstack_copy
+XLIB asm_obstack_copy
 
 LIB asm_obstack_alloc, asm_memcpy
-
-obstack_copy_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
 
 asm_obstack_copy:
 

@@ -10,16 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_align_distance_callee
-XDEF asm_obstack_align_distance
+XLIB asm_obstack_align_distance
 
 LIB l_power_2_bc, error_einval_mc, error_znc, l_andc_hlbc
-
-obstack_align_distance_callee:
-
-   pop hl
-   pop bc
-   ex (sp),hl
 
 asm_obstack_align_distance:
 

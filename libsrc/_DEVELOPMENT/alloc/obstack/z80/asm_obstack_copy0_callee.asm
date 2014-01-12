@@ -11,17 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB obstack_copy0_callee
-XDEF asm_obstack_copy0
+XLIB asm_obstack_copy0
 
 LIB asm_obstack_alloc, asm_memcpy, error_enomem_zc
-
-obstack_copy0_callee:
-
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
 
 asm_obstack_copy0:
 
