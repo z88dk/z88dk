@@ -21,6 +21,7 @@ asm_memswap:
    ; exit  : hl = void *s1
    ;         de = ptr in s2 to byte after last one written
    ;         bc = 0
+   ;         carry reset
    ;
    ; uses  : af, bc, de
 
