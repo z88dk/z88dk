@@ -20,7 +20,7 @@
 ; results in the lowest upper bound on stack usage at O(lg n).
 ; Four bytes per recursive iteration is reserved on the stack.
 ;
-; The biggest improvements that can be made is to resort to
+; The biggest improvement that can be made is to resort to
 ; insertion sort for few items, followed by selecting a pivot
 ; from a widespread sample of three or more pivot options.
 ;
@@ -28,7 +28,7 @@
 
 XLIB asm_qsort
 
-LIB l_mulu_16_16x16, asm_memswap, l_jpix, error_zc
+LIB l_mulu_16_16x16, asm_memswap, l_jpix, error_einval_zc, error_erange_zc
 LIB l_ltu_de_hl, l_ltu_hl_de, l_ltu_bc_hl
 
 asm_qsort:
@@ -39,6 +39,11 @@ asm_qsort:
    ;         de = size_t size
    ;
    ; exit  : none
+   ;
+   ;         if an error below occurs, no sorting is done.
+   ;
+   ;         einval if array size > 64k
+   ;         erange if array wraps 64k boundary
    ;
    ; uses  : af, bc, de, hl, compare function
 
@@ -53,12 +58,12 @@ asm_qsort:
    call l_mulu_16_16x16        ; hl = hl * de = (nmemb - 1) * size
    
    pop de                      ; de = lo (base)
-   jp c, error_zc - 1          ; if multiply overflowed
+   jp c, error_einval_zc - 1   ; if multiply overflowed
    
    add hl,de                   ; hl = hi (address of last item)
    pop bc                      ; bc = size
    
-   jp c, error_zc              ; if address out of range
+   jp c, error_erange_zc       ; if address out of range
    
    push hl
    ld hl,0                     ; mark end of stack with 0
@@ -170,7 +175,7 @@ right_loop:
    push de                     ; push j
 
 ;******************************
-IF __ORDER_PARAM_RL
+IF __PARAM_ORDER_RL
 ;******************************
 
    push ix
