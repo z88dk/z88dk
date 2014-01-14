@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.195 2013-12-05 09:34:00 stefano Exp $
+# $Id: Makefile,v 1.196 2014-01-14 07:48:40 stefano Exp $
 
 
 include Make.config
@@ -1444,6 +1444,7 @@ sos_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd sos ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
+	cd fcntl ; $(MAKE) lgendos ; cd ..
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:

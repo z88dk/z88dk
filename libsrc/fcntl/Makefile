@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2012-03-08 07:16:45 stefano Exp $
+# $Id: Makefile,v 1.17 2014-01-14 07:48:40 stefano Exp $
 
 lcpc:
 	cd cpc ; $(MAKE) ; cd ..
@@ -31,6 +31,12 @@ lpps:
 	@echo ''
 	cd sprinter ; $(MAKE) ; cd ..
 
+lgendos:
+	@echo ''
+	@echo '---> Generic Random Access File library <---'
+	@echo ''
+	cd gen_rnd ; $(MAKE) ; cd ..
+
 lzxvgs:
 	cd zxvgs ; $(MAKE) ; cd ..
 
@@ -41,6 +47,7 @@ lcpcold:
 clean:
 	cd cpm ; $(MAKE) clean ; cd ..
 	cd dummy ; $(MAKE) clean ; cd ..
+	cd gen_rnd ; $(MAKE) clean ; cd ..
 	cd spectrum ; $(MAKE) clean ; cd ..
 	cd newbrain ; $(MAKE) clean ; cd ..
 	cd sprinter ; $(MAKE) clean ; cd ..
@@ -48,3 +55,4 @@ clean:
 	cd zxvgs ; $(MAKE) clean ; cd ..
 	cd cpc ; $(MAKE) clean ; cd ..
 	cd osca ; $(MAKE) clean ; cd ..
+	cd sos ; $(MAKE) clean ; cd ..

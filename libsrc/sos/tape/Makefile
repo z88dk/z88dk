@@ -1,12 +1,14 @@
 #
 # Makefile for S-OS
 #
-# $Id: Makefile,v 1.1 2013-12-05 09:34:01 stefano Exp $
+# $Id: Makefile,v 1.2 2014-01-14 07:48:41 stefano Exp $
 #
 
 include ../../Make.config
 
 CIAFILES = \
+	rnd_saveblock.c \
+	rnd_loadblock.c \
 	tape_save.c \
 	tape_save_block.c \
 	tape_load.c \

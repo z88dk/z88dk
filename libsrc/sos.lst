@@ -21,6 +21,8 @@ sos/sos_ropen.asm
 sos/sos_wopen.asm
 sos/sos_rdd.asm
 sos/sos_wrd.asm
+sos/tape/rnd_saveblock
+sos/tape/rnd_loadblock
 sos/tape/tape_save.asm
 sos/tape/tape_save_block.asm
 sos/tape/tape_load.asm
