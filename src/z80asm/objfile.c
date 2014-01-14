@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.14 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.15 2014-01-14 23:53:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,6 +27,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.14 2014-01-11 01
 #include "strpool.h"
 #include "strutil.h"
 #include "legacy.h"
+
+#include <sys/stat.h>
+
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -199,7 +202,10 @@ ObjFile *ObjFile_read( char *filename, FILE *libfile )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.14  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.15  2014-01-14 23:53:53  pauloscustodio
+* Missing include
+*
+* Revision 1.14  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
