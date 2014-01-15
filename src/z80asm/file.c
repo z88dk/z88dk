@@ -14,66 +14,167 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.43 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.44 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "file.h"
-#include "listfile.h"
-#include "options.h"
+
+#include "init.h"
 #include "strpool.h"
-#include "errors.h"
-
-#if 0
-/*-----------------------------------------------------------------------------
-*   Initialize and Terminate functions called by init()
-*----------------------------------------------------------------------------*/
-void struct_File_init( struct File *self, char *filename, char *mode )
-{
-    FILE *fp     = xfopen( filename, mode );
-    BOOL writing = strchr( mode, 'w' ) ? TRUE : FALSE;
-
-    /* init structure */
-    self->fp		= fp;
-    self->filename	= strpool_add( filename );
-    self->text		= g_string_new( "" );
-    self->writing	= writing;
-}
-
-void struct_File_fini( struct File *self )
-{
-    if ( self->fp )
-    {
-        close_File( self );
-
-        /* delete file if writing */
-        if ( self->writing )
-            unlink( self->filename );
-    }
-
-    /* free string and data */
-    if ( self->text )
-    {
-        g_string_free( self->text, TRUE );
-        self->text = NULL;
-    }
-
-}
+#include "strutil.h"
+#include "types.h"
+#include "uthash.h"
 
 /*-----------------------------------------------------------------------------
-*   close an open file
-*   if not called, delete_File() will delete a file open for writing
+*	Keep hash table of FILE* to opened files for error messages
 *----------------------------------------------------------------------------*/
-void close_File( struct File *self )
+typedef struct OpenFileElem
 {
-    if ( self->fp )
+    FILE    *file; 					/* file pointer returned by fopen */
+    char    *filename;				/* file name kept in strpool.h */
+	BOOL	 writing;				/* TRUE if writing, FALSE if reading */
+
+    UT_hash_handle hh;      		/* hash table */
+
+} OpenFileElem;
+
+OpenFileElem *open_files = NULL;	/* singleton */
+
+/*-----------------------------------------------------------------------------
+*	Initialize and terminate module
+*----------------------------------------------------------------------------*/
+DEFINE_init()
+{
+	strpool_init();
+	
+	open_files = NULL;
+}
+
+DEFINE_fini()
+{
+    OpenFileElem *elem, *tmp;
+
+    HASH_ITER( hh, open_files, elem, tmp )
     {
-        xfclose( self->fp );
-        self->fp = NULL;
+        HASH_DEL( open_files, elem );
+        xfree( elem );
     }
 }
-#endif
+
+/*-----------------------------------------------------------------------------
+*	Add open files to hash table
+*	hash items are only deleted on end of program, to be able to show error
+* 	messages after xfclose
+*----------------------------------------------------------------------------*/
+static void add_open_file( FILE *file, char *filename, BOOL writing )
+{
+    OpenFileElem *elem;
+
+	init();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files, &file, elem );
+
+    if ( elem )
+    {
+        /* found, replace entry */
+        elem->filename 	= strpool_add( filename );
+		elem->writing	= writing;
+    }
+    else
+    {
+        /* new, create hash entry */
+        elem = xnew( OpenFileElem );
+        elem->file 		= file;
+        elem->filename 	= strpool_add( filename );
+		elem->writing	= writing;
+
+        HASH_ADD_PTR( open_files, file, elem );
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*	Search open file by file handle
+*----------------------------------------------------------------------------*/
+static OpenFileElem *get_open_file( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files, &file, elem );
+
+    return elem;
+}
+
+/*-----------------------------------------------------------------------------
+*	Fatal error handling
+*----------------------------------------------------------------------------*/
+static ferr_callback_t ferr_callback = NULL;		/* default handler */
+
+/* set call-back for input/output error; return old call-back */
+ferr_callback_t set_ferr_callback( ferr_callback_t func )
+{
+	ferr_callback_t old;
+
+	init();
+	
+	old = ferr_callback;
+	ferr_callback = func;
+
+	return old;
+}
+
+/* call fatal error for a file */
+static void fatal_ferr_filename( char *filename, BOOL writing )
+{
+	init();
+
+	/* call call-back, if any */
+	if (ferr_callback != NULL)
+		ferr_callback( filename, writing );
+	
+	/* safety net - abort if no call-back registered */
+	die("Error: cannot %s file '%s'\n", writing ? "write" : "read", filename );
+}
+
+static void fatal_ferr( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???",
+						 elem ? elem->writing  : FALSE );
+}
+
+static void fatal_ferr_read( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???", FALSE );
+}
+
+static void fatal_ferr_write( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???", TRUE );
+}
+
+
+
+
 
 /*-----------------------------------------------------------------------------
 *   TODO: remove old interface down this line
@@ -84,115 +185,42 @@ void close_File( struct File *self )
 
 
 
-#include "class.h"
-#include "config.h"
-#include "file.h"
-#include "strpool.h"
-#include "strutil.h"
-#include "uthash.h"
-#include <sys/stat.h>
-#include <sys/types.h>
 
-/*-----------------------------------------------------------------------------
-*	Keep hash table of FILE* to file names for error messages
-*----------------------------------------------------------------------------*/
-typedef struct OpenFileElem
-{
-    FILE    *file; 					/* file pointer returned by fopen */
-    char    *filename;				/* file name kept in strpool.h */
 
-    UT_hash_handle hh;      		/* hash table */
 
-} OpenFileElem;
 
-CLASS( OpenFile )
-OpenFileElem *hash;				/* keep hash of all open files */
-END_CLASS;
-
-DEF_CLASS( OpenFile );
-
-void OpenFile_init( OpenFile *self ) { }
-
-void OpenFile_copy( OpenFile *self, OpenFile *other ) { }
-
-void OpenFile_fini( OpenFile *self )
-{
-    OpenFileElem *elem, *tmp;
-
-    HASH_ITER( hh, self->hash, elem, tmp )
-    {
-        HASH_DEL( self->hash, elem );
-        xfree( elem );
-    }
-}
-
-static OpenFile *open_files = NULL;	/* sigleton */
-
-#define init_open_files()	( open_files == NULL ? (open_files = OBJ_NEW( OpenFile )) : open_files )
-
-/* file names are only deleted on end of program, to be able to show error message on 2nd fclose */
-static void add_filename( FILE *file, char *filename )
-{
-    OpenFileElem *elem;
-
-    init_open_files();
-
-    /* check if file exists already */
-    HASH_FIND_PTR( open_files->hash, &file, elem );
-
-    if ( elem )
-    {
-        /* found, replace name */
-        elem->filename 	= strpool_add( filename );
-    }
-    else
-    {
-        /* new, create hash entry */
-        elem = xnew( OpenFileElem );
-        elem->file 		= file;
-        elem->filename 	= strpool_add( filename );
-
-        HASH_ADD_PTR( open_files->hash, file, elem );
-    }
-}
-
-static char *get_filename( FILE *file )
-{
-    OpenFileElem *elem;
-
-    init_open_files();
-
-    /* check if file exists already */
-    HASH_FIND_PTR( open_files->hash, &file, elem );
-
-    return elem ? elem->filename : "???";
-}
 
 /*-----------------------------------------------------------------------------
 *   File open and close
 *----------------------------------------------------------------------------*/
 FILE *xfopen( char *filename, char *mode )
 {
-    FILE *file = fopen( filename, mode );
+    FILE *file;
+	BOOL writing;
+
+	init();
+	
+	writing = strchr( mode, 'r' ) ? FALSE : TRUE;
+	file = fopen( filename, mode );
 
     if ( file == NULL )
-    {
-        if ( strchr( mode, 'r' ) )
-            fatal_read_file( filename );
-        else
-            fatal_write_file( filename );
-    }
+		fatal_ferr_filename( filename, writing );
+	else 
+		add_open_file( file, filename, writing );	/* never deleted from hash */
 
-    add_filename( file, filename );		/* never deleted from hash */
-    return file;
+	return file;
 }
 
 void xfclose( FILE *file )
 {
-    int result = fclose( file );
+    int result;
+
+	init();
+	
+	result = fclose( file );
 
     if ( result < 0 )
-        fatal_close_file( get_filename( file ) );
+        fatal_ferr( file );
 }
 
 /*-----------------------------------------------------------------------------
@@ -200,27 +228,39 @@ void xfclose( FILE *file )
 *----------------------------------------------------------------------------*/
 void xfwrite( const void *buffer, size_t size, size_t count, FILE *file )
 {
-    size_t written = fwrite( buffer, size, count, file );
+    size_t written;
+
+	init();
+	
+	written = fwrite( buffer, size, count, file );
 
     if ( written != count )
-        fatal_write_file( get_filename( file ) );
+        fatal_ferr_write( file );
 }
 
 void xfread( void *buffer, size_t size, size_t count, FILE *file )
 {
-    size_t read = fread( buffer, size, count, file );
+    size_t read;
+
+	init();
+	
+	read = fread( buffer, size, count, file );
 
     if ( read != count )
-        fatal_read_file( get_filename( file ) );
+        fatal_ferr_read( file );
 }
 
 void xfput_char( const char *buffer, size_t len, FILE *file )
 {
+	init();
+	
     xfwrite( buffer, sizeof( char ), len, file );
 }
 
 void xfget_char( char *buffer, size_t len, FILE *file )
 {
+	init();
+	
     xfread( buffer, sizeof( char ), len, file );
 }
 
@@ -229,25 +269,37 @@ void xfget_char( char *buffer, size_t len, FILE *file )
 *----------------------------------------------------------------------------*/
 void xfput_u8( int value, FILE *file )
 {
-    int result = fputc( value, file );
+    int result;
+
+	init();
+	
+	result = fputc( value, file );
 
     if ( result < 0 )
-        fatal_write_file( get_filename( file ) );
+        fatal_ferr_write( file );
 }
 
 int xfget_u8( FILE *file )
 {
-    int result = getc( file );
+    int result;
+
+	init();
+	
+	result = getc( file );
 
     if ( result < 0 )
-        fatal_read_file( get_filename( file ) );
+        fatal_ferr_read( file );
 
     return result;
 }
 
 int xfget_i8( FILE *file )
 {
-    int result = xfget_u8( file );
+    int result;
+
+	init();
+	
+	result = xfget_u8( file );
 
     if ( result & 0x80 )
         result |= ~ 0xFF;
@@ -265,12 +317,18 @@ void xfput_u16( int value, FILE *file )
         ( value & 0x00FF ) >> 0,
         ( value & 0xFF00 ) >> 8
     };
+
+	init();
+	
     xfput_char( buffer, sizeof( buffer ), file );
 }
 
 int xfget_u16( FILE *file )
 {
     char buffer[2];
+
+	init();
+	
     xfget_char( buffer, sizeof( buffer ), file );
     return
         ( ( buffer[0] << 0 ) & 0x00FF ) |
@@ -279,7 +337,11 @@ int xfget_u16( FILE *file )
 
 int xfget_i16( FILE *file )
 {
-    int result = xfget_u16( file );
+    int result;
+
+	init();
+	
+	result = xfget_u16( file );
 
     if ( result & 0x8000 )
         result |= ~ 0xFFFF;
@@ -299,6 +361,9 @@ void xfput_u32( long value, FILE *file )
         ( char )( ( value & 0x00FF0000 ) >> 16 ),
         ( char )( ( value & 0xFF000000 ) >> 24 )
     };
+
+	init();
+	
     xfput_char( buffer, sizeof( buffer ), file );
 }
 
@@ -306,6 +371,8 @@ long xfget_u32( FILE *file )
 {
     char buffer[4];
 
+	init();
+	
     xfget_char( buffer, sizeof( buffer ), file );
     return
         ( ( buffer[0] << 0 ) & 0x000000FF ) |
@@ -316,7 +383,11 @@ long xfget_u32( FILE *file )
 
 long xfget_i32( FILE *file )
 {
-    long result = xfget_u32( file );
+    long result;
+
+	init();
+	
+	result = xfget_u32( file );
 
     if ( result & 0x80000000L )		/* BUG_0021: sign extend if bit 31 is on */
         result |= ~ 0xFFFFFFFFL;
@@ -329,13 +400,17 @@ long xfget_i32( FILE *file )
 *----------------------------------------------------------------------------*/
 void xfput_sstr( Str *str, FILE *file )
 {
+	init();
+	
     xfput_char( str->str, str->len, file );
 }
 
 void xfget_sstr( Str *str, size_t len, FILE *file )
 {
+	init();
+	
     if ( len + 1 > str->size )
-        fatal_read_file( get_filename( file ) ); /* too long */
+        fatal_ferr_read( file ); /* too long */
 
     xfget_char( str->str, len, file );				/* characters */
     str->str[len] = '\0';								/* terminate string */
@@ -349,8 +424,10 @@ void xfget_sstr( Str *str, size_t len, FILE *file )
 /* read/write Str byte-counted strings (1 byte size + string chars) with error check */
 void xfput_c1sstr( Str *str, FILE *file )
 {
+	init();
+	
     if ( str->len > 0xFF )
-        fatal_write_file( get_filename( file ) );					/* too long */
+        fatal_ferr_write( file );					/* too long */
 
     xfput_u8( str->len, file );							/* byte count */
     xfput_sstr( str, file );									/* characters */
@@ -358,15 +435,21 @@ void xfput_c1sstr( Str *str, FILE *file )
 
 void xfget_c1sstr( Str *str, FILE *file )
 {
-    size_t len = xfget_u8( file );								/* byte count */
+	size_t len;
+	
+	init();
+	
+    len = xfget_u8( file );								/* byte count */
     xfget_sstr( str, len, file );
 }
 
 /* read/write Str word-counted strings (2 bytes size + string chars) with error check */
 void xfput_c2sstr( Str *str, FILE *file )
 {
+	init();
+	
     if ( str->len > 0xFFFF )
-        fatal_write_file( get_filename( file ) );					/* too long */
+        fatal_ferr_write( file );					/* too long */
 
     xfput_u16( str->len, file );							/* word count */
     xfput_sstr( str, file );									/* characters */
@@ -374,14 +457,22 @@ void xfput_c2sstr( Str *str, FILE *file )
 
 void xfget_c2sstr( Str *str, FILE *file )
 {
-    size_t len = xfget_u16( file );								/* word count */
+	size_t len;
+
+	init();
+	
+    len = xfget_u16( file );								/* word count */
     xfget_sstr( str, len, file );
 }
 
 
 /*
 * $Log: file.c,v $
-* Revision 1.43  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.44  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.43  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

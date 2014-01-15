@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-:Header: /cvsroot/z88dk/z88dk/src/z80asm/scan.rl,v 1.9 2014/01/11 00:10:39 pauloscustodio Exp $ 
+:Header: /cvsroot/z88dk/z88dk/src/z80asm/scan.rl,v 1.10 2014/01/11 01:29:40 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -7648,6 +7648,10 @@ void Skipline( void )
 
 /*
 * :Log: scan.rl,v $
+* Revision 1.10  2014/01/11 01:29:40  pauloscustodio
+* Extend copyright to 2014.
+* Move CVS log to bottom of file.
+*
 * Revision 1.9  2014/01/11 00:10:39  pauloscustodio
 * Astyle - format C code
 * Add -Wall option to CFLAGS, remove all warnings

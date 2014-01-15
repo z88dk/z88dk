@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.34 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.35 2014-01-15 00:01:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,6 +29,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.34 2014-01-11 01:
 #include "types.h"
 #include "init.h"
 #include <stdio.h>
+
+static void fatal_file_error( char *filename, BOOL writing );
 
 /*-----------------------------------------------------------------------------
 *   Singleton data
@@ -62,8 +64,12 @@ DEFINE_init()
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
 
-    /* init ErrorFile */
-    error_file.errors = OBJ_NEW( StrHash );	/* initialize, force StrHash to init before */
+    /* init ErrorFile
+	   initialize, force StrHash to init before */
+    error_file.errors = OBJ_NEW( StrHash );	
+	
+	/* init file error handling */
+	set_ferr_callback( fatal_file_error );
 }
 
 DEFINE_fini()
@@ -73,6 +79,11 @@ DEFINE_fini()
 
     /* delete hash table */
     OBJ_DELETE( error_file.errors );
+}
+
+void errors_init( void ) 
+{
+	init();
 }
 
 /*-----------------------------------------------------------------------------
@@ -262,10 +273,27 @@ static void do_error( enum ErrType err_type, char *message )
 #include "errors_def.h"
 #undef ERR
 
+/*-----------------------------------------------------------------------------
+*   fatal file error handling
+*----------------------------------------------------------------------------*/
+static void fatal_file_error( char *filename, BOOL writing )
+{
+	init();
+	
+	if ( writing )
+		fatal_write_file( filename );
+	else
+		fatal_read_file( filename );
+}
+
 
 /*
 * $Log: errors.c,v $
-* Revision 1.34  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.35  2014-01-15 00:01:39  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.34  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

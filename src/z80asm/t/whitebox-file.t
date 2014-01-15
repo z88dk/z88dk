@@ -204,6 +204,8 @@ t_compile_module($init, <<'END', $objs);
 	long fpos;
 	struct stat filestat;
 	
+	errors_init();
+	
 	TITLE("xfopen");
 	TRY_NOK( file = xfopen("test1xxxx.bin", "rb") );
 	TRY_NOK( file = xfopen("x/x/x/x/test1.bin", "wb") );
@@ -496,7 +498,7 @@ Error: cannot write file 'x/x/x/x/test1.bin'
 
 ---- TEST: xfclose ----
 
-Error: cannot close file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfwrite ----
 
@@ -652,9 +654,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.35 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.36 2014-01-15 00:01:40 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.35  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.36  2014-01-15 00:01:40  pauloscustodio
+# Decouple file.c from errors.c by adding a call-back mechanism in file for
+# fatal errors, setup by errors_init()
+#
+# Revision 1.35  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

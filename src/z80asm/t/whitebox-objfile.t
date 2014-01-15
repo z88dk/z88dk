@@ -50,6 +50,8 @@ t_compile_module($init, <<'END', $objs);
 	FILE	*file;
 	int 	code_size;
 	
+	errors_init();
+
 	code_size = atoi(argv[1]);
 	
 	TITLE("File not found, test mode");	
@@ -200,9 +202,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.21 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.22 2014-01-15 00:01:40 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.21  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.22  2014-01-15 00:01:40  pauloscustodio
+# Decouple file.c from errors.c by adding a call-back mechanism in file for
+# fatal errors, setup by errors_init()
+#
+# Revision 1.21  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

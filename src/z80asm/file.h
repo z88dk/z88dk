@@ -14,37 +14,28 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.32 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.33 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "strutil.h"
 #include "types.h"
 
-#if 0
+#include <stdio.h>
+
 /*-----------------------------------------------------------------------------
-*   Object representing an open file
-*	Files open for writing and not closed are removed on exit, to avoid
-*	having half-created files left over on errors.
+*   File input/output
+*	Register callbacks to be used on fatal read/write of a file.
 *----------------------------------------------------------------------------*/
-typedef struct File
-{
-    FILE	*fp;			/* open file handle */
-    char	*filename;		/* name of file, kept in strpool */
-    GString	*text;			/* reading text buffer */
-    BOOL	 writing;		/* TRUE if writing, FALSE if reading */
-}
-File;
+typedef void (*ferr_callback_t)(char *filename, BOOL writing);
 
-extern void struct_File_init( File *self, char *filename, char *mode );
-extern void struct_File_fini( File *self );
+/* set call-back for input/output error; return old call-back */
+extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
 
-/* close an open file
-   if not called, delete_File() will delete a file open for writing */
-extern void close_File( File *self );
-#endif
+
 
 
 
@@ -56,11 +47,7 @@ extern void close_File( File *self );
 
 
 
-#include "config.h"
-#include "strutil.h"
-#include "types.h"
-#include <stdio.h>
-#include <sys/stat.h>
+
 
 
 /* OS interface with fatal errors on failure */
@@ -101,7 +88,11 @@ extern void   xfget_c2sstr( Str *str, FILE *file );
 
 /*
 * $Log: file.h,v $
-* Revision 1.32  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.33  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.32  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

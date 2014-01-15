@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.4 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.5 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -11,6 +11,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.4 2014-01-1
 #include "xmalloc.h"   /* before any other include */
 #include "list.h"
 #include "strutil.h"
+#include "types.h"
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -42,23 +43,14 @@ extern void path_basename( Str *dest, char *filename );
 extern void path_search( Str *dest, char *filename, List *dir_list );
 extern char *search_file( char *filename, List *dir_list );	/* returned string in strpool */
 
-/*-----------------------------------------------------------------------------
-*   File input/output
-*	Register callbacks to be used on fatal read/write of a file.
-*	In case of error, functions call the registered call-back and then return
-*	FALSE or NULL.
-*----------------------------------------------------------------------------*/
-
-/* set call-back for input/output error; return old call-back */
-typedef void (*file_io_err_f)(char *filename);
-
-extern file_io_err_f file_set_rerr_callback( file_io_err_f func );
-extern file_io_err_f file_set_werr_callback( file_io_err_f func );
-
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.4  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.5  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

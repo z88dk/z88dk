@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.23 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.24 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -28,7 +28,6 @@ ERR( ErrInfo,	info_total_errors( void ),				"%d errors occurred during assembly"
 /* fatal errors */
 ERR( ErrFatal,	fatal_read_file( char *filename ),		"cannot read file '%s'" _C_ filename )
 ERR( ErrFatal,	fatal_write_file( char *filename ),		"cannot write file '%s'" _C_ filename )
-ERR( ErrFatal,	fatal_close_file( char *filename ),		"cannot close file '%s'" _C_ filename )
 ERR( ErrFatal,	fatal_include_recursion( char *filename ), "cannot include file '%s' recursively" _C_ filename )
 
 /* command line parsing errors */
@@ -81,7 +80,11 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.23  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.24  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.23  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.24 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.25 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,6 +26,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.24 2014-01-11 01:
 #include <stdio.h>
 
 enum ErrType { ErrInfo, ErrWarn, ErrError, ErrFatal };
+
+/*-----------------------------------------------------------------------------
+*	initialize error module
+*----------------------------------------------------------------------------*/
+extern void errors_init( void );
 
 /*-----------------------------------------------------------------------------
 *	define the next FILE, LINENO, MODULE to use in error messages
@@ -60,7 +65,11 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.24  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.25  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.24  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

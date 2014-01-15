@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.130 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.131 2014-01-15 00:01:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -668,6 +668,8 @@ int main( int argc, char *argv[] )
 {
     ListElem *iter;
 
+	errors_init();						/* setup error handler */
+
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
@@ -757,7 +759,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.130  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.131  2014-01-15 00:01:40  pauloscustodio
+* Decouple file.c from errors.c by adding a call-back mechanism in file for
+* fatal errors, setup by errors_init()
+*
+* Revision 1.130  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
