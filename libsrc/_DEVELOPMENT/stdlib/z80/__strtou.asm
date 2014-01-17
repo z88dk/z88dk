@@ -1,0 +1,293 @@
+
+XLIB __strtou
+
+LIB l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix, l_char2num
+LIB l_mulu_24_16x8, l_eat_digits, l_atou, l_htou, l_otou, l_btou
+
+__strtou:
+
+   ; _strtoi, _strtou helper
+   ;
+   ; enter : bc = base
+   ;         de = char **endp
+   ;         hl = char *
+   ;
+   ; exit  : carry reset indicates no error
+   ;
+   ;              a = 0 (number not negated) or 1 (number negated)
+   ;             hl = result
+   ;             de = char * (& next unconsumed char in string)
+   ;
+   ;         carry set indicates error, a holds error code
+   ;
+   ;              a = 0/-1 for invalid string, -2 for invalid base
+   ;             hl = 0
+   ;             de = original char *
+   ;
+   ;              a = 3/2 indicates unsigned overflow
+   ;             de = char * (& next unconsumed char following number)
+   ;
+   ;              a = 1 indicates signed overflow
+   ;             de = char * (& next unconsumed char following number)
+   ;
+   ; uses  : af, bc, de, hl
+
+   ld a,d
+   or e
+   jr z, no_endp
+
+   ; have char **endp
+   
+   push de                     ; save char **endp
+   call no_endp
+   
+   ; strtou() done, now we must write endp
+   
+   ; de = char * (first uninterpretted char)
+   ; hl = result
+   ;  a = error code
+   ; carry set = overflow or error
+   ; stack = char **endp
+   
+   ex (sp),hl
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   pop hl
+   ret
+
+no_endp:
+
+   call l_valid_base
+   
+   ld c,a                      ; c = base
+   ld e,l
+   ld d,h                      ; de = original char *
+   
+   jr z, valid_base            ; accept base == 0
+   jr nc, invalid_base
+   
+valid_base:
+
+   ; de = original char *
+   ; hl = char *
+   ;  c = base
+   
+   call l_eat_ws               ; skip whitespace
+   call l_eat_sign             ; carry set if negative
+   jr nc, positive
+   
+   ; negative sign found
+   
+   call positive
+   
+   ; return here to negate result
+   
+   ; de = char * (first uninterpretted char)
+   ; hl = result
+   ;  a = error code
+   ; carry set = overflow or error
+   
+   dec a                       ; indicate negate applied (if error occurred)
+   ret c                       ; return if error
+   
+   ; successful conversion, check for signed overflow
+   
+   bit 7,h
+   jr nz, signed_overflow
+   
+   call l_neg_hl
+   ld a,1
+   ret
+
+signed_overflow:
+
+   ld a,1                      ; indicate signed overflow
+   scf
+   ret
+
+positive:
+
+   ; de = original char *
+   ; hl = char *
+   ;  c = base
+
+   ld a,c                      ; a = base
+   call l_eat_base_prefix
+   ld c,a                      ; c = base
+   
+   ; there must be at least one valid digit
+   
+   ld a,(hl)
+   call l_char2num
+   jr c, invalid_input
+   
+   cp c
+   jr nc, invalid_input
+   
+   ; there is special code for base 2, 8, 10, 16
+   
+   ld e,a
+   ld a,c
+   
+   ex de,hl
+   
+   cp 10
+   jr z, decimal
+   
+   cp 16
+   jr z, hex
+   
+   cp 8
+   jr z, octal
+   
+   cp 2
+   jr z, binary
+   
+   ; use generic algorithm
+   
+   ; de = char *
+   ;  c = base
+   ;  l = first numerical digit
+   
+   inc de
+   ld h,0
+   
+loop:
+
+   ; hl = result
+   ; de = char *
+   ;  c = base
+   
+   ; get next digit
+   
+   ld a,(de)
+   call l_char2num
+   jr c, number_complete       ; if not valid digit
+   
+   cp c
+   jr nc, number_complete      ; if not valid digit
+   
+   inc de                      ; consume char
+   
+   ; multiply pending result by base
+   
+   ld b,a                      ; b = digit
+   push bc                     ; save digit and base
+   push de                     ; save char *
+   
+   ld a,c                      ; a = base
+   call l_mulu_24_16x8         ; AHL = HL * A
+   
+   pop de                      ; de = char *
+   pop bc                      ; bc = digit and base
+   
+   or a                        ; result confined to 16 bits ?
+   jr nz, unsigned_overflow
+   
+   ld a,b                      ; a = digit to add
+   
+   ; add digit to result
+   
+   add a,l
+   ld l,a
+   jp nc, loop
+   
+   inc h
+   jp nz, loop
+
+unsigned_overflow:
+
+   ; de = char * (next unconsumed char)
+   ;  c = base
+
+   ; consume the entire number before reporting error
+
+   ex de,hl                    ; hl = char *
+   call l_eat_digits
+   
+   ex de,hl
+   ld a,3
+   scf
+   
+   ; de = char * (next unconsumed char)
+   ;  a = 3
+   ; carry set for error
+   
+   ret
+
+invalid_base:
+
+   call invalid_input
+   
+   ld a,-2
+   ret
+
+invalid_input:
+
+   ; de = original char *
+
+   xor a
+   ld l,a
+   ld h,a
+   scf
+
+   ; de = original char *
+   ; hl = 0
+   ;  a = 0 (error invalid input string)
+   ; carry set for error
+
+   ret
+
+number_complete:
+
+   ; hl = result
+   ; de = char *
+
+   xor a                       ; carry reset no error
+   ret
+
+
+decimal:
+
+   ; de = char *
+
+   call l_atou
+   jr c, unsigned_overflow
+
+   xor a
+   ret
+
+
+hex:
+
+   ; de = char *
+   
+   call l_htou
+   jr c, unsigned_overflow
+   
+   xor a
+   ret
+
+
+octal:
+
+   ; de = char *
+   
+   call l_otou
+   jr c, unsigned_overflow
+   
+   xor a
+   ret
+
+
+binary:
+
+   ; de = char *
+   
+   call l_btou
+   jr c, unsigned_overflow
+   
+   xor a
+   ret
