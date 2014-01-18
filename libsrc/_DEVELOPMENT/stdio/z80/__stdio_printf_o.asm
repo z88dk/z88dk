@@ -1,7 +1,7 @@
 
 XLIB __stdio_printf_o
 
-LIB __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_utoo
+LIB __stdio_printf_number_tail_uint
 
 __stdio_printf_o:
 
@@ -16,29 +16,5 @@ __stdio_printf_o:
    ;
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
 
-   ; read uint to convert
-   
-   call __stdio_nextarg_hl     ; hl = uint
-   
-   or h
-   jp z, __stdio_printf_number_zero  ; if uint is zero
-   
-   ; convert uint to ascii buffer
-   
-   push de                     ; save buffer_digits
-   
-   call l_utoo                 ; convert uint in hl to ascii digits in buffer at de
-   
-   pop hl
-   ex de,hl                    ; de = buffer_digits
-   
-   or a
-   sbc hl,de
-   ld c,l
-   ld b,h                      ; bc = num_sz = number of digits in ascii string
-      
-   ; ix = FILE *
-   ; bc = num_sz
-   ; stack = buffer_digits, width, precision
-   
-   jp __stdio_printf_number_tail
+   ld bc,8                     ; base 8 conversion
+   jp __stdio_printf_number_tail_uint

@@ -2,7 +2,7 @@
 XLIB __stdio_printf_ld
 XDEF __stdio_printf_li
 
-LIB __stdio_nextarg_de, __stdio_nextarg_hl, __stdio_printf_number_tail, __stdio_printf_number_zero, l_neg_dehl, l_ultoa
+LIB __stdio_printf_number_tail_long
 
 __stdio_printf_ld:
 __stdio_printf_li:
@@ -18,64 +18,5 @@ __stdio_printf_li:
    ;
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
 
-   ld c,e
-   ld b,d                      ; bc = void *buffer_digits
-
-   ; read long to convert
-   
-   call __stdio_nextarg_de     ; de = MSW of long
-   call __stdio_nextarg_hl     ; hl = LSW of long
-      
-   or h
-   or e
-   or d
-   jp z, __stdio_printf_number_zero  ; if integer is zero
-
-;******************************
-IF __PARAM_ORDER_RL
-;******************************
-
-   ex de,hl                    ; dehl = long
-
-;******************************
-ENDIF
-;******************************
-
-   ; integer negative ?
-   
-   bit 7,d
-   jr z, positive              ; if integer is positive
-   
-   set 7,(ix+5)                ; set negative flag
-   call l_neg_dehl             ; change to positive for conversion
-   
-positive:
-
-   ; convert integer to ascii buffer
-   
-   push bc                     ; save buffer_digits
-   
-   exx
-   push bc
-   push hl
-   exx
-   
-   call l_ultoa                ; convert integer in dehl to ascii digits in buffer at bc
-   
-   exx
-   pop hl
-   pop bc
-   exx
-   
-   pop hl
-   ex de,hl                    ; de = buffer_digits
-   
-   sbc hl,de
-   ld c,l
-   ld b,h                      ; bc = num_sz = number of digits in ascii string
-      
-   ; ix = FILE *
-   ; bc = num_sz
-   ; stack = buffer_digits, width, precision
-   
-   jp __stdio_printf_number_tail
+   ld bc,10                    ; base 10 conversion
+   jp __stdio_printf_number_tail_long

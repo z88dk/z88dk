@@ -1,7 +1,7 @@
 
 XLIB __stdio_verify_output
 
-LIB error_eacces_mc, asm0_fflush
+LIB error_eacces_mc, error_mc, asm0_fflush
 
 __stdio_verify_output:
 
@@ -10,7 +10,7 @@ __stdio_verify_output:
    ; enter : ix = FILE *
    ;
    ; exit  : ix = FILE *
-   ;         carry set if problem
+   ;         carry set if problem with hl=-1
    ;
    ; uses  : all except bc, de, hl, ix
    
@@ -21,7 +21,7 @@ __stdio_verify_output:
    and $48                     ; keep write and error flags
    cp $40                      ; compare W=1 and ERR=0
    
-   jp nz, error_eacces_mc
+   jr nz, errors
    
    ; check if last operation on stream was a read
    
@@ -44,3 +44,10 @@ last_write:
    
    or a
    ret
+
+errors:
+
+   and $08
+   jp nz, error_mc             ; if ERR bit set, do not alter errno
+
+   jp error_eacces_mc          ; if not open for writing

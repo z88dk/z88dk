@@ -8,7 +8,7 @@ XDEF __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
 XDEF __stdio_printf_padding_precision
 XDEF __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
-LIB l_jpix
+LIB l_jpix, l_saturated_add_hl_bc
 
 __stdio_printf_padding_precision_hl:
 
@@ -181,8 +181,8 @@ __stdio_send_output:
    
    jr c, error_detected
    
-   add hl,bc                   ; update tally
-   jr c, saturate_nc           ; if tally wrapped
+   call l_saturated_add_hl_bc  ; update tally
+   or a                        ; no error
 
 exit:
 
@@ -192,15 +192,6 @@ exit:
    exx
    
    ret
-
-saturate_nc:
-
-   or a                        ; no stream error
-
-saturate:
-
-   ld hl,$ffff                 ; tally saturates
-   jr exit
    
 error_detected:
    
@@ -208,10 +199,7 @@ error_detected:
 
    ; update tally and exit with error indicator on
    
-   add hl,bc                   ; update tally
-   jr c, saturate              ; if tally wrapped (carry is set)
-   
-   ; tally ok
+   call l_saturated_add_hl_bc  ; update tally
    
    scf                         ; indicate stream error
    jr exit
