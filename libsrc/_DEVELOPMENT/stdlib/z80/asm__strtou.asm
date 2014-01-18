@@ -27,7 +27,7 @@ asm__strtou:
    ;         no error:
    ;
    ;           carry reset
-   ;             hl = long result
+   ;             hl = uint result
    ;             de = char *nptr (& next unconsumed char)
    ;
    ;         invalid input string or base:
