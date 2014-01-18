@@ -29,7 +29,7 @@ bit   name    purpose
  5    0       reserved
  4    eof     if set the input stream reached eof
  3    err     if set the stream encountered an error
-210   type    stdio structure type (000 = FILE)
+210   type    stdio structure type (000 = FILE, 001 = FILE_MEMSTREAM)
 
 * state_flags_1
 
@@ -43,6 +43,8 @@ bit   name    purpose
 
 * conversion_flags
 
+(PRINTF)
+
 bit   name    purpose
 
  7    N       set by printf converters to indicate negative number
@@ -54,14 +56,17 @@ bit   name    purpose
  1    base    if set indicates octal conversion
  0    P       if set indicates precision was defined 
 
+(SCANF)
+
 
 STDIO_MESSAGES
 ==============
 
 These are messages sent through the stdio chain.
 
-
+****************
 * STDIO_MSG_PUTC
+****************
 
 Output a single char multiple times on the stream.
 
@@ -77,8 +82,9 @@ return:
 HL = number of bytes successfully output
 carry set if error
 
-
+****************
 * STDIO_MSG_WRIT
+****************
 
 Output a buffer on the stream
 
@@ -86,10 +92,76 @@ input:
 
  A  = STDIO_MSG_WRIT
 BC' = length > 0
-HL' = void *buffer
+HL' = void *buffer = byte source
 HL  = length > 0
 
 return:
 
 HL = number of bytes successfully output
 carry set if error
+
+****************
+* STDIO_MSG_GETC
+****************
+
+Read a single character from the stream
+
+input:
+
+ A = STDIO_MSG_GETC
+
+return:
+
+HL = char or EOF
+carry set if error (HL=0) or eof
+
+****************
+* STDIO_MSG_EATC
+****************
+
+Remove matching characters from the stream
+
+input:
+
+ A = STDIO_MSG_EATC
+HL'= int (*qualify)(char c)
+BC'= optional - uint destination_buffer_length
+DE'= optional - void *destination_buffer
+HL = max_length = number of stream chars to consume
+
+return:
+
+BC = number of bytes consumed from stream
+HL = next unconsumed (unmatching) char or EOF
+BC'= unchanged by driver
+DE'= unchanged by driver
+HL'= unchanged by driver
+
+carry set on error or eof: if HL=0 stream error, HL=-1 on eof
+
+note: Characters are consumed from the stream until the qualify
+function returns with carry flag set or until max_length
+chars are consumed from the stream.
+
+The qualify function owns the bc, de, and hl registers but
+must not alter any others.
+
+****************
+* STDIO_MSG_READ
+****************
+
+Read stream characters into a buffer
+
+input:
+
+ A = STDIO_MSG_READ
+DE'= void *buffer = byte destination
+BC'= max_length > 0
+HL = max_length > 0
+
+return:
+
+BC = number of bytes successfully read
+DE'= void *buffer_ptr = address of byte following last written
+
+carry set on error with HL=0 for stream err, HL=-1 for eof
