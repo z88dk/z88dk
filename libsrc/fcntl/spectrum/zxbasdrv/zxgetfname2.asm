@@ -10,7 +10,7 @@
 ; N$ will always hold the file name
 ; The character specifying the current block is handled
 ;
-; $Id: zxgetfname2.asm,v 1.1 2014-01-20 09:15:32 stefano Exp $
+; $Id: zxgetfname2.asm,v 1.2 2014-01-20 11:20:18 stefano Exp $
 
 	XLIB	zxgetfname2
 	
@@ -81,8 +81,8 @@
 
 	pop	af
 	pop	de
-	inc de
-	inc de
+	;inc de
+	;inc de
 	ld	(de),a
 	ret
 
