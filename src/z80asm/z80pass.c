@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.68 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.69 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,7 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.68 2014-01-11 01
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "hist.h"
 #include "listfile.h"
 #include "model.h"
@@ -309,22 +309,20 @@ Evallogexpr( void )
 void
 StoreName( Symbol *node, byte_t scope )
 {
-    int b;
-
     switch ( scope )
     {
     case SYMLOCAL:
-        xfput_u8( 'L', objfile );
+        xfput_uint8(objfile, 'L');
         break;
 
     case SYMXDEF:
         if ( node->type & SYMDEF )
         {
-            xfput_u8( 'X', objfile );
+            xfput_uint8(objfile, 'X');
         }
         else
         {
-            xfput_u8( 'G', objfile );
+            xfput_uint8(objfile, 'G');
         }
 
         break;
@@ -332,18 +330,15 @@ StoreName( Symbol *node, byte_t scope )
 
     if ( node->type & SYMADDR )   /* then write type of symbol */
     {
-        xfput_u8( 'A', objfile );    /* either a relocatable address */
+        xfput_uint8(objfile, 'A');    /* either a relocatable address */
     }
     else
     {
-        xfput_u8( 'C', objfile );    /* or a constant */
+        xfput_uint8(objfile, 'C');    /* or a constant */
     }
 
-    xfput_u32( node->value, objfile );
-
-    b = strlen( node->name );
-    xfput_u8( b, objfile );         /* write length of symbol name to relocatable file */
-    xfput_char( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+    xfput_uint32(objfile, node->value);
+	xfput_count_byte_strz(objfile, node->name );
 }
 
 
@@ -392,8 +387,6 @@ StoreLocalNames( SymbolHash *symtab )
 void
 StoreExternReferences( SymbolHash *symtab )
 {
-    size_t b;
-
     SymbolHashElem *iter;
     Symbol         *sym;
 
@@ -404,11 +397,7 @@ StoreExternReferences( SymbolHash *symtab )
         sym = ( Symbol * )iter->value;
 
         if ( ( sym->type & SYMXREF ) && ( sym->type & SYMTOUCHED ) )
-        {
-            b = strlen( sym->name );
-            xfput_u8( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-            xfput_char( sym->name, b, objfile );    /* write symbol name to relocatable file */
-        }
+			xfput_count_byte_strz( objfile, sym->name );
     }
 }
 
@@ -584,9 +573,7 @@ Z80pass2( void )
     StoreExternReferences( global_symtab );
 
     fptr_modname = ftell( objfile );
-    constant = strlen( CURRENTMODULE->mname );
-    xfput_u8( constant, objfile );  /* write length of module name to relocatable file */
-    xfput_char( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable file */
+	xfput_count_byte_strz( objfile, CURRENTMODULE->mname );		/* write module name */
 
     if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
     {
@@ -595,7 +582,7 @@ Z80pass2( void )
     else
     {
         fptr_modcode = ftell( objfile );
-        xfput_u16( constant, objfile );  /* two bytes of module code size */
+        xfput_uint16( objfile, constant );  /* two bytes of module code size */
         fwrite_codearea( objfile );
     }
 
@@ -612,11 +599,11 @@ Z80pass2( void )
     {
         if ( opts.origin >= 0 )
         {
-            CURRENTMODULE->origin = opts.origin;    /* use origin from command line */
+            CURRENTMODULE->origin = opts.origin;		/* use origin from command line */
         }
     }
 
-    xfput_u16( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
+    xfput_uint16( objfile, CURRENTMODULE->origin );		/* two bytes of origin */
 
     fptr_exprdecl = 30;           /* expressions always begins at file position 24 */
 
@@ -635,11 +622,11 @@ Z80pass2( void )
         fptr_libnmdecl = -1;    /* no library reference declarations */
     }
 
-    xfput_u32( fptr_modname, objfile );  /* write fptr. to module name */
-    xfput_u32( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
-    xfput_u32( fptr_namedecl, objfile ); /* write fptr. to name declarations */
-    xfput_u32( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
-    xfput_u32( fptr_modcode, objfile );  /* write fptr. to module code */
+    xfput_uint32( objfile, fptr_modname );		/* write fptr. to module name */
+    xfput_uint32( objfile, fptr_exprdecl );		/* write fptr. to name declarations */
+    xfput_uint32( objfile, fptr_namedecl );		/* write fptr. to name declarations */
+    xfput_uint32( objfile, fptr_libnmdecl );	/* write fptr. to library name declarations */
+    xfput_uint32( objfile, fptr_modcode );		/* write fptr. to module code */
 }
 
 
@@ -781,7 +768,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.68  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.69  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.68  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

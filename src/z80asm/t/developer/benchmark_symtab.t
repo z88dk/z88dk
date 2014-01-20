@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.17 2014-01-11 01:29:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.18 2014-01-20 23:29:18 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.17  2014-01-11 01:29:50  pauloscustodio
+# Revision 1.18  2014-01-20 23:29:18  pauloscustodio
+# Moved file.c to lib/fileutil.c
+#
+# Revision 1.17  2014/01/11 01:29:50  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -87,7 +90,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o lib/strutil.o lib/list.o  errors.o strpool.o lib/strhash.o lib/class.o file.o";
+my $objs = "avltree.o lib/xmalloc.o lib/die.o lib/except.o lib/strutil.o lib/list.o  errors.o strpool.o lib/strhash.o lib/class.o";
 my $src = "t/data/zx48.asm";
 my @words;
 

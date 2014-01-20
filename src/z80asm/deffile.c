@@ -14,14 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.7 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.8 2014-01-20 23:29:18 pauloscustodio Exp $
 
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "deffile.h"
-#include "file.h"
+#include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
 #include "symbol.h"
@@ -92,7 +92,10 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.7  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.8  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.7  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

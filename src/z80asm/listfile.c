@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.12 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.13 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 #include "listfile.h"
-#include "file.h"
+#include "fileutil.h"
 #include "options.h"
 #include "z80asm.h"
 #include "errors.h"
@@ -101,7 +101,7 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
         /* output to list file, advance line if newline, insert header on new page */
         for ( p = str->str ; *p ; p++ )
         {
-            xfput_u8( *p, self->file );
+            fputc( *p, self->file );
 
             if ( *p == '\n' )
             {
@@ -159,7 +159,7 @@ static void ListFile_write_header( ListFile *self )
             fpos2 = ftell( self->file );		/* before last newline */
         }
 
-        xfput_u8( '\n', self->file );
+        fputc( '\n', self->file );
 
         /* compute header size and newline size on first call */
         if ( header_size == 0 )
@@ -228,7 +228,7 @@ void ListFile_close( ListFile *self, BOOL keep_file )
         /* close any pending line started */
         ListFile_end( self );
 
-        xfput_u8( '\f', self->file );     /* end listing with a FF */
+        fputc( '\f', self->file );     /* end listing with a FF */
         fclose( self->file );
 
         if ( ! keep_file )
@@ -583,7 +583,10 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.12  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.13  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

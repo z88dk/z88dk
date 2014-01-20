@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.22 2014-01-11 01:29:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.23 2014-01-20 23:29:17 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.22 2014-01-11 0
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "init.h"
 #include "listfile.h"
 #include "symbol.h"
@@ -122,7 +122,7 @@ static void check_space( size_t addr, size_t n )
 void fwrite_codearea( FILE *stream )
 {
     init();
-    xfput_char( codearea, codeindex, stream );
+    xfput_chars( stream, codearea, codeindex );
 }
 
 void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
@@ -136,7 +136,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
             size = codeindex - addr;
         }
 
-        xfput_char( codearea + addr, size, stream );
+        xfput_chars( stream, codearea + addr, size );
     }
 }
 
@@ -145,7 +145,7 @@ void fread_codearea( FILE *stream, size_t size )
 {
     init();
     check_space( codeindex, size );
-    xfget_char( codearea + codeindex, size, stream );
+    xfget_chars( stream, codearea + codeindex, size );
     codeindex += size;
 }
 
@@ -154,7 +154,7 @@ void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 {
     init();
     check_space( offset, size );
-    xfget_char( codearea + offset, size, stream );
+    xfget_chars( stream, codearea + offset, size );
 
     if ( codeindex < offset + size )
     {
@@ -231,7 +231,10 @@ byte_t get_byte( size_t *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.22  2014-01-11 01:29:39  pauloscustodio
+* Revision 1.23  2014-01-20 23:29:17  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.22  2014/01/11 01:29:39  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

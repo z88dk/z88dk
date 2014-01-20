@@ -26,7 +26,7 @@ Scanner - to be processed by: ragel -G2 scan.rl
 #include "codearea.h"
 #include "ctype.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "init.h"
 #include "legacy.h"
 #include "listfile.h"

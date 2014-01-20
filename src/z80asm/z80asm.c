@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.131 2014-01-15 00:01:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.132 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,7 +22,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.131 2014-01-15 00
 #include "config.h"
 #include "deffile.h"
 #include "errors.h"
-#include "file.h"
 #include "fileutil.h"
 #include "hist.h"
 #include "legacy.h"
@@ -215,8 +214,8 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         /* Create relocatable object file */
         objfile = xfopen( obj_filename, "w+b" );           /* CH_0012 */
-        xfput_char( Z80objhdr,    strlen( Z80objhdr ),    objfile );
-        xfput_char( objhdrprefix, strlen( objhdrprefix ), objfile );
+        xfput_strz( objfile, Z80objhdr );
+		xfput_strz( objfile, objhdrprefix );
 
         set_PC( 0 );
 
@@ -418,7 +417,8 @@ char *GetLibfile( char *filename )
     newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
 
     file = xfopen( found_libfilename, "rb" );           /* CH_0012 */
-    xfget_char( fheader, 8U, file );     /* read first 8 chars from file into array */
+	/* read first 8 chars from file into array */
+    xfget_chars( file, fheader, 8 );
     fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */
@@ -759,7 +759,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.131  2014-01-15 00:01:40  pauloscustodio
+* Revision 1.132  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.131  2014/01/15 00:01:40  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *

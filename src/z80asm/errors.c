@@ -15,14 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.35 2014-01-15 00:01:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.36 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "except.h"
-#include "file.h"
+#include "fileutil.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "strhash.h"
@@ -289,7 +289,10 @@ static void fatal_file_error( char *filename, BOOL writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.35  2014-01-15 00:01:39  pauloscustodio
+* Revision 1.36  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.35  2014/01/15 00:01:39  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *

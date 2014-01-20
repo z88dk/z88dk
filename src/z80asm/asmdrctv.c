@@ -14,10 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.64 2014-01-11 01:29:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.65 2014-01-20 23:29:17 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.64  2014-01-11 01:29:39  pauloscustodio
+ * Revision 1.65  2014-01-20 23:29:17  pauloscustodio
+ * Moved file.c to lib/fileutil.c
+ *
+ * Revision 1.64  2014/01/11 01:29:39  pauloscustodio
  * Extend copyright to 2014.
  * Move CVS log to bottom of file.
  *
@@ -373,7 +376,6 @@ Copyright (C) Paulo Custodio, 2011-2014
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "file.h"
 #include "fileutil.h"
 #include "listfile.h"
 #include "options.h"

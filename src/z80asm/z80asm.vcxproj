@@ -91,7 +91,6 @@
     <ClInclude Include="deffile.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />
-    <ClInclude Include="file.h" />
     <ClInclude Include="hist.h" />
     <ClInclude Include="legacy.h" />
     <ClInclude Include="lib\class.h" />
@@ -132,7 +131,6 @@
     <ClCompile Include="deffile.c" />
     <ClCompile Include="errors.c" />
     <ClCompile Include="exprprsr.c" />
-    <ClCompile Include="file.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="lib\class.c" />

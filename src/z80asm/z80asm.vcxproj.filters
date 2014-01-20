@@ -36,9 +36,6 @@
     <ClInclude Include="errors_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="file.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="hist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -174,9 +171,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="errors.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="file.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objfile.c">

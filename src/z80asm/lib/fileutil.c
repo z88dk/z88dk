@@ -3,13 +3,430 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.6 2014-01-15 00:01:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.7 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
+
 #include "fileutil.h"
-#include "strutil.h"
+
+#include "init.h"
 #include "strpool.h"
+#include "strutil.h"
+#include "uthash.h"
+
+#include <assert.h>
+#include <stdarg.h>
+#include <sys/stat.h>
+
+/*-----------------------------------------------------------------------------
+*	Keep hash table of FILE* to opened files for error messages
+*----------------------------------------------------------------------------*/
+typedef struct OpenFileElem
+{
+    FILE    *file; 					/* file pointer returned by fopen */
+    char    *filename;				/* file name kept in strpool.h */
+	BOOL	 writing;				/* TRUE if writing, FALSE if reading */
+
+    UT_hash_handle hh;      		/* hash table */
+
+} OpenFileElem;
+
+OpenFileElem *open_files = NULL;	/* singleton */
+
+/*-----------------------------------------------------------------------------
+*	Initialize and terminate module
+*----------------------------------------------------------------------------*/
+DEFINE_init()
+{
+	strpool_init();
+	
+	open_files = NULL;
+}
+
+DEFINE_fini()
+{
+    OpenFileElem *elem, *tmp;
+
+    HASH_ITER( hh, open_files, elem, tmp )
+    {
+        HASH_DEL( open_files, elem );
+        xfree( elem );
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*	Add open files to hash table
+*	hash items are only deleted on end of program, to be able to show error
+* 	messages after xfclose
+*----------------------------------------------------------------------------*/
+static void add_open_file( FILE *file, char *filename, BOOL writing )
+{
+    OpenFileElem *elem;
+
+	init();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files, &file, elem );
+
+    if ( elem )
+    {
+        /* found, replace entry */
+        elem->filename 	= strpool_add( filename );
+		elem->writing	= writing;
+    }
+    else
+    {
+        /* new, create hash entry */
+        elem = xnew( OpenFileElem );
+        elem->file 		= file;
+        elem->filename 	= strpool_add( filename );
+		elem->writing	= writing;
+
+        HASH_ADD_PTR( open_files, file, elem );
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*	Search open file by file handle
+*----------------------------------------------------------------------------*/
+static OpenFileElem *get_open_file( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files, &file, elem );
+
+    return elem;
+}
+
+/*-----------------------------------------------------------------------------
+*	Fatal error handling
+*----------------------------------------------------------------------------*/
+static ferr_callback_t ferr_callback = NULL;		/* default handler */
+
+/* set call-back for input/output error; return old call-back */
+ferr_callback_t set_ferr_callback( ferr_callback_t func )
+{
+	ferr_callback_t old;
+
+	init();
+	
+	old = ferr_callback;
+	ferr_callback = func;
+
+	return old;
+}
+
+/* call fatal error for a file */
+static void fatal_ferr_filename( char *filename, BOOL writing )
+{
+	init();
+
+	/* call call-back, if any */
+	if (ferr_callback != NULL)
+		ferr_callback( filename, writing );
+	
+	/* safety net - abort if no call-back registered */
+	die("Error: cannot %s file '%s'\n", writing ? "write" : "read", filename );
+}
+
+static void fatal_ferr( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???",
+						 elem ? elem->writing  : FALSE );
+}
+
+static void fatal_ferr_read( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???", FALSE );
+}
+
+static void fatal_ferr_write( FILE *file )
+{
+    OpenFileElem *elem;
+
+	init();
+
+	elem = get_open_file( file );
+	fatal_ferr_filename( elem ? elem->filename : "???", TRUE );
+}
+
+/*-----------------------------------------------------------------------------
+*   File open and close
+*----------------------------------------------------------------------------*/
+FILE *xfopen( char *filename, char *mode )
+{
+    FILE *file;
+	BOOL writing;
+
+	init();
+	
+	writing = strchr( mode, 'r' ) ? FALSE : TRUE;
+	file = fopen( filename, mode );
+
+    if ( file == NULL )
+		fatal_ferr_filename( filename, writing );
+	else 
+		add_open_file( file, filename, writing );	/* never deleted from hash */
+
+	return file;
+}
+
+void xfclose( FILE *file )
+{
+	init();
+
+    if ( fclose( file ) < 0 )
+        fatal_ferr( file );
+}
+
+/*-----------------------------------------------------------------------------
+*   Buffers
+*----------------------------------------------------------------------------*/
+void xfwrite( void *buffer, size_t size, size_t count, FILE *file )
+{
+	init();
+    if ( fwrite( buffer, size, count, file ) != count )
+        fatal_ferr_write( file );
+}
+
+void xfread( void *buffer, size_t size, size_t count, FILE *file )
+{
+	init();
+    if ( fread( buffer, size, count, file ) != count )
+        fatal_ferr_read( file );
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write strings of characters
+*----------------------------------------------------------------------------*/
+void xfput_chars( FILE *file, char *buffer, size_t len )
+{
+	init();
+    xfwrite( buffer, sizeof(char), len, file );
+}
+
+void xfget_chars( FILE *file, char *buffer, size_t len )
+{
+	init();
+    xfread( buffer, sizeof(char), len, file );
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write Str
+*----------------------------------------------------------------------------*/
+void xfput_strz( FILE *file, char *str )
+{
+    xfput_chars( file, str, strlen(str) );
+}
+
+void xfput_Str( FILE *file, Str *str )
+{
+    xfput_chars( file, str->str, str->len );
+}
+
+void xfget_Str( FILE *file, Str *str, size_t len )
+{
+	init();
+    if ( len + 1 > str->size )
+        fatal_ferr_read( file ); 			/* too long */
+
+    xfget_chars( file, str->str, len );		/* characters */
+    str->str[len] = '\0';					/* terminate string */
+	str->len = len;							/* set lenght; Str_sync_len() only for
+											   strings not including nulls */
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write counted string - string with size byte at start
+*----------------------------------------------------------------------------*/
+static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
+{
+	init();
+    if ( len > 0xFF )
+        fatal_ferr_write( file );			/* too long */
+
+    xfput_uint8( file, len );				/* byte count */
+	xfput_chars( file, str, len );			/* characters */
+}
+
+void xfput_count_byte_strz( FILE *file, char *str )
+{
+	_xfput_count_byte_str( file, str, strlen(str) );
+}
+
+void xfput_count_byte_Str( FILE *file, Str *str )
+{
+	_xfput_count_byte_str( file, str->str, str->len );
+}
+
+void xfget_count_byte_Str( FILE *file, Str *str )
+{
+	size_t len;
+	
+	init();
+	xfget_uint8( file, &len );				/* byte count */
+    xfget_Str(   file, str, len );			/* characters */
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write counted string - string with size word at start
+*----------------------------------------------------------------------------*/
+static void _xfput_count_word_str( FILE *file, char *str, size_t len )
+{
+	init();
+    if ( len > 0xFFFF )
+        fatal_ferr_write( file );			/* too long */
+
+    xfput_uint16( file, len );				/* word count */
+	xfput_chars(  file, str, len );			/* characters */
+}
+
+void xfput_count_word_strz( FILE *file, char *str )
+{
+	_xfput_count_word_str( file, str, strlen(str) );
+}
+
+void xfput_count_word_Str( FILE *file, Str *str )
+{
+	_xfput_count_word_str( file, str->str, str->len );
+}
+
+void xfget_count_word_Str( FILE *file, Str *str )
+{
+	size_t len;
+	
+	init();
+	xfget_uint16( file, &len );				/* byte count */
+    xfget_Str(    file, str, len );			/* characters */
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write numbers - 8 bit
+*----------------------------------------------------------------------------*/
+void xfput_int8( FILE *file, int value )
+{
+	init();
+	xfput_uint8( file, (unsigned) value );
+}
+
+void xfput_uint8( FILE *file, unsigned value )
+{
+	init();
+    if ( fputc( (unsigned) value, file ) < 0 )
+        fatal_ferr_write( file );
+}
+
+void xfget_int8(  FILE *file, int *pvalue )
+{
+	init();
+	xfget_uint8( file, (unsigned *) pvalue );
+    if ( *pvalue & 0x80 )
+        *pvalue |= ~ 0xFF;				/* sign-extend above bit 7 */
+}
+
+void xfget_uint8( FILE *file, unsigned *pvalue )
+{
+	int c;
+	
+	init();
+	if ( (c = getc( file )) < 0 )
+        fatal_ferr_read( file );
+	*pvalue = (unsigned) c;
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write numbers - 16 bit
+*----------------------------------------------------------------------------*/
+void xfput_int16( FILE *file, int value )
+{
+	init();
+	xfput_uint16( file, (unsigned) value );
+}
+
+void xfput_uint16( FILE *file, unsigned value )
+{
+    char buffer[2];
+
+	init();
+	buffer[0] = value & 0xFF; value >>= 8;
+	buffer[1] = value & 0xFF; value >>= 8;
+    xfput_chars( file, buffer, sizeof(buffer) );
+}
+
+void xfget_int16( FILE *file, int *pvalue )
+{
+	init();
+	xfget_uint16( file, (unsigned *) pvalue );
+    if ( *pvalue & 0x8000 )
+        *pvalue |= ~ 0xFFFF;			/* sign-extend above bit 15 */
+}
+
+void xfget_uint16( FILE *file, unsigned *pvalue )
+{
+    char buffer[2];
+
+	init();
+    xfget_chars( file, buffer, sizeof(buffer) );
+	*pvalue = 
+        ( ( buffer[0] << 0 ) & 0x00FF ) |
+        ( ( buffer[1] << 8 ) & 0xFF00 );
+}
+
+/*-----------------------------------------------------------------------------
+*   read/write numbers - 32 bit
+*----------------------------------------------------------------------------*/
+void xfput_int32( FILE *file, long value )
+{
+	init();
+	xfput_uint32( file, (unsigned long) value );
+}
+
+void xfput_uint32( FILE *file, unsigned long value )
+{
+    char buffer[4];
+
+	init();
+	buffer[0] = value & 0xFF; value >>= 8;
+	buffer[1] = value & 0xFF; value >>= 8;
+	buffer[2] = value & 0xFF; value >>= 8;
+	buffer[3] = value & 0xFF; value >>= 8;
+    xfput_chars( file, buffer, sizeof(buffer) );
+}
+
+void xfget_int32( FILE *file, long *pvalue )
+{
+	init();
+	xfget_uint32( file, (unsigned long *) pvalue );
+    if ( *pvalue & 0x80000000L )
+        *pvalue |= ~ 0xFFFFFFFFL;	/* sign-extend above bit 31; solve BUG_0021 */
+}
+
+void xfget_uint32( FILE *file, unsigned long *pvalue )
+{
+    char buffer[4];
+
+	init();
+    xfget_chars( file, buffer, sizeof(buffer) );
+	*pvalue = 
+        ( ( buffer[0] << 0 ) & 0x000000FF ) |
+        ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
+        ( ( buffer[2] << 16 ) & 0x00FF0000 ) |
+        ( ( buffer[3] << 24 ) & 0xFF000000 );
+}
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -25,6 +442,8 @@ void path_remove_ext( Str *dest, char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
 
+	init();
+	
     Str_set( dest, filename );		/* make a copy */
 
     /* BUG_0014 : need to ignore dot if before a directory separator */
@@ -47,6 +466,8 @@ void path_remove_ext( Str *dest, char *filename )
 /* make a copy of the file name in strpool, replacing the extension */
 void path_replace_ext( Str *dest, char *filename, char *new_ext )
 {
+	init();
+	
     path_remove_ext( dest, filename );
 
     if ( new_ext != NULL )
@@ -58,6 +479,8 @@ void path_basename( Str *dest, char *filename )
 {
     char *dir_pos_1, *dir_pos_2, *basename;
 
+	init();
+	
     dir_pos_1 = strrchr( filename, '/' );
 
     if ( dir_pos_1 == NULL ) dir_pos_1 = filename - 1;
@@ -71,12 +494,14 @@ void path_basename( Str *dest, char *filename )
 }
 
 /* search for a file on the given directory list, return full path name */
-extern void path_search( Str *dest, char *filename, List *dir_list )
+void path_search( Str *dest, char *filename, List *dir_list )
 {
     DEFINE_FILE_STR( pathname );
     struct stat  sb;
     ListElem	*iter;
 
+	init();
+	
     Str_set( dest, filename );		/* default return: input file name */
 
     /* if no dir_list, return file */
@@ -108,6 +533,9 @@ extern void path_search( Str *dest, char *filename, List *dir_list )
 char *search_file( char *filename, List *dir_list )
 {
     DEFINE_FILE_STR( dest );
+
+	init();
+	
     path_search( dest, filename, dir_list );
     return strpool_add( dest->str );
 }
@@ -115,7 +543,10 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.6  2014-01-15 00:01:40  pauloscustodio
+* Revision 1.7  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.6  2014/01/15 00:01:40  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *
@@ -139,5 +570,3 @@ char *search_file( char *filename, List *dir_list )
 *
 *
 */
-
-

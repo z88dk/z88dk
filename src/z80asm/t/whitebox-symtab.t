@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/list.o lib/fileutil.o file.o options.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/list.o lib/fileutil.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -312,9 +312,12 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.33 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.34 2014-01-20 23:29:19 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.33  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.34  2014-01-20 23:29:19  pauloscustodio
+# Moved file.c to lib/fileutil.c
+#
+# Revision 1.33  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

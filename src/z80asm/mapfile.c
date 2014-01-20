@@ -14,13 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.12 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.13 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "file.h"
+#include "fileutil.h"
 #include "listfile.h"
 #include "mapfile.h"
 #include "options.h"
@@ -55,13 +55,9 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
         }
 
         if ( sym->type & SYMLOCAL )
-        {
-            xfput_u8( 'L', file );
-        }
+            fputc( 'L', file );
         else
-        {
-            xfput_u8( 'G', file );
-        }
+            fputc( 'G', file );
 
         fprintf( file, ": %s\n", sym->owner->mname );
     }
@@ -117,7 +113,10 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.12  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.13  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

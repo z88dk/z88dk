@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.26 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.27 2014-01-20 23:29:19 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -76,7 +76,7 @@ require 't/test_utils.pl';
 SKIP: {
 	skip "SourceFile and SourceFileList not implemented";
 	
-my $objs = "srcfile.o lib/class.o file.o errors.o dynstr.o lib/strutil.o scan.o options.o hist.o";
+my $objs = "srcfile.o lib/class.o errors.o dynstr.o lib/strutil.o scan.o options.o hist.o";
 
 my $init_code = <<'END';
 #include "symbol.h"
@@ -532,7 +532,10 @@ done_testing;
 
 
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.26  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.27  2014-01-20 23:29:19  pauloscustodio
+# Moved file.c to lib/fileutil.c
+#
+# Revision 1.26  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.10 2014-01-11 01:29:40 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.11 2014-01-20 23:29:18 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -24,7 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.10 2014-01-1
 #include "codearea.h"
 #include "ctype.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "init.h"
 #include "legacy.h"
 #include "listfile.h"
@@ -701,7 +701,10 @@ void Skipline( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.10  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.11  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.10  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

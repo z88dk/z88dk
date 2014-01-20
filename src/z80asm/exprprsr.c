@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.50 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.51 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,7 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.50 2014-0
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "legacy.h"
 #include "options.h"
 #include "symbol.h"
@@ -494,14 +494,10 @@ ParseNumExpr( void )
 void
 StoreExpr( struct expr *pfixexpr, char range )
 {
-    byte_t b;
-
-    xfput_u8( range, objfile );     /* range of expression */
-    xfput_u16( pfixexpr->codepos, objfile );     /* patchptr */
-    b = strlen( pfixexpr->infixexpr );
-    xfput_u8( b, objfile );         /* length prefixed string */
-    xfput_char( pfixexpr->infixexpr, ( size_t ) b, objfile );
-    xfput_u8( 0, objfile );         /* nul-terminate expression */
+    xfput_uint8(			objfile, range );				/* range of expression */
+    xfput_uint16(			objfile, pfixexpr->codepos );	/* patchptr */
+	xfput_count_byte_strz(	objfile, pfixexpr->infixexpr );	/* expression */
+    xfput_uint8(			objfile, 0 );					/* nul-terminate expression */
 
     pfixexpr->stored = ON;
 }
@@ -1112,7 +1108,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.50  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.51  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.50  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

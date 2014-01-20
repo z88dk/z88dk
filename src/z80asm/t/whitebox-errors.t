@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
+my $objs = "errors.o scan.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -180,9 +180,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.24 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.25 2014-01-20 23:29:18 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.24  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.25  2014-01-20 23:29:18  pauloscustodio
+# Moved file.c to lib/fileutil.c
+#
+# Revision 1.24  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

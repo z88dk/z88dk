@@ -16,7 +16,7 @@ Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.17 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.18 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,7 +59,10 @@ void SrcFile_fini( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.17  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.18  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.17  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -133,7 +136,7 @@ void SrcFile_fini( SrcFile *self )
 
 #include "codearea.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "listfile.h"
 #include "srcfile.h"
 #include "strutil.h"

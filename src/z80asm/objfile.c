@@ -15,14 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.15 2014-01-14 23:53:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.16 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "objfile.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -107,6 +107,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     ObjFile *self;
     FILE    *file;
     long	 start_ptr;
+	size_t	 org_addr;
     BOOL	 in_library = libfile == NULL ? FALSE : TRUE;
 
     /* open file if needed */
@@ -146,20 +147,18 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     self->writing		= FALSE;
 
     /* read object file header */
-    self->org_addr		= xfget_u16( self->file );
+    xfget_uint16( self->file, &org_addr );
+	self->org_addr = (org_addr == 0xFFFF) ? -1 : (int) org_addr;
 
-    if ( self->org_addr == 0xFFFF )
-        self->org_addr = -1;
-
-    self->modname_ptr	= xfget_i32( self->file );
-    self->expr_ptr		= xfget_i32( self->file );
-    self->symbols_ptr	= xfget_i32( self->file );
-    self->externsym_ptr	= xfget_i32( self->file );
-    self->code_ptr		= xfget_i32( self->file );
+    xfget_int32( self->file, &(self->modname_ptr  ) );
+    xfget_int32( self->file, &(self->expr_ptr	  ) );
+    xfget_int32( self->file, &(self->symbols_ptr  ) );
+    xfget_int32( self->file, &(self->externsym_ptr) );
+    xfget_int32( self->file, &(self->code_ptr	  ) );
 
     /* read module name */
     fseek( self->file, self->start_ptr + self->modname_ptr, SEEK_SET );
-    xfget_c1sstr( buffer, self->file );
+    xfget_count_byte_Str( self->file, buffer );
     self->modname = strpool_add( buffer->str );
 
     /* read code size */
@@ -168,7 +167,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     else
     {
         fseek( self->file, self->start_ptr + self->code_ptr, SEEK_SET );
-        self->code_size = xfget_u16( self->file );
+        xfget_uint16( self->file, &(self->code_size) );
 
         if ( self->code_size == 0 )		/* BUG_0008 */
             self->code_size = 0x10000;
@@ -202,7 +201,10 @@ ObjFile *ObjFile_read( char *filename, FILE *libfile )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.15  2014-01-14 23:53:53  pauloscustodio
+* Revision 1.16  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.15  2014/01/14 23:53:53  pauloscustodio
 * Missing include
 *
 * Revision 1.14  2014/01/11 01:29:40  pauloscustodio

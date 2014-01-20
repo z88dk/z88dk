@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o file.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
+my $objs = "scan.o errors.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
 
 # build list of case TOKEN: return "TOKEN" from scan.h
 my @token_case;
@@ -1296,9 +1296,12 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.33 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.34 2014-01-20 23:29:18 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.33  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.34  2014-01-20 23:29:18  pauloscustodio
+# Moved file.c to lib/fileutil.c
+#
+# Revision 1.33  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

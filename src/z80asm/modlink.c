@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.87 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.88 2014-01-20 23:29:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,7 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.87 2014-01-11 01
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "file.h"
+#include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
@@ -81,16 +81,16 @@ size_t totaladdr, curroffset;
 void
 ReadNames( char *filename, FILE *file, long nextname, long endnames )
 {
-    char scope, symbol_char;
+    int scope, symbol_char;
     byte_t symboltype = 0;
     long value;
 
     do
     {
-        scope = xfget_u8( file );
-        symbol_char = xfget_u8( file ); /* type of name   */
-        value = xfget_i32( file );		/* read symbol (long) integer */
-        ReadName( file );				/* read symbol name */
+        xfget_int8(  file, &scope );
+        xfget_int8(  file, &symbol_char );	/* type of name   */
+        xfget_int32( file, &value );		/* read symbol (long) integer */
+        ReadName( file );					/* read symbol name */
 
         nextname += 1 + 1 + 4 + 1 + strlen( line );
 
@@ -135,26 +135,26 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 void
 ReadExpr( long nextexpr, long endexpr )
 {
-    char type;
-    long constant, i, fptr;
+    int type;
+    long constant, fptr;
     struct expr *postfixexpr;
-    size_t patchptr, offsetptr;
+    size_t patchptr, offsetptr, expr_len;
 
     do
     {
-        type = xfget_u8( z80asmfile );
-        offsetptr = xfget_u16( z80asmfile );
+        xfget_int8(   z80asmfile, &type );
+        xfget_uint16( z80asmfile, &offsetptr );
 
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
         ASMPC->value = get_PC();
 
-        i = xfget_u8( z80asmfile ); /* get length of infix expression */
+        xfget_uint8( z80asmfile, &expr_len ); /* get length of infix expression */
         fptr = ftell( z80asmfile );       /* file pointer is at start of expression */
-        fgets( line, i + 1, z80asmfile ); /* read string for error reference */
+        fgets( line, expr_len + 1, z80asmfile ); /* read string for error reference */
         fseek( z80asmfile, fptr, SEEK_SET );      /* reset file pointer to start of expression */
-        nextexpr += 1 + 1 + 1 + 1 + i + 1;
+        nextexpr += 1 + 1 + 1 + 1 + expr_len + 1;
 
 
         EOL = OFF;                /* reset end of line parsing flag - a line is to be parsed... */
@@ -306,7 +306,8 @@ LinkModules( void )
 
             /* open relocatable file for reading */
             z80asmfile = xfopen( obj_filename, "rb" );           /* CH_0012 */
-            xfget_char( fheader, 8U, z80asmfile );             /* read first 6 chars from file into array */
+			/* read first 6 chars from file into array */
+            xfget_chars( z80asmfile, fheader, 8 );
             fheader[8] = '\0';
 
             /* compare header of file */
@@ -318,7 +319,7 @@ LinkModules( void )
                 break;
             }
 
-            origin = xfget_u16( z80asmfile );
+            xfget_uint16( z80asmfile, &origin );
 
             if ( modulehdr->first == CURRENTMODULE )            /* origin of first module */
             {
@@ -397,7 +398,7 @@ LinkModules( void )
 int
 LinkModule( char *filename, long fptr_base )
 {
-    long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
+    long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl, dummy;
     size_t size;
     int flag = 0;
 
@@ -405,23 +406,21 @@ LinkModule( char *filename, long fptr_base )
     z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
     fseek( z80asmfile, fptr_base + 10U, SEEK_SET );
 
-    fptr_modname = xfget_i32( z80asmfile );              /* get file pointer to module name */
-    xfget_i32( z80asmfile );                     /* get file pointer to expression declarations */
-    fptr_namedecl = xfget_i32( z80asmfile );     /* get file pointer to name declarations */
-    fptr_libnmdecl = xfget_i32( z80asmfile );    /* get file pointer to library name declarations */
-    fptr_modcode = xfget_i32( z80asmfile );              /* get file pointer to module code */
+    xfget_int32( z80asmfile, &fptr_modname );		/* get file pointer to module name */
+    xfget_int32( z80asmfile, &dummy );				/* get file pointer to expression declarations */
+    xfget_int32( z80asmfile, &fptr_namedecl );		/* get file pointer to name declarations */
+    xfget_int32( z80asmfile, &fptr_libnmdecl );		/* get file pointer to library name declarations */
+    xfget_int32( z80asmfile, &fptr_modcode );		/* get file pointer to module code */
 
     if ( fptr_modcode != -1 )
     {
         fseek( z80asmfile, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
 
-        size = xfget_u16( z80asmfile );
+        xfget_uint16( z80asmfile, &size );
 
         /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
         if ( size == 0 )
-        {
             size = 0x10000;
-        }
 
         /* read module code at startoffset of the module */
         /* BUG_0015: was reading at current position in code area, swaping order of modules */
@@ -429,10 +428,7 @@ LinkModule( char *filename, long fptr_base )
 
         /* BUG_0015 : was no updating codesize */
         if ( CURRENTMODULE->startoffset == get_codesize() )
-        {
             inc_codesize( size );    /* a new module has been added */
-        }
-
     }
 
     if ( fptr_namedecl != -1 )
@@ -441,13 +437,9 @@ LinkModule( char *filename, long fptr_base )
                                                                  * declarations */
 
         if ( fptr_libnmdecl != -1 )
-        {
             ReadNames( filename, z80asmfile, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
-        }
         else
-        {
             ReadNames( filename, z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
-        }
     }
 
     fclose( z80asmfile );
@@ -461,9 +453,7 @@ LinkModule( char *filename, long fptr_base )
             flag = LinkLibModules( filename, fptr_base, fptr_libnmdecl, fptr_modname );   /* link library modules */
 
             if ( !flag )
-            {
                 return 0;
-            }
         }
     }
 
@@ -567,8 +557,8 @@ SearchLibfile( struct libfile *curlib, char *modname )
             /* point at first available module in library */
             fseek( file, curlib->nextobjfile, SEEK_SET );   /* point at beginning of a module */
             currentlibmodule = curlib->nextobjfile;
-            curlib->nextobjfile = xfget_i32( file ); /* get file pointer to next module in library */
-            modulesize = xfget_i32( file ); /* get size of current module */
+            xfget_int32( file, &(curlib->nextobjfile) ); /* get file pointer to next module in library */
+            xfget_int32( file, &modulesize ); /* get size of current module */
         }
         while ( modulesize == 0 && curlib->nextobjfile != -1 );
 
@@ -624,7 +614,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
 static char *
 CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 {
-    long fptr_mname, fptr_name, fptr_libname;
+    long fptr_mname, fptr_name, fptr_libname, dummy;
     char *mname;
     char *name;
     enum flag found = OFF;
@@ -633,10 +623,10 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
     /* found module name? */
     fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file
                                                                         * pointer */
-    fptr_mname = xfget_i32( file );      /* get module name file  pointer   */
-    xfget_i32( file ); /* fptr_expr */
-    fptr_name = xfget_i32( file );
-    fptr_libname = xfget_i32( file );
+    xfget_int32( file, &fptr_mname );      /* get module name file  pointer   */
+    xfget_int32( file, &dummy ); /* fptr_expr */
+    xfget_int32( file, &fptr_name );
+    xfget_int32( file, &fptr_libname );
     fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
     mname = xstrdup( ReadName( file ) );                      /* read module name */
 
@@ -663,13 +653,14 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 
             while ( ! found && red < end )
             {
-                char scope;
+                int scope, dummy;
+				long value;
 
-                scope = xfget_u8( file );
+                xfget_int8( file, &scope );
                 red++;
-                xfget_u8( file ); /* type */
+                xfget_int8( file, &dummy ); /* type */
                 red++;
-                xfget_i32( file );
+                xfget_int32( file, &value );
                 red += 4;
                 name = ReadName( file );
                 red += strlen( name );
@@ -722,8 +713,8 @@ ReadName( FILE *file )
 {
     size_t strlength;
 
-    strlength = xfget_u8( file );
-    xfget_char( line, strlength, file ); /* read   name */
+    xfget_uint8( file, &strlength );
+    xfget_chars( file, line, strlength ); /* read   name */
     line[strlength] = '\0';
 
     return line;
@@ -755,12 +746,12 @@ ModuleExpr( void )
         set_error_file( CURRENTFILE->fname );
 
         /* open relocatable file for reading */
-        z80asmfile = xfopen( curlink->objfilename, "rb" );           /* CH_0012 */
-        fseek( z80asmfile, fptr_base + 10, SEEK_SET );        /* point at module name  pointer   */
-        fptr_modname = xfget_i32( z80asmfile );              /* get file pointer to module name */
-        fptr_exprdecl = xfget_i32( z80asmfile );     /* get file pointer to expression declarations */
-        fptr_namedecl = xfget_i32( z80asmfile );     /* get file pointer to name declarations */
-        fptr_libnmdecl = xfget_i32( z80asmfile );    /* get file pointer to library name declarations */
+        z80asmfile = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
+        fseek( z80asmfile, fptr_base + 10, SEEK_SET );	/* point at module name  pointer   */
+        xfget_int32( z80asmfile, &fptr_modname );		/* get file pointer to module name */
+        xfget_int32( z80asmfile, &fptr_exprdecl );		/* get file pointer to expression declarations */
+        xfget_int32( z80asmfile, &fptr_namedecl );		/* get file pointer to name declarations */
+        xfget_int32( z80asmfile, &fptr_libnmdecl );		/* get file pointer to library name declarations */
 
         if ( fptr_exprdecl != -1 )
         {
@@ -826,14 +817,18 @@ CreateBinFile( void )
 
     if ( opts.relocatable && totaladdr != 0 )
     {
-        xfput_char( (const char *) reloc_routine, sizeof_relocroutine, binaryfile );   /* relocate routine */
+		/* relocate routine */
+        xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
+
         *( reloctable + 0 ) = ( size_t ) totaladdr % 256U;
         *( reloctable + 1 ) = ( size_t ) totaladdr / 256U;  /* total of relocation elements */
         *( reloctable + 2 ) = ( size_t ) sizeof_reloctable % 256U;
         *( reloctable + 3 ) = ( size_t ) sizeof_reloctable / 256U; /* total size of relocation table elements */
 
-        xfput_char( reloctable, sizeof_reloctable + 4, binaryfile );    /* write relocation table, inclusive 4 byte header */
-        printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
+		/* write relocation table, inclusive 4 byte header */
+        xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
+
+		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
         fclose( binaryfile );
         binaryfile = NULL;
@@ -898,7 +893,9 @@ CreateLib( char *lib_filename )
     {
         /* create library as BINARY file */
         lib_file = xfopen( lib_filename, "w+b" );          /* CH_0012 */
-        xfput_char( Z80libhdr, 8U, lib_file );				/* write library header */
+
+		/* write library header */
+		xfput_strz( lib_file, Z80libhdr );
 
         open_error_file( get_err_filename( lib_filename ) );
 
@@ -918,7 +915,8 @@ CreateLib( char *lib_filename )
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
             filebuffer = xnew_n( char, ( size_t ) Codesize );
-            xfget_char( filebuffer, Codesize, obj_file ); /* load object file */
+			/* load object file */
+            xfget_chars( obj_file, filebuffer, Codesize );
             fclose( obj_file );
             obj_file = NULL;
 
@@ -935,17 +933,20 @@ CreateLib( char *lib_filename )
 
             if ( CURRENTMODULE->nextmodule == NULL )
             {
-                xfput_u32( -1, lib_file );    /* this is the last module */
+                xfput_uint32( lib_file, -1 );    /* this is the last module */
             }
             else
             {
                 fptr = ftell( lib_file ) + 4 + 4;
-                xfput_u32( fptr + Codesize, lib_file ); /* file pointer to next module */
+                xfput_uint32( lib_file, fptr + Codesize ); /* file pointer to next module */
             }
 
-            xfput_u32( Codesize, lib_file );    /* size of this module */
-            xfput_char( filebuffer, ( size_t ) Codesize, lib_file ); /* write module to library */
-            xfree( filebuffer );
+            xfput_uint32( lib_file, Codesize );    /* size of this module */
+
+			/* write module to library */
+            xfput_chars( lib_file, filebuffer, Codesize ); 
+
+			xfree( filebuffer );
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;
         }
@@ -1041,7 +1042,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.87  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.88  2014-01-20 23:29:18  pauloscustodio
+* Moved file.c to lib/fileutil.c
+*
+* Revision 1.87  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
