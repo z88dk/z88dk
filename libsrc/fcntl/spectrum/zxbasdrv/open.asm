@@ -5,7 +5,7 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.4 2007-06-28 20:16:20 stefano Exp $
+; $Id: open.asm,v 1.5 2014-01-20 11:04:30 stefano Exp $
 
 	XLIB	open
 	
@@ -41,7 +41,7 @@
 
 	inc hl
 	inc hl
-
+	
 	call	zxgetfname	; HL is pointing to file name
 
 	cp	16		; drive "P:" ?

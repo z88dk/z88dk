@@ -9,7 +9,7 @@
 ; the 'D' BASIC variable with the drive number.
 ; N$ will always hold the file name
 ;
-; $Id: zxgetfname.asm,v 1.2 2014-01-20 09:15:31 stefano Exp $
+; $Id: zxgetfname.asm,v 1.3 2014-01-20 11:04:30 stefano Exp $
 
 	XLIB	zxgetfname
 	
@@ -24,6 +24,10 @@
 .dvar	defb 'D',0
 
 .zxgetfname
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 ;	ld	e,(hl)		; pointer to file name
 ;	inc	hl
 ;	ld	d,(hl)
