@@ -10,7 +10,7 @@
  *      writebyte(int fd, int c) - Read byte from file
  * 
  * -----
- * $Id: writebyte.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+ * $Id: writebyte.c,v 1.2 2014-01-20 09:15:31 stefano Exp $
  */
 
 
@@ -42,8 +42,8 @@ int writebyte(int handle, int byte)
 		if ((myfile)->name_prefix=='9') (myfile)->name_prefix='A';
 		else (myfile)->name_prefix++;
 
-		if ((myfile)->name_prefix=='_')
-			return (EOF);
+		//if ((myfile)->name_prefix=='_')
+		//	return (EOF);
 
 		//if (rnd_loadblock(&(myfile)->name_prefix, (myfile)->blockptr, (myfile)->blocksize)) {
 		//	(myfile)->pos_in_block=0;

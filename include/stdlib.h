@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.46 2013-12-05 09:34:00 stefano Exp $
+ * $Id: stdlib.h,v 1.47 2014-01-20 09:15:31 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -27,14 +27,14 @@
 extern int  __LIB__ __FASTCALL__  atoi(char *s);
 extern long __LIB__ __FASTCALL__  atol(char *s);
 
-extern int  __LIB__               itoa(int n, char *s, uchar radix);
-extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, uchar radix);
-extern int  __LIB__               utoa(uint n, char *s, uchar radix);
-extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, uchar radix);
-extern int  __LIB__               ltoa(long n, char *s, uchar radix);
-extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, uchar radix);
-extern int  __LIB__               ultoa(unsigned long n, char *s, uchar radix);
-extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, uchar radix);
+extern int  __LIB__               itoa(int n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__               utoa(uint n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__               ltoa(long n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__               ultoa(unsigned long n, char *s, uchar radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, uchar radix) __SMALLCDECL;
 
 #define itoa(a,b,c)  itoa_callee(a,b,c)
 #define utoa(a,b,c)  utoa_callee(a,b,c)
@@ -43,9 +43,9 @@ extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, uchar r
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
 
-extern long          __LIB__               strtol(char *s, char **endp, int base);
-extern long          __LIB__ __CALLEE__    strtol_callee(char *s, char **endp, int base);
-extern unsigned long __LIB__               strtoul(char *s, char **endp, int base);
+extern long          __LIB__               strtol(char *s, char **endp, int base) __SMALLCDECL;
+extern long          __LIB__ __CALLEE__    strtol_callee(char *s, char **endp, int base) __SMALLCDECL;
+extern unsigned long __LIB__               strtoul(char *s, char **endp, int base) __SMALLCDECL;
 
 #define strtol(a,b,c)  strtol_callee(a,b,c)
 #define strtoul(a,b,c) strtol_callee(a,b,c)
@@ -101,7 +101,7 @@ extern int  __LIB__ __FASTCALL__ atexit(void *fcn);
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 // char *getenv(char *name);                /* might be implemented in target's library but doubtful */
 
-extern int  __LIB__  getopt (int, char **, char *);
+extern int  __LIB__  getopt (int, char **, char *) __SMALLCDECL;
 extern   char *optarg;                      /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;
@@ -118,13 +118,13 @@ extern   int optreset;
 //
 // void *cmp == char (*cmp)(void *key, void *datum);
 
-extern void __LIB__            *l_bsearch(void *key, void *base, unsigned int n, void *cmp);
-extern void __LIB__ __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp);
-extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp);
-extern void __LIB__ __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp);
+extern void __LIB__            *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __SMALLCDECL;
+extern void __LIB__ __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp) __SMALLCDECL;
+extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp) __SMALLCDECL;
+extern void __LIB__ __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp) __SMALLCDECL;
 
-extern void __LIB__            qsort(char *base, unsigned int nel, unsigned int width, void *compar);
-extern void __LIB__ __CALLEE__ qsort_callee(char *base, unsigned int nel, unsigned int width, void *compar);
+extern void __LIB__            qsort(char *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL;
+extern void __LIB__ __CALLEE__ qsort_callee(char *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL;
 
 #define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
@@ -163,8 +163,8 @@ extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 // used to inline code if the parameters resolve to constants.
 
 extern unsigned int  __LIB__ __FASTCALL__ inp(unsigned int port);
-extern void          __LIB__              outp(unsigned int port, unsigned char byte);
-extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigned char byte);
+extern void          __LIB__              outp(unsigned int port, unsigned char byte) __SMALLCDECL;
+extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigned char byte) __SMALLCDECL;
 
 #define outp(a,b) outp_callee(a,b)
 
@@ -181,10 +181,10 @@ extern void __LIB__ __FASTCALL__ *swapendian(void *addr);
 
 // The macros can be used to inline code if the parameters resolve to constants
 
-extern void          __LIB__              bpoke(void *addr, unsigned char byte);
-extern void          __LIB__ __CALLEE__   bpoke_callee(void *addr, unsigned char byte);
-extern void          __LIB__              wpoke(void *addr, unsigned int word);
-extern void          __LIB__ __CALLEE__   wpoke_callee(void *addr, unsigned int word);
+extern void          __LIB__              bpoke(void *addr, unsigned char byte) __SMALLCDECL;
+extern void          __LIB__ __CALLEE__   bpoke_callee(void *addr, unsigned char byte) __SMALLCDECL;
+extern void          __LIB__              wpoke(void *addr, unsigned int word) __SMALLCDECL;
+extern void          __LIB__ __CALLEE__   wpoke_callee(void *addr, unsigned int word) __SMALLCDECL;
 extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr);
 extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 
@@ -216,13 +216,13 @@ extern void   __LIB__  __FASTCALL__   delay (long milliseconds);
 
 // Non standard stdlib.h defs (mode is ignored)
 // Extract a given number of bits from a byte string (at specified bit position) and load into a long value
-extern unsigned long __LIB__             extract_bits(unsigned char *data, unsigned int start, unsigned int size);
-extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size);
+extern unsigned long __LIB__             extract_bits(unsigned char *data, unsigned int start, unsigned int size) __SMALLCDECL;
+extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size) __SMALLCDECL;
 
 #define extract_bits(a,b,c)  extract_bits_callee(a,b,c)
 
 // Compare a file name in "8.3" format to a wildcard expression
-extern int __LIB__ wcmatch(char *wildnam, char *filnam);
+extern int __LIB__ wcmatch(char *wildnam, char *filnam) __SMALLCDECL;
 
 // Convert a BCD encoded value to unsigned int
 extern unsigned int __LIB__ unbcd(unsigned int value);

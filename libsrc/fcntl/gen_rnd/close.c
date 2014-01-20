@@ -5,7 +5,7 @@
  *	int close(int handle)
  *  (write the current block and the control block amd free memory)
  *
- *	$Id: close.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+ *	$Id: close.c,v 1.2 2014-01-20 09:15:31 stefano Exp $
  */
 
 #include <fcntl.h>

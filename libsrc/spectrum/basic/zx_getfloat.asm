@@ -7,12 +7,13 @@
 ;	float zx_getfloat(char *variable);
 ;
 ;
-;	$Id: zx_getfloat.asm,v 1.1 2009-08-04 14:07:18 stefano Exp $
+;	$Id: zx_getfloat.asm,v 1.2 2014-01-20 09:15:32 stefano Exp $
 ;	
 
 XLIB	zx_getfloat
 LIB	zx_locatenum
 XREF	fa
+XREF	call_rom3
 
 INCLUDE  "zxfp.def"
 
@@ -34,7 +35,8 @@ zx_getfloat:
 	inc	hl
 	ld	b,(hl)
 
-	call	ZXFP_STK_STORE
+	call	call_rom3
+	defw	ZXFP_STK_STORE
 
 	rst	ZXFP_BEGIN_CALC
 	defb	ZXFP_RE_STACK

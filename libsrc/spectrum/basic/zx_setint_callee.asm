@@ -6,11 +6,12 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $ 
+;	$Id: zx_setint_callee.asm,v 1.2 2014-01-20 09:15:32 stefano Exp $ 
 ;  	
 
 XLIB	zx_setint_callee
 XDEF 	ASMDISP_ZX_SETINT_CALLEE
+XREF	call_rom3
 
 LIB	zx_locatenum
 
@@ -54,7 +55,8 @@ vlcount:
 	ld	b,0
 	ld	hl,($5c59)      ; E_LINE
 	dec	hl		; now HL points to end of VARS
-	call	$1655		; MAKE-ROOM
+	call    call_rom3
+	defw	$1655		; MAKE-ROOM
 	inc	hl
 	
 	pop	de		; point to VAR name

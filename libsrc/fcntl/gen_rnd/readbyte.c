@@ -7,7 +7,7 @@
  *	Not user callable - internal LIB routine
  *
  *
- *	$Id: readbyte.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+ *	$Id: readbyte.c,v 1.2 2014-01-20 09:15:31 stefano Exp $
 */
 
 #include <fcntl.h>
@@ -33,13 +33,13 @@ int __FASTCALL__ readbyte(int handle)
 		if ((myfile)->name_prefix='Z')
 			return (EOF);
 
-		// TODO : add a save_block here in case we are in RDWR mode
+		// TODO : add a save_block here when we are in RDWR mode
 
 		if ((myfile)->name_prefix=='9') (myfile)->name_prefix='A';
 		else (myfile)->name_prefix++;
 
-		if ((myfile)->name_prefix=='_')
-			return (EOF);
+		//if ((myfile)->name_prefix=='_')
+		//	return (EOF);
 
 		if (rnd_loadblock(&(myfile)->name_prefix, (myfile)->blockptr, (myfile)->blocksize))
 			return (EOF);

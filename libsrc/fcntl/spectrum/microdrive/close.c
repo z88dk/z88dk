@@ -5,7 +5,7 @@
  *	int close(int handle)
  *	closes file and frees memory
  *
- *	$Id: close.c,v 1.2 2005-03-01 17:50:36 stefano Exp $
+ *	$Id: close.c,v 1.3 2014-01-20 09:15:31 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -24,6 +24,7 @@ printf ("-- closing '%s' - %u --",if1_getname( (char *) if1_file->hdname ), hand
 */
 
 free(handle);
+return 0;
 
 }
 

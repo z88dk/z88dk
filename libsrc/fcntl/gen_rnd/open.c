@@ -17,7 +17,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+ *	$Id: open.c,v 1.2 2014-01-20 09:15:31 stefano Exp $
  */
 
 #include <fcntl.h>

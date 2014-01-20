@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.15 2014-01-03 15:20:42 stefano Exp $
+ *	$Id: fcntl.h,v 1.16 2014-01-20 09:15:30 stefano Exp $
  */
 
 
@@ -61,6 +61,8 @@ extern char __LIB__ *getcwd(char *buf, size_t maxlen) __SMALLCDECL;
 /* Following two only implemented for Sprinter ATM (20.11.2002) */
 extern int  __LIB__ rmdir(char *);
 extern char __LIB__ *getwd(char *buf);
+
+
 
 
 /* ********************************************************* */

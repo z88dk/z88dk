@@ -9,11 +9,12 @@
 ;
 ;	CPIR, debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_setstr_callee.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $
+;	$Id: zx_setstr_callee.asm,v 1.3 2014-01-20 09:15:32 stefano Exp $
 ;
 
 XLIB	zx_setstr_callee
 XDEF	ASMDISP_ZX_SETSTR_CALLEE
+XREF	call_rom3
 
 zx_setstr_callee:
 
@@ -47,15 +48,18 @@ morevar:
 	cp	d
 	jr	z,found
 
-	call	$19b8			;get next variable start
+	call    call_rom3
+	defw	$19b8			;get next variable start
 	ex	de,hl
 	pop	de
 	push	de
 	jr	loop
 
 found:	
-	call	$19b8			; get next variable start
-	call	$19e8			; reclaim space (delete)
+	call    call_rom3
+	defw	$19b8			; get next variable start
+	call    call_rom3
+	defw	$19e8			; reclaim space (delete)
 	
 store:
 
@@ -82,7 +86,8 @@ store:
 	inc	bc
 	inc	bc
 	inc	bc
-	call	$1655			; MAKE-ROOM
+	call    call_rom3
+	defw	$1655			; MAKE-ROOM
 	pop	bc
 	pop	hl
 	

@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.196 2014-01-14 07:48:40 stefano Exp $
+# $Id: Makefile,v 1.197 2014-01-20 09:15:31 stefano Exp $
 
 
 include Make.config
@@ -27,7 +27,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
-genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib ndos.lib adt.lib balloc.lib \
+genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -204,6 +204,9 @@ malloc.lib:
 
 ndos.lib:
 	cd fcntl/dummy ; $(MAKE) ; cd ../..
+
+gendos.lib:
+	cd fcntl ; $(MAKE) lgendos ; cd ..
 
 # Startup code (such as division etc) common to all z80s - dom
 z80_crt0.lib:
@@ -1444,7 +1447,6 @@ sos_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd sos ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
-	cd fcntl ; $(MAKE) lgendos ; cd ..
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:

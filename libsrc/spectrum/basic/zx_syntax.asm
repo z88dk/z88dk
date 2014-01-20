@@ -11,11 +11,12 @@
 ;		Terminate the string with carriage return.
 ;
 ;
-;	$Id: zx_syntax.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_syntax.asm,v 1.2 2014-01-20 09:15:32 stefano Exp $
 ;
 
 XLIB	zx_syntax
 LIB	zx_interface1
+XREF	call_rom3
 
 	; max space for BASIC command(s)
 	defc	cmdlen = 20
@@ -23,7 +24,8 @@ LIB	zx_interface1
 zx_syntax:
 		push	hl
 		call	zx_interface1	; force IF1 activation to avoid crashes
-		call	$16b0		; clear buffers
+		call	call_rom3
+		defw	$16b0		; clear buffers
 		pop	de
 		
 		ld	hl,($5c5d)	; save CH-ADD
@@ -36,7 +38,8 @@ zx_syntax:
 		ld	bc,cmdlen
 		push	bc
 		push	de
-		call	$1655		; MAKE_ROOM
+		call	call_rom3
+		defw	$1655		; MAKE_ROOM
 		pop	hl
 		pop	bc
 		pop	de
@@ -58,7 +61,8 @@ zx_syntax:
 		push	bc
 		ld	($5c3d),sp	; update error handling routine
 		
-		call	$1b17		; check syntax
+		call	call_rom3
+		defw	$1b17		; check syntax
 		;ld	(iy+0),255	; set ERR_NR to OK
 		pop	bc
 return:
@@ -91,7 +95,8 @@ nook:
 		;set     5,(iy+$37)	; force to EDIT mode
 		;call	$1097		; CLEAR-SP
 		;res     5,(iy+$37)	; unset EDIT mode
-		call	$16b0		; clear buffers
+		call	call_rom3
+		defw	$16b0		; clear buffers
 		
 		pop	hl
 		ld	($5c5f),hl	; restore X-PTR

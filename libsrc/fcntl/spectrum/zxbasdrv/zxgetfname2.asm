@@ -8,30 +8,37 @@
 ; This routine will eventually strip the header and update
 ; the 'D' BASIC variable with the drive number.
 ; N$ will always hold the file name
+; The character specifying the current block is handled
 ;
-; $Id: zxgetfname.asm,v 1.2 2014-01-20 09:15:31 stefano Exp $
+; $Id: zxgetfname2.asm,v 1.1 2014-01-20 09:15:32 stefano Exp $
 
-	XLIB	zxgetfname
+	XLIB	zxgetfname2
 	
 	LIB	zx_setint_callee
 	LIB	zx_setstr_callee
-	
+
 	XREF ASMDISP_ZX_SETSTR_CALLEE
 	XREF ASMDISP_ZX_SETINT_CALLEE
-
 
 ; BASIC variable names for numeric values
 .dvar	defb 'D',0
 
-.zxgetfname
-;	ld	e,(hl)		; pointer to file name
-;	inc	hl
-;	ld	d,(hl)
+.zxgetfname2
+	;ld	e,(hl)		; pointer to file name
+	;inc	hl
+	;ld	d,(hl)
+
+	ld	b,(hl)
+	;ld	b,a
 
 	inc	hl
+	inc	hl
 	ld	a,(hl)
+	push hl
 	cp	':'		; is a drive specified ?
+	push af		; remember the character and the answer
 	dec	hl
+	dec hl
 	jr	nz,default
 
 	ld	a,(hl)
@@ -42,44 +49,40 @@
 .nonum	and	95		; to upper
 	sub	64		; now 'A' = drive 1, etc..
 .wasnum	
+	ld	c,a
 	inc	hl		; now skip the first 2 chars ('a:' or similar)
-	inc	hl
+	;ld	a,b
+	ld	(hl),b	; well.. almost.  let's temporairly overwrite ':' with the first char in the block name
+	;inc	hl
 	jr	nodefault
 .default
-	ld	a,1		; force default: first drive
+	ld	c,1		; force default: first drive
 .nodefault
 
 	;ld	b,0
 	;ld	c,a
 
-	push	af		; keep the "drive number", can be useful ;o)
-
 	push	hl
 	ld	hl,dvar		; BASIC variable 'D'
-	;push	hl
-	;push	bc
 	ld	d,0
-	ld	e,a
+	ld	e,c
 	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
-	;pop	bc
-	;pop	hl
 	pop	hl
 ;	jr	drvnum
 	
 
 ;.drvnum
-	;ld	h,0
 	;ex	de,hl
+	
 	push hl
 	ld	e,'N'		; n$
-	;push	hl
-	;push	de
 	call	zx_setstr_callee + ASMDISP_ZX_SETSTR_CALLEE
-	;pop	hl
-	;pop	bc
 	pop hl
 
-	pop	af		; drive number (to check if printer, etc)
-
+	pop	af
+	pop	de
+	inc de
+	inc de
+	ld	(de),a
 	ret
 

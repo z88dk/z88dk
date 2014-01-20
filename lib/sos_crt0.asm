@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.3 2013-11-28 15:33:52 stefano Exp $
+;       $Id: sos_crt0.asm,v 1.4 2014-01-20 09:15:31 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -41,13 +41,13 @@
 
 	XDEF    __sgoioblk	;std* control block
 
-
 ;-----------------------
 ; Target specific labels
 ;-----------------------
 
 	XDEF	snd_tick	; for sound code, if any
 	XDEF	bit_irqstatus	; current irq status when DI is necessary
+	XDEF    _RND_BLOCKSIZE;
 
         IF      !myzorg
                 defc    myzorg  = $3000
@@ -67,16 +67,13 @@
 ;----------------------
 start:
 	ld      (start1+1),sp	;Save entry stack
-	;ld	a,($80)		;byte count of length of args
-	;inc	a		;we can use this since args are space separated
-	;neg
-	;ld	l,a
-	;ld	h,-1		;negative number
-	;ld      de,-64		;Add on space for atexit() stack
-	;add	hl,de
-	;add     hl,sp
-	;ld      sp,hl
-	;ld      (exitsp),sp
+
+        ld      sp,($1f6a)	;Upper limit of the user area
+
+        ld      hl,-65
+        add     hl,sp
+        ld      sp,hl
+        ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -332,6 +329,16 @@ IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable
 bit_irqstatus:	defw	0
 ENDIF
+
+; Default block size for "gendos.lib"
+; every single block (up to 36) is written in a separate file
+; the bigger RND_BLOCKSIZE, bigger can be the output file size
+; but this comes at cost of the malloc'd space for the internal buffer
+; Current block size is kept in a control block (just a structure saved
+; in a separate file, so changing this value
+; at runtime before creating a file is perfectly legal.
+_RND_BLOCKSIZE:	defw	1000
+
 
 ;-----------------------------------------------------
 ; Unneccessary file signature + target specific stuff

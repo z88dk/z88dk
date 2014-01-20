@@ -9,11 +9,12 @@
 ;
 ;	Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $ 
+;	$Id: zx_getstr_callee.asm,v 1.3 2014-01-20 09:15:32 stefano Exp $ 
 ;
 
 XLIB	zx_getstr_callee
 XDEF	ASMDISP_ZX_GETSTR_CALLEE
+XREF	call_rom3
 
 zx_getstr_callee:
 
@@ -43,7 +44,8 @@ loop:	ld	a,(hl)
 	jr	z,found
 
 	push	de
-	call	$19b8			;get next variable start
+	call	call_rom3
+	defw	$19b8			;get next variable start
 	ex	de,hl
 	pop	de
 	jr	loop

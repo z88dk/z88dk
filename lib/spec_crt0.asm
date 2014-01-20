@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.34 2013-10-21 14:23:44 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.35 2014-01-20 09:15:31 stefano Exp $
 ;
 
 
@@ -42,6 +42,8 @@
 
         XDEF    snd_tick        ; Sound variable
         XDEF	bit_irqstatus	; current irq status when DI is necessary
+
+        XDEF	_RND_BLOCKSIZE;
 
         XDEF    call_rom3       ; Interposer
        
@@ -488,6 +490,7 @@ bit_irqstatus   ds.w    1       ; used to save the current IRQ status
 heaplast        ds.w    1       ; Address of last block on heap
 heapblocks      ds.w    1       ; Number of blocks
 card_select		ds.b	1		; Currently selected MMC/SD slot for ZXMMC
+_RND_BLOCKSIZE  ds.w    1       ; RND file block size
 romsvc          ds.b	1	; Pointer to the end of the sysdefvars
 				; used by the ROM version of some library
 }
@@ -522,6 +525,7 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
+
 IF DEFINED_USING_amalloc
 XREF ASMTAIL
 XDEF _heap
@@ -544,6 +548,14 @@ IF DEFINED_NEED_ZXMMC
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
+; Default block size for "gendos.lib"
+; every single block (up to 36) is written in a separate file
+; the bigger RND_BLOCKSIZE, bigger can be the output file size
+; but this comes at cost of the malloc'd space for the internal buffer
+; Current block size is kept in a control block (just a structure saved
+; in a separate file, so changing this value
+; at runtime before creating a file is perfectly legal.
+_RND_BLOCKSIZE:	defw	1000
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the

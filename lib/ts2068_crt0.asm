@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.17 2013-10-21 14:23:44 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.18 2014-01-20 09:15:31 stefano Exp $
 ;
 
 
@@ -37,6 +37,8 @@
 
         XDEF	snd_tick	; Sound variable
         XDEF	bit_irqstatus	; current irq status when DI is necessary
+
+        XDEF	_RND_BLOCKSIZE;
 
         XDEF    call_rom3       ; Interposer
 
@@ -446,6 +448,14 @@ IF DEFINED_NEED_ZXMMC
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
+; Default block size for "gendos.lib"
+; every single block (up to 36) is written in a separate file
+; the bigger RND_BLOCKSIZE, bigger can be the output file size
+; but this comes at cost of the malloc'd space for the internal buffer
+; Current block size is kept in a control block (just a structure saved
+; in a separate file, so changing this value
+; at runtime before creating a file is perfectly legal.
+_RND_BLOCKSIZE:	defw	1000
 
 		defm	"Small C+ ZX"	;Unnecessary file signature
 		defb	0

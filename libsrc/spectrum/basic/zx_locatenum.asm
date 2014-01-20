@@ -9,7 +9,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.4 2009-08-05 07:14:47 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.5 2014-01-20 09:15:32 stefano Exp $
 ;
 ;	vars format:
 ;
@@ -19,6 +19,7 @@
 ;
 
 	XLIB	zx_locatenum
+	XREF	call_rom3
 	
 zx_locatenum:
 
@@ -67,7 +68,8 @@ vp:	ld	a,(hl)
 	ld	a,(hl)
 	
 v1:	push	bc
-	call	$19b8		; find next variable
+	call    call_rom3
+	defw	$19b8		; find next variable
 	pop	bc
 	ex	de,hl
 	jr	vp

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.8 2013-12-10 11:43:14 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.9 2014-01-20 09:15:31 stefano Exp $
 ;
 
 

@@ -18,10 +18,11 @@
 ;		 or 
 ;		 9999 STOP
 ;
-;	$Id: zx_goto.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_goto.asm,v 1.2 2014-01-20 09:15:32 stefano Exp $
 ;
 
 XLIB	zx_goto	
+XREF	call_rom3
 
 ; enter : hl = line number
 
@@ -35,7 +36,8 @@ zx_goto:
 	ld	($5c6e),hl	; BASIC line number
 	xor	a
 	ld	($5c44),a	; Position within line
-	call	$1b9e		; Enter BASIC
+	call	call_rom3
+	defw	$1b9e		; Enter BASIC
 	pop	bc
 	ld	hl,0
 	jr	exitgoto
@@ -49,7 +51,7 @@ return:
 	bit	0,(iy+124)	; test FLAGS3: coming from paged ROM ?
 	jr	nz,stderr
 	ld	(iy+124),0	; yes, reset FLAGS3..
-	ld	l,254		; ... and set error code to 255
+	;ld	l,254		; ... and set error code to 255
 stderr:
 
 	inc	l		; return with error code (0=OK, etc..)

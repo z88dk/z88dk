@@ -8,11 +8,12 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: zx_getint.asm,v 1.3 2014-01-20 09:15:32 stefano Exp $
 ;	
 
 XLIB	zx_getint
 LIB	zx_locatenum
+XREF	call_rom3
 
 INCLUDE  "zxfp.def"
 
@@ -33,8 +34,10 @@ zx_getint:
 	inc	hl
 	ld	b,(hl)
 	
-	call	ZXFP_STK_STORE
-	call	ZXFP_FP_TO_BC
+	call    call_rom3
+	defw	ZXFP_STK_STORE
+	call    call_rom3
+	defw	ZXFP_FP_TO_BC
 	
 	ld	h,b
 	ld	l,c

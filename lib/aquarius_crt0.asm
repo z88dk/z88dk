@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.11 2014-01-20 09:15:31 stefano Exp $
 ;
 
 
@@ -43,8 +43,13 @@
         XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 
-        ;;org     14768		; Mattel relocating loader
-	org	14712		; Simpler loader
+        IF      !myzorg
+                defc    myzorg  = 14712
+        ENDIF
+
+       ;;org     14768		; Mattel relocating loader
+	;;org	14712		; Simpler loader
+	org myzorg
 
 start:
         ld      (start1+1),sp	;Save entry stack

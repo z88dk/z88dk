@@ -1,0 +1,4 @@
+rnd_loadblock
+rnd_saveblock
+rnd_erase
+zxgetfname2
