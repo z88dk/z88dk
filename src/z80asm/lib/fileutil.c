@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.7 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.8 2014-01-21 22:42:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -34,6 +34,8 @@ typedef struct OpenFileElem
 
 OpenFileElem *open_files = NULL;	/* singleton */
 
+List *temp_files = NULL;			/* keep list of temp files generated */
+
 /*-----------------------------------------------------------------------------
 *	Initialize and terminate module
 *----------------------------------------------------------------------------*/
@@ -42,17 +44,24 @@ DEFINE_init()
 	strpool_init();
 	
 	open_files = NULL;
+	temp_files = OBJ_NEW( List );	/* make sure we cleanup before class */
 }
 
 DEFINE_fini()
 {
-    OpenFileElem *elem, *tmp;
-
-    HASH_ITER( hh, open_files, elem, tmp )
+    OpenFileElem *open_elem, *tmp;
+	char *filename;
+	
+	/* delete open files hash */
+    HASH_ITER( hh, open_files, open_elem, tmp )
     {
-        HASH_DEL( open_files, elem );
-        xfree( elem );
+        HASH_DEL( open_files, open_elem );
+        xfree( open_elem );
     }
+	
+	/* unlink all temp files */
+	while ( (filename = List_pop( temp_files )) != NULL )
+		remove( filename );		/* ignore errors, file may not exist */
 }
 
 /*-----------------------------------------------------------------------------
@@ -85,6 +94,15 @@ static void add_open_file( FILE *file, char *filename, BOOL writing )
 
         HASH_ADD_PTR( open_files, file, elem );
     }
+}
+
+/*-----------------------------------------------------------------------------
+*	Add temp file name to list of files to delete at exit
+*----------------------------------------------------------------------------*/
+static void add_temp_file( char *filename )
+{
+	init();
+	List_push( &temp_files, strpool_add(filename) );
 }
 
 /*-----------------------------------------------------------------------------
@@ -230,11 +248,13 @@ void xfget_chars( FILE *file, char *buffer, size_t len )
 *----------------------------------------------------------------------------*/
 void xfput_strz( FILE *file, char *str )
 {
+	init();
     xfput_chars( file, str, strlen(str) );
 }
 
 void xfput_Str( FILE *file, Str *str )
 {
+	init();
     xfput_chars( file, str->str, str->len );
 }
 
@@ -265,11 +285,13 @@ static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
 
 void xfput_count_byte_strz( FILE *file, char *str )
 {
+	init();
 	_xfput_count_byte_str( file, str, strlen(str) );
 }
 
 void xfput_count_byte_Str( FILE *file, Str *str )
 {
+	init();
 	_xfput_count_byte_str( file, str->str, str->len );
 }
 
@@ -297,11 +319,13 @@ static void _xfput_count_word_str( FILE *file, char *str, size_t len )
 
 void xfput_count_word_strz( FILE *file, char *str )
 {
+	init();
 	_xfput_count_word_str( file, str, strlen(str) );
 }
 
 void xfput_count_word_Str( FILE *file, Str *str )
 {
+	init();
 	_xfput_count_word_str( file, str->str, str->len );
 }
 
@@ -474,23 +498,40 @@ void path_replace_ext( Str *dest, char *filename, char *new_ext )
         Str_append( dest, new_ext );
 }
 
-/* make a copy of the file basename, skipping the directory part */
-void path_basename( Str *dest, char *filename )
+/* return address of start of file basename after final slash, or start of string in none */
+static char *_start_basename( char *filename )
 {
-    char *dir_pos_1, *dir_pos_2, *basename;
+    char *dir_pos_1, *dir_pos_2;
 
 	init();
 	
     dir_pos_1 = strrchr( filename, '/' );
-
     if ( dir_pos_1 == NULL ) dir_pos_1 = filename - 1;
 
     dir_pos_2 = strrchr( filename, '\\' );
-
     if ( dir_pos_2 == NULL ) dir_pos_2 = filename - 1;
 
-    basename = MAX( dir_pos_1, dir_pos_2 ) + 1;
-    Str_set( dest, basename );
+	return MAX( dir_pos_1, dir_pos_2 ) + 1;
+}
+
+/* make a copy of the file basename, skipping the directory part */
+void path_basename( Str *dest, char *filename )
+{
+	init();
+    Str_set( dest, _start_basename(filename) );
+}
+
+/* make a copy of the file dirname */
+void path_dirname( Str *dest, char *filename )
+{
+	char *basename;
+	
+	init();
+	
+    Str_set( dest, filename );
+	basename = _start_basename( dest->str );
+	*basename = '\0';		/* remove basename */
+	Str_sync_len( dest );
 }
 
 /* search for a file on the given directory list, return full path name */
@@ -540,10 +581,33 @@ char *search_file( char *filename, List *dir_list )
     return strpool_add( dest->str );
 }
 
+/*-----------------------------------------------------------------------------
+*   Temp files
+*----------------------------------------------------------------------------*/
+char *temp_filename( char *filename )
+{
+	static int count;
+	
+	DEFINE_FILE_STR( temp );
+	DEFINE_FILE_STR( dirname );
+	DEFINE_FILE_STR( basename );
+	
+	init();
+
+	path_dirname(   dirname, filename);		
+	path_basename( basename, filename);
+	
+	Str_sprintf( temp, "%s~$%d$%s", dirname->str, ++count, basename->str );
+	add_temp_file( temp->str );
+	return strpool_add( temp->str );
+}
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.7  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.8  2014-01-21 22:42:18  pauloscustodio
+* New dirname(), temp_filename()
+*
+* Revision 1.7  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.6  2014/01/15 00:01:40  pauloscustodio
