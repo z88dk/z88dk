@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.132 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.133 2014-01-21 23:12:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -191,7 +191,6 @@ static void query_assemble( char *src_filename, char *obj_filename )
 *----------------------------------------------------------------------------*/
 static void do_assemble( char *src_filename, char *obj_filename )
 {
-    DEFINE_FILE_STR( basename );
     DEFINE_FILE_STR( module_name );
     int start_errors = get_num_errors();     /* count errors in this source file */
 
@@ -236,8 +235,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
         {
-            path_basename( basename, src_filename );
-            path_remove_ext( module_name, basename->str );
+			Str_set( module_name, path_remove_ext(path_basename(src_filename)) );
             strtoupper( module_name->str );
             CURRENTMODULE->mname = xstrdup( module_name->str );
         }
@@ -759,7 +757,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.132  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.133  2014-01-21 23:12:30  pauloscustodio
+* path_... functions return filename instrpool, no need to pass an array to store result.
+*
+* Revision 1.132  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.131  2014/01/15 00:01:40  pauloscustodio

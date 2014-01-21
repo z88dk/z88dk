@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.6 2014-01-21 22:42:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.7 2014-01-21 23:12:30 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -36,20 +36,20 @@ write_file("test.c", <<'END');
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
 #define T_REMOVE_EXT(init, result) \
-		path_remove_ext( s, init ); \
-		if ( strcmp( s->str, result ) ) ERROR;
+		p = path_remove_ext( init ); \
+		if ( strcmp( p, result ) ) ERROR;
 
 #define T_REPLACE_EXT(init, ext, result) \
-		path_replace_ext( s, init, ext ); \
-		if ( strcmp( s->str, result ) ) ERROR;
+		p = path_replace_ext( init, ext ); \
+		if ( strcmp( p, result ) ) ERROR;
 
 #define T_BASENAME(init, result) \
-		path_basename( s, init ); \
-		if ( strcmp( s->str, result ) ) ERROR;
+		p = path_basename( init ); \
+		if ( strcmp( p, result ) ) ERROR;
 
 #define T_DIRNAME(init, result) \
-		path_dirname( s, init ); \
-		if ( strcmp( s->str, result ) ) ERROR;
+		p = path_dirname( init ); \
+		if ( strcmp( p, result ) ) ERROR;
 
 #define T_SEARCH(file, path, result) \
 		path_search( s, file, path ); \
@@ -565,7 +565,10 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binary => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.6  2014-01-21 22:42:18  pauloscustodio
+# Revision 1.7  2014-01-21 23:12:30  pauloscustodio
+# path_... functions return filename instrpool, no need to pass an array to store result.
+#
+# Revision 1.6  2014/01/21 22:42:18  pauloscustodio
 # New dirname(), temp_filename()
 #
 # Revision 1.5  2014/01/20 23:29:18  pauloscustodio

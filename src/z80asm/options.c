@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.70 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.71 2014-01-21 23:12:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -515,16 +515,6 @@ static void option_cpu_RCM2000( void )
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
 
-static char *replace_ext( char *filename, char *ext )
-{
-    DEFINE_FILE_STR( new_filename );
-
-    init();
-
-    path_replace_ext( new_filename, filename, ext );
-    return strpool_add( new_filename->str );
-}
-
 static char *get_opts_ext_filename( char *filename, char *opts_ext )
 {
     DEFINE_FILE_STR( ext );
@@ -533,41 +523,56 @@ static char *get_opts_ext_filename( char *filename, char *opts_ext )
 
     Str_set( ext, FILEEXT_SEPARATOR );
     Str_append( ext, opts_ext );
-    return replace_ext( filename, ext->str );
+    return path_replace_ext( filename, ext->str );
 }
 
 char *get_lst_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_LST );
+    init();
+	return path_replace_ext( filename, FILEEXT_LST );
 }
+
 char *get_def_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_DEF );
+    init();
+	return path_replace_ext( filename, FILEEXT_DEF );
 }
+
 char *get_err_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_ERR );
+    init();
+	return path_replace_ext( filename, FILEEXT_ERR );
 }
+
 char *get_bin_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_BIN );
+    init();
+	return path_replace_ext( filename, FILEEXT_BIN );
 }
+
 char *get_lib_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_LIB );
+    init();
+	return path_replace_ext( filename, FILEEXT_LIB );
 }
+
 char *get_sym_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_SYM );
+    init();
+	return path_replace_ext( filename, FILEEXT_SYM );
 }
+
 char *get_map_filename( char *filename )
 {
-    return replace_ext( filename, FILEEXT_MAP );
+    init();
+	return path_replace_ext( filename, FILEEXT_MAP );
 }
+
 char *get_asm_filename( char *filename )
 {
     return get_opts_ext_filename( filename, opts.asm_ext );
 }
+
 char *get_obj_filename( char *filename )
 {
     return get_opts_ext_filename( filename, opts.obj_ext );
@@ -581,13 +586,16 @@ char *get_segbin_filename( char *filename, int segment )
 
     Str_set( ext, FILEEXT_SEGBIN );
     Str_append_sprintf( ext, "%d", segment );
-    return replace_ext( filename, ext->str );
+    return path_replace_ext( filename, ext->str );
 }
 
 
 /*
 * $Log: options.c,v $
-* Revision 1.70  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.71  2014-01-21 23:12:30  pauloscustodio
+* path_... functions return filename instrpool, no need to pass an array to store result.
+*
+* Revision 1.70  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.69  2014/01/11 01:29:40  pauloscustodio

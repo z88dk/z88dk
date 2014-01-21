@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.8 2014-01-21 22:42:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.9 2014-01-21 23:12:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -462,7 +462,7 @@ void xfget_uint32( FILE *file, unsigned long *pvalue )
 *----------------------------------------------------------------------------*/
 
 /* remove the extension of the filename, returns in passed Str */
-void path_remove_ext( Str *dest, char *filename )
+static void _path_remove_ext( Str *dest, char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
 
@@ -487,15 +487,27 @@ void path_remove_ext( Str *dest, char *filename )
     }
 }
 
-/* make a copy of the file name in strpool, replacing the extension */
-void path_replace_ext( Str *dest, char *filename, char *new_ext )
+char *path_remove_ext( char *filename )
 {
+	DEFINE_FILE_STR( dest );
+
+	init();
+	_path_remove_ext( dest, filename );
+	return strpool_add( dest->str );
+}
+
+/* make a copy of the file name in strpool, replacing the extension */
+char *path_replace_ext( char *filename, char *new_ext )
+{
+	DEFINE_FILE_STR( dest );
+
 	init();
 	
-    path_remove_ext( dest, filename );
+    _path_remove_ext( dest, filename );
 
     if ( new_ext != NULL )
         Str_append( dest, new_ext );
+	return strpool_add( dest->str );
 }
 
 /* return address of start of file basename after final slash, or start of string in none */
@@ -515,15 +527,16 @@ static char *_start_basename( char *filename )
 }
 
 /* make a copy of the file basename, skipping the directory part */
-void path_basename( Str *dest, char *filename )
+char *path_basename( char *filename )
 {
 	init();
-    Str_set( dest, _start_basename(filename) );
+    return strpool_add( _start_basename(filename) );
 }
 
 /* make a copy of the file dirname */
-void path_dirname( Str *dest, char *filename )
+char *path_dirname( char *filename )
 {
+	DEFINE_FILE_STR( dest );
 	char *basename;
 	
 	init();
@@ -531,7 +544,7 @@ void path_dirname( Str *dest, char *filename )
     Str_set( dest, filename );
 	basename = _start_basename( dest->str );
 	*basename = '\0';		/* remove basename */
-	Str_sync_len( dest );
+	return strpool_add( dest->str );
 }
 
 /* search for a file on the given directory list, return full path name */
@@ -586,25 +599,23 @@ char *search_file( char *filename, List *dir_list )
 *----------------------------------------------------------------------------*/
 char *temp_filename( char *filename )
 {
+	DEFINE_FILE_STR( temp );
 	static int count;
 	
-	DEFINE_FILE_STR( temp );
-	DEFINE_FILE_STR( dirname );
-	DEFINE_FILE_STR( basename );
-	
 	init();
-
-	path_dirname(   dirname, filename);		
-	path_basename( basename, filename);
 	
-	Str_sprintf( temp, "%s~$%d$%s", dirname->str, ++count, basename->str );
+	Str_sprintf( temp, "%s~$%d$%s", 
+				 path_dirname(filename), ++count, path_basename(filename) );
 	add_temp_file( temp->str );
 	return strpool_add( temp->str );
 }
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.8  2014-01-21 22:42:18  pauloscustodio
+* Revision 1.9  2014-01-21 23:12:30  pauloscustodio
+* path_... functions return filename instrpool, no need to pass an array to store result.
+*
+* Revision 1.8  2014/01/21 22:42:18  pauloscustodio
 * New dirname(), temp_filename()
 *
 * Revision 1.7  2014/01/20 23:29:18  pauloscustodio

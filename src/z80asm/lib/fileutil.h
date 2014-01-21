@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.7 2014-01-21 22:42:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.8 2014-01-21 23:12:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -83,17 +83,16 @@ extern void xfget_uint32( FILE *file, unsigned long *pvalue );
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
-*   All filenames are returned in fixed length Str defined by
-*	DEFINE_STR( dest, FILENAME_MAX ).
+*   All filenames are returned in strpool
 *	Input string is unchanged.
 *	Basename is file name removing all directories.
 *	Dirname is the path up to and including the final slash.
 *	Extension is the final "." followed by sequence of letters or digits
 *----------------------------------------------------------------------------*/
-extern void path_remove_ext(  Str *dest, char *filename );
-extern void path_replace_ext( Str *dest, char *filename, char *new_ext );
-extern void path_basename(    Str *dest, char *filename );
-extern void path_dirname(     Str *dest, char *filename );
+extern char *path_remove_ext( char *filename );
+extern char *path_replace_ext( char *filename, char *new_ext );
+extern char *path_basename( char *filename );
+extern char *path_dirname( char *filename );
 
 /* search for a file on the given directory list, return full path name */
 extern void path_search( Str *dest, char *filename, List *dir_list );
@@ -105,7 +104,10 @@ extern char *temp_filename( char *filename );
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.7  2014-01-21 22:42:18  pauloscustodio
+* Revision 1.8  2014-01-21 23:12:30  pauloscustodio
+* path_... functions return filename instrpool, no need to pass an array to store result.
+*
+* Revision 1.7  2014/01/21 22:42:18  pauloscustodio
 * New dirname(), temp_filename()
 *
 * Revision 1.6  2014/01/20 23:29:18  pauloscustodio
