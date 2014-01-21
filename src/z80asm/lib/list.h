@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.5 2014-01-21 21:33:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.6 2014-01-21 22:42:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -39,11 +39,11 @@ CLASS( List )
 END_CLASS;
 
 /* add and retrieve at the end */
-extern void   List_push( List **pself, void *data );
+extern void  List_push( List **pself, void *data );
 extern void *List_pop( List *self );
 
 /* add and retrieve at the start */
-extern void   List_unshift( List **pself, void *data );
+extern void  List_unshift( List **pself, void *data );
 extern void *List_shift( List *self );
 
 /* set iterator to start and end of list, data is iter->data */
@@ -71,7 +71,10 @@ extern BOOL List_empty( List *self );
 
 /*
 * $Log: list.h,v $
-* Revision 1.5  2014-01-21 21:33:02  pauloscustodio
+* Revision 1.6  2014-01-21 22:42:40  pauloscustodio
+* ws
+*
+* Revision 1.5  2014/01/21 21:33:02  pauloscustodio
 * ws
 *
 * Revision 1.4  2014/01/11 01:29:40  pauloscustodio
