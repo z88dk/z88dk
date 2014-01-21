@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.7 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.8 2014-01-21 21:31:52 pauloscustodio Exp $
 */
 
 #pragma once
@@ -51,10 +51,10 @@ extern char *strip( char *string );
 *	Str_sync_len(&s2)	// syncronize s2.len after s2.str is manipulated
 *----------------------------------------------------------------------------*/
 CLASS( Str )
-char	*str;		/* string - may contain zero bytes */
-size_t	 size;		/* allocated size */
-size_t	 len;		/* sring length (excluding zero terminator) */
-BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
+	char	*str;		/* string - may contain zero bytes */
+	size_t	 size;		/* allocated size */
+	size_t	 len;		/* sring length (excluding zero terminator) */
+	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
 						   FALSE if str is in user supplied buffer and cannot grow */
 END_CLASS;
 
@@ -113,7 +113,10 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.7  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.8  2014-01-21 21:31:52  pauloscustodio
+* ws
+*
+* Revision 1.7  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

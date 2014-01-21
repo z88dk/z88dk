@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.4 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.5 2014-01-21 21:33:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,10 +32,10 @@ typedef struct ListElem
 } ListElem;
 
 CLASS( List )
-size_t count;							/* number of objects */
-void ( *free_data )( void * );				/* function to free an element
+	size_t count;							/* number of objects */
+	void ( *free_data )( void * );			/* function to free an element
 											   called by List_remove_all() */
-TAILQ_HEAD( ListHead, ListElem ) head;	/* head of queue */
+	TAILQ_HEAD( ListHead, ListElem ) head;	/* head of queue */
 END_CLASS;
 
 /* add and retrieve at the end */
@@ -71,7 +71,10 @@ extern BOOL List_empty( List *self );
 
 /*
 * $Log: list.h,v $
-* Revision 1.4  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.5  2014-01-21 21:33:02  pauloscustodio
+* ws
+*
+* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
