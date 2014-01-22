@@ -20,7 +20,7 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 
    ld a,b
    or a
-   jr z, correcty
+   jr nz, correcty
    ld a,c
    cp 191
    jp c, yok

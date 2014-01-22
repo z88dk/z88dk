@@ -21,7 +21,7 @@ XREF _in_KempcoordX, _in_KempcoordY
 
    ld a,b
    or a
-   jr z, correcty
+   jr nz, correcty
    ld a,c
    cp 191
    jp c, yok
