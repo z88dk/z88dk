@@ -14,34 +14,53 @@ XREF _in_KemprawX, _in_KemprawY
 ; uses : AF,BC,E
 
 .INMouseKemp
+
    ld a,(_in_KempcoordX)
-   ld b,a
+   ld b,a                      ; b = current x coordinate
+   
    ld a,(_in_KemprawX)
    ld e,a
+   
    ld a,$fb
    in a,($df)
+   
    ld (_in_KemprawX),a
-   sub e                       ; A = delta X
-   jp pe, overflowX            ; kill the X movement if overflow
+   sub e                       ; a = delta x
+   
    jp m, negdx
 
 .posdx
-   add a,b
-   jr nc, Xok
-   ld a,255
+
+   cp 80
+   jr nc, overflowX            ; kill x movement if change is 1/3 of screen
+
+   add a,b                     ; a = x + delta
+   jp nc, Xok
+   
+   ld a,255                    ; moved past right side of screen
    jp Xok
 
 .negdx
-   add a,b
-   jp po, Xok
-   xor a
+
+   neg                         ; make negative delta positive
+   cp 80
+   jr nc, overflowX            ; kill movement if change is 1/3 of screen
+   
+   ld c,a
+   ld a,b
+   sub c                       ; a = x - delta
+   jp nc, Xok
+   
+   xor a                       ; moved past left side of screen
 
 .Xok
+
    ld (_in_KempcoordX),a
    ld b,a
 
 .overflowX
 .dobuts
+
    ld a,$fa
    in a,($df)
    and $03
