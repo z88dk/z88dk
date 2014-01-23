@@ -44,13 +44,34 @@ width_specified:
 
 assignment_suppressed:
 
-   ; SKIP CHARS FROM STREAM
+   ; SEEK PAST CHARS FROM STREAM
+   ; forward seek is always successful even if it passes end of file
 
-;; 1. fseek to get position
-;; 2. push position
-;; 3. fseek ahead by width bytes
-;; 4. subtract old position from new position
-;; 5. add to stream bytes consumed so far
-;; 6. return error if fseek failed,
-***
+   ld l,c
+   ld h,b
+   ld de,0                     ; dehl = forward seek offset
+   
+   ld a,STDIO_MSG_SEEK
+   ld c,STDIO_SEEK_CUR
+   
+   push hl                     ; save forward seek offset
+   
+   exx
+   
+   push de                     ; save chars read from stream
+   push hl                     ; save items assigned
+   
+   call l_jpix
+   
+   pop de                      ; de = items assigned
+   pop hl                      ; hl = chars read from stream
+   
+   pop bc                      ; bc = forward seek offset
+   
+   call l_saturated_add_hl_bc
+   ex de,hl
+   
+   exx
 
+   or a
+   ret
