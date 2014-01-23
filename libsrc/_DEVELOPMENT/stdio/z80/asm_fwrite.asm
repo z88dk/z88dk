@@ -3,7 +3,7 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream
+; size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
 ;
 ; Write nmemb records of size bytes pointed at by ptr.  Output
 ; one record at a time and return the number of records

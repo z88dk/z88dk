@@ -81,7 +81,6 @@ asm_vfprintf_unlocked:
    ;            hl = - (chars output + 1) < 0
    ;            carry set, errno set as below
    ;
-   ;            enolck = stream lock could not be acquired
    ;            eacces = stream not open for writing
    ;            eacces = stream is in an error state
    ;            erange = width or precision out of range

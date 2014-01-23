@@ -11,7 +11,7 @@
 
 XLIB asm_printf_unlocked
 
-LIB asm_vprintf_unlocked, __stdio_varg_2, __stdio_nextarg_de
+LIB asm_vprintf_unlocked, __stdio_varg_2
 
 asm_printf_unlocked:
 
@@ -32,7 +32,6 @@ asm_printf_unlocked:
    ;            hl = - (chars output + 1) < 0
    ;            carry set, errno set as below
    ;
-   ;            enolck = stream lock could not be acquired
    ;            eacces = stream not open for writing
    ;            eacces = stream is in an error state
    ;            erange = width or precision out of range

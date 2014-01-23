@@ -5,7 +5,8 @@ LIB __stdio_printf_number_tail_ulong
 
 __stdio_printf_lbb:
 
-   ; %lb converter called from vfprintf()
+   ; non-standard %lB converter called from vfprintf()
+   ; outputs binary number
    ;
    ; enter : ix = FILE *
    ;         hl = void *stack_param

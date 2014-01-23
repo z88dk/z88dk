@@ -11,7 +11,7 @@
 
 XLIB asm_vsprintf
 
-LIB asm0_vfprintf_unlocked, asm_memset, asm_memcpy
+LIB asm0_vfprintf_unlocked, asm_memset
 
 asm_vsprintf:
 
@@ -73,6 +73,9 @@ asm_vsprintf:
 
 vsprintf_outchar:
 
+   ; vfprintf will generate two messages here
+   ; STDIO_MSG_PUTC and STDIO_MSG_WRIT
+
    cp STDIO_MSG_PUTC
    jr z, _putc
    
@@ -87,12 +90,13 @@ _writ:
    exx
    pop de
    
-   call asm_memcpy
+   ldir
    
    push de
    exx
    pop de
    
+   or a
    ret
 
 _putc:

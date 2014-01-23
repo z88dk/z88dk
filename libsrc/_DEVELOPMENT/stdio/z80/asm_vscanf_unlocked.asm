@@ -19,10 +19,9 @@ asm_vscanf_unlocked:
    ;
    ;         fail
    ;
-   ;            hl will be -1 on enolck, eof and stream in error state
+   ;            hl will be -1 on eof and stream in error state
    ;            carry set, errno set as below
    ;
-   ;            enolck = stream lock could not be acquired
    ;            eacces = stream not open for reading
    ;            eacces = stream is in an error state
    ;            einval = unknown conversion specifier

@@ -17,7 +17,7 @@
 
 XLIB asm_vsnprintf
 
-LIB asm0_vfprintf_unlocked, asm_memset, asm_memcpy, l_minu_bc_hl, l_neg_hl
+LIB asm0_vfprintf_unlocked, asm_memset, l_minu_bc_hl, l_neg_hl
 
 asm_vsnprintf:
 
@@ -115,6 +115,9 @@ output_string:
 
 vsnprintf_outchar:
 
+   ; vfprintf will generate two messages here
+   ; STDIO_MSG_PUTC and STDIO_MSG_WRIT
+
    cp STDIO_MSG_PUTC
    jr z, _putc
    
@@ -147,11 +150,13 @@ _writ:
    pop de                      ; de = char *s
    pop bc                      ; bc = out_length
    
-   call asm_memcpy
+   ldir
    
    push de
    exx
    pop de
+   
+   or a
    
 _writ_0:
 

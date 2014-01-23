@@ -11,7 +11,7 @@
 
 XLIB asm_printf
 
-LIB asm_vprintf, __stdio_varg_2, __stdio_nextarg_de
+LIB asm_vprintf, __stdio_varg_2
 
 asm_printf:
 
