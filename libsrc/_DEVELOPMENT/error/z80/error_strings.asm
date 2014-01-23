@@ -32,6 +32,10 @@ error_strings:
    defm "ENOLCK - Attempt to lock failed"
    defb 0
    
+   defb __EOVERFLOW
+   defm "EOVERFLOW - Value too large for data type"
+   defb 0
+   
    defb 0                      ; string terminator
 
 error_string_default:
