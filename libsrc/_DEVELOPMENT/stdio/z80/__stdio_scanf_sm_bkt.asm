@@ -16,6 +16,8 @@ __stdio_scanf_sm_bkt:
    ; return: bc = void *buffer_ptr (address past last byte written)
    ;         de = unchanged
 
+   push af
+   
    push bc
    call l_bitset_locate
    pop bc
@@ -24,7 +26,16 @@ __stdio_scanf_sm_bkt:
    and (hl)
 
    ld hl,__stdio_scanf_sm_bkt
-   jp nz, __stdio_scanf_sm_string_write  ; if the char is in the bitset
+   jr nz, accept                         ; if the char is in the bitset
    
+   pop af
+      
    scf                                   ; reject
    ret
+
+accept:
+
+   pop af
+   
+   or a
+   jp __stdio_scanf_sm_string_write
