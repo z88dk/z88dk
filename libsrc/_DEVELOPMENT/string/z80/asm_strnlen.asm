@@ -21,7 +21,6 @@ asm_strnlen:
    ;
    ; exit : hl = min( strlen(s), maxlen )
    ;        de = char *s
-   ;        bc = 0
    ;        z flag set if hl=min is 0
    ;        carry reset
    ;
