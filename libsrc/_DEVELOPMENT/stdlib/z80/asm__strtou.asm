@@ -22,7 +22,7 @@ asm__strtou:
    ;         de = char **endp
    ;         hl = char *nptr
    ;
-   ; exit  : *endp = bc as detailed below
+   ; exit  : *endp = de as detailed below
    ;
    ;         no error:
    ;
