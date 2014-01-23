@@ -3,17 +3,17 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; char *_strnlwr(void *p, size_t n)
+; char *_memupr(void *p, size_t n)
 ;
-; Change letters in buffer p to lower case.
+; Change letters in buffer p to upper case.
 ;
 ; ===============================================================
 
-XLIB asm__strnlwr
+XLIB asm__memupr
 
-LIB asm_tolower
+LIB asm_toupper
 
-asm__strnlwr:
+asm__memupr:
 
    ; enter : hl = void *p
    ;         bc = size_t n
@@ -32,7 +32,7 @@ asm__strnlwr:
 loop:
 
    ld a,(hl)
-   call asm_tolower
+   call asm_toupper
    ld (hl),a
    
    cpd                         ; hl++, bc--
