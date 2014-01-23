@@ -16,12 +16,13 @@ Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.18 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.19 2014-01-23 22:30:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "die.h"
+#include "fileutil.h"
 #include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
@@ -50,7 +51,7 @@ void SrcFile_copy( SrcFile *self, SrcFile *other )
 void SrcFile_fini( SrcFile *self )
 {
     if ( self->fp != NULL )
-        fclose( self->fp );
+        xfclose( self->fp );
 
     OBJ_DELETE( self->line );
     OBJ_DELETE( self->line_stack );
@@ -59,7 +60,11 @@ void SrcFile_fini( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.18  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.19  2014-01-23 22:30:55  pauloscustodio
+* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+* at fclose()
+*
+* Revision 1.18  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.17  2014/01/11 01:29:40  pauloscustodio
@@ -160,7 +165,7 @@ void SrcFile_open( SrcFile *self, char *source_file )
     /* close last file */
     if ( self->file != NULL )
     {
-        fclose( self->file );
+        xfclose( self->file );
         self->file = NULL;
     }
 
@@ -275,7 +280,7 @@ char *SrcFile_getline( SrcFile *self )
         }
 
         self->line_nr = 0;					/* no more input */
-        fclose( self->file );				/* close input */
+        xfclose( self->file );				/* close input */
         self->file = NULL;
 
         return NULL;						/* EOF */

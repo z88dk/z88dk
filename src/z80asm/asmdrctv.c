@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.65 2014-01-20 23:29:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.66 2014-01-23 22:30:55 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.65  2014-01-20 23:29:17  pauloscustodio
+ * Revision 1.66  2014-01-23 22:30:55  pauloscustodio
+ * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+ * at fclose()
+ *
+ * Revision 1.65  2014/01/20 23:29:17  pauloscustodio
  * Moved file.c to lib/fileutil.c
  *
  * Revision 1.64  2014/01/11 01:29:39  pauloscustodio
@@ -1182,7 +1186,7 @@ INCLUDE( void )
         }
 
         CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
-        fclose( z80asmfile );     /* close current source file */
+        xfclose( z80asmfile );     /* close current source file */
         z80asmfile = NULL;          /* NOTE: this is necessary to make sure
                                        z80asmfile is NULL in case the next
                                        xfopen() throws an exception */
@@ -1203,7 +1207,7 @@ INCLUDE( void )
 
         set_error_file( CURRENTFILE->fname );
 
-        fclose( z80asmfile );
+        xfclose( z80asmfile );
         z80asmfile = NULL;          /* NOTE: this is necessary to make sure
                                        z80asmfile is NULL in case the next
                                        xfopen() throws an exception */
@@ -1239,7 +1243,7 @@ BINARY( void )
         fread_codearea( binfile, Codesize );  /* read binary code */
         inc_PC( Codesize );
 
-        fclose( binfile );
+        xfclose( binfile );
         binfile = NULL;
     }
     else

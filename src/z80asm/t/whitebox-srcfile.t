@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.27 2014-01-20 23:29:19 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.28 2014-01-23 22:30:55 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -24,7 +24,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-	"lib/list.c lib/strutil.c lib/class.c lib/xmalloc.c lib/die.c";
+	"lib/list.c lib/fileutil.c lib/strutil.c lib/strpool.c lib/class.c lib/xmalloc.c lib/die.c";
 
 write_file("test.c", <<'END');
 #include "srcfile.h"
@@ -532,7 +532,11 @@ done_testing;
 
 
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.27  2014-01-20 23:29:19  pauloscustodio
+# Revision 1.28  2014-01-23 22:30:55  pauloscustodio
+# Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+# at fclose()
+#
+# Revision 1.27  2014/01/20 23:29:19  pauloscustodio
 # Moved file.c to lib/fileutil.c
 #
 # Revision 1.26  2014/01/11 01:29:46  pauloscustodio

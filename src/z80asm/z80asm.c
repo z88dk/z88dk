@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.133 2014-01-21 23:12:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.134 2014-01-23 22:30:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -265,7 +265,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( z80asmfile != NULL )
         {
-            fclose( z80asmfile );
+            xfclose( z80asmfile );
             z80asmfile = NULL;
         }
 
@@ -274,7 +274,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( objfile != NULL )
         {
-            fclose( objfile );
+            xfclose( objfile );
             objfile = NULL;
         }
 
@@ -336,13 +336,13 @@ CloseFiles( void )
 {
     if ( z80asmfile != NULL )
     {
-        fclose( z80asmfile );
+        xfclose( z80asmfile );
         z80asmfile = NULL;
     }
 
     if ( objfile != NULL )
     {
-        fclose( objfile );
+        xfclose( objfile );
         objfile = NULL;
     }
 
@@ -428,7 +428,7 @@ char *GetLibfile( char *filename )
         opts.library = TRUE;
     }
 
-    fclose( file );
+    xfclose( file );
 
     return found_libfilename;
 }
@@ -757,7 +757,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.133  2014-01-21 23:12:30  pauloscustodio
+* Revision 1.134  2014-01-23 22:30:55  pauloscustodio
+* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+* at fclose()
+*
+* Revision 1.133  2014/01/21 23:12:30  pauloscustodio
 * path_... functions return filename instrpool, no need to pass an array to store result.
 *
 * Revision 1.132  2014/01/20 23:29:18  pauloscustodio

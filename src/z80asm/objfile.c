@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.16 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.17 2014-01-23 22:30:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -62,7 +62,7 @@ void ObjFile_copy( ObjFile *self, ObjFile *other ) { }
 void ObjFile_fini( ObjFile *self )
 {
     if ( self->file != NULL && ! self->in_library )
-        fclose( self->file );
+        xfclose( self->file );
 
     if ( self->writing && ! self->in_library &&
             self->file != NULL && self->filename != NULL )
@@ -201,7 +201,11 @@ ObjFile *ObjFile_read( char *filename, FILE *libfile )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.16  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.17  2014-01-23 22:30:55  pauloscustodio
+* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+* at fclose()
+*
+* Revision 1.16  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.15  2014/01/14 23:53:53  pauloscustodio

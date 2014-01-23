@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.88 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.89 2014-01-23 22:30:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -314,7 +314,7 @@ LinkModules( void )
             if ( strcmp( fheader, Z80objhdr ) != 0 )
             {
                 error_not_obj_file( obj_filename );  /* not a object     file */
-                fclose( z80asmfile );
+                xfclose( z80asmfile );
                 z80asmfile = NULL;
                 break;
             }
@@ -340,7 +340,7 @@ LinkModules( void )
                         if ( CURRENTMODULE->origin == 65535U )
                         {
                             error_org_not_defined();  /* no ORG */
-                            fclose( z80asmfile );
+                            xfclose( z80asmfile );
                             z80asmfile = NULL;
                             break;
                         }
@@ -353,7 +353,7 @@ LinkModules( void )
                 }
             }
 
-            fclose( z80asmfile );
+            xfclose( z80asmfile );
             z80asmfile = NULL;
 
             LinkModule( obj_filename, 0 );       /* link code & read name definitions */
@@ -442,7 +442,7 @@ LinkModule( char *filename, long fptr_base )
             ReadNames( filename, z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
     }
 
-    fclose( z80asmfile );
+    xfclose( z80asmfile );
     z80asmfile = NULL;
 
     if ( fptr_libnmdecl != -1 )
@@ -477,7 +477,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
         fseek( file, fptr_base + nextname, SEEK_SET );       /* set file pointer to point at library name
                                                              * declarations */
         ReadName( file );					/* read library reference name */
-        fclose( file );
+        xfclose( file );
 
         len = strlen( line );
         nextname += 1 + len;      /* remember module pointer to next name in this   object module */
@@ -568,7 +568,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
             {
                 TRY
                 {
-                    fclose( file );
+                    xfclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
                 FINALLY
@@ -585,7 +585,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
             {
                 TRY
                 {
-                    fclose( file );
+                    xfclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
                 FINALLY
@@ -599,7 +599,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
         }
     }
 
-    fclose( file );
+    xfclose( file );
     return 0;
 }
 
@@ -771,7 +771,7 @@ ModuleExpr( void )
             }
         }
 
-        fclose( z80asmfile );
+        xfclose( z80asmfile );
         z80asmfile = NULL;
 
         curlink = curlink->nextlink;
@@ -830,12 +830,12 @@ CreateBinFile( void )
 
 		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
-        fclose( binaryfile );
+        xfclose( binaryfile );
         binaryfile = NULL;
     }
     else if ( opts.code_seg && get_codesize() > 16384 )
     {
-        fclose( binaryfile );
+        xfclose( binaryfile );
         binaryfile = NULL;
         offset = 0;
         segment = 0;
@@ -847,7 +847,7 @@ CreateBinFile( void )
             codesize -= codeblock;
             binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
             fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
-            fclose( binaryfile );
+            xfclose( binaryfile );
             binaryfile = NULL;
 
             offset += codeblock;
@@ -860,7 +860,7 @@ CreateBinFile( void )
     else
     {
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
-        fclose( binaryfile );
+        xfclose( binaryfile );
         binaryfile = NULL;
     }
 
@@ -917,7 +917,7 @@ CreateLib( char *lib_filename )
             filebuffer = xnew_n( char, ( size_t ) Codesize );
 			/* load object file */
             xfget_chars( obj_file, filebuffer, Codesize );
-            fclose( obj_file );
+            xfclose( obj_file );
             obj_file = NULL;
 
             if ( memcmp( filebuffer, Z80objhdr, 8U ) != 0 )
@@ -955,10 +955,10 @@ CreateLib( char *lib_filename )
     FINALLY
     {
         if ( obj_file )
-            fclose( obj_file );
+            xfclose( obj_file );
 
         if ( lib_file )
-            fclose( lib_file );
+            xfclose( lib_file );
 
         if ( get_num_errors() )
             remove( lib_filename );
@@ -1042,7 +1042,11 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.88  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.89  2014-01-23 22:30:55  pauloscustodio
+* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+* at fclose()
+*
+* Revision 1.88  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.87  2014/01/11 01:29:40  pauloscustodio

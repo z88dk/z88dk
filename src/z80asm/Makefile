@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.119 2014-01-20 23:29:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.120 2014-01-23 22:30:55 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.119  2014-01-20 23:29:17  pauloscustodio
+# Revision 1.120  2014-01-23 22:30:55  pauloscustodio
+# Use xfclose() instead of fclose() to detect file write errors during buffer flush called
+# at fclose()
+#
+# Revision 1.119  2014/01/20 23:29:17  pauloscustodio
 # Moved file.c to lib/fileutil.c
 #
 # Revision 1.118  2014/01/15 00:01:39  pauloscustodio
@@ -788,10 +792,10 @@ scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h
 scan.o: lib/strutil.h lib/list.h codearea.h errors.h errors_def.h
 scan.o: lib/fileutil.h lib/init.h lib/die.h legacy.h listfile.h symref.h
 scan.o: lib/classlist.h options.h options_def.h lib/strpool.h
-srcfile.o: lib/xmalloc.h lib/die.h options.h lib/types.h lib/list.h
-srcfile.o: lib/class.h lib/queue.h options_def.h srcfile.h lib/strutil.h
-srcfile.o: lib/classlist.h lib/strpool.h codearea.h errors.h errors_def.h
-srcfile.o: lib/fileutil.h listfile.h symref.h
+srcfile.o: lib/xmalloc.h lib/die.h lib/fileutil.h lib/list.h lib/class.h
+srcfile.o: lib/queue.h lib/types.h lib/strutil.h options.h options_def.h
+srcfile.o: srcfile.h lib/classlist.h lib/strpool.h codearea.h errors.h
+srcfile.o: errors_def.h listfile.h symref.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
