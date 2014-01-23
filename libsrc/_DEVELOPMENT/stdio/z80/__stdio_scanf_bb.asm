@@ -1,12 +1,13 @@
 
-XLIB __stdio_scanf_i
+XLIB __stdio_scanf_bb
 
-LIB __stdio_scanf_sm_i, __stdio_scanf_number_head
-LIB l_inc_sp, asm__strtoi, __stdio_scanf_number_tail_int
+LIB __stdio_scanf_sm_binary, __stdio_scanf_number_head
+LIB l_inc_sp, asm__strtou, __stdio_scanf_number_tail_int
 
-__stdio_scanf_i:
+__stdio_scanf_bb:
 
-   ; %i converter called from vfscanf()
+   ; %B converter called from vfscanf()
+   ; non-standard, reads binary number
    ;
    ; enter : ix = FILE *
    ;         de = void *buffer
@@ -22,20 +23,20 @@ __stdio_scanf_i:
    push hl                     ; save int *p
    push de                     ; save void *buffer
    
-   ld a,9                          ; nine hex digits + prefix needed to reach overflow in worst case
-   ld hl,__stdio_scanf_sm_i        ; dec/hex/oct number state machine
+   ld a,19                        ; nineteen binary digits + prefix needed to reach overflow
+   ld hl,__stdio_scanf_sm_binary  ; binary number state machine
 
    call __stdio_scanf_number_head
-   jp c, l_inc_sp - 4              ; if stream error, pop twice and exit
+   jp c, l_inc_sp - 4             ; if stream error, pop twice and exit
 
-   ; ASC-II NUMBER TO 16-BIT INTEGER
+   ; ASC-II BINARY TO 16-BIT INTEGER
    
    pop hl                      ; hl = void *buffer
-   ld bc,0                     ; auto select dec/hex/oct conversion
+   ld bc,2                     ; base 2 conversion
    ld e,b
    ld d,b                      ; de = 0 = char **endp
    
-   call asm__strtoi
+   call asm__strtou
    pop de                      ; de = int *p
    
    ; WRITE RESULT TO INT *P

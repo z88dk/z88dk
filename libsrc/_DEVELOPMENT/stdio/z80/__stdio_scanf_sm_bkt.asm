@@ -1,0 +1,30 @@
+
+XLIB __stdio_scanf_sm_bkt
+
+LIB l_bitset_locate, __stdio_scanf_sm_string_write
+
+__stdio_scanf_sm_bkt:
+
+   ; RIGHT BRACKET STATE MACHINE
+   ;
+   ; Qualify function for STDIO_MSG_EATC
+   ;
+   ; set-up: hl = state machine function address
+   ;         de = void *bitset
+   ;         bc = void *buffer (0 = assignment suppression)
+   ;
+   ; return: bc = void *buffer_ptr (address past last byte written)
+   ;         de = unchanged
+
+   push bc
+   call l_bitset_locate
+   pop bc
+
+   add hl,de
+   and (hl)
+
+   ld hl,__stdio_scanf_sm_bkt
+   jp nz, __stdio_scanf_sm_string_write  ; if the char is in the bitset
+   
+   scf                                   ; reject
+   ret

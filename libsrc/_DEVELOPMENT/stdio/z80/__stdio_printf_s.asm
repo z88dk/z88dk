@@ -86,5 +86,5 @@ left_justify:
 
 null_s:
 
-   defm "(null)"
+   defm "<null>"
    defb 0

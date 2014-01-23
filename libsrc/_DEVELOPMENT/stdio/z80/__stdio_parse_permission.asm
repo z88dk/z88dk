@@ -8,7 +8,8 @@ __stdio_parse_permission:
    ;
    ; enter : de = char *permission
    ;
-   ; exit  : success, permission string valid
+   ; exit  : de = char *permission_ptr (address of non-matching char)
+   ;         success, permission string valid
    ;
    ;            c = flags = IOB0 00AC
    ;            carry reset
@@ -22,6 +23,7 @@ __stdio_parse_permission:
    ;          I =  1  open for reading
    ;          O =  1  open for writing
    ;          B =  1  binary mode (may be relevant for a driver)
+   ;          A =  1  append writes
    ;         AC = 00  file must exist, do not create
    ;              10  open if exists but create if it does not exist
    ;              01  create and/or truncate

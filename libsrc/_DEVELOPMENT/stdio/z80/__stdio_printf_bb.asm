@@ -1,10 +1,11 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_PRINTF_LD
+XLIB __stdio_printf_bb
 
-__stdio_printf_li:
+LIB __stdio_printf_number_tail_uint
 
-   ; %ld, %li converter called from vfprintf()
+__stdio_printf_bb:
+
+   ; %b converter called from vfprintf()
    ;
    ; enter : ix = FILE *
    ;         hl = void *stack_param
@@ -14,3 +15,6 @@ __stdio_printf_li:
    ; exit  : carry set if stream error
    ;
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
+
+   ld bc,2                     ; base 2 conversion
+   jp __stdio_printf_number_tail_uint

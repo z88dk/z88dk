@@ -14,6 +14,7 @@ XDEF asm_putchar_unlocked
 
 LIB asm_fputc_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+
 XREF __FILE_STDOUT
 
 asm_putchar:

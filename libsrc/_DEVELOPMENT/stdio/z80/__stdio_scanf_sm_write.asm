@@ -4,6 +4,7 @@ XLIB __stdio_scanf_sm_write
 __stdio_scanf_sm_write:
 
    ; some common code used by the number state machines to write to the buffer
+   ; no change to carry flag state
    
    inc c
    dec c

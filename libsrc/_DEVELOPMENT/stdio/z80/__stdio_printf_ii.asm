@@ -146,13 +146,12 @@ left_justify:
    ret
 
 write_octet:
-
+   
    or a
    call l_utoa
-   
-   ld a,'.'
 
+   ld a,'.'
    ld (de),a
    inc de
-   
+
    ret

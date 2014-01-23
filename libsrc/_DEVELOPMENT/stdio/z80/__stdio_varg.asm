@@ -1,6 +1,5 @@
 
 XLIB __stdio_varg_2
-XDEF __stdio_varg_3
 
 LIB __stdio_nextarg_de
 
@@ -29,20 +28,9 @@ __stdio_varg_2:
    
    jp __stdio_nextarg_de
 
-__stdio_varg_3:
-
-   ld hl,6
-   add hl,sp
-   
-   jp __stdio_nextarg_de
-
 ;******************************
 ELSE
 ;******************************
-
-__stdio_varg_3:
-
-   inc a
    
 __stdio_varg_2:
 

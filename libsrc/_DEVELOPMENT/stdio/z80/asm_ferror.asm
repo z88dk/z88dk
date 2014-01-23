@@ -12,8 +12,7 @@
 XLIB asm_ferror
 XDEF asm_ferror_unlocked
 
-LIB __stdio_lock_acquire, __stdio_lock_release
-LIB error_enlock_zc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enlock_zc
 
 asm_ferror:
 
@@ -45,19 +44,19 @@ asm_ferror_unlocked:
    ; enter : ix = FILE *
    ;
    ; exit  : ix = FILE *
+   ;         carry reset
    ;
-   ;         success
+   ;         if stream in error state
    ;
-   ;            hl = 0 and Z flag set if no error
-   ;            hl = non-zero and NZ flag set if error
-   ;            carry reset
+   ;            hl = non-zero
+   ;            nz flag set
    ;
-   ;         fail
+   ;         if stream is error free
    ;
    ;            hl = 0
-   ;            carry set, errno = enolck
+   ;            z flag set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl
 
    ld a,(ix+3)
    and $08                     ; err bit only

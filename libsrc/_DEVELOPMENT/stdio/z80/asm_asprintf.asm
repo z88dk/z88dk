@@ -12,7 +12,7 @@
 
 XLIB asm_asprintf
 
-LIB asm_vasprintf, asm_sprintf_common
+LIB asm_vasprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_asprintf:
 
@@ -42,6 +42,15 @@ asm_asprintf:
    ;            
    ; uses  : all
 
-   call asm_sprintf_common
+   call __stdio_varg_2         ; de = char **ptr
+
+   push hl
+   exx
+   pop hl
    
+   call __stdio_nextarg_de     ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
+
    jp asm_vasprintf

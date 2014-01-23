@@ -13,9 +13,10 @@ asm_funlockfile:
    ;
    ; exit  : ix = FILE *
    ;
-   ; uses  : bc, de
+   ; uses  : bc
 
    push af
+   push de
    push hl
    
    ld e,ixl
@@ -27,6 +28,7 @@ asm_funlockfile:
    call asm_mtx_unlock
 
    pop hl
+   pop de
    pop af
    
    ret

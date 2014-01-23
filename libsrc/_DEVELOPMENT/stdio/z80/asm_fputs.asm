@@ -12,8 +12,8 @@
 XLIB asm_fputs
 XDEF asm_fputs_unlocked
 
-LIB __stdio_send_output_raw_buffer_unchecked, error_mc, __stdio_verify_output, asm_strlen, l_utod_hl
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+LIB __stdio_send_output_raw_buffer_unchecked, error_mc, __stdio_verify_output
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc, asm_strlen, l_utod_hl
 
 asm_fputs:
 

@@ -10,6 +10,11 @@ XDEF __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
 LIB l_jpix, l_saturated_add_hl_bc
 
+; ALL VFPRINTF OUTPUT PASSES THROUGH THESE FUNCTIONS
+; HL' IS USED TO TRACK TOTAL NUMBER OF CHARS OUTPUT ON STREAM
+;
+; OTHER HIGH LEVEL OUTPUT SHOULD USE __STDIO_SEND_OUTPUT_RAW
+
 __stdio_printf_padding_precision_hl:
 
    ; output length zeroes on stream

@@ -13,8 +13,9 @@
 XLIB asm_puts
 XDEF asm_puts_unlocked
 
-LIB asm_fputs_unlocked, l_utod_hl, error_mc
+LIB asm_fputs_unlocked, asm_fputc_unlocked, l_utod_hl, error_mc
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+
 XREF __FILE_STDOUT
 
 asm_puts:

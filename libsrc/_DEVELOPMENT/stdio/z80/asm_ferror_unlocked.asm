@@ -7,16 +7,16 @@ asm_ferror_unlocked:
    ; enter : ix = FILE *
    ;
    ; exit  : ix = FILE *
+   ;         carry reset
    ;
-   ;         success
+   ;         if stream in error state
    ;
-   ;            hl = 0 and Z flag set if no error
-   ;            hl = non-zero and NZ flag set if error
-   ;            carry reset
+   ;            hl = non-zero
+   ;            nz flag set
    ;
-   ;         fail
+   ;         if stream is error free
    ;
    ;            hl = 0
-   ;            carry set, errno = enolck
+   ;            z flag set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl

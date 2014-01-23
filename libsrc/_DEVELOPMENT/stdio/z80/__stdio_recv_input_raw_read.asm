@@ -1,30 +1,23 @@
 
-XLIB __stdio_recv_input_read
+XLIB __stdio_recv_input_raw_read
 
 LIB l_saturated_add_hl_bc, l_saturated_inc_de, l_jpix
 
-; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
-; DE' IS USED TO TRACK NUMBER OF CHARS READ FROM STREAM
-; HL' IS USED TO TRACK NUMBER OF ITEMS ASSIGNED
-;
-; OTHER HIGH LEVEL STDIO SHOULD USE __STDIO_RECV_INPUT_RAW_*
+; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
+; EXCEPT FOR VFSCANF.  THIS ENSURES STREAM STATE IS CORRECTLY MAINTAINED
 
-__stdio_recv_input_read:
+__stdio_recv_input_raw_read:
 
    ; Driver reads a block of bytes from the stream and writes to buffer
    ;
    ; enter : ix = FILE *
    ;         bc = max_length = number of chars to read from stream
    ;         de = void *buffer = destination buffer
-   ;         de'= total number of chars read from stream so far
-   ;         hl'= total number of items assigned so far
    ; 
    ; exit  : ix = FILE *
    ;         de = void *buffer_ptr = address of byte following last written
    ;          a = on error: 0 for stream error, -1 for eof
    ;         bc'= number of bytes successfully read from stream
-   ;         de'= total number of chars read from stream so far (updated)
-   ;         hl'= total number of items assigned so far
    ;
    ;         carry set on error or eof, stream state set appropriately
 
@@ -58,34 +51,13 @@ _no_ungetc_rd:
    
    push bc
    exx
-   pop bc
+   pop hl
    
-   push hl
-   push de
-   
-   ld l,c
-   ld h,b                      ; hl = max_length
-
    call l_jpix
    
    ld a,l
-   pop hl
-
-   ;  a = if error: 0 for stream error, -1 for eof
-   ; bc = number of bytes consumed from stream in this operation
-   ; hl = total num chars read from stream so far
-   ; carry set on error or eof
-   ; stack = number of items assigned
-
-   push af
-   
-   call l_saturated_add_hl_bc
-   ex de,hl                    ; de = total num of chars read from stream (updated)
-
-   pop af
-   pop hl                      ; hl = num items assigned
-   
    exx
+
    ret nc                      ; if no error
    
    ; stream error or eof ?
@@ -111,7 +83,6 @@ len_one:
 
    exx
    ld bc,1
-   call l_saturated_inc_de
    exx
    
    ret

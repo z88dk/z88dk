@@ -2,7 +2,7 @@
 XLIB __stdio_printf_number_tail
 XDEF __stdio_printf_number_tail_zero
 
-LIB __stdio_printf_sign, asm__strnupr, l_maxu_bc_hl
+LIB __stdio_printf_sign, asm__memupr, l_maxu_bc_hl, l_saturated_add_hl_de
 LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_precision_bc
 LIB __stdio_printf_padding_precision_hl, __stdio_printf_padding_width_bc
 
@@ -126,14 +126,10 @@ number_zero:
    
    ; any external_spacing required becomes internal_spacing
    
-   add hl,de
+   call l_saturated_add_hl_de
    
    ex de,hl                    ; de = internal_spacing = external_spacing + internal_spacing
    ld hl,0                     ; hl = external_spacing = 0
-   
-   jr nc, spacing_ok           ; no overflow
-   
-   ld de,$ffff                 ; internal_spacing = max $ffff
 
 spacing_ok:
 
@@ -258,7 +254,7 @@ stream_error:
 
    push bc                     ; save num_sz
    
-   call asm__strnupr           ; capitalize buffer
+   call asm__memupr            ; capitalize buffer
    
    pop bc                      ; bc = num_sz
    jp __stdio_send_output_buffer

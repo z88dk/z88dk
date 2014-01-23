@@ -8,15 +8,14 @@ asm_feof_unlocked:
    ;
    ; exit  : ix = FILE *
    ;
-   ;         success
+   ;         if stream is at eof
    ;
-   ;            hl = 0 and Z flag set if not eof
-   ;            hl = non-zero and NZ flag set if eof
-   ;            carry reset
+   ;            hl = non-zero
+   ;            nz flag set
    ;
-   ;         fail
+   ;         if stream is not at eof
    ;
    ;            hl = 0
-   ;            carry set, errno = enolck
+   ;            z flag set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl

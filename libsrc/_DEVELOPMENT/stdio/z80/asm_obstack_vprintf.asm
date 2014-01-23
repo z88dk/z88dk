@@ -24,7 +24,7 @@ asm_obstack_vprintf:
    ;
    ;         success
    ;
-   ;            hl   = strlen(genrated s)
+   ;            hl   = strlen(generated s)
    ;            hl'  = address of terminating '\0' in obstack
    ;            carry reset
    ;
@@ -39,8 +39,6 @@ asm_obstack_vprintf:
    ;            
    ; uses  : all
    
-   ; use vsnprintf to determine length of result
-   
    push bc                     ; save arg
    push de                     ; save format
    push hl                     ; save obstack
@@ -52,7 +50,7 @@ asm_obstack_vprintf:
    exx
    
    call asm_vsnprintf          ; hl = length of result
-   jr c, error_2               ; if error
+   jr c, error_3               ; if error
 
    inc hl                      ; add room for terminating '\0'
    call l_utod_hl              ; saturate hl

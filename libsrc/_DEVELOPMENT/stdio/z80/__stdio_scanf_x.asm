@@ -3,7 +3,7 @@ XLIB __stdio_scanf_x
 XDEF __stdio_scanf_p
 
 LIB __stdio_scanf_sm_hex, __stdio_scanf_number_head
-LIB l_inc_sp, asm_strtou, __stdio_scanf_number_tail_int
+LIB l_inc_sp, asm__strtou, __stdio_scanf_number_tail_int
 
 __stdio_scanf_x:
 __stdio_scanf_p:
@@ -37,7 +37,7 @@ __stdio_scanf_p:
    ld e,b
    ld d,b                      ; de = 0 = char **endp
    
-   call asm_strtou
+   call asm__strtou
    pop de                      ; de = int *p
    
    ; WRITE RESULT TO INT *P

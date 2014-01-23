@@ -10,4 +10,4 @@ asm_clearerr_unlocked:
    ;         hl = 0
    ;         carry reset
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl

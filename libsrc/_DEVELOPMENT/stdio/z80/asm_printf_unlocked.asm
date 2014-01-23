@@ -1,6 +1,17 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FPRINTF_UNLOCKED
+; ===============================================================
+; Jan 2014
+; ===============================================================
+; 
+; int printf_unlocked(const char *format, ...)
+;
+; See C11 specification.
+;
+; ===============================================================
+
+XLIB asm_printf_unlocked
+
+LIB asm_vprintf_unlocked, __stdio_varg_2, __stdio_nextarg_de
 
 asm_printf_unlocked:
 
@@ -30,3 +41,10 @@ asm_printf_unlocked:
    ;            more errors may be set by underlying driver
    ;            
    ; uses  : all
+
+   call __stdio_varg_2         ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
+   
+   jp asm_vprintf_unlocked

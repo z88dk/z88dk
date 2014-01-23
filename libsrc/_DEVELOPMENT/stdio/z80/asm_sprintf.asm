@@ -11,7 +11,7 @@
 
 XLIB asm_sprintf
 
-LIB asm_vsprintf, asm_sprintf_common
+LIB asm_vsprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_sprintf:
 
@@ -40,6 +40,15 @@ asm_sprintf:
    ;            
    ; uses  : all
 
-   call asm_sprintf_common
+   call __stdio_varg_2         ; de = char *s
+   
+   push hl
+   exx
+   pop hl
+   
+   call __stdio_nextarg_de     ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
 
    jp asm_vsprintf

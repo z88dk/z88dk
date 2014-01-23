@@ -2,7 +2,7 @@
 XLIB __stdio_scanf_d
 
 LIB __stdio_scanf_sm_decimal, __stdio_scanf_number_head
-LIB l_inc_sp, asm_strtoi, __stdio_scanf_number_tail_int
+LIB l_inc_sp, asm__strtoi, __stdio_scanf_number_tail_int
 
 __stdio_scanf_d:
 
@@ -35,7 +35,7 @@ __stdio_scanf_d:
    ld e,b
    ld d,b                      ; de = 0 = char **endp
    
-   call asm_strtoi
+   call asm__strtoi
    pop de                      ; de = int *p
    
    ; WRITE RESULT TO INT *P

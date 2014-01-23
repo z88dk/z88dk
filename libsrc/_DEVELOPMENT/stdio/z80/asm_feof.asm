@@ -12,8 +12,7 @@
 XLIB asm_feof
 XDEF asm_feof_unlocked
 
-LIB __stdio_lock_acquire, __stdio_lock_release
-LIB error_enlock_zc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enlock_zc
 
 asm_feof:
 
@@ -46,18 +45,17 @@ asm_feof_unlocked:
    ;
    ; exit  : ix = FILE *
    ;
-   ;         success
+   ;         if stream is at eof
    ;
-   ;            hl = 0 and Z flag set if not eof
-   ;            hl = non-zero and NZ flag set if eof
-   ;            carry reset
+   ;            hl = non-zero
+   ;            nz flag set
    ;
-   ;         fail
+   ;         if stream is not at eof
    ;
    ;            hl = 0
-   ;            carry set, errno = enolck
+   ;            z flag set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl
 
    ld a,(ix+3)
    and $10                     ; eof bit only

@@ -1,6 +1,17 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FPRINTF
+; ===============================================================
+; Jan 2014
+; ===============================================================
+; 
+; int printf(const char *format, ...)
+;
+; See C11 specification.
+;
+; ===============================================================
+
+XLIB asm_printf
+
+LIB asm_vprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_printf:
 
@@ -30,3 +41,10 @@ asm_printf:
    ;            more errors may be set by underlying driver
    ;            
    ; uses  : all
+
+   call __stdio_varg_2         ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
+   
+   jp asm_vprintf

@@ -10,14 +10,10 @@
 ; ===============================================================
 
 XLIB asm_fprintf
-XDEF asm_printf
 
-LIB asm_vfprintf, asm_fprintf_common
+LIB asm_vfprintf, __stdio_varg_2, __stdio_nextarg_de
+
 XREF __FILE_STDOUT
-
-asm_printf:
-
-   ld ix,__FILE_STDOUT
 
 asm_fprintf:
 
@@ -48,6 +44,14 @@ asm_fprintf:
    ;            
    ; uses  : all
    
-   call asm_fprintf_common     ; collect parameters
+   call __stdio_varg_2
    
+   ld ixl,e
+   ld ixh,d                    ; ix = FILE *
+   
+   call __stdio_nextarg_de     ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
+      
    jp asm_vfprintf

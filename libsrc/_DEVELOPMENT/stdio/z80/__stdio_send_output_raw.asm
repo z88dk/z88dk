@@ -3,8 +3,8 @@ XLIB __stdio_send_output_raw
 XDEF __stdio_send_output_raw_chars, __stdio_send_output_raw_chars_unchecked
 XDEF __stdio_send_output_raw_buffer, __stdio_send_output_raw_buffer_unchecked
 
-; A single output path for all stdio functions ensures
-; the error state of the stream is set properly
+; ALL HIGH LEVEL STDIO OUTPUT EXCEPT VFPRINTF PASSES THROUGH THESE FUNCTIONS
+; A COMMON PATH ENSURES STREAM STATE IS UPDATED PROPERLY
 
 __stdio_send_output_raw_chars:
 
@@ -100,4 +100,3 @@ return_zero:
    exx
    
    ret
-

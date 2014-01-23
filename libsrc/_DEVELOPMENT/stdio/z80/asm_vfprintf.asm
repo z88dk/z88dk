@@ -13,10 +13,10 @@ XLIB asm_vfprintf
 XDEF asm_vfprintf_unlocked, asm0_vfprintf_unlocked
 XDEF asm_vprintf, asm_vprintf_unlocked
 
-LIB asm_strchrnul, l_atou, l_neg_hl, l_jphl, l_utod_hl
-LIB __stdio_nextarg_de, __stdio_send_output_buffer
-LIB __stdio_lock_acquire, __stdio_lock_release, __stdio_verify_output
-LIB error_enolck_mc, error_erange_zc, error_einval_zc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc, __stdio_verify_output
+LIB asm_strchrnul, __stdio_send_output_buffer, l_utod_hl, __stdio_nextarg_de, l_neg_hl
+LIB l_atou, __stdio_length_modifier, error_einval_zc, error_erange_zc
+
 XREF  __FILE_STDOUT
 
 asm_vprintf:
@@ -126,6 +126,7 @@ _format_loop:
    
    push hl
    
+   or a
    sbc hl,de
    ld c,l
    ld b,h                      ; bc = num chars to output
@@ -172,7 +173,16 @@ format_end:
    exx
    pop hl                      ; hl = number of chars output
    
+   or a
    jp l_utod_hl                ; hl = max $7fff
+
+flag_chars:
+
+   defb '+', $40
+   defb ' ', $20
+   defb '#', $10
+   defb '0', $08
+   defb '-', $04
 
 interpret :
 
@@ -278,10 +288,10 @@ width_from_format:
    ; stack = WORKSPACE_44, stack_param
    
    call l_atou                 ; hl = width
-   jp c, error_format_width    ; width out of range
+   jr c, error_format_width    ; width out of range
 
    bit 7,h
-   jp nz, error_format_width   ; width out of range
+   jr nz, error_format_width   ; width out of range
 
    ex (sp),hl
    push hl
@@ -319,14 +329,14 @@ precision:
    push de
    
    ; hl = stack_param
-   ; stack = width, address of next format char to examine
+   ; stack = WORKSPACE_44, width, address of next format char to examine
    
    call __stdio_nextarg_de     ; de = precision
    ex de,hl
 
    ; hl = precision
    ; de = stack_param
-   ; stack = width, address of next format char to examine
+   ; stack = WORKSPACE_44, width, address of next format char to examine
    
    bit 7,h
    jr z, precision_positive
@@ -343,7 +353,7 @@ precision_positive:
    push hl
    
    ; de = address of next format char to examine
-   ; stack = width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    jr length_modifier
 
@@ -358,7 +368,7 @@ precision_from_format:
    jr c, error_format_precision  ; precision out of range
 
    bit 7,h
-   jp nz, error_format_precision ; precision out of range
+   jr nz, error_format_precision ; precision out of range
 
 end_precision:
 
@@ -377,22 +387,9 @@ length_modifier:
    ; consume optional length modifier
 
    ; de = address of next format char to examine
-   ; stack = width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
-   ld a,(de)
-
-   ld hl,lm_chars
-   ld b,6
-
-lm_loop:
-
-   cp (hl)
-   inc hl
-   
-   jr z, lm_found
-
-   inc hl
-   djnz lm_loop
+   call __stdio_length_modifier
 
 ;******************************
 ; * CONVERSION SPECIFIER ******
@@ -403,10 +400,11 @@ converter_specifier:
    ; long modifies "bdinopuxX" not "csI"
    
    ; de = address of next format char to examine
-   ;  a = length modifier id
+   ;  c = length modifier id
    ; stack = WORKSPACE_44, width, precision, stack_param
 
-   and lm_l + lm_ll            ; only pay attention to long modifier
+   ld a,c
+   and $30                     ; only pay attention to long modifier
 
    ld a,(de)                   ; a = specifier
    inc de
@@ -416,44 +414,44 @@ converter_specifier:
    ; no long modifier
 
    cp 'd'
-   jp z, _printf_d
+   jr z, _printf_d
 
    cp 'u'
-   jp z, _printf_u
+   jr z, _printf_u
 
    cp 'x'
-   jp z, _printf_x
+   jr z, _printf_x
    
    cp 'X'
-   jp z, _printf_X
+   jr z, _printf_X
    
    cp 'o'
-   jp z, _printf_o
+   jr z, _printf_o
    
    cp 'n'
-   jp z, _printf_n
+   jr z, _printf_n
    
    cp 'i'
-   jp z, _printf_d             ; %i is the same as %d 
+   jr z, _printf_d             ; %i is the same as %d 
    
    cp 'p'
    jr z, _printf_p
    
    cp 'b'
-   jp z, _printf_b
+   jr z, _printf_bb
 
 more_spec:
 
    ; converters unaffected by long modifier (in this implementation)
 
    cp 's'
-   jp z, _printf_s
+   jr z, _printf_s
    
    cp 'c'
-   jp z, _printf_c
+   jr z, _printf_c
    
    cp 'I'
-   jp z, _printf_I
+   jr z, _printf_I
    
 error_spec_unknown:
 
@@ -463,98 +461,38 @@ error_spec_unknown:
    call error_einval_zc        ; set errno
    
    ld hl,50
-   jp _error_stream
+   jr _error_stream
 
 long_spec:
 
    cp 'd'
-   jp z, _printf_ld
+   jr z, _printf_ld
 
    cp 'u'
-   jp z, _printf_lu
+   jr z, _printf_lu
 
    cp 'x'
-   jp z, _printf_lx
+   jr z, _printf_lx
    
    cp 'X'
-   jp z, _printf_lX
+   jr z, _printf_lX
    
    cp 'o'
-   jp z, _printf_lo
+   jr z, _printf_lo
    
    cp 'n'
-   jp z, _printf_ln
+   jr z, _printf_ln
    
    cp 'i'
-   jp z, _printf_ld            ; %i is the same as %d
+   jr z, _printf_ld            ; %i is the same as %d
    
    cp 'p'
    jr z, _printf_lp
    
    cp 'b'
-   jp z, _printf_lb
+   jr z, _printf_lbb
 
    jr more_spec
-   
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-lm_found:
-
-   ld c,(hl)                   ; c = length modifier id
-   inc de                      ; consume length modifier
-
-   cp 'l'   
-   jr z, lm_double
-   
-   cp 'h'
-   jr nz, converter_specifier
-
-lm_double:
-
-   ld b,a
-   ld a,(de)
-   
-   cp b
-   jr nz, converter_specifier
-   
-   inc de                      ; consume second 'l' or 'h'
-
-   ld a,c
-   add a,a
-   ld c,a
-   
-   jr converter_specifier
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-flag_chars:
-
-   defb '+', $40
-   defb ' ', $20
-   defb '#', $10
-   defb '0', $08
-   defb '-', $04
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-lm_chars:
-
-   defb 'l', __lm_l
-   defb 'L', __lm_L
-   defb 'h', __lm_h
-   defb 'j', __lm_j
-   defb 't', __lm_t
-   defb 'z', __lm_z
-
-   defc __lm_L = $01
-   defc __lm_h = $02
-   defc __lm_j = $08
-   defc __lm_l = $10
-   defc __lm_t = $40
-   defc __lm_z = $80
-   
-   defc __lm_ll = $20
-   defc __lm_hh = $04
 
 ;******************************
 ; * PRINTF CONVERTERS *********
@@ -578,117 +516,121 @@ lm_chars:
 
    ; bcdinopsuxIX
 
-_printf_b:
+_printf_bb:
 
-   LIB __stdio_printf_b
+   LIB __stdio_printf_bb
    
    res 4,(ix+5)                ; base indicator off
+   ld hl,__stdio_printf_bb
+   
+   jr printf_invoke_2 - 1
 
-   ld hl,__stdio_printf_b   
-   jp printf_invoke_2 - 1
+_printf_lbb:
 
-_printf_lb:
-
-   LIB __stdio_printf_lb
+   LIB __stdio_printf_lbb
 
    res 4,(ix+5)                ; base indicator off
+   ld hl,__stdio_printf_lbb
 
-   ld hl,__stdio_printf_lb
-   jp printf_invoke_4 - 1
+   jr printf_invoke_4 - 1
 
 _printf_c:
 
    LIB __stdio_printf_c
 
    ld hl,__stdio_printf_c
-   jp printf_invoke_2 - 1
+   jr printf_invoke_2 - 1
 
 _printf_d:
 
    LIB __stdio_printf_d
 
    res 4,(ix+5)                ; base indicator off
-
    ld a,$40                    ; signed
+
    ld hl,__stdio_printf_d
-   jp printf_invoke_2
+   jr printf_invoke_2
 
 _printf_ld:
 
    LIB __stdio_printf_ld
 
    res 4,(ix+5)                ; base indicator off
-   
    ld a,$40                    ; signed
+
    ld hl,__stdio_printf_ld
-   jp printf_invoke_4
+   jr printf_invoke_4
 
 _printf_n:
 
    LIB __stdio_printf_n
 
    ld hl,__stdio_printf_n
-   jp printf_invoke_2 - 1
+   jr printf_invoke_2 - 1
 
 _printf_ln:
 
    LIB __stdio_printf_ln
 
    ld hl,__stdio_printf_ln
-   jp printf_invoke_4 - 1
+   jr printf_invoke_4 - 1
 
 _pritnf_o:
 
    LIB __stdio_printf_o
 
+   set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_o
-   jp printf_invoke_2 - 1
+   
+   jr printf_invoke_2 - 1
 
 _printf_lo:
 
    LIB __stdio_printf_lo
 
+   set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_lo
-   jp printf_invoke_4 - 1
+
+   jr printf_invoke_4 - 1
 
 _printf_p:
 
    LIB __stdio_printf_p
 
    ld hl,__stdio_printf_p
-   jp printf_invoke_2 - 1
+   jr printf_invoke_2 - 1
 
 _printf_lp:
 
    LIB __stdio_printf_lp
 
    ld hl,__stdio_printf_lp
-   jp printf_invoke_4 - 1
+   jr printf_invoke_4 - 1
 
 _printf_s:
 
    LIB __stdio_printf_s
  
    ld hl,__stido_printf_s
-   jp printf_invoke_2 - 1
+   jr printf_invoke_2 - 1
 
 _printf_u:
 
    LIB __stdio_printf_u
 
    res 4,(ix+5)                ; base indicator off
-
-   ld hl,__stdio_printf_u   
-   jp printf_invoke_2 - 1
+   ld hl,__stdio_printf_u
+   
+   jr printf_invoke_2 - 1
 
 _printf_lu:
 
    LIB __stdio_printf_lu
 
    res 4,(ix+5)                ; base indicator off
-
    ld hl,__stdio_printf_lu
-   jp printf_invoke_4 - 1
+   
+   jr printf_invoke_4 - 1
 
 _printf_X:
 
@@ -696,36 +638,38 @@ _printf_X:
 
    ld a,$80                    ; capitalize
    ld hl,__stdio_printf_x
-   jp printf_invoke_2
-   
+
+   jr printf_invoke_2
+
 _printf_lX:
 
    LIB __stdio_printf_lx
       
    ld a,$80                    ; capitalize
    ld hl,__stdio_printf_lx
-   jp printf_invoke_4
+
+   jr printf_invoke_4
 
 _printf_x:
 
    LIB __stdio_printf_x
 
    ld hl,__stdio_printf_x
-   jp printf_invoke_2 - 1
+   jr printf_invoke_2 - 1
 
 _printf_lx:
 
    LIB __stdio_printf_lx
 
    ld hl,__stdio_printf_lx
-   jp printf_invoke_4 - 1
+   jr printf_invoke_4 - 1
 
 _printf_I:
 
    LIB __stdio_printf_ii
 
    ld hl,__stdio_printf_ii
-   jp printf_invoke_4 - 1
+   jr printf_invoke_4 - 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -733,19 +677,18 @@ _printf_I:
 
 printf_invoke_4:
 
-   ld (ix+4),a                 ; signed / unsigned / capitalize
    ld bc,printf_return_4
-
    jr printf_invoke
 
    xor a
 
 printf_invoke_2:
 
-   ld (ix+4),a                 ; signed / unsigned / capitalize
    ld bc,printf_return_2
 
 printf_invoke:
+
+   ld (ix+4),a                 ; signed / unsigned / capitalize
 
    ; hl = & printf_converter
    ; de = address of next format char to examine
@@ -755,7 +698,11 @@ printf_invoke:
    ex (sp),hl                  ; push & printf_converter
    push hl
 
-   ld hl,13
+   ; de = char *format
+   ; bc = return address
+   ; stack = WORKSPACE_44, width, precision, & converter, stack_param
+
+   ld hl,15
    add hl,sp
    
    ld (hl),d
@@ -871,7 +818,7 @@ ENDIF
    ; de = char *format
    ; stack = WORKSPACE_44, stack_param
 
-   jp format_loop
+   jr format_loop
 
 ;******************************
 ; * ERRORS ********************
@@ -912,7 +859,6 @@ _error_stream:
    pop hl                      ; hl = number of chars transmitted
 
    call l_utod_hl              ; hl = max $7fff
-
    inc hl
    
    scf                         ; indicate error

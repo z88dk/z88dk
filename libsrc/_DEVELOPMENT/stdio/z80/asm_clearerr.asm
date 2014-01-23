@@ -12,8 +12,7 @@
 XLIB asm_clearerr
 XDEF asm_clearerr_unlocked
 
-LIB __stdio_lock_acquire, __stdio_lock_release
-LIB error_enolck_mc, error_znc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc, error_znc
 
 asm_clearerr:
 
@@ -47,7 +46,7 @@ asm_clearerr_unlocked:
    ;         hl = 0
    ;         carry reset
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, hl
 
    ld a,(ix+3)
    and $e7                     ; clear eof and err bits

@@ -13,6 +13,7 @@ XLIB asm_perror
 
 LIB asm_strerror, asm_fputs_unlocked, asm_fputc_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_mc
+
 XREF __FILE_STDERR, _errno
 
 asm_perror:

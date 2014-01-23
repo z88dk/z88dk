@@ -1,5 +1,6 @@
 
 XLIB __stdio_scanf_s
+XDEF __stdio_scanf_s_tail
 
 LIB l_saturated_inc_hl
 LIB __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc, __stdio_scanf_sm_string
@@ -45,6 +46,9 @@ width_specified:
    call __stdio_recv_input_eatc
    
    exx
+
+__stdio_scanf_s_tail:
+
    jr c, stream_error
 
 zero_terminate:
@@ -61,7 +65,7 @@ zero_terminate:
    
    ld a,b
    or c
-   call nz, l_saturated_inc_hl ; if at least one char written, num items assigned++
+   call nz, l_saturated_inc_hl ; if at least one char consumed from stream, num items assigned++
 
    exx
    

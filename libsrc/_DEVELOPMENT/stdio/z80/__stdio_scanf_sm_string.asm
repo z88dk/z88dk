@@ -1,5 +1,6 @@
 
 XLIB __stdio_scanf_sm_string
+XDEF __stdio_scanf_sm_string_write
 
 LIB asm_isspace
 
@@ -18,6 +19,8 @@ __stdio_scanf_sm_string:
    
    ccf
    ret c                       ; reject whitespace
+
+__stdio_scanf_sm_string_write:
    
    inc c
    dec c

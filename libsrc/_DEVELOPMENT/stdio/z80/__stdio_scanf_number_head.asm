@@ -10,7 +10,8 @@ __stdio_scanf_number_head:
    ;          a = char buffer_len
    ;         hl = int (*qualify)(char c)
    ;
-   ; exit  : carry if stream error
+   ; exit  : de = void *buffer_ptr (pointing to char following last written)
+   ;         carry if stream error
    
    ; CONSUME LEADING WHITESPACE
 

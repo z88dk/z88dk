@@ -3,21 +3,17 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; int fprintf(FILE *stream, const char *format, ...)
+; int fprintf_unlocked(FILE *stream, const char *format, ...)
 ;
 ; See C11 specification.
 ;
 ; ===============================================================
 
 XLIB asm_fprintf_unlocked
-XDEF asm_printf_unlocked
 
-LIB asm_vfprintf_unlocked, asm_fprintf_common
+LIB asm_vfprintf_unlocked, __stdio_varg_2, __stdio_nextarg_de
+
 XREF __FILE_STDOUT
-
-asm_printf_unlocked:
-
-   ld ix,__FILE_STDOUT
 
 asm_fprintf_unlocked:
 
@@ -47,7 +43,15 @@ asm_fprintf_unlocked:
    ;            more errors may be set by underlying driver
    ;            
    ; uses  : all
+
+   call __stdio_varg_2
    
-   call asm_fprintf_common     ; collect parameters
+   ld ixl,e
+   ld ixh,d                    ; ix = FILE *
+   
+   call __stdio_nextarg_de     ; de = char *format
+   
+   ld c,l
+   ld b,h                      ; bc = void *arg
    
    jp asm_vfprintf_unlocked

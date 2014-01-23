@@ -28,7 +28,7 @@ __stdio_printf_number_tail_int:
    ; integer negative ?
    
    bit 7,h
-   jp z, signed_join           ; if integer is positive
+   jr z, signed_join           ; if integer is positive
    
    set 7,(ix+5)                ; set negative flag
    call l_neg_hl               ; change to positive for conversion

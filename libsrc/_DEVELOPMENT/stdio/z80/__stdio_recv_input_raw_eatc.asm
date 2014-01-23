@@ -1,15 +1,12 @@
 
-XLIB __stdio_recv_input_eatc
+XLIB __stdio_recv_input_raw_eatc
 
-LIB l_saturated_inc_de, l_saturated_inc_bc, l_saturated_add_hl_bc, l_jpix, l_jphl
+LIB l_saturated_inc_bc, l_jpix, l_jphl
 
-; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
-; DE' IS USED TO TRACK NUMBER OF CHARS READ FROM STREAM
-; HL' IS USED TO TRACK NUMBER OF ITEMS ASSIGNED
-;
-; OTHER HIGH LEVEL STDIO SHOULD USE __STDIO_RECV_INPUT_RAW_*
+; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
+; EXCEPT FOR VFSCANF.  THIS ENSURES STREAM STATE IS CORRECTLY MAINTAINED
 
-__stdio_recv_input_eatc:
+__stdio_recv_input_raw_eatc:
 
    ; Driver consumes chars from the stream, as qualified by ignore()
    ;
@@ -17,17 +14,13 @@ __stdio_recv_input_eatc:
    ;         hl'= int (*qualify)(char c)
    ;         bc'= reserved
    ;         de'= reserved
-   ;         bc = max_length = max number of stream chars to consume
-   ;         de = number of chars read from stream so far
-   ;         hl = number of items assigned so far
+   ;         hl = max_length = max number of stream chars to consume
    ;
    ; exit  : ix = FILE *
    ;         hl'= unchanged
    ;         bc'= unchanged
    ;         de'= unchanged
    ;         bc = number of chars consumed from stream in this operation
-   ;         de = number of chars read from stream so far (updated)
-   ;         hl = number of items assigned so far
    ;          a = next unconsumed char (if error: 0 on stream error, -1 on eof)
    ;
    ;         carry set on error or eof, stream state set appropriately
@@ -43,8 +36,8 @@ __stdio_recv_input_eatc:
 
    ; examine unget char
 
-   ld a,b
-   or c
+   ld a,h
+   or l
    
    ld a,(ix+6)                 ; a = unget char
    jr z, _ungetc_rejected_ec   ; if max_length is zero only provide peek
@@ -56,7 +49,7 @@ __stdio_recv_input_eatc:
    jr c, _ungetc_rejected_ec
 
    res 0,(ix+4)                ; consume the unget char
-   dec bc                      ; max_length--
+   dec hl                      ; max_length--
 
    call _no_ungetc_ec
 
@@ -64,7 +57,6 @@ _post_ungetc:
 
    push af                     ; save error state
    
-   call l_saturated_inc_de     ; total num chars read from stream++
    call l_saturated_inc_bc     ; num chars consumed in this operation++
    
    pop af
@@ -82,32 +74,9 @@ _ungetc_rejected_ec:
 _no_ungetc_ec:
 
    ld a,STDIO_MSG_EATC
-
-   push hl
-   push de
-   
-   ld l,c
-   ld h,b                      ; hl = max_length
-
    call l_jpix
-   
+      
    ld a,l
-   pop hl
-
-   ;  a = next unconsumed char (if error: 0 for stream error, -1 for eof)
-   ; bc = number of bytes consumed from stream in this operation
-   ; hl = total num chars read from stream so far
-   ; carry set on error or eof
-   ; stack = number of items assigned
-
-   push af
-
-   call l_saturated_add_hl_bc
-   ex de,hl                    ; de = total num chars read from stream (updated)
-
-   pop af
-   pop hl                      ; hl = total num items assigned
-   
    ret nc                      ; if no error
 
    ; stream error or eof ?
