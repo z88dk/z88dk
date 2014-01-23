@@ -26,7 +26,7 @@ __stdio_verify_input:
    ; check if last operation on stream was a write
    
    bit 1,(ix+4)
-   jr nz, last_read
+   ret nz                      ; if last operation was read
    
    push bc
    push de
@@ -38,10 +38,8 @@ __stdio_verify_input:
    pop de
    pop bc
 
-last_read:
+   ld (ix+4),$02               ; clear unget char, change last op to read
 
-   set 1,(ix+4)                ; indicate last operation is read
-   
    or a
    ret
 

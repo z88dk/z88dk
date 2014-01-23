@@ -26,7 +26,7 @@ __stdio_verify_output:
    ; check if last operation on stream was a read
    
    bit 1,(ix+4)
-   jr z, last_write
+   ret z                       ; if last operation was write
    
    push bc
    push de
@@ -38,9 +38,7 @@ __stdio_verify_output:
    pop de
    pop bc
 
-last_write:
-
-   ld (ix+4),0                 ; clear state_flags_1
+   ld (ix+4),0                 ; set last operation to write
    
    or a
    ret
