@@ -1,7 +1,7 @@
 
 XLIB __stdio_scanf_c
 
-LIB __stdio_recv_input_read, l_saturated_inc_hl
+LIB __stdio_recv_input_read, l_saturated_inc_hl, l_saturated_add_hl_bc, l_jpix
 
 __stdio_scanf_c:
 

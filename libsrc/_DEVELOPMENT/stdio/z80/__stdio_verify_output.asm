@@ -1,7 +1,7 @@
 
 XLIB __stdio_verify_output
 
-LIB error_eacces_mc, error_mc, asm0_fflush
+LIB error_eacces_mc, error_mc, asm0_fflush_unlocked
 
 __stdio_verify_output:
 
@@ -12,7 +12,7 @@ __stdio_verify_output:
    ; exit  : ix = FILE *
    ;         carry set if problem with hl=-1
    ;
-   ; uses  : all except bc, de, hl, ix
+   ; uses  : all except bc, de, (hl on no error), ix
    
    ; check for stream error and write mode
    

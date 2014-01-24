@@ -10,10 +10,10 @@ asm_fwrite_unlocked:
    ;         de = nmemb
    ;
    ; exit  : ix = FILE *
+   ;         hl = number of records successfully transmitted
    ;
    ;         success
    ;
-   ;            hl = number of records successfully transmitted
    ;            de = char *p = ptr following all records
    ;            bc = size
    ;            carry reset
@@ -22,7 +22,6 @@ asm_fwrite_unlocked:
    ;
    ;            de = char *p (ptr to current record not transmitted completely)
    ;            bc = number of bytes in last incomplete record transmitted
-   ;            hl = number of records successfully transmitted
    ;            carry set, errno set
    ;
    ; uses  : all except ix
