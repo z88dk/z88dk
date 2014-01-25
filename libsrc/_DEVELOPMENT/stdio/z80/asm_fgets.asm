@@ -115,9 +115,10 @@ asm0_fgets_unlocked:             ; entry for gets()
    or c
    jp z, error_zc - 1          ; if n == 0
    
-   pop hl                      ; hl = state machine
-   push de                     ; save char *s
    dec bc                      ; make room for '\0'
+   pop hl                      ; hl = state machine
+   
+   push de                     ; save char *s
 
    push bc
    exx
