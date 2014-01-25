@@ -3,11 +3,12 @@ Exit with a fatal error, warn on stderr
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.4 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.h,v 1.5 2014-01-25 20:19:35 pauloscustodio Exp $
 */
 
 #pragma once
 
+#include <assert.h>
 #include <stdlib.h>
 
 /* fatal error on stderr with printf-like argument */
@@ -16,15 +17,18 @@ extern void die( char *msg, ... );
 /* warning on stderr with printf-like argument */
 extern void warn( char *msg, ... );
 
-/* OS-interface - die on error */
+/* OS-interface - assert no error */
 #define xatexit(func) 	do { \
-							if ( atexit(func) ) \
-								die("atexit() failed at %s:%d\n", __FILE__, __LINE__ ); \
+							int atexit_ret = atexit(func); \
+							assert( atexit_ret == 0 ); \
 						} while (0)
 
 /*
 * $Log: die.h,v $
-* Revision 1.4  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.5  2014-01-25 20:19:35  pauloscustodio
+* Use assert for failure
+*
+* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
