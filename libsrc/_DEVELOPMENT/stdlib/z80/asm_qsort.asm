@@ -28,7 +28,7 @@
 
 XLIB asm_qsort
 
-LIB l_mulu_16_16x16, asm_memswap, l_jpix, error_einval_zc, error_erange_zc
+LIB l_mulu_16_16x16, asm0_memswap, l_jpix, error_einval_zc, error_erange_zc
 LIB l_ltu_de_hl, l_ltu_hl_de, l_ltu_bc_hl
 
 asm_qsort:
@@ -42,10 +42,15 @@ asm_qsort:
    ;
    ;         if an error below occurs, no sorting is done.
    ;
+   ;         einval if size == 0
    ;         einval if array size > 64k
    ;         erange if array wraps 64k boundary
    ;
    ; uses  : af, bc, de, hl, compare function
+
+   ld a,d
+   or e
+   jp z, error_einval_zc       ; if size == 0
 
    ld a,h
    or l
@@ -234,7 +239,7 @@ swap_ij:
 
    push de
    push bc
-   call asm_memswap            ; swap(i, j, size)
+   call asm0_memswap           ; swap(i, j, size)
    pop bc
    
    add hl,bc                   ; i += size
@@ -260,7 +265,7 @@ partition_done:
    
    push bc
    push de
-   call asm_memswap            ; swap(j, lo, size)
+   call asm0_memswap           ; swap(j, lo, size)
    pop bc
    pop de
    
