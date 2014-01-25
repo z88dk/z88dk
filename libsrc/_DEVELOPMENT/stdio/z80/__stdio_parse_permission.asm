@@ -9,6 +9,7 @@ __stdio_parse_permission:
    ; enter : de = char *permission
    ;
    ; exit  : de = char *permission_ptr (address of non-matching char)
+   ;
    ;         success, permission string valid
    ;
    ;            c = flags = IOB0 00AC
