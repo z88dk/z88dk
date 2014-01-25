@@ -11,7 +11,8 @@
 
 XLIB asm_vsscanf
 
-LIB asm0_vfscanf_unlocked, error_einval_zc, l_jphl, error_mc, asm_strnlen
+LIB asm_strnlen, asm__memstrcpy, l_jphl, error_mnc
+LIB asm0_vfscanf_unlocked, error_einval_zc, error_mc
 
 asm_vsscanf:
 
@@ -67,7 +68,7 @@ asm_vsscanf:
 
 sscanf_inchar:
 
-   ; vfscanf will generate two messages here
+   ; vfscanf will generate three messages
    ; STDIO_MSG_EATC, STDIO_MSG_READ, STDIO_MSG_SEEK
 
    cp STDIO_MSG_READ
@@ -139,58 +140,43 @@ return_max_reached:
    call return_unqualified
    ret nz                      ; if next char is not eof
 
-   ld hl,-1                    ; indicate next char will be eof
-   ret
+   jp error_mnc                ; indicate next char will be eof
 
 _read:
 
    ; hl = length > 0
    ; de'= void *buffer (destination)
    ; bc'= length > 0
-   
-   push hl                     ; save requested length
-   
-   ld c,l
-   ld b,h                      ; bc = requested read length
+
+   exx
    
    ld l,(ix+4)
    ld h,(ix+5)                 ; hl = char *s
    
-   call asm_strnlen            ; determine number of chars available
+   call asm__memstrcpy
    
-   ; hl = num chars to read = min(request size, strlen)
-   ; de = char *s
-   ; z flag set if 0 chars available
+   ld (ix+4),l
+   ld (ix+5),h                 ; update char *s
    
-   ld c,l
-   ld b,h                      ; bc = num chars successfully read
-   
-   jp z, error_mc - 1          ; indicate eof
-   
-   push de
    push bc
    
    exx
    
-   pop bc                      ; bc = num chars to copy
-   pop hl                      ; hl = char *s
-   
-   ldir
-   
-   exx
-   
-   add hl,de                   ; hl = new char *s
-   
-   ld (ix+4),l
-   ld (ix+5),h                 ; store char *s
-   
-   pop hl                      ; hl = request length
-   
-   or a
-   sbc hl,bc
-   ret z                       ; if request length == num chars read, ok
+   pop bc                      ; bc = length_remaining
 
-   jp error_mc                 ; indicate eof
+   sbc hl,bc                   ; hl = num bytes copied
+   
+   ld a,b
+   or c
+   
+   ld c,l
+   ld b,h                      ; bc = num bytes copied
+
+   ret z                       ; if request completely satisfied
+   
+   ; EOF reached, only reason request cannot be satisfied
+   
+   jp error_mc
 
 _seek:
 
