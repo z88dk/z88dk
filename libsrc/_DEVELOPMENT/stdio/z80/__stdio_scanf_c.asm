@@ -1,7 +1,8 @@
 
 XLIB __stdio_scanf_c
 
-LIB __stdio_recv_input_read, l_saturated_inc_hl, l_saturated_add_hl_bc, l_jpix
+LIB __stdio_recv_input_read, l_saturated_inc_hl
+LIB l_saturated_add_hl_bc, asm_fseek_unlocked
 
 __stdio_scanf_c:
 
@@ -50,27 +51,27 @@ assignment_suppressed:
    ld l,c
    ld h,b
    ld de,0                     ; dehl = forward seek offset
-   
-   ld a,STDIO_MSG_SEEK
+
    ld c,STDIO_SEEK_CUR
    
    push hl                     ; save forward seek offset
-   
+
    exx
    
    push de                     ; save chars read from stream
    push hl                     ; save items assigned
+
+   exx
    
-   call l_jpix
+   call asm_fseek_unlocked
    
    pop de                      ; de = items assigned
    pop hl                      ; hl = chars read from stream
-   
    pop bc                      ; bc = forward seek offset
    
    call l_saturated_add_hl_bc
-   ex de,hl
    
+   ex de,hl
    exx
 
    or a
