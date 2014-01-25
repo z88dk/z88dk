@@ -41,6 +41,5 @@ asm_strndup:
    
    call asm_strlen             ; hl = strlen(s)
    call l_minu_bc_hl           ; hl = min(strlen, n)
-   inc hl                      ; include space for NUL
    
    jp asm0_strdup

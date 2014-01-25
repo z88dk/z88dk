@@ -16,7 +16,7 @@ INCLUDE "../../crt_vars.inc"
 XLIB asm_strdup
 XDEF asm0_strdup
 
-LIB asm_strlen, malloc, error_enomem_zc
+LIB asm_strlen, malloc, error_enomem_zc, l_saturated_inc_hl
 
 asm_strdup:
 
@@ -41,9 +41,10 @@ asm_strdup:
    push hl                     ; save char *s
    
    call asm_strlen             ; hl = length
-   inc hl                      ; include space for NUL
 
 asm0_strdup:
+
+   inc hl                      ; include space for NUL
  
    push hl
    call malloc                 ; malloc(hl bytes)
