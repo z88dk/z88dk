@@ -60,7 +60,7 @@ asm_fputs_unlocked:
    ; uses  : all except ix
 
    call __stdio_verify_output  ; check that output on stream is ok
-   jp c, error_mc              ; if output on stream not possible
+   ret c
 
    ld e,l
    ld d,h                      ; de = char *s

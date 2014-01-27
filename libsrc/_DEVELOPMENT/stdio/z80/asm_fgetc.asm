@@ -71,7 +71,7 @@ asm_getc_unlocked:
    ; uses  : all except ix
 
    call __stdio_verify_input   ; check that input from stream is ok
-   jp c, error_mc
+   ret c
 
    call __stdio_recv_input_raw_getc
    ret nc
