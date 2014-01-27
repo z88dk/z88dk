@@ -100,35 +100,31 @@ asm_getdelim_unlocked:
    inc hl
    ld h,(hl)
    ld l,a
-   
+
    ex de,hl                    ; de = char *lineptr
+
+   or d
+   jr z, lineptr_0             ; if lineptr == 0
    
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = size_t n
-   
-   cp 1
-   jr nc, n_sufficient         ; if n >= 1 use buffer provided
-   
-   inc h
-   dec h
-   jr nz, n_sufficient         ; if n >= 1 use buffer provided
-   
-   ld e,h
-   ld d,h                      ; de = char *lineptr = 0
 
-n_sufficient:
+   or h
+   jr z, rejoin                ; if n == 0
+
+   dec hl                      ; make room for terminating '\0'
+
+rejoin:
+
+   ; CREATE STATE MACHINE STRUCT ON STACK
 
    ; de = char *lineptr (0 if no buffer provided)
    ; bc = int delim_char
-   ; hl = size_t n
+   ; hl = size_t n (0 if state machine should immediately realloc)
    ; stack = size_t *n, char **lineptr
-   
-   dec hl                      ; make room for terminating '\0'
 
-   ; CREATE STATE MACHINE STRUCT ON STACK
-   
    push de
    push bc
    push de
@@ -181,6 +177,11 @@ n_sufficient:
    
    or a
    ret
+
+lineptr_0:
+
+   ld hl,0                     ; setting n = 0 will cause malloc in state machine
+   jr rejoin
 
 buffer_allocated:
 
