@@ -14,6 +14,8 @@
 ; STDIO_SEEK_CUR (1) : offset is relative to current position
 ; STDIO_SEEK_END (2) : offset is relative to end of file
 ;
+; For STDIO_SEEK_SET, offset is treated as unsigned.
+;
 ; ===============================================================
 
 XLIB asm_fseek
