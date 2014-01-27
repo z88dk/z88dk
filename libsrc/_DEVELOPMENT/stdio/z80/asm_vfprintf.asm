@@ -395,8 +395,8 @@ length_modifier:
 
 converter_specifier:
 
-   ; identify conversion "bcdinopsuxIX"
-   ; long modifies "bdinopuxX" not "csI"
+   ; identify conversion "BcdinopsuxIX"
+   ; long modifies "BdinopuxX" not "csI"
    
    ; de = address of next format char to examine
    ;  c = length modifier id
@@ -436,7 +436,7 @@ converter_specifier:
    cp 'p'
    jr z, _printf_p
    
-   cp 'b'
+   cp 'B'
    jr z, _printf_bb
 
 more_spec:
@@ -488,7 +488,7 @@ long_spec:
    cp 'p'
    jr z, _printf_lp
    
-   cp 'b'
+   cp 'B'
    jr z, _printf_lbb
 
    jr more_spec
