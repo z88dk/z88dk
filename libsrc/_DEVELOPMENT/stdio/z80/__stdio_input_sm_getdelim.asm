@@ -19,12 +19,11 @@ __stdio_input_sm_getdelim:
    ;
    ;         if using existing buffer
    ;
-   ;            bc = remaining_n
-   ;            lineptr != 0
+   ;            bc = remaining_n > 0
    ;
    ;         if using an allocated buffer
    ;
-   ;            lineptr == 0
+   ;            bc = 0
 
    ; first call to state machine, determine where to join
 
@@ -35,17 +34,16 @@ __stdio_input_sm_getdelim:
    ld d,(hl)
    inc hl
    
-   inc e
-   dec e
-   jr nz, state_1_join         ; if lineptr != 0, have a buffer
+   inc c
+   dec c
+   jr nz, state_1_join         ; if n != 0, have a buffer
    
-   inc d
-   dec d
-   jr nz, state_1_join         ; if lineptr != 0, have a buffer
+   inc b
+   djnz state_1_join           ; if n != 0, have a buffer
    
    ; allocating a buffer
    
-   ; de = 0
+   ; de = char *lineptr
    ; hl = & struct.delim_char
    
    push hl                     ; save & struct.delim_char
@@ -59,7 +57,7 @@ __stdio_input_sm_getdelim:
    ; unable to allocate initial buffer
    
    pop af
-   pop af
+   pop hl
    
    scf                         ; indicate reject
    ret
