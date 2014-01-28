@@ -203,7 +203,8 @@ buffer_allocated:
    ld h,d
    add hl,bc                   ; hl = & end of allocated buffer
    
-   ld (hl),0                   ; zero terminate the buffer
+   xor a
+   ld (hl),a                   ; zero terminate the buffer
 
    pop hl                      ; hl = size_t *n
    inc de                      ; de = num chars written + 1 (room for '\0')
@@ -214,9 +215,8 @@ buffer_allocated:
    
    ex de,hl
    dec hl                      ; hl = number of chars written to buffer
-   
-   or a
-   ret
+
+   ret                         ; carry reset
 
 stream_error:
 
