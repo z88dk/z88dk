@@ -21,7 +21,7 @@
 XLIB asm_fseek
 XDEF asm_fseek_unlocked
 
-LIB l_decs_dehl, error_mc, error_znc
+LIB l_decs_dehl, error_mc, error_znc, error_einval_mc
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 
 asm_fseek:
@@ -73,7 +73,7 @@ asm_fseek_unlocked:
    bit 3,(ix+3)
    jp nz, error_mc             ; if stream is in an error state
    
-   ld a,c
+   ld a,c   
    cp STDIO_SEEK_CUR
    jr nz, absolute_seek
 
@@ -86,8 +86,13 @@ asm_fseek_unlocked:
 
 absolute_seek:
 
+   ld a,c
+   cp 3
+   jp nc, error_einval_mc      ; if seek type is invalid
+
    exx
    
+   ld c,a
    ld a,STDIO_MSG_SEEK
    call l_jpix
    
