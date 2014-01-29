@@ -395,7 +395,7 @@ _seek_cur:
 _seek:
 
    ld de,0                     ; dehl = current position
-   call l_add_long_exx         ; dehl = new position
+   call l_add_long_exx
    
    ; dehl = new file position
    
@@ -406,15 +406,48 @@ _seek:
    ex de,hl                    ; de = new position
    
    call mem_avail_data
-   jr c, _seek_error
+   jr nc, _seek_good
    
-   call mem_set_file_position_unchecked
+   ; seek moves past end of valid portion of buffer
+   
+   ; de = new position
+   ; hl = append - new position < 0
+
+   push de                     ; save new position
+
+   call l_neg_hl
+   call mem_get_append_position
+   
+   ld c,l
+   ld b,h
+   
+   call mem_make_space         ; try to create space for seek
+   jr c, _seek_error_0
+   
+   ; bc = number of extra bytes demanded
+   ; de = append position
+   
+   call mem_make_pointer       ; hl = pointer(de)
+   
+   ld e,0
+   call asm_memset             ; write zeroes to extra space
+   
+   pop de                      ; de = new position
+
+_seek_good:
+
+   call mem_set_file_position
    
    ex de,hl
    ld de,0                     ; dehl = updated position
    
-   ret                         ; carry reset
+   or a                        ; carry reset
+   ret
 
+_seek_error_0:
+
+   pop de
+   
 _seek_error:
 
    call mem_get_file_position
@@ -436,7 +469,7 @@ FLSH:
    ld l,(ix+18)
    ld h,(ix+19)                ; hl = char *buffer
    
-   bit 0,(ix+13)               ; can buffer grow ?
+   bit 4,(ix+13)               ; can buffer grow ?
    jr z, _flsh_no_change
 
    ; buffer can change so store location and size for caller
@@ -473,7 +506,7 @@ _flsh_no_change:
    ret
 
 
-CLOSE:
+CLOS:
 
    ; close file
    ; flush, free buffers if applicable and free FILE*
@@ -492,12 +525,8 @@ CLOSE:
 
 _close_no_free:
 
-   ld e,ixl
-   ld d,ixh
-   
-   push de
-   ex de,hl
-   
+   push ix
+      
    call __stdio_file_close
    
    pop hl
@@ -559,9 +588,9 @@ mem_make_space:
 
    ; attempt to realloc more memory
    ; all or nothing here, should we also aim for smaller
-   ; growth to capture more stream output ?
+   ; growth to capture more stream output ?  No -- see seek
    
-   bit 0,(ix+13)
+   bit 4,(ix+13)
    jr z, growth_denied         ; if buffer cannot be realloced
 
    push bc                     ; save number of bytes
