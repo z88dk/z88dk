@@ -2,6 +2,8 @@
 XLIB error_zc
 
    pop hl
+   pop hl
+   pop hl
 
 error_zc:
 
