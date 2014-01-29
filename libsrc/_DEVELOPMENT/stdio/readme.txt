@@ -43,7 +43,7 @@ bit   name    purpose
 
 * conversion_flags
 
-(PRINTF)
+(PRINTF ONLY)
 
 bit   name    purpose
 
@@ -56,7 +56,22 @@ bit   name    purpose
  1    base    if set indicates octal conversion
  0    P       if set indicates precision was defined 
 
-(SCANF)
+
+
+MEMORY STREAM FILE STRUCTURE
+============================
+
+offset  size  name              purpose
+
+  0      13   FILE              FILE structure
+  13      1   memstream_flags   see below
+  14      2   char **bufp       where to store buffer address
+  16      2   size_t *sizep     where to store buffer length
+  18      2   char *buffer      current buffer address
+  20      2   end_index         index to last byte in buffer
+  22      2   position_index    file pointer index (next read/write index)
+  24      2   append_index      pointer index to one past last valid byte
+
 
 
 STDIO_MESSAGES
@@ -112,8 +127,8 @@ input:
 
 return:
 
-HL = char or EOF
-carry set if error (HL=0) or eof
+HL = char
+carry set on error or eof: if HL=0 stream error, HL=-1 on eof
 
 ****************
 * STDIO_MSG_EATC
@@ -125,8 +140,8 @@ input:
 
  A = STDIO_MSG_EATC
 HL'= int (*qualify)(char c)
-BC'= optional - uint destination_buffer_length
-DE'= optional - void *destination_buffer
+BC'= optional
+DE'= optional
 HL = max_length = number of stream chars to consume
 
 return:
@@ -165,3 +180,47 @@ BC = number of bytes successfully read
 DE'= void *buffer_ptr = address of byte following last written
 
 carry set on error with HL=0 for stream err, HL=-1 for eof
+
+****************
+* STDIO_MSG_SEEK
+****************
+
+Move file pointer to new position
+
+input:
+
+   A = STDIO_MSG_SEEK
+   C = STDIO_SEEK_SET (0), STDIO_SEEK_CUR (1), STDIO_SEEK_END (2)
+DEHL'= file offset
+   C'= STDIO_SEEK_SET (0), STDIO_SEEK_CUR (1), STDIO_SEEK_END (2)
+
+return:
+
+DEHL = updated file position
+carry set on error (file position out of range)
+
+note: stdio stages with buffers must flush first when
+this message is received.
+
+****************
+* STDIO_MSG_FLSH
+****************
+
+Flush the file.
+
+If the last operation was a write, send the contents
+of any output buffers to the file.  If a stream
+error occurs, this may only be partially accomplished.
+
+If the last operation was a read, unread any unconsumed
+buffers by seeking backwards.  It is not possible
+to seek prior to position 0 and this operation always
+succeeds.
+
+input:
+
+ A = STDIO_MSG_FLSH
+
+return:
+
+carry set on error (write buffers could not be flushed)
