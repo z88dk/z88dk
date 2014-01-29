@@ -73,6 +73,18 @@ offset  size  name              purpose
   24      2   append_index      pointer index to one past last valid byte
 
 
+* memstream_flags
+
+bit   name    purpose
+
+ 7     F      if set buffer is freed when file is closed
+65     0      reserved
+ 4     G      if set buffer is allowed to grow via realloc
+32     0      reserved
+ 1     A      if set writes append
+ 0     0      reserved
+
+
 
 STDIO_MESSAGES
 ==============
