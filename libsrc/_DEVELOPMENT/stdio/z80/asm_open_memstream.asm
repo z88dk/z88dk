@@ -19,8 +19,8 @@ LIB asm__fmemopen
 
 asm_open_memstream:
 
-   ; enter : hl = char **bufp
-   ;         bc = size_t *sizep
+   ; enter : de = char **bufp
+   ;         hl = size_t *sizep
    ;
    ; exit  : success
    ;
@@ -34,6 +34,17 @@ asm_open_memstream:
    ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
+
+   xor a
+   ld (hl),a
+   inc hl
+   ld (hl),a                   ; set size = 0, forcing new allocation
+   dec hl
+
+   ld c,l
+   ld b,h                      ; bc = size_t *p
+   
+   ex de,hl                    ; hl = char **bufp
 
    ld a,$00001100              ; disallow unknown mode chars
    ld de,mode                  ; create an expanding write only buffer
