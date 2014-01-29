@@ -4,7 +4,7 @@ XLIB __stdio_parse_permission
 __stdio_parse_permission:
 
    ; parse the fopen permission string
-   ; valid characters include "rwab+"
+   ; valid characters include "rwabx+"
    ;
    ; enter : de = char *permission
    ;
@@ -12,18 +12,19 @@ __stdio_parse_permission:
    ;
    ;         success, permission string valid
    ;
-   ;            c = flags = IOB0 00AC
+   ;            c = flags = IOBX 00AC
    ;            carry reset
    ;
    ;         fail, permission string invalid
    ;
    ;            carry set
    ;
-   ; note  : IOB0 00AC
+   ; note  : IOBX 00AC
    ;
    ;          I =  1  open for reading
    ;          O =  1  open for writing
    ;          B =  1  binary mode (may be relevant for a driver)
+   ;          X =  1  exclusive mode (C11 specification)
    ;          A =  1  append writes
    ;         AC = 00  file must exist, do not create
    ;              10  open if exists but create if it does not exist
@@ -36,7 +37,7 @@ __stdio_parse_permission:
 
 flags_loop:
 
-   ld b,5
+   ld b,6
    ld hl,permission_table
 
    ld a,(de)
@@ -71,7 +72,7 @@ found_flag:
 
 check_validity:
 
-   ; c = flags = IOB0 00AC
+   ; c = flags = IOBX 00AC
    
    ld a,c
    and $c0                     ; valid set of flags must have I and/or O set
@@ -87,3 +88,4 @@ permission_table:
    defb 'a', $42
    defb '+', $c0
    defb 'b', $20
+   defb 'x', $10
