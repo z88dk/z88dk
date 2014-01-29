@@ -9,7 +9,7 @@ error_strings:
    defb 0
    
    defb __EDOM
-   defm "EDOM - Math function out of domain"
+   defm "EDOM - Math argument out of domain"
    defb 0
    
    defb __EINVAL
@@ -21,7 +21,7 @@ error_strings:
    defb 0
    
    defb __ERANGE
-   defm "ERANGE - Math result not representable"
+   defm "ERANGE - Result too large"
    defb 0
    
    defb __EACCES
@@ -36,7 +36,19 @@ error_strings:
    defm "EOVERFLOW - Value too large for data type"
    defb 0
    
-   defb 0                      ; string terminator
+   defb __ENOTSUP
+   defm "ENOTSUP - Not supported"
+   defb 0
+   
+   defb __EFBIG
+   defm "EFBIG - File too large"
+   defb 0
+   
+   defb __EBADF
+   defm "EBADF - Invalid file"
+   defb 0
+   
+   defb 0                      ; strings terminator
 
 error_string_default:
 
