@@ -16,7 +16,7 @@ INCLUDE "../../crt_vars.inc"
 XLIB asm_strdup
 XDEF asm0_strdup
 
-LIB asm_strlen, malloc, error_enomem_zc, l_saturated_inc_hl
+LIB asm_strlen, malloc, error_enomem_zc
 
 asm_strdup:
 
