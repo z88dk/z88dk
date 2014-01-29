@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.7 2014-01-21 23:12:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.8 2014-01-29 22:40:52 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -233,11 +233,6 @@ int main(int argc, char *argv[])
 					xfclose(file);
 					break;
 					
-		case '3':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfclose(file);
-					xfclose(file);
-					ERROR; /* not reached */
-
 		case '4':	Str_set( small, BIG_STR );
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfwrite( small->str, sizeof(char), small->len, file );
@@ -492,6 +487,33 @@ int main(int argc, char *argv[])
 					T_TEMP_FILENAME("test.x1\\x.c",	"test.x1\\~$4$x.c");
 					break;
 
+		case 'H':	/* without existing target file */
+					remove("test.1.bin");
+					file = xfopen_atomic("test.1.bin", "wb"); 
+					if ( ! file ) ERROR;
+					xfput_strz( file, "123" );
+					xfclose(file);
+
+					/* with existing target file */
+					file = xfopen_atomic("test.1.bin", "wb"); 
+					if ( ! file ) ERROR;
+					xfput_strz( file, "123" );
+					xfclose(file);
+
+					memset(buffer, 0, sizeof(buffer));
+					file = xfopen_atomic("test.1.bin", "rb"); 
+					if ( ! file ) ERROR;
+					xfget_chars( file, buffer, 3 );
+					xfclose(file);
+					if (memcmp(buffer, "123", 3)) ERROR;
+					break;
+					
+		case 'I':	remove("test.1.bin");
+					file = xfopen_atomic("test.1.bin", "wb"); 
+					if ( ! file ) ERROR;
+					xfput_strz( file, "123" );
+					break;
+					
 	}
 
 	return 0;
@@ -503,7 +525,6 @@ system($compile) and die "compile failed: $compile\n";
 t_capture("test 0", "", "Error: cannot read file 'test.1xxxx.bin'\n", 1);
 t_capture("test 1", "", "Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
 t_capture("test 2", "", "", 0); is read_binfile("test.1.bin"), "";
-t_capture("test 3", "", "Error: cannot write file 'test.1.bin'\n", 1);
 t_capture("test 4", "", "", 0); is read_binfile("test.1.bin"), "1234";
 t_capture("test 5", "", "Error: cannot write file 'test.1.bin'\n", 1);
 t_capture("test 6", "", "Error: cannot read file 'test.1.bin'\n", 1);
@@ -542,6 +563,45 @@ t_capture("test G", "", "", 0);
 	ok ! -f '~$2$test.1.c';
 	ok ! -f '~$3$test.2.c';
 	ok ! -f 'test.x1\\~$4$x.c';
+t_capture("test H", "", "", 0); is read_binfile("test.1.bin"), "123";
+t_capture("test I", "", "", 0); 
+	ok ! -f 'test.bin';
+	ok ! -f '~$1$test.bin';
+	ok ! -f '~$2$test.bin';
+
+#------------------------------------------------------------------------------
+# order of execution of fini() actions
+write_file("test.c", <<'END');
+#include "fileutil.h"
+#include "die.h"
+#include "init.h"
+
+#define ERROR die("Test failed at line %d\n", __LINE__)
+
+FILE *file;
+
+DEFINE_init() { }
+DEFINE_fini() 
+{
+	assert(file);
+	xfclose(file);	/* dummy, file is closed by class atexit() */
+}
+
+int main()
+{
+	/* call main fini() after fileutil fini() */
+	init();	
+	file = xfopen("test.1.bin", "wb"); assert(file);
+	
+	xfput_strz( file, "123" );
+	
+	return 0;
+}
+END
+
+system($compile) and die "compile failed: $compile\n";
+
+t_capture("test", "", "", 0); is read_binfile("test.1.bin"), "123";
 
 #------------------------------------------------------------------------------
 # cleanup and exit
@@ -565,7 +625,13 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binary => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.7  2014-01-21 23:12:30  pauloscustodio
+# Revision 1.8  2014-01-29 22:40:52  pauloscustodio
+# Mechanism for atomic file write - open a temp file for writing on
+# xfopen_atomic(), close and rename to final name on xfclose().
+# temp_filename() to generate a temporary file name that is
+# deleted atexit.
+#
+# Revision 1.7  2014/01/21 23:12:30  pauloscustodio
 # path_... functions return filename instrpool, no need to pass an array to store result.
 #
 # Revision 1.6  2014/01/21 22:42:18  pauloscustodio

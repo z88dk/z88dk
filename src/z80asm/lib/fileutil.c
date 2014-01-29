@@ -3,14 +3,13 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.9 2014-01-21 23:12:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.10 2014-01-29 22:40:52 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "fileutil.h"
 
-#include "init.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "uthash.h"
@@ -19,105 +18,231 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.9 2014-01-2
 #include <stdarg.h>
 #include <sys/stat.h>
 
+static void fatal_ferr_filename( char *filename, BOOL is_writing );
+
 /*-----------------------------------------------------------------------------
-*	Keep hash table of FILE* to opened files for error messages
+*	List to keep temporary file names that need to be deleted atexit
+*	Relies on class.c destruction of all created objects
 *----------------------------------------------------------------------------*/
-typedef struct OpenFileElem
+static List *temp_files = NULL;		/* keep list of temp files generated */
+
+/* add temp file name to list of files to delete at exit */
+static char *add_temp_file( char *filename )
 {
+	char *temp;
+	
+	strpool_init();
+	temp = strpool_add(filename);
+	
+	List_push( &temp_files, temp );
+	temp_files->free_data = (void(*)(void*))remove;	/* call remove(file) atexit */
+	
+	return temp;
+}
+
+/* return temporary file name, schedules file to be removed atexit */
+char *temp_filename( char *filename )
+{
+	DEFINE_FILE_STR( temp );
+	static int count;
+	
+	Str_sprintf( temp, "%s~$%d$%s", 
+				 path_dirname(filename), ++count, path_basename(filename) );
+
+	return add_temp_file( temp->str );
+}
+
+/*-----------------------------------------------------------------------------
+*	Class to keep one open file, and hash FILE* -> OpenFile
+*----------------------------------------------------------------------------*/
+CLASS( OpenFile )
     FILE    *file; 					/* file pointer returned by fopen */
     char    *filename;				/* file name kept in strpool.h */
-	BOOL	 writing;				/* TRUE if writing, FALSE if reading */
+	char 	*atomic_tempname;		/* tempname used in atomic mode */
+	BOOL	 is_open;				/* TRUE if fopen succeeded */
+	BOOL	 is_writing;			/* TRUE if writing, FALSE if reading */
+	BOOL	 is_atomic;				/* TRUE if writing a temp file to be
+									   renamed to filename at xfclose() */
+END_CLASS;
+
+typedef struct OpenFileElem
+{
+    FILE     *file; 				/* file pointer returned by fopen */
+    OpenFile *open_file;			/* OpenFile object */
 
     UT_hash_handle hh;      		/* hash table */
 
 } OpenFileElem;
 
-OpenFileElem *open_files = NULL;	/* singleton */
-
-List *temp_files = NULL;			/* keep list of temp files generated */
+static OpenFileElem *open_files = NULL;	/* singleton */
 
 /*-----------------------------------------------------------------------------
-*	Initialize and terminate module
+*	Keep map FILE* --> OpenFile
+*	allocated / released by OpenFile_xxx()
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+
+/* add open file to hash */
+static void add_open_file( FILE *file, OpenFile *open_file )
+{
+    OpenFileElem *elem;
+	
+	assert(file);
+
+	HASH_FIND_PTR( open_files, &file, elem );
+	assert( elem == NULL );			/* make sure FILE* is unique */
+	
+	elem = xnew( OpenFileElem );
+	elem->file 		= file;
+	elem->open_file	= open_file;
+
+	HASH_ADD_PTR( open_files, file, elem );
+}
+
+/* get open file from hash, NULL if file already closed */
+static OpenFile *get_open_file( FILE *file )
+{
+    OpenFileElem *elem;
+
+	if ( file == NULL )
+		return NULL;
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files, &file, elem );
+
+    return elem != NULL ? elem->open_file : NULL;
+}
+
+/* remove open file from hash */
+static void remove_open_file( FILE *file )
+{
+    OpenFileElem *elem;
+
+	if ( file != NULL )
+	{
+		HASH_FIND_PTR( open_files, &file, elem );
+		
+		if ( elem != NULL )
+		{
+			HASH_DEL( open_files, elem );
+			xfree( elem );
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	Class to keep information on open files
+*	Needed to assure correct order of destruction of objects
+*	Relies on class.c destruction of all created objects
+*----------------------------------------------------------------------------*/
+DEF_CLASS( OpenFile );
+
+void OpenFile_init( OpenFile *self )
 {
 	strpool_init();
+}
+
+void OpenFile_copy( OpenFile *self, OpenFile *other )
+{
+	assert(0);
+}
+
+void OpenFile_fini( OpenFile *self )
+{
+	if ( self->file != NULL && self->is_open )
+		fclose( self->file );		/* no xfclose for atomic to work */
+		
+	remove_open_file( self->file );
+}
+
+/* open a file, add to hash table */
+static FILE *OpenFile_open( char *filename, char *mode, BOOL is_atomic )
+{
+	OpenFile   *self;
+	char 	   *temp_name;
+
+	/* init temp_files before OpenFile, to assure temp files are removed last */
+	strpool_init();
+	temp_name = is_atomic ? temp_filename( filename ) : NULL;
+
+	/* init object */
+	self = OBJ_NEW( OpenFile );
+	self->filename   = strpool_add( filename );
+	self->is_writing = strchr( mode, 'r' ) ? FALSE : TRUE;
 	
-	open_files = NULL;
-	temp_files = OBJ_NEW( List );	/* make sure we cleanup before class */
+	/* handle atomic writes */
+	if ( self->is_writing && is_atomic )
+	{
+		self->is_atomic			= TRUE;
+		self->file 				= fopen( temp_name, mode );
+		self->atomic_tempname 	= temp_name;
+	}
+	else 
+	{
+		self->is_atomic			= FALSE;
+		self->file 				= fopen( filename, mode );
+		self->atomic_tempname 	= NULL;
+	}
+
+	if ( self->file == NULL )
+	{
+		/* error, remove object */
+		BOOL is_writing = self->is_writing;
+		OBJ_DELETE( self );
+		fatal_ferr_filename( filename, is_writing );
+	}
+	else 
+	{
+		/* add object to open_files map */
+		self->is_open = TRUE;
+		add_open_file( self->file, self );
+	}
+
+	return self->file;
 }
 
-DEFINE_fini()
+/* close a file, rename temp name if atomic, remove from hash table */
+static void OpenFile_close( FILE *file )
 {
-    OpenFileElem *open_elem, *tmp;
-	char *filename;
-	
-	/* delete open files hash */
-    HASH_ITER( hh, open_files, open_elem, tmp )
-    {
-        HASH_DEL( open_files, open_elem );
-        xfree( open_elem );
-    }
-	
-	/* unlink all temp files */
-	while ( (filename = List_pop( temp_files )) != NULL )
-		remove( filename );		/* ignore errors, file may not exist */
-}
+    OpenFile *self;
+	char     *filename;
+	BOOL	  is_writing;
+	int 	  fclose_ret 	= 0;
+	int 	  rename_ret 	= 0;
 
-/*-----------------------------------------------------------------------------
-*	Add open files to hash table
-*	hash items are only deleted on end of program, to be able to show error
-* 	messages after xfclose
-*----------------------------------------------------------------------------*/
-static void add_open_file( FILE *file, char *filename, BOOL writing )
-{
-    OpenFileElem *elem;
+	/* try to get open_file, may fail if file was already closed */
+	self = get_open_file( file );
+	if ( self == NULL )
+	{
+		fclose( file );				/* not-managed file, ignore errors */
+	}
+	else 
+	{												/* managed file */
+		filename   	= self->filename;
+		is_writing 	= self->is_writing;
+		
+		/* close file */
+		if ( self->is_open )
+			fclose_ret = fclose( file );
+		self->is_open = FALSE;			/* so that OBJ_DELETE() skips fclose() */
+		
+		/* handle atomic writes, if fclose OK */
+		if ( self->is_atomic )
+		{
+			if ( fclose_ret >= 0 )
+			{
+				/* remove target file, if it exists; needed for rename 
+				   ignore errors from remove */
+				remove( self->filename );
+				rename_ret = rename( self->atomic_tempname, self->filename );
+			}
+		}
 
-	init();
-
-    /* check if file exists already */
-    HASH_FIND_PTR( open_files, &file, elem );
-
-    if ( elem )
-    {
-        /* found, replace entry */
-        elem->filename 	= strpool_add( filename );
-		elem->writing	= writing;
-    }
-    else
-    {
-        /* new, create hash entry */
-        elem = xnew( OpenFileElem );
-        elem->file 		= file;
-        elem->filename 	= strpool_add( filename );
-		elem->writing	= writing;
-
-        HASH_ADD_PTR( open_files, file, elem );
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*	Add temp file name to list of files to delete at exit
-*----------------------------------------------------------------------------*/
-static void add_temp_file( char *filename )
-{
-	init();
-	List_push( &temp_files, strpool_add(filename) );
-}
-
-/*-----------------------------------------------------------------------------
-*	Search open file by file handle
-*----------------------------------------------------------------------------*/
-static OpenFileElem *get_open_file( FILE *file )
-{
-    OpenFileElem *elem;
-
-	init();
-
-    /* check if file exists already */
-    HASH_FIND_PTR( open_files, &file, elem );
-
-    return elem;
+		OBJ_DELETE( self );			/* object no longer needed */
+		
+		/* error if fclose or rename failed */
+		if ( fclose_ret < 0 || rename_ret < 0 )
+			fatal_ferr_filename( filename, is_writing );
+	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -128,58 +253,32 @@ static ferr_callback_t ferr_callback = NULL;		/* default handler */
 /* set call-back for input/output error; return old call-back */
 ferr_callback_t set_ferr_callback( ferr_callback_t func )
 {
-	ferr_callback_t old;
-
-	init();
-	
-	old = ferr_callback;
+	ferr_callback_t old = ferr_callback;
 	ferr_callback = func;
-
 	return old;
 }
 
 /* call fatal error for a file */
-static void fatal_ferr_filename( char *filename, BOOL writing )
+static void fatal_ferr_filename( char *filename, BOOL is_writing )
 {
-	init();
-
 	/* call call-back, if any */
 	if (ferr_callback != NULL)
-		ferr_callback( filename, writing );
+		ferr_callback( filename, is_writing );
 	
 	/* safety net - abort if no call-back registered */
-	die("Error: cannot %s file '%s'\n", writing ? "write" : "read", filename );
-}
-
-static void fatal_ferr( FILE *file )
-{
-    OpenFileElem *elem;
-
-	init();
-
-	elem = get_open_file( file );
-	fatal_ferr_filename( elem ? elem->filename : "???",
-						 elem ? elem->writing  : FALSE );
+	die("Error: cannot %s file '%s'\n", is_writing ? "write" : "read", filename );
 }
 
 static void fatal_ferr_read( FILE *file )
 {
-    OpenFileElem *elem;
-
-	init();
-
-	elem = get_open_file( file );
-	fatal_ferr_filename( elem ? elem->filename : "???", FALSE );
+    OpenFile *open_file = get_open_file( file );
+	fatal_ferr_filename( open_file ? open_file->filename : "???", FALSE );
 }
 
 static void fatal_ferr_write( FILE *file )
 {
-    OpenFileElem *elem;
-
-	init();
-
-	elem = get_open_file( file );
-	fatal_ferr_filename( elem ? elem->filename : "???", TRUE );
+    OpenFile *open_file = get_open_file( file );
+	fatal_ferr_filename( open_file ? open_file->filename : "???", TRUE );
 }
 
 /*-----------------------------------------------------------------------------
@@ -187,28 +286,17 @@ static void fatal_ferr_write( FILE *file )
 *----------------------------------------------------------------------------*/
 FILE *xfopen( char *filename, char *mode )
 {
-    FILE *file;
-	BOOL writing;
+	return OpenFile_open( filename, mode, FALSE );
+}
 
-	init();
-	
-	writing = strchr( mode, 'r' ) ? FALSE : TRUE;
-	file = fopen( filename, mode );
-
-    if ( file == NULL )
-		fatal_ferr_filename( filename, writing );
-	else 
-		add_open_file( file, filename, writing );	/* never deleted from hash */
-
-	return file;
+FILE *xfopen_atomic( char *filename, char *mode )
+{
+	return OpenFile_open( filename, mode, TRUE );
 }
 
 void xfclose( FILE *file )
 {
-	init();
-
-    if ( fclose( file ) < 0 )
-        fatal_ferr( file );
+    OpenFile_close( file );
 }
 
 /*-----------------------------------------------------------------------------
@@ -216,14 +304,12 @@ void xfclose( FILE *file )
 *----------------------------------------------------------------------------*/
 void xfwrite( void *buffer, size_t size, size_t count, FILE *file )
 {
-	init();
     if ( fwrite( buffer, size, count, file ) != count )
         fatal_ferr_write( file );
 }
 
 void xfread( void *buffer, size_t size, size_t count, FILE *file )
 {
-	init();
     if ( fread( buffer, size, count, file ) != count )
         fatal_ferr_read( file );
 }
@@ -233,13 +319,11 @@ void xfread( void *buffer, size_t size, size_t count, FILE *file )
 *----------------------------------------------------------------------------*/
 void xfput_chars( FILE *file, char *buffer, size_t len )
 {
-	init();
     xfwrite( buffer, sizeof(char), len, file );
 }
 
 void xfget_chars( FILE *file, char *buffer, size_t len )
 {
-	init();
     xfread( buffer, sizeof(char), len, file );
 }
 
@@ -248,19 +332,16 @@ void xfget_chars( FILE *file, char *buffer, size_t len )
 *----------------------------------------------------------------------------*/
 void xfput_strz( FILE *file, char *str )
 {
-	init();
     xfput_chars( file, str, strlen(str) );
 }
 
 void xfput_Str( FILE *file, Str *str )
 {
-	init();
     xfput_chars( file, str->str, str->len );
 }
 
 void xfget_Str( FILE *file, Str *str, size_t len )
 {
-	init();
     if ( len + 1 > str->size )
         fatal_ferr_read( file ); 			/* too long */
 
@@ -275,7 +356,6 @@ void xfget_Str( FILE *file, Str *str, size_t len )
 *----------------------------------------------------------------------------*/
 static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
 {
-	init();
     if ( len > 0xFF )
         fatal_ferr_write( file );			/* too long */
 
@@ -285,13 +365,11 @@ static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
 
 void xfput_count_byte_strz( FILE *file, char *str )
 {
-	init();
 	_xfput_count_byte_str( file, str, strlen(str) );
 }
 
 void xfput_count_byte_Str( FILE *file, Str *str )
 {
-	init();
 	_xfput_count_byte_str( file, str->str, str->len );
 }
 
@@ -299,7 +377,6 @@ void xfget_count_byte_Str( FILE *file, Str *str )
 {
 	size_t len;
 	
-	init();
 	xfget_uint8( file, &len );				/* byte count */
     xfget_Str(   file, str, len );			/* characters */
 }
@@ -309,7 +386,6 @@ void xfget_count_byte_Str( FILE *file, Str *str )
 *----------------------------------------------------------------------------*/
 static void _xfput_count_word_str( FILE *file, char *str, size_t len )
 {
-	init();
     if ( len > 0xFFFF )
         fatal_ferr_write( file );			/* too long */
 
@@ -319,13 +395,11 @@ static void _xfput_count_word_str( FILE *file, char *str, size_t len )
 
 void xfput_count_word_strz( FILE *file, char *str )
 {
-	init();
 	_xfput_count_word_str( file, str, strlen(str) );
 }
 
 void xfput_count_word_Str( FILE *file, Str *str )
 {
-	init();
 	_xfput_count_word_str( file, str->str, str->len );
 }
 
@@ -333,7 +407,6 @@ void xfget_count_word_Str( FILE *file, Str *str )
 {
 	size_t len;
 	
-	init();
 	xfget_uint16( file, &len );				/* byte count */
     xfget_Str(    file, str, len );			/* characters */
 }
@@ -343,20 +416,17 @@ void xfget_count_word_Str( FILE *file, Str *str )
 *----------------------------------------------------------------------------*/
 void xfput_int8( FILE *file, int value )
 {
-	init();
 	xfput_uint8( file, (unsigned) value );
 }
 
 void xfput_uint8( FILE *file, unsigned value )
 {
-	init();
     if ( fputc( (unsigned) value, file ) < 0 )
         fatal_ferr_write( file );
 }
 
 void xfget_int8(  FILE *file, int *pvalue )
 {
-	init();
 	xfget_uint8( file, (unsigned *) pvalue );
     if ( *pvalue & 0x80 )
         *pvalue |= ~ 0xFF;				/* sign-extend above bit 7 */
@@ -366,7 +436,6 @@ void xfget_uint8( FILE *file, unsigned *pvalue )
 {
 	int c;
 	
-	init();
 	if ( (c = getc( file )) < 0 )
         fatal_ferr_read( file );
 	*pvalue = (unsigned) c;
@@ -377,7 +446,6 @@ void xfget_uint8( FILE *file, unsigned *pvalue )
 *----------------------------------------------------------------------------*/
 void xfput_int16( FILE *file, int value )
 {
-	init();
 	xfput_uint16( file, (unsigned) value );
 }
 
@@ -385,7 +453,6 @@ void xfput_uint16( FILE *file, unsigned value )
 {
     char buffer[2];
 
-	init();
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
     xfput_chars( file, buffer, sizeof(buffer) );
@@ -393,7 +460,6 @@ void xfput_uint16( FILE *file, unsigned value )
 
 void xfget_int16( FILE *file, int *pvalue )
 {
-	init();
 	xfget_uint16( file, (unsigned *) pvalue );
     if ( *pvalue & 0x8000 )
         *pvalue |= ~ 0xFFFF;			/* sign-extend above bit 15 */
@@ -403,7 +469,6 @@ void xfget_uint16( FILE *file, unsigned *pvalue )
 {
     char buffer[2];
 
-	init();
     xfget_chars( file, buffer, sizeof(buffer) );
 	*pvalue = 
         ( ( buffer[0] << 0 ) & 0x00FF ) |
@@ -415,7 +480,6 @@ void xfget_uint16( FILE *file, unsigned *pvalue )
 *----------------------------------------------------------------------------*/
 void xfput_int32( FILE *file, long value )
 {
-	init();
 	xfput_uint32( file, (unsigned long) value );
 }
 
@@ -423,7 +487,6 @@ void xfput_uint32( FILE *file, unsigned long value )
 {
     char buffer[4];
 
-	init();
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
 	buffer[2] = value & 0xFF; value >>= 8;
@@ -433,7 +496,6 @@ void xfput_uint32( FILE *file, unsigned long value )
 
 void xfget_int32( FILE *file, long *pvalue )
 {
-	init();
 	xfget_uint32( file, (unsigned long *) pvalue );
     if ( *pvalue & 0x80000000L )
         *pvalue |= ~ 0xFFFFFFFFL;	/* sign-extend above bit 31; solve BUG_0021 */
@@ -443,7 +505,6 @@ void xfget_uint32( FILE *file, unsigned long *pvalue )
 {
     char buffer[4];
 
-	init();
     xfget_chars( file, buffer, sizeof(buffer) );
 	*pvalue = 
         ( ( buffer[0] << 0 ) & 0x000000FF ) |
@@ -465,8 +526,6 @@ void xfget_uint32( FILE *file, unsigned long *pvalue )
 static void _path_remove_ext( Str *dest, char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
-
-	init();
 	
     Str_set( dest, filename );		/* make a copy */
 
@@ -491,7 +550,6 @@ char *path_remove_ext( char *filename )
 {
 	DEFINE_FILE_STR( dest );
 
-	init();
 	_path_remove_ext( dest, filename );
 	return strpool_add( dest->str );
 }
@@ -500,8 +558,6 @@ char *path_remove_ext( char *filename )
 char *path_replace_ext( char *filename, char *new_ext )
 {
 	DEFINE_FILE_STR( dest );
-
-	init();
 	
     _path_remove_ext( dest, filename );
 
@@ -514,8 +570,6 @@ char *path_replace_ext( char *filename, char *new_ext )
 static char *_start_basename( char *filename )
 {
     char *dir_pos_1, *dir_pos_2;
-
-	init();
 	
     dir_pos_1 = strrchr( filename, '/' );
     if ( dir_pos_1 == NULL ) dir_pos_1 = filename - 1;
@@ -529,7 +583,6 @@ static char *_start_basename( char *filename )
 /* make a copy of the file basename, skipping the directory part */
 char *path_basename( char *filename )
 {
-	init();
     return strpool_add( _start_basename(filename) );
 }
 
@@ -538,8 +591,6 @@ char *path_dirname( char *filename )
 {
 	DEFINE_FILE_STR( dest );
 	char *basename;
-	
-	init();
 	
     Str_set( dest, filename );
 	basename = _start_basename( dest->str );
@@ -553,8 +604,6 @@ void path_search( Str *dest, char *filename, List *dir_list )
     DEFINE_FILE_STR( pathname );
     struct stat  sb;
     ListElem	*iter;
-
-	init();
 	
     Str_set( dest, filename );		/* default return: input file name */
 
@@ -587,32 +636,20 @@ void path_search( Str *dest, char *filename, List *dir_list )
 char *search_file( char *filename, List *dir_list )
 {
     DEFINE_FILE_STR( dest );
-
-	init();
 	
     path_search( dest, filename, dir_list );
     return strpool_add( dest->str );
 }
 
-/*-----------------------------------------------------------------------------
-*   Temp files
-*----------------------------------------------------------------------------*/
-char *temp_filename( char *filename )
-{
-	DEFINE_FILE_STR( temp );
-	static int count;
-	
-	init();
-	
-	Str_sprintf( temp, "%s~$%d$%s", 
-				 path_dirname(filename), ++count, path_basename(filename) );
-	add_temp_file( temp->str );
-	return strpool_add( temp->str );
-}
-
 /*
 * $Log: fileutil.c,v $
-* Revision 1.9  2014-01-21 23:12:30  pauloscustodio
+* Revision 1.10  2014-01-29 22:40:52  pauloscustodio
+* Mechanism for atomic file write - open a temp file for writing on
+* xfopen_atomic(), close and rename to final name on xfclose().
+* temp_filename() to generate a temporary file name that is
+* deleted atexit.
+*
+* Revision 1.9  2014/01/21 23:12:30  pauloscustodio
 * path_... functions return filename instrpool, no need to pass an array to store result.
 *
 * Revision 1.8  2014/01/21 22:42:18  pauloscustodio

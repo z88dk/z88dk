@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.8 2014-01-21 23:12:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.9 2014-01-29 22:40:52 pauloscustodio Exp $
 */
 
 #pragma once
@@ -42,6 +42,10 @@ extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
 /* OS interface with fatal errors on failure */
 extern FILE *xfopen( char *filename, char *mode );
 extern void  xfclose( FILE *file );
+
+/* open temp file for writing, rename to final name on xfclose(), or delete
+   temp file at exit if xflcose() not called */
+extern FILE *xfopen_atomic( char *filename, char *mode );
 
 /* read/write buffers */
 extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );
@@ -104,7 +108,13 @@ extern char *temp_filename( char *filename );
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.8  2014-01-21 23:12:30  pauloscustodio
+* Revision 1.9  2014-01-29 22:40:52  pauloscustodio
+* Mechanism for atomic file write - open a temp file for writing on
+* xfopen_atomic(), close and rename to final name on xfclose().
+* temp_filename() to generate a temporary file name that is
+* deleted atexit.
+*
+* Revision 1.8  2014/01/21 23:12:30  pauloscustodio
 * path_... functions return filename instrpool, no need to pass an array to store result.
 *
 * Revision 1.7  2014/01/21 22:42:18  pauloscustodio

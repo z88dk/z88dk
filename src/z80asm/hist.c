@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.68 2014-01-15 00:01:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.69 2014-01-29 22:40:52 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.68 2014-01-15 00:01
 
 /*
 * $Log: hist.c,v $
-* Revision 1.68  2014-01-15 00:01:40  pauloscustodio
+* Revision 1.69  2014-01-29 22:40:52  pauloscustodio
+* Mechanism for atomic file write - open a temp file for writing on
+* xfopen_atomic(), close and rename to final name on xfclose().
+* temp_filename() to generate a temporary file name that is
+* deleted atexit.
+*
+* Revision 1.68  2014/01/15 00:01:40  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *
@@ -1560,6 +1566,10 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	- glib dependency removed from code and Makefile
 	- Decouple file.c from errors.c by adding a call-back mechanism in file for
 	  fatal errors, setup by errors_init()
+	- Mechanism for atomic file write - open a temp file for writing on 
+	  xfopen_atomic(), close and rename to final name on xfclose().
+	- temp_filename() to generate a temporary file name that is
+	  deleted atexit.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

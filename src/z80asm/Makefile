@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.120 2014-01-23 22:30:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.121 2014-01-29 22:40:52 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,13 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.120  2014-01-23 22:30:55  pauloscustodio
+# Revision 1.121  2014-01-29 22:40:52  pauloscustodio
+# Mechanism for atomic file write - open a temp file for writing on
+# xfopen_atomic(), close and rename to final name on xfclose().
+# temp_filename() to generate a temporary file name that is
+# deleted atexit.
+#
+# Revision 1.120  2014/01/23 22:30:55  pauloscustodio
 # Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 # at fclose()
 #
@@ -830,8 +836,8 @@ lib/class.o: lib/init.h
 lib/die.o: lib/die.h
 lib/except.o: lib/xmalloc.h lib/except.h lib/die.h lib/types.h
 lib/fileutil.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h
-lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/init.h lib/die.h
-lib/fileutil.o: lib/strpool.h lib/uthash.h
+lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/strpool.h
+lib/fileutil.o: lib/uthash.h lib/die.h
 lib/list.o: lib/xmalloc.h lib/list.h lib/class.h lib/queue.h lib/types.h
 lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
 lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h
