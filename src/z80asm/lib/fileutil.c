@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.10 2014-01-29 22:40:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.11 2014-02-02 23:00:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -297,6 +297,23 @@ FILE *xfopen_atomic( char *filename, char *mode )
 void xfclose( FILE *file )
 {
     OpenFile_close( file );
+}
+
+void xfclose_remove( FILE *file )
+{
+    OpenFile *self;
+	char     *filename;
+
+	/* try to get open_file, may fail if file was already closed */
+	self = get_open_file( file );
+	filename = self ? self->filename : NULL;	/* filename in strpool */
+	
+	/* close the file */
+    xfclose( file );
+	
+	/* delete file, if one was found */
+	if ( filename != NULL )
+		remove( filename );
 }
 
 /*-----------------------------------------------------------------------------
@@ -643,7 +660,10 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.10  2014-01-29 22:40:52  pauloscustodio
+* Revision 1.11  2014-02-02 23:00:54  pauloscustodio
+* New xfclose_remove() to remove file after closing.
+*
+* Revision 1.10  2014/01/29 22:40:52  pauloscustodio
 * Mechanism for atomic file write - open a temp file for writing on
 * xfopen_atomic(), close and rename to final name on xfclose().
 * temp_filename() to generate a temporary file name that is

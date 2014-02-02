@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.8 2014-01-29 22:40:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.9 2014-02-02 23:00:55 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -514,6 +514,13 @@ int main(int argc, char *argv[])
 					xfput_strz( file, "123" );
 					break;
 					
+		case 'J':	remove("test.1.bin");
+					file = xfopen_atomic("test.1.bin", "wb"); 
+					if ( ! file ) ERROR;
+					xfput_strz( file, "123" );
+					xfclose_remove( file );
+					break;
+					
 	}
 
 	return 0;
@@ -565,6 +572,10 @@ t_capture("test G", "", "", 0);
 	ok ! -f 'test.x1\\~$4$x.c';
 t_capture("test H", "", "", 0); is read_binfile("test.1.bin"), "123";
 t_capture("test I", "", "", 0); 
+	ok ! -f 'test.bin';
+	ok ! -f '~$1$test.bin';
+	ok ! -f '~$2$test.bin';
+t_capture("test J", "", "", 0); 
 	ok ! -f 'test.bin';
 	ok ! -f '~$1$test.bin';
 	ok ! -f '~$2$test.bin';
@@ -625,7 +636,10 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binary => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.8  2014-01-29 22:40:52  pauloscustodio
+# Revision 1.9  2014-02-02 23:00:55  pauloscustodio
+# New xfclose_remove() to remove file after closing.
+#
+# Revision 1.8  2014/01/29 22:40:52  pauloscustodio
 # Mechanism for atomic file write - open a temp file for writing on
 # xfopen_atomic(), close and rename to final name on xfclose().
 # temp_filename() to generate a temporary file name that is

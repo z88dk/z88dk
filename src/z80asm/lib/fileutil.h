@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.9 2014-01-29 22:40:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.10 2014-02-02 23:00:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -43,9 +43,10 @@ extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
 extern FILE *xfopen( char *filename, char *mode );
 extern void  xfclose( FILE *file );
 
-/* open temp file for writing, rename to final name on xfclose(), or delete
-   temp file at exit if xflcose() not called */
+/* open temp file for writing, rename to final name on xfclose()
+   delete temp file by xfclose_remove() or atexit if xflcose() not called  */
 extern FILE *xfopen_atomic( char *filename, char *mode );
+extern void  xfclose_remove( FILE *file );
 
 /* read/write buffers */
 extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );
@@ -108,7 +109,10 @@ extern char *temp_filename( char *filename );
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.9  2014-01-29 22:40:52  pauloscustodio
+* Revision 1.10  2014-02-02 23:00:54  pauloscustodio
+* New xfclose_remove() to remove file after closing.
+*
+* Revision 1.9  2014/01/29 22:40:52  pauloscustodio
 * Mechanism for atomic file write - open a temp file for writing on
 * xfopen_atomic(), close and rename to final name on xfclose().
 * temp_filename() to generate a temporary file name that is
