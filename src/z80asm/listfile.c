@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.14 2014-01-23 22:30:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.15 2014-02-03 21:50:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -232,9 +232,7 @@ void ListFile_close( ListFile *self, BOOL keep_file )
         xfclose( self->file );
 
         if ( ! keep_file )
-        {
             remove( self->filename );
-        }
     }
 
     self->file = NULL;
@@ -583,7 +581,10 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.14  2014-01-23 22:30:55  pauloscustodio
+* Revision 1.15  2014-02-03 21:50:03  pauloscustodio
+* ws
+*
+* Revision 1.14  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 * at fclose()
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.134 2014-01-23 22:30:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.135 2014-02-03 21:48:52 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -246,12 +246,9 @@ static void do_assemble( char *src_filename, char *obj_filename )
         if ( start_errors == get_num_errors() )
         {
             if ( opts.verbose )
-            {
                 puts( "Pass2..." );
-            }
 
             Z80pass2();
-
         }
     }
     FINALLY
@@ -757,7 +754,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.134  2014-01-23 22:30:55  pauloscustodio
+* Revision 1.135  2014-02-03 21:48:52  pauloscustodio
+* ws
+*
+* Revision 1.134  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 * at fclose()
 *
