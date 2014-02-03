@@ -16,7 +16,7 @@ Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.8 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.9 2014-02-03 22:04:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,12 +32,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.8 2014-01-
 *   Class to hold current source file
 *----------------------------------------------------------------------------*/
 CLASS( SrcFile )
-FILE	*fp;					/* open file */
-char	*filename;				/* source file name, held in strpool */
-int		 line_nr;				/* current line number, i.e. last returned */
-Str		*line;					/* current input line, i.e. last returned */
+	FILE	*fp;					/* open file */
+	char	*filename;				/* source file name, held in strpool */
+	int		 line_nr;				/* current line number, i.e. last returned */
+	Str		*line;					/* current input line, i.e. last returned */
 
-List	*line_stack;			/* stack of input lines to read by getline()
+	List	*line_stack;			/* stack of input lines to read by getline()
 									   before reading next line from the file.
 									   Next line read is on the top of the stack */
 END_CLASS;
@@ -45,7 +45,10 @@ END_CLASS;
 
 /*
 * $Log: srcfile.h,v $
-* Revision 1.8  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.9  2014-02-03 22:04:03  pauloscustodio
+* ws
+*
+* Revision 1.8  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

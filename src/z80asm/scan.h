@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.25 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.26 2014-02-03 22:04:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -99,24 +99,24 @@ extern Str		 *last_token_str;
 * State of one scan context
 *----------------------------------------------------------------------------*/
 CLASS( ScanContext )
-Str		*input;				/* text being scanned */
+	Str		*input;				/* text being scanned */
 
-FILE	*file;				/* file being scanned, if any */
-char	*filename;			/* name of file, kept in strpool */
-int		 line_nr;			/* line number, starting at 1 */
+	FILE	*file;				/* file being scanned, if any */
+	char	*filename;			/* name of file, kept in strpool */
+	int		 line_nr;			/* line number, starting at 1 */
 
-BOOL	 bol;				/* true if at beginning of line */
+	BOOL	 bol;				/* true if at beginning of line */
 
-int      cs, act;			/* Ragel state variables */
-char	*p, *pe, *eof, *ts, *te;
+	int      cs, act;			/* Ragel state variables */
+	char	*p, *pe, *eof, *ts, *te;
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
 * Scanner object - stack of ScanContext's
 *----------------------------------------------------------------------------*/
 CLASS( Scan )
-ScanContext	*ctx;			/* current context */
-List		*stack;			/* stack of previous contexts */
+	ScanContext	*ctx;			/* current context */
+	List		*stack;			/* stack of previous contexts */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -160,7 +160,10 @@ extern void Skipline( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.25  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.26  2014-02-03 22:04:03  pauloscustodio
+* ws
+*
+* Revision 1.25  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
