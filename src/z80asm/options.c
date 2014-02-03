@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.71 2014-01-21 23:12:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.72 2014-02-03 22:07:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,6 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.71 2014-01-21 23
 #include "z80asm.h"
 #include <ctype.h>
 #include <string.h>
+#include <assert.h>
 
 /* default file name extensions */
 #define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
@@ -233,7 +234,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 break;
 
             default:
-                die( "missing case at %s:%d\n", __FILE__, __LINE__ );
+                assert(0);
             }
 
             return;
@@ -592,7 +593,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.71  2014-01-21 23:12:30  pauloscustodio
+* Revision 1.72  2014-02-03 22:07:38  pauloscustodio
+* Use assert() instead of die() for programming errors
+*
+* Revision 1.71  2014/01/21 23:12:30  pauloscustodio
 * path_... functions return filename instrpool, no need to pass an array to store result.
 *
 * Revision 1.70  2014/01/20 23:29:18  pauloscustodio

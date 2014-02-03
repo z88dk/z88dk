@@ -16,7 +16,7 @@ Handles reading lines from source file, allowing recursive inclusion of files.
 Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.19 2014-01-23 22:30:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.20 2014-02-03 22:07:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.19 2014-01
 #include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
+
+#include <assert.h>
 
 /*-----------------------------------------------------------------------------
 *   Class to hold current source file
@@ -45,7 +47,7 @@ void SrcFile_init( SrcFile *self )
 
 void SrcFile_copy( SrcFile *self, SrcFile *other )
 {
-    die( "cannot copy open file at %s:%d\n", __FILE__, __LINE__ );
+    assert(0);
 }
 
 void SrcFile_fini( SrcFile *self )
@@ -60,7 +62,10 @@ void SrcFile_fini( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.19  2014-01-23 22:30:55  pauloscustodio
+* Revision 1.20  2014-02-03 22:07:38  pauloscustodio
+* Use assert() instead of die() for programming errors
+*
+* Revision 1.19  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 * at fclose()
 *

@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.20 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.21 2014-02-03 22:07:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,6 +29,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.20 2014-01-11 01:
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"
+
+#include <assert.h>
 
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
@@ -373,9 +375,9 @@ static void declare_global_symbol( char *name, byte_t type )
                 }
                 else								/* cannot declare two identical global's */
                 {
-                    /* Already declared global - no possible path, as global tab is deleted between
-                       modules assembly */
-                    die( "not reached %s:%d", __FILE__, __LINE__ );
+                    /* Already declared global - no possible path, as global tab is 
+					   deleted between modules assembly */
+                    assert(0);
                 }
             }
             else if ( ( sym->type & ( SYMXDEF | type ) ) != ( SYMXDEF | type ) )
@@ -404,8 +406,9 @@ static void declare_global_symbol( char *name, byte_t type )
         }
         else
         {
-            /* local, global - no possible path, as if local & not global, symbol is moved local -> global */
-            die( "not reached %s:%d", __FILE__, __LINE__ );
+            /* local, global - no possible path, as if local & not global, 
+			   symbol is moved local -> global */
+            assert(0);
         }
     }
 }
@@ -520,7 +523,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.20  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.21  2014-02-03 22:07:38  pauloscustodio
+* Use assert() instead of die() for programming errors
+*
+* Revision 1.20  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
