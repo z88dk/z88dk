@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.9 2014-02-02 23:00:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.10 2014-02-08 11:20:20 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -633,10 +633,13 @@ sub t_capture {
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
 
-sub read_binfile { scalar(read_file($_[0], { binary => ':raw' })) }
+sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.9  2014-02-02 23:00:55  pauloscustodio
+# Revision 1.10  2014-02-08 11:20:20  pauloscustodio
+# Error creating binary file
+#
+# Revision 1.9  2014/02/02 23:00:55  pauloscustodio
 # New xfclose_remove() to remove file after closing.
 #
 # Revision 1.8  2014/01/29 22:40:52  pauloscustodio
