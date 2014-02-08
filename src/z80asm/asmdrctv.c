@@ -14,10 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.66 2014-01-23 22:30:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.67 2014-02-08 11:21:08 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.66  2014-01-23 22:30:55  pauloscustodio
+ * Revision 1.67  2014-02-08 11:21:08  pauloscustodio
+ * Moved srcfile.c to lib/
+ *
+ * Revision 1.66  2014/01/23 22:30:55  pauloscustodio
  * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
  * at fclose()
  *
@@ -383,7 +386,6 @@ Copyright (C) Paulo Custodio, 2011-2014
 #include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
-#include "srcfile.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"

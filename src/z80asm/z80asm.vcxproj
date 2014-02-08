@@ -117,7 +117,6 @@
     <ClInclude Include="options_def.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="scan.h" />
-    <ClInclude Include="srcfile.h" />
     <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symref.h" />
@@ -153,7 +152,6 @@
     <ClCompile Include="prsident.c" />
     <ClCompile Include="prsline.c" />
     <ClCompile Include="scan.c" />
-    <ClCompile Include="srcfile.c" />
     <ClCompile Include="sym.c" />
     <ClCompile Include="symref.c" />
     <ClCompile Include="symtab.c" />

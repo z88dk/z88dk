@@ -13,44 +13,329 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.28 2014-01-23 22:30:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.1 2014-02-08 11:21:09 pauloscustodio Exp $
 #
 # Test srcfile
 
 use Modern::Perl;
 use Test::More;
 use File::Slurp;
+use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-	"lib/list.c lib/fileutil.c lib/strutil.c lib/strpool.c lib/class.c lib/xmalloc.c lib/die.c";
+			  "class.c xmalloc.c strpool.c strutil.c fileutil.c die.c list.c";
+
+#------------------------------------------------------------------------------
+# create directories and files
+make_path('test.x1');
+write_binfile('test.f0',    		"F0 1\r\rF0 3\n\nF0 5\r\n\nF0 7\r\n\r".
+									"F0 9\n\r\rF0 11\n\r\nF0 13");
+write_binfile('test.x1/test.f1', 	"F0 x1\r");
+write_binfile('test.x1/test.f2', 	"F1 x1\n");
+write_binfile('test.x1/test.f3', 	"F2 x1\r\n");
+
 
 write_file("test.c", <<'END');
 #include "srcfile.h"
 #include "die.h"
+#include <string.h>
+#include <assert.h>
 
-#define ERROR die("Test failed at line %d\n", __LINE__)
+#define T_GETLINE(_filename, _line_nr, _expected)	\
+			assert( str = SrcFile_getline( file ) ); \
+			warn("(%s:%d)%s", _filename, _line_nr, _expected); \
+			assert( strcmp( file->filename, _filename ) == 0 ); \
+			assert( file->line_nr == _line_nr ); \
+			assert( strcmp( str, _expected ) == 0 ); \
+			assert( strcmp( file->line->str, _expected ) == 0 );
+			
+#define T_GETLINE_END()	\
+			assert( SrcFile_getline( file ) == NULL ); \
+			warn("(eof)\n");
+			
+static void new_line_cb( char *filename, int line_nr )
+{
+	warn("File %s line %d\n", filename ? filename : "NULL", line_nr);
+}
 
-int main()
+static void incl_recursion_err_cb( char *filename )
+{
+	die("Recursive include %s\n", filename ? filename : "NULL");
+}
+
+
+int main(int argc, char *argv[])
 {
 	SrcFile *file;
+	List *dirs = NULL;
+	char *str;
 	
-	file = OBJ_NEW( SrcFile );
+	List_push(&dirs, "test.x1");
 	
-	OBJ_DELETE( file );
+	switch (*argv[1]) 
+	{
+	case 'A':	
+		warn("read first file, no new line callback\n");
+		assert( file = OBJ_NEW( SrcFile ) );
+		SrcFile_open( file, "test.f0", NULL );
+		T_GETLINE("test.f0",  1, "F0 1\n");
+		T_GETLINE("test.f0",  2, "\n");
+		T_GETLINE("test.f0",  3, "F0 3\n");
+		T_GETLINE("test.f0",  4, "\n");
+		T_GETLINE("test.f0",  5, "F0 5\n");
+		T_GETLINE("test.f0",  6, "\n");
+		T_GETLINE("test.f0",  7, "F0 7\n");
+		T_GETLINE("test.f0",  8, "\n");
+		T_GETLINE("test.f0",  9, "F0 9\n");
+		T_GETLINE("test.f0", 10, "\n");
+		T_GETLINE("test.f0", 11, "F0 11\n");
+		T_GETLINE("test.f0", 12, "\n");
+		T_GETLINE("test.f0", 13, "F0 13\n");
+		T_GETLINE_END();
+		T_GETLINE_END();
+		T_GETLINE_END();
+		
+		warn("read second file, no new line callback\n");
+		SrcFile_open( file, "test.f1", dirs );
+		T_GETLINE("test.x1/test.f1", 1, "F0 x1\n");
+		T_GETLINE_END();
+		T_GETLINE_END();
+		T_GETLINE_END();
+		
+		warn("read third file, no new line callback\n");
+		SrcFile_open( file, "test.f2", dirs );
+		T_GETLINE("test.x1/test.f2", 1, "F1 x1\n");
+		T_GETLINE_END();
+		T_GETLINE_END();
+		T_GETLINE_END();
+		
+		warn("read fourth file, no new line callback\n");
+		SrcFile_open( file, "test.f3", dirs );
+		T_GETLINE("test.x1/test.f3", 1, "F2 x1\n");
+		T_GETLINE_END();
+		T_GETLINE_END();
+		T_GETLINE_END();
+		
+		warn("set new line callback\n");
+		assert( set_new_line_cb( new_line_cb ) == NULL );
+		assert( set_new_line_cb( new_line_cb ) == new_line_cb );
+
+		warn("read first file with new line callback\n");
+		SrcFile_open( file, "test.f0", NULL );
+		T_GETLINE("test.f0",  1, "F0 1\n");
+		T_GETLINE("test.f0",  2, "\n");
+		T_GETLINE("test.f0",  3, "F0 3\n");
+		T_GETLINE("test.f0",  4, "\n");
+		T_GETLINE("test.f0",  5, "F0 5\n");
+		T_GETLINE("test.f0",  6, "\n");
+		T_GETLINE("test.f0",  7, "F0 7\n");
+		T_GETLINE("test.f0",  8, "\n");
+		T_GETLINE("test.f0",  9, "F0 9\n");
+		T_GETLINE("test.f0", 10, "\n");
+		T_GETLINE("test.f0", 11, "F0 11\n");
+		T_GETLINE("test.f0", 12, "\n");
+		T_GETLINE("test.f0", 13, "F0 13\n");
+		
+		warn("ungetline\n");
+		SrcFile_ungetline( file, "line 6\n" );
+		SrcFile_ungetline( file, "line 5" );
+		SrcFile_ungetline( file, "line 1\n\nline 3\nline 4" );
+		
+		T_GETLINE("test.f0", 13, "line 1\n" );
+		T_GETLINE("test.f0", 13, "\n" );
+		T_GETLINE("test.f0", 13, "line 3\n" );
+		T_GETLINE("test.f0", 13, "line 4\n" );
+		T_GETLINE("test.f0", 13, "line 5\n" );
+		T_GETLINE("test.f0", 13, "line 6\n" );
+		
+		T_GETLINE_END();
+		T_GETLINE_END();
+		T_GETLINE_END();
+
+		warn("includes\n");
+		SrcFile_open( file, "test.f1", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f2", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f3", dirs );
+
+		T_GETLINE("test.x1/test.f3", 1, "F2 x1\n");
+		T_GETLINE_END();	
+		assert( SrcFile_pop( file ) );
+		
+		T_GETLINE("test.x1/test.f2", 1, "F1 x1\n");
+		T_GETLINE_END();	
+		assert( SrcFile_pop( file ) );
+		
+		T_GETLINE("test.x1/test.f1", 1, "F0 x1\n");
+		T_GETLINE_END();	
+		assert( ! SrcFile_pop( file ) );
+
+		T_GETLINE_END();
+		T_GETLINE_END();
+		
+		warn("recursive include, no callback\n");
+		SrcFile_open( file, "test.f1", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f1", dirs );
+
+		T_GETLINE("test.x1/test.f1", 1, "F0 x1\n");
+		T_GETLINE_END();	
+		assert( SrcFile_pop( file ) );
+
+		T_GETLINE("test.x1/test.f1", 1, "F0 x1\n");
+		T_GETLINE_END();	
+		assert( ! SrcFile_pop( file ) );
+
+		warn("set callback\n");
+		assert( set_incl_recursion_err_cb( incl_recursion_err_cb ) == NULL );
+		assert( set_incl_recursion_err_cb( incl_recursion_err_cb ) == incl_recursion_err_cb );
+
+		warn("recursive include, with callback\n");
+		SrcFile_open( file, "test.f1", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f1", dirs );
+
+		assert(0); /* not reached */
+		
+		return 0;
+	
+	case 'B':	
+		/* test garbage collection */
+		assert( file = OBJ_NEW( SrcFile ) );
+		SrcFile_open( file, "test.f0", NULL );
+		SrcFile_ungetline( file, "line 1\n\nline 3\nline 4" );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f1", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f2", dirs );
+		SrcFile_push( file );
+		SrcFile_open( file, "test.f3", dirs );
+		SrcFile_push( file );
+		return 0;
+	
+	default:	
+		assert(0);
+	}
 	
 	return 0;
 }
 END
 
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
+t_capture("test A", "", <<END, 1);
+read first file, no new line callback
+(test.f0:1)F0 1
+(test.f0:2)
+(test.f0:3)F0 3
+(test.f0:4)
+(test.f0:5)F0 5
+(test.f0:6)
+(test.f0:7)F0 7
+(test.f0:8)
+(test.f0:9)F0 9
+(test.f0:10)
+(test.f0:11)F0 11
+(test.f0:12)
+(test.f0:13)F0 13
+(eof)
+(eof)
+(eof)
+read second file, no new line callback
+(test.x1/test.f1:1)F0 x1
+(eof)
+(eof)
+(eof)
+read third file, no new line callback
+(test.x1/test.f2:1)F1 x1
+(eof)
+(eof)
+(eof)
+read fourth file, no new line callback
+(test.x1/test.f3:1)F2 x1
+(eof)
+(eof)
+(eof)
+set new line callback
+read first file with new line callback
+File test.f0 line 1
+(test.f0:1)F0 1
+File test.f0 line 2
+(test.f0:2)
+File test.f0 line 3
+(test.f0:3)F0 3
+File test.f0 line 4
+(test.f0:4)
+File test.f0 line 5
+(test.f0:5)F0 5
+File test.f0 line 6
+(test.f0:6)
+File test.f0 line 7
+(test.f0:7)F0 7
+File test.f0 line 8
+(test.f0:8)
+File test.f0 line 9
+(test.f0:9)F0 9
+File test.f0 line 10
+(test.f0:10)
+File test.f0 line 11
+(test.f0:11)F0 11
+File test.f0 line 12
+(test.f0:12)
+File test.f0 line 13
+(test.f0:13)F0 13
+ungetline
+(test.f0:13)line 1
+(test.f0:13)
+(test.f0:13)line 3
+(test.f0:13)line 4
+(test.f0:13)line 5
+(test.f0:13)line 6
+File NULL line 0
+(eof)
+(eof)
+(eof)
+includes
+File test.x1/test.f3 line 1
+(test.x1/test.f3:1)F2 x1
+File NULL line 0
+(eof)
+File test.x1/test.f2 line 1
+(test.x1/test.f2:1)F1 x1
+File NULL line 0
+(eof)
+File test.x1/test.f1 line 1
+(test.x1/test.f1:1)F0 x1
+File NULL line 0
+(eof)
+(eof)
+(eof)
+recursive include, no callback
+File test.x1/test.f1 line 1
+(test.x1/test.f1:1)F0 x1
+File NULL line 0
+(eof)
+File test.x1/test.f1 line 1
+(test.x1/test.f1:1)F0 x1
+File NULL line 0
+(eof)
+set callback
+recursive include, with callback
+Recursive include test.x1/test.f1
+END
 
+t_capture("test B", "", "", 0);
 
+#------------------------------------------------------------------------------
+# cleanup and exit
+remove_tree(<test.x*>);
 unlink <test.*>;
 done_testing;
 
+#------------------------------------------------------------------------------
+# util
 sub t_capture {
 	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
 	my $line = "[line ".((caller)[2])."]";
@@ -62,8 +347,10 @@ sub t_capture {
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
 
-exit 0;
+sub read_binfile  { scalar(read_file($_[0], { binmode => ':raw' })) }
+sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @_) }
 
+exit 0;
 
 
 
@@ -92,15 +379,6 @@ char ident[MAXLINE];
 char separators[MAXLINE];
 END
 
-# create directories and files
-make_path(qw( x1 x2 x3 ));
-write_file('f0',    {binmode => ':raw'}, "F0 1\r\rF0 3\n\nF0 5\r\n\nF0 7\r\n\rF0 9\n\r\rF0 11\n\r\nF0 13");
-write_file('x1/f0', {binmode => ':raw'}, "");
-write_file('x1/f1', {binmode => ':raw'}, "F1 1\r\nF1 2\r\nF1 3\r");
-write_file('x2/f1', {binmode => ':raw'}, "");
-write_file('x2/f2', {binmode => ':raw'}, "");
-write_file('x3/f2', {binmode => ':raw'}, "");
-write_file('x3/f3', {binmode => ':raw'}, "");
 
 
 # test module
@@ -531,8 +809,11 @@ unlink_testfiles('f0');
 done_testing;
 
 
-# $Log: whitebox-srcfile.t,v $
-# Revision 1.28  2014-01-23 22:30:55  pauloscustodio
+# $Log: srcfile.t,v $
+# Revision 1.1  2014-02-08 11:21:09  pauloscustodio
+# Moved srcfile.c to lib/
+#
+# Revision 1.28  2014/01/23 22:30:55  pauloscustodio
 # Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 # at fclose()
 #

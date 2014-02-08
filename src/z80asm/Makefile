@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.121 2014-01-29 22:40:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.122 2014-02-08 11:21:08 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -82,7 +82,6 @@ OBJS = 	\
 	prsident.o		\
 	prsline.o		\
 	scan.o			\
-	srcfile.o		\
 	sym.o			\
 	symref.o		\
 	symtab.o		\
@@ -95,6 +94,7 @@ OBJS = 	\
 	lib/except.o	\
 	lib/fileutil.o	\
 	lib/list.o		\
+	lib/srcfile.o	\
 	lib/strhash.o	\
 	lib/strpool.o	\
 	lib/strutil.o	\
@@ -243,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.121  2014-01-29 22:40:52  pauloscustodio
+# Revision 1.122  2014-02-08 11:21:08  pauloscustodio
+# Moved srcfile.c to lib/
+#
+# Revision 1.121  2014/01/29 22:40:52  pauloscustodio
 # Mechanism for atomic file write - open a temp file for writing on
 # xfopen_atomic(), close and rename to final name on xfclose().
 # temp_filename() to generate a temporary file name that is
@@ -729,9 +732,9 @@ depend:
 asmdrctv.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 asmdrctv.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/class.h
 asmdrctv.o: lib/queue.h lib/strutil.h listfile.h symref.h lib/classlist.h
-asmdrctv.o: options.h options_def.h srcfile.h symbol.h model.h objfile.h
-asmdrctv.o: symtab.h lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h
-asmdrctv.o: sym.h token_def.h z80asm.h
+asmdrctv.o: options.h options_def.h symbol.h model.h objfile.h symtab.h
+asmdrctv.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+asmdrctv.o: token_def.h z80asm.h
 codearea.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 codearea.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/class.h
 codearea.o: lib/queue.h lib/strutil.h lib/init.h lib/die.h listfile.h
@@ -798,10 +801,6 @@ scan.o: lib/xmalloc.h scan.h lib/class.h lib/queue.h lib/types.h
 scan.o: lib/strutil.h lib/list.h codearea.h errors.h errors_def.h
 scan.o: lib/fileutil.h lib/init.h lib/die.h legacy.h listfile.h symref.h
 scan.o: lib/classlist.h options.h options_def.h lib/strpool.h
-srcfile.o: lib/xmalloc.h lib/die.h lib/fileutil.h lib/list.h lib/class.h
-srcfile.o: lib/queue.h lib/types.h lib/strutil.h options.h options_def.h
-srcfile.o: srcfile.h lib/classlist.h lib/strpool.h codearea.h errors.h
-srcfile.o: errors_def.h listfile.h symref.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
@@ -839,6 +838,9 @@ lib/fileutil.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h
 lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/strpool.h
 lib/fileutil.o: lib/uthash.h lib/die.h
 lib/list.o: lib/xmalloc.h lib/list.h lib/class.h lib/queue.h lib/types.h
+lib/srcfile.o: lib/xmalloc.h lib/srcfile.h lib/class.h lib/queue.h
+lib/srcfile.o: lib/types.h lib/list.h lib/strutil.h lib/fileutil.h
+lib/srcfile.o: lib/strpool.h
 lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
 lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h
 lib/strpool.o: lib/xmalloc.h lib/die.h lib/init.h lib/types.h lib/queue.h

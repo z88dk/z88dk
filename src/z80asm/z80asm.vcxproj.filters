@@ -57,9 +57,6 @@
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="srcfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="scan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -183,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model_symref.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="srcfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="scan.c">
