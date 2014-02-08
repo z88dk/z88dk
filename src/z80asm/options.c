@@ -15,17 +15,18 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.72 2014-02-03 22:07:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.73 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
-#include "scan.h"
 #include "fileutil.h"
 #include "hist.h"
 #include "init.h"
+#include "model.h"
 #include "options.h"
+#include "srcfile.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "symtab.h"
@@ -67,7 +68,7 @@ static void option_use_lib( char *library );
 static void option_cpu_RCM2000( void );
 
 static void parse_options( int *parg, int argc, char *argv[] );
-static void parse_files( int arg, int argc, char *argv[] );
+static void parse_files( int arg, int argc, char *argv[], void (*process_arg_cb)(char *filename) );
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -117,7 +118,7 @@ DEFINE_fini()
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-void parse_argv( int argc, char *argv[] )
+void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) )
 {
     int arg;
 
@@ -135,7 +136,7 @@ void parse_argv( int argc, char *argv[] )
         display_options();				/* display status messages of select assembler options */
 
     if ( ! get_num_errors() )
-        parse_files( arg, argc, argv );	/* process each source file */
+        parse_files( arg, argc, argv, process_arg_cb );	/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -260,8 +261,11 @@ static void parse_options( int *parg, int argc, char *argv[] )
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
-static void parse_file( char *filename )
+static void parse_file( char *filename, 
+						void (*process_arg_cb)(char *filename) )
 {
+	char *line;
+
     strip( filename );
 
     switch ( filename[0] )
@@ -273,60 +277,34 @@ static void parse_file( char *filename )
     case '\0':		/* no file */
         break;
 
+	case '@':		/* file list */
+		filename++;						/* point to after '@' */
+		strip( filename );
+
+		/* loop on file to read each line and recurse */
+		src_push();
+			src_open( filename, NULL );
+			while ( (line = src_getline()) != NULL )
+				parse_file( line, process_arg_cb );
+		src_pop();
+		break;
+
     default:
-        List_push( &opts.files, strpool_add( filename ) );
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   process a @list file or a simple file
-*----------------------------------------------------------------------------*/
-static void parse_file_list( Scan *files, char *filename )
-{
-    char *line;
-
-    strip( filename );
-
-    if ( filename[0] == '@' )
-    {
-        strip( filename + 1 );
-        scan_file_Scan( files, filename + 1 );
-
-        while ( ( line = get_line_Scan( files ) ) != NULL )
-        {
-            strip( line );
-
-            if ( line[0] == '@' )
-            {
-                strip( line + 1 );
-                scan_file_Scan( files, line + 1 );		/* recurse */
-            }
-            else
-            {
-                parse_file( line );
-            }
-        }
-    }
-    else
-    {
-        parse_file( filename );
+        process_arg_cb( filename );
     }
 }
 
 /*-----------------------------------------------------------------------------
 *   process all files
 *----------------------------------------------------------------------------*/
-static void parse_files( int arg, int argc, char *argv[] )
+static void parse_files( int arg, int argc, char *argv[], 
+						 void (*process_arg_cb)(char *filename) )
 {
-    Scan *files = OBJ_NEW( Scan );
-    {
-        int i;
+    int i;
 
-        /* Assemble file list */
-        for ( i = arg; i < argc; i++ )
-            parse_file_list( files, argv[i] );
-    }
-    OBJ_DELETE( files );
+    /* Assemble file list */
+    for ( i = arg; i < argc; i++ )
+        parse_file( argv[i], process_arg_cb );
 }
 
 /*-----------------------------------------------------------------------------
@@ -593,7 +571,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.72  2014-02-03 22:07:38  pauloscustodio
+* Revision 1.73  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.72  2014/02/03 22:07:38  pauloscustodio
 * Use assert() instead of die() for programming errors
 *
 * Revision 1.71  2014/01/21 23:12:30  pauloscustodio

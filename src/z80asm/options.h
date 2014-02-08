@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.41 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.42 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 #pragma once
@@ -53,7 +53,7 @@ extern Opts opts;
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-extern void parse_argv( int argc, char *argv[] );
+extern void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) );
 
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
@@ -74,7 +74,12 @@ extern char *get_map_filename( char *filename );
 
 /*
 * $Log: options.h,v $
-* Revision 1.41  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.42  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.41  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

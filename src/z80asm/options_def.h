@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.32 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.33 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -51,8 +51,6 @@ OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
 
 OPT_VAR( List *,	inc_path,	NULL )		/* path for include files */
 OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
-
-OPT_VAR( List *,	files,		NULL )		/* list of input files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
@@ -188,7 +186,12 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.32  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.33  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.32  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

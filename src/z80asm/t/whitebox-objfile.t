@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o lib/class.o errors.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o hist.o";
+my $objs = "objfile.o lib/class.o errors.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o lib/srcfile.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -202,9 +202,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.23 2014-01-20 23:29:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.24 2014-02-08 18:30:49 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.23  2014-01-20 23:29:18  pauloscustodio
+# Revision 1.24  2014-02-08 18:30:49  pauloscustodio
+# lib/srcfile.c to read source files and handle recursive includes,
+# used to read @lists, removed opts.files;
+# model.c to hold global data model
+#
+# Revision 1.23  2014/01/20 23:29:18  pauloscustodio
 # Moved file.c to lib/fileutil.c
 #
 # Revision 1.22  2014/01/15 00:01:40  pauloscustodio

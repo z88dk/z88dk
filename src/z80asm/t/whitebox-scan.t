@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o hist.o";
+my $objs = "scan.o errors.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o";
 
 # build list of case TOKEN: return "TOKEN" from scan.h
 my @token_case;
@@ -1296,9 +1296,14 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.34 2014-01-20 23:29:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.35 2014-02-08 18:30:49 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.34  2014-01-20 23:29:18  pauloscustodio
+# Revision 1.35  2014-02-08 18:30:49  pauloscustodio
+# lib/srcfile.c to read source files and handle recursive includes,
+# used to read @lists, removed opts.files;
+# model.c to hold global data model
+#
+# Revision 1.34  2014/01/20 23:29:18  pauloscustodio
 # Moved file.c to lib/fileutil.c
 #
 # Revision 1.33  2014/01/11 01:29:46  pauloscustodio

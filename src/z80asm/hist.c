@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.69 2014-01-29 22:40:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.70 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.69 2014-01-29 22:40
 
 /*
 * $Log: hist.c,v $
-* Revision 1.69  2014-01-29 22:40:52  pauloscustodio
+* Revision 1.70  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.69  2014/01/29 22:40:52  pauloscustodio
 * Mechanism for atomic file write - open a temp file for writing on
 * xfopen_atomic(), close and rename to final name on xfclose().
 * temp_filename() to generate a temporary file name that is
@@ -1570,6 +1575,9 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	  xfopen_atomic(), close and rename to final name on xfclose().
 	- temp_filename() to generate a temporary file name that is
 	  deleted atexit.
+	- lib/srcfile.c to read source files and handle recursive includes,
+	  used to read @lists
+	- model.c to hold global data model
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

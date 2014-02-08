@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.36 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.37 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.36 2014-01-20 23:
 #include "errors.h"
 #include "except.h"
 #include "fileutil.h"
+#include "srcfile.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "strhash.h"
@@ -70,6 +71,7 @@ DEFINE_init()
 	
 	/* init file error handling */
 	set_ferr_callback( fatal_file_error );
+	set_incl_recursion_err_cb( fatal_include_recursion );
 }
 
 DEFINE_fini()
@@ -289,7 +291,12 @@ static void fatal_file_error( char *filename, BOOL writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.36  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.37  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.36  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.35  2014/01/15 00:01:39  pauloscustodio

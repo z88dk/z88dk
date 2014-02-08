@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.135 2014-02-03 21:48:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.136 2014-02-08 18:30:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -152,6 +152,7 @@ void assemble_file( char *filename )
 
     query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
+	opts.cur_list = FALSE;
 }
 
 /*-----------------------------------------------------------------------------
@@ -661,9 +662,7 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
-    ListElem *iter;
-
-	errors_init();						/* setup error handler */
+	model_init();						/* init global data */
 
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
@@ -678,10 +677,7 @@ int main( int argc, char *argv[] )
         TOTALLINES = 0;
 
         /* parse command line and call-back via assemble_file() */
-        parse_argv( argc, argv );
-
-        for ( iter = List_first( opts.files ); iter != NULL; iter = List_next( iter ) )
-            assemble_file( iter->data );
+        parse_argv( argc, argv, assemble_file );
 
         /* Link */
         CloseFiles();
@@ -754,7 +750,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.135  2014-02-03 21:48:52  pauloscustodio
+* Revision 1.136  2014-02-08 18:30:49  pauloscustodio
+* lib/srcfile.c to read source files and handle recursive includes,
+* used to read @lists, removed opts.files;
+* model.c to hold global data model
+*
+* Revision 1.135  2014/02/03 21:48:52  pauloscustodio
 * ws
 *
 * Revision 1.134  2014/01/23 22:30:55  pauloscustodio
