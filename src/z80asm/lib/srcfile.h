@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.1 2014-02-08 11:21:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.2 2014-02-08 18:21:18 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,7 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.1 2014-02-08
 *   Call-back interace to declare a new line has been read, telling the
 * 	file name and line number
 *----------------------------------------------------------------------------*/
-typedef void (*new_line_cb_t)( char *filename, int line_nr );
+typedef void (*new_line_cb_t)( char *filename, int line_nr, char *text );
 
 /* set call-back when reading a new line; return old call-back */
 extern new_line_cb_t set_new_line_cb( new_line_cb_t func );
@@ -85,7 +85,12 @@ extern BOOL SrcFile_pop( SrcFile *self );
 
 /*
 * $Log: srcfile.h,v $
-* Revision 1.1  2014-02-08 11:21:09  pauloscustodio
+* Revision 1.2  2014-02-08 18:21:18  pauloscustodio
+* new line callback needs text read to pass on to listfile.c.
+* file_stack filenames may be NULL, protect when checking for recursive includes.
+* Remove dead test code.
+*
+* Revision 1.1  2014/02/08 11:21:09  pauloscustodio
 * Moved srcfile.c to lib/
 *
 * Revision 1.9  2014/02/03 22:04:03  pauloscustodio

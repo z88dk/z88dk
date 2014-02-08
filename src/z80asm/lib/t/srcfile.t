@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.1 2014-02-08 11:21:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.2 2014-02-08 18:21:18 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -55,9 +55,12 @@ write_file("test.c", <<'END');
 			assert( SrcFile_getline( file ) == NULL ); \
 			warn("(eof)\n");
 			
-static void new_line_cb( char *filename, int line_nr )
+static void new_line_cb( char *filename, int line_nr, char *text )
 {
-	warn("File %s line %d\n", filename ? filename : "NULL", line_nr);
+	warn("File %s line %d text %s\n", 
+		 filename ? filename : "NULL", 
+		 line_nr,
+		 text ? text : "NULL");
 }
 
 static void incl_recursion_err_cb( char *filename )
@@ -260,31 +263,44 @@ read fourth file, no new line callback
 (eof)
 set new line callback
 read first file with new line callback
-File test.f0 line 1
+File test.f0 line 1 text F0 1
+
 (test.f0:1)F0 1
-File test.f0 line 2
+File test.f0 line 2 text 
+
 (test.f0:2)
-File test.f0 line 3
+File test.f0 line 3 text F0 3
+
 (test.f0:3)F0 3
-File test.f0 line 4
+File test.f0 line 4 text 
+
 (test.f0:4)
-File test.f0 line 5
+File test.f0 line 5 text F0 5
+
 (test.f0:5)F0 5
-File test.f0 line 6
+File test.f0 line 6 text 
+
 (test.f0:6)
-File test.f0 line 7
+File test.f0 line 7 text F0 7
+
 (test.f0:7)F0 7
-File test.f0 line 8
+File test.f0 line 8 text 
+
 (test.f0:8)
-File test.f0 line 9
+File test.f0 line 9 text F0 9
+
 (test.f0:9)F0 9
-File test.f0 line 10
+File test.f0 line 10 text 
+
 (test.f0:10)
-File test.f0 line 11
+File test.f0 line 11 text F0 11
+
 (test.f0:11)F0 11
-File test.f0 line 12
+File test.f0 line 12 text 
+
 (test.f0:12)
-File test.f0 line 13
+File test.f0 line 13 text F0 13
+
 (test.f0:13)F0 13
 ungetline
 (test.f0:13)line 1
@@ -293,33 +309,38 @@ ungetline
 (test.f0:13)line 4
 (test.f0:13)line 5
 (test.f0:13)line 6
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
 (eof)
 (eof)
 includes
-File test.x1/test.f3 line 1
+File test.x1/test.f3 line 1 text F2 x1
+
 (test.x1/test.f3:1)F2 x1
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
-File test.x1/test.f2 line 1
+File test.x1/test.f2 line 1 text F1 x1
+
 (test.x1/test.f2:1)F1 x1
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
-File test.x1/test.f1 line 1
+File test.x1/test.f1 line 1 text F0 x1
+
 (test.x1/test.f1:1)F0 x1
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
 (eof)
 (eof)
 recursive include, no callback
-File test.x1/test.f1 line 1
+File test.x1/test.f1 line 1 text F0 x1
+
 (test.x1/test.f1:1)F0 x1
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
-File test.x1/test.f1 line 1
+File test.x1/test.f1 line 1 text F0 x1
+
 (test.x1/test.f1:1)F0 x1
-File NULL line 0
+File NULL line 0 text NULL
 (eof)
 set callback
 recursive include, with callback
@@ -350,467 +371,14 @@ sub t_capture {
 sub read_binfile  { scalar(read_file($_[0], { binmode => ':raw' })) }
 sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @_) }
 
-exit 0;
-
-
-
-
-use Modern::Perl;
-use Test::More;
-use File::Path qw(make_path remove_tree);
-require 't/test_utils.pl';
-
-SKIP: {
-	skip "SourceFile and SourceFileList not implemented";
-	
-my $objs = "srcfile.o lib/class.o errors.o dynstr.o lib/strutil.o scan.o options.o hist.o";
-
-my $init_code = <<'END';
-#include "symbol.h"
-#define ERROR return __LINE__
-struct module *CURRENTMODULE;
-FILE *errfile;
-size_t get_PC( void ) { return 0; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
-char *CreateLibfile( char *filename ) {return NULL;}
-char *GetLibfile( char *filename ) {return NULL;}
-Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
-char ident[MAXLINE];
-char separators[MAXLINE];
-END
-
-
-
-# test module
-t_compile_module($init_code, <<'END', $objs);
-
-#define T_GETLINE(nr,text)										\
-	line = SourceFile_getline( src );							\
-	if (line == NULL)							ERROR;			\
-	if (strcmp(line, text))	{ puts(line); puts(text); ERROR; } 	\
-	if (src->line_nr != nr)						ERROR;			\
-
-#define T_END()													\
-	line = SourceFile_getline( src );							\
-	if (line != NULL)							ERROR;			\
-	if (strcmp(Str_data(src->line), ""))		ERROR; 		 	\
-	if (src->line_nr != 0)						ERROR;			\
-
-#define T_LST_GETLINE(filename,nr,text)							\
-	line = SourceFileList_getline( lst );						\
-	if (line == NULL)							ERROR;			\
-	if (SourceFileList_line( lst ) != line) 	ERROR;			\
-	if (strcmp(line, text))	{ puts(line); puts(text); ERROR; } 	\
-	if (SourceFileList_line_nr( lst ) != nr)	ERROR;			\
-	if (strcmp(SourceFileList_filename( lst ), filename))	ERROR;			\
-
-#define T_LST_END()												\
-	line = SourceFileList_getline( lst );						\
-	if (line != NULL)							ERROR;			\
-	if (strcmp(SourceFileList_line( lst ), ""))	ERROR; 		 	\
-	if (SourceFileList_line_nr( lst ) != 0)		ERROR;			\
-
-#define T_SINGLETON_GETLINE(filename,nr,text)					\
-	line = source_getline();									\
-	if (line == NULL)							ERROR;			\
-	if (source_line() != line)				 	ERROR;			\
-	if (strcmp(line, text))	{ puts(line); puts(text); ERROR; } 	\
-	if (source_line_nr() != nr)					ERROR;			\
-	if (strcmp(source_filename(), filename))	ERROR;			\
-
-#define T_SINGLETON_END()										\
-	line = source_getline();									\
-	if (line != NULL)							ERROR;			\
-	if (strcmp(source_line(), ""))				ERROR; 		 	\
-	if (source_line_nr() != 0)					ERROR;			\
-
-	/* main */
-	SourceFile *src;
-	SourceFileList *lst;
-	char *line;
-	
-	List_push(&opts.inc_path, "x1");
-	List_push(&opts.inc_path, "x2");
-	List_push(&opts.inc_path, "x3");
-	
-	src = OBJ_NEW( SourceFile );
-	if (strcmp(src->filename, "")) 			ERROR;
-	if (src->file       	!= NULL) 		ERROR;
-	if (src->line       	== NULL) 		ERROR;
-	if (Str_len(src->line) 	!= 0)			ERROR;
-	if (src->line_nr    	!= 0   ) 		ERROR;
-	if (src->line_stack 	== NULL) 		ERROR;
-	if (src->line_stack->count != 0) 		ERROR;
-	
-	T_END();
-	T_END();
-	T_END();
-	
-	SourceFile_open( src, "f0" );
-	if (strcmp(src->filename, "f0")) 		ERROR;
-	if (src->file       	== NULL) 		ERROR;
-	if (src->line       	== NULL) 		ERROR;
-	if (Str_len(src->line) 	!= 0)			ERROR;
-	if (src->line_nr    	!= 0   ) 		ERROR;
-	if (src->line_stack 	== NULL) 		ERROR;
-	if (src->line_stack->count != 0) 		ERROR;
-
-	T_GETLINE(1, "F0 1\n");
-	T_GETLINE(2, "\n");
-	T_GETLINE(3, "F0 3\n");
-	T_GETLINE(4, "\n");
-	
-
-	/* open file again */
-	SourceFile_open( src, "f0" );
-	if (strcmp(src->filename, "f0")) 		ERROR;
-	if (src->file       	== NULL) 		ERROR;
-	if (src->line       	== NULL) 		ERROR;
-	if (Str_len(src->line) 	!= 0)			ERROR;
-	if (src->line_nr    	!= 0   ) 		ERROR;
-	if (src->line_stack 	== NULL) 		ERROR;
-	if (src->line_stack->count != 0) 		ERROR;
-
-	T_GETLINE( 1, "F0 1\n");
-	T_GETLINE( 2, "\n");
-	T_GETLINE( 3, "F0 3\n");
-	T_GETLINE( 4, "\n");
-	T_GETLINE( 5, "F0 5\n");
-	T_GETLINE( 6, "\n");
-	T_GETLINE( 7, "F0 7\n");
-	T_GETLINE( 8, "\n");
-	T_GETLINE( 9, "F0 9\n");
-	T_GETLINE(10, "\n");
-	T_GETLINE(11, "F0 11\n");
-	T_GETLINE(12, "\n");
-	T_GETLINE(13, "F0 13\n");
-	T_END();
-	T_END();
-	T_END();
-	
-	
-	/* open new file */
-	SourceFile_open( src, "f1" );
-	if (strcmp(src->filename, "x1/f1"))		ERROR;
-	if (src->file       	== NULL) 		ERROR;
-	if (src->line       	== NULL) 		ERROR;
-	if (Str_len(src->line) 	!= 0)			ERROR;
-	if (src->line_nr    	!= 0   ) 		ERROR;
-	if (src->line_stack 	== NULL) 		ERROR;
-	if (src->line_stack->count != 0) 		ERROR;
-
-	T_GETLINE( 1, "F1 1\n");
-	T_GETLINE( 2, "F1 2\n");
-	T_GETLINE( 3, "F1 3\n");
-	T_END();
-	T_END();
-	T_END();
-	
-	/* ungetline */
-	SourceFile_ungetline( src, "line 6\n" );
-	SourceFile_ungetline( src, "line 5" );
-	SourceFile_ungetline( src, "line 1\nline 2\nline 3\nline 4" );
-	
-	T_GETLINE( 0, "line 1\n" );
-	T_GETLINE( 0, "line 2\n" );
-	T_GETLINE( 0, "line 3\n" );
-	T_GETLINE( 0, "line 4" );
-	T_GETLINE( 0, "line 5" );
-	T_GETLINE( 0, "line 6\n" );
-	T_END();
-	T_END();
-	T_END();
-	
-	/* open new file */
-	SourceFile_open( src, "f1" );
-	if (strcmp(src->filename, "x1/f1"))		ERROR;
-	if (src->file       	== NULL) 		ERROR;
-	if (src->line       	== NULL) 		ERROR;
-	if (Str_len(src->line) 	!= 0)			ERROR;
-	if (src->line_nr    	!= 0   ) 		ERROR;
-	if (src->line_stack 	== NULL) 		ERROR;
-	if (src->line_stack->count != 0) 		ERROR;
-
-	T_GETLINE( 1, "F1 1\n");
-
-	/* ungetline in the middle of file */
-	SourceFile_ungetline( src, "line 1\nline 2\nline 3\nline 4" );
-	
-	T_GETLINE( 1, "line 1\n" );
-	T_GETLINE( 1, "line 2\n" );
-	T_GETLINE( 1, "line 3\n" );
-	T_GETLINE( 1, "line 4" );
-
-	/* continue from file */
-	T_GETLINE( 2, "F1 2\n");
-	T_GETLINE( 3, "F1 3\n");
-	T_END();
-	T_END();
-	T_END();
-	
-	
-	/* SourceFileList_getline / ungetline before open */
-	lst = OBJ_NEW( SourceFileList );
-	
-	T_LST_END();
-	T_LST_END();
-	T_LST_END();
-	
-	SourceFileList_ungetline( lst, "line 6\n" );
-	SourceFileList_ungetline( lst, "line 5" );
-	SourceFileList_ungetline( lst, "line 1\nline 2\nline 3\nline 4" );
-	
-	T_LST_GETLINE("", 0, "line 1\n" );
-	T_LST_GETLINE("", 0, "line 2\n" );
-	T_LST_GETLINE("", 0, "line 3\n" );
-	T_LST_GETLINE("", 0, "line 4" );
-	T_LST_GETLINE("", 0, "line 5" );
-	T_LST_GETLINE("", 0, "line 6\n" );
-	T_LST_END();
-	T_LST_END();
-	T_LST_END();
-
-	/* open file */
-	SourceFileList_open( lst, "f0" );
-	if (strcmp(SourceFileList_filename(lst),"f0"))	ERROR;
-	if (strcmp(SourceFileList_line( lst ), ""))	ERROR;
-	if (SourceFileList_line_nr( lst ) != 0)		ERROR;
-
-	T_LST_GETLINE("f0",1, "F0 1\n");
-	T_LST_GETLINE("f0",2, "\n");
-	T_LST_GETLINE("f0",3, "F0 3\n");
-	T_LST_GETLINE("f0",4, "\n");
-	
-	SourceFileList_ungetline( lst, "line 6\n" );
-	SourceFileList_ungetline( lst, "line 5" );
-	SourceFileList_ungetline( lst, "line 1\nline 2\nline 3\nline 4" );
-	
-	T_LST_GETLINE("f0", 4, "line 1\n" );
-	T_LST_GETLINE("f0", 4, "line 2\n" );
-	T_LST_GETLINE("f0", 4, "line 3\n" );
-	T_LST_GETLINE("f0", 4, "line 4" );
-	T_LST_GETLINE("f0", 4, "line 5" );
-	T_LST_GETLINE("f0", 4, "line 6\n" );
-
-	T_LST_GETLINE("f0", 5, "F0 5\n");
-	T_LST_GETLINE("f0", 6, "\n");
-	T_LST_GETLINE("f0", 7, "F0 7\n");
-	T_LST_GETLINE("f0", 8, "\n");
-	
-	/* open new file */
-	SourceFileList_open( lst, "f1" );
-	if (strcmp(SourceFileList_filename(lst),"x1/f1"))	ERROR;
-	if (strcmp(SourceFileList_line( lst ), ""))	ERROR;
-	if (SourceFileList_line_nr( lst ) != 0)		ERROR;
-	
-	T_LST_GETLINE("x1/f1", 1, "F1 1\n");
-	T_LST_GETLINE("x1/f1", 2, "F1 2\n");
-	T_LST_GETLINE("x1/f1", 3, "F1 3\n");
-	
-	T_LST_GETLINE("f0", 9, "F0 9\n");
-	T_LST_GETLINE("f0",10, "\n");
-	T_LST_GETLINE("f0",11, "F0 11\n");
-	T_LST_GETLINE("f0",12, "\n");
-	T_LST_GETLINE("f0",13, "F0 13\n");
-	T_LST_END();
-	T_LST_END();
-	T_LST_END();
-	
-
-	/* singleton API */
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-	
-	source_ungetline("line 6\n" );
-	source_ungetline("line 5" );
-	source_ungetline("line 1\nline 2\nline 3\nline 4" );
-	
-	T_SINGLETON_GETLINE("", 0, "line 1\n" );
-	T_SINGLETON_GETLINE("", 0, "line 2\n" );
-	T_SINGLETON_GETLINE("", 0, "line 3\n" );
-	T_SINGLETON_GETLINE("", 0, "line 4" );
-	T_SINGLETON_GETLINE("", 0, "line 5" );
-	T_SINGLETON_GETLINE("", 0, "line 6\n" );
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-	
-	/* open file */
-	source_open("f0");
-	if (strcmp(source_filename(),"f0"))	ERROR;
-	if (strcmp(source_line(), ""))	ERROR;
-	if (source_line_nr() != 0)		ERROR;
-
-	T_SINGLETON_GETLINE("f0",1, "F0 1\n");
-	T_SINGLETON_GETLINE("f0",2, "\n");
-	T_SINGLETON_GETLINE("f0",3, "F0 3\n");
-	T_SINGLETON_GETLINE("f0",4, "\n");
-	
-	source_ungetline("line 6\n" );
-	source_ungetline("line 5" );
-	source_ungetline("line 1\nline 2\nline 3\nline 4" );
-	
-	T_SINGLETON_GETLINE("f0", 4, "line 1\n" );
-	T_SINGLETON_GETLINE("f0", 4, "line 2\n" );
-	T_SINGLETON_GETLINE("f0", 4, "line 3\n" );
-	T_SINGLETON_GETLINE("f0", 4, "line 4" );
-	T_SINGLETON_GETLINE("f0", 4, "line 5" );
-	T_SINGLETON_GETLINE("f0", 4, "line 6\n" );
-
-	T_SINGLETON_GETLINE("f0", 5, "F0 5\n");
-	T_SINGLETON_GETLINE("f0", 6, "\n");
-	T_SINGLETON_GETLINE("f0", 7, "F0 7\n");
-	T_SINGLETON_GETLINE("f0", 8, "\n");
-	
-	/* open new file */
-	source_open("f1");
-	if (strcmp(source_filename(),"x1/f1"))	ERROR;
-	if (strcmp(source_line(), ""))	ERROR;
-	if (source_line_nr() != 0)		ERROR;
-	
-	T_SINGLETON_GETLINE("x1/f1", 1, "F1 1\n");
-	T_SINGLETON_GETLINE("x1/f1", 2, "F1 2\n");
-	T_SINGLETON_GETLINE("x1/f1", 3, "F1 3\n");
-	
-	T_SINGLETON_GETLINE("f0", 9, "F0 9\n");
-	T_SINGLETON_GETLINE("f0",10, "\n");
-	T_SINGLETON_GETLINE("f0",11, "F0 11\n");
-	T_SINGLETON_GETLINE("f0",12, "\n");
-	T_SINGLETON_GETLINE("f0",13, "F0 13\n");
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-	T_SINGLETON_END();
-
-
-	OBJ_DELETE( src );
-	OBJ_DELETE( lst );
-	warn("last object deleted\n");
-	
-	return 0;
-END
-
-t_run_module([], '', <<'ERR', 0);
-last object deleted
-ERR
-
-
-# check recursive includes
-t_compile_module($init_code, <<'END', $objs);
-	/* main */
-	SourceFileList *lst;
-	int ret = 1;
-	
-    /* start try..catch with finally to cleanup any allocated memory */
-    TRY
-    {
-		List_push(&opts.inc_path, "x1");
-		List_push(&opts.inc_path, "x2");
-		List_push(&opts.inc_path, "x3");
-		
-		lst = OBJ_NEW( SourceFileList );
-		if (lst->count != 0) ERROR;
-		
-		SourceFileList_open( lst, "f0" );
-		if (lst->count != 1) ERROR;
-		
-		SourceFileList_open( lst, "f1" );
-		if (lst->count != 2) ERROR;
-
-		SourceFileList_open( lst, "f0" );
-		
-		warn("not reached\n");
-	}
-    CATCH ( FatalErrorException )
-    {
-        ret = 0;		/* ok */
-    }
-	FINALLY {}
-	ETRY;
-	
-	return ret;
-END
-
-t_run_module([], '', <<'END', 0);
-Error: cannot include file 'f0' recursively
-END
-diag "Should show error message location";
-
-
-# Check file open error at top level
-t_compile_module($init_code, <<'END', $objs);
-	/* main */
-	SourceFileList *lst;
-	int ret = 1;
-	
-    /* start try..catch with finally to cleanup any allocated memory */
-    TRY
-    {
-		lst = OBJ_NEW( SourceFileList );
-		if (lst->count != 0) ERROR;
-		
-		SourceFileList_open( lst, "fxxx" );
-		warn("not reached\n");
-	}
-    CATCH ( FatalErrorException )
-    {
-        ret = 0;		/* ok */
-    }
-	FINALLY {}
-	ETRY;
-	
-	return ret;
-END
-
-t_run_module([], '', <<'END', 0);
-Error: cannot read file 'fxxx'
-END
-
-
-# Check file open error at include level
-t_compile_module($init_code, <<'END', $objs);
-	/* main */
-	SourceFileList *lst;
-	int ret = 1;
-	
-    /* start try..catch with finally to cleanup any allocated memory */
-    TRY
-    {
-		lst = OBJ_NEW( SourceFileList );
-		if (lst->count != 0) ERROR;
-		
-		SourceFileList_open( lst, "f0" );
-		if (lst->count != 1) ERROR;
-		
-		SourceFileList_open( lst, "fxxx" );
-		
-		warn("not reached\n");
-	}
-    CATCH ( FatalErrorException )
-    {
-        ret = 0;		/* ok */
-    }
-	FINALLY {}
-	ETRY;
-	
-	return ret;
-END
-
-t_run_module([], '', <<'END', 0);
-Error: cannot read file 'fxxx'
-END
-diag "Should show error message location";
-
-}
-
-# delete directories and files
-remove_tree(qw( x1 x2 x3 ));
-unlink_testfiles('f0');
-done_testing;
-
 
 # $Log: srcfile.t,v $
-# Revision 1.1  2014-02-08 11:21:09  pauloscustodio
+# Revision 1.2  2014-02-08 18:21:18  pauloscustodio
+# new line callback needs text read to pass on to listfile.c.
+# file_stack filenames may be NULL, protect when checking for recursive includes.
+# Remove dead test code.
+#
+# Revision 1.1  2014/02/08 11:21:09  pauloscustodio
 # Moved srcfile.c to lib/
 #
 # Revision 1.28  2014/01/23 22:30:55  pauloscustodio

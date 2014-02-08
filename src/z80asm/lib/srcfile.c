@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.1 2014-02-08 11:21:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.2 2014-02-08 18:21:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -51,10 +51,10 @@ new_line_cb_t set_new_line_cb( new_line_cb_t func )
 }
 
 /* call callback */
-static void call_new_line_cb( char *filename, int line_nr )
+static void call_new_line_cb( char *filename, int line_nr, char *text )
 {
-	if (new_line_cb != NULL)
-		new_line_cb( filename, line_nr );
+	if ( new_line_cb != NULL )
+		new_line_cb( filename, line_nr, text );
 }
 
 /*-----------------------------------------------------------------------------
@@ -125,7 +125,8 @@ static void check_recursive_include( SrcFile *self, char *filename )
 			iter = List_next( iter ) )
 		{
 			elem = iter->data;
-			if ( strcmp( filename, elem->filename ) == 0 )
+			if ( elem->filename != NULL &&
+				 strcmp( filename, elem->filename ) == 0 )
 			{
 				incl_recursion_err_cb( filename );
 				assert(0);	/* not reached */
@@ -236,7 +237,7 @@ char *SrcFile_getline( SrcFile *self )
     {
         self->line_nr++;
 
-		call_new_line_cb( self->filename, self->line_nr );
+		call_new_line_cb( self->filename, self->line_nr, self->line->str );
         return self->line->str;
     }
     else
@@ -245,7 +246,7 @@ char *SrcFile_getline( SrcFile *self )
         xfclose( self->file );				/* close input */
         self->file = NULL;
 
-		call_new_line_cb( NULL, 0 );
+		call_new_line_cb( NULL, 0, NULL );
         return NULL;						/* EOF */
     }
 }
@@ -335,7 +336,12 @@ BOOL SrcFile_pop( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.1  2014-02-08 11:21:08  pauloscustodio
+* Revision 1.2  2014-02-08 18:21:18  pauloscustodio
+* new line callback needs text read to pass on to listfile.c.
+* file_stack filenames may be NULL, protect when checking for recursive includes.
+* Remove dead test code.
+*
+* Revision 1.1  2014/02/08 11:21:08  pauloscustodio
 * Moved srcfile.c to lib/
 *
 * Revision 1.20  2014/02/03 22:07:38  pauloscustodio
