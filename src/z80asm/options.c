@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.73 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.74 2014-02-09 10:10:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -67,8 +67,8 @@ static void option_make_lib( char *library );
 static void option_use_lib( char *library );
 static void option_cpu_RCM2000( void );
 
-static void parse_options( int *parg, int argc, char *argv[] );
-static void parse_files( int arg, int argc, char *argv[], void (*process_arg_cb)(char *filename) );
+static void process_options( int *parg, int argc, char *argv[] );
+static void process_files( int arg, int argc, char *argv[], void (*process_arg_cb)(char *filename) );
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -127,7 +127,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
     if ( argc == 1 )
         exit_copyright();				/* exit if no arguments */
 
-    parse_options( &arg, argc, argv );	/* process all options, set arg to next */
+    process_options( &arg, argc, argv );	/* process all options, set arg to next */
 
     if ( arg >= argc )
         error_no_src_file();			/* no source file */
@@ -136,7 +136,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
         display_options();				/* display status messages of select assembler options */
 
     if ( ! get_num_errors() )
-        parse_files( arg, argc, argv, process_arg_cb );	/* process each source file */
+        process_files( arg, argc, argv, process_arg_cb );	/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 #undef i
 }
 
-static void parse_options( int *parg, int argc, char *argv[] )
+static void process_options( int *parg, int argc, char *argv[] )
 {
 #define i (*parg)
 
@@ -261,7 +261,7 @@ static void parse_options( int *parg, int argc, char *argv[] )
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
-static void parse_file( char *filename, 
+static void process_file( char *filename, 
 						void (*process_arg_cb)(char *filename) )
 {
 	char *line;
@@ -283,9 +283,11 @@ static void parse_file( char *filename,
 
 		/* loop on file to read each line and recurse */
 		src_push();
+		{
 			src_open( filename, NULL );
 			while ( (line = src_getline()) != NULL )
-				parse_file( line, process_arg_cb );
+				process_file( line, process_arg_cb );
+		}
 		src_pop();
 		break;
 
@@ -297,14 +299,14 @@ static void parse_file( char *filename,
 /*-----------------------------------------------------------------------------
 *   process all files
 *----------------------------------------------------------------------------*/
-static void parse_files( int arg, int argc, char *argv[], 
+static void process_files( int arg, int argc, char *argv[], 
 						 void (*process_arg_cb)(char *filename) )
 {
     int i;
 
     /* Assemble file list */
     for ( i = arg; i < argc; i++ )
-        parse_file( argv[i], process_arg_cb );
+        process_file( argv[i], process_arg_cb );
 }
 
 /*-----------------------------------------------------------------------------
@@ -571,7 +573,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.73  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.74  2014-02-09 10:10:25  pauloscustodio
+* Rename internal functions.
+*
+* Revision 1.73  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model
