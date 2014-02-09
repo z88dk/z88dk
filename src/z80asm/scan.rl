@@ -13,36 +13,43 @@
 Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner - to be processed by: ragel -G2 scan.rl
+Note: the scanner is not reentrant. scan_get() relies on state variables that
+need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.11 2014-01-20 23:29:18 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.12 2014-02-09 10:16:15 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "scan.h"
 
-#include "codearea.h"
-#include "ctype.h"
 #include "errors.h"
-#include "fileutil.h"
-#include "init.h"
-#include "legacy.h"
-#include "listfile.h"
-#include "options.h"
-#include "strpool.h"
-#include "strutil.h"
 #include "types.h"
 
-static int scan_num(char *text, int num_suffix_chars, int base);
+#include <assert.h>
+#include <ctype.h>
+
+static long  scan_num( char *text, int num_suffix_chars, int base );
+static char *copy_token_str( char *text, size_t len );
 
 /*-----------------------------------------------------------------------------
-* Globals that keep last token read
+* 	Globals that keep last token read
 *----------------------------------------------------------------------------*/
-enum token last_token;
-int		   last_token_num;
-Str		  *last_token_str;
+DEFINE_STR(	scan_buffer, MAXLINE );		/* keep a copy of string being scanned */
+DEFINE_STR(	token_str, MAXLINE );		/* keep a copy of last token string */
 
-static Scan *the_scan;
+Token	 last_token;
+long	 last_token_num;
+char	*last_token_str = "";
+
+/*-----------------------------------------------------------------------------
+* 	Static - current scan context
+*----------------------------------------------------------------------------*/
+static BOOL	 at_bol;				/* true if at beginning of line */
+
+/* Ragel state variables */
+static int	 cs, act;			
+static char	*p, *pe, *eof, *ts, *te;
 
 /*-----------------------------------------------------------------------------
 * Z80ASM scanner
@@ -50,25 +57,13 @@ static Scan *the_scan;
 %%{
 	machine asm;
 
-	variable cs		ctx->cs;
-	variable act	ctx->act;
-	variable p		ctx->p;
-	variable pe		ctx->pe;
-	variable eof	ctx->eof;
-	variable ts		ctx->ts;
-	variable te		ctx->te;
-
 	# check predicates - beginning of line
-	action at_bol 		{ ctx->bol }	
-	
-	# check predicates - reading by lines / by tokens
-	action by_lines		{   by_lines }	
-	action by_tokens	{ ! by_lines }	
+	action at_bol 		{ at_bol }	
 	
 	# Alpha numeric characters or underscore.
 	alnum_u = alnum | '_';
 
-	# Alpha charactres or underscore.
+	# Alpha characters or underscore.
 	alpha_u = alpha | '_';
 
 	# Name
@@ -82,151 +77,126 @@ static Scan *the_scan;
 	
 	main := |*
 
-	#--------------------------------------------------------------------------
-	# Token lexer
-	#--------------------------------------------------------------------------
-	
 	# Newline
-	( '\n' ) when by_tokens
-	{ 
-		last_token = t_newline; 
-		fbreak; 
-	};
+	'\n'						{ last_token = T_NEWLINE; fbreak; };
 	
 	# Comment
-	( ';' [^\n]* ) when by_tokens ; 
+	';' [^\n]*  				; 
 	
 	# Whitespace is standard ws, newlines and control codes.
-	( any - 0x21..0x7e - '\n' ) when by_tokens ;
+	any - 0x21..0x7e - '\n'		;
 
 	# Symbols
-	( punct - [_'";] ) when by_tokens
-							{ last_token = ctx->ts[0];	fbreak; };
-	( '==' ) when by_tokens { last_token = t_eq_eq; 	fbreak; };
-	( '<>' ) when by_tokens { last_token = t_lt_gt; 	fbreak; };
-	( '!=' ) when by_tokens { last_token = t_exclam_eq; fbreak; };
-	( '<=' ) when by_tokens { last_token = t_lt_eq; 	fbreak; };
-	( '>=' ) when by_tokens { last_token = t_gt_eq; 	fbreak; };
-	( '||' ) when by_tokens { last_token = t_vbar_vbar; fbreak; };
-	( '&&' ) when by_tokens { last_token = t_and_and; 	fbreak; };
-	( '<<' ) when by_tokens { last_token = t_lt_lt; 	fbreak; };
-	( '>>' ) when by_tokens { last_token = t_gt_gt; 	fbreak; };
-	( '**' ) when by_tokens { last_token = t_star_star; fbreak; };
+	punct - [_'";]				{ last_token = ts[0];		fbreak; };
+	'=='						{ last_token = T_EQ_EQ; 	fbreak; };
+	'<>'						{ last_token = T_LT_GT; 	fbreak; };
+	'!='						{ last_token = T_EXCLAM_EQ; fbreak; };
+	'<='						{ last_token = T_LT_EQ; 	fbreak; };
+	'>='						{ last_token = T_GT_EQ; 	fbreak; };
+	'||'						{ last_token = T_VBAR_VBAR; fbreak; };
+	'&&'						{ last_token = T_AND_AND; 	fbreak; };
+	'<<'						{ last_token = T_LT_LT; 	fbreak; };
+	'>>'						{ last_token = T_GT_GT; 	fbreak; };
+	'**'						{ last_token = T_STAR_STAR; fbreak; };
 
 	# Numbers
-	( digit+ ) when by_tokens
+	digit+
 	{ 
-		last_token_num = scan_num( ctx->ts, ctx->te - ctx->ts, 10 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts, te - ts, 10 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( digit xdigit* 'h'i ) when by_tokens
+	digit xdigit* 'h'i
 	{ 
-		last_token_num = scan_num( ctx->ts, ctx->te - ctx->ts - 1, 16 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts, te - ts - 1, 16 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( [$#] xdigit+ ) when by_tokens
+	[$#] xdigit+
 	{ 
-		last_token_num = scan_num( ctx->ts + 1, ctx->te - ctx->ts - 1, 16 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts + 1, te - ts - 1, 16 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( '0x'i xdigit+ ) when by_tokens
+	'0x'i xdigit+
 	{ 
-		last_token_num = scan_num( ctx->ts + 2, ctx->te - ctx->ts - 2, 16 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts + 2, te - ts - 2, 16 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( digit bdigit* 'b'i ) when by_tokens
+	digit bdigit* 'b'i
 	{ 
-		last_token_num = scan_num( ctx->ts, ctx->te - ctx->ts - 1, 2 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts, te - ts - 1, 2 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( [@%] bdigit+ ) when by_tokens
+	[@%] bdigit+
 	{ 
-		last_token_num = scan_num( ctx->ts + 1, ctx->te - ctx->ts - 1, 2 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts + 1, te - ts - 1, 2 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( '0b'i bdigit+ ) when by_tokens
+	'0b'i bdigit+
 	{ 
-		last_token_num = scan_num( ctx->ts + 2, ctx->te - ctx->ts - 2, 2 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts + 2, te - ts - 2, 2 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
-	( [@%] '"' [\-#]+ '"' ) when by_tokens
+	[@%] '"' [\-#]+ '"'
 	{ 
-		last_token_num = scan_num( ctx->ts + 2, ctx->te - ctx->ts - 3, 2 ); 
-		last_token = t_number;
+		last_token_num = scan_num( ts + 2, te - ts - 3, 2 ); 
+		last_token = T_NUMBER;
 		fbreak;
 	};
 	
+	# Keywords
+	"add"i						{ last_token = T_ADD;		fbreak; };
+	"ld"i						{ last_token = T_LD;		fbreak; };
+	"nop"i						{ last_token = T_NOP;		fbreak; };
+	
 	# Identifier
-	( name | "af'"i ) when by_tokens
+	name | "af'"i
 	{
-		c = *(ctx->te); *(ctx->te) = '\0';			/* make substring */
-		Str_set( last_token_str, ctx->ts );
-		strtoupper( last_token_str->str );
-		*(ctx->te) = c;								/* recover input */
-		last_token = t_name;
+		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
+		last_token = T_NAME;
 		fbreak;
 	};
 	
 	# Label
-	( ( label ) when at_bol ) when by_tokens
+	label when at_bol
 	{
 		/* remove '.' and ':' */
-		while ( *(ctx->ts)     == '.' || isspace(*(ctx->ts))   ) (ctx->ts)++;
-		while ( *((ctx->te)-1) == ':' || isspace(*(ctx->te-1)) ) (ctx->te)--;
+		while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
+		while ( te[-1] == ':' || isspace(te[-1]) ) te--;
 		
 		/* copy token */
-		c = *(ctx->te); *(ctx->te) = '\0';		/* make substring */
-		Str_set( last_token_str, ctx->ts );
-		strtoupper( last_token_str->str );
-		*(ctx->te) = c;							/* recover input */
-		last_token = t_label;
+		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
+		last_token = T_LABEL;
 		fbreak;
 	};
 	
 	# Single Quote
-	( "'" [^'\n]* "'" ) when by_tokens
+	"'" [^'\n]* "'"
 	{
-		if ( ctx->te - ctx->ts == 3 )
+		if ( te - ts == 3 )
 		{
-			last_token_num = *(ctx->ts + 1);
-			last_token = t_number;
+			last_token_num = ts[1];
+			last_token = T_NUMBER;
 			fbreak;
 		}
 		else
 			error_invalid_squoted_string();
 	};
-	( "'" [^'\n]* ) when by_tokens	{ error_invalid_squoted_string(); };
+	"'" [^'\n]*					{ error_invalid_squoted_string(); };
 
 	# Double Quote
-	( '"' [^"\n]* '"' ) when by_tokens
+	'"' [^"\n]* '"'
 	{
-		c = *(ctx->te-1); *(ctx->te-1) = '\0';		/* make substring */
-		Str_set( last_token_str, ctx->ts+1 );
-		*(ctx->te-1) = c;							/* recover input */
-		last_token = t_string;
+		last_token_str = copy_token_str( ts+1, te-ts-2 );
+		last_token = T_STRING;
 		fbreak;
 	};
-	( '"' [^"\n]* ) when by_tokens	{ error_unclosed_string(); };
-	
-	#--------------------------------------------------------------------------
-	# Lines lexer
-	#--------------------------------------------------------------------------
-
-	( [^\n]* '\n'? ) when by_lines
-	{
-		c = *(ctx->te); *(ctx->te) = '\0';			/* make substring */
-		Str_set( last_token_str, ctx->ts );
-		*(ctx->te) = c;								/* recover input */
-		last_token = t_string;
-		fbreak;
-	};
+	'"' [^"\n]*					{ error_unclosed_string(); };
 	
 	*|;
 }%%
@@ -236,9 +206,9 @@ static Scan *the_scan;
 /*-----------------------------------------------------------------------------
 *	convert number to int, range warning if greater than INT_MAX
 *----------------------------------------------------------------------------*/
-static int scan_num (char *text, int length, int base)
+static long scan_num ( char *text, int length, int base )
 {
-	int value;
+	long value;
 	int digit = 0;
 	char c;
 	int i;
@@ -249,24 +219,26 @@ static int scan_num (char *text, int length, int base)
 	for ( i = 0 ; i < length ; i++ ) 
 	{
 		c = *text++;					/* read each digit */
-		if (isdigit(c)) 
+		if ( isdigit(c) ) 
 		{
 			digit = c - '0';
 		}
-		else if (isalpha(c)) 
+		else if ( isalpha(c) ) 
 		{
 			digit = toupper(c) - 'A' + 10;
 		}
-		else if (base == 2 && (c == '-' || c == '#')) 
+		else if ( base == 2 && (c == '-' || c == '#') ) 
 		{
 			digit = (c == '#') ? 1 : 0;
 		}
-		else {							/* invalid digit - should not be reached */
-			error_syntax();
+		else 
+		{
+			assert(0); /* invalid digit - should not be reached */
 		}
 
-		if (digit >= base) {			/* digit out of range - should not be reached */
-			error_syntax();
+		if (digit >= base) 
+		{
+			assert(0); /* digit out of range - should not be reached */
 		}
 		
 		value = value * base + digit;
@@ -274,434 +246,69 @@ static int scan_num (char *text, int length, int base)
 		if ( ! range_err && value < 0 )	/* overflow to sign bit */
 		{
 			range_err = TRUE;		
-			warn_int_range( value );
 		}
+	}
+	
+	if ( range_err )
+	{
+		warn_int_range( value );
 	}
 		
 	return value;
 }
 
 /*-----------------------------------------------------------------------------
-* Initialize and Terminate module
+*	copy characters into token string buffer, set last_token_str
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+static char *copy_token_str( char *text, size_t len )
 {
-	last_token_str	= OBJ_NEW(Str);
-	the_scan 		= OBJ_NEW(Scan);
-}
+	/* copy to buffer */
+	Str_set( token_str, text );								/* copy all chars */
+	token_str->str[ MIN( len, token_str->len ) ] = '\0';	/* truncate */
+	Str_sync_len( token_str );
 	
-DEFINE_fini()
-{
-	OBJ_DELETE(last_token_str);
-	OBJ_DELETE(the_scan);
+	return token_str->str;
 }
 
 /*-----------------------------------------------------------------------------
-* Initialize and Terminate scan context
+*	Scan API
 *----------------------------------------------------------------------------*/
-DEF_CLASS(ScanContext);
 
-void ScanContext_init(ScanContext *self)
+void scan_reset( char *text, BOOL _at_bol )
 {
-	init();
-	self->input = OBJ_NEW(Str);
-	OBJ_AUTODELETE(self->input) = FALSE;
-}
-
-void ScanContext_fini(ScanContext *self)
-{
-	init();
-	OBJ_DELETE(self->input);
+	Str_set( scan_buffer, text );
 	
-	if ( self->file )
-		xfclose( self->file );
-}
-
-void ScanContext_copy(ScanContext *self, ScanContext *other)
-{
-	init();
-}
-
-
-/*-----------------------------------------------------------------------------
-* Initialize and Terminate scan
-*----------------------------------------------------------------------------*/
-DEF_CLASS(Scan);
-
-void Scan_init(Scan *self)
-{
-	init();
-	self->ctx = NULL;		/* init by push_context() */
-	self->stack = OBJ_NEW(List);
-	OBJ_AUTODELETE(self->stack) = FALSE;
-}
-
-void Scan_fini(Scan *self)
-{
-	ScanContext *ctx;
-	
-	init();
-	
-	/* delete all list elements */
-	while ( (ctx = List_pop( self->stack )) != NULL )
-		OBJ_DELETE( ctx );
-
-	OBJ_DELETE(self->ctx);
-	OBJ_DELETE(self->stack);
-}
-
-void Scan_copy(Scan *self, Scan *other)
-{
-	init();
-}
-
-
-/*-----------------------------------------------------------------------------
-* Reset last token variables before each new scan
-*----------------------------------------------------------------------------*/
-static void reset_last_token(void)
-{
-	last_token = t_end;
-	last_token_num = 0;
-	Str_clear( last_token_str );
-}
-
-/*-----------------------------------------------------------------------------
-* Initialize the scanner to read ctx->input
-*----------------------------------------------------------------------------*/
-static void reset_scan( ScanContext *ctx )
-{
-	/* init state structure */
-	ctx->bol   	= TRUE;
-	ctx->p		= ctx->input->str;
-	ctx->pe		= ctx->input->str + ctx->input->len;
-	ctx->eof	= ctx->pe;	/* tokens are not split acros input lines */
+	/* init state */
+	at_bol  = _at_bol;
+	p		= scan_buffer->str;
+	pe		= scan_buffer->str + scan_buffer->len;
+	eof		= pe;	/* tokens are not split acros input lines */
 	
 	%% write init;
 
-	reset_last_token();
+	last_token = T_END;
 }
 
-/*-----------------------------------------------------------------------------
-* Interface with error location
-*----------------------------------------------------------------------------*/
-static void set_error_location( ScanContext *ctx )
+Token scan_get( void )
 {
-	/* set error location; in line_mode, only set error line at LINE directive */
-	set_error_file( ctx->filename );
-	if ( !opts.line_mode )
-		set_error_line( ctx->line_nr );
-}
+	last_token = T_END;
 
-/*-----------------------------------------------------------------------------
-* Read the next line to input
-*----------------------------------------------------------------------------*/
-static BOOL read_next_line( ScanContext *ctx )
-{
-	int c1, c2;
+	%% write exec;
 	
-	Str_clear( ctx->input );
-	while ( (c1 = getc( ctx->file )) != EOF && c1 != '\n' && c1 != '\r' )
-		Str_append_char( ctx->input, c1 );
+	at_bol = (last_token == T_NEWLINE) ? TRUE : FALSE;
 	
-	if ( c1 == EOF )
-	{
-		if ( ctx->input->len > 0 )					/* read some chars */
-			Str_append_char( ctx->input, '\n' );	/* missing newline at end of line */
-	}
-	else 						
-	{
-		Str_append_char( ctx->input, '\n' );		/* end of line */
-		
-		if ( (c2 = getc( ctx->file )) != EOF &&
-			 ! ( (c1 == '\n' && c2 == '\r') ||
-				 (c1 == '\r' && c2 == '\n') ) )
-		{
-			ungetc( c2, ctx->file );				/* push back to input */
-		}
-	}
-	
-	if ( ctx->input->len > 0 )
-	{
-		ctx->line_nr++;
-	
-		/* call listing */
-		if ( opts.cur_list )
-			list_start_line( get_PC(), ctx->filename, ctx->line_nr, ctx->input->str );
-
-		set_error_location( ctx );
-
-		return TRUE;
-	}
-	else
-	{
-		/* clear error location */
-		set_error_null();
-
-		return FALSE;
-	}
+	return last_token;
 }
-
-/*-----------------------------------------------------------------------------
-* Push the current context, create a new one
-*----------------------------------------------------------------------------*/
-static void push_context( Scan *self )
-{
-	char *filename = NULL;
-	int	  line_nr  = 0;
-	
-	if ( self->ctx )
-	{
-		/* copy current filename/line_nr to new context */
-		filename = self->ctx->filename;
-		line_nr  = self->ctx->line_nr;
-
-		/* push current top context to stack */
-		List_push( & self->stack, self->ctx );
-	}
-
-	/* create the new context */
-	self->ctx = OBJ_NEW(ScanContext);
-	OBJ_AUTODELETE(self->ctx) = FALSE;
-	
-	/* init filename/line_nr */
-	self->ctx->filename = filename;
-	self->ctx->line_nr  = line_nr;
-}
-
-/*-----------------------------------------------------------------------------
-* Pop and delete the current context
-*----------------------------------------------------------------------------*/
-static void pop_context( Scan *self )
-{
-	OBJ_DELETE( self->ctx );
-	if ( ! List_empty( self->stack ) )
-	{
-		/* pop one */
-		self->ctx = List_pop( self->stack );
-		set_error_location( self->ctx );
-	}
-	else
-	{
-		self->ctx = NULL;
-		set_error_null();
-	}
-}
-
-/*-----------------------------------------------------------------------------
-* push current scan context, start scanning a string
-*----------------------------------------------------------------------------*/
-void scan_string( char *text )
-{
-	init();
-	scan_string_Scan( the_scan, text );
-}
-
-void scan_string_Scan( Scan *self, char *text )
-{
-	init();
-	push_context( self );
-	Str_set( self->ctx->input, text );
-	reset_scan( self->ctx );
-}
-
-/*-----------------------------------------------------------------------------
-* push current scan context, start scanning a file
-*----------------------------------------------------------------------------*/
-void scan_file( char *filename )
-{
-	init();
-	scan_file_Scan( the_scan, filename );
-}
-
-void scan_file_Scan( Scan *self, char *filename )
-{
-	ListElem	*iter;
-	ScanContext *ctx;
-
-	init();
-
-	/* create the context */
-	push_context( self );
-	
-	/* check for recursive includes */
-	for ( iter = List_first(self->stack); iter; iter = List_next(iter) )
-	{
-		ctx = iter->data;
-		if ( ctx->file && ctx->filename &&
-		     strcmp(filename, ctx->filename) == 0 )
-			fatal_include_recursion( filename );
-	}
-
-	/* open the file */
-	self->ctx->file		= xfopen( filename, "rb" );		/* "b" to return eol chars */
-	self->ctx->filename = strpool_add( filename );
-	self->ctx->line_nr  = 0;
-	
-	set_error_location( self->ctx );
-
-	reset_scan( self->ctx );
-}
-
-/*-----------------------------------------------------------------------------
-* get the next token or line workhorse
-*----------------------------------------------------------------------------*/
-static enum token _get_token_Scan( Scan *self, BOOL by_lines )
-{
-	ScanContext *ctx;
-	char c;
-	
-	reset_last_token();			/* sets last_token to t_end */
-	
-	while ( (ctx = self->ctx) != NULL )
-	{
-		%% write exec;
-		
-		ctx->bol = (last_token == t_newline) ? TRUE : FALSE;
-	
-		if ( last_token != t_end )
-			return last_token;
-
-		/* if reading from file, get next line */
-		if ( ctx->file && read_next_line( ctx ) )
-			reset_scan( ctx );
-		else
-			pop_context( self );	/* pop context and try again */
-	}
-	
-	return t_end;					/* no more input */
-}
-
-/*-----------------------------------------------------------------------------
-* get the next token, set last_tokenXXX as side-effect
-*----------------------------------------------------------------------------*/
-enum token get_token( void )
-{
-	init();
-	return get_token_Scan( the_scan );
-}
-
-enum token get_token_Scan( Scan *self )
-{
-	init();
-	return _get_token_Scan( self, FALSE );	/* by tokens */
-}
-
-/*-----------------------------------------------------------------------------
-* get the next input line from file - return pointer to last_token_str->str, 
-* or NULL at end of input
-*----------------------------------------------------------------------------*/
-char *get_line( void )
-{
-	init();
-	return get_line_Scan( the_scan );
-}
-
-char *get_line_Scan( Scan *self )
-{
-	enum token token;
-	
-	init();
-	token = _get_token_Scan( self, TRUE );	/* by lines */
-	if ( token == t_string )
-		return last_token_str->str;
-	else
-		return NULL;
-}
-
-#if 0
-/*-----------------------------------------------------------------------------
-* Bridge to OLD-SCAN interface
-*----------------------------------------------------------------------------*/
-enum symbols sym = nil;
-char ident[MAXLINE];
-
-static enum symbols map_sym( enum token token )
-{
-	switch (token)
-	{
-		case t_end:			return nil;
-		case t_name:		return name;
-		case t_label:		return label;
-		case t_number:		return number;
-		case t_string:		return string;
-		case t_newline:		return newline;
-		case t_exclam:		return log_not;
-		case t_hash:		return constexpr;
-		case t_percent:		return mod;
-		case t_lparen:		return lparen;
-		case t_rparen:		return rparen;
-		case t_star:		return multiply;
-		case t_plus:		return plus;
-		case t_comma:		return comma;
-		case t_minus:		return minus;
-		case t_dot:			return fullstop;
-		case t_slash:		return divi;
-		case t_lt:			return less;
-		case t_eq:			return assign;
-		case t_gt:			return greater;
-		case t_lsquare:		return lsquare;
-		case t_rsquare:		return rsquare;
-		case t_lcurly:		return lcurly;
-		case t_vbar:		return bin_or;
-		case t_rcurly:		return rcurly;
-		case t_lt_gt:		return notequal;
-		case t_exclam_eq:	return notequal;
-		case t_lt_eq:		return lessequal;
-		case t_gt_eq:		return greatequal;
-		case t_star_star:	return power;
-#ifdef __LEGACY_Z80ASM_SYNTAX
-		case t_and:			return strconq;
-		case t_tilde:		return bin_and;
-		case t_colon:		return bin_xor;
-		case t_caret:		return power;
-#else
-		case t_and:			return bin_and;
-		case t_tilde:		return bin_not;
-		case t_colon:		return colon;
-		case t_caret:		return bin_xor;
-#endif
-
-		/* unused */
-		case t_dollar:
-		case t_question:	
-		case t_at:			
-		case t_bslash:		
-		case t_bquote:		
-		case t_eq_eq:		
-		case t_vbar_vbar:	
-		case t_and_and:		
-		case t_lt_lt:		
-		case t_gt_gt:		
-		default: 			return nil;
-	}
-}
-
-/* get the next token */
-enum symbols GetSym( void )
-{
-	init();
-	/* call lexer, set token, ident */
-	sym = map_sym( get_token() );
-	g_strlcpy( ident, last_token_str->str, sizeof(ident) );
-	
-	return sym;
-}
-
-/* skip to end of line */
-void Skipline( void )
-{
-	init();
-	while ( sym != newline && sym != nil )
-		GetSym();
-}
-#endif
-
 
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.11  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.12  2014-02-09 10:16:15  pauloscustodio
+* Remove complexity out of scan.rl by relying on srcfile to handle contexts of
+* recursive includes, and reading of lines of text, and by assuming scan.c
+* will not be reentred, simplifying the keeping of state variables for the scan.
+*
+* Revision 1.11  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.10  2014/01/11 01:29:40  pauloscustodio

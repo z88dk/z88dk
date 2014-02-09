@@ -13,1292 +13,483 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.36 2014-02-09 10:16:15 pauloscustodio Exp $
+#
 # Test scan.rl
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+use File::Slurp;
+use Capture::Tiny 'capture';
+use Test::Differences; 
 
-my $objs = "scan.o errors.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o";
+my $objs = "scan.o errors.o ".
+		   "lib/strutil.o lib/xmalloc.o lib/strhash.o lib/fileutil.o ".
+		   "lib/srcfile.o lib/strpool.o lib/die.o lib/except.o lib/class.o ".
+		   "lib/list.o";
+my $compile = "cc -Wall -otest -Ilib test.c $objs";
 
-# build list of case TOKEN: return "TOKEN" from scan.h
-my @token_case;
-for (read_file("scan.h")) {
-	if (/enum token/ .. /\};/) {
-		if (/^\s*(t_\w+)\s*=\s*/) {
-			my $case = $1;
-			push @token_case, "\t\tcase $case: return \"$case\";\n";
-		}
-	}
-}
+write_file("test.c", <<'END');
+#include "scan.h"
+#include <assert.h>
 
-my $init = <<'END'; $init =~ s/<TOKEN_CASE>/@token_case/;
-#include "symbol.h"
-
-struct module *CURRENTMODULE;
-FILE *errfile;
-size_t get_PC( void ) { return 0; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
-{	
-	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
-}
-char *CreateLibfile( char *filename ) {return NULL;}
-char *GetLibfile( char *filename ) {return NULL;}
-Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
-char ident[MAXLINE];
-char separators[MAXLINE];
-
-
-char *decode_token (enum token token)
-{
-	static char token_str[MAXLINE];
+#define T_GET( exp_token, exp_num, exp_str )	\
+	token = scan_get(); \
+	assert( token == exp_token ); \
+	assert( last_token == exp_token ); \
+	assert( last_token_num == exp_num ); \
+	assert( strcmp( last_token_str, exp_str ) == 0 );
 	
-	switch (token) {
-<TOKEN_CASE>
-		default:
-			if (token >= 32 && token < 127)
-				sprintf(token_str, "'%c'", token);
-			else
-				sprintf(token_str, "token(%d)", token);
-			return token_str;
-	}
-}
-
-void dump_string( char *p )
+int main()
 {
-	fprintf( stderr, "\"" );
-	for ( ; *p; p++ )
-		if (*p >= 32 && *p < 127)
-			fprintf( stderr, "%c", *p );
-		else
-			fprintf( stderr, "<%02X>", *p & 0xFF );
-	fprintf( stderr, "\"" );
-}
+	Token token;
+	
+	scan_reset("", TRUE);
+	T_GET( T_END,		0,	"" );
+	T_GET( T_END,		0,	"" );
+	
+	/* at_bol = TRUE */
+	scan_reset(" \t start \t : \t . start : \n", TRUE);
+	T_GET( T_LABEL,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	scan_reset(" \t . \t start \t : \t . start : \n", TRUE);
+	T_GET( T_LABEL,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	scan_reset(" \t . \t start \t . start : \n", TRUE);
+	T_GET( T_LABEL,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	scan_reset(" \t . \t : \t . start : \n", TRUE);
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	/* at_bol = FALSE */
+	scan_reset(" \t start \t : \t . start : \n", FALSE);
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	scan_reset(" \t . \t start \t : \t . start : \n", FALSE);
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	scan_reset(" \t . \t start \t . start : \n", FALSE);
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_DOT,		0,		"START" );
+	T_GET( T_NAME,		0,		"START" );
+	T_GET( T_COLON,		0,		"START" );
+	T_GET( T_NEWLINE,	0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	T_GET( T_END,		0,		"START" );
+	
+	/* reset */
+	scan_reset("\"\" 0", FALSE);
+	T_GET( T_STRING,	0,		"" );
+	T_GET( T_NUMBER,	0,		"" );
+	T_GET( T_END,		0,		"" );
+	
+	/* symbols */
+	scan_reset(" \r\f\v\t ; comment "
+			   " \n ! # $ % & ( ) * + , - . / : < = > ? @ [ \\ ] ^ ` { | } ~ "
+			   " == <> != <= >= || && << >> ** "
+			   " ; comment ", 
+			   FALSE);
+	T_GET( T_NEWLINE,	0,		"" );
+	T_GET( T_EXCLAM,	0,		"" );
+	T_GET( T_HASH,		0,		"" );
+	T_GET( T_DOLLAR,	0,		"" );
+	T_GET( T_PERCENT,	0,		"" );
+	T_GET( T_AND,		0,		"" );
+	T_GET( T_LPAREN,	0,		"" );
+	T_GET( T_RPAREN,	0,		"" );
+	T_GET( T_STAR,		0,		"" );
+	T_GET( T_PLUS,		0,		"" );
+	T_GET( T_COMMA,		0,		"" );
+	T_GET( T_MINUS,		0,		"" );
+	T_GET( T_DOT,		0,		"" );
+	T_GET( T_SLASH,		0,		"" );
+	T_GET( T_COLON,		0,		"" );
+	T_GET( T_LT,		0,		"" );
+	T_GET( T_EQ,		0,		"" );
+	T_GET( T_GT,		0,		"" );
+	T_GET( T_QUESTION,	0,		"" );
+	T_GET( T_AT,		0,		"" );
+	T_GET( T_LSQUARE,	0,		"" );
+	T_GET( T_BSLASH,	0,		"" );
+	T_GET( T_RSQUARE,	0,		"" );
+	T_GET( T_CARET,		0,		"" );
+	T_GET( T_BQUOTE,	0,		"" );
+	T_GET( T_LCURLY,	0,		"" );
+	T_GET( T_VBAR,		0,		"" );
+	T_GET( T_RCURLY,	0,		"" );
+	T_GET( T_TILDE,		0,		"" );
+	T_GET( T_EQ_EQ,		0,		"" );
+	T_GET( T_LT_GT,		0,		"" );
+	T_GET( T_EXCLAM_EQ,	0,		"" );
+	T_GET( T_LT_EQ,		0,		"" );
+	T_GET( T_GT_EQ,		0,		"" );
+	T_GET( T_VBAR_VBAR,	0,		"" );
+	T_GET( T_AND_AND,	0,		"" );
+	T_GET( T_LT_LT,		0,		"" );
+	T_GET( T_GT_GT,		0,		"" );
+	T_GET( T_STAR_STAR,	0,		"" );
+	T_GET( T_END,		0,		"" );
+	T_GET( T_END,		0,		"" );
 
-void get_tokens( Scan *scan, int n, BOOL by_lines )
-{
-	enum token token;
-	int count_end = 0;
-	char *line;
+	/* names */
+	scan_reset(" _Abc_123 Abc_123 123_Abc_0 0 "
+			   " Abc_123	af' b'c'd'e'af' A 0 \"\" ", 
+			   FALSE);
+	T_GET( T_NAME,		0,		"_ABC_123" );
+	T_GET( T_NAME,		0,		"ABC_123" );
+	T_GET( T_NUMBER,	123,	"ABC_123" );
+	T_GET( T_NAME,		123,	"_ABC_0" );
+	T_GET( T_NUMBER,	0,		"_ABC_0" );
+	T_GET( T_NAME,		0,		"ABC_123" );
+	T_GET( T_NAME,		0,		"AF'" );
+	T_GET( T_NAME,		0,		"B" );
+	T_GET( T_NUMBER,	'c',	"B" );
+	T_GET( T_NAME,		'c',	"D" );
+	T_GET( T_NUMBER,	'e',	"D" );
+	T_GET( T_NAME,		'e',	"AF'" );
+	T_GET( T_NAME,		'e',	"A" );
+	T_GET( T_NUMBER,	0,		"A" );
+	T_GET( T_STRING,	0,		"" );
+	T_GET( T_END,		0,		"" );
+	T_GET( T_END,		0,		"" );
 
-	while ( n-- != 0 && count_end < 2 )
-	{
-		if (by_lines)
-		{
-			if ( scan )
-				line = get_line_Scan( scan );
-			else
-				line = get_line();
-				
-			if ( line )
-			{
-				ASSERT( line == last_token_str->str );
-				ASSERT( last_token == t_string );
-			}
-			else 
-			{
-				ASSERT( last_token == t_end );
-			}
-		}
-		else			
-		{
-			if ( scan )
-				token = get_token_Scan( scan );
-			else
-				token = get_token();
+	/* labels */
+	scan_reset(".   abc   .def ghi: .jkl: \n"
+			   "    abc : .def ghi: .jkl: \n"
+			   ".   abc : .def ghi: .jkl: \n"
+			   "\"\"", 
+			   TRUE);
+	T_GET( T_LABEL,		0,		"ABC" );
+	T_GET( T_DOT,		0,		"ABC" );
+	T_GET( T_NAME,		0,		"DEF" );
+	T_GET( T_NAME,		0,		"GHI" );
+	T_GET( T_COLON,		0,		"GHI" );
+	T_GET( T_DOT,		0,		"GHI" );
+	T_GET( T_NAME,		0,		"JKL" );
+	T_GET( T_COLON,		0,		"JKL" );
+	T_GET( T_NEWLINE,	0,		"JKL" );
+	
+	T_GET( T_LABEL,		0,		"ABC" );
+	T_GET( T_DOT,		0,		"ABC" );
+	T_GET( T_NAME,		0,		"DEF" );
+	T_GET( T_NAME,		0,		"GHI" );
+	T_GET( T_COLON,		0,		"GHI" );
+	T_GET( T_DOT,		0,		"GHI" );
+	T_GET( T_NAME,		0,		"JKL" );
+	T_GET( T_COLON,		0,		"JKL" );
+	T_GET( T_NEWLINE,	0,		"JKL" );
+	
+	T_GET( T_LABEL,		0,		"ABC" );
+	T_GET( T_DOT,		0,		"ABC" );
+	T_GET( T_NAME,		0,		"DEF" );
+	T_GET( T_NAME,		0,		"GHI" );
+	T_GET( T_COLON,		0,		"GHI" );
+	T_GET( T_DOT,		0,		"GHI" );
+	T_GET( T_NAME,		0,		"JKL" );
+	T_GET( T_COLON,		0,		"JKL" );
+	T_GET( T_NEWLINE,	0,		"JKL" );
 
-			ASSERT( token == last_token );
-		}
+	T_GET( T_STRING,	0,		"" );
+	T_GET( T_END,		0,		"" );
+	T_GET( T_END,		0,		"" );
 
-		warn("%5d %-12s, value %5d, ",
-			 last_token, decode_token(last_token), 
-			 last_token_num );
-		dump_string( last_token_str->str );
-		warn("\n");
+	/* numbers - decimal */
+	scan_reset("2147483647 2147483648 0", FALSE);
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+	T_GET( T_NUMBER,	0x80000000,	"" );
+	T_GET( T_NUMBER,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+	
+	/* numbers - binary */
+	scan_reset("   0000b     0011b      1111111111111111111111111111111b	"
+			   "  @0000     @0011      @1111111111111111111111111111111		"
+			   "  %0000     %0011      %1111111111111111111111111111111		"
+			   " 0b0000    0b0011     0b1111111111111111111111111111111		"
+			   "@\"----\" @\"--##\"  @\"###############################\"	"
+			   "%\"----\" %\"--##\"  %\"###############################\"	"
+			   "%\"#\" 														"
+			   "%\"#---\"													"
+			   "%\"#-------\"												"
+			   "%\"#-----------\" 											"
+			   "%\"#---------------\" 										"
+			   "%\"#-------------------\"									"
+			   "%\"#-----------------------\" 								"
+			   "%\"#---------------------------\" 							"
+			   "%\"#-------------------------------\"						"
+			   "%\"#--------------------------------\"						",
+			   FALSE );
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x00000003,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000001,	"" );
+	T_GET( T_NUMBER,	0x00000008,	"" );
+	T_GET( T_NUMBER,	0x00000080,	"" );
+	T_GET( T_NUMBER,	0x00000800,	"" );
+	T_GET( T_NUMBER,	0x00008000,	"" );
+	T_GET( T_NUMBER,	0x00080000,	"" );
+	T_GET( T_NUMBER,	0x00800000,	"" );
+	T_GET( T_NUMBER,	0x08000000,	"" );
+	T_GET( T_NUMBER,	0x80000000,	"" );
+	T_GET( T_NUMBER,	0x00000000,	"" );
+
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+
+	/* numbers - hexadecimal */
+	scan_reset("  0h 0ah 0FH   7FFFFFFFh	"
+			   " $0   $a  $F  $7FFFFFFF 	"
+			   " #0   #a  #F  #7FFFFFFF		"
+			   "0x0  0xa 0xF 0x7FFFFFFF		"
+			   "0", 
+			   FALSE);
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x0000000A,	"" );
+	T_GET( T_NUMBER,	0x0000000F,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x0000000A,	"" );
+	T_GET( T_NUMBER,	0x0000000F,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x0000000A,	"" );
+	T_GET( T_NUMBER,	0x0000000F,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+
+	T_GET( T_NUMBER,	0x00000000,	"" );
+	T_GET( T_NUMBER,	0x0000000A,	"" );
+	T_GET( T_NUMBER,	0x0000000F,	"" );
+	T_GET( T_NUMBER,	0x7FFFFFFF,	"" );
+	
+	T_GET( T_NUMBER,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+	
+	/* very long number > MAXLINE = 1024 --> truncates to 0 */
+	scan_reset("0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "0000000000000000000000000000000000000000"
+			   "1", 
+			   FALSE);
+	T_GET( T_NUMBER,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+	
+	/* strings - single-quote */
+	scan_reset("'		\n"
+			   "'a		\n"
+			   "''		\n"
+			   "'a'		\n"
+			   "'aa'	\n"
+			   "0", 
+			   FALSE);
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_NUMBER,	'a',		"" );
+	T_GET( T_NEWLINE,	'a',		"" );
+	T_GET( T_NEWLINE,	'a',		"" );
+	T_GET( T_NUMBER,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+
+	/* strings - double-quote */
+	scan_reset("\"		\n"
+			   "\"a		\n"
+			   "\"\"	\n"
+			   "\"a\"	\n"
+			   "\"aa\"	\n"
+			   "\"\"", 
+			   FALSE);
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_STRING,	0,			"" );
+	T_GET( T_NEWLINE,	0,			"" );
+	T_GET( T_STRING,	0,			"a" );
+	T_GET( T_NEWLINE,	0,			"a" );
+	T_GET( T_STRING,	0,			"aa" );
+	T_GET( T_NEWLINE,	0,			"aa" );
+	T_GET( T_STRING,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
 		
-		if ( ! last_token ) count_end++;
-	}
+	/* keywords */
+	scan_reset(" add ld nop adc \"\"", 
+			   FALSE);
+	T_GET( T_ADD,		0,			"" );
+	T_GET( T_LD,		0,			"" );
+	T_GET( T_NOP,		0,			"" );
+	T_GET( T_NAME,		0,			"ADC" );
+	T_GET( T_STRING,	0,			"" );
+	T_GET( T_END,		0,			"" );
+	T_GET( T_END,		0,			"" );
+
+	return 0;
 }
+END
+system("make $objs") and die "make failed: $objs\n";
+system($compile) and die "compile failed: $compile\n";
 
+t_capture("test", "", <<'END', 0);
+Warning: integer '-2147483648' out of range
+Warning: integer '-2147483648' out of range
+Warning: integer '0' out of range
+Error: invalid single quoted character
+Error: invalid single quoted character
+Error: invalid single quoted character
+Error: invalid single quoted character
+Error: unclosed quoted string
+Error: unclosed quoted string
 END
 
-t_compile_module($init, <<'END', $objs);
-	Str *input = OBJ_NEW(Str);
-	Scan *scan = OBJ_NEW(Scan);
-	int i, j;
-	
-	/* scan each argv */
-	for ( i = 1; i < argc; i++ )
-	{
-		for ( j = 0; j < 2; j++ )
-		{
-			Scan *my_scan = j == 0 ? scan : NULL;
-			
-			warn("Scan file \"%s\" by lines (%d)\n", argv[i], j );
-	
-			if ( my_scan )
-				scan_file_Scan( my_scan, argv[i] );
-			else
-				scan_file( argv[i] );
-				
-			get_tokens( my_scan, -1, TRUE );
-			warn("\n");
-				
-			warn("Scan file \"%s\" by tokens (%d)\n", argv[i], j );
-	
-			if ( my_scan )
-				scan_file_Scan( my_scan, argv[i] );
-			else
-				scan_file( argv[i] );
-				
-			get_tokens( my_scan, -1, FALSE );
-			warn("\n");
-		}
-	}
-	
-	warn("Test scan stack\n");
-	Str_set( input, "start:ld a,25\n");
-	warn("Text: %s", input->str );
-	scan_string( input->str );
-	get_tokens( NULL, 4, FALSE );
-	scan_string( "2*" );
-	warn("Insert text: 2*\n" );
-	get_tokens( NULL, -1, FALSE );
-	
-	OBJ_DELETE(input);
-	OBJ_DELETE(scan);
-END
 
-write_file(asm1_file(), "" );
-write_file(asm2_file(), {binmode => ':raw'},
-	"\n",
-	join(" ", grep {! /[\"\';]/ } map {chr} 1..255),	# no end newline
-);
-
-write_file(asm3_file(), <<'END' );
-; sigle-character tokens
-! # $ % & ( ) * + , - . / : < = > ? @ [ \ ] ^ ` { | } ~ 
-
-; multiple-character tokens
-== <> != <= >= || && << >> ** 
-
-; names
-_Abc_123 Abc_123 123_Abc_
-Abc_123	af' b'c'd'e'af'
-
-; labels
-. 	abc	   .def ghi: .jkl:
-	abc	 : .def ghi: .jkl:
-. 	abc	 : .def ghi: .jkl:
-
-; numbers - decimal
-0 2147483647 2147483648
-
-; numbers - binary
-  0000b   0011b    1111111111111111111111111111111b
- @0000   @0011    @1111111111111111111111111111111
- %0000   %0011    %1111111111111111111111111111111
-0b0000  0b0011   0b1111111111111111111111111111111
-@"----" @"--##"  @"###############################"
-%"----" %"--##"  %"###############################"
-%"#" %"#---" %"#-------"  %"#-----------" %"#---------------" %"#-------------------"
-%"#-----------------------" %"#---------------------------" 
-%"#-------------------------------" %"#--------------------------------"
-
-; numbers - hexadecimal
-  0h 0ah 0FH   7FFFFFFFh
- $0   $a  $F  $7FFFFFFF 
- #0   #a  #F  #7FFFFFFF
-0x0  0xa 0xF 0x7FFFFFFF
-
-"strings - single-quote"
-'
-'a
-''
-'a'
-'aa'
-
-"strings - double-quotes"
-"
-"a
-""
-"a"
-"aa"
-
-END
-
-write_file(asm4_file(), "\"Very long number token\" " . ("0" x (32*1024)) . "12345\n" );
-
-t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], '', <<'ERR', 0); 
-Scan file "test1.asm" by lines (0)
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test1.asm" by tokens (0)
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test1.asm" by lines (1)
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test1.asm" by tokens (1)
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test2.asm" by lines (0)
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "<01> <02> <03> <04> <05> <06> <07> <08> <09> <0A>"
-    4 t_string    , value     0, " <0B> <0C> <0A>"
-    4 t_string    , value     0, " <0E> <0F> <10> <11> <12> <13> <14> <15> <16> <17> <18> <19> <1A> <1B> <1C> <1D> <1E> <1F>   ! # $ % & ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ <7F> <80> <81> <82> <83> <84> <85> <86> <87> <88> <89> <8A> <8B> <8C> <8D> <8E> <8F> <90> <91> <92> <93> <94> <95> <96> <97> <98> <99> <9A> <9B> <9C> <9D> <9E> <9F> <A0> <A1> <A2> <A3> <A4> <A5> <A6> <A7> <A8> <A9> <AA> <AB> <AC> <AD> <AE> <AF> <B0> <B1> <B2> <B3> <B4> <B5> <B6> <B7> <B8> <B9> <BA> <BB> <BC> <BD> <BE> <BF> <C0> <C1> <C2> <C3> <C4> <C5> <C6> <C7> <C8> <C9> <CA> <CB> <CC> <CD> <CE> <CF> <D0> <D1> <D2> <D3> <D4> <D5> <D6> <D7> <D8> <D9> <DA> <DB> <DC> <DD> <DE> <DF> <E0> <E1> <E2> <E3> <E4> <E5> <E6> <E7> <E8> <E9> <EA> <EB> <EC> <ED> <EE> <EF> <F0> <F1> <F2> <F3> <F4> <F5> <F6> <F7> <F8> <F9> <FA> <FB> <FC> <FD> <FE> <FF><0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test2.asm" by tokens (0)
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-   35 t_hash      , value     0, ""
-   36 t_dollar    , value     0, ""
-   37 t_percent   , value     0, ""
-   38 t_and       , value     0, ""
-   40 t_lparen    , value     0, ""
-   41 t_rparen    , value     0, ""
-   42 t_star      , value     0, ""
-   43 t_plus      , value     0, ""
-   44 t_comma     , value     0, ""
-   45 t_minus     , value     0, ""
-   46 t_dot       , value     0, ""
-   47 t_slash     , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     1, ""
-    3 t_number    , value     2, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value     4, ""
-    3 t_number    , value     5, ""
-    3 t_number    , value     6, ""
-    3 t_number    , value     7, ""
-    3 t_number    , value     8, ""
-    3 t_number    , value     9, ""
-   58 t_colon     , value     0, ""
-   60 t_lt        , value     0, ""
-   61 t_eq        , value     0, ""
-   62 t_gt        , value     0, ""
-   63 t_question  , value     0, ""
-   64 t_at        , value     0, ""
-    1 t_name      , value     0, "A"
-    1 t_name      , value     0, "B"
-    1 t_name      , value     0, "C"
-    1 t_name      , value     0, "D"
-    1 t_name      , value     0, "E"
-    1 t_name      , value     0, "F"
-    1 t_name      , value     0, "G"
-    1 t_name      , value     0, "H"
-    1 t_name      , value     0, "I"
-    1 t_name      , value     0, "J"
-    1 t_name      , value     0, "K"
-    1 t_name      , value     0, "L"
-    1 t_name      , value     0, "M"
-    1 t_name      , value     0, "N"
-    1 t_name      , value     0, "O"
-    1 t_name      , value     0, "P"
-    1 t_name      , value     0, "Q"
-    1 t_name      , value     0, "R"
-    1 t_name      , value     0, "S"
-    1 t_name      , value     0, "T"
-    1 t_name      , value     0, "U"
-    1 t_name      , value     0, "V"
-    1 t_name      , value     0, "W"
-    1 t_name      , value     0, "X"
-    1 t_name      , value     0, "Y"
-    1 t_name      , value     0, "Z"
-   91 t_lsquare   , value     0, ""
-   92 t_bslash    , value     0, ""
-   93 t_rsquare   , value     0, ""
-   94 t_caret     , value     0, ""
-    1 t_name      , value     0, "_"
-   96 t_bquote    , value     0, ""
-    1 t_name      , value     0, "A"
-    1 t_name      , value     0, "B"
-    1 t_name      , value     0, "C"
-    1 t_name      , value     0, "D"
-    1 t_name      , value     0, "E"
-    1 t_name      , value     0, "F"
-    1 t_name      , value     0, "G"
-    1 t_name      , value     0, "H"
-    1 t_name      , value     0, "I"
-    1 t_name      , value     0, "J"
-    1 t_name      , value     0, "K"
-    1 t_name      , value     0, "L"
-    1 t_name      , value     0, "M"
-    1 t_name      , value     0, "N"
-    1 t_name      , value     0, "O"
-    1 t_name      , value     0, "P"
-    1 t_name      , value     0, "Q"
-    1 t_name      , value     0, "R"
-    1 t_name      , value     0, "S"
-    1 t_name      , value     0, "T"
-    1 t_name      , value     0, "U"
-    1 t_name      , value     0, "V"
-    1 t_name      , value     0, "W"
-    1 t_name      , value     0, "X"
-    1 t_name      , value     0, "Y"
-    1 t_name      , value     0, "Z"
-  123 t_lcurly    , value     0, ""
-  124 t_vbar      , value     0, ""
-  125 t_rcurly    , value     0, ""
-  126 t_tilde     , value     0, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test2.asm" by lines (1)
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "<01> <02> <03> <04> <05> <06> <07> <08> <09> <0A>"
-    4 t_string    , value     0, " <0B> <0C> <0A>"
-    4 t_string    , value     0, " <0E> <0F> <10> <11> <12> <13> <14> <15> <16> <17> <18> <19> <1A> <1B> <1C> <1D> <1E> <1F>   ! # $ % & ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ <7F> <80> <81> <82> <83> <84> <85> <86> <87> <88> <89> <8A> <8B> <8C> <8D> <8E> <8F> <90> <91> <92> <93> <94> <95> <96> <97> <98> <99> <9A> <9B> <9C> <9D> <9E> <9F> <A0> <A1> <A2> <A3> <A4> <A5> <A6> <A7> <A8> <A9> <AA> <AB> <AC> <AD> <AE> <AF> <B0> <B1> <B2> <B3> <B4> <B5> <B6> <B7> <B8> <B9> <BA> <BB> <BC> <BD> <BE> <BF> <C0> <C1> <C2> <C3> <C4> <C5> <C6> <C7> <C8> <C9> <CA> <CB> <CC> <CD> <CE> <CF> <D0> <D1> <D2> <D3> <D4> <D5> <D6> <D7> <D8> <D9> <DA> <DB> <DC> <DD> <DE> <DF> <E0> <E1> <E2> <E3> <E4> <E5> <E6> <E7> <E8> <E9> <EA> <EB> <EC> <ED> <EE> <EF> <F0> <F1> <F2> <F3> <F4> <F5> <F6> <F7> <F8> <F9> <FA> <FB> <FC> <FD> <FE> <FF><0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test2.asm" by tokens (1)
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-   35 t_hash      , value     0, ""
-   36 t_dollar    , value     0, ""
-   37 t_percent   , value     0, ""
-   38 t_and       , value     0, ""
-   40 t_lparen    , value     0, ""
-   41 t_rparen    , value     0, ""
-   42 t_star      , value     0, ""
-   43 t_plus      , value     0, ""
-   44 t_comma     , value     0, ""
-   45 t_minus     , value     0, ""
-   46 t_dot       , value     0, ""
-   47 t_slash     , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     1, ""
-    3 t_number    , value     2, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value     4, ""
-    3 t_number    , value     5, ""
-    3 t_number    , value     6, ""
-    3 t_number    , value     7, ""
-    3 t_number    , value     8, ""
-    3 t_number    , value     9, ""
-   58 t_colon     , value     0, ""
-   60 t_lt        , value     0, ""
-   61 t_eq        , value     0, ""
-   62 t_gt        , value     0, ""
-   63 t_question  , value     0, ""
-   64 t_at        , value     0, ""
-    1 t_name      , value     0, "A"
-    1 t_name      , value     0, "B"
-    1 t_name      , value     0, "C"
-    1 t_name      , value     0, "D"
-    1 t_name      , value     0, "E"
-    1 t_name      , value     0, "F"
-    1 t_name      , value     0, "G"
-    1 t_name      , value     0, "H"
-    1 t_name      , value     0, "I"
-    1 t_name      , value     0, "J"
-    1 t_name      , value     0, "K"
-    1 t_name      , value     0, "L"
-    1 t_name      , value     0, "M"
-    1 t_name      , value     0, "N"
-    1 t_name      , value     0, "O"
-    1 t_name      , value     0, "P"
-    1 t_name      , value     0, "Q"
-    1 t_name      , value     0, "R"
-    1 t_name      , value     0, "S"
-    1 t_name      , value     0, "T"
-    1 t_name      , value     0, "U"
-    1 t_name      , value     0, "V"
-    1 t_name      , value     0, "W"
-    1 t_name      , value     0, "X"
-    1 t_name      , value     0, "Y"
-    1 t_name      , value     0, "Z"
-   91 t_lsquare   , value     0, ""
-   92 t_bslash    , value     0, ""
-   93 t_rsquare   , value     0, ""
-   94 t_caret     , value     0, ""
-    1 t_name      , value     0, "_"
-   96 t_bquote    , value     0, ""
-    1 t_name      , value     0, "A"
-    1 t_name      , value     0, "B"
-    1 t_name      , value     0, "C"
-    1 t_name      , value     0, "D"
-    1 t_name      , value     0, "E"
-    1 t_name      , value     0, "F"
-    1 t_name      , value     0, "G"
-    1 t_name      , value     0, "H"
-    1 t_name      , value     0, "I"
-    1 t_name      , value     0, "J"
-    1 t_name      , value     0, "K"
-    1 t_name      , value     0, "L"
-    1 t_name      , value     0, "M"
-    1 t_name      , value     0, "N"
-    1 t_name      , value     0, "O"
-    1 t_name      , value     0, "P"
-    1 t_name      , value     0, "Q"
-    1 t_name      , value     0, "R"
-    1 t_name      , value     0, "S"
-    1 t_name      , value     0, "T"
-    1 t_name      , value     0, "U"
-    1 t_name      , value     0, "V"
-    1 t_name      , value     0, "W"
-    1 t_name      , value     0, "X"
-    1 t_name      , value     0, "Y"
-    1 t_name      , value     0, "Z"
-  123 t_lcurly    , value     0, ""
-  124 t_vbar      , value     0, ""
-  125 t_rcurly    , value     0, ""
-  126 t_tilde     , value     0, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test3.asm" by lines (0)
-    4 t_string    , value     0, "; sigle-character tokens<0A>"
-    4 t_string    , value     0, "! # $ % & ( ) * + , - . / : < = > ? @ [ \ ] ^ ` { | } ~ <0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; multiple-character tokens<0A>"
-    4 t_string    , value     0, "== <> != <= >= || && << >> ** <0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; names<0A>"
-    4 t_string    , value     0, "_Abc_123 Abc_123 123_Abc_<0A>"
-    4 t_string    , value     0, "Abc_123<09>af' b'c'd'e'af'<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; labels<0A>"
-    4 t_string    , value     0, ". <09>abc<09>   .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, "<09>abc<09> : .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, ". <09>abc<09> : .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - decimal<0A>"
-    4 t_string    , value     0, "0 2147483647 2147483648<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - binary<0A>"
-    4 t_string    , value     0, "  0000b   0011b    1111111111111111111111111111111b<0A>"
-    4 t_string    , value     0, " @0000   @0011    @1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, " %0000   %0011    %1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, "0b0000  0b0011   0b1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, "@"----" @"--##"  @"###############################"<0A>"
-    4 t_string    , value     0, "%"----" %"--##"  %"###############################"<0A>"
-    4 t_string    , value     0, "%"#" %"#---" %"#-------"  %"#-----------" %"#---------------" %"#-------------------"<0A>"
-    4 t_string    , value     0, "%"#-----------------------" %"#---------------------------" <0A>"
-    4 t_string    , value     0, "%"#-------------------------------" %"#--------------------------------"<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - hexadecimal<0A>"
-    4 t_string    , value     0, "  0h 0ah 0FH   7FFFFFFFh<0A>"
-    4 t_string    , value     0, " $0   $a  $F  $7FFFFFFF <0A>"
-    4 t_string    , value     0, " #0   #a  #F  #7FFFFFFF<0A>"
-    4 t_string    , value     0, "0x0  0xa 0xF 0x7FFFFFFF<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, ""strings - single-quote"<0A>"
-    4 t_string    , value     0, "'<0A>"
-    4 t_string    , value     0, "'a<0A>"
-    4 t_string    , value     0, "''<0A>"
-    4 t_string    , value     0, "'a'<0A>"
-    4 t_string    , value     0, "'aa'<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, ""strings - double-quotes"<0A>"
-    4 t_string    , value     0, ""<0A>"
-    4 t_string    , value     0, ""a<0A>"
-    4 t_string    , value     0, """<0A>"
-    4 t_string    , value     0, ""a"<0A>"
-    4 t_string    , value     0, ""aa"<0A>"
-    4 t_string    , value     0, "<0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test3.asm" by tokens (0)
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-   35 t_hash      , value     0, ""
-   36 t_dollar    , value     0, ""
-   37 t_percent   , value     0, ""
-   38 t_and       , value     0, ""
-   40 t_lparen    , value     0, ""
-   41 t_rparen    , value     0, ""
-   42 t_star      , value     0, ""
-   43 t_plus      , value     0, ""
-   44 t_comma     , value     0, ""
-   45 t_minus     , value     0, ""
-   46 t_dot       , value     0, ""
-   47 t_slash     , value     0, ""
-   58 t_colon     , value     0, ""
-   60 t_lt        , value     0, ""
-   61 t_eq        , value     0, ""
-   62 t_gt        , value     0, ""
-   63 t_question  , value     0, ""
-   64 t_at        , value     0, ""
-   91 t_lsquare   , value     0, ""
-   92 t_bslash    , value     0, ""
-   93 t_rsquare   , value     0, ""
-   94 t_caret     , value     0, ""
-   96 t_bquote    , value     0, ""
-  123 t_lcurly    , value     0, ""
-  124 t_vbar      , value     0, ""
-  125 t_rcurly    , value     0, ""
-  126 t_tilde     , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-15677 t_eq_eq     , value     0, ""
-15422 t_lt_gt     , value     0, ""
- 8509 t_exclam_eq , value     0, ""
-15421 t_lt_eq     , value     0, ""
-15933 t_gt_eq     , value     0, ""
-31868 t_vbar_vbar , value     0, ""
- 9766 t_and_and   , value     0, ""
-15420 t_lt_lt     , value     0, ""
-15934 t_gt_gt     , value     0, ""
-10794 t_star_star , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    1 t_name      , value     0, "_ABC_123"
-    1 t_name      , value     0, "ABC_123"
-    3 t_number    , value   123, ""
-    1 t_name      , value     0, "_ABC_"
-   10 t_newline   , value     0, ""
-    1 t_name      , value     0, "ABC_123"
-    1 t_name      , value     0, "AF'"
-    1 t_name      , value     0, "B"
-    3 t_number    , value    99, ""
-    1 t_name      , value     0, "D"
-    3 t_number    , value   101, ""
-    1 t_name      , value     0, "AF'"
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value 2147483647, ""
-Warning at file 'test3.asm' line 17: integer '-2147483648' out of range
-    3 t_number    , value -2147483648, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     1, ""
-    3 t_number    , value     8, ""
-    3 t_number    , value   128, ""
-    3 t_number    , value  2048, ""
-    3 t_number    , value 32768, ""
-    3 t_number    , value 524288, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value 8388608, ""
-    3 t_number    , value 134217728, ""
-   10 t_newline   , value     0, ""
-Warning at file 'test3.asm' line 28: integer '-2147483648' out of range
-    3 t_number    , value -2147483648, ""
-Warning at file 'test3.asm' line 28: integer '-2147483648' out of range
-    3 t_number    , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "strings - single-quote"
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 37: invalid single quoted character
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 38: invalid single quoted character
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 39: invalid single quoted character
-   10 t_newline   , value     0, ""
-    3 t_number    , value    97, ""
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 41: invalid single quoted character
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "strings - double-quotes"
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 44: unclosed quoted string
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 45: unclosed quoted string
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "a"
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "aa"
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test3.asm" by lines (1)
-    4 t_string    , value     0, "; sigle-character tokens<0A>"
-    4 t_string    , value     0, "! # $ % & ( ) * + , - . / : < = > ? @ [ \ ] ^ ` { | } ~ <0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; multiple-character tokens<0A>"
-    4 t_string    , value     0, "== <> != <= >= || && << >> ** <0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; names<0A>"
-    4 t_string    , value     0, "_Abc_123 Abc_123 123_Abc_<0A>"
-    4 t_string    , value     0, "Abc_123<09>af' b'c'd'e'af'<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; labels<0A>"
-    4 t_string    , value     0, ". <09>abc<09>   .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, "<09>abc<09> : .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, ". <09>abc<09> : .def ghi: .jkl:<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - decimal<0A>"
-    4 t_string    , value     0, "0 2147483647 2147483648<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - binary<0A>"
-    4 t_string    , value     0, "  0000b   0011b    1111111111111111111111111111111b<0A>"
-    4 t_string    , value     0, " @0000   @0011    @1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, " %0000   %0011    %1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, "0b0000  0b0011   0b1111111111111111111111111111111<0A>"
-    4 t_string    , value     0, "@"----" @"--##"  @"###############################"<0A>"
-    4 t_string    , value     0, "%"----" %"--##"  %"###############################"<0A>"
-    4 t_string    , value     0, "%"#" %"#---" %"#-------"  %"#-----------" %"#---------------" %"#-------------------"<0A>"
-    4 t_string    , value     0, "%"#-----------------------" %"#---------------------------" <0A>"
-    4 t_string    , value     0, "%"#-------------------------------" %"#--------------------------------"<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, "; numbers - hexadecimal<0A>"
-    4 t_string    , value     0, "  0h 0ah 0FH   7FFFFFFFh<0A>"
-    4 t_string    , value     0, " $0   $a  $F  $7FFFFFFF <0A>"
-    4 t_string    , value     0, " #0   #a  #F  #7FFFFFFF<0A>"
-    4 t_string    , value     0, "0x0  0xa 0xF 0x7FFFFFFF<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, ""strings - single-quote"<0A>"
-    4 t_string    , value     0, "'<0A>"
-    4 t_string    , value     0, "'a<0A>"
-    4 t_string    , value     0, "''<0A>"
-    4 t_string    , value     0, "'a'<0A>"
-    4 t_string    , value     0, "'aa'<0A>"
-    4 t_string    , value     0, "<0A>"
-    4 t_string    , value     0, ""strings - double-quotes"<0A>"
-    4 t_string    , value     0, ""<0A>"
-    4 t_string    , value     0, ""a<0A>"
-    4 t_string    , value     0, """<0A>"
-    4 t_string    , value     0, ""a"<0A>"
-    4 t_string    , value     0, ""aa"<0A>"
-    4 t_string    , value     0, "<0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test3.asm" by tokens (1)
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-   35 t_hash      , value     0, ""
-   36 t_dollar    , value     0, ""
-   37 t_percent   , value     0, ""
-   38 t_and       , value     0, ""
-   40 t_lparen    , value     0, ""
-   41 t_rparen    , value     0, ""
-   42 t_star      , value     0, ""
-   43 t_plus      , value     0, ""
-   44 t_comma     , value     0, ""
-   45 t_minus     , value     0, ""
-   46 t_dot       , value     0, ""
-   47 t_slash     , value     0, ""
-   58 t_colon     , value     0, ""
-   60 t_lt        , value     0, ""
-   61 t_eq        , value     0, ""
-   62 t_gt        , value     0, ""
-   63 t_question  , value     0, ""
-   64 t_at        , value     0, ""
-   91 t_lsquare   , value     0, ""
-   92 t_bslash    , value     0, ""
-   93 t_rsquare   , value     0, ""
-   94 t_caret     , value     0, ""
-   96 t_bquote    , value     0, ""
-  123 t_lcurly    , value     0, ""
-  124 t_vbar      , value     0, ""
-  125 t_rcurly    , value     0, ""
-  126 t_tilde     , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-15677 t_eq_eq     , value     0, ""
-15422 t_lt_gt     , value     0, ""
- 8509 t_exclam_eq , value     0, ""
-15421 t_lt_eq     , value     0, ""
-15933 t_gt_eq     , value     0, ""
-31868 t_vbar_vbar , value     0, ""
- 9766 t_and_and   , value     0, ""
-15420 t_lt_lt     , value     0, ""
-15934 t_gt_gt     , value     0, ""
-10794 t_star_star , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    1 t_name      , value     0, "_ABC_123"
-    1 t_name      , value     0, "ABC_123"
-    3 t_number    , value   123, ""
-    1 t_name      , value     0, "_ABC_"
-   10 t_newline   , value     0, ""
-    1 t_name      , value     0, "ABC_123"
-    1 t_name      , value     0, "AF'"
-    1 t_name      , value     0, "B"
-    3 t_number    , value    99, ""
-    1 t_name      , value     0, "D"
-    3 t_number    , value   101, ""
-    1 t_name      , value     0, "AF'"
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-    2 t_label     , value     0, "ABC"
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "DEF"
-    1 t_name      , value     0, "GHI"
-   58 t_colon     , value     0, ""
-   46 t_dot       , value     0, ""
-    1 t_name      , value     0, "JKL"
-   58 t_colon     , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value 2147483647, ""
-Warning at file 'test3.asm' line 17: integer '-2147483648' out of range
-    3 t_number    , value -2147483648, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value     3, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     1, ""
-    3 t_number    , value     8, ""
-    3 t_number    , value   128, ""
-    3 t_number    , value  2048, ""
-    3 t_number    , value 32768, ""
-    3 t_number    , value 524288, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value 8388608, ""
-    3 t_number    , value 134217728, ""
-   10 t_newline   , value     0, ""
-Warning at file 'test3.asm' line 28: integer '-2147483648' out of range
-    3 t_number    , value -2147483648, ""
-Warning at file 'test3.asm' line 28: integer '-2147483648' out of range
-    3 t_number    , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-    3 t_number    , value     0, ""
-    3 t_number    , value    10, ""
-    3 t_number    , value    15, ""
-    3 t_number    , value 2147483647, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "strings - single-quote"
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 37: invalid single quoted character
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 38: invalid single quoted character
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 39: invalid single quoted character
-   10 t_newline   , value     0, ""
-    3 t_number    , value    97, ""
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 41: invalid single quoted character
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "strings - double-quotes"
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 44: unclosed quoted string
-   10 t_newline   , value     0, ""
-Error at file 'test3.asm' line 45: unclosed quoted string
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, ""
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "a"
-   10 t_newline   , value     0, ""
-    4 t_string    , value     0, "aa"
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test4.asm" by lines (0)
-    4 t_string    , value     0, ""Very long number token" 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000012345<0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test4.asm" by tokens (0)
-    4 t_string    , value     0, "Very long number token"
-    3 t_number    , value 12345, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test4.asm" by lines (1)
-    4 t_string    , value     0, ""Very long number token" 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000012345<0A>"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test4.asm" by tokens (1)
-    4 t_string    , value     0, "Very long number token"
-    3 t_number    , value 12345, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Test scan stack
-Text: start:ld a,25
-    2 t_label     , value     0, "START"
-    1 t_name      , value     0, "LD"
-    1 t_name      , value     0, "A"
-   44 t_comma     , value     0, ""
-Insert text: 2*
-    3 t_number    , value     2, ""
-   42 t_star      , value     0, ""
-    3 t_number    , value    25, ""
-   10 t_newline   , value     0, ""
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-ERR
-
-
-# recursive includes
-t_compile_module($init, <<'END', $objs);
-	int i, j;
-	
-	for ( j = 0; j < 2; j++ )
-	{
-		for ( i = 1; i < argc; i++ )
-		{
-			warn("Scan file \"%s\"\n", argv[i] );
-			scan_file( argv[i] );
-			get_tokens( NULL, 4, FALSE );
-			warn("\n");
-		}
-	}
-END
-
-t_run_module( [ asm1_file(), asm2_file(), asm3_file(), asm4_file() ], '', <<'ERR', 1); 
-Scan file "test1.asm"
-    0 t_end       , value     0, ""
-    0 t_end       , value     0, ""
-
-Scan file "test2.asm"
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-
-Scan file "test3.asm"
-   10 t_newline   , value     0, ""
-   33 t_exclam    , value     0, ""
-   35 t_hash      , value     0, ""
-   36 t_dollar    , value     0, ""
-
-Scan file "test4.asm"
-    4 t_string    , value     0, "Very long number token"
-    3 t_number    , value 12345, ""
-   10 t_newline   , value     0, ""
-   37 t_percent   , value     0, ""
-
-Scan file "test1.asm"
-   38 t_and       , value     0, ""
-   40 t_lparen    , value     0, ""
-   41 t_rparen    , value     0, ""
-   42 t_star      , value     0, ""
-
-Scan file "test2.asm"
-Error at file 'test3.asm' line 2: cannot include file 'test2.asm' recursively
-Uncaught runtime exception at errors.c(1)
-ERR
-
-
-
-# test file stack and line numbers
-write_file(asm1_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
-write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n");
-write_file(asm3_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r");
-write_file(asm4_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r\n");
-write_file(asm5_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n\r");
-write_file(asm6_file(), {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
-write_file(asm7_file(), {binmode => ':raw'}, "");
-
-t_compile_module($init, <<'END', $objs);
-	char *files[] = {"test1.asm", "test2.asm", "test3.asm", "test4.asm", 
-					 "test5.asm", "test6.asm", "test7.asm", NULL};
-	int i;
-	char *text;
-	
-	if (argc == 2 && strcmp(argv[1], "-C") == 0) opts.line_mode = TRUE;
-	if (argc == 2 && strcmp(argv[1], "-l") == 0) opts.list = opts.cur_list = TRUE;
-	
-	i = 0;
-	warn("Scan %s\n", files[i] );
-	scan_file( files[i++] );
-	
-	while ( text = get_line() )
-	{
-		warn_option_deprecated("");
-		dump_string(text);
-		warn("\n");
-		
-		if (files[i]) 
-		{
-			warn("Scan %s\n", files[i] );
-			scan_file( files[i++] );
-		}
-	}
-	
-END
-
-t_run_module([], '', <<'ERR', 0);
-Scan test1.asm
-Warning at file 'test1.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test2.asm
-Warning at file 'test2.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test3.asm
-Warning at file 'test3.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test4.asm
-Warning at file 'test4.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test5.asm
-Warning at file 'test5.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test6.asm
-Warning at file 'test6.asm' line 1: option '' is deprecated
-"ABCDEFGHIJ<0A>"
-Scan test7.asm
-Warning at file 'test6.asm' line 2: option '' is deprecated
-"abcdefghij<0A>"
-Warning at file 'test5.asm' line 2: option '' is deprecated
-"B<0A>"
-Warning at file 'test5.asm' line 3: option '' is deprecated
-"C<0A>"
-Warning at file 'test5.asm' line 4: option '' is deprecated
-"D<0A>"
-Warning at file 'test5.asm' line 5: option '' is deprecated
-"E<0A>"
-Warning at file 'test4.asm' line 2: option '' is deprecated
-"B<0A>"
-Warning at file 'test4.asm' line 3: option '' is deprecated
-"C<0A>"
-Warning at file 'test4.asm' line 4: option '' is deprecated
-"D<0A>"
-Warning at file 'test4.asm' line 5: option '' is deprecated
-"E<0A>"
-Warning at file 'test3.asm' line 2: option '' is deprecated
-"B<0A>"
-Warning at file 'test3.asm' line 3: option '' is deprecated
-"C<0A>"
-Warning at file 'test3.asm' line 4: option '' is deprecated
-"D<0A>"
-Warning at file 'test3.asm' line 5: option '' is deprecated
-"E<0A>"
-Warning at file 'test2.asm' line 2: option '' is deprecated
-"B<0A>"
-Warning at file 'test2.asm' line 3: option '' is deprecated
-"C<0A>"
-Warning at file 'test2.asm' line 4: option '' is deprecated
-"D<0A>"
-Warning at file 'test2.asm' line 5: option '' is deprecated
-"E<0A>"
-Warning at file 'test1.asm' line 2: option '' is deprecated
-"B<0A>"
-Warning at file 'test1.asm' line 3: option '' is deprecated
-"C<0A>"
-Warning at file 'test1.asm' line 4: option '' is deprecated
-"D<0A>"
-Warning at file 'test1.asm' line 5: option '' is deprecated
-"E<0A>"
-ERR
-
-t_run_module(['-l'], '', <<'ERR', 0);
-Scan test1.asm
-0000 test1.asm            1 A
-Warning at file 'test1.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test2.asm
-0000 test2.asm            1 A
-Warning at file 'test2.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test3.asm
-0000 test3.asm            1 A
-Warning at file 'test3.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test4.asm
-0000 test4.asm            1 A
-Warning at file 'test4.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test5.asm
-0000 test5.asm            1 A
-Warning at file 'test5.asm' line 1: option '' is deprecated
-"A<0A>"
-Scan test6.asm
-0000 test6.asm            1 ABCDEFGHIJ
-Warning at file 'test6.asm' line 1: option '' is deprecated
-"ABCDEFGHIJ<0A>"
-Scan test7.asm
-0000 test6.asm            2 abcdefghij
-Warning at file 'test6.asm' line 2: option '' is deprecated
-"abcdefghij<0A>"
-0000 test5.asm            2 B
-Warning at file 'test5.asm' line 2: option '' is deprecated
-"B<0A>"
-0000 test5.asm            3 C
-Warning at file 'test5.asm' line 3: option '' is deprecated
-"C<0A>"
-0000 test5.asm            4 D
-Warning at file 'test5.asm' line 4: option '' is deprecated
-"D<0A>"
-0000 test5.asm            5 E
-Warning at file 'test5.asm' line 5: option '' is deprecated
-"E<0A>"
-0000 test4.asm            2 B
-Warning at file 'test4.asm' line 2: option '' is deprecated
-"B<0A>"
-0000 test4.asm            3 C
-Warning at file 'test4.asm' line 3: option '' is deprecated
-"C<0A>"
-0000 test4.asm            4 D
-Warning at file 'test4.asm' line 4: option '' is deprecated
-"D<0A>"
-0000 test4.asm            5 E
-Warning at file 'test4.asm' line 5: option '' is deprecated
-"E<0A>"
-0000 test3.asm            2 B
-Warning at file 'test3.asm' line 2: option '' is deprecated
-"B<0A>"
-0000 test3.asm            3 C
-Warning at file 'test3.asm' line 3: option '' is deprecated
-"C<0A>"
-0000 test3.asm            4 D
-Warning at file 'test3.asm' line 4: option '' is deprecated
-"D<0A>"
-0000 test3.asm            5 E
-Warning at file 'test3.asm' line 5: option '' is deprecated
-"E<0A>"
-0000 test2.asm            2 B
-Warning at file 'test2.asm' line 2: option '' is deprecated
-"B<0A>"
-0000 test2.asm            3 C
-Warning at file 'test2.asm' line 3: option '' is deprecated
-"C<0A>"
-0000 test2.asm            4 D
-Warning at file 'test2.asm' line 4: option '' is deprecated
-"D<0A>"
-0000 test2.asm            5 E
-Warning at file 'test2.asm' line 5: option '' is deprecated
-"E<0A>"
-0000 test1.asm            2 B
-Warning at file 'test1.asm' line 2: option '' is deprecated
-"B<0A>"
-0000 test1.asm            3 C
-Warning at file 'test1.asm' line 3: option '' is deprecated
-"C<0A>"
-0000 test1.asm            4 D
-Warning at file 'test1.asm' line 4: option '' is deprecated
-"D<0A>"
-0000 test1.asm            5 E
-Warning at file 'test1.asm' line 5: option '' is deprecated
-"E<0A>"
-ERR
-
-t_run_module(['-C'], '', <<'ERR', 0);
-Scan test1.asm
-Warning at file 'test1.asm': option '' is deprecated
-"A<0A>"
-Scan test2.asm
-Warning at file 'test2.asm': option '' is deprecated
-"A<0A>"
-Scan test3.asm
-Warning at file 'test3.asm': option '' is deprecated
-"A<0A>"
-Scan test4.asm
-Warning at file 'test4.asm': option '' is deprecated
-"A<0A>"
-Scan test5.asm
-Warning at file 'test5.asm': option '' is deprecated
-"A<0A>"
-Scan test6.asm
-Warning at file 'test6.asm': option '' is deprecated
-"ABCDEFGHIJ<0A>"
-Scan test7.asm
-Warning at file 'test6.asm': option '' is deprecated
-"abcdefghij<0A>"
-Warning at file 'test5.asm': option '' is deprecated
-"B<0A>"
-Warning at file 'test5.asm': option '' is deprecated
-"C<0A>"
-Warning at file 'test5.asm': option '' is deprecated
-"D<0A>"
-Warning at file 'test5.asm': option '' is deprecated
-"E<0A>"
-Warning at file 'test4.asm': option '' is deprecated
-"B<0A>"
-Warning at file 'test4.asm': option '' is deprecated
-"C<0A>"
-Warning at file 'test4.asm': option '' is deprecated
-"D<0A>"
-Warning at file 'test4.asm': option '' is deprecated
-"E<0A>"
-Warning at file 'test3.asm': option '' is deprecated
-"B<0A>"
-Warning at file 'test3.asm': option '' is deprecated
-"C<0A>"
-Warning at file 'test3.asm': option '' is deprecated
-"D<0A>"
-Warning at file 'test3.asm': option '' is deprecated
-"E<0A>"
-Warning at file 'test2.asm': option '' is deprecated
-"B<0A>"
-Warning at file 'test2.asm': option '' is deprecated
-"C<0A>"
-Warning at file 'test2.asm': option '' is deprecated
-"D<0A>"
-Warning at file 'test2.asm': option '' is deprecated
-"E<0A>"
-Warning at file 'test1.asm': option '' is deprecated
-"B<0A>"
-Warning at file 'test1.asm': option '' is deprecated
-"C<0A>"
-Warning at file 'test1.asm': option '' is deprecated
-"D<0A>"
-Warning at file 'test1.asm': option '' is deprecated
-"E<0A>"
-ERR
-
-
-
-unlink_testfiles();
+unlink <test.*>;
 done_testing;
 
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.35 2014-02-08 18:30:49 pauloscustodio Exp $
+
 # $Log: whitebox-scan.t,v $
-# Revision 1.35  2014-02-08 18:30:49  pauloscustodio
+# Revision 1.36  2014-02-09 10:16:15  pauloscustodio
+# Remove complexity out of scan.rl by relying on srcfile to handle contexts of
+# recursive includes, and reading of lines of text, and by assuming scan.c
+# will not be reentred, simplifying the keeping of state variables for the scan.
+#
+# Revision 1.35  2014/02/08 18:30:49  pauloscustodio
 # lib/srcfile.c to read source files and handle recursive includes,
 # used to read @lists, removed opts.files;
 # model.c to hold global data model

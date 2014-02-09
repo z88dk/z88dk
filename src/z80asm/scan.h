@@ -12,155 +12,115 @@
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-Scanner
+Scanner - to be processed by: ragel -G2 scan.rl
+Note: the scanner is not reentrant. scan_get() relies on state variables that
+need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.26 2014-02-03 22:04:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.27 2014-02-09 10:16:15 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "class.h"
-#include "types.h"
 #include "strutil.h"
-#include "list.h"
-#include <stdio.h>
+#include "types.h"
 
 /*-----------------------------------------------------------------------------
 *   A scanner token is represented as an integer that is the ascii code for
 *	the single-character token.
 *	0 represents end of input.
-*	The macro T_VALUE() can be used to compute the token value for a
-*	two-character token.
 *	Special tokens have codes that do not overlap with the above.
 *----------------------------------------------------------------------------*/
-#define T_VALUE(c1,c2) ((((c1) & 0xFF) << 8) | ((c2) & 0xFF))
-
-enum token
+typedef enum token
 {
-    t_end		= 0,
-    t_name		= 1,		/* identifier, sets last_token_str in upper case */
-    t_label		= 2,		/* .identifier | identifier:, sets last_token_str in upper case */
-    t_number	= 3,		/* number or single-quoted char, sets last_token_num */
-    t_string	= 4,		/* double-quoted string, sets last_token_str excluding quotes */
+    T_END		= 0,
 
-    t_newline 	= '\n',
-    t_exclam 	= '!',
-    t_hash 		= '#',
-    t_dollar 	= '$',
-    t_percent 	= '%',
-    t_and 		= '&',
-    t_lparen 	= '(',
-    t_rparen 	= ')',
-    t_star 		= '*',
-    t_plus 		= '+',
-    t_comma 	= ',',
-    t_minus 	= '-',
-    t_dot 		= '.',
-    t_slash 	= '/',
-    t_colon 	= ':',
-    t_lt 		= '<',
-    t_eq 		= '=',
-    t_gt 		= '>',
-    t_question 	= '?',
-    t_at 		= '@',
-    t_lsquare 	= '[',
-    t_bslash 	= '\\',
-    t_rsquare 	= ']',
-    t_caret 	= '^',
-    t_bquote 	= '`',
-    t_lcurly 	= '{',
-    t_vbar 		= '|',
-    t_rcurly 	= '}',
-    t_tilde 	= '~',
+    T_NEWLINE 	= '\n',
+	
+    T_EXCLAM 	= '!',
+    T_HASH 		= '#',
+    T_DOLLAR 	= '$',
+    T_PERCENT 	= '%',
+    T_AND 		= '&',
+    T_LPAREN 	= '(',
+    T_RPAREN 	= ')',
+    T_STAR 		= '*',
+    T_PLUS 		= '+',
+    T_COMMA 	= ',',
+    T_MINUS 	= '-',
+    T_DOT 		= '.',
+    T_SLASH 	= '/',
+    T_COLON 	= ':',
+    T_LT 		= '<',
+    T_EQ 		= '=',
+    T_GT 		= '>',
+    T_QUESTION 	= '?',
+    T_AT 		= '@',
+    T_LSQUARE 	= '[',
+    T_BSLASH 	= '\\',
+    T_RSQUARE 	= ']',
+    T_CARET 	= '^',
+    T_BQUOTE 	= '`',
+    T_LCURLY 	= '{',
+    T_VBAR 		= '|',
+    T_RCURLY 	= '}',
+    T_TILDE 	= '~',
 
-    t_eq_eq		= T_VALUE( '=', '=' ),
-    t_lt_gt		= T_VALUE( '<', '>' ),
-    t_exclam_eq	= T_VALUE( '!', '=' ),
-    t_lt_eq		= T_VALUE( '<', '=' ),
-    t_gt_eq		= T_VALUE( '>', '=' ),
-    t_vbar_vbar	= T_VALUE( '|', '|' ),
-    t_and_and	= T_VALUE( '&', '&' ),
-    t_lt_lt		= T_VALUE( '<', '<' ),
-    t_gt_gt		= T_VALUE( '>', '>' ),
-    t_star_star	= T_VALUE( '*', '*' ),
+    T_EQ_EQ		= 128,	/* "==" */
+    T_LT_GT,			/* "<>" */
+    T_EXCLAM_EQ,		/* "!=" */
+    T_LT_EQ,			/* "<=" */
+    T_GT_EQ,			/* ">=" */
+    T_VBAR_VBAR,		/* "||" */
+    T_AND_AND,			/* "&&" */
+    T_LT_LT,			/* "<<" */
+    T_GT_GT,			/* ">>" */
+    T_STAR_STAR,		/* "**" */
 
-};
-
-/*-----------------------------------------------------------------------------
-* Globals - last token retrieved
-*----------------------------------------------------------------------------*/
-extern enum token last_token;
-extern int		  last_token_num;
-extern Str		 *last_token_str;
-
-/*-----------------------------------------------------------------------------
-* State of one scan context
-*----------------------------------------------------------------------------*/
-CLASS( ScanContext )
-	Str		*input;				/* text being scanned */
-
-	FILE	*file;				/* file being scanned, if any */
-	char	*filename;			/* name of file, kept in strpool */
-	int		 line_nr;			/* line number, starting at 1 */
-
-	BOOL	 bol;				/* true if at beginning of line */
-
-	int      cs, act;			/* Ragel state variables */
-	char	*p, *pe, *eof, *ts, *te;
-END_CLASS;
+    T_NAME,				/* identifier, sets last_token_str in upper case */
+    T_LABEL,			/* .identifier | identifier:, sets last_token_str 
+						   in upper case */
+    T_STRING,			/* double-quoted string, sets last_token_str 
+						   excluding quotes */
+    T_NUMBER,			/* number or single-quoted char, sets last_token_num */
+	
+	/* assembly keywords */
+	T_ADD,
+	T_LD,
+	T_NOP,
+	
+} Token;
 
 /*-----------------------------------------------------------------------------
-* Scanner object - stack of ScanContext's
+* 	Globals - last token retrieved
+*	last_token_num and last_token_str keep their values until a new token
+*	of the same type is retrieved.
 *----------------------------------------------------------------------------*/
-CLASS( Scan )
-	ScanContext	*ctx;			/* current context */
-	List		*stack;			/* stack of previous contexts */
-END_CLASS;
+extern Token	 last_token;
+extern long		 last_token_num;
+extern char		*last_token_str;
 
 /*-----------------------------------------------------------------------------
-* Scanner API - methods without Scan* argument operate on a singleton
+* 	Scan API
 *----------------------------------------------------------------------------*/
 
-/* push current scan context, start scanning a string */
-extern void scan_string( char *text );
-extern void scan_string_Scan( Scan *self, char *text );
-
-/* push current scan context, start scanning a file */
-extern void scan_file( char *filename );
-extern void scan_file_Scan( Scan *self, char *filename );
+/* prepare for scanning string, bol = TRUE if string is at start of a line,
+   to detect label definitions */
+extern void scan_reset( char *text, BOOL _at_bol );
 
 /* get the next token, set last_tokenXXX as side-effect */
-extern enum token get_token( void );
-extern enum token get_token_Scan( Scan *self );
-
-/* get the next input line from file - return pointer to
-   input string in ScanConext, or NULL at end of input */
-extern char *get_line( void );
-extern char *get_line_Scan( Scan *self );
-
-#if 0
-/*-----------------------------------------------------------------------------
-* Bridge to OLD-SCAN interface
-*----------------------------------------------------------------------------*/
-#include "symbol.h"
-
-/* last returned symbol */
-extern enum symbols sym;
-extern char ident[];
-
-/* get the next token */
-extern enum symbols GetSym( void );
-
-/* skip to end of line */
-extern void Skipline( void );
-#endif
+extern Token scan_get( void );
 
 
 /*
 * $Log: scan.h,v $
-* Revision 1.26  2014-02-03 22:04:03  pauloscustodio
+* Revision 1.27  2014-02-09 10:16:15  pauloscustodio
+* Remove complexity out of scan.rl by relying on srcfile to handle contexts of
+* recursive includes, and reading of lines of text, and by assuming scan.c
+* will not be reentred, simplifying the keeping of state variables for the scan.
+*
+* Revision 1.26  2014/02/03 22:04:03  pauloscustodio
 * ws
 *
 * Revision 1.25  2014/01/11 01:29:40  pauloscustodio
