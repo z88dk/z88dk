@@ -14,10 +14,21 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.4 2013-12-15 23:38:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.5 2014-02-11 15:18:56 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
-# ragel
+# EXESUFFIX needs to be defined as .exe for windows
+#------------------------------------------------------------------------------
+ifndef EXESUFFIX
+  ifeq ($(OS),Windows_NT)
+    EXESUFFIX := .exe
+  else
+    EXESUFFIX := 
+  endif
+endif
+
+#------------------------------------------------------------------------------
+# ragel lexer generator
 #------------------------------------------------------------------------------
 all : scan.c
 
@@ -26,6 +37,25 @@ scan.c : scan.rl dev/Makefile
 	perl -i.bak -pe "s/^#line/\/\/#line/; s/\x24Header/:Header/; s/\x24Log/:Log/;" scan.c
 	$(RM) scan.c.bak
 
+#------------------------------------------------------------------------------
+# Lemon parser generator
+#------------------------------------------------------------------------------
+#LEMON := 		dev/lemon$(EXESUFFIX)
+#LEMON_SRC := 	dev/lemon.c
+#LEMON_TMPL := 	dev/lempar.c
+#
+#all : grammar.c
+#
+#grammar.c grammar.h : $(LEMON) $(LEMON_TMPL) grammar.y dev/Makefile
+#	$(LEMON) grammar.y
+#
+#clean::
+#	$(RM) grammar.out $(LEMON)
+#
+#$(LEMON) : $(LEMON_SRC)
+#	$(CC) $(CFLAGS) -o $(LEMON) $(LEMON_SRC)
+#
+#
 #------------------------------------------------------------------------------
 # flex
 #------------------------------------------------------------------------------
@@ -43,7 +73,10 @@ scan.c : scan.rl dev/Makefile
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.4  2013-12-15 23:38:49  pauloscustodio
+# Revision 1.5  2014-02-11 15:18:56  pauloscustodio
+# Add (commented) lemon parser generation.
+#
+# Revision 1.4  2013/12/15 23:38:49  pauloscustodio
 # Remove CVS tags from generated file
 #
 # Revision 1.3  2013/12/15 23:05:54  pauloscustodio
