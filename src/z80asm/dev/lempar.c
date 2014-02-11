@@ -1,6 +1,8 @@
 /* Driver template for the LEMON parser generator.
 ** The author disclaims copyright to this source code.
 */
+#include "xmalloc.h"   /* before any other include */
+#include <assert.h>
 /* First off, code is included that follows the "include" declaration
 ** in the input grammar file. */
 #include <stdio.h>
@@ -45,7 +47,7 @@
 **                       which is ParseTOKENTYPE.  The entry in the union
 **                       for base tokens is called "yy0".
 **    YYSTACKDEPTH       is the maximum depth of the parser's stack.  If
-**                       zero the stack is dynamically sized using realloc()
+**                       zero the stack is dynamically sized using xrealloc()
 **    ParseARG_SDECL     A static variable declaration for the %extra_argument
 **    ParseARG_PDECL     A parameter declaration for the %extra_argument
 **    ParseARG_STORE     Code to store %extra_argument into yypParser
@@ -239,7 +241,7 @@ static void yyGrowStack(yyParser *p){
   yyStackEntry *pNew;
 
   newSize = p->yystksz*2 + 100;
-  pNew = realloc(p->yystack, newSize*sizeof(pNew[0]));
+  pNew = xrealloc(p->yystack, newSize*sizeof(pNew[0]));
   if( pNew ){
     p->yystack = pNew;
     p->yystksz = newSize;
@@ -256,7 +258,7 @@ static void yyGrowStack(yyParser *p){
 /* 
 ** This function allocates a new parser.
 ** The only argument is a pointer to a function which works like
-** malloc.
+** xmalloc.
 **
 ** Inputs:
 ** A pointer to the function used to allocate memory.
@@ -344,7 +346,7 @@ static int yy_pop_parser_stack(yyParser *pParser){
 ** <li>  A pointer to the parser.  This should be a pointer
 **       obtained from ParseAlloc.
 ** <li>  A pointer to a function used to reclaim memory obtained
-**       from malloc.
+**       from xmalloc.
 ** </ul>
 */
 void ParseFree(
@@ -355,7 +357,7 @@ void ParseFree(
   if( pParser==0 ) return;
   while( pParser->yyidx>=0 ) yy_pop_parser_stack(pParser);
 #if YYSTACKDEPTH<=0
-  free(pParser->yystack);
+  xfree(pParser->yystack);
 #endif
   (*freeProc)((void*)pParser);
 }

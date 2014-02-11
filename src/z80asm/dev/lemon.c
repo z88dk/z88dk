@@ -4184,6 +4184,7 @@ void ReportHeader(struct lemon *lemp)
   }
   out = file_open(lemp,".h","wb");
   if( out ){
+    fprintf(out,"#pragma once\n\n");
     for(i=1; i<lemp->nterminal; i++){
       fprintf(out,"#define %s%-30s %3d\n",prefix,lemp->symbols[i]->name,i);
     }
