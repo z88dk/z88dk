@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.5 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.6 2014-02-11 15:20:20 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,12 +50,16 @@ extern char *_xstrdup( char *source, char *file, int lineno );
 extern void _xfree( void *memptr, char *file, int lineno );
 #define xfree(memptr)   ( _xfree((memptr), __FILE__, __LINE__), (memptr) = NULL )
 
-/* to use when a function pointer compatible with free() is expected */
-extern void xfreef( void *memptr );
+/* to use when a function pointer compatible with malloc() and free() is expected */
+extern void *xmallocf( size_t size );
+extern void  xfreef( void *memptr );
 
 /*
 * $Log: xmalloc.h,v $
-* Revision 1.5  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.6  2014-02-11 15:20:20  pauloscustodio
+* Add xmallocf() to be used when a function pointer compatible with malloc is needed.
+*
+* Revision 1.5  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
