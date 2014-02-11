@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.69 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.70 2014-02-11 15:27:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,7 +26,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.69 2014-01-20 23
 #include "listfile.h"
 #include "model.h"
 #include "options.h"
-#include "scan.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
@@ -768,7 +767,18 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.69  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.70  2014-02-11 15:27:19  pauloscustodio
+* Removed Bison parser files (which where a very incomplete work in progress).
+*
+* Bison grammar not practical due to dual nature of z80asm keywords, i.e.
+* DEFC NOP = 3 ; define a constant called NOP
+* NOP ; assemble a NOP instruction
+* LD A,NOP ; loads A with 3
+*
+* A Bison grammar requires the NOP to be a terminal token, which complicates
+* the lexer to be able to return a NAME or a NOP depending on context.
+*
+* Revision 1.69  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.68  2014/01/11 01:29:40  pauloscustodio

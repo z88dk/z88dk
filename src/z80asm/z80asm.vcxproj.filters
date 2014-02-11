@@ -57,12 +57,6 @@
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sym.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -135,6 +129,9 @@
     <ClInclude Include="lib\srcfile.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="scan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -183,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model_symref.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model.c">
@@ -239,12 +233,12 @@
     <ClCompile Include="lib\srcfile.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
+    <ClCompile Include="scan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scan.rl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="parse.y">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

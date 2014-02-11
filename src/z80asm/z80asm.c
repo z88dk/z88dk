@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.136 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.137 2014-02-11 15:27:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,7 +29,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.136 2014-02-08 18
 #include "mapfile.h"
 #include "objfile.h"
 #include "options.h"
-#include "scan.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
@@ -750,7 +749,18 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.136  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.137  2014-02-11 15:27:19  pauloscustodio
+* Removed Bison parser files (which where a very incomplete work in progress).
+*
+* Bison grammar not practical due to dual nature of z80asm keywords, i.e.
+* DEFC NOP = 3 ; define a constant called NOP
+* NOP ; assemble a NOP instruction
+* LD A,NOP ; loads A with 3
+*
+* A Bison grammar requires the NOP to be a terminal token, which complicates
+* the lexer to be able to return a NAME or a NOP depending on context.
+*
+* Revision 1.136  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model
