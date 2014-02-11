@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.14 2014-01-11 01:29:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.15 2014-02-11 15:10:10 pauloscustodio Exp $
 */
 
 #pragma once
@@ -54,13 +54,13 @@ extern void fread_codearea_offset( FILE *stream, size_t offset, size_t size );  
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_byte( size_t *paddr, byte_t byte );   /* one byte */
+extern void  patch_byte( size_t *paddr, byte_t byte );		/* one byte */
 extern void append_byte( byte_t byte );
 
-extern void  patch_word( size_t *paddr, int word );             /* 2-byte word */
+extern void  patch_word( size_t *paddr, int word );			/* 2-byte word */
 extern void append_word( int word );
 
-extern void  patch_long( size_t *paddr, long dword );           /* 4-byte long */
+extern void  patch_long( size_t *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
 /*-----------------------------------------------------------------------------
@@ -72,7 +72,10 @@ extern byte_t get_byte( size_t *paddr );
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.14  2014-01-11 01:29:39  pauloscustodio
+* Revision 1.15  2014-02-11 15:10:10  pauloscustodio
+* ws
+*
+* Revision 1.14  2014/01/11 01:29:39  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
