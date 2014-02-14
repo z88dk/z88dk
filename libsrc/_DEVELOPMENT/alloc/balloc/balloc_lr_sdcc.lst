@@ -1,0 +1,6 @@
+c/lr_sdcc/ba_addmem
+c/lr_sdcc/ba_alloc
+c/lr_sdcc/ba_blockcount
+c/lr_sdcc/ba_firstfit
+c/lr_sdcc/ba_free
+c/lr_sdcc/ba_init

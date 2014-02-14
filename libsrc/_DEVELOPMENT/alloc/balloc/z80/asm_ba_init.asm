@@ -9,8 +9,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_ba_init
 
 LIB asm_forward_list_init

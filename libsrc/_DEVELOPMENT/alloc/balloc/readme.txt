@@ -1,11 +1,10 @@
 
-balloc
-======
+BLOCK ALLOCATOR (BALLOC)
 
-A block memory allocator that allocates available fixed-size blocks from queues holding a linked list of available blocks.  Allocation and deallocation is very quick.
+The block allocator maintains an array of linked lists of available memory blocks.  Each array index's linked list contains blocks of the same size.  It is suggested that the size of the blocks increases with array index to be compatible with ba_firstfit().
 
-An array of queues is maintained in a "qtbl", with each queue addressed by an integer index.  The user adds available memory to each queue with the ba_addmem() function and is therefore responsible for determining the size of blocks in each queue.  The ba_bestfit() function assumes the queues are ordered in increasing size order and allocates from the first queue it examines that has an available block.
+The programmer is responsible for adding available memory blocks to each index.  This memory can come from anywhere, including memory in different banks.  It is the responsibility of the programmer to ensure the appropriate bank and the allocator array is paged in when a block is allocated or freed.
 
-Each queue is forward_list container.
+The allocator array is a property of the thread and can be swapped out on context switch.
 
-Each block has an overhead of one byte which identifies which queue the block came from.  The minimum block size is therefore three bytes.
+Block allocation and deallocation is very quick and has no external fragmentation.  Each allocated block does incur a one byte overhead to identify the array index the block belongs to.  For these reasons, block allocation is an attractive alternative to the heap for frequent allocation of small fixed-size blocks.

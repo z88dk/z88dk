@@ -1,0 +1,8 @@
+c/lr_sccz80/ba_addmem
+c/lr_sccz80/ba_addmem_callee
+c/lr_sccz80/ba_alloc
+c/lr_sccz80/ba_blockcount
+c/lr_sccz80/ba_firstfit
+c/lr_sccz80/ba_firstfit_callee
+c/lr_sccz80/ba_free
+c/lr_sccz80/ba_init

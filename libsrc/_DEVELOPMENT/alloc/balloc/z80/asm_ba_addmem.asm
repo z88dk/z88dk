@@ -14,8 +14,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_ba_addmem
 
 LIB asm_forward_list_insert_after

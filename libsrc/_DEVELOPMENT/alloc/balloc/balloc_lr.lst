@@ -1,8 +1,0 @@
-c/c_lr/ba_addmem
-c/c_lr/ba_addmem_callee
-c/c_lr/ba_bestfit
-c/c_lr/ba_bestfit_callee
-c/c_lr/ba_blockcount
-c/c_lr/ba_free
-c/c_lr/ba_init
-c/c_lr/ba_malloc

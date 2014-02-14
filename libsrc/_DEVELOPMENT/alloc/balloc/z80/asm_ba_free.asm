@@ -10,8 +10,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_ba_free
 
 LIB asm_forward_list_insert_after

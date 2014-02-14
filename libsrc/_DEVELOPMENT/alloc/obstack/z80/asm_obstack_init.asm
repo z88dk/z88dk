@@ -24,29 +24,12 @@ asm_obstack_init:
    ;            carry reset
    ;            hl = struct obstack *ob
    ;
-   ;         fail if size too small
-   ;
-   ;            carry set, einval
-   ;            hl = 0
-   ;
    ;         fail if obstack wraps 64k boundary
    ;
    ;            carry set, einval
    ;            hl = 0
    ;
    ; uses  : af, de, hl
-
-   ; size must be at least six for obstack header
-
-   ld a,b
-   or a
-   jp nz, big_enough
-
-   ld a,c
-   cp __ob_mem + 1             ; header plus one byte
-   jp c, error_einval_zc
-
-big_enough:
 
    push de                     ; save ob
 
