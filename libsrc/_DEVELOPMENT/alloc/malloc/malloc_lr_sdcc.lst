@@ -31,3 +31,7 @@ c/lr_sdcc/_falloc
 c/lr_sdcc/_falloc_unlocked
 c/lr_sdcc/_galloc
 c/lr_sdcc/_galloc_unlocked
+z80/__heap_allocate_block
+z80/__heap_lock_acquire
+z80/__heap_lock_release
+z80/__heap_place_block

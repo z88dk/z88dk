@@ -61,3 +61,7 @@ c/lr_sccz80/_galloc
 c/lr_sccz80/_galloc_callee
 c/lr_sccz80/_galloc_unlocked
 c/lr_sccz80/_galloc_unlocked_callee
+z80/__heap_allocate_block
+z80/__heap_lock_acquire
+z80/__heap_lock_release
+z80/__heap_place_block
