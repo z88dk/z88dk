@@ -10,8 +10,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_quick_exit
 
 LIB asm0_exit

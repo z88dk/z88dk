@@ -13,7 +13,7 @@
 XLIB asm_ultoa
 XDEF asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
 
-LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x32
+LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8
 LIB l_num2char, l_ultoa, l_ultoh, l_ultoo, l_ultob
 
 asm_ultoa:
@@ -73,19 +73,9 @@ compute_lp:
    ;   bc = radix
    
    push bc                     ; save radix
-   
-   push de
-   push hl
-   ld de,0
-   ld l,c
-   ld h,b
-   call l0_divu_32_32x32       ; dehl = num/radix, l' = num%radix
-   
+   call l0_divu_32_32x8        ; dehl = num/radix, a = num%radix
    pop bc                      ; bc = radix
-   
-   exx
-   ld a,l
-   exx
+
    call l_num2char
    scf
    push af                     ; digit onto stack

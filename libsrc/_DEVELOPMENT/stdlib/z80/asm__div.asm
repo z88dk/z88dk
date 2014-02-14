@@ -23,20 +23,21 @@ LIB l_divs_16_16x16
 asm__div:
 
    ; enter : bc = div_t *
-   ;         hl = denom
-   ;         de = numer
+   ;         de = denom
+   ;         hl = numer
    ;
-   ; exit  : div_t -> quot = numer / denom = de / hl
-   ;         div_t -> rem  = numer % denom = de % hl
+   ; exit  : div_t.rem  = numer % denom = hl % de
+   ;         div_t.quot = numer / denom = hl / de
    ;
-   ;         bc = de / hl
-   ;         de = de % hl
+   ;         bc = hl / de
+   ;         hl = hl / de
+   ;         de = hl % de
    ;
    ; uses  : af, bc, de, hl
    
    push bc                     ; save div_t *
    
-   call l_divs_16_16x16        ; hl = de/hl, de = de%hl
+   call l_divs_16_16x16        ; hl = hl/de, de = hl%de
    
    ex (sp),hl                  ; hl = div_t *
    
@@ -45,10 +46,12 @@ asm__div:
    ld (hl),d
    inc hl
    
-   pop bc                      ; bc = de / hl
+   pop bc                      ; bc = hl/de
    
    ld (hl),c
    inc hl
    ld (hl),b
    
+   ld l,c
+   ld h,b
    ret

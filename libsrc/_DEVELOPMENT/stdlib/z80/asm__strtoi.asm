@@ -61,7 +61,7 @@ asm__strtoi:
 positive_overflow:
    
    call error_erange_mc
-   res 7,h                     ; hl = $7fff = INT_MAX
+   ld h,$7f                    ; hl = $7fff = INT_MAX
    ret
    
 check_errors:
@@ -76,5 +76,5 @@ check_errors:
    jr nz, positive_overflow
 
    call error_erange_zc
-   set 7,h                     ; hl = $8000 = INT_MIN
+   ld h,$80                    ; hl = $8000 = INT_MIN
    ret

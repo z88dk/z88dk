@@ -177,8 +177,8 @@ loop:
    push bc                     ; save digit and base
    push de                     ; save char *
    
-   ld a,c                      ; a = base
-   call l_mulu_24_16x8         ; AHL = HL * A
+   ld e,c                      ; e = base
+   call l_mulu_24_16x8         ; AHL = HL * E
    
    pop de                      ; de = char *
    pop bc                      ; bc = digit and base

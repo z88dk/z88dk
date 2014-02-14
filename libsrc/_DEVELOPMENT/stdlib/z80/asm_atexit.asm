@@ -10,8 +10,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_atexit
 XDEF asm0_atexit
 

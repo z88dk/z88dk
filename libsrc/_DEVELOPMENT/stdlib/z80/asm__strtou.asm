@@ -58,5 +58,5 @@ asm__strtou:
    ; signed overflow
    
    call error_erange_zc
-   set 7,h                     ; hl = $8000 = INT_MIN
+   ld h,$80                    ; hl = $8000 = INT_MIN
    ret
