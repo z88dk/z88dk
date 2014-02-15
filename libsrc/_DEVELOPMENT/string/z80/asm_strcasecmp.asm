@@ -16,7 +16,7 @@ XDEF asm_stricmp
 LIB asm_tolower
 
 asm_strcasecmp:
-asm_stricmp:
+stricmp:
 
    ; enter : hl = char *s2
    ;         de = char *s1

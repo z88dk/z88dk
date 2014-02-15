@@ -16,8 +16,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_strxfrm
 
 LIB asm_strlen, error_zc

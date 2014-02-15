@@ -11,7 +11,7 @@
 
 XLIB asm_strerror
 
-LIB error_strings, error_string_default, __str_locate_nul
+LIB __error_strings, __error_string_default, __str_locate_nul
 
 asm_strerror:
 
@@ -29,11 +29,9 @@ asm_strerror:
    ld e,l
    ld hl,error_strings
    
-search_loop:
-
    ld a,(hl)
-   or a
-   jr z, use_default           ; if errnum not found
+   
+search_loop:
    
    cp e
    inc hl
@@ -43,7 +41,9 @@ search_loop:
    call __str_locate_nul
    inc hl
    
-   jp search_loop
+   ld a,(hl)
+   or a
+   jr nz, search_loop          ; if end of strings not met
 
 use_default:
 

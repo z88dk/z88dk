@@ -1,0 +1,14 @@
+
+; int strncmp(const char *s1, const char *s2, size_t n)
+
+XDEF strncmp_callee
+
+strncmp_callee:
+
+   pop af
+   pop bc
+   pop hl
+   pop de
+   push af
+   
+   INCLUDE "../../z80/asm_strncmp.asm"

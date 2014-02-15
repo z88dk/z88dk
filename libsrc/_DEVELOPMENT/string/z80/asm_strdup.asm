@@ -11,8 +11,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_strdup
 XDEF asm0_strdup
 
@@ -51,7 +49,7 @@ asm0_strdup:
    pop bc                      ; bc = length
    
    pop de                      ; de = char *s
-   jp c, error_enomem_zc
+   ret c                       ; malloc error
    
    push hl                     ; save char *str (dup)
 

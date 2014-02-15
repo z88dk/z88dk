@@ -11,8 +11,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_strcoll
 
 asm_strcoll:

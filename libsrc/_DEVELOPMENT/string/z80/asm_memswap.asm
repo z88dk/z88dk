@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *memswap_callee(void *s1, void *s2, size_t n)
+; void *memswap(void *s1, void *s2, size_t n)
 ;
 ; Swap n bytes pointed at by s1 and s2.
 ;

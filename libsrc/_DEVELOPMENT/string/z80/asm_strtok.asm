@@ -23,8 +23,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB asm_strtok
 
 LIB asm_strtok_r
