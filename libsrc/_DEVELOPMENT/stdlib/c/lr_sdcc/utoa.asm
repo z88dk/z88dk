@@ -15,4 +15,11 @@ utoa:
    push bc
    push af
    
+   push ix
+   
+   call asm_utoa
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_utoa.asm"

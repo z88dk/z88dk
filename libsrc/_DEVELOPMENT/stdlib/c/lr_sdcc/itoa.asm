@@ -15,4 +15,11 @@ itoa:
    push bc
    push af
    
+   push ix
+   
+   call asm_itoa
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_itoa.asm"

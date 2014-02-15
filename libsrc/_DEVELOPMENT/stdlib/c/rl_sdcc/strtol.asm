@@ -15,4 +15,11 @@ strtol:
    push hl
    push af
    
+   push ix
+   
+   call asm_strtol
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_strtol.asm"

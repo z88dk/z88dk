@@ -15,4 +15,11 @@ strtoul:
    push bc
    push af
 
+   push ix
+
+   call asm_strtoul
+
+   pop ix
+   ret
+
    INCLUDE "../../z80/asm_strtoul.asm"
