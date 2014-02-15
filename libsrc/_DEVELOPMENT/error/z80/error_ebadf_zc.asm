@@ -1,4 +1,3 @@
-INCLUDE "../../errorno.inc"
 
 XLIB error_ebadf_zc
 

@@ -1,4 +1,3 @@
-INCLUDE "../../crt_vars.inc"
 
 XLIB errno_zc
 

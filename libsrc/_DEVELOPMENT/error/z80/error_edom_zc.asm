@@ -1,4 +1,3 @@
-INCLUDE "../../errorno.inc"
 
 XLIB error_edom_zc
 XDEF error_divide_by_zero_zc

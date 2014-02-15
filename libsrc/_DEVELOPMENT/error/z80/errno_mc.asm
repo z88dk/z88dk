@@ -1,6 +1,4 @@
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB errno_mc
 
 LIB error_mc

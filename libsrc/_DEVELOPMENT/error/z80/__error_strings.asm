@@ -1,8 +1,8 @@
 
-XLIB error_strings
-XDEF error_string_default
+XLIB __error_strings
+XDEF __error_string_default
 
-error_strings:
+__error_strings:
 
    defb __EOK
    defm "EOK - No error"
@@ -50,7 +50,7 @@ error_strings:
    
    defb 0                      ; strings terminator
 
-error_string_default:
+__error_string_default:
 
    defb "EUNKWN - Unknown"
    defb 0

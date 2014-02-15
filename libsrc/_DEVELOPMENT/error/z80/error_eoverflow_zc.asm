@@ -1,6 +1,4 @@
 
-INCLUDE "../../errorno.inc"
-
 XLIB error_eoverflow_zc
 
 LIB errno_zc
