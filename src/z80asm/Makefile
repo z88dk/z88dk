@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.124 2014-02-09 10:09:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.125 2014-02-16 12:58:14 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -243,7 +243,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.124  2014-02-09 10:09:18  pauloscustodio
+# Revision 1.125  2014-02-16 12:58:14  pauloscustodio
+# depends
+#
+# Revision 1.124  2014/02/09 10:09:18  pauloscustodio
 # depends
 #
 # Revision 1.123  2014/02/08 18:30:49  pauloscustodio
@@ -826,7 +829,7 @@ symtab.o: token_def.h z80asm.h config.h
 z80asm.o: lib/xmalloc.h codearea.h lib/types.h config.h  deffile.h
 z80asm.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/class.h
 z80asm.o: lib/queue.h lib/strutil.h hist.h legacy.h listfile.h symref.h
-z80asm.o: lib/classlist.h mapfile.h objfile.h options.h options_def.h scan.h
+z80asm.o: lib/classlist.h mapfile.h objfile.h options.h options_def.h
 z80asm.o: lib/strpool.h symbol.h model.h symtab.h lib/classhash.h
 z80asm.o: lib/strhash.h lib/uthash.h lib/die.h sym.h token_def.h lib/except.h
 z80asm.o: z80asm.h
@@ -838,7 +841,7 @@ z80instr.o: errors.h errors_def.h codearea.h
 z80pass.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
 z80pass.o: errors_def.h lib/fileutil.h lib/list.h lib/class.h lib/queue.h
 z80pass.o: lib/strutil.h hist.h listfile.h symref.h lib/classlist.h model.h
-z80pass.o: options.h options_def.h scan.h sym.h symbol.h objfile.h symtab.h
+z80pass.o: options.h options_def.h sym.h symbol.h objfile.h symtab.h
 z80pass.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h token_def.h
 z80pass.o: z80asm.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
