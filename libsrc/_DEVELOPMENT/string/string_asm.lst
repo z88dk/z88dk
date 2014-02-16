@@ -21,7 +21,6 @@ z80/asm_strcpy
 z80/asm_strcspn
 z80/asm_strdup
 z80/asm_strerror
-z80/asm_stricmp
 z80/asm_strlcat
 z80/asm_strlcpy
 z80/asm_strlen
@@ -32,7 +31,6 @@ z80/asm_strnchr
 z80/asm_strncmp
 z80/asm_strncpy
 z80/asm_strndup
-z80/asm_strnicmp
 z80/asm_strnlen
 z80/asm_strpbrk
 z80/asm_strrchr
