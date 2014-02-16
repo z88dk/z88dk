@@ -1,7 +1,5 @@
 z80/errno_mc
 z80/errno_zc
-z80/error_divide_by_zero_mc
-z80/error_divide_by_zero_zc
 z80/error_eacces_mc
 z80/error_ebadf_zc
 z80/error_edom_mc
@@ -19,7 +17,6 @@ z80/error_erange_mc
 z80/error_erange_zc
 z80/error_mc
 z80/error_mnc
-z80/error_mulu_overflow_mc
 z80/error_zc
 z80/error_znc
 z80/__error_strings
