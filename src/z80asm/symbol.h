@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.31 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.32 2014-02-17 22:48:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -54,7 +54,7 @@ struct postfixlist
     struct postfixlist *nextoperand;      /* pointer to next element in postfix expression */
     long               operandconst;
     enum symbols       operatortype;
-    char               *id;               /* pointer to identifier */
+    char              *id;                /* pointer to identifier */
     byte_t			   type;              /* type of identifier (local, global, rel. address or constant) */
 };
 
@@ -157,30 +157,13 @@ struct linkedmod
 
 #define CURRENTFILE     CURRENTMODULE->cfile
 
-/* bitmasks for expression evaluation in rangetype */
-#define RANGE           7		/* bitmask 00000111 */   /* Range types are 0 - 4 */
-#define EXPRADDR        8       /* bitmask 00001000 */   /* Expression contains reloc. address label */
-#define EXPRLOCAL       16      /* bitmask 00010000 */   /* Expression contains local symbol */
-#define EXPRGLOBAL      32      /* bitmask 00100000 */   /* Expression contains global symbol */
-#define EXPREXTERN      64      /* bitmask 01000000 */   /* Expression contains extern symbol */
-#define NOTEVALUABLE    128     /* bitmask 10000000 */   /* Expression is not evaluable */
-#define EVALUATED       127     /* bitmask 01111111 */   /* Expression is evaluated */
-#define CLEAR_EXPRADDR  247     /* bitmask 11110111 */   /* Convert to constant expression */
-
-#define RANGE_JROFFSET  0		/* relative jump argument */
-#define RANGE_8UNSIGN   1		/* 8-bit immediate */
-#define RANGE_8SIGN     2		/* (ix+d) */
-#define RANGE_16CONST   3		/* 16-bit immediate */
-#define RANGE_32SIGN    4		/* 32-bit immediate */
-
-/* return 1, 2 or 4 for a rangetype */
-#define RANGE_SIZE(x)	(((x) & RANGE) == RANGE_32SIGN  ? 4 : \
-						 ((x) & RANGE) == RANGE_16CONST ? 2 : \
-														  1 )
-
 /*
 * $Log: symbol.h,v $
-* Revision 1.31  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.32  2014-02-17 22:48:28  pauloscustodio
+* Symbol types and Expression types need to be in sync
+* Move from sym.h and symbol.h to model.h
+*
+* Revision 1.31  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
