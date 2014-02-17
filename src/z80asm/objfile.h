@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.10 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.11 2014-02-17 23:12:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,27 +30,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.10 2014-01-11 01
 *   Object file handle
 *----------------------------------------------------------------------------*/
 CLASS( ObjFile )
-FILE   *file;				/* file handle, if file open */
-long	start_ptr;			/* offset in file to start of object file
+	FILE   *file;				/* file handle, if file open */
+	long	start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
 
-char   *filename;			/* object file name, in strpool */
-char   *modname;			/* module name, in strpool */
+	char   *filename;			/* object file name, in strpool */
+	char   *modname;			/* module name, in strpool */
 
-BOOL	in_library;			/* true if this file is part of a library */
-BOOL	writing;			/* TRUE if writing a new object file,
+	BOOL	in_library;			/* true if this file is part of a library */
+	BOOL	writing;			/* TRUE if writing a new object file,
 								   FALSE if reading */
 
-int		org_addr;			/* defined ORG address, -1 if not defined */
+	int		org_addr;			/* defined ORG address, -1 if not defined */
 
-/* all file pointers are -1 if not defined */
-long	modname_ptr;		/* offset in file to Module Name */
-long	expr_ptr;			/* offset if file to Expression Declaration */
-long	symbols_ptr;		/* offset if file to Name Definition */
-long	externsym_ptr;		/* offset if file to External Name Declaration */
-long	code_ptr;			/* offset if file to Machine Code Block */
+	/* all file pointers are -1 if not defined */
+	long	modname_ptr;		/* offset in file to Module Name */
+	long	expr_ptr;			/* offset if file to Expression Declaration */
+	long	symbols_ptr;		/* offset if file to Name Definition */
+	long	externsym_ptr;		/* offset if file to External Name Declaration */
+	long	code_ptr;			/* offset if file to Machine Code Block */
 
-size_t	code_size;			/* size of code block */
+	size_t	code_size;			/* size of code block */
 
 END_CLASS;
 
@@ -73,7 +73,10 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.10  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.11  2014-02-17 23:12:38  pauloscustodio
+* ws
+*
+* Revision 1.10  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
