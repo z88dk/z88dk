@@ -18,7 +18,7 @@ Scanner - to be processed by: ragel -G2 scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-:Header: /cvsroot/z88dk/z88dk/src/z80asm/scan.rl,v 1.11 2014/01/20 23:29:18 pauloscustodio Exp $ 
+:Header: /cvsroot/z88dk/z88dk/src/z80asm/scan.rl,v 1.12 2014/02/09 10:16:15 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -1973,6 +1973,11 @@ case 42:
 
 /*
 * :Log: scan.rl,v $
+* Revision 1.12  2014/02/09 10:16:15  pauloscustodio
+* Remove complexity out of scan.rl by relying on srcfile to handle contexts of
+* recursive includes, and reading of lines of text, and by assuming scan.c
+* will not be reentred, simplifying the keeping of state variables for the scan.
+*
 * Revision 1.11  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
