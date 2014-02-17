@@ -46,7 +46,7 @@
     <ClCompile>
       <AdditionalOptions>/U "MSDOS" /wd4996 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>LEMON;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;MEMALLOC_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;MEMALLOC_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -91,8 +91,10 @@
     <ClInclude Include="deffile.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />
+    <ClInclude Include="expr.h" />
     <ClInclude Include="hist.h" />
     <ClInclude Include="legacy.h" />
+    <ClInclude Include="lib\array.h" />
     <ClInclude Include="lib\class.h" />
     <ClInclude Include="lib\classhash.h" />
     <ClInclude Include="lib\classlist.h" />
@@ -129,6 +131,7 @@
     <ClCompile Include="codearea.c" />
     <ClCompile Include="deffile.c" />
     <ClCompile Include="errors.c" />
+    <ClCompile Include="expr.c" />
     <ClCompile Include="exprprsr.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />

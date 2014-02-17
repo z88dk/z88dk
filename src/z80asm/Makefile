@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.125 2014-02-16 12:58:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.126 2014-02-17 23:36:07 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -68,6 +68,7 @@ OBJS = 	\
 	codearea.o		\
 	deffile.o		\
 	errors.o		\
+	expr.o			\
 	exprprsr.o		\
 	hist.o			\
 	ldinstr.o		\
@@ -243,7 +244,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.125  2014-02-16 12:58:14  pauloscustodio
+# Revision 1.126  2014-02-17 23:36:07  pauloscustodio
+# Embryo of new expression parser
+#
+# Revision 1.125  2014/02/16 12:58:14  pauloscustodio
 # depends
 #
 # Revision 1.124  2014/02/09 10:09:18  pauloscustodio
@@ -761,12 +765,16 @@ errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/die.h
 errors.o: lib/types.h lib/fileutil.h lib/list.h lib/class.h lib/queue.h
 errors.o: lib/strutil.h lib/srcfile.h lib/strpool.h lib/strhash.h
 errors.o: lib/uthash.h lib/init.h
+expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
+expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
+expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
+expr.o: lib/classlist.h token_def.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
-exprprsr.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/class.h
-exprprsr.o: lib/queue.h lib/strutil.h legacy.h options.h options_def.h
-exprprsr.o: symbol.h model.h objfile.h symtab.h lib/classhash.h lib/strhash.h
-exprprsr.o: lib/uthash.h lib/die.h sym.h symref.h lib/classlist.h token_def.h
-exprprsr.o: lib/except.h z80asm.h
+exprprsr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
+exprprsr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
+exprprsr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+exprprsr.o: symref.h lib/classlist.h token_def.h lib/fileutil.h legacy.h
+exprprsr.o: options.h options_def.h lib/except.h z80asm.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h config.h  z80asm.h lib/types.h sym.h
 ldinstr.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h
