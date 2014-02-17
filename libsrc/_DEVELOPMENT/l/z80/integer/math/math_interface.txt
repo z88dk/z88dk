@@ -1,0 +1,82 @@
+
+All integer math functions must saturate to maximum or minimum values and exit through an error function if an overflow condition arises.
+
+The following interfaces are required by the c library:
+
+===============================
+
+*******************************
+
+l0_divu_16_16x8
+(asm_utoa)
+
++ bypass test for division by zero
++ compute hl = hl / de, e = hl % de
++ modify af, bc, de, hl
+
+*******************************
+
+l0_divu_32_32x8
+(asm_ultoa)
+
++ bypass test for division by zero
++ compute dehl = dehl / c, a = dehl % c
++ modify af, bc, de, hl, bc', de', hl'
+
+*******************************
+
+l_mulu_40_32x8
+(__strtoul)
+
++ compute ADEHL = DEHL * A
++ modify af, bc, de, hl, ixh
+
+*******************************
+
+l_mulu_16_16x16
+(asm_heap_calloc, asm_bsearch, asm_qsort)
+
++ compute hl = hl * de
++ modify af, bc, de, hl
++ carry set on overflow
+
+*******************************
+
+l_divs_16_16x16
+(asm__div)
+
++ compute hl = hl / de, de = hl % de
++ modify af, bc, de, hl
+
+*******************************
+
+l_divs_32_32x32
+(asm__ldiv)
+
++ compute dehl = dehl' / dehl, dehl' = dehl' % dehl
++ modify af, bc, de, hl, bc', de', hl'
+
+*******************************
+
+l_mulu_24_16x8
+(__strtou)
+
++ compute ahl = hl * e
++ modify af, bc, de, hl
+
+*******************************
+
+===============================
+
+
+The following interfaces are requird by the sccz80 C compiler:
+
+==============================
+
+==============================
+
+
+The following interfaces are required by the sdcc C compiler:
+
+==============================
+==============================
