@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.51 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.52 2014-02-17 23:33:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,6 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.51 2014-0
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
+#include "expr.h"
 #include "fileutil.h"
 #include "legacy.h"
 #include "options.h"
@@ -615,14 +616,8 @@ EvalPfixExpr( struct expr *pfixlist )
         }
         while ( pfixexpr != NULL );
 
-        if ( stackptr != NULL )
-        {
-            ret = PopItem( &stackptr );
-        }
-        else
-        {
-            ret = 0;    /* Unbalanced stack - probably during low memory... */
-        }
+        assert( stackptr != NULL );
+        ret = PopItem( &stackptr );
     }
     FINALLY
     {
@@ -721,7 +716,7 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
         break;
 
     default:
-        PushItem( 0, stackptr );
+		assert(0);		/* PushItem( 0, stackptr ); */
         break;
     }
 }
@@ -1108,7 +1103,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.51  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.52  2014-02-17 23:33:37  pauloscustodio
+* Add assert() on impossible paths.
+*
+* Revision 1.51  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.50  2014/01/11 01:29:40  pauloscustodio
