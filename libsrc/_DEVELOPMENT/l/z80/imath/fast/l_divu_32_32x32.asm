@@ -68,12 +68,15 @@ l0_divu_32_32x32:
    ex de,hl
    
    jr c, result_zero
+   jr nz, begin
    
    sbc hl,bc
    add hl,bc
    
    jr c, result_zero
-   
+
+begin:
+
    ; max quotient is 255
    ;
    ; this means the result of the first 24 iterations
