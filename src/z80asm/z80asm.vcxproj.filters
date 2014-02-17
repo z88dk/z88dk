@@ -138,6 +138,9 @@
     <ClInclude Include="lib\array.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="expr_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">

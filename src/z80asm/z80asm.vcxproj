@@ -92,6 +92,7 @@
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />
     <ClInclude Include="expr.h" />
+    <ClInclude Include="expr_def.h" />
     <ClInclude Include="hist.h" />
     <ClInclude Include="legacy.h" />
     <ClInclude Include="lib\array.h" />
