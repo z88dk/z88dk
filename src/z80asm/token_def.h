@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.9 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.10 2014-02-17 23:15:13 pauloscustodio Exp $
 */
 
 #ifndef TOKEN
@@ -76,13 +76,20 @@ TOKEN(	string,		" ", " " )
 /* must be last and empty string to match '\0' */
 TOKEN(	newline,	"",  "" )
 
+/* size of array index by tokens */
+#ifndef NUM_TOKENS
+#define NUM_TOKENS (newline+1)
+#endif
 
 
 #undef TOKEN
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.9  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.10  2014-02-17 23:15:13  pauloscustodio
+* Define NUM_TOKENS to be used as size of arrays.
+*
+* Revision 1.9  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
