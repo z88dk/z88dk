@@ -1,0 +1,14 @@
+c/lr_sccz80/p_forward_list_alt_back
+c/lr_sccz80/p_forward_list_alt_init
+c/lr_sccz80/p_forward_list_alt_insert_after
+c/lr_sccz80/p_forward_list_alt_insert_after_callee
+c/lr_sccz80/p_forward_list_alt_pop_back
+c/lr_sccz80/p_forward_list_alt_pop_front
+c/lr_sccz80/p_forward_list_alt_push_back
+c/lr_sccz80/p_forward_list_alt_push_back_callee
+c/lr_sccz80/p_forward_list_alt_push_front
+c/lr_sccz80/p_forward_list_alt_push_front_callee
+c/lr_sccz80/p_forward_list_alt_remove
+c/lr_sccz80/p_forward_list_alt_remove_after
+c/lr_sccz80/p_forward_list_alt_remove_after_callee
+c/lr_sccz80/p_forward_list_alt_remove_callee

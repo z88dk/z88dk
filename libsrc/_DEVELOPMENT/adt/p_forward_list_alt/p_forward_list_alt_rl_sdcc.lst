@@ -1,0 +1,9 @@
+c/rl_sdcc/p_forward_list_alt_back
+c/rl_sdcc/p_forward_list_alt_init
+c/rl_sdcc/p_forward_list_alt_insert_after
+c/rl_sdcc/p_forward_list_alt_pop_back
+c/rl_sdcc/p_forward_list_alt_pop_front
+c/rl_sdcc/p_forward_list_alt_push_back
+c/rl_sdcc/p_forward_list_alt_push_front
+c/rl_sdcc/p_forward_list_alt_remove
+c/rl_sdcc/p_forward_list_alt_remove_after
