@@ -1,0 +1,10 @@
+c/rl_sdcc/p_list_back
+c/rl_sdcc/p_list_init
+c/rl_sdcc/p_list_insert
+c/rl_sdcc/p_list_insert_after
+c/rl_sdcc/p_list_pop_back
+c/rl_sdcc/p_list_pop_front
+c/rl_sdcc/p_list_push_back
+c/rl_sdcc/p_list_push_front
+c/rl_sdcc/p_list_remove
+c/rl_sdcc/p_list_remove_after

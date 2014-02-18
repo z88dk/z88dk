@@ -1,0 +1,5 @@
+
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_EMPTY
+
+; int p_list_empty(p_list_t *list)
