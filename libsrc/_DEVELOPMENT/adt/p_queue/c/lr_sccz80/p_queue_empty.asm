@@ -1,0 +1,5 @@
+
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_EMPTY
+
+; int p_queue_empty(p_queue_t *q)

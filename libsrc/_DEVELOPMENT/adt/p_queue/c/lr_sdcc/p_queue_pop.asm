@@ -1,0 +1,5 @@
+
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_ALT_POP_FRONT
+
+; void *p_queue_pop(p_queue_t *q)
