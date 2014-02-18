@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.5 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.6 2014-02-18 22:59:06 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -42,6 +42,16 @@ write_file(asm_file(), "nop");
 t_z80asm_capture("-t0 ".asm_file(), "",
 		"Warning: option '-t' is deprecated\n",
 		0);
+
+#------------------------------------------------------------------------------
+# fatal_divide_by_zero - BUG_0040
+unlink_testfiles();
+t_z80asm_error("ld a, 1/0",
+	"Error at file 'test.asm' line 1: division by zero",
+	"-l");
+t_z80asm_error("ld a, 1%0",
+	"Error at file 'test.asm' line 1: division by zero",
+	"-l");
 
 #------------------------------------------------------------------------------
 # fatal_read_file
@@ -1009,7 +1019,11 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.5  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.6  2014-02-18 22:59:06  pauloscustodio
+# BUG_0040: Detect and report division by zero instead of crashing
+# BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+#
+# Revision 1.5  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

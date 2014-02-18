@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.70 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.71 2014-02-18 22:59:06 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.70 2014-02-08 18:30
 
 /*
 * $Log: hist.c,v $
-* Revision 1.70  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.71  2014-02-18 22:59:06  pauloscustodio
+* BUG_0040: Detect and report division by zero instead of crashing
+* BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+*
+* Revision 1.70  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model
@@ -1549,11 +1553,12 @@ Based on 1.0.31
 	  g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.1.2] (pauloscustodio)
+18.02.2014 [2.1.2] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Move generic file utility functions to lib/fileutil.c.
-	- lib/strlist.c removed, replaced by lib/list.c.
-	- Unify interface of classlist and list.
+	BUG_0040: Detect and report division by zero instead of crashing
+	BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+	
+	- Move generic utility functions to lib/
 	- List, StrHash classlist and classhash receive the address of the container
 	  object in all functions that add items to the container, and create the
 	  container on first use. This allows a container to be staticaly
@@ -1561,22 +1566,9 @@ xx.xx.2014 [2.1.2] (pauloscustodio)
 	- Add count attribute to StrHash, classhash to count elements in container.
 	- Add free_data attribute in StrHash to register a free fucntion to delete
 	  the data container when the hash is removed or a key is overwritten.
-	- errors.c: Use init.h mechanism, no need for main() calling init_errors
-	  and atexit(fini_errors); use Str and StrHash instead of glib.
-	- options.c: Use init.h mechanism, no need for main() calling init_options.
-	  Use Str instead of glib.
-	- codearea.c: Use init.h mechanism, no need for main() calling init_codearea.
-	- scan.c: Use Str instead of glib, List instead of GSList. Use init.h
-	  mechanism, no need for main() calling init_scan.
 	- glib dependency removed from code and Makefile
 	- Decouple file.c from errors.c by adding a call-back mechanism in file for
 	  fatal errors, setup by errors_init()
-	- Mechanism for atomic file write - open a temp file for writing on 
-	  xfopen_atomic(), close and rename to final name on xfclose().
-	- temp_filename() to generate a temporary file name that is
-	  deleted atexit.
-	- lib/srcfile.c to read source files and handle recursive includes,
-	  used to read @lists
 	- model.c to hold global data model
 
 -------------------------------------------------------------------------------
@@ -1616,7 +1608,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.2a"
+#define VERSION     "2.1.2"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.126 2014-02-17 23:36:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.127 2014-02-18 22:59:06 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -244,7 +244,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.126  2014-02-17 23:36:07  pauloscustodio
+# Revision 1.127  2014-02-18 22:59:06  pauloscustodio
+# BUG_0040: Detect and report division by zero instead of crashing
+# BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+#
+# Revision 1.126  2014/02/17 23:36:07  pauloscustodio
 # Embryo of new expression parser
 #
 # Revision 1.125  2014/02/16 12:58:14  pauloscustodio
@@ -768,7 +772,7 @@ errors.o: lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
-expr.o: lib/classlist.h token_def.h
+expr.o: lib/classlist.h token_def.h errors.h errors_def.h expr_def.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 exprprsr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.1 2014-02-17 23:36:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.2 2014-02-18 22:59:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,6 +25,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.1 2014-02-17 23:36:
 #include "array.h"
 #include "class.h"
 #include "symbol.h"
+
+extern long calc_divi(long a, long b);
+extern long calc_mod(long a, long b);
+extern long calc_pow(long a, long b);
 
 #if 0
 /*-----------------------------------------------------------------------------
@@ -52,7 +56,11 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.1  2014-02-17 23:36:07  pauloscustodio
+* Revision 1.2  2014-02-18 22:59:06  pauloscustodio
+* BUG_0040: Detect and report division by zero instead of crashing
+* BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+*
+* Revision 1.1  2014/02/17 23:36:07  pauloscustodio
 * Embryo of new expression parser
 *
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.52 2014-02-17 23:33:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.53 2014-02-18 22:59:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,6 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.52 2014-0
 #include "options.h"
 #include "symbol.h"
 #include "except.h"
+#include "expr.h"
 #include "z80asm.h"
 #include <assert.h>
 #include <ctype.h>
@@ -59,7 +60,6 @@ int Pterm( struct expr *pfixexpr );
 int Factor( struct expr *pfixexpr );
 long EvalPfixExpr( struct expr *pfixexpr );
 long PopItem( struct pfixstack **stackpointer );
-long Pw( long x, long y );
 struct expr *ParseNumExpr( void );
 
 /* global variables */
@@ -630,21 +630,6 @@ EvalPfixExpr( struct expr *pfixlist )
 
 
 
-long
-Pw( long x, long y )
-{
-    long i;
-
-    for ( i = 1; y > 0; --y )
-    {
-        i *= x;
-    }
-
-    return i;
-}
-
-
-
 void
 CalcExpression( enum symbols opr, struct pfixstack **stackptr )
 {
@@ -680,15 +665,15 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
         break;
 
     case divi:
-        PushItem( ( leftoperand / rightoperand ), stackptr );
+        PushItem( calc_divi( leftoperand, rightoperand ), stackptr );
         break;
 
     case mod:
-        PushItem( ( leftoperand % rightoperand ), stackptr );
+        PushItem( calc_mod( leftoperand, rightoperand ), stackptr );
         break;
 
     case power:
-        PushItem( Pw( leftoperand, rightoperand ), stackptr );
+        PushItem( calc_pow( leftoperand, rightoperand ), stackptr );
         break;
 
     case assign:
@@ -1103,7 +1088,11 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.52  2014-02-17 23:33:37  pauloscustodio
+* Revision 1.53  2014-02-18 22:59:06  pauloscustodio
+* BUG_0040: Detect and report division by zero instead of crashing
+* BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+*
+* Revision 1.52  2014/02/17 23:33:37  pauloscustodio
 * Add assert() on impossible paths.
 *
 * Revision 1.51  2014/01/20 23:29:18  pauloscustodio

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.24 2014-01-15 00:01:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.25 2014-02-18 22:59:06 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -29,6 +29,7 @@ ERR( ErrInfo,	info_total_errors( void ),				"%d errors occurred during assembly"
 ERR( ErrFatal,	fatal_read_file( char *filename ),		"cannot read file '%s'" _C_ filename )
 ERR( ErrFatal,	fatal_write_file( char *filename ),		"cannot write file '%s'" _C_ filename )
 ERR( ErrFatal,	fatal_include_recursion( char *filename ), "cannot include file '%s' recursively" _C_ filename )
+ERR( ErrFatal,	fatal_divide_by_zero( void ),			"division by zero" )
 
 /* command line parsing errors */
 ERR( ErrWarn,	warn_option_deprecated( char *option ),	"option '%s' is deprecated" _C_ option )
@@ -80,7 +81,11 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.24  2014-01-15 00:01:40  pauloscustodio
+* Revision 1.25  2014-02-18 22:59:06  pauloscustodio
+* BUG_0040: Detect and report division by zero instead of crashing
+* BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+*
+* Revision 1.24  2014/01/15 00:01:40  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *

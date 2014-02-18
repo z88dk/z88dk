@@ -13,9 +13,77 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.8 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.9 2014-02-18 22:59:06 pauloscustodio Exp $
+#
+# Test lexer
+
+use Modern::Perl;
+use Test::More;
+require 't/test_utils.pl';
+
+diag "Should accept binary constant longer than 8 bits";
+
+my($COMMA, $AND, $XOR, $NOT,      $POWER) = get_legacy() ? 	
+  ('&',    '~',  ':',  '0xFF :',  '^'   ) : 
+  (',',    '&',  '^',  '~',       '**'  );
+	
+my @asmbin = (
+	["ld a,1; comment ignored",		"\x3E\x01"],
+	[".label_1 ld a,2",				"\x3E\x02"],
+	["_label_2: ld a,3",			"\x3E\x03"],
+	["defw label_1,_label_2",		"\x02\x00\x04\x00"],
+	["defw #label_1",				"\x02\x00"],
+	["defb 255,128D",				"\xFF\x80"],
+	["defb \$FF,0xFE,0BEH",			"\xFF\xFE\xBE"],
+	["defb \@1010,1010B",			"\x0A\x0A"],
+	["defm \"hello\" $COMMA 32,\"world\"",
+									"hello world"],
+	["defb 1<0,1<1,1<2",			"\0\0\1"],
+	["defb 1<=0,1<=1,1<=2",			"\0\1\1"],
+	["defb 1=0,1=1,1=2",			"\0\1\0"],
+	["defb 1<>0,1<>1,1<>2",			"\1\0\1"],
+	["defb 1>0,1>1,1>2",			"\1\0\0"],
+	["defb 1>=0,1>=1,1>=2",			"\1\1\0"],
+	["defb +1,-1",					"\x01\xFF"],
+	["defb 1+1,3-1,3 $AND 2,2|0,0 $XOR 2,( $NOT 0xAA ) $AND 0xFF",
+									"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
+	["defb 5*2,100/10,10%3",		"\x0A\x0A\x01"],
+	["defb 2 $POWER 7, 2**6",		"\x80\x40"],
+	["defb 2 $POWER 1",				"\x02"],
+	["defb 2 $POWER 0",				"\x01"],
+	["defb 2 $POWER -1",			"\x00"],		# BUG_0041
+	["defb 2*[1+2*(1+2)]",			"\x0E"],
+	["defb 2*1+2*1+2",				"\x06"],
+	["defb !0,!1",					"\1\0"],
+	["defb ' '",					"\x20"],
+);
+my($asm,$bin) = ("","");
+for (@asmbin) {
+	$asm .= $_->[0]."\n";
+	$bin .= $_->[1];
+}
+
+t_z80asm_ok(0, $asm, $bin);
+
+t_z80asm_error("defb ''",						"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 'he'",						"Error at file 'test.asm' line 1: syntax error in expression");
+
+# test power expression (**) in object file
+t_z80asm(
+	asm		=> " xref v1, v2 : defb v1**v2",
+	asm2	=> " xdef v1, v2 : defc v1 = 2, v2 = 7 ",
+	bin		=> "\x80",
+);
+
+unlink_testfiles();
+done_testing();
+
 # $Log: lexer.t,v $
-# Revision 1.8  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.9  2014-02-18 22:59:06  pauloscustodio
+# BUG_0040: Detect and report division by zero instead of crashing
+# BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+#
+# Revision 1.8  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -63,63 +131,4 @@
 # Revision 1.1  2011/08/05 19:28:40  pauloscustodio
 # Test include
 #
-#
-# Test lexer
 
-use Modern::Perl;
-use Test::More;
-require 't/test_utils.pl';
-
-diag "Should accept binary constant longer than 8 bits";
-
-my($COMMA, $AND, $XOR, $NOT,      $POWER) = get_legacy() ? 	
-  ('&',    '~',  ':',  '0xFF :',  '^'   ) : 
-  (',',    '&',  '^',  '~',       '**'  );
-	
-my @asmbin = (
-	["ld a,1; comment ignored",		"\x3E\x01"],
-	[".label_1 ld a,2",				"\x3E\x02"],
-	["_label_2: ld a,3",			"\x3E\x03"],
-	["defw label_1,_label_2",		"\x02\x00\x04\x00"],
-	["defw #label_1",				"\x02\x00"],
-	["defb 255,128D",				"\xFF\x80"],
-	["defb \$FF,0xFE,0BEH",			"\xFF\xFE\xBE"],
-	["defb \@1010,1010B",			"\x0A\x0A"],
-	["defm \"hello\" $COMMA 32,\"world\"",
-									"hello world"],
-	["defb 1<0,1<1,1<2",			"\0\0\1"],
-	["defb 1<=0,1<=1,1<=2",			"\0\1\1"],
-	["defb 1=0,1=1,1=2",			"\0\1\0"],
-	["defb 1<>0,1<>1,1<>2",			"\1\0\1"],
-	["defb 1>0,1>1,1>2",			"\1\0\0"],
-	["defb 1>=0,1>=1,1>=2",			"\1\1\0"],
-	["defb +1,-1",					"\x01\xFF"],
-	["defb 1+1,3-1,3 $AND 2,2|0,0 $XOR 2,( $NOT 0xAA ) $AND 0xFF",
-									"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
-	["defb 5*2,100/10,10%3",		"\x0A\x0A\x01"],
-	["defb 2 $POWER 7, 2**6",		"\x80\x40"],
-	["defb 2*[1+2*(1+2)]",			"\x0E"],
-	["defb 2*1+2*1+2",				"\x06"],
-	["defb !0,!1",					"\1\0"],
-	["defb ' '",					"\x20"],
-);
-my($asm,$bin) = ("","");
-for (@asmbin) {
-	$asm .= $_->[0]."\n";
-	$bin .= $_->[1];
-}
-
-t_z80asm_ok(0, $asm, $bin);
-
-t_z80asm_error("defb ''",						"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 'he'",						"Error at file 'test.asm' line 1: syntax error in expression");
-
-# test power expression (**) in object file
-t_z80asm(
-	asm		=> " xref v1, v2 : defb v1**v2",
-	asm2	=> " xdef v1, v2 : defc v1 = 2, v2 = 7 ",
-	bin		=> "\x80",
-);
-
-unlink_testfiles();
-done_testing();
