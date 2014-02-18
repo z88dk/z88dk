@@ -1,0 +1,14 @@
+
+; void *p_list_insert_after(p_list_t *list, void *list_item, void *item)
+
+XDEF asm_p_list_insert_after_callee
+
+p_list_insert_after_callee:
+
+   pop af
+   pop de
+   pop hl
+   pop bc
+   push af
+   
+   INCLUDE "../../z80/asm_p_list_insert_after.asm"
