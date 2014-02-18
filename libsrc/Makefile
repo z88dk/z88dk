@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.197 2014-01-20 09:15:31 stefano Exp $
+# $Id: Makefile,v 1.198 2014-02-18 22:26:58 dom Exp $
 
 
 include Make.config
@@ -1523,58 +1523,58 @@ sp1-clean:
 
 
 clean:
-	cd ace    ; $(MAKE) clean ; cd ..
-	cd assert ; $(MAKE) clean ; cd ..
-	cd c128   ; $(MAKE) clean ; cd ..
-	cd ctype  ; $(MAKE) clean ; cd ..
-	cd farz88 ; $(MAKE) clean ; cd ..
-	cd fcntl  ; $(MAKE) clean ; cd ..
-	cd math/genmath ; $(MAKE) clean ; cd ../..
-	cd math/z88math ; $(MAKE) clean ; cd ../..
-	cd math/cpcmath ; $(MAKE) clean ; cd ../..
-	cd math/zxmath  ; $(MAKE) clean ; cd ../..
-	cd graphics     ; $(MAKE) clean ; cd ..
-	cd malloc     ; $(MAKE) clean ; cd ..
-	cd net        ; $(MAKE) clean ; cd ..
-	cd printflike ; $(MAKE) clean ; cd ..
-	cd rex        ; $(MAKE) clean ; cd ..
-	cd rs232      ; $(MAKE) clean ; cd ..
-	cd setjmp     ; $(MAKE) clean ; cd ..
-	cd spectrum   ; $(MAKE) clean ; cd ..
-	cd stdio      ; $(MAKE) clean ; cd ..
-	cd stdlib     ; $(MAKE) clean ; cd ..
-	cd strings    ; $(MAKE) clean ; cd ..
-	cd time       ; $(MAKE) clean ; cd ..
-	cd z80_crt0s  ; $(MAKE) clean ; cd ..
-	cd z88    ; $(MAKE) clean ; cd ..
-	cd zxvgs  ; $(MAKE) clean ; cd ..
-	cd games  ; $(MAKE) clean ; cd ..
-	cd adt    ; $(MAKE) clean ; cd ..
-	cd balloc ; $(MAKE) clean ; cd ..
-	cd im2    ; $(MAKE) clean ; cd ..
-	cd rect   ; $(MAKE) clean ; cd ..
-	cd algorithm ; $(MAKE) clean ; cd ..
-	cd debug  ; $(MAKE) clean ; cd ..
-	cd osca   ; $(MAKE) clean ; cd ..
-	cd oz     ; $(MAKE) clean ; cd ..
-	cd lib3d  ; $(MAKE) clean ; cd ..
-	cd input  ; $(MAKE) clean ; cd ..
-	cd abc80  ; $(RM) *.o ; cd ..
-	cd abc800 ; $(RM) *.o ; cd ..
-	cd enterprise ; $(MAKE) clean ; cd ..
-	cd msx      ; $(MAKE) clean ; cd ..
-	cd psg      ; $(MAKE) clean ; cd ..
-	cd newbrain ; $(RM) *.o ; cd ..
-	cd ts2068   ; $(RM) *.o ; cd ..
-	cd vz       ; $(RM) *.o ; cd ..
-	cd zx81     ; $(MAKE) clean ; cd ..
-	cd cpc      ; $(RM) *.o ; cd ..
-	cd sms      ; $(MAKE) clean ; cd ..
-	cd sos      ; $(MAKE) clean ; cd ..
-	cd threading/preempt    ; $(MAKE) clean ; cd ../..
-	cd sprites/software/sp1 ; $(MAKE) clean ; cd ../../..
-	cd stdio_new ; $(MAKE) clean ; cd ..
-	cd sdcard    ; $(MAKE) clean ; cd ..
+	$(MAKE) -C ace clean
+	$(MAKE) -C assert clean
+	$(MAKE) -C c128 clean
+	$(MAKE) -C ctype clean
+	$(MAKE) -C farz88 clean
+	$(MAKE) -C fcntl clean
+	$(MAKE) -C math/genmath clean
+	$(MAKE) -C math/z88math clean
+	$(MAKE) -C math/cpcmath clean
+	$(MAKE) -C math/zxmath clean
+	$(MAKE) -C graphics clean
+	$(MAKE) -C malloc clean
+	$(MAKE) -C net clean
+	$(MAKE) -C printflike clean
+	$(MAKE) -C rex clean
+	$(MAKE) -C rs232 clean
+	$(MAKE) -C setjmp clean
+	$(MAKE) -C spectrum clean
+	$(MAKE) -C stdio clean
+	$(MAKE) -C stdlib clean
+	$(MAKE) -C strings clean
+	$(MAKE) -C time clean
+	$(MAKE) -C z80_crt0s clean
+	$(MAKE) -C z88 clean
+	$(MAKE) -C zxvgs clean
+	$(MAKE) -C adt clean
+	$(MAKE) -C balloc clean
+	$(MAKE) -C im2 clean
+	$(MAKE) -C rect clean
+	$(MAKE) -C algorithm clean
+	$(MAKE) -C debug clean
+	$(MAKE) -C osca clean
+	$(MAKE) -C oz clean
+	$(MAKE) -C lib3d clean
+	$(MAKE) -C input clean	
+	$(RM) abc80/*.o
+	$(RM) abc800/*.o
+	$(MAKE) -C enterprise clean
+	$(MAKE) -C msx clean
+	$(MAKE) -C psg clean
+	$(RM) newbrain/*.o
+	$(RM) ts2068/*.o
+	$(RM) vz/*.o
+	$(MAKE) -C zx81 clean
+	$(RM) cpc/*.o
+	$(MAKE) -C sms clean
+	$(MAKE) -C sos clean
+	$(MAKE) -C threading/preempt clean
+	$(MAKE) -C sprites/software/sp1 clean
+	$(MAKE) -C stdio_new clean
+	$(MAKE) -C sdcard clean
+	$(MAKE) -C games clean
 	$(RM) *.lib
 
 install:

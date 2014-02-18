@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2014-01-14 07:48:40 stefano Exp $
+# $Id: Makefile,v 1.18 2014-02-18 22:26:58 dom Exp $
 
 lcpc:
 	cd cpc ; $(MAKE) ; cd ..
@@ -45,14 +45,14 @@ lcpcold:
 	cd dummy ; $(MAKE) ; cd ..
 
 clean:
-	cd cpm ; $(MAKE) clean ; cd ..
-	cd dummy ; $(MAKE) clean ; cd ..
-	cd gen_rnd ; $(MAKE) clean ; cd ..
-	cd spectrum ; $(MAKE) clean ; cd ..
-	cd newbrain ; $(MAKE) clean ; cd ..
-	cd sprinter ; $(MAKE) clean ; cd ..
-	cd z88 ; $(MAKE) clean ; cd ..
-	cd zxvgs ; $(MAKE) clean ; cd ..
-	cd cpc ; $(MAKE) clean ; cd ..
-	cd osca ; $(MAKE) clean ; cd ..
-	cd sos ; $(MAKE) clean ; cd ..
+	$(MAKE) -C cpc clean
+	$(MAKE) -C dummy clean
+	$(MAKE) -C gen_rnd clean
+	$(MAKE) -C spectrum clean
+	$(MAKE) -C newbrain clean
+	$(MAKE) -C sprinter clean
+	$(MAKE) -C z88 clean
+	$(MAKE) -C zxvgs clean
+	$(MAKE) -C cpc clean
+	$(MAKE) -C osca clean
+	#$(MAKE) -C sos clean
