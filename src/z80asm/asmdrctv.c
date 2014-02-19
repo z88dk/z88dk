@@ -14,10 +14,19 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.67 2014-02-08 11:21:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.68 2014-02-19 23:59:26 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.67  2014-02-08 11:21:08  pauloscustodio
+ * Revision 1.68  2014-02-19 23:59:26  pauloscustodio
+ * BUG_0041: 64-bit portability issues
+ * size_t changes to unsigned long in 64-bit. Usage of size_t * to
+ * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+ * breaks on a 64-bit architecture. Make the functions return the value instead
+ * of being passed the pointer to the return value, so that the compiler
+ * takes care of size convertions.
+ * Create uint_t and ulong_t, use uint_t instead of size_t.
+ *
+ * Revision 1.67  2014/02/08 11:21:08  pauloscustodio
  * Moved srcfile.c to lib/
  *
  * Revision 1.66  2014/01/23 22:30:55  pauloscustodio
@@ -143,7 +152,7 @@ Copyright (C) Paulo Custodio, 2011-2014
  *
  * Revision 1.37  2013/01/24 23:03:03  pauloscustodio
  * Replaced (unsigned char) by (byte_t)
- * Replaced (unisigned int) by (size_t)
+ * Replaced (unisigned int) by (uint_t)
  * Replaced (short) by (int)
  *
  * Revision 1.36  2013/01/20 21:24:28  pauloscustodio
@@ -424,7 +433,7 @@ void UNDEFINE( void );
 /* global variables */
 extern FILE *z80asmfile;
 extern char ident[], stringconst[];
-extern size_t DEFVPC;
+extern uint_t DEFVPC;
 extern enum symbols sym;
 extern enum flag EOL;
 extern struct module *CURRENTMODULE;
@@ -575,7 +584,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = ( size_t )offset;
+            DEFVPC = ( uint_t )offset;
             globaldefv = ON;
         }
         else
@@ -647,7 +656,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = ( size_t )offset;
+            DEFVPC = ( uint_t )offset;
         }
     }
 }

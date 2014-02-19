@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.6 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.7 2014-02-19 23:59:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -137,9 +137,9 @@ void Str_fini( Str *self )
 *   expand if needed to store at least more num_chars plus a zero byte
 *   increment size in blocks of SIZE_MASK (256)
 *----------------------------------------------------------------------------*/
-void Str_reserve( Str *self, size_t num_chars )
+void Str_reserve( Str *self, uint_t num_chars )
 {
-    size_t need_size, new_size;
+    uint_t need_size, new_size;
 
     if ( ! self->alloc_str )		/* exit if fixed-buffer */
         return;
@@ -173,7 +173,7 @@ void Str_reserve( Str *self, size_t num_chars )
 *----------------------------------------------------------------------------*/
 void Str_unreserve( Str *self )
 {
-    size_t need_size;
+    uint_t need_size;
 
     if ( ! self->alloc_str )		/* exit if fixed-buffer */
         return;
@@ -186,15 +186,15 @@ void Str_unreserve( Str *self )
 /*-----------------------------------------------------------------------------
 *   set / append from memory buffer, add always a zero byte after
 *----------------------------------------------------------------------------*/
-void Str_set_bytes( Str *self, char *source, size_t size )
+void Str_set_bytes( Str *self, char *source, uint_t size )
 {
     Str_clear( self );
     Str_append_bytes( self, source, size );
 }
 
-void Str_append_bytes( Str *self, char *source, size_t size )
+void Str_append_bytes( Str *self, char *source, uint_t size )
 {
-    size_t num_copy;
+    uint_t num_copy;
 
     /* expand string if needed and possible */
     Str_reserve( self, size );
@@ -268,7 +268,7 @@ void Str_append_vsprintf( Str *self, char *format, va_list argptr )
         free_space = self->size - self->len;
 
         if ( free_space > 0 )
-            need_space = vsnprintf( self->str + self->len, ( size_t ) free_space,
+            need_space = vsnprintf( self->str + self->len, ( uint_t ) free_space,
                                     format, argptr );
 
         if ( free_space <= 0 ||					/* no free space */
@@ -315,7 +315,7 @@ void Str_append_sprintf( Str *self, char *format, ... )
 /*-----------------------------------------------------------------------------
 *   get N characters from input, return FALSE on EOF
 *----------------------------------------------------------------------------*/
-BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars )
+BOOL Str_getchars( Str *self, FILE *fp, uint_t num_chars )
 {
     int c = EOF;
 
@@ -364,7 +364,16 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.6  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.7  2014-02-19 23:59:27  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.6  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

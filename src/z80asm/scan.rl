@@ -16,7 +16,7 @@ Scanner - to be processed by: ragel -G2 scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.12 2014-02-09 10:16:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.13 2014-02-19 23:59:26 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,7 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.12 2014-02-0
 #include <ctype.h>
 
 static long  scan_num( char *text, int num_suffix_chars, int base );
-static char *copy_token_str( char *text, size_t len );
+static char *copy_token_str( char *text, uint_t len );
 
 /*-----------------------------------------------------------------------------
 * 	Globals that keep last token read
@@ -260,7 +260,7 @@ static long scan_num ( char *text, int length, int base )
 /*-----------------------------------------------------------------------------
 *	copy characters into token string buffer, set last_token_str
 *----------------------------------------------------------------------------*/
-static char *copy_token_str( char *text, size_t len )
+static char *copy_token_str( char *text, uint_t len )
 {
 	/* copy to buffer */
 	Str_set( token_str, text );								/* copy all chars */
@@ -303,7 +303,16 @@ Token scan_get( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.12  2014-02-09 10:16:15  pauloscustodio
+* Revision 1.13  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.12  2014/02/09 10:16:15  pauloscustodio
 * Remove complexity out of scan.rl by relying on srcfile to handle contexts of
 * recursive includes, and reading of lines of text, and by assuming scan.c
 * will not be reentred, simplifying the keeping of state variables for the scan.

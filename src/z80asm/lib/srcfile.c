@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.2 2014-02-08 18:21:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.3 2014-02-19 23:59:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -272,7 +272,7 @@ static char *search_next_line( char *lines )
 void SrcFile_ungetline( SrcFile *self, char *lines )
 {
 	char *next_line, *line;
-	size_t len;
+	uint_t len;
 
 	/* search next line after first '\n' */
 	next_line = search_next_line( lines );
@@ -336,7 +336,16 @@ BOOL SrcFile_pop( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.2  2014-02-08 18:21:18  pauloscustodio
+* Revision 1.3  2014-02-19 23:59:27  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.2  2014/02/08 18:21:18  pauloscustodio
 * new line callback needs text read to pass on to listfile.c.
 * file_stack filenames may be NULL, protect when checking for recursive includes.
 * Remove dead test code.

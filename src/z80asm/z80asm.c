@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.137 2014-02-11 15:27:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.138 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -109,12 +109,12 @@ byte_t reloc_routine[] =
     "\xD1\xE3\x2B\x7C\xB5\xE3\xD5\x20\xDD\xF1\xF1\xFD\x36\x00\xC3\xFD"
     "\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
 
-size_t sizeof_relocroutine = 73;
-size_t sizeof_reloctable   = 0;
+uint_t sizeof_relocroutine = 73;
+uint_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
 
-size_t DEFVPC;          /* DEFVARS address counter */
+uint_t DEFVPC;          /* DEFVARS address counter */
 
 struct modules *modulehdr;
 struct module *CURRENTMODULE;
@@ -350,7 +350,7 @@ CloseFiles( void )
 /* define name of library file to create, return name in strpool */
 char *CreateLibfile( char *filename )
 {
-    size_t len;
+    uint_t len;
     char *found_libfilename;
 
     len = strlen( filename );
@@ -749,7 +749,16 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.137  2014-02-11 15:27:19  pauloscustodio
+* Revision 1.138  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.137  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
 *
 * Bison grammar not practical due to dual nature of z80asm keywords, i.e.
@@ -1057,7 +1066,7 @@ createsym( Symbol *symptr )
 *
 * Revision 1.66  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.65  2013/01/20 21:24:28  pauloscustodio

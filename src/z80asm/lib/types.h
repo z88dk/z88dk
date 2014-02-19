@@ -3,15 +3,14 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.4 2014-02-19 23:59:27 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "xmalloc.h"   /* before any other include */
+#include "xmalloc.h"	/* before any other include */
 
-#include <stdio.h>					/* FILENAME_MAX */
-#include <stdlib.h>					/* size_t */
+#include <stdio.h>		/* FILENAME_MAX */
 
 /* BOOL type and constants */
 typedef int BOOL;
@@ -26,7 +25,8 @@ typedef int BOOL;
 
 /* Unsigned types */
 typedef unsigned char byte_t;		/*  8-bit */
-/* typedef unsigned int size_t;	*/	/* 32-bit */
+typedef unsigned int  uint_t;		/* 16 or 32-bit */
+typedef unsigned int  ulong_t;		/* 32 or 64-bit */
 
 /* MIN, MAX, ABS, CLAMP */
 #undef	MIN
@@ -49,7 +49,16 @@ typedef unsigned char byte_t;		/*  8-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.4  2014-02-19 23:59:27  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -88,7 +97,7 @@ typedef unsigned char byte_t;		/*  8-bit */
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:10:32  pauloscustodio

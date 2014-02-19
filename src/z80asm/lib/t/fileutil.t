@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.10 2014-02-08 11:20:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.11 2014-02-19 23:59:27 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -424,54 +424,54 @@ int main(int argc, char *argv[])
 					xfclose(file);
 
 					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=        -128 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=         128 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=        -127 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=         129 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=           0 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=           0 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=         127 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=         127 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=        -128 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=         128 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=          -1 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=         255 ) ERROR;
-					xfget_int8(   file,  &ivalue ); if ( ivalue !=           0 ) ERROR;
-					xfget_uint8(  file,  &uvalue ); if ( uvalue !=           0 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=      -32768 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=       32768 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=      -32767 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=       32769 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=           0 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=           0 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=       32767 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=       32767 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=      -32768 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=       32768 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=          -1 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=       65535 ) ERROR;
-					xfget_int16(  file,  &ivalue ); if ( ivalue !=           0 ) ERROR;
-					xfget_uint16( file,  &uvalue ); if ( uvalue !=           0 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue != ulong(2,147,483,649) ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue != ulong(2,147,483,649) ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue !=           0 ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue !=           0 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue !=           1 ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue !=           1 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue !=         256 ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue !=         256 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue !=       65536 ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue !=       65536 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue !=    16777216 ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue !=    16777216 ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue != ulong(2,147,483,647) ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue != ulong(2,147,483,647) ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
-					xfget_int32(  file, &ilvalue ); if (ilvalue != ulong(4,294,967,295) ) ERROR;
-					xfget_uint32( file, &ulvalue ); if (ulvalue != ulong(4,294,967,295) ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=        -128 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=         128 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=        -127 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=         129 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=           0 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=           0 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=         127 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=         127 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=        -128 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=         128 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=          -1 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=         255 ) ERROR;
+					ivalue = xfget_int8(   file ); if ( ivalue !=           0 ) ERROR;
+					uvalue = xfget_uint8(  file ); if ( uvalue !=           0 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=      -32768 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=       32768 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=      -32767 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=       32769 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=           0 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=           0 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=       32767 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=       32767 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=      -32768 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=       32768 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=          -1 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=       65535 ) ERROR;
+					ivalue = xfget_int16(  file ); if ( ivalue !=           0 ) ERROR;
+					uvalue = xfget_uint16( file ); if ( uvalue !=           0 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,649) ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,649) ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=           0 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=           0 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=           1 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=           1 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=         256 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=         256 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=       65536 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=       65536 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=    16777216 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=    16777216 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,647) ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,647) ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue != ulong(4,294,967,295) ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(4,294,967,295) ) ERROR;
 					xfclose(file);
 					break;
 
@@ -636,7 +636,16 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.10  2014-02-08 11:20:20  pauloscustodio
+# Revision 1.11  2014-02-19 23:59:27  pauloscustodio
+# BUG_0041: 64-bit portability issues
+# size_t changes to unsigned long in 64-bit. Usage of size_t * to
+# retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+# breaks on a 64-bit architecture. Make the functions return the value instead
+# of being passed the pointer to the return value, so that the compiler
+# takes care of size convertions.
+# Create uint_t and ulong_t, use uint_t instead of size_t.
+#
+# Revision 1.10  2014/02/08 11:20:20  pauloscustodio
 # Error creating binary file
 #
 # Revision 1.9  2014/02/02 23:00:55  pauloscustodio

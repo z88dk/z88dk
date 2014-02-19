@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.89 2014-01-23 22:30:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.90 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -76,7 +76,7 @@ extern char *reloctable, *relocptr;
 
 struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
-size_t totaladdr, curroffset;
+uint_t totaladdr, curroffset;
 
 void
 ReadNames( char *filename, FILE *file, long nextname, long endnames )
@@ -87,10 +87,10 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 
     do
     {
-        xfget_int8(  file, &scope );
-        xfget_int8(  file, &symbol_char );	/* type of name   */
-        xfget_int32( file, &value );		/* read symbol (long) integer */
-        ReadName( file );					/* read symbol name */
+        scope		= xfget_int8(  file );
+        symbol_char	= xfget_int8(  file );		/* type of name   */
+        value		= xfget_int32( file );		/* read symbol (long) integer */
+        ReadName( file );						/* read symbol name */
 
         nextname += 1 + 1 + 4 + 1 + strlen( line );
 
@@ -138,22 +138,22 @@ ReadExpr( long nextexpr, long endexpr )
     int type;
     long constant, fptr;
     struct expr *postfixexpr;
-    size_t patchptr, offsetptr, expr_len;
+    uint_t patchptr, offsetptr, expr_len;
 
     do
     {
-        xfget_int8(   z80asmfile, &type );
-        xfget_uint16( z80asmfile, &offsetptr );
+        type		= xfget_int8(   z80asmfile );
+        offsetptr	= xfget_uint16( z80asmfile );
 
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
         ASMPC->value = get_PC();
 
-        xfget_uint8( z80asmfile, &expr_len ); /* get length of infix expression */
-        fptr = ftell( z80asmfile );       /* file pointer is at start of expression */
-        fgets( line, expr_len + 1, z80asmfile ); /* read string for error reference */
-        fseek( z80asmfile, fptr, SEEK_SET );      /* reset file pointer to start of expression */
+        expr_len	= xfget_uint8( z80asmfile );	/* get length of infix expression */
+        fptr = ftell( z80asmfile );					/* file pointer is at start of expression */
+        fgets( line, expr_len + 1, z80asmfile );	/* read string for error reference */
+        fseek( z80asmfile, fptr, SEEK_SET );		/* reset file pointer to start of expression */
         nextexpr += 1 + 1 + 1 + 1 + expr_len + 1;
 
 
@@ -209,13 +209,13 @@ ReadExpr( long nextexpr, long endexpr )
                             else
                             {
                                 *relocptr++ = 0;
-                                *relocptr++ = ( size_t )( get_PC() - curroffset ) % 256U;
-                                *relocptr++ = ( size_t )( get_PC() - curroffset ) / 256U;
+                                *relocptr++ = ( uint_t )( get_PC() - curroffset ) % 256U;
+                                *relocptr++ = ( uint_t )( get_PC() - curroffset ) / 256U;
                                 sizeof_reloctable += 3;
                             }
 
                             totaladdr++;
-                            curroffset = ( size_t )get_PC();
+                            curroffset = ( uint_t )get_PC();
                         }
 
                     break;
@@ -245,7 +245,7 @@ void
 LinkModules( void )
 {
     char fheader[9];
-    size_t origin;
+    uint_t origin;
     struct module *lastobjmodule;
     char *obj_filename;
 
@@ -319,7 +319,7 @@ LinkModules( void )
                 break;
             }
 
-            xfget_uint16( z80asmfile, &origin );
+            origin = xfget_uint16( z80asmfile );
 
             if ( modulehdr->first == CURRENTMODULE )            /* origin of first module */
             {
@@ -399,24 +399,24 @@ int
 LinkModule( char *filename, long fptr_base )
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl, dummy;
-    size_t size;
+    uint_t size;
     int flag = 0;
 
     /* open object file for reading */
     z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
     fseek( z80asmfile, fptr_base + 10U, SEEK_SET );
 
-    xfget_int32( z80asmfile, &fptr_modname );		/* get file pointer to module name */
-    xfget_int32( z80asmfile, &dummy );				/* get file pointer to expression declarations */
-    xfget_int32( z80asmfile, &fptr_namedecl );		/* get file pointer to name declarations */
-    xfget_int32( z80asmfile, &fptr_libnmdecl );		/* get file pointer to library name declarations */
-    xfget_int32( z80asmfile, &fptr_modcode );		/* get file pointer to module code */
+    fptr_modname	= xfget_int32( z80asmfile );	/* get file pointer to module name */
+    dummy			= xfget_int32( z80asmfile );	/* get file pointer to expression declarations */
+    fptr_namedecl	= xfget_int32( z80asmfile );	/* get file pointer to name declarations */
+    fptr_libnmdecl	= xfget_int32( z80asmfile );	/* get file pointer to library name declarations */
+    fptr_modcode	= xfget_int32( z80asmfile );	/* get file pointer to module code */
 
     if ( fptr_modcode != -1 )
     {
         fseek( z80asmfile, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
 
-        xfget_uint16( z80asmfile, &size );
+        size = xfget_uint16( z80asmfile );
 
         /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
         if ( size == 0 )
@@ -555,10 +555,10 @@ SearchLibfile( struct libfile *curlib, char *modname )
         do
         {
             /* point at first available module in library */
-            fseek( file, curlib->nextobjfile, SEEK_SET );   /* point at beginning of a module */
-            currentlibmodule = curlib->nextobjfile;
-            xfget_int32( file, &(curlib->nextobjfile) ); /* get file pointer to next module in library */
-            xfget_int32( file, &modulesize ); /* get size of current module */
+            fseek( file, curlib->nextobjfile, SEEK_SET );	/* point at beginning of a module */
+            currentlibmodule	= curlib->nextobjfile;
+            curlib->nextobjfile	= xfget_int32( file );		/* get file pointer to next module in library */
+            modulesize			= xfget_int32( file );		/* get size of current module */
         }
         while ( modulesize == 0 && curlib->nextobjfile != -1 );
 
@@ -621,12 +621,11 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 
 
     /* found module name? */
-    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file
-                                                                        * pointer */
-    xfget_int32( file, &fptr_mname );      /* get module name file  pointer   */
-    xfget_int32( file, &dummy ); /* fptr_expr */
-    xfget_int32( file, &fptr_name );
-    xfget_int32( file, &fptr_libname );
+    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file pointer */
+    fptr_mname		= xfget_int32( file );	/* get module name file  pointer   */
+    dummy			= xfget_int32( file );	/* fptr_expr */
+    fptr_name		= xfget_int32( file );
+    fptr_libname	= xfget_int32( file );
     fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
     mname = xstrdup( ReadName( file ) );                      /* read module name */
 
@@ -656,15 +655,11 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
                 int scope, dummy;
 				long value;
 
-                xfget_int8( file, &scope );
-                red++;
-                xfget_int8( file, &dummy ); /* type */
-                red++;
-                xfget_int32( file, &value );
-                red += 4;
-                name = ReadName( file );
-                red += strlen( name );
-                red++; /* Length byte */
+                scope	= xfget_int8(  file );	red++;
+                dummy	= xfget_int8(  file );	red++;	/* type */
+                value	= xfget_int32( file );	red += 4;
+                name	= ReadName( file );		red += strlen( name );
+                red++;									/* Length byte */
 
                 if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
                 {
@@ -711,9 +706,9 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
 char *
 ReadName( FILE *file )
 {
-    size_t strlength;
+    uint_t strlength;
 
-    xfget_uint8( file, &strlength );
+    strlength = xfget_uint8( file );
     xfget_chars( file, line, strlength ); /* read   name */
     line[strlength] = '\0';
 
@@ -748,10 +743,10 @@ ModuleExpr( void )
         /* open relocatable file for reading */
         z80asmfile = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
         fseek( z80asmfile, fptr_base + 10, SEEK_SET );	/* point at module name  pointer   */
-        xfget_int32( z80asmfile, &fptr_modname );		/* get file pointer to module name */
-        xfget_int32( z80asmfile, &fptr_exprdecl );		/* get file pointer to expression declarations */
-        xfget_int32( z80asmfile, &fptr_namedecl );		/* get file pointer to name declarations */
-        xfget_int32( z80asmfile, &fptr_libnmdecl );		/* get file pointer to library name declarations */
+        fptr_modname	= xfget_int32( z80asmfile );	/* get file pointer to module name */
+        fptr_exprdecl	= xfget_int32( z80asmfile );	/* get file pointer to expression declarations */
+        fptr_namedecl	= xfget_int32( z80asmfile );	/* get file pointer to name declarations */
+        fptr_libnmdecl	= xfget_int32( z80asmfile );	/* get file pointer to library name declarations */
 
         if ( fptr_exprdecl != -1 )
         {
@@ -787,7 +782,7 @@ void
 CreateBinFile( void )
 {
     FILE *binaryfile;
-    size_t codesize, codeblock, offset;
+    uint_t codesize, codeblock, offset;
     int segment;
     char *filename;
 
@@ -820,10 +815,10 @@ CreateBinFile( void )
 		/* relocate routine */
         xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
 
-        *( reloctable + 0 ) = ( size_t ) totaladdr % 256U;
-        *( reloctable + 1 ) = ( size_t ) totaladdr / 256U;  /* total of relocation elements */
-        *( reloctable + 2 ) = ( size_t ) sizeof_reloctable % 256U;
-        *( reloctable + 3 ) = ( size_t ) sizeof_reloctable / 256U; /* total size of relocation table elements */
+        *( reloctable + 0 ) = ( uint_t ) totaladdr % 256U;
+        *( reloctable + 1 ) = ( uint_t ) totaladdr / 256U;  /* total of relocation elements */
+        *( reloctable + 2 ) = ( uint_t ) sizeof_reloctable % 256U;
+        *( reloctable + 3 ) = ( uint_t ) sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 		/* write relocation table, inclusive 4 byte header */
         xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
@@ -914,7 +909,7 @@ CreateLib( char *lib_filename )
             Codesize = ftell( obj_file );
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
-            filebuffer = xnew_n( char, ( size_t ) Codesize );
+            filebuffer = xnew_n( char, ( uint_t ) Codesize );
 			/* load object file */
             xfget_chars( obj_file, filebuffer, Codesize );
             xfclose( obj_file );
@@ -1042,7 +1037,16 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.89  2014-01-23 22:30:55  pauloscustodio
+* Revision 1.90  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.89  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 * at fclose()
 *
@@ -1224,7 +1228,7 @@ ReleaseLinkInfo( void )
 *
 * Revision 1.47  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.46  2013/01/20 13:18:10  pauloscustodio

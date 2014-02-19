@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.32 2014-02-17 22:48:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.33 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -67,7 +67,7 @@ struct expr
     enum flag          stored;            /* Flag to indicate that expression has been stored to object file */
     char               *infixexpr;        /* pointer to ASCII infix expression */
     char               *infixptr;         /* pointer to current char in infix expression */
-    size_t             codepos;           /* rel. position in module code to patch (in pass 2) */
+    uint_t             codepos;           /* rel. position in module code to patch (in pass 2) */
     char               *srcfile;          /* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
     int                curline;           /* expression in line of source file */
     long               listpos;           /* position in listing file to patch (in pass 2) */
@@ -105,7 +105,7 @@ struct JRPC_Hdr
 struct JRPC
 {
     struct JRPC        *nextref;          /* pointer to next JR address reference  */
-    size_t			   PCaddr;            /* absolute of PC address of JR instruction  */
+    uint_t			   PCaddr;            /* absolute of PC address of JR instruction  */
 };
 
 struct modules
@@ -118,7 +118,7 @@ struct module
 {
     struct module     *nextmodule;      /* pointer to next module */
     char              *mname;           /* pointer to string of module name */
-    size_t             startoffset;     /* this module's start offset from start of code buffer */
+    uint_t             startoffset;     /* this module's start offset from start of code buffer */
     long               origin;          /* Address Origin of current machine code module during linking */
     struct sourcefile *cfile;           /* pointer to current file record */
     SymbolHash        *local_symtab;    /* pointer to root of local symbols tree */
@@ -159,7 +159,16 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.32  2014-02-17 22:48:28  pauloscustodio
+* Revision 1.33  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.32  2014/02/17 22:48:28  pauloscustodio
 * Symbol types and Expression types need to be in sync
 * Move from sym.h and symbol.h to model.h
 *
@@ -223,7 +232,7 @@ struct linkedmod
 *
 * Revision 1.18  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.17  2013/01/20 13:18:10  pauloscustodio

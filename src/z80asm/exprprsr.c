@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.53 2014-02-18 22:59:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.54 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -831,7 +831,7 @@ ExprLong( int listoffset )
     struct expr *pfixexpr;
     long constant;
     int flag = 1;
-    size_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -893,7 +893,7 @@ ExprAddress( int listoffset )
     struct expr *pfixexpr;
     long constant;
     int flag = 1;
-    size_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -954,7 +954,7 @@ ExprUnsigned8( int listoffset )
     struct expr *pfixexpr;
     long constant;
     int flag = 1;
-    size_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -1016,7 +1016,7 @@ ExprSigned8( int listoffset )
     struct expr *pfixexpr;
     long constant;
     int flag = 1;
-    size_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
     switch ( sym )
@@ -1088,7 +1088,16 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.53  2014-02-18 22:59:06  pauloscustodio
+* Revision 1.54  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.53  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
 * BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 *
@@ -1187,7 +1196,7 @@ ExprSigned8( int listoffset )
 *
 * Revision 1.32  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.31  2013/01/20 13:18:10  pauloscustodio

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.127 2014-02-18 22:59:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.128 2014-02-19 23:59:26 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -244,7 +244,16 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.127  2014-02-18 22:59:06  pauloscustodio
+# Revision 1.128  2014-02-19 23:59:26  pauloscustodio
+# BUG_0041: 64-bit portability issues
+# size_t changes to unsigned long in 64-bit. Usage of size_t * to
+# retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+# breaks on a 64-bit architecture. Make the functions return the value instead
+# of being passed the pointer to the return value, so that the compiler
+# takes care of size convertions.
+# Create uint_t and ulong_t, use uint_t instead of size_t.
+#
+# Revision 1.127  2014/02/18 22:59:06  pauloscustodio
 # BUG_0040: Detect and report division by zero instead of crashing
 # BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 #
@@ -772,7 +781,7 @@ errors.o: lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
-expr.o: lib/classlist.h token_def.h errors.h errors_def.h expr_def.h
+expr.o: lib/classlist.h token_def.h errors.h errors_def.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 exprprsr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h

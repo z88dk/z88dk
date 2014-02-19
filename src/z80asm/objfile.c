@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.17 2014-01-23 22:30:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.18 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -107,7 +107,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     ObjFile *self;
     FILE    *file;
     long	 start_ptr;
-	size_t	 org_addr;
+	uint_t	 org_addr;
     BOOL	 in_library = libfile == NULL ? FALSE : TRUE;
 
     /* open file if needed */
@@ -147,14 +147,14 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     self->writing		= FALSE;
 
     /* read object file header */
-    xfget_uint16( self->file, &org_addr );
-	self->org_addr = (org_addr == 0xFFFF) ? -1 : (int) org_addr;
+    org_addr			= xfget_uint16( self->file );
+	self->org_addr		= (org_addr == 0xFFFF) ? -1 : (int) org_addr;
 
-    xfget_int32( self->file, &(self->modname_ptr  ) );
-    xfget_int32( self->file, &(self->expr_ptr	  ) );
-    xfget_int32( self->file, &(self->symbols_ptr  ) );
-    xfget_int32( self->file, &(self->externsym_ptr) );
-    xfget_int32( self->file, &(self->code_ptr	  ) );
+    self->modname_ptr	= xfget_int32( self->file );
+    self->expr_ptr		= xfget_int32( self->file );
+    self->symbols_ptr	= xfget_int32( self->file );
+    self->externsym_ptr	= xfget_int32( self->file );
+    self->code_ptr		= xfget_int32( self->file );
 
     /* read module name */
     fseek( self->file, self->start_ptr + self->modname_ptr, SEEK_SET );
@@ -167,7 +167,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
     else
     {
         fseek( self->file, self->start_ptr + self->code_ptr, SEEK_SET );
-        xfget_uint16( self->file, &(self->code_size) );
+        self->code_size = xfget_uint16( self->file );
 
         if ( self->code_size == 0 )		/* BUG_0008 */
             self->code_size = 0x10000;
@@ -201,7 +201,16 @@ ObjFile *ObjFile_read( char *filename, FILE *libfile )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.17  2014-01-23 22:30:55  pauloscustodio
+* Revision 1.18  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.17  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
 * at fclose()
 *

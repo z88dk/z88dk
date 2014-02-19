@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.12 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.13 2014-02-19 23:59:26 pauloscustodio Exp $
 
 */
 
@@ -49,7 +49,7 @@ BOOL	source_list_ended;		/* end of source listing, from now on no source lines *
 /* current line being output */
 BOOL	line_started;			/* true if a line was started but not ended */
 long	start_line_pos;			/* ftell() position at start of next list line */
-size_t	address;				/* address of start of line */
+uint_t	address;				/* address of start of line */
 Str		*bytes;					/* list of bytes output for this line */
 
 char	*source_file;			/* source file, kept in strpool */
@@ -73,7 +73,7 @@ extern void ListFile_close( ListFile *self, BOOL keep_file );
    2.1. append bytes, words, longs
    2.2. collect patch position in list file for expressions
    3. output the full line */
-extern void ListFile_start_line( ListFile *self, size_t address,
+extern void ListFile_start_line( ListFile *self, uint_t address,
                                  char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
 extern void ListFile_append_byte( ListFile *self, byte_t byte );
@@ -105,7 +105,7 @@ extern int ListFile_get_page_nr( ListFile *self );
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
 extern void list_close( BOOL keep_file );
-extern void list_start_line( size_t address,
+extern void list_start_line( uint_t address,
                              char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
 extern void list_append_byte( byte_t byte );
@@ -122,7 +122,16 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.12  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.13  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

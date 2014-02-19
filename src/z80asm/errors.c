@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.37 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.38 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -200,7 +200,7 @@ static void puts_error_file( char *string )
 static void do_error( enum ErrType err_type, char *message )
 {
     DEFINE_STR( msg, MAXLINE );
-    size_t len_at, len_prefix;
+    uint_t len_at, len_prefix;
 
     init();
 
@@ -291,7 +291,16 @@ static void fatal_file_error( char *filename, BOOL writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.37  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.38  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.37  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model

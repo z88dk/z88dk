@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.8 2014-01-21 21:31:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.9 2014-02-19 23:59:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,8 +52,8 @@ extern char *strip( char *string );
 *----------------------------------------------------------------------------*/
 CLASS( Str )
 	char	*str;		/* string - may contain zero bytes */
-	size_t	 size;		/* allocated size */
-	size_t	 len;		/* sring length (excluding zero terminator) */
+	uint_t	 size;		/* allocated size */
+	uint_t	 len;		/* sring length (excluding zero terminator) */
 	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
 						   FALSE if str is in user supplied buffer and cannot grow */
 END_CLASS;
@@ -74,7 +74,7 @@ END_CLASS;
 #define Str_sync_len(self)  ((self)->len = strlen((self)->str))
 
 /* expand if needed to store at least more num_chars plus a zero byte */
-extern void Str_reserve( Str *self, size_t num_chars );
+extern void Str_reserve( Str *self, uint_t num_chars );
 
 /* delete extra unused space */
 extern void Str_unreserve( Str *self );
@@ -84,8 +84,8 @@ extern void Str_set( Str *self, char *source );
 extern void Str_append( Str *self, char *source );
 
 /* set / append bytes */
-extern void Str_set_bytes( Str *self, char *source, size_t size );
-extern void Str_append_bytes( Str *self, char *source, size_t size );
+extern void Str_set_bytes( Str *self, char *source, uint_t size );
+extern void Str_append_bytes( Str *self, char *source, uint_t size );
 
 /* set / append char */
 extern void Str_set_char( Str *self, char ch );
@@ -103,7 +103,7 @@ extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
 #define Str_strip(self)		( strip( (self)->str ), Str_sync_len(self) )
 
 /* get N characters from input, return FALSE on EOF */
-extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
+extern BOOL Str_getchars( Str *self, FILE *fp, uint_t num_chars );
 
 /* get one line from input, convert end-of-line sequences,
    return string including one LF character
@@ -113,7 +113,16 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.8  2014-01-21 21:31:52  pauloscustodio
+* Revision 1.9  2014-02-19 23:59:27  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.8  2014/01/21 21:31:52  pauloscustodio
 * ws
 *
 * Revision 1.7  2014/01/11 01:29:40  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.71 2014-02-18 22:59:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.72 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.71 2014-02-18 22:59
 
 /*
 * $Log: hist.c,v $
-* Revision 1.71  2014-02-18 22:59:06  pauloscustodio
+* Revision 1.72  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.71  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
 * BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 *
@@ -1259,7 +1268,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, byte_t, size_t
+	- Unified usage of integer types: int, char, byte_t, uint_t
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1572,6 +1581,17 @@ Based on 1.0.31
 	- model.c to hold global data model
 
 -------------------------------------------------------------------------------
+19.02.2014 [2.1.3] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0041: 64-bit portability issues
+		size_t changes to unsigned long in 64-bit. Usage of size_t * to 
+		retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+		breaks on a 64-bit architecture. Make the functions return the value instead 
+		of being passed the pointer to the return value, so that the compiler
+		takes care of size convertions.
+		Create uint_t and ulong_t, use uint_t instead of size_t.
+		
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1608,7 +1628,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.2"
+#define VERSION     "2.1.3"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

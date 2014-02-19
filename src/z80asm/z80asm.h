@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.40 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.41 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,7 +52,7 @@ extern struct module *CURRENTMODULE;
 extern struct modules *modulehdr;
 extern FILE *z80asmfile;
 extern Symbol *ASMPC;
-extern size_t sizeof_relocroutine, sizeof_reloctable;
+extern uint_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );
@@ -63,7 +63,16 @@ extern void assemble_file( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.40  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.41  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.40  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

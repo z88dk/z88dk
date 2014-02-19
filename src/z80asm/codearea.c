@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.23 2014-01-20 23:29:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.24 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -35,11 +35,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.23 2014-01-20 2
 *   global data
 *----------------------------------------------------------------------------*/
 static char *codearea;                  /* machine code block */
-static size_t codeindex;                /* point to current address of codearea */
-static size_t codesize;                 /* size of all modules before current,
+static uint_t codeindex;                /* point to current address of codearea */
+static uint_t codesize;                 /* size of all modules before current,
                                            i.e. base address of current module
                                            BUG_0015 */
-static size_t PC;		                /* Program Counter */
+static uint_t PC;		                /* Program Counter */
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
@@ -61,19 +61,19 @@ DEFINE_fini()
 /*-----------------------------------------------------------------------------
 *   modify program counter
 *----------------------------------------------------------------------------*/
-size_t set_PC( size_t n )
+uint_t set_PC( uint_t n )
 {
     init();
     return PC = n;
 }
 
-size_t inc_PC( size_t n )
+uint_t inc_PC( uint_t n )
 {
     init();
     return PC += n;
 }
 
-size_t get_PC( void )
+uint_t get_PC( void )
 {
     init();
     return PC;
@@ -90,25 +90,25 @@ void reset_codearea( void )
     memset( codearea, 0, MAXCODESIZE );
 }
 
-size_t get_codeindex( void ) /* BUG_0015 */
+uint_t get_codeindex( void ) /* BUG_0015 */
 {
     init();
     return codeindex;
 }
 
-size_t get_codesize( void ) /* BUG_0015 */
+uint_t get_codesize( void ) /* BUG_0015 */
 {
     init();
     return codesize;
 }
 
-size_t inc_codesize( size_t n ) /* BUG_0015 */
+uint_t inc_codesize( uint_t n ) /* BUG_0015 */
 {
     init();
     return codesize += n;
 }
 
-static void check_space( size_t addr, size_t n )
+static void check_space( uint_t addr, uint_t n )
 {
     if ( addr + n > MAXCODESIZE )
     {
@@ -125,7 +125,7 @@ void fwrite_codearea( FILE *stream )
     xfput_chars( stream, codearea, codeindex );
 }
 
-void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
+void fwrite_codearea_chunk( FILE *stream, uint_t addr, uint_t size )
 {
     init();
 
@@ -141,7 +141,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 }
 
 /* append data read from file to the current code area */
-void fread_codearea( FILE *stream, size_t size )
+void fread_codearea( FILE *stream, uint_t size )
 {
     init();
     check_space( codeindex, size );
@@ -150,7 +150,7 @@ void fread_codearea( FILE *stream, size_t size )
 }
 
 /* read to codearea at offset - BUG_0015 */
-void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
+void fread_codearea_offset( FILE *stream, uint_t offset, uint_t size )
 {
     init();
     check_space( offset, size );
@@ -166,7 +166,7 @@ void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte( size_t *paddr, byte_t byte )
+void patch_byte( uint_t *paddr, byte_t byte )
 {
     init();
     check_space( *paddr, 1 );
@@ -180,7 +180,7 @@ void append_byte( byte_t byte )
     list_append_byte( byte );
 }
 
-void patch_word( size_t *paddr, int word )
+void patch_word( uint_t *paddr, int word )
 {
     init();
     check_space( *paddr, 2 );
@@ -197,7 +197,7 @@ void append_word( int word )
     list_append_word( word );
 }
 
-void patch_long( size_t *paddr, long dword )
+void patch_long( uint_t *paddr, long dword )
 {
     init();
     check_space( *paddr, 4 );
@@ -218,7 +218,7 @@ void append_long( long dword )
     list_append_long( dword );
 }
 
-byte_t get_byte( size_t *paddr )
+byte_t get_byte( uint_t *paddr )
 {
     byte_t byte;
 
@@ -231,7 +231,16 @@ byte_t get_byte( size_t *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.23  2014-01-20 23:29:17  pauloscustodio
+* Revision 1.24  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.23  2014/01/20 23:29:17  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.22  2014/01/11 01:29:39  pauloscustodio
@@ -287,7 +296,7 @@ byte_t get_byte( size_t *paddr )
 *
 * Revision 1.9  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (size_t)
+* Replaced (unisigned int) by (uint_t)
 * Replaced (short) by (int)
 *
 * Revision 1.8  2013/01/20 21:24:28  pauloscustodio

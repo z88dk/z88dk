@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.15 2014-02-03 21:50:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.16 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -249,7 +249,7 @@ void list_close( BOOL keep_file )
 /*-----------------------------------------------------------------------------
 *	start output of list line
 *----------------------------------------------------------------------------*/
-void ListFile_start_line( ListFile *self, size_t address,
+void ListFile_start_line( ListFile *self, uint_t address,
                           char *source_file, int source_line_nr, char *line )
 {
     if ( self->file != NULL && ! self->source_list_ended )
@@ -276,7 +276,7 @@ void ListFile_start_line( ListFile *self, size_t address,
     }
 }
 
-void list_start_line( size_t address,
+void list_start_line( uint_t address,
                       char *source_file, int source_line_nr, char *line )
 {
     if ( the_list != NULL )
@@ -581,7 +581,16 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.15  2014-02-03 21:50:03  pauloscustodio
+* Revision 1.16  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.15  2014/02/03 21:50:03  pauloscustodio
 * ws
 *
 * Revision 1.14  2014/01/23 22:30:55  pauloscustodio

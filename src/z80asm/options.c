@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.74 2014-02-09 10:10:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.75 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -146,7 +146,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
    to retrieve an argument, if any */
 static char *check_option( char *arg, char *opt )
 {
-    size_t len = strlen( opt );
+    uint_t len = strlen( opt );
 
     if ( *opt &&				/* ignore empty option strings */
             strncmp( arg, opt, len ) == 0 )
@@ -573,7 +573,16 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.74  2014-02-09 10:10:25  pauloscustodio
+* Revision 1.75  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.74  2014/02/09 10:10:25  pauloscustodio
 * Rename internal functions.
 *
 * Revision 1.73  2014/02/08 18:30:49  pauloscustodio

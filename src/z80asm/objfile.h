@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.11 2014-02-17 23:12:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.12 2014-02-19 23:59:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,7 +50,7 @@ CLASS( ObjFile )
 	long	externsym_ptr;		/* offset if file to External Name Declaration */
 	long	code_ptr;			/* offset if file to Machine Code Block */
 
-	size_t	code_size;			/* size of code block */
+	uint_t	code_size;			/* size of code block */
 
 END_CLASS;
 
@@ -73,7 +73,16 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.11  2014-02-17 23:12:38  pauloscustodio
+* Revision 1.12  2014-02-19 23:59:26  pauloscustodio
+* BUG_0041: 64-bit portability issues
+* size_t changes to unsigned long in 64-bit. Usage of size_t * to
+* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
+* breaks on a 64-bit architecture. Make the functions return the value instead
+* of being passed the pointer to the return value, so that the compiler
+* takes care of size convertions.
+* Create uint_t and ulong_t, use uint_t instead of size_t.
+*
+* Revision 1.11  2014/02/17 23:12:38  pauloscustodio
 * ws
 *
 * Revision 1.10  2014/01/11 01:29:40  pauloscustodio
