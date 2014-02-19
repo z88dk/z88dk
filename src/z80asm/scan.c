@@ -32,7 +32,7 @@ need to be kept across calls.
 #include <ctype.h>
 
 static long  scan_num( char *text, int num_suffix_chars, int base );
-static char *copy_token_str( char *text, size_t len );
+static char *copy_token_str( char *text, uint_t len );
 
 /*-----------------------------------------------------------------------------
 * 	Globals that keep last token read
@@ -127,7 +127,7 @@ static long scan_num ( char *text, int length, int base )
 /*-----------------------------------------------------------------------------
 *	copy characters into token string buffer, set last_token_str
 *----------------------------------------------------------------------------*/
-static char *copy_token_str( char *text, size_t len )
+static char *copy_token_str( char *text, uint_t len )
 {
 	/* copy to buffer */
 	Str_set( token_str, text );								/* copy all chars */
