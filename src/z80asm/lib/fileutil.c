@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.12 2014-02-19 23:59:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.13 2014-02-20 22:55:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -477,10 +477,10 @@ void xfput_uint16( FILE *file, uint_t value )
 
 int xfget_int16( FILE *file )
 {
-	uint_t value = xfget_uint16( file );
+	int value = (int) xfget_uint16( file );
     if ( value & 0x8000 )
         value |= ~ 0xFFFF;			/* sign-extend above bit 15 */
-	return (int) value;
+	return value;
 }
 
 uint_t xfget_uint16( FILE *file )
@@ -514,10 +514,10 @@ void xfput_uint32( FILE *file, ulong_t value )
 
 long xfget_int32( FILE *file )
 {
-	ulong_t value = xfget_uint32( file );
+	long value = (long) xfget_uint32( file );
     if ( value & 0x80000000L )
         value |= ~ 0xFFFFFFFFL;	/* sign-extend above bit 31; solve BUG_0021 */
-	return (long) value;
+	return value;
 }
 
 ulong_t xfget_uint32( FILE *file )
@@ -662,7 +662,11 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.12  2014-02-19 23:59:27  pauloscustodio
+* Revision 1.13  2014-02-20 22:55:27  pauloscustodio
+* xfget_int16() and xfget_int32() were not sign-extending correctly
+* causing link to fail on a 64-bit architecture.
+*
+* Revision 1.12  2014/02/19 23:59:27  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
