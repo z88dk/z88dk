@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.32 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.33 2014-02-20 23:36:17 pauloscustodio Exp $
 #
 # Test options
 
@@ -48,18 +48,18 @@ t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), asm2_file(), asm3_file(), a
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
-write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
-write_file(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
+write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
+write_binfile(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
 t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", "", 0);
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
-write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
-write_file(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst1_file());
+write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
+write_binfile(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst1_file());
 t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", <<'ERR', 1);
-Error at file 'test2.asmlst' line 9: cannot include file 'test1.asmlst' recursively
+Error at file 'test2.asmlst' line 7: cannot include file 'test1.asmlst' recursively
 1 errors occurred during assembly
 ERR
 
@@ -1107,7 +1107,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.32  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.33  2014-02-20 23:36:17  pauloscustodio
+# Failed in Unix due to different handling of cr-lf
+#
+# Revision 1.32  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
