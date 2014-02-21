@@ -50,7 +50,7 @@ asm_b_vector_append_block:
    inc hl
 
    ex de,hl
-   add hl,de
+   add hl,bc
    ex de,hl                    ; de = new_size
    
    jp c, error_enomem_zc       ; if new_size > 64k
@@ -131,7 +131,7 @@ capacity_growing:
    ; bc = new_size
    ; stack = n
    
-   ld de,-__b_vector_capacity - 1
+   ld de,-7
    add hl,de
    
    push hl                     ; save vector *
