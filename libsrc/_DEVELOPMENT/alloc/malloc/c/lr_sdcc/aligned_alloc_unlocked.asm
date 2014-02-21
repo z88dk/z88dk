@@ -16,7 +16,7 @@
 ;
 ; ===============================================================
 
-XDEF aligned_alloc_unlocked
+XDEF aligned_alloc_unlocked, memalign_unlocked
 
 aligned_alloc_unlocked:
 

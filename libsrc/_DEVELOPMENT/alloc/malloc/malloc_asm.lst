@@ -26,8 +26,6 @@ z80/asm_heap_realloc
 z80/asm_heap_realloc_unlocked
 z80/asm_malloc
 z80/asm_malloc_unlocked
-z80/asm_memalign
-z80/asm_memalign_unlocked
 z80/asm_posix_memalign
 z80/asm_posix_memalign_unlocked
 z80/asm_realloc

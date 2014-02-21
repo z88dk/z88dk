@@ -1,9 +1,11 @@
 
 XLIB asm_aligned_alloc_unlocked
+XDEF asm_memalign_unlocked
 
 LIB asm_heap_alloc_aligned_unlocked
 
 asm_aligned_alloc_unlocked:
+asm_memalign_unlocked:
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap without locking

@@ -16,9 +16,10 @@
 ;
 ; ===============================================================
 
-XDEF aligned_alloc
+XDEF aligned_alloc, memalign
 
 aligned_alloc:
+memalign:
 
    pop de
    pop hl

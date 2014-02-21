@@ -16,9 +16,10 @@
 ;
 ; ===============================================================
 
-XDEF aligned_alloc_callee
+XDEF aligned_alloc_callee, memalign_callee
 
 aligned_alloc_callee:
+memalign_callee:
 
    pop de
    pop hl

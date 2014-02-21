@@ -1,7 +1,6 @@
 
-XLIB asm_memalign_unlocked
-
-LIB asm_heap_alloc_aligned_unlocked
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_ALIGNED_ALLOC_UNLOCKED
 
 asm_memalign_unlocked:
 
@@ -27,6 +26,3 @@ asm_memalign_unlocked:
    ;            carry set, errno = ENOMEM
    ;
    ; uses   : af, bc, de, hl
-
-   ld de,(__heap)
-   jp asm_heap_alloc_aligned_unlocked

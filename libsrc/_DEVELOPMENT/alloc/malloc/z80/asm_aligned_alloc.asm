@@ -1,9 +1,11 @@
 
 XLIB asm_aligned_alloc
+XDEF asm_memalign
 
 LIB asm_heap_alloc_aligned
 
 asm_aligned_alloc:
+asm_memalign:
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap

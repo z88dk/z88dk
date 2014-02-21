@@ -21,8 +21,6 @@ c/rl_sdcc/heap_init
 c/rl_sdcc/heap_realloc
 c/rl_sdcc/heap_realloc_unlocked
 c/rl_sdcc/malloc
-c/rl_sdcc/memalign
-c/rl_sdcc/memalign_unlocked
 c/rl_sdcc/posix_memalign
 c/rl_sdcc/posix_memalign_unlocked
 c/rl_sdcc/realloc

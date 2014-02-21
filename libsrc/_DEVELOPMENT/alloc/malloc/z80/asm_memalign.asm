@@ -1,7 +1,6 @@
 
-XLIB asm_memalign
-
-LIB asm_heap_alloc_aligned
+*** DO NOT ADD TO LIBRARY
+*** THIS FUNCTION IS EXPORTED AS PART OF ASM_ALIGNED_ALLOC
 
 asm_memalign:
 
@@ -32,6 +31,3 @@ asm_memalign:
    ;            carry set, errno = ENOLCK
    ;
    ; uses   : af, bc, de, hl
-
-   ld de,(__heap)
-   jp asm_heap_alloc_aligned
