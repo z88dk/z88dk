@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.17 2010-04-09 23:47:45 dom Exp $
+ *      $Id: stmt.c,v 1.18 2014-02-22 20:40:48 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -685,7 +685,7 @@ void doasm()
 				memmove(label,label+1,strlen(label+1)+1);
 				lab=2; 
                         } else if ( strncmp(label,"smc_",4)==0 ) {
-                         	strcpy(label,label+4);
+                                memmove(label, label + 4, strlen(label+4)+1);
 				lab=5;
 			}
 			if (lab) {
