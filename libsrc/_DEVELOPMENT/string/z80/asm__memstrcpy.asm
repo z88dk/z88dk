@@ -39,4 +39,5 @@ loop:
    ldi
    jp pe, loop
 
+   or a
    ret
