@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.30 2011-06-26 16:07:29 dom Exp $
+ * $Id: zcc.h,v 1.31 2014-02-22 21:03:10 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -15,11 +15,9 @@
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.59 (C) 16.4.2010 D.J.Morris\n";
+char *version = "v3.00 (C) 1998-2004 D.J.Morris\n";
 
-#ifdef AMIGA
-char *amiver="$VER: zcc v2.59 (16.04.2010)";
-#endif
+
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
@@ -38,18 +36,8 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define snprintf _snprintf
 #endif
 
-/* hpux 9 has a slightly odd FILENAME_MAX defined */
-#ifdef hpux
-#undef FILENAME_MAX
-#define FILENAME_MAX 1024
-#endif
 
 
-
-/* 
- *      Now some fun stuff - all this moved out of zcc.c to clean
- *      things up a little bit!
- */
 
 #define CFILE   1
 #define PFILE   2
@@ -59,29 +47,13 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define NO      0
 #define YES     1
 
-#define Z88MATH 1
-#define GENMATH 2
 
 #define LINEMAX 1024      /* Max number of chars to read from config file*/
 
-/*
- *      Sorry, this is hard coded, hopefully won't cause too many
- *      problems - needed to ensure math libs are linked in correctly!
- */
-
+/* Name of the file that linking tweaks are written to */
 #define DEFFILE "zcc_opt.def"
 
 
+enum iostyle { outimplied=1, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
 
-
-struct confs {
-    char *name;
-    char *alias;
-    void (*setfunc)(char *,int);
-    char *def;
-};
-
-enum iostyle { outimplied=0, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
-
-enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE, VASMOPTS, ASZ80OPTS, VLINKOPTS, ASLINKOPTS, MPMEXE, LIBPATH, GNUASOPTS, GNULINKOPTS };
 
