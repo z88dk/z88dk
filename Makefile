@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.40 2013-03-12 09:56:21 stefano Exp $
+#	$Id: Makefile,v 1.41 2014-02-22 19:13:46 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -15,7 +15,7 @@ DEFAULT = z88
 
 # --> End of Configurable Options
 
-all: setup appmake copt zcpp sccz80 z80asm zcc z80nm config
+all: setup appmake copt zcpp sccz80 z80asm zcc scanner z80nm config
 
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
@@ -44,6 +44,10 @@ z80asm:
 zcc:
 	$(MAKE) -C src/zcc
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
+
+scanner:
+	$(MAKE) -C src/scanner
+	$(MAKE) -C src/scanner PREFIX=`pwd` install
 
 z80nm:
 	$(MAKE) -C support/ar
