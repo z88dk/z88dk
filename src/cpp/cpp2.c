@@ -3,7 +3,7 @@
  *
  *                         Process #control lines
  *
- * $Id: cpp2.c,v 1.4 2013-11-23 09:04:36 dom Exp $
+ * $Id: cpp2.c,v 1.5 2014-02-22 19:58:50 dom Exp $
  *
  *
  * Edit history
@@ -286,7 +286,9 @@ nest_err:       cerror("#%s must be in an #if", token);
              * This would allow #asm or similar extensions.
              */
 /*            cerror("Illegal # command \"%s\"", token); */
-            printf("#%s\n",token);
+            if (compiling) {
+               printf("#%s\n",token);
+            }
             break;
         }
         if (hash != L_include) {
