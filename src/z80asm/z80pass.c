@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.71 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.72 2014-02-23 18:48:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -594,7 +594,7 @@ Z80pass2( void )
 
     fseek( objfile, 8, SEEK_SET ); /* set file pointer to point at ORG */
 
-    if ( ( modulehdr->first == CURRENTMODULE ) )
+    if ( modulehdr->first == CURRENTMODULE )
     {
         if ( opts.origin >= 0 )
         {
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.71  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.72  2014-02-23 18:48:46  pauloscustodio
+* Extra parentheses removed.
+*
+* Revision 1.71  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
