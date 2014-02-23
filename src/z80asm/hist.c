@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.72 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.73 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.72 2014-02-19 23:59
 
 /*
 * $Log: hist.c,v $
-* Revision 1.72  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.73  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.72  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -1530,7 +1535,7 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 26.11.2013 [2.0.0] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- C-like expression syntax instead of old operators
+	CH_0020: C-like expression syntax instead of old operators
 	- Object and Library file version incremented to 02 due to incompatibility
 	  with old expression syntax
 
@@ -1592,6 +1597,13 @@ Based on 1.0.31
 		Create uint_t and ulong_t, use uint_t instead of size_t.
 		
 -------------------------------------------------------------------------------
+xx.xx.2014 [2.1.4] (pauloscustodio)
+-------------------------------------------------------------------------------
+	CH_0021: New operators ==, !=, &&, ||, ?:
+		Handle C-like operators ==, !=, &&, || and ?:.
+		Simplify expression parser by handling composed tokens in lexer.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1628,7 +1640,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.3"
+#define VERSION     "2.1.4a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

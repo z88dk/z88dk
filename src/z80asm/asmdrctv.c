@@ -14,10 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.68 2014-02-19 23:59:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.69 2014-02-23 18:48:16 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.68  2014-02-19 23:59:26  pauloscustodio
+ * Revision 1.69  2014-02-23 18:48:16  pauloscustodio
+ * CH_0021: New operators ==, !=, &&, ||, ?:
+ * Handle C-like operators ==, !=, &&, || and ?:.
+ * Simplify expression parser by handling composed tokens in lexer.
+ *
+ * Revision 1.68  2014/02/19 23:59:26  pauloscustodio
  * BUG_0041: 64-bit portability issues
  * size_t changes to unsigned long in 64-bit. Usage of size_t * to
  * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -726,7 +731,7 @@ DEFGROUP( void )
                     case name:
                         strcpy( stringconst, ident );     /* remember name */
 
-                        if ( GetSym() == assign )
+                        if ( GetSym() == equal )
                         {
                             GetSym();
 
@@ -889,7 +894,7 @@ DEFC( void )
         {
             strcpy( stringconst, ident ); /* remember name */
 
-            if ( GetSym() == assign )
+            if ( GetSym() == equal )
             {
                 GetSym();         /* get numerical expression */
 

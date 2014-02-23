@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.128 2014-02-19 23:59:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.129 2014-02-23 18:48:16 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -244,7 +244,12 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.128  2014-02-19 23:59:26  pauloscustodio
+# Revision 1.129  2014-02-23 18:48:16  pauloscustodio
+# CH_0021: New operators ==, !=, &&, ||, ?:
+# Handle C-like operators ==, !=, &&, || and ?:.
+# Simplify expression parser by handling composed tokens in lexer.
+#
+# Revision 1.128  2014/02/19 23:59:26  pauloscustodio
 # BUG_0041: 64-bit portability issues
 # size_t changes to unsigned long in 64-bit. Usage of size_t * to
 # retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -781,7 +786,7 @@ errors.o: lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
-expr.o: lib/classlist.h token_def.h errors.h errors_def.h
+expr.o: lib/classlist.h token_def.h errors.h errors_def.h expr_def.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 exprprsr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h

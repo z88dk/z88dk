@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.2 2014-02-18 22:59:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.3 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,7 +33,7 @@ enum AssocType	{ ASSOC_LEFT, ASSOC_RIGHT };
 /*-----------------------------------------------------------------------------
 *	Calculation functions that need to check arguments
 *----------------------------------------------------------------------------*/
-long calc_divi ( long a, long b )
+long calc_divide ( long a, long b )
 {
 	if ( b == 0 )
 		fatal_divide_by_zero();	/* BUG_0040 */
@@ -48,7 +48,7 @@ long calc_mod ( long a, long b )
 }
 
 /* exponentiation by squaring */
-long calc_pow(long base, long exp)
+long calc_power(long base, long exp)
 {
     long result = 1;
 
@@ -66,8 +66,6 @@ long calc_pow(long base, long exp)
     return result;
 }
 
-#if 0
-
 /*-----------------------------------------------------------------------------
 *	Define calc functions for all operators, template:
 *	static long f_<symbol> (long a, long b) { return <calc>; }
@@ -75,6 +73,9 @@ long calc_pow(long base, long exp)
 #define OPERATOR(_symbol, _type, _prec, _assoc, _calc)	\
 	static long f_##_symbol ( long a, long b ) { return _calc; }
 #include "expr_def.h"
+
+#if 0
+
 
 
 /*-----------------------------------------------------------------------------
@@ -105,7 +106,12 @@ void Expr_fini (Expr *self)
 
 /*
 * $Log: expr.c,v $
-* Revision 1.2  2014-02-18 22:59:06  pauloscustodio
+* Revision 1.3  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.2  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
 * BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.54 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.55 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,11 +53,14 @@ void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
-int Condition( struct expr *pfixexpr );
-int Expression( struct expr *pfixexpr );
-int Term( struct expr *pfixexpr );
-int Pterm( struct expr *pfixexpr );
-int Factor( struct expr *pfixexpr );
+static int Condition( struct expr *pfixexpr );
+static int LogAndCondition( struct expr *pfixexpr );
+static int LogOrCondition( struct expr *pfixexpr );
+static int TernaryCondition( struct expr *pfixexpr );
+static int Expression( struct expr *pfixexpr );
+static int Term( struct expr *pfixexpr );
+static int Pterm( struct expr *pfixexpr );
+static int Factor( struct expr *pfixexpr );
 long EvalPfixExpr( struct expr *pfixexpr );
 long PopItem( struct pfixstack **stackpointer );
 struct expr *ParseNumExpr( void );
@@ -69,7 +72,7 @@ extern char ident[], separators[];
 extern FILE *z80asmfile, *objfile;
 
 
-int
+static int
 Factor( struct expr *pfixexpr )
 {
     long constant;
@@ -112,7 +115,6 @@ Factor( struct expr *pfixexpr )
 
         if ( eval_err == 1 )
         {
-            error_syntax_expr();
             return 0;           /* syntax error in expression */
         }
         else
@@ -129,7 +131,7 @@ Factor( struct expr *pfixexpr )
         *pfixexpr->infixptr++ = separators[sym];    /* store '(' or '[' in infix expr */
         GetSym();
 
-        if ( Condition( pfixexpr ) )
+        if ( TernaryCondition( pfixexpr ) )
         {
             /* BUG_0006 : check correct balance */
             if ( ( open_paren == lparen  && sym == rparen ) ||
@@ -141,7 +143,6 @@ Factor( struct expr *pfixexpr )
             }
             else
             {
-                error_unbanlanced_paren();
                 return 0;
             }
         }
@@ -208,7 +209,6 @@ Factor( struct expr *pfixexpr )
                 }
                 else
                 {
-                    error_syntax_expr();
                     return 0;
                 }
             }
@@ -229,7 +229,7 @@ Factor( struct expr *pfixexpr )
 
         if ( Factor( pfixexpr ) )
         {
-            NewPfixSymbol( pfixexpr, 0, negated, NULL, 0 );
+            NewPfixSymbol( pfixexpr, 0, unary_minus, NULL, 0 );
         }
         else
         {
@@ -239,7 +239,6 @@ Factor( struct expr *pfixexpr )
         break;
 
     default:
-        error_syntax_expr();  /* syntax error */
         return 0;
     }
 
@@ -248,7 +247,7 @@ Factor( struct expr *pfixexpr )
 
 
 
-int
+static int
 Pterm( struct expr *pfixexpr )
 {
 
@@ -284,7 +283,7 @@ Pterm( struct expr *pfixexpr )
 
 
 
-int
+static int
 Term( struct expr *pfixexpr )
 {
     enum symbols mulsym;
@@ -294,7 +293,7 @@ Term( struct expr *pfixexpr )
         return ( 0 );
     }
 
-    while ( ( sym == multiply ) || ( sym == divi ) || ( sym == mod ) )
+    while ( ( sym == multiply ) || ( sym == divide ) || ( sym == mod ) )
     {
         *pfixexpr->infixptr++ = separators[sym];  /* store '/', '%', '*' in infix expr */
         mulsym = sym;
@@ -315,7 +314,7 @@ Term( struct expr *pfixexpr )
 
 
 
-int
+static int
 Expression( struct expr *pfixexpr )
 {
     enum symbols addsym = nil;
@@ -334,7 +333,7 @@ Expression( struct expr *pfixexpr )
         {
             if ( addsym == minus )
             {
-                NewPfixSymbol( pfixexpr, 0, negated, NULL, 0 );
+                NewPfixSymbol( pfixexpr, 0, unary_minus, NULL, 0 );
             }
 
             /* operand is signed, plus is redundant... */
@@ -370,7 +369,7 @@ Expression( struct expr *pfixexpr )
 }
 
 
-int
+static int
 Condition( struct expr *pfixexpr )
 {
     enum symbols relsym = nil;
@@ -387,42 +386,34 @@ Condition( struct expr *pfixexpr )
     case less:
         *pfixexpr->infixptr++ = '<';
         GetSym();
-
-        switch ( sym )
-        {
-        case greater:
-            *pfixexpr->infixptr++ = '>';
-            relsym = notequal;  /* '<>' */
-            GetSym();
-            break;
-
-        case assign:
-            *pfixexpr->infixptr++ = '=';
-            relsym = lessequal; /* '<=' */
-            GetSym();
-            break;
-
-        default:
-            break;
-        }
-
         break;
 
-    case assign:
+    case lessequal:
+        *pfixexpr->infixptr++ = '<';
         *pfixexpr->infixptr++ = '=';
+        GetSym();
+        break;
+
+    case equal:
+        *pfixexpr->infixptr++ = '=';
+        GetSym();
+        break;
+
+    case notequal:
+        *pfixexpr->infixptr++ = '<';
+        *pfixexpr->infixptr++ = '>';
         GetSym();
         break;
 
     case greater:
         *pfixexpr->infixptr++ = '>';
+        GetSym();
+        break;
 
-        if ( GetSym() == assign )
-        {
-            *pfixexpr->infixptr++ = '=';
-            relsym = greatequal;
-            GetSym();
-        }
-
+    case greatequal:
+        *pfixexpr->infixptr++ = '>';
+        *pfixexpr->infixptr++ = '=';
+        GetSym();
         break;
 
     default:
@@ -442,6 +433,75 @@ Condition( struct expr *pfixexpr )
 }
 
 
+/* parse A && B */
+static int LogAndCondition( struct expr *pfixexpr )
+{
+	if ( ! Condition(pfixexpr) )		/* get A */
+		return FALSE;
+
+	while ( sym == log_and )
+	{
+	    *pfixexpr->infixptr++ = '&';
+	    *pfixexpr->infixptr++ = '&';
+		GetSym();						/* consume '&&' */
+		if ( ! Condition(pfixexpr) )	/* get B */
+			return FALSE;
+
+		NewPfixSymbol( pfixexpr, 0, log_and, NULL, 0 );
+	}
+
+	return TRUE;
+}
+
+
+/* parse A || B */
+static int LogOrCondition( struct expr *pfixexpr )
+{
+	if ( ! LogAndCondition(pfixexpr) )		/* get A */
+		return FALSE;
+
+	while ( sym == log_or )
+	{
+	    *pfixexpr->infixptr++ = '|';
+	    *pfixexpr->infixptr++ = '|';
+		GetSym();							/* consume '||' */
+		if ( ! LogAndCondition(pfixexpr) )	/* get B */
+			return FALSE;
+
+		NewPfixSymbol( pfixexpr, 0, log_or, NULL, 0 );
+	}
+
+	return TRUE;
+}
+
+
+/* parse cond ? true : false */
+static int TernaryCondition( struct expr *pfixexpr )
+{
+	if ( ! LogOrCondition(pfixexpr) )		/* get cond or expression */
+		return FALSE;
+
+	if ( sym != question )
+		return TRUE;
+
+	/* ternary construct found */
+    *pfixexpr->infixptr++ = '?';
+	GetSym();						/* consume '?' */
+		
+	if ( ! TernaryCondition(pfixexpr) )	/* get true */
+		return FALSE;
+
+	if ( sym != colon )
+		return FALSE;
+    *pfixexpr->infixptr++ = ':';
+	GetSym();						/* consume ':' */
+
+	if ( ! TernaryCondition(pfixexpr) )	/* get false */
+		return FALSE;
+
+	NewPfixSymbol( pfixexpr, 0, ternary_cond, NULL, 0 );    /* ?: */
+	return TRUE;
+}
 
 
 struct expr *
@@ -471,7 +531,7 @@ ParseNumExpr( void )
         *pfixhdr->infixptr++ = '#';
     }
 
-    if ( Condition( pfixhdr ) )
+    if ( TernaryCondition( pfixhdr ) )
     {
         /* parse expression... */
         if ( constant_expression == constexpr )
@@ -484,8 +544,9 @@ ParseNumExpr( void )
     else
     {
         RemovePfixlist( pfixhdr );
-        pfixhdr = NULL;         /* syntax error in expression or no room */
-    }                           /* for postfix expression */
+        pfixhdr = NULL;         /* syntax error in expression or no room for postfix expression */
+		error_syntax_expr();
+	}
 
     return pfixhdr;
 }
@@ -590,7 +651,7 @@ EvalPfixExpr( struct expr *pfixlist )
 
                 break;
 
-            case negated:
+            case unary_minus:
                 stackptr->stackconstant = -stackptr->stackconstant;
                 break;
 
@@ -633,7 +694,7 @@ EvalPfixExpr( struct expr *pfixlist )
 void
 CalcExpression( enum symbols opr, struct pfixstack **stackptr )
 {
-    long leftoperand, rightoperand;
+    long leftoperand, rightoperand, condition;
 
     rightoperand = PopItem( stackptr );   /* first get right operator */
     leftoperand = PopItem( stackptr );    /* then get left operator... */
@@ -646,6 +707,14 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
 
     case bin_or:
         PushItem( ( leftoperand | rightoperand ), stackptr );
+        break;
+
+    case log_and:
+        PushItem( ( leftoperand && rightoperand ), stackptr );
+        break;
+
+    case log_or:
+        PushItem( ( leftoperand || rightoperand ), stackptr );
         break;
 
     case bin_xor:
@@ -664,8 +733,8 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
         PushItem( ( leftoperand * rightoperand ), stackptr );
         break;
 
-    case divi:
-        PushItem( calc_divi( leftoperand, rightoperand ), stackptr );
+    case divide:
+        PushItem( calc_divide( leftoperand, rightoperand ), stackptr );
         break;
 
     case mod:
@@ -673,10 +742,10 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
         break;
 
     case power:
-        PushItem( calc_pow( leftoperand, rightoperand ), stackptr );
+        PushItem( calc_power( leftoperand, rightoperand ), stackptr );
         break;
 
-    case assign:
+    case equal:
         PushItem( ( leftoperand == rightoperand ), stackptr );
         break;
 
@@ -699,6 +768,11 @@ CalcExpression( enum symbols opr, struct pfixstack **stackptr )
     case notequal:
         PushItem( ( leftoperand != rightoperand ), stackptr );
         break;
+
+	case ternary_cond:
+		condition = PopItem( stackptr );
+		PushItem( condition ? leftoperand : rightoperand, stackptr );
+		break;
 
     default:
 		assert(0);		/* PushItem( 0, stackptr ); */
@@ -1088,7 +1162,12 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.54  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.55  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.54  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()

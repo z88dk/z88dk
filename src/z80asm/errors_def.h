@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.25 2014-02-18 22:59:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.26 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -44,7 +44,6 @@ ERR( ErrError,	error_syntax_expr( void ),				"syntax error in expression" )
 ERR( ErrError,	error_expr( char *expr ),					"error in expression '%s'" _C_ expr )
 ERR( ErrError,	error_invalid_squoted_string( void ),		"invalid single quoted character" )
 ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
-ERR( ErrError,	error_unbanlanced_paren( void ),			"unbalanced parenthesis" )
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
 ERR( ErrError,	error_not_defined_expr( char *expr ),		"symbol not defined in expression '%s'" _C_ expr )
@@ -81,7 +80,12 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.25  2014-02-18 22:59:06  pauloscustodio
+* Revision 1.26  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.25  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
 * BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 *

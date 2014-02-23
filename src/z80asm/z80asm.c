@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.138 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.139 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -75,7 +75,6 @@ enum symbols sym, ssym[] =
     {
 #define TOKEN(name, str_legacy, str_new) name,
 #include "token_def.h"
-#undef TOKEN
     };
 
 char separators[] =
@@ -85,7 +84,6 @@ char separators[] =
 #define TOKEN(name, str_legacy, str_new) str_new
 #endif
 #include "token_def.h"
-#undef TOKEN
     ;
 
 enum flag EOL;
@@ -749,7 +747,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.138  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.139  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.138  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()

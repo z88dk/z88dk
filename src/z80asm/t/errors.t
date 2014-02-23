@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.6 2014-02-18 22:59:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.7 2014-02-23 18:48:16 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -700,10 +700,10 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 unlink_testfiles();
 t_z80asm_ok(0, "ld a,2*(1+2)", "\x3E\x06");
 t_z80asm_ok(0, "ld a,2*[1+2]", "\x3E\x06");
-t_z80asm_error("ld a,2*(1+2", 	"Error at file 'test.asm' line 1: unbalanced parenthesis");
-t_z80asm_error("ld a,2*(1+2]", 	"Error at file 'test.asm' line 1: unbalanced parenthesis");
-t_z80asm_error("ld a,2*[1+2", 	"Error at file 'test.asm' line 1: unbalanced parenthesis");
-t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: unbalanced parenthesis");
+t_z80asm_error("ld a,2*(1+2", 	"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("ld a,2*(1+2]", 	"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("ld a,2*[1+2", 	"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: syntax error in expression");
 
 #------------------------------------------------------------------------------
 # error_not_defined
@@ -1019,7 +1019,12 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.6  2014-02-18 22:59:06  pauloscustodio
+# Revision 1.7  2014-02-23 18:48:16  pauloscustodio
+# CH_0021: New operators ==, !=, &&, ||, ?:
+# Handle C-like operators ==, !=, &&, || and ?:.
+# Simplify expression parser by handling composed tokens in lexer.
+#
+# Revision 1.6  2014/02/18 22:59:06  pauloscustodio
 # BUG_0040: Detect and report division by zero instead of crashing
 # BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 #

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.9 2014-02-18 22:59:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.10 2014-02-23 18:48:16 pauloscustodio Exp $
 #
 # Test lexer
 
@@ -41,6 +41,8 @@ my @asmbin = (
 	["defb 1<0,1<1,1<2",			"\0\0\1"],
 	["defb 1<=0,1<=1,1<=2",			"\0\1\1"],
 	["defb 1=0,1=1,1=2",			"\0\1\0"],
+	["defb 1==0,1==1,1==2",			"\0\1\0"],		# CH_0021
+	["defb 1!=0,1!=1,1!=2",			"\1\0\1"],		# CH_0021
 	["defb 1<>0,1<>1,1<>2",			"\1\0\1"],
 	["defb 1>0,1>1,1>2",			"\1\0\0"],
 	["defb 1>=0,1>=1,1>=2",			"\1\1\0"],
@@ -55,8 +57,21 @@ my @asmbin = (
 	["defb 2*[1+2*(1+2)]",			"\x0E"],
 	["defb 2*1+2*1+2",				"\x06"],
 	["defb !0,!1",					"\1\0"],
+	["defb 0&&0,0&&1,1&&0,1&&1",	"\0\0\0\1"],	# CH_0021
+	["defb 0||0,0||1,1||0,1||1",	"\0\1\1\1"],	# CH_0021
+	["defb 0||0||1,0||0||0",		"\1\0"],		# CH_0021
 	["defb ' '",					"\x20"],
 );
+
+if ( ! get_legacy() ) {
+	push @asmbin, 
+	["defb 1?2:3,0?4:5",			"\2\5"],		# CH_0021
+	["defb 0? 0?2:3 : 0?4:5",		"\5"],			# CH_0021
+	["defb 0? 0?2:3 : 1?4:5",		"\4"],			# CH_0021
+	["defb 1? 0?2:3 : 1?4:5",		"\3"],			# CH_0021
+	["defb 1? 1?2:3 : 1?4:5",		"\2"],			# CH_0021
+}
+
 my($asm,$bin) = ("","");
 for (@asmbin) {
 	$asm .= $_->[0]."\n";
@@ -64,9 +79,12 @@ for (@asmbin) {
 }
 
 t_z80asm_ok(0, $asm, $bin);
-
-t_z80asm_error("defb ''",						"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 'he'",						"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb ''",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 'he'",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 1?2",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 1?2:",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
 
 # test power expression (**) in object file
 t_z80asm(
@@ -79,7 +97,12 @@ unlink_testfiles();
 done_testing();
 
 # $Log: lexer.t,v $
-# Revision 1.9  2014-02-18 22:59:06  pauloscustodio
+# Revision 1.10  2014-02-23 18:48:16  pauloscustodio
+# CH_0021: New operators ==, !=, &&, ||, ?:
+# Handle C-like operators ==, !=, &&, || and ?:.
+# Simplify expression parser by handling composed tokens in lexer.
+#
+# Revision 1.9  2014/02/18 22:59:06  pauloscustodio
 # BUG_0040: Detect and report division by zero instead of crashing
 # BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
 #

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.10 2014-02-17 23:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.11 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #ifndef TOKEN
@@ -26,47 +26,60 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.10 2014-
    use a " " when not single-char token
    newline must be the last token so that it is returned when a '\0' char is searched */
 TOKEN(	nil,		" ", " " )
-TOKEN(	space, 		" ", " " )
+TOKEN(	space, 		" ", " " )		/* catches space, " " can be used later for not-single-char tokens */
+
 TOKEN(	dquote, 	"\"", "\"" )
 TOKEN(	squote, 	"'", "'" )
+
 TOKEN(	colon,		" ", ":" )
 TOKEN(	semicolon, 	";", ";" )
 TOKEN(	comma, 		",", "," )
 TOKEN(	fullstop, 	".", "." )
+TOKEN(	question, 	"?", "?" )
+
 TOKEN(	lparen,		"(", "(" )
 TOKEN(	lcurly,		"{", "{" )
 TOKEN(	lsquare,	"[", "[" )
 TOKEN(	rsquare,	"]", "]" )
 TOKEN(	rcurly,		"}", "}" )
 TOKEN(	rparen,		")", ")" )
+
 TOKEN(	plus,		"+", "+" )
 TOKEN(	minus,		"-", "-" )
 TOKEN(	multiply,	"*", "*" )
-TOKEN(	divi,		"/", "/" )
+TOKEN(	divide,		"/", "/" )
 TOKEN(	mod,		"%", "%" )
-TOKEN(	assign,		"=", "=" )
+TOKEN(	power,		"^", " " )	/* ** */
+
+TOKEN(	equal,		"=", "=" )	/* == */
+TOKEN(	notequal,	" ", " " )	/* !=, <> */
+TOKEN(	less,		"<", "<" )
+TOKEN(	lessequal,	" ", " " )	/* <= */
+TOKEN(	greater,	">", ">" )
+TOKEN(	greatequal,	" ", " " )	/* >= */
+
 TOKEN(	bin_and,	"~", "&" )
 TOKEN(	bin_or,		"|", "|" )
 TOKEN(	bin_xor,	":", "^" )
-TOKEN(	less,		"<", "<" )
-TOKEN(	greater,	">", ">" )
-TOKEN(	log_not,	"!", "!" )
-TOKEN(	constexpr,	"#", "#" )
-TOKEN(	power,		"^", " " )	/* ** */
-TOKEN(	strconq,	"&", " " )
 TOKEN(	bin_not,	" ", "~" )
 
+TOKEN(	log_and,	" ", " " )	/* && */
+TOKEN(	log_or,		" ", " " )	/* || */
+TOKEN(	log_not,	"!", "!" )
+
+TOKEN(	ternary_cond," "," " )	/* cond ? true : false */
+
+TOKEN(	constexpr,	"#", "#" )
+TOKEN(	strconq,	"&", " " )
+
 /* not single-char */
-TOKEN(	lessequal,	" ", " " )
-TOKEN(	greatequal,	" ", " " )
-TOKEN(	notequal,	" ", " " )
 TOKEN(	name,		" ", " " )
 TOKEN(	number,		" ", " " )
 TOKEN(	decmconst,	" ", " " )
 TOKEN(	hexconst,	" ", " " )
 TOKEN(	binconst,	" ", " " )
 TOKEN(	charconst,	" ", " " )
-TOKEN(	negated,	" ", " " )
+TOKEN(	unary_minus," ", " " )
 TOKEN(	ifstatm,	" ", " " )
 TOKEN(	elsestatm,	" ", " " )
 TOKEN(	endifstatm,	" ", " " )
@@ -86,7 +99,12 @@ TOKEN(	newline,	"",  "" )
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.10  2014-02-17 23:15:13  pauloscustodio
+* Revision 1.11  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.10  2014/02/17 23:15:13  pauloscustodio
 * Define NUM_TOKENS to be used as size of arrays.
 *
 * Revision 1.9  2014/01/11 01:29:40  pauloscustodio

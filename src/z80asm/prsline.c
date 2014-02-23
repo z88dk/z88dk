@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.42 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.43 2014-02-23 18:48:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -119,11 +119,34 @@ GetChar( FILE *fptr )
 }
 
 
+/* check if given char and next are a two-byte token */
+static BOOL GetComposed( int c, char *expect )
+{
+	int c2;
+
+	assert( strlen(expect) == 2 );
+
+	/* check first char */
+	if ( c != expect[0] )
+		return FALSE;
+
+	/* check second char */
+    c2 = GetChar( z80asmfile );
+	if ( c2 == expect[1] )
+		return TRUE;
+
+	/* not this token, push back c2 */
+	if ( c2 != EOF )
+        UnGet( c2, z80asmfile );
+	
+	return FALSE;
+}
+
 enum symbols
 GetSym( void )
 {
     char *instr;
-    int c, c2, chcount = 0;
+    int c, chcount = 0;
 
     ident[0] = '\0';
 
@@ -160,35 +183,21 @@ GetSym( void )
         }
     }
 
-    /* special cases for composed separators */
-    switch ( c )
-    {
-    case '*':
-        c2 = GetChar( z80asmfile );
-
-        if ( c2 == '*' )
-        {
-            sym = power;
-            return sym;
-        }
-        else
-        {
-            if ( c2 != EOF )
-                UnGet( c2, z80asmfile );
-
-            sym = multiply;
-            return sym;
-        }
-
-    default:
-        /* continue */
-        ;
-    }
-
+	/* single char separators */
     instr = strchr( separators, c );
 
     if ( instr != NULL )
     {
+		/* special cases for composed separators */
+		if ( GetComposed( c, "**" ) ) return (sym = power);			/* assign and return */
+		if ( GetComposed( c, "==" ) ) return (sym = equal);			/* assign and return */
+		if ( GetComposed( c, "!=" ) ) return (sym = notequal);		/* assign and return */
+		if ( GetComposed( c, "<>" ) ) return (sym = notequal);		/* assign and return */
+		if ( GetComposed( c, "<=" ) ) return (sym = lessequal);		/* assign and return */
+		if ( GetComposed( c, ">=" ) ) return (sym = greatequal);	/* assign and return */
+		if ( GetComposed( c, "&&" ) ) return (sym = log_and);		/* assign and return */
+		if ( GetComposed( c, "||" ) ) return (sym = log_or);		/* assign and return */
+
         sym = ssym[instr - separators];   /* index of found char in separators[] */
 
         if ( sym == semicolon )
@@ -796,7 +805,12 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.42  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.43  2014-02-23 18:48:16  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, ?:
+* Handle C-like operators ==, !=, &&, || and ?:.
+* Simplify expression parser by handling composed tokens in lexer.
+*
+* Revision 1.42  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
