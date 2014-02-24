@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.43 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.44 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -36,7 +36,7 @@ int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
 int GetChar( FILE *fptr );
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 void Skipline( FILE *fptr );
 int CheckBaseType( int chcount );
 
@@ -44,7 +44,7 @@ int CheckBaseType( int chcount );
 extern FILE *z80asmfile;
 extern char ident[];
 extern char separators[];
-extern enum symbols sym, ssym[];
+extern tokid_t sym, ssym[];
 extern int currentline;
 extern struct module *CURRENTMODULE;
 extern enum flag EOL;
@@ -142,7 +142,7 @@ static BOOL GetComposed( int c, char *expect )
 	return FALSE;
 }
 
-enum symbols
+tokid_t
 GetSym( void )
 {
     char *instr;
@@ -805,7 +805,10 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.43  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.44  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.43  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

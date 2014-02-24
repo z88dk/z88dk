@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.73 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.74 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.73 2014-02-23 18:48
 
 /*
 * $Log: hist.c,v $
-* Revision 1.73  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.74  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.73  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.
@@ -890,7 +893,7 @@ Based on 1.0.31
 15.07.2011 [1.1.4] (pauloscustodio)
 -------------------------------------------------------------------------------
     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced
-        in enum symbols, causing expressions stored in object files to be wrong,
+        in tokid_t, causing expressions stored in object files to be wrong,
         e.g. VALUE-1 was stored as VALUE*1. This caused problems in expression
         evaluation in link phase.
 

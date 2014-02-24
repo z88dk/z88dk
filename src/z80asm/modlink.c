@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.90 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.91 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -67,7 +67,7 @@ extern FILE *z80asmfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
-extern enum symbols sym, GetSym( void );
+extern tokid_t sym, GetSym( void );
 extern enum flag EOL;
 extern byte_t reloc_routine[];
 extern struct liblist *libraryhdr;
@@ -1037,7 +1037,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.90  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.91  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.90  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()

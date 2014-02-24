@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.72 2014-02-23 18:48:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.73 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,7 @@ void StoreExpr( struct expr *pfixexpr, char range );
 int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 
 /* local functions */
 void ifstatement( enum flag interpret );
@@ -66,7 +66,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 /* global variables */
 extern FILE *z80asmfile, *objfile;
 extern char line[], ident[], separators[];
-extern enum symbols sym;
+extern tokid_t sym;
 extern enum flag EOL;
 extern long TOTALLINES;
 extern struct module *CURRENTMODULE;
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.72  2014-02-23 18:48:46  pauloscustodio
+* Revision 1.73  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.72  2014/02/23 18:48:46  pauloscustodio
 * Extra parentheses removed.
 *
 * Revision 1.71  2014/02/19 23:59:26  pauloscustodio

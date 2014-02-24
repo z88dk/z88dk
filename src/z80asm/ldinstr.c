@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.25 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.26 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,12 +22,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.25 2014-02
 #include "config.h"
 #include "z80asm.h"
 #include "symbol.h"
+#include "token.h"
 #include "errors.h"
 #include "codearea.h"
 #include "options.h"
 
 /* external functions */
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 void RemovePfixlist( struct expr *pfixexpr );
 int ExprUnsigned8( int listoffset );
 int ExprSigned8( int listoffset );
@@ -46,7 +47,7 @@ void LD_r_8bit_indrct( int reg );
 
 
 /* global variables */
-extern enum symbols sym, GetSym( void );
+extern tokid_t sym, GetSym( void );
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
 
@@ -711,7 +712,10 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.25  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.26  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.25  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()

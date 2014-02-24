@@ -14,10 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.69 2014-02-23 18:48:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.70 2014-02-24 23:08:55 pauloscustodio Exp $ */
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.69  2014-02-23 18:48:16  pauloscustodio
+ * Revision 1.70  2014-02-24 23:08:55  pauloscustodio
+ * Rename "enum symbols" to "tokid_t", define in token.h
+ *
+ * Revision 1.69  2014/02/23 18:48:16  pauloscustodio
  * CH_0021: New operators ==, !=, &&, ||, ?:
  * Handle C-like operators ==, !=, &&, || and ?:.
  * Simplify expression parser by handling composed tokens in lexer.
@@ -402,6 +405,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 #include "options.h"
 #include "symbol.h"
 #include "symtab.h"
+#include "token.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -409,7 +413,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 #include <string.h>
 
 /* external functions */
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
@@ -439,7 +443,7 @@ void UNDEFINE( void );
 extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern uint_t DEFVPC;
-extern enum symbols sym;
+extern tokid_t sym;
 extern enum flag EOL;
 extern struct module *CURRENTMODULE;
 
@@ -1140,7 +1144,7 @@ DEFM( void )
                 else
                 {
                     if ( constant != '\"' ) /* NOTE: should be dquote, but dquote is index in
-											   enum symbols (=2) computed by GetSym(),
+											   tokid_t (=2) computed by GetSym(),
 											   different from char retrieved by GetChar() */
                     {
                         append_byte( ( byte_t ) constant );

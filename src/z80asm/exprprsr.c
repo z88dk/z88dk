@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.55 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.56 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.55 2014-0
 #include "legacy.h"
 #include "options.h"
 #include "symbol.h"
+#include "token.h"
 #include "except.h"
 #include "expr.h"
 #include "z80asm.h"
@@ -37,7 +38,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.55 2014-0
 #include <string.h>
 
 /* external functions */
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 long GetConstant( char *evalerr );
 int GetChar( FILE *fptr );
@@ -47,8 +48,8 @@ void list_PfixExpr( struct expr *pfixlist );
 void RemovePfixlist( struct expr *pfixexpr );
 void PushItem( long oprconst, struct pfixstack **stackpointer );
 void ClearEvalStack( struct pfixstack **stackptr );
-void CalcExpression( enum symbols opr, struct pfixstack **stackptr );
-void NewPfixSymbol( struct expr *pfixexpr, long oprconst, enum symbols oprtype, char *symident, char symboltype );
+void CalcExpression( tokid_t opr, struct pfixstack **stackptr );
+void NewPfixSymbol( struct expr *pfixexpr, long oprconst, tokid_t oprtype, char *symident, char symboltype );
 void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
@@ -67,7 +68,7 @@ struct expr *ParseNumExpr( void );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
-extern enum symbols sym;
+extern tokid_t sym;
 extern char ident[], separators[];
 extern FILE *z80asmfile, *objfile;
 
@@ -78,7 +79,7 @@ Factor( struct expr *pfixexpr )
     long constant;
     Symbol *symptr;
     char eval_err;
-    enum symbols open_paren;
+    tokid_t open_paren;
 
     switch ( sym )
     {
@@ -286,7 +287,7 @@ Pterm( struct expr *pfixexpr )
 static int
 Term( struct expr *pfixexpr )
 {
-    enum symbols mulsym;
+    tokid_t mulsym;
 
     if ( !Pterm( pfixexpr ) )
     {
@@ -317,7 +318,7 @@ Term( struct expr *pfixexpr )
 static int
 Expression( struct expr *pfixexpr )
 {
-    enum symbols addsym = nil;
+    tokid_t addsym = nil;
 
     if ( ( sym == plus ) || ( sym == minus ) )
     {
@@ -372,7 +373,7 @@ Expression( struct expr *pfixexpr )
 static int
 Condition( struct expr *pfixexpr )
 {
-    enum symbols relsym = nil;
+    tokid_t relsym = nil;
 
     if ( !Expression( pfixexpr ) )
     {
@@ -508,7 +509,7 @@ struct expr *
 ParseNumExpr( void )
 {
     struct expr *pfixhdr;
-    enum symbols constant_expression = nil;
+    tokid_t constant_expression = nil;
 
     pfixhdr = xnew( struct expr );
 
@@ -692,7 +693,7 @@ EvalPfixExpr( struct expr *pfixlist )
 
 
 void
-CalcExpression( enum symbols opr, struct pfixstack **stackptr )
+CalcExpression( tokid_t opr, struct pfixstack **stackptr )
 {
     long leftoperand, rightoperand, condition;
 
@@ -821,7 +822,7 @@ RemovePfixlist( struct expr *pfixexpr )
 void
 NewPfixSymbol( struct expr *pfixexpr,
                long oprconst,
-               enum symbols oprtype,
+               tokid_t oprtype,
                char *symident,
                char symboltype )
 {
@@ -1162,7 +1163,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.55  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.56  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.55  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

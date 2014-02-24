@@ -124,6 +124,7 @@
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symref.h" />
     <ClInclude Include="symtab.h" />
+    <ClInclude Include="token.h" />
     <ClInclude Include="token_def.h" />
     <ClInclude Include="z80asm.h" />
   </ItemGroup>
@@ -160,6 +161,7 @@
     <ClCompile Include="sym.c" />
     <ClCompile Include="symref.c" />
     <ClCompile Include="symtab.c" />
+    <ClCompile Include="token.c" />
     <ClCompile Include="z80asm.c" />
     <ClCompile Include="z80instr.c" />
     <ClCompile Include="z80pass.c" />

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.3 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.4 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,6 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.3 2014-02-23 18:48:
 #include "array.h"
 #include "class.h"
 #include "symbol.h"
+#include "token.h"
 
 extern long calc_divide(long a, long b);
 extern long calc_mod(long a, long b);
@@ -41,13 +42,13 @@ ARRAY( long );
 *----------------------------------------------------------------------------*/
 typedef struct ExprOp					/* hold one operation or operand */
 {
-    enum symbols	operatortype;		
-    long			operandconst;		/* hold constant */
-    char		   *id;					/* identifier name kept in strpool */
-    byte_t			type;				/* type of identifier (local, global, rel. address or constant) */
+    tokid_t		operatortype;		
+    long		operandconst;		/* hold constant */
+    char	   *id;					/* identifier name kept in strpool */
+    byte_t		type;				/* type of identifier (local, global, rel. address or constant) */
 } ExprOp;
 
-ARRAY( ExprOp )							/* hold list of Expr operations/operands */
+ARRAY( ExprOp )						/* hold list of Expr operations/operands */
 
 CLASS( Expr )
 
@@ -56,7 +57,10 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.3  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.4  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.3  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.139 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.140 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,6 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.139 2014-02-23 18
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
+#include "token.h"
 #include "except.h"
 #include "z80asm.h"
 #include <ctype.h>
@@ -50,7 +51,7 @@ void LinkModules( void );
 void DeclModuleName( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
-enum symbols GetSym( void );
+tokid_t GetSym( void );
 long GetConstant( char *evalerr );
 
 
@@ -70,8 +71,8 @@ FILE *z80asmfile, *objfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
- * not caught before, needs to have the same sequence as enum symbols {} */
-enum symbols sym, ssym[] =
+ * not caught before, needs to have the same sequence as tokid_t {} */
+tokid_t sym, ssym[] =
     {
 #define TOKEN(name, str_legacy, str_new) name,
 #include "token_def.h"
@@ -747,7 +748,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.139  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.140  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.139  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

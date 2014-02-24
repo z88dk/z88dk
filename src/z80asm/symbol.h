@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.34 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.35 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,21 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.34 2014-02-23 18:
 #include "objfile.h"
 #include "symtab.h"
 #include "types.h"
+#include "token.h"
 #include <stdlib.h>
 
 /* Structured data types : */
 
 enum flag           { OFF, ON };
 
-/* BUG_0001 - add colon symbol */
-/* BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
-        causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
-        VALUE*1. This caused problems in expression evaluation in link phase. */
-enum symbols
-{
-#define TOKEN(name, str_legacy, str_new) name,
-#include "token_def.h"
-};
 
 
 struct pfixstack
@@ -52,7 +44,7 @@ struct postfixlist
 {
     struct postfixlist *nextoperand;      /* pointer to next element in postfix expression */
     long               operandconst;
-    enum symbols       operatortype;
+    tokid_t			   operatortype;
     char              *id;                /* pointer to identifier */
     byte_t			   type;              /* type of identifier (local, global, rel. address or constant) */
 };
@@ -158,7 +150,10 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.34  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.35  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.34  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.
@@ -272,7 +267,7 @@ struct linkedmod
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.11  2011/07/14 23:49:50  pauloscustodio
-*     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
+*     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in tokid_t,
 *      causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
 *      VALUE*1. This caused problems in expression evaluation in link phase.
 *

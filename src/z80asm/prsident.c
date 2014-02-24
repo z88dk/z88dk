@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.52 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.53 2014-02-24 23:08:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -77,7 +77,7 @@ void SetTemporaryLine( char *line );
 
 /* global variables */
 extern FILE *z80asmfile;
-extern enum symbols sym, GetSym( void );
+extern tokid_t sym, GetSym( void );
 extern enum flag EOL;
 extern char ident[], line[];
 extern struct module *CURRENTMODULE;
@@ -1092,7 +1092,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.52  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.53  2014-02-24 23:08:55  pauloscustodio
+* Rename "enum symbols" to "tokid_t", define in token.h
+*
+* Revision 1.52  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
