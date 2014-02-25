@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.11 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.12 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,7 +26,10 @@ extern char copyrightmsg[];
 
 /*
 * $Log: hist.h,v $
-* Revision 1.11  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.12  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.11  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -41,7 +44,8 @@ extern char copyrightmsg[];
 * Unify copyright header
 *
 * Revision 1.7  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

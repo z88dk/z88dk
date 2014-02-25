@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.42 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.43 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -74,7 +74,10 @@ extern char *get_map_filename( char *filename );
 
 /*
 * $Log: options.h,v $
-* Revision 1.42  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.43  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.42  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model
@@ -229,7 +232,8 @@ extern char *get_map_filename( char *filename );
 * Unify copyright header
 *
 * Revision 1.5  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

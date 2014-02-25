@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.53 2014-02-24 23:08:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.54 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -1092,7 +1092,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.53  2014-02-24 23:08:55  pauloscustodio
+* Revision 1.54  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.53  2014/02/24 23:08:55  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 * Revision 1.52  2014/01/11 01:29:40  pauloscustodio
@@ -1205,7 +1208,8 @@ DAA( void )
 *         Also added registry of rcmx_cpi as external library routine.
 *
 * Revision 1.27  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

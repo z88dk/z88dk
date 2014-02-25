@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.25 2014-01-15 00:01:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.26 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,7 +65,10 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.25  2014-01-15 00:01:40  pauloscustodio
+* Revision 1.26  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.25  2014/01/15 00:01:40  pauloscustodio
 * Decouple file.c from errors.c by adding a call-back mechanism in file for
 * fatal errors, setup by errors_init()
 *
@@ -144,7 +147,8 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 * Remove global ASSEMBLE_ERROR, not used
 *
 * Revision 1.4  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

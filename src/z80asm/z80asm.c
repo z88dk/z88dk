@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.140 2014-02-24 23:08:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.141 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -748,7 +748,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.140  2014-02-24 23:08:55  pauloscustodio
+* Revision 1.141  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.140  2014/02/24 23:08:55  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 * Revision 1.139  2014/02/23 18:48:16  pauloscustodio
@@ -1158,7 +1161,8 @@ createsym( Symbol *symptr )
 * New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
 *
 * Revision 1.43  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

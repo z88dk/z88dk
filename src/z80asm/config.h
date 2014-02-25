@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.31 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.32 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -83,7 +83,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.31 2014-01-
 
 /*
 * $Log: config.h,v $
-* Revision 1.31  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.32  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.31  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -147,7 +150,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.31 2014-01-
 * Unify copyright header
 *
 * Revision 1.18  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

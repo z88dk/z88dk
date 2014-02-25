@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.24 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.25 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -231,7 +231,10 @@ byte_t get_byte( uint_t *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.24  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.25  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.24  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -322,7 +325,8 @@ byte_t get_byte( uint_t *paddr )
 * Renamed xfree0() to xfree().
 *
 * Revision 1.3  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

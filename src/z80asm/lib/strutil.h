@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.9 2014-02-19 23:59:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.10 2014-02-25 22:39:35 pauloscustodio Exp $
 */
 
 #pragma once
@@ -113,7 +113,10 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.9  2014-02-19 23:59:27  pauloscustodio
+* Revision 1.10  2014-02-25 22:39:35  pauloscustodio
+* ws
+*
+* Revision 1.9  2014/02/19 23:59:27  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -203,7 +206,8 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 * Remove strtoupper, use POSIX strupr instead
 *
 * Revision 1.2  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

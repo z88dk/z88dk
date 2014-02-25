@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.41 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.42 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -63,7 +63,10 @@ extern void assemble_file( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.41  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.42  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.41  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -175,7 +178,8 @@ extern void assemble_file( char *filename );
 * NUM_ELEMS() moved to types.h
 * 
 * Revision 1.13  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4

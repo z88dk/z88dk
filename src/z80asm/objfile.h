@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.12 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.13 2014-02-25 22:39:34 pauloscustodio Exp $
 */
 
 #pragma once
@@ -73,7 +73,10 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.12  2014-02-19 23:59:26  pauloscustodio
+* Revision 1.13  2014-02-25 22:39:34  pauloscustodio
+* ws
+*
+* Revision 1.12  2014/02/19 23:59:26  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
@@ -113,7 +116,8 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 * Unify copyright header
 * 
 * Revision 1.2  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
+* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 *         --mode=c
 *         --lineend=linux
 *         --indent=spaces=4
