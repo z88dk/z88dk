@@ -4,16 +4,16 @@ INSTALL ?= install
 OBJS = scanner.o
 
 
-all: scanner$(EXESUFFIX)
+all: zpragma$(EXESUFFIX)
 
-scanner$(EXESUFFIX):	$(OBJS)
-	$(CC) -o scanner$(EXESUFFIX) $(LDFLAGS) $(OBJS)
+zpragma$(EXESUFFIX):	$(OBJS)
+	$(CC) -o zpragma$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
-	$(INSTALL) scanner$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) zpragma$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
-	$(RM) scanner$(EXESUFFIX) scanner.o core$(EXESUFFIX)
+	$(RM) zpragma$(EXESUFFIX) scanner.o core$(EXESUFFIX)
 	$(RM) -rf Debug Release
 
 
