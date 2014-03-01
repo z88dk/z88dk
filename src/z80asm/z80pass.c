@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.73 2014-02-24 23:08:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.74 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -65,7 +65,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 /* global variables */
 extern FILE *z80asmfile, *objfile;
-extern char line[], ident[], separators[];
+extern char line[], ident[];
 extern tokid_t sym;
 extern enum flag EOL;
 extern long TOTALLINES;
@@ -142,12 +142,12 @@ parseline( enum flag interpret )
     EOL = OFF;                /* reset END OF LINE flag */
     GetSym();
 
-    if ( sym == fullstop || sym == label )
+    if ( sym == TK_DOT || sym == TK_LABEL )
     {
         if ( interpret == ON )
         {
             /* Generate only possible label declaration if line parsing is allowed */
-            if ( sym == label || GetSym() == name )
+            if ( sym == TK_LABEL || GetSym() == TK_NAME )
             {
                 /* labels must always be touched due to forward referencing problems in expressions */
                 define_symbol( ident, get_PC(), SYMADDR | SYMTOUCHED );
@@ -163,17 +163,17 @@ parseline( enum flag interpret )
         else
         {
             Skipline( z80asmfile );
-            sym = newline;    /* ignore label and rest of line */
+            sym = TK_NEWLINE;    /* ignore label and rest of line */
         }
     }
 
     switch ( sym )
     {
-    case name:
+    case TK_NAME:
         ParseIdent( interpret );
         break;
 
-    case newline:
+    case TK_NEWLINE:
         break;                /* empty line, get next... */
 
     default:
@@ -282,7 +282,7 @@ ifstatement( enum flag interpret )
         while ( sym != endifstatm );
     }
 
-    sym = nil;
+    sym = TK_NIL;
 }
 
 
@@ -767,7 +767,13 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.73  2014-02-24 23:08:55  pauloscustodio
+* Revision 1.74  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.73  2014/02/24 23:08:55  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 * Revision 1.72  2014/02/23 18:48:46  pauloscustodio

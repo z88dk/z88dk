@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.54 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.55 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -338,7 +338,7 @@ XDEF( void )
 {
     do
     {
-        if ( GetSym() == name )
+        if ( GetSym() == TK_NAME )
         {
             declare_global_obj_symbol( ident );
         }
@@ -348,9 +348,9 @@ XDEF( void )
             return;
         }
     }
-    while ( GetSym() == comma );
+    while ( GetSym() == TK_COMMA );
 
-    if ( sym != newline )
+    if ( sym != TK_NEWLINE )
     {
         error_syntax();
     }
@@ -361,7 +361,7 @@ XDEF( void )
 void
 XLIB( void )
 {
-    if ( GetSym() == name )
+    if ( GetSym() == TK_NAME )
     {
         DeclModuleName();         /* XLIB name is implicit MODULE name */
         declare_global_lib_symbol( ident );
@@ -386,7 +386,7 @@ XREF( void )
 
     do
     {
-        if ( GetSym() == name )
+        if ( GetSym() == TK_NAME )
         {
             declare_extern_obj_symbol( ident );    /* Define symbol as extern */
         }
@@ -396,9 +396,9 @@ XREF( void )
             return;
         }
     }
-    while ( GetSym() == comma );
+    while ( GetSym() == TK_COMMA );
 
-    if ( sym != newline )
+    if ( sym != TK_NEWLINE )
     {
         error_syntax();
     }
@@ -412,7 +412,7 @@ LIB( void )
 
     do
     {
-        if ( GetSym() == name )
+        if ( GetSym() == TK_NAME )
         {
             declare_extern_lib_symbol( ident );     /* Define symbol as extern LIB reference */
         }
@@ -422,9 +422,9 @@ LIB( void )
             return;
         }
     }
-    while ( GetSym() == comma );
+    while ( GetSym() == TK_COMMA );
 
-    if ( sym != newline )
+    if ( sym != TK_NEWLINE )
     {
         error_syntax();
     }
@@ -715,11 +715,11 @@ ExtAccumulator( int opcode )
 
     fptr = ftell( z80asmfile );
 
-    if ( GetSym() == name )
+    if ( GetSym() == TK_NAME )
     {
         if ( CheckRegister8() == 7 )
         {
-            if ( GetSym() == comma )
+            if ( GetSym() == TK_COMMA )
             {
                 /* <instr> A, ... */
                 ArithLog8_instr( opcode );
@@ -730,7 +730,7 @@ ExtAccumulator( int opcode )
     }
 
     /* reparse and code generate (if possible) */
-    sym = nil;
+    sym = TK_NIL;
     EOL = OFF;
 
     fseek( z80asmfile, fptr, SEEK_SET );
@@ -1092,7 +1092,13 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.54  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.55  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.54  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.53  2014/02/24 23:08:55  pauloscustodio
@@ -1391,16 +1397,3 @@ DAA( void )
 /* "<instr> [A,]xxx", allowing for specification of accumulator. This */
 /* makes all accumulator related instructions equal in syntax and removes */
 /* ambiguity. */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */

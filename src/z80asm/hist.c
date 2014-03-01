@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.74 2014-02-24 23:08:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.75 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.74 2014-02-24 23:08
 
 /*
 * $Log: hist.c,v $
-* Revision 1.74  2014-02-24 23:08:55  pauloscustodio
+* Revision 1.75  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.74  2014/02/24 23:08:55  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 * Revision 1.73  2014/02/23 18:48:16  pauloscustodio
@@ -1600,11 +1606,12 @@ Based on 1.0.31
 		Create uint_t and ulong_t, use uint_t instead of size_t.
 		
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.1.4] (pauloscustodio)
+01.03.2014 [2.1.4] (pauloscustodio)
 -------------------------------------------------------------------------------
-	CH_0021: New operators ==, !=, &&, ||, ?:
-		Handle C-like operators ==, !=, &&, || and ?:.
+	CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+		Handle C-like operators, make exponentiation (**) right-associative.
 		Simplify expression parser by handling composed tokens in lexer.
+		Change token ids to TK_...
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1643,7 +1650,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.4a"
+#define VERSION     "2.1.4"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -15,26 +15,43 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token.h,v 1.1 2014-02-24 23:08:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token.h,v 1.2 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#define TOKEN(name, str_legacy, str_new) name,
+#include "types.h"
+
+/*-----------------------------------------------------------------------------
+*	Token IDs
+*----------------------------------------------------------------------------*/
+#define TOKEN(name, string) name,
 typedef enum tokid_t
 {
 #include "token_def.h"
 } tokid_t;
 
+/*-----------------------------------------------------------------------------
+*	Lookup char in token tables; char may be -1 (EOF)
+*----------------------------------------------------------------------------*/
 
-/* return tokid_t of the given character, for single-token chars */
+/* return tokid_t of the given character, for single-char tokens */
 extern tokid_t char_token( int c );
+
+/* return the string representation of the given token */
+extern char *token_string( tokid_t tok );
 
 /*
 * $Log: token.h,v $
-* Revision 1.1  2014-02-24 23:08:57  pauloscustodio
+* Revision 1.2  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.1  2014/02/24 23:08:57  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 *

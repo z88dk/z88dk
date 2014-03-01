@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.27 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.28 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,7 +59,7 @@ LD( void )
     long exprptr;
     int sourcereg, destreg;
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         exprptr = ftell( z80asmfile );    /* remember start of expression */
 
@@ -75,7 +75,7 @@ LD( void )
             break;
 
         case 0:
-            if ( sym == comma )
+            if ( sym == TK_COMMA )
             {
                 /* LD  (BC),A  */
                 GetSym();
@@ -98,7 +98,7 @@ LD( void )
             break;
 
         case 1:
-            if ( sym == comma )
+            if ( sym == TK_COMMA )
             {
                 /* LD  (DE),A  */
                 GetSym();
@@ -137,7 +137,7 @@ LD( void )
             break;
 
         case 8:
-            if ( GetSym() == comma )
+            if ( GetSym() == TK_COMMA )
             {
                 GetSym();
 
@@ -161,7 +161,7 @@ LD( void )
             break;
 
         case 9:
-            if ( GetSym() == comma )
+            if ( GetSym() == TK_COMMA )
             {
                 GetSym();
 
@@ -185,9 +185,9 @@ LD( void )
             break;
 
         default:
-            if ( GetSym() == comma )
+            if ( GetSym() == TK_COMMA )
             {
-                if ( GetSym() == lparen )
+                if ( GetSym() == TK_LPAREN )
                 {
                     LD_r_8bit_indrct( destreg );    /* LD  r,(HL)  ;   LD  r,(IX|IY+d)  */
                 }
@@ -304,7 +304,7 @@ LD_HL8bit_indrct( void )
 {
     int sourcereg;
 
-    if ( sym == comma )
+    if ( sym == TK_COMMA )
     {
         GetSym();
 
@@ -362,13 +362,13 @@ LD_index8bit_indrct( int destreg )
         return;    /* IX/IY offset expression */
     }
 
-    if ( sym != rparen )
+    if ( sym != TK_RPAREN )
     {
         error_syntax(); /* ')' wasn't found in line */
         return;
     }
 
-    if ( GetSym() == comma )
+    if ( GetSym() == TK_COMMA )
     {
         GetSym();
 
@@ -494,13 +494,13 @@ LD_address_indrct( long exprptr )
         RemovePfixlist( addrexpr );    /* remove this expression again */
     }
 
-    if ( sym != rparen )
+    if ( sym != TK_RPAREN )
     {
         error_syntax(); /* Right bracket missing! */
         return;
     }
 
-    if ( GetSym() == comma )
+    if ( GetSym() == TK_COMMA )
     {
         GetSym();
 
@@ -579,8 +579,8 @@ LD_16bit_reg( void )
     destreg = CheckRegister16();
 
     if ( destreg != -1 )
-        if ( GetSym() == comma )
-            if ( GetSym() == lparen )
+        if ( GetSym() == TK_COMMA )
+            if ( GetSym() == TK_LPAREN )
             {
                 switch ( destreg )
                 {
@@ -712,7 +712,13 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.27  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.28  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.27  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.26  2014/02/24 23:08:55  pauloscustodio
@@ -870,16 +876,3 @@ LD_16bit_reg( void )
 /* User: Gbs          Date: 20-06-98   Time: 15:10 */
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */

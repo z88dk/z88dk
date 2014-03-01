@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.3 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.4 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -70,8 +70,8 @@ long calc_power(long base, long exp)
 *	Define calc functions for all operators, template:
 *	static long f_<symbol> (long a, long b) { return <calc>; }
 *----------------------------------------------------------------------------*/
-#define OPERATOR(_symbol, _type, _prec, _assoc, _calc)	\
-	static long f_##_symbol ( long a, long b ) { return _calc; }
+#define OPERATOR(_symbol, _operation, _type, _prec, _assoc, _calc)	\
+	static long f_##_operation ( long a, long b ) { return _calc; }
 #include "expr_def.h"
 
 #if 0
@@ -106,7 +106,13 @@ void Expr_fini (Expr *self)
 
 /*
 * $Log: expr.c,v $
-* Revision 1.3  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.4  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.3  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

@@ -12,12 +12,978 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.72 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.71 2014-02-25 22:39:34 pauloscustodio Exp $ */
+#include "xmalloc.h"   /* before any other include to enable memory leak detection */
+
+#include "codearea.h"
+#include "config.h"
+#include "errors.h"
+#include "fileutil.h"
+#include "listfile.h"
+#include "legacy.h"
+#include "expr_def.h"
+#include "options.h"
+#include "symbol.h"
+#include "symtab.h"
+#include "token.h"
+#include "z80asm.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* external functions */
+tokid_t GetSym( void );
+int ExprSigned8( int listoffset );
+int ExprUnsigned8( int listoffset );
+int ExprAddress( int listoffset );
+int ExprLong( int listoffset );
+int DEFSP( void );
+int GetChar( FILE *fptr );
+long EvalPfixExpr( struct expr *pfixexpr );
+long GetConstant( char *evalerr );
+void Pass2info( struct expr *expression, char constrange, long lfileptr );
+void RemovePfixlist( struct expr *pfixexpr );
+void Z80pass1( void );
+void Skipline( FILE *fptr );
+struct expr *ParseNumExpr( void );
+struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
+struct sourcefile *Prevfile( void );
+struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
+void getasmline( void );
+
+
+/* local functions */
+void DeclModuleName( void );
+void DEFINE( void );
+void UNDEFINE( void );
+
+
+/* global variables */
+extern FILE *z80asmfile;
+extern char ident[], stringconst[];
+extern uint_t DEFVPC;
+extern tokid_t sym;
+extern enum flag EOL;
+extern struct module *CURRENTMODULE;
+
+
+int
+DEFSP( void )
+{
+    if ( GetSym() == TK_DOT )
+        if ( GetSym() == TK_NAME )
+            switch ( ident[0] )
+            {
+            case 'B':
+                return 1;
+
+            case 'W':
+                return 2;
+
+            case 'P':
+                return 3;
+
+            case 'L':
+                return 4;
+
+            default:
+                return -1;
+            }
+        else
+        {
+            error_syntax();
+            return -1;
+        }
+    else
+    {
+        error_syntax();
+        return -1;
+    }
+}
+
+
+
+long
+Parsevarsize( void )
+{
+
+    struct expr *postfixexpr;
+
+    long offset = 0, varsize, size_multiplier;
+
+    if ( strcmp( ident, "DS" ) != 0 )
+    {
+        error_illegal_ident();
+    }
+    else
+    {
+        if ( ( varsize = DEFSP() ) == -1 )
+        {
+            error_unknown_ident();
+        }
+        else
+        {
+            GetSym();
+
+            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+            {
+                if ( postfixexpr->rangetype & NOTEVALUABLE )
+                {
+                    error_not_defined();
+                    RemovePfixlist( postfixexpr );
+                }
+                else
+                {
+                    size_multiplier = EvalPfixExpr( postfixexpr );
+                    RemovePfixlist( postfixexpr );
+
+                    if ( size_multiplier > 0 && size_multiplier <= MAXCODESIZE )
+                    {
+                        offset = varsize * size_multiplier;
+                    }
+                    else
+                    {
+                        error_int_range( size_multiplier );
+                    }
+                }
+            }
+        }
+    }
+
+    return offset;
+}
+
+
+
+long
+Parsedefvarsize( long offset )
+{
+    long varoffset = 0;
+
+    switch ( sym )
+    {
+    case TK_NAME:
+        if ( strcmp( ident, "DS" ) != 0 )
+        {
+            define_symbol( ident, offset, 0 );
+            GetSym();
+        }
+
+        if ( sym == TK_NAME )
+        {
+            varoffset = Parsevarsize();
+        }
+
+        break;
+
+    default:
+        error_syntax();
+    }
+
+    return varoffset;
+}
+
+
+
+void
+DEFVARS( void )
+{
+    struct expr *postfixexpr;
+
+    long offset;
+    enum flag globaldefv;
+
+    GetSym();
+
+    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    {
+        /* expr. must not be stored in relocatable file */
+        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        {
+            error_not_defined();
+            RemovePfixlist( postfixexpr );
+            return;
+        }
+        else
+        {
+            offset = EvalPfixExpr( postfixexpr ); /* offset expression must not contain undefined symbols */
+            RemovePfixlist( postfixexpr );
+        }
+
+        if ( ( offset != -1 ) && ( offset != 0 ) )
+        {
+            DEFVPC = ( uint_t )offset;
+            globaldefv = ON;
+        }
+        else
+        {
+            if ( offset == -1 )
+            {
+                globaldefv = ON;
+                offset = DEFVPC;
+            }
+            else
+            {
+                /* offset = 0, use temporarily without smashing DEFVPC */
+                globaldefv = OFF;
+            }
+        }
+    }
+    else
+    {
+        return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
+    }
+
+    while ( !feof( z80asmfile ) && sym != TK_LCURLY )
+    {
+        Skipline( z80asmfile );
+
+        EOL = OFF;
+        ++CURRENTFILE->line;
+
+        if ( !opts.line_mode )
+        {
+            set_error_line( CURRENTFILE->line );    /* error location */
+        }
+
+        if ( opts.cur_list )
+        {
+            getasmline();    /* get a copy of current source line */
+            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+        }
+
+        GetSym();
+    }
+
+    if ( sym == TK_LCURLY )
+    {
+        while ( !feof( z80asmfile ) && GetSym() != TK_RCURLY )
+        {
+            if ( EOL == ON )
+            {
+                ++CURRENTFILE->line;
+
+                if ( !opts.line_mode )
+                {
+                    set_error_line( CURRENTFILE->line );    /* error location */
+                }
+
+                if ( opts.cur_list )
+                {
+                    getasmline();    /* get a copy of current source line */
+                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+                }
+
+                EOL = OFF;
+            }
+            else
+            {
+                offset += Parsedefvarsize( offset );
+            }
+        }
+
+        if ( globaldefv == ON )
+        {
+            DEFVPC = ( uint_t )offset;
+        }
+    }
+}
+
+
+
+void
+DEFGROUP( void )
+{
+    struct expr *postfixexpr;
+    long constant, enumconst = 0;
+
+    while ( !feof( z80asmfile ) && GetSym() != TK_LCURLY )
+    {
+        Skipline( z80asmfile );
+        EOL = OFF;
+        ++CURRENTFILE->line;
+
+        if ( !opts.line_mode )
+        {
+            set_error_line( CURRENTFILE->line );    /* error location */
+        }
+
+        if ( opts.cur_list )
+        {
+            getasmline();    /* get a copy of current source line */
+            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+        }
+
+
+    }
+
+    if ( sym == TK_LCURLY )
+    {
+        while ( !feof( z80asmfile ) && sym != TK_RCURLY )
+        {
+            if ( EOL == ON )
+            {
+                ++CURRENTFILE->line;
+
+                if ( !opts.line_mode )
+                {
+                    set_error_line( CURRENTFILE->line );    /* error location */
+                }
+
+                if ( opts.cur_list )
+                {
+                    getasmline();    /* get a copy of current source line */
+                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+                }
+
+                EOL = OFF;
+            }
+            else
+            {
+                do
+                {
+                    GetSym();
+
+                    switch ( sym )
+                    {
+                    case TK_RCURLY:
+                    case TK_NEWLINE:
+                        break;
+
+                    case TK_NAME:
+                        strcpy( stringconst, ident );     /* remember name */
+
+                        if ( GetSym() == TK_EQUAL )
+                        {
+                            GetSym();
+
+                            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+                            {
+                                if ( postfixexpr->rangetype & NOTEVALUABLE )
+                                {
+                                    error_not_defined();
+                                }
+                                else
+                                {
+                                    constant = EvalPfixExpr( postfixexpr );
+                                    enumconst = constant;
+                                    define_symbol( stringconst, enumconst++, 0 );
+                                }
+
+                                RemovePfixlist( postfixexpr );
+                            }
+
+                            /* BUG_0032 - removed: GetSym(); */
+                        }
+                        else
+                        {
+                            define_symbol( stringconst, enumconst++, 0 );
+                        }
+
+                        break;
+
+                    default:
+                        error_syntax();
+                        break;
+                    }
+                }
+                while ( sym == TK_COMMA );   /* get enum definitions separated by comma in current line */
+
+                Skipline( z80asmfile );   /* ignore rest of line */
+            }
+        }
+    }
+}
+
+
+void
+DEFS()
+{
+    struct expr *postfixexpr;
+    struct expr *constexpr;
+
+    long constant = 0, val = 0;
+
+    GetSym();                     /* get numerical expression */
+
+    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    {
+        /* expr. must not be stored in relocatable file */
+        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        {
+            error_not_defined();
+        }
+        else
+        {
+            constant = EvalPfixExpr( postfixexpr );
+            /* BUG_0007 : memory leaks - was not being released in case of error */
+            RemovePfixlist( postfixexpr ); /* remove linked list, expression evaluated */
+
+            if ( sym != TK_COMMA )
+            {
+                val = 0;
+            }
+            else
+            {
+                GetSym();
+
+                if ( ( constexpr = ParseNumExpr() ) != NULL )
+                {
+                    if ( constexpr->rangetype & NOTEVALUABLE )
+                    {
+                        error_not_defined();
+                    }
+                    else
+                    {
+                        val = EvalPfixExpr( constexpr );
+                    }
+
+                    RemovePfixlist( constexpr );
+                }
+            }
+
+            if ( constant >= 0 )
+            {
+                inc_PC( constant );
+
+                while ( constant-- )
+                {
+                    append_byte( ( byte_t ) val );
+                }
+            }
+            else
+            {
+                error_int_range( constant );
+                return;
+            }
+        }
+    }
+}
+
+void
+UNDEFINE( void )
+{
+    Symbol *sym = NULL;
+
+    do
+    {
+        if ( GetSym() == TK_NAME )
+        {
+            sym = find_local_symbol( ident );
+        }
+
+        if ( sym != NULL )
+        {
+            SymbolHash_remove( CURRENTMODULE->local_symtab, ident );
+        }
+        else
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( GetSym() == TK_COMMA );
+}
+
+void
+DEFINE( void )
+{
+    do
+    {
+        if ( GetSym() == TK_NAME )
+        {
+            define_local_def_sym( ident, 1 );
+        }
+        else
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( GetSym() == TK_COMMA );
+}
+
+
+void
+DEFC( void )
+{
+    struct expr *postfixexpr;
+    long constant;
+
+    do
+    {
+        if ( GetSym() == TK_NAME )
+        {
+            strcpy( stringconst, ident ); /* remember name */
+
+            if ( GetSym() == TK_EQUAL )
+            {
+                GetSym();         /* get numerical expression */
+
+                if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+                {
+                    /* expr. must not be stored in
+                       * relocatable file */
+                    if ( postfixexpr->rangetype & NOTEVALUABLE )
+                    {
+                        error_not_defined();
+                        break;
+                    }
+                    else
+                    {
+                        constant = EvalPfixExpr( postfixexpr );    /* DEFC expression must not
+                                                                 * contain undefined symbols */
+                        define_symbol( stringconst, constant, 0 );
+                    }
+
+                    RemovePfixlist( postfixexpr );
+                }
+                else
+                {
+                    break;    /* syntax error - get next line from file... */
+                }
+            }
+            else
+            {
+                error_syntax();
+                break;
+            }
+        }
+        else
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( sym == TK_COMMA );       /* get all DEFC definition separated by comma */
+}
+
+
+
+void
+ORG( void )
+{
+
+    struct expr *postfixexpr;
+    long constant;
+
+    GetSym();                     /* get numerical expression */
+
+    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    {
+        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        {
+            error_not_defined();
+        }
+        else
+        {
+            constant = EvalPfixExpr( postfixexpr );       /* ORG expression must not contain undefined symbols */
+
+            if ( constant >= 0 && constant <= 65535 )
+            {
+                CURRENTMODULE->origin = constant;
+            }
+            else
+            {
+                error_int_range( constant );
+            }
+        }
+
+        RemovePfixlist( postfixexpr );
+    }
+}
+
+
+void
+DEFB( void )
+{
+    long bytepos = 0;
+
+    do
+    {
+        GetSym();
+
+        if ( !ExprUnsigned8( bytepos ) )
+        {
+            break;    /* syntax error - get next line from file... */
+        }
+
+        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
+        ++bytepos;
+
+        if ( sym == TK_NEWLINE )
+        {
+            break;
+        }
+        else if ( sym != TK_COMMA )
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+}
+
+
+
+void
+DEFW( void )
+{
+    long bytepos = 0;
+
+    do
+    {
+        GetSym();
+
+        if ( !ExprAddress( bytepos ) )
+        {
+            break;    /* syntax error - get next line from file... */
+        }
+
+        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
+        bytepos += 2;
+
+        if ( sym == TK_NEWLINE )
+        {
+            break;
+        }
+        else if ( sym != TK_COMMA )
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+}
+
+
+
+void
+DEFP( void )
+{
+    long bytepos = 0;
+
+    do
+    {
+        GetSym();
+
+        if ( !ExprAddress( bytepos ) )
+        {
+            break;    /* syntax error - get next line from file... */
+        }
+
+        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
+        bytepos += 2;
+
+        /* Pointers must be specified as WORD,BYTE pairs separated by commas */
+        if ( sym != TK_COMMA )
+        {
+            error_syntax();
+        }
+
+        GetSym();
+
+        if ( !ExprUnsigned8( bytepos ) )
+        {
+            break;    /* syntax error - get next line from file... */
+        }
+
+        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
+        bytepos += 1;
+
+        if ( sym == TK_NEWLINE )
+        {
+            break;
+        }
+        else if ( sym != TK_COMMA )
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+}
+
+
+
+void
+DEFL( void )
+{
+    long bytepos = 0;
+
+    do
+    {
+        GetSym();
+
+        if ( !ExprLong( bytepos ) )
+        {
+            break;    /* syntax error - get next line from file... */
+        }
+
+        inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
+        bytepos += 4;
+
+        if ( sym == TK_NEWLINE )
+        {
+            break;
+        }
+        else if ( sym != TK_COMMA )
+        {
+            error_syntax();
+            break;
+        }
+    }
+    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+}
+
+
+
+void
+DEFM( void )
+{
+    long constant, bytepos = 0;
+
+    do
+    {
+        if ( GetSym() == TK_DQUOTE )
+        {
+            while ( !feof( z80asmfile ) )
+            {
+                constant = GetChar( z80asmfile );
+
+                if ( constant == EOF )
+                {
+                    sym = TK_NEWLINE;
+                    EOL = ON;
+                    error_unclosed_string();
+                    return;
+                }
+                else
+                {
+                    if ( constant != '\"' ) /* NOTE: should be TK_DQUOTE, but TK_DQUOTE is index in
+											   tokid_t (=2) computed by GetSym(),
+											   different from char retrieved by GetChar() */
+                    {
+                        append_byte( ( byte_t ) constant );
+                        ++bytepos;
+                        inc_PC( 1 );
+                    }
+                    else
+                    {
+                        GetSym();
+
+                        if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
+                        {
+                            error_syntax();
+                            return;
+                        }
+
+                        break;    /* get out of loop */
+                    }
+                }
+            }
+        }
+        else
+        {
+            if ( !ExprUnsigned8( bytepos ) )
+            {
+                break;    /* syntax error - get next line from file... */
+            }
+
+            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
+            {
+                error_syntax(); /* expression separator not found */
+                break;
+            }
+
+            ++bytepos;
+            inc_PC( 1 );
+        }
+    }
+    while ( sym != TK_NEWLINE );
+}
+
+
+
+
+void
+INCLUDE( void )
+{
+    char    *filename;
+
+    if ( GetSym() == TK_DQUOTE )
+    {
+        /* fetch filename of include file */
+        filename = Fetchfilename( z80asmfile );
+
+        if ( FindFile( CURRENTFILE, filename ) != NULL )
+        {
+            fatal_include_recursion( filename );
+            return;
+        }
+
+        CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
+        xfclose( z80asmfile );     /* close current source file */
+        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
+                                       z80asmfile is NULL in case the next
+                                       xfopen() throws an exception */
+
+        z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
+        CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
+
+        set_error_file( filename );
+
+        if ( opts.verbose )
+        {
+            puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
+        }
+
+        Z80pass1();           /* parse include file */
+
+        CURRENTFILE = Prevfile();     /* Now get back to current file... */
+
+        set_error_file( CURRENTFILE->fname );
+
+        xfclose( z80asmfile );
+        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
+                                       z80asmfile is NULL in case the next
+                                       xfopen() throws an exception */
+
+        z80asmfile = xfopen( CURRENTFILE->fname, "rb" );           /* CH_0012 */
+        fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
+    }
+    else
+    {
+        error_syntax();
+    }
+
+    sym = TK_NEWLINE;
+}
+
+
+void
+BINARY( void )
+{
+    char      *filename;
+    FILE          *binfile;
+    long          Codesize;
+
+    if ( GetSym() == TK_DQUOTE )
+    {
+        filename = Fetchfilename( z80asmfile );
+
+        binfile = xfopen( filename, "rb" );           /* CH_0012 */
+        fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
+        Codesize = ftell( binfile );
+        fseek( binfile, 0L, SEEK_SET ); /* file pointer to start of file */
+
+        fread_codearea( binfile, Codesize );  /* read binary code */
+        inc_PC( Codesize );
+
+        xfclose( binfile );
+        binfile = NULL;
+    }
+    else
+    {
+        error_syntax();
+    }
+}
+
+
+
+char *
+Fetchfilename( FILE *fptr )
+{
+    char  *ptr;
+    int    len, c = 0;
+
+    do
+    {
+        for ( len = 0; len < 255; len++ )
+        {
+            if ( !feof( fptr ) )
+            {
+                c = GetChar( fptr );
+
+                if ( ( c == '\n' ) || ( c == EOF ) )
+                {
+                    break;
+                }
+
+                if ( c != '"' )
+                {
+                    ident[len] = ( char ) c;
+                }
+                else
+                {
+                    break;       /* fatal - end of file reached! */
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        ident[len] = '\0';          /* null-terminate file name */
+    }
+    while ( strlen( ident ) == 0 && !feof( fptr ) );
+
+    if ( c != '\n' )
+    {
+        Skipline( fptr );    /* prepare for next line */
+    }
+
+    ptr = ident;
+
+#ifdef __LEGACY_Z80ASM_SYNTAX
+
+    if ( *ptr == '#' )
+    {
+        ptr++;
+    }
+
+#endif
+
+    return strlen( ptr ) ? search_file( ptr, opts.inc_path ) : "";
+}
+
+
+
+void
+DeclModuleName( void )
+{
+    if ( CURRENTMODULE->mname == NULL )
+    {
+        if ( sym == TK_NAME )
+        {
+            CURRENTMODULE->mname = xstrdup( ident );
+        }
+        else
+        {
+            error_illegal_ident();
+        }
+    }
+    else
+    {
+        error_module_redefined();
+    }
+}
+
+
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.71  2014-02-25 22:39:34  pauloscustodio
+ * Revision 1.72  2014-03-01 15:45:31  pauloscustodio
+ * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+ * Handle C-like operators, make exponentiation (**) right-associative.
+ * Simplify expression parser by handling composed tokens in lexer.
+ * Change token ids to TK_...
+ *
+ * Revision 1.71  2014/02/25 22:39:34  pauloscustodio
  * ws
  *
  * Revision 1.70  2014/02/24 23:08:55  pauloscustodio
@@ -398,977 +1364,3 @@ Copyright (C) Paulo Custodio, 2011-2014
 /* Created in $/Z80asm */
 /* Improvements on defm() and Fetchfilename(): */
 /* fgetc() logic now handled better according to EOF events. */
-
-#include "xmalloc.h"   /* before any other include to enable memory leak detection */
-
-#include "codearea.h"
-#include "config.h"
-#include "errors.h"
-#include "fileutil.h"
-#include "listfile.h"
-#include "options.h"
-#include "symbol.h"
-#include "symtab.h"
-#include "token.h"
-#include "z80asm.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/* external functions */
-tokid_t GetSym( void );
-int ExprSigned8( int listoffset );
-int ExprUnsigned8( int listoffset );
-int ExprAddress( int listoffset );
-int ExprLong( int listoffset );
-int DEFSP( void );
-int GetChar( FILE *fptr );
-long EvalPfixExpr( struct expr *pfixexpr );
-long GetConstant( char *evalerr );
-void Pass2info( struct expr *expression, char constrange, long lfileptr );
-void RemovePfixlist( struct expr *pfixexpr );
-void Z80pass1( void );
-void Skipline( FILE *fptr );
-struct expr *ParseNumExpr( void );
-struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
-struct sourcefile *Prevfile( void );
-struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
-void getasmline( void );
-
-
-/* local functions */
-void DeclModuleName( void );
-void DEFINE( void );
-void UNDEFINE( void );
-
-
-/* global variables */
-extern FILE *z80asmfile;
-extern char ident[], stringconst[];
-extern uint_t DEFVPC;
-extern tokid_t sym;
-extern enum flag EOL;
-extern struct module *CURRENTMODULE;
-
-
-int
-DEFSP( void )
-{
-    if ( GetSym() == fullstop )
-        if ( GetSym() == name )
-            switch ( ident[0] )
-            {
-            case 'B':
-                return 1;
-
-            case 'W':
-                return 2;
-
-            case 'P':
-                return 3;
-
-            case 'L':
-                return 4;
-
-            default:
-                return -1;
-            }
-        else
-        {
-            error_syntax();
-            return -1;
-        }
-    else
-    {
-        error_syntax();
-        return -1;
-    }
-}
-
-
-
-long
-Parsevarsize( void )
-{
-
-    struct expr *postfixexpr;
-
-    long offset = 0, varsize, size_multiplier;
-
-    if ( strcmp( ident, "DS" ) != 0 )
-    {
-        error_illegal_ident();
-    }
-    else
-    {
-        if ( ( varsize = DEFSP() ) == -1 )
-        {
-            error_unknown_ident();
-        }
-        else
-        {
-            GetSym();
-
-            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-            {
-                if ( postfixexpr->rangetype & NOTEVALUABLE )
-                {
-                    error_not_defined();
-                    RemovePfixlist( postfixexpr );
-                }
-                else
-                {
-                    size_multiplier = EvalPfixExpr( postfixexpr );
-                    RemovePfixlist( postfixexpr );
-
-                    if ( size_multiplier > 0 && size_multiplier <= MAXCODESIZE )
-                    {
-                        offset = varsize * size_multiplier;
-                    }
-                    else
-                    {
-                        error_int_range( size_multiplier );
-                    }
-                }
-            }
-        }
-    }
-
-    return offset;
-}
-
-
-
-long
-Parsedefvarsize( long offset )
-{
-    long varoffset = 0;
-
-    switch ( sym )
-    {
-    case name:
-        if ( strcmp( ident, "DS" ) != 0 )
-        {
-            define_symbol( ident, offset, 0 );
-            GetSym();
-        }
-
-        if ( sym == name )
-        {
-            varoffset = Parsevarsize();
-        }
-
-        break;
-
-    default:
-        error_syntax();
-    }
-
-    return varoffset;
-}
-
-
-
-void
-DEFVARS( void )
-{
-    struct expr *postfixexpr;
-
-    long offset;
-    enum flag globaldefv;
-
-    GetSym();
-
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
-        {
-            error_not_defined();
-            RemovePfixlist( postfixexpr );
-            return;
-        }
-        else
-        {
-            offset = EvalPfixExpr( postfixexpr ); /* offset expression must not contain undefined symbols */
-            RemovePfixlist( postfixexpr );
-        }
-
-        if ( ( offset != -1 ) && ( offset != 0 ) )
-        {
-            DEFVPC = ( uint_t )offset;
-            globaldefv = ON;
-        }
-        else
-        {
-            if ( offset == -1 )
-            {
-                globaldefv = ON;
-                offset = DEFVPC;
-            }
-            else
-            {
-                /* offset = 0, use temporarily without smashing DEFVPC */
-                globaldefv = OFF;
-            }
-        }
-    }
-    else
-    {
-        return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
-    }
-
-    while ( !feof( z80asmfile ) && sym != lcurly )
-    {
-        Skipline( z80asmfile );
-
-        EOL = OFF;
-        ++CURRENTFILE->line;
-
-        if ( !opts.line_mode )
-        {
-            set_error_line( CURRENTFILE->line );    /* error location */
-        }
-
-        if ( opts.cur_list )
-        {
-            getasmline();    /* get a copy of current source line */
-            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-        }
-
-        GetSym();
-    }
-
-    if ( sym == lcurly )
-    {
-        while ( !feof( z80asmfile ) && GetSym() != rcurly )
-        {
-            if ( EOL == ON )
-            {
-                ++CURRENTFILE->line;
-
-                if ( !opts.line_mode )
-                {
-                    set_error_line( CURRENTFILE->line );    /* error location */
-                }
-
-                if ( opts.cur_list )
-                {
-                    getasmline();    /* get a copy of current source line */
-                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-                }
-
-                EOL = OFF;
-            }
-            else
-            {
-                offset += Parsedefvarsize( offset );
-            }
-        }
-
-        if ( globaldefv == ON )
-        {
-            DEFVPC = ( uint_t )offset;
-        }
-    }
-}
-
-
-
-void
-DEFGROUP( void )
-{
-    struct expr *postfixexpr;
-    long constant, enumconst = 0;
-
-    while ( !feof( z80asmfile ) && GetSym() != lcurly )
-    {
-        Skipline( z80asmfile );
-        EOL = OFF;
-        ++CURRENTFILE->line;
-
-        if ( !opts.line_mode )
-        {
-            set_error_line( CURRENTFILE->line );    /* error location */
-        }
-
-        if ( opts.cur_list )
-        {
-            getasmline();    /* get a copy of current source line */
-            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-        }
-
-
-    }
-
-    if ( sym == lcurly )
-    {
-        while ( !feof( z80asmfile ) && sym != rcurly )
-        {
-            if ( EOL == ON )
-            {
-                ++CURRENTFILE->line;
-
-                if ( !opts.line_mode )
-                {
-                    set_error_line( CURRENTFILE->line );    /* error location */
-                }
-
-                if ( opts.cur_list )
-                {
-                    getasmline();    /* get a copy of current source line */
-                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-                }
-
-                EOL = OFF;
-            }
-            else
-            {
-                do
-                {
-                    GetSym();
-
-                    switch ( sym )
-                    {
-                    case rcurly:
-                    case semicolon:
-                    case newline:
-                        break;
-
-                    case name:
-                        strcpy( stringconst, ident );     /* remember name */
-
-                        if ( GetSym() == equal )
-                        {
-                            GetSym();
-
-                            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-                            {
-                                if ( postfixexpr->rangetype & NOTEVALUABLE )
-                                {
-                                    error_not_defined();
-                                }
-                                else
-                                {
-                                    constant = EvalPfixExpr( postfixexpr );
-                                    enumconst = constant;
-                                    define_symbol( stringconst, enumconst++, 0 );
-                                }
-
-                                RemovePfixlist( postfixexpr );
-                            }
-
-                            /* BUG_0032 - removed: GetSym(); */
-                        }
-                        else
-                        {
-                            define_symbol( stringconst, enumconst++, 0 );
-                        }
-
-                        break;
-
-                    default:
-                        error_syntax();
-                        break;
-                    }
-                }
-                while ( sym == comma );   /* get enum definitions separated by comma in current line */
-
-                Skipline( z80asmfile );   /* ignore rest of line */
-            }
-        }
-    }
-}
-
-
-void
-DEFS()
-{
-    struct expr *postfixexpr;
-    struct expr *constexpr;
-
-    long constant = 0, val = 0;
-
-    GetSym();                     /* get numerical expression */
-
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
-        {
-            error_not_defined();
-        }
-        else
-        {
-            constant = EvalPfixExpr( postfixexpr );
-            /* BUG_0007 : memory leaks - was not being released in case of error */
-            RemovePfixlist( postfixexpr ); /* remove linked list, expression evaluated */
-
-            if ( sym != comma )
-            {
-                val = 0;
-            }
-            else
-            {
-                GetSym();
-
-                if ( ( constexpr = ParseNumExpr() ) != NULL )
-                {
-                    if ( constexpr->rangetype & NOTEVALUABLE )
-                    {
-                        error_not_defined();
-                    }
-                    else
-                    {
-                        val = EvalPfixExpr( constexpr );
-                    }
-
-                    RemovePfixlist( constexpr );
-                }
-            }
-
-            if ( constant >= 0 )
-            {
-                inc_PC( constant );
-
-                while ( constant-- )
-                {
-                    append_byte( ( byte_t ) val );
-                }
-            }
-            else
-            {
-                error_int_range( constant );
-                return;
-            }
-        }
-    }
-}
-
-void
-UNDEFINE( void )
-{
-    Symbol *sym = NULL;
-
-    do
-    {
-        if ( GetSym() == name )
-        {
-            sym = find_local_symbol( ident );
-        }
-
-        if ( sym != NULL )
-        {
-            SymbolHash_remove( CURRENTMODULE->local_symtab, ident );
-        }
-        else
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( GetSym() == comma );
-}
-
-void
-DEFINE( void )
-{
-    do
-    {
-        if ( GetSym() == name )
-        {
-            define_local_def_sym( ident, 1 );
-        }
-        else
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( GetSym() == comma );
-}
-
-
-void
-DEFC( void )
-{
-    struct expr *postfixexpr;
-    long constant;
-
-    do
-    {
-        if ( GetSym() == name )
-        {
-            strcpy( stringconst, ident ); /* remember name */
-
-            if ( GetSym() == equal )
-            {
-                GetSym();         /* get numerical expression */
-
-                if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-                {
-                    /* expr. must not be stored in
-                       * relocatable file */
-                    if ( postfixexpr->rangetype & NOTEVALUABLE )
-                    {
-                        error_not_defined();
-                        break;
-                    }
-                    else
-                    {
-                        constant = EvalPfixExpr( postfixexpr );    /* DEFC expression must not
-                                                                 * contain undefined symbols */
-                        define_symbol( stringconst, constant, 0 );
-                    }
-
-                    RemovePfixlist( postfixexpr );
-                }
-                else
-                {
-                    break;    /* syntax error - get next line from file... */
-                }
-            }
-            else
-            {
-                error_syntax();
-                break;
-            }
-        }
-        else
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( sym == comma );       /* get all DEFC definition separated by comma */
-}
-
-
-
-void
-ORG( void )
-{
-
-    struct expr *postfixexpr;
-    long constant;
-
-    GetSym();                     /* get numerical expression */
-
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
-        {
-            error_not_defined();
-        }
-        else
-        {
-            constant = EvalPfixExpr( postfixexpr );       /* ORG expression must not contain undefined symbols */
-
-            if ( constant >= 0 && constant <= 65535 )
-            {
-                CURRENTMODULE->origin = constant;
-            }
-            else
-            {
-                error_int_range( constant );
-            }
-        }
-
-        RemovePfixlist( postfixexpr );
-    }
-}
-
-
-void
-DEFB( void )
-{
-    long bytepos = 0;
-
-    do
-    {
-        GetSym();
-
-        if ( !ExprUnsigned8( bytepos ) )
-        {
-            break;    /* syntax error - get next line from file... */
-        }
-
-        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
-        ++bytepos;
-
-        if ( sym == newline )
-        {
-            break;
-        }
-        else if ( sym != comma )
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( sym == comma );       /* get all DEFB definitions separated by comma */
-}
-
-
-
-void
-DEFW( void )
-{
-    long bytepos = 0;
-
-    do
-    {
-        GetSym();
-
-        if ( !ExprAddress( bytepos ) )
-        {
-            break;    /* syntax error - get next line from file... */
-        }
-
-        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
-        bytepos += 2;
-
-        if ( sym == newline )
-        {
-            break;
-        }
-        else if ( sym != comma )
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( sym == comma );       /* get all DEFB definitions separated by comma */
-}
-
-
-
-void
-DEFP( void )
-{
-    long bytepos = 0;
-
-    do
-    {
-        GetSym();
-
-        if ( !ExprAddress( bytepos ) )
-        {
-            break;    /* syntax error - get next line from file... */
-        }
-
-        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
-        bytepos += 2;
-
-        /* Pointers must be specified as WORD,BYTE pairs separated by commas */
-        if ( sym != comma )
-        {
-            error_syntax();
-        }
-
-        GetSym();
-
-        if ( !ExprUnsigned8( bytepos ) )
-        {
-            break;    /* syntax error - get next line from file... */
-        }
-
-        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
-        bytepos += 1;
-
-        if ( sym == newline )
-        {
-            break;
-        }
-        else if ( sym != comma )
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( sym == comma );       /* get all DEFB definitions separated by comma */
-}
-
-
-
-void
-DEFL( void )
-{
-    long bytepos = 0;
-
-    do
-    {
-        GetSym();
-
-        if ( !ExprLong( bytepos ) )
-        {
-            break;    /* syntax error - get next line from file... */
-        }
-
-        inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
-        bytepos += 4;
-
-        if ( sym == newline )
-        {
-            break;
-        }
-        else if ( sym != comma )
-        {
-            error_syntax();
-            break;
-        }
-    }
-    while ( sym == comma );       /* get all DEFB definitions separated by comma */
-}
-
-
-
-
-void
-DEFM( void )
-{
-    long constant, bytepos = 0;
-
-    do
-    {
-        if ( GetSym() == dquote )
-        {
-            while ( !feof( z80asmfile ) )
-            {
-                constant = GetChar( z80asmfile );
-
-                if ( constant == EOF )
-                {
-                    sym = newline;
-                    EOL = ON;
-                    error_unclosed_string();
-                    return;
-                }
-                else
-                {
-                    if ( constant != '\"' ) /* NOTE: should be dquote, but dquote is index in
-											   tokid_t (=2) computed by GetSym(),
-											   different from char retrieved by GetChar() */
-                    {
-                        append_byte( ( byte_t ) constant );
-                        ++bytepos;
-                        inc_PC( 1 );
-                    }
-                    else
-                    {
-                        GetSym();
-
-                        if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
-                        {
-                            error_syntax();
-                            return;
-                        }
-
-                        break;    /* get out of loop */
-                    }
-                }
-            }
-        }
-        else
-        {
-            if ( !ExprUnsigned8( bytepos ) )
-            {
-                break;    /* syntax error - get next line from file... */
-            }
-
-            if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
-            {
-                error_syntax(); /* expression separator not found */
-                break;
-            }
-
-            ++bytepos;
-            inc_PC( 1 );
-        }
-    }
-    while ( sym != newline && sym != semicolon );
-}
-
-
-
-
-void
-INCLUDE( void )
-{
-    char    *filename;
-
-    if ( GetSym() == dquote )
-    {
-        /* fetch filename of include file */
-        filename = Fetchfilename( z80asmfile );
-
-        if ( FindFile( CURRENTFILE, filename ) != NULL )
-        {
-            fatal_include_recursion( filename );
-            return;
-        }
-
-        CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
-        xfclose( z80asmfile );     /* close current source file */
-        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
-                                       z80asmfile is NULL in case the next
-                                       xfopen() throws an exception */
-
-        z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
-        CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
-
-        set_error_file( filename );
-
-        if ( opts.verbose )
-        {
-            puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
-        }
-
-        Z80pass1();           /* parse include file */
-
-        CURRENTFILE = Prevfile();     /* Now get back to current file... */
-
-        set_error_file( CURRENTFILE->fname );
-
-        xfclose( z80asmfile );
-        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
-                                       z80asmfile is NULL in case the next
-                                       xfopen() throws an exception */
-
-        z80asmfile = xfopen( CURRENTFILE->fname, "rb" );           /* CH_0012 */
-        fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
-    }
-    else
-    {
-        error_syntax();
-    }
-
-    sym = newline;
-}
-
-
-void
-BINARY( void )
-{
-    char      *filename;
-    FILE          *binfile;
-    long          Codesize;
-
-    if ( GetSym() == dquote )
-    {
-        filename = Fetchfilename( z80asmfile );
-
-        binfile = xfopen( filename, "rb" );           /* CH_0012 */
-        fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
-        Codesize = ftell( binfile );
-        fseek( binfile, 0L, SEEK_SET ); /* file pointer to start of file */
-
-        fread_codearea( binfile, Codesize );  /* read binary code */
-        inc_PC( Codesize );
-
-        xfclose( binfile );
-        binfile = NULL;
-    }
-    else
-    {
-        error_syntax();
-    }
-}
-
-
-
-char *
-Fetchfilename( FILE *fptr )
-{
-    char  *ptr;
-    int    len, c = 0;
-
-    do
-    {
-        for ( len = 0; len < 255; len++ )
-        {
-            if ( !feof( fptr ) )
-            {
-                c = GetChar( fptr );
-
-                if ( ( c == '\n' ) || ( c == EOF ) )
-                {
-                    break;
-                }
-
-                if ( c != '"' )
-                {
-                    ident[len] = ( char ) c;
-                }
-                else
-                {
-                    break;       /* fatal - end of file reached! */
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        ident[len] = '\0';          /* null-terminate file name */
-    }
-    while ( strlen( ident ) == 0 && !feof( fptr ) );
-
-    if ( c != '\n' )
-    {
-        Skipline( fptr );    /* prepare for next line */
-    }
-
-    ptr = ident;
-
-#ifdef __LEGACY_Z80ASM_SYNTAX
-
-    if ( *ptr == '#' )
-    {
-        ptr++;
-    }
-
-#endif
-
-    return strlen( ptr ) ? search_file( ptr, opts.inc_path ) : "";
-}
-
-
-
-void
-DeclModuleName( void )
-{
-    if ( CURRENTMODULE->mname == NULL )
-    {
-        if ( sym == name )
-        {
-            CURRENTMODULE->mname = xstrdup( ident );
-        }
-        else
-        {
-            error_illegal_ident();
-        }
-    }
-    else
-    {
-        error_module_redefined();
-    }
-}
-
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */
-
-

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.10 2014-02-23 18:48:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.11 2014-03-01 15:45:32 pauloscustodio Exp $
 #
 # Test lexer
 
@@ -28,48 +28,102 @@ my($COMMA, $AND, $XOR, $NOT,      $POWER) = get_legacy() ?
   (',',    '&',  '^',  '~',       '**'  );
 	
 my @asmbin = (
-	["ld a,1; comment ignored",		"\x3E\x01"],
-	[".label_1 ld a,2",				"\x3E\x02"],
-	["_label_2: ld a,3",			"\x3E\x03"],
-	["defw label_1,_label_2",		"\x02\x00\x04\x00"],
-	["defw #label_1",				"\x02\x00"],
-	["defb 255,128D",				"\xFF\x80"],
-	["defb \$FF,0xFE,0BEH",			"\xFF\xFE\xBE"],
-	["defb \@1010,1010B",			"\x0A\x0A"],
-	["defm \"hello\" $COMMA 32,\"world\"",
-									"hello world"],
-	["defb 1<0,1<1,1<2",			"\0\0\1"],
-	["defb 1<=0,1<=1,1<=2",			"\0\1\1"],
-	["defb 1=0,1=1,1=2",			"\0\1\0"],
-	["defb 1==0,1==1,1==2",			"\0\1\0"],		# CH_0021
-	["defb 1!=0,1!=1,1!=2",			"\1\0\1"],		# CH_0021
-	["defb 1<>0,1<>1,1<>2",			"\1\0\1"],
-	["defb 1>0,1>1,1>2",			"\1\0\0"],
-	["defb 1>=0,1>=1,1>=2",			"\1\1\0"],
-	["defb +1,-1",					"\x01\xFF"],
-	["defb 1+1,3-1,3 $AND 2,2|0,0 $XOR 2,( $NOT 0xAA ) $AND 0xFF",
-									"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
-	["defb 5*2,100/10,10%3",		"\x0A\x0A\x01"],
-	["defb 2 $POWER 7, 2**6",		"\x80\x40"],
-	["defb 2 $POWER 1",				"\x02"],
-	["defb 2 $POWER 0",				"\x01"],
-	["defb 2 $POWER -1",			"\x00"],		# BUG_0041
-	["defb 2*[1+2*(1+2)]",			"\x0E"],
-	["defb 2*1+2*1+2",				"\x06"],
-	["defb !0,!1",					"\1\0"],
-	["defb 0&&0,0&&1,1&&0,1&&1",	"\0\0\0\1"],	# CH_0021
-	["defb 0||0,0||1,1||0,1||1",	"\0\1\1\1"],	# CH_0021
-	["defb 0||0||1,0||0||0",		"\1\0"],		# CH_0021
-	["defb ' '",					"\x20"],
+	["ld a,1;comment",						"\x3E\x01"],
+	[".label_1 ld a,2",						"\x3E\x02"],
+	["_label_2: ld a,3",					"\x3E\x03"],
+	["defw label_1,_label_2",				"\x02\x00\x04\x00"],
+	["defw ZERO+label_1,ZERO+_label_2",		"\x02\x00\x04\x00"],
+	["defw #label_1;comment",				"\x02\x00"],
+	["defw #ZERO+label_1;comment",			"\x02\x00"],
+	["defb 255,128D",						"\xFF\x80"],
+	["defb ZERO+255,ZERO+128D",				"\xFF\x80"],
+	["defb \$FF,0xFE,0BEH",					"\xFF\xFE\xBE"],
+	["defb ZERO+\$FF,ZERO+0xFE,ZERO+0BEH",	"\xFF\xFE\xBE"],
+	["defb \@1010,1010B",					"\x0A\x0A"],
+	["defb ZERO+\@1010,ZERO+1010B",			"\x0A\x0A"],
+	["defm \"hello\"${COMMA}32,\"world\"",	"hello world"],
+	["defm \"hello\"${COMMA}ZERO+32,\"world\"",	"hello world"],
+	["defb 1<0,1<1,1<2",					"\0\0\1"],
+	["defb ZERO+1<0,ZERO+1<1,ZERO+1<2",		"\0\0\1"],
+	["defb 1<=0,1<=1,1<=2",					"\0\1\1"],
+	["defb ZERO+1<=0,ZERO+1<=1,ZERO+1<=2",	"\0\1\1"],
+	["defb 1=0,1=1,1=2",					"\0\1\0"],
+	["defb ZERO+1=0,ZERO+1=1,ZERO+1=2",		"\0\1\0"],
+	["defb 1==0,1==1,1==2",					"\0\1\0"],		# CH_0021
+	["defb ZERO+1==0,ZERO+1==1,ZERO+1==2",	"\0\1\0"],		# CH_0021
+	["defb 1!=0,1!=1,1!=2",					"\1\0\1"],		# CH_0021
+	["defb ZERO+1!=0,ZERO+1!=1,ZERO+1!=2",	"\1\0\1"],		# CH_0021
+	["defb 1<>0,1<>1,1<>2",					"\1\0\1"],
+	["defb ZERO+1<>0,ZERO+1<>1,ZERO+1<>2",	"\1\0\1"],
+	["defb 1>0,1>1,1>2",					"\1\0\0"],
+	["defb ZERO+1>0,ZERO+1>1,ZERO+1>2",		"\1\0\0"],
+	["defb 1>=0,1>=1,1>=2",					"\1\1\0"],
+	["defb ZERO+1>=0,ZERO+1>=1,ZERO+1>=2",	"\1\1\0"],
+	["defb +1,-1",							"\x01\xFF"],
+	["defb ZERO+ +1,ZERO+ -1",				"\x01\xFF"],
+	["defb 1+1,3-1,3${AND}2,2|0,0${XOR}2,(${NOT}0xAA )${AND}0xFF",
+											"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
+	["defb ZERO+1+1,ZERO+3-1,ZERO+3${AND}2,ZERO+2|0,ZERO+0${XOR}2,ZERO+(${NOT}0xAA )${AND}0xFF",
+											"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
+	["defb 5*2,100/10,10%3",				"\x0A\x0A\x01"],
+	["defb ZERO+5*2,ZERO+100/10,ZERO+10%3",	"\x0A\x0A\x01"],
+	["defb 2${POWER}7, 2**6",				"\x80\x40"],
+	["defb ZERO+2${POWER}7, 2**6",			"\x80\x40"],
+	["defb 2${POWER}1",						"\x02"],
+	["defb ZERO+2${POWER}1",				"\x02"],
+	["defb 2${POWER}0",						"\x01"],
+	["defb ZERO+2${POWER}0",				"\x01"],
+	["defb 2${POWER}-1",					"\x00"],		# BUG_0041
+	["defb ZERO+2${POWER}-1",				"\x00"],		# BUG_0041
+	["defb 2*[1+2*(1+2)]",					"\x0E"],
+	["defb ZERO+2*[1+2*(1+2)]",				"\x0E"],
+	["defb 2*1+2*1+2",						"\x06"],
+	["defb ZERO+2*1+2*1+2",					"\x06"],
+	["defb !0,!1",							"\1\0"],
+	["defb ZERO+!0,ZERO+!1",				"\1\0"],
+	["defb 0&&0,0&&1,1&&0,1&&1",			"\0\0\0\1"],	# CH_0021
+	["defb ZERO+0&&0,ZERO+0&&1,ZERO+1&&0,ZERO+1&&1",	
+											"\0\0\0\1"],	# CH_0021
+	["defb 0||0,0||1,1||0,1||1",			"\0\1\1\1"],	# CH_0021
+	["defb ZERO+0||0,ZERO+0||1,ZERO+1||0,ZERO+1||1",
+											"\0\1\1\1"],	# CH_0021
+	["defb 0||0||1,0||0||0",				"\1\0"],		# CH_0021
+	["defb ZERO+0||0||1,ZERO+0||0||0",		"\1\0"],		# CH_0021
+	["defb ' '",							"\x20"],
+	["defb ZERO+' '",						"\x20"],
+	["defb 1<<7,128>>7",					"\x80\1"],		# CH_0021
+	["defb ZERO+1<<7,ZERO+128>>7",			"\x80\1"],		# CH_0021
+	
+	# check priorities
+	["defb 1 || 0 && 0",					"\1"],
+	["defb 0 && 0 |  1",					"\0"],
+	["defb 0 && 0${XOR}1",					"\0"],
+	["defb 0 |  1${AND}1",					"\1"],
+	["defb 1${XOR}0${AND}0",				"\1"],
+	["defb 0${AND}1 == 0",					"\0"],
+	["defb 0${AND}0 != 1",					"\0"],
+	["defb 2 == 1 << 1",					"\1"],
+	["defb 1 << 1 +  3",					"\x10"],
+	["defb 1 +  2 *  3",					"\7"],
+	["defb 2 *  3 ** 4",					pack("C",162)],
+	["defw 2 ** 3 ** 2",					pack("v",512)],
+	["defb 2 ** -3",						"\0"],
+	["defb ---+--+-2",						"\2"],
 );
 
 if ( ! get_legacy() ) {
 	push @asmbin, 
 	["defb 1?2:3,0?4:5",			"\2\5"],		# CH_0021
-	["defb 0? 0?2:3 : 0?4:5",		"\5"],			# CH_0021
-	["defb 0? 0?2:3 : 1?4:5",		"\4"],			# CH_0021
-	["defb 1? 0?2:3 : 1?4:5",		"\3"],			# CH_0021
-	["defb 1? 1?2:3 : 1?4:5",		"\2"],			# CH_0021
+	["defb ZERO+1?2:3,0?4:5",		"\2\5"],		# CH_0021
+	["defb 0? 0?2:3 :0?4:5",		"\5"],			# CH_0021
+	["defb ZERO+0? 0?2:3 :0?4:5",	"\5"],			# CH_0021
+	["defb 0? 0?2:3 :1?4:5",		"\4"],			# CH_0021
+	["defb ZERO+0? 0?2:3 :1?4:5",	"\4"],			# CH_0021
+	["defb 1? 0?2:3 :1?4:5",		"\3"],			# CH_0021
+	["defb ZERO+1? 0?2:3 :1?4:5",	"\3"],			# CH_0021
+	["defb 1? 1?2:3 :1?4:5",		"\2"],			# CH_0021
+	["defb ZERO+1? 1?2:3 :1?4:5",	"\2"],			# CH_0021
+	["defb ~~2",					"\2"],
 }
 
 my($asm,$bin) = ("","");
@@ -78,26 +132,38 @@ for (@asmbin) {
 	$bin .= $_->[1];
 }
 
-t_z80asm_ok(0, $asm, $bin);
+t_z80asm(
+	asm		=> "XDEF ZERO : DEFC ZERO = 0",
+	asm1	=> "XREF ZERO\n".$asm,
+	bin		=> $bin
+);
 t_z80asm_error("defb ''",		"Error at file 'test.asm' line 1: syntax error in expression");
 t_z80asm_error("defb 'he'",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 1?2",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 1?2:",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
 
-# test power expression (**) in object file
-t_z80asm(
-	asm		=> " xref v1, v2 : defb v1**v2",
-	asm2	=> " xdef v1, v2 : defc v1 = 2, v2 = 7 ",
-	bin		=> "\x80",
-);
+# test BUG_0006
+t_z80asm_error("defb (2",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb (2+[",		"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb (2+[3-1]",	"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error("defb (2+[3-1)]","Error at file 'test.asm' line 1: syntax error in expression");
+
+if ( ! get_legacy() ) {
+	t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error in expression");
+	t_z80asm_error("defb 1?2",		"Error at file 'test.asm' line 1: syntax error in expression");
+	t_z80asm_error("defb 1?2:",		"Error at file 'test.asm' line 1: syntax error in expression");
+	t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
+}
 
 unlink_testfiles();
 done_testing();
 
 # $Log: lexer.t,v $
-# Revision 1.10  2014-02-23 18:48:16  pauloscustodio
+# Revision 1.11  2014-03-01 15:45:32  pauloscustodio
+# CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+# Handle C-like operators, make exponentiation (**) right-associative.
+# Simplify expression parser by handling composed tokens in lexer.
+# Change token ids to TK_...
+#
+# Revision 1.10  2014/02/23 18:48:16  pauloscustodio
 # CH_0021: New operators ==, !=, &&, ||, ?:
 # Handle C-like operators ==, !=, &&, || and ?:.
 # Simplify expression parser by handling composed tokens in lexer.

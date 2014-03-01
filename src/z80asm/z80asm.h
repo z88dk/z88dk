@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.42 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.43 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,7 +47,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.42 2014-02-25 22:
 
 extern char line[];
 extern char ident[];
-extern char separators[];
 extern struct module *CURRENTMODULE;
 extern struct modules *modulehdr;
 extern FILE *z80asmfile;
@@ -63,7 +62,13 @@ extern void assemble_file( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.42  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.43  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.42  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.41  2014/02/19 23:59:26  pauloscustodio

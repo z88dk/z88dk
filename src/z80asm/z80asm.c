@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.141 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.142 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -69,23 +69,7 @@ struct libfile *NewLibrary( void );
 
 FILE *z80asmfile, *objfile;
 
-/* BUG_0001 array ssym[] needs to have one element per character in
- * separators, plus one newline to match the final '\0' just in case it is
- * not caught before, needs to have the same sequence as tokid_t {} */
-tokid_t sym, ssym[] =
-    {
-#define TOKEN(name, str_legacy, str_new) name,
-#include "token_def.h"
-    };
-
-char separators[] =
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define TOKEN(name, str_legacy, str_new) str_legacy
-#else
-#define TOKEN(name, str_legacy, str_new) str_new
-#endif
-#include "token_def.h"
-    ;
+tokid_t sym;
 
 enum flag EOL;
 
@@ -748,7 +732,13 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.141  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.142  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.141  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.140  2014/02/24 23:08:55  pauloscustodio
@@ -1502,17 +1492,3 @@ createsym( Symbol *symptr )
 /* Cleaned up info so doesn't linewrap on Amiga */
 
 /* Oops, screw up! exit(0) (was exit(-1))  should be exit(1) - djm 29/2/99 */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */
-

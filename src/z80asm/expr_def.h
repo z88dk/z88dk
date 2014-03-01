@@ -15,38 +15,58 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.3 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.4 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #ifndef OPERATOR
-#define OPERATOR(_symbol, _type, _prec, _assoc, _calc)
+#define OPERATOR(_symbol, _operation, _type, _prec, _assoc, _calc)
 #endif
 
-/* define list of operators */
-OPERATOR( unary_minus,	UNARY_OP,	4,	ASSOC_RIGHT,	- a )
-OPERATOR( log_not,		UNARY_OP,	4,	ASSOC_RIGHT,	! a )
-OPERATOR( bin_not,		UNARY_OP,	4,	ASSOC_RIGHT,	~ a )
-OPERATOR( bin_and,		BINARY_OP,	4,	ASSOC_LEFT,		a & b )
-OPERATOR( bin_or,		BINARY_OP,	4,	ASSOC_LEFT,		a | b )
-OPERATOR( bin_xor,		BINARY_OP,	4,	ASSOC_LEFT,		a ^ b )
-OPERATOR( plus,			BINARY_OP,	4,	ASSOC_LEFT,		a + b )
-OPERATOR( minus,		BINARY_OP,	4,	ASSOC_LEFT,		a - b )
-OPERATOR( multiply,		BINARY_OP,	4,	ASSOC_LEFT,		a * b )
-OPERATOR( divide,		BINARY_OP,	4,	ASSOC_LEFT,		calc_divide(a, b) )
-OPERATOR( mod,			BINARY_OP,	4,	ASSOC_LEFT,		calc_mod(a, b) )
-OPERATOR( power,		BINARY_OP,	4,	ASSOC_RIGHT,	calc_power(a, b) )
-OPERATOR( equal,		BINARY_OP,	4,	ASSOC_LEFT,		a == b )
-OPERATOR( less,			BINARY_OP,	4,	ASSOC_LEFT,		a <  b )
-OPERATOR( greater,		BINARY_OP,	4,	ASSOC_LEFT,		a >  b )
-OPERATOR( lessequal,	BINARY_OP,	4,	ASSOC_LEFT,		a <= b )
-OPERATOR( greatequal,	BINARY_OP,	4,	ASSOC_LEFT,		a >= b )
-OPERATOR( notequal,		BINARY_OP,	4,	ASSOC_LEFT,		a != b )
+/* define list of operators in increasing priority*/
+OPERATOR( TK_LOG_OR,		TK_LOG_OR,		BINARY_OP,	1,	ASSOC_LEFT,		a || b )
+
+OPERATOR( TK_LOG_AND,		TK_LOG_AND,		BINARY_OP,	2,	ASSOC_LEFT,		a && b )
+
+OPERATOR( TK_BIN_OR,		TK_BIN_OR,		BINARY_OP,	3,	ASSOC_LEFT,		a | b )
+OPERATOR( TK_BIN_XOR,		TK_BIN_XOR,		BINARY_OP,	3,	ASSOC_LEFT,		a ^ b )
+
+OPERATOR( TK_BIN_AND,		TK_BIN_AND,		BINARY_OP,	4,	ASSOC_LEFT,		a & b )
+
+OPERATOR( TK_EQUAL,			TK_EQUAL,		BINARY_OP,	5,	ASSOC_LEFT,		a == b )
+OPERATOR( TK_LESS,			TK_LESS,		BINARY_OP,	5,	ASSOC_LEFT,		a <  b )
+OPERATOR( TK_GREATER,		TK_GREATER,		BINARY_OP,	5,	ASSOC_LEFT,		a >  b )
+OPERATOR( TK_LESS_EQ,		TK_LESS_EQ,		BINARY_OP,	5,	ASSOC_LEFT,		a <= b )
+OPERATOR( TK_GREATER_EQ,	TK_GREATER_EQ,	BINARY_OP,	5,	ASSOC_LEFT,		a >= b )
+OPERATOR( TK_NOT_EQ,		TK_NOT_EQ,		BINARY_OP,	5,	ASSOC_LEFT,		a != b )
+
+OPERATOR( TK_LEFT_SHIFT,	TK_LEFT_SHIFT,	BINARY_OP,	6,	ASSOC_LEFT,		a << b )
+OPERATOR( TK_RIGHT_SHIFT,	TK_RIGHT_SHIFT,	BINARY_OP,	6,	ASSOC_LEFT,		a >> b )
+
+OPERATOR( TK_PLUS,			TK_PLUS,		BINARY_OP,	7,	ASSOC_LEFT,		a + b )
+OPERATOR( TK_MINUS,			TK_MINUS,		BINARY_OP,	7,	ASSOC_LEFT,		a - b )
+
+OPERATOR( TK_MULTIPLY,		TK_MULTIPLY,	BINARY_OP,	8,	ASSOC_LEFT,		a * b )
+OPERATOR( TK_DIVIDE,		TK_DIVIDE,		BINARY_OP,	8,	ASSOC_LEFT,		calc_divide(a, b) )
+OPERATOR( TK_MOD,			TK_MOD,			BINARY_OP,	8,	ASSOC_LEFT,		calc_mod(a, b) )
+
+OPERATOR( TK_POWER,			TK_POWER,		BINARY_OP,	9,	ASSOC_RIGHT,	calc_power(a, b) )
+
+OPERATOR( TK_MINUS,			TK_NEGATE,		UNARY_OP,	10,	ASSOC_RIGHT,	- a )
+OPERATOR( TK_PLUS,			TK_IDENTITY,	UNARY_OP,	10,	ASSOC_RIGHT,	  a )
+OPERATOR( TK_BIN_NOT,		TK_BIN_NOT,		UNARY_OP,	10,	ASSOC_RIGHT,	~ a )
+OPERATOR( TK_LOG_NOT,		TK_LOG_NOT,		UNARY_OP,	10,	ASSOC_RIGHT,	! a )
 
 #undef OPERATOR
 
 /*
 * $Log: expr_def.h,v $
-* Revision 1.3  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.4  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.3  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.43 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.44 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -65,7 +65,7 @@ PushPop_instr( int opcode )
 {
     int qq;
 
-    if ( GetSym() == name )
+    if ( GetSym() == TK_NAME )
         switch ( qq = CheckRegister16() )
         {
         case REG16_BC:
@@ -109,7 +109,7 @@ RET( void )
 
     switch ( GetSym() )
     {
-    case name:
+    case TK_NAME:
         if ( ( constant = CheckCondition() ) != -1 )
         {
             append_byte( ( byte_t )( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
@@ -121,7 +121,7 @@ RET( void )
 
         break;
 
-    case newline:
+    case TK_NEWLINE:
         append_byte( 0xC9 );
         break;
 
@@ -138,12 +138,12 @@ RET( void )
 void
 EX( void )
 {
-    if ( GetSym() == lparen )
-        if ( GetSym() == name )
+    if ( GetSym() == TK_LPAREN )
+        if ( GetSym() == TK_NAME )
             if ( CheckRegister16() == REG16_SP )      /* EX  (SP) */
-                if ( GetSym() == rparen )
-                    if ( GetSym() == comma )
-                        if ( GetSym() == name )
+                if ( GetSym() == TK_RPAREN )
+                    if ( GetSym() == TK_COMMA )
+                        if ( GetSym() == TK_NAME )
                             switch ( CheckRegister16() )
                             {
                             case REG16_HL:
@@ -197,13 +197,13 @@ EX( void )
         {
             error_syntax();
         }
-    else if ( sym == name )
+    else if ( sym == TK_NAME )
     {
         switch ( CheckRegister16() )
         {
         case REG16_DE:
-            if ( GetSym() == comma )      /* EX  DE,HL   */
-                if ( GetSym() == name )
+            if ( GetSym() == TK_COMMA )      /* EX  DE,HL   */
+                if ( GetSym() == TK_NAME )
                     if ( CheckRegister16() == 2 )
                     {
                         append_byte( 0xEB );
@@ -225,8 +225,8 @@ EX( void )
             break;
 
         case 4:
-            if ( GetSym() == comma )      /* EX  AF,AF'   */
-                if ( GetSym() == name )
+            if ( GetSym() == TK_COMMA )      /* EX  AF,AF'   */
+                if ( GetSym() == TK_NAME )
                     if ( CheckRegister16() == 4 )
                     {
                         append_byte( 0x08 );
@@ -270,16 +270,16 @@ OUT( void )
         return;
     }
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();
 
         if ( CheckRegister8() == 1 )
         {
             /* OUT (C) */
-            if ( GetSym() == rparen )
-                if ( GetSym() == comma )
-                    if ( GetSym() == name )
+            if ( GetSym() == TK_RPAREN )
+                if ( GetSym() == TK_COMMA )
+                    if ( GetSym() == TK_NAME )
                         switch ( reg = CheckRegister8() )
                         {
                         case 6:
@@ -319,9 +319,9 @@ OUT( void )
 
             inc_PC( 2 );
 
-            if ( sym == rparen )
-                if ( GetSym() == comma )
-                    if ( GetSym() == name )
+            if ( sym == TK_RPAREN )
+                if ( GetSym() == TK_COMMA )
+                    if ( GetSym() == TK_NAME )
                     {
                         if ( CheckRegister8() != 7 )
                         {
@@ -360,7 +360,7 @@ IN( void )
         return;
     }
 
-    if ( GetSym() == name )
+    if ( GetSym() == TK_NAME )
     {
         switch ( inreg = CheckRegister8() )
         {
@@ -371,13 +371,13 @@ IN( void )
             break;
 
         default:
-            if ( GetSym() != comma )
+            if ( GetSym() != TK_COMMA )
             {
                 error_syntax();
                 break;
             }
 
-            if ( GetSym() != lparen )
+            if ( GetSym() != TK_LPAREN )
             {
                 error_syntax();
                 break;
@@ -399,7 +399,7 @@ IN( void )
                     append_byte( 0xDB );
 
                     if ( ExprUnsigned8( 1 ) )
-                        if ( sym != rparen )
+                        if ( sym != TK_RPAREN )
                         {
                             error_syntax();
                         }
@@ -528,7 +528,7 @@ void CALL_OZ( void )
     append_byte( 0xE7 );          /* RST 20H instruction */
     inc_PC( 1 );
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();    /* Optional parenthesis around expression */
     }
@@ -579,7 +579,7 @@ CALL_PKG( void )
     append_byte( 0xCF );          /* RST 08H instruction */
     inc_PC( 1 );
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();    /* Optional parenthesis around expression */
     }
@@ -626,7 +626,7 @@ INVOKE( void )
 
     inc_PC( 1 );
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();    /* Optional parenthesis around expression */
     }
@@ -665,7 +665,7 @@ FPP( void )
     append_byte( 0xDF );          /* RST 18H instruction */
     inc_PC( 1 );
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();    /* Optional parenthesis around expression */
     }
@@ -707,7 +707,7 @@ Subroutine_addr( int opcode0, int opcode )
     if ( ( constant = CheckCondition() ) != -1 ) /* Check for condition */
     {
 
-        if ( GetSym() != comma )
+        if ( GetSym() != TK_COMMA )
         {
             error_syntax();
             return;
@@ -827,7 +827,7 @@ JP_instr( int opc0, int opc )
 
     startexpr = ftell( z80asmfile );      /* remember position of possible start of expression */
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
     {
         GetSym();
 
@@ -873,7 +873,7 @@ JR( void )
     struct expr *postfixexpr;
     long constant;
 
-    if ( GetSym() == name )
+    if ( GetSym() == TK_NAME )
     {
         switch ( constant = CheckCondition() )
         {
@@ -884,7 +884,7 @@ JR( void )
         case FLAGS_C:
             append_byte( ( byte_t )( 0x20 + constant * 0x08 ) );
 
-            if ( GetSym() == comma )
+            if ( GetSym() == TK_COMMA )
             {
                 GetSym();         /* point at start of address expression */
                 break;
@@ -945,7 +945,7 @@ DJNZ( void )
 
     append_byte( 0x10 );          /* DJNZ opcode */
 
-    if ( GetSym() == comma )
+    if ( GetSym() == TK_COMMA )
     {
         GetSym();                         /* optional comma */
     }
@@ -1023,7 +1023,7 @@ ADD( void )
         break;
 
     case 2:
-        if ( GetSym() == comma )
+        if ( GetSym() == TK_COMMA )
         {
             GetSym();
             reg16 = CheckRegister16();
@@ -1047,7 +1047,7 @@ ADD( void )
 
     case 5:
     case 6:
-        if ( GetSym() == comma )
+        if ( GetSym() == TK_COMMA )
         {
             GetSym();
             reg16 = CheckRegister16();
@@ -1121,7 +1121,7 @@ SBC( void )
         break;
 
     case 2:
-        if ( GetSym() == comma )
+        if ( GetSym() == TK_COMMA )
         {
             GetSym();
             reg16 = CheckRegister16();
@@ -1169,7 +1169,7 @@ ADC( void )
         break;
 
     case 2:
-        if ( GetSym() == comma )
+        if ( GetSym() == TK_COMMA )
         {
             GetSym();
             reg16 = CheckRegister16();
@@ -1208,7 +1208,7 @@ ArithLog8_instr( int opcode )
 {
     long reg;
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
         switch ( reg = IndirectRegisters() )
         {
         case 2:
@@ -1372,7 +1372,7 @@ IncDec_8bit_instr( int opcode )
 {
     long reg;
 
-    if ( sym == lparen )
+    if ( sym == TK_LPAREN )
     {
         switch ( reg = IndirectRegisters() )
         {
@@ -1475,9 +1475,9 @@ BitTest_instr( int opcode )
             if ( bitnumber >= 0 && bitnumber <= 7 )
             {
                 /* bit 0 - 7 */
-                if ( sym == comma )
+                if ( sym == TK_COMMA )
                 {
-                    if ( GetSym() == lparen )
+                    if ( GetSym() == TK_LPAREN )
                     {
                         switch ( ( reg = IndirectRegisters() ) )
                         {
@@ -1551,7 +1551,7 @@ RotShift_instr( int opcode )
 {
     long reg;
 
-    if ( GetSym() == lparen )
+    if ( GetSym() == TK_LPAREN )
         switch ( ( reg = IndirectRegisters() ) )
         {
         case 2:
@@ -1605,7 +1605,13 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.43  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.44  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.43  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.42  2014/02/24 23:08:55  pauloscustodio
@@ -1846,17 +1852,3 @@ RotShift_instr( int opcode )
 /* User: Gbs          Date: 20-06-98   Time: 14:59 */
 /* Updated in $/Z80asm */
 /* SourceSafe version history comment block added. */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */
-

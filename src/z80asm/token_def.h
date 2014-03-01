@@ -15,91 +15,144 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.11 2014-02-23 18:48:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.12 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
+#include "xmalloc.h"   /* before any other include */
+
+#include "legacy.h"
+
+/*-----------------------------------------------------------------------------
+*	Token IDs
+*	Lexical tokens are returned by the lexer
+*	Semantical tokens are used internally and have semantical value 
+*----------------------------------------------------------------------------*/
 #ifndef TOKEN
-#define TOKEN(name, str_legacy, str_new)
+#define TOKEN(name, string)
 #endif
 
-/* define list of tokens with corresponding string representation,
-   use a " " when not single-char token
-   newline must be the last token so that it is returned when a '\0' char is searched */
-TOKEN(	nil,		" ", " " )
-TOKEN(	space, 		" ", " " )		/* catches space, " " can be used later for not-single-char tokens */
+TOKEN(	TK_NIL,			"" )
+TOKEN(	TK_INVALID,		"" )	/* used as impossible to get token */
+TOKEN(	TK_NAME,		"" )
+TOKEN(	TK_LABEL,		"" )
+TOKEN(	TK_NUMBER,		"" )
+TOKEN(	TK_STRING,		"" )
 
-TOKEN(	dquote, 	"\"", "\"" )
-TOKEN(	squote, 	"'", "'" )
+TOKEN(	decmconst,		"" )
+TOKEN(	hexconst,		"" )
+TOKEN(	binconst,		"" )
+TOKEN(	charconst,		"" )
 
-TOKEN(	colon,		" ", ":" )
-TOKEN(	semicolon, 	";", ";" )
-TOKEN(	comma, 		",", "," )
-TOKEN(	fullstop, 	".", "." )
-TOKEN(	question, 	"?", "?" )
+TOKEN(	ifstatm,		"" )
+TOKEN(	elsestatm,		"" )
+TOKEN(	endifstatm,		"" )
 
-TOKEN(	lparen,		"(", "(" )
-TOKEN(	lcurly,		"{", "{" )
-TOKEN(	lsquare,	"[", "[" )
-TOKEN(	rsquare,	"]", "]" )
-TOKEN(	rcurly,		"}", "}" )
-TOKEN(	rparen,		")", ")" )
+/* lexical tokens in ASCII order */
 
-TOKEN(	plus,		"+", "+" )
-TOKEN(	minus,		"-", "-" )
-TOKEN(	multiply,	"*", "*" )
-TOKEN(	divide,		"/", "/" )
-TOKEN(	mod,		"%", "%" )
-TOKEN(	power,		"^", " " )	/* ** */
+TOKEN(	TK_NEWLINE,		"\n")
 
-TOKEN(	equal,		"=", "=" )	/* == */
-TOKEN(	notequal,	" ", " " )	/* !=, <> */
-TOKEN(	less,		"<", "<" )
-TOKEN(	lessequal,	" ", " " )	/* <= */
-TOKEN(	greater,	">", ">" )
-TOKEN(	greatequal,	" ", " " )	/* >= */
+/* no token for " " */
 
-TOKEN(	bin_and,	"~", "&" )
-TOKEN(	bin_or,		"|", "|" )
-TOKEN(	bin_xor,	":", "^" )
-TOKEN(	bin_not,	" ", "~" )
+TOKEN(	TK_LOG_NOT,		"!" )
+TOKEN(	TK_DQUOTE, 		"\"" )
+TOKEN(	TK_CONST_EXPR,	"#" )
 
-TOKEN(	log_and,	" ", " " )	/* && */
-TOKEN(	log_or,		" ", " " )	/* || */
-TOKEN(	log_not,	"!", "!" )
+/* no token for "$" */
 
-TOKEN(	ternary_cond," "," " )	/* cond ? true : false */
+TOKEN(	TK_MOD,			"%" )
 
-TOKEN(	constexpr,	"#", "#" )
-TOKEN(	strconq,	"&", " " )
-
-/* not single-char */
-TOKEN(	name,		" ", " " )
-TOKEN(	number,		" ", " " )
-TOKEN(	decmconst,	" ", " " )
-TOKEN(	hexconst,	" ", " " )
-TOKEN(	binconst,	" ", " " )
-TOKEN(	charconst,	" ", " " )
-TOKEN(	unary_minus," ", " " )
-TOKEN(	ifstatm,	" ", " " )
-TOKEN(	elsestatm,	" ", " " )
-TOKEN(	endifstatm,	" ", " " )
-TOKEN(	label,		" ", " " )
-TOKEN(	string,		" ", " " )
-
-/* must be last and empty string to match '\0' */
-TOKEN(	newline,	"",  "" )
-
-/* size of array index by tokens */
-#ifndef NUM_TOKENS
-#define NUM_TOKENS (newline+1)
+#ifdef __LEGACY_Z80ASM_SYNTAX
+TOKEN(	TK_STRING_CAT,	"&" )
+#else
+TOKEN(	TK_BIN_AND,		"&" )
+#define TK_STRING_CAT	TK_COMMA
 #endif
 
+TOKEN(	TK_LOG_AND,		"&&" )
+
+TOKEN(	TK_SQUOTE,		"'" )
+TOKEN(	TK_LPAREN,		"(" )
+TOKEN(	TK_RPAREN,		")" )
+TOKEN(	TK_MULTIPLY,	"*" )
+TOKEN(	TK_PLUS,		"+" )
+TOKEN(	TK_COMMA,		"," )
+TOKEN(	TK_MINUS,		"-" )
+TOKEN(	TK_DOT, 		"." )
+TOKEN(	TK_DIVIDE,		"/" )
+
+/* no token for "0" .. "9" */
+
+#ifdef __LEGACY_Z80ASM_SYNTAX
+TOKEN(	TK_BIN_XOR,		":" )
+#define TK_COLON		TK_INVALID
+#else
+TOKEN(	TK_COLON,		":" )
+#endif
+
+/* no token for ";" */
+
+TOKEN(	TK_LESS,		"<" )
+TOKEN(	TK_LEFT_SHIFT,	"<<" )
+TOKEN(	TK_LESS_EQ,		"<=" )
+TOKEN(	TK_NOT_EQ,		"<>" )	/* != */
+TOKEN(	TK_EQUAL,		"=" )	/* == */
+TOKEN(	TK_GREATER,		">" )
+TOKEN(	TK_RIGHT_SHIFT,	">>" )
+TOKEN(	TK_GREATER_EQ,	">=" )
+
+#ifdef __LEGACY_Z80ASM_SYNTAX
+#define TK_QUESTION		TK_INVALID
+#else
+TOKEN(	TK_QUESTION, 	"?" )
+#endif
+
+/* no token for "@", "A" .. "Z" */
+
+TOKEN(	TK_LSQUARE,		"[" )
+
+/* no token for "\\" */
+
+TOKEN(	TK_RSQUARE,		"]" )
+
+#ifdef __LEGACY_Z80ASM_SYNTAX
+TOKEN(	TK_POWER,		"^" )
+#else
+TOKEN(	TK_BIN_XOR,		"^" )
+TOKEN(	TK_POWER,		"**" )
+#endif
+
+/* no token for "_", "`", "a" .. "z" */
+
+TOKEN(	TK_LCURLY,		"{" )
+TOKEN(	TK_BIN_OR,		"|" )
+TOKEN(	TK_LOG_OR,		"||" )
+TOKEN(	TK_RCURLY,		"}" )
+
+#ifdef __LEGACY_Z80ASM_SYNTAX
+TOKEN(	TK_BIN_AND,		"~" )
+#define TK_BIN_NOT		TK_INVALID
+#else
+TOKEN(	TK_BIN_NOT,		"~" )
+#endif
+
+/* semantical tokens */
+TOKEN(	TK_NEGATE,		"" )	/* unary minus */
+TOKEN(	TK_TERN_COND,	"" )	/* cond ? true : false */
+
+/* marker to get number of tokens */
+TOKEN(	NUM_TOKENS,		""	)
 
 #undef TOKEN
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.11  2014-02-23 18:48:16  pauloscustodio
+* Revision 1.12  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.11  2014/02/23 18:48:16  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, ?:
 * Handle C-like operators ==, !=, &&, || and ?:.
 * Simplify expression parser by handling composed tokens in lexer.

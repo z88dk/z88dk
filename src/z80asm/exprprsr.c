@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.57 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.58 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,6 +29,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.57 2014-0
 #include "token.h"
 #include "except.h"
 #include "expr.h"
+#include "expr_def.h"
 #include "z80asm.h"
 #include <assert.h>
 #include <ctype.h>
@@ -54,14 +55,8 @@ void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
-static int Condition( struct expr *pfixexpr );
-static int LogAndCondition( struct expr *pfixexpr );
-static int LogOrCondition( struct expr *pfixexpr );
-static int TernaryCondition( struct expr *pfixexpr );
-static int Expression( struct expr *pfixexpr );
-static int Term( struct expr *pfixexpr );
-static int Pterm( struct expr *pfixexpr );
-static int Factor( struct expr *pfixexpr );
+static BOOL TernaryCondition( struct expr *pfixexpr );
+
 long EvalPfixExpr( struct expr *pfixexpr );
 long PopItem( struct pfixstack **stackpointer );
 struct expr *ParseNumExpr( void );
@@ -69,28 +64,50 @@ struct expr *ParseNumExpr( void );
 /* global variables */
 extern struct module *CURRENTMODULE;
 extern tokid_t sym;
-extern char ident[], separators[];
+extern char ident[];
 extern FILE *z80asmfile, *objfile;
 
 
-static int
-Factor( struct expr *pfixexpr )
+#define DEFINE_PARSER( name, prev_name, condition )				\
+	static BOOL name( struct expr *pfixexpr )					\
+	{															\
+		tokid_t op = TK_NIL;									\
+																\
+		if ( ! prev_name(pfixexpr) )							\
+			return FALSE;										\
+																\
+		while ( condition )										\
+		{														\
+			op = sym;											\
+			strcpy(pfixexpr->infixptr, token_string(sym));		\
+			pfixexpr->infixptr += strlen(pfixexpr->infixptr);	\
+			GetSym();											\
+			if ( ! prev_name(pfixexpr) )						\
+				return FALSE;									\
+																\
+			NewPfixSymbol( pfixexpr, 0, op, NULL, 0 );			\
+		}														\
+																\
+		return TRUE;											\
+	}
+
+/* parse value */
+static BOOL Factor( struct expr *pfixexpr )
 {
     long constant;
     Symbol *symptr;
     char eval_err;
-    tokid_t open_paren;
 
     switch ( sym )
     {
-    case name:
+    case TK_NAME:
         symptr = get_used_symbol( ident );
 
         if ( symptr->type & SYMDEFINED )
         {
             /* copy appropriate type bits */
             pfixexpr->rangetype |= ( symptr->type & SYMTYPE );
-            NewPfixSymbol( pfixexpr, symptr->value, number, NULL, symptr->type );
+            NewPfixSymbol( pfixexpr, symptr->value, TK_NUMBER, NULL, symptr->type );
         }
         else
         {
@@ -98,7 +115,7 @@ Factor( struct expr *pfixexpr )
             pfixexpr->rangetype |= ( symptr->type & SYMTYPE ) | NOTEVALUABLE;
 
             /* symbol only declared, store symbol name */
-            NewPfixSymbol( pfixexpr, 0, number, ident, symptr->type );
+            NewPfixSymbol( pfixexpr, 0, TK_NUMBER, ident, symptr->type );
         }
 
         strcpy( pfixexpr->infixptr, ident );    /* add identifier to infix expr */
@@ -120,69 +137,13 @@ Factor( struct expr *pfixexpr )
         }
         else
         {
-            NewPfixSymbol( pfixexpr, constant, number, NULL, 0 );
+            NewPfixSymbol( pfixexpr, constant, TK_NUMBER, NULL, 0 );
         }
 
         GetSym();
         break;
 
-    case lparen:
-    case lsquare:
-        open_paren = sym;                           /* BUG_0006 : check correct balance */
-        *pfixexpr->infixptr++ = separators[sym];    /* store '(' or '[' in infix expr */
-        GetSym();
-
-        if ( TernaryCondition( pfixexpr ) )
-        {
-            /* BUG_0006 : check correct balance */
-            if ( ( open_paren == lparen  && sym == rparen ) ||
-                    ( open_paren == lsquare && sym == rsquare ) )
-            {
-                *pfixexpr->infixptr++ = separators[sym];        /* store ')' or ']' in infix expr */
-                GetSym();
-                break;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            return 0;
-        }
-
-    case log_not:
-        *pfixexpr->infixptr++ = '!';
-        GetSym();
-
-        if ( !Factor( pfixexpr ) )
-        {
-            return 0;
-        }
-        else
-        {
-            NewPfixSymbol( pfixexpr, 0, log_not, NULL, 0 );    /* logical NOT...  */
-        }
-
-        break;
-
-    case bin_not:
-        *pfixexpr->infixptr++ = '~';
-        GetSym();
-
-        if ( !Factor( pfixexpr ) )
-        {
-            return 0;
-        }
-        else
-        {
-            NewPfixSymbol( pfixexpr, 0, bin_not, NULL, 0 );    /* binary NOT...  */
-        }
-
-        break;
-
-    case squote:
+    case TK_SQUOTE:
         *pfixexpr->infixptr++ = '\'';   /* store single quote in infix expr */
 
         if ( feof( z80asmfile ) )
@@ -203,10 +164,10 @@ Factor( struct expr *pfixexpr )
             {
                 *pfixexpr->infixptr++ = ( byte_t )constant;           /* store char in infix expr */
 
-                if ( GetSym() == squote )
+                if ( GetSym() == TK_SQUOTE )
                 {
                     *pfixexpr->infixptr++ = '\'';
-                    NewPfixSymbol( pfixexpr, constant, number, NULL, 0 );
+                    NewPfixSymbol( pfixexpr, constant, TK_NUMBER, NULL, 0 );
                 }
                 else
                 {
@@ -218,27 +179,6 @@ Factor( struct expr *pfixexpr )
         GetSym();
         break;
 
-        /* CH_0002 accept and ignore unary plus */
-    case plus:
-        GetSym();
-        return Factor( pfixexpr );
-
-        /* CH_0002 accept and parse unary minus */
-    case minus:
-        GetSym();
-        *pfixexpr->infixptr++ = '-';
-
-        if ( Factor( pfixexpr ) )
-        {
-            NewPfixSymbol( pfixexpr, 0, unary_minus, NULL, 0 );
-        }
-        else
-        {
-            return 0;
-        }
-
-        break;
-
     default:
         return 0;
     }
@@ -246,243 +186,127 @@ Factor( struct expr *pfixexpr )
     return 1;                   /* syntax OK */
 }
 
-
-
-static int
-Pterm( struct expr *pfixexpr )
+/* parse unary operators */
+static BOOL UnaryTerm( struct expr *pfixexpr )
 {
+    tokid_t open_paren;
 
-    if ( !Factor( pfixexpr ) )
-    {
-        return ( 0 );
-    }
+	switch (sym) 
+	{
+    case TK_MINUS:
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        GetSym();
+		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
+			return FALSE;
 
-    while ( sym == power )
-    {
-#ifdef __LEGACY_Z80ASM_SYNTAX
-        *pfixexpr->infixptr++ = separators[power];        /* store '^' in infix expr */
-#else
-        /* store '**' in infix expr */
-        *pfixexpr->infixptr++ = '*';
-        *pfixexpr->infixptr++ = '*';
-#endif
+		NewPfixSymbol( pfixexpr, 0, TK_NEGATE, NULL, 0 );
+		return TRUE;
 
+    case TK_PLUS:
+        GetSym();
+        return UnaryTerm( pfixexpr );
+
+    case TK_BIN_NOT:
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        GetSym();
+		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
+			return FALSE;
+
+		NewPfixSymbol( pfixexpr, 0, TK_BIN_NOT, NULL, 0 );
+		return TRUE;
+
+    case TK_LOG_NOT:
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
         GetSym();
 
-        if ( Factor( pfixexpr ) )
-        {
-            NewPfixSymbol( pfixexpr, 0, power, NULL, 0 );
-        }
-        else
-        {
-            return 0;
-        }
+        if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
+			return FALSE;
+
+		NewPfixSymbol( pfixexpr, 0, TK_LOG_NOT, NULL, 0 );
+		return TRUE;
+
+    case TK_LPAREN:
+    case TK_LSQUARE:
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        open_paren = sym;
+        GetSym();
+
+        if ( ! TernaryCondition( pfixexpr ) )
+			return FALSE;
+
+		/* chack parentheses balance */
+        if ( ( open_paren == TK_LPAREN  && sym != TK_RPAREN ) ||
+             ( open_paren == TK_LSQUARE && sym != TK_RSQUARE ) )
+			return FALSE;
+
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        GetSym();
+		return TRUE;
+
+	default:
+		return Factor( pfixexpr );
+	}
+}
+
+/* parse A ** B */
+static BOOL PowerTerm( struct expr *pfixexpr )
+{
+    if ( ! UnaryTerm( pfixexpr ) )
+        return FALSE;
+
+    while ( sym == TK_POWER )
+    {
+        strcpy(pfixexpr->infixptr, token_string(sym));
+		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        GetSym();
+		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
+			return FALSE;
+
+		NewPfixSymbol( pfixexpr, 0, TK_POWER, NULL, 0 );
     }
 
-    return ( 1 );
+    return TRUE;
 }
 
 
+/* parse A * B, A / B, A % B */
+DEFINE_PARSER( Multiplication, PowerTerm, sym == TK_MULTIPLY || sym == TK_DIVIDE || sym == TK_MOD )
 
-static int
-Term( struct expr *pfixexpr )
-{
-    tokid_t mulsym;
+/* parse A + B, A - B */
+DEFINE_PARSER( Addition, Multiplication, sym == TK_PLUS || sym == TK_MINUS )
 
-    if ( !Pterm( pfixexpr ) )
-    {
-        return ( 0 );
-    }
+/* parse A << B, A >> B */
+DEFINE_PARSER( BinaryShift, Addition, sym == TK_LEFT_SHIFT || sym == TK_RIGHT_SHIFT )
 
-    while ( ( sym == multiply ) || ( sym == divide ) || ( sym == mod ) )
-    {
-        *pfixexpr->infixptr++ = separators[sym];  /* store '/', '%', '*' in infix expr */
-        mulsym = sym;
-        GetSym();
+/* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
+DEFINE_PARSER( Condition, BinaryShift, sym == TK_LESS	|| sym == TK_LESS_EQ ||
+									   sym == TK_EQUAL	|| sym == TK_NOT_EQ  ||
+									   sym == TK_GREATER|| sym == TK_GREATER_EQ )
 
-        if ( Pterm( pfixexpr ) )
-        {
-            NewPfixSymbol( pfixexpr, 0, mulsym, NULL, 0 );
-        }
-        else
-        {
-            return 0;
-        }
-    }
+/* parse A & B */
+DEFINE_PARSER( BinaryAnd, Condition, sym == TK_BIN_AND )
 
-    return ( 1 );
-}
-
-
-
-static int
-Expression( struct expr *pfixexpr )
-{
-    tokid_t addsym = nil;
-
-    if ( ( sym == plus ) || ( sym == minus ) )
-    {
-        if ( sym == minus )
-        {
-            *pfixexpr->infixptr++ = '-';
-        }
-
-        addsym = sym;
-        GetSym();
-
-        if ( Term( pfixexpr ) )
-        {
-            if ( addsym == minus )
-            {
-                NewPfixSymbol( pfixexpr, 0, unary_minus, NULL, 0 );
-            }
-
-            /* operand is signed, plus is redundant... */
-        }
-        else
-        {
-            return ( 0 );
-        }
-    }
-    else if ( !Term( pfixexpr ) )
-    {
-        return ( 0 );
-    }
-
-    while ( ( sym == plus ) || ( sym == minus ) ||
-            ( sym == bin_and ) || ( sym == bin_or ) || ( sym == bin_xor ) )
-    {
-        *pfixexpr->infixptr++ = separators[sym];
-        addsym = sym;
-        GetSym();
-
-        if ( Term( pfixexpr ) )
-        {
-            NewPfixSymbol( pfixexpr, 0, addsym, NULL, 0 );
-        }
-        else
-        {
-            return ( 0 );
-        }
-    }
-
-    return ( 1 );
-}
-
-
-static int
-Condition( struct expr *pfixexpr )
-{
-    tokid_t relsym = nil;
-
-    if ( !Expression( pfixexpr ) )
-    {
-        return 0;
-    }
-
-    relsym = sym;
-
-    switch ( sym )
-    {
-    case less:
-        *pfixexpr->infixptr++ = '<';
-        GetSym();
-        break;
-
-    case lessequal:
-        *pfixexpr->infixptr++ = '<';
-        *pfixexpr->infixptr++ = '=';
-        GetSym();
-        break;
-
-    case equal:
-        *pfixexpr->infixptr++ = '=';
-        GetSym();
-        break;
-
-    case notequal:
-        *pfixexpr->infixptr++ = '<';
-        *pfixexpr->infixptr++ = '>';
-        GetSym();
-        break;
-
-    case greater:
-        *pfixexpr->infixptr++ = '>';
-        GetSym();
-        break;
-
-    case greatequal:
-        *pfixexpr->infixptr++ = '>';
-        *pfixexpr->infixptr++ = '=';
-        GetSym();
-        break;
-
-    default:
-        return 1;                       /* implicit (left side only) expression */
-    }
-
-    if ( !Expression( pfixexpr ) )
-    {
-        return 0;
-    }
-    else
-    {
-        NewPfixSymbol( pfixexpr, 0, relsym, NULL, 0 );    /* condition... */
-    }
-
-    return ( 1 );
-}
-
+/* parse A | B, A ^ B */
+DEFINE_PARSER( BinaryOr, BinaryAnd, sym == TK_BIN_OR || sym == TK_BIN_XOR )
 
 /* parse A && B */
-static int LogAndCondition( struct expr *pfixexpr )
-{
-	if ( ! Condition(pfixexpr) )		/* get A */
-		return FALSE;
-
-	while ( sym == log_and )
-	{
-	    *pfixexpr->infixptr++ = '&';
-	    *pfixexpr->infixptr++ = '&';
-		GetSym();						/* consume '&&' */
-		if ( ! Condition(pfixexpr) )	/* get B */
-			return FALSE;
-
-		NewPfixSymbol( pfixexpr, 0, log_and, NULL, 0 );
-	}
-
-	return TRUE;
-}
-
+DEFINE_PARSER( LogicalAnd, BinaryOr, sym == TK_LOG_AND )
 
 /* parse A || B */
-static int LogOrCondition( struct expr *pfixexpr )
-{
-	if ( ! LogAndCondition(pfixexpr) )		/* get A */
-		return FALSE;
-
-	while ( sym == log_or )
-	{
-	    *pfixexpr->infixptr++ = '|';
-	    *pfixexpr->infixptr++ = '|';
-		GetSym();							/* consume '||' */
-		if ( ! LogAndCondition(pfixexpr) )	/* get B */
-			return FALSE;
-
-		NewPfixSymbol( pfixexpr, 0, log_or, NULL, 0 );
-	}
-
-	return TRUE;
-}
-
+DEFINE_PARSER( LogicalOr, LogicalAnd, sym == TK_LOG_OR )
 
 /* parse cond ? true : false */
-static int TernaryCondition( struct expr *pfixexpr )
+static BOOL TernaryCondition( struct expr *pfixexpr )
 {
-	if ( ! LogOrCondition(pfixexpr) )		/* get cond or expression */
+	if ( ! LogicalOr(pfixexpr) )		/* get cond or expression */
 		return FALSE;
 
-	if ( sym != question )
+	if ( sym != TK_QUESTION )
 		return TRUE;
 
 	/* ternary construct found */
@@ -492,7 +316,7 @@ static int TernaryCondition( struct expr *pfixexpr )
 	if ( ! TernaryCondition(pfixexpr) )	/* get true */
 		return FALSE;
 
-	if ( sym != colon )
+	if ( sym != TK_COLON )
 		return FALSE;
     *pfixexpr->infixptr++ = ':';
 	GetSym();						/* consume ':' */
@@ -500,7 +324,7 @@ static int TernaryCondition( struct expr *pfixexpr )
 	if ( ! TernaryCondition(pfixexpr) )	/* get false */
 		return FALSE;
 
-	NewPfixSymbol( pfixexpr, 0, ternary_cond, NULL, 0 );    /* ?: */
+	NewPfixSymbol( pfixexpr, 0, TK_TERN_COND, NULL, 0 );    /* ?: */
 	return TRUE;
 }
 
@@ -509,7 +333,7 @@ struct expr *
 ParseNumExpr( void )
 {
     struct expr *pfixhdr;
-    tokid_t constant_expression = nil;
+    BOOL is_const_expr = FALSE;
 
     pfixhdr = xnew( struct expr );
 
@@ -525,19 +349,21 @@ ParseNumExpr( void )
 
     pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
-    if ( sym == constexpr )
+    if ( sym == TK_CONST_EXPR )
     {
-        GetSym();               /* leading '#' : ignore relocatable address expression */
-        constant_expression = constexpr;        /* convert to constant expression */
-        *pfixhdr->infixptr++ = '#';
+		strcpy(pfixhdr->infixptr, token_string(sym));
+		pfixhdr->infixptr += strlen(pfixhdr->infixptr);
+
+		GetSym();               /* leading '#' : ignore relocatable address expression */
+        is_const_expr = TRUE;        /* convert to constant expression */
     }
 
     if ( TernaryCondition( pfixhdr ) )
     {
         /* parse expression... */
-        if ( constant_expression == constexpr )
+        if ( is_const_expr )
         {
-            NewPfixSymbol( pfixhdr, 0, constexpr, NULL, 0 );    /* convert to constant expression */
+            NewPfixSymbol( pfixhdr, 0, TK_CONST_EXPR, NULL, 0 );    /* convert to constant expression */
         }
 
         *pfixhdr->infixptr = '\0';                      /* terminate infix expression */
@@ -584,7 +410,7 @@ EvalPfixExpr( struct expr *pfixlist )
         {
             switch ( pfixexpr->operatortype )
             {
-            case number:
+            case TK_NUMBER:
                 if ( pfixexpr->id == NULL ) /* Is operand an identifier? */
                 {
                     PushItem( pfixexpr->operandconst, &stackptr );
@@ -652,25 +478,24 @@ EvalPfixExpr( struct expr *pfixlist )
 
                 break;
 
-            case unary_minus:
+            case TK_NEGATE:
                 stackptr->stackconstant = -stackptr->stackconstant;
                 break;
 
-            case log_not:
+            case TK_LOG_NOT:
                 stackptr->stackconstant = !( stackptr->stackconstant );
                 break;
 
-            case bin_not:
+            case TK_BIN_NOT:
                 stackptr->stackconstant = ~( stackptr->stackconstant );
                 break;
 
-            case constexpr:
+            case TK_CONST_EXPR:
                 pfixlist->rangetype &= CLEAR_EXPRADDR;    /* convert to constant expression */
                 break;
 
             default:
-                CalcExpression( pfixexpr->operatortype, &stackptr );       /* plus minus, multiply, div,
-                                                                     * mod */
+                CalcExpression( pfixexpr->operatortype, &stackptr );       /* plus minus, multiply, divide, mod */
                 break;
             }
 
@@ -702,75 +527,83 @@ CalcExpression( tokid_t opr, struct pfixstack **stackptr )
 
     switch ( opr )
     {
-    case bin_and:
+    case TK_BIN_AND:
         PushItem( ( leftoperand & rightoperand ), stackptr );
         break;
 
-    case bin_or:
+    case TK_BIN_OR:
         PushItem( ( leftoperand | rightoperand ), stackptr );
         break;
 
-    case log_and:
+    case TK_LOG_AND:
         PushItem( ( leftoperand && rightoperand ), stackptr );
         break;
 
-    case log_or:
+    case TK_LOG_OR:
         PushItem( ( leftoperand || rightoperand ), stackptr );
         break;
 
-    case bin_xor:
+    case TK_BIN_XOR:
         PushItem( ( leftoperand ^ rightoperand ), stackptr );
         break;
 
-    case plus:
+    case TK_PLUS:
         PushItem( ( leftoperand + rightoperand ), stackptr );
         break;
 
-    case minus:
+    case TK_MINUS:
         PushItem( ( leftoperand - rightoperand ), stackptr );
         break;
 
-    case multiply:
+    case TK_MULTIPLY:
         PushItem( ( leftoperand * rightoperand ), stackptr );
         break;
 
-    case divide:
+    case TK_DIVIDE:
         PushItem( calc_divide( leftoperand, rightoperand ), stackptr );
         break;
 
-    case mod:
+    case TK_MOD:
         PushItem( calc_mod( leftoperand, rightoperand ), stackptr );
         break;
 
-    case power:
+    case TK_POWER:
         PushItem( calc_power( leftoperand, rightoperand ), stackptr );
         break;
 
-    case equal:
+    case TK_EQUAL:
         PushItem( ( leftoperand == rightoperand ), stackptr );
         break;
 
-    case less:
+    case TK_LESS:
         PushItem( ( leftoperand < rightoperand ), stackptr );
         break;
 
-    case greater:
+    case TK_GREATER:
         PushItem( ( leftoperand > rightoperand ), stackptr );
         break;
 
-    case lessequal:
+    case TK_LESS_EQ:
         PushItem( ( leftoperand <= rightoperand ), stackptr );
         break;
 
-    case greatequal:
+    case TK_GREATER_EQ:
         PushItem( ( leftoperand >= rightoperand ), stackptr );
         break;
 
-    case notequal:
+    case TK_NOT_EQ:
         PushItem( ( leftoperand != rightoperand ), stackptr );
         break;
 
-	case ternary_cond:
+    case TK_LEFT_SHIFT:
+        PushItem( ( leftoperand << rightoperand ), stackptr );
+        break;
+
+    case TK_RIGHT_SHIFT:
+        PushItem( ( leftoperand >> rightoperand ), stackptr );
+        break;
+
+	case TK_TERN_COND:
 		condition = PopItem( stackptr );
 		PushItem( condition ? leftoperand : rightoperand, stackptr );
 		break;
@@ -1096,12 +929,12 @@ ExprSigned8( int listoffset )
     /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
     switch ( sym )
     {
-    case rparen:
+    case TK_RPAREN:
         append_byte( 0 );   /* offset zero */
         return 1;           /* OK, zero already stored */
 
-    case plus:
-    case minus:             /* + or - expected */
+    case TK_PLUS:
+    case TK_MINUS:          /* + or - expected */
         break;              /* continue into parsing expression */
 
     default:                /* Syntax error, e.g. (ix 4) */
@@ -1163,7 +996,13 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.57  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.58  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.57  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.56  2014/02/24 23:08:55  pauloscustodio
@@ -1507,16 +1346,3 @@ ExprSigned8( int listoffset )
 /* Updated in $/Z80asm */
 /* Improved handling of fgetc() character reading in relation to premature */
 /* EOF handling (for character constants in expressions). */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.45 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.46 2014-03-01 15:45:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -43,8 +43,7 @@ int CheckBaseType( int chcount );
 /* global variables */
 extern FILE *z80asmfile;
 extern char ident[];
-extern char separators[];
-extern tokid_t sym, ssym[];
+extern tokid_t sym;
 extern int currentline;
 extern struct module *CURRENTMODULE;
 extern enum flag EOL;
@@ -145,14 +144,13 @@ static BOOL GetComposed( int c, char *expect )
 tokid_t
 GetSym( void )
 {
-    char *instr;
     int c, chcount = 0;
 
     ident[0] = '\0';
 
     if ( EOL == ON )
     {
-        sym = newline;
+        sym = TK_NEWLINE;
         return sym;
     }
 
@@ -161,9 +159,9 @@ GetSym( void )
         /* Ignore leading white spaces, if any... */
         if ( feof( z80asmfile ) )
         {
-            sym = newline;
+            sym = TK_NEWLINE;
             EOL = ON;
-            return newline;
+            return TK_NEWLINE;
         }
         else
         {
@@ -172,9 +170,9 @@ GetSym( void )
             if ( ( c == '\n' ) || ( c == EOF ) || ( c == '\x1A' )
                     || ( c == '\0' ) )        /* BUG_0001 Bugfix read overrun in OBJ file expression */
             {
-                sym = newline;
+                sym = TK_NEWLINE;
                 EOL = ON;
-                return newline;
+                return TK_NEWLINE;
             }
             else if ( !isspace( c ) )
             {
@@ -183,31 +181,32 @@ GetSym( void )
         }
     }
 
-	/* single char separators */
-    instr = strchr( separators, c );
-
-    if ( instr != NULL )
+	/* comment */
+    if ( c == ';' )
     {
-		/* special cases for composed separators */
-		if ( GetComposed( c, "**" ) ) return (sym = power);			/* assign and return */
-		if ( GetComposed( c, "==" ) ) return (sym = equal);			/* assign and return */
-		if ( GetComposed( c, "!=" ) ) return (sym = notequal);		/* assign and return */
-		if ( GetComposed( c, "<>" ) ) return (sym = notequal);		/* assign and return */
-		if ( GetComposed( c, "<=" ) ) return (sym = lessequal);		/* assign and return */
-		if ( GetComposed( c, ">=" ) ) return (sym = greatequal);	/* assign and return */
-		if ( GetComposed( c, "&&" ) ) return (sym = log_and);		/* assign and return */
-		if ( GetComposed( c, "||" ) ) return (sym = log_or);		/* assign and return */
-
-        sym = ssym[instr - separators];   /* index of found char in separators[] */
-
-        if ( sym == semicolon )
-        {
-            Skipline( z80asmfile );       /* ignore comment line, prepare for next line */
-            sym = newline;
-        }
-
-        return sym;
+        Skipline( z80asmfile );				/* ignore comment line, prepare for next line */
+        return (sym = TK_NEWLINE);				/* assign and return */
     }
+
+	/* special cases for composed separators */
+	if ( ispunct(c) )
+	{
+		if ( GetComposed( c, "**" ) ) return (sym = TK_POWER);			/* assign and return */
+		if ( GetComposed( c, "==" ) ) return (sym = TK_EQUAL);			/* assign and return */
+		if ( GetComposed( c, "!=" ) ) return (sym = TK_NOT_EQ);			/* assign and return */
+		if ( GetComposed( c, "<>" ) ) return (sym = TK_NOT_EQ);			/* assign and return */
+		if ( GetComposed( c, "<=" ) ) return (sym = TK_LESS_EQ);		/* assign and return */
+		if ( GetComposed( c, ">=" ) ) return (sym = TK_GREATER_EQ);		/* assign and return */
+		if ( GetComposed( c, "<<" ) ) return (sym = TK_LEFT_SHIFT);		/* assign and return */
+		if ( GetComposed( c, ">>" ) ) return (sym = TK_RIGHT_SHIFT);	/* assign and return */
+		if ( GetComposed( c, "&&" ) ) return (sym = TK_LOG_AND);		/* assign and return */
+		if ( GetComposed( c, "||" ) ) return (sym = TK_LOG_OR);			/* assign and return */
+	}
+
+	/* single char separators */
+	sym = char_token( c );
+	if ( sym != TK_NIL )
+		return sym;
 
     ident[chcount++] = ( char ) toupper( c );
 
@@ -223,7 +222,7 @@ GetSym( void )
         break;
 
     case '#':       /* not reached, as '#' is a separator */
-        sym = name;
+        sym = TK_NAME;
         break;
 
     default:
@@ -235,11 +234,11 @@ GetSym( void )
         {
             if ( isalpha( c ) || c == '_' )
             {
-                sym = name;       /* an identifier found */
+                sym = TK_NAME;       /* an identifier found */
             }
             else
             {
-                sym = nil;        /* rubbish ... */
+                sym = TK_NIL;        /* rubbish ... */
             }
         }
 
@@ -247,79 +246,41 @@ GetSym( void )
     }
 
     /* Read identifier until space or legal separator is found */
-    if ( sym == name )
+    if ( sym == TK_NAME )
     {
-        for ( ;; )
+        while (1)
         {
             if ( feof( z80asmfile ) )
-            {
                 break;
-            }
-            else
-            {
-                c = GetChar( z80asmfile );
 
-                if ( ( c != EOF ) && ( !iscntrl( c ) ) && ( strchr( separators, c ) == NULL ) )
-                {
-                    if ( !isalnum( c ) )
-                    {
-                        if ( c != '_' )
-                        {
-                            sym = nil;
-                            break;
-                        }
-                        else
-                        {
-                            ident[chcount++] = '_';       /* underscore in identifier */
-                        }
-                    }
-                    else
-                    {
-                        ident[chcount++] = ( char ) toupper( c );
-                    }
-                }
-                else
-                {
-                    if ( c != ':' )
-                    {
-                        UnGet( c, z80asmfile );    /* puch character back into stream for next read */
-                    }
-                    else
-                    {
-                        sym = label;
-                    }
+            c = GetChar( z80asmfile );
+			if ( !isalnum( c ) && c != '_' )
+			{
+				if ( c == ':' )					/* eat ':' if any */
+					sym = TK_LABEL;
+				else
+					UnGet( c, z80asmfile );
+				break;
+			}
 
-                    break;
-                }
-            }
-        }
-
-        chcount = CheckBaseType( chcount );
+			ident[chcount++] = toupper( c );
+		}
     }
     else
     {
-        for ( ;; )
+        while (1)
         {
             if ( feof( z80asmfile ) )
-            {
                 break;
-            }
-            else
-            {
-                c = GetChar( z80asmfile );
 
-                if ( ( c != EOF ) && !iscntrl( c ) && ( strchr( separators, c ) == NULL ) )
-                {
-                    ident[chcount++] = c;
-                }
-                else
-                {
-                    UnGet( c, z80asmfile );       /* puch character back into stream for next read */
-                    break;
-                }
-            }
-        }
-
+            c = GetChar( z80asmfile );
+			if ( !isalnum( c ) )
+			{
+				UnGet( c, z80asmfile );
+				break;
+			}
+			ident[chcount++] = c;
+		}
         chcount = CheckBaseType( chcount );
     }
 
@@ -515,7 +476,7 @@ CheckCondition( void )
 int
 CheckRegister8( void )
 {
-    if ( sym == name )
+    if ( sym == TK_NAME )
     {
         if ( *( ident + 1 ) == '\0' )
         {
@@ -643,7 +604,7 @@ CheckRegister8( void )
 int
 CheckRegister16( void )
 {
-    if ( sym == name )
+    if ( sym == TK_NAME )
     {
         if ( strcmp( ident, "HL" ) == 0 )
         {
@@ -700,7 +661,7 @@ IndirectRegisters( void )
     case REG16_BC:
     case REG16_DE:
     case REG16_HL:
-        if ( GetSym() == rparen )
+        if ( GetSym() == TK_RPAREN )
         {
             /* (BC) | (DE) | (HL) | ? */
             GetSym();
@@ -805,7 +766,13 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.45  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.46  2014-03-01 15:45:31  pauloscustodio
+* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
+* Handle C-like operators, make exponentiation (**) right-associative.
+* Simplify expression parser by handling composed tokens in lexer.
+* Change token ids to TK_...
+*
+* Revision 1.45  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.44  2014/02/24 23:08:55  pauloscustodio
@@ -1032,17 +999,3 @@ GetConstant( char *evalerr )
 /* User: Gbs          Date: 20-06-98   Time: 15:02 */
 /* Updated in $/Z80asm */
 /* GetSym() and Skipline() improved with EOF handling. */
-
-/*
- * Local Variables:
- *  indent-tabs-mode:nil
- *  require-final-newline:t
- *  c-basic-offset: 2
- *  eval: (c-set-offset 'case-label 0)
- *  eval: (c-set-offset 'substatement-open 2)
- *  eval: (c-set-offset 'access-label 0)
- *  eval: (c-set-offset 'class-open 2)
- *  eval: (c-set-offset 'class-close 2)
- * End:
- */
-
