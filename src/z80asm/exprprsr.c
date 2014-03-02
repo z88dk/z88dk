@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.58 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.59 2014-03-02 12:51:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -124,9 +124,9 @@ static BOOL Factor( struct expr *pfixexpr )
         GetSym();
         break;
 
-    case hexconst:
-    case binconst:
-    case decmconst:
+    case TK_HEX_CONST:
+    case TK_BIN_CONST:
+    case TK_DEC_CONST:
         strcpy( pfixexpr->infixptr, ident );    /* add constant to infix expr */
         pfixexpr->infixptr += strlen( ident );  /* update pointer */
         constant = GetConstant( &eval_err );
@@ -996,7 +996,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.58  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.59  2014-03-02 12:51:41  pauloscustodio
+* Change token ids to TK_...
+*
+* Revision 1.58  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

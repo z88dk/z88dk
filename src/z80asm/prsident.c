@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.55 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.56 2014-03-02 12:51:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -319,7 +319,7 @@ IF( void )
 void
 ELSE( void )
 {
-    sym = elsestatm;
+    sym = TK_ELSE_STMT;
 }
 
 
@@ -328,7 +328,7 @@ ELSE( void )
 void
 ENDIF( void )
 {
-    sym = endifstatm;
+    sym = TK_ENDIF_STMT;
 }
 
 
@@ -1092,7 +1092,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.55  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.56  2014-03-02 12:51:41  pauloscustodio
+* Change token ids to TK_...
+*
+* Revision 1.55  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

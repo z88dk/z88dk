@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.74 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.75 2014-03-02 12:51:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -213,9 +213,9 @@ ifstatement( enum flag interpret )
                     return;    /* end of file - exit from this #if level */
                 }
             }
-            while ( ( sym != elsestatm ) && ( sym != endifstatm ) );
+            while ( ( sym != TK_ELSE_STMT ) && ( sym != TK_ENDIF_STMT ) );
 
-            if ( sym == elsestatm )
+            if ( sym == TK_ELSE_STMT )
             {
                 do
                 {
@@ -229,7 +229,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( sym != endifstatm );
+                while ( sym != TK_ENDIF_STMT );
             }
         }
         else
@@ -246,9 +246,9 @@ ifstatement( enum flag interpret )
                     return;
                 }
             }
-            while ( ( sym != elsestatm ) && ( sym != endifstatm ) );
+            while ( ( sym != TK_ELSE_STMT ) && ( sym != TK_ENDIF_STMT ) );
 
-            if ( sym == elsestatm )
+            if ( sym == TK_ELSE_STMT )
             {
                 do
                 {
@@ -261,7 +261,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( sym != endifstatm );
+                while ( sym != TK_ENDIF_STMT );
             }
         }
     }
@@ -279,7 +279,7 @@ ifstatement( enum flag interpret )
                 return;    /* end of file - exit from this IF level */
             }
         }
-        while ( sym != endifstatm );
+        while ( sym != TK_ENDIF_STMT );
     }
 
     sym = TK_NIL;
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.74  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.75  2014-03-02 12:51:41  pauloscustodio
+* Change token ids to TK_...
+*
+* Revision 1.74  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

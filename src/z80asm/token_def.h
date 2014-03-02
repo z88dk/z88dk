@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.12 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.13 2014-03-02 12:51:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -38,14 +38,13 @@ TOKEN(	TK_LABEL,		"" )
 TOKEN(	TK_NUMBER,		"" )
 TOKEN(	TK_STRING,		"" )
 
-TOKEN(	decmconst,		"" )
-TOKEN(	hexconst,		"" )
-TOKEN(	binconst,		"" )
-TOKEN(	charconst,		"" )
+TOKEN(	TK_DEC_CONST,	"" )
+TOKEN(	TK_HEX_CONST,	"" )
+TOKEN(	TK_BIN_CONST,	"" )
 
-TOKEN(	ifstatm,		"" )
-TOKEN(	elsestatm,		"" )
-TOKEN(	endifstatm,		"" )
+TOKEN(	TK_IF_STMT,		"" )
+TOKEN(	TK_ELSE_STMT,	"" )
+TOKEN(	TK_ENDIF_STMT,	"" )
 
 /* lexical tokens in ASCII order */
 
@@ -146,7 +145,10 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.12  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.13  2014-03-02 12:51:41  pauloscustodio
+* Change token ids to TK_...
+*
+* Revision 1.12  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.46 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.47 2014-03-02 12:51:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -213,12 +213,12 @@ GetSym( void )
     switch ( c )
     {
     case '$':
-        sym = hexconst;
+        sym = TK_HEX_CONST;
         break;
 
     case '@':
     case '%':       /* not reached, as '%' is a separator */
-        sym = binconst;
+        sym = TK_BIN_CONST;
         break;
 
     case '#':       /* not reached, as '#' is a separator */
@@ -228,7 +228,7 @@ GetSym( void )
     default:
         if ( isdigit( c ) )
         {
-            sym = decmconst;      /* a decimal number found */
+            sym = TK_DEC_CONST;      /* a decimal number found */
         }
         else
         {
@@ -318,7 +318,7 @@ CheckBaseType( int chcount )
             }
 
             ident[0] = '$';
-            sym = hexconst;
+            sym = TK_HEX_CONST;
             return ( chcount - 1 );
         }
     }
@@ -342,7 +342,7 @@ CheckBaseType( int chcount )
             }
 
             ident[0] = '$';
-            sym = hexconst;
+            sym = TK_HEX_CONST;
             return chcount;
         }
         else
@@ -368,7 +368,7 @@ CheckBaseType( int chcount )
         }
 
         ident[0] = '@';
-        sym = binconst;
+        sym = TK_BIN_CONST;
         return chcount;
     }
 
@@ -383,7 +383,7 @@ CheckBaseType( int chcount )
 
     if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'D' )
     {
-        sym = decmconst;
+        sym = TK_DEC_CONST;
         return chcount - 1;
     }
 
@@ -696,7 +696,7 @@ GetConstant( char *evalerr )
 
     *evalerr = 0;                 /* preset to no errors */
 
-    if ( ( sym != hexconst ) && ( sym != binconst ) && ( sym != decmconst ) )
+    if ( ( sym != TK_HEX_CONST ) && ( sym != TK_BIN_CONST ) && ( sym != TK_DEC_CONST ) )
     {
         *evalerr = 1;
         return ( 0 );             /* syntax error - illegal constant definition */
@@ -704,7 +704,7 @@ GetConstant( char *evalerr )
 
     size = strlen( ident );
 
-    if ( sym != decmconst )
+    if ( sym != TK_DEC_CONST )
         if ( ( --size ) == 0 )
         {
             *evalerr = 1;
@@ -766,7 +766,10 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.46  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.47  2014-03-02 12:51:41  pauloscustodio
+* Change token ids to TK_...
+*
+* Revision 1.46  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.
