@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.2 2014-02-19 23:59:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.3 2014-03-02 14:08:42 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,8 +23,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.2 2014-02-19 2
 *	arr->free_data = elem_free;	// function to free each element
 *	T *TArray_item(n)			// expand array if needed and return address of item
 *	uint_t TArray_size()		// return number of elements
+*	TArray_set_size(n)			// set number of elements, call free_data on dropped ones
 *	TArray_remove_all()			// free each element and colapse array
 *	TArray_unreserve()			// free all unused space of array
+*	T *TArray_push()			// add empty element to top, return address
+*	T *TArray_top()				// return pointer to top item, NULL if empty
+*	TArray_pop()				// drop top element
 *----------------------------------------------------------------------------*/
 
 /* declare */
@@ -36,9 +40,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.2 2014-02-19 2
 	END_CLASS																\
 																			\
 	extern uint_t	T##Array_size(T##Array *self);							\
+	extern void		T##Array_set_size(T##Array *self, uint_t n);			\
 	extern T 	   *T##Array_item(T##Array *self, uint_t n);				\
 	extern void		T##Array_remove_all(T##Array *self);					\
 	extern void		T##Array_unreserve(T##Array *self);						\
+	extern T	   *T##Array_push(T##Array *self);							\
+	extern T	   *T##Array_top(T##Array *self);							\
+	extern void		T##Array_pop(T##Array *self);							\
 
 /* define */
 #define DEF_ARRAY( T )														\
@@ -66,6 +74,26 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.2 2014-02-19 2
 		return self->items->len / sizeof(T);								\
 	}																		\
 																			\
+	void T##Array_set_size(T##Array *self, uint_t n)						\
+	{																		\
+		uint_t size, i;														\
+																			\
+		/* delete old items */												\
+		if ( self->free_data != NULL )										\
+		{																	\
+			size = T##Array_size(self);										\
+			for ( i = n; i < size; i++ )									\
+				self->free_data( T##Array_item(self, i) );					\
+		}																	\
+																			\
+		/* create new items */												\
+		if ( n > 0 )														\
+			T##Array_item(self, n-1);										\
+		else 																\
+			Str_clear(self->items);											\
+		self->items->len = n * sizeof(T);									\
+	}																		\
+																			\
 	T *T##Array_item(T##Array *self, uint_t n)								\
 	{																		\
 		uint_t old_size, new_size, new_bytes;								\
@@ -88,26 +116,39 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.2 2014-02-19 2
 																			\
 	void T##Array_remove_all(T##Array *self)								\
 	{																		\
-		uint_t size, i;														\
-																			\
-		if ( self->free_data != NULL )										\
-		{																	\
-			size = T##Array_size(self);										\
-			for ( i = 0; i < size; i++ )									\
-				self->free_data( T##Array_item(self, i) );					\
-		}																	\
-		Str_clear(self->items);												\
+		T##Array_set_size(self, 0);											\
 	}																		\
 																			\
 	void T##Array_unreserve(T##Array *self)									\
 	{																		\
 		Str_unreserve(self->items);											\
 	}																		\
-
+																			\
+	T *T##Array_push(T##Array *self)										\
+	{																		\
+		uint_t size = T##Array_size(self);									\
+		return T##Array_item(self, size);									\
+	}																		\
+																			\
+	T *T##Array_top(T##Array *self)											\
+	{																		\
+		uint_t size = T##Array_size(self);									\
+		return size > 0 ? T##Array_item(self, size - 1) : NULL;				\
+	}																		\
+																			\
+	void T##Array_pop(T##Array *self)										\
+	{																		\
+		uint_t size = T##Array_size(self);									\
+		assert( size > 0 );													\
+		T##Array_set_size(self, size - 1);									\
+	}																		\
 
 /*
 * $Log: array.h,v $
-* Revision 1.2  2014-02-19 23:59:27  pauloscustodio
+* Revision 1.3  2014-03-02 14:08:42  pauloscustodio
+* Add methods to set size, push, pop and lookup top item
+*
+* Revision 1.2  2014/02/19 23:59:27  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
