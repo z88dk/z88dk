@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.72 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.73 2014-03-03 13:27:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -131,7 +131,7 @@ Parsevarsize( void )
 
             if ( ( postfixexpr = ParseNumExpr() ) != NULL )
             {
-                if ( postfixexpr->rangetype & NOTEVALUABLE )
+                if ( postfixexpr->rangetype & NOT_EVALUABLE )
                 {
                     error_not_defined();
                     RemovePfixlist( postfixexpr );
@@ -202,7 +202,7 @@ DEFVARS( void )
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        if ( postfixexpr->rangetype & NOT_EVALUABLE )
         {
             error_not_defined();
             RemovePfixlist( postfixexpr );
@@ -363,7 +363,7 @@ DEFGROUP( void )
 
                             if ( ( postfixexpr = ParseNumExpr() ) != NULL )
                             {
-                                if ( postfixexpr->rangetype & NOTEVALUABLE )
+                                if ( postfixexpr->rangetype & NOT_EVALUABLE )
                                 {
                                     error_not_defined();
                                 }
@@ -413,7 +413,7 @@ DEFS()
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        if ( postfixexpr->rangetype & NOT_EVALUABLE )
         {
             error_not_defined();
         }
@@ -433,7 +433,7 @@ DEFS()
 
                 if ( ( constexpr = ParseNumExpr() ) != NULL )
                 {
-                    if ( constexpr->rangetype & NOTEVALUABLE )
+                    if ( constexpr->rangetype & NOT_EVALUABLE )
                     {
                         error_not_defined();
                     }
@@ -528,7 +528,7 @@ DEFC( void )
                 {
                     /* expr. must not be stored in
                        * relocatable file */
-                    if ( postfixexpr->rangetype & NOTEVALUABLE )
+                    if ( postfixexpr->rangetype & NOT_EVALUABLE )
                     {
                         error_not_defined();
                         break;
@@ -575,7 +575,7 @@ ORG( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOTEVALUABLE )
+        if ( postfixexpr->rangetype & NOT_EVALUABLE )
         {
             error_not_defined();
         }
@@ -977,7 +977,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.72  2014-03-01 15:45:31  pauloscustodio
+ * Revision 1.73  2014-03-03 13:27:06  pauloscustodio
+ * Rename symbol type constants
+ *
+ * Revision 1.72  2014/03/01 15:45:31  pauloscustodio
  * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
  * Handle C-like operators, make exponentiation (**) right-associative.
  * Simplify expression parser by handling composed tokens in lexer.

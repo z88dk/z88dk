@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.6 2014-02-17 23:10:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.7 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,35 +28,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.6 2014-02-17 23:10
 /*-----------------------------------------------------------------------------
 *   Symbol type bitmasks - bits 3 to 6 same as Expression type bitmasks
 *----------------------------------------------------------------------------*/
-#define SYMDEFINED      1       	/* 00000001 symbol is defined */
-#define SYMTOUCHED      2       	/* 00000010 symbol was used, e.g. returned by 
+#define SYM_DEFINED		1       	/* 00000001 symbol is defined */
+#define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
 									   a symbol table search */
-#define SYMDEF          4       	/* 00000100 DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, 
+#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, 
 									   global library; not output in sym list */
-#define SYMADDR         8       	/* 00001000 symbol is address */
-#define SYMLOCAL        16      	/* 00010000 symbol is local */
-#define SYMXDEF         32      	/* 00100000 symbol is global (SYMXDEF) 
-									   or global library (SYMXDEF|SYMDEF) */
-#define SYMXREF         64      	/* 01000000 symbol is external (SYMXREF) 
-									   or external library (SYMXREF|SYMDEF) */
 
-#define XDEF_OFF        223     	/* 11011111 */
-#define XREF_OFF        191     	/* 10111111 */
-#define SYMLOCAL_OFF    239     	/* 11101111 */
-#define SYMTYPE         120     	/* 01111000 */
+#define SYM_TYPE		120     	/* 01111000 */
+
+#define SYM_ADDR		8       	/* 00001000 symbol is address */
+#define SYM_LOCAL		16      	/* 00010000 symbol is local */
+#define SYM_GLOBAL		32      	/* 00100000 symbol is global (SYM_GLOBAL) 
+									   or global library (SYM_GLOBAL|SYM_DEFINE) */
+#define SYM_EXTERN		64      	/* 01000000 symbol is external (SYM_EXTERN) 
+									   or external library (SYM_EXTERN|SYM_DEFINE) */
+
 #define SYM_NOTDEFINED  0
 
 /*-----------------------------------------------------------------------------
 *   Expression rangetype bitmasks - bits 3 to 6 same as Symbol type bitmasks
 *----------------------------------------------------------------------------*/
 #define RANGE           7			/* 00000111 Range types are 0 - 4 */
-#define EXPRADDR        SYMADDR		/* 00001000 Expression contains reloc. address label */
-#define EXPRLOCAL       SYMLOCAL   	/* 00010000 Expression contains local symbol */
-#define EXPRGLOBAL      SYMXDEF    	/* 00100000 Expression contains global symbol */
-#define EXPREXTERN      SYMXREF    	/* 01000000 Expression contains extern symbol */
-#define NOTEVALUABLE    128     	/* 10000000 Expression is not evaluable */
-#define EVALUATED       127     	/* 01111111 Expression is evaluated */
-#define CLEAR_EXPRADDR  247     	/* 11110111 Convert to constant expression */
 
 #define RANGE_JROFFSET  0			/* relative jump argument */
 #define RANGE_8UNSIGN   1			/* 8-bit immediate */
@@ -68,6 +60,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.6 2014-02-17 23:10
 #define RANGE_SIZE(x)	(((x) & RANGE) == RANGE_32SIGN  ? 4 : \
 						 ((x) & RANGE) == RANGE_16CONST ? 2 : \
 														  1 )
+
+#define EXPR_ADDR		SYM_ADDR	/* 00001000 Expression contains reloc. address label */
+#define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
+#define EXPR_GLOBAL		SYM_GLOBAL 	/* 00100000 Expression contains global symbol */
+#define EXPR_EXTERN		SYM_EXTERN	/* 01000000 Expression contains extern symbol */
+
+#define NOT_EVALUABLE	128     	/* 10000000 Expression is not evaluable */
 
 /*-----------------------------------------------------------------------------
 *   Initialize data structures
@@ -87,8 +86,11 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.6  2014-02-17 23:10:39  pauloscustodio
-* Define EXPRADDR as SYMADDR, ...
+* Revision 1.7  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.6  2014/02/17 23:10:39  pauloscustodio
+* Define EXPR_ADDR as SYM_ADDR, ...
 *
 * Revision 1.5  2014/02/17 22:48:28  pauloscustodio
 * Symbol types and Expression types need to be in sync

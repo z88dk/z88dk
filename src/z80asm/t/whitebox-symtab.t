@@ -61,13 +61,13 @@ void dump_Symbol ( Symbol *sym )
 {
 	warn("Symbol %s (%s) = %ld, type = 0x%02X [", 
 		 sym->name, Symbol_fullname(sym), sym->value, sym->type );
-	if (sym->type & SYMDEFINED)	warn("DEFINED ");
-	if (sym->type & SYMTOUCHED)	warn("TOUCHED ");
-	if (sym->type & SYMDEF)		warn("DEF ");
-	if (sym->type & SYMADDR)	warn("ADDR ");
-	if (sym->type & SYMLOCAL)	warn("LOCAL ");
-	if (sym->type & SYMXDEF)	warn("XDEF ");
-	if (sym->type & SYMXREF)	warn("XREF ");
+	if (sym->type & SYM_DEFINED)	warn("DEFINED ");
+	if (sym->type & SYM_TOUCHED)	warn("TOUCHED ");
+	if (sym->type & SYM_DEFINE)		warn("DEF ");
+	if (sym->type & SYM_ADDR)		warn("ADDR ");
+	if (sym->type & SYM_LOCAL)		warn("LOCAL ");
+	if (sym->type & SYM_GLOBAL)		warn("GLOBAL ");
+	if (sym->type & SYM_EXTERN)		warn("EXTERN ");
 	warn("], ref = [");
 	dump_SymbolRefList(sym->references);
 	warn("], owner = %s\n", 
@@ -187,16 +187,16 @@ t_compile_module($init, <<'END', $objs);
 	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
-	ASSERT( ! (sym->type & SYMDEFINED) );
+	ASSERT( ! (sym->type & SYM_DEFINED) );
 	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
-	ASSERT( ! (sym->type & SYMDEFINED) );
+	ASSERT( ! (sym->type & SYM_DEFINED) );
 	find_symbol( S(ASMPC_KW), global_symtab )->value += 3; page_nr++;
-	define_symbol(S("NN"), find_symbol( S(ASMPC_KW), global_symtab )->value, SYMADDR | SYMTOUCHED ); 
+	define_symbol(S("NN"), find_symbol( S(ASMPC_KW), global_symtab )->value, SYM_ADDR | SYM_TOUCHED ); 
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
-	ASSERT( sym->type & SYMDEFINED );
+	ASSERT( sym->type & SYM_DEFINED );
 	dump_Symbol(sym);
 	
 	dump_symtab();
@@ -312,9 +312,12 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.35 2014-02-08 18:30:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.36 2014-03-03 13:27:07 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.35  2014-02-08 18:30:49  pauloscustodio
+# Revision 1.36  2014-03-03 13:27:07  pauloscustodio
+# Rename symbol type constants
+#
+# Revision 1.35  2014/02/08 18:30:49  pauloscustodio
 # lib/srcfile.c to read source files and handle recursive includes,
 # used to read @lists, removed opts.files;
 # model.c to hold global data model

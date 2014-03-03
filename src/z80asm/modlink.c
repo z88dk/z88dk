@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.93 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.94 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -97,7 +97,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
         switch ( symbol_char )
         {
         case 'A':
-            symboltype = SYMADDR;
+            symboltype = SYM_ADDR;
             value += modulehdr->first->origin + CURRENTMODULE->startoffset;       /* Absolute address */
             break;
 
@@ -164,7 +164,7 @@ ReadExpr( long nextexpr, long endexpr )
         if ( ( postfixexpr = ParseNumExpr() ) != NULL )
         {
             /* parse numerical expression */
-            if ( postfixexpr->rangetype & NOTEVALUABLE )
+            if ( postfixexpr->rangetype & NOT_EVALUABLE )
             {
                 error_not_defined_expr( line );
             }
@@ -196,7 +196,7 @@ ReadExpr( long nextexpr, long endexpr )
                     patch_word( &patchptr, constant );
 
                     if ( opts.relocatable )
-                        if ( postfixexpr->rangetype & SYMADDR )
+                        if ( postfixexpr->rangetype & SYM_ADDR )
                         {
                             /* Expression contains relocatable address */
                             constant = get_PC() - curroffset;
@@ -1037,7 +1037,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.93  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.94  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.93  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

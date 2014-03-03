@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.8 2014-01-20 23:29:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.9 2014-03-03 13:27:06 pauloscustodio Exp $
 
 */
 
@@ -77,8 +77,8 @@ void write_def_file( void )
         puts( "Creating global definition file..." );
     }
 
-    def_symtab = get_all_syms( SYMADDR | SYMLOCAL | SYMXDEF | SYMDEF,
-                               SYMADDR | 0        | SYMXDEF | 0 );
+    def_symtab = get_all_syms( SYM_ADDR | SYM_LOCAL | SYM_GLOBAL | SYM_DEFINE,
+                               SYM_ADDR | 0         | SYM_GLOBAL | 0 );
 
     /* Write symbols by address */
     SymbolHash_sort( def_symtab, SymbolHash_by_value );
@@ -92,7 +92,10 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.8  2014-01-20 23:29:18  pauloscustodio
+* Revision 1.9  2014-03-03 13:27:06  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.8  2014/01/20 23:29:18  pauloscustodio
 * Moved file.c to lib/fileutil.c
 *
 * Revision 1.7  2014/01/11 01:29:40  pauloscustodio

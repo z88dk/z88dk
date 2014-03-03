@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.75 2014-03-02 12:51:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.76 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -150,7 +150,7 @@ parseline( enum flag interpret )
             if ( sym == TK_LABEL || GetSym() == TK_NAME )
             {
                 /* labels must always be touched due to forward referencing problems in expressions */
-                define_symbol( ident, get_PC(), SYMADDR | SYMTOUCHED );
+                define_symbol( ident, get_PC(), SYM_ADDR | SYM_TOUCHED );
 
                 GetSym();      /* check for another identifier */
             }
@@ -310,12 +310,12 @@ StoreName( Symbol *node, byte_t scope )
 {
     switch ( scope )
     {
-    case SYMLOCAL:
+    case SYM_LOCAL:
         xfput_uint8(objfile, 'L');
         break;
 
-    case SYMXDEF:
-        if ( node->type & SYMDEF )
+    case SYM_GLOBAL:
+        if ( node->type & SYM_DEFINE )
         {
             xfput_uint8(objfile, 'X');
         }
@@ -327,7 +327,7 @@ StoreName( Symbol *node, byte_t scope )
         break;
     }
 
-    if ( node->type & SYMADDR )   /* then write type of symbol */
+    if ( node->type & SYM_ADDR )   /* then write type of symbol */
     {
         xfput_uint8(objfile, 'A');    /* either a relocatable address */
     }
@@ -353,9 +353,9 @@ StoreGlobalNames( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYMXDEF ) && ( sym->type & SYMTOUCHED ) )
+        if ( ( sym->type & SYM_GLOBAL ) && ( sym->type & SYM_TOUCHED ) )
         {
-            StoreName( sym, SYMXDEF );
+            StoreName( sym, SYM_GLOBAL );
         }
     }
 }
@@ -373,9 +373,9 @@ StoreLocalNames( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYMLOCAL ) && ( sym->type & SYMTOUCHED ) )
+        if ( ( sym->type & SYM_LOCAL ) && ( sym->type & SYM_TOUCHED ) )
         {
-            StoreName( sym, SYMLOCAL );
+            StoreName( sym, SYM_LOCAL );
         }
     }
 }
@@ -395,7 +395,7 @@ StoreExternReferences( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYMXREF ) && ( sym->type & SYMTOUCHED ) )
+        if ( ( sym->type & SYM_EXTERN ) && ( sym->type & SYM_TOUCHED ) )
 			xfput_count_byte_strz( objfile, sym->name );
     }
 }
@@ -428,7 +428,7 @@ Z80pass2( void )
 
             if ( pass2expr->stored == OFF )
             {
-                if ( ( pass2expr->rangetype & EXPREXTERN ) || ( pass2expr->rangetype & EXPRADDR ) )
+                if ( ( pass2expr->rangetype & EXPR_EXTERN ) || ( pass2expr->rangetype & EXPR_ADDR ) )
                 {
                     /*
                      * Expression contains symbol declared as external or defined as a relocatable
@@ -456,11 +456,11 @@ Z80pass2( void )
                 }
             }
 
-            if ( ( pass2expr->rangetype & NOTEVALUABLE ) && ( pass2expr->stored == OFF ) )
+            if ( ( pass2expr->rangetype & NOT_EVALUABLE ) && ( pass2expr->stored == OFF ) )
             {
                 if ( ( pass2expr->rangetype & RANGE ) == RANGE_JROFFSET )
                 {
-                    if ( pass2expr->rangetype & EXPREXTERN )
+                    if ( pass2expr->rangetype & EXPR_EXTERN )
                     {
                         /* JR, DJNZ used an external label - */
                         error_jr_not_local();
@@ -752,9 +752,9 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
         if ( sym->owner == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
-            if ( ( sym->type & SYMLOCAL ) || ( sym->type & SYMXDEF ) )
+            if ( ( sym->type & SYM_LOCAL ) || ( sym->type & SYM_GLOBAL ) )
             {
-                if ( ( sym->type & SYMTOUCHED ) )
+                if ( ( sym->type & SYM_TOUCHED ) )
                 {
                     list_symbol( sym->name, sym->value, sym->references );
                 }
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.75  2014-03-02 12:51:41  pauloscustodio
+* Revision 1.76  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.75  2014/03/02 12:51:41  pauloscustodio
 * Change token ids to TK_...
 *
 * Revision 1.74  2014/03/01 15:45:31  pauloscustodio

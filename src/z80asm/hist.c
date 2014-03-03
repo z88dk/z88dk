@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.75 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.76 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.75 2014-03-01 15:45
 
 /*
 * $Log: hist.c,v $
-* Revision 1.75  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.76  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.75  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.
@@ -1411,7 +1414,7 @@ Based on 1.0.31
 		being defined. Consequence of removal of notdecl_tab symbol table.
 
 	CH_0023 : Remove notdecl_tab
-		Symbol is created in symbol table on first usage, SYMDEFINED bit
+		Symbol is created in symbol table on first usage, SYM_DEFINED bit
 		identifies if it was defined or not.
 
 -------------------------------------------------------------------------------

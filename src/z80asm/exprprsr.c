@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.60 2014-03-03 02:44:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.61 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -99,16 +99,16 @@ static BOOL Factor( struct expr *pfixexpr )
     case TK_NAME:
         symptr = get_used_symbol( ident );
 
-        if ( symptr->type & SYMDEFINED )
+        if ( symptr->type & SYM_DEFINED )
         {
             /* copy appropriate type bits */
-            pfixexpr->rangetype |= ( symptr->type & SYMTYPE );
+            pfixexpr->rangetype |= ( symptr->type & SYM_TYPE );
             NewPfixSymbol( pfixexpr, symptr->value, TK_NUMBER, NULL, symptr->type );
         }
         else
         {
             /* copy appropriate declaration bits */
-            pfixexpr->rangetype |= ( symptr->type & SYMTYPE ) | NOTEVALUABLE;
+            pfixexpr->rangetype |= ( symptr->type & SYM_TYPE ) | NOT_EVALUABLE;
 
             /* symbol only declared, store symbol name */
             NewPfixSymbol( pfixexpr, 0, TK_NUMBER, ident, symptr->type );
@@ -395,8 +395,8 @@ EvalPfixExpr( struct expr *pfixlist )
     struct postfixlist *pfixexpr;
     Symbol *symptr;
 
-	pfixlist->rangetype &= EVALUATED; /* prefix expression as evaluated */
-	pfixexpr = pfixlist->firstnode;   /* initiate to first node */
+	pfixlist->rangetype &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
+	pfixexpr = pfixlist->firstnode;				/* initiate to first node */
 
 	do
 	{
@@ -410,15 +410,15 @@ EvalPfixExpr( struct expr *pfixlist )
 			else
 			{
 				/* symbol was not defined and not declared */
-				if ( ( pfixexpr->type & ~ SYMTOUCHED ) != SYM_NOTDEFINED )
+				if ( ( pfixexpr->type & ~ SYM_TOUCHED ) != SYM_NOTDEFINED )
 				{
 					/* if all bits are set to zero */
-					if ( pfixexpr->type & SYMLOCAL )
+					if ( pfixexpr->type & SYM_LOCAL )
 					{
 						symptr = find_local_symbol( pfixexpr->id );
 
 						/* copy appropriate type bits */
-						pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+						pfixlist->rangetype |= ( symptr->type & SYM_TYPE );
 
 						Calc_push( symptr->value );
 					}
@@ -429,21 +429,21 @@ EvalPfixExpr( struct expr *pfixlist )
 						if ( symptr != NULL )
 						{
 							/* copy appropriate type bits */
-							pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+							pfixlist->rangetype |= ( symptr->type & SYM_TYPE );
 
-							if ( symptr->type & SYMDEFINED )
+							if ( symptr->type & SYM_DEFINED )
 							{
 								Calc_push( symptr->value );
 							}
 							else
 							{
-								pfixlist->rangetype |= NOTEVALUABLE;
+								pfixlist->rangetype |= NOT_EVALUABLE;
 								Calc_push( 0 );
 							}
 						}
 						else
 						{
-							pfixlist->rangetype |= NOTEVALUABLE;
+							pfixlist->rangetype |= NOT_EVALUABLE;
 							Calc_push( 0 );
 						}
 					}
@@ -454,15 +454,15 @@ EvalPfixExpr( struct expr *pfixlist )
 					symptr = get_used_symbol( pfixexpr->id );
 
 					/* copy appropriate type bits */
-					pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+					pfixlist->rangetype |= ( symptr->type & SYM_TYPE );
 
-					if ( symptr->type & SYMDEFINED )
+					if ( symptr->type & SYM_DEFINED )
 					{
 						Calc_push( symptr->value );
 					}
 					else
 					{
-						pfixlist->rangetype |= NOTEVALUABLE;
+						pfixlist->rangetype |= NOT_EVALUABLE;
 						Calc_push( 0 );
 					}
 				}
@@ -471,7 +471,7 @@ EvalPfixExpr( struct expr *pfixlist )
 			break;
 
 		case TK_CONST_EXPR:
-			pfixlist->rangetype &= CLEAR_EXPRADDR;    /* convert to constant expression */
+			pfixlist->rangetype &= ~ EXPR_ADDR;		/* convert to constant expression */
 			break;
 
 		case TK_BIN_AND:	Calc_compute_binary( calc_bin_and 	); break;
@@ -608,26 +608,26 @@ ExprLong( int listoffset )
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->rangetype & EXPREXTERN ) || ( pfixexpr->rangetype & EXPRADDR ) )
+        if ( ( pfixexpr->rangetype & EXPR_EXTERN ) || ( pfixexpr->rangetype & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
             StoreExpr( pfixexpr, 'L' );
         }
 
-        if ( pfixexpr->rangetype & EXPREXTERN )
+        if ( pfixexpr->rangetype & EXPR_EXTERN )
         {
             RemovePfixlist( pfixexpr );
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->rangetype & NOTEVALUABLE )
+                if ( pfixexpr->rangetype & NOT_EVALUABLE )
                 {
                     Pass2info( pfixexpr, RANGE_32SIGN, listoffset );
                 }
@@ -670,26 +670,26 @@ ExprAddress( int listoffset )
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->rangetype & EXPREXTERN ) || ( pfixexpr->rangetype & EXPRADDR ) )
+        if ( ( pfixexpr->rangetype & EXPR_EXTERN ) || ( pfixexpr->rangetype & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
             StoreExpr( pfixexpr, 'C' );
         }
 
-        if ( pfixexpr->rangetype & EXPREXTERN )
+        if ( pfixexpr->rangetype & EXPR_EXTERN )
         {
             RemovePfixlist( pfixexpr );
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->rangetype & NOTEVALUABLE )
+                if ( pfixexpr->rangetype & NOT_EVALUABLE )
                 {
                     Pass2info( pfixexpr, RANGE_16CONST, listoffset );
                 }
@@ -731,26 +731,26 @@ ExprUnsigned8( int listoffset )
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->rangetype & EXPREXTERN ) || ( pfixexpr->rangetype & EXPRADDR ) )
+        if ( ( pfixexpr->rangetype & EXPR_EXTERN ) || ( pfixexpr->rangetype & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
             StoreExpr( pfixexpr, 'U' );
         }
 
-        if ( pfixexpr->rangetype & EXPREXTERN )
+        if ( pfixexpr->rangetype & EXPR_EXTERN )
         {
             RemovePfixlist( pfixexpr );
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->rangetype & NOTEVALUABLE )
+                if ( pfixexpr->rangetype & NOT_EVALUABLE )
                 {
                     Pass2info( pfixexpr, RANGE_8UNSIGN, listoffset );
                 }
@@ -809,25 +809,25 @@ ExprSigned8( int listoffset )
     if ( ( pfixexpr = ParseNumExpr() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->rangetype & EXPREXTERN ) || ( pfixexpr->rangetype & EXPRADDR ) )
+        if ( ( pfixexpr->rangetype & EXPR_EXTERN ) || ( pfixexpr->rangetype & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
             StoreExpr( pfixexpr, 'S' );
         }
 
-        if ( pfixexpr->rangetype & EXPREXTERN )
+        if ( pfixexpr->rangetype & EXPR_EXTERN )
         {
             RemovePfixlist( pfixexpr );
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list ) /* expression contains address label */
+            if ( ( pfixexpr->rangetype & EXPR_ADDR ) && ! opts.cur_list ) /* expression contains address label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->rangetype & NOTEVALUABLE )
+                if ( pfixexpr->rangetype & NOT_EVALUABLE )
                 {
                     Pass2info( pfixexpr, RANGE_8SIGN, listoffset );
                 }
@@ -860,7 +860,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.60  2014-03-03 02:44:15  pauloscustodio
+* Revision 1.61  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.60  2014/03/03 02:44:15  pauloscustodio
 * Division by zero error was causing memory leaks - made non-fatal.
 * Moved calculator stack to expr.c, made it singleton and based on array.h - no
 * need to allocate on every expression computed, elements are stored in

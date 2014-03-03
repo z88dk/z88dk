@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.56 2014-03-02 12:51:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.57 2014-03-03 13:27:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -302,7 +302,7 @@ void LINE( void )
 
     line[0] = '\0';
     snprintf( name, sizeof( name ), "__C_LINE_%ld", clineno );
-    define_symbol( name, get_PC(), SYMADDR | SYMTOUCHED );
+    define_symbol( name, get_PC(), SYM_ADDR | SYM_TOUCHED );
 }
 
 
@@ -1092,7 +1092,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.56  2014-03-02 12:51:41  pauloscustodio
+* Revision 1.57  2014-03-03 13:27:07  pauloscustodio
+* Rename symbol type constants
+*
+* Revision 1.56  2014/03/02 12:51:41  pauloscustodio
 * Change token ids to TK_...
 *
 * Revision 1.55  2014/03/01 15:45:31  pauloscustodio
