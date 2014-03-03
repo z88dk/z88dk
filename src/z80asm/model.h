@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.7 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.8 2014-03-03 13:43:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -46,7 +46,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.7 2014-03-03 13:27
 #define SYM_NOTDEFINED  0
 
 /*-----------------------------------------------------------------------------
-*   Expression rangetype bitmasks - bits 3 to 6 same as Symbol type bitmasks
+*   Expression expr_type bitmasks - bits 3 to 6 same as Symbol type bitmasks
 *----------------------------------------------------------------------------*/
 #define RANGE           7			/* 00000111 Range types are 0 - 4 */
 
@@ -56,7 +56,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.7 2014-03-03 13:27
 #define RANGE_16CONST   3			/* 16-bit immediate */
 #define RANGE_32SIGN    4			/* 32-bit immediate */
 
-/* return 1, 2 or 4 for a rangetype */
+/* return 1, 2 or 4 for a expr_type */
 #define RANGE_SIZE(x)	(((x) & RANGE) == RANGE_32SIGN  ? 4 : \
 						 ((x) & RANGE) == RANGE_16CONST ? 2 : \
 														  1 )
@@ -86,7 +86,10 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.7  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.8  2014-03-03 13:43:50  pauloscustodio
+* Renamed symbol and expression type attributes
+*
+* Revision 1.7  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.6  2014/02/17 23:10:39  pauloscustodio

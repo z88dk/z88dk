@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.76 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.77 2014-03-03 13:43:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -428,14 +428,14 @@ Z80pass2( void )
 
             if ( pass2expr->stored == OFF )
             {
-                if ( ( pass2expr->rangetype & EXPR_EXTERN ) || ( pass2expr->rangetype & EXPR_ADDR ) )
+                if ( ( pass2expr->expr_type & EXPR_EXTERN ) || ( pass2expr->expr_type & EXPR_ADDR ) )
                 {
                     /*
                      * Expression contains symbol declared as external or defined as a relocatable
                      * address,
                      */
                     /* store expression in relocatable file */
-                    switch ( pass2expr->rangetype & RANGE )
+                    switch ( pass2expr->expr_type & RANGE )
                     {
                     case RANGE_32SIGN:
                         StoreExpr( pass2expr, 'L' );
@@ -456,11 +456,11 @@ Z80pass2( void )
                 }
             }
 
-            if ( ( pass2expr->rangetype & NOT_EVALUABLE ) && ( pass2expr->stored == OFF ) )
+            if ( ( pass2expr->expr_type & NOT_EVALUABLE ) && ( pass2expr->stored == OFF ) )
             {
-                if ( ( pass2expr->rangetype & RANGE ) == RANGE_JROFFSET )
+                if ( ( pass2expr->expr_type & RANGE ) == RANGE_JROFFSET )
                 {
-                    if ( pass2expr->rangetype & EXPR_EXTERN )
+                    if ( pass2expr->expr_type & EXPR_EXTERN )
                     {
                         /* JR, DJNZ used an external label - */
                         error_jr_not_local();
@@ -483,7 +483,7 @@ Z80pass2( void )
             {
                 patchptr = pass2expr->codepos;            /* index in memory buffer */
 
-                switch ( pass2expr->rangetype & RANGE )
+                switch ( pass2expr->expr_type & RANGE )
                 {
                 case RANGE_JROFFSET:
                     constant -= curJR->PCaddr;    /* get module PC at JR instruction */
@@ -535,7 +535,7 @@ Z80pass2( void )
 
             if ( opts.list )
             {
-                list_patch_data( pass2expr->listpos, constant, RANGE_SIZE( pass2expr->rangetype ) );
+                list_patch_data( pass2expr->listpos, constant, RANGE_SIZE( pass2expr->expr_type ) );
             }
 
             prevexpr = pass2expr;
@@ -635,7 +635,7 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
            long byteoffset )			/* position in listing file to patch */
 {
     pfixexpr->nextexpr = NULL;
-    pfixexpr->rangetype = constrange;
+    pfixexpr->expr_type = constrange;
     pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
     pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
     pfixexpr->listpos = list_patch_pos( byteoffset );
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.76  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.77  2014-03-03 13:43:50  pauloscustodio
+* Renamed symbol and expression type attributes
+*
+* Revision 1.76  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.75  2014/03/02 12:51:41  pauloscustodio

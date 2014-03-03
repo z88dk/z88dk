@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.5 2014-03-03 02:44:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.6 2014-03-03 13:43:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -29,7 +29,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.5 2014-03-03 02:44:
 
 /*-----------------------------------------------------------------------------
 *	Calculation functions for all operators, template:
-*	long f_<symbol> (long a [, long b [, long c ] ] );
+*	long calc_<symbol> (long a [, long b [, long c ] ] );
 *----------------------------------------------------------------------------*/
 #define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
 	extern long calc_ ## _operation _args;
@@ -65,7 +65,10 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.5  2014-03-03 02:44:15  pauloscustodio
+* Revision 1.6  2014-03-03 13:43:50  pauloscustodio
+* Renamed symbol and expression type attributes
+*
+* Revision 1.5  2014/03/03 02:44:15  pauloscustodio
 * Division by zero error was causing memory leaks - made non-fatal.
 * Moved calculator stack to expr.c, made it singleton and based on array.h - no
 * need to allocate on every expression computed, elements are stored in

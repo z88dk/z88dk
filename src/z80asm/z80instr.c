@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.45 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.46 2014-03-03 13:43:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -444,7 +444,7 @@ IM( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
         }
@@ -488,7 +488,7 @@ RST( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
         }
@@ -535,7 +535,7 @@ void CALL_OZ( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();    /* CALL_OZ expression must be evaluable */
         }
@@ -586,7 +586,7 @@ CALL_PKG( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();    /* CALL_OZ expression must be evaluable */
         }
@@ -633,7 +633,7 @@ INVOKE( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();    /* INVOKE expression must be evaluable */
         }
@@ -672,7 +672,7 @@ FPP( void )
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();    /* FPP expression must be evaluable */
         }
@@ -911,7 +911,7 @@ JR( void )
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
         /* get numerical expression */
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             NewJRaddr();          /* Amend another JR PC address to the list */
             Pass2info( postfixexpr, RANGE_JROFFSET, 1 );
@@ -955,7 +955,7 @@ DJNZ( void )
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
         /* get numerical expression */
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             NewJRaddr();          /* Amend another JR PC address to the list */
             Pass2info( postfixexpr, RANGE_JROFFSET, 1 );
@@ -1464,7 +1464,7 @@ BitTest_instr( int opcode )
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
         /* Expression must not be stored in object file */
-        if ( postfixexpr->rangetype & NOT_EVALUABLE )
+        if ( postfixexpr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
         }
@@ -1605,7 +1605,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.45  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.46  2014-03-03 13:43:50  pauloscustodio
+* Renamed symbol and expression type attributes
+*
+* Revision 1.45  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.44  2014/03/01 15:45:31  pauloscustodio

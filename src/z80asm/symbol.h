@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.37 2014-03-03 02:44:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.38 2014-03-03 13:43:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,31 +34,31 @@ enum flag           { OFF, ON };
 
 struct postfixlist
 {
-    struct postfixlist *nextoperand;      /* pointer to next element in postfix expression */
+    struct postfixlist *nextoperand;	/* pointer to next element in postfix expression */
     long               operandconst;
     tokid_t			   operatortype;
-    char              *id;                /* pointer to identifier */
-    byte_t			   type;              /* type of identifier (local, global, rel. address or constant) */
+    char              *id;				/* pointer to identifier */
+    byte_t			   sym_type;		/* type of identifier (local, global, rel. address or constant) */
 };
 
 struct expr
 {
-    struct expr        *nextexpr;         /* pointer to next expression */
+    struct expr        *nextexpr;		/* pointer to next expression */
     struct postfixlist *firstnode;
     struct postfixlist *currentnode;
-    byte_t			   rangetype;         /* range type of evaluated expression */
-    enum flag          stored;            /* Flag to indicate that expression has been stored to object file */
-    char               *infixexpr;        /* pointer to ASCII infix expression */
-    char               *infixptr;         /* pointer to current char in infix expression */
-    uint_t             codepos;           /* rel. position in module code to patch (in pass 2) */
-    char               *srcfile;          /* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
-    int                curline;           /* expression in line of source file */
-    long               listpos;           /* position in listing file to patch (in pass 2) */
+    byte_t			   expr_type;		/* range type of evaluated expression */
+    enum flag          stored;			/* Flag to indicate that expression has been stored to object file */
+    char               *infixexpr;		/* pointer to ASCII infix expression */
+    char               *infixptr;		/* pointer to current char in infix expression */
+    uint_t             codepos;			/* rel. position in module code to patch (in pass 2) */
+    char               *srcfile;		/* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
+    int                curline;			/* expression in line of source file */
+    long               listpos;			/* position in listing file to patch (in pass 2) */
 };
 
 struct expression
 {
-    struct expr        *firstexpr;        /* header of list of expressions in current module */
+    struct expr        *firstexpr;		/* header of list of expressions in current module */
     struct expr        *currexpr;
 };
 
@@ -71,70 +71,70 @@ struct usedfile
 
 struct sourcefile
 {
-    struct sourcefile  *prevsourcefile;   /* pointer to previously parsed source file */
-    struct sourcefile  *newsourcefile;    /* pointer to new source file to be parsed */
-    struct usedfile    *usedsourcefile;   /* list of pointers to used files owned by this file */
-    long               filepointer;       /* file pointer of current source file */
-    int               line;              /* current line number of current source file */
-    char               *fname;            /* pointer to file name of current source file */
+    struct sourcefile  *prevsourcefile;	/* pointer to previously parsed source file */
+    struct sourcefile  *newsourcefile;	/* pointer to new source file to be parsed */
+    struct usedfile    *usedsourcefile;	/* list of pointers to used files owned by this file */
+    long               filepointer;		/* file pointer of current source file */
+    int               line;				/* current line number of current source file */
+    char               *fname;			/* pointer to file name of current source file */
 };
 
 struct JRPC_Hdr
 {
-    struct JRPC        *firstref;         /* pointer to first JR address reference in list */
-    struct JRPC        *lastref;          /* pointer to last JR address reference in list */
+    struct JRPC        *firstref;		/* pointer to first JR address reference in list */
+    struct JRPC        *lastref;		/* pointer to last JR address reference in list */
 };
 
 struct JRPC
 {
-    struct JRPC        *nextref;          /* pointer to next JR address reference  */
-    uint_t			   PCaddr;            /* absolute of PC address of JR instruction  */
+    struct JRPC        *nextref;		/* pointer to next JR address reference  */
+    uint_t			   PCaddr;			/* absolute of PC address of JR instruction  */
 };
 
 struct modules
 {
-    struct module      *first;            /* pointer to first module */
-    struct module      *last;             /* pointer to current/last module */
+    struct module      *first;			/* pointer to first module */
+    struct module      *last;			/* pointer to current/last module */
 };
 
 struct module
 {
-    struct module     *nextmodule;      /* pointer to next module */
-    char              *mname;           /* pointer to string of module name */
-    uint_t             startoffset;     /* this module's start offset from start of code buffer */
-    long               origin;          /* Address Origin of current machine code module during linking */
-    struct sourcefile *cfile;           /* pointer to current file record */
-    SymbolHash        *local_symtab;    /* pointer to root of local symbols tree */
-    struct expression *mexpr;           /* pointer to expressions in this module */
-    struct JRPC_Hdr   *JRaddr;          /* pointer to list of JR PC addresses */
+    struct module     *nextmodule;		/* pointer to next module */
+    char              *mname;			/* pointer to string of module name */
+    uint_t             startoffset;		/* this module's start offset from start of code buffer */
+    long               origin;			/* Address Origin of current machine code module during linking */
+    struct sourcefile *cfile;			/* pointer to current file record */
+    SymbolHash        *local_symtab;	/* pointer to root of local symbols tree */
+    struct expression *mexpr;			/* pointer to expressions in this module */
+    struct JRPC_Hdr   *JRaddr;			/* pointer to list of JR PC addresses */
     ObjFile			  *obj_file;		/* ObjFile structure describing the object file */
 };
 
 struct liblist
 {
-    struct libfile    *firstlib;          /* pointer to first library file specified from command line */
-    struct libfile    *currlib;           /* pointer to current library file specified from command line */
+    struct libfile    *firstlib;		/* pointer to first library file specified from command line */
+    struct libfile    *currlib;			/* pointer to current library file specified from command line */
 };
 
 struct libfile
 {
-    struct libfile    *nextlib;           /* pointer to next library file in list */
-    char              *libfilename;       /* filename of library (incl. extension) */
-    long              nextobjfile;        /* file pointer to next object file in library */
+    struct libfile    *nextlib;			/* pointer to next library file in list */
+    char              *libfilename;		/* filename of library (incl. extension) */
+    long              nextobjfile;		/* file pointer to next object file in library */
 };
 
 struct linklist
 {
-    struct linkedmod  *firstlink;         /* pointer to first linked object module */
-    struct linkedmod  *lastlink;          /* pointer to last linked module in list */
+    struct linkedmod  *firstlink;		/* pointer to first linked object module */
+    struct linkedmod  *lastlink;		/* pointer to last linked module in list */
 };
 
 struct linkedmod
 {
-    struct linkedmod  *nextlink;          /* pointer to next module link */
-    char              *objfilename;       /* filename of library/object file (incl. extension) */
-    long              modulestart;        /* base pointer of beginning of object module */
-    struct module     *moduleinfo;        /* pointer to main module information */
+    struct linkedmod  *nextlink;		/* pointer to next module link */
+    char              *objfilename;		/* filename of library/object file (incl. extension) */
+    long              modulestart;		/* base pointer of beginning of object module */
+    struct module     *moduleinfo;		/* pointer to main module information */
 };
 
 
@@ -142,7 +142,10 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.37  2014-03-03 02:44:15  pauloscustodio
+* Revision 1.38  2014-03-03 13:43:50  pauloscustodio
+* Renamed symbol and expression type attributes
+*
+* Revision 1.37  2014/03/03 02:44:15  pauloscustodio
 * Division by zero error was causing memory leaks - made non-fatal.
 * Moved calculator stack to expr.c, made it singleton and based on array.h - no
 * need to allocate on every expression computed, elements are stored in
