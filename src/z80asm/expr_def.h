@@ -15,52 +15,79 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.4 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.5 2014-03-03 02:44:15 pauloscustodio Exp $
 */
 
+/* Unary, Binary and Ternary operators */
 #ifndef OPERATOR
-#define OPERATOR(_symbol, _operation, _type, _prec, _assoc, _calc)
+#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)
 #endif
 
-/* define list of operators in increasing priority*/
-OPERATOR( TK_LOG_OR,		TK_LOG_OR,		BINARY_OP,	1,	ASSOC_LEFT,		a || b )
+#ifndef OPERATOR_1
+#define OPERATOR_1(_operation, _symbol,             _prec, _assoc,           _calc)	\
+		OPERATOR(  _operation, _symbol, UNARY_OP,   _prec, _assoc, (long a), _calc)
+#endif
 
-OPERATOR( TK_LOG_AND,		TK_LOG_AND,		BINARY_OP,	2,	ASSOC_LEFT,		a && b )
+#ifndef OPERATOR_2
+#define OPERATOR_2(_operation, _symbol,             _prec, _assoc,                   _calc)	\
+		OPERATOR(  _operation, _symbol, BINARY_OP,  _prec, _assoc, (long a, long b), _calc)
+#endif
 
-OPERATOR( TK_BIN_OR,		TK_BIN_OR,		BINARY_OP,	3,	ASSOC_LEFT,		a | b )
-OPERATOR( TK_BIN_XOR,		TK_BIN_XOR,		BINARY_OP,	3,	ASSOC_LEFT,		a ^ b )
+#ifndef OPERATOR_3
+#define OPERATOR_3(_operation, _symbol,             _prec, _assoc,                           _calc)	\
+		OPERATOR(  _operation, _symbol, TERNARY_OP, _prec, _assoc, (long a, long b, long c), _calc)
+#endif
 
-OPERATOR( TK_BIN_AND,		TK_BIN_AND,		BINARY_OP,	4,	ASSOC_LEFT,		a & b )
-
-OPERATOR( TK_EQUAL,			TK_EQUAL,		BINARY_OP,	5,	ASSOC_LEFT,		a == b )
-OPERATOR( TK_LESS,			TK_LESS,		BINARY_OP,	5,	ASSOC_LEFT,		a <  b )
-OPERATOR( TK_GREATER,		TK_GREATER,		BINARY_OP,	5,	ASSOC_LEFT,		a >  b )
-OPERATOR( TK_LESS_EQ,		TK_LESS_EQ,		BINARY_OP,	5,	ASSOC_LEFT,		a <= b )
-OPERATOR( TK_GREATER_EQ,	TK_GREATER_EQ,	BINARY_OP,	5,	ASSOC_LEFT,		a >= b )
-OPERATOR( TK_NOT_EQ,		TK_NOT_EQ,		BINARY_OP,	5,	ASSOC_LEFT,		a != b )
-
-OPERATOR( TK_LEFT_SHIFT,	TK_LEFT_SHIFT,	BINARY_OP,	6,	ASSOC_LEFT,		a << b )
-OPERATOR( TK_RIGHT_SHIFT,	TK_RIGHT_SHIFT,	BINARY_OP,	6,	ASSOC_LEFT,		a >> b )
-
-OPERATOR( TK_PLUS,			TK_PLUS,		BINARY_OP,	7,	ASSOC_LEFT,		a + b )
-OPERATOR( TK_MINUS,			TK_MINUS,		BINARY_OP,	7,	ASSOC_LEFT,		a - b )
-
-OPERATOR( TK_MULTIPLY,		TK_MULTIPLY,	BINARY_OP,	8,	ASSOC_LEFT,		a * b )
-OPERATOR( TK_DIVIDE,		TK_DIVIDE,		BINARY_OP,	8,	ASSOC_LEFT,		calc_divide(a, b) )
-OPERATOR( TK_MOD,			TK_MOD,			BINARY_OP,	8,	ASSOC_LEFT,		calc_mod(a, b) )
-
-OPERATOR( TK_POWER,			TK_POWER,		BINARY_OP,	9,	ASSOC_RIGHT,	calc_power(a, b) )
-
-OPERATOR( TK_MINUS,			TK_NEGATE,		UNARY_OP,	10,	ASSOC_RIGHT,	- a )
-OPERATOR( TK_PLUS,			TK_IDENTITY,	UNARY_OP,	10,	ASSOC_RIGHT,	  a )
-OPERATOR( TK_BIN_NOT,		TK_BIN_NOT,		UNARY_OP,	10,	ASSOC_RIGHT,	~ a )
-OPERATOR( TK_LOG_NOT,		TK_LOG_NOT,		UNARY_OP,	10,	ASSOC_RIGHT,	! a )
+/* define list of operators in increasing priority */
+OPERATOR_3( tern_cond,	TK_QUESTION,	1,	ASSOC_RIGHT,	a ? b : c )
+          
+OPERATOR_2( log_or,		TK_LOG_OR,		2,	ASSOC_LEFT,		a || b )
+          
+OPERATOR_2( log_and,	TK_LOG_AND,		3,	ASSOC_LEFT,		a && b )
+          
+OPERATOR_2( bin_or,		TK_BIN_OR,		4,	ASSOC_LEFT,		a | b )
+OPERATOR_2( bin_xor,	TK_BIN_XOR,		4,	ASSOC_LEFT,		a ^ b )
+          
+OPERATOR_2( bin_and,	TK_BIN_AND,		5,	ASSOC_LEFT,		a & b )
+          
+OPERATOR_2( equal,		TK_EQUAL,		6,	ASSOC_LEFT,		a == b )
+OPERATOR_2( less,		TK_LESS,		6,	ASSOC_LEFT,		a <  b )
+OPERATOR_2( greater,	TK_GREATER,		6,	ASSOC_LEFT,		a >  b )
+OPERATOR_2( less_eq,	TK_LESS_EQ,		6,	ASSOC_LEFT,		a <= b )
+OPERATOR_2( greater_eq,	TK_GREATER_EQ,	6,	ASSOC_LEFT,		a >= b )
+OPERATOR_2( not_eq,		TK_NOT_EQ,		6,	ASSOC_LEFT,		a != b )
+          
+OPERATOR_2( left_shift,	TK_LEFT_SHIFT,	7,	ASSOC_LEFT,		a << b )
+OPERATOR_2( right_shift,TK_RIGHT_SHIFT,	7,	ASSOC_LEFT,		a >> b )
+          
+OPERATOR_2( plus,		TK_PLUS,		8,	ASSOC_LEFT,		a + b )
+OPERATOR_2( minus,		TK_MINUS,		8,	ASSOC_LEFT,		a - b )
+          
+OPERATOR_2( multiply,	TK_MULTIPLY,	9,	ASSOC_LEFT,		a * b )
+OPERATOR_2( divide,		TK_DIVIDE,		9,	ASSOC_LEFT,		_calc_divide(a, b) )
+OPERATOR_2( mod,		TK_MOD,			9,	ASSOC_LEFT,		_calc_mod(a, b) )
+          
+OPERATOR_2( power,		TK_POWER,		10,	ASSOC_RIGHT,	_calc_power(a, b) )
+          
+OPERATOR_1( negate,		TK_MINUS,		11,	ASSOC_RIGHT,	- a )
+OPERATOR_1( identity,	TK_PLUS,		11,	ASSOC_RIGHT,	  a )
+OPERATOR_1( bin_not,	TK_BIN_NOT,		11,	ASSOC_RIGHT,	~ a )
+OPERATOR_1( log_not,	TK_LOG_NOT,		11,	ASSOC_RIGHT,	! a )
 
 #undef OPERATOR
+#undef OPERATOR_1
+#undef OPERATOR_2
+#undef OPERATOR_3
 
 /*
 * $Log: expr_def.h,v $
-* Revision 1.4  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.5  2014-03-03 02:44:15  pauloscustodio
+* Division by zero error was causing memory leaks - made non-fatal.
+* Moved calculator stack to expr.c, made it singleton and based on array.h - no
+* need to allocate on every expression computed, elements are stored in
+* a vector instead of being allocated individually.
+*
+* Revision 1.4  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

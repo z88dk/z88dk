@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.4 2014-02-24 23:08:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.5 2014-03-03 02:44:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -27,16 +27,24 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.4 2014-02-24 23:08:
 #include "symbol.h"
 #include "token.h"
 
-extern long calc_divide(long a, long b);
-extern long calc_mod(long a, long b);
-extern long calc_power(long a, long b);
+/*-----------------------------------------------------------------------------
+*	Calculation functions for all operators, template:
+*	long f_<symbol> (long a [, long b [, long c ] ] );
+*----------------------------------------------------------------------------*/
+#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
+	extern long calc_ ## _operation _args;
+#include "expr_def.h"
+
+/*-----------------------------------------------------------------------------
+*	Stack for calculator
+*----------------------------------------------------------------------------*/
+extern void Calc_push( long value );
+extern long Calc_pop( void );
+extern void Calc_compute_unary(   long (*calc)(long a) );
+extern void Calc_compute_binary(  long (*calc)(long a, long b) );
+extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 #if 0
-/*-----------------------------------------------------------------------------
-*	Stack of values used for expression computation
-*----------------------------------------------------------------------------*/
-ARRAY( long );
-
 /*-----------------------------------------------------------------------------
 *	Class to hold one parsed expression
 *----------------------------------------------------------------------------*/
@@ -57,7 +65,13 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.4  2014-02-24 23:08:55  pauloscustodio
+* Revision 1.5  2014-03-03 02:44:15  pauloscustodio
+* Division by zero error was causing memory leaks - made non-fatal.
+* Moved calculator stack to expr.c, made it singleton and based on array.h - no
+* need to allocate on every expression computed, elements are stored in
+* a vector instead of being allocated individually.
+*
+* Revision 1.4  2014/02/24 23:08:55  pauloscustodio
 * Rename "enum symbols" to "tokid_t", define in token.h
 *
 * Revision 1.3  2014/02/23 18:48:16  pauloscustodio

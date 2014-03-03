@@ -13,13 +13,20 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.11 2014-03-01 15:45:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.1 2014-03-03 02:44:15 pauloscustodio Exp $
 #
-# Test lexer
+# Test lexer and expressions
 
 use Modern::Perl;
 use Test::More;
+use Capture::Tiny 'capture';
+use Test::Differences; 
 require 't/test_utils.pl';
+
+#------------------------------------------------------------------------------
+# lexer
+#------------------------------------------------------------------------------
+unlink_testfiles();
 
 diag "Should accept binary constant longer than 8 bits";
 
@@ -153,11 +160,72 @@ if ( ! get_legacy() ) {
 	t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
 }
 
+#------------------------------------------------------------------------------
+# calculator stack
+#------------------------------------------------------------------------------
+unlink_testfiles();
+my $compile = "cc -Wall -Ilib -otest test.c expr.c errors.c ".
+			  "lib/strutil.c lib/strhash.c lib/fileutil.c lib/srcfile.c ".
+			  "lib/strpool.c lib/except.c ".
+			  "lib/list.c lib/class.c lib/xmalloc.c lib/die.c";
+
+write_file("test.c", <<'END');
+#include "expr.h"
+#include <assert.h>
+
+long add3(long a, long b, long c) { return 3+a+b+c; }
+long add2(long a, long b) { return 2+a+b; }
+long add1(long a) { return 1+a; }
+
+int main()
+{
+	Calc_push(23); 
+	Calc_compute_unary(add1);
+	assert( Calc_pop() == 24 );
+	
+	Calc_push(11);
+	Calc_push(22);
+	Calc_compute_binary(add2);
+	assert( Calc_pop() == 35 );
+	
+	Calc_push(11);
+	Calc_push(22);
+	Calc_push(33);
+	Calc_compute_ternary(add3);
+	assert( Calc_pop() == 69 );
+	
+	return 0;
+}
+END
+system($compile) and die "compile failed: $compile\n";
+t_capture("test", "", "", 0);
+
+
+
 unlink_testfiles();
 done_testing();
 
-# $Log: lexer.t,v $
-# Revision 1.11  2014-03-01 15:45:32  pauloscustodio
+
+sub t_capture {
+	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	my $line = "[line ".((caller)[2])."]";
+	ok 1, "$line command: $cmd";
+	
+	my($out, $err, $exit) = capture { system $cmd; };
+	eq_or_diff_text $out, $exp_out, "$line out";
+	eq_or_diff_text $err, $exp_err, "$line err";
+	ok !!$exit == !!$exp_exit, "$line exit";
+}
+
+
+# $Log: expr.t,v $
+# Revision 1.1  2014-03-03 02:44:15  pauloscustodio
+# Division by zero error was causing memory leaks - made non-fatal.
+# Moved calculator stack to expr.c, made it singleton and based on array.h - no
+# need to allocate on every expression computed, elements are stored in
+# a vector instead of being allocated individually.
+#
+# Revision 1.11  2014/03/01 15:45:32  pauloscustodio
 # CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 # Handle C-like operators, make exponentiation (**) right-associative.
 # Simplify expression parser by handling composed tokens in lexer.

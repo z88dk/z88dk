@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.131 2014-03-01 15:45:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.132 2014-03-03 02:44:14 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -245,7 +245,13 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.131  2014-03-01 15:45:31  pauloscustodio
+# Revision 1.132  2014-03-03 02:44:14  pauloscustodio
+# Division by zero error was causing memory leaks - made non-fatal.
+# Moved calculator stack to expr.c, made it singleton and based on array.h - no
+# need to allocate on every expression computed, elements are stored in
+# a vector instead of being allocated individually.
+#
+# Revision 1.131  2014/03/01 15:45:31  pauloscustodio
 # CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 # Handle C-like operators, make exponentiation (**) right-associative.
 # Simplify expression parser by handling composed tokens in lexer.
@@ -796,15 +802,14 @@ errors.o: lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
-expr.o: lib/classlist.h token.h token_def.h legacy.h errors.h errors_def.h
-expr.o: expr_def.h
+expr.o: lib/classlist.h token.h token_def.h legacy.h expr_def.h errors.h
+expr.o: errors_def.h
 exprprsr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 exprprsr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 exprprsr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 exprprsr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
-exprprsr.o: symref.h lib/classlist.h token.h token_def.h legacy.h
-exprprsr.o: lib/fileutil.h options.h options_def.h lib/except.h expr_def.h
-exprprsr.o: z80asm.h
+exprprsr.o: symref.h lib/classlist.h token.h token_def.h legacy.h expr_def.h
+exprprsr.o: lib/fileutil.h options.h options_def.h lib/except.h z80asm.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h config.h  z80asm.h lib/types.h sym.h
 ldinstr.o: lib/class.h lib/queue.h symref.h lib/classlist.h symbol.h model.h

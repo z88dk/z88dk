@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.59 2014-03-02 12:51:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.60 2014-03-03 02:44:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,9 +47,6 @@ int GetChar( FILE *fptr );
 /* local functions */
 void list_PfixExpr( struct expr *pfixlist );
 void RemovePfixlist( struct expr *pfixexpr );
-void PushItem( long oprconst, struct pfixstack **stackpointer );
-void ClearEvalStack( struct pfixstack **stackptr );
-void CalcExpression( tokid_t opr, struct pfixstack **stackptr );
 void NewPfixSymbol( struct expr *pfixexpr, long oprconst, tokid_t oprtype, char *symident, char symboltype );
 void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
@@ -58,7 +55,6 @@ int ExprAddress( int listoffset );
 static BOOL TernaryCondition( struct expr *pfixexpr );
 
 long EvalPfixExpr( struct expr *pfixexpr );
-long PopItem( struct pfixstack **stackpointer );
 struct expr *ParseNumExpr( void );
 
 /* global variables */
@@ -396,223 +392,126 @@ StoreExpr( struct expr *pfixexpr, char range )
 long
 EvalPfixExpr( struct expr *pfixlist )
 {
-    struct pfixstack *stackptr = NULL;
     struct postfixlist *pfixexpr;
     Symbol *symptr;
-    long ret = 0;
 
-    TRY
-    {
-        pfixlist->rangetype &= EVALUATED; /* prefix expression as evaluated */
-        pfixexpr = pfixlist->firstnode;   /* initiate to first node */
+	pfixlist->rangetype &= EVALUATED; /* prefix expression as evaluated */
+	pfixexpr = pfixlist->firstnode;   /* initiate to first node */
 
-        do
-        {
-            switch ( pfixexpr->operatortype )
-            {
-            case TK_NUMBER:
-                if ( pfixexpr->id == NULL ) /* Is operand an identifier? */
-                {
-                    PushItem( pfixexpr->operandconst, &stackptr );
-                }
-                else
-                {
-                    /* symbol was not defined and not declared */
-                    if ( ( pfixexpr->type & ~ SYMTOUCHED ) != SYM_NOTDEFINED )
-                    {
-                        /* if all bits are set to zero */
-                        if ( pfixexpr->type & SYMLOCAL )
-                        {
-                            symptr = find_local_symbol( pfixexpr->id );
+	do
+	{
+		switch ( pfixexpr->operatortype )
+		{
+		case TK_NUMBER:
+			if ( pfixexpr->id == NULL ) /* Is operand an identifier? */
+			{
+				Calc_push( pfixexpr->operandconst );
+			}
+			else
+			{
+				/* symbol was not defined and not declared */
+				if ( ( pfixexpr->type & ~ SYMTOUCHED ) != SYM_NOTDEFINED )
+				{
+					/* if all bits are set to zero */
+					if ( pfixexpr->type & SYMLOCAL )
+					{
+						symptr = find_local_symbol( pfixexpr->id );
 
-                            /* copy appropriate type bits */
-                            pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+						/* copy appropriate type bits */
+						pfixlist->rangetype |= ( symptr->type & SYMTYPE );
 
-                            PushItem( symptr->value, &stackptr );
-                        }
-                        else
-                        {
-                            symptr = find_global_symbol( pfixexpr->id );
+						Calc_push( symptr->value );
+					}
+					else
+					{
+						symptr = find_global_symbol( pfixexpr->id );
 
-                            if ( symptr != NULL )
-                            {
-                                /* copy appropriate type bits */
-                                pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+						if ( symptr != NULL )
+						{
+							/* copy appropriate type bits */
+							pfixlist->rangetype |= ( symptr->type & SYMTYPE );
 
-                                if ( symptr->type & SYMDEFINED )
-                                {
-                                    PushItem( symptr->value, &stackptr );
-                                }
-                                else
-                                {
-                                    pfixlist->rangetype |= NOTEVALUABLE;
-                                    PushItem( 0, &stackptr );
-                                }
-                            }
-                            else
-                            {
-                                pfixlist->rangetype |= NOTEVALUABLE;
-                                PushItem( 0, &stackptr );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        /* try to find symbol now as either declared local or global */
-                        symptr = get_used_symbol( pfixexpr->id );
+							if ( symptr->type & SYMDEFINED )
+							{
+								Calc_push( symptr->value );
+							}
+							else
+							{
+								pfixlist->rangetype |= NOTEVALUABLE;
+								Calc_push( 0 );
+							}
+						}
+						else
+						{
+							pfixlist->rangetype |= NOTEVALUABLE;
+							Calc_push( 0 );
+						}
+					}
+				}
+				else
+				{
+					/* try to find symbol now as either declared local or global */
+					symptr = get_used_symbol( pfixexpr->id );
 
-                        /* copy appropriate type bits */
-                        pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+					/* copy appropriate type bits */
+					pfixlist->rangetype |= ( symptr->type & SYMTYPE );
 
-                        if ( symptr->type & SYMDEFINED )
-                        {
-                            PushItem( symptr->value, &stackptr );
-                        }
-                        else
-                        {
-                            pfixlist->rangetype |= NOTEVALUABLE;
-                            PushItem( 0, &stackptr );
-                        }
-                    }
-                }
+					if ( symptr->type & SYMDEFINED )
+					{
+						Calc_push( symptr->value );
+					}
+					else
+					{
+						pfixlist->rangetype |= NOTEVALUABLE;
+						Calc_push( 0 );
+					}
+				}
+			}
 
-                break;
+			break;
 
-            case TK_NEGATE:
-                stackptr->stackconstant = -stackptr->stackconstant;
-                break;
+		case TK_CONST_EXPR:
+			pfixlist->rangetype &= CLEAR_EXPRADDR;    /* convert to constant expression */
+			break;
 
-            case TK_LOG_NOT:
-                stackptr->stackconstant = !( stackptr->stackconstant );
-                break;
+		case TK_BIN_AND:	Calc_compute_binary( calc_bin_and 	); break;
+		case TK_BIN_OR:		Calc_compute_binary( calc_bin_or	); break;
+		case TK_LOG_AND:	Calc_compute_binary( calc_log_and	); break;
+		case TK_LOG_OR:		Calc_compute_binary( calc_log_or	); break;
+		case TK_BIN_XOR:	Calc_compute_binary( calc_bin_xor	); break;
+		case TK_PLUS:		Calc_compute_binary( calc_plus		); break;
+		case TK_MINUS:		Calc_compute_binary( calc_minus		); break;
+		case TK_MULTIPLY:	Calc_compute_binary( calc_multiply	); break;
+		case TK_DIVIDE:		Calc_compute_binary( calc_divide	); break;
+		case TK_MOD:		Calc_compute_binary( calc_mod		); break;
+		case TK_POWER:		Calc_compute_binary( calc_power		); break;
+		case TK_EQUAL:		Calc_compute_binary( calc_equal		); break;
+		case TK_LESS:		Calc_compute_binary( calc_less		); break;
+		case TK_GREATER:	Calc_compute_binary( calc_greater	); break;
+		case TK_LESS_EQ:	Calc_compute_binary( calc_less_eq	); break;
+		case TK_GREATER_EQ:	Calc_compute_binary( calc_greater_eq); break;
+		case TK_NOT_EQ:		Calc_compute_binary( calc_not_eq	); break;
+		case TK_LEFT_SHIFT:	Calc_compute_binary( calc_left_shift); break;
+		case TK_RIGHT_SHIFT:Calc_compute_binary( calc_right_shift);break;
+		case TK_TERN_COND:	Calc_compute_ternary(calc_tern_cond	); break;
+		case TK_NEGATE:		Calc_compute_unary(  calc_negate	); break;
+		case TK_LOG_NOT:	Calc_compute_unary(  calc_log_not	); break;
+		case TK_BIN_NOT:	Calc_compute_unary(  calc_bin_not	); break;
 
-            case TK_BIN_NOT:
-                stackptr->stackconstant = ~( stackptr->stackconstant );
-                break;
+		default:
+			assert(0);
+			break;
+		}
 
-            case TK_CONST_EXPR:
-                pfixlist->rangetype &= CLEAR_EXPRADDR;    /* convert to constant expression */
-                break;
+		pfixexpr = pfixexpr->nextoperand;             /* get next operand in postfix expression */
+	}
+	while ( pfixexpr != NULL );
 
-            default:
-                CalcExpression( pfixexpr->operatortype, &stackptr );       /* plus minus, multiply, divide, mod */
-                break;
-            }
-
-            pfixexpr = pfixexpr->nextoperand;             /* get next operand in postfix expression */
-        }
-        while ( pfixexpr != NULL );
-
-        assert( stackptr != NULL );
-        ret = PopItem( &stackptr );
-    }
-    FINALLY
-    {
-        ClearEvalStack( &stackptr );      /* in case stack is not balanced */
-    }
-    ETRY;
-
-    return ret;
+    return Calc_pop();
 }
 
 
 
-void
-CalcExpression( tokid_t opr, struct pfixstack **stackptr )
-{
-    long leftoperand, rightoperand, condition;
-
-    rightoperand = PopItem( stackptr );   /* first get right operator */
-    leftoperand = PopItem( stackptr );    /* then get left operator... */
-
-    switch ( opr )
-    {
-    case TK_BIN_AND:
-        PushItem( ( leftoperand & rightoperand ), stackptr );
-        break;
-
-    case TK_BIN_OR:
-        PushItem( ( leftoperand | rightoperand ), stackptr );
-        break;
-
-    case TK_LOG_AND:
-        PushItem( ( leftoperand && rightoperand ), stackptr );
-        break;
-
-    case TK_LOG_OR:
-        PushItem( ( leftoperand || rightoperand ), stackptr );
-        break;
-
-    case TK_BIN_XOR:
-        PushItem( ( leftoperand ^ rightoperand ), stackptr );
-        break;
-
-    case TK_PLUS:
-        PushItem( ( leftoperand + rightoperand ), stackptr );
-        break;
-
-    case TK_MINUS:
-        PushItem( ( leftoperand - rightoperand ), stackptr );
-        break;
-
-    case TK_MULTIPLY:
-        PushItem( ( leftoperand * rightoperand ), stackptr );
-        break;
-
-    case TK_DIVIDE:
-        PushItem( calc_divide( leftoperand, rightoperand ), stackptr );
-        break;
-
-    case TK_MOD:
-        PushItem( calc_mod( leftoperand, rightoperand ), stackptr );
-        break;
-
-    case TK_POWER:
-        PushItem( calc_power( leftoperand, rightoperand ), stackptr );
-        break;
-
-    case TK_EQUAL:
-        PushItem( ( leftoperand == rightoperand ), stackptr );
-        break;
-
-    case TK_LESS:
-        PushItem( ( leftoperand < rightoperand ), stackptr );
-        break;
-
-    case TK_GREATER:
-        PushItem( ( leftoperand > rightoperand ), stackptr );
-        break;
-
-    case TK_LESS_EQ:
-        PushItem( ( leftoperand <= rightoperand ), stackptr );
-        break;
-
-    case TK_GREATER_EQ:
-        PushItem( ( leftoperand >= rightoperand ), stackptr );
-        break;
-
-    case TK_NOT_EQ:
-        PushItem( ( leftoperand != rightoperand ), stackptr );
-        break;
-
-    case TK_LEFT_SHIFT:
-        PushItem( ( leftoperand << rightoperand ), stackptr );
-        break;
-
-    case TK_RIGHT_SHIFT:
-        PushItem( ( leftoperand >> rightoperand ), stackptr );
-        break;
-
-	case TK_TERN_COND:
-		condition = PopItem( stackptr );
-		PushItem( condition ? leftoperand : rightoperand, stackptr );
-		break;
-
-    default:
-		assert(0);		/* PushItem( 0, stackptr ); */
-        break;
-    }
-}
 
 
 
@@ -691,43 +590,8 @@ NewPfixSymbol( struct expr *pfixexpr,
 
 
 
-void
-PushItem( long oprconst, struct pfixstack **stackpointer )
-{
-    struct pfixstack *newitem;
-
-    newitem = xnew( struct pfixstack );
-    newitem->stackconstant = oprconst;
-    newitem->prevstackitem = *stackpointer;     /* link new node to current node */
-    *stackpointer = newitem;                    /* update stackpointer to new item */
-}
 
 
-
-long
-PopItem( struct pfixstack **stackpointer )
-{
-    struct pfixstack *stackitem;
-    long constant;
-
-    assert( *stackpointer );
-    constant = ( *stackpointer )->stackconstant;
-    stackitem = *stackpointer;
-    *stackpointer = ( *stackpointer )->prevstackitem;   /* move stackpointer to previous item */
-    xfree( stackitem );                                /* return old item memory to OS */
-    return ( constant );
-}
-
-
-
-void
-ClearEvalStack( struct pfixstack **stackptr )
-{
-    while ( *stackptr != NULL )
-    {
-        PopItem( stackptr );    /* clear evaluation stack */
-    }
-}
 
 
 
@@ -996,7 +860,13 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.59  2014-03-02 12:51:41  pauloscustodio
+* Revision 1.60  2014-03-03 02:44:15  pauloscustodio
+* Division by zero error was causing memory leaks - made non-fatal.
+* Moved calculator stack to expr.c, made it singleton and based on array.h - no
+* need to allocate on every expression computed, elements are stored in
+* a vector instead of being allocated individually.
+*
+* Revision 1.59  2014/03/02 12:51:41  pauloscustodio
 * Change token ids to TK_...
 *
 * Revision 1.58  2014/03/01 15:45:31  pauloscustodio

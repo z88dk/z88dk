@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.36 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.37 2014-03-03 02:44:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,14 +30,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.36 2014-02-25 22:
 /* Structured data types : */
 
 enum flag           { OFF, ON };
-
-
-
-struct pfixstack
-{
-    long               stackconstant;     /* stack structure used to evaluate postfix expressions */
-    struct pfixstack   *prevstackitem;    /* pointer to previous element on stack */
-};
 
 
 struct postfixlist
@@ -150,7 +142,13 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.36  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.37  2014-03-03 02:44:15  pauloscustodio
+* Division by zero error was causing memory leaks - made non-fatal.
+* Moved calculator stack to expr.c, made it singleton and based on array.h - no
+* need to allocate on every expression computed, elements are stored in
+* a vector instead of being allocated individually.
+*
+* Revision 1.36  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.35  2014/02/24 23:08:55  pauloscustodio
