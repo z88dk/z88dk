@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.12 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.13 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -58,7 +58,7 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
 
     self->name 		= strpool_add( name );			/* name in strpool, not freed */
     self->value 	= value;
-    self->type 		= type;
+    self->sym_type	= type;
     self->owner 	= owner;
 
     /* add reference */
@@ -88,7 +88,10 @@ char *Symbol_fullname( Symbol *sym )
 
 /*
 * $Log: sym.c,v $
-* Revision 1.12  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.13  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

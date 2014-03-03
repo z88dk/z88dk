@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.10 2014-02-17 22:48:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.11 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,7 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.10 2014-02-17 22:48:
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-	byte_t			type;				/* type of symbol */
+	byte_t			sym_type;			/* type of symbol */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
 	struct module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
@@ -58,7 +58,10 @@ extern char *Symbol_fullname( Symbol *sym );
 
 /*
 * $Log: sym.h,v $
-* Revision 1.10  2014-02-17 22:48:28  pauloscustodio
+* Revision 1.11  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.10  2014/02/17 22:48:28  pauloscustodio
 * Symbol types and Expression types need to be in sync
 * Move from sym.h and symbol.h to model.h
 *

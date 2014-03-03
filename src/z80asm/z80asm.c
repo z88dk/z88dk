@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.142 2014-03-01 15:45:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.143 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -727,12 +727,15 @@ int main( int argc, char *argv[] )
 Symbol *
 createsym( Symbol *symptr )
 {
-    return Symbol_create( symptr->name, symptr->value, symptr->type, symptr->owner );
+    return Symbol_create( symptr->name, symptr->value, symptr->sym_type, symptr->owner );
 }
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.142  2014-03-01 15:45:31  pauloscustodio
+* Revision 1.143  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.142  2014/03/01 15:45:31  pauloscustodio
 * CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
 * Handle C-like operators, make exponentiation (**) right-associative.
 * Simplify expression parser by handling composed tokens in lexer.

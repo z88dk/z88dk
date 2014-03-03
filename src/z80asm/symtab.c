@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.22 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.23 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -75,7 +75,7 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
         sym = SymbolHash_get( symtab, name + 1 );
 
     if ( sym != NULL )
-        sym->type |= SYM_TOUCHED;
+        sym->sym_type |= SYM_TOUCHED;
 
     return sym;
 }
@@ -105,10 +105,10 @@ Symbol *_define_sym( char *name, long value, byte_t type,
         sym = Symbol_create( name, value, type | SYM_DEFINED, owner );
         SymbolHash_set( psymtab, name, sym );
     }
-    else if ( !( sym->type & SYM_DEFINED ) )	/* already declared but not defined */
+    else if ( !( sym->sym_type & SYM_DEFINED ) )	/* already declared but not defined */
     {
         sym->value = value;
-        sym->type |= type | SYM_DEFINED;
+        sym->sym_type |= type | SYM_DEFINED;
         sym->owner = owner;
     }
     else									/* already defined */
@@ -209,7 +209,7 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & type_mask ) == ( type_value & type_mask ) )
+        if ( ( sym->sym_type & type_mask ) == ( type_value & type_mask ) )
             SymbolHash_set( ptarget, Symbol_fullname( sym ), Symbol_clone( sym ) );
     }
 }
@@ -245,7 +245,7 @@ void copy_static_syms( void )
     for ( iter = SymbolHash_first( static_symtab ); iter; iter = SymbolHash_next( iter ) )
     {
         sym = ( Symbol * )iter->value;
-        _define_sym( sym->name, sym->value, sym->type, CURRENTMODULE, & CURRENTMODULE->local_symtab );
+        _define_sym( sym->name, sym->value, sym->sym_type, CURRENTMODULE, & CURRENTMODULE->local_symtab );
     }
 }
 
@@ -286,14 +286,14 @@ static void define_local_symbol( char *name, long value, byte_t type )
         /* First element in list is definition of symbol */
         add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
     }
-    else if ( sym->type & SYM_DEFINED )	/* local symbol already defined */
+    else if ( sym->sym_type & SYM_DEFINED )	/* local symbol already defined */
     {
         error_symbol_redefined( name );
     }
     else								/* symbol declared local, but not yet defined */
     {
         sym->value = value;
-        sym->type |= type | SYM_LOCAL | SYM_DEFINED;	/* local symbol type set to address label or constant */
+        sym->sym_type |= type | SYM_LOCAL | SYM_DEFINED;	/* local symbol type set to address label or constant */
         sym->owner = CURRENTMODULE;					/* owner of symbol is always creator */
 
         /* First element in list is definition of symbol */
@@ -318,16 +318,16 @@ void define_symbol( char *name, long value, byte_t type )
     {
         define_local_symbol( name, value, type );
     }
-    else if ( sym->type & SYM_GLOBAL )		/* symbol declared global */
+    else if ( sym->sym_type & SYM_GLOBAL )		/* symbol declared global */
     {
-        if ( sym->type & SYM_DEFINED )	/* global symbol already defined */
+        if ( sym->sym_type & SYM_DEFINED )	/* global symbol already defined */
         {
             error_symbol_redefined( name );
         }
         else							/* symbol declared global, but not yet defined */
         {
             sym->value = value;
-            sym->type |= type | SYM_DEFINED;	/* defined, and typed as address label or constant */
+            sym->sym_type |= type | SYM_DEFINED;	/* defined, and typed as address label or constant */
             sym->owner = CURRENTMODULE;		/* owner of symbol is always creator */
 
             /* First element in list is definition of symbol */
@@ -367,11 +367,11 @@ static void declare_global_symbol( char *name, byte_t type )
             if ( sym->owner != CURRENTMODULE )
             {
                 /* this symbol is declared in another module */
-                if ( sym->type & SYM_EXTERN )
+                if ( sym->sym_type & SYM_EXTERN )
                 {
                     sym->owner = CURRENTMODULE;		/* symbol now owned by this module */
-                    sym->type &= ~ SYM_EXTERN;		/* re-declare symbol as global if symbol was */
-                    sym->type |= SYM_GLOBAL | type;	/* declared extern in another module */
+                    sym->sym_type &= ~ SYM_EXTERN;		/* re-declare symbol as global if symbol was */
+                    sym->sym_type |= SYM_GLOBAL | type;	/* declared extern in another module */
                 }
                 else								/* cannot declare two identical global's */
                 {
@@ -380,7 +380,7 @@ static void declare_global_symbol( char *name, byte_t type )
                     assert(0);
                 }
             }
-            else if ( ( sym->type & ( SYM_GLOBAL | type ) ) != ( SYM_GLOBAL | type ) )
+            else if ( ( sym->sym_type & ( SYM_GLOBAL | type ) ) != ( SYM_GLOBAL | type ) )
             {
                 /* re-declaration not allowed */
                 error_symbol_redecl( name );
@@ -396,9 +396,9 @@ static void declare_global_symbol( char *name, byte_t type )
         {
             /* local, not global */
             /* If no global symbol of identical name has been created, then re-declare local symbol as global symbol */
-            sym->type &= ~ SYM_LOCAL;
-            sym->type |= SYM_GLOBAL;
-            cloned_sym = Symbol_create( sym->name, sym->value, sym->type, CURRENTMODULE );
+            sym->sym_type &= ~ SYM_LOCAL;
+            sym->sym_type |= SYM_GLOBAL;
+            cloned_sym = Symbol_create( sym->name, sym->value, sym->sym_type, CURRENTMODULE );
             SymbolHash_set( &global_symtab, name, cloned_sym );
 
             /* original local symbol cloned as global symbol, now delete old local ... */
@@ -448,11 +448,11 @@ static void declare_extern_symbol( char *name, byte_t type )
             /* not local, global */
             if ( sym->owner == CURRENTMODULE )
             {
-                if ( ( sym->type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
+                if ( ( sym->sym_type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
                 {
                     if ( opts.sdcc )
                     {
-                        sym->type = SYM_EXTERN | type ;
+                        sym->sym_type = SYM_EXTERN | type ;
                     }
                     else
                     {
@@ -472,11 +472,11 @@ static void declare_extern_symbol( char *name, byte_t type )
         {
             /* If no external symbol of identical name has been declared, then re-declare local
                symbol as external symbol, but only if local symbol is not defined yet */
-            if ( ( sym->type & SYM_DEFINED ) == 0 )
+            if ( ( sym->sym_type & SYM_DEFINED ) == 0 )
             {
-                sym->type &= ~ SYM_LOCAL;
-                sym->type |= ( SYM_EXTERN | type );
-                ext_sym = Symbol_create( name, 0, sym->type, CURRENTMODULE );
+                sym->sym_type &= ~ SYM_LOCAL;
+                sym->sym_type |= ( SYM_EXTERN | type );
+                ext_sym = Symbol_create( name, 0, sym->sym_type, CURRENTMODULE );
                 SymbolHash_set( &global_symtab, name, ext_sym );
 
                 /* original local symbol cloned as external symbol, now delete old local ... */
@@ -488,7 +488,7 @@ static void declare_extern_symbol( char *name, byte_t type )
                 error_symbol_decl_local( name );
             }
         }
-        else if ( ( sym->type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
+        else if ( ( sym->sym_type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
         {
             /* re-declaration not allowed */
             error_symbol_redecl( name );
@@ -523,7 +523,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.22  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.23  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.22  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.21  2014/02/03 22:07:38  pauloscustodio

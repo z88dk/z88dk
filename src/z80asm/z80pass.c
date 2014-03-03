@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.77 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.78 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -315,7 +315,7 @@ StoreName( Symbol *node, byte_t scope )
         break;
 
     case SYM_GLOBAL:
-        if ( node->type & SYM_DEFINE )
+        if ( node->sym_type & SYM_DEFINE )
         {
             xfput_uint8(objfile, 'X');
         }
@@ -327,7 +327,7 @@ StoreName( Symbol *node, byte_t scope )
         break;
     }
 
-    if ( node->type & SYM_ADDR )   /* then write type of symbol */
+    if ( node->sym_type & SYM_ADDR )   /* then write type of symbol */
     {
         xfput_uint8(objfile, 'A');    /* either a relocatable address */
     }
@@ -353,7 +353,7 @@ StoreGlobalNames( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYM_GLOBAL ) && ( sym->type & SYM_TOUCHED ) )
+        if ( ( sym->sym_type & SYM_GLOBAL ) && ( sym->sym_type & SYM_TOUCHED ) )
         {
             StoreName( sym, SYM_GLOBAL );
         }
@@ -373,7 +373,7 @@ StoreLocalNames( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYM_LOCAL ) && ( sym->type & SYM_TOUCHED ) )
+        if ( ( sym->sym_type & SYM_LOCAL ) && ( sym->sym_type & SYM_TOUCHED ) )
         {
             StoreName( sym, SYM_LOCAL );
         }
@@ -395,7 +395,7 @@ StoreExternReferences( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->type & SYM_EXTERN ) && ( sym->type & SYM_TOUCHED ) )
+        if ( ( sym->sym_type & SYM_EXTERN ) && ( sym->sym_type & SYM_TOUCHED ) )
 			xfput_count_byte_strz( objfile, sym->name );
     }
 }
@@ -752,9 +752,9 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
         if ( sym->owner == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
-            if ( ( sym->type & SYM_LOCAL ) || ( sym->type & SYM_GLOBAL ) )
+            if ( ( sym->sym_type & SYM_LOCAL ) || ( sym->sym_type & SYM_GLOBAL ) )
             {
-                if ( ( sym->type & SYM_TOUCHED ) )
+                if ( ( sym->sym_type & SYM_TOUCHED ) )
                 {
                     list_symbol( sym->name, sym->value, sym->references );
                 }
@@ -767,7 +767,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.77  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.78  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.77  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.76  2014/03/03 13:27:07  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.62 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.63 2014-03-03 14:09:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,7 +47,7 @@ int GetChar( FILE *fptr );
 /* local functions */
 void list_PfixExpr( struct expr *pfixlist );
 void RemovePfixlist( struct expr *pfixexpr );
-void NewPfixSymbol( struct expr *pfixexpr, long oprconst, tokid_t oprtype, char *symident, char symboltype );
+static void NewPfixSymbol( struct expr *pfixexpr, long oprconst, tokid_t oprtype, char *symident, char symboltype );
 void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
@@ -99,19 +99,19 @@ static BOOL Factor( struct expr *pfixexpr )
     case TK_NAME:
         symptr = get_used_symbol( ident );
 
-        if ( symptr->type & SYM_DEFINED )
+        if ( symptr->sym_type & SYM_DEFINED )
         {
             /* copy appropriate type bits */
-            pfixexpr->expr_type |= ( symptr->type & SYM_TYPE );
-            NewPfixSymbol( pfixexpr, symptr->value, TK_NUMBER, NULL, symptr->type );
+            pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE );
+            NewPfixSymbol( pfixexpr, symptr->value, TK_NUMBER, NULL, symptr->sym_type );
         }
         else
         {
             /* copy appropriate declaration bits */
-            pfixexpr->expr_type |= ( symptr->type & SYM_TYPE ) | NOT_EVALUABLE;
+            pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE ) | NOT_EVALUABLE;
 
             /* symbol only declared, store symbol name */
-            NewPfixSymbol( pfixexpr, 0, TK_NUMBER, ident, symptr->type );
+            NewPfixSymbol( pfixexpr, 0, TK_NUMBER, ident, symptr->sym_type );
         }
 
         strcpy( pfixexpr->infixptr, ident );    /* add identifier to infix expr */
@@ -418,7 +418,7 @@ EvalPfixExpr( struct expr *pfixlist )
 						symptr = find_local_symbol( pfixexpr->id );
 
 						/* copy appropriate type bits */
-						pfixlist->expr_type |= ( symptr->type & SYM_TYPE );
+						pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
 
 						Calc_push( symptr->value );
 					}
@@ -429,9 +429,9 @@ EvalPfixExpr( struct expr *pfixlist )
 						if ( symptr != NULL )
 						{
 							/* copy appropriate type bits */
-							pfixlist->expr_type |= ( symptr->type & SYM_TYPE );
+							pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
 
-							if ( symptr->type & SYM_DEFINED )
+							if ( symptr->sym_type & SYM_DEFINED )
 							{
 								Calc_push( symptr->value );
 							}
@@ -454,9 +454,9 @@ EvalPfixExpr( struct expr *pfixlist )
 					symptr = get_used_symbol( pfixexpr->id );
 
 					/* copy appropriate type bits */
-					pfixlist->expr_type |= ( symptr->type & SYM_TYPE );
+					pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
 
-					if ( symptr->type & SYM_DEFINED )
+					if ( symptr->sym_type & SYM_DEFINED )
 					{
 						Calc_push( symptr->value );
 					}
@@ -551,7 +551,7 @@ RemovePfixlist( struct expr *pfixexpr )
 
 
 
-void
+static void
 NewPfixSymbol( struct expr *pfixexpr,
                long oprconst,
                tokid_t oprtype,
@@ -860,7 +860,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.62  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.63  2014-03-03 14:09:20  pauloscustodio
+* Renamed symbol type attribute
+*
+* Revision 1.62  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.61  2014/03/03 13:27:07  pauloscustodio
