@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.38 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.39 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,38 +30,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.38 2014-03-03 13:
 /* Structured data types : */
 
 enum flag           { OFF, ON };
-
-
-struct postfixlist
-{
-    struct postfixlist *nextoperand;	/* pointer to next element in postfix expression */
-    long               operandconst;
-    tokid_t			   operatortype;
-    char              *id;				/* pointer to identifier */
-    byte_t			   sym_type;		/* type of identifier (local, global, rel. address or constant) */
-};
-
-struct expr
-{
-    struct expr        *nextexpr;		/* pointer to next expression */
-    struct postfixlist *firstnode;
-    struct postfixlist *currentnode;
-    byte_t			   expr_type;		/* range type of evaluated expression */
-    enum flag          stored;			/* Flag to indicate that expression has been stored to object file */
-    char               *infixexpr;		/* pointer to ASCII infix expression */
-    char               *infixptr;		/* pointer to current char in infix expression */
-    uint_t             codepos;			/* rel. position in module code to patch (in pass 2) */
-    char               *srcfile;		/* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
-    int                curline;			/* expression in line of source file */
-    long               listpos;			/* position in listing file to patch (in pass 2) */
-};
-
-struct expression
-{
-    struct expr        *firstexpr;		/* header of list of expressions in current module */
-    struct expr        *currexpr;
-};
-
 
 struct usedfile
 {
@@ -142,7 +110,14 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.38  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.39  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.38  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.37  2014/03/03 02:44:15  pauloscustodio

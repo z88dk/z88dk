@@ -16,20 +16,33 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.6 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.7 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "expr.h"
 #include "errors.h"
+#include "init.h"
+#include "strhash.h"
+#include "strpool.h"
 #include <assert.h>
 
+static void init_operator_hash(void);
+static void fini_operator_hash(void);
+
 /*-----------------------------------------------------------------------------
-*	Types of operators and associativity
+*	Initialization
 *----------------------------------------------------------------------------*/
-enum OperType	{ UNARY_OP, BINARY_OP, TERNARY_OP };
-enum AssocType	{ ASSOC_LEFT, ASSOC_RIGHT };
+DEFINE_init()
+{
+	init_operator_hash();
+}
+
+DEFINE_fini()
+{
+	fini_operator_hash();
+}
 
 /*-----------------------------------------------------------------------------
 *	Calculation functions that need to check arguments
@@ -80,8 +93,68 @@ static long _calc_power(long base, long exp)
 *	long calc_<symbol> (long a [, long b [, long c ] ] );
 *----------------------------------------------------------------------------*/
 #define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
-	long calc_ ## _operation _args { return _calc; }
+	long calc_##_operation _args { return _calc; }
 #include "expr_def.h"
+
+/*-----------------------------------------------------------------------------
+*	Operator descriptors
+*----------------------------------------------------------------------------*/
+
+/* hash of (sym,op_type) to Operator* */
+static StrHash *operator_hash;
+
+/* compute hash key */
+static char *operator_hash_key( tokid_t sym, op_type_t op_type )
+{
+	char key[3];		/* byte 1 = sym; byte 2 = op_type; byte 3 = '\0' */
+
+	/* assert we can map symbol and type in a string */
+	assert( sym     > 0 && sym     < 256 );
+	assert( op_type > 0 && op_type < 256 );
+	key[0] = (char) sym; key[1] = (char) op_type; key[2] = '\0';
+
+	return strpool_add(key);
+}
+
+/* init operator_hash - create one Operator for each, add to hash table */
+static void init_operator_hash(void)
+{
+	char *key;
+
+#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
+	{																		\
+		static Operator op_##_operation;									\
+																			\
+		/* init static operator structure */								\
+		op_##_operation.sym			= _symbol;								\
+		op_##_operation.op_type		= _type;								\
+		op_##_operation.prec		= _prec;								\
+		op_##_operation.assoc		= _assoc;								\
+		/* cast into unary type, cannot decide union path at compile time */ \
+		op_##_operation.calc.unary	= (long(*)(long))calc_##_operation;		\
+																			\
+		key = operator_hash_key( _symbol, _type );							\
+		StrHash_set( &operator_hash, key, & op_##_operation );				\
+	}
+#include "expr_def.h"
+}
+
+/* fini operator_hash */
+static void fini_operator_hash(void)
+{
+	StrHash_remove_all( operator_hash );
+}
+
+
+/* get the operator descriptor for the given (sym, op_type) */
+Operator *Operator_get( tokid_t sym, op_type_t op_type )
+{
+	char *key;
+
+	init();
+	key = operator_hash_key( sym, op_type );
+	return (Operator *) StrHash_get( operator_hash, key );
+}
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
@@ -139,6 +212,123 @@ void Calc_compute_ternary( long (*calc)(long a, long b, long c) )
 	Calc_push(x);
 }
 
+/*-----------------------------------------------------------------------------
+*	Expression operations
+*----------------------------------------------------------------------------*/
+DEF_ARRAY( ExprOp );
+
+/* init each type of ExprOp */
+void ExprOp_init_number( ExprOp *self, long value )
+{
+	self->op_type	= NUMBER_OP;
+	self->d.value	= value;
+}
+
+void ExprOp_init_name( ExprOp *self, char *name, byte_t sym_type )
+{
+	self->op_type 			= NAME_OP;
+	self->d.ident.name		= strpool_add(name);
+	self->d.ident.sym_type	= sym_type;
+}
+
+extern void ExprOp_init_const_expr( ExprOp *self )
+{
+	self->op_type = CONST_EXPR_OP;
+}
+
+void ExprOp_init_operator( ExprOp *self, tokid_t sym, op_type_t op_type )
+{
+	Operator *op;
+
+	op = Operator_get( sym, op_type ); assert( op != NULL );
+
+	self->op_type	= op_type;
+	self->d.op		= op;
+}
+
+/* compute ExprOp using Calc_xxx functions */
+void ExprOp_compute( ExprOp *self, struct expr *pfixlist )
+{
+    Symbol *symptr;
+
+	switch (self->op_type)
+	{
+	case NAME_OP:
+		/* symbol was not defined and not declared */
+		if ( ( self->d.ident.sym_type & ~ SYM_TOUCHED ) != SYM_NOTDEFINED )
+		{
+			/* if all bits are set to zero */
+			if ( self->d.ident.sym_type & SYM_LOCAL )
+			{
+				symptr = find_local_symbol( self->d.ident.name );
+
+				/* copy appropriate type bits */
+				pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
+
+				Calc_push( symptr->value );
+			}
+			else
+			{
+				symptr = find_global_symbol( self->d.ident.name );
+
+				if ( symptr != NULL )
+				{
+					/* copy appropriate type bits */
+					pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
+
+					if ( symptr->sym_type & SYM_DEFINED )
+					{
+						Calc_push( symptr->value );
+					}
+					else
+					{
+						pfixlist->expr_type |= NOT_EVALUABLE;
+						Calc_push( 0 );
+					}
+				}
+				else
+				{
+					pfixlist->expr_type |= NOT_EVALUABLE;
+					Calc_push( 0 );
+				}
+			}
+		}
+		else
+		{
+			/* try to find symbol now as either declared local or global */
+			symptr = get_used_symbol( self->d.ident.name );
+
+			/* copy appropriate type bits */
+			pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
+
+			if ( symptr->sym_type & SYM_DEFINED )
+			{
+				Calc_push( symptr->value );
+			}
+			else
+			{
+				pfixlist->expr_type |= NOT_EVALUABLE;
+				Calc_push( 0 );
+			}
+		}
+		break;
+		
+	case CONST_EXPR_OP:
+		pfixlist->expr_type &= ~ EXPR_ADDR;		/* convert to constant expression */
+		break;
+		
+	case NUMBER_OP:	Calc_push( self->d.value ); break;		
+	case UNARY_OP:	Calc_compute_unary( self->d.op->calc.unary ); break;
+	case BINARY_OP:	Calc_compute_binary( self->d.op->calc.binary ); break;
+	case TERNARY_OP:Calc_compute_ternary( self->d.op->calc.ternary ); break;
+	
+	default:
+		assert(0);
+	}
+}
+
+
+
 #if 0
 
 
@@ -171,7 +361,14 @@ void Expr_fini (Expr *self)
 
 /*
 * $Log: expr.c,v $
-* Revision 1.6  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.7  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.6  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.5  2014/03/03 02:44:15  pauloscustodio

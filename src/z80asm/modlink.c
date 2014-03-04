@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.95 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.96 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,6 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.95 2014-03-03 13
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
+#include "expr.h"
 #include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
@@ -1037,7 +1038,14 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.95  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.96  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.95  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.94  2014/03/03 13:27:07  pauloscustodio

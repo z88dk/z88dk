@@ -13,13 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.1 2014-03-03 02:44:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.2 2014-03-04 11:49:47 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
 use Modern::Perl;
 use Test::More;
-use Capture::Tiny 'capture';
+use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 require 't/test_utils.pl';
 
@@ -164,7 +164,8 @@ if ( ! get_legacy() ) {
 # calculator stack
 #------------------------------------------------------------------------------
 unlink_testfiles();
-my $compile = "cc -Wall -Ilib -otest test.c expr.c errors.c ".
+my $compile = "cc -Wall -Ilib -otest test.c expr.c errors.c sym.c symtab.c symref.c ".
+			  "options.c model.o hist.c ".
 			  "lib/strutil.c lib/strhash.c lib/fileutil.c lib/srcfile.c ".
 			  "lib/strpool.c lib/except.c ".
 			  "lib/list.c lib/class.c lib/xmalloc.c lib/die.c";
@@ -172,6 +173,16 @@ my $compile = "cc -Wall -Ilib -otest test.c expr.c errors.c ".
 write_file("test.c", <<'END');
 #include "expr.h"
 #include <assert.h>
+
+struct module the_module;
+struct module *CURRENTMODULE = &the_module;
+struct modules the_modules;
+struct modules *modulehdr = &the_modules;
+char *CreateLibfile( char *filename ) {return NULL;}
+char *GetLibfile( char *filename ) {return NULL;}
+size_t get_PC( void ) { return 0; }
+int list_get_page_nr() { return 1; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
 
 long add3(long a, long b, long c) { return 3+a+b+c; }
 long add2(long a, long b) { return 2+a+b; }
@@ -219,7 +230,14 @@ sub t_capture {
 
 
 # $Log: expr.t,v $
-# Revision 1.1  2014-03-03 02:44:15  pauloscustodio
+# Revision 1.2  2014-03-04 11:49:47  pauloscustodio
+# Expression parser and expression evaluator use a look-up table of all
+# supported unary, binary and ternary oprators, instead of a big switch
+# statement to select the operation.
+# Expression operations are stored in a contiguous array instead of
+# a liked list to reduce administrative overhead of adding / iterating.
+#
+# Revision 1.1  2014/03/03 02:44:15  pauloscustodio
 # Division by zero error was causing memory leaks - made non-fatal.
 # Moved calculator stack to expr.c, made it singleton and based on array.h - no
 # need to allocate on every expression computed, elements are stored in

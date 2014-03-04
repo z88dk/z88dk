@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.5 2014-03-03 02:44:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.6 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 /* Unary, Binary and Ternary operators */
@@ -39,7 +39,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.5 2014-03-03 02
 #endif
 
 /* define list of operators in increasing priority */
-OPERATOR_3( tern_cond,	TK_QUESTION,	1,	ASSOC_RIGHT,	a ? b : c )
+OPERATOR_1( sentinel,	TK_INVALID,		0,	ASSOC_NONE,		0 )
+
+OPERATOR_3( tern_cond,	TK_TERN_COND,	1,	ASSOC_RIGHT,	a ? b : c )
           
 OPERATOR_2( log_or,		TK_LOG_OR,		2,	ASSOC_LEFT,		a || b )
           
@@ -81,7 +83,14 @@ OPERATOR_1( log_not,	TK_LOG_NOT,		11,	ASSOC_RIGHT,	! a )
 
 /*
 * $Log: expr_def.h,v $
-* Revision 1.5  2014-03-03 02:44:15  pauloscustodio
+* Revision 1.6  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.5  2014/03/03 02:44:15  pauloscustodio
 * Division by zero error was causing memory leaks - made non-fatal.
 * Moved calculator stack to expr.c, made it singleton and based on array.h - no
 * need to allocate on every expression computed, elements are stored in

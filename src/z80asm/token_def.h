@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.13 2014-03-02 12:51:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.14 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -135,7 +135,6 @@ TOKEN(	TK_BIN_NOT,		"~" )
 #endif
 
 /* semantical tokens */
-TOKEN(	TK_NEGATE,		"" )	/* unary minus */
 TOKEN(	TK_TERN_COND,	"" )	/* cond ? true : false */
 
 /* marker to get number of tokens */
@@ -145,7 +144,14 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.13  2014-03-02 12:51:41  pauloscustodio
+* Revision 1.14  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.13  2014/03/02 12:51:41  pauloscustodio
 * Change token ids to TK_...
 *
 * Revision 1.12  2014/03/01 15:45:31  pauloscustodio

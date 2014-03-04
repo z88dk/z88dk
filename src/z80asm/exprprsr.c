@@ -13,11 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.63 2014-03-03 14:09:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.64 2014-03-04 11:49:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "class.h"
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
@@ -47,7 +48,6 @@ int GetChar( FILE *fptr );
 /* local functions */
 void list_PfixExpr( struct expr *pfixlist );
 void RemovePfixlist( struct expr *pfixexpr );
-static void NewPfixSymbol( struct expr *pfixexpr, long oprconst, tokid_t oprtype, char *symident, char symboltype );
 void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
@@ -81,7 +81,9 @@ extern FILE *z80asmfile, *objfile;
 			if ( ! prev_name(pfixexpr) )						\
 				return FALSE;									\
 																\
-			NewPfixSymbol( pfixexpr, 0, op, NULL, 0 );			\
+			ExprOp_init_operator(								\
+				ExprOpArray_push( pfixexpr->rpn_ops ),			\
+				op, BINARY_OP );								\
 		}														\
 																\
 		return TRUE;											\
@@ -103,7 +105,8 @@ static BOOL Factor( struct expr *pfixexpr )
         {
             /* copy appropriate type bits */
             pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE );
-            NewPfixSymbol( pfixexpr, symptr->value, TK_NUMBER, NULL, symptr->sym_type );
+			ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
+								symptr->value );
         }
         else
         {
@@ -111,7 +114,8 @@ static BOOL Factor( struct expr *pfixexpr )
             pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE ) | NOT_EVALUABLE;
 
             /* symbol only declared, store symbol name */
-            NewPfixSymbol( pfixexpr, 0, TK_NUMBER, ident, symptr->sym_type );
+			ExprOp_init_name( ExprOpArray_push( pfixexpr->rpn_ops ),
+							  ident, symptr->sym_type );
         }
 
         strcpy( pfixexpr->infixptr, ident );    /* add identifier to infix expr */
@@ -133,7 +137,8 @@ static BOOL Factor( struct expr *pfixexpr )
         }
         else
         {
-            NewPfixSymbol( pfixexpr, constant, TK_NUMBER, NULL, 0 );
+			ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
+								constant );
         }
 
         GetSym();
@@ -163,7 +168,8 @@ static BOOL Factor( struct expr *pfixexpr )
                 if ( GetSym() == TK_SQUOTE )
                 {
                     *pfixexpr->infixptr++ = '\'';
-                    NewPfixSymbol( pfixexpr, constant, TK_NUMBER, NULL, 0 );
+					ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
+										constant );
                 }
                 else
                 {
@@ -196,7 +202,8 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
 
-		NewPfixSymbol( pfixexpr, 0, TK_NEGATE, NULL, 0 );
+		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
+							  TK_MINUS, UNARY_OP );
 		return TRUE;
 
     case TK_PLUS:
@@ -210,7 +217,8 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
 
-		NewPfixSymbol( pfixexpr, 0, TK_BIN_NOT, NULL, 0 );
+		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
+							  TK_BIN_NOT, UNARY_OP );
 		return TRUE;
 
     case TK_LOG_NOT:
@@ -221,7 +229,8 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
         if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
 
-		NewPfixSymbol( pfixexpr, 0, TK_LOG_NOT, NULL, 0 );
+		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
+							  TK_LOG_NOT, UNARY_OP );
 		return TRUE;
 
     case TK_LPAREN:
@@ -263,7 +272,8 @@ static BOOL PowerTerm( struct expr *pfixexpr )
 		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
 
-		NewPfixSymbol( pfixexpr, 0, TK_POWER, NULL, 0 );
+		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
+							  TK_POWER, BINARY_OP );
     }
 
     return TRUE;
@@ -320,7 +330,8 @@ static BOOL TernaryCondition( struct expr *pfixexpr )
 	if ( ! TernaryCondition(pfixexpr) )	/* get false */
 		return FALSE;
 
-	NewPfixSymbol( pfixexpr, 0, TK_TERN_COND, NULL, 0 );    /* ?: */
+	ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
+						  TK_TERN_COND, TERNARY_OP );
 	return TRUE;
 }
 
@@ -333,8 +344,9 @@ ParseNumExpr( void )
 
     pfixhdr = xnew( struct expr );
 
-    pfixhdr->firstnode = NULL;
-    pfixhdr->currentnode = NULL;
+    pfixhdr->rpn_ops = OBJ_NEW( ExprOpArray );
+	OBJ_AUTODELETE( pfixhdr->rpn_ops ) = FALSE;
+
     pfixhdr->expr_type = 0;
     pfixhdr->stored = OFF;
     pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
@@ -356,11 +368,9 @@ ParseNumExpr( void )
 
     if ( TernaryCondition( pfixhdr ) )
     {
-        /* parse expression... */
+        /* convert to constant expression */
         if ( is_const_expr )
-        {
-            NewPfixSymbol( pfixhdr, 0, TK_CONST_EXPR, NULL, 0 );    /* convert to constant expression */
-        }
+			ExprOp_init_const_expr( ExprOpArray_push( pfixhdr->rpn_ops ) );
 
         *pfixhdr->infixptr = '\0';                      /* terminate infix expression */
     }
@@ -392,120 +402,16 @@ StoreExpr( struct expr *pfixexpr, char range )
 long
 EvalPfixExpr( struct expr *pfixlist )
 {
-    struct postfixlist *pfixexpr;
-    Symbol *symptr;
+	uint_t i;
 
 	pfixlist->expr_type &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
-	pfixexpr = pfixlist->firstnode;				/* initiate to first node */
 
-	do
+	for ( i = 0; i < ExprOpArray_size( pfixlist->rpn_ops ); i++ )
 	{
-		switch ( pfixexpr->operatortype )
-		{
-		case TK_NUMBER:
-			if ( pfixexpr->id == NULL ) /* Is operand an identifier? */
-			{
-				Calc_push( pfixexpr->operandconst );
-			}
-			else
-			{
-				/* symbol was not defined and not declared */
-				if ( ( pfixexpr->sym_type & ~ SYM_TOUCHED ) != SYM_NOTDEFINED )
-				{
-					/* if all bits are set to zero */
-					if ( pfixexpr->sym_type & SYM_LOCAL )
-					{
-						symptr = find_local_symbol( pfixexpr->id );
+		ExprOp *expr_op = ExprOpArray_item( pfixlist->rpn_ops, i );
 
-						/* copy appropriate type bits */
-						pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
-
-						Calc_push( symptr->value );
-					}
-					else
-					{
-						symptr = find_global_symbol( pfixexpr->id );
-
-						if ( symptr != NULL )
-						{
-							/* copy appropriate type bits */
-							pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
-
-							if ( symptr->sym_type & SYM_DEFINED )
-							{
-								Calc_push( symptr->value );
-							}
-							else
-							{
-								pfixlist->expr_type |= NOT_EVALUABLE;
-								Calc_push( 0 );
-							}
-						}
-						else
-						{
-							pfixlist->expr_type |= NOT_EVALUABLE;
-							Calc_push( 0 );
-						}
-					}
-				}
-				else
-				{
-					/* try to find symbol now as either declared local or global */
-					symptr = get_used_symbol( pfixexpr->id );
-
-					/* copy appropriate type bits */
-					pfixlist->expr_type |= ( symptr->sym_type & SYM_TYPE );
-
-					if ( symptr->sym_type & SYM_DEFINED )
-					{
-						Calc_push( symptr->value );
-					}
-					else
-					{
-						pfixlist->expr_type |= NOT_EVALUABLE;
-						Calc_push( 0 );
-					}
-				}
-			}
-
-			break;
-
-		case TK_CONST_EXPR:
-			pfixlist->expr_type &= ~ EXPR_ADDR;		/* convert to constant expression */
-			break;
-
-		case TK_BIN_AND:	Calc_compute_binary( calc_bin_and 	); break;
-		case TK_BIN_OR:		Calc_compute_binary( calc_bin_or	); break;
-		case TK_LOG_AND:	Calc_compute_binary( calc_log_and	); break;
-		case TK_LOG_OR:		Calc_compute_binary( calc_log_or	); break;
-		case TK_BIN_XOR:	Calc_compute_binary( calc_bin_xor	); break;
-		case TK_PLUS:		Calc_compute_binary( calc_plus		); break;
-		case TK_MINUS:		Calc_compute_binary( calc_minus		); break;
-		case TK_MULTIPLY:	Calc_compute_binary( calc_multiply	); break;
-		case TK_DIVIDE:		Calc_compute_binary( calc_divide	); break;
-		case TK_MOD:		Calc_compute_binary( calc_mod		); break;
-		case TK_POWER:		Calc_compute_binary( calc_power		); break;
-		case TK_EQUAL:		Calc_compute_binary( calc_equal		); break;
-		case TK_LESS:		Calc_compute_binary( calc_less		); break;
-		case TK_GREATER:	Calc_compute_binary( calc_greater	); break;
-		case TK_LESS_EQ:	Calc_compute_binary( calc_less_eq	); break;
-		case TK_GREATER_EQ:	Calc_compute_binary( calc_greater_eq); break;
-		case TK_NOT_EQ:		Calc_compute_binary( calc_not_eq	); break;
-		case TK_LEFT_SHIFT:	Calc_compute_binary( calc_left_shift); break;
-		case TK_RIGHT_SHIFT:Calc_compute_binary( calc_right_shift);break;
-		case TK_TERN_COND:	Calc_compute_ternary(calc_tern_cond	); break;
-		case TK_NEGATE:		Calc_compute_unary(  calc_negate	); break;
-		case TK_LOG_NOT:	Calc_compute_unary(  calc_log_not	); break;
-		case TK_BIN_NOT:	Calc_compute_unary(  calc_bin_not	); break;
-
-		default:
-			assert(0);
-			break;
-		}
-
-		pfixexpr = pfixexpr->nextoperand;             /* get next operand in postfix expression */
+		ExprOp_compute( expr_op, pfixlist );
 	}
-	while ( pfixexpr != NULL );
 
     return Calc_pop();
 }
@@ -518,27 +424,10 @@ EvalPfixExpr( struct expr *pfixlist )
 void
 RemovePfixlist( struct expr *pfixexpr )
 {
-    struct postfixlist *node, *tmpnode;
-
     if ( pfixexpr == NULL )
-    {
         return;
-    }
 
-    node = pfixexpr->firstnode;
-
-    while ( node != NULL )
-    {
-        tmpnode = node->nextoperand;
-
-        if ( node->id != NULL )
-        {
-            xfree( node->id );    /* Remove symbol id, if defined */
-        }
-
-        xfree( node );
-        node = tmpnode;
-    }
+	OBJ_DELETE( pfixexpr->rpn_ops );
 
     if ( pfixexpr->infixexpr != NULL )
     {
@@ -547,51 +436,6 @@ RemovePfixlist( struct expr *pfixexpr )
 
     xfree( pfixexpr );           /* release header of postfix expression */
 }
-
-
-
-
-static void
-NewPfixSymbol( struct expr *pfixexpr,
-               long oprconst,
-               tokid_t oprtype,
-               char *symident,
-               char symboltype )
-{
-    struct postfixlist *newnode;
-
-    newnode = xnew( struct postfixlist );
-
-    newnode->operandconst = oprconst;
-    newnode->operatortype = oprtype;
-    newnode->nextoperand = NULL;
-    newnode->sym_type = symboltype;
-
-    if ( symident != NULL )
-    {
-        newnode->id = xstrdup( symident );    /* Allocate symbol */
-    }
-    else
-    {
-        newnode->id = NULL;
-    }
-
-    if ( pfixexpr->firstnode == NULL )
-    {
-        pfixexpr->firstnode = newnode;
-        pfixexpr->currentnode = newnode;
-    }
-    else
-    {
-        pfixexpr->currentnode->nextoperand = newnode;
-        pfixexpr->currentnode = newnode;
-    }
-}
-
-
-
-
-
 
 
 
@@ -860,7 +704,14 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.63  2014-03-03 14:09:20  pauloscustodio
+* Revision 1.64  2014-03-04 11:49:47  pauloscustodio
+* Expression parser and expression evaluator use a look-up table of all
+* supported unary, binary and ternary oprators, instead of a big switch
+* statement to select the operation.
+* Expression operations are stored in a contiguous array instead of
+* a liked list to reduce administrative overhead of adding / iterating.
+*
+* Revision 1.63  2014/03/03 14:09:20  pauloscustodio
 * Renamed symbol type attribute
 *
 * Revision 1.62  2014/03/03 13:43:50  pauloscustodio
