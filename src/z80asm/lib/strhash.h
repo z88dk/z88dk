@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.5 2014-02-19 23:59:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.6 2014-03-04 11:51:08 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,10 +30,10 @@ typedef struct StrHashElem
 } StrHashElem;
 
 CLASS( StrHash )
-uint_t count;					/* number of objects */
-void ( *free_data )( void * );		/* function to free an element
+	uint_t count;					/* number of objects */
+	void ( *free_data )( void * );	/* function to free an element
 									   called by StrHash_remove_all() */
-StrHashElem		*hash;			/* hash table of all keys */
+	StrHashElem		*hash;			/* hash table of all keys */
 END_CLASS;
 
 /* compare function used by sort */
@@ -76,7 +76,10 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /*
 * $Log: strhash.h,v $
-* Revision 1.5  2014-02-19 23:59:27  pauloscustodio
+* Revision 1.6  2014-03-04 11:51:08  pauloscustodio
+* ws
+*
+* Revision 1.5  2014/02/19 23:59:27  pauloscustodio
 * BUG_0041: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
