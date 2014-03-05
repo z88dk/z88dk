@@ -5,7 +5,7 @@
 ;      Load (L=0) and verify (L=0x40), speed auto-calibration
 ;
 ;
-;	$Id: musamy_load.asm,v 1.3 2012-01-09 16:02:36 stefano Exp $
+;	$Id: musamy_load.asm,v 1.4 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 
@@ -16,7 +16,7 @@ XLIB musamy_load
 L00D5:	CCF
 L00D6:	EXX
 		RL E
-		OUT (FFh),A 	;   set output bit high
+		OUT (0FFh),A 	;   set output bit high
 		JR NC,L0113
 		SET 1,L
 		JR L014A
@@ -98,7 +98,7 @@ L0134:	SET 4,L  ; 000X0000
 
 L0139:	LD E,A		; my byte
 L013A:	LD B,A
-L013B:	IN A,(FEh)	; read tape + key row + set output bit low
+L013B:	IN A,(0FEh)	; read tape + key row + set output bit low
 		RLA
 		JR C,L00E7 ; if bit 7 is set..
 		DJNZ L013B
@@ -138,7 +138,7 @@ L00F4:	DEC D
 L014A:	LD C,09h
 
 L014C:	INC C
-		IN A,(FEh)	; read tape + key row + set output bit low
+		IN A,(0FEh)	; read tape + key row + set output bit low
 		RLA
 		JR C,L014C ; loop while bit 7 is set..
 		BIT 1,L  ; 000000?0
@@ -149,7 +149,7 @@ L014C:	INC C
 L015A:	LD B,64h  ; NEVER CHANGE THIS VALUE !
 ;--L015B:   LD H,H  ---> from the 'LOAD' loop
 L015C:	INC C
-		IN A,(FEh)	; read tape + key row + set output bit low
+		IN A,(0FEh)	; read tape + key row + set output bit low
 		RLA
 		JR C,L0119 ; jp if bit 7 is set
 		DJNZ L015C  ; ..loop

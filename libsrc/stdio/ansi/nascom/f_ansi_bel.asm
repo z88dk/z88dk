@@ -8,7 +8,7 @@
 ;	No sound on nascom (?).  We'll look for some trick..
 ;	What about making buzz the tape relais ?
 ;
-;	$Id: f_ansi_bel.asm,v 1.2 2004-07-27 09:40:19 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.3 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 	XLIB	ansi_BEL
@@ -22,11 +22,11 @@
 	
 ; T monitor
 	ld	a,7
-	jp	c4ah
+	jp	0c4ah
 
 .nassys
 ; NASSYS monitor
 	ld	a,7
-	defb	f7h
+	defb	0f7h
 	ret
 

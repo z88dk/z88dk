@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.10 2013-06-18 06:11:23 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.11 2014-03-05 22:59:17 pauloscustodio Exp $
 ;
 ; - - - - - - -
 
@@ -523,8 +523,8 @@ ENDIF
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
 
-base_graphics:	defw A000h	; Address of the Graphics map
-ozactivepage:	defw 0400h	; Page number for the graph map (0400h for A000h)
+base_graphics:	defw 0A000h	; Address of the Graphics map
+ozactivepage:	defw 0400h	; Page number for the graph map (0400h for 0A000h)
 ozmodel:	defb    -1	; Set with "ozdetectmodel" (see libraries)
 s_filetypetable: defw    0c089h
 

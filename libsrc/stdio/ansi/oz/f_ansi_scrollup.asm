@@ -5,7 +5,7 @@
 ;
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2011-08-12 20:42:23 pauloscustodio Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.4 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -23,14 +23,14 @@
         ld      hl,(base_graphics)
         ld	d,h
         ld	e,l
-        ld	bc,f0h
+        ld	bc,0f0h
         add	hl,bc
 
         ld      bc,2160
-	;ld	bc,2160-f0h
+	;ld	bc,2160-0f0h
         ldir
 
-	ld	de,f0h
+	ld	de,0f0h
 	sbc	hl,de
 
 	ld	d,h

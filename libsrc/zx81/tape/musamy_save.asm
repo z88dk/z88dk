@@ -8,7 +8,7 @@
 ;      Save data !  ...set custom speed in (SAVE_SPEED+1)
 ;
 ;
-;	$Id: musamy_save.asm,v 1.2 2012-01-09 16:02:36 stefano Exp $
+;	$Id: musamy_save.asm,v 1.3 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 ;
 ; speed extimations:
@@ -29,7 +29,7 @@ musamy_save:
 
 ; Leading pause
 		LD D,5
-SILNC:	LD BC,FF00h
+SILNC:	LD BC,0FF00h
 DLOOP:	DEC BC
 		LD A,B
 		OR C
@@ -96,7 +96,7 @@ L0223:	RL E
 		LD C,L
 
 L0229:	RL L
-L022B:	OUT (FFh),A  ; set output bit high
+L022B:	OUT (0FFh),A  ; set output bit high
 
 SAVE_SPEED:
 		LD A,20
@@ -106,7 +106,7 @@ L0230:	LD D,A
 DLY3:	DJNZ DLY3
 		LD B,06h
 DLY4:	DJNZ DLY4 ;
-		IN A,(FEh)	; read tape + key row + set output bit low
+		IN A,(0FEh)	; read tape + key row + set output bit low
 		XOR A
 		BIT 1,L		; @000000?0
 		JR NZ,L0214 ; 
@@ -127,7 +127,7 @@ DLY7:	DJNZ DLY7
 		LD B,A
 DLY8:	DJNZ DLY8
 		LD A,7Fh
-		IN A,(FEh)	; read tape + key row + set output bit low
+		IN A,(0FEh)	; read tape + key row + set output bit low
 		RRA
 		JR C,L0222
 

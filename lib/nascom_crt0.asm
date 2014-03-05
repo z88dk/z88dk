@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.8 2013-06-18 06:11:23 stefano Exp $
+;       $Id: nascom_crt0.asm,v 1.9 2014-03-05 22:59:17 pauloscustodio Exp $
 ;
 ; - - - - - - -
 
@@ -45,8 +45,8 @@
 	XDEF    montest         ;NASCOM: check the monitor type
 
 
-	org	C80h
-	;org	E000h
+	org	0C80h
+	;org	0E000h
 	
 ; NASSYS1..NASSYS3
 ;  IF (startup=1) | (startup=2) | (startup=3)
@@ -59,7 +59,7 @@ start:
 	ld	(start1+1),sp	;Save entry stack
 
 	; search for the top of writeble memory and set the stack pointer
-	ld	hl,ffffh
+	ld	hl,0ffffh
 	ld	a,55
 stackloop:
 	ld	(hl),a

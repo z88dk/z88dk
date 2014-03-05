@@ -9,14 +9,14 @@
 ;
 ;
 ; ------
-; $Id: ozinstisr.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozinstisr.asm,v 1.3 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 	XLIB	ozinstisr
 	
 ozinstisr:
         ld      a,(0)
-        cp      F3h	;di
+        cp      0F3h	;di
         jr      nz,error
 
 ;; install an interrupt table ;;
@@ -29,9 +29,9 @@ ozinstisr:
 
         di
         ld      hl,0fff4h
-        ld      (hl),F3h	;di
+        ld      (hl),0F3h	;di
         inc     hl
-        ld      (hl),C3h	;jp
+        ld      (hl),0C3h	;jp
         inc     hl
 
         pop     bc  ;; return address

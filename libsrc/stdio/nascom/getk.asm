@@ -5,7 +5,7 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.1 2003-06-27 14:04:13 stefano Exp $
+;	$Id: getk.asm,v 1.2 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 		XLIB	getk
@@ -16,7 +16,7 @@
 	jr	nz,nassys
 
 ; T monitor
-	call	c4dh
+	call	0c4dh
 	jr	gkret
 
 ; NASSYS monitor

@@ -2,7 +2,7 @@
 ;	ROM Console routine for the NASCOM1/2
 ;	By Stefano Bodrato - 19/6/2003
 ;
-;	$Id: fputc_cons.asm,v 1.1 2003-06-27 14:04:13 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 	XLIB	fputc_cons
@@ -26,7 +26,7 @@
 	jr	nz,notcr
 	ld	a,1fh
 .notcr
-	jp	c4ah
+	jp	0c4ah
 
 .nassys
 ; NASSYS monitor
@@ -35,5 +35,5 @@
 	jr	nz,nocls
 	ld	a,0ch
 .nocls
-	defb	f7h
+	defb	0f7h
 	ret

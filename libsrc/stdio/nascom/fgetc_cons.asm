@@ -5,7 +5,7 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.1 2003-06-27 14:04:13 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.2 2014-03-05 23:01:59 pauloscustodio Exp $
 ;
 
 		XLIB	fgetc_cons
@@ -18,7 +18,7 @@
 
 ; NASBUG 'T' monitor
 .tin
-	call	c4dh
+	call	0c4dh
 	jr	nc,tin
 	
 	cp	1dh
