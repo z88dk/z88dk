@@ -107,5 +107,14 @@
     <ClCompile Include="x07.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nec.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sos.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
