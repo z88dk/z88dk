@@ -20,6 +20,7 @@ asm_b_vector_at:
    ;         bc = size_t idx
    ;
    ; exit  : bc = size_t idx
+   ;         de = vector.size
    ;
    ;         success
    ;

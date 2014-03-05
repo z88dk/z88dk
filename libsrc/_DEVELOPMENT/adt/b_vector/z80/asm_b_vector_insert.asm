@@ -5,7 +5,7 @@
 ; 
 ; size_t b_vector_insert(b_vector_t *v, size_t idx, int c)
 ;
-; Insert char c before vector.array[idx] returning index of
+; Insert char c before vector.array[idx], returns index of
 ; char inserted.
 ;
 ; ===============================================================
@@ -29,7 +29,7 @@ asm_b_vector_insert:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set
+   ;            carry set, errno set
    ;
    ; uses  : af, bc, de, hl
 

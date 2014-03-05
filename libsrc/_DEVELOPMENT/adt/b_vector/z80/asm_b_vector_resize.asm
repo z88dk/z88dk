@@ -19,7 +19,7 @@
 
 XLIB asm_b_vector_resize
 
-LIB l_neg_de, l_ex_bc_de, asm0_b_vector_append_block, asm_memset
+LIB __vector_resize, l_ex_bc_hl, error_mnc, asm_memset
 
 asm_b_vector_resize:
 
@@ -42,48 +42,59 @@ asm_b_vector_resize:
    ;            carry set, errno set
    ;
    ; uses  : af, bc, de, hl
-   
+
    inc hl
-   inc hl
+   inc hl                      ; hl = & vector.size
    
    ld e,(hl)
    inc hl
-   ld d,(hl)
-   
-   ex de,hl                    ; hl = vector.size
-   
-   or a
-   sbc hl,bc                   ; hl = vector.size - n
-   
-   ex de,hl
-   jr c, size_growing          ; if vector.size < n
+   ld d,(hl)                   ; de = vector.size = old_size
 
-size_shrinking:
-
-   ; vector size is shrinking
-   
-   ld (hl),b
-   dec hl
-   ld (hl),c                   ; set vector.size = n
-   
-   ret
-
-size_growing:
-
-   call l_neg_de
+   push de                     ; save old_size
 
    ; hl = & vector.size + 1b
    ; bc = size_t n = new_size
-   ; de = num_bytes_being_added
+   ; stack = old_size
 
-   inc hl
-   call l_ex_bc_de
+   call __vector_resize
+   jp c, error_zc - 1          ; if resize failed
+
+   ex de,hl
    
-   call asm0_b_vector_append_block
-   ret c                       ; if growth fails
+   ; bc = new_size
+   ; hl = & vector.size + 1b
+   ; stack = old_size
    
-   ; hl = & bytes added to vector.array
-   ; bc = num bytes added
+   ld (hl),b
+   dec hl
+   ld (hl),c                   ; vector.size = new_size
    
+   ; bc = new_size
+   ; hl = & vector.size
+   ; stack = old_size
+   
+   dec hl
+   ld d,(hl)
+   dec hl
+   ld e,(hl)                   ; de = vector.array
+   
+   ld l,c
+   ld h,b                      ; hl = new_size
+   
+   pop bc                      ; bc = old_size
+   
+   sbc hl,bc                   ; hl = new_size - old_size
+   jp c, error_mnc             ; if new_size < old_size, indicate success
+   
+   ; size grew, must zero newly appended bytes
+   
+   call l_ex_bc_hl
+   
+   ; de = vector.array
+   ; hl = old_size
+   ; bc = num bytes to zero
+
+   add hl,de                   ; hl = & vector.array[old_size]
+
    ld e,0
    jp asm_memset

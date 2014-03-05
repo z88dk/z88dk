@@ -45,7 +45,6 @@ asm_b_vector_shrink_to_fit:
    push bc                     ; save vector.size
 
    ex de,hl                    ; hl = vector.array
-
    call asm_realloc
 
    pop bc                      ; bc = vector.size

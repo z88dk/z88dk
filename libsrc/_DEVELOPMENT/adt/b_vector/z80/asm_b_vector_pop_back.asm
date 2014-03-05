@@ -11,7 +11,7 @@
 
 XLIB asm_b_vector_pop_back
 
-LIB __vector_back
+LIB __vector_back, error_einval_mc
 
 asm_b_vector_pop_back:
 
@@ -30,7 +30,11 @@ asm_b_vector_pop_back:
    ; uses  : af, bc, de, hl
 
    call __vector_back
-   ret c
+   jp z, error_einval_mc       ; if vector is empty
+
+   ; bc = vector.size
+   ; hl = & vector.size + 1b
+   ; de = vector.array
 
    dec bc                      ; size--
    
@@ -38,8 +42,8 @@ asm_b_vector_pop_back:
    dec hl
    ld (hl),c                   ; write new size
    
-   ex de,hl
-   add hl,bc
+   ex de,hl                    ; hl = vector.array
+   add hl,bc                   ; hl = vector.array + size - 1
    
    ld l,(hl)
    ld h,0

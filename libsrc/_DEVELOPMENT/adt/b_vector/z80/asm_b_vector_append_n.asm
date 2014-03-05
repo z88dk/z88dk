@@ -36,17 +36,14 @@ asm_b_vector_append_n:
    ; uses  : af, bc, de, hl
 
    push de                     ; save char
-   push bc                     ; save n
    
    call asm_b_vector_append_block
-
-   pop bc                      ; bc = n
 
    ex de,hl
    ex (sp),hl
    ex de,hl
    
-   ; bc = n
+   ; bc = size_t n
    ; de = int c
    ; hl = & vector.array[idx]
    ; stack = idx

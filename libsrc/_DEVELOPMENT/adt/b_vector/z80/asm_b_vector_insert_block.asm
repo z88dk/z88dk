@@ -46,9 +46,10 @@ asm_b_vector_insert_block:
    
    or a
    sbc hl,bc                   ; hl = vector.size - idx
+   jp c, error_einval_zc - 1   ; if vector.size < idx
    
    ; bc = idx
-   ; hl = size - idx
+   ; hl = vector.size - idx
    ; de = & vector.size + 1b
    ; stack = n
 
@@ -66,14 +67,13 @@ asm_b_vector_insert_block:
    
    ; bc = n
    ; hl = vector *
-   ; stack = size - idx, idx
+   ; stack = vector.size - idx, idx
 
-   jp c, error_einval_zc - 2   ; if vector.size < idx
-
-   push hl                         ; save vector *
+   push hl                     ; save vector *
+   
    call asm_b_vector_append_block  ; grow vector by n bytes
-   pop hl                          ; hl = vector *
-
+   
+   pop hl                      ; hl = vector *
    jp c, error_zc - 2          ; if growth not possible
    
    ; hl = vector *

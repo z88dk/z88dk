@@ -22,7 +22,7 @@ asm_b_vector_erase_range:
    ; exit  : success
    ;
    ;            de = & vector.array[idx]
-   ;            hl = idx = idx of first byte following erased
+   ;            hl = idx_first = idx of first byte following erased
    ;            carry reset
    ;
    ;         fail if block does not lie within vector.array

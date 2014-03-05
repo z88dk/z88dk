@@ -3,7 +3,7 @@
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *b_vector_init(void *p, size_t capacity, size_t max_size)
+; b_vector_t *b_vector_init(void *p, size_t capacity, size_t max_size)
 ;
 ; Initialize a byte vector structure at address p and allocate
 ; an array of capacity bytes to begin with.  The vector's array
@@ -52,6 +52,7 @@ asm_b_vector_init:
 
    ld c,l
    ld b,h                      ; bc = void *array
+   
    pop hl                      ; hl = void *p
    
    jp c, error_zc - 2          ; if realloc failed
@@ -65,18 +66,21 @@ asm_b_vector_init:
    inc hl
    
    xor a
+   
    ld (hl),a
    inc hl
-   ld (hl),a                   ; initial vector size = 0
+   ld (hl),a                   ; vector.size = 0
    inc hl
    
    pop bc
+   
    ld (hl),c
    inc hl
    ld (hl),b                   ; set vector capacity
    inc hl
    
    pop bc
+   
    ld (hl),c
    inc hl
    ld (hl),b                   ; set vector max_size

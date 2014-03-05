@@ -27,7 +27,7 @@ asm_b_vector_push_back:
    ;
    ;         fail
    ;
-   ;            hl = 0
+   ;            hl = -1
    ;            carry set, errno set
    ;
    ; uses  : af, de, hl

@@ -27,7 +27,7 @@ __vector_at:
 
    ld e,(hl)
    inc hl
-   ld d,(hl)                   ; de = void *array
+   ld d,(hl)                   ; de = vector.array
    inc hl
    
    ld a,(hl)
@@ -36,9 +36,9 @@ __vector_at:
    ld l,a                      ; hl = size
    
    call l_ltu_bc_hl
-   jp nc, error_einval_mc      ; if bc >= hl, idx >= size
    
-   ex de,hl
-   add hl,bc
+   ex de,hl                    ; de = vector.size, hl = vector.array
+   jp nc, error_einval_mc      ; if bc >= hl, idx >= size
 
+   add hl,bc
    ret

@@ -1,25 +1,17 @@
 
 XLIB __vector_back
 
-LIB error_einval_mc
-
 __vector_back:
 
    ; enter : hl = vector *
    ;
-   ; exit  : success
+   ; exit  : de = vector.array
+   ;         bc = vector.size
+   ;         hl = & vector.size + 1b
    ;
-   ;            bc = vector.size
-   ;            de = vector.array
-   ;            hl = & vector.size + 1b
-   ;            carry reset
+   ;         z flag set if vector is empty
    ;
-   ;         fail if vector is empty
-   ;
-   ;            hl = -1
-   ;            carry set, errno = EINVAL
-   ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
    
    ld e,(hl)
    inc hl
@@ -32,6 +24,4 @@ __vector_back:
 
    ld a,b
    or c
-   ret nz
-   
-   jp error_einval_mc          ; if vector is empty
+   ret

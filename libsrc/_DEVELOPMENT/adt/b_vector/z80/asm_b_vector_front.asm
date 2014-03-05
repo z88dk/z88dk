@@ -6,26 +6,41 @@
 ; int b_vector_front(b_vector_t *v)
 ;
 ; Return char stored at front of vector.
-; No check if vector is empty.
 ;
 ; ===============================================================
 
 XLIB asm_b_vector_front
 
+LIB __vector_back, error_einval_mc
+
 asm_b_vector_front:
 
    ; enter : hl = b_vector_t *
    ;
-   ; exit  : hl = char at front of vector
+   ; exit  : de = vector.array
+   ;         bc = vector.size
    ;
-   ; uses  : a, hl
+   ;         success
+   ;
+   ;            hl = char at front of vector
+   ;            carry reset
+   ;
+   ;         fail if vector is empty
+   ;
+   ;            hl = -1
+   ;            carry set, errno = EINVAL
+   ;
+   ; uses  : af, bc, de, hl
+
+   call __vector_back
+   jp z, error_einval_mc       ; if vector is empty
    
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a                      ; hl = vector.array
+   ; de = vector.array
+   ; bc = vector.size
+
+   ld a,(de)
    
-   ld l,(hl)
-   ld h,0
+   ld l,a
+   ld h,0                      ; hl = char at front of vector
    
    ret

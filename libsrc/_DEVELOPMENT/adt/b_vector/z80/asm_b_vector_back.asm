@@ -5,14 +5,14 @@
 ; 
 ; int b_vector_back(b_vector_t *v)
 ;
-; Return char stored at end of vector.
+; Return char stored at the end of the vector.
 ; If the vector is empty, return -1.
 ;
 ; ===============================================================
 
 XLIB asm_b_vector_back
 
-LIB __vector_back
+LIB __vector_back, error_einval_mc
 
 asm_b_vector_back:
 
@@ -28,14 +28,15 @@ asm_b_vector_back:
    ;            hl = -1
    ;            carry set, errno = EINVAL
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
    
    call __vector_back
-   ret c
+   jp c, error_einval_mc
 
-   ex de,hl
-   add hl,bc
+   ex de,hl                    ; hl = vector.array
+   
    dec hl
+   add hl,bc                   ; hl = vector.array + vector.size - 1b
    
    ld l,(hl)
    ld h,0
