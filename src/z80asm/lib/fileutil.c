@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.13 2014-02-20 22:55:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.14 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -662,12 +662,15 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.13  2014-02-20 22:55:27  pauloscustodio
+* Revision 1.14  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.13  2014/02/20 22:55:27  pauloscustodio
 * xfget_int16() and xfget_int32() were not sign-extending correctly
 * causing link to fail on a 64-bit architecture.
 *
 * Revision 1.12  2014/02/19 23:59:27  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

@@ -16,7 +16,7 @@ Scanner - to be processed by: ragel -G2 scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.13 2014-02-19 23:59:26 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.14 2014-03-05 23:44:55 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -303,8 +303,11 @@ Token scan_get( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.13  2014-02-19 23:59:26  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* Revision 1.14  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.13  2014/02/19 23:59:26  pauloscustodio
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

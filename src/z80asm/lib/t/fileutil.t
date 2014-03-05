@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.11 2014-02-19 23:59:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.12 2014-03-05 23:44:55 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -636,8 +636,11 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.11  2014-02-19 23:59:27  pauloscustodio
-# BUG_0041: 64-bit portability issues
+# Revision 1.12  2014-03-05 23:44:55  pauloscustodio
+# Renamed 64-bit portability to BUG_0042
+#
+# Revision 1.11  2014/02/19 23:59:27  pauloscustodio
+# BUG_0042: 64-bit portability issues
 # size_t changes to unsigned long in 64-bit. Usage of size_t * to
 # retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 # breaks on a 64-bit architecture. Make the functions return the value instead

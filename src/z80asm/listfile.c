@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.16 2014-02-19 23:59:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.17 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -581,8 +581,11 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.16  2014-02-19 23:59:26  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* Revision 1.17  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.16  2014/02/19 23:59:26  pauloscustodio
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

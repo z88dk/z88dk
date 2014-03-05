@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.79 2014-03-04 11:49:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.80 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -768,7 +768,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.79  2014-03-04 11:49:47  pauloscustodio
+* Revision 1.80  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.79  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all
 * supported unary, binary and ternary oprators, instead of a big switch
 * statement to select the operation.
@@ -800,7 +803,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * Extra parentheses removed.
 *
 * Revision 1.71  2014/02/19 23:59:26  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

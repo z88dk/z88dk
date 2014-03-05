@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.76 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.77 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.76 2014-03-03 13:27
 
 /*
 * $Log: hist.c,v $
-* Revision 1.76  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.77  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.76  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.75  2014/03/01 15:45:31  pauloscustodio
@@ -42,7 +45,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.76 2014-03-03 13:27
 * Simplify expression parser by handling composed tokens in lexer.
 *
 * Revision 1.72  2014/02/19 23:59:26  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead
@@ -1600,7 +1603,7 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 19.02.2014 [2.1.3] (pauloscustodio)
 -------------------------------------------------------------------------------
-	BUG_0041: 64-bit portability issues
+	BUG_0042: 64-bit portability issues
 		size_t changes to unsigned long in 64-bit. Usage of size_t * to 
 		retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 		breaks on a 64-bit architecture. Make the functions return the value instead 

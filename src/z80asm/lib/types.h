@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.4 2014-02-19 23:59:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.5 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -49,8 +49,11 @@ typedef unsigned int  ulong_t;		/* 32 or 64-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.4  2014-02-19 23:59:27  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* Revision 1.5  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.4  2014/02/19 23:59:27  pauloscustodio
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

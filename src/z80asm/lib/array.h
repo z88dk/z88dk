@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.3 2014-03-02 14:08:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.4 2014-03-05 23:44:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -145,11 +145,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.3 2014-03-02 1
 
 /*
 * $Log: array.h,v $
-* Revision 1.3  2014-03-02 14:08:42  pauloscustodio
+* Revision 1.4  2014-03-05 23:44:55  pauloscustodio
+* Renamed 64-bit portability to BUG_0042
+*
+* Revision 1.3  2014/03/02 14:08:42  pauloscustodio
 * Add methods to set size, push, pop and lookup top item
 *
 * Revision 1.2  2014/02/19 23:59:27  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead

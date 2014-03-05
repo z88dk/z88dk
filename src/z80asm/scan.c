@@ -1974,7 +1974,7 @@ case 42:
 /*
 * :Log: scan.rl,v $
 * Revision 1.13  2014/02/19 23:59:26  pauloscustodio
-* BUG_0041: 64-bit portability issues
+* BUG_0042: 64-bit portability issues
 * size_t changes to unsigned long in 64-bit. Usage of size_t * to
 * retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
 * breaks on a 64-bit architecture. Make the functions return the value instead
