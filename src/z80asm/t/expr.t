@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.2 2014-03-04 11:49:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.3 2014-03-05 23:04:45 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -44,8 +44,9 @@ my @asmbin = (
 	["defw #ZERO+label_1;comment",			"\x02\x00"],
 	["defb 255,128D",						"\xFF\x80"],
 	["defb ZERO+255,ZERO+128D",				"\xFF\x80"],
-	["defb \$FF,0xFE,0BEH",					"\xFF\xFE\xBE"],
-	["defb ZERO+\$FF,ZERO+0xFE,ZERO+0BEH",	"\xFF\xFE\xBE"],
+	["defb \$FF,0xFE,0BEH,0ebh",			"\xFF\xFE\xBE\xEB"],
+	["defb ZERO+\$FF,ZERO+0xFE,ZERO+0BEH,ZERO+0ebh",
+											"\xFF\xFE\xBE\xEB"],
 	["defb \@1010,1010B",					"\x0A\x0A"],
 	["defb ZERO+\@1010,ZERO+1010B",			"\x0A\x0A"],
 	["defm \"hello\"${COMMA}32,\"world\"",	"hello world"],
@@ -230,7 +231,10 @@ sub t_capture {
 
 
 # $Log: expr.t,v $
-# Revision 1.2  2014-03-04 11:49:47  pauloscustodio
+# Revision 1.3  2014-03-05 23:04:45  pauloscustodio
+# hex constants in lower case
+#
+# Revision 1.2  2014/03/04 11:49:47  pauloscustodio
 # Expression parser and expression evaluator use a look-up table of all
 # supported unary, binary and ternary oprators, instead of a big switch
 # statement to select the operation.
