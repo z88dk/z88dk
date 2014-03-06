@@ -1,5 +1,5 @@
 
-; byte vector structure
+; b_vector structure
 
 defvars 0
 {
