@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.7 2014-03-04 11:49:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.8 2014-03-06 00:18:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.7 2014-03-04 11:49:
 #include "class.h"
 #include "symbol.h"
 #include "token.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *	Types of operations and associativity
@@ -127,16 +128,11 @@ struct expr
 {
     struct expr        *nextexpr;		/* pointer to next expression */
 
-	ExprOpArray		*rpn_ops;			/* list of operands / operators */
-#if 0
-	struct postfixlist *firstnode;
-	struct postfixlist *lastnode;
-#endif
+	ExprOpArray		*rpn_ops;			/* list of operands / operators in reverse polish notation */
+	Str				*text;				/* expression in infix text */
 
 	byte_t			   expr_type;		/* range type of evaluated expression */
     enum flag          stored;			/* Flag to indicate that expression has been stored to object file */
-    char               *infixexpr;		/* pointer to ASCII infix expression */
-    char               *infixptr;		/* pointer to current char in infix expression */
     uint_t             codepos;			/* rel. position in module code to patch (in pass 2) */
     char               *srcfile;		/* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
     int                curline;			/* expression in line of source file */
@@ -164,7 +160,12 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.7  2014-03-04 11:49:47  pauloscustodio
+* Revision 1.8  2014-03-06 00:18:43  pauloscustodio
+* BUG_0043: buffer overflow on constants longer than 128 chars in object file
+* z80asm crashed when the expression to be stored in the obejct file was
+* longer than the maximum allocated size (128). Changed to dynamic string.
+*
+* Revision 1.7  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all
 * supported unary, binary and ternary oprators, instead of a big switch
 * statement to select the operation.

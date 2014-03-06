@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.65 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.66 2014-03-06 00:18:43 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -75,8 +75,7 @@ extern FILE *z80asmfile, *objfile;
 		while ( condition )										\
 		{														\
 			op = sym;											\
-			strcpy(pfixexpr->infixptr, token_string(sym));		\
-			pfixexpr->infixptr += strlen(pfixexpr->infixptr);	\
+			Str_append(pfixexpr->text, token_string(sym));		\
 			GetSym();											\
 			if ( ! prev_name(pfixexpr) )						\
 				return FALSE;									\
@@ -118,8 +117,7 @@ static BOOL Factor( struct expr *pfixexpr )
 							  ident, symptr->sym_type );
         }
 
-        strcpy( pfixexpr->infixptr, ident );    /* add identifier to infix expr */
-        pfixexpr->infixptr += strlen( ident );  /* update pointer */
+        Str_append(pfixexpr->text, ident);		/* add identifier to infix expr */
 
         GetSym();
         break;
@@ -127,8 +125,7 @@ static BOOL Factor( struct expr *pfixexpr )
     case TK_HEX_CONST:
     case TK_BIN_CONST:
     case TK_DEC_CONST:
-        strcpy( pfixexpr->infixptr, ident );    /* add constant to infix expr */
-        pfixexpr->infixptr += strlen( ident );  /* update pointer */
+        Str_append(pfixexpr->text, ident );		/* add constant to infix expr */
         constant = GetConstant( &eval_err );
 
         if ( eval_err == 1 )
@@ -145,7 +142,7 @@ static BOOL Factor( struct expr *pfixexpr )
         break;
 
     case TK_SQUOTE:
-        *pfixexpr->infixptr++ = '\'';   /* store single quote in infix expr */
+        Str_append_char(pfixexpr->text, '\'');					/* store single quote in infix expr */
 
         if ( feof( z80asmfile ) )
         {
@@ -163,11 +160,11 @@ static BOOL Factor( struct expr *pfixexpr )
             }
             else
             {
-                *pfixexpr->infixptr++ = ( byte_t )constant;           /* store char in infix expr */
+                Str_append_char(pfixexpr->text, (char) constant);		/* store char in infix expr */
 
                 if ( GetSym() == TK_SQUOTE )
                 {
-                    *pfixexpr->infixptr++ = '\'';
+					Str_append_char(pfixexpr->text, '\'');		/* store single quote in infix expr */
 					ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
 										constant );
                 }
@@ -196,8 +193,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 	switch (sym) 
 	{
     case TK_MINUS:
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -211,8 +207,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
         return UnaryTerm( pfixexpr );
 
     case TK_BIN_NOT:
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -222,8 +217,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 		return TRUE;
 
     case TK_LOG_NOT:
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         GetSym();
 
         if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
@@ -235,8 +229,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         open_paren = sym;
         GetSym();
 
@@ -248,8 +241,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
              ( open_paren == TK_LSQUARE && sym != TK_RSQUARE ) )
 			return FALSE;
 
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         GetSym();
 		return TRUE;
 
@@ -266,8 +258,7 @@ static BOOL PowerTerm( struct expr *pfixexpr )
 
     while ( sym == TK_POWER )
     {
-        strcpy(pfixexpr->infixptr, token_string(sym));
-		pfixexpr->infixptr += strlen(pfixexpr->infixptr);
+        Str_append(pfixexpr->text, token_string(sym));
         GetSym();
 		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -316,7 +307,7 @@ static BOOL TernaryCondition( struct expr *pfixexpr )
 		return TRUE;
 
 	/* ternary construct found */
-    *pfixexpr->infixptr++ = '?';
+    Str_append_char(pfixexpr->text, '?');
 	GetSym();						/* consume '?' */
 		
 	if ( ! TernaryCondition(pfixexpr) )	/* get true */
@@ -324,7 +315,7 @@ static BOOL TernaryCondition( struct expr *pfixexpr )
 
 	if ( sym != TK_COLON )
 		return FALSE;
-    *pfixexpr->infixptr++ = ':';
+    Str_append_char(pfixexpr->text, ':');
 	GetSym();						/* consume ':' */
 
 	if ( ! TernaryCondition(pfixexpr) )	/* get false */
@@ -347,20 +338,16 @@ ParseNumExpr( void )
     pfixhdr->rpn_ops = OBJ_NEW( ExprOpArray );
 	OBJ_AUTODELETE( pfixhdr->rpn_ops ) = FALSE;
 
+    pfixhdr->text = OBJ_NEW( Str );
+	OBJ_AUTODELETE( pfixhdr->text ) = FALSE;
+
     pfixhdr->expr_type = 0;
     pfixhdr->stored = OFF;
     pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
-    pfixhdr->infixexpr = NULL;
-    pfixhdr->infixptr = NULL;
-
-    pfixhdr->infixexpr = xnew_n( char, 128 );     /* TODO: make size a constant */
-
-    pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
     if ( sym == TK_CONST_EXPR )
     {
-		strcpy(pfixhdr->infixptr, token_string(sym));
-		pfixhdr->infixptr += strlen(pfixhdr->infixptr);
+		Str_append(pfixhdr->text, token_string(sym));
 
 		GetSym();               /* leading '#' : ignore relocatable address expression */
         is_const_expr = TRUE;        /* convert to constant expression */
@@ -371,8 +358,6 @@ ParseNumExpr( void )
         /* convert to constant expression */
         if ( is_const_expr )
 			ExprOp_init_const_expr( ExprOpArray_push( pfixhdr->rpn_ops ) );
-
-        *pfixhdr->infixptr = '\0';                      /* terminate infix expression */
     }
     else
     {
@@ -391,7 +376,7 @@ StoreExpr( struct expr *pfixexpr, char range )
 {
     xfput_uint8(			objfile, range );				/* range of expression */
     xfput_uint16(			objfile, pfixexpr->codepos );	/* patchptr */
-	xfput_count_byte_strz(	objfile, pfixexpr->infixexpr );	/* expression */
+	xfput_count_byte_strz(	objfile, pfixexpr->text->str );	/* expression */
     xfput_uint8(			objfile, 0 );					/* nul-terminate expression */
 
     pfixexpr->stored = ON;
@@ -428,11 +413,7 @@ RemovePfixlist( struct expr *pfixexpr )
         return;
 
 	OBJ_DELETE( pfixexpr->rpn_ops );
-
-    if ( pfixexpr->infixexpr != NULL )
-    {
-        xfree( pfixexpr->infixexpr );    /* release infix expr. string */
-    }
+	OBJ_DELETE( pfixexpr->text );
 
     xfree( pfixexpr );           /* release header of postfix expression */
 }
@@ -704,8 +685,10 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.65  2014-03-05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
+* Revision 1.66  2014-03-06 00:18:43  pauloscustodio
+* BUG_0043: buffer overflow on constants longer than 128 chars in object file
+* z80asm crashed when the expression to be stored in the obejct file was
+* longer than the maximum allocated size (128). Changed to dynamic string.
 *
 * Revision 1.64  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all

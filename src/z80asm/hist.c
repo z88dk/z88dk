@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.77 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.78 2014-03-06 00:18:43 pauloscustodio Exp $
 */
 
 /*
@@ -24,8 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.77 2014-03-05 23:44
 
 /*
 * $Log: hist.c,v $
-* Revision 1.77  2014-03-05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
+* Revision 1.78  2014-03-06 00:18:43  pauloscustodio
+* BUG_0043: buffer overflow on constants longer than 128 chars in object file
+* z80asm crashed when the expression to be stored in the obejct file was
+* longer than the maximum allocated size (128). Changed to dynamic string.
 *
 * Revision 1.76  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
@@ -1618,6 +1620,21 @@ Based on 1.0.31
 		Handle C-like operators, make exponentiation (**) right-associative.
 		Simplify expression parser by handling composed tokens in lexer.
 		Change token ids to TK_...
+		The original z80asm scanner used a simple heuristic to convert an 
+		identifier to a number if it was only composed of hex digits and an 'H' 
+		at the end. This caused unexpected syntax errors with identifiers with 
+		only hex digits, e.g. "EACH: NOP" stopped with a syntax error, 
+		as EACH was interpreted as the constant 0x0EAC.
+		Changed the scanner to the common processing of hex constants in 
+		assemblers: a hex constants ending with an 'H' needs to start with 
+		a digit, or be prefixed with a zero.
+
+-------------------------------------------------------------------------------
+06.03.2014 [2.1.5] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0043: buffer overflow on constants longer than 128 chars in object file
+		z80asm crashed when the expression to be stored in the obejct file was
+		longer than the maximum allocated size (128). Changed to dynamic string.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1656,7 +1673,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.4"
+#define VERSION     "2.1.5"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -13,14 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.3 2014-03-05 23:04:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.4 2014-03-06 00:18:43 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
 use Modern::Perl;
 use Test::More;
-use Capture::Tiny::Extended 'capture';
-use Test::Differences; 
 require 't/test_utils.pl';
 
 #------------------------------------------------------------------------------
@@ -117,6 +115,7 @@ my @asmbin = (
 	["defw 2 ** 3 ** 2",					pack("v",512)],
 	["defb 2 ** -3",						"\0"],
 	["defb ---+--+-2",						"\2"],
+	["EACH:DJNZ EACH",						"\x10\xFE"],	# CH_0021
 );
 
 if ( ! get_legacy() ) {
@@ -161,20 +160,24 @@ if ( ! get_legacy() ) {
 	t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
 }
 
+# text BUG_0043
+t_z80asm(
+	asm		=> "XDEF ZERO : DEFC ZERO = 0",
+	asm1	=> "XREF ZERO : DEFB ZERO".("+0" x 122),	# line lenght = 255, expression len > 128
+	bin		=> "\0",
+);
+
 #------------------------------------------------------------------------------
 # calculator stack
 #------------------------------------------------------------------------------
 unlink_testfiles();
-my $compile = "cc -Wall -Ilib -otest test.c expr.c errors.c sym.c symtab.c symref.c ".
-			  "options.c model.o hist.c ".
-			  "lib/strutil.c lib/strhash.c lib/fileutil.c lib/srcfile.c ".
-			  "lib/strpool.c lib/except.c ".
-			  "lib/list.c lib/class.c lib/xmalloc.c lib/die.c";
+my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
+		   "options.o model.o hist.o ".
+		   "lib/strutil.o lib/strhash.o lib/fileutil.o lib/srcfile.o ".
+		   "lib/except.o ".
+		   "lib/list.o lib/class.o";
 
-write_file("test.c", <<'END');
-#include "expr.h"
-#include <assert.h>
-
+my $init = <<'END';
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
 struct modules the_modules;
@@ -188,9 +191,9 @@ void list_start_line( size_t address, char *source_file, int source_line_nr, cha
 long add3(long a, long b, long c) { return 3+a+b+c; }
 long add2(long a, long b) { return 2+a+b; }
 long add1(long a) { return 1+a; }
+END
 
-int main()
-{
+t_compile_module($init, <<'END', $objs);
 	Calc_push(23); 
 	Calc_compute_unary(add1);
 	assert( Calc_pop() == 24 );
@@ -206,32 +209,22 @@ int main()
 	Calc_compute_ternary(add3);
 	assert( Calc_pop() == 69 );
 	
-	return 0;
-}
 END
-system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
 
+t_run_module([], '', '', 0);
 
 
 unlink_testfiles();
 done_testing();
 
 
-sub t_capture {
-	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
-	my $line = "[line ".((caller)[2])."]";
-	ok 1, "$line command: $cmd";
-	
-	my($out, $err, $exit) = capture { system $cmd; };
-	eq_or_diff_text $out, $exp_out, "$line out";
-	eq_or_diff_text $err, $exp_err, "$line err";
-	ok !!$exit == !!$exp_exit, "$line exit";
-}
-
-
 # $Log: expr.t,v $
-# Revision 1.3  2014-03-05 23:04:45  pauloscustodio
+# Revision 1.4  2014-03-06 00:18:43  pauloscustodio
+# BUG_0043: buffer overflow on constants longer than 128 chars in object file
+# z80asm crashed when the expression to be stored in the obejct file was
+# longer than the maximum allocated size (128). Changed to dynamic string.
+#
+# Revision 1.3  2014/03/05 23:04:45  pauloscustodio
 # hex constants in lower case
 #
 # Revision 1.2  2014/03/04 11:49:47  pauloscustodio
