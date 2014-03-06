@@ -5,6 +5,7 @@ LIB errno_zc
 
    pop hl
    pop hl
+   pop hl
    
 error_enomem_zc:
 

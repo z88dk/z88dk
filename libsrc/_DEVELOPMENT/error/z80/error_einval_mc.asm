@@ -4,6 +4,8 @@ XLIB error_einval_mc
 LIB errno_mc
 
    pop hl
+   pop hl
+   pop hl
 
 error_einval_mc:
 
