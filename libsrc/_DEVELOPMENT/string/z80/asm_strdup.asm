@@ -14,7 +14,7 @@
 XLIB asm_strdup
 XDEF asm0_strdup
 
-LIB asm_strlen, malloc, error_enomem_zc
+LIB asm_strlen, asm_malloc, error_enomem_zc
 
 asm_strdup:
 
@@ -45,7 +45,7 @@ asm0_strdup:
    inc hl                      ; include space for NUL
  
    push hl
-   call malloc                 ; malloc(hl bytes)
+   call asm_malloc             ; malloc(hl bytes)
    pop bc                      ; bc = length
    
    pop de                      ; de = char *s
