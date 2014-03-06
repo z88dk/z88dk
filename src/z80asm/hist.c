@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.78 2014-03-06 00:18:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.79 2014-03-06 00:29:01 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.78 2014-03-06 00:18
 
 /*
 * $Log: hist.c,v $
-* Revision 1.78  2014-03-06 00:18:43  pauloscustodio
+* Revision 1.79  2014-03-06 00:29:01  pauloscustodio
+* spelling
+*
+* Revision 1.78  2014/03/06 00:18:43  pauloscustodio
 * BUG_0043: buffer overflow on constants longer than 128 chars in object file
 * z80asm crashed when the expression to be stored in the obejct file was
 * longer than the maximum allocated size (128). Changed to dynamic string.
@@ -1633,7 +1636,7 @@ Based on 1.0.31
 06.03.2014 [2.1.5] (pauloscustodio)
 -------------------------------------------------------------------------------
 	BUG_0043: buffer overflow on constants longer than 128 chars in object file
-		z80asm crashed when the expression to be stored in the obejct file was
+		z80asm crashed when the expression to be stored in the object file was
 		longer than the maximum allocated size (128). Changed to dynamic string.
 
 -------------------------------------------------------------------------------
