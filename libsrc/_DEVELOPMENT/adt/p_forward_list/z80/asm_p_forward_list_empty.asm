@@ -11,13 +11,14 @@
 
 XLIB asm_p_forward_list_empty
 XDEF asm_p_forward_list_alt_empty, asm_p_list_empty
-XDEF asm_p_stack_empty, asm_p_queue_empty
+XDEF asm_p_stack_empty, asm_p_queue_empty, asm_b_vector_empty
 
 asm_p_forward_list_empty:
 asm_p_forward_list_alt_empty:
 asm_p_list_empty:
 asm_p_stack_empty:
 asm_p_queue_empty:
+asm_b_vector_empty:
 
    ; enter : hl = p_forward_list_t *
    ;
