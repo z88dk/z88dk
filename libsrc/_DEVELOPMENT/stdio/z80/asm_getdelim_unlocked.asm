@@ -65,16 +65,31 @@ asm_getdelim_unlocked:
 
    ex de,hl                    ; de = char *line
    
+   ld a,d
+   or e
+   jr nz, line_not_zero        ; if line != 0
+   
+   ; if char *line == 0, make sure the size is 0 too
+   
+   ld l,a
+   ld h,a
+   
+   jr create_vector
+
+line_not_zero:
+
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                      ; hl = size_t n
 
+create_vector:
+
    ; create a b_vector on the stack
-   
+
    push hl
    ld hl,$ffff
-   ex (sp),hl                  ; push vector,max_size
+   ex (sp),hl                  ; push vector.max_size
    push hl                     ; push vector.capacity
    push hl                     ; push vector.size
    push de                     ; push vector.array
@@ -92,9 +107,18 @@ asm_getdelim_unlocked:
    pop bc                      ; bc = delim_char
    jr c, error_exit            ; if vector size failed
    
+   ; zero terminate initial vector
+   
+   pop hl                      ; hl = vector.array
+   push hl
+   
+   xor a
+   ld (hl),a
+   
    ; read chars from the stream
    
-   ld hl,0
+   ld l,a
+   ld h,a
    add hl,sp
    ex de,hl                    ; de = vector *
 

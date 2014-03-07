@@ -39,7 +39,7 @@ __stdio_scanf_s:
    or c
    jr nz, width_specified      ; if field width was supplied
    
-   ld bc,$ffff                 ; otherwise consume all string chars from stream
+   dec bc                      ; otherwise consume all string chars from stream
 
 width_specified:
 

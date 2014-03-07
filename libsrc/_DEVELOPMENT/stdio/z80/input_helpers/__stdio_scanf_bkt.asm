@@ -60,7 +60,7 @@ __stdio_scanf_bkt:
    or c
    jr nz, width_specified      ; if field width was supplied
    
-   ld bc,$ffff                 ; otherwise consume all matching chars from stream
+   dec bc                      ; otherwise consume all matching chars from stream
 
 width_specified:
 

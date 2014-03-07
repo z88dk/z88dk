@@ -40,7 +40,7 @@ __stdio_scanf_number_head:
    or c
    jr nz, width_specified      ; if field width was supplied
    
-   ld bc,$ffff                 ; otherwise consume all digits from stream
+   dec bc                      ; otherwise consume all digits from stream
    
 width_specified:
 

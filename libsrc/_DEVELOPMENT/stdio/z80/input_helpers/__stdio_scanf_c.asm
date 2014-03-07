@@ -22,7 +22,7 @@ __stdio_scanf_c:
    or c
    jr nz, width_specified
    
-   ld bc,1                     ; default is one char
+   inc bc                        ; default is one char
 
 width_specified:
 

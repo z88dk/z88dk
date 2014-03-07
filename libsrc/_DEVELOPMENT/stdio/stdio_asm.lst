@@ -1,3 +1,4 @@
+z80/asm__fmemopen
 z80/asm_asprintf
 z80/asm_clearerr
 z80/asm_clearerr_unlocked
@@ -13,6 +14,7 @@ z80/asm_fgetpos
 z80/asm_fgetpos_unlocked
 z80/asm_fgets
 z80/asm_fgets_unlocked
+z80/asm_fmemopen
 z80/asm_fprintf
 z80/asm_fprintf_unlocked
 z80/asm_fputc
@@ -42,6 +44,7 @@ z80/asm_gets
 z80/asm_gets_unlocked
 z80/asm_obstack_printf
 z80/asm_obstack_vprintf
+z80/asm_open_memstream
 z80/asm_perror
 z80/asm_printf
 z80/asm_printf_unlocked
@@ -81,6 +84,7 @@ z80/__stdio_parse_permission
 z80/__stdio_varg
 z80/__stdio_verify_input
 z80/__stdio_verify_output
+z80/drivers/memstream/__stdio_memstream_driver
 z80/input_helpers/__stdio_input_sm_fgets
 z80/input_helpers/__stdio_input_sm_getdelim
 z80/input_helpers/__stdio_input_sm_gets

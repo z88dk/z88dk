@@ -1,3 +1,4 @@
+c/rl_sdcc/_fmemopen
 c/rl_sdcc/asprintf
 c/rl_sdcc/clearerr
 c/rl_sdcc/clearerr_unlocked
@@ -14,6 +15,7 @@ c/rl_sdcc/fgetpos_unlocked
 c/rl_sdcc/fgets
 c/rl_sdcc/fgets_unlocked
 c/rl_sdcc/flockfile
+c/rl_sdcc/fmemopen
 c/rl_sdcc/fprintf
 c/rl_sdcc/fprintf_unlocked
 c/rl_sdcc/fputc
@@ -44,6 +46,7 @@ c/rl_sdcc/gets
 c/rl_sdcc/gets_unlocked
 c/rl_sdcc/obstack_printf
 c/rl_sdcc/obstack_vprintf
+c/rl_sdcc/open_memstream
 c/rl_sdcc/perror
 c/rl_sdcc/printf
 c/rl_sdcc/printf_unlocked
@@ -81,6 +84,7 @@ z80/__stdio_parse_permission
 z80/__stdio_varg
 z80/__stdio_verify_input
 z80/__stdio_verify_output
+z80/drivers/memstream/__stdio_memstream_driver
 z80/input_helpers/__stdio_input_sm_fgets
 z80/input_helpers/__stdio_input_sm_getdelim
 z80/input_helpers/__stdio_input_sm_gets

@@ -67,11 +67,8 @@ offset  size  name              purpose
   13      1   memstream_flags   see below
   14      2   char **bufp       where to store buffer address
   16      2   size_t *sizep     where to store buffer length
-  18      2   char *buffer      current buffer address
-  20      2   end_index         index to last byte in buffer
-  22      2   position_index    file pointer index (next read/write index)
-  24      2   append_index      pointer index to one past last valid byte
-
+  18      8   b_vector          byte vector to manage resizeable buffer
+  26      2   fptr              file pointer index (index in vector for next read/write)
 
 * memstream_flags
 
@@ -79,7 +76,7 @@ bit   name    purpose
 
  7     F      if set buffer is freed when file is closed
 65     0      reserved
- 4     G      if set buffer is allowed to grow via realloc
+ 4     W      if set buffer info is written on flush
 32     0      reserved
  1     A      if set writes append
  0     0      reserved
@@ -113,7 +110,7 @@ carry set if error
 * STDIO_MSG_WRIT
 ****************
 
-Output a buffer on the stream
+Write the buffer to the stream
 
 input:
 
@@ -236,3 +233,9 @@ input:
 return:
 
 carry set on error (write buffers could not be flushed)
+
+****************
+* STDIO_MSG_CLOS
+****************
+
+....
