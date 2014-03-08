@@ -7,5 +7,9 @@ defgroup
    __ENOMEM,
    __ERANGE,
    __EACCES,
-   __ENOLCK
+   __ENOLCK,
+   __EOVERFLOW,
+   __ENOTSUP,
+   __EFBIG,
+   __EBADF
 }
