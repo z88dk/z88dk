@@ -3,7 +3,7 @@
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *w_vector_back(b_vector_t *v)
+; void *w_vector_back(w_vector_t *v)
 ;
 ; Return word stored at the end of the vector.
 ; If the vector is empty, return -1.

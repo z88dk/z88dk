@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-asm_b_vector_capacity:
+asm_w_vector_capacity:
 
    ; enter : hl = w_vector_t *v
    ;

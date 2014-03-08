@@ -37,9 +37,7 @@ asm_w_vector_reserve:
 
    sla c
    rl b
-   
-   call c, error_enomem_zc
-   jr c, adjust_bc
+   jr c, too_large
    
    call asm_b_vector_reserve
 
@@ -49,3 +47,8 @@ adjust_bc:
    rr c
    
    ret
+
+too_large:
+
+   call adjust_bc
+   jp error_enomem_zc

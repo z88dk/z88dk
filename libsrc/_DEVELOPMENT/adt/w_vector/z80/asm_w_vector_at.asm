@@ -3,7 +3,7 @@
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *w_vector_at(b_vector_t *v, size_t idx)
+; void *w_vector_at(w_vector_t *v, size_t idx)
 ;
 ; Return word stored in vector at index idx.
 ; If idx is outside the vector's range, return -1.

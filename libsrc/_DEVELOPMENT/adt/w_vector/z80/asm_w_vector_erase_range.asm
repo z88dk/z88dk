@@ -41,7 +41,7 @@ asm_w_vector_erase_range:
    jp c, error_einval_mc
    
    add hl,hl
-   jp c. error_einval_mc
+   jp c, error_einval_mc
 
    ex de,hl
    call asm_b_vector_erase_block
