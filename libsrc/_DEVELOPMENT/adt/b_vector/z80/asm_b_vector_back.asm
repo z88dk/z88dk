@@ -31,7 +31,7 @@ asm_b_vector_back:
    ; uses  : af, bc, de, hl
    
    call __vector_back
-   jp c, error_einval_mc
+   jp z, error_einval_mc
 
    ex de,hl                    ; hl = vector.array
    

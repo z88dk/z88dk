@@ -33,7 +33,7 @@ asm_b_vector_erase_range:
    ; uses  : af, bc, de, hl
 
    or a
-   sbc hl,de
+   sbc hl,bc
    jp c, error_einval_mc       ; if idx.last < idx.first
 
    ex de,hl

@@ -11,6 +11,7 @@
 
 XLIB asm_b_vector_max_size
 XDEF asm_b_vector_capacity, asm_b_vector_size, asm_b_vector_data
+XDEF asm_w_vector_data
 
 asm_b_vector_max_size:
 
@@ -34,6 +35,7 @@ asm_b_vector_size:
    inc hl
 
 asm_b_vector_data:
+asm_w_vector_data:
 
    ld a,(hl)
    inc hl

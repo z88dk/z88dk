@@ -2,8 +2,10 @@
 ; void b_vector_destroy(b_vector_t *v)
 
 XDEF b_vector_destroy
+XDEF w_vector_destroy
 
 b_vector_destroy:
+w_vector_destroy:
 
    pop af
    pop hl

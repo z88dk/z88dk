@@ -12,10 +12,12 @@
 ; ===============================================================
 
 XLIB asm_b_vector_shrink_to_fit
+XDEF asm_w_vector_shrink_to_fit
 
 LIB asm_realloc, error_mc, error_znc
 
 asm_b_vector_shrink_to_fit:
+asm_w_vector_shrink_to_fit:
 
    ; enter : hl = b_vector_t *
    ;

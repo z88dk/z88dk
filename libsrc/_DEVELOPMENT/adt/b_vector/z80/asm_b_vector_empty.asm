@@ -10,10 +10,12 @@
 ; ===============================================================
 
 XLIB asm_b_vector_empty
+XDEF asm_w_vector_empty
 
 LIB asm_p_forward_list_empty
 
 asm_b_vector_empty:
+asm_w_vector_empty:
 
    ; enter : hl = b_vector_t *
    ;
