@@ -1,4 +1,3 @@
 
 Z80
-Collection of functions specific to the processor
-
+Collection of functions applicable only to the processor
