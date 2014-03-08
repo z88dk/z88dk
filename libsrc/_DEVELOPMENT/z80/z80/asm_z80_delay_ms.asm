@@ -22,7 +22,7 @@ asm_z80_delay_ms:
 
    ex de,hl
    
-   ld hl,(__clock_freq / 1000) - 49
+   ld hl,+(__clock_freq / 1000) - 49
    call asm_z80_delay_tstate
    
    ex de,hl
@@ -42,7 +42,7 @@ not_done:
    ret z                       ; never taken
    ex de,hl
    
-   ld hl,(__clock_freq / 1000) - 61
+   ld hl,+(__clock_freq / 1000) - 61
    call asm_z80_delay_tstate
    
    ex de,hl
