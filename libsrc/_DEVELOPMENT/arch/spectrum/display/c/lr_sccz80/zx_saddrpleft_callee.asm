@@ -1,0 +1,12 @@
+
+; void *zx_saddrpleft(void *saddr, uchar bitmask)
+
+XDEF zx_saddrpleft_callee
+
+zx_saddrpleft_callee:
+
+   pop hl
+   pop de
+   ex (sp),hl
+   
+   INCLUDE "../../z80/asm_zx_saddrpleft.asm"
