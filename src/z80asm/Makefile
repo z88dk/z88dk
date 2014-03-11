@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.134 2014-03-11 00:15:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.135 2014-03-11 22:59:20 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -245,7 +245,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.134  2014-03-11 00:15:13  pauloscustodio
+# Revision 1.135  2014-03-11 22:59:20  pauloscustodio
+# Move EOL flag to scanner
+#
+# Revision 1.134  2014/03/11 00:15:13  pauloscustodio
 # Scanner reads input line-by-line instead of character-by-character.
 # Factor house-keeping at each new line read in the scanner getasmline().
 # Add interface to allow back-tacking of the recursive descent parser by
@@ -831,10 +834,9 @@ exprprsr.o: z80asm.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
 ldinstr.o: errors_def.h options.h lib/list.h lib/class.h lib/queue.h
-ldinstr.o: options_def.h scan.h lib/strutil.h symbol.h model.h objfile.h
-ldinstr.o: symtab.h lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h
-ldinstr.o: sym.h symref.h lib/classlist.h token.h token_def.h legacy.h
-ldinstr.o: z80asm.h
+ldinstr.o: options_def.h scan.h symbol.h model.h objfile.h symtab.h
+ldinstr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+ldinstr.o: symref.h lib/classlist.h token.h token_def.h legacy.h z80asm.h
 listfile.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 listfile.o: lib/strutil.h symref.h lib/classlist.h lib/fileutil.h lib/list.h
 listfile.o: options.h options_def.h z80asm.h config.h  sym.h
@@ -879,8 +881,8 @@ prsline.o: lib/queue.h listfile.h lib/strutil.h symref.h lib/classlist.h
 prsline.o: options.h options_def.h scan.h symbol.h model.h objfile.h symtab.h
 prsline.o: lib/classhash.h lib/strhash.h lib/uthash.h sym.h token.h
 prsline.o: token_def.h legacy.h z80asm.h
-scan.o: lib/xmalloc.h scan.h lib/strutil.h lib/class.h lib/queue.h
-scan.o: lib/types.h errors.h errors_def.h
+scan.o: lib/xmalloc.h errors.h errors_def.h scan.h lib/types.h lib/strutil.h
+scan.o: lib/class.h lib/queue.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
@@ -901,7 +903,7 @@ z80asm.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 z80asm.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
 z80asm.o: lib/classlist.h token.h token_def.h legacy.h expr_def.h
 z80asm.o: lib/fileutil.h hist.h listfile.h mapfile.h options.h options_def.h
-z80asm.o: lib/strpool.h lib/except.h z80asm.h
+z80asm.o: scan.h lib/strpool.h lib/except.h z80asm.h
 z80instr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 z80instr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 z80instr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h

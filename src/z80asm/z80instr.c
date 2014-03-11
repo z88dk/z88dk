@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.49 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.50 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -701,7 +701,6 @@ void
 Subroutine_addr( int opcode0, int opcode )
 {
     long constant;
-    extern enum flag EOL;
 
     GetSym();
 
@@ -765,7 +764,7 @@ Subroutine_addr( int opcode0, int opcode )
                 SetTemporaryLine( buffer );
                 GetSym();
                 ExprAddress( 1 );
-                EOL = OFF;
+                EOL = FALSE;
                 append_byte( 0xCD );
                 inc_PC( 3 );
                 break;
@@ -776,7 +775,7 @@ Subroutine_addr( int opcode0, int opcode )
                 SetTemporaryLine( buffer );
                 GetSym();
                 ExprAddress( 1 );
-                EOL = OFF;
+                EOL = FALSE;
                 append_byte( 0xCD );
                 inc_PC( 3 );
                 break;
@@ -787,7 +786,7 @@ Subroutine_addr( int opcode0, int opcode )
                 SetTemporaryLine( buffer );
                 GetSym();
                 ExprAddress( 1 );
-                EOL = OFF;
+                EOL = FALSE;
                 append_byte( 0xCD );
                 inc_PC( 3 );
                 break;
@@ -798,7 +797,7 @@ Subroutine_addr( int opcode0, int opcode )
                 SetTemporaryLine( buffer );
                 GetSym();
                 ExprAddress( 1 );
-                EOL = OFF;
+                EOL = FALSE;
                 append_byte( 0xCD );
                 inc_PC( 3 );
                 break;
@@ -1606,7 +1605,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.49  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.50  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.49  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.58 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.59 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -78,7 +78,6 @@ void LINE( void );
 /* global variables */
 extern FILE *z80asmfile;
 extern tokid_t sym, GetSym( void );
-extern enum flag EOL;
 extern char ident[], line[];
 extern struct module *CURRENTMODULE;
 
@@ -731,7 +730,7 @@ ExtAccumulator( int opcode )
 
     /* reparse and code generate (if possible) */
     sym = TK_NIL;
-    EOL = OFF;
+    EOL = FALSE;
 
     ScanSetPos( fptr );
     ArithLog8_instr( opcode );
@@ -1092,7 +1091,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.58  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.59  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.58  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

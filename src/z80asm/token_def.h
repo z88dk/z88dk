@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.15 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.16 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,7 +31,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.15 2014-
 #define TOKEN(name, string)
 #endif
 
-TOKEN(	TK_NIL,			"" )
+TOKEN(	TK_EOF,			"" )	/* = 0; end of file reached */
+TOKEN(	TK_NIL,			"" )	/* returned for rubish */
 TOKEN(	TK_INVALID,		"" )	/* used as impossible to get token */
 TOKEN(	TK_NAME,		"" )
 TOKEN(	TK_LABEL,		"" )
@@ -147,7 +148,10 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.15  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.16  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.15  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.78 2014-03-11 00:21:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.79 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -68,7 +68,6 @@ extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern uint_t DEFVPC;
 extern tokid_t sym;
-extern enum flag EOL;
 extern struct module *CURRENTMODULE;
 
 
@@ -243,7 +242,7 @@ DEFVARS( void )
     {
         Skipline( z80asmfile );
 
-        EOL = OFF;
+        EOL = FALSE;
         GetSym();
     }
 
@@ -251,9 +250,9 @@ DEFVARS( void )
     {
         while ( !feof( z80asmfile ) && GetSym() != TK_RCURLY )
         {
-            if ( EOL == ON )
+            if ( EOL )
             {
-                EOL = OFF;
+                EOL = FALSE;
             }
             else
             {
@@ -279,16 +278,16 @@ DEFGROUP( void )
     while ( !feof( z80asmfile ) && GetSym() != TK_LCURLY )
     {
         Skipline( z80asmfile );
-        EOL = OFF;
+        EOL = FALSE;
     }
 
     if ( sym == TK_LCURLY )
     {
         while ( !feof( z80asmfile ) && sym != TK_RCURLY )
         {
-            if ( EOL == ON )
+            if ( EOL )
             {
-                EOL = OFF;
+                EOL = FALSE;
             }
             else
             {
@@ -844,7 +843,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.78  2014-03-11 00:21:33  pauloscustodio
+ * Revision 1.79  2014-03-11 22:59:20  pauloscustodio
+ * Move EOL flag to scanner
+ *
+ * Revision 1.78  2014/03/11 00:21:33  pauloscustodio
  * Removed Fetchfilename(), handled as TK_STRING in scanner
  *
  * Revision 1.77  2014/03/11 00:15:13  pauloscustodio

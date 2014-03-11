@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.98 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.99 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -70,7 +70,6 @@ extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
 extern tokid_t sym, GetSym( void );
-extern enum flag EOL;
 extern byte_t reloc_routine[];
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
@@ -163,7 +162,7 @@ ReadExpr( long nextexpr, long endexpr )
 		SetTemporaryLine( expr->str );				/* read expression */
 		Str_chomp( expr );							/* remove newline for error messages below */
 
-        EOL = OFF;                /* reset end of line parsing flag - a line is to be parsed... */
+        EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
         GetSym();
 
@@ -1043,7 +1042,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.98  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.99  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.98  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

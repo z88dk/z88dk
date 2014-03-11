@@ -16,14 +16,13 @@ Scanner header corresponding to scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.28 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.29 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "strutil.h"
 #include "types.h"
 
 /* declare prsline.c externals */
@@ -34,6 +33,8 @@ extern void  ScanSetPos( char *pos );
 extern char *sym_string;	/* contains double-quoted string without quotes
 							   to return with a TK_STRING */
 extern long  sym_number;	/* contains number to return with a TK_NUMBER */
+
+extern BOOL EOL;
 
 /*-----------------------------------------------------------------------------
 *   A scanner token is represented as an integer that is the ascii code for
@@ -124,7 +125,10 @@ extern Token scan_get( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.28  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.29  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.28  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

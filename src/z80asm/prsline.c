@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.49 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.50 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,7 +53,6 @@ extern char ident[];
 extern tokid_t sym;
 extern int currentline;
 extern struct module *CURRENTMODULE;
-extern enum flag EOL;
 
 /* current input buffer */
 static Str  *input_buffer = NULL;
@@ -66,6 +65,8 @@ static Str	*sym_string_str = NULL;
 char		*sym_string     = "";	/* contains double-quoted string without quotes
 									   to return with a TK_STRING */
 long		 sym_number;			/* contains number to return with a TK_NUMBER */
+
+BOOL		 EOL;
 
 /*-----------------------------------------------------------------------------
 *   Init functions
@@ -228,11 +229,8 @@ tokid_t GetSym( void )
 
     ident[0] = '\0';
 
-    if ( EOL == ON )
-    {
-        sym = TK_NEWLINE;
-        return sym;
-    }
+    if ( EOL )
+        return (sym = TK_NEWLINE);			/* assign and return */
 
     for ( ;; )
     {
@@ -240,9 +238,8 @@ tokid_t GetSym( void )
         c = GetChar( z80asmfile );
         if ( c == '\n' || c == EOF )
         {
-            sym = TK_NEWLINE;
-            EOL = ON;
-            return TK_NEWLINE;
+            EOL = TRUE;
+	        return (sym = TK_NEWLINE);		/* assign and return */
         }
         else if ( !isspace( c ) )
         {
@@ -527,7 +524,7 @@ Skipline( FILE *fp )
 		if ( *input_ptr == '\n' )
 			input_ptr++;
 		
-		EOL = ON;
+		EOL = TRUE;
 	}
 }
 
@@ -892,7 +889,10 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.49  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.50  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.49  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

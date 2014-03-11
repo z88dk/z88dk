@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.81 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.82 2014-03-11 22:59:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -68,7 +68,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 extern FILE *z80asmfile, *objfile;
 extern char line[], ident[];
 extern tokid_t sym;
-extern enum flag EOL;
 extern long TOTALLINES;
 extern struct module *CURRENTMODULE;
 
@@ -89,7 +88,7 @@ void
 parseline( enum flag interpret )
 {
     ASMPC->value = get_PC();   /* update assembler program counter */
-    EOL = OFF;                /* reset END OF LINE flag */
+    EOL = FALSE;                /* reset END OF LINE flag */
     GetSym();
 
     if ( sym == TK_DOT || sym == TK_LABEL )
@@ -717,7 +716,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.81  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.82  2014-03-11 22:59:20  pauloscustodio
+* Move EOL flag to scanner
+*
+* Revision 1.81  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by
