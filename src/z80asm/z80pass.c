@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.80 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.81 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,6 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.80 2014-03-05 23
 #include "listfile.h"
 #include "model.h"
 #include "options.h"
+#include "scan.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
@@ -52,7 +53,6 @@ tokid_t GetSym( void );
 /* local functions */
 void ifstatement( enum flag interpret );
 void parseline( enum flag interpret );
-void getasmline( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void Z80pass1( void );
 void Z80pass2( void );
@@ -71,7 +71,6 @@ extern tokid_t sym;
 extern enum flag EOL;
 extern long TOTALLINES;
 extern struct module *CURRENTMODULE;
-extern char *temporary_ptr;
 
 void
 Z80pass1( void )
@@ -87,59 +86,9 @@ Z80pass1( void )
 
 
 void
-getasmline( void )
-{
-    long fptr;
-    char *save_temporary_ptr;
-    int len, c;
-
-    fptr = ftell( z80asmfile );           /* remember file and temp buffer position */
-    save_temporary_ptr = temporary_ptr;
-
-    c = 0;
-
-    for ( len = 0; ( len < 254 ) && ( c != '\n' ); len++ )
-    {
-        c = GetChar( z80asmfile );
-
-        if ( c != EOF )
-        {
-            line[len] = c;    /* line feed inclusive */
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    line[len] = '\0';
-
-    fseek( z80asmfile, fptr, SEEK_SET );  /* resume file and temp buffer position */
-    temporary_ptr = save_temporary_ptr;
-}
-
-
-
-void
 parseline( enum flag interpret )
 {
     ASMPC->value = get_PC();   /* update assembler program counter */
-
-    ++CURRENTFILE->line;
-
-    if ( !opts.line_mode )
-    {
-        set_error_line( CURRENTFILE->line );    /* error location */
-    }
-
-    ++TOTALLINES;
-
-    if ( opts.cur_list )
-    {
-        getasmline();    /* get a copy of current source line */
-        list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-    }
-
     EOL = OFF;                /* reset END OF LINE flag */
     GetSym();
 
@@ -768,7 +717,17 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.80  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.81  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.80  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.79  2014/03/04 11:49:47  pauloscustodio

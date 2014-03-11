@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.97 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.98 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -25,6 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.97 2014-03-05 23
 #include "fileutil.h"
 #include "listfile.h"
 #include "options.h"
+#include "scan.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
@@ -137,9 +138,10 @@ void
 ReadExpr( long nextexpr, long endexpr )
 {
     int type;
-    long constant, fptr;
+    long constant;
     struct expr *postfixexpr;
-    uint_t patchptr, offsetptr, expr_len;
+    uint_t patchptr, offsetptr;
+	DEFINE_STR( expr, MAXLINE );
 
     do
     {
@@ -151,12 +153,15 @@ ReadExpr( long nextexpr, long endexpr )
 
         ASMPC->value = get_PC();
 
-        expr_len	= xfget_uint8( z80asmfile );	/* get length of infix expression */
-        fptr = ftell( z80asmfile );					/* file pointer is at start of expression */
-        fgets( line, expr_len + 1, z80asmfile );	/* read string for error reference */
-        fseek( z80asmfile, fptr, SEEK_SET );		/* reset file pointer to start of expression */
-        nextexpr += 1 + 1 + 1 + 1 + expr_len + 1;
+		xfget_count_byte_Str( z80asmfile, expr );	/* get expression */
+		xfget_uint8( z80asmfile );					/* skip zero byte */
 
+        nextexpr += 1 + 2 + 1 + expr->len + 1;
+
+		/* read expression followed by newline */
+		Str_append_char( expr, '\n');
+		SetTemporaryLine( expr->str );				/* read expression */
+		Str_chomp( expr );							/* remove newline for error messages below */
 
         EOL = OFF;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -167,7 +172,7 @@ ReadExpr( long nextexpr, long endexpr )
             /* parse numerical expression */
             if ( postfixexpr->expr_type & NOT_EVALUABLE )
             {
-                error_not_defined_expr( line );
+                error_not_defined_expr( expr->str );
             }
             else
             {
@@ -178,21 +183,21 @@ ReadExpr( long nextexpr, long endexpr )
                 {
                 case 'U':
                     if ( constant < -128 || constant > 255 )
-                        warn_int_range_expr( constant, line );
+                        warn_int_range_expr( constant, expr->str );
 
                     patch_byte( &patchptr, ( byte_t ) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
-                        warn_int_range_expr( constant, line );
+                        warn_int_range_expr( constant, expr->str );
 
                     patch_byte( &patchptr, ( byte_t ) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
                     if ( constant < -32768 || constant > 65535 )
-                        warn_int_range_expr( constant, line );
+                        warn_int_range_expr( constant, expr->str );
 
                     patch_word( &patchptr, constant );
 
@@ -223,7 +228,7 @@ ReadExpr( long nextexpr, long endexpr )
 
                 case 'L':
                     if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range_expr( constant, line );
+                        warn_int_range_expr( constant, expr->str );
 
                     patch_long( &patchptr, constant );
                     break;
@@ -234,7 +239,7 @@ ReadExpr( long nextexpr, long endexpr )
         }
         else
         {
-            error_expr( line );
+            error_expr( expr->str );
         }
     }
     while ( nextexpr < endexpr );
@@ -1038,7 +1043,17 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.97  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.98  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.97  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.96  2014/03/04 11:49:47  pauloscustodio

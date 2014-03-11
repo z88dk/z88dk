@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.76 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.77 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -27,6 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.76 2014-0
 #include "legacy.h"
 #include "expr_def.h"
 #include "options.h"
+#include "scan.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "token.h"
@@ -54,7 +55,6 @@ struct expr *ParseNumExpr( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
-void getasmline( void );
 
 
 /* local functions */
@@ -244,19 +244,6 @@ DEFVARS( void )
         Skipline( z80asmfile );
 
         EOL = OFF;
-        ++CURRENTFILE->line;
-
-        if ( !opts.line_mode )
-        {
-            set_error_line( CURRENTFILE->line );    /* error location */
-        }
-
-        if ( opts.cur_list )
-        {
-            getasmline();    /* get a copy of current source line */
-            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-        }
-
         GetSym();
     }
 
@@ -266,19 +253,6 @@ DEFVARS( void )
         {
             if ( EOL == ON )
             {
-                ++CURRENTFILE->line;
-
-                if ( !opts.line_mode )
-                {
-                    set_error_line( CURRENTFILE->line );    /* error location */
-                }
-
-                if ( opts.cur_list )
-                {
-                    getasmline();    /* get a copy of current source line */
-                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-                }
-
                 EOL = OFF;
             }
             else
@@ -306,20 +280,6 @@ DEFGROUP( void )
     {
         Skipline( z80asmfile );
         EOL = OFF;
-        ++CURRENTFILE->line;
-
-        if ( !opts.line_mode )
-        {
-            set_error_line( CURRENTFILE->line );    /* error location */
-        }
-
-        if ( opts.cur_list )
-        {
-            getasmline();    /* get a copy of current source line */
-            list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-        }
-
-
     }
 
     if ( sym == TK_LCURLY )
@@ -328,19 +288,6 @@ DEFGROUP( void )
         {
             if ( EOL == ON )
             {
-                ++CURRENTFILE->line;
-
-                if ( !opts.line_mode )
-                {
-                    set_error_line( CURRENTFILE->line );    /* error location */
-                }
-
-                if ( opts.cur_list )
-                {
-                    getasmline();    /* get a copy of current source line */
-                    list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-                }
-
                 EOL = OFF;
             }
             else
@@ -746,46 +693,25 @@ DEFL( void )
 void
 DEFM( void )
 {
-    long constant, bytepos = 0;
+    long bytepos = 0;
+	char *p;
 
     do
     {
-        if ( GetSym() == TK_DQUOTE )
+        if ( GetSym() == TK_STRING )
         {
-            while ( !feof( z80asmfile ) )
+			for ( p = sym_string; *p != '\0'; p++ )
+			{
+                append_byte( ( byte_t ) *p );
+                ++bytepos;
+                inc_PC( 1 );
+			}
+
+            GetSym();
+            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
             {
-                constant = GetChar( z80asmfile );
-
-                if ( constant == EOF )
-                {
-                    sym = TK_NEWLINE;
-                    EOL = ON;
-                    error_unclosed_string();
-                    return;
-                }
-                else
-                {
-                    if ( constant != '\"' ) /* NOTE: should be TK_DQUOTE, but TK_DQUOTE is index in
-											   tokid_t (=2) computed by GetSym(),
-											   different from char retrieved by GetChar() */
-                    {
-                        append_byte( ( byte_t ) constant );
-                        ++bytepos;
-                        inc_PC( 1 );
-                    }
-                    else
-                    {
-                        GetSym();
-
-                        if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
-                        {
-                            error_syntax();
-                            return;
-                        }
-
-                        break;    /* get out of loop */
-                    }
-                }
+                error_syntax();
+                return;
             }
         }
         else
@@ -814,12 +740,12 @@ DEFM( void )
 void
 INCLUDE( void )
 {
-    char    *filename;
+    char *filename;
 
-    if ( GetSym() == TK_DQUOTE )
+    if ( GetSym() == TK_STRING )
     {
         /* fetch filename of include file */
-        filename = Fetchfilename( z80asmfile );
+        filename = search_file( sym_string, opts.inc_path );
 
         if ( FindFile( CURRENTFILE, filename ) != NULL )
         {
@@ -873,9 +799,9 @@ BINARY( void )
     FILE          *binfile;
     long          Codesize;
 
-    if ( GetSym() == TK_DQUOTE )
+    if ( GetSym() == TK_STRING )
     {
-        filename = Fetchfilename( z80asmfile );
+        filename = search_file( sym_string, opts.inc_path );
 
         binfile = xfopen( filename, "rb" );           /* CH_0012 */
         fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
@@ -893,7 +819,6 @@ BINARY( void )
         error_syntax();
     }
 }
-
 
 
 char *
@@ -978,7 +903,17 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.76  2014-03-05 23:44:55  pauloscustodio
+ * Revision 1.77  2014-03-11 00:15:13  pauloscustodio
+ * Scanner reads input line-by-line instead of character-by-character.
+ * Factor house-keeping at each new line read in the scanner getasmline().
+ * Add interface to allow back-tacking of the recursive descent parser by
+ * getting the current input buffer position and comming back to the same later.
+ * SetTemporaryLine() keeps a stack of previous input lines.
+ * Scanner handles single-quoted strings and returns a number.
+ * New error for single-quoted string with length != 1.
+ * Scanner handles double-quoted strings and returns the quoted string.
+ *
+ * Revision 1.76  2014/03/05 23:44:55  pauloscustodio
  * Renamed 64-bit portability to BUG_0042
  *
  * Revision 1.75  2014/03/04 11:49:47  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.66 2014-03-06 00:18:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.67 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.66 2014-0
 #include "fileutil.h"
 #include "legacy.h"
 #include "options.h"
+#include "scan.h"
 #include "symbol.h"
 #include "token.h"
 #include "except.h"
@@ -122,6 +123,13 @@ static BOOL Factor( struct expr *pfixexpr )
         GetSym();
         break;
 
+	case TK_NUMBER:
+		Str_append_sprintf(pfixexpr->text, "%ld", sym_number);
+		ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
+							sym_number );
+        GetSym();
+        break;
+
     case TK_HEX_CONST:
     case TK_BIN_CONST:
     case TK_DEC_CONST:
@@ -136,43 +144,6 @@ static BOOL Factor( struct expr *pfixexpr )
         {
 			ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
 								constant );
-        }
-
-        GetSym();
-        break;
-
-    case TK_SQUOTE:
-        Str_append_char(pfixexpr->text, '\'');					/* store single quote in infix expr */
-
-        if ( feof( z80asmfile ) )
-        {
-            error_syntax();
-            return 0;
-        }
-        else
-        {
-            constant = GetChar( z80asmfile );
-
-            if ( constant == EOF )
-            {
-                error_syntax();
-                return 0;
-            }
-            else
-            {
-                Str_append_char(pfixexpr->text, (char) constant);		/* store char in infix expr */
-
-                if ( GetSym() == TK_SQUOTE )
-                {
-					Str_append_char(pfixexpr->text, '\'');		/* store single quote in infix expr */
-					ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
-										constant );
-                }
-                else
-                {
-                    return 0;
-                }
-            }
         }
 
         GetSym();
@@ -685,7 +656,17 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.66  2014-03-06 00:18:43  pauloscustodio
+* Revision 1.67  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.66  2014/03/06 00:18:43  pauloscustodio
 * BUG_0043: buffer overflow on constants longer than 128 chars in object file
 * z80asm crashed when the expression to be stored in the obejct file was
 * longer than the maximum allocated size (128). Changed to dynamic string.

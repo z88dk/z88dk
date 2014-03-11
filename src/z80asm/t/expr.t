@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.4 2014-03-06 00:18:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.5 2014-03-11 00:15:13 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -47,8 +47,8 @@ my @asmbin = (
 											"\xFF\xFE\xBE\xEB"],
 	["defb \@1010,1010B",					"\x0A\x0A"],
 	["defb ZERO+\@1010,ZERO+1010B",			"\x0A\x0A"],
-	["defm \"hello\"${COMMA}32,\"world\"",	"hello world"],
-	["defm \"hello\"${COMMA}ZERO+32,\"world\"",	"hello world"],
+	["defm \"hello\"${COMMA}32,\"\",\"world\"",			"hello world"],
+	["defm \"hello\"${COMMA}ZERO+32,\"\",\"world\"",	"hello world"],
 	["defb 1<0,1<1,1<2",					"\0\0\1"],
 	["defb ZERO+1<0,ZERO+1<1,ZERO+1<2",		"\0\0\1"],
 	["defb 1<=0,1<=1,1<=2",					"\0\1\1"],
@@ -144,8 +144,6 @@ t_z80asm(
 	asm1	=> "XREF ZERO\n".$asm,
 	bin		=> $bin
 );
-t_z80asm_error("defb ''",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb 'he'",		"Error at file 'test.asm' line 1: syntax error in expression");
 
 # test BUG_0006
 t_z80asm_error("defb (2",		"Error at file 'test.asm' line 1: syntax error in expression");
@@ -219,7 +217,17 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.4  2014-03-06 00:18:43  pauloscustodio
+# Revision 1.5  2014-03-11 00:15:13  pauloscustodio
+# Scanner reads input line-by-line instead of character-by-character.
+# Factor house-keeping at each new line read in the scanner getasmline().
+# Add interface to allow back-tacking of the recursive descent parser by
+# getting the current input buffer position and comming back to the same later.
+# SetTemporaryLine() keeps a stack of previous input lines.
+# Scanner handles single-quoted strings and returns a number.
+# New error for single-quoted string with length != 1.
+# Scanner handles double-quoted strings and returns the quoted string.
+#
+# Revision 1.4  2014/03/06 00:18:43  pauloscustodio
 # BUG_0043: buffer overflow on constants longer than 128 chars in object file
 # z80asm crashed when the expression to be stored in the obejct file was
 # longer than the maximum allocated size (128). Changed to dynamic string.

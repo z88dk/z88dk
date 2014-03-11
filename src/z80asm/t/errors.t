@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.7 2014-02-23 18:48:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.8 2014-03-11 00:15:13 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -160,7 +160,16 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 #------------------------------------------------------------------------------
 # error_unclosed_string
 unlink_testfiles();
+t_z80asm_error('defm "', "Error at file 'test.asm' line 1: unclosed quoted string");
 t_z80asm_error('defm "hello', "Error at file 'test.asm' line 1: unclosed quoted string");
+
+#------------------------------------------------------------------------------
+# error_invalid_squoted_string
+unlink_testfiles();
+t_z80asm_error("defb '", "Error at file 'test.asm' line 1: invalid single quoted character");
+t_z80asm_error("defb 'x", "Error at file 'test.asm' line 1: invalid single quoted character");
+t_z80asm_error("defb ''", "Error at file 'test.asm' line 1: invalid single quoted character");
+t_z80asm_error("defb 'he'", "Error at file 'test.asm' line 1: invalid single quoted character");
 
 #------------------------------------------------------------------------------
 # warn_int_range / error_int_range
@@ -1019,7 +1028,17 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.7  2014-02-23 18:48:16  pauloscustodio
+# Revision 1.8  2014-03-11 00:15:13  pauloscustodio
+# Scanner reads input line-by-line instead of character-by-character.
+# Factor house-keeping at each new line read in the scanner getasmline().
+# Add interface to allow back-tacking of the recursive descent parser by
+# getting the current input buffer position and comming back to the same later.
+# SetTemporaryLine() keeps a stack of previous input lines.
+# Scanner handles single-quoted strings and returns a number.
+# New error for single-quoted string with length != 1.
+# Scanner handles double-quoted strings and returns the quoted string.
+#
+# Revision 1.7  2014/02/23 18:48:16  pauloscustodio
 # CH_0021: New operators ==, !=, &&, ||, ?:
 # Handle C-like operators ==, !=, &&, || and ?:.
 # Simplify expression parser by handling composed tokens in lexer.

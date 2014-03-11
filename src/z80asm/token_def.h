@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.14 2014-03-04 11:49:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.15 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,7 +53,9 @@ TOKEN(	TK_NEWLINE,		"\n")
 /* no token for " " */
 
 TOKEN(	TK_LOG_NOT,		"!" )
-TOKEN(	TK_DQUOTE, 		"\"" )
+
+/* no token for "\"" */
+
 TOKEN(	TK_CONST_EXPR,	"#" )
 
 /* no token for "$" */
@@ -69,7 +71,8 @@ TOKEN(	TK_BIN_AND,		"&" )
 
 TOKEN(	TK_LOG_AND,		"&&" )
 
-TOKEN(	TK_SQUOTE,		"'" )
+/* no token for "'" */
+
 TOKEN(	TK_LPAREN,		"(" )
 TOKEN(	TK_RPAREN,		")" )
 TOKEN(	TK_MULTIPLY,	"*" )
@@ -144,7 +147,17 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.14  2014-03-04 11:49:47  pauloscustodio
+* Revision 1.15  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.14  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all
 * supported unary, binary and ternary oprators, instead of a big switch
 * statement to select the operation.

@@ -13,21 +13,28 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.48 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.49 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include "codearea.h"
 #include "config.h"
-#include "z80asm.h"
-#include "symbol.h"
-#include "options.h"
 #include "errors.h"
+#include "init.h"
+#include "list.h"
+#include "listfile.h"
+#include "options.h"
+#include "scan.h"
+#include "strutil.h"
+#include "symbol.h"
 #include "types.h"
+#include "z80asm.h"
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* local functions */
 long GetConstant( char *evalerr );
@@ -35,9 +42,9 @@ int IndirectRegisters( void );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
-int GetChar( FILE *fptr );
+int GetChar( FILE *fp );
 tokid_t GetSym( void );
-void Skipline( FILE *fptr );
+void Skipline( FILE *fp );
 int CheckBaseType( int chcount );
 
 /* global variables */
@@ -48,103 +55,176 @@ extern int currentline;
 extern struct module *CURRENTMODULE;
 extern enum flag EOL;
 
+/* current input buffer */
+static Str  *input_buffer = NULL;
+static char *input_ptr    = "";
 
-char  *temporary_ptr = NULL;
+/* stack of previous contexts */
+static List *input_stack;
 
+static Str	*sym_string_str = NULL;
+char		*sym_string     = "";	/* contains double-quoted string without quotes
+									   to return with a TK_STRING */
+long		 sym_number;			/* contains number to return with a TK_NUMBER */
 
-void UnGet( int c, FILE *fp )
+/*-----------------------------------------------------------------------------
+*   Init functions
+*----------------------------------------------------------------------------*/
+DEFINE_init()
 {
-    if ( temporary_ptr )
+	input_buffer = OBJ_NEW(Str);
+	input_ptr    = input_buffer->str;
+
+	input_stack	 = OBJ_NEW(List);
+	input_stack->free_data = xfreef;
+
+	sym_string_str = OBJ_NEW(Str);
+	sym_string	 = sym_string_str->str;
+}
+
+DEFINE_fini()
+{
+	OBJ_DELETE(input_buffer);
+	OBJ_DELETE(input_stack);
+	OBJ_DELETE(sym_string_str);
+}
+
+/*-----------------------------------------------------------------------------
+*   
+*----------------------------------------------------------------------------*/
+
+/* set new input buffer */
+static void set_input_buffer( char *line )
+{
+	Str_set( input_buffer, line );
+	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
+}
+
+/* listfile handling */
+static void getasmline( void )
+{
+    ++TOTALLINES;
+	++CURRENTFILE->line;
+
+    if ( !opts.line_mode )
     {
-        temporary_ptr--;
+        set_error_line( CURRENTFILE->line );    /* error location */
     }
-    else
+
+    if ( opts.cur_list )
     {
-        ungetc( c, fp );
+		line[0] = '\0';							/* prepare for strncat */
+		strncat( line, input_buffer->str, 255 );
+
+		list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
     }
 }
 
-
-
-
-void
-SetTemporaryLine( char *line )
+/* read new line from input */
+static BOOL ReadLine( FILE *fp )
 {
-    temporary_ptr = line;
+	BOOL ret;
+
+	ret = Str_getline( input_buffer, fp );	/* read next line */
+	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
+
+	getasmline();
+
+	return ret;
 }
 
-/* get a character from file with CR/LF/CRLF parsing capability.
- *
- * return '\n' byte if a CR/LF/CRLF variation line feed is found
- *
- */
-int
-GetChar( FILE *fptr )
+/* set a new input text */
+void SetTemporaryLine( char *line )
+{
+	init();
+
+	List_push( & input_stack, xstrdup(input_ptr) );		/* save current input */
+	set_input_buffer( line );
+}
+
+/* Unget the given char */
+static void UnGet( int c )
+{
+	assert( input_buffer != NULL );
+	assert( input_ptr > input_buffer->str && input_ptr <= input_buffer->str + input_buffer->len );
+
+	input_ptr--;
+	*input_ptr = c;
+}
+
+/* save scan position and retrieve it, for back-tracking */
+char *ScanGetPos( void )
+{
+	init();
+
+	return input_ptr;
+}
+
+void ScanSetPos( char *pos )
+{
+	init();
+
+	assert( pos != NULL );
+	assert( pos >= input_buffer->str && pos <= input_buffer->str + input_buffer->len );
+
+	input_ptr = pos;
+}
+
+/* get a character from file */
+int GetChar( FILE *fp )
 {
     int c;
+	char *line;
 
-    if ( temporary_ptr != NULL )
-    {
-        if ( *temporary_ptr != 0 )
-        {
-            c = *temporary_ptr++;
-            return c;
-        }
+	init();
 
-        temporary_ptr = NULL;
-    }
+	while (TRUE)
+	{
+		/* get character from current buffer */
+		c = *input_ptr;
+		if ( c != '\0' )
+		{
+			input_ptr++;
+			return c;
+		}
 
-
-    c = fgetc( fptr );
-
-    if ( c == 13 )
-    {
-        /* Mac/Z88 line feed found,poll for MSDOS line feed */
-        c = fgetc( fptr );
-
-        if ( c != 10 )
-        {
-            ungetc( c, fptr );    /* push non-line-feed character back into file stream */
-        }
-
-        c = '\n'; /* always return the symbolic '\n' for line feed */
-    }
-    else if ( c == 10 )
-    {
-        c = '\n';    /* UNIX/QDOS line feed */
-    }
-
-    return c;     /* return all other characters */
+		/* get last buffer from stack, if any */
+		line = List_pop( input_stack );
+		if ( line != NULL )
+		{
+			set_input_buffer( line );
+			xfree( line );
+		}
+		else 
+		{
+			/* get next line from input file */
+			if ( ! ReadLine( fp ) )
+				return EOF;
+		}
+	}
 }
 
 
-/* check if given char and next are a two-byte token */
-static BOOL GetComposed( int c, char *expect )
+/* check for multi-char tokens */
+static BOOL GetComposed( char *expect )
 {
-	int c2;
+	size_t len = strlen(expect);
 
-	assert( strlen(expect) == 2 );
-
-	/* check first char */
-	if ( c != expect[0] )
-		return FALSE;
-
-	/* check second char */
-    c2 = GetChar( z80asmfile );
-	if ( c2 == expect[1] )
+	if ( strncmp( input_ptr, expect, len ) == 0 )
+	{
+		input_ptr += len;
 		return TRUE;
-
-	/* not this token, push back c2 */
-	if ( c2 != EOF )
-        UnGet( c2, z80asmfile );
-	
-	return FALSE;
+	}
+	else 
+		return FALSE;
 }
 
-tokid_t
-GetSym( void )
+/* get the next token */
+tokid_t GetSym( void )
 {
     int c, chcount = 0;
+
+	init();
 
     ident[0] = '\0';
 
@@ -157,27 +237,16 @@ GetSym( void )
     for ( ;; )
     {
         /* Ignore leading white spaces, if any... */
-        if ( feof( z80asmfile ) )
+        c = GetChar( z80asmfile );
+        if ( c == '\n' || c == EOF )
         {
             sym = TK_NEWLINE;
             EOL = ON;
             return TK_NEWLINE;
         }
-        else
+        else if ( !isspace( c ) )
         {
-            c = GetChar( z80asmfile );
-
-            if ( ( c == '\n' ) || ( c == EOF ) || ( c == '\x1A' )
-                    || ( c == '\0' ) )        /* BUG_0001 Bugfix read overrun in OBJ file expression */
-            {
-                sym = TK_NEWLINE;
-                EOL = ON;
-                return TK_NEWLINE;
-            }
-            else if ( !isspace( c ) )
-            {
-                break;
-            }
+            break;
         }
     }
 
@@ -185,22 +254,71 @@ GetSym( void )
     if ( c == ';' )
     {
         Skipline( z80asmfile );				/* ignore comment line, prepare for next line */
-        return (sym = TK_NEWLINE);				/* assign and return */
+        return (sym = TK_NEWLINE);			/* assign and return */
     }
+
+	/* double-quoted string */
+	if ( c == '"' )
+	{
+		char *quote = strchr( input_ptr, '"' );
+		if ( quote == NULL )
+		{
+			error_unclosed_string();
+			quote = input_ptr + strlen(input_ptr);	/* consider string up to end of input */
+			if (quote > input_ptr && quote[-1] == '\n')
+				quote--;							/* exclude newline */
+		}
+
+		/* copy chars up to close quote */
+		Str_set( sym_string_str, input_ptr );
+		sym_string_str->str[ quote - input_ptr ] = '\0';
+		Str_sync_len( sym_string_str );
+
+		sym_string = sym_string_str->str;
+
+		input_ptr = quote;					/* advance past string */
+		if ( *input_ptr == '"' )
+			input_ptr++;					/* advance past quote */
+
+		return (sym = TK_STRING);			/* assign and return */
+	}
+
+	/* single-quoted string */
+	if ( c == '\'' )
+	{
+		char *quote = strchr( input_ptr, '\'' );
+		if ( quote == NULL || quote - input_ptr != 1 )	/* only 1-char quoted strings */
+		{
+			sym_number = 0;
+			error_invalid_squoted_string();
+			Skipline( z80asmfile );
+		}
+		else
+		{
+			sym_number = (byte_t) input_ptr[0];
+			input_ptr = quote + 1;			/* advance past string */
+		}
+
+		return (sym = TK_NUMBER);			/* assign and return */
+	}
 
 	/* special cases for composed separators */
 	if ( ispunct(c) )
 	{
-		if ( GetComposed( c, "**" ) ) return (sym = TK_POWER);			/* assign and return */
-		if ( GetComposed( c, "==" ) ) return (sym = TK_EQUAL);			/* assign and return */
-		if ( GetComposed( c, "!=" ) ) return (sym = TK_NOT_EQ);			/* assign and return */
-		if ( GetComposed( c, "<>" ) ) return (sym = TK_NOT_EQ);			/* assign and return */
-		if ( GetComposed( c, "<=" ) ) return (sym = TK_LESS_EQ);		/* assign and return */
-		if ( GetComposed( c, ">=" ) ) return (sym = TK_GREATER_EQ);		/* assign and return */
-		if ( GetComposed( c, "<<" ) ) return (sym = TK_LEFT_SHIFT);		/* assign and return */
-		if ( GetComposed( c, ">>" ) ) return (sym = TK_RIGHT_SHIFT);	/* assign and return */
-		if ( GetComposed( c, "&&" ) ) return (sym = TK_LOG_AND);		/* assign and return */
-		if ( GetComposed( c, "||" ) ) return (sym = TK_LOG_OR);			/* assign and return */
+		input_ptr--;
+
+		if ( GetComposed( "**" ) ) return (sym = TK_POWER);			/* assign and return */
+		if ( GetComposed( "==" ) ) return (sym = TK_EQUAL);			/* assign and return */
+		if ( GetComposed( "!=" ) ) return (sym = TK_NOT_EQ);		/* assign and return */
+		if ( GetComposed( "<>" ) ) return (sym = TK_NOT_EQ);		/* assign and return */
+		if ( GetComposed( "<=" ) ) return (sym = TK_LESS_EQ);		/* assign and return */
+		if ( GetComposed( ">=" ) ) return (sym = TK_GREATER_EQ);	/* assign and return */
+		if ( GetComposed( "<<" ) ) return (sym = TK_LEFT_SHIFT);	/* assign and return */
+		if ( GetComposed( ">>" ) ) return (sym = TK_RIGHT_SHIFT);	/* assign and return */
+		if ( GetComposed( "&&" ) ) return (sym = TK_LOG_AND);		/* assign and return */
+		if ( GetComposed( "||" ) ) return (sym = TK_LOG_OR);		/* assign and return */
+
+		input_ptr++;
 	}
 
 	/* single char separators */
@@ -250,16 +368,16 @@ GetSym( void )
     {
         while (1)
         {
-            if ( feof( z80asmfile ) )
-                break;
-
             c = GetChar( z80asmfile );
+			if ( c == EOF )
+				break;
+
 			if ( !isalnum( c ) && c != '_' )
 			{
 				if ( c == ':' )					/* eat ':' if any */
 					sym = TK_LABEL;
 				else
-					UnGet( c, z80asmfile );
+					UnGet( c );
 				break;
 			}
 
@@ -270,13 +388,13 @@ GetSym( void )
     {
         while (1)
         {
-            if ( feof( z80asmfile ) )
-                break;
-
             c = GetChar( z80asmfile );
+			if ( c == EOF )
+				break;
+
 			if ( !isalnum( c ) )
 			{
-				UnGet( c, z80asmfile );
+				UnGet( c );
 				break;
 			}
 			ident[chcount++] = c;
@@ -293,6 +411,8 @@ int
 CheckBaseType( int chcount )
 {
     int   i;
+
+	init();
 
     if ( !isxdigit( ident[0] ) || chcount < 2 )    /* If it's not a hex digit straight off then reject it */
     {
@@ -395,24 +515,20 @@ CheckBaseType( int chcount )
 
 
 void
-Skipline( FILE *fptr )
+Skipline( FILE *fp )
 {
-    int c;
+	init();
 
-    if ( EOL == OFF )
-    {
-        while ( !feof( fptr ) )
-        {
-            c = GetChar( fptr );
+	if ( ! EOL )
+	{
+		while ( *input_ptr != '\0' && *input_ptr != '\n' )
+			input_ptr++;
 
-            if ( ( c == '\n' ) || ( c == EOF ) )
-            {
-                break;    /* get to beginning of next line... */
-            }
-        }
-
-        EOL = ON;
-    }
+		if ( *input_ptr == '\n' )
+			input_ptr++;
+		
+		EOL = ON;
+	}
 }
 
 
@@ -451,6 +567,8 @@ CheckCondition( void )
     char   *text = ident;
     uint_t  len = strlen( text );
 
+	init();
+
     for ( i = 0; i < NUM_ELEMS( flags ); i++ )
     {
         if ( len != strlen( flags[i].name ) )
@@ -476,6 +594,8 @@ CheckCondition( void )
 int
 CheckRegister8( void )
 {
+	init();
+
     if ( sym == TK_NAME )
     {
         if ( *( ident + 1 ) == '\0' )
@@ -604,6 +724,8 @@ CheckRegister8( void )
 int
 CheckRegister16( void )
 {
+	init();
+
     if ( sym == TK_NAME )
     {
         if ( strcmp( ident, "HL" ) == 0 )
@@ -653,6 +775,8 @@ IndirectRegisters( void )
 {
     int reg16;
 
+	init();
+
     GetSym();
     reg16 = CheckRegister16();
 
@@ -693,6 +817,8 @@ GetConstant( char *evalerr )
 {
     long size, len, intresult = 0;
     uint_t bitvalue = 1;
+
+	init();
 
     *evalerr = 0;                 /* preset to no errors */
 
@@ -766,7 +892,17 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.48  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.49  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.48  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.47  2014/03/02 12:51:41  pauloscustodio

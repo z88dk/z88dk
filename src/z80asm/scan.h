@@ -12,11 +12,11 @@
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-Scanner - to be processed by: ragel -G2 scan.rl
+Scanner header corresponding to scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.27 2014-02-09 10:16:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.28 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,6 +25,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.27 2014-02-09 10:16
 
 #include "strutil.h"
 #include "types.h"
+
+/* declare prsline.c externals */
+extern void SetTemporaryLine( char *line );
+extern char *ScanGetPos( void );
+extern void  ScanSetPos( char *pos );
+
+extern char *sym_string;	/* contains double-quoted string without quotes
+							   to return with a TK_STRING */
+extern long  sym_number;	/* contains number to return with a TK_NUMBER */
 
 /*-----------------------------------------------------------------------------
 *   A scanner token is represented as an integer that is the ascii code for
@@ -115,7 +124,17 @@ extern Token scan_get( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.27  2014-02-09 10:16:15  pauloscustodio
+* Revision 1.28  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.27  2014/02/09 10:16:15  pauloscustodio
 * Remove complexity out of scan.rl by relying on srcfile to handle contexts of
 * recursive includes, and reading of lines of text, and by assuming scan.c
 * will not be reentred, simplifying the keeping of state variables for the scan.

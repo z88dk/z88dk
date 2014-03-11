@@ -13,19 +13,20 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.29 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.30 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include <stdio.h>
+#include "codearea.h"
 #include "config.h"
-#include "z80asm.h"
+#include "errors.h"
+#include "options.h"
+#include "scan.h"
 #include "symbol.h"
 #include "token.h"
-#include "errors.h"
-#include "codearea.h"
-#include "options.h"
+#include "z80asm.h"
+#include <stdio.h>
 
 /* external functions */
 tokid_t GetSym( void );
@@ -42,7 +43,7 @@ int IndirectRegisters( void );
 void LD_HL8bit_indrct( void );
 void LD_16bit_reg( void );
 void LD_index8bit_indrct( int reg );
-void LD_address_indrct( long exprptr );
+void LD_address_indrct( char *exprptr );
 void LD_r_8bit_indrct( int reg );
 
 
@@ -56,12 +57,12 @@ extern FILE *z80asmfile;
 void
 LD( void )
 {
-    long exprptr;
+    char *exprptr;
     int sourcereg, destreg;
 
     if ( GetSym() == TK_LPAREN )
     {
-        exprptr = ftell( z80asmfile );    /* remember start of expression */
+        exprptr = ScanGetPos();    /* remember start of expression */
 
         switch ( destreg = IndirectRegisters() )
         {
@@ -479,7 +480,7 @@ LD_r_8bit_indrct( int destreg )
 
 
 void
-LD_address_indrct( long exprptr )
+LD_address_indrct( char *exprptr )
 {
     int sourcereg;
     long bytepos;
@@ -563,9 +564,9 @@ LD_address_indrct( long exprptr )
         return;
     }
 
-    fseek( z80asmfile, exprptr, SEEK_SET );       /* rewind fileptr to beginning of address expression */
+    ScanSetPos( exprptr );			/* rewind fileptr to beginning of address expression */
     GetSym();
-    ExprAddress( bytepos );       /* re-parse, evaluate, etc. */
+    ExprAddress( bytepos );			/* re-parse, evaluate, etc. */
     inc_PC( 2 );
 }
 
@@ -712,7 +713,17 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.29  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.30  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.29  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.28  2014/03/01 15:45:31  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.57 2014-03-03 13:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.58 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.57 2014-0
 #include "errors.h"
 #include "listfile.h"
 #include "options.h"
+#include "scan.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "types.h"
@@ -73,7 +74,6 @@ void LIB( void ), XLIB( void );
 void IF( void ), ELSE( void ), ENDIF( void );
 void MODULE( void );
 void LINE( void );
-void SetTemporaryLine( char *line );
 
 /* global variables */
 extern FILE *z80asmfile;
@@ -711,9 +711,9 @@ OTDR( void )
 void
 ExtAccumulator( int opcode )
 {
-    long fptr;
+    char *fptr;
 
-    fptr = ftell( z80asmfile );
+    fptr = ScanGetPos();
 
     if ( GetSym() == TK_NAME )
     {
@@ -733,7 +733,7 @@ ExtAccumulator( int opcode )
     sym = TK_NIL;
     EOL = OFF;
 
-    fseek( z80asmfile, fptr, SEEK_SET );
+    ScanSetPos( fptr );
     ArithLog8_instr( opcode );
 }
 
@@ -1092,7 +1092,17 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.57  2014-03-03 13:27:07  pauloscustodio
+* Revision 1.58  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.57  2014/03/03 13:27:07  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.56  2014/03/02 12:51:41  pauloscustodio

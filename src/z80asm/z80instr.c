@@ -13,21 +13,22 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.48 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.49 2014-03-11 00:15:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "codearea.h"
+#include "config.h"
+#include "errors.h"
+#include "expr.h"
+#include "options.h"
+#include "scan.h"
+#include "symbol.h"
+#include "z80asm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
-#include "z80asm.h"
-#include "symbol.h"
-#include "options.h"
-#include "errors.h"
-#include "expr.h"
-#include "codearea.h"
 
 /* external functions */
 struct expr *ParseNumExpr( void );
@@ -42,7 +43,6 @@ int CheckRegister16( void );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
 void ExtAccumulator( int opcode );
-extern void SetTemporaryLine( char *line );
 
 /* local functions */
 void ADD_8bit_instr( void );
@@ -824,9 +824,9 @@ Subroutine_addr( int opcode0, int opcode )
 void
 JP_instr( int opc0, int opc )
 {
-    long startexpr;               /* file pointer to start of address expression */
+    char *startexpr;				/* scan pointer to start of address expression */
 
-    startexpr = ftell( z80asmfile );      /* remember position of possible start of expression */
+	startexpr = ScanGetPos();		/* remember position of possible start of expression */
 
     if ( GetSym() == TK_LPAREN )
     {
@@ -862,8 +862,8 @@ JP_instr( int opc0, int opc )
     }
     else
     {
-        fseek( z80asmfile, startexpr, SEEK_SET ); /* no indirect register were found, reparse line after 'JP' */
-        Subroutine_addr( opc0, opc );     /* base opcode for <instr> nn; <instr> cc, nn */
+		ScanSetPos( startexpr );		/* no indirect register were found, reparse line after 'JP' */
+		Subroutine_addr( opc0, opc );	/* base opcode for <instr> nn; <instr> cc, nn */
     }
 }
 
@@ -1010,16 +1010,16 @@ void
 ADD( void )
 {
     int acc16, reg16;
-    long fptr;
+    char *fptr;
 
-    fptr = ftell( z80asmfile );
+    fptr = ScanGetPos();
 
     GetSym();
 
     switch ( acc16 = CheckRegister16() )
     {
     case -1:
-        fseek( z80asmfile, fptr, SEEK_SET );
+        ScanSetPos( fptr );
         ExtAccumulator( 0 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
         break;
 
@@ -1109,15 +1109,15 @@ void
 SBC( void )
 {
     int reg16;
-    long fptr;
+    char *fptr;
 
-    fptr = ftell( z80asmfile );
+    fptr = ScanGetPos();
     GetSym();
 
     switch ( CheckRegister16() )
     {
     case -1:
-        fseek( z80asmfile, fptr, SEEK_SET );
+        ScanSetPos( fptr );
         ExtAccumulator( 3 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
         break;
 
@@ -1156,16 +1156,16 @@ void
 ADC( void )
 {
     int reg16;
-    long fptr;
+    char *fptr;
 
-    fptr = ftell( z80asmfile );
+    fptr = ScanGetPos();
 
     GetSym();
 
     switch ( CheckRegister16() )
     {
     case -1:
-        fseek( z80asmfile, fptr, SEEK_SET );
+        ScanSetPos( fptr );
         ExtAccumulator( 1 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
         break;
 
@@ -1606,7 +1606,17 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.48  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.49  2014-03-11 00:15:13  pauloscustodio
+* Scanner reads input line-by-line instead of character-by-character.
+* Factor house-keeping at each new line read in the scanner getasmline().
+* Add interface to allow back-tacking of the recursive descent parser by
+* getting the current input buffer position and comming back to the same later.
+* SetTemporaryLine() keeps a stack of previous input lines.
+* Scanner handles single-quoted strings and returns a number.
+* New error for single-quoted string with length != 1.
+* Scanner handles double-quoted strings and returns the quoted string.
+*
+* Revision 1.48  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.47  2014/03/04 11:49:47  pauloscustodio
