@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.67 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.68 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -44,7 +44,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.67 2014-0
 tokid_t GetSym( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 long GetConstant( char *evalerr );
-int GetChar( FILE *fptr );
 
 /* local functions */
 void list_PfixExpr( struct expr *pfixlist );
@@ -656,7 +655,13 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.67  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.68  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.67  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

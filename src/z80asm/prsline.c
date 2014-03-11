@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.50 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.51 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,6 @@ int IndirectRegisters( void );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
-int GetChar( FILE *fp );
 tokid_t GetSym( void );
 void Skipline( FILE *fp );
 int CheckBaseType( int chcount );
@@ -104,7 +103,6 @@ static void set_input_buffer( char *line )
 /* listfile handling */
 static void getasmline( void )
 {
-    ++TOTALLINES;
 	++CURRENTFILE->line;
 
     if ( !opts.line_mode )
@@ -172,7 +170,7 @@ void ScanSetPos( char *pos )
 }
 
 /* get a character from file */
-int GetChar( FILE *fp )
+static int GetChar( FILE *fp )
 {
     int c;
 	char *line;
@@ -236,7 +234,11 @@ tokid_t GetSym( void )
     {
         /* Ignore leading white spaces, if any... */
         c = GetChar( z80asmfile );
-        if ( c == '\n' || c == EOF )
+		if ( c == EOF )
+		{
+	        return (sym = TK_EOF);			/* assign and return */
+		}
+		else if ( c == '\n' )
         {
             EOL = TRUE;
 	        return (sym = TK_NEWLINE);		/* assign and return */
@@ -889,7 +891,13 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.50  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.51  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.50  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.49  2014/03/11 00:15:13  pauloscustodio

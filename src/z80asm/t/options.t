@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.33 2014-02-20 23:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.34 2014-03-11 23:34:00 pauloscustodio Exp $
 #
 # Test options
 
@@ -172,7 +172,6 @@ Pass1...
 Pass2...
 Size of module is 3 bytes
 
-Total of 3 lines assembled.
 linking module(s)...
 Pass1...
 ORG address for code is 0000
@@ -1107,7 +1106,13 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.33  2014-02-20 23:36:17  pauloscustodio
+# Revision 1.34  2014-03-11 23:34:00  pauloscustodio
+# Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+# Allows decoupling of input file used in scanner from callers.
+# Removed TOTALLINES.
+# GetChar() made static to scanner, not called by other modules.
+#
+# Revision 1.33  2014/02/20 23:36:17  pauloscustodio
 # Failed in Unix due to different handling of cr-lf
 #
 # Revision 1.32  2014/01/11 01:29:46  pauloscustodio

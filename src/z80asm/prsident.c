@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.59 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.60 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -349,7 +349,7 @@ XDEF( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE )
+    if ( sym != TK_NEWLINE && sym != TK_EOF )
     {
         error_syntax();
     }
@@ -397,7 +397,7 @@ XREF( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE )
+    if ( sym != TK_NEWLINE && sym != TK_EOF )
     {
         error_syntax();
     }
@@ -423,7 +423,7 @@ LIB( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE )
+    if ( sym != TK_NEWLINE && sym != TK_EOF )
     {
         error_syntax();
     }
@@ -1091,7 +1091,13 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.59  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.60  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.59  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.58  2014/03/11 00:15:13  pauloscustodio

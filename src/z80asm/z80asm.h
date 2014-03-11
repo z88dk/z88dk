@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.45 2014-03-11 00:21:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.46 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #pragma once
@@ -55,13 +55,18 @@ extern uint_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
-extern long TOTALLINES;
 
 extern void assemble_file( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.45  2014-03-11 00:21:33  pauloscustodio
+* Revision 1.46  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.45  2014/03/11 00:21:33  pauloscustodio
 * Removed Fetchfilename(), handled as TK_STRING in scanner
 *
 * Revision 1.44  2014/03/05 23:44:55  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.79 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.80 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -44,7 +44,6 @@ int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
 int ExprLong( int listoffset );
 int DEFSP( void );
-int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pfixexpr );
 long GetConstant( char *evalerr );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
@@ -238,7 +237,7 @@ DEFVARS( void )
         return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
     }
 
-    while ( !feof( z80asmfile ) && sym != TK_LCURLY )
+    while ( sym != TK_EOF && sym != TK_LCURLY )
     {
         Skipline( z80asmfile );
 
@@ -248,7 +247,7 @@ DEFVARS( void )
 
     if ( sym == TK_LCURLY )
     {
-        while ( !feof( z80asmfile ) && GetSym() != TK_RCURLY )
+        while ( sym != TK_EOF && GetSym() != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -275,7 +274,7 @@ DEFGROUP( void )
     struct expr *postfixexpr;
     long constant, enumconst = 0;
 
-    while ( !feof( z80asmfile ) && GetSym() != TK_LCURLY )
+    while ( sym != TK_EOF && GetSym() != TK_LCURLY )
     {
         Skipline( z80asmfile );
         EOL = FALSE;
@@ -283,7 +282,7 @@ DEFGROUP( void )
 
     if ( sym == TK_LCURLY )
     {
-        while ( !feof( z80asmfile ) && sym != TK_RCURLY )
+        while ( sym != TK_EOF && sym != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -562,7 +561,7 @@ DEFB( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         ++bytepos;
 
-        if ( sym == TK_NEWLINE )
+        if ( sym == TK_NEWLINE || sym == TK_EOF )
         {
             break;
         }
@@ -594,7 +593,7 @@ DEFW( void )
         inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
         bytepos += 2;
 
-        if ( sym == TK_NEWLINE )
+        if ( sym == TK_NEWLINE || sym == TK_EOF )
         {
             break;
         }
@@ -642,7 +641,7 @@ DEFP( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         bytepos += 1;
 
-        if ( sym == TK_NEWLINE )
+        if ( sym == TK_NEWLINE || sym == TK_EOF )
         {
             break;
         }
@@ -674,7 +673,7 @@ DEFL( void )
         inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
         bytepos += 4;
 
-        if ( sym == TK_NEWLINE )
+        if ( sym == TK_NEWLINE || sym == TK_EOF )
         {
             break;
         }
@@ -707,7 +706,7 @@ DEFM( void )
 			}
 
             GetSym();
-            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
+            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE && sym != TK_EOF)
             {
                 error_syntax();
                 return;
@@ -720,7 +719,7 @@ DEFM( void )
                 break;    /* syntax error - get next line from file... */
             }
 
-            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE )
+            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE && sym != TK_EOF)
             {
                 error_syntax(); /* expression separator not found */
                 break;
@@ -730,7 +729,7 @@ DEFM( void )
             inc_PC( 1 );
         }
     }
-    while ( sym != TK_NEWLINE );
+    while ( sym != TK_NEWLINE && sym != TK_EOF );
 }
 
 
@@ -843,7 +842,13 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.79  2014-03-11 22:59:20  pauloscustodio
+ * Revision 1.80  2014-03-11 23:34:00  pauloscustodio
+ * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+ * Allows decoupling of input file used in scanner from callers.
+ * Removed TOTALLINES.
+ * GetChar() made static to scanner, not called by other modules.
+ *
+ * Revision 1.79  2014/03/11 22:59:20  pauloscustodio
  * Move EOL flag to scanner
  *
  * Revision 1.78  2014/03/11 00:21:33  pauloscustodio

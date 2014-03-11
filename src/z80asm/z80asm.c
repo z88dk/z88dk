@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.146 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.147 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -73,7 +73,6 @@ FILE *z80asmfile, *objfile;
 
 tokid_t sym;
 
-long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
 extern char Z80objhdr[];
@@ -656,8 +655,6 @@ int main( int argc, char *argv[] )
         /* define OS_ID */
         define_static_def_sym( OS_ID, 1 );
 
-        TOTALLINES = 0;
-
         /* parse command line and call-back via assemble_file() */
         parse_argv( argc, argv, assemble_file );
 
@@ -667,9 +664,6 @@ int main( int argc, char *argv[] )
         /* Create library */
         if ( opts.lib_file && ! get_num_errors() )
             CreateLib( opts.lib_file );
-
-        if ( ! get_num_errors() && opts.verbose )
-            printf( "Total of %ld lines assembled.\n", TOTALLINES );
 
         if ( ! get_num_errors() && opts.make_bin )
             LinkModules();
@@ -732,7 +726,13 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.146  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.147  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.146  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.145  2014/03/05 23:44:55  pauloscustodio

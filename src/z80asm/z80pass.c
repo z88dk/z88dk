@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.82 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.83 2014-03-11 23:34:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,7 +45,6 @@ void LinkModules( void );
 void ParseIdent( enum flag interpret );
 void RemovePfixlist( struct expr *pfixexpr );
 void StoreExpr( struct expr *pfixexpr, char range );
-int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );
 tokid_t GetSym( void );
@@ -68,7 +67,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 extern FILE *z80asmfile, *objfile;
 extern char line[], ident[];
 extern tokid_t sym;
-extern long TOTALLINES;
 extern struct module *CURRENTMODULE;
 
 void
@@ -76,7 +74,8 @@ Z80pass1( void )
 {
     line[0] = '\0';                   /* reset contents of list buffer */
 
-    while ( !feof( z80asmfile ) )
+	sym = TK_NIL;
+    while ( sym != TK_EOF )
     {
         parseline( ON );              /* before parsing it */
     }
@@ -122,6 +121,7 @@ parseline( enum flag interpret )
         ParseIdent( interpret );
         break;
 
+    case TK_EOF:
     case TK_NEWLINE:
         break;                /* empty line, get next... */
 
@@ -153,7 +153,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is TRUE, interpret lines until #else or #endif */
-                if ( !feof( z80asmfile ) )
+                if ( sym != TK_EOF )
                 {
                     parseline( ON );
                 }
@@ -169,7 +169,7 @@ ifstatement( enum flag interpret )
                 do
                 {
                     /* then ignore lines until #endif ... */
-                    if ( !feof( z80asmfile ) )
+                    if ( sym != TK_EOF )
                     {
                         parseline( OFF );
                     }
@@ -186,7 +186,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is FALSE, ignore until #else or #endif */
-                if ( !feof( z80asmfile ) )
+                if ( sym != TK_EOF )
                 {
                     parseline( OFF );
                 }
@@ -201,7 +201,7 @@ ifstatement( enum flag interpret )
             {
                 do
                 {
-                    if ( !feof( z80asmfile ) )
+                    if ( sym != TK_EOF )
                     {
                         parseline( ON );
                     }
@@ -219,7 +219,7 @@ ifstatement( enum flag interpret )
         do
         {
             /* don't evaluate #if expression and ignore all lines until #endif */
-            if ( !feof( z80asmfile ) )
+            if ( sym != TK_EOF )
             {
                 parseline( OFF );
             }
@@ -716,7 +716,13 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.82  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.83  2014-03-11 23:34:00  pauloscustodio
+* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Allows decoupling of input file used in scanner from callers.
+* Removed TOTALLINES.
+* GetChar() made static to scanner, not called by other modules.
+*
+* Revision 1.82  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.81  2014/03/11 00:15:13  pauloscustodio
