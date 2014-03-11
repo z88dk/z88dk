@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.77 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.78 2014-03-11 00:21:33 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -821,65 +821,6 @@ BINARY( void )
 }
 
 
-char *
-Fetchfilename( FILE *fptr )
-{
-    char  *ptr;
-    int    len, c = 0;
-
-    do
-    {
-        for ( len = 0; len < 255; len++ )
-        {
-            if ( !feof( fptr ) )
-            {
-                c = GetChar( fptr );
-
-                if ( ( c == '\n' ) || ( c == EOF ) )
-                {
-                    break;
-                }
-
-                if ( c != '"' )
-                {
-                    ident[len] = ( char ) c;
-                }
-                else
-                {
-                    break;       /* fatal - end of file reached! */
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        ident[len] = '\0';          /* null-terminate file name */
-    }
-    while ( strlen( ident ) == 0 && !feof( fptr ) );
-
-    if ( c != '\n' )
-    {
-        Skipline( fptr );    /* prepare for next line */
-    }
-
-    ptr = ident;
-
-#ifdef __LEGACY_Z80ASM_SYNTAX
-
-    if ( *ptr == '#' )
-    {
-        ptr++;
-    }
-
-#endif
-
-    return strlen( ptr ) ? search_file( ptr, opts.inc_path ) : "";
-}
-
-
-
 void
 DeclModuleName( void )
 {
@@ -903,7 +844,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.77  2014-03-11 00:15:13  pauloscustodio
+ * Revision 1.78  2014-03-11 00:21:33  pauloscustodio
+ * Removed Fetchfilename(), handled as TK_STRING in scanner
+ *
+ * Revision 1.77  2014/03/11 00:15:13  pauloscustodio
  * Scanner reads input line-by-line instead of character-by-character.
  * Factor house-keeping at each new line read in the scanner getasmline().
  * Add interface to allow back-tacking of the recursive descent parser by
