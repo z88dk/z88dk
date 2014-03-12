@@ -11,6 +11,7 @@
 ; ===============================================================
 
 XLIB asm_w_array_append_n
+XDEF asm1_w_array_append_n
 
 LIB asm_b_array_append_block, asm_memset, error_enomem_mc
 
@@ -41,6 +42,8 @@ asm_w_array_append_n:
    
    call asm_b_array_append_block
    jp c, error_enomem_mc - 1
+
+asm1_w_array_append_n:
 
    ; append successful, now fill appended area
    

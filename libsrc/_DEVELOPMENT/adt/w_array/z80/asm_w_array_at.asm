@@ -11,10 +11,12 @@
 ; ===============================================================
 
 XLIB asm_w_array_at
+XDEF asm_w_vector_at
 
 LIB __array_at, error_einval_mc
 
 asm_w_array_at:
+asm_w_vector_at:
 
    ; enter : hl = array *
    ;         bc = idx

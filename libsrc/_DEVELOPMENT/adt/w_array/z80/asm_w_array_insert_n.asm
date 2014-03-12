@@ -11,6 +11,7 @@
 ; ===============================================================
 
 XLIB asm_w_array_insert_n
+XDEF asm1_w_array_insert_n
 
 LIB error_einval_mc, error_enomem_mc, error_mc
 LIB asm_b_array_insert_block, asm_memset
@@ -25,7 +26,7 @@ asm_w_array_insert_n:
    ; exit  : success
    ;
    ;            de = & array.data[idx]
-   ;            hl = idx of first char inserted
+   ;            hl = idx of first word inserted
    ;            carry reset
    ;
    ;         fail
@@ -49,6 +50,8 @@ asm_w_array_insert_n:
    push de                     ; save n*2
    
    call asm_b_array_insert_block
+
+asm1_w_array_insert_n:
 
    pop bc                      ; bc = n*2
    pop de                      ; de = item

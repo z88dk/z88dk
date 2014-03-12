@@ -10,7 +10,7 @@
 ; ===============================================================
 
 XLIB asm_w_array_append
-XDEF asm_w_array_push_back
+XDEF asm1_w_array_append, asm_w_array_push_back
 
 LIB asm_b_array_append_block, error_enomem_mc
 
@@ -42,7 +42,9 @@ asm_w_array_push_back:
    
    pop bc                      ; bc = item
    jp c, error_enomem_mc       ; if append error
-   
+
+asm1_w_array_append:
+
    ld (hl),c                   ; append item to end
    inc hl
    ld (hl),b

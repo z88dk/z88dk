@@ -10,10 +10,12 @@
 ; ===============================================================
 
 XLIB asm_w_array_pop_back
+XDEF asm_w_vector_pop_back
 
 LIB __array_info, error_einval_mc
 
 asm_w_array_pop_back:
+asm_w_vector_pop_back:
 
    ; enter : hl = array *
    ;

@@ -10,10 +10,12 @@
 ; ===============================================================
 
 XLIB asm_w_array_erase_range
+XDEF asm_w_vector_erase_range
 
 LIB asm_b_array_erase_block, error_einval_mc
 
 asm_w_array_erase_range:
+asm_w_vector_erase_range:
 
    ; enter : hl = idx_last
    ;         bc = idx_first

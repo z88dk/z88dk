@@ -12,7 +12,15 @@
 XLIB asm_w_array_capacity
 XDEF asm_w_array_size
 
+XDEF asm_w_vector_size, asm_w_vector_capacity, asm_w_vector_max_size
+
+asm_w_vector_max_size:
+
+   inc hl
+   inc hl
+
 asm_w_array_capacity:
+asm_w_vector_capacity:
 
    ; enter : hl = array *
    ;
@@ -24,6 +32,7 @@ asm_w_array_capacity:
    inc hl
 
 asm_w_array_size:
+asm_w_vector_size:
 
    inc hl
    inc hl
