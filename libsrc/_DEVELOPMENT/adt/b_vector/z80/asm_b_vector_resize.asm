@@ -10,7 +10,7 @@
 ; If n <= vector.size, vector.size = n and any elements in
 ; the vector.array at positions >= n are ignored.
 ;
-; If n > vector.size, vector.array is grown and if that
+; If n > vector.size, vector.data is grown and if that
 ; is successfully done, new elements are zeroed. 
 ;
 ; Carry set on failure.

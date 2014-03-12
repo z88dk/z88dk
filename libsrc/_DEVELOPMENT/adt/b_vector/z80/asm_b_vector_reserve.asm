@@ -13,7 +13,7 @@
 
 XLIB asm_b_vector_reserve
 
-LIB 
+LIB __0_vector_realloc_grow, error_znc
 
 asm_b_vector_reserve:
 

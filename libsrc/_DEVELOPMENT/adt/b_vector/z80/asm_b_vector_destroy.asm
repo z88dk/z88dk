@@ -10,10 +10,12 @@
 ; ===============================================================
 
 XLIB asm_b_vector_destroy
+XDEF asm_w_vector_destroy
 
 LIB asm_free, l_setmem_hl
 
 asm_b_vector_destroy:
+asm_w_vector_destroy:
 
    ; enter : hl = vector *
    ;

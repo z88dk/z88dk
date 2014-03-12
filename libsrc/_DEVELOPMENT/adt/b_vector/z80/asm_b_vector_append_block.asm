@@ -28,8 +28,8 @@ asm_b_vector_append_block_extra:
    ;
    ; exit  : success
    ;
-   ;            hl = & bytes added to vector.array
-   ;            de = idx of bytes added to vector.array
+   ;            hl = & bytes added to vector.data
+   ;            de = idx of bytes added to vector.data
    ;            bc = n
    ;            carry reset
    ;

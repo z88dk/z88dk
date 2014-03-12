@@ -26,10 +26,9 @@ asm_b_vector_append_n:
    ;            de = & vector.data[idx]
    ;            carry reset
    ;
-   ;         fail if array too small
+   ;         fail
    ;
    ;            hl = -1
-   ;            de = n
    ;            carry set, errno = ENOMEM
    ;
    ; uses  : af, bc, de, hl
@@ -40,11 +39,6 @@ asm_b_vector_append_n:
    jp c, error_mc - 1
 
    ; append successful, now fill appended area
-   
-   ; bc = n
-   ; de = idx = old vector.size
-   ; hl = & vector.data[idx]
-   ; stack = char
 
    ex de,hl
    ex (sp),hl
