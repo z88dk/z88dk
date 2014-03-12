@@ -14,7 +14,7 @@ XDEF asm_b_array_size, asm_b_array_data
 
 XDEF asm_b_vector_max_capacity, asm_b_vector_capacity, asm_b_vector_size, asm_b_vector_data
 
-XDEF asm_w_array_data
+XDEF asm_w_array_data, asm_w_vector_data
 
 asm_b_vector_max_capacity:
 
@@ -42,6 +42,7 @@ asm_b_vector_size:
 asm_b_array_data:
 asm_w_array_data:
 asm_b_vector_data:
+asm_w_vector_data:
 
    ld a,(hl)
    inc hl
