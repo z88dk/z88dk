@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.8 2014-03-06 00:18:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.9 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #pragma once
@@ -42,7 +42,7 @@ typedef enum { ASSOC_NONE, ASSOC_LEFT, ASSOC_RIGHT } assoc_t;
 *	Calculation functions for all operators, template:
 *	long calc_<symbol> (long a [, long b [, long c ] ] );
 *----------------------------------------------------------------------------*/
-#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
+#define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)	\
 	extern long calc_##_operation _args;
 #include "expr_def.h"
 
@@ -51,7 +51,7 @@ typedef enum { ASSOC_NONE, ASSOC_LEFT, ASSOC_RIGHT } assoc_t;
 *----------------------------------------------------------------------------*/
 typedef struct Operator
 {
-	tokid_t		sym;				/* symbol */
+	tokid_t		tok;				/* symbol */
 	op_type_t	op_type;			/* UNARY_OP, BINARY_OP, TERNARY_OP */
 	int			prec;				/* precedence lowest (1) to highest (N) */
 	assoc_t		assoc;				/* left or rigth association */
@@ -64,7 +64,7 @@ typedef struct Operator
 } Operator;
 
 /* get the operator descriptor for the given (sym, op_type) */
-extern Operator *Operator_get( tokid_t sym, op_type_t op_type );
+extern Operator *Operator_get( tokid_t tok, op_type_t op_type );
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
@@ -106,7 +106,7 @@ ARRAY( ExprOp );					/* hold list of Expr operations/operands */
 extern void ExprOp_init_number(     ExprOp *self, long value );
 extern void ExprOp_init_name(       ExprOp *self, char *name, byte_t sym_type );
 extern void ExprOp_init_const_expr( ExprOp *self );
-extern void ExprOp_init_operator(   ExprOp *self, tokid_t sym, op_type_t op_type );
+extern void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type );
 
 /*-----------------------------------------------------------------------------
 *	Expression
@@ -160,7 +160,11 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.8  2014-03-06 00:18:43  pauloscustodio
+* Revision 1.9  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.8  2014/03/06 00:18:43  pauloscustodio
 * BUG_0043: buffer overflow on constants longer than 128 chars in object file
 * z80asm crashed when the expression to be stored in the obejct file was
 * longer than the maximum allocated size (128). Changed to dynamic string.

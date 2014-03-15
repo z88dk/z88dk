@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.68 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.69 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -41,7 +41,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.68 2014-0
 #include <string.h>
 
 /* external functions */
-tokid_t GetSym( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 long GetConstant( char *evalerr );
 
@@ -59,7 +58,6 @@ struct expr *ParseNumExpr( void );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
-extern tokid_t sym;
 extern char ident[];
 extern FILE *z80asmfile, *objfile;
 
@@ -74,8 +72,8 @@ extern FILE *z80asmfile, *objfile;
 																\
 		while ( condition )										\
 		{														\
-			op = sym;											\
-			Str_append(pfixexpr->text, token_string(sym));		\
+			op = tok;											\
+			Str_append(pfixexpr->text, token_string(tok));		\
 			GetSym();											\
 			if ( ! prev_name(pfixexpr) )						\
 				return FALSE;									\
@@ -95,7 +93,7 @@ static BOOL Factor( struct expr *pfixexpr )
     Symbol *symptr;
     char eval_err;
 
-    switch ( sym )
+    switch ( tok )
     {
     case TK_NAME:
         symptr = get_used_symbol( ident );
@@ -123,9 +121,9 @@ static BOOL Factor( struct expr *pfixexpr )
         break;
 
 	case TK_NUMBER:
-		Str_append_sprintf(pfixexpr->text, "%ld", sym_number);
+		Str_append_sprintf(pfixexpr->text, "%ld", tok_number);
 		ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
-							sym_number );
+							tok_number );
         GetSym();
         break;
 
@@ -160,10 +158,10 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 {
     tokid_t open_paren;
 
-	switch (sym) 
+	switch (tok) 
 	{
     case TK_MINUS:
-        Str_append(pfixexpr->text, token_string(sym));
+        Str_append(pfixexpr->text, token_string(tok));
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -177,7 +175,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
         return UnaryTerm( pfixexpr );
 
     case TK_BIN_NOT:
-        Str_append(pfixexpr->text, token_string(sym));
+        Str_append(pfixexpr->text, token_string(tok));
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -187,7 +185,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 		return TRUE;
 
     case TK_LOG_NOT:
-        Str_append(pfixexpr->text, token_string(sym));
+        Str_append(pfixexpr->text, token_string(tok));
         GetSym();
 
         if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
@@ -199,19 +197,19 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-        Str_append(pfixexpr->text, token_string(sym));
-        open_paren = sym;
+        Str_append(pfixexpr->text, token_string(tok));
+        open_paren = tok;
         GetSym();
 
         if ( ! TernaryCondition( pfixexpr ) )
 			return FALSE;
 
 		/* chack parentheses balance */
-        if ( ( open_paren == TK_LPAREN  && sym != TK_RPAREN ) ||
-             ( open_paren == TK_LSQUARE && sym != TK_RSQUARE ) )
+        if ( ( open_paren == TK_LPAREN  && tok != TK_RPAREN ) ||
+             ( open_paren == TK_LSQUARE && tok != TK_RSQUARE ) )
 			return FALSE;
 
-        Str_append(pfixexpr->text, token_string(sym));
+        Str_append(pfixexpr->text, token_string(tok));
         GetSym();
 		return TRUE;
 
@@ -226,9 +224,9 @@ static BOOL PowerTerm( struct expr *pfixexpr )
     if ( ! UnaryTerm( pfixexpr ) )
         return FALSE;
 
-    while ( sym == TK_POWER )
+    while ( tok == TK_POWER )
     {
-        Str_append(pfixexpr->text, token_string(sym));
+        Str_append(pfixexpr->text, token_string(tok));
         GetSym();
 		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -242,30 +240,30 @@ static BOOL PowerTerm( struct expr *pfixexpr )
 
 
 /* parse A * B, A / B, A % B */
-DEFINE_PARSER( Multiplication, PowerTerm, sym == TK_MULTIPLY || sym == TK_DIVIDE || sym == TK_MOD )
+DEFINE_PARSER( Multiplication, PowerTerm, tok == TK_MULTIPLY || tok == TK_DIVIDE || tok == TK_MOD )
 
 /* parse A + B, A - B */
-DEFINE_PARSER( Addition, Multiplication, sym == TK_PLUS || sym == TK_MINUS )
+DEFINE_PARSER( Addition, Multiplication, tok == TK_PLUS || tok == TK_MINUS )
 
 /* parse A << B, A >> B */
-DEFINE_PARSER( BinaryShift, Addition, sym == TK_LEFT_SHIFT || sym == TK_RIGHT_SHIFT )
+DEFINE_PARSER( BinaryShift, Addition, tok == TK_LEFT_SHIFT || tok == TK_RIGHT_SHIFT )
 
 /* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
-DEFINE_PARSER( Condition, BinaryShift, sym == TK_LESS	|| sym == TK_LESS_EQ ||
-									   sym == TK_EQUAL	|| sym == TK_NOT_EQ  ||
-									   sym == TK_GREATER|| sym == TK_GREATER_EQ )
+DEFINE_PARSER( Condition, BinaryShift, tok == TK_LESS	|| tok == TK_LESS_EQ ||
+									   tok == TK_EQUAL	|| tok == TK_NOT_EQ  ||
+									   tok == TK_GREATER|| tok == TK_GREATER_EQ )
 
 /* parse A & B */
-DEFINE_PARSER( BinaryAnd, Condition, sym == TK_BIN_AND )
+DEFINE_PARSER( BinaryAnd, Condition, tok == TK_BIN_AND )
 
 /* parse A | B, A ^ B */
-DEFINE_PARSER( BinaryOr, BinaryAnd, sym == TK_BIN_OR || sym == TK_BIN_XOR )
+DEFINE_PARSER( BinaryOr, BinaryAnd, tok == TK_BIN_OR || tok == TK_BIN_XOR )
 
 /* parse A && B */
-DEFINE_PARSER( LogicalAnd, BinaryOr, sym == TK_LOG_AND )
+DEFINE_PARSER( LogicalAnd, BinaryOr, tok == TK_LOG_AND )
 
 /* parse A || B */
-DEFINE_PARSER( LogicalOr, LogicalAnd, sym == TK_LOG_OR )
+DEFINE_PARSER( LogicalOr, LogicalAnd, tok == TK_LOG_OR )
 
 /* parse cond ? true : false */
 static BOOL TernaryCondition( struct expr *pfixexpr )
@@ -273,7 +271,7 @@ static BOOL TernaryCondition( struct expr *pfixexpr )
 	if ( ! LogicalOr(pfixexpr) )		/* get cond or expression */
 		return FALSE;
 
-	if ( sym != TK_QUESTION )
+	if ( tok != TK_QUESTION )
 		return TRUE;
 
 	/* ternary construct found */
@@ -283,7 +281,7 @@ static BOOL TernaryCondition( struct expr *pfixexpr )
 	if ( ! TernaryCondition(pfixexpr) )	/* get true */
 		return FALSE;
 
-	if ( sym != TK_COLON )
+	if ( tok != TK_COLON )
 		return FALSE;
     Str_append_char(pfixexpr->text, ':');
 	GetSym();						/* consume ':' */
@@ -315,9 +313,9 @@ ParseNumExpr( void )
     pfixhdr->stored = OFF;
     pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
 
-    if ( sym == TK_CONST_EXPR )
+    if ( tok == TK_CONST_EXPR )
     {
-		Str_append(pfixhdr->text, token_string(sym));
+		Str_append(pfixhdr->text, token_string(tok));
 
 		GetSym();               /* leading '#' : ignore relocatable address expression */
         is_const_expr = TRUE;        /* convert to constant expression */
@@ -586,7 +584,7 @@ ExprSigned8( int listoffset )
     uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
-    switch ( sym )
+    switch ( tok )
     {
     case TK_RPAREN:
         append_byte( 0 );   /* offset zero */
@@ -655,7 +653,11 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.68  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.69  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.68  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.80 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.81 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -38,7 +38,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.80 2014-0
 #include <string.h>
 
 /* external functions */
-tokid_t GetSym( void );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
@@ -66,7 +65,6 @@ void UNDEFINE( void );
 extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern uint_t DEFVPC;
-extern tokid_t sym;
 extern struct module *CURRENTMODULE;
 
 
@@ -163,7 +161,7 @@ Parsedefvarsize( long offset )
 {
     long varoffset = 0;
 
-    switch ( sym )
+    switch ( tok )
     {
     case TK_NAME:
         if ( strcmp( ident, "DS" ) != 0 )
@@ -172,7 +170,7 @@ Parsedefvarsize( long offset )
             GetSym();
         }
 
-        if ( sym == TK_NAME )
+        if ( tok == TK_NAME )
         {
             varoffset = Parsevarsize();
         }
@@ -237,7 +235,7 @@ DEFVARS( void )
         return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
     }
 
-    while ( sym != TK_EOF && sym != TK_LCURLY )
+    while ( tok != TK_EOF && tok != TK_LCURLY )
     {
         Skipline( z80asmfile );
 
@@ -245,9 +243,9 @@ DEFVARS( void )
         GetSym();
     }
 
-    if ( sym == TK_LCURLY )
+    if ( tok == TK_LCURLY )
     {
-        while ( sym != TK_EOF && GetSym() != TK_RCURLY )
+        while ( tok != TK_EOF && GetSym() != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -274,15 +272,15 @@ DEFGROUP( void )
     struct expr *postfixexpr;
     long constant, enumconst = 0;
 
-    while ( sym != TK_EOF && GetSym() != TK_LCURLY )
+    while ( tok != TK_EOF && GetSym() != TK_LCURLY )
     {
         Skipline( z80asmfile );
         EOL = FALSE;
     }
 
-    if ( sym == TK_LCURLY )
+    if ( tok == TK_LCURLY )
     {
-        while ( sym != TK_EOF && sym != TK_RCURLY )
+        while ( tok != TK_EOF && tok != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -294,7 +292,7 @@ DEFGROUP( void )
                 {
                     GetSym();
 
-                    switch ( sym )
+                    switch ( tok )
                     {
                     case TK_RCURLY:
                     case TK_NEWLINE:
@@ -337,7 +335,7 @@ DEFGROUP( void )
                         break;
                     }
                 }
-                while ( sym == TK_COMMA );   /* get enum definitions separated by comma in current line */
+                while ( tok == TK_COMMA );   /* get enum definitions separated by comma in current line */
 
                 Skipline( z80asmfile );   /* ignore rest of line */
             }
@@ -369,7 +367,7 @@ DEFS()
             /* BUG_0007 : memory leaks - was not being released in case of error */
             RemovePfixlist( postfixexpr ); /* remove linked list, expression evaluated */
 
-            if ( sym != TK_COMMA )
+            if ( tok != TK_COMMA )
             {
                 val = 0;
             }
@@ -413,16 +411,16 @@ DEFS()
 void
 UNDEFINE( void )
 {
-    Symbol *sym = NULL;
+    Symbol *tok = NULL;
 
     do
     {
         if ( GetSym() == TK_NAME )
         {
-            sym = find_local_symbol( ident );
+            tok = find_local_symbol( ident );
         }
 
-        if ( sym != NULL )
+        if ( tok != NULL )
         {
             SymbolHash_remove( CURRENTMODULE->local_symtab, ident );
         }
@@ -505,7 +503,7 @@ DEFC( void )
             break;
         }
     }
-    while ( sym == TK_COMMA );       /* get all DEFC definition separated by comma */
+    while ( tok == TK_COMMA );       /* get all DEFC definition separated by comma */
 }
 
 
@@ -561,17 +559,17 @@ DEFB( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         ++bytepos;
 
-        if ( sym == TK_NEWLINE || sym == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_EOF )
         {
             break;
         }
-        else if ( sym != TK_COMMA )
+        else if ( tok != TK_COMMA )
         {
             error_syntax();
             break;
         }
     }
-    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -593,17 +591,17 @@ DEFW( void )
         inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
         bytepos += 2;
 
-        if ( sym == TK_NEWLINE || sym == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_EOF )
         {
             break;
         }
-        else if ( sym != TK_COMMA )
+        else if ( tok != TK_COMMA )
         {
             error_syntax();
             break;
         }
     }
-    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -626,7 +624,7 @@ DEFP( void )
         bytepos += 2;
 
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
-        if ( sym != TK_COMMA )
+        if ( tok != TK_COMMA )
         {
             error_syntax();
         }
@@ -641,17 +639,17 @@ DEFP( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         bytepos += 1;
 
-        if ( sym == TK_NEWLINE || sym == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_EOF )
         {
             break;
         }
-        else if ( sym != TK_COMMA )
+        else if ( tok != TK_COMMA )
         {
             error_syntax();
             break;
         }
     }
-    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -673,17 +671,17 @@ DEFL( void )
         inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
         bytepos += 4;
 
-        if ( sym == TK_NEWLINE || sym == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_EOF )
         {
             break;
         }
-        else if ( sym != TK_COMMA )
+        else if ( tok != TK_COMMA )
         {
             error_syntax();
             break;
         }
     }
-    while ( sym == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -698,7 +696,7 @@ DEFM( void )
     {
         if ( GetSym() == TK_STRING )
         {
-			for ( p = sym_string; *p != '\0'; p++ )
+			for ( p = tok_string; *p != '\0'; p++ )
 			{
                 append_byte( ( byte_t ) *p );
                 ++bytepos;
@@ -706,7 +704,7 @@ DEFM( void )
 			}
 
             GetSym();
-            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE && sym != TK_EOF)
+            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_EOF)
             {
                 error_syntax();
                 return;
@@ -719,7 +717,7 @@ DEFM( void )
                 break;    /* syntax error - get next line from file... */
             }
 
-            if ( sym != TK_STRING_CAT && sym != TK_COMMA && sym != TK_NEWLINE && sym != TK_EOF)
+            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_EOF)
             {
                 error_syntax(); /* expression separator not found */
                 break;
@@ -729,7 +727,7 @@ DEFM( void )
             inc_PC( 1 );
         }
     }
-    while ( sym != TK_NEWLINE && sym != TK_EOF );
+    while ( tok != TK_NEWLINE && tok != TK_EOF );
 }
 
 
@@ -743,7 +741,7 @@ INCLUDE( void )
     if ( GetSym() == TK_STRING )
     {
         /* fetch filename of include file */
-        filename = search_file( sym_string, opts.inc_path );
+        filename = search_file( tok_string, opts.inc_path );
 
         if ( FindFile( CURRENTFILE, filename ) != NULL )
         {
@@ -786,7 +784,7 @@ INCLUDE( void )
         error_syntax();
     }
 
-    sym = TK_NEWLINE;
+    tok = TK_NEWLINE;
 }
 
 
@@ -799,7 +797,7 @@ BINARY( void )
 
     if ( GetSym() == TK_STRING )
     {
-        filename = search_file( sym_string, opts.inc_path );
+        filename = search_file( tok_string, opts.inc_path );
 
         binfile = xfopen( filename, "rb" );           /* CH_0012 */
         fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
@@ -824,7 +822,7 @@ DeclModuleName( void )
 {
     if ( CURRENTMODULE->mname == NULL )
     {
-        if ( sym == TK_NAME )
+        if ( tok == TK_NAME )
         {
             CURRENTMODULE->mname = xstrdup( ident );
         }
@@ -842,7 +840,11 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.80  2014-03-11 23:34:00  pauloscustodio
+ * Revision 1.81  2014-03-15 02:12:07  pauloscustodio
+ * Rename last token to tok*
+ * GetSym() declared in scan.h
+ *
+ * Revision 1.80  2014/03/11 23:34:00  pauloscustodio
  * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
  * Allows decoupling of input file used in scanner from callers.
  * Removed TOTALLINES.

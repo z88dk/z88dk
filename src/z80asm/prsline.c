@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.51 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.52 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -49,7 +49,6 @@ int CheckBaseType( int chcount );
 /* global variables */
 extern FILE *z80asmfile;
 extern char ident[];
-extern tokid_t sym;
 extern int currentline;
 extern struct module *CURRENTMODULE;
 
@@ -60,11 +59,16 @@ static char *input_ptr    = "";
 /* stack of previous contexts */
 static List *input_stack;
 
-static Str	*sym_string_str = NULL;
-char		*sym_string     = "";	/* contains double-quoted string without quotes
+/* current symbol */
+tokid_t		 tok = TK_NIL;
+static Str	*tok_name_str   = NULL;
+char		*tok_name       = "";	/* contains identifier to return with TK_NAME and TK_LABEL */
+static Str	*tok_string_str = NULL;
+char		*tok_string     = "";	/* contains double-quoted string without quotes
 									   to return with a TK_STRING */
-long		 sym_number;			/* contains number to return with a TK_NUMBER */
+long		 tok_number;			/* contains number to return with a TK_NUMBER */
 
+/* scanner state */
 BOOL		 EOL;
 
 /*-----------------------------------------------------------------------------
@@ -78,15 +82,19 @@ DEFINE_init()
 	input_stack	 = OBJ_NEW(List);
 	input_stack->free_data = xfreef;
 
-	sym_string_str = OBJ_NEW(Str);
-	sym_string	 = sym_string_str->str;
+	tok_name_str = OBJ_NEW(Str);
+	tok_name	 = tok_name_str->str;
+
+	tok_string_str = OBJ_NEW(Str);
+	tok_string	 = tok_string_str->str;
 }
 
 DEFINE_fini()
 {
 	OBJ_DELETE(input_buffer);
 	OBJ_DELETE(input_stack);
-	OBJ_DELETE(sym_string_str);
+	OBJ_DELETE(tok_name_str);
+	OBJ_DELETE(tok_string_str);
 }
 
 /*-----------------------------------------------------------------------------
@@ -228,7 +236,7 @@ tokid_t GetSym( void )
     ident[0] = '\0';
 
     if ( EOL )
-        return (sym = TK_NEWLINE);			/* assign and return */
+        return (tok = TK_NEWLINE);			/* assign and return */
 
     for ( ;; )
     {
@@ -236,12 +244,12 @@ tokid_t GetSym( void )
         c = GetChar( z80asmfile );
 		if ( c == EOF )
 		{
-	        return (sym = TK_EOF);			/* assign and return */
+	        return (tok = TK_EOF);			/* assign and return */
 		}
 		else if ( c == '\n' )
         {
             EOL = TRUE;
-	        return (sym = TK_NEWLINE);		/* assign and return */
+	        return (tok = TK_NEWLINE);		/* assign and return */
         }
         else if ( !isspace( c ) )
         {
@@ -253,7 +261,7 @@ tokid_t GetSym( void )
     if ( c == ';' )
     {
         Skipline( z80asmfile );				/* ignore comment line, prepare for next line */
-        return (sym = TK_NEWLINE);			/* assign and return */
+        return (tok = TK_NEWLINE);			/* assign and return */
     }
 
 	/* double-quoted string */
@@ -269,17 +277,17 @@ tokid_t GetSym( void )
 		}
 
 		/* copy chars up to close quote */
-		Str_set( sym_string_str, input_ptr );
-		sym_string_str->str[ quote - input_ptr ] = '\0';
-		Str_sync_len( sym_string_str );
+		Str_set( tok_string_str, input_ptr );
+		tok_string_str->str[ quote - input_ptr ] = '\0';
+		Str_sync_len( tok_string_str );
 
-		sym_string = sym_string_str->str;
+		tok_string = tok_string_str->str;
 
 		input_ptr = quote;					/* advance past string */
 		if ( *input_ptr == '"' )
 			input_ptr++;					/* advance past quote */
 
-		return (sym = TK_STRING);			/* assign and return */
+		return (tok = TK_STRING);			/* assign and return */
 	}
 
 	/* single-quoted string */
@@ -288,17 +296,17 @@ tokid_t GetSym( void )
 		char *quote = strchr( input_ptr, '\'' );
 		if ( quote == NULL || quote - input_ptr != 1 )	/* only 1-char quoted strings */
 		{
-			sym_number = 0;
+			tok_number = 0;
 			error_invalid_squoted_string();
 			Skipline( z80asmfile );
 		}
 		else
 		{
-			sym_number = (byte_t) input_ptr[0];
+			tok_number = (byte_t) input_ptr[0];
 			input_ptr = quote + 1;			/* advance past string */
 		}
 
-		return (sym = TK_NUMBER);			/* assign and return */
+		return (tok = TK_NUMBER);			/* assign and return */
 	}
 
 	/* special cases for composed separators */
@@ -306,56 +314,56 @@ tokid_t GetSym( void )
 	{
 		input_ptr--;
 
-		if ( GetComposed( "**" ) ) return (sym = TK_POWER);			/* assign and return */
-		if ( GetComposed( "==" ) ) return (sym = TK_EQUAL);			/* assign and return */
-		if ( GetComposed( "!=" ) ) return (sym = TK_NOT_EQ);		/* assign and return */
-		if ( GetComposed( "<>" ) ) return (sym = TK_NOT_EQ);		/* assign and return */
-		if ( GetComposed( "<=" ) ) return (sym = TK_LESS_EQ);		/* assign and return */
-		if ( GetComposed( ">=" ) ) return (sym = TK_GREATER_EQ);	/* assign and return */
-		if ( GetComposed( "<<" ) ) return (sym = TK_LEFT_SHIFT);	/* assign and return */
-		if ( GetComposed( ">>" ) ) return (sym = TK_RIGHT_SHIFT);	/* assign and return */
-		if ( GetComposed( "&&" ) ) return (sym = TK_LOG_AND);		/* assign and return */
-		if ( GetComposed( "||" ) ) return (sym = TK_LOG_OR);		/* assign and return */
+		if ( GetComposed( "**" ) ) return (tok = TK_POWER);			/* assign and return */
+		if ( GetComposed( "==" ) ) return (tok = TK_EQUAL);			/* assign and return */
+		if ( GetComposed( "!=" ) ) return (tok = TK_NOT_EQ);		/* assign and return */
+		if ( GetComposed( "<>" ) ) return (tok = TK_NOT_EQ);		/* assign and return */
+		if ( GetComposed( "<=" ) ) return (tok = TK_LESS_EQ);		/* assign and return */
+		if ( GetComposed( ">=" ) ) return (tok = TK_GREATER_EQ);	/* assign and return */
+		if ( GetComposed( "<<" ) ) return (tok = TK_LEFT_SHIFT);	/* assign and return */
+		if ( GetComposed( ">>" ) ) return (tok = TK_RIGHT_SHIFT);	/* assign and return */
+		if ( GetComposed( "&&" ) ) return (tok = TK_LOG_AND);		/* assign and return */
+		if ( GetComposed( "||" ) ) return (tok = TK_LOG_OR);		/* assign and return */
 
 		input_ptr++;
 	}
 
 	/* single char separators */
-	sym = char_token( c );
-	if ( sym != TK_NIL )
-		return sym;
+	tok = char_token( c );
+	if ( tok != TK_NIL )
+		return tok;
 
     ident[chcount++] = ( char ) toupper( c );
 
     switch ( c )
     {
     case '$':
-        sym = TK_HEX_CONST;
+        tok = TK_HEX_CONST;
         break;
 
     case '@':
     case '%':       /* not reached, as '%' is a separator */
-        sym = TK_BIN_CONST;
+        tok = TK_BIN_CONST;
         break;
 
     case '#':       /* not reached, as '#' is a separator */
-        sym = TK_NAME;
+        tok = TK_NAME;
         break;
 
     default:
         if ( isdigit( c ) )
         {
-            sym = TK_DEC_CONST;      /* a decimal number found */
+            tok = TK_DEC_CONST;      /* a decimal number found */
         }
         else
         {
             if ( isalpha( c ) || c == '_' )
             {
-                sym = TK_NAME;       /* an identifier found */
+                tok = TK_NAME;       /* an identifier found */
             }
             else
             {
-                sym = TK_NIL;        /* rubbish ... */
+                tok = TK_NIL;        /* rubbish ... */
             }
         }
 
@@ -363,7 +371,7 @@ tokid_t GetSym( void )
     }
 
     /* Read identifier until space or legal separator is found */
-    if ( sym == TK_NAME )
+    if ( tok == TK_NAME )
     {
         while (1)
         {
@@ -374,7 +382,7 @@ tokid_t GetSym( void )
 			if ( !isalnum( c ) && c != '_' )
 			{
 				if ( c == ':' )					/* eat ':' if any */
-					sym = TK_LABEL;
+					tok = TK_LABEL;
 				else
 					UnGet( c );
 				break;
@@ -403,7 +411,7 @@ tokid_t GetSym( void )
 
     ident[chcount] = '\0';
 
-    return sym;
+    return tok;
 }
 
 int
@@ -437,7 +445,7 @@ CheckBaseType( int chcount )
             }
 
             ident[0] = '$';
-            sym = TK_HEX_CONST;
+            tok = TK_HEX_CONST;
             return ( chcount - 1 );
         }
     }
@@ -461,7 +469,7 @@ CheckBaseType( int chcount )
             }
 
             ident[0] = '$';
-            sym = TK_HEX_CONST;
+            tok = TK_HEX_CONST;
             return chcount;
         }
         else
@@ -487,7 +495,7 @@ CheckBaseType( int chcount )
         }
 
         ident[0] = '@';
-        sym = TK_BIN_CONST;
+        tok = TK_BIN_CONST;
         return chcount;
     }
 
@@ -502,7 +510,7 @@ CheckBaseType( int chcount )
 
     if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'D' )
     {
-        sym = TK_DEC_CONST;
+        tok = TK_DEC_CONST;
         return chcount - 1;
     }
 
@@ -595,7 +603,7 @@ CheckRegister8( void )
 {
 	init();
 
-    if ( sym == TK_NAME )
+    if ( tok == TK_NAME )
     {
         if ( *( ident + 1 ) == '\0' )
         {
@@ -725,7 +733,7 @@ CheckRegister16( void )
 {
 	init();
 
-    if ( sym == TK_NAME )
+    if ( tok == TK_NAME )
     {
         if ( strcmp( ident, "HL" ) == 0 )
         {
@@ -801,7 +809,7 @@ IndirectRegisters( void )
         GetSym();                 /* prepare expression evaluation */
         return ( reg16 );
 
-    case -1:                    /* sym could be a '+', '-' or a symbol... */
+    case -1:                    /* tok could be a '+', '-' or a symbol... */
         return 7;
 
     default:
@@ -821,7 +829,7 @@ GetConstant( char *evalerr )
 
     *evalerr = 0;                 /* preset to no errors */
 
-    if ( ( sym != TK_HEX_CONST ) && ( sym != TK_BIN_CONST ) && ( sym != TK_DEC_CONST ) )
+    if ( ( tok != TK_HEX_CONST ) && ( tok != TK_BIN_CONST ) && ( tok != TK_DEC_CONST ) )
     {
         *evalerr = 1;
         return ( 0 );             /* syntax error - illegal constant definition */
@@ -829,7 +837,7 @@ GetConstant( char *evalerr )
 
     size = strlen( ident );
 
-    if ( sym != TK_DEC_CONST )
+    if ( tok != TK_DEC_CONST )
         if ( ( --size ) == 0 )
         {
             *evalerr = 1;
@@ -891,7 +899,11 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.51  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.52  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.51  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

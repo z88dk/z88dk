@@ -15,27 +15,27 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.6 2014-03-04 11:49:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.7 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 /* Unary, Binary and Ternary operators */
 #ifndef OPERATOR
-#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)
+#define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)
 #endif
 
 #ifndef OPERATOR_1
-#define OPERATOR_1(_operation, _symbol,             _prec, _assoc,           _calc)	\
-		OPERATOR(  _operation, _symbol, UNARY_OP,   _prec, _assoc, (long a), _calc)
+#define OPERATOR_1(_operation, _tok,             _prec, _assoc,           _calc)	\
+		OPERATOR(  _operation, _tok, UNARY_OP,   _prec, _assoc, (long a), _calc)
 #endif
 
 #ifndef OPERATOR_2
-#define OPERATOR_2(_operation, _symbol,             _prec, _assoc,                   _calc)	\
-		OPERATOR(  _operation, _symbol, BINARY_OP,  _prec, _assoc, (long a, long b), _calc)
+#define OPERATOR_2(_operation, _tok,             _prec, _assoc,                   _calc)	\
+		OPERATOR(  _operation, _tok, BINARY_OP,  _prec, _assoc, (long a, long b), _calc)
 #endif
 
 #ifndef OPERATOR_3
-#define OPERATOR_3(_operation, _symbol,             _prec, _assoc,                           _calc)	\
-		OPERATOR(  _operation, _symbol, TERNARY_OP, _prec, _assoc, (long a, long b, long c), _calc)
+#define OPERATOR_3(_operation, _tok,             _prec, _assoc,                           _calc)	\
+		OPERATOR(  _operation, _tok, TERNARY_OP, _prec, _assoc, (long a, long b, long c), _calc)
 #endif
 
 /* define list of operators in increasing priority */
@@ -83,7 +83,11 @@ OPERATOR_1( log_not,	TK_LOG_NOT,		11,	ASSOC_RIGHT,	! a )
 
 /*
 * $Log: expr_def.h,v $
-* Revision 1.6  2014-03-04 11:49:47  pauloscustodio
+* Revision 1.7  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.6  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all
 * supported unary, binary and ternary oprators, instead of a big switch
 * statement to select the operation.

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.7 2014-03-04 11:49:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.8 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -92,7 +92,7 @@ static long _calc_power(long base, long exp)
 *	Calculation functions for all operators, template:
 *	long calc_<symbol> (long a [, long b [, long c ] ] );
 *----------------------------------------------------------------------------*/
-#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
+#define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)	\
 	long calc_##_operation _args { return _calc; }
 #include "expr_def.h"
 
@@ -100,18 +100,18 @@ static long _calc_power(long base, long exp)
 *	Operator descriptors
 *----------------------------------------------------------------------------*/
 
-/* hash of (sym,op_type) to Operator* */
+/* hash of (tok,op_type) to Operator* */
 static StrHash *operator_hash;
 
 /* compute hash key */
-static char *operator_hash_key( tokid_t sym, op_type_t op_type )
+static char *operator_hash_key( tokid_t tok, op_type_t op_type )
 {
-	char key[3];		/* byte 1 = sym; byte 2 = op_type; byte 3 = '\0' */
+	char key[3];		/* byte 1 = tok; byte 2 = op_type; byte 3 = '\0' */
 
 	/* assert we can map symbol and type in a string */
-	assert( sym     > 0 && sym     < 256 );
+	assert( tok     > 0 && tok     < 256 );
 	assert( op_type > 0 && op_type < 256 );
-	key[0] = (char) sym; key[1] = (char) op_type; key[2] = '\0';
+	key[0] = (char) tok; key[1] = (char) op_type; key[2] = '\0';
 
 	return strpool_add(key);
 }
@@ -121,19 +121,19 @@ static void init_operator_hash(void)
 {
 	char *key;
 
-#define OPERATOR(_operation, _symbol, _type, _prec, _assoc, _args, _calc)	\
+#define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)		\
 	{																		\
 		static Operator op_##_operation;									\
 																			\
 		/* init static operator structure */								\
-		op_##_operation.sym			= _symbol;								\
+		op_##_operation.tok			= _tok;									\
 		op_##_operation.op_type		= _type;								\
 		op_##_operation.prec		= _prec;								\
 		op_##_operation.assoc		= _assoc;								\
 		/* cast into unary type, cannot decide union path at compile time */ \
 		op_##_operation.calc.unary	= (long(*)(long))calc_##_operation;		\
 																			\
-		key = operator_hash_key( _symbol, _type );							\
+		key = operator_hash_key( _tok, _type );								\
 		StrHash_set( &operator_hash, key, & op_##_operation );				\
 	}
 #include "expr_def.h"
@@ -146,13 +146,13 @@ static void fini_operator_hash(void)
 }
 
 
-/* get the operator descriptor for the given (sym, op_type) */
-Operator *Operator_get( tokid_t sym, op_type_t op_type )
+/* get the operator descriptor for the given (tok, op_type) */
+Operator *Operator_get( tokid_t tok, op_type_t op_type )
 {
 	char *key;
 
 	init();
-	key = operator_hash_key( sym, op_type );
+	key = operator_hash_key( tok, op_type );
 	return (Operator *) StrHash_get( operator_hash, key );
 }
 
@@ -236,11 +236,11 @@ extern void ExprOp_init_const_expr( ExprOp *self )
 	self->op_type = CONST_EXPR_OP;
 }
 
-void ExprOp_init_operator( ExprOp *self, tokid_t sym, op_type_t op_type )
+void ExprOp_init_operator( ExprOp *self, tokid_t tok, op_type_t op_type )
 {
 	Operator *op;
 
-	op = Operator_get( sym, op_type ); assert( op != NULL );
+	op = Operator_get( tok, op_type ); assert( op != NULL );
 
 	self->op_type	= op_type;
 	self->d.op		= op;
@@ -361,7 +361,11 @@ void Expr_fini (Expr *self)
 
 /*
 * $Log: expr.c,v $
-* Revision 1.7  2014-03-04 11:49:47  pauloscustodio
+* Revision 1.8  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.7  2014/03/04 11:49:47  pauloscustodio
 * Expression parser and expression evaluator use a look-up table of all
 * supported unary, binary and ternary oprators, instead of a big switch
 * statement to select the operation.

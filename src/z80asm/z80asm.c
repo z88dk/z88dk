@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.147 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.148 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,6 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.147 2014-03-11 23
 #include "config.h"
 #include "deffile.h"
 #include "errors.h"
+#include "except.h"
 #include "expr.h"
 #include "fileutil.h"
 #include "hist.h"
@@ -35,7 +36,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.147 2014-03-11 23
 #include "strutil.h"
 #include "symbol.h"
 #include "token.h"
-#include "except.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -53,7 +53,6 @@ void LinkModules( void );
 void DeclModuleName( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
-tokid_t GetSym( void );
 long GetConstant( char *evalerr );
 
 
@@ -70,8 +69,6 @@ struct libfile *NewLibrary( void );
 
 
 FILE *z80asmfile, *objfile;
-
-tokid_t sym;
 
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
@@ -726,7 +723,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.147  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.148  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.147  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

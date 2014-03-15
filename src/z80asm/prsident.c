@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.60 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.61 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -77,7 +77,6 @@ void LINE( void );
 
 /* global variables */
 extern FILE *z80asmfile;
-extern tokid_t sym, GetSym( void );
 extern char ident[], line[];
 extern struct module *CURRENTMODULE;
 
@@ -318,7 +317,7 @@ IF( void )
 void
 ELSE( void )
 {
-    sym = TK_ELSE_STMT;
+    tok = TK_ELSE_STMT;
 }
 
 
@@ -327,7 +326,7 @@ ELSE( void )
 void
 ENDIF( void )
 {
-    sym = TK_ENDIF_STMT;
+    tok = TK_ENDIF_STMT;
 }
 
 
@@ -349,7 +348,7 @@ XDEF( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE && sym != TK_EOF )
+    if ( tok != TK_NEWLINE && tok != TK_EOF )
     {
         error_syntax();
     }
@@ -397,7 +396,7 @@ XREF( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE && sym != TK_EOF )
+    if ( tok != TK_NEWLINE && tok != TK_EOF )
     {
         error_syntax();
     }
@@ -423,7 +422,7 @@ LIB( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( sym != TK_NEWLINE && sym != TK_EOF )
+    if ( tok != TK_NEWLINE && tok != TK_EOF )
     {
         error_syntax();
     }
@@ -729,7 +728,7 @@ ExtAccumulator( int opcode )
     }
 
     /* reparse and code generate (if possible) */
-    sym = TK_NIL;
+    tok = TK_NIL;
     EOL = FALSE;
 
     ScanSetPos( fptr );
@@ -1091,7 +1090,11 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.60  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.61  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.60  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

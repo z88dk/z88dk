@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.30 2014-03-11 00:15:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.31 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,7 +29,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.30 2014-03
 #include <stdio.h>
 
 /* external functions */
-tokid_t GetSym( void );
 void RemovePfixlist( struct expr *pfixexpr );
 int ExprUnsigned8( int listoffset );
 int ExprSigned8( int listoffset );
@@ -48,7 +47,6 @@ void LD_r_8bit_indrct( int reg );
 
 
 /* global variables */
-extern tokid_t sym, GetSym( void );
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
 
@@ -76,7 +74,7 @@ LD( void )
             break;
 
         case 0:
-            if ( sym == TK_COMMA )
+            if ( tok == TK_COMMA )
             {
                 /* LD  (BC),A  */
                 GetSym();
@@ -99,7 +97,7 @@ LD( void )
             break;
 
         case 1:
-            if ( sym == TK_COMMA )
+            if ( tok == TK_COMMA )
             {
                 /* LD  (DE),A  */
                 GetSym();
@@ -305,7 +303,7 @@ LD_HL8bit_indrct( void )
 {
     int sourcereg;
 
-    if ( sym == TK_COMMA )
+    if ( tok == TK_COMMA )
     {
         GetSym();
 
@@ -363,7 +361,7 @@ LD_index8bit_indrct( int destreg )
         return;    /* IX/IY offset expression */
     }
 
-    if ( sym != TK_RPAREN )
+    if ( tok != TK_RPAREN )
     {
         error_syntax(); /* ')' wasn't found in line */
         return;
@@ -495,7 +493,7 @@ LD_address_indrct( char *exprptr )
         RemovePfixlist( addrexpr );    /* remove this expression again */
     }
 
-    if ( sym != TK_RPAREN )
+    if ( tok != TK_RPAREN )
     {
         error_syntax(); /* Right bracket missing! */
         return;
@@ -713,7 +711,11 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.30  2014-03-11 00:15:13  pauloscustodio
+* Revision 1.31  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.30  2014/03/11 00:15:13  pauloscustodio
 * Scanner reads input line-by-line instead of character-by-character.
 * Factor house-keeping at each new line read in the scanner getasmline().
 * Add interface to allow back-tacking of the recursive descent parser by

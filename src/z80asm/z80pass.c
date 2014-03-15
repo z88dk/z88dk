@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.83 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.84 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,7 +47,6 @@ void RemovePfixlist( struct expr *pfixexpr );
 void StoreExpr( struct expr *pfixexpr, char range );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );
-tokid_t GetSym( void );
 
 /* local functions */
 void ifstatement( enum flag interpret );
@@ -66,7 +65,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 /* global variables */
 extern FILE *z80asmfile, *objfile;
 extern char line[], ident[];
-extern tokid_t sym;
 extern struct module *CURRENTMODULE;
 
 void
@@ -74,8 +72,8 @@ Z80pass1( void )
 {
     line[0] = '\0';                   /* reset contents of list buffer */
 
-	sym = TK_NIL;
-    while ( sym != TK_EOF )
+	tok = TK_NIL;
+    while ( tok != TK_EOF )
     {
         parseline( ON );              /* before parsing it */
     }
@@ -90,12 +88,12 @@ parseline( enum flag interpret )
     EOL = FALSE;                /* reset END OF LINE flag */
     GetSym();
 
-    if ( sym == TK_DOT || sym == TK_LABEL )
+    if ( tok == TK_DOT || tok == TK_LABEL )
     {
         if ( interpret == ON )
         {
             /* Generate only possible label declaration if line parsing is allowed */
-            if ( sym == TK_LABEL || GetSym() == TK_NAME )
+            if ( tok == TK_LABEL || GetSym() == TK_NAME )
             {
                 /* labels must always be touched due to forward referencing problems in expressions */
                 define_symbol( ident, get_PC(), SYM_ADDR | SYM_TOUCHED );
@@ -111,11 +109,11 @@ parseline( enum flag interpret )
         else
         {
             Skipline( z80asmfile );
-            sym = TK_NEWLINE;    /* ignore label and rest of line */
+            tok = TK_NEWLINE;    /* ignore label and rest of line */
         }
     }
 
-    switch ( sym )
+    switch ( tok )
     {
     case TK_NAME:
         ParseIdent( interpret );
@@ -153,7 +151,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is TRUE, interpret lines until #else or #endif */
-                if ( sym != TK_EOF )
+                if ( tok != TK_EOF )
                 {
                     parseline( ON );
                 }
@@ -162,14 +160,14 @@ ifstatement( enum flag interpret )
                     return;    /* end of file - exit from this #if level */
                 }
             }
-            while ( ( sym != TK_ELSE_STMT ) && ( sym != TK_ENDIF_STMT ) );
+            while ( ( tok != TK_ELSE_STMT ) && ( tok != TK_ENDIF_STMT ) );
 
-            if ( sym == TK_ELSE_STMT )
+            if ( tok == TK_ELSE_STMT )
             {
                 do
                 {
                     /* then ignore lines until #endif ... */
-                    if ( sym != TK_EOF )
+                    if ( tok != TK_EOF )
                     {
                         parseline( OFF );
                     }
@@ -178,7 +176,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( sym != TK_ENDIF_STMT );
+                while ( tok != TK_ENDIF_STMT );
             }
         }
         else
@@ -186,7 +184,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is FALSE, ignore until #else or #endif */
-                if ( sym != TK_EOF )
+                if ( tok != TK_EOF )
                 {
                     parseline( OFF );
                 }
@@ -195,13 +193,13 @@ ifstatement( enum flag interpret )
                     return;
                 }
             }
-            while ( ( sym != TK_ELSE_STMT ) && ( sym != TK_ENDIF_STMT ) );
+            while ( ( tok != TK_ELSE_STMT ) && ( tok != TK_ENDIF_STMT ) );
 
-            if ( sym == TK_ELSE_STMT )
+            if ( tok == TK_ELSE_STMT )
             {
                 do
                 {
-                    if ( sym != TK_EOF )
+                    if ( tok != TK_EOF )
                     {
                         parseline( ON );
                     }
@@ -210,7 +208,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( sym != TK_ENDIF_STMT );
+                while ( tok != TK_ENDIF_STMT );
             }
         }
     }
@@ -219,7 +217,7 @@ ifstatement( enum flag interpret )
         do
         {
             /* don't evaluate #if expression and ignore all lines until #endif */
-            if ( sym != TK_EOF )
+            if ( tok != TK_EOF )
             {
                 parseline( OFF );
             }
@@ -228,10 +226,10 @@ ifstatement( enum flag interpret )
                 return;    /* end of file - exit from this IF level */
             }
         }
-        while ( sym != TK_ENDIF_STMT );
+        while ( tok != TK_ENDIF_STMT );
     }
 
-    sym = TK_NIL;
+    tok = TK_NIL;
 }
 
 
@@ -716,7 +714,11 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.83  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.84  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.83  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

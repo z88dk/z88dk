@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.100 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.101 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,6 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.100 2014-03-11 2
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
+#include "except.h"
 #include "expr.h"
 #include "fileutil.h"
 #include "listfile.h"
@@ -30,7 +31,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.100 2014-03-11 2
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
-#include "except.h"
 #include "z80asm.h"
 #include <limits.h>
 #include <stdio.h>
@@ -68,7 +68,6 @@ extern FILE *z80asmfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
-extern tokid_t sym, GetSym( void );
 extern byte_t reloc_routine[];
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
@@ -1041,7 +1040,11 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.100  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.101  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.100  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

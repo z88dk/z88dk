@@ -16,23 +16,27 @@ Scanner header corresponding to scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.29 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.30 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "token.h"
 #include "types.h"
 
 /* declare prsline.c externals */
+extern tokid_t GetSym( void );
 extern void SetTemporaryLine( char *line );
 extern char *ScanGetPos( void );
 extern void  ScanSetPos( char *pos );
 
-extern char *sym_string;	/* contains double-quoted string without quotes
+extern tokid_t tok;			/* current token */
+extern char *tok_name;		/* contains identifier to return with TK_NAME and TK_LABEL */
+extern char *tok_string;	/* contains double-quoted string without quotes
 							   to return with a TK_STRING */
-extern long  sym_number;	/* contains number to return with a TK_NUMBER */
+extern long  tok_number;	/* contains number to return with TK_NUMBER */
 
 extern BOOL EOL;
 
@@ -125,7 +129,11 @@ extern Token scan_get( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.29  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.30  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.29  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.28  2014/03/11 00:15:13  pauloscustodio

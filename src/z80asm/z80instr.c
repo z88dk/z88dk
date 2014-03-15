@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.51 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.52 2014-03-15 02:12:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -58,7 +58,6 @@ void Subroutine_addr( int opc0, int opc );
 /* global variables */
 extern FILE *z80asmfile;
 extern struct module *CURRENTMODULE;
-extern tokid_t GetSym( void ), sym;
 
 
 void
@@ -199,7 +198,7 @@ EX( void )
         {
             error_syntax();
         }
-    else if ( sym == TK_NAME )
+    else if ( tok == TK_NAME )
     {
         switch ( CheckRegister16() )
         {
@@ -321,7 +320,7 @@ OUT( void )
 
             inc_PC( 2 );
 
-            if ( sym == TK_RPAREN )
+            if ( tok == TK_RPAREN )
                 if ( GetSym() == TK_COMMA )
                     if ( GetSym() == TK_NAME )
                     {
@@ -401,7 +400,7 @@ IN( void )
                     append_byte( 0xDB );
 
                     if ( ExprUnsigned8( 1 ) )
-                        if ( sym != TK_RPAREN )
+                        if ( tok != TK_RPAREN )
                         {
                             error_syntax();
                         }
@@ -1373,7 +1372,7 @@ IncDec_8bit_instr( int opcode )
 {
     long reg;
 
-    if ( sym == TK_LPAREN )
+    if ( tok == TK_LPAREN )
     {
         switch ( reg = IndirectRegisters() )
         {
@@ -1476,7 +1475,7 @@ BitTest_instr( int opcode )
             if ( bitnumber >= 0 && bitnumber <= 7 )
             {
                 /* bit 0 - 7 */
-                if ( sym == TK_COMMA )
+                if ( tok == TK_COMMA )
                 {
                     if ( GetSym() == TK_LPAREN )
                     {
@@ -1606,7 +1605,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.51  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.52  2014-03-15 02:12:07  pauloscustodio
+* Rename last token to tok*
+* GetSym() declared in scan.h
+*
+* Revision 1.51  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
