@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.8 2014-03-03 13:43:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.9 2014-03-15 14:35:51 pauloscustodio Exp $
 */
 
 #pragma once
@@ -81,12 +81,18 @@ extern void model_init(void);
 extern void  src_open( char *filename, List *dir_list );
 extern char *src_getline( void );
 extern void  src_ungetline( char *lines );
+extern char *src_filename( void );
+extern int   src_line_nr( void );	
+
 extern void  src_push( void );
 extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.8  2014-03-03 13:43:50  pauloscustodio
+* Revision 1.9  2014-03-15 14:35:51  pauloscustodio
+* Add interface to lookup current file name and line number
+*
+* Revision 1.8  2014/03/03 13:43:50  pauloscustodio
 * Renamed symbol and expression type attributes
 *
 * Revision 1.7  2014/03/03 13:27:07  pauloscustodio

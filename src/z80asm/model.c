@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.3 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.4 2014-03-15 14:35:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -103,6 +103,18 @@ void src_ungetline( char *lines )
 	SrcFile_ungetline( g_src_input, lines );
 }
 
+char *src_filename( void )
+{
+	init();
+	return SrcFile_filename( g_src_input );
+}
+
+int src_line_nr( void )
+{
+	init();
+	return SrcFile_line_nr( g_src_input );
+}
+
 void src_push( void )
 {
 	init();
@@ -118,7 +130,10 @@ BOOL src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.3  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.4  2014-03-15 14:35:51  pauloscustodio
+* Add interface to lookup current file name and line number
+*
+* Revision 1.3  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model

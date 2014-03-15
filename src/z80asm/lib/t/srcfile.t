@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.2 2014-02-08 18:21:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.3 2014-03-15 14:35:51 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -47,7 +47,9 @@ write_file("test.c", <<'END');
 			assert( str = SrcFile_getline( file ) ); \
 			warn("(%s:%d)%s", _filename, _line_nr, _expected); \
 			assert( strcmp( file->filename, _filename ) == 0 ); \
+			assert( strcmp( SrcFile_filename(file), _filename ) == 0 ); \
 			assert( file->line_nr == _line_nr ); \
+			assert( SrcFile_line_nr(file) == _line_nr ); \
 			assert( strcmp( str, _expected ) == 0 ); \
 			assert( strcmp( file->line->str, _expected ) == 0 );
 			
@@ -82,6 +84,8 @@ int main(int argc, char *argv[])
 	case 'A':	
 		warn("read first file, no new line callback\n");
 		assert( file = OBJ_NEW( SrcFile ) );
+		assert( SrcFile_filename( file ) == NULL );
+		assert( SrcFile_line_nr( file ) == 0 );
 		SrcFile_open( file, "test.f0", NULL );
 		T_GETLINE("test.f0",  1, "F0 1\n");
 		T_GETLINE("test.f0",  2, "\n");
@@ -373,7 +377,10 @@ sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @
 
 
 # $Log: srcfile.t,v $
-# Revision 1.2  2014-02-08 18:21:18  pauloscustodio
+# Revision 1.3  2014-03-15 14:35:51  pauloscustodio
+# Add interface to lookup current file name and line number
+#
+# Revision 1.2  2014/02/08 18:21:18  pauloscustodio
 # new line callback needs text read to pass on to listfile.c.
 # file_stack filenames may be NULL, protect when checking for recursive includes.
 # Remove dead test code.

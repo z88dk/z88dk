@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.4 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.5 2014-03-15 14:35:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -295,6 +295,11 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 	List_push( & self->line_stack, line );
 }
 
+/* return the current file name and line number */
+char *SrcFile_filename( SrcFile *self ) { return self->filename; }
+int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
+
+
 /* stack of input files manipulation:
    push saves current file on the stack and prepares for a new open
    pop returns FALSE if the stack is empty; else retrieves last file from stack
@@ -336,7 +341,10 @@ BOOL SrcFile_pop( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.4  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.5  2014-03-15 14:35:51  pauloscustodio
+* Add interface to lookup current file name and line number
+*
+* Revision 1.4  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.3  2014/02/19 23:59:27  pauloscustodio
