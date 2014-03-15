@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.3 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.4 2014-03-15 01:41:44 pauloscustodio Exp $
 #
 # Check that xmalloc.h is included before any other include
 
@@ -23,7 +23,7 @@ use Test::More;
 
 for (read_dir(".")) {
 	next unless -f $_;
-	next unless /\.[ch]$/;
+	next unless /\.c$/i;
 	
 	check_file($_);
 }
@@ -51,7 +51,10 @@ sub check_file {
 
 __END__
 # $Log: check_includes.t,v $
-# Revision 1.3  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.4  2014-03-15 01:41:44  pauloscustodio
+# Check that xmalloc.h is first include only in source files
+#
+# Revision 1.3  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
