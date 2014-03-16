@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.52 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.53 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -56,7 +56,6 @@ void Subroutine_addr( int opc0, int opc );
 
 
 /* global variables */
-extern FILE *z80asmfile;
 extern struct module *CURRENTMODULE;
 
 
@@ -717,16 +716,6 @@ Subroutine_addr( int opcode0, int opcode )
         if ( opcode0 == 205 && ( opts.cpu & CPU_RABBIT ) )
         {
             static char buffer[200];
-
-#if 0
-
-            if ( constant >= 4 )
-            {
-                error_illegal_ident();
-                return;
-            }
-
-#endif
 
             switch ( constant )
             {
@@ -1605,7 +1594,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.52  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.53  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.52  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

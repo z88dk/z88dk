@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.62 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.63 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -75,7 +75,7 @@ void MODULE( void );
 void LINE( void );
 
 /* global variables */
-extern char ident[], line[];
+extern char ident[];
 extern struct module *CURRENTMODULE;
 
 
@@ -255,10 +255,7 @@ void
 LSTON( void )
 {
     if ( opts.list )
-    {
         opts.cur_list = TRUE;				/* switch listing ON again... */
-        line[0] = '\0';
-    }
 }
 
 
@@ -267,10 +264,7 @@ void
 LSTOFF( void )
 {
     if ( opts.list )
-    {
         opts.cur_list = FALSE;
-        line[0] = '\0';
-    }
 }
 
 /* Function for Line number in C source */
@@ -278,8 +272,8 @@ LSTOFF( void )
 void LINE( void )
 {
     char    err;
-    char    name[128];
     long 	clineno;
+	DEFINE_STR( name, MAXLINE );
 
     GetSym();
 
@@ -288,9 +282,8 @@ void LINE( void )
     if ( opts.line_mode )
         set_error_line( clineno );
 
-    line[0] = '\0';
-    snprintf( name, sizeof( name ), "__C_LINE_%ld", clineno );
-    define_symbol( name, get_PC(), SYM_ADDR | SYM_TOUCHED );
+	Str_sprintf( name, "__C_LINE_%ld", clineno );
+    define_symbol( name->str, get_PC(), SYM_ADDR | SYM_TOUCHED );
 }
 
 
@@ -1080,7 +1073,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.62  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.63  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.62  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.85 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.86 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,7 +63,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 /* global variables */
 extern FILE *objfile;
-extern char line[], ident[];
+extern char ident[];
 extern struct module *CURRENTMODULE;
 
 void Z80pass1( char *filename )
@@ -74,13 +74,9 @@ void Z80pass1( char *filename )
 	src_push();
 	{
 		src_open( filename, opts.inc_path );
-		line[0] = '\0';                   /* reset contents of list buffer */
-
 		tok = TK_NIL;
 		while ( tok != TK_EOF )
-		{
 			parseline( ON );              /* before parsing it */
-		}
 	}
 	src_pop();
 }
@@ -641,7 +637,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.85  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.86  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.85  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

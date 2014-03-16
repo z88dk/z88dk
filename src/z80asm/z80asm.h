@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.47 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.48 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,7 +45,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.47 2014-03-16 19:
 #define FLAGS_M 7
 
 
-extern char line[];
 extern char ident[];
 extern struct module *CURRENTMODULE;
 extern struct modules *modulehdr;
@@ -61,7 +60,10 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.47  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.48  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.47  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

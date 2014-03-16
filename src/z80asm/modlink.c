@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.102 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.103 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,7 +63,7 @@ void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
-extern char line[], ident[];
+extern char ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
 extern byte_t reloc_routine[];
@@ -81,15 +81,16 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
     int scope, symbol_char;
     byte_t symboltype = 0;
     long value;
+	DEFINE_STR( name, MAXLINE );
 
     do
     {
         scope		= xfget_int8(  file );
         symbol_char	= xfget_int8(  file );		/* type of name   */
         value		= xfget_int32( file );		/* read symbol (long) integer */
-        ReadName( file );						/* read symbol name */
+		xfget_count_byte_Str( file, name );		/* read symbol name */
 
-        nextname += 1 + 1 + 4 + 1 + strlen( line );
+        nextname += 1 + 1 + 4 + 1 + name->len;
 
         switch ( symbol_char )
         {
@@ -109,15 +110,15 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
         switch ( scope )
         {
         case 'L':
-            define_local_sym( line, value, symboltype );
+            define_local_sym( name->str, value, symboltype );
             break;
 
         case 'G':
-            define_global_sym( line, value, symboltype );
+            define_global_sym( name->str, value, symboltype );
             break;
 
         case 'X':
-            define_library_sym( line, value, symboltype );
+            define_library_sym( name->str, value, symboltype );
             break;
 
         default:
@@ -390,7 +391,7 @@ LinkModules( void )
 int
 LinkModule( char *filename, long fptr_base )
 {
-    long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl, dummy;
+    long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     uint_t size;
     int flag = 0;
 	FILE *file;
@@ -400,7 +401,7 @@ LinkModule( char *filename, long fptr_base )
     fseek( file, fptr_base + 10U, SEEK_SET );
 
     fptr_modname	= xfget_int32( file );	/* get file pointer to module name */
-    dummy			= xfget_int32( file );	/* get file pointer to expression declarations */
+					  xfget_int32( file );	/* get file pointer to expression declarations */
     fptr_namedecl	= xfget_int32( file );	/* get file pointer to name declarations */
     fptr_libnmdecl	= xfget_int32( file );	/* get file pointer to library name declarations */
     fptr_modcode	= xfget_int32( file );	/* get file pointer to module code */
@@ -458,36 +459,22 @@ LinkModule( char *filename, long fptr_base )
 int
 LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
 {
-    long len;
-    char *modname;
     FILE *file;
+	DEFINE_STR( name, MAXLINE );
 
     do
     {
         /* open object file for reading */
         file = xfopen( filename, "rb" );           /* CH_0012 */
-        fseek( file, fptr_base + nextname, SEEK_SET );       /* set file pointer to point at library name
-                                                             * declarations */
-        ReadName( file );					/* read library reference name */
+        fseek( file, fptr_base + nextname, SEEK_SET );	/* set file pointer to point at 
+														 * library name declarations */
+        xfget_count_byte_Str( file, name );				/* read library reference name */
         xfclose( file );
 
-        len = strlen( line );
-        nextname += 1 + len;      /* remember module pointer to next name in this   object module */
+        nextname += 1 + name->len;	/* remember module pointer to next name in this object module */
 
-        if ( find_global_symbol( line ) == NULL )
-        {
-            modname = xstrdup( line );
-
-            TRY
-            {
-                SearchLibraries( modname );       /* search name in libraries */
-            }
-            FINALLY
-            {
-                xfree( modname ); /* remove copy of module name */
-            }
-            ETRY;
-        }
+        if ( find_global_symbol( name->str ) == NULL )
+            SearchLibraries( name->str );       /* search name in libraries */
     }
     while ( nextname < endnames );
 
@@ -500,9 +487,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
 void
 SearchLibraries( char *modname )
 {
-
     int i;
-
 
     for ( i = 0; i < 2; i++ )
     {
@@ -535,7 +520,6 @@ int
 SearchLibfile( struct libfile *curlib, char *modname )
 {
     long currentlibmodule, modulesize;
-    int ret = 0;
     char *mname;
     FILE *file;
 
@@ -558,35 +542,15 @@ SearchLibfile( struct libfile *curlib, char *modname )
         {
             if ( ( mname = CheckIfModuleWanted( file, currentlibmodule, modname ) ) != NULL )
             {
-                TRY
-                {
-                    xfclose( file );
-                    ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
-                }
-                FINALLY
-                {
-                    xfree( mname );
-                }
-                ETRY;
-
-                return ret;
+                xfclose( file );
+                return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
             }
             else if ( opts.sdcc &&
                       modname[0] == '_' &&
                       ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
-                TRY
-                {
-                    xfclose( file );
-                    ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
-                }
-                FINALLY
-                {
-                    xfree( mname );
-                }
-                ETRY;
-
-                return ret;
+                xfclose( file );
+                return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
             }
         }
     }
@@ -606,22 +570,23 @@ SearchLibfile( struct libfile *curlib, char *modname )
 static char *
 CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 {
-    long fptr_mname, fptr_name, fptr_libname, dummy;
-    char *mname;
-    char *name;
+    long fptr_mname, fptr_name, fptr_libname;
     enum flag found = OFF;
-
+	DEFINE_STR( got_modname, MAXLINE );
+	DEFINE_STR( symbol_name, MAXLINE );
 
     /* found module name? */
-    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file pointer */
-    fptr_mname		= xfget_int32( file );	/* get module name file  pointer   */
-    dummy			= xfget_int32( file );	/* fptr_expr */
+    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     
+													/* point at module name  file pointer */
+    fptr_mname		= xfget_int32( file );			/* get module name file  pointer   */
+					  xfget_int32( file );			/* fptr_expr */
     fptr_name		= xfget_int32( file );
     fptr_libname	= xfget_int32( file );
-    fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
-    mname = xstrdup( ReadName( file ) );                      /* read module name */
+    fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       
+													/* point at module name  */
+	xfget_count_byte_Str( file, got_modname );		/* read module name */
 
-    if ( strcmp( mname, modname ) == 0 )
+    if ( strcmp( got_modname->str, modname ) == 0 )
     {
         found = ON;
     }
@@ -634,9 +599,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
             long red = 0;
 
             if ( fptr_libname == -1 )
-            {
                 end = fptr_mname;
-            }
 
             /* Move to the name section */
             fseek( file, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
@@ -644,16 +607,17 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 
             while ( ! found && red < end )
             {
-                int scope, dummy;
+                int scope;
 				long value;
 
                 scope	= xfget_int8(  file );	red++;
-                dummy	= xfget_int8(  file );	red++;	/* type */
+                          xfget_int8(  file );	red++;	/* type */
                 value	= xfget_int32( file );	red += 4;
-                name	= ReadName( file );		red += strlen( name );
-                red++;									/* Length byte */
+				xfget_count_byte_Str( file, symbol_name );
+				red += symbol_name->len + 1;			/* Length byte */
 
-                if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
+                if ( ( scope == 'X' || scope == 'G' ) && 
+					 strcmp( symbol_name->str, modname ) == 0 )
                 {
                     found = ON;
                 }
@@ -661,12 +625,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
         }
     }
 
-    if ( !found )
-    {
-        xfree( mname );
-    }
-
-    return mname;
+    return found ? strpool_add( got_modname->str ) : NULL;
 }
 
 int
@@ -690,21 +649,6 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     CURRENTMODULE = tmpmodule;  /* restore previous current module */
     return flag;
 }
-
-
-
-char *
-ReadName( FILE *file )
-{
-    uint_t strlength;
-
-    strlength = xfget_uint8( file );
-    xfget_chars( file, line, strlength ); /* read   name */
-    line[strlength] = '\0';
-
-    return line;
-}
-
 
 
 void
@@ -1024,7 +968,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.102  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.103  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.102  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

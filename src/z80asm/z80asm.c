@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.149 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.150 2014-03-16 23:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -67,7 +67,8 @@ struct libfile *NewLibrary( void );
 
 FILE *objfile;
 
-char line[255], stringconst[255], ident[FILENAME_MAX + 1];
+
+char stringconst[255], ident[FILENAME_MAX + 1];
 
 extern char Z80objhdr[];
 extern char objhdrprefix[];
@@ -658,7 +659,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.149  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.150  2014-03-16 23:57:06  pauloscustodio
+* Removed global line[]
+*
+* Revision 1.149  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *
