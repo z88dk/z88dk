@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.56 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.57 2014-03-16 19:19:49 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -935,7 +935,7 @@ sub list_test {
 		t_z80asm(
 			asm		=> $asm,
 			bin		=> $bin,
-			options	=> "-ns -nl",
+			options	=> $options,
 			nolist	=> 1,
 		);
 		ok ! -f lst_file(), "no ".lst_file();
@@ -946,7 +946,7 @@ sub list_test {
 		t_z80asm(
 			asm		=> $asm,
 			bin		=> $bin,
-			options	=> "-ns -l",
+			options	=> $options,
 			nolist	=> 1,
 		);
 		ok   -f lst_file(), lst_file();
@@ -958,7 +958,7 @@ sub list_test {
 		t_z80asm(
 			asm		=> $asm,
 			bin		=> $bin,
-			options	=> "-s -nl",
+			options	=> $options,
 			nolist	=> 1,
 		);
 		ok ! -f lst_file(), "no ".lst_file();
@@ -970,7 +970,7 @@ sub list_test {
 		t_z80asm(
 			asm		=> $asm,
 			bin		=> $bin,
-			options	=> "-s -l",
+			options	=> $options,
 			nolist	=> 1,
 		);
 		ok   -f lst_file(), lst_file();
@@ -1016,7 +1016,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.56  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.57  2014-03-16 19:19:49  pauloscustodio
+# Integrate use of srcfile in scanner, removing global variable z80asmfile
+# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+#
+# Revision 1.56  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.84 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.85 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -28,6 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.84 2014-03-15 02
 #include "model.h"
 #include "options.h"
 #include "scan.h"
+#include "srcfile.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
@@ -40,7 +41,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.84 2014-03-15 02
 #include <time.h>
 
 /* external functions */
-void Skipline( FILE *fptr );
 void LinkModules( void );
 void ParseIdent( enum flag interpret );
 void RemovePfixlist( struct expr *pfixexpr );
@@ -52,7 +52,6 @@ struct expr *ParseNumExpr( void );
 void ifstatement( enum flag interpret );
 void parseline( enum flag interpret );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
-void Z80pass1( void );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
 long Evallogexpr( void );
@@ -63,20 +62,27 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* global variables */
-extern FILE *z80asmfile, *objfile;
+extern FILE *objfile;
 extern char line[], ident[];
 extern struct module *CURRENTMODULE;
 
-void
-Z80pass1( void )
+void Z80pass1( char *filename )
 {
-    line[0] = '\0';                   /* reset contents of list buffer */
+    if ( opts.verbose )
+        printf( "Reading '%s'...\n", filename );	/* display name of file */
 
-	tok = TK_NIL;
-    while ( tok != TK_EOF )
-    {
-        parseline( ON );              /* before parsing it */
-    }
+	src_push();
+	{
+		src_open( filename, opts.inc_path );
+		line[0] = '\0';                   /* reset contents of list buffer */
+
+		tok = TK_NIL;
+		while ( tok != TK_EOF )
+		{
+			parseline( ON );              /* before parsing it */
+		}
+	}
+	src_pop();
 }
 
 
@@ -108,7 +114,7 @@ parseline( enum flag interpret )
         }
         else
         {
-            Skipline( z80asmfile );
+            Skipline();
             tok = TK_NEWLINE;    /* ignore label and rest of line */
         }
     }
@@ -583,8 +589,8 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
 {
     pfixexpr->nextexpr = NULL;
     pfixexpr->expr_type = constrange;
-    pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
-    pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
+    pfixexpr->srcfile = src_filename();	/* pointer to record containing current source file name */
+    pfixexpr->curline = src_line_nr();	/* pointer to record containing current line number */
     pfixexpr->listpos = list_patch_pos( byteoffset );
     /* now calculated as absolute file pointer */
 
@@ -598,85 +604,6 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
         CURRENTMODULE->mexpr->currexpr->nextexpr = pfixexpr;      /* Current expr. node points to new expression
                                                                    * node */
         CURRENTMODULE->mexpr->currexpr = pfixexpr;				  /* Pointer to current expr. node updated */
-    }
-}
-
-
-
-struct sourcefile *
-Prevfile( void )
-{
-    struct usedfile *newusedfile;
-    struct sourcefile *ownedfile;
-
-    newusedfile = xnew( struct usedfile );
-    ownedfile = CURRENTFILE;
-    CURRENTFILE = CURRENTFILE->prevsourcefile;    /* get back to owner file - now the current */
-    CURRENTFILE->newsourcefile = NULL;    /* current file is now the last in the list */
-    ownedfile->prevsourcefile = NULL;     /* pointer to owner now obsolete... */
-
-    newusedfile->nextusedfile = CURRENTFILE->usedsourcefile;      /* set ptr to next record to current ptr to
-                                                                 * another used file */
-    CURRENTFILE->usedsourcefile = newusedfile;    /* new used file now inserted into list */
-    newusedfile->ownedsourcefile = ownedfile;     /* the inserted record now points to previously owned file */
-    return ( CURRENTFILE );
-}
-
-
-/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-struct sourcefile *
-Newfile( struct sourcefile *curfile, char *fname )
-{
-    struct sourcefile *nfile;
-    struct sourcefile *ret;
-
-    nfile = xnew( struct sourcefile );
-    ret = Setfile( curfile, nfile, fname );
-
-    return ret;
-}
-
-
-struct sourcefile *
-Setfile( struct sourcefile *curfile,    /* pointer to record of current source file */
-         struct sourcefile *nfile,      /* pointer to record of new
-                                         * source file */
-         char *filename )
-{
-    nfile->fname = xstrdup( filename );   /* pointer to filename string */
-    nfile->prevsourcefile = curfile;
-    nfile->newsourcefile = NULL;
-    nfile->usedsourcefile = NULL;
-    nfile->filepointer = 0;
-    nfile->line = 0;                      /* Reset to 0 as line counter during parsing */
-    return ( nfile );
-}
-
-
-struct sourcefile *
-FindFile( struct sourcefile *srcfile, char *flnm )
-{
-    struct sourcefile *foundfile;
-
-    if ( srcfile != NULL )
-    {
-        if ( ( foundfile = FindFile( srcfile->prevsourcefile, flnm ) ) != NULL )
-        {
-            return foundfile;    /* trying to include an already included file recursively! */
-        }
-
-        if ( stricompare( srcfile->fname, flnm ) == 0 )
-        {
-            return srcfile;    /* this include file already used! */
-        }
-        else
-        {
-            return NULL;    /* this include file didn't match filename searched */
-        }
-    }
-    else
-    {
-        return NULL;
     }
 }
 
@@ -714,7 +641,11 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.84  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.85  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.84  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.31 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.32 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -48,7 +48,6 @@ void LD_r_8bit_indrct( int reg );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
-extern FILE *z80asmfile;
 
 
 
@@ -711,7 +710,11 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.31  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.32  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.31  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

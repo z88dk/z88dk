@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.69 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.70 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,7 +59,6 @@ struct expr *ParseNumExpr( void );
 /* global variables */
 extern struct module *CURRENTMODULE;
 extern char ident[];
-extern FILE *z80asmfile, *objfile;
 
 
 #define DEFINE_PARSER( name, prev_name, condition )				\
@@ -653,7 +652,11 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.69  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.70  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.69  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

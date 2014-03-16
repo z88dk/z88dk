@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.8 2014-03-11 00:15:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.9 2014-03-16 19:19:49 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -91,7 +91,7 @@ make_path( err_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error at file 'test.asm': cannot write file 'test.err'\n".
+				"Error: cannot write file 'test.err'\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( err_file() );
@@ -101,7 +101,7 @@ make_path( lst_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-l -r0 -b -c ".asm_file(),
 				"", 
-				"Error at file 'test.asm': cannot write file 'test.lst'\n".
+				"Error: cannot write file 'test.lst'\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( lst_file() );
@@ -111,7 +111,7 @@ make_path( sym_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error at file 'test.asm': cannot write file 'test.sym'\n".
+				"Error: cannot write file 'test.sym'\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( sym_file() );
@@ -121,7 +121,7 @@ make_path( obj_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-l -r0 -b -c ".asm_file(),
 				"", 
-				"Error at file 'test.asm': cannot write file 'test.obj'\n".
+				"Error: cannot write file 'test.obj'\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( obj_file() );
@@ -1028,7 +1028,11 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.8  2014-03-11 00:15:13  pauloscustodio
+# Revision 1.9  2014-03-16 19:19:49  pauloscustodio
+# Integrate use of srcfile in scanner, removing global variable z80asmfile
+# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+#
+# Revision 1.8  2014/03/11 00:15:13  pauloscustodio
 # Scanner reads input line-by-line instead of character-by-character.
 # Factor house-keeping at each new line read in the scanner getasmline().
 # Add interface to allow back-tacking of the recursive descent parser by

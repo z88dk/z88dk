@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.46 2014-03-11 23:34:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.47 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #pragma once
@@ -49,7 +49,7 @@ extern char line[];
 extern char ident[];
 extern struct module *CURRENTMODULE;
 extern struct modules *modulehdr;
-extern FILE *z80asmfile;
+extern FILE *objfile;
 extern Symbol *ASMPC;
 extern uint_t sizeof_relocroutine, sizeof_reloctable;
 
@@ -57,10 +57,15 @@ extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
+extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.46  2014-03-11 23:34:00  pauloscustodio
+* Revision 1.47  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.46  2014/03/11 23:34:00  pauloscustodio
 * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.

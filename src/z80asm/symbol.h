@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.40 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.41 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,22 +30,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.40 2014-03-05 23:
 /* Structured data types : */
 
 enum flag           { OFF, ON };
-
-struct usedfile
-{
-    struct usedfile    *nextusedfile;
-    struct sourcefile  *ownedsourcefile;
-};
-
-struct sourcefile
-{
-    struct sourcefile  *prevsourcefile;	/* pointer to previously parsed source file */
-    struct sourcefile  *newsourcefile;	/* pointer to new source file to be parsed */
-    struct usedfile    *usedsourcefile;	/* list of pointers to used files owned by this file */
-    long               filepointer;		/* file pointer of current source file */
-    int               line;				/* current line number of current source file */
-    char               *fname;			/* pointer to file name of current source file */
-};
 
 struct JRPC_Hdr
 {
@@ -69,9 +53,9 @@ struct module
 {
     struct module     *nextmodule;		/* pointer to next module */
     char              *mname;			/* pointer to string of module name */
+	char			  *filename;		/* source file name, kept in strpool */
     uint_t             startoffset;		/* this module's start offset from start of code buffer */
     long               origin;			/* Address Origin of current machine code module during linking */
-    struct sourcefile *cfile;			/* pointer to current file record */
     SymbolHash        *local_symtab;	/* pointer to root of local symbols tree */
     struct expression *mexpr;			/* pointer to expressions in this module */
     struct JRPC_Hdr   *JRaddr;			/* pointer to list of JR PC addresses */
@@ -106,11 +90,15 @@ struct linkedmod
 };
 
 
-#define CURRENTFILE     CURRENTMODULE->cfile
+extern struct module *NewModule( void );
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.40  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.41  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.40  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.39  2014/03/04 11:49:47  pauloscustodio

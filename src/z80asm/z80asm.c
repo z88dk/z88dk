@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.148 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.149 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.148 2014-03-15 02
 
 /* external functions */
 void RemovePfixlist( struct expr *pfixexpr );
-void Z80pass1( void );
 void Z80pass2( void );
 void CreateLib( char *lib_filename );
 void LinkModules( void );
@@ -64,11 +63,9 @@ void ReleaseModules( void );
 void ReleaseExprns( struct expression *express );
 void CloseFiles( void );
 Symbol *createsym( Symbol *symptr );
-struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
-
-FILE *z80asmfile, *objfile;
+FILE *objfile;
 
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
@@ -115,7 +112,7 @@ void assemble_file( char *filename )
     char *src_filename, *obj_filename;
 
     /* normal case - assemble a asm source file */
-    z80asmfile = objfile = NULL;
+    objfile = NULL;
     opts.cur_list = opts.list;		/* initial LSTON status */
     reset_codearea();           /* Pointer (PC) to store z80 instruction */
 
@@ -124,9 +121,7 @@ void assemble_file( char *filename )
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();
-
-    /* Create first file record */
-    CURRENTFILE = Newfile( NULL, src_filename );
+	CURRENTMODULE->filename = strpool_add( src_filename );
 
     query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
@@ -176,13 +171,10 @@ static void do_assemble( char *src_filename, char *obj_filename )
     /* try-catch to delete incomplete files in case of fatal error */
     TRY
     {
-        z80asmfile = xfopen( src_filename, "rb" );           /* CH_0012 */
-        set_error_file( src_filename );
-
         /* Create error file */
         open_error_file( get_err_filename( src_filename ) );
 
-        /* create list file or symtable */
+		/* create list file or symtable */
         if ( opts.list )
             list_open( get_lst_filename( src_filename ) );	/* set '.lst' extension */
         else if ( opts.symtable )
@@ -204,11 +196,9 @@ static void do_assemble( char *src_filename, char *obj_filename )
         ASMPC = define_global_def_sym( ASMPC_KW, get_PC() );
 
         if ( opts.verbose )
-        {
             printf( "Assembling '%s'...\nPass1...\n", src_filename );
-        }
 
-        Z80pass1();
+        Z80pass1( src_filename );
 
         list_end();                    /* get_used_symbol will only generate page references until list_end() */
 
@@ -238,12 +228,6 @@ static void do_assemble( char *src_filename, char *obj_filename )
          */
 
         set_error_null();
-
-        if ( z80asmfile != NULL )
-        {
-            xfclose( z80asmfile );
-            z80asmfile = NULL;
-        }
 
         /* remove list file if more errors now than before */
         list_close( start_errors == get_num_errors() );
@@ -310,12 +294,6 @@ BOOL load_module_object( char *filename )
 void
 CloseFiles( void )
 {
-    if ( z80asmfile != NULL )
-    {
-        xfclose( z80asmfile );
-        z80asmfile = NULL;
-    }
-
     if ( objfile != NULL )
     {
         xfclose( objfile );
@@ -411,8 +389,7 @@ char *GetLibfile( char *filename )
 
 
 /* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-struct module *
-NewModule( void )
+struct module *NewModule( void )
 {
     struct module *newm;
 
@@ -427,9 +404,9 @@ NewModule( void )
 
     newm->nextmodule = NULL;
     newm->mname = NULL;
-    newm->startoffset = get_codesize();
+	newm->filename = NULL;
+	newm->startoffset = get_codesize();
     newm->origin = 65535;
-    newm->cfile = NULL;
     newm->local_symtab = OBJ_NEW( SymbolHash );
 
     newm->mexpr = xnew( struct expression );
@@ -511,11 +488,6 @@ ReleaseModules( void )
 
     while ( curptr != NULL )    /* until all modules are released */
     {
-        if ( curptr->cfile != NULL )
-        {
-            ReleaseFile( curptr->cfile );
-        }
-
         OBJ_DELETE( curptr->local_symtab );
 
         if ( curptr->mexpr != NULL )
@@ -597,43 +569,6 @@ ReleaseExprns( struct expression *express )
 
     xfree( express );
 }
-
-
-void
-ReleaseFile( struct sourcefile *srcfile )
-{
-    if ( srcfile == NULL )
-        return;
-
-    if ( srcfile->prevsourcefile != NULL )
-        ReleaseFile( srcfile->prevsourcefile );
-
-    if ( srcfile->usedsourcefile != NULL )
-        ReleaseOwnedFile( srcfile->usedsourcefile );
-
-    xfree( srcfile->fname );   /* Release allocated area for filename */
-    xfree( srcfile );          /* Release file information record for this file */
-}
-
-
-void
-ReleaseOwnedFile( struct usedfile *ownedfile )
-{
-    /* Release first other files called by this file */
-    if ( ownedfile->nextusedfile != NULL )
-    {
-        ReleaseOwnedFile( ownedfile->nextusedfile );
-    }
-
-    /* Release first file owned by this file */
-    if ( ownedfile->ownedsourcefile != NULL )
-    {
-        ReleaseFile( ownedfile->ownedsourcefile );
-    }
-
-    xfree( ownedfile );        /* Then release this owned file */
-}
-
 
 /***************************************************************************************************
  * Main entry of Z80asm
@@ -723,7 +658,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.148  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.149  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.148  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

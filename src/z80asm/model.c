@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.4 2014-03-15 14:35:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.5 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,14 +39,13 @@ static SrcFile *g_src_input;		/* input handle for reading source lines */
 *----------------------------------------------------------------------------*/
 static void new_line_cb( char *filename, int line_nr, char *text )
 {
+    set_error_file( filename );		/* error file */
+
 	if ( filename != NULL )
 	{
         /* interface with error - set error location */
         if ( ! opts.line_mode )
-        {
-            set_error_file( filename );	/* error location */
             set_error_line( line_nr );
-        }
 
         /* interface with list */
         if ( opts.cur_list )
@@ -55,7 +54,7 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 	else
 	{
 		if ( ! opts.line_mode )
-            set_error_null();			/* clear error location */
+            set_error_line( 0 );
 	}
 }
 
@@ -130,7 +129,11 @@ BOOL src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.4  2014-03-15 14:35:51  pauloscustodio
+* Revision 1.5  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.4  2014/03/15 14:35:51  pauloscustodio
 * Add interface to lookup current file name and line number
 *
 * Revision 1.3  2014/02/08 18:30:49  pauloscustodio

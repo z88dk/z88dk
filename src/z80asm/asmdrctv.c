@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.81 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.82 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -47,8 +47,6 @@ long EvalPfixExpr( struct expr *pfixexpr );
 long GetConstant( char *evalerr );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void RemovePfixlist( struct expr *pfixexpr );
-void Z80pass1( void );
-void Skipline( FILE *fptr );
 struct expr *ParseNumExpr( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
@@ -62,7 +60,6 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern uint_t DEFVPC;
 extern struct module *CURRENTMODULE;
@@ -237,7 +234,7 @@ DEFVARS( void )
 
     while ( tok != TK_EOF && tok != TK_LCURLY )
     {
-        Skipline( z80asmfile );
+        Skipline();
 
         EOL = FALSE;
         GetSym();
@@ -274,7 +271,7 @@ DEFGROUP( void )
 
     while ( tok != TK_EOF && GetSym() != TK_LCURLY )
     {
-        Skipline( z80asmfile );
+        Skipline();
         EOL = FALSE;
     }
 
@@ -337,7 +334,7 @@ DEFGROUP( void )
                 }
                 while ( tok == TK_COMMA );   /* get enum definitions separated by comma in current line */
 
-                Skipline( z80asmfile );   /* ignore rest of line */
+                Skipline();   /* ignore rest of line */
             }
         }
     }
@@ -736,48 +733,9 @@ DEFM( void )
 void
 INCLUDE( void )
 {
-    char *filename;
-
     if ( GetSym() == TK_STRING )
     {
-        /* fetch filename of include file */
-        filename = search_file( tok_string, opts.inc_path );
-
-        if ( FindFile( CURRENTFILE, filename ) != NULL )
-        {
-            fatal_include_recursion( filename );
-            return;
-        }
-
-        CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
-        xfclose( z80asmfile );     /* close current source file */
-        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
-                                       z80asmfile is NULL in case the next
-                                       xfopen() throws an exception */
-
-        z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
-        CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
-
-        set_error_file( filename );
-
-        if ( opts.verbose )
-        {
-            puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
-        }
-
-        Z80pass1();           /* parse include file */
-
-        CURRENTFILE = Prevfile();     /* Now get back to current file... */
-
-        set_error_file( CURRENTFILE->fname );
-
-        xfclose( z80asmfile );
-        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
-                                       z80asmfile is NULL in case the next
-                                       xfopen() throws an exception */
-
-        z80asmfile = xfopen( CURRENTFILE->fname, "rb" );           /* CH_0012 */
-        fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
+        Z80pass1( tok_string );				/* parse include file */
     }
     else
     {
@@ -840,7 +798,11 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.81  2014-03-15 02:12:07  pauloscustodio
+ * Revision 1.82  2014-03-16 19:19:49  pauloscustodio
+ * Integrate use of srcfile in scanner, removing global variable z80asmfile
+ * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+ *
+ * Revision 1.81  2014/03/15 02:12:07  pauloscustodio
  * Rename last token to tok*
  * GetSym() declared in scan.h
  *

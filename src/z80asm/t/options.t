@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.34 2014-03-11 23:34:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.35 2014-03-16 19:19:49 pauloscustodio Exp $
 #
 # Test options
 
@@ -169,6 +169,7 @@ Create address map file.map
 
 Assembling 'test.asm'...
 Pass1...
+Reading 'test.asm'...
 Pass2...
 Size of module is 3 bytes
 
@@ -1106,7 +1107,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.34  2014-03-11 23:34:00  pauloscustodio
+# Revision 1.35  2014-03-16 19:19:49  pauloscustodio
+# Integrate use of srcfile in scanner, removing global variable z80asmfile
+# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+#
+# Revision 1.34  2014/03/11 23:34:00  pauloscustodio
 # Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
 # Allows decoupling of input file used in scanner from callers.
 # Removed TOTALLINES.

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.15 2014-03-03 14:09:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.16 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 
@@ -74,7 +74,7 @@ void write_map_file( void )
     SymbolHash *map_symtab;
 
     /* use first module filename to create global map file */
-    filename = get_map_filename( modulehdr->first->cfile->fname ); /* set '.map' extension */
+    filename = get_map_filename( modulehdr->first->filename ); /* set '.map' extension */
 
     /* Create MAP file */
     file = xfopen( filename, "w" );           /* CH_0012 */
@@ -113,7 +113,11 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.15  2014-03-03 14:09:20  pauloscustodio
+* Revision 1.16  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.15  2014/03/03 14:09:20  pauloscustodio
 * Renamed symbol type attribute
 *
 * Revision 1.14  2014/03/03 13:27:07  pauloscustodio

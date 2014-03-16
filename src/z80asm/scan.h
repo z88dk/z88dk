@@ -16,7 +16,7 @@ Scanner header corresponding to scan.rl
 Note: the scanner is not reentrant. scan_get() relies on state variables that
 need to be kept across calls.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.30 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.31 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,6 +31,7 @@ extern tokid_t GetSym( void );
 extern void SetTemporaryLine( char *line );
 extern char *ScanGetPos( void );
 extern void  ScanSetPos( char *pos );
+extern void  Skipline( void );
 
 extern tokid_t tok;			/* current token */
 extern char *tok_name;		/* contains identifier to return with TK_NAME and TK_LABEL */
@@ -129,7 +130,11 @@ extern Token scan_get( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.30  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.31  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.30  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

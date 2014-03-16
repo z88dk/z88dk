@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.101 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.102 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,7 +39,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.101 2014-03-15 0
 
 /* external functions */
 void RemovePfixlist( struct expr *pfixexpr );
-struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 long EvalPfixExpr( struct expr *pass2expr );
@@ -59,12 +58,11 @@ void LinkModules( void );
 void ModuleExpr( void );
 void CreateBinFile( void );
 void ReadNames( char *filename, FILE *file, long nextname, long endnames );
-void ReadExpr( long nextexpr, long endexpr );
+void ReadExpr( FILE *file, long nextexpr, long endexpr );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
-extern FILE *z80asmfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
@@ -132,7 +130,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 
 
 void
-ReadExpr( long nextexpr, long endexpr )
+ReadExpr( FILE *file, long nextexpr, long endexpr )
 {
     int type;
     long constant;
@@ -142,16 +140,16 @@ ReadExpr( long nextexpr, long endexpr )
 
     do
     {
-        type		= xfget_int8(   z80asmfile );
-        offsetptr	= xfget_uint16( z80asmfile );
+        type		= xfget_int8(   file );
+        offsetptr	= xfget_uint16( file );
 
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
         ASMPC->value = get_PC();
 
-		xfget_count_byte_Str( z80asmfile, expr );	/* get expression */
-		xfget_uint8( z80asmfile );					/* skip zero byte */
+		xfget_count_byte_Str( file, expr );			/* get expression */
+		xfget_uint8( file );						/* skip zero byte */
 
         nextexpr += 1 + 2 + 1 + expr->len + 1;
 
@@ -251,6 +249,7 @@ LinkModules( void )
     uint_t origin;
     struct module *lastobjmodule;
     char *obj_filename;
+	FILE *file;
 
     opts.symtable = opts.cur_list = FALSE;
     linkhdr = NULL;
@@ -280,7 +279,7 @@ LinkModules( void )
         lastobjmodule = modulehdr->last;        /* remember this last module, further modules are libraries */
 
         /* open error file */
-        open_error_file( get_err_filename( CURRENTFILE->fname ) );
+        open_error_file( get_err_filename( CURRENTMODULE->filename ) );
 
         set_PC( 0 );
         ASMPC = define_global_def_sym( ASMPC_KW, get_PC() );  /* Create standard 'ASMPC' identifier */
@@ -297,32 +296,24 @@ LinkModules( void )
                 CURRENTLIB->nextobjfile = 8;            /* point at first library module (past header) */
             }
 
-            CURRENTFILE->line = 0;              /* no line references on errors during link processing */
-
-            if ( !opts.line_mode )
-            {
-                set_error_line( CURRENTFILE->line );    /* error location */
-            }
-
             /* overwrite '.asm' extension with * '.obj' */
-            obj_filename = get_obj_filename( CURRENTFILE->fname );
+            obj_filename = get_obj_filename( CURRENTMODULE->filename );
 
             /* open relocatable file for reading */
-            z80asmfile = xfopen( obj_filename, "rb" );           /* CH_0012 */
+            file = xfopen( obj_filename, "rb" );           /* CH_0012 */
 			/* read first 6 chars from file into array */
-            xfget_chars( z80asmfile, fheader, 8 );
+            xfget_chars( file, fheader, 8 );
             fheader[8] = '\0';
 
             /* compare header of file */
             if ( strcmp( fheader, Z80objhdr ) != 0 )
             {
                 error_not_obj_file( obj_filename );  /* not a object     file */
-                xfclose( z80asmfile );
-                z80asmfile = NULL;
+                xfclose( file );
                 break;
             }
 
-            origin = xfget_uint16( z80asmfile );
+            origin = xfget_uint16( file );
 
             if ( modulehdr->first == CURRENTMODULE )            /* origin of first module */
             {
@@ -343,8 +334,7 @@ LinkModules( void )
                         if ( CURRENTMODULE->origin == 65535U )
                         {
                             error_org_not_defined();  /* no ORG */
-                            xfclose( z80asmfile );
-                            z80asmfile = NULL;
+                            xfclose( file );
                             break;
                         }
                     }
@@ -356,8 +346,7 @@ LinkModules( void )
                 }
             }
 
-            xfclose( z80asmfile );
-            z80asmfile = NULL;
+            xfclose( file );
 
             LinkModule( obj_filename, 0 );       /* link code & read name definitions */
 
@@ -404,22 +393,23 @@ LinkModule( char *filename, long fptr_base )
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl, dummy;
     uint_t size;
     int flag = 0;
+	FILE *file;
 
     /* open object file for reading */
-    z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
-    fseek( z80asmfile, fptr_base + 10U, SEEK_SET );
+    file = xfopen( filename, "rb" );           /* CH_0012 */
+    fseek( file, fptr_base + 10U, SEEK_SET );
 
-    fptr_modname	= xfget_int32( z80asmfile );	/* get file pointer to module name */
-    dummy			= xfget_int32( z80asmfile );	/* get file pointer to expression declarations */
-    fptr_namedecl	= xfget_int32( z80asmfile );	/* get file pointer to name declarations */
-    fptr_libnmdecl	= xfget_int32( z80asmfile );	/* get file pointer to library name declarations */
-    fptr_modcode	= xfget_int32( z80asmfile );	/* get file pointer to module code */
+    fptr_modname	= xfget_int32( file );	/* get file pointer to module name */
+    dummy			= xfget_int32( file );	/* get file pointer to expression declarations */
+    fptr_namedecl	= xfget_int32( file );	/* get file pointer to name declarations */
+    fptr_libnmdecl	= xfget_int32( file );	/* get file pointer to library name declarations */
+    fptr_modcode	= xfget_int32( file );	/* get file pointer to module code */
 
     if ( fptr_modcode != -1 )
     {
-        fseek( z80asmfile, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
+        fseek( file, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
 
-        size = xfget_uint16( z80asmfile );
+        size = xfget_uint16( file );
 
         /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
         if ( size == 0 )
@@ -427,7 +417,7 @@ LinkModule( char *filename, long fptr_base )
 
         /* read module code at startoffset of the module */
         /* BUG_0015: was reading at current position in code area, swaping order of modules */
-        fread_codearea_offset( z80asmfile, CURRENTMODULE->startoffset, size );
+        fread_codearea_offset( file, CURRENTMODULE->startoffset, size );
 
         /* BUG_0015 : was no updating codesize */
         if ( CURRENTMODULE->startoffset == get_codesize() )
@@ -436,17 +426,16 @@ LinkModule( char *filename, long fptr_base )
 
     if ( fptr_namedecl != -1 )
     {
-        fseek( z80asmfile, fptr_base + fptr_namedecl, SEEK_SET );  /* set file pointer to point at name
+        fseek( file, fptr_base + fptr_namedecl, SEEK_SET );  /* set file pointer to point at name
                                                                  * declarations */
 
         if ( fptr_libnmdecl != -1 )
-            ReadNames( filename, z80asmfile, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
+            ReadNames( filename, file, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
         else
-            ReadNames( filename, z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
+            ReadNames( filename, file, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
     }
 
-    xfclose( z80asmfile );
-    z80asmfile = NULL;
+    xfclose( file );
 
     if ( fptr_libnmdecl != -1 )
     {
@@ -690,8 +679,6 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
 
     CURRENTMODULE = NewModule();
     CURRENTMODULE->mname = xstrdup( modname );  /* get a copy of module name */
-    /* create new module for library */
-    CURRENTFILE = Newfile( NULL, library->libfilename ); /* filename for 'module' */
 
     if ( opts.verbose )
     {
@@ -726,6 +713,7 @@ ModuleExpr( void )
     long fptr_namedecl, fptr_modname, fptr_exprdecl, fptr_libnmdecl;
     long fptr_base;
     struct linkedmod *curlink;
+	FILE *file;
 
     if ( opts.verbose )
     {
@@ -741,36 +729,35 @@ ModuleExpr( void )
 
         set_error_null();
         set_error_module( CURRENTMODULE->mname );
-        set_error_file( CURRENTFILE->fname );
+        set_error_file( CURRENTMODULE->filename );
 
         /* open relocatable file for reading */
-        z80asmfile = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
-        fseek( z80asmfile, fptr_base + 10, SEEK_SET );	/* point at module name  pointer   */
-        fptr_modname	= xfget_int32( z80asmfile );	/* get file pointer to module name */
-        fptr_exprdecl	= xfget_int32( z80asmfile );	/* get file pointer to expression declarations */
-        fptr_namedecl	= xfget_int32( z80asmfile );	/* get file pointer to name declarations */
-        fptr_libnmdecl	= xfget_int32( z80asmfile );	/* get file pointer to library name declarations */
+        file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
+        fseek( file, fptr_base + 10, SEEK_SET );		/* point at module name  pointer   */
+        fptr_modname	= xfget_int32( file );			/* get file pointer to module name */
+        fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
+        fptr_namedecl	= xfget_int32( file );			/* get file pointer to name declarations */
+        fptr_libnmdecl	= xfget_int32( file );			/* get file pointer to library name declarations */
 
         if ( fptr_exprdecl != -1 )
         {
-            fseek( z80asmfile, fptr_base + fptr_exprdecl, SEEK_SET );
+            fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
 
             if ( fptr_namedecl != -1 )
             {
-                ReadExpr( fptr_exprdecl, fptr_namedecl );	/* Evaluate until beginning of name declarations */
+                ReadExpr( file, fptr_exprdecl, fptr_namedecl );	/* Evaluate until beginning of name declarations */
             }
             else if ( fptr_libnmdecl != -1 )
             {
-                ReadExpr( fptr_exprdecl, fptr_libnmdecl );	/* Evaluate until beginning of library reference declarations */
+                ReadExpr( file, fptr_exprdecl, fptr_libnmdecl );	/* Evaluate until beginning of library reference declarations */
             }
             else
             {
-                ReadExpr( fptr_exprdecl, fptr_modname );    /* Evaluate until beginning of module name */
+                ReadExpr( file, fptr_exprdecl, fptr_modname );    /* Evaluate until beginning of module name */
             }
         }
 
-        xfclose( z80asmfile );
-        z80asmfile = NULL;
+        xfclose( file );
 
         curlink = curlink->nextlink;
     }
@@ -801,12 +788,12 @@ CreateBinFile( void )
         if ( opts.code_seg && get_codesize() > 16384 )
         {
             /* add '.bn0' extension */
-            filename = get_segbin_filename( modulehdr->first->cfile->fname, 0 );
+            filename = get_segbin_filename( modulehdr->first->filename, 0 );
         }
         else
         {
             /* add '.bin' extension */
-            filename = get_bin_filename( modulehdr->first->cfile->fname );
+            filename = get_bin_filename( modulehdr->first->filename );
         }
     }
 
@@ -878,7 +865,6 @@ CreateLib( char *lib_filename )
     FILE *obj_file = NULL;
     char *filebuffer = NULL;
     long fptr;
-    char *obj_filename;
 
     if ( opts.verbose )
     {
@@ -903,11 +889,9 @@ CreateLib( char *lib_filename )
             set_error_module( CURRENTMODULE->mname );
 
             /* replace fname with the .obj extension */
-            obj_filename = get_obj_filename( CURRENTFILE->fname );
-            xfree( CURRENTFILE->fname );
-            CURRENTFILE->fname = xstrdup( obj_filename );
+            CURRENTMODULE->filename = get_obj_filename( CURRENTMODULE->filename );
 
-            obj_file = xfopen( CURRENTFILE->fname, "rb" );           /* CH_0012 */
+            obj_file = xfopen( CURRENTMODULE->filename, "rb" );           /* CH_0012 */
             fseek( obj_file, 0L, SEEK_END );  /* file pointer to end of file */
             Codesize = ftell( obj_file );
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
@@ -920,13 +904,13 @@ CreateLib( char *lib_filename )
 
             if ( memcmp( filebuffer, Z80objhdr, 8U ) != 0 )
             {
-                error_not_obj_file( CURRENTFILE->fname );
+                error_not_obj_file( CURRENTMODULE->filename );
                 break;
             }
 
             if ( opts.verbose )
             {
-                printf( "<%s> module at %04lX.\n", CURRENTFILE->fname, ftell( lib_file ) );
+                printf( "<%s> module at %04lX.\n", CURRENTMODULE->filename, ftell( lib_file ) );
             }
 
             if ( CURRENTMODULE->nextmodule == NULL )
@@ -1040,7 +1024,11 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.101  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.102  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.101  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.52 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.53 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,12 +42,9 @@ int IndirectRegisters( void );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
-tokid_t GetSym( void );
-void Skipline( FILE *fp );
 int CheckBaseType( int chcount );
 
 /* global variables */
-extern FILE *z80asmfile;
 extern char ident[];
 extern int currentline;
 extern struct module *CURRENTMODULE;
@@ -108,38 +105,6 @@ static void set_input_buffer( char *line )
 	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
 }
 
-/* listfile handling */
-static void getasmline( void )
-{
-	++CURRENTFILE->line;
-
-    if ( !opts.line_mode )
-    {
-        set_error_line( CURRENTFILE->line );    /* error location */
-    }
-
-    if ( opts.cur_list )
-    {
-		line[0] = '\0';							/* prepare for strncat */
-		strncat( line, input_buffer->str, 255 );
-
-		list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
-    }
-}
-
-/* read new line from input */
-static BOOL ReadLine( FILE *fp )
-{
-	BOOL ret;
-
-	ret = Str_getline( input_buffer, fp );	/* read next line */
-	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
-
-	getasmline();
-
-	return ret;
-}
-
 /* set a new input text */
 void SetTemporaryLine( char *line )
 {
@@ -178,7 +143,7 @@ void ScanSetPos( char *pos )
 }
 
 /* get a character from file */
-static int GetChar( FILE *fp )
+static int GetChar( void )
 {
     int c;
 	char *line;
@@ -205,8 +170,12 @@ static int GetChar( FILE *fp )
 		else 
 		{
 			/* get next line from input file */
-			if ( ! ReadLine( fp ) )
+			line = src_getline();
+			if ( line == NULL )
 				return EOF;
+
+			/* got new line */
+			set_input_buffer( line );
 		}
 	}
 }
@@ -241,7 +210,7 @@ tokid_t GetSym( void )
     for ( ;; )
     {
         /* Ignore leading white spaces, if any... */
-        c = GetChar( z80asmfile );
+        c = GetChar();
 		if ( c == EOF )
 		{
 	        return (tok = TK_EOF);			/* assign and return */
@@ -260,7 +229,7 @@ tokid_t GetSym( void )
 	/* comment */
     if ( c == ';' )
     {
-        Skipline( z80asmfile );				/* ignore comment line, prepare for next line */
+        Skipline();							/* ignore comment line, prepare for next line */
         return (tok = TK_NEWLINE);			/* assign and return */
     }
 
@@ -298,7 +267,7 @@ tokid_t GetSym( void )
 		{
 			tok_number = 0;
 			error_invalid_squoted_string();
-			Skipline( z80asmfile );
+			Skipline();
 		}
 		else
 		{
@@ -375,7 +344,7 @@ tokid_t GetSym( void )
     {
         while (1)
         {
-            c = GetChar( z80asmfile );
+            c = GetChar();
 			if ( c == EOF )
 				break;
 
@@ -395,7 +364,7 @@ tokid_t GetSym( void )
     {
         while (1)
         {
-            c = GetChar( z80asmfile );
+            c = GetChar();
 			if ( c == EOF )
 				break;
 
@@ -521,8 +490,7 @@ CheckBaseType( int chcount )
 
 
 
-void
-Skipline( FILE *fp )
+void Skipline( void )
 {
 	init();
 
@@ -899,7 +867,11 @@ GetConstant( char *evalerr )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.52  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.53  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.52  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.61 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.62 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,7 +33,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.61 2014-0
 #include <string.h>
 
 /* external functions */
-void Skipline( FILE *fptr );
 void Subroutine_addr( int opc0, int opc );
 void JP_instr( int opc0, int opc );
 void PushPop_instr( int opcode );
@@ -76,7 +75,6 @@ void MODULE( void );
 void LINE( void );
 
 /* global variables */
-extern FILE *z80asmfile;
 extern char ident[], line[];
 extern struct module *CURRENTMODULE;
 
@@ -224,18 +222,14 @@ ParseIdent( enum flag interpret )
     if ( foundsym == NULL )
     {
         if ( interpret == ON )      /* only issue error message if interpreting */
-        {
             error_unknown_ident();
-        }
     }
     else
     {
         if ( foundsym->z80func == IF )
         {
             if ( interpret == OFF )
-            {
-                Skipline( z80asmfile );    /* skip current line until EOL */
-            }
+                Skipline();    /* skip current line until EOL */
 
             ifstatement( interpret );
         }
@@ -243,16 +237,14 @@ ParseIdent( enum flag interpret )
                   foundsym->z80func == ENDIF )
         {
             ( foundsym->z80func )();
-            Skipline( z80asmfile );
+            Skipline();
         }
         else
         {
             if ( interpret == ON )
-            {
                 ( foundsym->z80func )();
-            }
 
-            Skipline( z80asmfile );               /* skip current line until EOL */
+            Skipline();               /* skip current line until EOL */
         }
     }
 }
@@ -294,9 +286,7 @@ void LINE( void )
     clineno = GetConstant( &err );
 
     if ( opts.line_mode )
-    {
         set_error_line( clineno );
-    }
 
     line[0] = '\0';
     snprintf( name, sizeof( name ), "__C_LINE_%ld", clineno );
@@ -1090,7 +1080,11 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.61  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.62  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.61  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *

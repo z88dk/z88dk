@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.5 2014-03-15 14:35:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.6 2014-03-16 19:19:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -231,13 +231,14 @@ char *SrcFile_getline( SrcFile *self )
     if ( self->line->len > 0 && ! found_newline )
         Str_append_char( self->line, '\n' );
 
-    /* check for end of file
+	/* signal new line, even empty one, to show end line in list */
+    self->line_nr++;
+	call_new_line_cb( self->filename, self->line_nr, self->line->str );
+
+	/* check for end of file
 	   even if EOF found, we need to return any chars in line first */
     if ( self->line->len > 0 )		
     {
-        self->line_nr++;
-
-		call_new_line_cb( self->filename, self->line_nr, self->line->str );
         return self->line->str;
     }
     else
@@ -341,7 +342,11 @@ BOOL SrcFile_pop( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.5  2014-03-15 14:35:51  pauloscustodio
+* Revision 1.6  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.5  2014/03/15 14:35:51  pauloscustodio
 * Add interface to lookup current file name and line number
 *
 * Revision 1.4  2014/03/05 23:44:55  pauloscustodio

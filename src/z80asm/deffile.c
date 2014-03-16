@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.9 2014-03-03 13:27:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.10 2014-03-16 19:19:49 pauloscustodio Exp $
 
 */
 
@@ -67,7 +67,7 @@ void write_def_file( void )
     SymbolHash *def_symtab;
 
     /* use first module filename to create global def file */
-    filename = get_def_filename( modulehdr->first->cfile->fname ); /* set '.def' extension */
+    filename = get_def_filename( modulehdr->first->filename ); /* set '.def' extension */
 
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
@@ -92,7 +92,11 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.9  2014-03-03 13:27:06  pauloscustodio
+* Revision 1.10  2014-03-16 19:19:49  pauloscustodio
+* Integrate use of srcfile in scanner, removing global variable z80asmfile
+* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+*
+* Revision 1.9  2014/03/03 13:27:06  pauloscustodio
 * Rename symbol type constants
 *
 * Revision 1.8  2014/01/20 23:29:18  pauloscustodio
