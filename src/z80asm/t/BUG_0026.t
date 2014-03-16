@@ -13,23 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: BUG_0026.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2013/02/19 22:52:40  pauloscustodio
-# BUG_0030 : List bytes patching overwrites header
-# BUG_0031 : List file garbled with input lines with 255 chars
-# New listfile.c with all the listing related code
-#
-# Revision 1.2  2013/02/12 00:55:32  pauloscustodio
-# Comment
-#
-# Revision 1.1  2013/02/11 21:54:38  pauloscustodio
-# BUG_0026 : Incorrect paging in symbol list
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.5 2014-03-16 19:47:33 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -45,3 +29,23 @@ list_test();
 
 unlink_testfiles();
 done_testing();
+
+# $Log: BUG_0026.t,v $
+# Revision 1.5  2014-03-16 19:47:33  pauloscustodio
+# comments
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.3  2013/02/19 22:52:40  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
+#
+# Revision 1.2  2013/02/12 00:55:32  pauloscustodio
+# Comment
+#
+# Revision 1.1  2013/02/11 21:54:38  pauloscustodio
+# BUG_0026 : Incorrect paging in symbol list
+#
