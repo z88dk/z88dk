@@ -3,20 +3,20 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t w_array_capacity(w_array_t *a)
+; size_t w_array_size(w_array_t *a)
 ;
-; Return the amount of space allocated for the array in words.
+; Return the array's current size in words.
 ;
 ; ===============================================================
 
-XLIB asm_w_array_capacity
+XLIB asm_w_array_size
 
 LIB l_readword_2_hl
 
-defc asm_w_array_capacity = l_readword_2_hl - 4
+defc asm_w_array_size = l_readword_2_hl - 2
 
    ; enter : hl = array *
    ;
-   ; exit  : hl = capacity in words
+   ; exit  : hl = size in words
    ;
    ; uses  : a, hl

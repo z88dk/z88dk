@@ -3,20 +3,20 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t w_array_capacity(w_array_t *a)
+; void *w_array_data(w_array_t *a)
 ;
-; Return the amount of space allocated for the array in words.
+; Return the address of the array's data, could be 0.
 ;
 ; ===============================================================
 
-XLIB asm_w_array_capacity
+XLIB asm_w_array_data
 
-LIB l_readword_2_hl
+LIB l_readword_hl
 
-defc asm_w_array_capacity = l_readword_2_hl - 4
+asm_w_array_data = l_readword_hl
 
    ; enter : hl = array *
    ;
-   ; exit  : hl = capacity in words
+   ; exit  : hl = array.data
    ;
    ; uses  : a, hl

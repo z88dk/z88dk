@@ -10,12 +10,11 @@
 ; ===============================================================
 
 XLIB asm_w_array_append
-XDEF asm1_w_array_append, asm_w_array_push_back
+XDEF asm1_w_array_append
 
 LIB asm_b_array_append_block, error_enomem_mc
 
 asm_w_array_append:
-asm_w_array_push_back:
 
    ; enter : hl = array *
    ;         bc = item

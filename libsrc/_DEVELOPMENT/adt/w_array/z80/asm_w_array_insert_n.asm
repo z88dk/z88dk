@@ -14,7 +14,7 @@ XLIB asm_w_array_insert_n
 XDEF asm1_w_array_insert_n
 
 LIB error_einval_mc, error_enomem_mc, error_mc
-LIB asm_b_array_insert_block, asm_memset
+LIB asm_b_array_insert_block, __w_array_write_n
 
 asm_w_array_insert_n:
 
