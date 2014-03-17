@@ -53,6 +53,6 @@ list_empty:
    ex de,hl
    
    ; de = & item->next
-   ; hl = & item->prev->next or & p_list_t->head
+   ; hl = & item->prev->next or & list->head
    
    jp asm_p_forward_list_insert_after

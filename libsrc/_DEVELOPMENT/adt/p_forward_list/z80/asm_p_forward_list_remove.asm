@@ -11,6 +11,7 @@
 
 XLIB asm_p_forward_list_remove
 
+LIB error_einval_zc
 LIB __p_forward_list_locate_item, asm_p_forward_list_remove_after
 
 asm_p_forward_list_remove:
@@ -20,27 +21,20 @@ asm_p_forward_list_remove:
    ;
    ; exit  : bc = void *item
    ;
-   ;         if item found
+   ;         success
    ;
    ;            hl = void *item
-   ;            de = void *item_prev (item in list before hl)
-   ;            carry set
+   ;            de = void *item_prev (item in list before hl, may be list *)
+   ;            carry reset
    ;
-   ;         if item not found
+   ;         fail if item not member of the list
    ;
    ;            hl = 0
-   ;            carry reset
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, de, hl
    
    call __p_forward_list_locate_item
    jp nc, asm_p_forward_list_remove_after
 
-not_found:
-
-   xor a
-   
-   ld l,a
-   ld h,a
-
-   ret
+   jp error_einval_zc

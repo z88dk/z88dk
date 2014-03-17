@@ -1,6 +1,4 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_W_VECTOR_APPEND
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_w_vector_push_back:
+XLIB asm_w_vector_push_back
+
+LIB asm_w_vector_append
+
+defc asm_w_vector_push_back = asm_w_vector_append
 
    ; enter : hl = vector *
    ;         bc = item

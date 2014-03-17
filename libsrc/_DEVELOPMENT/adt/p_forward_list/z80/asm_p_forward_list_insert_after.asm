@@ -10,18 +10,15 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_insert_after
-XDEF asm_p_forward_list_push_front, asm_p_stack_push
 
 asm_p_forward_list_insert_after:
-asm_p_forward_list_push_front:
-asm_p_stack_push:
 
    ; enter : hl = void *list_item (insert after this item)
    ;         de = void *item (item to be added to list)
    ;
    ; exit  : hl = void *item
    ;         de = void *list_item
-   ;         z flag set if item is new end of list
+   ;         z flag set if item is the last item in the list
    ;
    ; uses  : af, de, hl
    

@@ -72,7 +72,7 @@ not_found:
    ld l,(hl)
    ld h,a                      ; hl = new current
    
-   jp loop
+   jr loop
 
 list_end:
 

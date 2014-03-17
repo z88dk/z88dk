@@ -10,14 +10,10 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_empty
-XDEF asm_p_forward_list_alt_empty, asm_p_list_empty
-XDEF asm_p_stack_empty, asm_p_queue_empty, asm_b_vector_empty
 
-asm_p_forward_list_empty:
-asm_p_forward_list_alt_empty:
-asm_p_list_empty:
-asm_p_stack_empty:
-asm_p_queue_empty:
+LIB l_testword_hl
+
+defc asm_p_forward_list_empty = l_testword_hl
 
    ; enter : hl = p_forward_list_t *
    ;
@@ -32,13 +28,3 @@ asm_p_queue_empty:
    ;           nz flag set
    ;
    ; uses  : af, hl
-   
-   ld a,(hl)
-   inc hl
-   or (hl)
-
-   ld hl,0
-   ret nz
-   
-   inc l
-   ret

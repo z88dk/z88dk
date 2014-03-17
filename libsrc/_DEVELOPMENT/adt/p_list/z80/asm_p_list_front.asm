@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_FRONT
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -12,11 +9,22 @@
 ;
 ; ===============================================================
 
-asm_p_list_front:
+XLIB asm_p_list_front
+
+LIB asm_p_forward_list_front
+
+defc asm_p_list_front = asm_p_forward_list_front
 
    ; enter : hl = p_list_t *list
    ;
-   ; exit  : hl = void *item (item at front, 0 if none)
-   ;         z flag set if list was empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (item at front)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, hl

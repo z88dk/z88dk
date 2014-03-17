@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_FRONT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -12,3 +9,22 @@
 ;
 ; ===============================================================
 
+XLIB asm_p_stack_top
+
+LIB asm_p_forward_list_front
+
+defc asm_p_stack_top = asm_p_forward_list_front
+
+   ; enter : hl = stack *
+   ;
+   ; exit  : success
+   ;
+   ;            hl = void *item (item at front)
+   ;            carry reset
+   ;
+   ;         fail if stack is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
+   ;
+   ; uses  : af, hl

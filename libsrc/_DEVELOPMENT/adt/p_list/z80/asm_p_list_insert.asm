@@ -25,7 +25,7 @@ asm_p_list_insert:
    ; uses  : af, de, hl
 
    inc hl
-   inc hl                      ; hl = & p_list_t_item->prev
+   inc hl                      ; hl = & list_item->prev
    
    ld a,(hl)
    inc hl
@@ -35,7 +35,7 @@ asm_p_list_insert:
    or h
    
    dec hl
-   dec hl                      ; hl = & p_list_t_item_prev
+   dec hl                      ; hl = & list_item_prev
    
    jp nz, asm_p_list_insert_after
    

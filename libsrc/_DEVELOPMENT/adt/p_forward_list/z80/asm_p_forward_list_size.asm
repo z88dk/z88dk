@@ -10,14 +10,8 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_size
-XDEF asm_p_forward_list_alt_size, asm_p_list_size
-XDEF asm_p_stack_size, asm_p_queue_size
 
 asm_p_forward_list_size:
-asm_p_forward_list_alt_size:
-asm_p_list_size:
-asm_p_stack_size:
-asm_p_queue_size:
 
    ; enter : hl = p_forward_list_t *list
    ;
@@ -37,7 +31,7 @@ loop:
    ld l,a
    
    or h
-   jp nz, loop
+   jr nz, loop
 
    ex de,hl
    ret

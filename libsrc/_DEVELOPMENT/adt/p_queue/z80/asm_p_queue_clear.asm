@@ -1,18 +1,19 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_ALT_INIT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
 ; void p_queue_clear(p_queue_t *q)
 ;
-; Clear the stack to empty.
+; Clear the queue to empty.
 ;
 ; ===============================================================
 
-asm_p_queue_clear:
+XLIB asm_p_queue_clear
+
+LIB asm_p_forward_list_alt_init
+
+defc asm_p_queue_clear = asm_p_forward_list_alt_init
 
    ; enter : hl = p_queue_t *
    ;

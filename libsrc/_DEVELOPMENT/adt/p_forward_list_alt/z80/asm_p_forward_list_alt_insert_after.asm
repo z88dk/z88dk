@@ -11,7 +11,7 @@
 
 XLIB asm_p_forward_list_alt_insert_after
 
-LIB asm_p_forward_list_insert_after
+LIB asm_p_forward_list_insert_after, l_dec_bc
 
 asm_p_forward_list_alt_insert_after:
 
@@ -22,12 +22,11 @@ asm_p_forward_list_alt_insert_after:
    ; exit  : bc = p_forward_list_alt_t *list
    ;         hl = void *item
    ;         de = void *list_item
-   ;         z flag set if item is new end of list
+   ;         z flag set if item is the last item in the list
    ;
    ; uses  : af, de, hl
    
    call asm_p_forward_list_insert_after
-   
    ret nz                      ; if new item is not new end of list
    
    ; new item is now the list's tail
@@ -41,8 +40,4 @@ asm_p_forward_list_alt_insert_after:
    ld a,h
    ld (bc),a                   ; list->tail = & item
    
-   dec bc
-   dec bc
-   dec bc
-   
-   ret
+   jp l_dec_bc - 3

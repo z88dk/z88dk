@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_INSERT_AFTER
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -14,13 +11,17 @@
 ;
 ; ===============================================================
 
-asm_p_forward_list_push_front:
+XLIB asm_p_forward_list_push_front
+
+LIB asm_p_forward_list_insert_after
+
+defc asm_p_forward_list_push_front = asm_p_forward_list_insert_after
 
    ; enter : hl = p_forward_list_t *list
    ;         de = void *item
    ;
    ; exit  : hl = void *item
    ;         de = p_forward_list_t *list
-   ;         z flag set if new item is only one in list
+   ;         z flag set if item is the only one in list
    ;
    ; uses  : af, de, hl

@@ -10,18 +10,25 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_remove_after
-XDEF asm_p_forward_list_pop_front, asm_p_stack_pop
+
+LIB error_einval_zc
 
 asm_p_forward_list_remove_after:
-asm_p_forward_list_pop_front:
-asm_p_stack_pop:
 
    ; enter : hl = void *list_item (remove item after this one)
    ;
-   ; exit  : hl = void *item (item removed, 0 if none)
-   ;         de = void *list_item
-   ;         carry reset if no next item to remove (hl=0)
-   ;         if carry set, z flag set if removed item was last in list
+   ; exit  : de = void *list_item
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (item removed)
+   ;            z flag set if item was the tail member of list
+   ;            carry reset
+   ;
+   ;         fail if there is no item following list_item
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, de, hl
    
@@ -34,7 +41,7 @@ asm_p_stack_pop:
    
    ld a,h
    or l
-   ret z                       ; if there is no next item in list
+   jp z, error_einval_zc       ; if there is no following item
    
    ldi
    inc bc                      ; undo changes to bc
@@ -48,6 +55,4 @@ asm_p_stack_pop:
    ; hl = void *item
    
    or (hl)                     ; tail change indicator for asm_forward_list_ext_*
-   
-   scf
    ret

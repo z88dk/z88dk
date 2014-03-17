@@ -1,23 +1,28 @@
 
-*** IMPLEMENTED AS PART OF ASM_W_ARRAY_POP_BACK
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *w_vector_pop_back(w_vector_t *v)
+; void *w_vector_front(w_vector_t *v)
 ;
-; Pop word from end of vector.
+; Return word stored at front of vector.
 ;
 ; ===============================================================
 
-asm_w_vector_pop_back:
+XLIB asm_w_vector_front
+
+LIB asm_w_array_front
+
+defc asm_w_vector_front = asm_w_array_front
 
    ; enter : hl = vector *
    ;
-   ; exit  : success
+   ; exit  : de = vector.data
+   ;         bc = vector.size in bytes
    ;
-   ;            hl = last word, popped
+   ;         success
+   ;
+   ;            hl = word at front of vector
    ;            carry reset
    ;
    ;         fail if vector is empty

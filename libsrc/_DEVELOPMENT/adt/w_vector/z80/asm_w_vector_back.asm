@@ -1,26 +1,27 @@
 
-*** IMPLEMENTED AS PART OF ASM_W_ARRAY_FRONT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *w_vector_front(w_vector_t *v)
+; void *w_vector_back(w_vector_t *v)
 ;
-; Return word stored at front of vector.
+; Return word stored at the end of the vector.
+; If the vector is empty, return -1.
 ;
 ; ===============================================================
 
-asm_w_vector_front:
+XLIB asm_w_vector_back
+
+LIB asm_w_array_back
+
+defc asm_w_vector_back = asm_w_array_back
 
    ; enter : hl = vector *
    ;
-   ; exit  : de = vector.data
-   ;         bc = vector.size in bytes
+   ; exit  : success
    ;
-   ;         success
-   ;
-   ;            hl = word at front of vector
+   ;            de = & last word in vector
+   ;            hl = last word in vector
    ;            carry reset
    ;
    ;         fail if vector is empty

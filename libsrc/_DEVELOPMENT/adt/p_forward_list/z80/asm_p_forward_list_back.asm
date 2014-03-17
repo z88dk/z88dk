@@ -12,7 +12,7 @@
 
 XLIB asm_p_forward_list_back
 
-LIB __p_forward_list_locate_item
+LIB __p_forward_list_locate_item, error_znc
 
 asm_p_forward_list_back:
 
@@ -27,16 +27,9 @@ asm_p_forward_list_back:
    inc hl
    or (hl)
    
-   jr z, empty_list
+   jp z, error_znc
 
    dec hl
    ld bc,0                     ; locate end of list
    
    jp __p_forward_list_locate_item
-
-empty_list:
-
-   ld l,a
-   ld h,a
-
-   ret

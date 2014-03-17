@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_SIZE
-
 ; ===============================================================
 ; Jan 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_p_list_size:
+XLIB asm_p_list_size
+
+LIB asm_p_forward_list_size
+
+defc asm_p_list_size = asm_p_forward_list_size
 
    ; enter : hl = p_list_t *list
    ;

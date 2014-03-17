@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_p_list_init
-XDEF asm_p_list_clear
 
 LIB asm_p_forward_list_init, l_setmem_hl
 
 asm_p_list_init:
-asm_p_list_clear:
 
    ; enter : hl = void *p
    ;

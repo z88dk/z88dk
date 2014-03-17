@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_ALT_PUSH_BACK
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -12,13 +9,16 @@
 ;
 ; ===============================================================
 
-asm_p_queue_push:
+XLIB asm_p_queue_push
 
-   ; enter : hl = p_queue_t *q
+LIB asm_p_forward_list_alt_push_back
+
+defc asm_p_queue_push = asm_p_forward_list_alt_push_back
+
+   ; enter : bc = queue *
    ;         de = void *item
    ;
-   ; exit  : hl = void *item
-   ;         de = p_queue_t *q
-   ;         z flag set if new item is only one in queue
+   ; exit  : bc = queue *
+   ;         hl = void *item
    ;
    ; uses  : af, de, hl

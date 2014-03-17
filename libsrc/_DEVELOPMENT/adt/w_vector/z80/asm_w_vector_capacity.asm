@@ -1,6 +1,4 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_W_ARRAY_CAPACITY
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_w_vector_capacity:
+XLIB asm_w_vector_capacity
+
+LIB l_readword_2_hl
+
+defc asm_w_vector_capacity = l_readword_2_hl - 4
 
    ; enter : hl = vector *v
    ;

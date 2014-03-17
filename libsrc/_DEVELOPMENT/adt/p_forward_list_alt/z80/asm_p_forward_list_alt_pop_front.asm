@@ -10,18 +10,23 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_alt_pop_front
-XDEF asm_p_queue_pop
 
 LIB asm_p_forward_list_alt_remove_after
 
 asm_p_forward_list_alt_pop_front:
-asm_p_queue_pop:
 
    ; enter : hl = p_forward_list_alt_t *list
    ;
-   ; exit  : bc = p_forward_list_alt_t *list
-   ;         hl = void *item (item popped, 0 if none)
-   ;         carry reset if list was empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (item removed)
+   ;            z flag set if list is now empty
+   ;            carry reset
+   ;
+   ;         fail if the list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, bc, de, hl
    

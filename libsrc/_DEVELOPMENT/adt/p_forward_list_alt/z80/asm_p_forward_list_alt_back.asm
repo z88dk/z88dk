@@ -10,26 +10,30 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_alt_back
-XDEF asm_p_queue_back
 
-LIB asm_p_forward_list_alt_front
-
-LIB error_znc
+LIB l_readword_hl, error_einval_zc
 
 asm_p_forward_list_alt_back:
-asm_p_queue_back:
 
    ; enter : hl = p_forward_list_alt_t *list
    ;
-   ; exit  : hl = void *item (item at back, 0 if none)
-   ;         z flag set if list was empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (last item in list)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, hl
 
    ld a,(hl)
    inc hl
    or (hl)
-   jp z, error_znc   
-
    inc hl
-   jp asm_p_forward_list_alt_front
+   
+   jp nz, l_readword_hl
+   
+   jp error_einval_zc  

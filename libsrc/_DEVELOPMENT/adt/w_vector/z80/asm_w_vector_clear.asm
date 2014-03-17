@@ -1,18 +1,22 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_VECTOR_DESTROY
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
-; void w_vector_destroy(w_vector_t *v)
+; void w_vector_clear(w_vector_t *v)
 ;
-; Free the vector's array and zero out the structure.
+; Clear the vector to empty.
 ;
 ; ===============================================================
 
-asm_w_vector_destroy:
+XLIB asm_w_vector_clear
+
+LIB l_zeroword_hl
+
+defc asm_w_vector_clear = l_zeroword_hl - 2
 
    ; enter : hl = vector *
    ;
-   ; uses  : af, de, hl
+   ; exit  : hl = & vector.size
+   ;
+   ; uses  : hl

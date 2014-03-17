@@ -29,7 +29,7 @@ asm_p_list_push_front:
    ; de = list *list
    ; z flag set if list was empty
 
-   jr z,list_empty
+   jr z, list_empty
 
    ld e,(hl)
    inc hl

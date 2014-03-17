@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_ALT_BACK
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -12,3 +9,22 @@
 ;
 ; ===============================================================
 
+XLIB asm_p_queue_back
+
+LIB asm_p_forward_list_alt_back
+
+defc asm_p_queue_back = asm_p_forward_list_alt_back
+
+   ; enter : hl = queue *
+   ;
+   ; exit  : success
+   ;
+   ;            hl = void *item (last item in list)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
+   ;
+   ; uses  : af, hl

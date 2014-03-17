@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_REMOVE_AFTER
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -12,12 +9,25 @@
 ;
 ; ===============================================================
 
-asm_p_stack_pop:
+XLIB asm_p_stack_pop
 
-   ; enter : hl = p_stack_t *s
+LIB asm_p_forward_list_remove_after
+
+defc asm_p_stack_pop = asm_p_forward_list_remove_after
+
+   ; enter : hl = stack *
    ;
-   ; exit  : hl = void *item (item popped, 0 if none)
-   ;         de = p_stack_t *s
-   ;         carry reset if stack was empty
+   ; exit  : de = stack *
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (item removed)
+   ;            z flag set if stack is now empty
+   ;            carry reset
+   ;
+   ;         fail if the stack is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, de, hl

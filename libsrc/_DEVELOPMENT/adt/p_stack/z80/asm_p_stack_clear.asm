@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_INIT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_p_stack_clear:
+XLIB asm_p_stack_clear
+
+LIB asm_p_forward_list_init
+
+defc asm_p_stack_clear = asm_p_forward_list_init
 
    ; enter : hl = p_stack_t *
    ;

@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_W_ARRAY_ERASE_RANGE
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_w_vector_erase_range:
+XLIB asm_w_vector_erase_range
+
+LIB asm_w_array_erase_range
+
+defc asm_w_vector_erase_range = asm_w_array_erase_range
 
    ; enter : hl = idx_last
    ;         bc = idx_first

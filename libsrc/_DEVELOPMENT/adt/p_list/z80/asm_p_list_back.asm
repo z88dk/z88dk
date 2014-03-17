@@ -13,16 +13,18 @@ XLIB asm_p_list_back
 
 LIB asm_p_forward_list_front
 
-asm_p_list_back:
+defc asm_p_list_back = asm_p_forward_list_front - 2
 
    ; enter : hl = p_list_t *list
    ;
-   ; exit  : hl = void *item (item at back, 0 if none)
-   ;         z flag set if list was empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (item at back)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, hl
-
-   inc hl
-   inc hl                      ; hl = & p_list_t->tail
-   
-   jp asm_p_forward_list_front

@@ -6,7 +6,7 @@ A doubly linked list container modelled on C++ list<>.
 
 The leading "p_" indicates the container holds items allocated by the caller and does not perform any allocations or deallocations internally.
 
-Items stored in the container must contain space for a two two-byte pointers.  A typical item might be laid out like this:
+Items stored in the container must contain space for two two-byte pointers.  A typical item might be laid out like this:
 
 offset   size (bytes)   description
 

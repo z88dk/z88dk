@@ -11,7 +11,7 @@
 
 XLIB asm_p_list_remove_after
 
-LIB asm_p_list_remove
+LIB asm_p_list_remove, error_einval_zc
 
 asm_p_list_remove_after:
 
@@ -19,7 +19,16 @@ asm_p_list_remove_after:
    ;         hl = void *list_item
    ;
    ; exit  : bc = p_list_t *list
-   ;         hl = void *item (0 if none)
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (item removed)
+   ;            carry reset
+   ;
+   ;         fail if following item does not exist
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, de, hl
 
@@ -31,4 +40,4 @@ asm_p_list_remove_after:
    or h
    jp nz, asm_p_list_remove
 
-   ret
+   jp error_einval_zc

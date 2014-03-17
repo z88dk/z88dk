@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_W_ARRAY_CAPACITY
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_w_vector_max_size:
+XLIB asm_w_vector_max_size
+
+LIB l_readword_2_hl
+
+defc asm_w_vector_max_size = l_readword_2_hl - 6
 
    ; enter : hl = vector *
    ;

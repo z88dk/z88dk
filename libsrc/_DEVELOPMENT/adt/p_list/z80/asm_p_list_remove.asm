@@ -19,7 +19,7 @@ asm_p_list_remove:
    ; exit  : bc = p_list_t *list
    ;         hl = void *item
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, de
    
    push hl                     ; save item
    

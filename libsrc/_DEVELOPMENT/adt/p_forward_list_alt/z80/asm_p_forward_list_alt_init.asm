@@ -11,15 +11,10 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_alt_init
-XDEF asm_p_forward_list_alt_clear
-XDEF asm_p_queue_init, asm_p_queue_clear
 
 LIB asm_p_forward_list_init
 
 asm_p_forward_list_alt_init:
-asm_p_forward_list_alt_clear:
-asm_p_queue_init:
-asm_p_queue_clear:
 
    ; enter : hl = void *p
    ;

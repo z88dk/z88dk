@@ -12,7 +12,7 @@
 
 XLIB asm_w_vector_insert_n
 
-LIB asm_b_vector_insert_block, error_einval_mc
+LIB asm_b_vector_insert_block, asm1_w_array_insert_n, error_einval_mc
 
 asm_w_vector_insert_n:
 

@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_ALT_POP_FRONT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -12,12 +9,23 @@
 ;
 ; ===============================================================
 
-asm_p_queue_pop:
+XLIB asm_p_queue_pop
+
+LIB asm_p_forward_list_alt_pop_front
+
+defc asm_p_queue_pop = asm_p_forward_list_alt_pop_front
 
    ; enter : hl = p_queue_t *q
    ;
-   ; exit  : hl = void *item (item popped, 0 if none)
-   ;         de = p_queue_t *q
-   ;         carry reset if stack was empty
+   ; exit  : success
    ;
-   ; uses  : af, de, hl
+   ;            hl = void *item (item removed)
+   ;            z flag set if queue is now empty
+   ;            carry reset
+   ;
+   ;         fail if the list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
+   ;
+   ; uses  : af, bc, de, hl

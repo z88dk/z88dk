@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_LIST_INIT
-
 ; ===============================================================
 ; Jan 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_p_list_clear:
+XLIB asm_p_list_clear
+
+LIB asm_p_list_init
+
+defc asm_p_list_clear = asm_p_list_init
 
    ; enter : hl = p_list_t *
    ;

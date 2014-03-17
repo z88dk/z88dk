@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_REMOVE_AFTER
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -12,12 +9,25 @@
 ;
 ; ===============================================================
 
-asm_p_forward_list_pop_front:
+XLIB asm_p_forward_list_pop_front
+
+LIB asm_p_forward_list_remove_after
+
+defc asm_p_forward_list_pop_front = asm_p_forward_list_remove_after
 
    ; enter : hl = p_forward_list_t *list
    ;
-   ; exit  : hl = void *item (item popped, 0 if none)
-   ;         de = p_forward_list_t *list
-   ;         carry reset if list was empty
+   ; exit  : de = p_forward_list_t *list
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (item removed)
+   ;            z flag set if list is now empty
+   ;            carry reset
+   ;
+   ;         fail if the list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, de, hl

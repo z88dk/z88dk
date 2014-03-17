@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_EMPTY
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_p_stack_empty:
+XLIB asm_p_stack_empty
+
+LIB l_testword_hl
+
+defc asm_p_stack_empty = l_testword_hl
 
    ; enter : hl = p_stack_t *
    ;

@@ -11,14 +11,23 @@
 
 XLIB asm_p_list_pop_back
 
-LIB asm_p_list_remove
+LIB asm_p_list_remove, error_einval_zc
 
 asm_p_list_pop_back:
 
    ; enter : hl = p_list_t *list
    ;
    ; exit  : bc = p_list_t *list
-   ;         hl = void *item (0 if none)
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (item at back)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, bc, de, hl
    
@@ -36,4 +45,4 @@ asm_p_list_pop_back:
    or h
    jp nz, asm_p_list_remove
    
-   ret
+   jp error_einval_zc

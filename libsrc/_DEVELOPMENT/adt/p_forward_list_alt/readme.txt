@@ -15,7 +15,7 @@ offset   size (bytes)   description
 
 The "next" pointer is maintained by the container.  When placing items into the container or removing items from the container, the address of the next pointer is what is communicated.
 
-Creation of a p_forward_list container involves reserving four bytes to hold the list's head and tail.  In C:
+Creation of a p_forward_list_alt container involves reserving four bytes to hold the list's head and tail.  In C:
 
 p_forward_list_alt_t my_list;   // struct { void *head; void *tail; };
 

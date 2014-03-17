@@ -20,7 +20,7 @@ asm_p_forward_list_alt_push_front:
    ;
    ; exit  : bc = p_forward_list_alt_t *list
    ;         hl = void *item
-   ;         z flag set if new item is only one in list
+   ;         z flag set if item is the only one in the list
    ;
    ; uses  : af, de, hl
    

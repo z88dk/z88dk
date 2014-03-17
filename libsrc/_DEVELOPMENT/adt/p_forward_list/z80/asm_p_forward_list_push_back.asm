@@ -18,9 +18,9 @@ asm_p_forward_list_push_back:
    ; enter : hl = p_forward_list_t *list
    ;         de = void *item
    ;
-   ; exit  : hl = void *item
-   ;         de = p_forward_list_t *list
-   ;         z flag set if new item is only one in list
+   ; exit  : de = void *item_last (list_item prior to item, may be list *)
+   ;         hl = void *item
+   ;         z flag set if item is the last item in the list
    ;
    ; uses  : af, bc, de, hl
 

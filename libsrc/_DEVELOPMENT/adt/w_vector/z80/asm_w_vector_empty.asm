@@ -1,6 +1,4 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_ARRAY_EMPTY
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_w_vector_empty:
+XLIB asm_w_vector_empty
+
+LIB l_testword_hl
+
+defc asm_w_vector_empty = l_testword_hl - 2
 
    ; enter : hl = vector *
    ;
@@ -26,4 +28,3 @@ asm_w_vector_empty:
    ;           nz flag set
    ;
    ; uses  : af, hl
-

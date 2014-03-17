@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_P_FORWARD_LIST_INIT
-
 ; ===============================================================
 ; Dec 2013
 ; ===============================================================
@@ -12,10 +9,14 @@
 ;
 ; ===============================================================
 
-asm_p_forward_list_clear:
+XLIB asm_p_forward_list_clear
+
+LIB l_zeroword_hl
+
+defc asm_p_forward_list_clear = l_zeroword_hl
 
    ; enter : hl = p_forward_list_t *
    ;
-   ; exit  : de = p_forward_list_t *
+   ; exit  : hl = p_forward_list_t *
    ;
-   ; uses  : af, de, hl
+   ; uses  : none

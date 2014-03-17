@@ -15,6 +15,9 @@ XLIB asm_w_vector_reserve
 
 LIB asm_b_vector_reserve, error_enomem_mc
 
+   inc hl
+   inc hl
+
 asm_w_vector_reserve:
 
    ; enter : hl = vector *
@@ -25,7 +28,7 @@ asm_w_vector_reserve:
    ;
    ;         success
    ;
-   ;            hl = 0
+   ;            hl = -1
    ;            carry reset
    ;
    ;         fail if max_size exceeded
@@ -38,7 +41,7 @@ asm_w_vector_reserve:
    ;            hl = 0
    ;            carry set, errno = ENOMEM or ENOLCK
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
 
    sla c
    rl b

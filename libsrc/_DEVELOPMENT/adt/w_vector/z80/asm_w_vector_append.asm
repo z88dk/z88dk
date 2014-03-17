@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_w_vector_append
-XDEF asm_w_vector_push_back
 
 LIB asm_b_vector_append_block, asm1_w_array_append, error_mc
 
 asm_w_vector_append:
-asm_w_vector_push_back:
 
    ; enter : hl = vector *
    ;         bc = item
@@ -25,7 +23,7 @@ asm_w_vector_push_back:
    ;         success
    ;
    ;            de = & vector.data[idx]
-   ;            hl = idx of appended char
+   ;            hl = idx of appended word
    ;            carry reset
    ;
    ;         fail

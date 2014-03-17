@@ -18,8 +18,17 @@ asm_p_forward_list_alt_pop_back:
    ; enter : hl = p_forward_list_alt_t *list
    ;
    ; exit  : bc = p_forward_list_alt_t *list
-   ;         hl = void *item (item popped, 0 if none)
-   ;         carry reset if list is empty
+   ;         de = void *last_item (new tail of list)
+   ;
+   ;         success
+   ;
+   ;            hl = void *item (popped item)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, bc, de, hl
    

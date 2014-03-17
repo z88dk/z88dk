@@ -22,3 +22,5 @@ offset   size (bytes)   description
   2           2         size_t size, number of occupied bytes in vector
   4           2         capacity, allocated size of array in bytes
   6           2         max_size, maximum allocation for array in bytes
+
+Note that w_vector_t is identical to b_vector_t.

@@ -1,30 +1,30 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_VECTOR_SHRINK_TO_FIT
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
-; int w_vector_shrink_to_fit(w_vector_t *v)
+; void *w_vector_pop_back(w_vector_t *v)
 ;
-; Release any excess memory allocated for the vector's array.
-;
-; After calling, vector.capacity == vector.size
+; Pop word from end of vector.
 ;
 ; ===============================================================
 
-asm_w_vector_shrink_to_fit:
+XLIB asm_w_vector_pop_back
+
+LIB asm_w_array_pop_back
+
+defc asm_w_vector_pop_back = asm_w_array_pop_back
 
    ; enter : hl = vector *
    ;
    ; exit  : success
    ;
-   ;            hl = 0
+   ;            hl = last word, popped
    ;            carry reset
    ;
-   ;         fail on realloc not getting lock
+   ;         fail if vector is empty
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, bc, de, hl

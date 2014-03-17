@@ -1,28 +1,31 @@
 
-*** IMPLEMENTED AS PART OF ASM_W_ARRAY_BACK
-
 ; ===============================================================
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *w_vector_back(w_vector_t *v)
+; size_t w_vector_erase(w_vector_t *v, size_t idx)
 ;
-; Return word stored at the end of the vector.
-; If the vector is empty, return -1.
+; Remove word at vector.data[idx] and return new index of
+; word that follows the one removed.
 ;
 ; ===============================================================
 
-asm_w_vector_back:
+XLIB asm_w_vector_erase
+
+LIB asm_w_array_erase
+
+defc asm_w_vector_erase = asm_w_array_erase
 
    ; enter : hl = vector *
+   ;         bc = idx
    ;
    ; exit  : success
    ;
-   ;            de = & last word in vector
-   ;            hl = last word in vector
+   ;            de = & vector.data[idx]
+   ;            hl = idx = idx of word following the one removed
    ;            carry reset
    ;
-   ;         fail if vector is empty
+   ;         fail if idx outside vector.data
    ;
    ;            hl = -1
    ;            carry set, errno = EINVAL

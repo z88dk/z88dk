@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_alt_push_back
-XDEF asm_p_queue_push
 
 LIB asm_p_forward_list_alt_insert_after
 
 asm_p_forward_list_alt_push_back:
-asm_p_queue_push:
 
    ; enter : bc = p_forward_list_alt_t *list
    ;         de = void *item

@@ -10,19 +10,25 @@
 ; ===============================================================
 
 XLIB asm_p_forward_list_front
-XDEF asm_p_forward_list_alt_front, asm_p_list_front
-XDEF asm_p_stack_top, asm_p_queue_front
+
+LIB error_einval_zc
+
+   inc hl
+   inc hl
 
 asm_p_forward_list_front:
-asm_p_forward_list_alt_front:
-asm_p_list_front:
-asm_p_stack_top:
-asm_p_queue_front:
 
    ; enter : hl = p_forward_list_t *list
    ;
-   ; exit  : hl = void *item (item at front, 0 if none)
-   ;         z flag set if list was empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (item at front)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, hl
 
@@ -32,4 +38,6 @@ asm_p_queue_front:
    ld l,a
    
    or h
-   ret
+   ret nz
+   
+   jp error_einval_zc
