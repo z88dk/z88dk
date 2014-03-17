@@ -1,20 +1,22 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_CAPACITY
-
 ; ===============================================================
-; Feb 2014
+; Mar 2014
 ; ===============================================================
 ; 
-; void *b_vector_max_size(b_vector_t *v)
+; void *b_array_data(b_array_t *a)
 ;
-; Return the vector's max_size.
+; Return the address of the array's data, could be 0.
 ;
 ; ===============================================================
 
-asm_b_vector_max_size:
+XLIB asm_b_array_data
 
-   ; enter : hl = b_vector_t *
+LIB l_readword_hl
+
+defc asm_b_array_data = l_readword_hl
+
+   ; enter : hl = array *
    ;
-   ; exit  : hl = max_size
+   ; exit  : hl = array.data
    ;
    ; uses  : a, hl

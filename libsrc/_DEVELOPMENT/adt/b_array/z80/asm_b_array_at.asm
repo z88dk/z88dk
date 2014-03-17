@@ -11,12 +11,10 @@
 ; ===============================================================
 
 XLIB asm_b_array_at
-XDEF asm_b_vector_at
 
 LIB __array_at, error_einval_mc
 
 asm_b_array_at:
-asm_b_vector_at:
 
    ; enter : hl = array *
    ;         bc = idx

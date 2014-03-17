@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_READ_BLOCK
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -14,7 +12,11 @@
 ;
 ; ===============================================================
 
-asm_b_vector_read_block:
+XLIB asm_b_vector_read_block
+
+LIB asm_b_array_read_block
+
+defc asm_b_vector_read_block = asm_b_array_read_block
 
    ; enter : de'= void *dst
    ;         hl = vector *

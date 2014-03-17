@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_b_vector_append
-XDEF asm_b_vector_push_back
 
 LIB asm_b_vector_append_block, error_mc
 
 asm_b_vector_append:
-asm_b_vector_push_back:
 
    ; enter : hl = vector *
    ;         bc = int c

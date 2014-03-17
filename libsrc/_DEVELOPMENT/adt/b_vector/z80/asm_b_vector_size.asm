@@ -1,20 +1,22 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_CAPACITY
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t b_vector_capacity(b_vector_t *v)
+; size_t b_vector_size(b_vector_t *v)
 ;
-; Return the amount of space allocated for vector.data.
+; Return the vector's current size.
 ;
 ; ===============================================================
 
-asm_b_vector_capacity:
+XLIB asm_b_vector_size
+
+LIB l_readword_hl
+
+defc asm_b_vector_size = l_readword_hl - 2
 
    ; enter : hl = vector *
    ;
-   ; exit  : hl = capacity in bytes
+   ; exit  : hl = size
    ;
    ; uses  : a, hl

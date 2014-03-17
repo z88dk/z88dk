@@ -14,8 +14,7 @@
 XLIB asm_b_vector_write_block
 XDEF asm_b_vector_write_block_extra
 
-LIB __vector_make_room_extra, l_inc_sp
-LIB asm1_b_array_write_block, asm2_b_array_write_block
+LIB __vector_make_room_best_effort_extra, asm1_b_array_write_block
 
 asm_b_vector_write_block:
 
@@ -42,7 +41,7 @@ asm_b_vector_write_block_extra:
    ;               =-1 if not all n bytes could be written
    ;               > 0 otherwise
    ;
-   ;         fail if idx >= vector.capacity and vector could not grow
+   ;         fail if idx > vector.capacity and vector could not grow
    ;
    ;            hl = 0
    ;            carry set, errno = ENOMEM
@@ -54,33 +53,7 @@ asm_b_vector_write_block_extra:
    inc de
    inc de                      ; de = & vector.size
    
-   push de                     ; save & vector.size
-   push bc                     ; save idx
+   call __vector_make_room_best_effort_extra
+   jp nc, asm1_b_array_write_block
    
-   call __vector_make_room_extra
-   jr c, room_unavailable      ; if room for the write is not available
-
-room_available:
-
-   ; hl = & vector.data[idx]
-   ; bc = n
-   ; hl'= void *src
-   ; a = 0 if realloc performed
-   ; stack = two items
-
-   push af                     ; save realloc_status
-   
-   call asm1_b_array_write_block
-   
-   pop af                      ; a = realloc_status
-   jp l_inc_sp - 4             ; remove two items on stack
-
-room_unavailable:
-
-   ; hl'= void *src
-   ; stack = & vector.size, idx
-
-   pop bc                      ; bc = idx
-   pop hl                      ; hl = & vector.size
-   
-   jp asm2_b_array_write_block
+   ret

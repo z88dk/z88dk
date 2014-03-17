@@ -1,23 +1,27 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_POP_BACK
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
 ; 
-; int b_vector_pop_back(b_vector_t *v)
+; int b_vector_back(b_vector_t *v)
 ;
-; Pop char from end of vector.
+; Return char stored at the end of the vector.
+; If the vector is empty, return -1.
 ;
 ; ===============================================================
 
-asm_b_vector_pop_back:
+XLIB asm_b_vector_back
+
+LIB asm_b_array_back
+
+defc asm_b_vector_back = asm_b_array_back
 
    ; enter : hl = vector *
    ;
    ; exit  : success
    ;
-   ;            hl = last char, popped
+   ;            de = & last char in vector
+   ;            hl = last char in vector
    ;            carry reset
    ;
    ;         fail if vector is empty

@@ -1,20 +1,22 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_ARRAY_CAPACITY
-
 ; ===============================================================
-; Mar 2014
+; Feb 2014
 ; ===============================================================
 ; 
-; void *b_vector_data(b_vector_t *v)
+; void b_vector_clear(b_vector_t *v)
 ;
-; Return the address of the vector's data, could be 0.
+; Clear the vector to empty.
 ;
 ; ===============================================================
 
-asm_b_vector_data:
+XLIB asm_b_vector_clear
+
+LIB l_zeroword_hl
+
+defc asm_b_vector_clear = l_zeroword_hl - 2
 
    ; enter : hl = vector *
    ;
-   ; exit  : hl = vector.data
+   ; exit  : hl = & vector.size
    ;
-   ; uses  : a, hl
+   ; uses  : hl

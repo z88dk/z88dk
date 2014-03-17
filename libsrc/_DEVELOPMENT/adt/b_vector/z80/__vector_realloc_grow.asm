@@ -70,7 +70,7 @@ __0_vector_realloc_grow:
    call asm_realloc
 
    pop bc
-   jr c, error_zc - 1          ; if realloc error
+   jp c, error_zc - 1          ; if realloc error
    
    ; hl = new vector.data
    ; bc = n

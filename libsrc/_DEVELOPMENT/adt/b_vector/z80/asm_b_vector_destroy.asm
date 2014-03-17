@@ -10,12 +10,13 @@
 ; ===============================================================
 
 XLIB asm_b_vector_destroy
-XDEF asm_w_vector_destroy
 
-LIB asm_free, l_setmem_hl
+LIB asm_free, l_zerostruct8_hl
 
+   inc hl
+   inc hl
+   
 asm_b_vector_destroy:
-asm_w_vector_destroy:
 
    ; enter : hl = vector *
    ;
@@ -26,8 +27,7 @@ asm_w_vector_destroy:
    ld d,(hl)
    dec hl
    
-   xor a
-   call l_setmem_hl - 16
+   call l_zerostruct8_hl
    
    ex de,hl
    jp asm_free

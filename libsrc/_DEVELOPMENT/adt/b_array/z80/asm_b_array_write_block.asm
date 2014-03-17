@@ -12,9 +12,9 @@
 ; ===============================================================
 
 XLIB asm_b_array_write_block
-XDEF asm1_b_array_write_block, asm2_b_array_write_block
+XDEF asm1_b_array_write_block
 
-LIB __array_make_room, error_enomem_zc
+LIB __array_make_room_best_effort, error_enomem_zc
 
 asm_b_array_write_block:
 
@@ -32,7 +32,7 @@ asm_b_array_write_block:
    ;             a =  0 if all n bytes were written (hl == n)
    ;                 -1 if not all n bytes were written (hl < n)
    ;
-   ;         fail if idx >= array.capacity
+   ;         fail if idx > array.capacity
    ;
    ;            hl = 0
    ;            carry set, errno = ENOMEM
@@ -44,15 +44,18 @@ asm_b_array_write_block:
    inc de
    inc de                     ; de = & array.size
 
-   call __array_make_room
-   jr c, room_unavailable     ; if room for the write is not available
+   call __array_make_room_best_effort
+   jp c, error_enomem_zc
 
 room_available:
 asm1_b_array_write_block:
 
    ; hl = & array.data[idx]
-   ; bc = n
+   ; bc = n_max
    ; hl'= void *src
+   ;  a = 0 if room for all bytes, -1 otherwise
+
+   push af                     ; save flag
 
    push hl
    push bc
@@ -82,82 +85,5 @@ degenerate_case:
    ld l,c
    ld h,b                      ; hl = n
    
-   xor a                       ; a = 0 indicates all bytes written
-   ret
-
-room_unavailable:
-
-   ; write as many bytes as possible
-   
-   ex de,hl
-
-asm2_b_array_write_block:
-
-   ; hl = & array.size
-   ; bc = idx
-   ; hl' = void *src
-
-   dec hl
-   dec hl
-   
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                   ; de = array.data
-   
-   ex de,hl
-   add hl,bc
-   ex de,hl                    ; de = & array.data[idx]
-   
-   ; hl = & array.data + 1b
-   ; de = & array.data[idx]
-   ; bc = idx
-   ; hl'= void *src
-
-   push de                     ; save & array.data[idx]
-   
-   inc hl
-   inc hl
-   inc hl                      ; hl = & array.capacity
-   
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                   ; de = array.capacity
-
-   ex de,hl                    ; hl = array.capacity
-
-   scf
-   sbc hl,bc                   ; hl = array.capacity - idx - 1
-   jp c, error_enomem_zc - 1   ; if array.capacity <= idx
-
-   inc hl
-   
-   ld c,l
-   ld b,h                      ; bc = avail_bytes = array.capacity - idx
-   
-   ; de = & array.capacity + 1b
-   ; bc = avail_bytes
-   ; hl'= void *src
-   ; stack = & array.data[idx]
-
-   ld l,e
-   ld h,d                      ; hl = & array.capacity + 1b
-   
-   dec de
-   dec de                      ; de = & array.size + 1b
-   
-   ldd
-   inc bc                      ; undo bc--
-   
-   ld a,(hl)
-   ld (de),a                   ; array.size = array.capacity
-   
-   pop hl
-
-   ; hl = & array.data[idx]
-   ; bc = avail_bytes = n
-   ; hl'= void *src
-
-   call room_available         ; write src bytes into array
-
-   dec a                       ; indicate not all bytes written
+   pop af                      ; a = 0 indicates all bytes written
    ret

@@ -13,12 +13,9 @@
 XLIB asm_b_array_erase_block
 XDEF asm0_b_array_erase_block
 
-XDEF asm_b_vector_erase_block, asm0_b_vector_erase_block
-
-LIB error_einval_mc, l_neg_hl
+LIB error_einval_mc, l_neg_hl, asm_memcpy
 
 asm_b_array_erase_block:
-asm_b_vector_erase_block:
 
    ; enter : hl = array *
    ;         bc = idx
@@ -41,7 +38,6 @@ asm_b_vector_erase_block:
    inc hl
 
 asm0_b_array_erase_block:
-asm0_b_vector_erase_block:
 
    ld a,(hl)
    inc hl
@@ -59,7 +55,10 @@ asm0_b_vector_erase_block:
    jp c, error_einval_mc - 3   ; if (idx + n) > 64k
 
    sbc hl,de                   ; hl = idx + n - array.size
-   jp nc, error_einval_mc - 3  ; if (idx + n) >= array.size
+   jr z, range_ok              ; if (idx + n) == array.size
+   jp nc, error_einval_mc - 3  ; if (idx + n) > array.size
+
+range_ok:
 
    call l_neg_hl               ; hl = array.size - (idx + n)
 
@@ -112,18 +111,10 @@ asm0_b_vector_erase_block:
    add hl,bc                   ; hl = & array.data[idx+n]
 
    pop bc                      ; bc = num bytes to copy
-   
-   push de                     ; save & array.data[idx]
-   
-   ld a,b
-   or c
-   jr z, degenerate_case
-   
-   ldir
 
-degenerate_case:
-
-   pop de                      ; de = & array.data[idx]
-   pop hl                      ; hl = idx
+   call asm_memcpy
    
+   pop de                      ; de = idx
+   
+   ex de,hl
    ret

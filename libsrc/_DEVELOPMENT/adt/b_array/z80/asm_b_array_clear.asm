@@ -1,20 +1,22 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_ARRAY_CAPACITY
-
 ; ===============================================================
-; Mar 2014
+; Feb 2014
 ; ===============================================================
 ; 
-; void *b_array_data(b_array_t *a)
+; void b_array_clear(b_array_t *a)
 ;
-; Return the address of the array's data, could be 0.
+; Clear the array to empty.
 ;
 ; ===============================================================
 
-asm_b_array_data:
+XLIB asm_b_array_clear
+
+LIB l_zeroword_hl
+
+defc asm_b_array_clear = l_zeroword_hl - 2
 
    ; enter : hl = array *
    ;
-   ; exit  : hl = array.data
+   ; exit  : hl = & array.size
    ;
-   ; uses  : a, hl
+   ; uses  : hl

@@ -73,6 +73,7 @@ asm0_b_array_resize:
    add hl,bc                   ; hl = & array.data[old_size]
    
    ex de,hl                    ; hl = n
+   
    sbc hl,bc                   ; hl = num_new = n - old_size
    
    ld c,l

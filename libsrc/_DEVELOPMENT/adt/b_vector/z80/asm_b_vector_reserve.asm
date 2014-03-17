@@ -13,7 +13,10 @@
 
 XLIB asm_b_vector_reserve
 
-LIB __0_vector_realloc_grow, error_znc
+LIB __0_vector_realloc_grow, error_mnc
+
+   inc hl
+   inc hl
 
 asm_b_vector_reserve:
 
@@ -25,7 +28,7 @@ asm_b_vector_reserve:
    ;
    ;         success
    ;
-   ;            hl = 0
+   ;            hl = -1
    ;            carry reset
    ;
    ;         fail if max_size exceeded
@@ -50,7 +53,7 @@ asm_b_vector_reserve:
    ex de,hl
    
    sbc hl,bc                   ; hl = vector.capacity - n
-   ret nc                      ; if vector.capacity >= n
+   jp nc, error_mnc            ; if vector.capacity >= n
    
    ; realloc required
    
@@ -59,7 +62,7 @@ asm_b_vector_reserve:
    inc hl
    inc hl
    
-   ; hl = & vector.max_capacity + 1b
+   ; hl = & vector.max_size + 1b
    ; bc = n
    
    call __0_vector_realloc_grow
@@ -72,4 +75,4 @@ asm_b_vector_reserve:
    add hl,de                   ; hl = & vector.capacity + 1b
    
    ex de,hl
-   jp error_znc
+   jp error_mnc

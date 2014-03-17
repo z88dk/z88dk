@@ -19,6 +19,7 @@ __vector_make_room_extra:
    ; enter : de = & vector.size
    ;         hl = n
    ;         bc = idx
+   ;         de'= extra
    ;
    ; exit  : de'= extra
    ;
@@ -44,14 +45,14 @@ __vector_make_room_extra:
    call __array_make_room
    jr c, realloc_needed
 
-   ld a,1
+   inc a
    ret
 
 realloc_needed:
 
    or a
-   jp z, error_einval_zc       ; if idx + n > 64k
-   
+   jp z, error_einval_zc
+
    ; de = & vector.size
    ; hl = n
    ; bc = idx

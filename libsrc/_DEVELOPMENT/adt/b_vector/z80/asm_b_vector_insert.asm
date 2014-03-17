@@ -3,7 +3,7 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t b_vector_insert(b_vector_t *a, size_t idx, int c)
+; size_t b_vector_insert(b_vector_t *v, size_t idx, int c)
 ;
 ; Insert char c before vector.data[idx], returns index of
 ; char inserted.

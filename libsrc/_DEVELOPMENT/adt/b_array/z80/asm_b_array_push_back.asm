@@ -1,26 +1,28 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_vector_APPEND
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t b_vector_push_back(b_vector_t *a, int c)
+; size_t b_array_push_back(b_array_t *a, int c)
 ;
-; Append char to end of vector, return index of appended char.
+; Append char to end of array, return index of appended char.
 ;
 ; ===============================================================
 
-asm_b_vector_push_back:
+XLIB asm_b_array_push_back
 
-   ; enter : hl = vector *
+LIB asm_b_array_append
+
+defc asm_b_array_push_back = asm_b_array_append
+
+   ; enter : hl = array *
    ;         bc = int c
    ;
    ; exit  : bc = int c
    ;
    ;         success
    ;
-   ;            de = & vector.data[idx]
+   ;            de = & array.data[idx]
    ;            hl = idx of appended char
    ;            carry reset
    ;

@@ -11,12 +11,10 @@
 ; ===============================================================
 
 XLIB asm_b_array_back
-XDEF asm_b_vector_back
 
 LIB __array_info, error_einval_mc
 
 asm_b_array_back:
-asm_b_vector_back:
 
    ; enter : hl = array *
    ;

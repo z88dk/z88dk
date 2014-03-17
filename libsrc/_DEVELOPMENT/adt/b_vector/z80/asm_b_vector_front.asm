@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_FRONT
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_b_vector_front:
+XLIB asm_b_vector_front
+
+LIB asm_b_array_front
+
+defc asm_b_vector_front = asm_b_array_front
 
    ; enter : hl = vector *
    ;

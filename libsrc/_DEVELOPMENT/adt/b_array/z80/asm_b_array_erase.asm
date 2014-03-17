@@ -11,12 +11,10 @@
 ; ===============================================================
 
 XLIB asm_b_array_erase
-XDEF asm_b_vector_erase
 
 LIB asm_b_array_erase_block
 
 asm_b_array_erase:
-asm_b_vector_erase:
 
    ; enter : hl = array *
    ;         bc = idx

@@ -13,12 +13,10 @@
 ; ===============================================================
 
 XLIB asm_b_array_read_block
-XDEF asm_b_vector_read_block
 
 LIB __array_at, l_minu_de_hl, asm_memcpy, error_einval_zc
 
 asm_b_array_read_block:
-asm_b_vector_read_block:
 
    ; enter : de'= void *dst
    ;         hl = array *

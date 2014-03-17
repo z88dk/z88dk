@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_ERASE_RANGE
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_b_vector_erase_range:
+XLIB asm_b_vector_erase_range
+
+LIB asm_b_array_erase_range
+
+defc asm_b_vector_erase_range = asm_b_array_erase_range
 
    ; enter : hl = idx_last
    ;         bc = idx_first
@@ -23,7 +25,7 @@ asm_b_vector_erase_range:
    ;            hl = idx_first = idx of first byte following erased
    ;            carry reset
    ;
-   ;         fail if block does not lie within array.data
+   ;         fail if block does not lie within vector.data
    ;
    ;            hl = -1
    ;            carry set, errno = EINVAL

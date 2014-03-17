@@ -15,7 +15,7 @@
 
 XLIB asm_b_vector_init
 
-LIB l_setmem_hl, l_ltu_hl_bc, asm_realloc, error_einval_zc
+LIB l_setmem_hl, l_ltu_hl_bc, asm_realloc, error_einval_zc, error_zc
 
 asm_b_vector_init:
 
@@ -66,11 +66,7 @@ asm_b_vector_init:
    inc hl
    
    xor a
-   
-   ld (hl),a
-   inc hl
-   ld (hl),a                   ; vector.size = 0
-   inc hl
+   call l_setmem_hl - 4        ; vector.size = 0
    
    pop bc
    

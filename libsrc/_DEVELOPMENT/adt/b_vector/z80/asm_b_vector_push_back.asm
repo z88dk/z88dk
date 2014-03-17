@@ -1,34 +1,34 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_AT
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
 ; 
-; int b_vector_at(b_vector_t *a, size_t idx)
+; size_t b_vector_push_back(b_vector_t *v, int c)
 ;
-; Return char stored in vector at index idx.
-; If idx is outside the vector's range, return -1.
+; Append char to end of vector, return index of appended char.
 ;
 ; ===============================================================
 
-asm_b_vector_at:
+XLIB asm_b_vector_push_back
+
+LIB asm_b_vector_append
+
+defc asm_b_vector_push_back = asm_b_vector_append
 
    ; enter : hl = vector *
-   ;         bc = idx
+   ;         bc = int c
    ;
-   ; exit  : bc = idx
+   ; exit  : bc = int c
    ;
    ;         success
    ;
    ;            de = & vector.data[idx]
-   ;            hl = vector.data[idx]
+   ;            hl = idx of appended char
    ;            carry reset
    ;
-   ;         fail if idx out of range
+   ;         fail
    ;
-   ;            de = vector.size
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set, errno = ENOMEM
    ;
    ; uses  : af, de, hl

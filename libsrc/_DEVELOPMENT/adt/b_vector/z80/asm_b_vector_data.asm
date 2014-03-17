@@ -3,20 +3,20 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t b_array_capacity(b_array_t *a)
+; void *b_vector_data(b_vector_t *v)
 ;
-; Return the amount of space allocated for the array.
+; Return the address of the vector's data, could be 0.
 ;
 ; ===============================================================
 
-XLIB asm_b_array_capacity
+XLIB asm_b_vector_data
 
 LIB l_readword_hl
 
-defc asm_b_array_capacity = l_readword_hl - 4
+defc asm_b_vector_data = l_readword_hl
 
-   ; enter : hl = array *
+   ; enter : hl = vector *
    ;
-   ; exit  : hl = capacity in bytes
+   ; exit  : hl = vector.data
    ;
    ; uses  : a, hl

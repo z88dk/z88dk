@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_ERASE_BLOCK
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -12,7 +10,11 @@
 ;
 ; ===============================================================
 
-asm_b_vector_erase_block:
+XLIB asm_b_vector_erase_block
+
+LIB asm_b_array_erase_block
+
+defc asm_b_vector_erase_block = asm_b_array_erase_block
 
    ; enter : hl = vector *
    ;         bc = idx

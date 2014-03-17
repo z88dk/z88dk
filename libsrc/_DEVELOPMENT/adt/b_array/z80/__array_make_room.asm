@@ -7,7 +7,7 @@ LIB __array_expand, asm_memset
 __array_make_room:
 
    ; Make room for n bytes at index idx (overwrite not insert)
-   ; If idx > vector.size, zero the resulting hole.
+   ; If idx > array.size, zero the resulting hole.
    ;
    ; enter : de = & array.size
    ;         hl = n
@@ -37,8 +37,8 @@ __array_make_room:
    jr c, error_64k             ; if new_size > 64k
    
    ex de,hl
-   
    call __array_expand
+   
    jr c, error_small           ; if array too small
 
 __0_array_make_room:

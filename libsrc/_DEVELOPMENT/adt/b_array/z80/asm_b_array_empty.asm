@@ -10,14 +10,10 @@
 ; ===============================================================
 
 XLIB asm_b_array_empty
-XDEF asm_w_array_empty, asm_b_vector_empty, asm_w_vector_empty
 
-LIB asm_p_forward_list_empty
+LIB l_testword_hl
 
-asm_b_array_empty:
-asm_w_array_empty:
-asm_b_vector_empty:
-asm_w_vector_empty:
+defc asm_b_array_empty = l_testword_hl - 2
 
    ; enter : hl = array *
    ;
@@ -32,8 +28,3 @@ asm_w_vector_empty:
    ;           nz flag set
    ;
    ; uses  : af, hl
-
-   inc hl
-   inc hl
-   
-   jp asm_p_forward_list_empty

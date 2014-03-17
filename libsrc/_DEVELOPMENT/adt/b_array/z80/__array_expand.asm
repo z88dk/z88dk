@@ -1,6 +1,8 @@
 
 XLIB __array_expand
-XDEF __0_array_expand
+XDEF __0_array_expand, __1_array_expand
+
+LIB l_ltu_bc_hl
 
 __array_expand:
 
@@ -39,21 +41,17 @@ __0_array_expand:
    ; hl = n
    ; de = & array.size + 1b
    ; bc = array.size
-   
-   scf
-   sbc hl,bc                   ; hl = n - array.size - 1
-   jr nc, size_exceeded        ; if n > array.size
+
+   call l_ltu_bc_hl
+   jr c, size_exceeded         ; if hl > bc, n > array.size
 
 size_sufficient:
 
    ; n <= array.size
 
-   ; hl = n - array.size - 1
+   ; hl = n
    ; de = & array.size + 1b
    ; bc = array.size
-
-   add hl,bc
-   inc hl
 
    ex de,hl
 
@@ -61,18 +59,10 @@ size_sufficient:
    ret
 
 size_exceeded:
+__1_array_expand:
 
    ; n > array.size
    
-   ; hl = n - array.size - 1
-   ; de = & array.size + 1b
-   ; bc = array.size
-
-   add hl,bc
-   inc hl
-
-__1_array_expand:
-
    ; hl = n
    ; de = & array.size + 1b
    ; bc = array.size

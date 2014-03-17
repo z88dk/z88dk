@@ -1,22 +1,22 @@
 
 ; ===============================================================
-; Mar 2014
+; Feb 2014
 ; ===============================================================
 ; 
-; size_t b_array_capacity(b_array_t *a)
+; void *b_vector_max_size(b_vector_t *v)
 ;
-; Return the amount of space allocated for the array.
+; Return the vector's max_size.
 ;
 ; ===============================================================
 
-XLIB asm_b_array_capacity
+XLIB asm_b_vector_max_size
 
 LIB l_readword_hl
 
-defc asm_b_array_capacity = l_readword_hl - 4
+defc asm_b_vector_max_size = l_readword_hl - 6
 
-   ; enter : hl = array *
+   ; enter : hl = b_vector_t *
    ;
-   ; exit  : hl = capacity in bytes
+   ; exit  : hl = max_size
    ;
    ; uses  : a, hl

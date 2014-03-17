@@ -3,20 +3,19 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; size_t b_array_capacity(b_array_t *a)
+; void b_array_destroy(b_array_t *a)
 ;
-; Return the amount of space allocated for the array.
+; Zero the array structure.
+; array.capacity = 0 ensures no array operations can be performed.
 ;
 ; ===============================================================
 
-XLIB asm_b_array_capacity
+XLIB asm_b_array_destroy
 
-LIB l_readword_hl
+LIB l_zerostruct6_hl
 
-defc asm_b_array_capacity = l_readword_hl - 4
+defc asm_b_array_destroy = l_zerostruct6_hl
 
    ; enter : hl = array *
    ;
-   ; exit  : hl = capacity in bytes
-   ;
-   ; uses  : a, hl
+   ; uses  : af, hl

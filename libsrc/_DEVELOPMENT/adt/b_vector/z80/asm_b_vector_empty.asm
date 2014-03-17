@@ -1,6 +1,4 @@
 
-*** IMPLEMENTED AS PART OF ASM_B_ARRAY_EMPTY
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_b_vector_empty:
+XLIB asm_b_vector_empty
+
+LIB l_testword_hl
+
+defc asm_b_vector_empty = l_testword_hl - 2
 
    ; enter : hl = vector *
    ;

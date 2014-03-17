@@ -1,6 +1,4 @@
 
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_B_ARRAY_CAPACITY
-
 ; ===============================================================
 ; Mar 2014
 ; ===============================================================
@@ -11,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_b_array_size:
+XLIB asm_b_array_size
+
+LIB l_readword_hl
+
+defc asm_b_array_size = l_readword_hl - 2
 
    ; enter : hl = array *
    ;
