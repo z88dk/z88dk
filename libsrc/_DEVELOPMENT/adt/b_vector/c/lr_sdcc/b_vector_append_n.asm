@@ -6,13 +6,13 @@ XDEF b_vector_append_n
 b_vector_append_n:
 
    pop af
-   pop de
    pop bc
+   pop de
    pop hl
    
    push hl
-   push bc
    push de
+   push bc
    push af
    
    INCLUDE "../../z80/asm_b_vector_append_n.asm"

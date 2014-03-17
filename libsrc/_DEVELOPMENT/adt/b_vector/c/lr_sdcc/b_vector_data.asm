@@ -1,16 +1,10 @@
 
 ; void *b_vector_data(b_vector_t *v)
 
-XLIB b_vector_data
+XDEF b_vector_data
 
-LIB asm_b_vector_data
+LIB b_array_data
 
-b_vector_data:
+defc b_vector_data = b_array_data
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
-   
-   jp asm_b_vector_data
+INCLUDE "../../z80/asm_b_vector_data.asm"

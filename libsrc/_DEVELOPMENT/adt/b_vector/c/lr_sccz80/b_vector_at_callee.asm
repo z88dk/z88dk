@@ -3,10 +3,8 @@
 
 XDEF b_vector_at_callee
 
-b_vector_at_callee:
+LIB b_array_at_callee
 
-   pop hl
-   pop bc
-   ex (sp),hl
-   
-   INCLUDE "../../z80/asm_b_vector_at.asm"
+defc b_vector_at_callee = b_array_at_callee
+
+INCLUDE "../../z80/asm_b_vector_at.asm"

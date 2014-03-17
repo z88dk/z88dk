@@ -7,11 +7,11 @@ b_vector_append_n:
 
    pop af
    pop hl
-   pop bc
    pop de
+   pop bc
    
-   push de
    push bc
+   push de
    push hl
    push af
    

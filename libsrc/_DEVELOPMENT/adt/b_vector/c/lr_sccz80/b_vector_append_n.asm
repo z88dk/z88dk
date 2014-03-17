@@ -8,13 +8,13 @@ LIB asm_b_vector_append_n
 b_vector_append_n:
 
    pop af
-   pop de
    pop bc
+   pop de
    pop hl
    
    push hl
-   push bc
    push de
+   push bc
    push af
    
    jp asm_b_vector_append_n

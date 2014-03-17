@@ -3,12 +3,8 @@
 
 XDEF b_vector_back
 
-b_vector_back:
+LIB b_array_back
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
+defc b_vector_back = b_array_back
 
-   INCLUDE "../../z80/asm_b_vector_back.asm"
+INCLUDE "../../z80/asm_b_vector_back.asm"

@@ -8,11 +8,11 @@ LIB asm_b_vector_resize
 b_vector_resize:
 
    pop af
-   pop bc
+   pop de
    pop hl
    
    push hl
-   push bc
+   push de
    push af
    
    jp asm_b_vector_resize

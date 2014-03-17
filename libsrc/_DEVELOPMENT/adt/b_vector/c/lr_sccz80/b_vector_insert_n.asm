@@ -20,10 +20,7 @@ b_vector_insert_n:
    push de
    exx
    push bc
-   exx
    push af
-   
-   exx
    ld a,c
    exx
    

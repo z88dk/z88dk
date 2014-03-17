@@ -3,16 +3,6 @@
 
 XLIB b_vector_at
 
-LIB asm_b_vector_at
+LIB b_array_at
 
-b_vector_at:
-
-   pop af
-   pop bc
-   pop hl
-   
-   push hl
-   push bc
-   push af
-   
-   jp asm_b_vector_at
+defc b_vector_at = b_array_at

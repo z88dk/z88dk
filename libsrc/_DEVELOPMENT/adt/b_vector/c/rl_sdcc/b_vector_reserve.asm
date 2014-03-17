@@ -13,4 +13,6 @@ b_vector_reserve:
    push hl
    push af
    
+   jr asm_b_vector_reserve
+   
    INCLUDE "../../z80/asm_b_vector_reserve.asm"

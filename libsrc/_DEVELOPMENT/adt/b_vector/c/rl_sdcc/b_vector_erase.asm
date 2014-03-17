@@ -3,14 +3,8 @@
 
 XDEF b_vector_erase
 
-b_vector_erase:
+LIB b_array_erase
 
-   pop af
-   pop hl
-   pop bc
-   
-   push bc
-   push hl
-   push af
-   
-   INCLUDE "../../z80/asm_b_vector_erase.asm"
+defc b_vector_erase = b_array_erase
+
+INCLUDE "../../z80/asm_b_vector_erase.asm"

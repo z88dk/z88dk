@@ -3,14 +3,8 @@
 
 XDEF b_vector_at
 
-b_vector_at:
+LIB b_array_at
 
-   pop af
-   pop bc
-   pop hl
-   
-   push hl
-   push bc
-   push af
-   
-   INCLUDE "../../z80/asm_b_vector_at.asm"
+defc b_vector_at = b_array_at
+
+INCLUDE "../../z80/asm_b_vector_at.asm"

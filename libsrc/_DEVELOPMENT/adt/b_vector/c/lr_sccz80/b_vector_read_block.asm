@@ -3,22 +3,6 @@
 
 XLIB b_vector_read_block
 
-LIB asm_b_vector_read_block
+LIB b_array_read_block
 
-b_vector_read_block:
-
-   pop af
-   pop bc
-   pop hl
-   pop de
-   exx
-   pop de
-   
-   push de
-   exx
-   push de
-   push hl
-   push bc
-   push af
-   
-   jp asm_b_vector_read_block
+defc b_vector_read_block = b_array_read_block

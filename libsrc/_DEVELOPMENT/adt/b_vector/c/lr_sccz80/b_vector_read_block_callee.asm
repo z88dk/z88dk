@@ -3,15 +3,8 @@
 
 XDEF b_vector_read_block_callee
 
-b_vector_read_block_callee:
+LIB b_array_read_block_callee
 
-   pop af
-   pop bc
-   pop hl
-   pop de
-   exx
-   pop de
-   exx
-   push af
-   
-   INCLUDE "../../z80/asm_b_vector_read_block.asm"
+defc b_vector_read_block_callee = b_array_read_block_callee
+
+INCLUDE "../../z80/asm_b_vector_read_block.asm"

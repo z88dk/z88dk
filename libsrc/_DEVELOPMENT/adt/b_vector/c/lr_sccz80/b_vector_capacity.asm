@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF B_VECTOR_MAX_SIZE
-
 ; size_t b_vector_capacity(b_vector_t *v)
+
+XDEF b_vector_capacity
+
+defc b_vector_capacity = asm_b_vector_capacity
+
+INCLUDE "../../z80/asm_b_vector_capacity.asm"

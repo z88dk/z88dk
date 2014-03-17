@@ -1,16 +1,10 @@
 
 ; size_t b_vector_capacity(b_vector_t *v)
 
-XLIB b_vector_capacity
+XDEF b_vector_capacity
 
-LIB asm_b_vector_capacity
+LIB b_array_capacity
 
-b_vector_capacity:
+defc b_vector_capacity = b_array_capacity
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
-   
-   jp asm_b_vector_capacity
+INCLUDE "../../z80/asm_b_vector_capacity.asm"

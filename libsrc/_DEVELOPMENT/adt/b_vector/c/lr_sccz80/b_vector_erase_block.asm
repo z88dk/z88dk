@@ -3,18 +3,6 @@
 
 XLIB b_vector_erase_block
 
-LIB asm_b_vector_erase_block
+LIB b_array_erase_block
 
-b_vector_erase_block:
-
-   pop af
-   pop de
-   pop bc
-   pop hl
-   
-   push hl
-   push bc
-   push de
-   push af
-   
-   jp asm_b_vector_erase_block
+defc b_vector_erase_block = b_array_erase_block
