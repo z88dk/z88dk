@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.82 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.83 2014-03-17 00:07:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -60,7 +60,7 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern char ident[], stringconst[];
+extern char ident[];
 extern uint_t DEFVPC;
 extern struct module *CURRENTMODULE;
 
@@ -268,6 +268,7 @@ DEFGROUP( void )
 {
     struct expr *postfixexpr;
     long constant, enumconst = 0;
+	DEFINE_STR( name, MAXLINE );
 
     while ( tok != TK_EOF && GetSym() != TK_LCURLY )
     {
@@ -296,7 +297,7 @@ DEFGROUP( void )
                         break;
 
                     case TK_NAME:
-                        strcpy( stringconst, ident );     /* remember name */
+						Str_set( name, ident );     /* remember name */
 
                         if ( GetSym() == TK_EQUAL )
                         {
@@ -312,7 +313,7 @@ DEFGROUP( void )
                                 {
                                     constant = EvalPfixExpr( postfixexpr );
                                     enumconst = constant;
-                                    define_symbol( stringconst, enumconst++, 0 );
+                                    define_symbol( name->str, enumconst++, 0 );
                                 }
 
                                 RemovePfixlist( postfixexpr );
@@ -322,7 +323,7 @@ DEFGROUP( void )
                         }
                         else
                         {
-                            define_symbol( stringconst, enumconst++, 0 );
+                            define_symbol( name->str, enumconst++, 0 );
                         }
 
                         break;
@@ -454,12 +455,13 @@ DEFC( void )
 {
     struct expr *postfixexpr;
     long constant;
+	DEFINE_STR( name, MAXLINE );
 
     do
     {
         if ( GetSym() == TK_NAME )
         {
-            strcpy( stringconst, ident ); /* remember name */
+			Str_set( name, ident ); /* remember name */
 
             if ( GetSym() == TK_EQUAL )
             {
@@ -478,7 +480,7 @@ DEFC( void )
                     {
                         constant = EvalPfixExpr( postfixexpr );    /* DEFC expression must not
                                                                  * contain undefined symbols */
-                        define_symbol( stringconst, constant, 0 );
+                        define_symbol( name->str, constant, 0 );
                     }
 
                     RemovePfixlist( postfixexpr );
@@ -798,7 +800,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.82  2014-03-16 19:19:49  pauloscustodio
+ * Revision 1.83  2014-03-17 00:07:53  pauloscustodio
+ * Remove global stringconst[]
+ *
+ * Revision 1.82  2014/03/16 19:19:49  pauloscustodio
  * Integrate use of srcfile in scanner, removing global variable z80asmfile
  * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
  *
