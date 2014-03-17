@@ -118,12 +118,12 @@ left_squeeze:
    push hl                     ; push lo
    push bc                     ; push size
    push de                     ; push i
+   push ix                     ; push compare
 
 ;******************************
 IF __PARAM_ORDER_RL
 ;******************************
 
-   push ix
    push de
    push hl
    ex de,hl
@@ -131,13 +131,11 @@ IF __PARAM_ORDER_RL
    ld a,h                      ; get result
    pop hl
    pop de
-   pop ix
 
 ;******************************
 ELSE
 ;******************************
 
-   push ix
    push hl
    push de
    ex de,hl
@@ -145,12 +143,12 @@ ELSE
    ld a,h                      ; get result
    pop de
    pop hl
-   pop ix
 
 ;******************************
 ENDIF
 ;******************************
    
+   pop ix                      ; ix = compare
    pop de                      ; de = i
    pop bc                      ; bc = size
    pop hl
@@ -178,37 +176,35 @@ right_loop:
    push hl                     ; push lo
    push bc                     ; push size
    push de                     ; push j
+   push ix                     ; push compare
 
 ;******************************
 IF __PARAM_ORDER_RL
 ;******************************
 
-   push ix
    push hl
    push de
    call l_jpix                 ; compare(de=j, hl=lo)
    ld a,h                      ; get result
    pop de
    pop hl
-   pop ix
 
 ;******************************
 ELSE
 ;******************************
 
-   push ix
    push de
    push hl
    call l_jpix                 ; compare(de=j, hl=lo)
    ld a,h                      ; get result
    pop hl
    pop de
-   pop ix
 
 ;******************************
 ENDIF
 ;******************************
 
+   pop ix                      ; ix = compare
    pop de                      ; de = j
    pop bc                      ; bc = size
    pop hl

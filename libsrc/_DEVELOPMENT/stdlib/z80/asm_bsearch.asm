@@ -74,34 +74,37 @@ bsearch_loop:
    add hl,de                   ; hl = p = base + (lim >> 1) * size
    pop de                      ; de = key
 
+   push de                     ; save key
+   push hl                     ; save p
+   push ix                     ; save compar
+
 ;******************************
 IF __PARAM_ORDER_RL
 ;******************************
 
-   push ix
    push hl
    push de
    call l_jpix                 ; (compar)(de = void *key, hl = void *p) R->L
    pop de
    pop bc
-   pop ix
-
 
 ;******************************
 ELSE
 ;******************************
 
-   push ix
    push de
    push hl
    call l_jpix                 ; (compar)(de = void *key, hl = void *p) L->R
    pop bc
    pop de
-   pop ix
 
 ;******************************
 ENDIF
 ;******************************
+
+   pop ix                      ; ix = compar
+   pop bc                      ; bc = p
+   pop de                      ; de = key
 
    ; bc = p
    ; de = key
