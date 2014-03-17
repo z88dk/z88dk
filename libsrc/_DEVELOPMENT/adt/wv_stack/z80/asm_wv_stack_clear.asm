@@ -1,0 +1,22 @@
+
+; ===============================================================
+; Feb 2014
+; ===============================================================
+; 
+; void wv_stack_clear(wv_stack_t *s)
+;
+; Clear the stack to empty.
+;
+; ===============================================================
+
+XLIB asm_wv_stack_clear
+
+LIB l_zeroword_hl
+
+defc asm_wv_stack_clear = l_zeroword_hl - 2
+
+   ; enter : hl = stack *
+   ;
+   ; exit  : hl = & stack.size
+   ;
+   ; uses  : hl
