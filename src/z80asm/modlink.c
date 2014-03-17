@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.103 2014-03-16 23:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.104 2014-03-17 00:08:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -608,11 +608,10 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
             while ( ! found && red < end )
             {
                 int scope;
-				long value;
 
                 scope	= xfget_int8(  file );	red++;
-                          xfget_int8(  file );	red++;	/* type */
-                value	= xfget_int32( file );	red += 4;
+                          xfget_int8(  file );	red++;		/* type */
+						  xfget_int32( file );	red += 4;	/* value */
 				xfget_count_byte_Str( file, symbol_name );
 				red += symbol_name->len + 1;			/* Length byte */
 
@@ -968,7 +967,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.103  2014-03-16 23:57:06  pauloscustodio
+* Revision 1.104  2014-03-17 00:08:24  pauloscustodio
+* Remove unsued local variable
+*
+* Revision 1.103  2014/03/16 23:57:06  pauloscustodio
 * Removed global line[]
 *
 * Revision 1.102  2014/03/16 19:19:49  pauloscustodio
