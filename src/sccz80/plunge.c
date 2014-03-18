@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.10 2007-09-09 15:29:33 dom Exp $
+ *      $Id: plunge.c,v 1.11 2014-03-18 23:15:30 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -123,8 +123,12 @@ void plnge2a(int (*heir)(), LVALUE *lval, LVALUE *lval2, void (*oper)(), void (*
     }
     else {
         /* non-constant on left */
-        if ( lval->val_type == DOUBLE ) dpush() ;
-        else {
+        if ( lval->val_type == DOUBLE ) { dpush() ;
+        } else if ( lval->val_type == CARRY ) {
+          force(CINT,CARRY, 0, 0, 0);
+          lval->val_type = CINT;
+          zpush();
+        } else {
             if ( lval->val_type == LONG || lval->val_type==CPTR) { lpush(); }
             else zpush();
         }
