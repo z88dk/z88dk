@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.104 2014-03-17 00:08:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.105 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,7 +63,6 @@ void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
-extern char ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
 extern byte_t reloc_routine[];
@@ -967,7 +966,12 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.104  2014-03-17 00:08:24  pauloscustodio
+* Revision 1.105  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.104  2014/03/17 00:08:24  pauloscustodio
 * Remove unsued local variable
 *
 * Revision 1.103  2014/03/16 23:57:06  pauloscustodio

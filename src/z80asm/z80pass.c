@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.86 2014-03-16 23:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.87 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,7 +63,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 /* global variables */
 extern FILE *objfile;
-extern char ident[];
 extern struct module *CURRENTMODULE;
 
 void Z80pass1( char *filename )
@@ -98,7 +97,7 @@ parseline( enum flag interpret )
             if ( tok == TK_LABEL || GetSym() == TK_NAME )
             {
                 /* labels must always be touched due to forward referencing problems in expressions */
-                define_symbol( ident, get_PC(), SYM_ADDR | SYM_TOUCHED );
+                define_symbol( tok_name, get_PC(), SYM_ADDR | SYM_TOUCHED );
 
                 GetSym();      /* check for another identifier */
             }
@@ -637,7 +636,12 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.86  2014-03-16 23:57:06  pauloscustodio
+* Revision 1.87  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.86  2014/03/16 23:57:06  pauloscustodio
 * Removed global line[]
 *
 * Revision 1.85  2014/03/16 19:19:49  pauloscustodio

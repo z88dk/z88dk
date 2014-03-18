@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.63 2014-03-16 23:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.64 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,7 +47,6 @@ void ADC( void ), ADD( void ), DEC( void ), IM( void ), IN( void ), INC( void ),
 void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void RST( void ), DEFGROUP( void );
-long GetConstant( char * );
 int CheckRegister8( void );
 void UNDEFINE( void );
 
@@ -75,7 +74,6 @@ void MODULE( void );
 void LINE( void );
 
 /* global variables */
-extern char ident[];
 extern struct module *CURRENTMODULE;
 
 
@@ -205,7 +203,7 @@ struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
+    foundsym = ( struct Z80sym * ) bsearch( tok_name, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }
@@ -268,21 +266,18 @@ LSTOFF( void )
 }
 
 /* Function for Line number in C source */
-
 void LINE( void )
 {
-    char    err;
-    long 	clineno;
 	DEFINE_STR( name, MAXLINE );
 
     GetSym();
-
-    clineno = GetConstant( &err );
+	if (tok != TK_NUMBER)
+		error_syntax();
 
     if ( opts.line_mode )
-        set_error_line( clineno );
+        set_error_line( tok_number );
 
-	Str_sprintf( name, "__C_LINE_%ld", clineno );
+	Str_sprintf( name, "__C_LINE_%ld", tok_number );
     define_symbol( name->str, get_PC(), SYM_ADDR | SYM_TOUCHED );
 }
 
@@ -321,7 +316,7 @@ XDEF( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_global_obj_symbol( ident );
+            declare_global_obj_symbol( tok_name );
         }
         else
         {
@@ -345,7 +340,7 @@ XLIB( void )
     if ( GetSym() == TK_NAME )
     {
         DeclModuleName();         /* XLIB name is implicit MODULE name */
-        declare_global_lib_symbol( ident );
+        declare_global_lib_symbol( tok_name );
     }
     else
     {
@@ -369,7 +364,7 @@ XREF( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_extern_obj_symbol( ident );    /* Define symbol as extern */
+            declare_extern_obj_symbol( tok_name );    /* Define symbol as extern */
         }
         else
         {
@@ -395,7 +390,7 @@ LIB( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_extern_lib_symbol( ident );     /* Define symbol as extern LIB reference */
+            declare_extern_lib_symbol( tok_name );     /* Define symbol as extern LIB reference */
         }
         else
         {
@@ -1073,7 +1068,12 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.63  2014-03-16 23:57:06  pauloscustodio
+* Revision 1.64  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.63  2014/03/16 23:57:06  pauloscustodio
 * Removed global line[]
 *
 * Revision 1.62  2014/03/16 19:19:49  pauloscustodio

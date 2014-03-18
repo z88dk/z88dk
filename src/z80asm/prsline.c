@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.53 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.54 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,15 +37,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.53 2014-03
 #include <string.h>
 
 /* local functions */
-long GetConstant( char *evalerr );
 int IndirectRegisters( void );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
-int CheckBaseType( int chcount );
 
 /* global variables */
-extern char ident[];
 extern int currentline;
 extern struct module *CURRENTMODULE;
 
@@ -104,6 +101,23 @@ static void set_input_buffer( char *line )
 	Str_set( input_buffer, line );
 	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
 }
+
+/*-----------------------------------------------------------------------------
+*   Update tok_name
+*----------------------------------------------------------------------------*/
+static void tok_name_clear( void )
+{
+	Str_clear( tok_name_str );
+	tok_name = tok_name_str->str;
+}
+
+static void tok_name_append( char c )
+{
+	Str_append_char( tok_name_str, c );
+	tok_name = tok_name_str->str;			/* may have reallocated */
+}
+
+
 
 /* set a new input text */
 void SetTemporaryLine( char *line )
@@ -180,7 +194,6 @@ static int GetChar( void )
 	}
 }
 
-
 /* check for multi-char tokens */
 static BOOL GetComposed( char *expect )
 {
@@ -195,14 +208,113 @@ static BOOL GetComposed( char *expect )
 		return FALSE;
 }
 
+/* check for numbers */
+static int get_digit( char c )
+{
+	c = toupper(c);
+	if ( c >= '0' && c <= '9' )
+		return c - '0';
+	else if ( c >= 'A' && c <= 'F' )
+		return 10 + c - 'A';
+	else 
+		return -1;
+}
+
+static BOOL get_digits( int base, int start, int *pend, long *pvalue )
+{
+	long value = 0;
+	int i, digit;
+
+	for (i = start; TRUE; i++)
+	{
+		digit = get_digit( input_ptr[i] );
+		if (digit < 0 || digit >= base)
+			break;
+
+		value = base * value + digit;
+	}
+
+	/* no digits found */
+	if (i == start)
+		return FALSE;
+
+	/* return value and index of end */
+	*pend = i;
+	*pvalue = value;
+	return TRUE;
+}
+
+static int is_alnum_bar(int c) { return c == '_' || isalnum(c); }
+
+static BOOL ParseNumber( long *pvalue )
+{
+	int end;
+
+	/* parse prefix */
+	if ( input_ptr[0] == '$' && 
+		 get_digits(16, 1, &end, pvalue) &&
+		 ! is_alnum_bar( input_ptr[end] ) ) 
+	{
+		input_ptr += end;
+		return TRUE;
+	}
+	else if ( (input_ptr[0] == '@' || input_ptr[0] == '%') && 
+			  get_digits(2, 1, &end, pvalue) &&
+			  ! is_alnum_bar( input_ptr[end] ) ) 
+	{
+		input_ptr += end;
+		return TRUE;
+	}
+	else if ( (input_ptr[0] == '0' && tolower(input_ptr[1]) == 'x') && 
+			  get_digits(16, 2, &end, pvalue) &&
+			  ! is_alnum_bar( input_ptr[end] ) ) 
+	{
+		input_ptr += end;
+		return TRUE;
+	}
+	else if ( isdigit( input_ptr[0] ) && 
+			  get_digits(16, 0, &end, pvalue) &&
+			  tolower( input_ptr[end] ) == 'h' &&
+			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
+	{
+		input_ptr += end + 1;
+		return TRUE;
+	}
+	else if ( isdigit( input_ptr[0] ) && 
+			  get_digits(10, 0, &end, pvalue) &&
+			  tolower( input_ptr[end] ) == 'd' &&
+			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
+	{
+		input_ptr += end + 1;
+		return TRUE;
+	}
+	else if ( isdigit( input_ptr[0] ) && 
+			  get_digits(2, 0, &end, pvalue) &&
+			  tolower( input_ptr[end] ) == 'b' &&
+			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
+	{
+		input_ptr += end + 1;
+		return TRUE;
+	}
+	else if ( isdigit( input_ptr[0] ) && 
+			  get_digits(10, 0, &end, pvalue) &&
+			  ! is_alnum_bar( input_ptr[end] ) ) 
+	{
+		input_ptr += end;
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
 /* get the next token */
 tokid_t GetSym( void )
 {
-    int c, chcount = 0;
+    int c;
 
 	init();
-
-    ident[0] = '\0';
 
     if ( EOL )
         return (tok = TK_NEWLINE);			/* assign and return */
@@ -302,53 +414,32 @@ tokid_t GetSym( void )
 	if ( tok != TK_NIL )
 		return tok;
 
-    ident[chcount++] = ( char ) toupper( c );
+	/* numbers */
+	if ( isdigit( c ) || c == '$' || c == '@' || c == '%' )
+	{
+		input_ptr--;
 
-    switch ( c )
-    {
-    case '$':
-        tok = TK_HEX_CONST;
-        break;
+		if ( ParseNumber(&tok_number) ) 
+			return (tok = TK_NUMBER);	/* assign and return */
 
-    case '@':
-    case '%':       /* not reached, as '%' is a separator */
-        tok = TK_BIN_CONST;
-        break;
+		input_ptr++;
+	}
 
-    case '#':       /* not reached, as '#' is a separator */
-        tok = TK_NAME;
-        break;
+	/* identifiers */
+    if ( isalpha( c ) || c == '_' )
+	{
+		tok = TK_NAME;
 
-    default:
-        if ( isdigit( c ) )
-        {
-            tok = TK_DEC_CONST;      /* a decimal number found */
-        }
-        else
-        {
-            if ( isalpha( c ) || c == '_' )
-            {
-                tok = TK_NAME;       /* an identifier found */
-            }
-            else
-            {
-                tok = TK_NIL;        /* rubbish ... */
-            }
-        }
+		tok_name_clear();
+		tok_name_append( toupper( c ) );
 
-        break;
-    }
-
-    /* Read identifier until space or legal separator is found */
-    if ( tok == TK_NAME )
-    {
         while (1)
         {
             c = GetChar();
 			if ( c == EOF )
 				break;
 
-			if ( !isalnum( c ) && c != '_' )
+			if ( ! is_alnum_bar( c ) )
 			{
 				if ( c == ':' )					/* eat ':' if any */
 					tok = TK_LABEL;
@@ -357,137 +448,15 @@ tokid_t GetSym( void )
 				break;
 			}
 
-			ident[chcount++] = toupper( c );
+		    tok_name_append( toupper( c ) );
 		}
-    }
-    else
-    {
-        while (1)
-        {
-            c = GetChar();
-			if ( c == EOF )
-				break;
 
-			if ( !isalnum( c ) )
-			{
-				UnGet( c );
-				break;
-			}
-			ident[chcount++] = c;
-		}
-        chcount = CheckBaseType( chcount );
-    }
+        return tok;
+	}
 
-    ident[chcount] = '\0';
-
-    return tok;
+	/* rubish */
+	return (tok = TK_NIL);			/* assign and return */
 }
-
-int
-CheckBaseType( int chcount )
-{
-    int   i;
-
-	init();
-
-    if ( !isxdigit( ident[0] ) || chcount < 2 )    /* If it's not a hex digit straight off then reject it */
-    {
-        return chcount;
-    }
-
-    /* C style hex number */
-    if ( chcount > 2 && strncmp( ident, "0x", 2 ) == 0 )
-    {
-        for ( i = 2; i < chcount; i++ )
-        {
-            if ( !isxdigit( ident[i] ) )
-            {
-                break;
-            }
-        }
-
-        if ( i == chcount )
-        {
-            for ( i = 2; i < chcount ; i++ )
-            {
-                ident[i - 1] = ident[i];
-            }
-
-            ident[0] = '$';
-            tok = TK_HEX_CONST;
-            return ( chcount - 1 );
-        }
-    }
-
-    /* Check for this to be a hex num here */
-    for ( i = 0; i <  chcount ; i++ )
-    {
-        if ( !isxdigit( ident[i] ) )
-        {
-            break;
-        }
-    }
-
-    if ( i == ( chcount - 1 ) )
-    {
-        if ( toupper( ident[i] ) == 'H' )
-        {
-            for ( i = ( chcount - 1 ); i >= 0 ; i-- )
-            {
-                ident[i + 1] = ident[i];
-            }
-
-            ident[0] = '$';
-            tok = TK_HEX_CONST;
-            return chcount;
-        }
-        else
-        {
-            return chcount;      /* If we reached end of hex digits and the last one wasn't a 'h', then something is wrong, so return */
-        }
-    }
-
-    /* Check for binary constant (ends in b) */
-    for ( i = 0; i <  chcount ; i++ )
-    {
-        if ( ident[i] != '0' && ident[i] != '1' )
-        {
-            break;
-        }
-    }
-
-    if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'B' )
-    {
-        for ( i = ( chcount - 1 ); i >= 0 ; i-- )
-        {
-            ident[i + 1] = ident[i];
-        }
-
-        ident[0] = '@';
-        tok = TK_BIN_CONST;
-        return chcount;
-    }
-
-    /* Check for decimal (we default to it in anycase..but */
-    for ( i = 0; i <  chcount ; i++ )
-    {
-        if ( !isdigit( ident[i] ) )
-        {
-            break;
-        }
-    }
-
-    if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'D' )
-    {
-        tok = TK_DEC_CONST;
-        return chcount - 1;
-    }
-
-    return chcount;
-}
-
-
-
 
 
 void Skipline( void )
@@ -539,7 +508,7 @@ int
 CheckCondition( void )
 {
     uint_t  i;
-    char   *text = ident;
+    char   *text = tok_name;
     uint_t  len = strlen( text );
 
 	init();
@@ -573,9 +542,9 @@ CheckRegister8( void )
 
     if ( tok == TK_NAME )
     {
-        if ( *( ident + 1 ) == '\0' )
+        if ( *( tok_name + 1 ) == '\0' )
         {
-            switch ( *ident )
+            switch ( *tok_name )
             {
             case 'A':
                 return 7;
@@ -626,7 +595,7 @@ CheckRegister8( void )
         }
         else
         {
-            if ( strcmp( ident, "IXL" ) == 0 )
+            if ( strcmp( tok_name, "IXL" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -638,7 +607,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( ident, "IXH" ) == 0 )
+            else if ( strcmp( tok_name, "IXH" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -650,7 +619,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( ident, "IYL" ) == 0 )
+            else if ( strcmp( tok_name, "IYL" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -662,7 +631,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( ident, "IYH" ) == 0 )
+            else if ( strcmp( tok_name, "IYH" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -674,14 +643,14 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( ident, "IIR" ) == 0 ) /** Was 'I' register */
+            else if ( strcmp( tok_name, "IIR" ) == 0 ) /** Was 'I' register */
             {
                 if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     return 8;
                 }
             }
-            else if ( strcmp( ident, "EIR" ) == 0 ) /** Was 'R' register */
+            else if ( strcmp( tok_name, "EIR" ) == 0 ) /** Was 'R' register */
             {
                 if ( ( opts.cpu & CPU_RABBIT ) )
                 {
@@ -703,31 +672,31 @@ CheckRegister16( void )
 
     if ( tok == TK_NAME )
     {
-        if ( strcmp( ident, "HL" ) == 0 )
+        if ( strcmp( tok_name, "HL" ) == 0 )
         {
             return REG16_HL;
         }
-        else if ( strcmp( ident, "BC" ) == 0 )
+        else if ( strcmp( tok_name, "BC" ) == 0 )
         {
             return REG16_BC;
         }
-        else if ( strcmp( ident, "DE" ) == 0 )
+        else if ( strcmp( tok_name, "DE" ) == 0 )
         {
             return REG16_DE;
         }
-        else if ( strcmp( ident, "SP" ) == 0 )
+        else if ( strcmp( tok_name, "SP" ) == 0 )
         {
             return REG16_SP;
         }
-        else if ( strcmp( ident, "AF" ) == 0 )
+        else if ( strcmp( tok_name, "AF" ) == 0 )
         {
             return REG16_AF;
         }
-        else if ( strcmp( ident, "IX" ) == 0 )
+        else if ( strcmp( tok_name, "IX" ) == 0 )
         {
             return opts.swap_ix_iy ? REG16_IY : REG16_IX;
         }
-        else if ( strcmp( ident, "IY" ) == 0 )
+        else if ( strcmp( tok_name, "IY" ) == 0 )
         {
             return opts.swap_ix_iy ? REG16_IX : REG16_IY;
         }
@@ -787,87 +756,14 @@ IndirectRegisters( void )
 }
 
 
-long
-GetConstant( char *evalerr )
-{
-    long size, len, intresult = 0;
-    uint_t bitvalue = 1;
-
-	init();
-
-    *evalerr = 0;                 /* preset to no errors */
-
-    if ( ( tok != TK_HEX_CONST ) && ( tok != TK_BIN_CONST ) && ( tok != TK_DEC_CONST ) )
-    {
-        *evalerr = 1;
-        return ( 0 );             /* syntax error - illegal constant definition */
-    }
-
-    size = strlen( ident );
-
-    if ( tok != TK_DEC_CONST )
-        if ( ( --size ) == 0 )
-        {
-            *evalerr = 1;
-            return ( 0 );           /* syntax error - no constant specified */
-        }
-
-    switch ( ident[0] )
-    {
-    case '@':
-    case '%':
-        if ( size > 8 )
-        {
-            *evalerr = 1;
-            return ( 0 );         /* max 8 bit */
-        }
-
-        for ( len = 1; len <= size; len++ )
-            if ( strchr( "01", ident[len] ) == NULL )
-            {
-                *evalerr = 1;
-                return ( 0 );
-            }
-
-        /* convert ASCII binary to integer */
-        for ( len = size; len >= 1; len-- )
-        {
-            if ( ident[len] == '1' )
-            {
-                intresult += bitvalue;
-            }
-
-            bitvalue <<= 1;       /* logical shift left & 16 bit 'adder' */
-        }
-
-        return ( intresult );
-
-    case '$':
-        for ( len = 1; len <= size; len++ )
-            if ( isxdigit( ident[len] ) == 0 )
-            {
-                *evalerr = 1;
-                return ( 0 );
-            }
-
-        sscanf( ( char * )( ident + 1 ), "%lx", &intresult );
-        return ( intresult );
-
-    default:
-        for ( len = 0; len <= ( size - 1 ); len++ )
-            if ( isdigit( ident[len] ) == 0 )
-            {
-                *evalerr = 1;
-                return ( 0 );
-            }
-
-        return ( atol( ident ) );
-    }
-}
-
 /*
 * $Log: prsline.c,v $
-* Revision 1.53  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.54  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.53  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

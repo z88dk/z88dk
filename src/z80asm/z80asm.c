@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.151 2014-03-17 00:07:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.152 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,7 +52,6 @@ void LinkModules( void );
 void DeclModuleName( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
-long GetConstant( char *evalerr );
 
 
 /* local functions */
@@ -66,9 +65,6 @@ Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
 
 FILE *objfile;
-
-
-char ident[FILENAME_MAX + 1];
 
 extern char Z80objhdr[];
 extern char objhdrprefix[];
@@ -659,7 +655,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.151  2014-03-17 00:07:53  pauloscustodio
+* Revision 1.152  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.151  2014/03/17 00:07:53  pauloscustodio
 * Remove global stringconst[]
 *
 * Revision 1.150  2014/03/16 23:57:06  pauloscustodio

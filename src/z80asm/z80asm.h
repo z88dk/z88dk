@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.48 2014-03-16 23:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.49 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,7 +45,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.48 2014-03-16 23:
 #define FLAGS_M 7
 
 
-extern char ident[];
 extern struct module *CURRENTMODULE;
 extern struct modules *modulehdr;
 extern FILE *objfile;
@@ -60,7 +59,12 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.48  2014-03-16 23:57:06  pauloscustodio
+* Revision 1.49  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.48  2014/03/16 23:57:06  pauloscustodio
 * Removed global line[]
 *
 * Revision 1.47  2014/03/16 19:19:49  pauloscustodio

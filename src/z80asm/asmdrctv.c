@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.83 2014-03-17 00:07:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.84 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -44,7 +44,6 @@ int ExprAddress( int listoffset );
 int ExprLong( int listoffset );
 int DEFSP( void );
 long EvalPfixExpr( struct expr *pfixexpr );
-long GetConstant( char *evalerr );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void RemovePfixlist( struct expr *pfixexpr );
 struct expr *ParseNumExpr( void );
@@ -60,7 +59,6 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern char ident[];
 extern uint_t DEFVPC;
 extern struct module *CURRENTMODULE;
 
@@ -70,7 +68,7 @@ DEFSP( void )
 {
     if ( GetSym() == TK_DOT )
         if ( GetSym() == TK_NAME )
-            switch ( ident[0] )
+            switch ( tok_name[0] )
             {
             case 'B':
                 return 1;
@@ -109,7 +107,7 @@ Parsevarsize( void )
 
     long offset = 0, varsize, size_multiplier;
 
-    if ( strcmp( ident, "DS" ) != 0 )
+    if ( strcmp( tok_name, "DS" ) != 0 )
     {
         error_illegal_ident();
     }
@@ -161,9 +159,9 @@ Parsedefvarsize( long offset )
     switch ( tok )
     {
     case TK_NAME:
-        if ( strcmp( ident, "DS" ) != 0 )
+        if ( strcmp( tok_name, "DS" ) != 0 )
         {
-            define_symbol( ident, offset, 0 );
+            define_symbol( tok_name, offset, 0 );
             GetSym();
         }
 
@@ -297,7 +295,7 @@ DEFGROUP( void )
                         break;
 
                     case TK_NAME:
-						Str_set( name, ident );     /* remember name */
+						Str_set( name, tok_name );     /* remember name */
 
                         if ( GetSym() == TK_EQUAL )
                         {
@@ -415,12 +413,12 @@ UNDEFINE( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            tok = find_local_symbol( ident );
+            tok = find_local_symbol( tok_name );
         }
 
         if ( tok != NULL )
         {
-            SymbolHash_remove( CURRENTMODULE->local_symtab, ident );
+            SymbolHash_remove( CURRENTMODULE->local_symtab, tok_name );
         }
         else
         {
@@ -438,7 +436,7 @@ DEFINE( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            define_local_def_sym( ident, 1 );
+            define_local_def_sym( tok_name, 1 );
         }
         else
         {
@@ -461,7 +459,7 @@ DEFC( void )
     {
         if ( GetSym() == TK_NAME )
         {
-			Str_set( name, ident ); /* remember name */
+			Str_set( name, tok_name ); /* remember name */
 
             if ( GetSym() == TK_EQUAL )
             {
@@ -784,7 +782,7 @@ DeclModuleName( void )
     {
         if ( tok == TK_NAME )
         {
-            CURRENTMODULE->mname = xstrdup( ident );
+            CURRENTMODULE->mname = xstrdup( tok_name );
         }
         else
         {
@@ -800,7 +798,12 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.83  2014-03-17 00:07:53  pauloscustodio
+ * Revision 1.84  2014-03-18 22:44:03  pauloscustodio
+ * Scanner decodes a number into tok_number.
+ * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+ * ident[] replaced by tok_name.
+ *
+ * Revision 1.83  2014/03/17 00:07:53  pauloscustodio
  * Remove global stringconst[]
  *
  * Revision 1.82  2014/03/16 19:19:49  pauloscustodio

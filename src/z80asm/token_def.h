@@ -15,10 +15,8 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.16 2014-03-11 22:59:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.17 2014-03-18 22:44:03 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "legacy.h"
 
@@ -38,10 +36,6 @@ TOKEN(	TK_NAME,		"" )
 TOKEN(	TK_LABEL,		"" )
 TOKEN(	TK_NUMBER,		"" )
 TOKEN(	TK_STRING,		"" )
-
-TOKEN(	TK_DEC_CONST,	"" )
-TOKEN(	TK_HEX_CONST,	"" )
-TOKEN(	TK_BIN_CONST,	"" )
 
 TOKEN(	TK_IF_STMT,		"" )
 TOKEN(	TK_ELSE_STMT,	"" )
@@ -148,7 +142,12 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.16  2014-03-11 22:59:20  pauloscustodio
+* Revision 1.17  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.16  2014/03/11 22:59:20  pauloscustodio
 * Move EOL flag to scanner
 *
 * Revision 1.15  2014/03/11 00:15:13  pauloscustodio

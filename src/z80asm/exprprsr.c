@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.70 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.71 2014-03-18 22:44:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.70 2014-0
 
 /* external functions */
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
-long GetConstant( char *evalerr );
 
 /* local functions */
 void list_PfixExpr( struct expr *pfixlist );
@@ -58,7 +57,6 @@ struct expr *ParseNumExpr( void );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
-extern char ident[];
 
 
 #define DEFINE_PARSER( name, prev_name, condition )				\
@@ -88,14 +86,12 @@ extern char ident[];
 /* parse value */
 static BOOL Factor( struct expr *pfixexpr )
 {
-    long constant;
     Symbol *symptr;
-    char eval_err;
 
     switch ( tok )
     {
     case TK_NAME:
-        symptr = get_used_symbol( ident );
+        symptr = get_used_symbol( tok_name );
 
         if ( symptr->sym_type & SYM_DEFINED )
         {
@@ -111,10 +107,10 @@ static BOOL Factor( struct expr *pfixexpr )
 
             /* symbol only declared, store symbol name */
 			ExprOp_init_name( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  ident, symptr->sym_type );
+							  tok_name, symptr->sym_type );
         }
 
-        Str_append(pfixexpr->text, ident);		/* add identifier to infix expr */
+        Str_append(pfixexpr->text, tok_name);		/* add identifier to infix expr */
 
         GetSym();
         break;
@@ -123,25 +119,6 @@ static BOOL Factor( struct expr *pfixexpr )
 		Str_append_sprintf(pfixexpr->text, "%ld", tok_number);
 		ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
 							tok_number );
-        GetSym();
-        break;
-
-    case TK_HEX_CONST:
-    case TK_BIN_CONST:
-    case TK_DEC_CONST:
-        Str_append(pfixexpr->text, ident );		/* add constant to infix expr */
-        constant = GetConstant( &eval_err );
-
-        if ( eval_err == 1 )
-        {
-            return 0;           /* syntax error in expression */
-        }
-        else
-        {
-			ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
-								constant );
-        }
-
         GetSym();
         break;
 
@@ -652,7 +629,12 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.70  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.71  2014-03-18 22:44:03  pauloscustodio
+* Scanner decodes a number into tok_number.
+* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
+* ident[] replaced by tok_name.
+*
+* Revision 1.70  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *
