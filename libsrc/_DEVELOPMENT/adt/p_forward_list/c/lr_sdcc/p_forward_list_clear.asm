@@ -1,5 +1,10 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_INIT
-
 ; void p_forward_list_clear(p_forward_list_t *list)
+
+XDEF p_forward_list_clear
+
+LIB p_forward_list_init
+
+defc p_forward_list_clear = p_forward_list_init
+
+INCLUDE "../../z80/asm_p_forward_list_clear.asm"

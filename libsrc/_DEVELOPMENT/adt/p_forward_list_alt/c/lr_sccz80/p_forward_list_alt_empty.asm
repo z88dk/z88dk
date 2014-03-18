@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_EMPTY
-
 ; int p_forward_list_alt_empty(p_forward_list_alt_t *list)
+
+XDEF p_forward_list_alt_empty
+
+defc p_forward_list_alt_empty = asm_p_forward_list_alt_empty
+
+INCLUDE "../../z80/asm_p_forward_list_alt_empty.asm"

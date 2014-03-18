@@ -1,10 +1,13 @@
 c/rl_sdcc/p_forward_list_back
+c/rl_sdcc/p_forward_list_clear
 c/rl_sdcc/p_forward_list_empty
 c/rl_sdcc/p_forward_list_front
 c/rl_sdcc/p_forward_list_init
 c/rl_sdcc/p_forward_list_insert_after
 c/rl_sdcc/p_forward_list_pop_back
+c/rl_sdcc/p_forward_list_pop_front
 c/rl_sdcc/p_forward_list_push_back
+c/rl_sdcc/p_forward_list_push_front
 c/rl_sdcc/p_forward_list_remove
 c/rl_sdcc/p_forward_list_remove_after
 c/rl_sdcc/p_forward_list_size
