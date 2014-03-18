@@ -54,5 +54,5 @@ asm_p_forward_list_remove_after:
    ; de = void *list_item
    ; hl = void *item
    
-   or (hl)                     ; tail change indicator for asm_forward_list_ext_*
+   or (hl)                     ; tail change indicator for asm_p_forward_list_ext_*
    ret

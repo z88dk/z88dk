@@ -12,14 +12,21 @@
 
 XLIB asm_p_forward_list_back
 
-LIB __p_forward_list_locate_item, error_znc
+LIB __p_forward_list_locate_item, error_einval_zc
 
 asm_p_forward_list_back:
 
    ; enter : hl = p_forward_list_t *list
    ;
-   ; exit  : hl = void *item_last (item at back, 0 if list empty)
-   ;         carry reset if list is empty
+   ; exit  : success
+   ;
+   ;            hl = void *item (item at back)
+   ;            carry reset
+   ;
+   ;         fail if list is empty
+   ;
+   ;            hl = 0
+   ;            carry set, errno = EINVAL
    ;
    ; uses  : af, bc, de, hl
 
@@ -27,7 +34,7 @@ asm_p_forward_list_back:
    inc hl
    or (hl)
    
-   jp z, error_znc
+   jp z, error_einval_zc
 
    dec hl
    ld bc,0                     ; locate end of list

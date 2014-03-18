@@ -20,7 +20,6 @@ asm_p_forward_list_push_back:
    ;
    ; exit  : de = void *item_last (list_item prior to item, may be list *)
    ;         hl = void *item
-   ;         z flag set if item is the last item in the list
    ;
    ; uses  : af, bc, de, hl
 

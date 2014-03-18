@@ -25,6 +25,7 @@ asm_p_forward_list_remove:
    ;
    ;            hl = void *item
    ;            de = void *item_prev (item in list before hl, may be list *)
+   ;            z flag set if item was the last in the list
    ;            carry reset
    ;
    ;         fail if item not member of the list

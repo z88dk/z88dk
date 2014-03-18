@@ -49,17 +49,17 @@ loop:
    ; hl = void *current
    
    ld a,(hl)
-   inc hl
-   
-   or (hl)
-   jr z, list_end
-
    cp c
+
+   jr nz, not_found
+   
+   inc hl
+   or (hl)
    
    ld a,(hl)
    dec hl
    
-   jr nz, not_found
+   jr z, list_end
    
    cp b
    ret z                       ; item found
@@ -69,14 +69,18 @@ not_found:
    ld e,l
    ld d,h                      ; de = new lagger
    
-   ld l,(hl)
-   ld h,a                      ; hl = new current
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a                      ; hl = new current
    
    jr loop
 
 list_end:
-
-   dec hl
+   
+   ld a,b
+   or c
+   ret z                       ; do not indicate error if searching for end
    
    ; de = void *lagger
    ; hl = void *item_back
