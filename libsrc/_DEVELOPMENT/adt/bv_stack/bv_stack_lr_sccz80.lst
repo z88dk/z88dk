@@ -1,0 +1,15 @@
+c/lr_sccz80/bv_stack_capacity
+c/lr_sccz80/bv_stack_clear
+c/lr_sccz80/bv_stack_destroy
+c/lr_sccz80/bv_stack_empty
+c/lr_sccz80/bv_stack_init
+c/lr_sccz80/bv_stack_init_callee
+c/lr_sccz80/bv_stack_max_size
+c/lr_sccz80/bv_stack_pop
+c/lr_sccz80/bv_stack_push
+c/lr_sccz80/bv_stack_push_callee
+c/lr_sccz80/bv_stack_reserve
+c/lr_sccz80/bv_stack_reserve_callee
+c/lr_sccz80/bv_stack_shrink_to_fit
+c/lr_sccz80/bv_stack_size
+c/lr_sccz80/bv_stack_top

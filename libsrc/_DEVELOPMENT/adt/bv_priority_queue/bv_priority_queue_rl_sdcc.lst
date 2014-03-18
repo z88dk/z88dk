@@ -1,0 +1,14 @@
+c/rl_sdcc/bv_priority_queue_capacity
+c/rl_sdcc/bv_priority_queue_clear
+c/rl_sdcc/bv_priority_queue_data
+c/rl_sdcc/bv_priority_queue_destroy
+c/rl_sdcc/bv_priority_queue_empty
+c/rl_sdcc/bv_priority_queue_init
+c/rl_sdcc/bv_priority_queue_max_size
+c/rl_sdcc/bv_priority_queue_pop
+c/rl_sdcc/bv_priority_queue_push
+c/rl_sdcc/bv_priority_queue_reserve
+c/rl_sdcc/bv_priority_queue_resize
+c/rl_sdcc/bv_priority_queue_shrink_to_fit
+c/rl_sdcc/bv_priority_queue_size
+c/rl_sdcc/bv_priority_queue_top
