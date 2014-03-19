@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_INIT
-
 ; void p_stack_init(void *p)
+
+XDEF p_stack_init
+
+defc p_stack_init = asm_p_stack_init
+
+INCLUDE "../../z80/asm_p_stack_init.asm"

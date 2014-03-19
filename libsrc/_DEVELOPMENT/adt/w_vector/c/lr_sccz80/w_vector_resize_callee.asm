@@ -6,7 +6,7 @@ XDEF w_vector_resize_callee
 w_vector_resize_callee:
 
    pop hl
-   pop bc
+   pop de
    ex (sp),hl
    
    INCLUDE "../../z80/asm_w_vector_resize.asm"

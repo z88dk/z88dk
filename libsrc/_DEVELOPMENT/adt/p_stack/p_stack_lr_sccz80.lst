@@ -1,1 +1,8 @@
-all functions exported elsewhere
+c/lr_sccz80/p_stack_clear
+c/lr_sccz80/p_stack_empty
+c/lr_sccz80/p_stack_init
+c/lr_sccz80/p_stack_pop
+c/lr_sccz80/p_stack_push
+c/lr_sccz80/p_stack_push_callee
+c/lr_sccz80/p_stack_size
+c/lr_sccz80/p_stack_top

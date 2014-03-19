@@ -1,1 +1,7 @@
-all functions exported elsewhere
+z80/asm_p_stack_clear
+z80/asm_p_stack_empty
+z80/asm_p_stack_init
+z80/asm_p_stack_pop
+z80/asm_p_stack_push
+z80/asm_p_stack_size
+z80/asm_p_stack_top

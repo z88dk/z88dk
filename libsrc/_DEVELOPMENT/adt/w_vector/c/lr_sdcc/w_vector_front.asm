@@ -3,12 +3,8 @@
 
 XDEF w_vector_front
 
-w_vector_front:
+LIB w_array_front
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
+defc w_vector_front = w_array_front
 
-   INCLUDE "../../z80/asm_w_vector_front.asm"
+INCLUDE "../../z80/asm_w_vector_front.asm"

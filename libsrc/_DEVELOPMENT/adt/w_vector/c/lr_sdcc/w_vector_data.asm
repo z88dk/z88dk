@@ -1,16 +1,10 @@
 
-; void *w_vector_data(w_vector_t *v)
+; void *w_vector_data(b_vector_t *v)
 
-XLIB w_vector_data
+XDEF w_vector_data
 
-LIB asm_w_vector_data
+LIB w_array_data
 
-w_vector_data:
+defc w_vector_data = w_array_data
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
-   
-   jp asm_w_vector_data
+INCLUDE "../../z80/asm_w_vector_data.asm"

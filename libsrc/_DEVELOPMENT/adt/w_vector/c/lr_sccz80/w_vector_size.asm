@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF W_VECTOR_MAX_SIZE
-
 ; void *w_vector_size(w_vector_t *v)
+
+XDEF w_vector_size
+
+defc w_vector_size = asm_w_vector_size
+
+INCLUDE "../../z80/asm_w_vector_size.asm"

@@ -1,0 +1,15 @@
+c/lr_sdcc/wa_priority_queue_capacity
+c/lr_sdcc/wa_priority_queue_clear
+c/lr_sdcc/wa_priority_queue_data
+c/lr_sdcc/wa_priority_queue_destroy
+c/lr_sdcc/wa_priority_queue_empty
+c/lr_sdcc/wa_priority_queue_init
+c/lr_sdcc/wa_priority_queue_pop
+c/lr_sdcc/wa_priority_queue_push
+c/lr_sdcc/wa_priority_queue_resize
+c/lr_sdcc/wa_priority_queue_size
+c/lr_sdcc/wa_priority_queue_top
+z80/__wa_pq_setsize
+z80/__w_heap_sift_down
+z80/__w_heap_sift_up
+z80/__w_heap_swap

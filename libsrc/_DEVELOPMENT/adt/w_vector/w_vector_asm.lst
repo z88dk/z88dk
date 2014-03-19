@@ -3,6 +3,7 @@ z80/asm_w_vector_append_n
 z80/asm_w_vector_at
 z80/asm_w_vector_back
 z80/asm_w_vector_capacity
+z80/asm_w_vector_clear
 z80/asm_w_vector_data
 z80/asm_w_vector_destroy
 z80/asm_w_vector_empty
@@ -19,4 +20,3 @@ z80/asm_w_vector_reserve
 z80/asm_w_vector_resize
 z80/asm_w_vector_shrink_to_fit
 z80/asm_w_vector_size
-z80/__w_vector_write_n

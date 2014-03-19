@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF B_VECTOR_DESTROY
-
 ; void w_vector_destroy(w_vector_t *v)
+
+XDEF w_vector_destroy
+
+defc w_vector_destroy = asm_w_vector_destroy
+
+INCLUDE "../../z80/asm_w_vector_destroy.asm"

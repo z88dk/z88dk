@@ -1,1 +1,8 @@
-all functions exported elsewhere
+z80/asm_p_queue_back
+z80/asm_p_queue_clear
+z80/asm_p_queue_empty
+z80/asm_p_queue_front
+z80/asm_p_queue_init
+z80/asm_p_queue_pop
+z80/asm_p_queue_push
+z80/asm_p_queue_size

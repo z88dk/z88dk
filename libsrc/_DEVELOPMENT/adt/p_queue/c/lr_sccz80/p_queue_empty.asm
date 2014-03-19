@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF P_FORWARD_LIST_EMPTY
-
 ; int p_queue_empty(p_queue_t *q)
+
+XDEF p_queue_empty
+
+defc p_queue_empty = asm_p_queue_empty
+
+INCLUDE "../../z80/asm_p_queue_empty.asm"

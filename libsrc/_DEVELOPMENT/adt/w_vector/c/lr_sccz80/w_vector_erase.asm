@@ -3,16 +3,6 @@
 
 XLIB w_vector_erase
 
-LIB asm_w_vector_erase
+LIB w_array_erase
 
-w_vector_erase:
-
-   pop af
-   pop bc
-   pop hl
-   
-   push hl
-   push bc
-   push af
-   
-   jp asm_w_vector_erase
+defc w_vector_erase = w_array_erase

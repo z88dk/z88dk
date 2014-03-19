@@ -6,11 +6,11 @@ XDEF w_vector_resize
 w_vector_resize:
 
    pop af
-   pop bc
+   pop de
    pop hl
    
    push hl
-   push bc
+   push de
    push af
    
    INCLUDE "../../z80/asm_w_vector_resize.asm"

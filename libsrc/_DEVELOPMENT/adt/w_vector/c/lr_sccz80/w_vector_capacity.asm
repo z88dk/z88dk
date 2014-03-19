@@ -1,5 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF W_VECTOR_MAX_SIZE
-
 ; size_t w_vector_capacity(w_vector_t *v)
+
+XDEF w_vector_capacity
+
+defc w_vector_capacity = asm_w_vector_capacity
+
+INCLUDE "../../z80/asm_w_vector_capacity.asm"

@@ -1,4 +1,7 @@
 z80/asm_p_list_back
+z80/asm_p_list_clear
+z80/asm_p_list_empty
+z80/asm_p_list_front
 z80/asm_p_list_init
 z80/asm_p_list_insert
 z80/asm_p_list_insert_after
@@ -8,3 +11,4 @@ z80/asm_p_list_push_back
 z80/asm_p_list_push_front
 z80/asm_p_list_remove
 z80/asm_p_list_remove_after
+z80/asm_p_list_size

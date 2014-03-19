@@ -3,6 +3,7 @@ c/rl_sdcc/w_vector_append_n
 c/rl_sdcc/w_vector_at
 c/rl_sdcc/w_vector_back
 c/rl_sdcc/w_vector_capacity
+c/rl_sdcc/w_vector_clear
 c/rl_sdcc/w_vector_data
 c/rl_sdcc/w_vector_destroy
 c/rl_sdcc/w_vector_empty
@@ -19,4 +20,3 @@ c/rl_sdcc/w_vector_reserve
 c/rl_sdcc/w_vector_resize
 c/rl_sdcc/w_vector_shrink_to_fit
 c/rl_sdcc/w_vector_size
-z80/__w_vector_write_n

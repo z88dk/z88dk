@@ -3,10 +3,8 @@
 
 XDEF w_vector_erase_callee
 
-w_vector_erase_callee:
+LIB w_array_erase_callee
 
-   pop hl
-   pop bc
-   ex (sp),hl
-   
-   INCLUDE "../../z80/asm_w_vector_erase.asm"
+defc w_vector_erase_callee = w_array_erase_callee
+
+INCLUDE "../../z80/asm_w_vector_erase.asm"

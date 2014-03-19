@@ -3,12 +3,8 @@
 
 XDEF w_vector_erase_range_callee
 
-w_vector_erase_range_callee:
+LIB w_array_erase_range_callee
 
-   pop af
-   pop hl
-   pop bc
-   pop de
-   push af
-   
-   INCLUDE "../../z80/asm_w_vector_erase_range.asm"
+defc w_vector_erase_range_callee = w_array_erase_range_callee
+
+INCLUDE "../../z80/asm_w_vector_erase_range.asm"

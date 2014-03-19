@@ -1,5 +1,10 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF B_VECTOR_EMPTY
-
 ; void w_vector_empty(w_vector_t *v)
+
+XDEF w_vector_empty
+
+LIB w_array_empty
+
+defc w_vector_empty = w_array_empty
+
+INCLUDE "../../z80/asm_w_vector_empty.asm"

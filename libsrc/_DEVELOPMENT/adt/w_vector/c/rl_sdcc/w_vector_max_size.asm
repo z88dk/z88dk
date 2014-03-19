@@ -10,5 +10,7 @@ w_vector_max_size:
    
    push hl
    push af
+   
+   jp asm_w_vector_max_size
 
    INCLUDE "../../z80/asm_w_vector_max_size.asm"

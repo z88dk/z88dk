@@ -7,9 +7,9 @@ w_vector_resize:
 
    pop af
    pop hl
-   pop bc
+   pop de
    
-   push bc
+   push de
    push hl
    push af
    

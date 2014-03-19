@@ -1,1 +1,7 @@
-all functions exported elsewhere
+c/rl_sdcc/p_stack_clear
+c/rl_sdcc/p_stack_empty
+c/rl_sdcc/p_stack_init
+c/rl_sdcc/p_stack_pop
+c/rl_sdcc/p_stack_push
+c/rl_sdcc/p_stack_size
+c/rl_sdcc/p_stack_top

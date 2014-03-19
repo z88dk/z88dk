@@ -1,16 +1,10 @@
 
 ; void *w_vector_size(w_vector_t *v)
 
-XLIB w_vector_size
+XDEF w_vector_size
 
-LIB asm_w_vector_size
+LIB w_array_size
 
-w_vector_size:
+defc w_vector_size = w_array_size
 
-   pop af
-   pop hl
-   
-   push hl
-   push af
-   
-   jp asm_w_vector_size
+INCLUDE "../../z80/asm_w_vector_size.asm"

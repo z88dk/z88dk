@@ -1,5 +1,10 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF W_VECTOR_APPEND
+; size_t w_vector_push_back(w_vector_t *v, int c)
 
-; size_t w_vector_push_back(w_vector_t *v, void *item)
+XDEF w_vector_push_back
+
+LIB w_vector_append
+
+defc w_vector_push_back = w_vector_append
+
+INCLUDE "../../z80/asm_w_vector_push_back.asm"

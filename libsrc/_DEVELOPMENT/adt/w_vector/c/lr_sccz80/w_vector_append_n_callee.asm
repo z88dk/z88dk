@@ -6,8 +6,8 @@ XDEF w_vector_append_n_callee
 w_vector_append_n_callee:
 
    pop hl
-   pop de
    pop bc
+   pop de
    ex (sp),hl
    
    INCLUDE "../../z80/asm_w_vector_append_n.asm"

@@ -10,5 +10,7 @@ p_list_back:
    
    push hl
    push af
+   
+   jp asm_p_list_back
 
    INCLUDE "../../z80/asm_p_list_back.asm"

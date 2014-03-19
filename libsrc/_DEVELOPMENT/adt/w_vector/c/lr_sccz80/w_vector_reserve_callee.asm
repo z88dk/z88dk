@@ -9,4 +9,6 @@ w_vector_reserve_callee:
    pop bc
    ex (sp),hl
    
+   jr asm_w_vector_reserve
+   
    INCLUDE "../../z80/asm_w_vector_reserve.asm"

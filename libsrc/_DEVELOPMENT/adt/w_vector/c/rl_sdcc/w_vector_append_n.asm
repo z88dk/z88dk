@@ -7,12 +7,12 @@ w_vector_append_n:
 
    pop af
    pop hl
-   pop bc
    pop de
+   pop bc
    
-   push de
    push bc
+   push de
    push hl
    push af
    
-   INCLUDE "../../z80/asm_w_vector_append.asm"
+   INCLUDE "../../z80/asm_w_vector_append_n.asm"
