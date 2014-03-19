@@ -1,0 +1,12 @@
+z80/asm_wv_stack_capacity
+z80/asm_wv_stack_clear
+z80/asm_wv_stack_destroy
+z80/asm_wv_stack_empty
+z80/asm_wv_stack_init
+z80/asm_wv_stack_max_size
+z80/asm_wv_stack_pop
+z80/asm_wv_stack_push
+z80/asm_wv_stack_reserve
+z80/asm_wv_stack_shrink_to_fit
+z80/asm_wv_stack_size
+z80/asm_wv_stack_top
