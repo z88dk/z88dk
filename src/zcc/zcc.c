@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.60 2014-03-19 22:25:12 dom Exp $
+ *      $Id: zcc.c,v 1.61 2014-03-19 22:44:57 dom Exp $
  */
 
 
@@ -505,6 +505,7 @@ int linkthem(char *linker)
 int main(int argc, char **argv)
 {
     int             i, gc;
+    char           *ptr;
     char            config_filename[FILENAME_MAX+1];
     char            asmarg[4096];    /* Hell, that should be long enough! */
     char            buffer[LINEMAX + 1];    /* For reading in option file */
@@ -527,6 +528,12 @@ int main(int argc, char **argv)
         exit(1);
     }
     
+    /* Setup the install prefix based on ZCCCFG */
+    if ( ( ptr = getenv("ZCCCFG") ) != NULL ) {
+    	snprintf(config_filename, sizeof(config_filename),"%s/../../", ptr);
+    	c_install_dir = strdup(config_filename);
+    }
+    
     
     gc = find_zcc_config_fileFile(argv[gc], gc, config_filename, sizeof(config_filename));
     /* Okay, so now we read in the options file and get some info for us */
@@ -543,7 +550,7 @@ int main(int argc, char **argv)
 
     /* We must have at least a crt file - we can rely on defaults for everything else */
     if ( c_crt0 == NULL ) {
-        fprintf(stderr, "No CRT0 defined\n");
+        fprintf(stderr, "No CRT0 defined in configuration file <%s>\n",config_filename);
         exit(1);
     }
 
@@ -1477,10 +1484,10 @@ int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
                 exit(1);
             }
             /* Config file in config directory */
-            snprintf(buf,buflen,"%s%s.cfg",cfgfile, arg+1);
+            snprintf(buf,buflen,"%s/%s.cfg",cfgfile, arg+1);
             return (gc);
         } else {
-            snprintf(buf, buflen, "%slib/config/%s.cfg", c_install_dir, arg + 1);
+            snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
         }
         /*
          * User supplied invalid config file, let it fall over back

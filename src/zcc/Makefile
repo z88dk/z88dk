@@ -1,6 +1,8 @@
 
 OBJS = zcc.o
 
+CFLAGS += -g
+
 INSTALL ?= install
 
 all: zcc$(EXESUFFIX)
