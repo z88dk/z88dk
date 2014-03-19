@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.59 2014-02-22 21:03:10 dom Exp $
+ *      $Id: zcc.c,v 1.60 2014-03-19 22:25:12 dom Exp $
  */
 
 
@@ -19,6 +19,7 @@
 #include        <stdlib.h>
 #include        <stdarg.h>
 #include        <ctype.h>
+#include        <stddef.h>
 #include        "zcc.h"
 
 #ifdef WIN32
@@ -84,7 +85,7 @@ static int             find_zcc_config_fileFile(char *arg, int argc, char *buf, 
 static void            parse_option(char *option);
 static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt,...);
-
+static char           *replace_str(const char *str, const char *old, const char *new);
 
 
 
@@ -812,18 +813,38 @@ void SetString(arg_t *argument, char *arg)
 
 void SetStringConfig(arg_t *argument, char *arg)
 {
-    char  *ptr;
+    char  *ptr, *nval;
+    char  *rep, *start;
     char  *value = strdup(arg);
+    char   varname[300];
     
-    while ( (ptr = strstr(value,"DESTDIR")) != NULL ) {
-        char *nval = malloc(strlen(value) + strlen(c_install_dir) + 3);
-        memcpy(nval, value, ptr - value);
-        strcat(nval, c_install_dir);
-        strcat(nval, ptr + strlen("DESTDIR"));
-        free(value);
-        value = nval;
+    
+    start = value;
+    while ( (ptr = strchr(start,'$')) != NULL ) {
+    	if ( *(ptr + 1) == '{' ) {
+    		char  *end = strchr(ptr+1,'}');
+    		
+    		if ( end != NULL ) {
+    			snprintf(varname, sizeof(varname), "%.*s", ( end - ptr - 2 ), ptr + 2);
+    			rep = getenv(varname);
+				if ( rep == NULL ) {
+					rep = "";
+				}
+				
+				snprintf(varname, sizeof(varname), "%.*s", end - ptr + 1, ptr);
+				nval = replace_str(value, varname, rep);
+				free(value);
+				value = nval;
+				start = value + (ptr - start); 
+    		}
+    	} else {
+    		start++;
+    	}
     }
     
+    nval = replace_str(value, "DESTDIR", c_install_dir);
+    free(value);
+    value = nval;
     *(char **)argument->data = value;
 }
 
@@ -1542,6 +1563,37 @@ void add_zccopt(char *fmt,...)
     strcpy(zccopt + len, buf);   
 }
 
+/* From: http://creativeandcritical.net/str-replace-c/ */
+char *replace_str(const char *str, const char *old, const char *new)
+{
+	char *ret, *r;
+	const char *p, *q;
+	size_t oldlen = strlen(old);
+	size_t count, retlen, newlen = strlen(new);
+
+	if (oldlen != newlen) {
+		for (count = 0, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen)
+			count++;
+		/* this is undefined if p - str > PTRDIFF_MAX */
+		retlen = p - str + strlen(p) + count * (newlen - oldlen);
+	} else
+		retlen = strlen(str);
+
+	if ((ret = malloc(retlen + 1)) == NULL)
+		return NULL;
+
+	for (r = ret, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen) {
+		/* this is undefined if q - p > PTRDIFF_MAX */
+		ptrdiff_t l = q - p;
+		memcpy(r, p, l);
+		r += l;
+		memcpy(r, new, newlen);
+		r += newlen;
+	}
+	strcpy(r, p);
+
+	return ret;
+}
 
 /*
  * Local Variables:
