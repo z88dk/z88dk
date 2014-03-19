@@ -1,0 +1,9 @@
+c/rl_sdcc/wa_stack_capacity
+c/rl_sdcc/wa_stack_clear
+c/rl_sdcc/wa_stack_destroy
+c/rl_sdcc/wa_stack_empty
+c/rl_sdcc/wa_stack_init
+c/rl_sdcc/wa_stack_pop
+c/rl_sdcc/wa_stack_push
+c/rl_sdcc/wa_stack_size
+c/rl_sdcc/wa_stack_top
