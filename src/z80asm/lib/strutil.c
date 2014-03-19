@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.9 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.10 2014-03-19 23:04:57 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -125,12 +125,56 @@ void Str_copy( Str *self, Str *other )
     memcpy( data_copy, self->str, self->size );
     self->alloc_str = TRUE;
     self->str = data_copy;
+	self->palias = NULL;		/* copy cannot point to same alias */
 }
 
 void Str_fini( Str *self )
 {
     if ( self->alloc_str )
         xfree( self->str );
+}
+
+/*-----------------------------------------------------------------------------
+*   handle alias alias char* that always points to self->str
+*----------------------------------------------------------------------------*/
+static void Str_update_alias( Str *self )
+{
+	if ( self->palias != NULL )
+		*(self->palias) = self->str;
+}
+
+void Str_set_alias( Str *self, char **palias )
+{
+	self->palias = palias;
+	Str_update_alias( self );
+}
+
+/*-----------------------------------------------------------------------------
+*   Modify Str
+*----------------------------------------------------------------------------*/
+void Str_clear( Str *self )
+{
+	self->str[0] = '\0';
+	self->len    = 0;
+	Str_update_alias( self );
+}
+
+void Str_sync_len( Str *self )
+{
+	self->len = strlen( self->str );
+	Str_update_alias( self );
+}
+
+void Str_chomp( Str *self )
+{
+	chomp( self->str );
+	Str_sync_len( self );
+}
+
+void Str_strip( Str *self )
+{
+	strip( self->str );
+	Str_sync_len( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -141,31 +185,33 @@ void Str_reserve( Str *self, uint_t num_chars )
 {
     uint_t need_size, new_size;
 
-    if ( ! self->alloc_str )		/* exit if fixed-buffer */
-        return;
+    if ( self->alloc_str )
+	{
+		if ( self->size == 0 )          /* empty data */
+		{
+			need_size = num_chars + 1;
+		}
+		else                            /* append to existing string */
+		{
+			need_size = self->len + num_chars + 1;
+		}
 
-    if ( self->size == 0 )          /* empty data */
-    {
-        need_size = num_chars + 1;
-    }
-    else                            /* append to existing string */
-    {
-        need_size = self->len + num_chars + 1;
-    }
+		if ( self->size < need_size )
+		{
+			/* round up in blocks of 256 */
+			new_size = need_size & ~SIZE_MASK;
 
-    if ( self->size < need_size )
-    {
-        /* round up in blocks of 256 */
-        new_size = need_size & ~SIZE_MASK;
+			if ( new_size < need_size )
+			{
+				new_size += SIZE_MASK + 1;
+			}
 
-        if ( new_size < need_size )
-        {
-            new_size += SIZE_MASK + 1;
-        }
-
-        self->str = ( char * ) xrealloc( self->str, new_size );
-        self->size = new_size;
-    }
+			self->str = ( char * ) xrealloc( self->str, new_size );
+			self->size = new_size;
+		}
+	}
+	
+	Str_update_alias( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -175,12 +221,14 @@ void Str_unreserve( Str *self )
 {
     uint_t need_size;
 
-    if ( ! self->alloc_str )		/* exit if fixed-buffer */
-        return;
+    if ( self->alloc_str )
+	{
+		need_size = self->len + 1;
+		self->str = ( char * ) xrealloc( self->str, need_size );
+		self->size = need_size;
+	}
 
-    need_size = self->len + 1;
-    self->str = ( char * ) xrealloc( self->str, need_size );
-    self->size = need_size;
+	Str_update_alias( self );
 }
 
 /*-----------------------------------------------------------------------------
@@ -224,6 +272,21 @@ void Str_append( Str *self, char *source )
 {
     Str_append_bytes( self, source, strlen( source ) );
 }
+
+/*-----------------------------------------------------------------------------
+*   set / append substring, add always a zero byte after
+*----------------------------------------------------------------------------*/
+void Str_set_n( Str *self, char *source, uint_t count )
+{
+    Str_clear( self );
+    Str_append_n( self, source, count );
+}
+
+void Str_append_n( Str *self, char *source, uint_t count )
+{
+    Str_append_bytes( self, source, MIN( count, strlen(source) ) );
+}
+
 
 /*-----------------------------------------------------------------------------
 *   set / append from char, add always a zero byte after
@@ -272,8 +335,8 @@ void Str_append_vsprintf( Str *self, char *format, va_list argptr )
                                     format, argptr );
 
         if ( free_space <= 0 ||					/* no free space */
-                need_space >= free_space || 		/* or not enough space */
-                need_space < 0 )    				/* or error */
+			 need_space >= free_space || 		/* or not enough space */
+			 need_space < 0 )    				/* or error */
         {
             if ( self->alloc_str )
             {
@@ -364,7 +427,11 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.9  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.10  2014-03-19 23:04:57  pauloscustodio
+* Add Str_set_alias() to define an alias char* that always points to self->str
+* Add Str_set_n() and Str_append_n() to copy substrings.
+*
+* Revision 1.9  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.8  2014/02/25 22:39:35  pauloscustodio

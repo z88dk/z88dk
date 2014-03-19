@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.7 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.8 2014-03-19 23:04:57 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -26,6 +26,7 @@ write_file("test.8.asm", {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
 write_file("test.c", <<'END');
 #include "die.h"
 #include "strutil.h"
+#include <assert.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 #define FOPEN(file)		fp = fopen((file), "rb"); if (fp == NULL) ERROR;
@@ -49,6 +50,7 @@ write_file("test.c", <<'END');
 						GETLINE((s),"",   FALSE); \
 						FCLOSE();
 
+char *alias;
 void _check_str(Str *str, size_t size, size_t len, char *text, BOOL alloc_str,
 				char *file, int lineno)
 {
@@ -66,6 +68,10 @@ void _check_str(Str *str, size_t size, size_t len, char *text, BOOL alloc_str,
 		warn("%s(%d) different text found\n", file, lineno);
 	if (str->alloc_str != alloc_str)
 		warn("%s(%d) str->alloc_str %d != %d\n", file, lineno, str->alloc_str, alloc_str);
+	if (str->palias != NULL && str->palias != &alias)
+		warn("%s(%d) str->palias incorrect\n", file, lineno);
+	if (str->palias != NULL && alias != str->str)
+		warn("%s(%d) alias incorrect\n", file, lineno);
 }	
 
 #define check_str(str,size,len,text,alloc_str)	\
@@ -91,7 +97,7 @@ DEFINE_STR( static_s2, 5 );
 int main()
 {
 	char s[255];
-	char * p;
+	char *p;
 
 	/* strtoupper, strtolower */
 	strcpy(s, "Abc1");
@@ -115,10 +121,17 @@ int main()
 	if (stricompare("a","ab") > -1)		ERROR;
 	if (stricompare("ab","ab") != 0)	ERROR;
 	
+	/* no alias */
+	{
+		Str *s1 = OBJ_NEW(Str);
+		Str_set( s1, "hello" );
+		check_str( s1, 256, 5, "hello", TRUE);
+	}
 	
 	/* chomp, Str_chomp */
 	{
 		Str *s1 = OBJ_NEW(Str);
+		Str_set_alias(s1, &alias);
 		
 		strcpy(s, "\r\n \t\fxxxxxxxx\r\n \t\f\v");
 		Str_set( s1, s );
@@ -144,6 +157,7 @@ int main()
 	/* strip, Str_strip */
 	{
 		Str *s1 = OBJ_NEW(Str);
+		Str_set_alias(s1, &alias);
 		
 		strcpy(s, "\r\n \t\fxxxxxxxx\r\n \t\f\v");
 		Str_set( s1, s );
@@ -174,6 +188,8 @@ int main()
 		Str _s3 = INIT_STR( buffer ), *s3 = & _s3;
 		DEFINE_STR( s4, 10 );
 
+		Str_set_alias(s1, &alias);
+		
 		check_str( s1, 256, 0, "", TRUE);
 		check_str( s3,   5, 0, "", FALSE);
 		check_str( s4,  10, 0, "", FALSE);
@@ -309,6 +325,46 @@ int main()
 		Str_clear( s4 ); Str_unreserve( s4 );
 
 
+		/* set_n, append_n */
+		Str_set_n( s1, "1234567890", 3 );
+		Str_set_n( s3, "1234567890", 3 );
+		Str_set_n( s4, "1234567890", 3 );
+
+		check_str( s1, 256, 3, "123", TRUE);
+		check_str( s3,   5, 3, "123", FALSE);
+		check_str( s4,  10, 3, "123", FALSE);
+
+		Str_append_n( s1, "1234567890", 3 );
+		Str_append_n( s3, "1234567890", 3 );
+		Str_append_n( s4, "1234567890", 3 );
+
+		check_str( s1, 256, 6, "123123", TRUE);
+		check_str( s3,   5, 4, "1231",   FALSE);
+		check_str( s4,  10, 6, "123123", FALSE);
+
+
+		Str_set_n( s1, "123", 10 );
+		Str_set_n( s3, "123", 10 );
+		Str_set_n( s4, "123", 10 );
+
+		check_str( s1, 256, 3, "123", TRUE);
+		check_str( s3,   5, 3, "123", FALSE);
+		check_str( s4,  10, 3, "123", FALSE);
+
+		Str_append_n( s1, "123", 10 );
+		Str_append_n( s3, "123", 10 );
+		Str_append_n( s4, "123", 10 );
+
+		check_str( s1, 256, 6, "123123", TRUE);
+		check_str( s3,   5, 4, "1231",   FALSE);
+		check_str( s4,  10, 6, "123123", FALSE);
+
+		
+		Str_clear( s1 ); Str_unreserve( s1 );
+		Str_clear( s3 ); Str_unreserve( s3 );
+		Str_clear( s4 ); Str_unreserve( s4 );
+		
+		
 		/* clear */
 		Str_clear( s1 );
 		Str_clear( s3 );
@@ -594,7 +650,11 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.7  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.8  2014-03-19 23:04:57  pauloscustodio
+# Add Str_set_alias() to define an alias char* that always points to self->str
+# Add Str_set_n() and Str_append_n() to copy substrings.
+#
+# Revision 1.7  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

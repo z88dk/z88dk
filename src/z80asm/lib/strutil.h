@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.11 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.12 2014-03-19 23:04:57 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,6 +52,9 @@ extern char *strip( char *string );
 *----------------------------------------------------------------------------*/
 CLASS( Str )
 	char	*str;		/* string - may contain zero bytes */
+	char   **palias;	/* points to a char* alias variable that is always kept pointing
+						   to self->str; useful to export a char* that always points
+						   at the buffer */
 	uint_t	 size;		/* allocated size */
 	uint_t	 len;		/* sring length (excluding zero terminator) */
 	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
@@ -60,7 +63,7 @@ END_CLASS;
 
 /* define Str with user supplied buffer */
 #define INIT_STR( buffer )	\
-			{ CLASS_INITIALIZER, buffer, sizeof(buffer), 0, FALSE }
+			{ CLASS_INITIALIZER, buffer, NULL, sizeof(buffer), 0, FALSE }
 
 #define DEFINE_STR( str, maxsize )	\
 			char	str##_data [ maxsize ] = "";	\
@@ -68,10 +71,13 @@ END_CLASS;
 			Str		* str = & _##str
 
 /* clear the string, keep allocated space */
-#define Str_clear(self)     ((self)->str[0] = 0, (self)->len = 0)
+extern void Str_clear( Str *self );
 
 /* sync length in case string was modified in place */
-#define Str_sync_len(self)  ((self)->len = strlen((self)->str))
+extern void Str_sync_len( Str *self );
+
+/* set alias char* that always points to self->str */
+extern void Str_set_alias( Str *self, char **palias );
 
 /* expand if needed to store at least more num_chars plus a zero byte */
 extern void Str_reserve( Str *self, uint_t num_chars );
@@ -82,6 +88,10 @@ extern void Str_unreserve( Str *self );
 /* set / append string */
 extern void Str_set( Str *self, char *source );
 extern void Str_append( Str *self, char *source );
+
+/* set / append substring */
+extern void Str_set_n( Str *self, char *source, uint_t count );
+extern void Str_append_n( Str *self, char *source, uint_t count );
 
 /* set / append bytes */
 extern void Str_set_bytes( Str *self, char *source, uint_t size );
@@ -99,8 +109,8 @@ extern void Str_vsprintf( Str *self, char *format, va_list argptr );
 extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
 
 /* chomp, strip */
-#define Str_chomp(self)		( chomp( (self)->str ), Str_sync_len(self) )
-#define Str_strip(self)		( strip( (self)->str ), Str_sync_len(self) )
+extern void Str_chomp( Str *self );
+extern void Str_strip( Str *self );
 
 /* get N characters from input, return FALSE on EOF */
 extern BOOL Str_getchars( Str *self, FILE *fp, uint_t num_chars );
@@ -113,7 +123,11 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.11  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.12  2014-03-19 23:04:57  pauloscustodio
+* Add Str_set_alias() to define an alias char* that always points to self->str
+* Add Str_set_n() and Str_append_n() to copy substrings.
+*
+* Revision 1.11  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.10  2014/02/25 22:39:35  pauloscustodio
