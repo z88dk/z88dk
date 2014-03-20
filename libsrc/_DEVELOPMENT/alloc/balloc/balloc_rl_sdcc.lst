@@ -1,6 +1,6 @@
-c/rl_sdcc/ba_addmem
-c/rl_sdcc/ba_alloc
-c/rl_sdcc/ba_blockcount
-c/rl_sdcc/ba_firstfit
-c/rl_sdcc/ba_free
-c/rl_sdcc/ba_init
+c/rl_sdcc/balloc_addmem
+c/rl_sdcc/balloc_alloc
+c/rl_sdcc/balloc_blockcount
+c/rl_sdcc/balloc_firstfit
+c/rl_sdcc/balloc_free
+c/rl_sdcc/balloc_init

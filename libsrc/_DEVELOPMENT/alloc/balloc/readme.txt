@@ -1,7 +1,7 @@
 
 BLOCK ALLOCATOR (BALLOC)
 
-The block allocator maintains an array of linked lists of available memory blocks.  Each array index's linked list contains blocks of the same size.  It is suggested that the size of the blocks increases with array index to be compatible with ba_firstfit().
+The block allocator maintains an array of linked lists of available memory blocks.  Each array index's linked list contains blocks of the same size.  It is suggested that the size of the blocks increases with array index to be compatible with balloc_firstfit().
 
 The programmer is responsible for adding available memory blocks to each index.  This memory can come from anywhere, including memory in different banks.  It is the responsibility of the programmer to ensure the appropriate bank and the allocator array is paged in when a block is allocated or freed.
 
