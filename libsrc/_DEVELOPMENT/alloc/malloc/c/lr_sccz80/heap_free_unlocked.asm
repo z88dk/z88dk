@@ -1,18 +1,8 @@
 
-; void heap_free_unlocked(void *heap, void *p)
+; void heap_free_unlocked(void *p)
 
-XLIB heap_free_unlocked
-
-LIB asm_heap_free_unlocked
+XDEF heap_free_unlocked
 
 heap_free_unlocked:
 
-   pop af
-   pop hl
-   pop de
-   
-   push de
-   push hl
-   push af
-   
-   jp asm_heap_free_unlocked
+   INCLUDE "../../z80/asm_heap_free_unlocked.asm"

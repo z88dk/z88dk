@@ -1,4 +1,17 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_alloc(void *heap, size_t size)
+;
+; Allocate size bytes from the heap, returning ptr to the
+; allocated memory or 0 with carry set on failure.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
+
 XLIB asm_heap_alloc
 
 LIB asm_heap_alloc_unlocked

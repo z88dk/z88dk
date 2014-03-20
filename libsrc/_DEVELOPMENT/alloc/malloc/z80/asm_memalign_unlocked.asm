@@ -1,8 +1,26 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_ALIGNED_ALLOC_UNLOCKED
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *memalign_unlocked(size_t alignment, size_t size)
+;
+; Allocate size bytes from the thread's default heap at an
+; address that is an integer multiple of alignment.
+; Returns 0 with carry set on failure.
+;
+; If alignment is not an exact power of 2, it will be rounded up
+; to the next power of 2.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
 
-asm_memalign_unlocked:
+XLIB asm_memalign_unlocked
+
+LIB asm_aligned_alloc_unlocked
+
+defc asm_memalign_unlocked = asm_aligned_alloc_unlocked
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap without locking

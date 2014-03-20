@@ -1,9 +1,22 @@
 
-XLIB asm_falloc
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *_falloc(void *p, size_t size)
+;
+; Attempt to allocate size bytes from the thread's heap at
+; fixed address p.  Returns p or 0 with carry set on failure.
+;
+; Returns 0 if size = 0 without indicating error.
+;
+; ===============================================================
+
+XLIB asm__falloc
 
 LIB asm_heap_alloc_fixed
 
-asm_falloc:
+asm__falloc:
 
    ; Attempt to allocate memory from the thread's default heap
    ; at a fixed address

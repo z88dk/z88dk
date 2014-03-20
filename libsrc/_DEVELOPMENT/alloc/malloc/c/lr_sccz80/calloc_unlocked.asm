@@ -7,12 +7,12 @@ LIB asm_calloc_unlocked
 
 calloc_unlocked:
 
-   pop de
+   pop af
    pop bc
    pop hl
    
    push hl
    push bc
-   push de
+   push af
    
    jp asm_calloc_unlocked

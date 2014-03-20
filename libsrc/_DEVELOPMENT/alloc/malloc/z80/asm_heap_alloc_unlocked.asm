@@ -1,4 +1,17 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_alloc_unlocked(void *heap, size_t size)
+;
+; Allocate size bytes from the heap, returning ptr to the
+; allocated memory or 0 with carry set on failure.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
+
 XLIB asm_heap_alloc_unlocked
 
 LIB __heap_allocate_block, error_enomem_zc
@@ -26,14 +39,14 @@ asm_heap_alloc_unlocked:
    or l
    ret z                       ; return 0 if size == 0
    
-   ld bc,__HEAP_HEADER_SZ
+   ld bc,6                     ; sizeof(heap header)
    add hl,bc                   ; add space for header to request
    jp c, error_enomem_zc
    
    ld c,l
    ld b,h                      ; bc = gross request size
    
-   ld hl,__MTX_STRUCT_SZ
+   ld hl,6                     ; hl = sizeof(mutex)
    add hl,de
 
 block_loop:

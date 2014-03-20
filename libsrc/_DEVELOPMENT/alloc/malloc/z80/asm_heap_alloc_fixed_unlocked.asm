@@ -1,11 +1,27 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size)
+;
+; Attempt to allocate size bytes from the heap at fixed
+; address p.  The allocation will fail if the heap does
+; not contain enough free memory at address p.
+;
+; Returns p on success or 0 with carry set on failure.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
+
 XLIB asm_heap_alloc_fixed_unlocked
 
 LIB l_ltu_de_hl, __heap_place_block, __heap_allocate_block, error_enomem_zc
 
 asm_heap_alloc_fixed_unlocked:
 
-   ; Attempt to allocate memory from a the heap at a fixed
+   ; Attempt to allocate memory from a heap at a fixed
    ; address without locking
    ;
    ; enter : bc = void *p
@@ -26,12 +42,12 @@ asm_heap_alloc_fixed_unlocked:
 
    push hl                     ; save size
 
-   ld hl,__MTX_STRUCT_SZ
+   ld hl,6                     ; sizeof(mutex)
    add hl,de
    
    ex de,hl                    ; de = & block_first
    
-   ld hl,-(__HEAP_HEADER_SZ)
+   ld hl,-6                    ; sizeof(heap header)
    add hl,bc                   ; hl = & block_p
    
    ex de,hl
@@ -39,9 +55,6 @@ asm_heap_alloc_fixed_unlocked:
    ; de = & block_p
    ; hl = & block = first block in the heap
    ; stack = size
-
-   ld c,l
-   ld b,h
 
 locate_loop:
 
@@ -57,7 +70,7 @@ locate_loop:
 
    ld a,(hl)
    inc hl
-   ld h,(hl
+   ld h,(hl)
    ld l,a                      ; hl = block->next
    
    or h
@@ -75,7 +88,7 @@ end_loop:
    pop hl
    push bc
    
-   ld bc,__HEAP_HEADER_SZ
+   ld bc,6                     ; sizeof(heap header)
    add hl,bc
    jp c, error_enomem_zc - 1   ; if request size too big
 

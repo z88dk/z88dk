@@ -7,12 +7,12 @@ LIB asm_heap_alloc
 
 heap_alloc:
 
-   pop bc
+   pop af
    pop hl
    pop de
    
    push de
    push hl
-   push bc
+   push af
    
    jp asm_heap_alloc

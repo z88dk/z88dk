@@ -1,4 +1,22 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size)
+;
+; Allocate size bytes from the heap at an address that is an
+; integer multiple of alignment.
+;
+; Returns 0 with carry set on failure.
+;
+; If alignment is not an exact power of 2, it will be rounded up
+; to the next power of 2.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
+
 XLIB asm_heap_alloc_aligned_unlocked
 
 LIB __heap_place_block, __heap_allocate_block, l_andc_hl_bc
@@ -49,12 +67,13 @@ asm_heap_alloc_aligned_unlocked:
 
    push bc                     ; save alignment - 1
    
-   ld bc,__HEAP_HEADER_SZ
+   ld bc,6                     ; sizeof(heap header)
    add hl,bc
+   jp c, error_enomem_zc
    
    ex de,hl                    ; de = gross request size
    
-   ld bc,__MTX_STRUCT_SZ
+   ld bc,6                     ; sizeof(mutex)
    add hl,bc                   ; hl = & first block in heap
 
    ; hl = & block
@@ -65,17 +84,26 @@ asm_heap_alloc_aligned_unlocked:
    ex (sp),hl
    push hl
    ex de,hl
+
+block_loop:
    
    ; hl = & block
    ; stack = gross request size, alignment - 1
 
-   ; the first block may have zero committed bytes
-   
    ld e,l
-   ld d,h
+   ld d,h                      ; de = & block
+
+   ; check if end of heap reached
    
+   ld a,(hl)
    inc hl
-   inc hl
+   or (hl)
+   
+   jp z, error_enomem_zc - 2   ; if end of heap reached
+
+   inc hl                      ; hl = & block.committed
+
+   ; compute first free aligned address in this block
    
    ld c,(hl)
    inc hl
@@ -83,161 +111,126 @@ asm_heap_alloc_aligned_unlocked:
    
    ld a,b
    or c
-   jr nz, enter_loop           ; if committed != 0
+   jr nz, committed_nonzero
    
-   ; committed is zero so test special case that aligned block overlays
+   ; block->committed == 0
+   ; this means the request can be overlayed on top
+   ; of the header so must test for this case
+   
+   ; de = & block
+   ; hl = & block.committed + 1b
+   ; stack = gross request size, alignment - 1
    
    inc hl
    inc hl
-   inc hl                      ; hl = & block_mem
+   inc hl                      ; hl = & block.mem[]
+   
+   ; check if memory address is aligned
    
    pop bc                      ; bc = alignment - 1
-   
-   ld a,c
-   and l
-   jr nz, special_fail         ; if address is not aligned
-   
-   ld a,b
-   and h
-   jr nz, special_fail         ; if address is not aligned
-   
-   ; overlayed block will align
-   
-   ; bc = alignment - 1
-   ; de = & block
-   ; stack = gross request size
-   
-   pop hl
    push bc
    
-   ld c,l
-   ld b,h                      ; bc = gross request size
+   ld a,l
+   and c
+   jr nz, overlay_unaligned
    
+   ld a,h
+   and b
+   jr nz, overlay_unaligned
+
+   ; overlay aligns
+
+   ; de = & block
+   ; stack = gross request size, alignment - 1
+
    ld l,e
    ld h,d
    
-   ; bc = gross request size
-   ; de = & block
-   ; hl = & block
-   ; stack = alignment - 1
-
-   call __heap_place_block
-   jr c, overlay_fail
-   
-   ; overlay is successful
-   
-   inc sp
-   inc sp                      ; junk item on stack
-   
-   jp __heap_allocate_block
-   
-special_fail:
-
-   ; overlay will not align so try to allocate within free area
-   
-   ; bc = alignment - 1
-   ; de = & block
-   ; stack = gross request size
-
-   pop hl
+   pop af
+   pop bc
    push bc
+   push af
    
-   ld c,l
-   ld b,h
+   jr test_fit
 
-overlay_fail:
-   
-   ; failed overlay so try to allocate within free area
-   
-   ; bc = gross request size
-   ; de = & block
-   ; stack = alignment - 1
-
-   pop hl
-   push bc
-   push hl
-   
-   ld bc,__HEAP_HEADER_SZ
-
-enter_loop:
+overlay_unaligned:
 
    ; de = & block
-   ; bc = block->committed
    ; stack = gross request size, alignment - 1
 
-   ; calculate earliest possible allocation address
-   
-   ld hl,__HEAP_HEADER_SZ
+   ld bc,6                     ; step over the zero-committed header
+
+committed_nonzero:
+
+  ; de = & block
+  ; bc = block->committed
+  ; stack = gross request size, alignment - 1
+
+   ld hl,6                     ; sizeof(heap header)
    add hl,bc
-   add hl,de
-   jp c, error_enomem_zc - 2   ; proposed address out of range
-
-   ; de = & block
-   ; hl = void *p
-   ; stack = gross request size, alignment - 1
-
+   add hl,de                   ; first free address after another header added
+   jp c, error_enomem_zc - 2
+   
    ; compute next aligned address
    
    pop bc                      ; bc = alignment - 1
-   
+
    add hl,bc
-   jp c, error_enomem_zc - 1   ; proposed address out of range
-   
-   call l_andc_hl_bc           ; hl = hl & (~bc)
+   jp c, error_enomem_zc - 1
+   call l_andc_hl_bc           ; hl = hl & ~bc
+
+   ; de = & block
+   ; hl = next aligned address
+   ; bc = alignment - 1
+   ; stack = gross request size
 
    pop af
    push af
    push bc
    push af
 
-   ; de = & block
-   ; hl = void *p_aligned
-   ; bc = gross request size
    ; stack = gross request size, alignment - 1, gross request size
    
-   ld bc,-(__HEAP_HEADER_SZ)
+   ld bc,-6                    ; sizeof(heap header)
    add hl,bc
    
-   pop bc
+   pop bc                      ; bc = gross request size
+   ex de,hl
+
+test_fit:
    
-   ; de = & block
-   ; hl = & block_aligned
+   ; hl = & block
+   ; de = & block_new = proposed aligned block location
    ; bc = gross request size
    ; stack = gross request size, alignment - 1
-
-   ; check if aligned block fits
-
-   ex de,hl
+   
+   ; see if proposed block fits
+   
    call __heap_place_block
-   jr nc, success
-
+   jr nc, success              ; if block fits
+   
    ; try next block
    
-   ex de,hl
-   
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                   ; de = block->next = & block_next
-   
-   ld l,e
-   ld h,d
-   
+   ; hl = & block
+   ; stack = gross request size, alignment - 1
+
    ld a,(hl)
    inc hl
-   or (hl)
-   jp z, error_enomem_zc - 2   ; if end of heap reached
+   ld h,(hl)
+   ld l,a
    
-   inc hl
-   
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                   ; bc = block_next -> committed
-   
-   jr enter_loop
+   jr block_loop
 
 success:
 
-   pop af
-   pop af                      ; junk two items on stack
+   ; hl = & block
+   ; de = & block_new
+   ; bc = gross request size
+   ; stack = gross request size, alignment - 1
    
-   jp __heap_allocate_block
+   call __heap_allocate_block  ; place the block
+   
+   pop de
+   pop de                      ; junk two items on stack
+
+   ret

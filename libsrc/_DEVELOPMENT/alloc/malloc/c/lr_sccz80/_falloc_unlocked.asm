@@ -3,16 +3,16 @@
 
 XLIB _falloc_unlocked
 
-LIB asm_falloc_unlocked
+LIB asm__falloc_unlocked
 
 _falloc_unlocked:
 
-   pop de
+   pop af
    pop hl
    pop bc
    
    push bc
    push hl
-   push de
+   push af
    
-   jp asm_falloc_unlocked
+   jp asm__falloc_unlocked

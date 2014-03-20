@@ -3,16 +3,16 @@
 
 XLIB _falloc
 
-LIB asm_falloc
+LIB asm__falloc
 
 _falloc:
 
-   pop de
+   pop af
    pop hl
    pop bc
    
    push bc
    push hl
-   push de
+   push af
    
-   jp asm_falloc
+   jp asm__falloc

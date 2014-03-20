@@ -1,4 +1,16 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void heap_free(void *heap, void *p)
+;
+; Deallocate memory previously allocated at p from the heap.
+;
+; If p == 0, function returns without performing an action.
+;
+; ===============================================================
+
 XLIB asm_heap_free
 
 LIB asm_heap_free_unlocked

@@ -64,6 +64,38 @@ __heap_place_block:
    ld h,(hl)
    ld l,a                      ; hl = block->committed
    
+   ld a,h
+   or l
+   jr nz, committed_nonzero    ; if committed != 0
+   
+   ; committed == 0 so either block_new sits exactly on
+   ; top of this header or it is at least six bytes ahead
+   
+   ld hl,6
+   
+   call committed_nonzero
+   ret nc
+
+   ; bc = gross request size
+   ; de = & block_new
+   ; hl = & block
+   
+   ld a,e
+   cp l
+   
+   scf
+   ret nz
+   
+   ld a,d
+   cp h
+   
+   ret z                       ; if block == block_new
+   
+   scf
+   ret
+   
+committed_nonzero:
+  
    add hl,bc                   ; hl = & first avail byte in block
    pop bc
    

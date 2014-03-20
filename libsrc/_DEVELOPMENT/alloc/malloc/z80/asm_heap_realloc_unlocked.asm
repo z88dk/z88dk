@@ -1,4 +1,28 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_realloc_unlocked(void *heap, void *p, size_t size)
+;
+; Resize the memory block p to size bytes.  If this cannot
+; be done in-place, a new memory block is allocated and the
+; data at address p is copied to the new block.
+;
+; If p == 0, an effective malloc is performed, except a
+; successful allocation occurs from the largest block available
+; in the heap to allow for further quick growth via realloc.
+;
+; If p != 0 and size == 0, the block is reduced to zero size
+; but is not freed.  You must call free to free blocks.
+;
+; If successful, returns ptr to the reallocated memory block,
+; which may be p if the block was resized in place.
+;
+; If unsuccessful, returns 0 with carry set.
+;
+; ===============================================================
+
 XLIB asm_heap_realloc_unlocked
 
 LIB error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked
@@ -26,7 +50,7 @@ asm_heap_realloc_unlocked:
    push de                     ; save void *heap
    push hl                     ; save void *p
    
-   ld hl,__HEAP_HEADER_SZ
+   ld hl,6                     ; sizeof(heap header)
    add hl,bc                   ; add space for header to request size
    jp c, error_enomem_zc - 2
    
@@ -45,8 +69,8 @@ resize:
    ; bc = gross request size
    ; stack = void *heap
    
-   ld de,-(__HEAP_HEADER_SZ - 1)
-   add hl,de
+   ld de,-5
+   add hl,de                   ; hl = & block_p->next + 1b
 
    ld d,(hl)
    dec hl                      ; hl = & block_p
@@ -193,7 +217,7 @@ resize_fail:
    
    pop bc
    
-   ld hl,-(__HEAP_HEADER_SZ)
+   ld hl,-6                    ; sizeof(heap header)
    add hl,bc
    
    ld c,l
@@ -252,9 +276,9 @@ largest_fit:
    ; exit  : de = & block_largest
    ;         bc = gross request size
    ;
-   ;         carry set if block not large enough for request
+   ;         carry set if no block large enough for request
 
-   ld de,__MTX_STRUCT_SZ
+   ld de,6                     ; sizeof(mutex)
    add hl,de
 
    push bc                     ; save gross request size

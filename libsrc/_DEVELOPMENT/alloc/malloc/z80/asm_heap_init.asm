@@ -1,4 +1,15 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *heap_init(void *heap, size_t size)
+;
+; Initialize a heap of size bytes.
+; An unchecked condition is that size > 14 bytes.
+;
+; ===============================================================
+
 XLIB asm_heap_init
 
 LIB asm_mtx_init, error_enolck_zc, l_setmem_hl
@@ -35,7 +46,7 @@ asm_heap_init:
    
    jp nz, error_enolck_zc - 2  ; if mutex init failed
 
-   ld hl,__MTX_STRUCT_SZ
+   ld hl,6                     ; sizeof(mutex)
    add hl,de
    
    ex de,hl                    ; de = start of heap proper

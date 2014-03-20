@@ -1,5 +1,19 @@
 
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void heap_free_unlocked(void *p)
+;
+; Deallocate memory previously allocated at p from the heap.
+;
+; If p == 0, function returns without performing an action.
+;
+; ===============================================================
+
 XLIB asm_heap_free_unlocked
+
+LIB l_setmem_hl
 
 asm_heap_free_unlocked:
 
@@ -19,15 +33,16 @@ asm_heap_free_unlocked:
    ld d,(hl)
    dec hl
    ld e,(hl)                   ; de = block->prev = & block_prev
-   dec hl                      ; hl = & block->committed + 1b
+   
+   dec hl
+   dec hl                      ; hl = & block->committed
 
    ld a,d
    or e
-   jr z, first_block           ; if there is no previous block
+   jp z, l_setmem_hl - 4       ; if there is no previous block, set block->committed = 0
 
 remove_block:
 
-   dec hl
    dec hl
    dec hl
 
@@ -39,9 +54,10 @@ remove_block:
 
    ld a,(hl)
    ld (de),a                   ; block_prev->next = block->next
+   
    dec de                      ; de = & block_prev
-
-   dec hl
+   dec hl                      ; hl = & block
+   
    ld l,(hl)
    ld h,a                      ; hl = block->next = & block_next
 
@@ -58,17 +74,4 @@ remove_block:
    inc hl
    ld (hl),d                   ; block_next->prev = & block_prev
    
-   ret
-
-first_block:
-
-   ; this is the first block in the heap
-
-   ; hl = & block->committed + 1b
-
-   xor a
-   ld (hl),a
-   dec hl
-   ld (hl),a                   ; block->committed = 0
-
    ret

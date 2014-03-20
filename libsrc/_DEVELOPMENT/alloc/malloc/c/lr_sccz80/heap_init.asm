@@ -7,12 +7,12 @@ LIB asm_heap_init
 
 heap_init:
 
-   pop de
+   pop af
    pop bc
    pop hl
    
    push hl
    push bc
-   push de
+   push af
    
    jp asm_heap_init

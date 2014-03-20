@@ -1,8 +1,26 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_ALIGNED_ALLOC
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; void *memalign(size_t alignment, size_t size)
+;
+; Allocate size bytes from the thread's default heap at an
+; address that is an integer multiple of alignment.
+; Returns 0 with carry set on failure.
+;
+; If alignment is not an exact power of 2, it will be rounded up
+; to the next power of 2.
+;
+; Returns 0 if size == 0 without indicating error.
+;
+; ===============================================================
 
-asm_memalign:
+XLIB asm_memalign
+
+LIB asm_aligned_alloc
+
+defc asm_memalign = asm_aligned_alloc
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap
