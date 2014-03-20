@@ -3,6 +3,7 @@ XLIB error_znc
 
    pop hl
    pop hl
+   pop hl
    
 error_znc:
 
