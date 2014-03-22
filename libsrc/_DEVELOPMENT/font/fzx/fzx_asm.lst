@@ -1,0 +1,14 @@
+font/fzx/z80/asm_fzx_buffer_extent
+font/fzx/z80/asm_fzx_buffer_partition
+font/fzx/z80/asm_fzx_buffer_partition_ww
+font/fzx/z80/asm_fzx_char_metrics
+font/fzx/z80/asm_fzx_puts
+font/fzx/z80/asm_fzx_setat
+font/fzx/z80/asm_fzx_string_extent
+font/fzx/z80/asm_fzx_string_partition
+font/fzx/z80/asm_fzx_string_partition_ww
+font/fzx/z80/asm_fzx_write
+font/fzx/z80/__fzx_char_metrics
+font/fzx/z80/__fzx_glyph_width
+font/fzx/z80/__fzx_width_sm
+@font/fzx/fonts/fonts.lst

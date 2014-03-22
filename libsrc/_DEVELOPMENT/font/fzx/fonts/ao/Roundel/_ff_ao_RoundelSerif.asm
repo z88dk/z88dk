@@ -1,0 +1,7 @@
+
+XLIB _ff_ao_RoundelSerif
+
+_ff_ao_RoundelSerif:
+
+BINARY "font/fzx/fonts/ao/Roundel/RoundelSerif.fzx"
+
