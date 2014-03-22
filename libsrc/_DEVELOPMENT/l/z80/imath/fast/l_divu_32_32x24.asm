@@ -4,6 +4,53 @@ XDEF l0_divu_32_32x24
 
 LIB l0_divu_32_32x16, l0_divu_24_24x24, l_cpl_dehl, error_divide_by_zero_mc
 
+
+divu_32_32x16:
+
+   ; dehl'/ bc
+
+   push bc
+   exx
+   pop bc
+   
+   jp l0_divu_32_32x16
+
+divu_32_24x24:
+
+   ; ehl / dbc'
+
+   push de
+   push hl
+   exx
+   pop hl
+   pop de
+   
+   call l0_divu_24_24x24
+   
+   push bc
+   push de
+   
+   ld e,a
+   xor a
+   ld d,a
+   
+   exx
+   
+   pop hl
+   pop de
+   
+   ld d,a
+   
+   exx
+   ret
+
+divide_by_zero:
+
+   exx
+   ld de,$ffff
+   jp error_divide_by_zero_mc
+
+
 l_divu_32_32x24:
 
    ; unsigned division of 32-bit number
@@ -299,7 +346,7 @@ loop_7:
 loop_8:
 
    dec ixh
-   jr nz, loop_0
+   jp nz, loop_0
 
    ; dehl'=~quotient with one more shift
    ;  ahl = remainder
@@ -314,48 +361,3 @@ loop_8:
    rl d
    
    jp l_cpl_dehl
-
-divu_32_32x16:
-
-   ; dehl'/ bc
-
-   push bc
-   exx
-   pop bc
-   
-   jp l0_divu_32_32x16
-
-divu_32_24x24:
-
-   ; ehl / dbc'
-
-   push de
-   push hl
-   exx
-   pop hl
-   pop de
-   
-   call l0_divu_24_24x24
-   
-   push bc
-   push de
-   
-   ld e,a
-   xor a
-   ld d,a
-   
-   exx
-   
-   pop hl
-   pop de
-   
-   ld d,a
-   
-   exx
-   ret
-
-divide_by_zero:
-
-   exx
-   ld de,$ffff
-   jp error_divide_by_zero_mc

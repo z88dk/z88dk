@@ -2,7 +2,7 @@
 XLIB l_divu_16_16x8
 XDEF l0_divu_16_16x8
 
-LIB l0_divu_8_8x8
+LIB l0_divu_8_8x8, error_divide_by_zero_mc
 
 l_divu_16_16x8:
 

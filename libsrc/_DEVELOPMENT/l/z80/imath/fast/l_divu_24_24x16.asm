@@ -4,6 +4,24 @@ XDEF l0_divu_24_24x16
 
 LIB l0_divu_16_16x16, l00_divu_24_24x8, error_divide_by_zero_mc
 
+
+divu_24_16x16:
+
+   ; hl / bc
+
+   ld e,c
+   ld d,b
+   
+   jp l0_divu_16_16x16
+
+divide_by_zero:
+
+   ld c,e
+   ex de,hl
+   
+   ld a,$ff
+   jp error_divide_by_zero_mc
+
 l_divu_24_24x16:
 
    ; unsigned division of 24-bit number by 16-bit number
@@ -182,20 +200,3 @@ exit_loop:
    
    or a
    ret
-
-divu_24_16x16:
-
-   ; hl / bc
-
-   ld e,c
-   ld d,b
-   
-   jp l0_divu_16_16x16
-
-divide_by_zero:
-
-   ld c,e
-   ex de,hl
-   
-   ld a,$ff
-   jp error_divide_by_zero_mc

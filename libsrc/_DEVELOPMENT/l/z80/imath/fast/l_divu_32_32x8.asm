@@ -4,6 +4,27 @@ XDEF l0_divu_32_32x8
 
 LIB l0_divu_24_24x8, error_divide_by_zero_mc
 
+
+divu_32_24x8:
+
+   ; ehl / c
+   
+   call l0_divu_24_24x8
+   
+   ld c,a
+   ld a,e
+   ld e,c
+   
+   ret
+
+divide_by_zero:
+
+   exx
+   
+   ld de,$ffff
+   jp error_divide_by_zero_mc
+
+
 l_divu_32_32x8:
 
    ; unsigned division of a 32-bit number
@@ -238,22 +259,3 @@ loop_8:
 
    or a
    ret
-
-divu_32_24x8:
-
-   ; ehl / c
-   
-   call l0_divu_24_24x8
-   
-   ld c,a
-   ld a,e
-   ld e,c
-   
-   ret
-
-divide_by_zero:
-
-   exx
-   
-   ld de,$ffff
-   jp error_divide_by_zero_mc

@@ -4,6 +4,64 @@ XDEF l0_divu_24_24x24
 
 LIB l0_divu_16_16x16, l0_divu_24_24x16, error_divide_by_zero_mc
 
+
+divu_24_16x24:
+
+   ; hl / dbc
+   
+   inc d
+   dec d
+   jr nz, result_zero
+
+divu_24_16x16:
+
+   ; hl / bc
+
+   ld e,c
+   ld d,b
+   
+   call l0_divu_16_16x16
+   
+   ; ahl = quotient
+   ;  de = remainder
+   
+   ld c,a
+   ret
+
+divu_24_24x16:
+
+   ; ehl / bc
+   
+   call l0_divu_24_24x16
+   
+   ; ahl = quotient
+   ;  de = remainder
+   
+   ld c,0
+   ret
+
+result_zero:
+
+   ; dividend < divisor
+   
+   ld c,e
+   ex de,hl
+   
+   xor a
+   ld l,a
+   ld h,a
+   
+   ret
+
+divide_by_zero:
+
+   ld c,e
+   ex de,hl
+   
+   ld a,$ff
+   jp error_divide_by_zero_mc
+
+
 l_divu_24_24x24:
 
    ; unsigned division of two 24-bit numbers
@@ -367,59 +425,3 @@ exit_loop:
    ld c,b
    
    ret
-
-divu_24_16x24:
-
-   ; hl / dbc
-   
-   inc d
-   dec d
-   jr nz, result_zero
-
-divu_24_16x16:
-
-   ; hl / bc
-
-   ld e,c
-   ld d,b
-   
-   call l0_divu_16_16x16
-   
-   ; ahl = quotient
-   ;  de = remainder
-   
-   ld c,a
-   ret
-
-divu_24_24x16:
-
-   ; ehl / bc
-   
-   call l0_divu_24_24x16
-   
-   ; ahl = quotient
-   ;  de = remainder
-   
-   ld c,0
-   ret
-
-result_zero:
-
-   ; dividend < divisor
-   
-   ld c,e
-   ex de,hl
-   
-   xor a
-   ld l,a
-   ld h,a
-   
-   ret
-
-divide_by_zero:
-
-   ld c,e
-   ex de,hl
-   
-   ld a,$ff
-   jp error_divide_by_zero_mc
