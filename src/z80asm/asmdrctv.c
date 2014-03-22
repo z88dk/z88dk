@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.84 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.85 2014-03-22 16:15:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -472,6 +472,7 @@ DEFC( void )
                     if ( postfixexpr->expr_type & NOT_EVALUABLE )
                     {
                         error_not_defined();
+	                    RemovePfixlist( postfixexpr );
                         break;
                     }
                     else
@@ -479,9 +480,8 @@ DEFC( void )
                         constant = EvalPfixExpr( postfixexpr );    /* DEFC expression must not
                                                                  * contain undefined symbols */
                         define_symbol( name->str, constant, 0 );
+	                    RemovePfixlist( postfixexpr );
                     }
-
-                    RemovePfixlist( postfixexpr );
                 }
                 else
                 {
@@ -798,7 +798,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.84  2014-03-18 22:44:03  pauloscustodio
+ * Revision 1.85  2014-03-22 16:15:24  pauloscustodio
+ * Memory leak - delete expression if not defined
+ *
+ * Revision 1.84  2014/03/18 22:44:03  pauloscustodio
  * Scanner decodes a number into tok_number.
  * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
  * ident[] replaced by tok_name.
