@@ -2,6 +2,10 @@
 XLIB __error_strings
 XDEF __error_string_default
 
+XREF __EOK, __EDOM, __EINVAL, __ENOMEM
+XREF __ERANGE, __EACCES, __ENOLCK, __EOVERFLOW
+XREF __ENOTSUP, __EFBIG, __EBADF, __EUNKWN
+
 __error_strings:
 
    defb __EOK
@@ -52,5 +56,5 @@ __error_strings:
 
 __error_string_default:
 
-   defb "EUNKWN - Unknown"
+   defm "EUNKWN - Unknown"
    defb 0

@@ -14,6 +14,8 @@
 
 XLIB asm_malloc
 
+XREF __heap
+
 LIB asm_heap_alloc
 
 asm_malloc:

@@ -27,6 +27,8 @@
 
 XLIB asm_realloc
 
+XREF __heap
+
 LIB asm_heap_realloc
 
 asm_realloc:

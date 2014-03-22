@@ -19,6 +19,8 @@
 
 XLIB asm_posix_memalign
 
+XREF __heap
+
 LIB asm_heap_alloc_aligned, asm0_posix_memalign_unlocked
 
 asm_posix_memalign:

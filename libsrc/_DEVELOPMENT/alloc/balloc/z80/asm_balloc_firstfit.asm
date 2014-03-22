@@ -12,6 +12,8 @@
 
 XLIB asm_balloc_firstfit
 
+XREF __qtbl
+
 LIB error_enomem_zc
 
 asm_balloc_firstfit:

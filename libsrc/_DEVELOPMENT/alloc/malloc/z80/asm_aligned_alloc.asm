@@ -18,6 +18,8 @@
 
 XLIB asm_aligned_alloc
 
+XREF __heap
+
 LIB asm_heap_alloc_aligned
 
 asm_aligned_alloc:

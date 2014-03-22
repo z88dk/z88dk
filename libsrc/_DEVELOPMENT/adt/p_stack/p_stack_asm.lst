@@ -1,7 +1,7 @@
-z80/asm_p_stack_clear
-z80/asm_p_stack_empty
-z80/asm_p_stack_init
-z80/asm_p_stack_pop
-z80/asm_p_stack_push
-z80/asm_p_stack_size
-z80/asm_p_stack_top
+adt/p_stack/z80/asm_p_stack_clear
+adt/p_stack/z80/asm_p_stack_empty
+adt/p_stack/z80/asm_p_stack_init
+adt/p_stack/z80/asm_p_stack_pop
+adt/p_stack/z80/asm_p_stack_push
+adt/p_stack/z80/asm_p_stack_size
+adt/p_stack/z80/asm_p_stack_top

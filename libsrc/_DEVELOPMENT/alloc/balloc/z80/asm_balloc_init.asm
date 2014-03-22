@@ -11,6 +11,8 @@
 
 XLIB asm_balloc_init
 
+XREF __qtbl
+
 LIB asm_p_forward_list_init
 
 asm_balloc_init:

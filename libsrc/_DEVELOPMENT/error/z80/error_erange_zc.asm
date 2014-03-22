@@ -1,6 +1,8 @@
 
 XLIB error_erange_zc
 
+XREF __ERANGE
+
 LIB errno_zc
 
    pop hl

@@ -12,6 +12,8 @@
 
 XLIB asm_heap_init
 
+XREF mtx_plain
+
 LIB asm_mtx_init, error_enolck_zc, l_setmem_hl
 
 asm_heap_init:

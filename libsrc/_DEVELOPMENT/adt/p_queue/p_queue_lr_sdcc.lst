@@ -1,8 +1,8 @@
-c/lr_sdcc/p_queue_back
-c/lr_sdcc/p_queue_clear
-c/lr_sdcc/p_queue_empty
-c/lr_sdcc/p_queue_front
-c/lr_sdcc/p_queue_init
-c/lr_sdcc/p_queue_pop
-c/lr_sdcc/p_queue_push
-c/lr_sdcc/p_queue_size
+adt/p_queue/c/lr_sdcc/p_queue_back
+adt/p_queue/c/lr_sdcc/p_queue_clear
+adt/p_queue/c/lr_sdcc/p_queue_empty
+adt/p_queue/c/lr_sdcc/p_queue_front
+adt/p_queue/c/lr_sdcc/p_queue_init
+adt/p_queue/c/lr_sdcc/p_queue_pop
+adt/p_queue/c/lr_sdcc/p_queue_push
+adt/p_queue/c/lr_sdcc/p_queue_size

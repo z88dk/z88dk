@@ -1,13 +1,13 @@
 
 XLIB error_edom_zc
-XDEF error_divide_by_zero_zc
+
+XREF __EDOM
 
 LIB errno_zc
 
    pop hl
    
 error_edom_zc:
-error_divide_by_zero_zc:
 
    ; set hl=0
    ; set carry flag

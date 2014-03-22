@@ -27,6 +27,8 @@
 
 XLIB asm_realloc_unlocked
 
+XREF __heap
+
 LIB asm_heap_realloc_unlocked
 
 asm_realloc_unlocked:

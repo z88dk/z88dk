@@ -13,7 +13,7 @@
 
 XLIB asm_w_vector_reserve
 
-LIB asm_b_vector_reserve, error_enomem_mc
+LIB asm_b_vector_reserve, error_enomem_zc
 
    inc hl
    inc hl

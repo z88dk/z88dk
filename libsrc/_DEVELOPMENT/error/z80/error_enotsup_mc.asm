@@ -1,6 +1,8 @@
 
 XLIB error_enotsup_mc
 
+XREF __ENOTSUP
+
 LIB errno_mc
 
    pop hl

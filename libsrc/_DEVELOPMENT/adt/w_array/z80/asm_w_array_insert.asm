@@ -45,7 +45,7 @@ asm_w_array_insert:
    call asm_b_array_insert_block
    
    pop de                      ; de = item
-   jr c, error_mc - 1
+   jp c, error_mc - 1
 
    ld (hl),e                   ; write inserted item
    inc hl

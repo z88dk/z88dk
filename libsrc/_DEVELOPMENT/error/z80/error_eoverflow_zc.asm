@@ -1,6 +1,8 @@
 
 XLIB error_eoverflow_zc
 
+XREF __EOVERFLOW
+
 LIB errno_zc
 
    pop hl

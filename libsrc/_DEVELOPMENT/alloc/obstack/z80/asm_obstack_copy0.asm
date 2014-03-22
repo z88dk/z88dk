@@ -13,7 +13,7 @@
 
 XLIB asm_obstack_copy0
 
-LIB asm_obstack_alloc, asm_memcpy, error_enomem_zc
+LIB asm_obstack_copy, error_enomem_zc
 
 asm_obstack_copy0:
 

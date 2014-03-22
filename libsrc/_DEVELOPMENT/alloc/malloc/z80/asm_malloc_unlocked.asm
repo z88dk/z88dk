@@ -14,6 +14,8 @@
 
 XLIB asm_malloc_unlocked
 
+XREF __heap
+
 LIB asm_heap_alloc_unlocked
 
 asm_malloc_unlocked:

@@ -1,6 +1,8 @@
 
 XLIB errno_mc
 
+XREF _errno
+
 LIB error_mc
    
 errno_mc:

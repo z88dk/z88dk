@@ -14,6 +14,8 @@
 
 XLIB asm__falloc
 
+XREF __heap
+
 LIB asm_heap_alloc_fixed
 
 asm__falloc:

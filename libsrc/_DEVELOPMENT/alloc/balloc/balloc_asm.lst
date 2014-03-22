@@ -1,6 +1,6 @@
-z80/asm_balloc_addmem
-z80/asm_balloc_alloc
-z80/asm_balloc_blockcount
-z80/asm_balloc_firstfit
-z80/asm_balloc_free
-z80/asm_balloc_init
+alloc/balloc/z80/asm_balloc_addmem
+alloc/balloc/z80/asm_balloc_alloc
+alloc/balloc/z80/asm_balloc_blockcount
+alloc/balloc/z80/asm_balloc_firstfit
+alloc/balloc/z80/asm_balloc_free
+alloc/balloc/z80/asm_balloc_init

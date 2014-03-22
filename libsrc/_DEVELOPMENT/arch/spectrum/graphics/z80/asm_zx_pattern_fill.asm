@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; 2002
+; 2002 aralbrec
 ; ===============================================================
 ;
 ; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
@@ -8,7 +8,7 @@
 ; Pattern flood fill an area on screen, allowing use of up to
 ; depth * 3 + 30 bytes of stack space.
 ;
-; Return non-zero if the flood fill could not complete.
+; Return zero if the flood fill could not complete.
 ;
 ; ===============================================================
 ;
@@ -80,8 +80,8 @@
 
 XLIB asm_zx_pattern_fill
 
-LIB error_einval_mc, error_enomem_mc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask
-LIB asm_zx_saddrup, asm_zx_saddrpdown, asm_zx_saddrcleft, asm_zx_saddrcright
+LIB error_einval_zc, error_enomem_zc, error_mnc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask
+LIB asm_zx_saddrup, asm_zx_saddrpdown, asm_zx_saddrpup, asm_zx_saddrcleft, asm_zx_saddrcright
 
 asm_zx_pattern_fill:
 
@@ -104,7 +104,7 @@ asm_zx_pattern_fill:
 
    ld a,h
    cp 192
-   jp nc, error_einval_mc      ; if y coordinate out of range
+   jp nc, error_einval_zc      ; if y coordinate out of range
    
    push de                     ; save (pattern pointer) variable
    dec bc                      ; we will start with one struct in the queue
@@ -286,7 +286,7 @@ pf_end:
    add ix,de
    ld sp,ix
    
-   jp error_znc                ; indicate success
+   jp error_mnc                ; indicate success
 
 ; INVESTIGATE BLOCK
 ; IN/OUT: hl = investigate block, de = new block
@@ -532,7 +532,7 @@ bail:
    add ix,de
    ld sp,ix
    
-   jp error_enomem_mc          ; indicate we had to bail
+   jp error_enomem_zc          ; indicate we had to bail
 
 ; APPLY PATTERN
 ; hl = pattern block, bc = max stack depth (available space)

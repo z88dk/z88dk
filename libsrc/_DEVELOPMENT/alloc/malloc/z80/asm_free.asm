@@ -14,6 +14,8 @@
 
 XLIB asm_free
 
+XREF __heap
+
 LIB asm_heap_free
 
 asm_free:

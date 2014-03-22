@@ -1,6 +1,8 @@
 
 XLIB error_efbig_zc
 
+XREF __EFBIG
+
 LIB errno_zc
 
    pop hl

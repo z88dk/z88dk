@@ -22,7 +22,7 @@
 
 XLIB ba_priority_queue_resize
 
-LIB __ba_pq_setsize, error_einval_mc, error_znc
+LIB __ba_pq_setsize, __b_heap_sift_down, error_einval_mc, error_znc, error_zc
 
 ba_priority_queue_resize:
 

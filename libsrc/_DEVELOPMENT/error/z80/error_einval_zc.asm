@@ -1,6 +1,8 @@
 
 XLIB error_einval_zc
 
+XREF __EINVAL
+
 LIB errno_zc
 
    pop hl

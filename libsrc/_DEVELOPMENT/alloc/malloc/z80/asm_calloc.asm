@@ -14,6 +14,8 @@
 
 XLIB asm_calloc
 
+XREF __heap
+
 LIB asm_heap_calloc
 
 asm_calloc:

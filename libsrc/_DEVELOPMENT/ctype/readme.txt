@@ -2,7 +2,4 @@
 CTYPE
 Character Classification
 
-The C and asm functions are completely separated in order
-to increase the convenience of the asm functions for z80
-programmers.  As such, two versions of each ctype function
-need to be maintained and kept in sync.
+The C and asm implementations are separate in order to keep the asm versions lightweight.  This means there are two versions of each function that need to be kept consistent.

@@ -14,6 +14,8 @@
 
 XLIB asm__falloc_unlocked
 
+XREF __heap
+
 LIB asm_heap_alloc_fixed_unlocked
 
 asm__falloc_unlocked:

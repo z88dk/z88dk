@@ -1,6 +1,8 @@
 
 XLIB error_enomem_zc
 
+XREF __ENOMEM
+
 LIB errno_zc
 
    pop hl

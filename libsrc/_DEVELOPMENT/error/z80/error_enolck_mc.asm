@@ -1,6 +1,8 @@
 
 XLIB error_enolck_mc
 
+XREF __ENOLCK
+
 LIB errno_mc
 
    pop hl

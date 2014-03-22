@@ -1,6 +1,8 @@
 
 XLIB errno_zc
 
+XREF _errno
+
 LIB error_zc
 
 errno_zc:

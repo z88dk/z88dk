@@ -1,6 +1,8 @@
 
 XLIB error_ebadf_zc
 
+XREF __EBADF
+
 LIB errno_zc
 
    pop hl

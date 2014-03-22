@@ -1,11 +1,4 @@
 
-========
-GRAPHICS
-========
-
-Various drawing primitives that access the display file directly.
-Also contains the back-end for the general libsrc/graphics library.
-
 =======
 DISPLAY
 =======
@@ -21,3 +14,9 @@ zx_saddr2px() will take a screen address (saddr) and return the corresponding x 
 If you want to convert a screen address (saddr) to an attribute address (aaddr), you would look for the function zx_saddr2aaddr().
 
 Getting the attribute address corresponding to character coordinate y,x can be had using zx_cyx2aaddr().
+
+========
+GRAPHICS
+========
+
+Various drawing primitives.

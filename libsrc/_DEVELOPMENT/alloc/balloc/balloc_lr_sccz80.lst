@@ -1,8 +1,8 @@
-c/lr_sccz80/balloc_addmem
-c/lr_sccz80/balloc_addmem_callee
-c/lr_sccz80/balloc_alloc
-c/lr_sccz80/balloc_blockcount
-c/lr_sccz80/balloc_firstfit
-c/lr_sccz80/balloc_firstfit_callee
-c/lr_sccz80/balloc_free
-c/lr_sccz80/balloc_init
+alloc/balloc/c/lr_sccz80/balloc_addmem
+alloc/balloc/c/lr_sccz80/balloc_addmem_callee
+alloc/balloc/c/lr_sccz80/balloc_alloc
+alloc/balloc/c/lr_sccz80/balloc_blockcount
+alloc/balloc/c/lr_sccz80/balloc_firstfit
+alloc/balloc/c/lr_sccz80/balloc_firstfit_callee
+alloc/balloc/c/lr_sccz80/balloc_free
+alloc/balloc/c/lr_sccz80/balloc_init

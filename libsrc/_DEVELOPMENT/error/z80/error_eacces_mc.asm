@@ -1,6 +1,8 @@
 
 XLIB error_eacces_mc
 
+XREF __EACCES
+
 LIB errno_mc
 
    pop hl

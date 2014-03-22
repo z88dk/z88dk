@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ERROR_ERANGE_MC
+XLIB error_mulu_overflow_mc
 
-error_mulu_overflow_mc:
+LIB error_erange_mc
+
+defc error_mulu_overflow_mc = error_erange_mc
 
    ; unsigned multiply overflow occurred
    ;

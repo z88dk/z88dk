@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ERROR_EDOM_ZC
+XLIB error_divide_by_zero_zc
 
-error_divide_by_zero_zc:
+LIB error_edom_zc
+
+defc error_divide_by_zero_zc = error_edom_zc
 
    ; integer divide by zero occurred
    ;

@@ -11,6 +11,8 @@
 
 XLIB asm_balloc_blockcount
 
+XREF __qtbl
+
 LIB asm_p_forward_list_size
 
 asm_balloc_blockcount:

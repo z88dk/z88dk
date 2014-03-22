@@ -1,2 +1,2 @@
-c/lr_sccz80/zx_pattern_fill
-c/lr_sccz80/zx_pattern_fill_callee
+arch/spectrum/graphics/c/lr_sccz80/zx_pattern_fill
+arch/spectrum/graphics/c/lr_sccz80/zx_pattern_fill_callee
