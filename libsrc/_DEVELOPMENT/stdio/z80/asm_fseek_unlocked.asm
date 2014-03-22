@@ -20,7 +20,9 @@
 
 XLIB asm_fseek_unlocked
 
-LIB l_decs_dehl, error_mc, error_znc, error_einval_mc
+XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
+
+LIB l_decs_dehl, error_mc, error_znc, error_einval_mc, l_jpix
 
 asm_fseek_unlocked:
 

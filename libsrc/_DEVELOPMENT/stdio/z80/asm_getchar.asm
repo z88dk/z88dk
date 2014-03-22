@@ -11,6 +11,8 @@
 
 XLIB asm_getchar
 
+XREF __stdio_file_stdin
+
 LIB asm_fgetc
 
 asm_getchar:

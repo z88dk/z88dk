@@ -25,6 +25,8 @@
 
 XLIB asm_strtok
 
+XREF __strtok_ptr
+
 LIB asm_strtok_r
 
 asm_strtok:

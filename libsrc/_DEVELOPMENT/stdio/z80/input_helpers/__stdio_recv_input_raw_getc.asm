@@ -1,6 +1,8 @@
 
 XLIB __stdio_recv_input_raw_getc
 
+XREF STDIO_MSG_GETC
+
 LIB l_jpix, error_zc, error_mc
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*

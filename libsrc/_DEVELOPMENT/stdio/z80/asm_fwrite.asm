@@ -41,7 +41,7 @@ asm_fwrite:
    ; uses  : all except ix
 
    call __stdio_lock_acquire
-   jr c, fwrite_immediate_error_enolck
+   jp c, fwrite_immediate_error_enolck
    
    call asm_fwrite_unlocked
    jp __stdio_lock_release

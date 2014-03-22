@@ -317,7 +317,7 @@ left_smallest:
    ; bc = size
    ; stack = hi, j+size (hi, lo)
    
-   jr while_lohi               ; do left side
+   jp while_lohi               ; do left side
 
 right_smallest:
 
@@ -341,7 +341,7 @@ right_smallest:
    ; ix = compare
    ; stack = j - size, lo (hi, lo)
 
-   jr while_lohi               ; do right side
+   jp while_lohi               ; do right side
 
 left_empty:
 
@@ -356,7 +356,7 @@ left_empty:
    add hl,bc
    ex de,hl
    
-   jr while_lohi
+   jp while_lohi
 
 interval_done:
 
@@ -373,4 +373,4 @@ interval_done:
    ret z
 
    pop hl
-   jr while_lohi
+   jp while_lohi

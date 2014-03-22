@@ -1,12 +1,10 @@
 
 XLIB __stdio_scanf_lx
-XDEF __stdio_scanf_lp
 
 LIB __stdio_scanf_sm_hex, __stdio_scanf_number_head
 LIB l_inc_sp, asm_strtoul, __stdio_scanf_number_tail_long
 
 __stdio_scanf_lx:
-__stdio_scanf_lp:
 
    ; %lx, %lp converter called from vfscanf()
    ;

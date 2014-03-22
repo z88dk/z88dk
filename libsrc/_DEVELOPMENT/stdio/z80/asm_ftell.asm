@@ -33,7 +33,7 @@ asm_ftell:
    ; uses  : all except ix
 
    call __stdio_lock_acquire
-   jr c, ftell_immediate_error_enolck
+   jp c, ftell_immediate_error_enolck
    
    call asm_ftell_unlocked
    jp __stdio_lock_release

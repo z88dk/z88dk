@@ -137,7 +137,7 @@ flag_chars:
    defb '0', $08
    defb '-', $04
 
-interpret :
+interpret:
 
    dec de
    ld c,0
@@ -771,7 +771,7 @@ ENDIF
    ; de = char *format
    ; stack = WORKSPACE_44, stack_param
 
-   jr format_loop
+   jp format_loop
 
 ;******************************
 ; * ERRORS ********************

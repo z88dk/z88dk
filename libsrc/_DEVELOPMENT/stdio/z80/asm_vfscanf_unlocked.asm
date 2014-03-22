@@ -284,7 +284,7 @@ suppressed_rejoin:
 spec_return:
 
    pop de                      ; de = char *format
-   jr nc, format_loop
+   jp nc, format_loop
    
    jr exit_failure
 
@@ -344,7 +344,7 @@ spec_constant:
    pop de                      ; de = char *format
    
    dec de                      ; move back to unknown conversion char
-   jr mismatch_error
+   jp mismatch_error
 
 spec_long:
 

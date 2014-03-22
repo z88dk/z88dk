@@ -11,6 +11,8 @@
 
 XLIB asm_vscanf
 
+XREF __stdio_file_stdin
+
 LIB asm_vfscanf
 
 asm_vscanf:

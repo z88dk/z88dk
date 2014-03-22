@@ -5,6 +5,9 @@
 
 XLIB __stdio_memstream_driver
 
+XREF STDIO_MSG_PUTC, STDIO_MSG_PUTC, STDIO_MSG_EATC, STDIO_MSG_READ
+XREF STDIO_MSG_GETC, STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_CLOS
+
 LIB asm_memset, asm_free, __stdio_file_destroy, l_long_add_exx
 LIB __array_at, __vector_make_room_best_effort_extra
 LIB l_minu_bc_hl, l_jphl, asm_b_vector_read_block, asm_b_vector_write_block_extra
@@ -22,10 +25,10 @@ __stdio_memstream_driver:
    ; uses  : all except ix, iy
 
    cp STDIO_MSG_PUTC
-   jr z, PUTC
+   jp z, PUTC
    
-   cp STDIO_MSG_WRIT
-   jr z, WRIT
+   cp STDIO_MSG_PUTC
+   jp z, WRIT
    
    cp STDIO_MSG_EATC
    jr z, EATC
@@ -37,13 +40,13 @@ __stdio_memstream_driver:
    jr z, GETC
    
    cp STDIO_MSG_SEEK
-   jr z, SEEK
+   jp z, SEEK
    
    cp STDIO_MSG_FLSH
-   jr z, FLSH
+   jp z, FLSH
 
    cp STDIO_MSG_CLOS
-   jr z, CLOS
+   jp z, CLOS
    
    ; message not implemented
    

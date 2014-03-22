@@ -12,6 +12,8 @@
 
 XLIB asm_z80_delay_ms
 
+XREF __clock_freq
+
 LIB asm_z80_delay_tstate
 
 asm_z80_delay_ms:

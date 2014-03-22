@@ -1,11 +1,9 @@
 
 XLIB __stdio_printf_ld
-XDEF __stdio_printf_li
 
 LIB __stdio_printf_number_tail_long
 
 __stdio_printf_ld:
-__stdio_printf_li:
 
    ; %ld, %li converter called from vfprintf()
    ;

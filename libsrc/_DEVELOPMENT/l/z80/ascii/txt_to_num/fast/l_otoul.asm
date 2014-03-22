@@ -1,7 +1,7 @@
 
 XLIB l_otoul
 
-LIB l_otou
+LIB l_otou, error_mc
 
 l_otoul:
 

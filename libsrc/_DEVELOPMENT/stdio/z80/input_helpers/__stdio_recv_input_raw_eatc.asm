@@ -1,6 +1,8 @@
 
 XLIB __stdio_recv_input_raw_eatc
 
+XREF STDIO_MSG_EATC
+
 LIB l_incu_bc, l_jpix, l_jphl
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*

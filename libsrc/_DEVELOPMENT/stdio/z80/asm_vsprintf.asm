@@ -11,6 +11,8 @@
 
 XLIB asm_vsprintf
 
+XREF STDIO_MSG_PUTC
+
 LIB asm0_vfprintf_unlocked, asm_memset
 
 asm_vsprintf:

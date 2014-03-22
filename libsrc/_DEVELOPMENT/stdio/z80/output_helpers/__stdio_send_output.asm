@@ -8,6 +8,8 @@ XDEF __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
 XDEF __stdio_printf_padding_precision
 XDEF __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
+XREF STDIO_MSG_PUTC, STDIO_MSG_WRIT
+
 LIB l_jpix, l_addu_hl_bc
 
 ; ALL VFPRINTF OUTPUT PASSES THROUGH THESE FUNCTIONS

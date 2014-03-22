@@ -19,6 +19,8 @@
 
 XLIB asm_rand
 
+XREF __seed
+
 asm_rand:
 
    ; XorShift RNG using triple (8,9,23)

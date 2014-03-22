@@ -58,7 +58,7 @@ leading_zeroes:
    ld (de),a
    inc de
    
-   jr write2
+   jr write_2
 
 sixteen_bit:
 

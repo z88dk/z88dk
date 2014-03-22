@@ -14,7 +14,7 @@
 XLIB asm_fwrite_unlocked
 XDEF fwrite_immediate_error_enolck
 
-LIB __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked
+LIB __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked, error_enolck_zc
 
 asm_fwrite_unlocked:
 

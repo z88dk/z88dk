@@ -11,8 +11,27 @@
 
 XLIB asm_vsscanf
 
+XREF STDIO_MSG_READ, STDIO_MSG_SEEK
+
 LIB asm_strnlen, asm__memstrcpy, l_jphl, error_mnc
 LIB asm0_vfscanf_unlocked, error_einval_zc, error_mc
+
+
+error_s_null:
+
+   ld c,l
+   ld b,h
+   
+   exx
+   
+   ld de,0
+   ld l,e
+   ld h,d
+
+   exx
+   
+   jp error_einval_zc
+
 
 asm_vsscanf:
 
@@ -58,7 +77,7 @@ asm_vsscanf:
    
    ; scan the string
    
-   call asm0_fscanf_unlocked
+   call asm0_vfscanf_unlocked
    
    pop bc                      ; repair stack
    pop bc
@@ -202,18 +221,3 @@ _seek:
       
    or a
    ret
-
-error_s_null:
-
-   ld c,l
-   ld b,h
-   
-   exx
-   
-   ld de,0
-   ld l,e
-   ld h,d
-
-   exx
-   
-   jp error_einval_zc

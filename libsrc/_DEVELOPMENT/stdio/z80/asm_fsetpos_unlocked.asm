@@ -11,6 +11,8 @@
 
 XLIB asm_fsetpos_unlocked
 
+XREF STDIO_SEEK_SET
+
 LIB asm_fseek_unlocked
 
 asm_fsetpos_unlocked:

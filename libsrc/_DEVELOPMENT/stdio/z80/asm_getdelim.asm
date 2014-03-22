@@ -26,7 +26,7 @@
 XLIB asm_getdelim
 
 LIB asm_getdelim_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enlock_zc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_zc
 
 asm_getdelim:
 

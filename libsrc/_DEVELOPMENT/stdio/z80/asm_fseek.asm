@@ -20,6 +20,7 @@
 
 XLIB asm_fseek
 
+LIB asm_fseek_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 
 asm_fseek:

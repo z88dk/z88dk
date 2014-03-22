@@ -3,7 +3,7 @@ XLIB __strtoul
 
 LIB l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
 LIB l_neg_dehl, l_char2num, l_mulu_40_32x8
-LIB l_btoul, l_otoul, l_atoul, l_htoul
+LIB l_btoul, l_otoul, l_atoul, l_htoul, l_eat_base_prefix
 
 __strtoul:
 

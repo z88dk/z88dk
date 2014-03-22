@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_PRINTF_D
+XLIB __stdio_printf_i
 
-__stdio_printf_i:
+LIB __stdio_printf_d
+
+defc __stdio_printf_i = __stdio_printf_d
 
    ; %d, %i converter called from vfprintf()
    ;

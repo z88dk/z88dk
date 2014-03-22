@@ -3,7 +3,7 @@ XLIB l_ltu_hl_de
 
 l_ltu_hl_de:
 
-   : hl < de ?
+   ; hl < de ?
 
    ; enter : hl = unsigned int
    ;         de = unsigned int

@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_SCANF_LX
+XLIB __stdio_scanf_lp
 
-__stdio_scanf_lp:
+LIB __stdio_scanf_lx
+
+defc __stdio_scanf_lp = __stdio_scanf_lx
 
    ; %lx, %lp converter called from vfscanf()
    ;

@@ -17,6 +17,8 @@
 XLIB asm_gets_unlocked
 XDEF asm0_gets_unlocked
 
+XREF __stdio_file_stdin
+
 LIB asm0_fgets_unlocked, __stdio_input_sm_gets
 
 asm_gets_unlocked:

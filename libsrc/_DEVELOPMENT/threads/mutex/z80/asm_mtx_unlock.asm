@@ -11,6 +11,8 @@
 
 XLIB asm_mtx_unlock
 
+XREF __thrd_id, thrd_success, thrd_error
+
 LIB asm_spinlock_acquire, __thread_unblock, error_einval_mc
 
 asm_mtx_unlock:

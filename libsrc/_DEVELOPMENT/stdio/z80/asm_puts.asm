@@ -12,6 +12,8 @@
 
 XLIB asm_puts
 
+XREF __stdio_file_stdout
+
 LIB asm0_puts_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 

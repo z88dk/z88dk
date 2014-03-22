@@ -18,7 +18,7 @@
 
 XLIB asm_strxfrm
 
-LIB asm_strlen, error_zc
+LIB asm_strlen, error_zc, __lc_char_ordinal
 
 asm_strxfrm:
 

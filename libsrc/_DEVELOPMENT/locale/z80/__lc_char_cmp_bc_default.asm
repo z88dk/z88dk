@@ -1,6 +1,8 @@
 
 XLIB __lc_char_cmp_bc_default
 
+LIB __lc_char_ordinal
+
 __lc_char_cmp_bc_default:
 
    ; compare two chars in the current locale

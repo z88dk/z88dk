@@ -13,7 +13,7 @@
 
 XLIB asm_system
 
-LIB l_inc_sp
+LIB l_inc_sp, __ch_system
 
 asm_system:
 

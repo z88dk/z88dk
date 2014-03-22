@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF __STDIO_PRINTF_LD
+XLIB __stdio_printf_li
 
-__stdio_printf_li:
+LIB __stdio_printf_ld
+
+defc __stdio_printf_li = __stdio_printf_ld
 
    ; %ld, %li converter called from vfprintf()
    ;

@@ -12,6 +12,8 @@
 XLIB asm_putchar_unlocked
 XDEF asm0_putchar_unlocked
 
+XREF __stdio_file_stdout
+
 LIB asm_fputc_unlocked
 
 asm_putchar_unlocked:

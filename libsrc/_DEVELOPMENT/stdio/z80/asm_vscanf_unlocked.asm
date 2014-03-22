@@ -11,6 +11,8 @@
 
 XLIB asm_vscanf_unlocked
 
+XREF __stdio_file_stdin
+
 LIB asm_vfscanf_unlocked
 
 asm_vscanf_unlocked:

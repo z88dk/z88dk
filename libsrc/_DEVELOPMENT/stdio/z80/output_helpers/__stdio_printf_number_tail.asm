@@ -185,7 +185,7 @@ out_internal:
    call nz, __stdio_printf_sign  ; if signed conversion, write possible sign to buffer
    
    bit 4,(ix+5)
-   jr z, no_base_indicator     ; if base indicator flag is not selected
+   jr z, no_base_indicator_2   ; if base indicator flag is not selected
    
    ; write base indicator
    
@@ -208,7 +208,7 @@ octal_base:
 
    inc hl
 
-no_base_indicator:
+no_base_indicator_2:
 
    ; hl = one char past end of buffer
    ; de = void *buffer

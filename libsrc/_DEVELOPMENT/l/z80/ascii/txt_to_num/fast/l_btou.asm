@@ -34,5 +34,5 @@ loop:
    rra
    adc hl,hl
    
-   jr nc. loop
+   jr nc, loop
    ret

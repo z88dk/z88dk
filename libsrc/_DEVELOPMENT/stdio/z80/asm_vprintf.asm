@@ -11,6 +11,8 @@
 
 XLIB asm_vprintf
 
+XREF __stdio_file_stdout
+
 LIB asm_vfprintf
 
 asm_vprintf:

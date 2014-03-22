@@ -1,6 +1,8 @@
 
 XLIB __stdio_scanf_c
 
+XREF STDIO_SEEK_CUR
+
 LIB __stdio_recv_input_read
 LIB l_addu_hl_bc, asm_fseek_unlocked
 

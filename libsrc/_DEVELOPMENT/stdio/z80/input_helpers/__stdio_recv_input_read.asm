@@ -1,6 +1,8 @@
 
 XLIB __stdio_recv_input_read
 
+XREF STDIO_MSG_READ
+
 LIB l_addu_hl_bc, l_incu_de, l_jpix
 
 ; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*

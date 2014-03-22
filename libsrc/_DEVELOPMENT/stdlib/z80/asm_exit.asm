@@ -13,6 +13,8 @@
 XLIB asm_exit
 XDEF asm0_exit
 
+XREF __exit_stack
+
 LIB _Exit, l_jphl
 
 asm_exit:

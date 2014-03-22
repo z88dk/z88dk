@@ -2,6 +2,8 @@
 XLIB __stdio_file_init
 XDEF __0_stdio_file_init
 
+XREF mtx_recursive
+
 LIB error_ebadf_zc, l_setmem_hl, asm_mtx_init
 
 __stdio_file_init:

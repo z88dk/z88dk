@@ -11,6 +11,8 @@
 
 XLIB asm_getchar_unlocked
 
+XREF __stdio_file_stdin
+
 LIB asm_fgetc_unlocked
 
 asm_getchar_unlocked:

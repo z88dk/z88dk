@@ -14,7 +14,7 @@
 XLIB asm_fread_unlocked
 XDEF fread_immediate_error_enolck
 
-LIB __stdio_verify_input, __stdio_recv_input_raw_read
+LIB __stdio_verify_input, __stdio_recv_input_raw_read, error_enolck_zc
 
 asm_fread_unlocked:
 

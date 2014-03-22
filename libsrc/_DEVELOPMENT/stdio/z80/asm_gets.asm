@@ -16,6 +16,8 @@
 
 XLIB asm_gets
 
+XREF __stdio_file_stdin
+
 LIB asm0_gets_unlocked
 LIB __stdio_lock_acquire, error_enolck_zc, __stdio_lock_release
 

@@ -54,7 +54,7 @@ __stdio_varg_2:
    ;
    ; uses  : af, de, hl
 
-IFDEF __SDCC
+IF __SDCC
 
    inc a
    inc a                       ; all vararg functions save ix and have extra call

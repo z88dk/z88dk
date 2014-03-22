@@ -13,6 +13,8 @@
 
 XLIB asm_strcoll
 
+LIB __lc_char_cmp_bc
+
 asm_strcoll:
 
    ; enter : hl = char *s2

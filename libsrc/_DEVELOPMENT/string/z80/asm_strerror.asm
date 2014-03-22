@@ -27,7 +27,7 @@ asm_strerror:
    jr nz, use_default
    
    ld e,l
-   ld hl,error_strings
+   ld hl,__error_strings
    
    ld a,(hl)
    
@@ -47,7 +47,7 @@ search_loop:
 
 use_default:
 
-   ld hl,error_string_default
+   ld hl,__error_string_default
    
    scf
    ret

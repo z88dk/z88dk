@@ -11,6 +11,8 @@
 
 XLIB asm_srand
 
+XREF __seed
+
 asm_srand:
 
    ; enter : hl = seed

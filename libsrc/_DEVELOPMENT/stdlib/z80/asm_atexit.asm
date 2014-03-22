@@ -13,6 +13,8 @@
 XLIB asm_atexit
 XDEF asm0_atexit
 
+XREF __exit_stack, __exit_stack_sz
+
 LIB error_mc, error_znc
 
 asm_atexit:
@@ -27,7 +29,7 @@ asm_atexit:
    ex de,hl                    ; de = func
    
    ld hl,__exit_stack
-   ld a,__EXITSTACK_SZ
+   ld a,__exit_stack_sz
 
 asm0_atexit:
 

@@ -12,7 +12,7 @@
 XLIB asm_ferror
 
 LIB asm_ferror_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enlock_zc
+LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_zc
 
 asm_ferror:
 
