@@ -9,11 +9,9 @@
 ;
 ; ===============================================================
 
-INCLUDE "../mutex.inc"
-
 XLIB asm_mtx_unlock
 
-LIB __mutex_acquire_spinlock, __thread_unblock
+LIB asm_spinlock_acquire, __thread_unblock, error_einval_mc
 
 asm_mtx_unlock:
 
@@ -29,7 +27,19 @@ asm_mtx_unlock:
    ;            hl = thrd_error
    ;            carry set
    ;
+   ;         fail if mutex invalid
+   ;
+   ;            hl = -1
+   ;            carry set, errno = EINVAL
+   ;
    ; uses  : af, bc, de, hl
+
+   inc hl
+   ld a,(hl)                   ; a = mutex_type
+   dec hl
+   
+   or a
+   jp z, error_einval_mc       ; if mutex invalid
 
    ld a,(__thrd_id)            ; thread id
    
@@ -48,7 +58,7 @@ relinquish_ownership:
 
    inc hl                      ; hl = & m->spinlock
    
-   call __mutex_acquire_spinlock
+   call asm_spinlock_acquire
    
    dec hl
    dec hl

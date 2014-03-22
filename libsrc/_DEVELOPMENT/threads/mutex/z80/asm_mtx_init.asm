@@ -3,13 +3,11 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; int mtx_init(mtx_t *m)
+; int mtx_init(mtx_t *mtx, int type)
 ;
 ; Initialize a mutex.
 ;
 ; ===============================================================
-
-INCLUDE "../mutex.inc"
 
 XLIB asm_mtx_init
 
@@ -25,18 +23,22 @@ asm_mtx_init:
    ;         success
    ;
    ;            hl = thrd_success
-   ;            z flag set
+   ;            carry reset
    ;
    ;         fail (type not supported)
    ;
    ;            hl = thrd_error
-   ;            nz flag set
+   ;            carry set
    ;
    ; uses  : af, hl
       
    ld a,c
-   and $fc
+   and $f8
    jr nz, unknown_type
+   
+   ld a,c
+   and $07
+   jr z, unknown_type
 
    xor a
    call l_setmem_hl - 12       ; zero structure
@@ -57,4 +59,6 @@ asm_mtx_init:
 unknown_type:
 
    ld hl,thrd_error
+   
+   scf
    ret

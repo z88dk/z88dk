@@ -9,11 +9,9 @@
 ;
 ; ===============================================================
 
-INCLUDE "../mutex.inc"
-
 XLIB asm_mtx_trylock
 
-LIB __mutex_acquire_spinlock
+LIB asm_spinlock_acquire, error_einval_mc
 
 asm_mtx_trylock:
 
@@ -34,7 +32,19 @@ asm_mtx_trylock:
    ;            hl = thrd_error
    ;            carry set
    ;
+   ;         fail if mutex invalid
+   ;
+   ;            hl = -1
+   ;            carry set, errno = EINVAL
+   ;
    ; uses  : af, hl
+   
+   inc hl
+   ld a,(hl)                   ; a = mutex_type
+   dec hl
+   
+   or a
+   jp z, error_einval_mc       ; if mutex is invalid
    
    ld a,(__thrd_id)            ; thread id
    
@@ -46,7 +56,7 @@ asm_mtx_trylock:
    inc hl
    inc hl                      ; hl = & m->spinlock
 
-   call __mutex_acquire_spinlock
+   call asm_spinlock_acquire
 
    dec hl
    dec hl
@@ -71,7 +81,7 @@ trylock_failed:
 mutex_acquired:
 
    ld a,(__thrd_id)            ; thread id
-
+   
    ld (hl),a                   ; m->owner = thread id
    
    inc hl
@@ -89,7 +99,7 @@ mutex_owned:
    ; hl = & m->mutex_type
    ; carry reset
 
-   bit 0,(hl)                  ; test recursive bit on type
+   bit 1,(hl)                  ; test recursive bit on type
    jr z, trylock_success
 
 recursive:
