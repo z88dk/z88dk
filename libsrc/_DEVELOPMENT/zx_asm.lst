@@ -1,0 +1,14 @@
+@adt/adt_asm.lst
+@alloc/alloc_asm.lst
+@arch/spectrum/spectrum_asm.lst
+@ctype/ctype_asm.lst
+@error/error.lst
+@font/fzx/fzx_asm.lst
+@font/fzx/arch/spectrum/spectrum_asm.lst
+@l/l_fast.lst
+@locale/locale.lst
+@stdio/stdio_asm.lst
+@stdlib/stdlib_asm.lst
+@string/string_asm.lst
+@threads/threads_asm.lst
+@z80/z80_asm.lst
