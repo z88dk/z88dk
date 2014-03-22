@@ -86,7 +86,7 @@ while_lohi:
    ; stack = 0, (hi,lo)*
    
    call l_ltu_de_hl            ; carry set if lo < hi
-   jr nc, interval_done
+   jp nc, interval_done
    
    push hl                     ; save hi
    push de                     ; save lo

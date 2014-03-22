@@ -13,7 +13,7 @@ XLIB asm_mtx_timedlock
 
 XREF __thrd_id, thrd_success, thrd_error
 
-LIB asm_spinlock_acquire, __thread_block_timeout
+LIB asm_spinlock_acquire, __thread_block_timeout, error_einval_mc
 
 asm_mtx_timedlock:
 

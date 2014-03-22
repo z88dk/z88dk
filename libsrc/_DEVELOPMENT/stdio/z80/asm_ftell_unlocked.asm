@@ -12,7 +12,7 @@
 XLIB asm_ftell_unlocked
 XDEF ftell_immediate_error_enolck
 
-XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK, 
+XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
 
 LIB l_jpix, error_mc, l_decu_dehl, error_enolck_mc
 

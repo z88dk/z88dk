@@ -4,6 +4,40 @@ XDEF l0_divu_32_32x32
 
 LIB l0_divu_32_32x24, error_divide_by_zero_mc
 
+
+
+divu_32_32x24:
+
+   ; dehl'= 32-bit dividend
+   ;  ehl = 32-bit divisor
+
+   ld d,e
+   ld b,h
+   ld c,l
+   
+   jp l0_divu_32_32x24
+
+result_zero:
+
+   ; dehl = dividend
+   ; dehl'= divisor
+
+   exx
+   
+   xor a
+   ld l,a
+   ld h,a
+   ld e,a
+   ld d,a
+   
+   ret
+
+divide_by_zero:
+
+   ld de,$ffff
+   jp error_divide_by_zero_mc
+
+
 l_divu_32_32x32:
 
    ; unsigned division of two 32-bit numbers
@@ -414,34 +448,3 @@ exit_loop:
    ; dehl'= remainder
    
    ret
-
-divu_32_32x24:
-
-   ; dehl'= 32-bit dividend
-   ;  ehl = 32-bit divisor
-
-   ld d,e
-   ld b,h
-   ld c,l
-   
-   jp l0_divu_32_32x24
-
-result_zero:
-
-   ; dehl = dividend
-   ; dehl'= divisor
-
-   exx
-   
-   xor a
-   ld l,a
-   ld h,a
-   ld e,a
-   ld d,a
-   
-   ret
-
-divide_by_zero:
-
-   ld de,$ffff
-   jp error_divide_by_zero_mc
