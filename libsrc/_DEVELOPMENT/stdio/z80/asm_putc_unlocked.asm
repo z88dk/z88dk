@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FPUTC_UNLOCKED
-
 ; ===============================================================
 ; Jan 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_putc_unlocked:
+XLIB asm_putc_unlocked
+
+LIB asm_fputc_unlocked
+
+defc asm_putc_unlocked = asm_fputc_unlocked
 
    ; enter : ix = FILE *
    ;          e = char c

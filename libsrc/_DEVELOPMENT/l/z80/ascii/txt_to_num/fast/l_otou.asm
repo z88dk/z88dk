@@ -43,7 +43,7 @@ loop:
    add a,l
    ld l,a
    
-   jp loop
+   jr loop
 
             oflow_1:
             

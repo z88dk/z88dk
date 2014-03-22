@@ -33,7 +33,7 @@ loop:                          ; append s2 to s1
 
    cp (hl)
    ldi
-   jp nz, loop
+   jr nz, loop
    
    pop hl                      ; hl = dst
    

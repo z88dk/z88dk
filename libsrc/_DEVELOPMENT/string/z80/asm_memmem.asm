@@ -120,7 +120,7 @@ no_match:
    
    ld a,b
    or c
-   jp nz, search_loop
+   jr nz, search_loop
 
 not_found:
 

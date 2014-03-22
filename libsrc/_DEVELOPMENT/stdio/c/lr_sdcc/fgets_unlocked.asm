@@ -14,7 +14,7 @@ fgets_unlocked:
    push bc
    push de
    push af
-
+   
    push ix
    
    ld ixl,e
@@ -25,5 +25,5 @@ fgets_unlocked:
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fgets_unlocked.asm"

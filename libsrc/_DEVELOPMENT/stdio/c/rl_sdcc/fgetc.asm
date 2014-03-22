@@ -1,10 +1,9 @@
 
 ; int fgetc(FILE *stream)
 
-XDEF fgetc, getc
+XDEF fgetc
 
 fgetc:
-getc:
 
    pop af
    pop bc
@@ -16,7 +15,7 @@ getc:
    
    ld ixl,c
    ld ixh,b
-   
+
    call asm_fgetc
    
    pop ix

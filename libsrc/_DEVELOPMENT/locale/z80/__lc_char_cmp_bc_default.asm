@@ -1,6 +1,4 @@
 
-INCLUDE "../../crt_vars.inc"
-
 XLIB __lc_char_cmp_bc_default
 
 __lc_char_cmp_bc_default:

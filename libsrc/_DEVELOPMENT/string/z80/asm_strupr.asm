@@ -33,7 +33,7 @@ loop:
    ld (hl),a
    
    inc hl
-   jp loop
+   jr loop
 
 exit:
 

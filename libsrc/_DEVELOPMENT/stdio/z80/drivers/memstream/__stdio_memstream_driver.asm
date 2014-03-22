@@ -6,8 +6,8 @@
 XLIB __stdio_memstream_driver
 
 LIB asm_memset, asm_free, __stdio_file_destroy, l_long_add_exx
-LIB __vector_at, __vector_make_room_extra, l_minu_bc_hl, l_jphl
-LIB asm_b_vector_read_block, asm_b_vector_write_block_extra
+LIB __array_at, __vector_make_room_best_effort_extra
+LIB l_minu_bc_hl, l_jphl, asm_b_vector_read_block, asm_b_vector_write_block_extra
 LIB error_enotsup_zc, error_efbig_zc, error_erange_zc, error_mc, error_znc
 
 __stdio_memstream_driver:
@@ -44,7 +44,7 @@ __stdio_memstream_driver:
 
    cp STDIO_MSG_CLOS
    jr z, CLOS
-
+   
    ; message not implemented
    
    jp error_enotsup_zc
@@ -71,7 +71,7 @@ EATC:
    
    call get_vector             ; hl = vector *
    
-   call __vector_at
+   call __array_at
    jr c, _eatc_at_eof
 
    ; hl'= qualify function
@@ -221,8 +221,8 @@ GETC:
    call get_file_pointer       ; bc = fp_idx_old
    call get_vector             ; hl = vector *
    
-   call __vector_at
-   ret c                       ; if at eof
+   call __array_at
+   jp c, error_mc              ; if at eof
    
    inc bc
    call set_file_pointer_bc    ; increment file pointer
@@ -346,9 +346,14 @@ PUTC:
 
    pop de                      ; de = n
 
-   ; hl = vector *
+   inc hl
+   inc hl
+   
+   ex de,hl
+   
+   ; de = & vector.size
    ; bc = idx
-   ; de = n
+   ; hl = n
    ;  e'= char
    
    push bc                     ; save idx
@@ -357,10 +362,10 @@ PUTC:
    ld c,e                      ; c = char
    ld de,1                     ; if vector grows, add one extra byte for zero terminator
    exx
-
-   call __vector_make_room_extra
-   jp c, error_efbig_zc - 1    ; if there is no room at all
    
+   call __vector_make_room_best_effort_extra
+   jp c, error_efbig_zc - 1    ; idx out of range should not happen
+
    ; bc = num bytes available at idx
    ; hl = & vector.array[idx]
    ;  a = realloc_status = 0 if realloc performed, -1 if num bytes < n

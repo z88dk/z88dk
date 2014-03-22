@@ -1,4 +1,8 @@
 
+JUST SOME NOTES, PROBABLY NO GOOD
+
+
+
 scheduler provides:
 
 

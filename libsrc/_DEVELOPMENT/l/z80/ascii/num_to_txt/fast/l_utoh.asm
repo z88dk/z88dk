@@ -1,5 +1,6 @@
 
 XLIB l_utoh
+
 LIB l_hex_nibble_hi, l_hex_nibble_lo
 
 l_utoh:
@@ -43,7 +44,7 @@ eight_bit:
    cp '0'
    jr nz, write_0
    
-   jp write_00
+   jr write_00
 
 
 leading_zeroes:
@@ -57,7 +58,7 @@ leading_zeroes:
    ld (de),a
    inc de
    
-   jp write2
+   jr write2
 
 sixteen_bit:
 

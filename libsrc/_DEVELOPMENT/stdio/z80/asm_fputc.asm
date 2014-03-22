@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_fputc
-XDEF asm_putc
 
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 
 asm_fputc:
-asm_putc:
 
    ; enter : ix = FILE *
    ;          e = char c

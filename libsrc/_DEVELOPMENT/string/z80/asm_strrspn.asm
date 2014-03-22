@@ -73,7 +73,7 @@ loop:
    pop hl
    pop bc
    
-   jp nc, loop                 ; loop if char in cset
+   jr nc, loop                 ; loop if char in cset
 
 not_in_cset:
 

@@ -73,7 +73,7 @@ leading_zeroes_24:
    xor a
    call l1_utoo_lz
    
-   jp rejoin_24
+   jr rejoin_24
 
 _32_bit:
 
@@ -90,4 +90,4 @@ _32_bit:
    call c, l2_utoo_lz
    call nc, l2_utoo_nlz
 
-   jp rejoin_24
+   jr rejoin_24

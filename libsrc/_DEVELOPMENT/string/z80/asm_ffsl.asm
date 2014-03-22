@@ -34,7 +34,7 @@ asm_ffsl:
    
    ld a,e
    or a
-   jp nz, bits_17_24
+   jr nz, bits_17_24
    
    ld a,d
    or a

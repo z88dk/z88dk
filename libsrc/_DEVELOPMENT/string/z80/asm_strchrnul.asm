@@ -40,7 +40,7 @@ loop:
    inc hl
    
    or a
-   jp nz, loop
+   jr nz, loop
    
    dec hl
       

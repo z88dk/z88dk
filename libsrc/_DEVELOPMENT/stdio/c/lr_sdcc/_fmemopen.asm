@@ -15,12 +15,13 @@ _fmemopen:
    push de
    push af
    
-   ld a,$0c                    ; disallow undefined bits
+   ld a,$0c
    
    push ix
-   call asm__fmemopen
-   pop ix
    
+   call asm__fmemopen
+   
+   pop ix
    ret
-
+   
    INCLUDE "../../z80/asm__fmemopen.asm"

@@ -49,7 +49,7 @@ loop:
    
    inc e                       ; is current char NUL?
    dec e
-   jp nz, loop
+   jr nz, loop
 
    jp error_zc
 

@@ -15,10 +15,10 @@ funlockfile:
    
    ld ixl,c
    ld ixh,b
-   
-   call __stdio_lock_release
+
+   call asm_funlockfile
    
    pop ix
    ret
-   
-   INCLUDE "../../z80/__stdio_lock_release.asm"
+      
+   INCLUDE "../../z80/asm_funlockfile.asm"

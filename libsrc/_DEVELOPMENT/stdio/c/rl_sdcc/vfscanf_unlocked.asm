@@ -6,24 +6,27 @@ XDEF vfscanf_unlocked
 vfscanf_unlocked:
 
    pop af
+   exx
+   pop bc
+   exx
    pop de
-   pop hl
    pop bc
    
    push bc
-   push hl
    push de
+   exx
+   push bc
    push af
    
    push ix
    
-   ld ixl,e
-   ld ixh,d
+   ld ixl,c
+   ld ixh,b
+   exx
    
-   ex de,hl
    call asm_vfscanf_unlocked
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_vfscanf_unlocked.asm"

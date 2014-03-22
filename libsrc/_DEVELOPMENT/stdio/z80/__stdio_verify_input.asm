@@ -1,7 +1,8 @@
 
 XLIB __stdio_verify_input
 
-LIB error_eacces_mc, error_mc, asm0_fflush_unlocked
+LIB error_eacces_mc, error_mc
+LIB asm0_fflush_unlocked
 
 __stdio_verify_input:
 

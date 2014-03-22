@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF LABS
+XLIB l_neg_dehl
 
-l_neg_dehl:
+LIB _l_neg_dehl
+
+defc l_neg_dehl = _l_neg_dehl
 
    ; negate dehl
    ;

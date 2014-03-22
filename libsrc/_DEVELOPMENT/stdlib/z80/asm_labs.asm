@@ -10,7 +10,7 @@
 ; ===============================================================
 
 XLIB asm_labs
-XDEF l_neg_dehl
+XDEF _l_neg_dehl
 
 asm_labs:
 
@@ -23,7 +23,7 @@ asm_labs:
    bit 7,d
    ret z
    
-l_neg_dehl:
+_l_neg_dehl:
 
    ; negate dehl
    ;

@@ -34,7 +34,7 @@ loop:
    inc hl
    
    call asm_isspace
-   jp nc, loop
+   jr nc, loop
 
    dec hl
    ret

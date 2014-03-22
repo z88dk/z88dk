@@ -27,7 +27,7 @@ loop:
 
    cp (hl)
    ldi
-   jp nz, loop
+   jr nz, loop
    
    dec de
    dec hl

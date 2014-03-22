@@ -16,5 +16,12 @@ vasprintf:
    push de
    push bc
    push af
-
+   
+   push ix
+   
+   call asm_vasprintf
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_vasprintf.asm"

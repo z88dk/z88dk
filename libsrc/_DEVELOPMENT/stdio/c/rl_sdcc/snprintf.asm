@@ -5,4 +5,11 @@ XDEF snprintf
 
 snprintf:
 
+   push ix
+   
+   call asm_snprintf
+   
+   pop ix
+   ret
+
    INCLUDE "../../z80/asm_snprintf.asm"

@@ -1,10 +1,9 @@
 
 ; int fputc(int c, FILE *stream)
 
-XDEF fputc, putc
+XDEF fputc
 
 fputc:
-putc:
 
    pop af
    pop bc
@@ -23,5 +22,5 @@ putc:
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fputc.asm"

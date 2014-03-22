@@ -12,12 +12,10 @@
 ; ===============================================================
 
 XLIB asm_strncasecmp
-XDEF asm_strnicmp
 
 LIB asm_tolower
 
 asm_strncasecmp:
-asm_strnicmp:
 
    ; enter : hl = char *s2
    ;         de = char *s1
@@ -53,7 +51,7 @@ loop:
    dec bc
    
    or a                      ; end of string?         
-   jp nz, loop
+   jr nz, loop
    
    dec de
 

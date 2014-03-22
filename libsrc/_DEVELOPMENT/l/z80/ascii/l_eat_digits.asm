@@ -1,5 +1,6 @@
 
 XLIB l_eat_digits
+
 LIB l_char2num
 
 l_eat_digits:
@@ -21,4 +22,4 @@ l_eat_digits:
    ret nc
    
    inc hl
-   jp l_eat_digits
+   jr l_eat_digits

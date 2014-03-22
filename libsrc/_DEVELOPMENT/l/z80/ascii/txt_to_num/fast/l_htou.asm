@@ -1,5 +1,6 @@
 
 XLIB l_htou
+
 LIB l_char2num
 
 l_htou:
@@ -52,7 +53,7 @@ loop:
    ld l,c
    
    or a
-   jp z, loop
+   jr z, loop
    
 unsigned_overflow:
 

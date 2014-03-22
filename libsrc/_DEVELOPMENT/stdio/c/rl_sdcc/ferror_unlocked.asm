@@ -20,5 +20,5 @@ ferror_unlocked:
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_ferror_unlocked.asm"

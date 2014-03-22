@@ -10,7 +10,7 @@ l_ltu_bc_hl:
    ;
    ; exit  : carry set if bc<hl, a<0
    ;         z     set if bc=hl, a=0
-   ;         p     set if bc>=hl, a>=0
+   ;         p,nc  set if bc>=hl, a>=0
    ;         a>0       if bc>hl
    ;
    ; uses  : af

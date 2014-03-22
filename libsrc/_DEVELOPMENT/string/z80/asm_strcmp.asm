@@ -34,7 +34,7 @@ loop:
    inc de
    
    or a                        ; end of string?
-   jp nz, loop
+   jr nz, loop
    
 equal:                         ; both strings ended same time
 

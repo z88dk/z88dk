@@ -8,4 +8,4 @@ funlockfile:
    push hl
    pop ix
    
-   INCLUDE "../../z80/__stdio_lock_release.asm"
+   INCLUDE "../../z80/asm_funlockfile.asm"

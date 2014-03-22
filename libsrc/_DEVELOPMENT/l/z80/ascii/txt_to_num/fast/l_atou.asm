@@ -61,10 +61,10 @@ loop:
    
    add a,l
    ld l,a
-   jp nc, loop
+   jr nc, loop
    
    inc h
-   jp nz, loop
+   jr nz, loop
 
    ; unsigned overflow has occurred
 

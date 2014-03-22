@@ -49,7 +49,7 @@ loop:
    jr nc, done                 ; char found
    
    inc hl
-   jp loop
+   jr loop
 
 end_string:
 

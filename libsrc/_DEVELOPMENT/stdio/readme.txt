@@ -68,7 +68,7 @@ offset  size  name              purpose
   14      2   char **bufp       where to store buffer address
   16      2   size_t *sizep     where to store buffer length
   18      8   b_vector          byte vector to manage resizeable buffer
-  26      2   fptr              file pointer index (index in vector for next read/write)
+  26      2   fp                file pointer index (index in vector for next read/write)
 
 * memstream_flags
 
@@ -87,6 +87,7 @@ STDIO_MESSAGES
 ==============
 
 These are messages sent through the stdio chain.
+
 
 ****************
 * STDIO_MSG_PUTC

@@ -20,8 +20,8 @@ getdelim_unlocked:
    push af
    
    push ix
-
-   exx   
+   
+   exx
    ld ixl,c
    ld ixh,b
    exx

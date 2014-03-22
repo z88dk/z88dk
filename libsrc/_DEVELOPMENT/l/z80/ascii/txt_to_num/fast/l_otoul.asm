@@ -1,5 +1,6 @@
 
 XLIB l_otoul
+
 LIB l_otou
 
 l_otoul:
@@ -62,7 +63,7 @@ loop:
    add a,l
    ld l,a
    
-   jp loop
+   jr loop
 
 oflow:
 

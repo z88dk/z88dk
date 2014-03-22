@@ -22,5 +22,5 @@ fputs:
    
    pop ix
    ret
-
-   INCLUDE "../../asm_fputs.asm"
+   
+   INCLUDE "../../z80/asm_fputs.asm"

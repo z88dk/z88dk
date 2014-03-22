@@ -51,4 +51,4 @@ loop:
    ret nc                      ; char found in needles
 
    inc hl
-   jp loop
+   jr loop

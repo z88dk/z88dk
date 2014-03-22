@@ -11,4 +11,11 @@ perror:
    push hl
    push af
 
+   push ix
+   
+   call asm_perror
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_perror.asm"

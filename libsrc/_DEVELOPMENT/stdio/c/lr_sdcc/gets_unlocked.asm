@@ -11,4 +11,11 @@ gets_unlocked:
    push hl
    push af
 
+   push ix
+   
+   call asm_gets_unlocked
+   
+   pop ix
+   ret
+
    INCLUDE "../../z80/asm_gets_unlocked.asm"

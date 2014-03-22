@@ -48,7 +48,7 @@ loop:
    inc hl
    
    or a
-   jp nz, loop                 ; end of string?
+   jr nz, loop                 ; end of string?
    
 equal:                         ; both strings ended same time
 

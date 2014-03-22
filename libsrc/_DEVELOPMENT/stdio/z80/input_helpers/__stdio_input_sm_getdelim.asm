@@ -20,7 +20,7 @@ state_0:
    push af                     ; save char
 
    ex de,hl
-   ld bc,1                     ; grow vector by one byte
+   ld de,1                     ; grow vector by one byte
    call asm_b_vector_append_block
    jr c, exit                  ; if failed to grow
 

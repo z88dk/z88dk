@@ -11,4 +11,11 @@ gets:
    push hl
    push af
 
+   push ix
+   
+   call asm_gets
+   
+   pop ix
+   ret
+
    INCLUDE "../../z80/asm_gets.asm"

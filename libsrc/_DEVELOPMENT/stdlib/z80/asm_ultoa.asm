@@ -84,7 +84,7 @@ compute_lp:
    or e
    or h
    or l
-   jp nz, compute_lp
+   jr nz, compute_lp
    
    ; write digits to string
    
@@ -101,7 +101,7 @@ write_lp:
    ld (de),a
    inc de
    
-   jp c, write_lp
+   jr c, write_lp
    
    ; last write above was NUL and carry is reset
    
@@ -142,7 +142,7 @@ hex:
    ld c,ixl
    ld b,ixh
    call l_ultoh
-   jp terminate
+   jr terminate
 
 
 octal:
@@ -150,7 +150,7 @@ octal:
    ld c,ixl
    ld b,ixh
    call l_ultoo
-   jp terminate
+   jr terminate
 
 
 binary:
@@ -158,4 +158,4 @@ binary:
    ld c,ixl
    ld b,ixh
    call l_ultob
-   jp terminate
+   jr terminate

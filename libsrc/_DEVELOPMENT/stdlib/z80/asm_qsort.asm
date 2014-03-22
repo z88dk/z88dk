@@ -217,7 +217,7 @@ ENDIF
    sbc hl,bc                   ; j -= size
    ex de,hl
    
-   jp right_loop
+   jr right_loop
 
 swap_ij:
 
@@ -243,7 +243,7 @@ swap_ij:
    pop hl
    sbc hl,bc                   ; j -= size
    
-   jp partition
+   jr partition
 
 partition_done:
 
@@ -317,7 +317,7 @@ left_smallest:
    ; bc = size
    ; stack = hi, j+size (hi, lo)
    
-   jp while_lohi               ; do left side
+   jr while_lohi               ; do left side
 
 right_smallest:
 
@@ -341,7 +341,7 @@ right_smallest:
    ; ix = compare
    ; stack = j - size, lo (hi, lo)
 
-   jp while_lohi               ; do right side
+   jr while_lohi               ; do right side
 
 left_empty:
 
@@ -356,7 +356,7 @@ left_empty:
    add hl,bc
    ex de,hl
    
-   jp while_lohi
+   jr while_lohi
 
 interval_done:
 
@@ -373,4 +373,4 @@ interval_done:
    ret z
 
    pop hl
-   jp while_lohi
+   jr while_lohi

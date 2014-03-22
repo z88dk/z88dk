@@ -199,16 +199,16 @@ loop:
    
    add a,l                     ; dehl += a
    ld l,a
-   jp nc, loop
+   jr nc, loop
    
    inc h
-   jp nz, loop
+   jr nz, loop
    
    inc e
-   jp nz, loop
+   jr nz, loop
    
    inc d
-   jp nz, loop
+   jr nz, loop
 
    push af
 

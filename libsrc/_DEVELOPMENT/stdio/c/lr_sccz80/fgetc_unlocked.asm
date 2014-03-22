@@ -1,10 +1,9 @@
 
 ; int fgetc_unlocked(FILE *stream)
 
-XDEF fgetc_unlocked, getc_unlocked
+XDEF fgetc_unlocked
 
 fgetc_unlocked:
-getc_unlocked:
 
    push hl
    pop ix

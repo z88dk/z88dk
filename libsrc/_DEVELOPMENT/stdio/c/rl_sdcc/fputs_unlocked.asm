@@ -12,7 +12,7 @@ fputs_unlocked:
    push bc
    push hl
    push af
-   
+
    push ix
    
    ld ixl,c

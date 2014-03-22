@@ -11,4 +11,11 @@ puts_unlocked:
    push hl
    push af
 
+   push ix
+   
+   call asm_puts_unlocked
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_puts_unlocked.asm"

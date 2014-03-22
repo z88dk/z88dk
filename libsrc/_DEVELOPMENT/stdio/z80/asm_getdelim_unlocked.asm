@@ -101,7 +101,7 @@ create_vector:
    
    push bc                     ; save delim_char
    
-   ld bc,1
+   ld de,1
    call asm_b_vector_resize    ; vector.size = 1
    
    pop bc                      ; bc = delim_char

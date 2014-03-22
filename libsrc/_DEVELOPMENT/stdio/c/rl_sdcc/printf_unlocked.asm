@@ -5,4 +5,11 @@ XDEF printf_unlocked
 
 printf_unlocked:
 
+   push ix
+   
+   call asm_printf_unlocked
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_printf_unlocked.asm"

@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FGETC
-
 ; ===============================================================
 ; Jan 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_getc:
+XLIB asm_getc
+
+LIB asm_fgetc
+
+defc asm_getc = asm_fgetc
 
    ; enter : ix = FILE *
    ;
@@ -29,4 +30,3 @@ asm_getc:
    ;            carry set
    ;
    ; uses  : all except ix
-

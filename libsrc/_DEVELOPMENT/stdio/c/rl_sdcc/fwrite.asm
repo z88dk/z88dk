@@ -1,7 +1,7 @@
 
 ; size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XLIB fwrite
+XDEF fwrite
 
 fwrite:
 
@@ -20,12 +20,12 @@ fwrite:
    push af
    
    push ix
-
+   
    exx
    ld ixl,c
    ld ixh,b
    exx
-   
+      
    call asm_fwrite
    
    pop ix

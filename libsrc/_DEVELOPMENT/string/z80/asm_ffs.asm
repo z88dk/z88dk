@@ -25,7 +25,7 @@ asm_ffs:
    
    ld a,l
    or a
-   jp nz, bits_1_8
+   jr nz, bits_1_8
    
    ld a,h
    or a
@@ -43,10 +43,10 @@ loop:
    ret c
    
    inc l
-   jp loop
+   jr loop
 
 asm0_ffs:
 bits_1_8:
 
    ld hl,1
-   jp loop
+   jr loop

@@ -1,8 +1,20 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF STRCASECMP
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; int stricmp(const char *s1, const char *s2)
+;
+; Perform caseless compare of string s1 to string s2.  Return
+; when the first differing char is found with *s1 - *s2.
+;
+; ===============================================================
 
-asm_stricmp:
+XLIB asm_stricmp
+
+LIB asm_strcasecmp
+
+defc asm_stricmp = asm_strcasecmp
 
    ; enter : hl = char *s2
    ;         de = char *s1

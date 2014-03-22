@@ -1,5 +1,6 @@
 
 XLIB l_eat_ws
+
 LIB asm_isspace
 
 l_eat_ws:
@@ -18,4 +19,4 @@ l_eat_ws:
    ret c
    
    inc hl
-   jp l_eat_ws
+   jr l_eat_ws

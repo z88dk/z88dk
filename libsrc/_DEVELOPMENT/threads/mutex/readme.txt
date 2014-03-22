@@ -1,5 +1,5 @@
 
-mutex
+MUTEX
 =====
 
 An implementation of the C11 mtx_t type.

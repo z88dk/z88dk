@@ -7,23 +7,26 @@ vfprintf_unlocked:
 
    pop af
    pop bc
-   pop hl
    pop de
+   exx
+   pop bc
    
+   push bc
+   exx
    push de
-   push hl
    push bc
    push af
    
    push ix
    
-   ld ixl,e
-   ld ixh,d
+   exx
+   ld ixl,c
+   ld ixh,b
+   exx
    
-   ex de,hl
    call asm_vfprintf_unlocked
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_vfprintf_unlocked.asm"

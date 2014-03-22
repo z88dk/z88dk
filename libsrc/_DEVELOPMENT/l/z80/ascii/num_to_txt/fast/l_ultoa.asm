@@ -1,5 +1,6 @@
 
 XLIB l_ultoa
+
 LIB l_utoa, l0_utoa, l_setmem_de
 
 l_ultoa:
@@ -176,7 +177,7 @@ divloop:
    adc hl,bc
    exx
    
-   jp c, divloop
+   jr c, divloop
    
    sbc hl,bc
    exx

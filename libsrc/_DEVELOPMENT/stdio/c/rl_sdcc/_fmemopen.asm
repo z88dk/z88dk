@@ -15,10 +15,13 @@ _fmemopen:
    push hl
    push af
    
-   push ix
-   call asm__fmemopen
-   pop ix
+   ld a,$0c
    
+   push ix
+   
+   call asm__fmemopen
+   
+   pop ix
    ret
-
+   
    INCLUDE "../../z80/asm__fmemopen.asm"

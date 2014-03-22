@@ -92,7 +92,7 @@ compute_lp:
    
    ld a,h                      ; keep going until number is zero
    or l
-   jp nz, compute_lp
+   jr nz, compute_lp
    
    ; write digits to string
    
@@ -109,7 +109,7 @@ write_lp:
    ld (de),a
    inc de
    
-   jp c, write_lp
+   jr c, write_lp
    
    ; last write above was NUL and carry is reset
    
@@ -134,16 +134,16 @@ terminate:
 hex:
    
    call l_utoh
-   jp terminate
+   jr terminate
 
 
 octal:
 
    call l_utoo
-   jp terminate
+   jr terminate
 
 
 binary:
 
    call l_utob
-   jp terminate
+   jr terminate

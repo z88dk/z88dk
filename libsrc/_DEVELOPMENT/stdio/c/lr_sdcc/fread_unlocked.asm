@@ -14,7 +14,7 @@ fread_unlocked:
    pop de
    
    push de
-   push nc
+   push bc
    push hl
    exx
    push bc
@@ -30,5 +30,5 @@ fread_unlocked:
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fread_unlocked.asm"

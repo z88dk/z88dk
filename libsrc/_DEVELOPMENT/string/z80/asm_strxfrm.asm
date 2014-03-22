@@ -77,7 +77,7 @@ loop:
 
    inc hl
    inc de   
-   jp loop
+   jr loop
 
 end_n:
 

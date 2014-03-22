@@ -137,7 +137,7 @@ key_less:
    srl h
    rr l
    
-   jp bsearch_loop
+   jr bsearch_loop
 
 key_greater_equal:
 
@@ -175,7 +175,7 @@ key_greater:
    ; ix = compare
    ; stack = key
    
-   jp bsearch_loop
+   jr bsearch_loop
 
 found_item:
 

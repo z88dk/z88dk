@@ -11,12 +11,10 @@
 ; ===============================================================
 
 XLIB asm_strcasecmp
-XDEF asm_stricmp
 
 LIB asm_tolower
 
 asm_strcasecmp:
-stricmp:
 
    ; enter : hl = char *s2
    ;         de = char *s1
@@ -46,7 +44,7 @@ loop:
    inc hl
    
    or a                      ; end of string?      
-   jp nz, loop
+   jr nz, loop
 
 equal:                       ; both strings ended same time
 

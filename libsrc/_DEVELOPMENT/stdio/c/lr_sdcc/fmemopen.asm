@@ -16,9 +16,10 @@ fmemopen:
    push af
    
    push ix
-   call asm_fmemopen
-   pop ix
    
+   call asm_fmemopen
+   
+   pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fmemopen.asm"

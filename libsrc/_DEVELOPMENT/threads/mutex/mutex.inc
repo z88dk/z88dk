@@ -1,9 +1,9 @@
 
 ;; MUTEX TYPES
 
-defc mtx_plain     = $00
-defc mtx_recursive = $01
-defc mtx_timed     = $02
+defc mtx_plain     = $01
+defc mtx_recursive = $02
+defc mtx_timed     = $04
 
 ;; MUTEX RETURN VALUES
 

@@ -1,8 +1,21 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF STRNCASECMP
+; ===============================================================
+; Dec 2013
+; ===============================================================
+; 
+; int strnicmp(const char *s1, const char *s2, size_t n)
+;
+; Perform caseless compare of string s1 to string s2, examining
+; no more than n chars.  Return when the first differing char is
+; found with *s1 - *s2.
+;
+; ===============================================================
 
-asm_strnicmp:
+XLIB asm_strnicmp
+
+LIB asm_strncasecmp
+
+defc asm_strnicmp = asm_strncasecmp
 
    ; enter : hl = char *s2
    ;         de = char *s1

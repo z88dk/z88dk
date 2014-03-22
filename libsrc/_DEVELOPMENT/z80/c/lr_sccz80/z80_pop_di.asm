@@ -1,5 +1,8 @@
 
-; DO NOT ADD TO THE LIBRARY
-; THIS FUNCTION IS EXPORTED AS PART OF Z80_POP_EI
-
 ; void z80_pop_di(void)
+
+XDEF z80_pop_di
+
+defc z80_pop_di = asm_z80_pop_di
+
+INCLUDE "../../z80/asm_z80_pop_di.asm"

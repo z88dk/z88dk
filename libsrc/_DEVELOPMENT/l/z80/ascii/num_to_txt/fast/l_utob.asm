@@ -1,5 +1,6 @@
 
 XLIB l_utob
+
 LIB l_setmem_de
 
 l_utob:
@@ -65,4 +66,4 @@ eight_bit:
    ld a,'0'
    call l_setmem_de - 16
    
-   jp leading_zeroes
+   jr leading_zeroes

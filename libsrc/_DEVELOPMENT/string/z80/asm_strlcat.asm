@@ -98,7 +98,7 @@ szexceeded0:
    ld c,a
    ld b,a
    ex de,hl
-   jp szexceeded1
+   jr szexceeded1
 
 success:
 

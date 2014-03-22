@@ -74,7 +74,7 @@ loop:
    pop hl
    pop bc
    
-   jp c, loop                  ; loop if char not in cset
+   jr c, loop                  ; loop if char not in cset
 
 in_cset:
 

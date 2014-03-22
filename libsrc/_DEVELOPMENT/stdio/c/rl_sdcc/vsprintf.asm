@@ -19,4 +19,11 @@ vsprintf:
    exx
    push af
    
+   push ix
+   
+   call asm_vsprintf
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_vsprintf.asm"

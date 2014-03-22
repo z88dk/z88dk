@@ -1,10 +1,9 @@
 
 ; int fgetc(FILE *stream)
 
-XDEF fgetc, getc
+XDEF fgetc
 
 fgetc:
-getc:
 
    push hl
    pop ix

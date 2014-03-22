@@ -16,9 +16,9 @@ flockfile:
    ld ixl,c
    ld ixh,b
    
-   call __stdio_lock_acquire
+   call asm_flockfile
    
    pop ix
    ret
-
-   INCLUDE "../../z80/__stdio_lock_acquire.asm"
+   
+   INCLUDE "../../z80/asm_flockfile.asm"

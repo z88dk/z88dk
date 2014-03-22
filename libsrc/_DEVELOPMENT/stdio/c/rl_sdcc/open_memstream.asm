@@ -14,9 +14,10 @@ open_memstream:
    push af
    
    push ix
-   call asm_open_memstream
-   pop ix
    
+   call asm_open_memstream
+   
+   pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_open_memstream.asm"

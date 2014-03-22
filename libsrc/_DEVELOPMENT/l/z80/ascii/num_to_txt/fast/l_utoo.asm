@@ -30,7 +30,7 @@ l_utoo:
 no_leading_zeroes:
 
    xor a
-   jp three_nlz
+   jr three_nlz
 
 loop_nlz:
                l1_utoo_nlz:
@@ -57,7 +57,7 @@ loop_nlz:
 leading_zeroes:
 
    xor a
-   jp three_lz
+   jr three_lz
 
 loop_lz:
                l1_utoo_lz:
@@ -96,4 +96,4 @@ eight_bit:
    call l_setmem_de - 6
    
    xor a
-   jp two_lz
+   jr two_lz

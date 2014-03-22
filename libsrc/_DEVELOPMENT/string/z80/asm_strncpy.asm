@@ -42,7 +42,7 @@ loop:
    cp (hl)
    ldi
    jp po, done                 ; reached max number of chars
-   jp nz, loop
+   jr nz, loop
    
    ; now pad with zeroes
    

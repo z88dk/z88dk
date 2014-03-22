@@ -1,7 +1,4 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ASM_FGETC
-
 ; ===============================================================
 ; Jan 2014
 ; ===============================================================
@@ -12,7 +9,11 @@
 ;
 ; ===============================================================
 
-asm_getc_unlocked:
+XLIB asm_getc_unlocked
+
+LIB asm_fgetc_unlocked
+
+defc asm_getc_unlocked = asm_fgetc_unlocked
 
    ; enter : ix = FILE *
    ;

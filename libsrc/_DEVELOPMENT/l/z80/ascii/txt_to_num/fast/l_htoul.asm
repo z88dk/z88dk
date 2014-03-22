@@ -1,5 +1,6 @@
 
 XLIB l_htoul
+
 LIB l_htou, l_char2num
 
 l_htoul:
@@ -68,7 +69,7 @@ loop:
    pop af
    
    or a
-   jp z, loop
+   jr z, loop
 
 unsigned_overflow:
 

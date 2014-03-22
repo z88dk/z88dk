@@ -47,7 +47,7 @@ no_leading_zeroes:
    pop bc
    djnz no_leading_zeroes
    
-   jp write1s
+   jr write1s
 
 
 leading_zeroes:
@@ -81,7 +81,7 @@ divloop:
 
    inc a
    add hl,bc
-   jp c, divloop
+   jr c, divloop
    
    sbc hl,bc
    ret
@@ -89,7 +89,7 @@ divloop:
 eight_bit:
 
    ld bc,-100
-   jp nc, no_leading_zeroes
+   jr nc, no_leading_zeroes
    
    ; write two leading zeroes to output string
    
@@ -99,4 +99,4 @@ eight_bit:
    ld (de),a
    inc de
    
-   jp leading_zeroes
+   jr leading_zeroes

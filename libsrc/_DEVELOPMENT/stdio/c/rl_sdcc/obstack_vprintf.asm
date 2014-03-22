@@ -15,4 +15,11 @@ obstack_vprintf:
    push hl
    push af
    
+   push ix
+   
+   call asm_obstack_vprintf
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_obstack_vprintf.asm"

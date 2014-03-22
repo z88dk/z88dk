@@ -22,8 +22,17 @@ __stdio_varg_2:
    ;         de = first 16-bit argument in list
    ;
    ; uses  : af, de, hl
-   
+
+IF __SDCC
+
+   ld hl,8                     ; all vararg functions save ix and have extra call
+
+ELSE
+
    ld hl,4
+
+ENDIF
+
    add hl,sp
    
    jp __stdio_nextarg_de
@@ -44,7 +53,14 @@ __stdio_varg_2:
    ;         de = first 16-bit argument in list
    ;
    ; uses  : af, de, hl
-   
+
+IFDEF __SDCC
+
+   inc a
+   inc a                       ; all vararg functions save ix and have extra call
+
+ENDIF
+
    inc a
    add a,a
    inc a

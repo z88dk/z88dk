@@ -42,6 +42,6 @@ loop:
    inc hl
    
    or a
-   jp nz, loop
+   jr nz, loop
    
    jp error_zc

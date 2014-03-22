@@ -1,8 +1,9 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF ABS
+XLIB l_neg_hl
 
-l_neg_hl:
+LIB _l_neg_hl
+
+defc l_neg_hl = _l_neg_hl
 
    ; negate hl
    ;

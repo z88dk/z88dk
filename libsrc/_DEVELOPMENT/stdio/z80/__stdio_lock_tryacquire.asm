@@ -17,7 +17,7 @@ __stdio_lock_tryacquire:
    push bc
    push de
    push hl
-   
+
    ld e,ixl
    ld d,ixh                    ; de = FILE *
    

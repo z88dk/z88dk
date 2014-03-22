@@ -14,7 +14,7 @@ fgets:
    push bc
    push hl
    push af
-
+   
    push ix
    
    ld ixl,e
@@ -25,5 +25,5 @@ fgets:
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fgets.asm"

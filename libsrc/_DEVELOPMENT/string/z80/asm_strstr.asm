@@ -48,7 +48,7 @@ match_1:
    inc de
    
    or a                        ; end of string reached?
-   jp nz, match_1
+   jr nz, match_1
 
 not_found:
 
@@ -74,7 +74,7 @@ loop:
    jr z, match_found
    
    cp (hl)
-   jp z, loop                  ; char matches so still hope
+   jr z, loop                  ; char matches so still hope
 
 no_match:
 
@@ -85,7 +85,7 @@ no_match:
    inc de
    
    or a                        ; if first mismatch occurred at end of string,
-   jp nz, match_1              ; substring cannot fit so abandon early
+   jr nz, match_1              ; substring cannot fit so abandon early
 
    jr not_found
 

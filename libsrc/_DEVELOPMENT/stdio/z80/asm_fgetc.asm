@@ -10,13 +10,11 @@
 ; ===============================================================
 
 XLIB asm_fgetc
-XDEF asm_getc
 
 LIB asm_fgetc_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 
 asm_fgetc:
-asm_getc:
 
    ; enter : ix = FILE *
    ;

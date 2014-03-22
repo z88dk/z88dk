@@ -13,4 +13,11 @@ vscanf_unlocked:
    push bc
    push af
    
+   push ix
+   
+   call asm_vscanf_unlocked
+   
+   pop ix
+   ret
+   
    INCLUDE "../../z80/asm_vscanf_unlocked.asm"

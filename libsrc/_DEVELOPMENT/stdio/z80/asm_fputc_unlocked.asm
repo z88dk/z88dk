@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_fputc_unlocked
-XDEF asm_putc_unlocked
 
 LIB error_mc, __stdio_verify_output, __stdio_send_output_raw_chars_unchecked
 
 asm_fputc_unlocked:
-asm_putc_unlocked:
 
    ; enter : ix = FILE *
    ;          e = char c

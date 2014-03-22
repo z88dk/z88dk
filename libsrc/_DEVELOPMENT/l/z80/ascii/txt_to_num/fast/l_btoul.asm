@@ -1,5 +1,6 @@
 
 XLIB l_btoul
+
 LIB l_btou
 
 l_btoul:
@@ -47,6 +48,6 @@ loop:
    rl e
    rl d
    
-   jp nc, loop
+   jr nc, loop
    ret
    

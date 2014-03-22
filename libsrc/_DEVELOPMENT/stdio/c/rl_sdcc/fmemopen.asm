@@ -1,6 +1,8 @@
 
 ; FILE *fmemopen(void *buf, size_t size, const char *mode)
 
+XDEF fmemopen
+
 fmemopen:
 
    pop af
@@ -14,9 +16,10 @@ fmemopen:
    push af
    
    push ix
-   call asm_fmemopen
-   pop ix
    
+   call asm_fmemopen
+   
+   pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_fmemopen.asm"

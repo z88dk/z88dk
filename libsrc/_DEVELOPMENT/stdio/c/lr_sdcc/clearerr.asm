@@ -10,7 +10,7 @@ clearerr:
    
    push bc
    push af
-   
+
    push ix
    
    ld ixl,c
@@ -20,5 +20,5 @@ clearerr:
    
    pop ix
    ret
-   
+
    INCLUDE "../../z80/asm_clearerr.asm"

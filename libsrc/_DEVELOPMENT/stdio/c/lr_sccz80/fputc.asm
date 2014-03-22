@@ -2,12 +2,10 @@
 ; int fputc(int c, FILE *stream)
 
 XLIB fputc
-XDEF putc
 
 LIB asm_fputc
 
 fputc:
-putc:
 
    pop af
    pop ix

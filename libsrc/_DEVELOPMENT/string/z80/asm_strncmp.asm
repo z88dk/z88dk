@@ -40,7 +40,7 @@ loop:
    inc de
    
    or a
-   jp nz, loop
+   jr nz, loop
    
    dec de
    

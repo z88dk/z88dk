@@ -10,7 +10,7 @@
 ; ===============================================================
 
 XLIB asm_abs
-XDEF l_neg_hl
+XDEF _l_neg_hl
 
 asm_abs:
 
@@ -23,7 +23,7 @@ asm_abs:
    bit 7,h
    ret z
 
-l_neg_hl:
+_l_neg_hl:
 
    ; negate hl
    ;

@@ -1,10 +1,9 @@
 
 ; int fputc(int c, FILE *stream)
 
-XDEF fputc_callee, putc_callee
+XDEF fputc_callee
 
 fputc_callee:
-putc_callee:
 
    pop af
    pop ix

@@ -7,23 +7,24 @@ vfscanf:
 
    pop af
    pop bc
-   pop hl
    pop de
-   
+   exx
+   pop bc
+
+   push bc
+   exx
    push de
-   push hl
    push bc
    push af
    
    push ix
    
-   ld ixl,e
-   ld ixh,d
+   ld ixl,c
+   ld ixh,b
    
-   ex de,hl
    call asm_vfscanf
    
    pop ix
    ret
-
+   
    INCLUDE "../../z80/asm_vfscanf.asm"

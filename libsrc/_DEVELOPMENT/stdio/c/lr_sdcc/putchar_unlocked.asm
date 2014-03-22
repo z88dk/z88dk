@@ -11,4 +11,11 @@ putchar_unlocked:
    push hl
    push af
 
+   push ix
+   
+   call asm_putchar_unlocked
+   
+   pop ix
+   ret
+
    INCLUDE "../../z80/asm_putchar_unlocked.asm"

@@ -1,7 +1,8 @@
 
 XLIB __stdio_verify_output
 
-LIB error_eacces_mc, error_mc, asm0_fflush_unlocked
+LIB error_eacces_mc, error_mc
+LIB asm0_fflush_unlocked
 
 __stdio_verify_output:
 
@@ -15,7 +16,7 @@ __stdio_verify_output:
    ; uses  : all except bc, de, (hl on no error), ix
    
    ; check for stream error and write mode
-   
+
    ld a,(ix+3)                 ; a = state_flags_0
    
    and $48                     ; keep write and error flags

@@ -1,3 +1,8 @@
 
-*** DO NOT ADD TO LIBRARY
-*** THIS FUNCTION IS EXPORTED AS PART OF STRCASECMP
+; int stricmp(const char *s1, const char *s2)
+
+XLIB stricmp
+
+LIB strcasecmp
+
+defc stricmp = strcasecmp

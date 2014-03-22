@@ -1,7 +1,4 @@
 
-; DO NOT ADD TO THE LIBRARY
-; THIS FUNCTION IS EXPORTED AS PART OF ASM_Z80_POP_EI
-
 ; ===============================================================
 ; Stefano Bodrato
 ; ===============================================================
@@ -11,9 +8,16 @@
 ; Pop the ei_di_status from the stack and restore the di/ei
 ; state to what it was previously when a push was called.
 ;
+; The "di" in the function name has no bearing on what the
+; function does; the name is meant to balance "z80_push_ei".
+
 ; ===============================================================
 
-asm_z80_pop_di:
+XLIB asm_z80_pop_di
+
+LIB asm_z80_pop_ei
+
+defc asm_z80_pop_di = asm_z80_pop_ei
 
    ; enter  : stack = ei_di_status, ret
    ;

@@ -10,12 +10,10 @@
 ; ===============================================================
 
 XLIB asm_fgetc_unlocked
-XDEF asm_getc_unlocked
 
 LIB __stdio_verify_input, __stdio_recv_input_raw_getc, error_mc
 
 asm_fgetc_unlocked:
-asm_getc_unlocked:
 
    ; enter : ix = FILE *
    ;
