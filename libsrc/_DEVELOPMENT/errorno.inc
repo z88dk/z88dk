@@ -11,5 +11,6 @@ defgroup
    __EOVERFLOW,
    __ENOTSUP,
    __EFBIG,
-   __EBADF
+   __EBADF,
+   __EUNKWN
 }
