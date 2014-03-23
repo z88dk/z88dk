@@ -35,7 +35,7 @@ loop:
    call asm_tolower
    ld (hl),a
    
-   cpd                         ; hl++, bc--
+   cpi                         ; hl++, bc--
    jp pe, loop
 
    pop hl
