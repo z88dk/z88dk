@@ -78,6 +78,7 @@ write:
    ld (de),a
    inc de
    
+   xor a
    djnz loop_lz
    
    scf
