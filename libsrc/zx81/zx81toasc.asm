@@ -6,7 +6,7 @@
 ;	in: source character in (HL)
 ;	out: A = converter character
 ;
-;	$Id: zx81toasc.asm,v 1.3 2012-03-13 20:38:35 stefano Exp $
+;	$Id: zx81toasc.asm,v 1.4 2014-03-23 22:20:50 aralbrec Exp $
 ;
 
 XLIB zx81toasc
@@ -51,6 +51,7 @@ LIB zx81_cnvtab
 	or	(hl)
 	jr	z,isntsym
 	pop	af
+	inc	hl
 	inc	hl
 	jr	symloop
 .chfound
