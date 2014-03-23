@@ -31,5 +31,5 @@ l_hex_nibble_lo:
     or $f0
     daa
     add a,$a0
-    adc a,$60
+    adc a,$40
     ret
