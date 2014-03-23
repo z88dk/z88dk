@@ -1,0 +1,227 @@
+
+Changes to make to source when z80asm is updated:
+
+*************************
+**1** Inherited Functions
+
+Want to do this:
+
+XLIB redirect_subroutine
+LIB true_subroutine
+defc redirect_subroutine = true_subroutine
+
+Have to do this:
+
+XLIB redirect_subroutine
+LIB true_subroutine
+redirect_subroutine:
+jp true_subroutine
+
+Where this is done:
+
+asm_b_array_capacity
+asm_b_array_clear
+asm_b_array_data
+Error at file 'adt/b_array/z80/asm_b_array_destroy.asm' line 17: symbol not defined
+Error at file 'adt/b_array/z80/asm_b_array_empty.asm' line 16: symbol not defined
+Error at file 'adt/b_array/z80/asm_b_array_push_back.asm' line 16: symbol not defined
+Error at file 'adt/b_array/z80/asm_b_array_size.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_at.asm' line 17: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_back.asm' line 17: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_capacity.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_clear.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_data.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_empty.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_erase.asm' line 17: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_erase_block.asm' line 17: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_erase_range.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_front.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_max_size.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_pop_back.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_push_back.asm' line 16: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_read_block.asm' line 19: symbol not defined
+Error at file 'adt/b_vector/z80/asm_b_vector_size.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_capacity.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_clear.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_data.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_destroy.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_empty.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_size.asm' line 16: symbol not defined
+Error at file 'adt/ba_priority_queue/z80/asm_ba_priority_queue_top.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_capacity.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_clear.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_destroy.asm' line 17: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_empty.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_init.asm' line 17: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_pop.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_push.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_size.asm' line 16: symbol not defined
+Error at file 'adt/ba_stack/z80/asm_ba_stack_top.asm' line 17: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_capacity.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_clear.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_data.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_destroy.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_empty.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_max_size.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_pop.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_reserve.asm' line 18: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_resize.asm' line 27: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_shrink_to_fit.asm' line 18: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_size.asm' line 16: symbol not defined
+Error at file 'adt/bv_priority_queue/z80/asm_bv_priority_queue_top.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_capacity.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_clear.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_destroy.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_empty.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_init.asm' line 20: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_max_size.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_pop.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_push.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_reserve.asm' line 18: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_shrink_to_fit.asm' line 18: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_size.asm' line 16: symbol not defined
+Error at file 'adt/bv_stack/z80/asm_bv_stack_top.asm' line 17: symbol not defined
+Error at file 'adt/p_forward_list/z80/asm_p_forward_list_clear.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list/z80/asm_p_forward_list_empty.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list/z80/asm_p_forward_list_pop_front.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list/z80/asm_p_forward_list_push_front.asm' line 18: symbol not defined
+Error at file 'adt/p_forward_list_alt/z80/asm_p_forward_list_alt_clear.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list_alt/z80/asm_p_forward_list_alt_empty.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list_alt/z80/asm_p_forward_list_alt_front.asm' line 16: symbol not defined
+Error at file 'adt/p_forward_list_alt/z80/asm_p_forward_list_alt_size.asm' line 16: symbol not defined
+Error at file 'adt/p_list/z80/asm_p_list_back.asm' line 16: symbol not defined
+Error at file 'adt/p_list/z80/asm_p_list_clear.asm' line 16: symbol not defined
+Error at file 'adt/p_list/z80/asm_p_list_empty.asm' line 16: symbol not defined
+Error at file 'adt/p_list/z80/asm_p_list_front.asm' line 16: symbol not defined
+Error at file 'adt/p_list/z80/asm_p_list_size.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_back.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_clear.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_empty.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_front.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_init.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_pop.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_push.asm' line 16: symbol not defined
+Error at file 'adt/p_queue/z80/asm_p_queue_size.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_clear.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_empty.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_init.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_pop.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_push.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_size.asm' line 16: symbol not defined
+Error at file 'adt/p_stack/z80/asm_p_stack_top.asm' line 16: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_capacity.asm' line 16: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_clear.asm' line 16: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_data.asm' line 16: unknown identifier
+Error at file 'adt/w_array/z80/asm_w_array_data.asm' line 16: syntax error
+Error at file 'adt/w_array/z80/asm_w_array_data.asm' line 16: unknown identifier
+Error at file 'adt/w_array/z80/asm_w_array_destroy.asm' line 17: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_empty.asm' line 16: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_push_back.asm' line 16: symbol not defined
+Error at file 'adt/w_array/z80/asm_w_array_size.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_at.asm' line 17: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_back.asm' line 17: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_capacity.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_clear.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_data.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_destroy.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_empty.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_erase.asm' line 17: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_erase_range.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_front.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_max_size.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_pop_back.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_push_back.asm' line 16: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_shrink_to_fit.asm' line 18: symbol not defined
+Error at file 'adt/w_vector/z80/asm_w_vector_size.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_capacity.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_clear.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_data.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_destroy.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_empty.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_size.asm' line 16: symbol not defined
+Error at file 'adt/wa_priority_queue/z80/asm_wa_priority_queue_top.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_capacity.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_clear.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_destroy.asm' line 17: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_empty.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_init.asm' line 17: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_pop.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_push.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_size.asm' line 16: symbol not defined
+Error at file 'adt/wa_stack/z80/asm_wa_stack_top.asm' line 17: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_capacity.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_clear.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_data.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_destroy.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_empty.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_max_size.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_pop.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_reserve.asm' line 18: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_resize.asm' line 27: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_shrink_to_fit.asm' line 18: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_size.asm' line 16: symbol not defined
+Error at file 'adt/wv_priority_queue/z80/asm_wv_priority_queue_top.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_capacity.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_clear.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_destroy.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_empty.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_init.asm' line 20: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_max_size.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_pop.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_push.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_reserve.asm' line 18: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_shrink_to_fit.asm' line 18: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_size.asm' line 16: symbol not defined
+Error at file 'adt/wv_stack/z80/asm_wv_stack_top.asm' line 17: symbol not defined
+Error at file 'alloc/balloc/z80/asm_balloc_alloc.asm' module 'ASM_BALLOC_ALLOC' line 35: symbol not defined
+Error at file 'alloc/balloc/z80/asm_balloc_blockcount.asm' module 'ASM_BALLOC_BLOCKCOUNT' line 27: symbol not defined
+Error at file 'alloc/balloc/z80/asm_balloc_firstfit.asm' module 'ASM_BALLOC_FIRSTFIT' line 40: symbol not defined
+Error at file 'alloc/malloc/z80/asm_free_unlocked.asm' line 19: symbol not defined
+Error at file 'alloc/malloc/z80/asm_heap_destroy.asm' line 16: symbol not defined
+Error at file 'alloc/malloc/z80/asm_memalign.asm' line 23: symbol not defined
+Error at file 'alloc/malloc/z80/asm_memalign_unlocked.asm' line 23: symbol not defined
+Error at file 'error/z80/error_divide_by_zero_mc.asm' line 6: symbol not defined
+Error at file 'error/z80/error_divide_by_zero_zc.asm' line 6: symbol not defined
+Error at file 'error/z80/error_mulu_overflow_mc.asm' line 6: symbol not defined
+Error at file 'l/z80/integer/l_neg_hl.asm' line 6: symbol not defined
+Error at file 'l/z80/long/l_neg_dehl.asm' line 6: symbol not defined
+Error at file 'stdio/z80/asm_getc.asm' line 16: symbol not defined
+Error at file 'stdio/z80/asm_getc_unlocked.asm' line 16: symbol not defined
+Error at file 'stdio/z80/asm_getline.asm' line 39: invalid single quoted character
+Error at file 'stdio/z80/asm_getline_unlocked.asm' line 39: invalid single quoted character
+Error at file 'stdio/z80/asm_perror.asm' line 54: invalid single quoted character
+Error at file 'stdio/z80/asm_putc.asm' line 16: symbol not defined
+Error at file 'stdio/z80/asm_putc_unlocked.asm' line 16: symbol not defined
+Error at file 'stdio/z80/asm_puts_unlocked.asm' line 45: invalid single quoted character
+Error at file 'stdio/z80/asm_vfprintf_unlocked.asm' line 606: symbol '_PRINTF_X' already defined
+Error at file 'stdio/z80/asm_vfprintf_unlocked.asm' line 613: symbol '_PRINTF_LX' already defined
+Error at file 'stdio/z80/__stdio_lock_acquire.asm' line 6: symbol not defined
+Error at file 'stdio/z80/__stdio_lock_release.asm' line 6: symbol not defined
+Error at file 'stdio/z80/input_helpers/__stdio_input_sm_fgets.asm' line 19: invalid single quoted character
+Error at file 'stdio/z80/input_helpers/__stdio_input_sm_fgets.asm' line 19: invalid single quoted character
+Error at file 'stdio/z80/input_helpers/__stdio_input_sm_gets.asm' line 16: invalid single quoted character
+Error at file 'stdio/z80/input_helpers/__stdio_input_sm_gets.asm' line 16: invalid single quoted character
+Error at file 'stdio/z80/input_helpers/__stdio_scanf_lp.asm' line 6: symbol not defined
+Error at file 'stdio/z80/input_helpers/__stdio_scanf_p.asm' line 6: symbol not defined
+Error at file 'stdio/z80/output_helpers/__stdio_printf_i.asm' line 6: symbol not defined
+Error at file 'stdio/z80/output_helpers/__stdio_printf_li.asm' line 6: symbol not defined
+Error at file 'string/z80/asm_stricmp.asm' line 17: symbol not defined
+Error at file 'string/z80/asm_strnicmp.asm' line 18: symbol not defined
+Error at file 'threads/mutex/z80/asm_mtx_destroy.asm' line 19: symbol not defined
+Error at file 'z80/z80/asm_z80_pop_di.asm' line 20: symbol not defined
+
+
+**********************************************
+**2** Change magic numbers to C char constants
+
+Want to do this:
+
+ld bc,'\n'
+
+Have to do this:
+
+ld bc,13
+
+Where this is done:
+
+(see above, invalid quoted char)
