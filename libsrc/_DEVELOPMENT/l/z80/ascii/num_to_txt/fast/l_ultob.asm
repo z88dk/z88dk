@@ -1,7 +1,7 @@
 
 XLIB l_ultob
 
-LIB l_utob
+LIB l_utob, l_setmem_de
    
 l_ultob:
 
