@@ -1,11 +1,11 @@
 
-XLIB __stdio_printf_I
+XLIB __stdio_printf_ii
 
 LIB __stdio_nextarg_de, __stdio_nextarg_hl, l_utoa
 LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl
 LIB __stdio_printf_padding_width_bc
 
-__stdio_printf_I:
+__stdio_printf_ii:
 
    ; non-standard %I converter called from vfprintf()
    ; output host order IPv4 address in dotted decimal form
