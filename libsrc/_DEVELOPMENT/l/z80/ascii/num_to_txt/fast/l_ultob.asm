@@ -16,6 +16,29 @@ l_ultob:
    ;
    ; uses  : af, b, de, hl
 
+   inc e
+   dec e
+   jr nz, bit_32
+
+   inc d
+   dec d
+   jr nz, bit_32
+   
+   ; 16-bit number
+   
+   ld e,c
+   ld d,b
+
+   jp nc, l_utob
+
+   ld a,'0'
+   call l_setmem_de - 16
+   call l_setmem_de - 16
+   
+   jp l_utob
+
+bit_32:
+
    push hl                     ; save least significant word
    ex de,hl
 
