@@ -19,7 +19,6 @@ IF __PARAM_ORDER_RL
    ld a,(hl)
    inc hl
    ld h,(hl)
-   inc hl
    ld l,a
 
 ;******************************
@@ -29,7 +28,6 @@ ELSE
    ld a,(hl)
    dec hl
    ld l,(hl)
-   dec hl
    ld h,a
    
    ld a,l
