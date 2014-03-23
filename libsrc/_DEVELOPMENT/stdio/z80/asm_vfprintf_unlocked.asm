@@ -476,7 +476,7 @@ _printf_bb:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_bb
    
-   jp printf_invoke_2 - 1
+   jp printf_invoke_2 - 2
 
 _printf_lbb:
 
@@ -485,21 +485,21 @@ _printf_lbb:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_lbb
 
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 _printf_c:
 
    LIB __stdio_printf_c
 
    ld hl,__stdio_printf_c
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_d:
 
    LIB __stdio_printf_d
 
    res 4,(ix+5)                ; base indicator off
-   ld a,$40                    ; signed
+   ld a,$c0                    ; signed & capitalize
 
    ld hl,__stdio_printf_d
    jr printf_invoke_2
@@ -509,7 +509,7 @@ _printf_ld:
    LIB __stdio_printf_ld
 
    res 4,(ix+5)                ; base indicator off
-   ld a,$40                    ; signed
+   ld a,$c0                    ; signed & capitalize
 
    ld hl,__stdio_printf_ld
    jr printf_invoke_4
@@ -519,14 +519,14 @@ _printf_n:
    LIB __stdio_printf_n
 
    ld hl,__stdio_printf_n
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_ln:
 
    LIB __stdio_printf_ln
 
    ld hl,__stdio_printf_ln
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 _printf_o:
 
@@ -535,7 +535,7 @@ _printf_o:
    set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_o
    
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_lo:
 
@@ -544,28 +544,28 @@ _printf_lo:
    set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_lo
 
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 _printf_p:
 
    LIB __stdio_printf_p
 
    ld hl,__stdio_printf_p
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_lp:
 
    LIB __stdio_printf_lp
 
    ld hl,__stdio_printf_lp
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 _printf_s:
 
    LIB __stdio_printf_s
  
    ld hl,__stdio_printf_s
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_u:
 
@@ -574,7 +574,7 @@ _printf_u:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_u
    
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2 - 2
 
 _printf_lu:
 
@@ -583,57 +583,55 @@ _printf_lu:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_lu
    
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 _printf_xx:
 
    LIB __stdio_printf_x
 
-   ld a,$80                    ; capitalize
    ld hl,__stdio_printf_x
-
-   jr printf_invoke_2
+   jr printf_invoke_2 - 2
 
 _printf_lxx:
 
    LIB __stdio_printf_lx
       
-   ld a,$80                    ; capitalize
    ld hl,__stdio_printf_lx
-
-   jr printf_invoke_4
+   jr printf_invoke_4 - 2
 
 _printf_x:
 
    LIB __stdio_printf_x
 
+   xor a                       ; no capitalize
    ld hl,__stdio_printf_x
-   jr printf_invoke_2 - 1
+   jr printf_invoke_2
 
 _printf_lx:
 
    LIB __stdio_printf_lx
-
+   
+   xor a                       ; no capitalize
    ld hl,__stdio_printf_lx
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4
 
 _printf_I:
 
    LIB __stdio_printf_ii
 
    ld hl,__stdio_printf_ii
-   jr printf_invoke_4 - 1
+   jr printf_invoke_4 - 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   xor a
+   ld a,$80                    ; capitalize by default
 
 printf_invoke_4:
 
    ld bc,printf_return_4
    jr printf_invoke
 
-   xor a
+   ld a,$80                    ; capitalize by default
 
 printf_invoke_2:
 
