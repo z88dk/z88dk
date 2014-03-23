@@ -207,9 +207,12 @@ x_fine:
    and $07
    ex af,af'                   ; a' = col % 8
    
+   push de
    call asm_zx_pxy2saddr       ; change pixel coord in hl to screen address in hl
+   pop de
+   
    jr chk_loop
-
+   
 main_loop:
 
    ; ix = struct fzx_font *
