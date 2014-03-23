@@ -66,35 +66,34 @@ bit_32:
    push bc
    push bc
    
-   ld bc,$ffff                 ; -10,000 (LSW + 256)
+   ld bc,$d9f0                 ; -10,000 (LSW + 256)
    push bc
-   ld bc,$d9f0
-   push bc
-   
-   ld bc,$fffe                 ; -100,000 (LSW + 256)
-   push bc
-   ld bc,$7a60
+   ld bc,$ffff
    push bc
    
-   ld bc,$fff0                 ; -1,000,000 (LSW + 256)
+   ld bc,$7a60                 ; -100,000 (LSW + 256)
    push bc
-   ld bc,$bec0
+   ld bc,$fffe
    push bc
    
-   ld bc,$ff67                 ; -10,000,000 (LSW + 256)
+   ld bc,$bec0                 ; -1,000,000 (LSW + 256)
    push bc
-   ld bc,$6980
+   ld bc,$fff0
+   push bc
+   
+   ld bc,$6a80                 ; -10,000,000 (LSW + 256)
+   push bc
+   ld bc,$ff67
    
    jr z, bit_24
-   inc b
    push bc
    
-   ld bc,$fa0a                 ; -100,000,000 (LSW + 256)
+   ld bc,$2000                 ; -100,000,000 (LSW + 256)
    push bc
-   ld bc,$2000
+   ld bc,$fa0a
    push bc
    
-   ld bc,$3600                 ; -1,000,000,000
+   ld bc,$3700                 ; -1,000,000,000
    push bc
    ld bc,$c465
 
@@ -103,7 +102,9 @@ bit_24:
    exx
    ld e,c
    ld d,b
+   
    pop bc
+   dec b
    
    ; hl'hl = long
    ; bc'bc = first divisor
