@@ -5,7 +5,7 @@ LIB l_utoh
 
 l_ultoh:
 
-   ; write unsigned hexadecimal long to ascii buffer in lowercase
+   ; write unsigned hexadecimal long to ascii buffer in uppercase
    ;
    ; enter : dehl = unsigned long
    ;           bc = char *buffer

@@ -5,7 +5,7 @@ LIB l_hex_nibble_hi, l_hex_nibble_lo
 
 l_utoh:
 
-   ; write unsigned hexadecimal integer to ascii buffer in lowercase
+   ; write unsigned hexadecimal integer to ascii buffer in uppercase
    ; derived from section 5.2 of http://baze.au.com/misc/z80bits.html
    ;
    ; enter : hl = unsigned integer
