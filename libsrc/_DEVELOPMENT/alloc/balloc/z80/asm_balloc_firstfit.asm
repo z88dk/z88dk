@@ -37,7 +37,7 @@ asm_balloc_firstfit:
    jp z, error_enomem_zc       ; zero queues to search
    
    add hl,hl
-   ld de,(__qbtl)
+   ld de,(__qtbl)
    add hl,de                   ; forward_list *q
    
    ld b,a

@@ -13,7 +13,11 @@ XLIB asm_bv_priority_queue_max_size
 
 LIB l_readword_hl
 
-defc asm_bv_priority_queue_max_size = l_readword_hl - 8
+asm_bv_priority_queue_max_size:
+
+   jp l_readword_hl - 8
+
+;defc asm_bv_priority_queue_max_size = l_readword_hl - 8
 
    ; enter : hl = priority_queue *
    ;

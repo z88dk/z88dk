@@ -17,7 +17,11 @@ XLIB asm_z80_pop_di
 
 LIB asm_z80_pop_ei
 
-defc asm_z80_pop_di = asm_z80_pop_ei
+asm_z80_pop_di:
+
+   jp asm_z80_pop_ei
+
+;defc asm_z80_pop_di = asm_z80_pop_ei
 
    ; enter  : stack = ei_di_status, ret
    ;

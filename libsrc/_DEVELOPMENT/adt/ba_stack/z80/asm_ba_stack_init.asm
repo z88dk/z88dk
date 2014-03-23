@@ -14,7 +14,11 @@ XLIB asm_ba_stack_init
 
 LIB asm_b_array_init
 
-defc asm_ba_stack_init = asm_b_array_init
+asm_ba_stack_init:
+
+   jp asm_b_array_init
+
+;defc asm_ba_stack_init = asm_b_array_init
 
    ; enter : hl = p
    ;         de = data

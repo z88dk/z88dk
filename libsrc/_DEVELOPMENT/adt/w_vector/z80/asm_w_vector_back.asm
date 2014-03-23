@@ -14,7 +14,11 @@ XLIB asm_w_vector_back
 
 LIB asm_w_array_back
 
-defc asm_w_vector_back = asm_w_array_back
+asm_w_vector_back:
+
+   jp asm_w_array_back
+
+;defc asm_w_vector_back = asm_w_array_back
 
    ; enter : hl = vector *
    ;

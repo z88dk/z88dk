@@ -16,7 +16,11 @@ XLIB asm_free_unlocked
 
 LIB asm_heap_free_unlocked
 
-defc asm_free_unlocked = asm_heap_free_unlocked
+asm_free_unlocked:
+
+   jp asm_heap_free_unlocked
+
+;defc asm_free_unlocked = asm_heap_free_unlocked
 
    ; Return the memory block to the heap for reuse without locking
    ;

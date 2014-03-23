@@ -13,7 +13,7 @@ __stdio_input_sm_gets:
    ;
    ; return: de = void *s_ptr (address past last byte written)
 
-   cp '\n'
+   cp 13                       ; '\n'
    jr z, state_1t
    
    ld (de),a                   ; write char to buffer

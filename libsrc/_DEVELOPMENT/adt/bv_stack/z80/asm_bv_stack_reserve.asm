@@ -15,7 +15,11 @@ XLIB asm_bv_stack_reserve
 
 LIB asm_b_vector_reserve
 
-defc asm_bv_stack_reserve = asm_b_vector_reserve
+asm_bv_stack_reserve:
+
+   jp asm_b_vector_reserve
+
+;defc asm_bv_stack_reserve = asm_b_vector_reserve
 
    ; enter : hl = stack *
    ;         bc = n

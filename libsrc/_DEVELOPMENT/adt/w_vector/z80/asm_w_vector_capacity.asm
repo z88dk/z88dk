@@ -13,7 +13,11 @@ XLIB asm_w_vector_capacity
 
 LIB l_readword_2_hl
 
-defc asm_w_vector_capacity = l_readword_2_hl - 4
+asm_w_vector_capacity:
+
+   jp l_readword_2_hl - 4
+
+;defc asm_w_vector_capacity = l_readword_2_hl - 4
 
    ; enter : hl = vector *v
    ;

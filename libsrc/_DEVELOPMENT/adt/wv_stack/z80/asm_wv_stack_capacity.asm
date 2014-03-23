@@ -13,7 +13,11 @@ XLIB asm_wv_stack_capacity
 
 LIB l_readword_2_hl
 
-defc asm_wv_stack_capacity = l_readword_2_hl - 4
+asm_wv_stack_capacity:
+
+   jp l_readword_2_hl - 4
+
+;defc asm_wv_stack_capacity = l_readword_2_hl - 4
 
    ; enter : hl = stack *
    ;

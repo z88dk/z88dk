@@ -13,7 +13,11 @@ XLIB asm_getc
 
 LIB asm_fgetc
 
-defc asm_getc = asm_fgetc
+asm_getc:
+
+   jp asm_fgetc
+
+;defc asm_getc = asm_fgetc
 
    ; enter : ix = FILE *
    ;

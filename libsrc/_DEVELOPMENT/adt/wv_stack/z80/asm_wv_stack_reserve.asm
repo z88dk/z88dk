@@ -15,7 +15,11 @@ XLIB asm_wv_stack_reserve
 
 LIB asm_w_vector_reserve
 
-defc asm_wv_stack_reserve = asm_w_vector_reserve
+asm_wv_stack_reserve:
+
+   jp asm_w_vector_reserve
+
+;defc asm_wv_stack_reserve = asm_w_vector_reserve
 
    ; enter : hl = stack *
    ;         bc = n words

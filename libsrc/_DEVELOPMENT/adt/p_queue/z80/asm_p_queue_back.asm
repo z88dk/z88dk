@@ -13,7 +13,11 @@ XLIB asm_p_queue_back
 
 LIB asm_p_forward_list_alt_back
 
-defc asm_p_queue_back = asm_p_forward_list_alt_back
+asm_p_queue_back:
+
+   jp asm_p_forward_list_alt_back
+
+;defc asm_p_queue_back = asm_p_forward_list_alt_back
 
    ; enter : hl = queue *
    ;

@@ -13,7 +13,11 @@ XLIB asm_w_array_clear
 
 LIB l_zeroword_hl
 
-defc asm_w_array_clear = l_zeroword_hl - 2
+asm_w_array_clear:
+
+   jp l_zeroword_hl - 2
+
+;defc asm_w_array_clear = l_zeroword_hl - 2
 
    ; enter : hl = array *
    ;

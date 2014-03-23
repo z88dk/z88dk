@@ -16,7 +16,7 @@ __stdio_input_sm_fgets:
    ld (de),a                   ; write char to buffer
    inc de
    
-   cp '\n'
+   cp 13                       ; '\n'
    jr z, state_1t
    
    or a                        ; indicate accepted

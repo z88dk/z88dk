@@ -13,7 +13,11 @@ XLIB asm_w_vector_max_size
 
 LIB l_readword_2_hl
 
-defc asm_w_vector_max_size = l_readword_2_hl - 6
+asm_w_vector_max_size:
+
+   jp l_readword_2_hl - 6
+
+;defc asm_w_vector_max_size = l_readword_2_hl - 6
 
    ; enter : hl = vector *
    ;

@@ -13,7 +13,11 @@ XLIB asm_getc_unlocked
 
 LIB asm_fgetc_unlocked
 
-defc asm_getc_unlocked = asm_fgetc_unlocked
+asm_getc_unlocked:
+
+   jp asm_fgetc_unlocked
+
+;defc asm_getc_unlocked = asm_fgetc_unlocked
 
    ; enter : ix = FILE *
    ;

@@ -20,11 +20,15 @@
 ;
 ; ===============================================================
 
-XLIB bv_priority_queue_resize
+XLIB asm_bv_priority_queue_resize
 
-LIB ba_priority_queue_resize
+LIB asm_ba_priority_queue_resize
 
-defc bv_priority_queue_resize = ba_priority_queue_resize
+asm_bv_priority_queue_resize:
+
+   jp asm_ba_priority_queue_resize
+
+;defc asm_bv_priority_queue_resize = asm_ba_priority_queue_resize
 
    ; enter : hl = queue *
    ;         de = n = desired size in bytes

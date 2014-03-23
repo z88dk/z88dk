@@ -13,7 +13,11 @@ XLIB asm_putc
 
 LIB asm_fputc
 
-defc asm_putc = asm_fputc
+asm_putc:
+
+   jp asm_fputc
+
+;defc asm_putc = asm_fputc
 
    ; enter : ix = FILE *
    ;          e = char c

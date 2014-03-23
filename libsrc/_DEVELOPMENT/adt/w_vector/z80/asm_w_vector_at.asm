@@ -14,7 +14,11 @@ XLIB asm_w_vector_at
 
 LIB asm_w_array_at
 
-defc asm_w_vector_at = asm_w_array_at
+asm_w_vector_at:
+
+   jp asm_w_array_at
+
+;defc asm_w_vector_at = asm_w_array_at
 
    ; enter : hl = vector *
    ;         bc = idx

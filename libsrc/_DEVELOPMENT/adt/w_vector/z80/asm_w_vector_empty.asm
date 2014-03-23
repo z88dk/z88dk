@@ -13,7 +13,11 @@ XLIB asm_w_vector_empty
 
 LIB l_testword_hl
 
-defc asm_w_vector_empty = l_testword_hl - 2
+asm_w_vector_empty:
+
+   jp l_testword_hl - 2
+
+;defc asm_w_vector_empty = l_testword_hl - 2
 
    ; enter : hl = vector *
    ;

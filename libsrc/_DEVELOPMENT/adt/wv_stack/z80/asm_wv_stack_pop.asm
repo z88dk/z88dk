@@ -13,7 +13,11 @@ XLIB asm_wv_stack_pop
 
 LIB asm_w_array_pop_back
 
-defc asm_wv_stack_pop = asm_w_array_pop_back
+asm_wv_stack_pop:
+
+   jp asm_w_array_pop_back
+
+;defc asm_wv_stack_pop = asm_w_array_pop_back
 
    ; enter : hl = stack *
    ;

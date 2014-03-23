@@ -3,7 +3,11 @@ XLIB error_divide_by_zero_zc
 
 LIB error_edom_zc
 
-defc error_divide_by_zero_zc = error_edom_zc
+error_divide_by_zero_zc:
+
+   jp error_edom_zc
+
+;defc error_divide_by_zero_zc = error_edom_zc
 
    ; integer divide by zero occurred
    ;

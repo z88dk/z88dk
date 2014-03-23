@@ -14,7 +14,11 @@ XLIB asm_stricmp
 
 LIB asm_strcasecmp
 
-defc asm_stricmp = asm_strcasecmp
+asm_stricmp:
+
+   jp asm_strcasecmp
+
+;defc asm_stricmp = asm_strcasecmp
 
    ; enter : hl = char *s2
    ;         de = char *s1

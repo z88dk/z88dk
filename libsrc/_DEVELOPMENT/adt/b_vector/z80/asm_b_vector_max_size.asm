@@ -13,7 +13,11 @@ XLIB asm_b_vector_max_size
 
 LIB l_readword_hl
 
-defc asm_b_vector_max_size = l_readword_hl - 6
+asm_b_vector_max_size:
+
+   jp l_readword_hl - 6
+
+;defc asm_b_vector_max_size = l_readword_hl - 6
 
    ; enter : hl = b_vector_t *
    ;

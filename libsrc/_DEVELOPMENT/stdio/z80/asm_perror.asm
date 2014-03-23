@@ -11,6 +11,8 @@
 
 XLIB asm_perror
 
+XREF __stdio_file_stderr, _errno
+
 LIB asm_strerror, asm_fputs_unlocked, asm_fputc_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_mc
 
@@ -51,7 +53,7 @@ errno_string:
    call asm_strerror
    call asm_fputs_unlocked
    
-   ld e,'\n'
+   ld e,13                     ; '\n'
    call asm_fputc_unlocked
    
    jp __stdio_lock_release

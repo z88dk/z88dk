@@ -13,6 +13,8 @@
 XLIB asm_puts_unlocked
 XDEF asm0_puts_unlocked
 
+XREF __stdio_file_stdout
+
 LIB asm_fputs_unlocked, asm_fputc_unlocked, l_utod_hl, error_mc
 
 asm_puts_unlocked:
@@ -42,7 +44,7 @@ asm0_puts_unlocked:
    
    push hl                     ; save strlen(s)
    
-   ld e,'\n'
+   ld e,13                     ; '\n'
    call asm_fputc_unlocked     ; output '\n'
    
    pop hl                      ; hl = strlen(s)

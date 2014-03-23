@@ -17,7 +17,11 @@ XLIB asm_wv_stack_init
 
 LIB asm_w_vector_init
 
-defc asm_wv_stack_init = asm_w_vector_init
+asm_wv_stack_init:
+
+   jp asm_w_vector_init
+
+;defc asm_wv_stack_init = asm_w_vector_init
 
    ; enter : de = void *p
    ;         bc = capacity in words

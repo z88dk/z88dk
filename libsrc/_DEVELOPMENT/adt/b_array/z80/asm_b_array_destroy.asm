@@ -14,7 +14,11 @@ XLIB asm_b_array_destroy
 
 LIB l_zerostruct6_hl
 
-defc asm_b_array_destroy = l_zerostruct6_hl
+asm_b_array_destroy:
+
+   jp l_zerostruct6_hl
+
+;defc asm_b_array_destroy = l_zerostruct6_hl
 
    ; enter : hl = array *
    ;

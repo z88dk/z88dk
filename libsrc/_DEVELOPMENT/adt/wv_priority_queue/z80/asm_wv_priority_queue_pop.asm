@@ -13,7 +13,11 @@ XLIB asm_wv_priority_queue_pop
 
 LIB asm_wa_priority_queue_pop
 
-defc asm_wv_priority_queue_pop = asm_wa_priority_queue_pop
+asm_wv_priority_queue_pop:
+
+   jp asm_wa_priority_queue_pop
+
+;defc asm_wv_priority_queue_pop = asm_wa_priority_queue_pop
 
    ; enter : hl = queue *
    ;

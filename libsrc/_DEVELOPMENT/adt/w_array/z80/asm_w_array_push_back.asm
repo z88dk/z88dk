@@ -13,7 +13,11 @@ XLIB asm_w_array_push_back
 
 LIB asm_w_array_append
 
-defc asm_w_array_push_back = asm_w_array_append
+asm_w_array_push_back:
+
+   jp asm_w_array_append
+
+;defc asm_w_array_push_back = asm_w_array_append
 
    ; enter : hl = array *
    ;         bc = item

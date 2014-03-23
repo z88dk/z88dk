@@ -13,7 +13,11 @@ XLIB asm_w_vector_push_back
 
 LIB asm_w_vector_append
 
-defc asm_w_vector_push_back = asm_w_vector_append
+asm_w_vector_push_back:
+
+   jp asm_w_vector_append
+
+;defc asm_w_vector_push_back = asm_w_vector_append
 
    ; enter : hl = vector *
    ;         bc = item

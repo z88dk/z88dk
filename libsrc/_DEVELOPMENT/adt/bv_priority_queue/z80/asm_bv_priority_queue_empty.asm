@@ -13,7 +13,11 @@ XLIB asm_bv_priority_queue_empty
 
 LIB l_testword_hl
 
-defc asm_bv_priority_queue_empty = l_testword_hl - 4
+asm_bv_priority_queue_empty:
+
+   jp l_testword_hl - 4
+
+;defc asm_bv_priority_queue_empty = l_testword_hl - 4
 
    ; enter : hl = priority_queue *
    ;

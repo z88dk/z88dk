@@ -13,7 +13,11 @@ XLIB asm_bv_stack_destroy
 
 LIB asm_b_vector_destroy
 
-defc asm_bv_stack_destroy = asm_b_vector_destroy
+asm_bv_stack_destroy:
+
+   jp asm_b_vector_destroy
+
+;defc asm_bv_stack_destroy = asm_b_vector_destroy
 
    ; enter : hl = vector *
    ;

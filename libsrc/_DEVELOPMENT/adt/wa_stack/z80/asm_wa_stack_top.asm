@@ -14,7 +14,11 @@ XLIB asm_wa_stack_top
 
 LIB asm_w_array_back
 
-defc asm_wa_stack_top = asm_w_array_back
+asm_wa_stack_top:
+
+   jp asm_w_array_back
+
+;defc asm_wa_stack_top = asm_w_array_back
 
    ; enter : hl = stack *
    ;

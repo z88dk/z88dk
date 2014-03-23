@@ -13,7 +13,11 @@ XLIB asm_b_vector_clear
 
 LIB l_zeroword_hl
 
-defc asm_b_vector_clear = l_zeroword_hl - 2
+asm_b_vector_clear:
+
+   jp l_zeroword_hl - 2
+
+;defc asm_b_vector_clear = l_zeroword_hl - 2
 
    ; enter : hl = vector *
    ;

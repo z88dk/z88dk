@@ -13,7 +13,11 @@ XLIB asm_p_queue_push
 
 LIB asm_p_forward_list_alt_push_back
 
-defc asm_p_queue_push = asm_p_forward_list_alt_push_back
+asm_p_queue_push:
+
+   jp asm_p_forward_list_alt_push_back
+
+;defc asm_p_queue_push = asm_p_forward_list_alt_push_back
 
    ; enter : bc = queue *
    ;         de = void *item

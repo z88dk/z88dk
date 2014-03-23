@@ -13,7 +13,11 @@ XLIB asm_wa_stack_size
 
 LIB l_readword_2_hl
 
-defc asm_wa_stack_size = l_readword_2_hl - 2
+asm_wa_stack_size:
+
+   jp l_readword_2_hl - 2
+
+;defc asm_wa_stack_size = l_readword_2_hl - 2
 
    ; enter : hl = stack *
    ;

@@ -14,7 +14,11 @@ XLIB asm_b_vector_erase
 
 LIB asm_b_array_erase
 
-defc asm_b_vector_erase = asm_b_array_erase
+asm_b_vector_erase:
+
+   jp asm_b_array_erase
+
+;defc asm_b_vector_erase = asm_b_array_erase
 
    ; enter : hl = vector *
    ;         bc = idx

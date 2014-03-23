@@ -13,7 +13,11 @@ XLIB asm_b_vector_data
 
 LIB l_readword_hl
 
-defc asm_b_vector_data = l_readword_hl
+asm_b_vector_data:
+
+   jp l_readword_hl
+
+;defc asm_b_vector_data = l_readword_hl
 
    ; enter : hl = vector *
    ;

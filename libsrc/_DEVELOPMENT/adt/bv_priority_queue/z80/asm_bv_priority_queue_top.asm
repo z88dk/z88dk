@@ -13,7 +13,11 @@ XLIB asm_bv_priority_queue_top
 
 LIB asm_b_array_front
 
-defc asm_bv_priority_queue_top = asm_b_array_front - 2
+asm_bv_priority_queue_top:
+
+   jp asm_b_array_front - 2
+
+;defc asm_bv_priority_queue_top = asm_b_array_front - 2
 
    ; enter : hl = priority_queue *
    ;

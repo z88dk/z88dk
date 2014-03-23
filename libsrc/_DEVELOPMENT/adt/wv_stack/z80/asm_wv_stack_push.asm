@@ -13,7 +13,11 @@ XLIB asm_wv_stack_push
 
 LIB asm_w_vector_append
 
-defc asm_wv_stack_push = asm_w_vector_append
+asm_wv_stack_push:
+
+   jp asm_w_vector_append
+
+;defc asm_wv_stack_push = asm_w_vector_append
 
    ; enter : hl = stack *
    ;         bc = item

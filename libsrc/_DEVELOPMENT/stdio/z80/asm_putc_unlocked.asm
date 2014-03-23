@@ -13,7 +13,11 @@ XLIB asm_putc_unlocked
 
 LIB asm_fputc_unlocked
 
-defc asm_putc_unlocked = asm_fputc_unlocked
+asm_putc_unlocked:
+
+   jp asm_fputc_unlocked
+
+;defc asm_putc_unlocked = asm_fputc_unlocked
 
    ; enter : ix = FILE *
    ;          e = char c

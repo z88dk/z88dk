@@ -24,7 +24,7 @@ asm_balloc_blockcount:
    ; uses  : af, de, hl
 
    add hl,hl
-   ld de,(__qbtl)
+   ld de,(__qtbl)
    add hl,de                   ; p_forward_list *q
 
    jp asm_p_forward_list_size

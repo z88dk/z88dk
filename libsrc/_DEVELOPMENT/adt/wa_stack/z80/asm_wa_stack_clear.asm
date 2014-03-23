@@ -13,7 +13,11 @@ XLIB asm_wa_stack_clear
 
 LIB l_zeroword_hl
 
-defc asm_wa_stack_clear = l_zeroword_hl - 2
+asm_wa_stack_clear:
+
+   jp l_zeroword_hl - 2
+
+;defc asm_wa_stack_clear = l_zeroword_hl - 2
 
    ; enter : hl = stack *
    ;

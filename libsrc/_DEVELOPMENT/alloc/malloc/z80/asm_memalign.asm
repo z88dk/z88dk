@@ -20,7 +20,11 @@ XLIB asm_memalign
 
 LIB asm_aligned_alloc
 
-defc asm_memalign = asm_aligned_alloc
+asm_memalign:
+
+   jp asm_aligned_alloc
+
+;defc asm_memalign = asm_aligned_alloc
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap

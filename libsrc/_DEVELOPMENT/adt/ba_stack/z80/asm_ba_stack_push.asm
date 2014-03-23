@@ -13,7 +13,11 @@ XLIB asm_ba_stack_push
 
 LIB asm_b_array_append
 
-defc asm_ba_stack_push = asm_b_array_append
+asm_ba_stack_push:
+
+   jp asm_b_array_append
+
+;defc asm_ba_stack_push = asm_b_array_append
 
    ; enter : hl = stack *
    ;         bc = int c

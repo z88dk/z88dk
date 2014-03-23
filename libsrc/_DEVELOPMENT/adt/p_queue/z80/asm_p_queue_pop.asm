@@ -13,7 +13,11 @@ XLIB asm_p_queue_pop
 
 LIB asm_p_forward_list_alt_pop_front
 
-defc asm_p_queue_pop = asm_p_forward_list_alt_pop_front
+asm_p_queue_pop:
+
+   jp asm_p_forward_list_alt_pop_front
+
+;defc asm_p_queue_pop = asm_p_forward_list_alt_pop_front
 
    ; enter : hl = p_queue_t *q
    ;

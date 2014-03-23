@@ -13,7 +13,11 @@ XLIB asm_p_forward_list_alt_empty
 
 LIB l_testword_hl
 
-defc asm_p_forward_list_alt_empty = l_testword_hl
+asm_p_forward_list_alt_empty:
+
+   jp l_testword_hl
+
+;defc asm_p_forward_list_alt_empty = l_testword_hl
 
    ; enter : hl = p_forward_list_alt_t *
    ;

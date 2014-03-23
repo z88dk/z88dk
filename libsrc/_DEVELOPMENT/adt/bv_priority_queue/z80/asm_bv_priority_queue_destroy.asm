@@ -13,7 +13,11 @@ XLIB asm_bv_priority_queue_destroy
 
 LIB asm_b_vector_destroy
 
-defc asm_bv_priority_queue_destroy = asm_b_vector_destroy - 2
+asm_bv_priority_queue_destroy:
+
+   jp asm_b_vector_destroy - 2
+
+;defc asm_bv_priority_queue_destroy = asm_b_vector_destroy - 2
 
    ; enter : hl = priority_queue *
    ;

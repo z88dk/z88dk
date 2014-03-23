@@ -3,7 +3,11 @@ XLIB __stdio_lock_release
 
 LIB asm_funlockfile
 
-defc __stdio_lock_release = asm_funlockfile
+__stdio_lock_release:
+
+   jp asm_funlockfile
+
+;defc __stdio_lock_release = asm_funlockfile
 
    ; Release the FILE lock
    ;

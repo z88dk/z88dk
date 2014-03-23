@@ -13,7 +13,11 @@ XLIB asm_wv_stack_empty
 
 LIB l_testword_hl
 
-defc asm_wv_stack_empty = l_testword_hl - 2
+asm_wv_stack_empty:
+
+   jp l_testword_hl - 2
+
+;defc asm_wv_stack_empty = l_testword_hl - 2
 
    ; enter : hl = stack *
    ;

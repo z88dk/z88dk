@@ -3,7 +3,11 @@ XLIB __stdio_scanf_p
 
 LIB __stdio_scanf_x
 
-defc __stdio_scanf_p = __stdio_scanf_x
+__stdio_scanf_p:
+
+   jp __stdio_scanf_x
+
+;defc __stdio_scanf_p = __stdio_scanf_x
 
    ; %x, %p converter called from vfscanf()
    ;

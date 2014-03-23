@@ -13,7 +13,11 @@ XLIB asm_b_array_capacity
 
 LIB l_readword_hl
 
-defc asm_b_array_capacity = l_readword_hl - 4
+asm_b_array_capacity:
+
+   jp l_readword_hl - 4
+
+;defc asm_b_array_capacity = l_readword_hl - 4
 
    ; enter : hl = array *
    ;

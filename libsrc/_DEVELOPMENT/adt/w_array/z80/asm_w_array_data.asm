@@ -13,7 +13,11 @@ XLIB asm_w_array_data
 
 LIB l_readword_hl
 
-asm_w_array_data = l_readword_hl
+asm_w_array_data:
+
+   jp l_readword_hl
+
+;defc asm_w_array_data = l_readword_hl
 
    ; enter : hl = array *
    ;

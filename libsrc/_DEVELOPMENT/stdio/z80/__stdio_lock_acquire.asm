@@ -3,7 +3,11 @@ XLIB __stdio_lock_acquire
 
 LIB asm_flockfile
 
-defc __stdio_lock_acquire = asm_flockfile
+__stdio_lock_acquire:
+
+   jp asm_flockfile
+
+;defc __stdio_lock_acquire = asm_flockfile
 
    ; Acquire the FILE lock
    ;

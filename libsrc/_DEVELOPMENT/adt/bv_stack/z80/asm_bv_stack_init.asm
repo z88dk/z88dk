@@ -17,7 +17,11 @@ XLIB asm_bv_stack_init
 
 LIB asm_b_vector_init
 
-defc asm_bv_stack_init = asm_b_vector_init
+asm_bv_stack_init:
+
+   jp asm_b_vector_init
+
+;defc asm_bv_stack_init = asm_b_vector_init
 
    ; enter : de = void *p
    ;         bc = capacity

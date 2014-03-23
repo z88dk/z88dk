@@ -241,10 +241,10 @@ width_from_format:
    ; stack = WORKSPACE_44, stack_param
    
    call l_atou                 ; hl = width
-   jr c, error_format_width    ; width out of range
+   jp c, error_format_width    ; width out of range
 
    bit 7,h
-   jr nz, error_format_width   ; width out of range
+   jp nz, error_format_width   ; width out of range
 
    ex (sp),hl
    push hl
@@ -318,10 +318,10 @@ precision_from_format:
    ; stack = WORKSPACE_44, width, stack_param
 
    call l_atou                   ; hl = precision
-   jr c, error_format_precision  ; precision out of range
+   jp c, error_format_precision  ; precision out of range
 
    bit 7,h
-   jr nz, error_format_precision ; precision out of range
+   jp nz, error_format_precision ; precision out of range
 
 end_precision:
 
@@ -370,16 +370,16 @@ converter_specifier:
    jr z, _printf_d
 
    cp 'u'
-   jr z, _printf_u
+   jp z, _printf_u
 
    cp 'x'
-   jr z, _printf_x
+   jp z, _printf_x
    
    cp 'X'
-   jr z, _printf_X
+   jp z, _printf_xx
    
    cp 'o'
-   jr z, _printf_o
+   jp z, _printf_o
    
    cp 'n'
    jr z, _printf_n
@@ -388,7 +388,7 @@ converter_specifier:
    jr z, _printf_d             ; %i is the same as %d 
    
    cp 'p'
-   jr z, _printf_p
+   jp z, _printf_p
    
    cp 'B'
    jr z, _printf_bb
@@ -398,13 +398,13 @@ more_spec:
    ; converters unaffected by long modifier (in this implementation)
 
    cp 's'
-   jr z, _printf_s
+   jp z, _printf_s
    
    cp 'c'
    jr z, _printf_c
    
    cp 'I'
-   jr z, _printf_I
+   jp z, _printf_I
    
 error_spec_unknown:
 
@@ -414,7 +414,7 @@ error_spec_unknown:
    call error_einval_zc        ; set errno
    
    ld hl,50
-   jr _error_stream
+   jp _error_stream
 
 long_spec:
 
@@ -422,13 +422,13 @@ long_spec:
    jr z, _printf_ld
 
    cp 'u'
-   jr z, _printf_lu
+   jp z, _printf_lu
 
    cp 'x'
-   jr z, _printf_lx
+   jp z, _printf_lx
    
    cp 'X'
-   jr z, _printf_lX
+   jp z, _printf_lxx
    
    cp 'o'
    jr z, _printf_lo
@@ -476,7 +476,7 @@ _printf_bb:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_bb
    
-   jr printf_invoke_2 - 1
+   jp printf_invoke_2 - 1
 
 _printf_lbb:
 
@@ -528,7 +528,7 @@ _printf_ln:
    ld hl,__stdio_printf_ln
    jr printf_invoke_4 - 1
 
-_pritnf_o:
+_printf_o:
 
    LIB __stdio_printf_o
 
@@ -564,7 +564,7 @@ _printf_s:
 
    LIB __stdio_printf_s
  
-   ld hl,__stido_printf_s
+   ld hl,__stdio_printf_s
    jr printf_invoke_2 - 1
 
 _printf_u:
@@ -585,7 +585,7 @@ _printf_lu:
    
    jr printf_invoke_4 - 1
 
-_printf_X:
+_printf_xx:
 
    LIB __stdio_printf_x
 
@@ -594,7 +594,7 @@ _printf_X:
 
    jr printf_invoke_2
 
-_printf_lX:
+_printf_lxx:
 
    LIB __stdio_printf_lx
       

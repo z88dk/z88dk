@@ -14,7 +14,11 @@ XLIB asm_wa_stack_destroy
 
 LIB l_zerostruct6_hl
 
-defc asm_wa_stack_destroy = l_zerostruct6_hl
+asm_wa_stack_destroy:
+
+   jp l_zerostruct6_hl
+
+;defc asm_wa_stack_destroy = l_zerostruct6_hl
 
    ; enter : hl = stack *
    ;

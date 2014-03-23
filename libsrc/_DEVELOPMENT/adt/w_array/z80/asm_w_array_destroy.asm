@@ -14,7 +14,11 @@ XLIB asm_w_array_destroy
 
 LIB asm_b_array_destroy
 
-defc asm_w_array_destroy = asm_b_array_destroy
+asm_w_array_destroy:
+
+   jp asm_b_array_destroy
+
+;defc asm_w_array_destroy = asm_b_array_destroy
 
    ; enter : hl = array *
    ;

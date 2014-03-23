@@ -13,7 +13,11 @@ XLIB asm_w_array_size
 
 LIB l_readword_2_hl
 
-defc asm_w_array_size = l_readword_2_hl - 2
+asm_w_array_size:
+
+   jp l_readword_2_hl - 2
+
+;defc asm_w_array_size = l_readword_2_hl - 2
 
    ; enter : hl = array *
    ;

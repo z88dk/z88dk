@@ -15,7 +15,11 @@ XLIB asm_strnicmp
 
 LIB asm_strncasecmp
 
-defc asm_strnicmp = asm_strncasecmp
+asm_strnicmp:
+
+   jp asm_strncasecmp
+
+;defc asm_strnicmp = asm_strncasecmp
 
    ; enter : hl = char *s2
    ;         de = char *s1

@@ -13,7 +13,11 @@ XLIB asm_b_vector_erase_range
 
 LIB asm_b_array_erase_range
 
-defc asm_b_vector_erase_range = asm_b_array_erase_range
+asm_b_vector_erase_range:
+
+   jp asm_b_array_erase_range
+
+;defc asm_b_vector_erase_range = asm_b_array_erase_range
 
    ; enter : hl = idx_last
    ;         bc = idx_first

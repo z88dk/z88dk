@@ -13,7 +13,11 @@ XLIB asm_p_stack_top
 
 LIB asm_p_forward_list_front
 
-defc asm_p_stack_top = asm_p_forward_list_front
+asm_p_stack_top:
+
+   jp asm_p_forward_list_front
+
+;defc asm_p_stack_top = asm_p_forward_list_front
 
    ; enter : hl = stack *
    ;

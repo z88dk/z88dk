@@ -13,7 +13,11 @@ XLIB asm_wv_priority_queue_size
 
 LIB l_readword_2_hl
 
-defc asm_wv_priority_queue_size = l_readword_2_hl - 4
+asm_wv_priority_queue_size:
+
+   jp l_readword_2_hl - 4
+
+;defc asm_wv_priority_queue_size = l_readword_2_hl - 4
 
    ; enter : hl = priority_queue *
    ;

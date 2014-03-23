@@ -13,7 +13,11 @@ XLIB asm_b_array_empty
 
 LIB l_testword_hl
 
-defc asm_b_array_empty = l_testword_hl - 2
+asm_b_array_empty:
+
+   jp l_testword_hl - 2
+
+;defc asm_b_array_empty = l_testword_hl - 2
 
    ; enter : hl = array *
    ;

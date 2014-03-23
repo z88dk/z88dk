@@ -13,7 +13,11 @@ XLIB asm_bv_priority_queue_capacity
 
 LIB l_readword_hl
 
-defc asm_bv_priority_queue_capacity = l_readword_hl - 6
+asm_bv_priority_queue_capacity:
+
+   jp l_readword_hl - 6
+
+;defc asm_bv_priority_queue_capacity = l_readword_hl - 6
 
    ; enter : hl = priority_queue *
    ;

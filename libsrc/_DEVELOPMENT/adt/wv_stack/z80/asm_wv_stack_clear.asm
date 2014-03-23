@@ -13,7 +13,11 @@ XLIB asm_wv_stack_clear
 
 LIB l_zeroword_hl
 
-defc asm_wv_stack_clear = l_zeroword_hl - 2
+asm_wv_stack_clear:
+
+   jp l_zeroword_hl - 2
+
+;defc asm_wv_stack_clear = l_zeroword_hl - 2
 
    ; enter : hl = stack *
    ;

@@ -14,7 +14,11 @@ XLIB asm_wa_stack_init
 
 LIB asm_w_array_init
 
-defc asm_wa_stack_init = asm_w_array_init
+asm_wa_stack_init:
+
+   jp asm_w_array_init
+
+;defc asm_wa_stack_init = asm_w_array_init
 
    ; enter : hl = p
    ;         de = data

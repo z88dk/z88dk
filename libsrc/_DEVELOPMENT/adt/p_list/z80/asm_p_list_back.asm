@@ -13,7 +13,11 @@ XLIB asm_p_list_back
 
 LIB asm_p_forward_list_front
 
-defc asm_p_list_back = asm_p_forward_list_front - 2
+asm_p_list_back:
+
+   jp asm_p_forward_list_front - 2
+
+;defc asm_p_list_back = asm_p_forward_list_front - 2
 
    ; enter : hl = p_list_t *list
    ;

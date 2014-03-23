@@ -24,7 +24,11 @@ XLIB asm_wv_priority_queue_resize
 
 LIB asm_wa_priority_queue_resize
 
-defc asm_wv_priority_queue_resize = asm_wa_priority_queue_resize
+asm_wv_priority_queue_resize:
+
+   jp asm_wa_priority_queue_resize
+
+;defc asm_wv_priority_queue_resize = asm_wa_priority_queue_resize
 
    ; enter : hl = queue *
    ;         de = n = desired size in words

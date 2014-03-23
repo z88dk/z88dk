@@ -13,7 +13,11 @@ XLIB asm_wa_priority_queue_destroy
 
 LIB l_zerostruct8_hl
 
-defc asm_wa_priority_queue_destroy = l_zerostruct8_hl
+asm_wa_priority_queue_destroy:
+
+   jp l_zerostruct8_hl
+
+;defc asm_wa_priority_queue_destroy = l_zerostruct8_hl
 
    ; enter : hl = priority_queue *
    ;

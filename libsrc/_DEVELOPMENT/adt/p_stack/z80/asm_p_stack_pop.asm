@@ -13,7 +13,11 @@ XLIB asm_p_stack_pop
 
 LIB asm_p_forward_list_remove_after
 
-defc asm_p_stack_pop = asm_p_forward_list_remove_after
+asm_p_stack_pop:
+
+   jp asm_p_forward_list_remove_after
+
+;defc asm_p_stack_pop = asm_p_forward_list_remove_after
 
    ; enter : hl = stack *
    ;

@@ -13,7 +13,11 @@ XLIB asm_w_vector_front
 
 LIB asm_w_array_front
 
-defc asm_w_vector_front = asm_w_array_front
+asm_w_vector_front:
+
+   jp asm_w_array_front
+
+;defc asm_w_vector_front = asm_w_array_front
 
    ; enter : hl = vector *
    ;

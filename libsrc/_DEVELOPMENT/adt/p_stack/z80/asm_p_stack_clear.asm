@@ -13,7 +13,11 @@ XLIB asm_p_stack_clear
 
 LIB asm_p_forward_list_init
 
-defc asm_p_stack_clear = asm_p_forward_list_init
+asm_p_stack_clear:
+
+   jp asm_p_forward_list_init
+
+;defc asm_p_stack_clear = asm_p_forward_list_init
 
    ; enter : hl = p_stack_t *
    ;

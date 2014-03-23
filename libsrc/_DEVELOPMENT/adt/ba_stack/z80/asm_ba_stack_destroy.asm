@@ -14,7 +14,11 @@ XLIB asm_ba_stack_destroy
 
 LIB asm_b_array_destroy
 
-defc asm_ba_stack_destroy = asm_b_array_destroy
+asm_ba_stack_destroy:
+
+   jp asm_b_array_destroy
+
+;defc asm_ba_stack_destroy = asm_b_array_destroy
 
    ; enter : hl = stack *
    ;

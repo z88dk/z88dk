@@ -13,7 +13,11 @@ XLIB asm_wa_priority_queue_data
 
 LIB l_readword_hl
 
-defc asm_wa_priority_queue_data = l_readword_hl - 2
+asm_wa_priority_queue_data:
+
+   jp l_readword_hl - 2
+
+;defc asm_wa_priority_queue_data = l_readword_hl - 2
 
    ; enter : hl = priority_queue *
    ;

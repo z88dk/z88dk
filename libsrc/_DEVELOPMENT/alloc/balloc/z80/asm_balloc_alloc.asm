@@ -32,7 +32,7 @@ asm_balloc_alloc:
    ; uses  : af, de, hl
 
    add hl,hl
-   ld de,(__qbtl)
+   ld de,(__qtbl)
    add hl,de                   ; p_forward_list *q
 
    call asm_p_forward_list_remove_after

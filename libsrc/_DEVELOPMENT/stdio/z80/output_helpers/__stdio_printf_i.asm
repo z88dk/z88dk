@@ -3,7 +3,11 @@ XLIB __stdio_printf_i
 
 LIB __stdio_printf_d
 
-defc __stdio_printf_i = __stdio_printf_d
+__stdio_printf_i:
+
+   jp __stdio_printf_d
+
+;defc __stdio_printf_i = __stdio_printf_d
 
    ; %d, %i converter called from vfprintf()
    ;

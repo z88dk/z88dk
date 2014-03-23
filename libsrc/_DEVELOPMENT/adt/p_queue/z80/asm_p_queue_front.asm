@@ -13,7 +13,11 @@ XLIB asm_p_queue_front
 
 LIB asm_p_forward_list_front
 
-defc asm_p_queue_front = asm_p_forward_list_front
+asm_p_queue_front:
+
+   jp asm_p_forward_list_front
+
+;defc asm_p_queue_front = asm_p_forward_list_front
 
    ; enter : hl = queue *
    ;

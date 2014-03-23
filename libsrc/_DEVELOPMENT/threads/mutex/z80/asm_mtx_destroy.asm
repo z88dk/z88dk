@@ -16,6 +16,10 @@ XLIB asm_mtx_destroy
 
 LIB l_setmem_hl
 
-defc asm_mtx_destroy = l_setmem_hl - 12
+asm_mtx_destroy:
+
+   jp l_setmem_hl - 12
+
+;defc asm_mtx_destroy = l_setmem_hl - 12
 
 ; zeroed structure makes mtx_type invalid

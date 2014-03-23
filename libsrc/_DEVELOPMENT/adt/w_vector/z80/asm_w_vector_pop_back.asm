@@ -13,7 +13,11 @@ XLIB asm_w_vector_pop_back
 
 LIB asm_w_array_pop_back
 
-defc asm_w_vector_pop_back = asm_w_array_pop_back
+asm_w_vector_pop_back:
+
+   jp asm_w_array_pop_back
+
+;defc asm_w_vector_pop_back = asm_w_array_pop_back
 
    ; enter : hl = vector *
    ;

@@ -13,7 +13,11 @@ XLIB asm_bv_stack_max_size
 
 LIB l_readword_hl
 
-defc asm_bv_stack_max_size = l_readword_hl - 6
+asm_bv_stack_max_size:
+
+   jp l_readword_hl - 6
+
+;defc asm_bv_stack_max_size = l_readword_hl - 6
 
    ; enter : hl = stack *
    ;

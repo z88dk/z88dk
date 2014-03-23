@@ -15,7 +15,11 @@ XLIB asm_wv_priority_queue_reserve
 
 LIB asm_w_vector_reserve
 
-defc asm_wv_priority_queue_reserve = asm_w_vector_reserve - 2
+asm_wv_priority_queue_reserve:
+
+   jp asm_w_vector_reserve - 2
+
+;defc asm_wv_priority_queue_reserve = asm_w_vector_reserve - 2
 
    ; enter : hl = priority_queue *
    ;         bc = n

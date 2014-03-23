@@ -36,5 +36,5 @@ asm_getline_unlocked:
    ;
    ; uses  : all except ix
 
-   ld bc,'\n'
+   ld bc,13                    ; '\n'
    jp asm_getdelim_unlocked
