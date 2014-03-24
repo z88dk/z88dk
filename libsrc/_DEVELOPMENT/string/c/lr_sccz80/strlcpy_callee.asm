@@ -10,4 +10,4 @@ strlcpy_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_strlcpy.asm"
+   INCLUDE "string/z80/asm_strlcpy.asm"

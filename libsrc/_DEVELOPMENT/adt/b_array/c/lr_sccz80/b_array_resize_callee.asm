@@ -9,4 +9,4 @@ b_array_resize_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_b_array_resize.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_resize.asm"

@@ -5,4 +5,4 @@ XDEF malloc
 
 malloc:
 
-   INCLUDE "../../z80/asm_malloc.asm"
+   INCLUDE "alloc/malloc/z80/asm_malloc.asm"

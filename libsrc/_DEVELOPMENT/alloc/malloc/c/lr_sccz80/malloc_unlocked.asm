@@ -5,4 +5,4 @@ XDEF malloc_unlocked
 
 malloc_unlocked:
 
-   INCLUDE "../../z80/asm_malloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_malloc_unlocked.asm"

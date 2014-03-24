@@ -3,6 +3,8 @@
 
 XDEF bv_stack_max_size
 
-defc bv_stack_max_size = asm_bv_stack_max_size
+;defc bv_stack_max_size = asm_bv_stack_max_size
 
-INCLUDE "../../z80/asm_bv_stack_max_size.asm"
+bv_stack_max_size:
+
+  INCLUDE "adt/bv_stack/z80/asm_bv_stack_max_size.asm"

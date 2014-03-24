@@ -10,4 +10,4 @@ fzx_write_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_fzx_write.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_write.asm"

@@ -5,4 +5,4 @@ XDEF exit
 
 exit:
 
-   INCLUDE "../../z80/asm_exit.asm"
+   INCLUDE "stdlib/z80/asm_exit.asm"

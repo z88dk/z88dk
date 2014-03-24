@@ -13,4 +13,4 @@ realloc:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_realloc.asm"
+   INCLUDE "alloc/malloc/z80/asm_realloc.asm"

@@ -15,4 +15,4 @@ _div:
    push de
    push af
    
-   INCLUDE "../../z80/asm__div.asm"
+   INCLUDE "stdlib/z80/asm__div.asm"

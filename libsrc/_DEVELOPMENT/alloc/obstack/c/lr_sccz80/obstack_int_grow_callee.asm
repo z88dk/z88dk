@@ -9,10 +9,12 @@
 ;
 ; ===============================================================
 
-XDEF obstack_int_grow_callee:
+XDEF obstack_int_grow_callee
+
+obstack_int_grow_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_int_grow.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_int_grow.asm"

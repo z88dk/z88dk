@@ -13,4 +13,4 @@ b_vector_destroy:
 
    jr asm_b_vector_destroy
    
-   INCLUDE "../../z80/asm_b_vector_destroy.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_destroy.asm"

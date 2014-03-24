@@ -10,4 +10,4 @@ strstr_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_strstr.asm"
+   INCLUDE "string/z80/asm_strstr.asm"

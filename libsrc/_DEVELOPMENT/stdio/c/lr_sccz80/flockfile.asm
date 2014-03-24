@@ -8,4 +8,4 @@ flockfile:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_flockfile.asm"
+   INCLUDE "stdio/z80/asm_flockfile.asm"

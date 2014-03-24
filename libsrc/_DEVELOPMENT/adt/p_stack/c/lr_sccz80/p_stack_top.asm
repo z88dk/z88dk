@@ -3,6 +3,8 @@
 
 XDEF p_stack_top
 
-defc p_stack_top = asm_p_stack_top
+;defc p_stack_top = asm_p_stack_top
 
-INCLUDE "../../z80/asm_p_stack_top.asm"
+p_stack_top:
+
+   INCLUDE "adt/p_stack/z80/asm_p_stack_top.asm"

@@ -13,4 +13,4 @@ _falloc_unlocked:
    push hl
    push af
    
-   INCLUDE "../../z80/asm__falloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm__falloc_unlocked.asm"

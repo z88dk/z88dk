@@ -3,6 +3,8 @@
 
 XDEF ba_stack_empty
 
-defc ba_stack_empty = asm_ba_stack_empty
+;defc ba_stack_empty = asm_ba_stack_empty
 
-INCLUDE "../../z80/asm_ba_stack_empty.asm"
+ba_stack_empty:
+
+   INCLUDE "adt/ba_stack/z80/asm_ba_stack_empty.asm"

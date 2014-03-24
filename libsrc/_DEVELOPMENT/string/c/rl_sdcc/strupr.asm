@@ -11,4 +11,4 @@ strupr:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_strupr.asm"
+   INCLUDE "string/z80/asm_strupr.asm"

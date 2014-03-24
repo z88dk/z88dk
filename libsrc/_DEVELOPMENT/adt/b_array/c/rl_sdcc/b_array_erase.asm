@@ -13,4 +13,4 @@ b_array_erase:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_b_array_erase.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_erase.asm"

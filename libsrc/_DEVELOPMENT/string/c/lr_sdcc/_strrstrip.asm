@@ -11,4 +11,4 @@ _strrstrip:
    push hl
    push af
 
-   INCLUDE "../../z80/asm__strrstrip.asm"
+   INCLUDE "string/z80/asm__strrstrip.asm"

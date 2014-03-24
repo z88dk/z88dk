@@ -3,6 +3,8 @@
 
 XDEF b_vector_clear
 
-defc b_vector_clear = asm_b_vector_clear
+;defc b_vector_clear = asm_b_vector_clear
 
-INCLUDE "../../z80/asm_b_vector_clear.asm"
+b_vector_clear:
+
+   INCLUDE "adt/b_vector/z80/asm_b_vector_clear.asm"

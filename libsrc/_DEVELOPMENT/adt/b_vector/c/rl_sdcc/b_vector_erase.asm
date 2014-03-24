@@ -7,4 +7,4 @@ LIB b_array_erase
 
 defc b_vector_erase = b_array_erase
 
-INCLUDE "../../z80/asm_b_vector_erase.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_erase.asm"

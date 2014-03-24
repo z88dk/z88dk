@@ -5,4 +5,4 @@ XDEF scanf_unlocked
 
 scanf_unlocked:
 
-   INCLUDE "../../z80/asm_scanf_unlocked.asm"
+   INCLUDE "stdio/z80/asm_scanf_unlocked.asm"

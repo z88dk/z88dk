@@ -15,4 +15,4 @@ w_array_init:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_w_array_init.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_init.asm"

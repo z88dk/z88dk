@@ -17,4 +17,4 @@ ba_priority_queue_pop:
    
    ret
 
-   INCLUDE "../../z80/asm_ba_priority_queue_pop.asm"
+   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_pop.asm"

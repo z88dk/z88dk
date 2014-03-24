@@ -15,4 +15,4 @@ strncat:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strncat.asm"
+   INCLUDE "string/z80/asm_strncat.asm"

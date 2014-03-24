@@ -13,4 +13,4 @@ p_forward_list_front:
    
    jr asm_p_forward_list_front
 
-   INCLUDE "../../z80/asm_p_forward_list_front.asm"
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_front.asm"

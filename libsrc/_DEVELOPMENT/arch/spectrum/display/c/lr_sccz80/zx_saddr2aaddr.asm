@@ -5,4 +5,4 @@ XDEF zx_saddr2aaddr
 
 zx_saddr2aaddr:
 
-   INCLUDE "../../z80/asm_zx_saddr2aaddr.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_saddr2aaddr.asm"

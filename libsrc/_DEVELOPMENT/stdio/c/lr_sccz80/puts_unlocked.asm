@@ -5,4 +5,4 @@ XDEF puts_unlocked
 
 puts_unlocked:
 
-   INCLUDE "../../z80/asm_puts_unlocked.asm"
+   INCLUDE "stdio/z80/asm_puts_unlocked.asm"

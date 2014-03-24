@@ -10,4 +10,4 @@ strtok_r_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_strtok_r.asm"
+   INCLUDE "string/z80/asm_strtok_r.asm"

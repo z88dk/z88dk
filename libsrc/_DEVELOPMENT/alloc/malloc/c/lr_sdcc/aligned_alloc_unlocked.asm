@@ -13,4 +13,4 @@ aligned_alloc_unlocked:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_aligned_alloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_aligned_alloc_unlocked.asm"

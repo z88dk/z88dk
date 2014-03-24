@@ -13,4 +13,4 @@ b_array_front:
    
    jr asm_b_array_front
    
-   INCLUDE "../../z80/asm_b_array_front.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_front.asm"

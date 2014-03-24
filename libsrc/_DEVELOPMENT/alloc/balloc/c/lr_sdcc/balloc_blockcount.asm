@@ -11,4 +11,4 @@ balloc_blockcount:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_balloc_blockcount.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_blockcount.asm"

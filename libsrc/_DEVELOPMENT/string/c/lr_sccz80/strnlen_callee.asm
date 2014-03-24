@@ -9,4 +9,4 @@ strnlen_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_strnlen.asm"
+   INCLUDE "string/z80/asm_strnlen.asm"

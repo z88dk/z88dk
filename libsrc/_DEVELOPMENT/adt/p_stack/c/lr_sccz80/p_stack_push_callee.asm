@@ -5,6 +5,10 @@ XDEF p_stack_push_callee
 
 LIB p_forward_list_insert_after_callee
 
-defc p_stack_push_callee = p_forward_list_insert_after_callee
+;defc p_stack_push_callee = p_forward_list_insert_after_callee
 
-INCLUDE "../../z80/asm_p_stack_push.asm"
+p_stack_push_callee:
+
+   jp p_forward_list_insert_after_callee
+
+INCLUDE "adt/p_stack/z80/asm_p_stack_push.asm"

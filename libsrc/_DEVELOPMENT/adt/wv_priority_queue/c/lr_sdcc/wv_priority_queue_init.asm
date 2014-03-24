@@ -32,4 +32,4 @@ wv_priority_queue_init:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_wv_priority_queue_init.asm"
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_init.asm"

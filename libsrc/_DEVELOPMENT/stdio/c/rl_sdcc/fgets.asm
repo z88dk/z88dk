@@ -26,4 +26,4 @@ fgets:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fgets.asm"
+   INCLUDE "stdio/z80/asm_fgets.asm"

@@ -14,4 +14,4 @@ balloc_addmem_callee:
    
    ld a,ixl
    
-   INCLUDE "../../z80/asm_balloc_addmem.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_addmem.asm"

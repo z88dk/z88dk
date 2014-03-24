@@ -25,4 +25,4 @@ obstack_copy0:
    push bc
    push af
 
-   INCLUDE "../../z80/asm_obstack_copy0.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_copy0.asm"

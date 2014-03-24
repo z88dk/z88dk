@@ -1,7 +1,7 @@
 
 ; void *memccpy(void * restrict s1, const void * restrict s2, int c, size_t n)
 
-XDEF memccpy_callee:
+XDEF memccpy_callee
 
 memccpy_callee:
 
@@ -14,4 +14,4 @@ memccpy_callee:
    
    ld a,ixl
       
-   INCLUDE "../../z80/asm_memccpy.asm"
+   INCLUDE "string/z80/asm_memccpy.asm"

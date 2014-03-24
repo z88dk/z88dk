@@ -13,4 +13,4 @@ w_array_at:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_w_array_at.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_at.asm"

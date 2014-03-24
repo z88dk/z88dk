@@ -18,4 +18,4 @@ puts:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_puts.asm"
+   INCLUDE "stdio/z80/asm_puts.asm"

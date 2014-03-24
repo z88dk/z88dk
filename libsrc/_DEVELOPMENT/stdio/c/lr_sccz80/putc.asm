@@ -5,4 +5,8 @@ XLIB putc
 
 LIB fputc
 
-defc putc = fputc
+;defc putc = fputc
+
+putc:
+
+   jp fputc

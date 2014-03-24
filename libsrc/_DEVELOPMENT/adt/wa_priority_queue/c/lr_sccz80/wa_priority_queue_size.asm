@@ -3,6 +3,8 @@
 
 XDEF wa_priority_queue_size
 
-defc wa_priority_queue_size = asm_wa_priority_queue_size
+;defc wa_priority_queue_size = asm_wa_priority_queue_size
 
-INCLUDE "../../z80/asm_wa_priority_queue_size.asm"
+wa_priority_queue_size:
+
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_size.asm"

@@ -5,4 +5,4 @@ XDEF fscanf_unlocked
 
 fscanf_unlocked:
 
-   INCLUDE "../../z80/asm_fscanf_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fscanf_unlocked.asm"

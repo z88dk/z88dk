@@ -22,4 +22,4 @@ strtol:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_strtol.asm"
+   INCLUDE "stdlib/z80/asm_strtol.asm"

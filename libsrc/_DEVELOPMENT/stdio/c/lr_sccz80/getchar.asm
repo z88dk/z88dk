@@ -5,4 +5,4 @@ XDEF getchar
 
 getchar:
 
-   INCLUDE "../../z80/asm_getchar.asm"
+   INCLUDE "stdio/z80/asm_getchar.asm"

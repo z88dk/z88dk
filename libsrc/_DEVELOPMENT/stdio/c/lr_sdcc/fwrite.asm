@@ -31,4 +31,4 @@ fwrite:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_fwrite.asm"
+   INCLUDE "stdio/z80/asm_fwrite.asm"

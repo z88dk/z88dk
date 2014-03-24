@@ -10,4 +10,4 @@ fputc_unlocked_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_fputc_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fputc_unlocked.asm"

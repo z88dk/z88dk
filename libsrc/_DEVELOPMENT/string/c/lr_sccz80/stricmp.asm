@@ -5,4 +5,8 @@ XLIB stricmp
 
 LIB strcasecmp
 
-defc stricmp = strcasecmp
+;defc stricmp = strcasecmp
+
+stricmp:
+
+   jp strcasecmp

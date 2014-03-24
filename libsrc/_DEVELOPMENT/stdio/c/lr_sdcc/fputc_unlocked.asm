@@ -23,4 +23,4 @@ fputc_unlocked:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fputc_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fputc_unlocked.asm"

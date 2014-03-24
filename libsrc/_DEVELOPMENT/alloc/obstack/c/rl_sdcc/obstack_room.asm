@@ -17,4 +17,4 @@ XDEF obstack_room:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_obstack_room.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_room.asm"

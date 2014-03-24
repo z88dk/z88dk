@@ -5,4 +5,8 @@ XLIB wv_stack_init
 
 LIB w_vector_init
 
-defc wv_stack_init = w_vector_init
+;defc wv_stack_init = w_vector_init
+
+wv_stack_init:
+
+   jp w_vector_init

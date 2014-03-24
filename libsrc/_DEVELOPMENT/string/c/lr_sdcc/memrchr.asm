@@ -17,4 +17,4 @@ memrchr:
    
    ld a,e
    
-   INCLUDE "../../z80/asm_memrchr.asm"
+   INCLUDE "string/z80/asm_memrchr.asm"

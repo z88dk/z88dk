@@ -13,4 +13,4 @@ bv_priority_queue_destroy:
       
    jp asm_bv_priority_queue_destroy
 
-   INCLUDE "../../z80/asm_bv_priority_queue_destroy.asm"
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_destroy.asm"

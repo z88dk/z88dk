@@ -10,4 +10,4 @@ fsetpos_callee:
    pop ix
    push af
    
-   INCLUDE "../../z80/asm_fsetpos.asm"
+   INCLUDE "stdio/z80/asm_fsetpos.asm"

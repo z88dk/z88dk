@@ -15,4 +15,4 @@ w_vector_append_n:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_w_vector_append_n.asm"
+   INCLUDE "adt/w_vector/z80/asm_w_vector_append_n.asm"

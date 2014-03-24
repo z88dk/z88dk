@@ -11,4 +11,4 @@ heap_free_unlocked:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_heap_free_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_free_unlocked.asm"

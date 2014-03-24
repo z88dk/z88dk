@@ -7,4 +7,4 @@ LIB fgetc
 
 defc getc = fgetc
 
-INCLUDE "../../z80/asm_getc.asm"
+INCLUDE "stdio/z80/asm_getc.asm"

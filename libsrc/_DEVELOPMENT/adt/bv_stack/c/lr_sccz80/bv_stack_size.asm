@@ -3,6 +3,8 @@
 
 XDEF bv_stack_size
 
-defc bv_stack_size = asm_bv_stack_size
+;defc bv_stack_size = asm_bv_stack_size
 
-INCLUDE "../../z80/asm_bv_stack_size.asm"
+bv_stack_size:
+
+   INCLUDE "adt/bv_stack/z80/asm_bv_stack_size.asm"

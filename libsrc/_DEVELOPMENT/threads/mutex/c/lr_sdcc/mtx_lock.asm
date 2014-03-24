@@ -11,4 +11,4 @@ mtx_lock:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_mtx_lock.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_lock.asm"

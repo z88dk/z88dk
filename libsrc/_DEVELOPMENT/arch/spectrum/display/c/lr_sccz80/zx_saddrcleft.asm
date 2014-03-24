@@ -5,4 +5,4 @@ XDEF zx_saddrcleft
 
 zx_saddrcleft:
 
-   INCLUDE "../../z80/asm_zx_saddrcleft.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_saddrcleft.asm"

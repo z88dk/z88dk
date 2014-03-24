@@ -19,4 +19,4 @@ obstack_object_size:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_obstack_object_size.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_object_size.asm"

@@ -13,4 +13,4 @@ b_array_data:
    
    jp asm_b_array_data
 
-   INCLUDE "../../z80/asm_b_array_data.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_data.asm"

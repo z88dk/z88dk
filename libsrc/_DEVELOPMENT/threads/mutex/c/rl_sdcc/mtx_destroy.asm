@@ -13,4 +13,4 @@ mtx_destroy:
    
    jp asm_mtx_destroy
 
-   INCLUDE "../../z80/asm_mtx_destroy.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_destroy.asm"

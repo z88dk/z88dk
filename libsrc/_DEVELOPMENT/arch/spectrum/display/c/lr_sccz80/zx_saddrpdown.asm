@@ -5,4 +5,4 @@ XDEF zx_saddrpdown
 
 zx_saddrpdown:
 
-   INCLUDE "../../z80/asm_zx_saddrpdown.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_saddrpdown.asm"

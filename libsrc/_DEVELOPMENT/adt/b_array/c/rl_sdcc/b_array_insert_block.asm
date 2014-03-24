@@ -15,4 +15,4 @@ b_array_insert_block:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_b_array_insert_block.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_insert_block.asm"

@@ -5,4 +5,8 @@ XLIB bv_stack_init
 
 LIB b_vector_init
 
-defc bv_stack_init = b_vector_init
+;defc bv_stack_init = b_vector_init
+
+bv_stack_init:
+
+   jp b_vector_init

@@ -5,4 +5,4 @@ XDEF heap_free_unlocked
 
 heap_free_unlocked:
 
-   INCLUDE "../../z80/asm_heap_free_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_free_unlocked.asm"

@@ -5,4 +5,4 @@ XDEF free
 
 free:
 
-   INCLUDE "../../z80/asm_free.asm"
+   INCLUDE "alloc/malloc/z80/asm_free.asm"

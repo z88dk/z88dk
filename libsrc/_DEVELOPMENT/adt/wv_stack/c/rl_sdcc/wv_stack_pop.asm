@@ -7,4 +7,4 @@ LIB w_array_pop_back
 
 defc wv_stack_pop = w_array_pop_back
 
-INCLUDE "../../z80/asm_wv_stack_pop.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_pop.asm"

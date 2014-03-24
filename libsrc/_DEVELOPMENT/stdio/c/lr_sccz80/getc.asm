@@ -5,6 +5,10 @@ XDEF getc
 
 LIB fgetc
 
-defc getc = fgetc
+;defc getc = fgetc
 
-INCLUDE "../../z80/asm_getc.asm"
+getc:
+
+   jp fgetc
+
+INCLUDE "stdio/z80/asm_getc.asm"

@@ -3,6 +3,8 @@
 
 XDEF p_queue_size
 
-defc p_queue_size = asm_p_queue_size
+;defc p_queue_size = asm_p_queue_size
 
-INCLUDE "../../z80/asm_p_queue_size.asm"
+p_queue_size:
+
+   INCLUDE "adt/p_queue/z80/asm_p_queue_size.asm"

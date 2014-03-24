@@ -10,4 +10,4 @@ open_memstream_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_open_memstream.asm"
+   INCLUDE "stdio/z80/asm_open_memstream.asm"

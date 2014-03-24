@@ -23,4 +23,4 @@ b_array_insert_n:
    ld a,c
    exx
    
-   INCLUDE "../../z80/asm_b_array_insert_n.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_insert_n.asm"

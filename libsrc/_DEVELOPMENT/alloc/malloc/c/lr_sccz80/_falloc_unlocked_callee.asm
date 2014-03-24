@@ -10,4 +10,4 @@ _falloc_unlocked_callee:
    pop bc
    push af
 
-   INCLUDE "../../z80/asm__falloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm__falloc_unlocked.asm"

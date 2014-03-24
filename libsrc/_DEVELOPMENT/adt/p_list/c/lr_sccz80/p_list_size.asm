@@ -3,6 +3,8 @@
 
 XDEF p_list_size
 
-defc p_list_size = asm_p_list_size
+;defc p_list_size = asm_p_list_size
 
-INCLUDE "../../z80/asm_p_list_size.asm"
+p_list_size:
+
+   INCLUDE "adt/p_list/z80/asm_p_list_size.asm"

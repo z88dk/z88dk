@@ -23,4 +23,4 @@ fgetpos:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fgetpos.asm"
+   INCLUDE "stdio/z80/asm_fgetpos.asm"

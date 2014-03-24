@@ -7,4 +7,4 @@ LIB b_array_init
 
 defc ba_stack_init = b_array_init
 
-INCLUDE "../../asm_ba_stack_init.asm"
+INCLUDE "adt/ba_stack/asm_ba_stack_init.asm"

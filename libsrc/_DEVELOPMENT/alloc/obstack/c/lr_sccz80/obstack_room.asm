@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
-XDEF obstack_room:
+XDEF obstack_room
 
-   INCLUDE "../../z80/asm_obstack_room.asm"
+obstack_room:
+
+   INCLUDE "alloc/obstack/z80/asm_obstack_room.asm"

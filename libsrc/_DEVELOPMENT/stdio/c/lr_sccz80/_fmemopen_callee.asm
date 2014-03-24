@@ -12,4 +12,4 @@ _fmemopen_callee:
    
    ld a,$0c                    ; only disallow undefined bits in mode
    
-   INCLUDE "../../z80/asm__fmemopen.asm"
+   INCLUDE "stdio/z80/asm__fmemopen.asm"

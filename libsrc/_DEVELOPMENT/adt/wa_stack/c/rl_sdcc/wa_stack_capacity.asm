@@ -7,4 +7,4 @@ LIB w_array_capacity
 
 defc wa_stack_capacity = w_array_capacity
 
-INCLUDE "../../z80/asm_wa_stack_capacity.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_capacity.asm"

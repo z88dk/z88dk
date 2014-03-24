@@ -15,4 +15,4 @@ strlcat:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_strlcat.asm"
+   INCLUDE "string/z80/asm_strlcat.asm"

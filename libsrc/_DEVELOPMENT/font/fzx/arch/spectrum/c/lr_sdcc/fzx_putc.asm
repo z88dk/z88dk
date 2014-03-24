@@ -20,4 +20,4 @@ fzx_putc:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fzx_putc.asm"
+   INCLUDE "font/fzx/arch/spectrum/z80/asm_fzx_putc.asm"

@@ -30,6 +30,7 @@ adt/b_vector/c/lr_sccz80/b_vector_insert_n_callee
 adt/b_vector/c/lr_sccz80/b_vector_max_size
 adt/b_vector/c/lr_sccz80/b_vector_pop_back
 adt/b_vector/c/lr_sccz80/b_vector_push_back
+adt/b_vector/c/lr_sccz80/b_vector_push_back_callee
 adt/b_vector/c/lr_sccz80/b_vector_read_block
 adt/b_vector/c/lr_sccz80/b_vector_read_block_callee
 adt/b_vector/c/lr_sccz80/b_vector_reserve

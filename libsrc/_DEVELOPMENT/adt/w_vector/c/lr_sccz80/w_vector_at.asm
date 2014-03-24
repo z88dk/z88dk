@@ -5,4 +5,8 @@ XLIB w_vector_at
 
 LIB w_array_at
 
-defc w_vector_at = w_array_at
+;defc w_vector_at = w_array_at
+
+w_vector_at:
+
+   jp w_array_at

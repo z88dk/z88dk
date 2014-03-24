@@ -5,4 +5,8 @@ XLIB p_stack_push
 
 LIB p_forward_list_insert_after
 
-defc p_stack_push = p_forward_list_insert_after
+;defc p_stack_push = p_forward_list_insert_after
+
+p_stack_push:
+
+   jp p_forward_list_insert_after

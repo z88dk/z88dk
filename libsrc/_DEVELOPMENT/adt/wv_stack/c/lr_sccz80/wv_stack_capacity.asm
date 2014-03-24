@@ -3,6 +3,8 @@
 
 XDEF wv_stack_capacity
 
-defc wv_stack_capacity = asm_wv_stack_capacity
+;defc wv_stack_capacity = asm_wv_stack_capacity
 
-INCLUDE "../../z80/asm_wv_stack_capacity.asm"
+wv_stack_capacity:
+
+   INCLUDE "adt/wv_stack/z80/asm_wv_stack_capacity.asm"

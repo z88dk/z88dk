@@ -5,4 +5,4 @@ XDEF fprintf
 
 fprintf:
 
-   INCLUDE "../../z80/asm_fprintf.asm"
+   INCLUDE "stdio/z80/asm_fprintf.asm"

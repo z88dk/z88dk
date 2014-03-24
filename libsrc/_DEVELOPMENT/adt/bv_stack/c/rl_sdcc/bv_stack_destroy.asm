@@ -7,4 +7,4 @@ LIB b_vector_destroy
 
 defc bv_stack_destroy = b_vector_destroy
 
-INCLUDE "../../z80/asm_bv_stack_destroy.asm"
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_destroy.asm"

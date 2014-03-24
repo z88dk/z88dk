@@ -3,6 +3,8 @@
 
 XDEF p_forward_list_empty
 
-defc p_forward_list_empty = asm_p_forward_list_empty
+;defc p_forward_list_empty = asm_p_forward_list_empty
 
-INCLUDE "../../z80/asm_p_forward_list_empty.asm"
+p_forward_list_empty:
+
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_empty.asm"

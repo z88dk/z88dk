@@ -3,6 +3,8 @@
 
 XDEF wv_priority_queue_capacity
 
-defc wv_priority_queue_capacity = asm_wv_priority_queue_capacity
+;defc wv_priority_queue_capacity = asm_wv_priority_queue_capacity
 
-INCLUDE "../../z80/asm_wv_priority_queue_capacity.asm"
+wv_priority_queue_capacity:
+
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_capacity.asm"

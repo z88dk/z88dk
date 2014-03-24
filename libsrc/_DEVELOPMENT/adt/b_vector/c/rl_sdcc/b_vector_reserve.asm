@@ -15,4 +15,4 @@ b_vector_reserve:
    
    jr asm_b_vector_reserve
    
-   INCLUDE "../../z80/asm_b_vector_reserve.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_reserve.asm"

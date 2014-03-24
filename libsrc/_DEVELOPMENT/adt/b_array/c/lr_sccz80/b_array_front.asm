@@ -3,6 +3,8 @@
 
 XDEF b_array_front
 
-defc b_array_front = asm_b_array_front
+;defc b_array_front = asm_b_array_front
 
-INCLUDE "../../z80/asm_b_array_front.asm"
+b_array_front:
+
+   INCLUDE "adt/b_array/z80/asm_b_array_front.asm"

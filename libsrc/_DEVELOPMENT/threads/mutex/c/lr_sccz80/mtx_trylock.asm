@@ -5,4 +5,4 @@ XDEF mtx_trylock
 
 mtx_trylock:
 
-   INCLUDE "../../z80/asm_mtx_trylock.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_trylock.asm"

@@ -14,4 +14,4 @@ stricmp:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strcasecmp.asm"
+   INCLUDE "string/z80/asm_strcasecmp.asm"

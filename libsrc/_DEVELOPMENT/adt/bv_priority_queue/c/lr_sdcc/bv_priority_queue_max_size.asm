@@ -13,4 +13,4 @@ bv_priority_queue_max_size:
    
    jp asm_bv_priority_queue_max_size
 
-   INCLUDE "../../z80/asm_bv_priority_queue_max_size.asm"
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_max_size.asm"

@@ -13,4 +13,4 @@ realloc_unlocked:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_realloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_realloc_unlocked.asm"

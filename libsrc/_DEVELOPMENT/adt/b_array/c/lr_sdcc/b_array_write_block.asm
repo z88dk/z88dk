@@ -19,4 +19,4 @@ b_array_write_block:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_b_array_write_block.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_write_block.asm"

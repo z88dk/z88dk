@@ -12,4 +12,4 @@ memchr_callee:
    
    ld a,e
    
-   INCLUDE "../../z80/asm_memchr.asm"
+   INCLUDE "string/z80/asm_memchr.asm"

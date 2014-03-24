@@ -9,4 +9,4 @@ mtx_init_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_mtx_init.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_init.asm"

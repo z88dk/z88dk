@@ -13,4 +13,4 @@ b_vector_shrink_to_fit:
    
    jr asm_b_vector_shrink_to_fit
 
-   INCLUDE "../../z80/asm_b_vector_shrink_to_fit.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_shrink_to_fit.asm"

@@ -20,4 +20,4 @@ fzx_string_partition_ww:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fzx_string_partition_ww.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_string_partition_ww.asm"

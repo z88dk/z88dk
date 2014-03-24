@@ -41,4 +41,4 @@ bsearch:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_bsearch.asm"
+   INCLUDE "stdlib/z80/asm_bsearch.asm"

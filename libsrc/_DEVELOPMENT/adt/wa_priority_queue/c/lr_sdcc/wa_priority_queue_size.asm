@@ -13,4 +13,4 @@ wa_priority_queue_size:
    
    jp asm_wa_priority_queue_size
 
-   INCLUDE "../../z80/asm_wa_priority_queue_size.asm"
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_size.asm"

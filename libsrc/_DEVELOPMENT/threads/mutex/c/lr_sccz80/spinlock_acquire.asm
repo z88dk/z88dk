@@ -5,4 +5,4 @@ XDEF spinlock_acquire
 
 spinlock_acquire:
 
-   INCLUDE "../../z80/asm_spinlock_acquire.asm"
+   INCLUDE "threads/mutex/z80/asm_spinlock_acquire.asm"

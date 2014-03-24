@@ -20,4 +20,4 @@ bsearch_callee:
    pop af
    exx
    
-   INCLUDE "../../z80/asm_bsearch.asm"
+   INCLUDE "stdlib/z80/asm_bsearch.asm"

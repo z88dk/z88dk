@@ -15,4 +15,4 @@ wv_priority_queue_reserve:
    
    jp asm_wv_priority_queue_reserve
    
-   INCLUDE "../../z80/asm_wv_priority_queue_reserve.asm"
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_reserve.asm"

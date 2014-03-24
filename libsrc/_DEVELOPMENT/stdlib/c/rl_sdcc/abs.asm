@@ -11,4 +11,4 @@ abs:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_abs.asm"
+   INCLUDE "stdlib/z80/asm_abs.asm"

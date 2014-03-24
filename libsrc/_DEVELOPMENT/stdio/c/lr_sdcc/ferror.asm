@@ -21,4 +21,4 @@ ferror:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_ferror.asm"
+   INCLUDE "stdio/z80/asm_ferror.asm"

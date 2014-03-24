@@ -7,4 +7,4 @@ LIB ba_priority_queue_data
 
 defc bv_priority_queue_data = ba_priority_queue_data
 
-INCLUDE "../../z80/asm_bv_priority_queue_data.asm"
+INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_data.asm"

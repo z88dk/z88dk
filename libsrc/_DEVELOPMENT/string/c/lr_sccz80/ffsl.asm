@@ -5,4 +5,4 @@ XDEF ffsl
 
 ffsl:
 
-   INCLUDE "../../z80/asm_ffsl.asm"
+   INCLUDE "string/z80/asm_ffsl.asm"

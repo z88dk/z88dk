@@ -13,4 +13,4 @@ w_vector_reserve:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_w_vector_reserve.asm"
+   INCLUDE "adt/w_vector/z80/asm_w_vector_reserve.asm"

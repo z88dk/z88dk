@@ -7,4 +7,4 @@ LIB b_array_pop_back
 
 defc bv_stack_pop = b_array_pop_back
 
-INCLUDE "../../z80/asm_bv_stack_pop.asm"
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_pop.asm"

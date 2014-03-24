@@ -5,4 +5,4 @@ XDEF system
 
 system:
 
-   INCLUDE "../../z80/asm_system.asm"
+   INCLUDE "stdlib/z80/asm_system.asm"

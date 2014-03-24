@@ -11,4 +11,4 @@ zx_saddrpup:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_zx_saddrpup.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_saddrpup.asm"

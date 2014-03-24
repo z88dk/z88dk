@@ -11,4 +11,4 @@ strrev:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_strrev.asm"
+   INCLUDE "string/z80/asm_strrev.asm"

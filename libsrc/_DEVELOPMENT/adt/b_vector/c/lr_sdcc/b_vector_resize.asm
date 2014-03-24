@@ -13,4 +13,4 @@ b_vector_resize:
    push de
    push af
    
-   INCLUDE "../../z80/asm_b_vector_resize.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_resize.asm"

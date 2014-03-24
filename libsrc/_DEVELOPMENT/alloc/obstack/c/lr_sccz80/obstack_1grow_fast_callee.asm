@@ -18,4 +18,4 @@ obstack_1grow_fast_callee:
    ex (sp),hl
    ld a,e
    
-   INCLUDE "../../z80/asm_obstack_1grow_fast.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_1grow_fast.asm"

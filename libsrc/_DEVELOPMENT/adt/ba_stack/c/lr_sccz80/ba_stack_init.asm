@@ -5,4 +5,8 @@ XLIB ba_stack_init
 
 LIB b_array_init
 
-defc ba_stack_init = b_array_init
+;defc ba_stack_init = b_array_init
+
+ba_stack_init:
+
+   jp b_array_init

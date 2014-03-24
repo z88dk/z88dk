@@ -5,4 +5,8 @@ XLIB putc_unlocked
 
 LIB fputc_unlocked
 
-defc putc_unlocked = fputc_unlocked
+;defc putc_unlocked = fputc_unlocked
+
+putc_unlocked:
+
+   jp fputc_unlocked

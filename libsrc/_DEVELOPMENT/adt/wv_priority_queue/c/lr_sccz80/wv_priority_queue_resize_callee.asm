@@ -5,6 +5,10 @@ XDEF wv_priority_queue_resize_callee
 
 LIB wa_priority_queue_resize_callee
 
-defc wv_priority_queue_resize_callee = wa_priority_queue_resize_callee
+;defc wv_priority_queue_resize_callee = wa_priority_queue_resize_callee
 
-INCLUDE "../../z80/asm_wv_priority_queue_resize.asm"
+wv_priority_queue_resize_callee:
+
+   jp wa_priority_queue_resize_callee
+
+INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_resize.asm"

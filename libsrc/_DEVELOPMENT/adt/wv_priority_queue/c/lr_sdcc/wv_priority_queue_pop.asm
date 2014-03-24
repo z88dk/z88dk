@@ -7,4 +7,4 @@ LIB wa_priority_queue_pop
 
 defc wv_priority_queue_pop = wa_priority_queue_pop
 
-INCLUDE "../../z80/asm_wv_priority_queue_pop.asm"
+INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_pop.asm"

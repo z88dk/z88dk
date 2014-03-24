@@ -8,4 +8,4 @@ feof:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_feof.asm"
+   INCLUDE "stdio/z80/asm_feof.asm"

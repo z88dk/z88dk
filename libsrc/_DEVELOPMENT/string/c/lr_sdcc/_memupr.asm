@@ -13,5 +13,5 @@ _memupr:
    push bc
    push af
    
-   INCLUDE "../../z80/asm__memupr.asm"
+   INCLUDE "string/z80/asm__memupr.asm"
 

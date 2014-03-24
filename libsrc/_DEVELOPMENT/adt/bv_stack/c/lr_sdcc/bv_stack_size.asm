@@ -7,4 +7,4 @@ LIB b_vector_size
 
 defc bv_stack_size = b_vector_size
 
-INCLUDE "../../z80/asm_bv_stack_size.asm"
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_size.asm"

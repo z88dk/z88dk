@@ -11,4 +11,4 @@ atexit:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_atexit.asm"
+   INCLUDE "stdlib/z80/asm_atexit.asm"

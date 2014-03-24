@@ -11,4 +11,4 @@ balloc_firstfit_callee:
    
    ld a,c
    
-   INCLUDE "../../z80/asm_balloc_firstfit.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_firstfit.asm"

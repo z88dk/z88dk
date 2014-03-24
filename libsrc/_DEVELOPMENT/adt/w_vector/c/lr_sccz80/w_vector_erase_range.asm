@@ -5,4 +5,8 @@ XLIB w_vector_erase_range
 
 LIB w_array_erase_range
 
-defc w_vector_erase_range = w_array_erase_range
+;defc w_vector_erase_range = w_array_erase_range
+
+w_vector_erase_range:
+
+   jp w_array_erase_range

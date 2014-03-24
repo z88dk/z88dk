@@ -25,4 +25,4 @@ memccpy:
    ld a,c
    exx
    
-   INCLUDE "../../z80/asm_memccpy.asm"
+   INCLUDE "string/z80/asm_memccpy.asm"

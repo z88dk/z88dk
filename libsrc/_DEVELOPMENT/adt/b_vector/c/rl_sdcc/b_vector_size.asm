@@ -7,4 +7,4 @@ LIB b_array_size
 
 defc b_vector_size = b_array_size
 
-INCLUDE "../../z80/asm_b_vector_size.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_size.asm"

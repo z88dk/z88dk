@@ -5,4 +5,4 @@ XDEF fzx_string_extent
 
 fzx_string_extent:
 
-   INCLUDE "../../z80/asm_fzx_string_extent.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_string_extent.asm"

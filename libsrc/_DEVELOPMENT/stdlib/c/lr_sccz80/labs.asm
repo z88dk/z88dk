@@ -5,4 +5,4 @@ XDEF labs
 
 labs:
 
-   INCLUDE "../../z80/asm_labs.asm"
+   INCLUDE "stdlib/z80/asm_labs.asm"

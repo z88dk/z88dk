@@ -7,4 +7,4 @@ LIB b_array_erase_range
 
 defc b_vector_erase_range = b_array_erase_range
 
-INCLUDE "../../z80/asm_b_vector_erase_range.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_erase_range.asm"

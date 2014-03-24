@@ -13,4 +13,4 @@ stpcpy:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_stpcpy.asm"
+   INCLUDE "string/z80/asm_stpcpy.asm"

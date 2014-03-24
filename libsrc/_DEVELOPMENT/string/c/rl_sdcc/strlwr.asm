@@ -11,4 +11,4 @@ strlwr:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_strlwr.asm"
+   INCLUDE "string/z80/asm_strlwr.asm"

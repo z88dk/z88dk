@@ -7,4 +7,4 @@ LIB w_vector_reserve
 
 defc wv_stack_reserve = w_vector_reserve
 
-INCLUDE "../../z80/asm_wv_stack_reserve.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_reserve.asm"

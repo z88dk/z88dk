@@ -10,4 +10,4 @@ b_array_erase_block_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_b_array_erase_block.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_erase_block.asm"

@@ -15,4 +15,4 @@ posix_memalign:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_posix_memalign.asm"
+   INCLUDE "alloc/malloc/z80/asm_posix_memalign.asm"

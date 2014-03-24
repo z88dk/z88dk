@@ -7,4 +7,4 @@ LIB p_forward_list_alt_init
 
 defc p_queue_init = p_forward_list_alt_init
 
-INCLUDE "../../z80/asm_p_queue_init.asm"
+INCLUDE "adt/p_queue/z80/asm_p_queue_init.asm"

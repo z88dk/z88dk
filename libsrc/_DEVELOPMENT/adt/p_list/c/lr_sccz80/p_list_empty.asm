@@ -3,6 +3,8 @@
 
 XDEF p_list_empty
 
-defc p_list_empty = asm_p_list_empty
+;defc p_list_empty = asm_p_list_empty
 
-INCLUDE "../../z80/asm_p_list_empty.asm"
+p_list_empty:
+
+   INCLUDE "adt/p_list/z80/asm_p_list_empty.asm"

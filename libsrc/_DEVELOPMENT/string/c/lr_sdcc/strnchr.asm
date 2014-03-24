@@ -15,4 +15,4 @@ strnchr:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strnchr.asm"
+   INCLUDE "string/z80/asm_strnchr.asm"

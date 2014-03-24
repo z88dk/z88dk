@@ -11,4 +11,4 @@ zx_pxy2aaddr_callee:
    
    ld h,e
    
-   INCLUDE "../../z80/asm_zx_pxy2aaddr.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_pxy2aaddr.asm"

@@ -13,4 +13,4 @@ XDEF obstack_base
 
 obstack_base:
 
-   INCLUDE "../../z80/asm_obstack_base.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_base.asm"

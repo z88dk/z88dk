@@ -5,4 +5,8 @@ XLIB b_vector_read_block
 
 LIB b_array_read_block
 
-defc b_vector_read_block = b_array_read_block
+;defc b_vector_read_block = b_array_read_block
+
+b_vector_read_block:
+
+   jp b_array_read_block

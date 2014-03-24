@@ -5,4 +5,9 @@ XLIB memalign_unlocked
 
 LIB aligned_alloc_unlocked
 
-defc memalign_unlocked = aligned_alloc_unlocked
+;defc memalign_unlocked = aligned_alloc_unlocked
+
+memalign_unlocked:
+
+   jp aligned_alloc_unlocked
+

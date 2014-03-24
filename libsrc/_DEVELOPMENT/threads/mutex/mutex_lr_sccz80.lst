@@ -1,0 +1,11 @@
+threads/mutex/c/lr_sccz80/mtx_destroy
+threads/mutex/c/lr_sccz80/mtx_init
+threads/mutex/c/lr_sccz80/mtx_init_callee
+threads/mutex/c/lr_sccz80/mtx_lock
+threads/mutex/c/lr_sccz80/mtx_timedlock
+threads/mutex/c/lr_sccz80/mtx_timedlock_callee
+threads/mutex/c/lr_sccz80/mtx_trylock
+threads/mutex/c/lr_sccz80/mtx_unlock
+threads/mutex/c/lr_sccz80/spinlock_acquire
+threads/mutex/c/lr_sccz80/spinlock_release
+threads/mutex/c/lr_sccz80/spinlock_tryacquire

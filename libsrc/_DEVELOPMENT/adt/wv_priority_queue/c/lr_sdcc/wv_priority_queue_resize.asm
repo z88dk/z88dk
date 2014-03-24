@@ -7,4 +7,4 @@ LIB wa_priority_queue_resize
 
 defc wv_priority_queue_resize = wa_priority_queue_resize
 
-INCLUDE "../../z80/asm_wv_priority_queue_resize.asm"
+INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_resize.asm"

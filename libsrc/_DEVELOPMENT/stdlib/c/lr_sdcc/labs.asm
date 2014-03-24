@@ -13,4 +13,4 @@ labs:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_labs.asm"
+   INCLUDE "stdlib/z80/asm_labs.asm"

@@ -5,6 +5,10 @@ XDEF strnicmp_callee
 
 LIB strncasecmp_callee
 
-defc strnicmp_callee = strncasecmp_callee
+;defc strnicmp_callee = strncasecmp_callee
 
-INCLUDE "../../z80/asm_strnicmp.asm"
+strnicmp_callee:
+
+   jp strncasecmp_callee
+
+INCLUDE "string/z80/asm_strnicmp.asm"

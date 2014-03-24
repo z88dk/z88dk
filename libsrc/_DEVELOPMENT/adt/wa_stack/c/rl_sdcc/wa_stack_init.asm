@@ -7,4 +7,4 @@ LIB w_array_init
 
 defc wa_stack_init = w_array_init
 
-INCLUDE "../../z80/asm_wa_stack_init.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_init.asm"

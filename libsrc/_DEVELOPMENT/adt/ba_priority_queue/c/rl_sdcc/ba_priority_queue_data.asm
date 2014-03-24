@@ -13,4 +13,4 @@ ba_priority_queue_data:
    
    jp asm_ba_priority_queue_data
 
-   INCLUDE "../../z80/asm_ba_priority_queue_data.asm"
+   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_data.asm"

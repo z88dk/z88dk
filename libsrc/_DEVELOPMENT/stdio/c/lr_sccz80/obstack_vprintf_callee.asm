@@ -10,4 +10,4 @@ obstack_vprintf_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_vprintf.asm"
+   INCLUDE "stdio/z80/asm_obstack_vprintf.asm"

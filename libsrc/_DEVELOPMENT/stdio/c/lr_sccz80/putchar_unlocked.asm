@@ -5,4 +5,4 @@ XDEF putchar_unlocked
 
 putchar_unlocked:
 
-   INCLUDE "../../z80/asm_putchar_unlocked.asm"
+   INCLUDE "stdio/z80/asm_putchar_unlocked.asm"

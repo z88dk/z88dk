@@ -5,4 +5,4 @@ XDEF balloc_blockcount
 
 balloc_blockcount:
 
-   INCLUDE "../../z80/asm_balloc_blockcount.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_blockcount.asm"

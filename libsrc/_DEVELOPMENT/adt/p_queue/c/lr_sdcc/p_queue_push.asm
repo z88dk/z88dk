@@ -7,4 +7,4 @@ LIB p_forward_list_alt_push_back
 
 defc p_queue_push = p_forward_list_alt_push_back
 
-INCLUDE "../../z80/asm_p_queue_push.asm"
+INCLUDE "adt/p_queue/z80/asm_p_queue_push.asm"

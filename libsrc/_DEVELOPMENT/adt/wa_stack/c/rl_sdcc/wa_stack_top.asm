@@ -7,4 +7,4 @@ LIB w_array_back
 
 defc wa_stack_top = w_array_back
 
-INCLUDE "../../z80/asm_wa_stack_top.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_top.asm"

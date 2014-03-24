@@ -7,4 +7,4 @@ LIB b_array_empty
 
 defc w_array_empty = b_array_empty
 
-INCLUDE "../../z80/asm_w_array_empty.asm"
+INCLUDE "adt/w_array/z80/asm_w_array_empty.asm"

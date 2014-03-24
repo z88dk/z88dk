@@ -15,4 +15,4 @@ heap_alloc_aligned_unlocked:
    push de
    push af
    
-   INCLUDE "../../z80/asm_heap_alloc_aligned_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_alloc_aligned_unlocked.asm"

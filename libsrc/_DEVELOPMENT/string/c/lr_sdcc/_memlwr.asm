@@ -13,5 +13,5 @@ _memlwr:
    push bc
    push af
    
-   INCLUDE "../../z80/asm__memlwr.asm"
+   INCLUDE "string/z80/asm__memlwr.asm"
 

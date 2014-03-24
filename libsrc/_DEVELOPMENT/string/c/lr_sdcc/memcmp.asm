@@ -15,4 +15,4 @@ memcmp:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_memcmp.asm"
+   INCLUDE "string/z80/asm_memcmp.asm"

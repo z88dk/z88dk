@@ -27,4 +27,4 @@ obstack_blank:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_obstack_blank.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_blank.asm"

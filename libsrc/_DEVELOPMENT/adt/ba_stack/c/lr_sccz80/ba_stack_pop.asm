@@ -3,6 +3,8 @@
 
 XDEF ba_stack_pop
 
-defc ba_stack_pop = asm_ba_stack_pop
+;defc ba_stack_pop = asm_ba_stack_pop
 
-INCLUDE "../../z80/asm_ba_stack_pop.asm"
+ba_stack_pop:
+
+   INCLUDE "adt/ba_stack/z80/asm_ba_stack_pop.asm"

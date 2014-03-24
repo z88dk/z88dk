@@ -5,4 +5,8 @@ XDEF wv_priority_queue_resize
 
 LIB wa_priority_queue_resize
 
-defc wv_priority_queue_resize = wa_priority_queue_resize
+;defc wv_priority_queue_resize = wa_priority_queue_resize
+
+wv_priority_queue_resize:
+
+   jp wa_priority_queue_resize

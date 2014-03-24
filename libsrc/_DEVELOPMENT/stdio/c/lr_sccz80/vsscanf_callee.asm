@@ -10,4 +10,4 @@ vsscanf_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_vsscanf.asm"
+   INCLUDE "stdio/z80/asm_vsscanf.asm"

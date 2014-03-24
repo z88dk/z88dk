@@ -13,4 +13,4 @@ strchrnul:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_strchrnul.asm"
+   INCLUDE "string/z80/asm_strchrnul.asm"

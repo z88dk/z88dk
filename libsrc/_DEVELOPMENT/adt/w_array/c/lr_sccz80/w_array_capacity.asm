@@ -3,6 +3,8 @@
 
 XDEF w_array_capacity
 
-defc w_array_capacity = asm_w_array_capacity
+;defc w_array_capacity = asm_w_array_capacity
 
-INCLUDE "../../z80/asm_w_array_capacity.asm"
+w_array_capacity:
+
+   INCLUDE "adt/w_array/z80/asm_w_array_capacity.asm"

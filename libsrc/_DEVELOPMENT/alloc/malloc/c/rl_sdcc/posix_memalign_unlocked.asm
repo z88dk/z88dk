@@ -15,4 +15,4 @@ posix_memalign_unlocked:
    push de
    push af
    
-   INCLUDE "../../z80/asm_posix_memalign_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_posix_memalign_unlocked.asm"

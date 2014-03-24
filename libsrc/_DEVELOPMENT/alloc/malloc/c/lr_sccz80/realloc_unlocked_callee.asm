@@ -9,4 +9,4 @@ realloc_unlocked_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_realloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_realloc_unlocked.asm"

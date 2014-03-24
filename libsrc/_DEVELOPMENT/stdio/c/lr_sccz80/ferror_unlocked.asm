@@ -8,4 +8,4 @@ ferror_unlocked:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_ferror_unlocked.asm"
+   INCLUDE "stdio/z80/asm_ferror_unlocked.asm"

@@ -20,4 +20,4 @@ obstack_blank_fast_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_blank_fast.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_blank_fast.asm"

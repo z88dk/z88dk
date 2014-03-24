@@ -15,4 +15,4 @@ heap_realloc:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_heap_realloc.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"

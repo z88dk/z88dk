@@ -11,4 +11,4 @@ spinlock_acquire:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_spinlock_acquire.asm"
+   INCLUDE "threads/mutex/z80/asm_spinlock_acquire.asm"

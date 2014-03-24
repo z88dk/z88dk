@@ -5,4 +5,4 @@ XDEF fprintf_unlocked
 
 fprintf_unlocked:
 
-   INCLUDE "../../z80/asm_fprintf_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fprintf_unlocked.asm"

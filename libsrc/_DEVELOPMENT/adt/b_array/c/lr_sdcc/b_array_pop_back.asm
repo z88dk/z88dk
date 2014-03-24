@@ -11,4 +11,4 @@ b_array_pop_back:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_b_array_pop_back.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_pop_back.asm"

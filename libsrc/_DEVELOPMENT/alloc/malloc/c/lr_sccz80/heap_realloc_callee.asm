@@ -11,4 +11,4 @@ heap_realloc_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_heap_realloc.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"

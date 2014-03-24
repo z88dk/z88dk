@@ -7,4 +7,4 @@ LIB w_array_append
 
 defc wa_stack_push = w_array_append
 
-INCLUDE "../../z80/asm_wa_stack_push.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_push.asm"

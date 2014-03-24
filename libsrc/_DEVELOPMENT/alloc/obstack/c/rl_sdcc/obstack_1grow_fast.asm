@@ -23,4 +23,4 @@ obstack_1grow_fast:
    
    ld a,e
 
-   INCLUDE "../../z80/asm_obstack_1grow_fast.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_1grow_fast.asm"

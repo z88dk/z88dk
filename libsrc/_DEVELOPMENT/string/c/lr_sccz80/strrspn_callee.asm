@@ -9,4 +9,4 @@ strrspn_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_strrspn.asm"
+   INCLUDE "string/z80/asm_strrspn.asm"

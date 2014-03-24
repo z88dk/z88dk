@@ -13,4 +13,4 @@ p_forward_list_empty:
    
    jp asm_p_forward_list_empty
 
-   INCLUDE "../../z80/asm_p_forward_list_empty.asm"
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_empty.asm"

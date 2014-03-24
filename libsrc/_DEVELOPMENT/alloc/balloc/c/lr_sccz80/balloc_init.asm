@@ -5,4 +5,4 @@ XDEF balloc_init
 
 balloc_init:
 
-   INCLUDE "../../z80/asm_balloc_init.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_init.asm"

@@ -3,6 +3,10 @@
 
 XDEF b_vector_push_back
 
-defc b_vector_push_back = asm_b_vector_push_back
+LIB b_vector_append
 
-INCLUDE "../../z80/asm_b_vector_push_back.asm"
+;defc b_vector_push_back = b_vector_append
+
+b_vector_push_back:
+
+   jp b_vector_append

@@ -8,4 +8,4 @@ ftell_unlocked:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_ftell_unlocked.asm"
+   INCLUDE "stdio/z80/asm_ftell_unlocked.asm"

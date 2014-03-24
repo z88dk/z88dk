@@ -7,4 +7,4 @@ LIB p_forward_list_front
 
 defc p_stack_top = p_forward_list_front
 
-INCLUDE "../../z80/asm_p_stack_top.asm"
+INCLUDE "adt/p_stack/z80/asm_p_stack_top.asm"

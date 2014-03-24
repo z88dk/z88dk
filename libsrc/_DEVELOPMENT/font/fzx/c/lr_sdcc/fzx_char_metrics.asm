@@ -22,4 +22,4 @@ fzx_char_metrics:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fzx_char_metrics.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_char_metrics.asm"

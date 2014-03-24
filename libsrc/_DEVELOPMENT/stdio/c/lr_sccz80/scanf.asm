@@ -5,4 +5,4 @@ XDEF scanf
 
 scanf:
 
-   INCLUDE "../../z80/asm_scanf.asm"
+   INCLUDE "stdio/z80/asm_scanf.asm"

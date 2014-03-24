@@ -11,4 +11,4 @@ getdelim_unlocked_callee:
    pop de
    ex (sp),hl
 
-   INCLUDE "../../z80/asm_getdelim_unlocked.asm"
+   INCLUDE "stdio/z80/asm_getdelim_unlocked.asm"

@@ -5,4 +5,4 @@ XDEF strrstrip
 
 strrstrip:
 
-   INCLUDE "../../z80/asm_strrstrip.asm"
+   INCLUDE "string/z80/asm_strrstrip.asm"

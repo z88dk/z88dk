@@ -3,6 +3,8 @@
 
 XDEF w_vector_size
 
-defc w_vector_size = asm_w_vector_size
+;defc w_vector_size = asm_w_vector_size
 
-INCLUDE "../../z80/asm_w_vector_size.asm"
+w_vector_size:
+
+   INCLUDE "adt/w_vector/z80/asm_w_vector_size.asm"

@@ -8,4 +8,4 @@ ftrylockfile:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_ftrylockfile.asm"
+   INCLUDE "stdio/z80/asm_ftrylockfile.asm"

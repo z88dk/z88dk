@@ -19,4 +19,4 @@ ba_priority_queue_push:
    
    ret
    
-   INCLUDE "../../z80/asm_ba_priority_queue_push.asm"
+   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_push.asm"

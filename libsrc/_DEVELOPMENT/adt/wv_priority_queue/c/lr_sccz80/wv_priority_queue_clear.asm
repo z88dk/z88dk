@@ -3,6 +3,8 @@
 
 XDEF wv_priority_queue_clear
 
-defc wv_priority_queue_clear = asm_wv_priority_queue_clear
+;defc wv_priority_queue_clear = asm_wv_priority_queue_clear
 
-INCLUDE "../../z80/asm_wv_priority_queue_clear.asm"
+wv_priority_queue_clear:
+
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_clear.asm"

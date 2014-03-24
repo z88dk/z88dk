@@ -5,4 +5,4 @@ XDEF printf
 
 printf:
 
-   INCLUDE "../../z80/asm_printf.asm"
+   INCLUDE "stdio/z80/asm_printf.asm"

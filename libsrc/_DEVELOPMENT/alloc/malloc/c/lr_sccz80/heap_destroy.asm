@@ -3,6 +3,8 @@
 
 XDEF heap_destroy
 
-defc heap_destroy = asm_heap_destroy
+;defc heap_destroy = asm_heap_destroy
 
-INCLUDE "../../z80/asm_heap_destroy.asm"
+heap_destroy:
+
+   INCLUDE "alloc/malloc/z80/asm_heap_destroy.asm"

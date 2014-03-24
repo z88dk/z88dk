@@ -12,4 +12,4 @@ fscanf_unlocked:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_fscanf_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fscanf_unlocked.asm"

@@ -5,4 +5,4 @@ XDEF atoi
 
 atoi:
 
-   INCLUDE "../../z80/asm_atoi.asm"
+   INCLUDE "stdlib/z80/asm_atoi.asm"

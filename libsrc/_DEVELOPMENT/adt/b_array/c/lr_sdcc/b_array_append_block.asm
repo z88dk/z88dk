@@ -20,5 +20,5 @@ b_array_append_block:
    
    jp error_enomem_zc
    
-   INCLUDE "../../z80/asm_b_array_append_block.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_append_block.asm"
 

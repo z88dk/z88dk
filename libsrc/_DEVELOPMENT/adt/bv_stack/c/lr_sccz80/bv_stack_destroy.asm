@@ -3,6 +3,8 @@
 
 XDEF bv_stack_destroy
 
-defc bv_stack_destroy = asm_bv_stack_destroy
+;defc bv_stack_destroy = asm_bv_stack_destroy
 
-INCLUDE "../../z80/asm_bv_stack_destroy.asm"
+bv_stack_destroy:
+
+   INCLUDE "adt/bv_stack/z80/asm_bv_stack_destroy.asm"

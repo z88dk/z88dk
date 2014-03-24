@@ -10,4 +10,4 @@ aligned_alloc_unlocked_callee:
    pop bc
    push af
    
-   INCLUDE "../../z80/asm_aligned_alloc_unlocked.asm"
+   INCLUDE "alloc/malloc/z80/asm_aligned_alloc_unlocked.asm"

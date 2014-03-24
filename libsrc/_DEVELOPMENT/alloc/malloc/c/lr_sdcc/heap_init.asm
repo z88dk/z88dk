@@ -13,4 +13,4 @@ heap_init:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_heap_init.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_init.asm"

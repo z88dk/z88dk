@@ -5,4 +5,4 @@ XDEF zx_saddrcright
 
 zx_saddrcright:
 
-   INCLUDE "../../z80/asm_zx_saddrcright.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_saddrcright.asm"

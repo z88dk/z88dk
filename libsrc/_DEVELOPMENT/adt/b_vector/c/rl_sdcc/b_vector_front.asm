@@ -7,4 +7,4 @@ LIB b_array_front
 
 defc b_vector_front = b_array_front
 
-INCLUDE "../../z80/asm_b_vector_front.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_front.asm"

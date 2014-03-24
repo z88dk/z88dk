@@ -7,4 +7,4 @@ LIB b_array_read_block
 
 defc b_vector_read_block = b_array_read_block
 
-INCLUDE "../../z80/asm_b_vector_read_block.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_read_block.asm"

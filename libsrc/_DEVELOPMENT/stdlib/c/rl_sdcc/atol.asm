@@ -13,4 +13,4 @@ atol:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_atol.asm"
+   INCLUDE "stdlib/z80/asm_atol.asm"

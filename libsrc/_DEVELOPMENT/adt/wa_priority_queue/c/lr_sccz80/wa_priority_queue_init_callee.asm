@@ -12,4 +12,4 @@ wa_priority_queue_init_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_wa_priority_queue_init.asm"
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_init.asm"

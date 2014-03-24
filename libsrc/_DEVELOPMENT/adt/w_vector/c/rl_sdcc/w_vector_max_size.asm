@@ -13,4 +13,4 @@ w_vector_max_size:
    
    jp asm_w_vector_max_size
 
-   INCLUDE "../../z80/asm_w_vector_max_size.asm"
+   INCLUDE "adt/w_vector/z80/asm_w_vector_max_size.asm"

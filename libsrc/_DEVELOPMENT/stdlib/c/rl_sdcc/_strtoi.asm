@@ -15,4 +15,4 @@ _strtoi:
    push hl
    push af
    
-   INCLUDE "../../z80/asm__strtoi.asm"
+   INCLUDE "stdlib/z80/asm__strtoi.asm"

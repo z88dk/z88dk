@@ -11,4 +11,4 @@ zx_cy2saddr:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_zx_cy2saddr.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_cy2saddr.asm"

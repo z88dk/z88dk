@@ -15,4 +15,4 @@ strncmp:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strncmp.asm"
+   INCLUDE "string/z80/asm_strncmp.asm"

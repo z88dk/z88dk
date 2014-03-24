@@ -9,4 +9,4 @@ w_array_append_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_w_array_append.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_append.asm"

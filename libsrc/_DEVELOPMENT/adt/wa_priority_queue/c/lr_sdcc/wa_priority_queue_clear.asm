@@ -7,4 +7,4 @@ LIB ba_priority_queue_clear
 
 defc wa_priority_queue_clear = ba_priority_queue_clear
 
-INCLUDE "../../z80/asm_wa_priority_queue_clear.asm"
+INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_clear.asm"

@@ -21,4 +21,4 @@ flockfile:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_flockfile.asm"
+   INCLUDE "stdio/z80/asm_flockfile.asm"

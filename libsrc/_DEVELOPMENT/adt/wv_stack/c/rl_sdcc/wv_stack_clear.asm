@@ -7,4 +7,4 @@ LIB w_vector_clear
 
 defc wv_stack_clear = w_vector_clear
 
-INCLUDE "../../z80/asm_wv_stack_clear.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_clear.asm"

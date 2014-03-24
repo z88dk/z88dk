@@ -11,4 +11,4 @@ w_array_erase_rangle_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_w_array_erase_range.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_erase_range.asm"

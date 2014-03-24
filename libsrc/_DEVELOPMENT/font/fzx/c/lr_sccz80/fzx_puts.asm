@@ -3,4 +3,4 @@
 
 fzx_puts:
 
-   INCLUDE "../../z80/asm_fzx_puts.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_puts.asm"

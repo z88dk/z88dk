@@ -3,6 +3,8 @@
 
 XDEF bv_priority_queue_size
 
-defc bv_priority_queue_size = asm_bv_priority_queue_size
+;defc bv_priority_queue_size = asm_bv_priority_queue_size
 
-INCLUDE "../../z80/asm_bv_priority_queue_size.asm"
+bv_priority_queue_size:
+
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_size.asm"

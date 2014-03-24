@@ -3,6 +3,8 @@
 
 XDEF wv_priority_queue_max_size
 
-defc wv_priority_queue_max_size = asm_wv_priority_queue_max_size
+;defc wv_priority_queue_max_size = asm_wv_priority_queue_max_size
 
-INCLUDE "../../z80/asm_wv_priority_queue_max_size.asm"
+wv_priority_queue_max_size:
+
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_max_size.asm"

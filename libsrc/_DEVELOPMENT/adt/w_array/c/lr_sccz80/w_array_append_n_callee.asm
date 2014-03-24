@@ -10,4 +10,4 @@ w_array_append_n_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_w_array_append_n.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_append_n.asm"

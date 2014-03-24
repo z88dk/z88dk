@@ -20,4 +20,4 @@ fzx_write:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fzx_write.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_write.asm"

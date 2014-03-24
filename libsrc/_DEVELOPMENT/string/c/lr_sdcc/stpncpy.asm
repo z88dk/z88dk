@@ -15,4 +15,4 @@ stpncpy:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_stpncpy.asm"
+   INCLUDE "string/z80/asm_stpncpy.asm"

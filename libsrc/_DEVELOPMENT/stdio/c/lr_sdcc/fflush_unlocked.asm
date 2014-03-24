@@ -21,4 +21,4 @@ fflush_unlocked:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fflush_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fflush_unlocked.asm"

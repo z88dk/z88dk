@@ -13,4 +13,4 @@ strpbrk:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strpbrk.asm"
+   INCLUDE "string/z80/asm_strpbrk.asm"

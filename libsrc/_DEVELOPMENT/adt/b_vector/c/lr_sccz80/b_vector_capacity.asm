@@ -3,6 +3,8 @@
 
 XDEF b_vector_capacity
 
-defc b_vector_capacity = asm_b_vector_capacity
+;defc b_vector_capacity = asm_b_vector_capacity
 
-INCLUDE "../../z80/asm_b_vector_capacity.asm"
+b_vector_capacity:
+
+   INCLUDE "adt/b_vector/z80/asm_b_vector_capacity.asm"

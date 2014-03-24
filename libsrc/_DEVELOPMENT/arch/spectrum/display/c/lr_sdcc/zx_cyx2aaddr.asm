@@ -15,4 +15,4 @@ zx_cyx2aaddr:
    
    ld h,e
    
-   INCLUDE "../../z80/asm_zx_cyx2aaddr.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_cyx2aaddr.asm"

@@ -13,4 +13,4 @@ strrcspn:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strrcspn.asm"
+   INCLUDE "string/z80/asm_strrcspn.asm"

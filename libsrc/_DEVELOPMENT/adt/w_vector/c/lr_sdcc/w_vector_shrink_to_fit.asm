@@ -7,4 +7,4 @@ LIB b_vector_shrink_to_fit
 
 defc w_vector_shrink_to_fit = b_vector_shrink_to_fit
 
-INCLUDE "../../z80/asm_w_vector_shrink_to_fit.asm"
+INCLUDE "adt/w_vector/z80/asm_w_vector_shrink_to_fit.asm"

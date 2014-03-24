@@ -13,4 +13,4 @@ wa_priority_queue_top:
    
    jp asm_wa_priority_queue_top
 
-   INCLUDE "../../z80/asm_wa_priority_queue_top.asm"
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_top.asm"

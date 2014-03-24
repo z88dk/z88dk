@@ -13,4 +13,4 @@ mtx_timedlock:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_mtx_timedlock.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_timedlock.asm"

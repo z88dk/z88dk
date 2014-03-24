@@ -13,4 +13,4 @@ w_array_resize:
    push de
    push af
    
-   INCLUDE "../../z80/asm_w_array_resize.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_resize.asm"

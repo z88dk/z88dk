@@ -15,4 +15,4 @@ memset:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_memset.asm"
+   INCLUDE "string/z80/asm_memset.asm"

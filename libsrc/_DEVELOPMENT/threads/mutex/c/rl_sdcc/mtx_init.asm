@@ -13,4 +13,4 @@ mtx_init:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_mtx_init.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_init.asm"

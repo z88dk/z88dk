@@ -5,4 +5,4 @@ XDEF snprintf
 
 snprintf:
 
-   INCLUDE "../../z80/asm_snprintf.asm"
+   INCLUDE "stdio/z80/asm_snprintf.asm"

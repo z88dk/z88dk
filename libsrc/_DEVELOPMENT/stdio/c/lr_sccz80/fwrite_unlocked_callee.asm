@@ -11,4 +11,4 @@ fwrite_unlocked_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_fwrite_unlocked.asm"
+   INCLUDE "stdio/z80/asm_fwrite_unlocked.asm"

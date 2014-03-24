@@ -18,4 +18,4 @@ zx_pattern_fill_callee:
    ld h,l
    ld l,a
    
-   INCLUDE "../../z80/asm_zx_pattern_fill.asm"
+   INCLUDE "arch/spectrum/graphics/z80/asm_zx_pattern_fill.asm"

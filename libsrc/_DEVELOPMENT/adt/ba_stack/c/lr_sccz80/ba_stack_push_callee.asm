@@ -5,6 +5,10 @@ XDEF ba_stack_push_callee
 
 LIB b_array_append_callee
 
-defc ba_stack_push_callee = b_array_append_callee
+;defc ba_stack_push_callee = b_array_append_callee
 
-INCLUDE "../../z80/asm_ba_stack_push.asm"
+ba_stack_push_callee:
+
+   jp b_array_append_callee
+
+INCLUDE "adt/ba_stack/z80/asm_ba_stack_push.asm"

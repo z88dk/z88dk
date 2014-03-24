@@ -13,4 +13,4 @@ XDEF obstack_next_free
 
 obstack_next_free:
 
-   INCLUDE "../../z80/asm_obstack_next_free.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_next_free.asm"

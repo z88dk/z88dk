@@ -5,6 +5,10 @@ XDEF bv_stack_reserve_callee
 
 LIB b_vector_reserve_callee
 
-defc bv_stack_reserve_callee = b_vector_reserve_callee
+;defc bv_stack_reserve_callee = b_vector_reserve_callee
 
-INCLUDE "../../z80/asm_bv_stack_reserve.asm"
+bv_stack_reserve_callee:
+
+   jp b_vector_reserve_callee
+
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_reserve.asm"

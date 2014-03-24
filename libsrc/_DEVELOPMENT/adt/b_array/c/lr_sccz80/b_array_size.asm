@@ -3,6 +3,8 @@
 
 XDEF b_array_size
 
-defc b_array_size = asm_b_array_size
+;defc b_array_size = asm_b_array_size
 
-INCLUDE "../../z80/asm_b_array_size.asm"
+b_array_size:
+
+   INCLUDE "adt/b_array/z80/asm_b_array_size.asm"

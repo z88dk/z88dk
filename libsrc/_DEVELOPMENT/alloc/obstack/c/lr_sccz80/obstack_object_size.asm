@@ -13,4 +13,4 @@ XDEF obstack_object_size
 
 obstack_object_size:
 
-   INCLUDE "../../z80/asm_obstack_object_size.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_object_size.asm"

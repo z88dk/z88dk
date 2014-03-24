@@ -19,4 +19,4 @@ obstack_next_free:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_obstack_next_free.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_next_free.asm"

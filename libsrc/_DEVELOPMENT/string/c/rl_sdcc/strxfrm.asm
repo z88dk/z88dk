@@ -15,4 +15,4 @@ strxfrm:
    push de
    push af
    
-   INCLUDE "../../z80/asm_strxfrm.asm"
+   INCLUDE "string/z80/asm_strxfrm.asm"

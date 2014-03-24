@@ -8,4 +8,4 @@ clearerr:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_clearerr.asm"
+   INCLUDE "stdio/z80/asm_clearerr.asm"

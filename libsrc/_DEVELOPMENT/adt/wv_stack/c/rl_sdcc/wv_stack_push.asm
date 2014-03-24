@@ -7,4 +7,4 @@ LIB w_vector_append
 
 defc wv_stack_push = w_vector_append
 
-INCLUDE "../../z80/asm_wv_stack_push.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_push.asm"

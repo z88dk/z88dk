@@ -3,6 +3,8 @@
 
 XDEF b_vector_max_size
 
-defc b_vector_max_size = asm_b_vector_max_size
+;defc b_vector_max_size = asm_b_vector_max_size
 
-INCLUDE "../../z80/asm_b_vector_max_size.asm"
+b_vector_max_size:
+
+   INCLUDE "adt/b_vector/z80/asm_b_vector_max_size.asm"

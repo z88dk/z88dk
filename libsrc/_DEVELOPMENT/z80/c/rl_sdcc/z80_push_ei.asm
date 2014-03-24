@@ -5,4 +5,4 @@ XDEF z80_push_ei
 
 z80_push_ei:
 
-   INCLUDE "../../z80/asm_z80_push_ei.asm"
+   INCLUDE "z80/z80/asm_z80_push_ei.asm"

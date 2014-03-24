@@ -24,4 +24,4 @@ obstack_grow:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_obstack_grow.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_grow.asm"

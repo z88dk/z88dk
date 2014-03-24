@@ -15,5 +15,5 @@ _memstrcpy:
    push de
    push af
    
-   INCLUDE "../../z80/asm__memstrcpy.asm"
+   INCLUDE "string/z80/asm__memstrcpy.asm"
 

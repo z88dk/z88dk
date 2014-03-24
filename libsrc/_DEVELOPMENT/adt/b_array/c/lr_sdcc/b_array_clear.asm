@@ -13,4 +13,4 @@ b_array_clear:
    
    jp asm_b_array_clear
 
-   INCLUDE "../../z80/asm_b_array_clear.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_clear.asm"

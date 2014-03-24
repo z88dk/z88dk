@@ -7,4 +7,4 @@ LIB b_array_clear
 
 defc ba_stack_clear = b_array_clear
 
-INCLUDE "../../asm_ba_stack_clear.asm"
+INCLUDE "adt/ba_stack/asm_ba_stack_clear.asm"

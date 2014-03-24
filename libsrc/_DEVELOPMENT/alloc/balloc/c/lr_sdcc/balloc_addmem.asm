@@ -23,4 +23,4 @@ balloc_addmem:
    ld a,c
    exx
 
-   INCLUDE "../../z80/asm_balloc_addmem.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_addmem.asm"

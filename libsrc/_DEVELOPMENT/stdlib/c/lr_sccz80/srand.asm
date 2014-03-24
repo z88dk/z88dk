@@ -5,4 +5,4 @@ XDEF srand
 
 srand:
 
-   INCLUDE "../../z80/asm_srand.asm"
+   INCLUDE "stdlib/z80/asm_srand.asm"

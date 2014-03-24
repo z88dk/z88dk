@@ -20,4 +20,4 @@ open_memstream:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_open_memstream.asm"
+   INCLUDE "stdio/z80/asm_open_memstream.asm"

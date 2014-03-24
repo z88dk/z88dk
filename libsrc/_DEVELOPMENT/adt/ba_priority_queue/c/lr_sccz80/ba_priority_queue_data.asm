@@ -3,6 +3,8 @@
 
 XDEF ba_priority_queue_data
 
-defc ba_priority_queue_data = asm_ba_priority_queue_data
+;defc ba_priority_queue_data = asm_ba_priority_queue_data
 
-INCLUDE "../../z80/asm_ba_priority_queue_data.asm"
+ba_priority_queue_data:
+
+   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_data.asm"

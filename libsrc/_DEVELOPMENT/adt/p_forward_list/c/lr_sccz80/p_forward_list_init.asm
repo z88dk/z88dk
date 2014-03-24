@@ -5,4 +5,4 @@ XDEF p_forward_list_init
 
 p_forward_list_init:
 
-   INCLUDE "../../z80/asm_p_forward_list_init.asm"
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_init.asm"

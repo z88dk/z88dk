@@ -9,4 +9,4 @@ strchrnul_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_strchrnul.asm"
+   INCLUDE "string/z80/asm_strchrnul.asm"

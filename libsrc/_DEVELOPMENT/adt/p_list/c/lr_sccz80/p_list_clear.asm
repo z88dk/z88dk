@@ -3,6 +3,8 @@
 
 XDEF p_list_clear
 
-defc p_list_clear = asm_p_list_clear
+;defc p_list_clear = asm_p_list_clear
 
-INCLUDE "../../z80/asm_p_list_clear.asm"
+p_list_clear:
+
+   INCLUDE "adt/p_list/z80/asm_p_list_clear.asm"

@@ -11,4 +11,4 @@ at_quick_exit:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_at_quick_exit.asm"
+   INCLUDE "stdlib/z80/asm_at_quick_exit.asm"

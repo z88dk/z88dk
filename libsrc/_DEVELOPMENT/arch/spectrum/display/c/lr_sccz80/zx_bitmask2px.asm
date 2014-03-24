@@ -5,4 +5,4 @@ XDEF zx_bitmask2px
 
 zx_bitmask2px:
 
-   INCLUDE "../../z80/asm_zx_bitmask2px.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_bitmask2px.asm"

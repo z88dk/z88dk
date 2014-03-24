@@ -7,4 +7,4 @@ LIB p_forward_list_init
 
 defc p_stack_clear = p_forward_list_init
 
-INCLUDE "../../z80/asm_p_stack_clear.asm"
+INCLUDE "adt/p_stack/z80/asm_p_stack_clear.asm"

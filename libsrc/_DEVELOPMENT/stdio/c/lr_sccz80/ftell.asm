@@ -8,4 +8,4 @@ ftell:
    push hl
    pop ix
    
-   INCLUDE "../../z80/asm_ftell.asm"
+   INCLUDE "stdio/z80/asm_ftell.asm"

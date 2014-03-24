@@ -5,4 +5,4 @@ XDEF obstack_printf
 
 obstack_printf:
 
-   INCLUDE "../../z80/asm_obstack_printf.asm"
+   INCLUDE "stdio/z80/asm_obstack_printf.asm"

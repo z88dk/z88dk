@@ -9,4 +9,4 @@ fputs_callee:
    pop ix
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_fputs.asm"
+   INCLUDE "stdio/z80/asm_fputs.asm"

@@ -5,4 +5,4 @@ XDEF zx_py2saddr
 
 zx_py2saddr:
 
-   INCLUDE "../../z80/asm_zx_py2saddr.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_py2saddr.asm"

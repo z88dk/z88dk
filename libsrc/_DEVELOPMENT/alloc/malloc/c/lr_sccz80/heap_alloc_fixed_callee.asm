@@ -11,4 +11,4 @@ heap_alloc_fixed_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_heap_alloc_fixed.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_alloc_fixed.asm"

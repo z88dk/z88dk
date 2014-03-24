@@ -13,4 +13,4 @@ b_array_append:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_b_array_append.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_append.asm"

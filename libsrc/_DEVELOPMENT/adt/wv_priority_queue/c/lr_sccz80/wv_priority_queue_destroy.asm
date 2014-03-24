@@ -3,6 +3,8 @@
 
 XDEF wv_priority_queue_destroy
 
-defc wv_priority_queue_destroy = asm_wv_priority_queue_destroy
+;defc wv_priority_queue_destroy = asm_wv_priority_queue_destroy
 
-INCLUDE "../../z80/asm_wv_priority_queue_destroy.asm"
+wv_priority_queue_destroy:
+
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_destroy.asm"

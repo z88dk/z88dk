@@ -13,4 +13,4 @@ strcoll:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_strcoll.asm"
+   INCLUDE "string/z80/asm_strcoll.asm"

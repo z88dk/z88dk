@@ -5,4 +5,4 @@ XDEF zx_aaddrcup
 
 zx_aaddrcup:
 
-   INCLUDE "../../z80/asm_zx_aaddrcup.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_aaddrcup.asm"

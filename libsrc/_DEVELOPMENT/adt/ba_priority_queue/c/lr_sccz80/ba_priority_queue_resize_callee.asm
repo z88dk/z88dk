@@ -9,4 +9,4 @@ ba_priority_queue_resize_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_ba_priority_queue_resize.asm"
+   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_resize.asm"

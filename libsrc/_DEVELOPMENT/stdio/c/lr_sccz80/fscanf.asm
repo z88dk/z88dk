@@ -5,4 +5,4 @@ XDEF fscanf
 
 fscanf:
 
-   INCLUDE "../../z80/asm_fscanf.asm"
+   INCLUDE "stdio/z80/asm_fscanf.asm"

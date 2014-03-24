@@ -19,4 +19,4 @@ wa_priority_queue_resize:
    
    ret
    
-   INCLUDE "../../z80/asm_wa_priority_queue_resize.asm"
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_resize.asm"

@@ -13,4 +13,4 @@ w_array_size:
    
    jp asm_w_array_size
 
-   INCLUDE "../../z80/asm_w_array_size.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_size.asm"

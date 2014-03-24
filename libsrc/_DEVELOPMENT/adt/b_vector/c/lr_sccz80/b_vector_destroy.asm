@@ -3,6 +3,8 @@
 
 XDEF b_vector_destroy
 
-defc b_vector_destroy = asm_b_vector_destroy
+;defc b_vector_destroy = asm_b_vector_destroy
 
-INCLUDE "../../z80/asm_b_vector_destroy.asm"
+b_vector_destroy:
+
+   INCLUDE "adt/b_vector/z80/asm_b_vector_destroy.asm"

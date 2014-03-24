@@ -10,4 +10,4 @@ vscanf_callee:
    pop de
    push af
    
-   INCLUDE "../../z80/asm_vscanf.asm"
+   INCLUDE "stdio/z80/asm_vscanf.asm"

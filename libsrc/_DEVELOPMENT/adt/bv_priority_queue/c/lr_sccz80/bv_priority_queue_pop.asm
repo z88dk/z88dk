@@ -3,6 +3,8 @@
 
 XDEF bv_priority_queue_pop
 
-defc bv_priority_queue_pop = asm_bv_priority_queue_pop
+;defc bv_priority_queue_pop = asm_bv_priority_queue_pop
 
-INCLUDE "../../z80/asm_bv_priority_queue_pop.asm"
+bv_priority_queue_pop:
+
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_pop.asm"

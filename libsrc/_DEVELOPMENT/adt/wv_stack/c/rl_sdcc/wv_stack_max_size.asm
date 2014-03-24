@@ -7,4 +7,4 @@ LIB w_vector_max_size
 
 defc wv_stack_max_size = w_vector_max_size
 
-INCLUDE "../../z80/asm_wv_stack_size.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_size.asm"

@@ -7,4 +7,4 @@ LIB b_array_at
 
 defc b_vector_at = b_array_at
 
-INCLUDE "../../z80/asm_b_vector_at.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_at.asm"

@@ -12,4 +12,4 @@ getchar:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_getchar.asm"
+   INCLUDE "stdio/z80/asm_getchar.asm"

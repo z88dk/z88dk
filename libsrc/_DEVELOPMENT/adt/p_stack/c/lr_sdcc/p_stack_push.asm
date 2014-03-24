@@ -7,4 +7,4 @@ LIB p_forward_list_insert_after
 
 defc p_stack_push = p_forward_list_insert_after
 
-INCLUDE "../../z80/asm_p_stack_push.asm"
+INCLUDE "adt/p_stack/z80/asm_p_stack_push.asm"

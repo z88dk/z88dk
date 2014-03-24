@@ -13,4 +13,4 @@ wv_priority_queue_shrink_to_fit:
    
    jp asm_wv_priority_queue_shrink_to_fit
 
-   INCLUDE "../../z80/asm_wv_priority_queue_shrink_to_fit.asm"
+   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_shrink_to_fit.asm"

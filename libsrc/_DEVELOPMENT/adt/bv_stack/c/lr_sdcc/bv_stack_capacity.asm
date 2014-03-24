@@ -7,4 +7,4 @@ LIB b_vector_capacity
 
 defc bv_stack_capacity = b_vector_capacity
 
-INCLUDE "../../z80/asm_bv_stack_capacity.asm"
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_capacity.asm"

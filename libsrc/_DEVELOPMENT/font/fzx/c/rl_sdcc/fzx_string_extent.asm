@@ -18,4 +18,4 @@ fzx_string_extent:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_fzx_string_extent.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_string_extent.asm"

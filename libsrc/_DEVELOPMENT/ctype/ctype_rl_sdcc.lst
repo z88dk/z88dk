@@ -16,4 +16,4 @@ ctype/c/rl_sdcc/isxdigit
 ctype/c/rl_sdcc/toascii
 ctype/c/rl_sdcc/tolower
 ctype/c/rl_sdcc/toupper
-@ctype_asm.lst
+@ctype/ctype_asm.lst

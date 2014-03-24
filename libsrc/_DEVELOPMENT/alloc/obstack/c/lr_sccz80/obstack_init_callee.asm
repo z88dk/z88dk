@@ -19,4 +19,4 @@ obstack_init_callee:
    pop de
    push hl
    
-   INCLUDE "../../z80/asm_obstack_init.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_init.asm"

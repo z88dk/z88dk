@@ -5,6 +5,10 @@ XDEF memalign_callee
 
 LIB aligned_alloc_callee
 
-defc memalign_callee = aligned_alloc_callee
+;defc memalign_callee = aligned_alloc_callee
 
-INCLUDE "../../z80/asm_memalign.asm"
+memalign_callee:
+
+   jp aligned_alloc_callee
+
+INCLUDE "alloc/malloc/z80/asm_memalign.asm"

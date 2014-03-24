@@ -15,4 +15,4 @@ fzx_setat:
    
    ld h,e
    
-   INCLUDE "../../z80/asm_fzx_setat.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_setat.asm"

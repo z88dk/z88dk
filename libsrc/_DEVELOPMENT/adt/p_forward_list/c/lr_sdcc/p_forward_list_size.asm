@@ -11,4 +11,4 @@ p_forward_list_size:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_p_forward_list_size.asm"
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_size.asm"

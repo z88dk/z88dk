@@ -33,4 +33,4 @@ memmem:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_memmem.asm"
+   INCLUDE "string/z80/asm_memmem.asm"

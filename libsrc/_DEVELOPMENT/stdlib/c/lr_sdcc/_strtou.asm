@@ -15,4 +15,4 @@ _strtou:
    push bc
    push af
    
-   INCLUDE "../../z80/asm__strtou.asm"
+   INCLUDE "stdlib/z80/asm__strtou.asm"

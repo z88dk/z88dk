@@ -5,4 +5,4 @@ XDEF perror
 
 perror:
 
-   INCLUDE "../../z80/asm_perror.asm"
+   INCLUDE "stdio/z80/asm_perror.asm"

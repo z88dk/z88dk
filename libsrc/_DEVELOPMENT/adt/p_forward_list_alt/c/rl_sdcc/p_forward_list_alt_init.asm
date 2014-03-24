@@ -11,4 +11,4 @@ p_forward_list_alt_init:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_p_forward_list_alt_init.asm"
+   INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_init.asm"

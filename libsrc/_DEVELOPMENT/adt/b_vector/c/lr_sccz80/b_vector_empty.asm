@@ -3,6 +3,8 @@
 
 XDEF b_vector_empty
 
-defc b_vector_empty = asm_b_vector_empty
+;defc b_vector_empty = asm_b_vector_empty
 
-INCLUDE "../../z80/asm_b_vector_empty.asm"
+b_vector_empty:
+
+   INCLUDE "adt/b_vector/z80/asm_b_vector_empty.asm"

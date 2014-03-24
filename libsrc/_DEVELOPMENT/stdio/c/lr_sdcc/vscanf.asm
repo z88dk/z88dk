@@ -20,4 +20,4 @@ vscanf:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_vscanf.asm"
+   INCLUDE "stdio/z80/asm_vscanf.asm"

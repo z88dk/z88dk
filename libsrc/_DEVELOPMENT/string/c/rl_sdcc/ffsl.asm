@@ -13,4 +13,4 @@ ffsl:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_ffsl.asm"
+   INCLUDE "string/z80/asm_ffsl.asm"

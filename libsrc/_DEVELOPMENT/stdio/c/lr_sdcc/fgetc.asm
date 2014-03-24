@@ -21,4 +21,4 @@ fgetc:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fgetc.asm"
+   INCLUDE "stdio/z80/asm_fgetc.asm"

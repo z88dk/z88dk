@@ -7,4 +7,4 @@ LIB p_forward_list_alt_pop_front
 
 defc p_queue_pop = p_forward_list_alt_pop_front
 
-INCLUDE "../../z80/asm_p_queue_pop.asm"
+INCLUDE "adt/p_queue/z80/asm_p_queue_pop.asm"

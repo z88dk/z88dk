@@ -11,4 +11,4 @@ balloc_init:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_balloc_init.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_init.asm"

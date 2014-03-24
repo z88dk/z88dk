@@ -21,4 +21,4 @@ funlockfile:
    pop ix
    ret
       
-   INCLUDE "../../z80/asm_funlockfile.asm"
+   INCLUDE "stdio/z80/asm_funlockfile.asm"

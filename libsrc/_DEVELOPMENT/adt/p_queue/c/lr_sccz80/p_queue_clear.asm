@@ -3,6 +3,8 @@
 
 XDEF p_queue_clear
 
-defc p_queue_clear = asm_p_queue_clear
+;defc p_queue_clear = asm_p_queue_clear
 
-INCLUDE "../../z80/asm_p_queue_clear.asm"
+p_queue_clear:
+
+   INCLUDE "adt/p_queue/z80/asm_p_queue_clear.asm"

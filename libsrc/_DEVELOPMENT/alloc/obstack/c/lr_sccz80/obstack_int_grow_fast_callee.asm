@@ -17,4 +17,4 @@ obstack_int_grow_fast_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_int_grow_fast.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_int_grow_fast.asm"

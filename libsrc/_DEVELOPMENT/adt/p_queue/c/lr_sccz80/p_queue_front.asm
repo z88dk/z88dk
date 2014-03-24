@@ -3,6 +3,8 @@
 
 XDEF p_queue_front
 
-defc p_queue_front = asm_p_queue_front
+;defc p_queue_front = asm_p_queue_front
 
-INCLUDE "../../z80/asm_p_queue_front.asm"
+p_queue_front:
+
+   INCLUDE "adt/p_queue/z80/asm_p_queue_front.asm"

@@ -5,4 +5,4 @@ XDEF asprintf
 
 asprintf:
 
-   INCLUDE "../../z80/asm_asprintf.asm"
+   INCLUDE "stdio/z80/asm_asprintf.asm"

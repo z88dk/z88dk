@@ -24,4 +24,4 @@ _fmemopen:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm__fmemopen.asm"
+   INCLUDE "stdio/z80/asm__fmemopen.asm"

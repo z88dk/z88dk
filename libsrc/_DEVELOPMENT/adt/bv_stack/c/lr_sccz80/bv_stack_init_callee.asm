@@ -5,6 +5,10 @@ XDEF bv_stack_init_callee
 
 LIB b_vector_init_callee
 
-defc bv_stack_init_callee = b_vector_init_callee
+;defc bv_stack_init_callee = b_vector_init_callee
 
-INCLUDE "../../z80/asm_bv_stack_init.asm"
+bv_stack_init_callee:
+
+   jp b_vector_init_callee
+
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_init.asm"

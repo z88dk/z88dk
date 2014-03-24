@@ -5,4 +5,4 @@ XDEF p_list_pop_front
 
 p_list_pop_front:
 
-   INCLUDE "../../z80/asm_p_list_pop_front.asm"
+   INCLUDE "adt/p_list/z80/asm_p_list_pop_front.asm"

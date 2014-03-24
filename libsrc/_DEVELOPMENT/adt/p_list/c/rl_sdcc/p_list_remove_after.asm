@@ -13,4 +13,4 @@ p_list_remove_after:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_p_list_remove_after.asm"
+   INCLUDE "adt/p_list/z80/asm_p_list_remove_after.asm"

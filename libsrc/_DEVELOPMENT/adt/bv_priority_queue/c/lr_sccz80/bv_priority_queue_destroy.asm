@@ -3,6 +3,8 @@
 
 XDEF bv_priority_queue_destroy
 
-defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy
+;defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy
 
-INCLUDE "../../z80/asm_bv_priority_queue_destroy.asm"
+bv_priority_queue_destroy:
+
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_destroy.asm"

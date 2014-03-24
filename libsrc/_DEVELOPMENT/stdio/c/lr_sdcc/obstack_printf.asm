@@ -12,4 +12,4 @@ obstack_printf:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_obstack_printf.asm"
+   INCLUDE "stdio/z80/asm_obstack_printf.asm"

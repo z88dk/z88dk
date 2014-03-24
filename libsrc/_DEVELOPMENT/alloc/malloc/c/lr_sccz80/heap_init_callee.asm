@@ -9,4 +9,4 @@ heap_init_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_heap_init.asm"
+   INCLUDE "alloc/malloc/z80/asm_heap_init.asm"

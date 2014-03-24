@@ -19,4 +19,4 @@ obstack_align_to_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_align_to.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_align_to.asm"

@@ -32,4 +32,4 @@ bv_priority_queue_init:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_bv_priority_queue_init.asm"
+   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_init.asm"

@@ -19,4 +19,4 @@ obstack_grow_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_obstack_grow.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_grow.asm"

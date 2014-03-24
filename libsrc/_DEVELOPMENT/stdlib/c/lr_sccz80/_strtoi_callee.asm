@@ -10,4 +10,4 @@ _strtoi_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm__strtoi.asm"
+   INCLUDE "stdlib/z80/asm__strtoi.asm"

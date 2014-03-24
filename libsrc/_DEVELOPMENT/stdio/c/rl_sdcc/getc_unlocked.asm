@@ -7,4 +7,4 @@ LIB fgetc_unlocked
 
 defc getc_unlocked = fgetc_unlocked
 
-INCLUDE "../../z80/asm_getc_unlocked.asm"
+INCLUDE "stdio/z80/asm_getc_unlocked.asm"

@@ -13,5 +13,5 @@ b_vector_append_block:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_b_vector_append_block.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_append_block.asm"
 

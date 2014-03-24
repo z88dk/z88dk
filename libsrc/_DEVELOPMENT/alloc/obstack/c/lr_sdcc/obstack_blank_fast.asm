@@ -24,4 +24,4 @@ obstack_blank_fast:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_obstack_blank_fast.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_blank_fast.asm"

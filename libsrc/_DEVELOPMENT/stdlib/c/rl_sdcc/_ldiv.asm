@@ -23,4 +23,4 @@ _ldiv:
    push bc
    push af
    
-   INCLUDE "../../z80/asm__ldiv.asm"
+   INCLUDE "stdlib/z80/asm__ldiv.asm"

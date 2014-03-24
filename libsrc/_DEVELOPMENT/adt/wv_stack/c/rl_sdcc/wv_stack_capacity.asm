@@ -7,4 +7,4 @@ LIB w_vector_capacity
 
 defc wv_stack_capacity = w_vector_capacity
 
-INCLUDE "../../z80/asm_wv_stack_capacity.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_capacity.asm"

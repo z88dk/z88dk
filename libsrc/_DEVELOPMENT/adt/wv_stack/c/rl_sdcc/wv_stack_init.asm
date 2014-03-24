@@ -7,4 +7,4 @@ LIB w_vector_init
 
 defc wv_stack_init = w_vector_init
 
-INCLUDE "../../z80/asm_wv_stack_init.asm"
+INCLUDE "adt/wv_stack/z80/asm_wv_stack_init.asm"

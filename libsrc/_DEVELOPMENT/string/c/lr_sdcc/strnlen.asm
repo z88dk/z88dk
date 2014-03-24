@@ -13,4 +13,4 @@ strnlen:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_strnlen.asm"
+   INCLUDE "string/z80/asm_strnlen.asm"

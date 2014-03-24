@@ -9,4 +9,4 @@ w_vector_resize_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_w_vector_resize.asm"
+   INCLUDE "adt/w_vector/z80/asm_w_vector_resize.asm"

@@ -9,4 +9,4 @@ wa_priority_queue_push_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_wa_priority_queue_push.asm"
+   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_push.asm"

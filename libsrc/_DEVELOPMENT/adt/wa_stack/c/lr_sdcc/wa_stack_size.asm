@@ -7,4 +7,4 @@ LIB w_array_size
 
 defc wa_stack_size = w_array_size
 
-INCLUDE "../../z80/asm_wa_stack_size.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_size.asm"

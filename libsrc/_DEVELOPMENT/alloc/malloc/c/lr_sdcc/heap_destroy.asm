@@ -7,4 +7,4 @@ LIB mtx_destroy
 
 defc heap_destroy = mtx_destroy
 
-INCLUDE "../../z80/asm_heap_destroy.asm"
+INCLUDE "alloc/malloc/z80/asm_heap_destroy.asm"

@@ -7,4 +7,4 @@ LIB b_array_append
 
 defc b_array_push_back = b_array_append
 
-INCLUDE "../../z80/asm_b_array_push_back.asm"
+INCLUDE "adt/b_array/z80/asm_b_array_push_back.asm"

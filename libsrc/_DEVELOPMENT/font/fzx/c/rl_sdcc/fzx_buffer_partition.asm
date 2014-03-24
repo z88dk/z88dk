@@ -22,4 +22,4 @@ fzx_buffer_partition:
    pop ix
    ret
    
-   INCLUDE "../../z80/asm_fzx_buffer_partition.asm"
+   INCLUDE "font/fzx/z80/asm_fzx_buffer_partition.asm"

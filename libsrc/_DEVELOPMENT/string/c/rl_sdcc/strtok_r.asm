@@ -15,4 +15,4 @@ strtok_r:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_strtok_r.asm"
+   INCLUDE "string/z80/asm_strtok_r.asm"

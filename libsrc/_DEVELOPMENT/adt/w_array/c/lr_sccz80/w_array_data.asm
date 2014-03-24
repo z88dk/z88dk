@@ -3,6 +3,8 @@
 
 XDEF w_array_data
 
-defc w_array_data = asm_w_array_data
+;defc w_array_data = asm_w_array_data
 
-INCLUDE "../../z80/asm_w_array_data.asm"
+w_array_data:
+
+   INCLUDE "adt/w_array/z80/asm_w_array_data.asm"

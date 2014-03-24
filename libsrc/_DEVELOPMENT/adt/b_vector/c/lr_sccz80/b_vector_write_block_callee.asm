@@ -14,4 +14,4 @@ b_vector_write_block_callee:
    exx
    push af
    
-   INCLUDE "../../z80/asm_b_vector_write_block.asm"
+   INCLUDE "adt/b_vector/z80/asm_b_vector_write_block.asm"

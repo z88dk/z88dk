@@ -7,4 +7,4 @@ LIB p_forward_list_size
 
 defc p_list_size = p_forward_list_size
 
-INCLUDE "../../z80/asm_p_list_size.asm"
+INCLUDE "adt/p_list/z80/asm_p_list_size.asm"

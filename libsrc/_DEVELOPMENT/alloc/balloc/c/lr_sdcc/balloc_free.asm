@@ -11,4 +11,4 @@ balloc_free:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_balloc_free.asm"
+   INCLUDE "alloc/balloc/z80/asm_balloc_free.asm"

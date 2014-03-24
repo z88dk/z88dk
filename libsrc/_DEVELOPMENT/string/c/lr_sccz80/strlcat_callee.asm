@@ -10,4 +10,4 @@ strlcat_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "../../z80/sm_strlcat.asm"
+   INCLUDE "string/z80/asm_strlcat.asm"

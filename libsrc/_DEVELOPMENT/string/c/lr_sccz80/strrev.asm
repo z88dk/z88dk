@@ -5,4 +5,4 @@ XDEF strrev
 
 strrev:
 
-   INCLUDE "../../z80/asm_strrev.asm"
+   INCLUDE "string/z80/asm_strrev.asm"

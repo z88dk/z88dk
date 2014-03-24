@@ -25,4 +25,4 @@ obstack_finish:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_obstack_finish.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_finish.asm"

@@ -21,4 +21,4 @@ w_array_insert:
    push bc
    exx
    
-   INCLUDE "../../z80/asm_w_array_insert.asm"
+   INCLUDE "adt/w_array/z80/asm_w_array_insert.asm"

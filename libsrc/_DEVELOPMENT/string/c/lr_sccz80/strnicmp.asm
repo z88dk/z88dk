@@ -5,4 +5,8 @@ XLIB strnicmp
 
 LIB strncasecmp
 
-defc strnicmp = strncasecmp
+;defc strnicmp = strncasecmp
+
+strnicmp:
+
+   jp strncasecmp

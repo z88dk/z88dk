@@ -12,4 +12,4 @@ sscanf:
    pop ix
    ret
 
-   INCLUDE "../../z80/asm_sscanf.asm"
+   INCLUDE "stdio/z80/asm_sscanf.asm"

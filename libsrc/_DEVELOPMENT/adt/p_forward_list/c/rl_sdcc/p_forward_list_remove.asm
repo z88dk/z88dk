@@ -13,4 +13,4 @@ p_forward_list_remove:
    push hl
    push af
    
-   INCLUDE "../../z80/asm_p_forward_list_remove.asm"
+   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_remove.asm"

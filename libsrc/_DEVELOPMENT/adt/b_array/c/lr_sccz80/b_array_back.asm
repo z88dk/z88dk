@@ -5,4 +5,4 @@ XDEF b_array_back
 
 b_array_back:
 
-   INCLUDE "../../z80/asm_b_array_back.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_back.asm"

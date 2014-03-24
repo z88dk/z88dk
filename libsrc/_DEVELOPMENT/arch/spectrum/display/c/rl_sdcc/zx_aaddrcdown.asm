@@ -11,4 +11,4 @@ zx_aaddrcdown:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_zx_aaddrcdown.asm"
+   INCLUDE "arch/spectrum/display/z80/asm_zx_aaddrcdown.asm"

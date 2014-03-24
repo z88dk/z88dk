@@ -11,4 +11,4 @@ spinlock_release:
    push hl
    push af
 
-   INCLUDE "../../z80/asm_spinlock_release.asm"
+   INCLUDE "threads/mutex/z80/asm_spinlock_release.asm"

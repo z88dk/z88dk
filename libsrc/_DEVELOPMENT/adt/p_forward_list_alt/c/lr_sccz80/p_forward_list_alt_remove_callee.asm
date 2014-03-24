@@ -9,4 +9,4 @@ p_forward_list_alt_remove_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "../../z80/asm_p_forward_list_alt_remove.asm"
+   INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_remove.asm"

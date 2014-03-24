@@ -15,4 +15,4 @@ b_array_erase_range:
    push de
    push af
    
-   INCLUDE "../../z80/asm_b_array_erase_range.asm"
+   INCLUDE "adt/b_array/z80/asm_b_array_erase_range.asm"

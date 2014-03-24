@@ -23,4 +23,4 @@ obstack_align_to:
    push bc
    push af
    
-   INCLUDE "../../z80/asm_obstack_align_to.asm"
+   INCLUDE "alloc/obstack/z80/asm_obstack_align_to.asm"

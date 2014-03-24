@@ -5,4 +5,4 @@ XDEF mtx_lock
 
 mtx_lock:
 
-   INCLUDE "../../z80/asm_mtx_lock.asm"
+   INCLUDE "threads/mutex/z80/asm_mtx_lock.asm"
