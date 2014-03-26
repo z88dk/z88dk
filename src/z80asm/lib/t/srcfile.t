@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.3 2014-03-15 14:35:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.4 2014-03-26 00:12:28 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -313,6 +313,7 @@ ungetline
 (test.f0:13)line 4
 (test.f0:13)line 5
 (test.f0:13)line 6
+File test.f0 line 14 text 
 File NULL line 0 text NULL
 (eof)
 (eof)
@@ -321,16 +322,19 @@ includes
 File test.x1/test.f3 line 1 text F2 x1
 
 (test.x1/test.f3:1)F2 x1
+File test.x1/test.f3 line 2 text 
 File NULL line 0 text NULL
 (eof)
 File test.x1/test.f2 line 1 text F1 x1
 
 (test.x1/test.f2:1)F1 x1
+File test.x1/test.f2 line 2 text 
 File NULL line 0 text NULL
 (eof)
 File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
+File test.x1/test.f1 line 2 text 
 File NULL line 0 text NULL
 (eof)
 (eof)
@@ -339,11 +343,13 @@ recursive include, no callback
 File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
+File test.x1/test.f1 line 2 text 
 File NULL line 0 text NULL
 (eof)
 File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
+File test.x1/test.f1 line 2 text 
 File NULL line 0 text NULL
 (eof)
 set callback
@@ -377,7 +383,11 @@ sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @
 
 
 # $Log: srcfile.t,v $
-# Revision 1.3  2014-03-15 14:35:51  pauloscustodio
+# Revision 1.4  2014-03-26 00:12:28  pauloscustodio
+# Integrate use of srcfile in scanner, removing global variable z80asmfile
+# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
+#
+# Revision 1.3  2014/03/15 14:35:51  pauloscustodio
 # Add interface to lookup current file name and line number
 #
 # Revision 1.2  2014/02/08 18:21:18  pauloscustodio
