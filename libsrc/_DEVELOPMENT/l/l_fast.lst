@@ -49,6 +49,7 @@ l/z80/integer/l_utod_hl
 l/z80/long/l_decs_dehl
 l/z80/long/l_decu_dehl
 l/z80/long/l_dec_dehl
+l/z80/long/l_inc_dehl
 l/z80/long/l_long_addu_exx
 l/z80/long/l_long_addu_stack
 l/z80/long/l_long_add_exx
