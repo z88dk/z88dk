@@ -32,17 +32,6 @@ asm_rand:
    ld hl,(__seed)
    ld de,(__seed + 2)
 
-   ld a,e
-   or d
-   or l
-   or h
-   jr nz, seed_ok
-   
-   inc de
-   inc hl
-
-seed_ok:
-
    ; dehl ^= dehl << 8
 
    ld a,d
