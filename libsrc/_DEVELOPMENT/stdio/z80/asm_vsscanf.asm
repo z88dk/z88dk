@@ -3,7 +3,7 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; int vsscanf(const char *s, const char *format, va_list arg)
+; int vsscanf(const char *s, const char *format, void *arg)
 ;
 ; As vfscanf() but input source is a string rather than a file.
 ;
