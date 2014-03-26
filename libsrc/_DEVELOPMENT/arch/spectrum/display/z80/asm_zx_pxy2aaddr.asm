@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; void *zx_pxy2aaddr_callee(uchar x, uchar y)
+; void *zx_pxy2aaddr(uchar x, uchar y)
 ;
 ; Attribute address corresponding to pixel coordinate x, y.
 ;

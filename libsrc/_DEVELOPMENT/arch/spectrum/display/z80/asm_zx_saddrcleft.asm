@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; void *zx_saddrcleft(saddr)
+; void *zx_saddrcleft(void *saddr)
 ;
 ; Modify screen address to move left one character (eight pixels)
 ; If at the leftmost edge, move to rightmost column on prev row.
