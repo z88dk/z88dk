@@ -5,7 +5,7 @@
 
 XLIB __stdio_memstream_driver
 
-XREF STDIO_MSG_PUTC, STDIO_MSG_PUTC, STDIO_MSG_EATC, STDIO_MSG_READ
+XREF STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_EATC, STDIO_MSG_READ
 XREF STDIO_MSG_GETC, STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_CLOS
 
 LIB asm_memset, asm_free, __stdio_file_destroy, l_long_add_exx
@@ -27,7 +27,7 @@ __stdio_memstream_driver:
    cp STDIO_MSG_PUTC
    jp z, PUTC
    
-   cp STDIO_MSG_PUTC
+   cp STDIO_MSG_WRIT
    jp z, WRIT
    
    cp STDIO_MSG_EATC
