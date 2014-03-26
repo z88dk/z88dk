@@ -7,8 +7,6 @@ font/fzx/c/lr_sccz80/fzx_buffer_partition_ww_callee
 font/fzx/c/lr_sccz80/fzx_char_metrics
 font/fzx/c/lr_sccz80/fzx_char_metrics_callee
 font/fzx/c/lr_sccz80/fzx_puts
-font/fzx/c/lr_sccz80/fzx_setat
-font/fzx/c/lr_sccz80/fzx_setat_callee
 font/fzx/c/lr_sccz80/fzx_string_extent
 font/fzx/c/lr_sccz80/fzx_string_partition
 font/fzx/c/lr_sccz80/fzx_string_partition_callee

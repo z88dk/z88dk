@@ -27,6 +27,8 @@ XLIB asm_fzx_putc
 LIB _fzx, error_zc, error_onc
 LIB asm_zx_pxy2saddr, asm_zx_saddrpdown
 
+XDEF __fzx_inst_0, __fzx_inst_1, __fzx_inst_2
+
 DEFC FONT = 0
 DEFC MARGIN = 2
 DEFC P_FLAG = 3
@@ -257,17 +259,32 @@ no_rotate:
 
    inc l
    inc l
+
+__fzx_inst_0:
+   
+   nop
    or (hl)                     ; rightmost byte A to screen
+   
    ld (hl),a                   ; (note could be offscreen but ORing zero in that case)
    
    dec l
    ld a,c
+
+__fzx_inst_1:
+
+   nop
    or (hl)
+   
    ld (hl),a                   ; second byte C to screen
    
    dec l
    ld a,d
+
+__fzx_inst_2:
+
+   nop
    or (hl)
+   
    ld (hl),a                   ; first byte D to screen
    
    call asm_zx_saddrpdown      ; modify screen address in HL to move down one pixel
