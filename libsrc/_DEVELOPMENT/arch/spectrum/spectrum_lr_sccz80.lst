@@ -1,2 +1,3 @@
+arch/spectrum/lr_sccz80/zx_border
 @arch/spectrum/display/display_lr_sccz80.lst
 @arch/spectrum/graphics/graphics_prims_lr_sccz80.lst
