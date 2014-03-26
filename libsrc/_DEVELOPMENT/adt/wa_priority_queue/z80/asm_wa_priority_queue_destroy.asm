@@ -3,7 +3,7 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; void wa_priority_queue_destroy(ba_priority_queue_t *q)
+; void wa_priority_queue_destroy(wa_priority_queue_t *q)
 ;
 ; Zero the queue structure.
 ;

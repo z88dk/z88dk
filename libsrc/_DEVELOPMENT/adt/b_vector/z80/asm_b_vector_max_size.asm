@@ -3,7 +3,7 @@
 ; Feb 2014
 ; ===============================================================
 ; 
-; void *b_vector_max_size(b_vector_t *v)
+; size_t b_vector_max_size(b_vector_t *v)
 ;
 ; Return the vector's max_size.
 ;

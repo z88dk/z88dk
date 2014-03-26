@@ -3,7 +3,7 @@
 ; Mar 2014
 ; ===============================================================
 ; 
-; int w_array_empty(b_array_t *a)
+; int w_array_empty(w_array_t *a)
 ;
 ; Return non-zero if the array is empty.
 ;

@@ -18,7 +18,7 @@ The vector structure w_vector_t:
 
 offset   size (bytes)   description
 
-  0           2         void *array, array managed by vector
+  0           2         void *data, array managed by vector
   2           2         size_t size, number of occupied bytes in vector
   4           2         capacity, allocated size of array in bytes
   6           2         max_size, maximum allocation for array in bytes
