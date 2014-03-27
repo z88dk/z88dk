@@ -30,7 +30,15 @@ IF __heap_sz
 
    XDEF __heap
    
-   __heap:                     defs __heap_sz
+   IF __heap_loc
+   
+      defc __heap = __heap_loc
+   
+   ELSE
+   
+      __heap:                  defs __heap_sz
+
+   ENDIF
 
 ENDIF
 
@@ -38,7 +46,15 @@ IF __qtbl_sz
 
    XDEF __qtbl
    
-   __qtbl:                     defs __qtbl_sz * 2
+   IF __qtbl_loc
+   
+      defc __qtbl = __qtbl_loc
+   
+   ELSE
+
+      __qtbl:                     defs __qtbl_sz * 2
+
+   ENDIF
 
 ENDIF
 
