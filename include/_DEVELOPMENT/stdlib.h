@@ -2,6 +2,24 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H
 
+// DATA STRUCTURES
+
+typedef struct div_s
+{
+
+   int rem;
+   int quot;
+
+} div_t;
+
+typedef struct ldiv_s
+{
+
+   long quot;
+   long rem;
+
+} ldiv_t;
+
 // SCCZ80
 
 extern void   __LIB__               _div(div_t *d, int numer, int denom);
@@ -28,7 +46,7 @@ extern int    __LIB__ __FASTCALL__  system(char *s);
 extern char   __LIB__              *ultoa(ulong num, char *buf, int radix);
 extern char   __LIB__              *utoa(uint num, char *buf, int radix);
 
-#ifndef _ALLOC_H
+#ifndef _ALLOC_MALLOC_H
 
 extern void   __LIB__              *aligned_alloc(size_t alignment, size_t size);
 extern void   __LIB__              *calloc(size_t nmemb, size_t size);
@@ -53,7 +71,7 @@ extern ulong  __LIB__ __CALLEE__    strtoul_callee(char *nptr, char **endptr, in
 extern char   __LIB__ __CALLEE__   *ultoa_callee(ulong num, char *buf, int radix);
 extern char   __LIB__ __CALLEE__   *utoa_callee(uint num, char *buf, int radix);
 
-#ifndef _ALLOC_H
+#ifndef _ALLOC_MALLOC_H
 
 extern void   __LIB__ __CALLEE__   *aligned_alloc_callee(size_t alignment, size_t size);
 extern void   __LIB__ __CALLEE__   *calloc_callee(size_t nmemb, size_t size);
@@ -76,7 +94,7 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 #define ultoa(a,b,c)                ultoa_callee(a,b,c)
 #define utoa(a,b,c)                 utoa_callee(a,b,c)
 
-#ifndef _ALLOC_H
+#ifndef _ALLOC_MALLOC_H
 
 #define aligned_alloc(a,b)          aligned_alloc_callee(a,b)
 #define calloc(a,b)                 calloc_callee(a,b)

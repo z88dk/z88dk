@@ -2,6 +2,20 @@
 #ifndef _THREADS_H
 #define _THREADS_H
 
+// DATA STRUCTURES
+
+typedef struct mtx_s
+{
+
+   uchar thrd_owner;
+   uchar mutex_type;
+   uchar lock_count;
+   
+   uchar spinlock;
+   forward_list *q;
+
+} mtx_t;
+
 // SCCZ80
 
 // mutex

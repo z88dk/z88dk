@@ -1,6 +1,6 @@
 
-#ifndef _SPECTRUM_H
-#define _SPECTRUM_H
+#ifndef _ARCH_SPECTRUM_H
+#define _ARCH_SPECTRUM_H
 
 // COMMON CONSTANTS
 

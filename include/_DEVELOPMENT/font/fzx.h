@@ -1,6 +1,6 @@
 
-#ifndef _FZX_H
-#define _FZX_H
+#ifndef _FONT_FZX_H
+#define _FONT_FZX_H
 
 // DATA STRUCTURES
 
@@ -42,6 +42,8 @@ struct fzx_state                    // FZX STATE
    uchar            y;              // current y coordinate in pixels
 
 };
+
+extern struct fzx_state fzx;
 
 #define FZX_MODE_OR    0xb600
 #define FZX_MODE_XOR   0xae00
@@ -128,5 +130,48 @@ extern int    __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 #define ff_ao_Vickers               ((struct fzx_font *)(_ff_ao_Vickers))
 #define ff_ao_Videotex              ((struct fzx_font *)(_ff_ao_Videotex))
 #define ff_ao_Zaibatsu              ((struct fzx_font *)(_ff_ao_Zaibatsu))
+
+extern void __LIB__ _ff_Aribeth14(void);
+extern void __LIB__ _ff_Aribeth6(void);
+extern void __LIB__ _ff_Aribeth8(void);
+extern void __LIB__ _ff_Arkade(void);
+extern void __LIB__ _ff_Blackadder(void);
+extern void __LIB__ _ff_Cayeux(void);
+extern void __LIB__ _ff_Cheveron(void);
+extern void __LIB__ _ff_Chloe(void);
+extern void __LIB__ _ff_Dutch(void);
+extern void __LIB__ _ff_GenevaMonoBold(void);
+extern void __LIB__ _ff_GenevaMonoBoldItalic(void);
+extern void __LIB__ _ff_GenevaMonoCyrillic(void);
+extern void __LIB__ _ff_GenevaMonoItalic(void);
+extern void __LIB__ _ff_GenevaMonoRoman(void);
+extern void __LIB__ _ff_GenevaMonoSymbol(void);
+extern void __LIB__ _ff_Grotesk(void);
+extern void __LIB__ _ff_Hemery(void);
+extern void __LIB__ _ff_Hiroshi(void);
+extern void __LIB__ _ff_Jangeborg(void);
+extern void __LIB__ _ff_Kaitaia(void);
+extern void __LIB__ _ff_Klausjahn(void);
+extern void __LIB__ _ff_Lettera(void);
+extern void __LIB__ _ff_Napier(void);
+extern void __LIB__ _ff_Newbrand(void);
+extern void __LIB__ _ff_OldEnglish(void);
+extern void __LIB__ _ff_OpenDyslexic(void);
+extern void __LIB__ _ff_Orion(void);
+extern void __LIB__ _ff_Prefect(void);
+extern void __LIB__ _ff_Programmer(void);
+extern void __LIB__ _ff_RoundelSans(void);
+extern void __LIB__ _ff_RoundelSerif(void);
+extern void __LIB__ _ff_Sabon(void);
+extern void __LIB__ _ff_Sinclair(void);
+extern void __LIB__ _ff_SoixanteQuatre(void);
+extern void __LIB__ _ff_Soxz(void);
+extern void __LIB__ _ff_SpecDings(void);
+extern void __LIB__ _ff_Swiss(void);
+extern void __LIB__ _ff_Trader(void);
+extern void __LIB__ _ff_Twombly(void);
+extern void __LIB__ _ff_Vickers(void);
+extern void __LIB__ _ff_Videotex(void);
+extern void __LIB__ _ff_Zaibatsu(void);
 
 #endif
