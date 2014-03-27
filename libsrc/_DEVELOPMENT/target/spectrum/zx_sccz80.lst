@@ -1,0 +1,14 @@
+@adt/adt_lr_sccz80.lst
+@alloc/alloc_lr_sccz80.lst
+@arch/spectrum/spectrum_lr_sccz80.lst
+@ctype/ctype_lr_sccz80.lst
+@error/error.lst
+@font/fzx/fzx_lr_sccz80.lst
+@font/fzx/arch/spectrum/spectrum_lr_sccz80.lst
+@l/l_fast.lst
+@locale/locale.lst
+@stdio/stdio_lr_sccz80.lst
+@stdlib/stdlib_lr_sccz80.lst
+@string/string_lr_sccz80.lst
+@threads/threads_lr_sccz80.lst
+@z80/z80_lr_sccz80.lst

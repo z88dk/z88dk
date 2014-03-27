@@ -1,0 +1,14 @@
+@adt/adt_rl_sdcc.lst
+@alloc/alloc_rl_sdcc.lst
+@arch/spectrum/spectrum_rl_sdcc.lst
+@ctype/ctype_rl_sdcc.lst
+@error/error.lst
+@font/fzx/fzx_rl_sdcc.lst
+@font/fzx/arch/spectrum/spectrum_rl_sdcc.lst
+@l/l_fast.lst
+@locale/locale.lst
+@stdio/stdio_rl_sdcc.lst
+@stdlib/stdlib_rl_sdcc.lst
+@string/string_rl_sdcc.lst
+@threads/threads_rl_sdcc.lst
+@z80/z80_rl_sdcc.lst
