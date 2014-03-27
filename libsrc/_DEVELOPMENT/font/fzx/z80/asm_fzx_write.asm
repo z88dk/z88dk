@@ -17,10 +17,14 @@ asm_fzx_write:
 
    ; enter : de = void *buf
    ;         bc = len
+   ;
    ; exit  : hl = number of chars written (<= len)
    ;         de = & first char in buf not written
+   ;         bc = num unwritten chars
+   ;
    ;         carry flag set if not all chars output successfully
    ;         (an off screen error)
+   ;
    ; uses  : all except iy
    
    ld hl,0                     ; number of chars written
