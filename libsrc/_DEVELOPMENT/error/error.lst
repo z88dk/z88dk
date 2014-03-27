@@ -15,10 +15,12 @@ error/z80/error_enolck_zc
 error/z80/error_enomem_mc
 error/z80/error_enomem_zc
 error/z80/error_enotsup_mc
+error/z80/error_enotsup_zc
 error/z80/error_eoverflow_mc
 error/z80/error_eoverflow_zc
 error/z80/error_erange_mc
 error/z80/error_erange_zc
+error/z80/error_lznc
 error/z80/error_mc
 error/z80/error_mnc
 error/z80/error_mulu_overflow_mc
