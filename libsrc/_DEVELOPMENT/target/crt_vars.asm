@@ -1,4 +1,6 @@
 
+; == crt variables ============
+
 ;;;;;;;;;;;;;;;;;;;
 ;; crt host defines
 ;;;;;;;;;;;;;;;;;;;
@@ -26,7 +28,7 @@ ENDIF
 
 ;;;;;;;;;;;; alloc
 
-IF __heap_sz
+IF __heap_sz > 14
 
    XDEF __heap
    
@@ -42,7 +44,7 @@ IF __heap_sz
 
 ENDIF
 
-IF __qtbl_sz
+IF __qtbl_sz > 0
 
    XDEF __qtbl
    
@@ -60,33 +62,39 @@ ENDIF
 
 ;;;;;; exit stacks
 
-IF __exit_stack_sz
-ELSE
+IF !__exit_stack_sz
 
    defc __exit_stack_sz = 32
 
 ENDIF
 
 XDEF __exit_stack, __exit_stack_sz
-   
+
 __exit_stack:
+
+IF __exit_stack_sz > 0
    
    defb 0
    defs __exit_stack_sz * 2
+      
+ENDIF
 
-IF __quickexit_stack_sz
-ELSE
+IF !__quickexit_stack_sz
 
    defc __quickexit_stack_sz = 32
 
 ENDIF
 
 XDEF __quickexit_stack, __quickexit_stack_sz
-   
+
 __quickexit_stack:
+
+IF __quickexit_stack_sz > 0
   
    defb 0
    defs __quickexit_stack_sz * 2
+
+ENDIF
 
 ;;;; stack pointer
 
@@ -202,3 +210,5 @@ ELSE
    __strtok_ptr:               defw 0
 
 ENDIF
+
+; =============================
