@@ -26,6 +26,12 @@ start:
 
    ld (__sp),sp
 
+   IF STACKPTR
+   
+      ld sp,STACKPTR
+   
+   ENDIF
+
    INCLUDE "../crt_init.asm"
 
    ; clear screen 
@@ -50,6 +56,8 @@ _Exit:
 
    ld sp,(__sp)
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 cls:
 
