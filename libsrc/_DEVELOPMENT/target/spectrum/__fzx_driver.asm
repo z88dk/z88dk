@@ -16,7 +16,7 @@ __fzx_driver:
    jp z, error_lznc            ; do nothing, report no error
    
    cp STDIO_MSG_FLSH
-   jp c, error_znc             ; do nothing, report no error
+   jp z, error_znc             ; do nothing, report no error
    
    cp STDIO_MSG_CLOS
    jp z, error_znc             ; do nothing, report no error

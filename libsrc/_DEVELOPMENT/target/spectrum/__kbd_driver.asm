@@ -22,7 +22,7 @@ __kbd_driver:
    jp z, error_znc             ; do nothing, report no error
    
    cp STDIO_MSG_CLOS
-   jp c, error_znc             ; do nothing, report no error
+   jp z, error_znc             ; do nothing, report no error
    
    jp error_enotsup_zc         ; hl = 0 puts stream in error state
 
