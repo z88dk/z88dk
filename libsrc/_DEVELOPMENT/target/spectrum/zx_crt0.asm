@@ -305,8 +305,6 @@ __kbd_eatc:
 __kbd_eatc_loop:
 
    call __kbd_getchar          ; l = char
-   jr z, __kbd_eatc_loop       ; if no keypress
-
    inc de                      ; de = num chars consumed
    
    ld a,b
@@ -355,23 +353,19 @@ __kbd_read:
    
    exx
    
-__kbd_read_loop_0:
+__kbd_read_loop:
 
    ld a,b
    or c
    jr z, __kbd_read_exit       ; if no more chars to read
    
    dec bc
-   
-__kbd_read_loop_1:
-
    call __kbd_getchar
-   jr z, __kbd_read_loop_1     ; if no keypress
    
    ld (de),a                   ; write char to buffer
    inc de
    
-   jr __kbd_read_loop_0
+   jr __kbd_read_loop
 
 __kbd_read_exit:
 
@@ -409,7 +403,7 @@ __kbd_seek:
 
    ex de,hl                    ; de = number of chars to consume
 
-__kbd_seek_loop_0:
+__kbd_seek_loop:
 
    ld a,d
    or e
@@ -417,23 +411,21 @@ __kbd_seek_loop_0:
 
    dec de
 
-__kbd_seek_loop_1:
-
    call __kbd_getchar
-   jr nz, __kbd_seek_loop_0    ; if key read
-
-   jr __kbd_seek_loop_1
-
+   jr __kbd_seek_loop
 ;;
 
 __kbd_getchar:
 
-   ld hl,(23560)               ; l = *LAST_K
+   ld a,(23560)                ; LASTK
+   
+   or a
+   jr z, __kbd_getchar         ; if no keypress
+
+   ld l,a
    
    xor a
-   ld (23560),a                ; clear any consumed keypress
+   ld (23560),a                ; consume the keypress
    
-   ld a,l                      ; a = keypress
-   
-   or a                        ; set z flag if no key
+   ld a,l
    ret
