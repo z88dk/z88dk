@@ -1,4 +1,6 @@
 
+; == crt_exit =================
+
 ; ISO/IEC 9899:201x
 ; 5.1.2.2.3 Program termination
 
@@ -8,12 +10,13 @@
 
 ; ONLY THE EXIT STACK WILL BE EXECUTED ON NORMAL RETURN FROM MAIN
 
-   ; run exit stack
+; run exit stack
 
-   IF __exit_stack_sz > 0
+IF __exit_stack_sz > 0
    
-      LIB asm_exit
-      
-      call asm_exit
+   LIB asm_exit
+   call asm_exit
    
-   ENDIF
+ENDIF
+
+; =============================

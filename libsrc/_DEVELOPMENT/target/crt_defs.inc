@@ -1,4 +1,6 @@
 
+; == crt defines ==============
+
 ;;;;;;;;
 ;; errno
 ;;;;;;;;
@@ -64,3 +66,5 @@ defc thrd_error    = $0001
 defc thrd_nomem    = $0002
 defc thrd_busy     = $0004
 defc thrd_timedout = $0008
+
+; =============================
