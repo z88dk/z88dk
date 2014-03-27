@@ -19,6 +19,14 @@ asm_srand:
    ;
    ; uses  : af
 
+   ld a,h
+   or l
+   jr nz, seed_ok
+   
+   inc hl
+
+seed_ok:
+
    ld (__seed),hl
    ld (__seed + 2),hl
 
