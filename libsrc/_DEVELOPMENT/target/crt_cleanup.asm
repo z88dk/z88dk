@@ -1,3 +1,3 @@
 
-; close files
+; close files, stop multitasking
 ; preserve hl
