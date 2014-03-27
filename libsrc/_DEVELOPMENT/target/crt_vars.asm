@@ -38,7 +38,7 @@ IF __qtbl_sz
 
    XDEF __qtbl
    
-   __qtbl:                     defs __qtbl_sz
+   __qtbl:                     defs __qtbl_sz * 2
 
 ENDIF
 
