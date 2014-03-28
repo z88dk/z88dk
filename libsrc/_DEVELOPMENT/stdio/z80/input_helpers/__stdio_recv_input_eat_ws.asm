@@ -33,7 +33,7 @@ __stdio_recv_input_eat_ws_repeat:
    
    call asm_isspace
    ret c
-   
+      
    jr __stdio_recv_input_eat_ws_repeat
 
 

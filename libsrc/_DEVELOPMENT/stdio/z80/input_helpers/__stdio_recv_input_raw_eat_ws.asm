@@ -24,9 +24,9 @@ __stdio_recv_input_raw_eat_ws_repeat:
    ld bc,$ffff
    call __stdio_recv_input_raw_eat_ws
    
-   call asm_isspace
+   call asm_isspace 
    ret c
-   
+     
    jr __stdio_recv_input_raw_eat_ws_repeat
 
 
