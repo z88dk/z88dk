@@ -1,5 +1,5 @@
 
-XLIB error_einval_zc
+XLIB error_enolck_zc
 
 XREF __ENOLCK
 
