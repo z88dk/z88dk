@@ -1,7 +1,7 @@
 
-XLIB l_long_add_stack
+XLIB l_long_addu_stack
 
-l_long_add_stack:
+l_long_addu_stack:
 
    ; compute a = a + b
    ;
