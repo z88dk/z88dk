@@ -2,6 +2,8 @@
 #ifndef _STRING_H
 #define _STRING_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // SCCZ80 
 
 extern char   __LIB__               *_memlwr(void *p, size_t n);
@@ -56,7 +58,7 @@ extern char   __LIB__               *strstr(char *s, char *subs);
 extern char   __LIB__  __FASTCALL__ *strstrip(char *s);
 extern char   __LIB__               *strtok(char *s, char *delim);
 extern char   __LIB__               *strtok_r(char *s, char *delim, char **last_s);
-extern char   __LIB__  __FASTCALL__  strupr(char *s)
+extern char   __LIB__  __FASTCALL__  strupr(char *s);
 extern size_t __LIB__                strxfrm(char *dst, char *src, size_t n);
 
 // SCCZ80 CALLEE LINKAGE

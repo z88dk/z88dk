@@ -2,6 +2,8 @@
 #ifndef _ADT_P_FORWARD_LIST_H
 #define _ADT_P_FORWARD_LIST_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef void* p_forward_list_t;

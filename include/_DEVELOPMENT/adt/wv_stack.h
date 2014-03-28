@@ -2,6 +2,8 @@
 #ifndef _ADT_WV_STACK_H
 #define _ADT_WV_STACK_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct wv_stack_s

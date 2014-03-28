@@ -2,6 +2,9 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H
 
+#include <_DEVELOPMENT/stddef.h>
+#include <_DEVELOPMENT/stdint.h>
+
 // DATA STRUCTURES
 
 typedef struct div_s
@@ -22,29 +25,29 @@ typedef struct ldiv_s
 
 // SCCZ80
 
-extern void   __LIB__               _div(div_t *d, int numer, int denom);
-extern void   __LIB__               _ldiv(ldiv_t *ld, long numer, long denom);
-extern int    __LIB__               _strtoi(char *nptr, char **endptr, int base);
-extern uint   __LIB__               _strtou(char *nptr, char **endptr, int base);
-extern int    __LIB__ __FASTCALL__  abs(int j);
-extern int    __LIB__ __FASTCALL__  at_quick_exit(void *func);
-extern int    __LIB__ __FASTCALL__  atexit(void *func);
-extern int    __LIB__ __FASTCALL__  atoi(char *buf);
-extern long   __LIB__ __FASTCALL__  atol(char *buf);
-extern void   __LIB__               bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
-extern void   __LIB__ __FASTCALL__  exit(int status);
-extern char   __LIB__              *itoa(int num, char *buf, int radix);
-extern long   __LIB__ __FASTCALL__  labs(long j);
-extern char   __LIB__              *ltoa(long num, char *buf, int radix);
-extern void   __LIB__               qsort(void *base, size_t nmemb, size_t size, void *compar);
-extern void   __LIB__ __FASTCALL__  quick_exit(int status);
-extern int    __LIB__               rand(void);
-extern void   __LIB__ __FASTCALL__  srand(uint seed);
-extern long   __LIB__               strtol(char *nptr, char **endptr, int base);
-extern ulong  __LIB__               strtoul(char *nptr, char **endptr, int base);
-extern int    __LIB__ __FASTCALL__  system(char *s);
-extern char   __LIB__              *ultoa(ulong num, char *buf, int radix);
-extern char   __LIB__              *utoa(uint num, char *buf, int radix);
+extern void      __LIB__               _div(div_t *d, int numer, int denom);
+extern void      __LIB__               _ldiv(ldiv_t *ld, long numer, long denom);
+extern int       __LIB__               _strtoi(char *nptr, char **endptr, int base);
+extern uint16_t  __LIB__               _strtou(char *nptr, char **endptr, int base);
+extern int       __LIB__ __FASTCALL__  abs(int j);
+extern int       __LIB__ __FASTCALL__  at_quick_exit(void *func);
+extern int       __LIB__ __FASTCALL__  atexit(void *func);
+extern int       __LIB__ __FASTCALL__  atoi(char *buf);
+extern long      __LIB__ __FASTCALL__  atol(char *buf);
+extern void      __LIB__               bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__ __FASTCALL__  exit(int status);
+extern char      __LIB__              *itoa(int num, char *buf, int radix);
+extern long      __LIB__ __FASTCALL__  labs(long j);
+extern char      __LIB__              *ltoa(long num, char *buf, int radix);
+extern void      __LIB__               qsort(void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__ __FASTCALL__  quick_exit(int status);
+extern int       __LIB__               rand(void);
+extern void      __LIB__ __FASTCALL__  srand(uint16_t seed);
+extern long      __LIB__               strtol(char *nptr, char **endptr, int base);
+extern uint32_t  __LIB__               strtoul(char *nptr, char **endptr, int base);
+extern int       __LIB__ __FASTCALL__  system(char *s);
+extern char      __LIB__              *ultoa(uint32_t num, char *buf, int radix);
+extern char      __LIB__              *utoa(uint16_t num, char *buf, int radix);
 
 #ifndef _ALLOC_MALLOC_H
 
@@ -58,18 +61,18 @@ extern void   __LIB__              *realloc(void *p, size_t size);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern void   __LIB__ __CALLEE__    _div_callee(div_t *d, int numer, int denom);
-extern void   __LIB__ __CALLEE__    _ldiv_callee(ldiv_t *ld, long numer, long denom);
-extern int    __LIB__ __CALLEE__    _strtoi_callee(char *nptr, char **endptr, int base);
-extern uint   __LIB__ __CALLEE__    _strtou_callee(char *nptr, char **endptr, int base);
-extern void   __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar);
-extern char   __LIB__ __CALLEE__   *itoa_callee(int num, char *buf, int radix);
-extern char   __LIB__ __CALLEE__   *ltoa_callee(long num, char *buf, int radix);
-extern void   __LIB__ __CALLEE__    qsort_callee(void *base, size_t nmemb, size_t size, void *compar);
-extern long   __LIB__ __CALLEE__    strtol_callee(char *nptr, char **endptr, int base);
-extern ulong  __LIB__ __CALLEE__    strtoul_callee(char *nptr, char **endptr, int base);
-extern char   __LIB__ __CALLEE__   *ultoa_callee(ulong num, char *buf, int radix);
-extern char   __LIB__ __CALLEE__   *utoa_callee(uint num, char *buf, int radix);
+extern void      __LIB__ __CALLEE__    _div_callee(div_t *d, int numer, int denom);
+extern void      __LIB__ __CALLEE__    _ldiv_callee(ldiv_t *ld, long numer, long denom);
+extern int       __LIB__ __CALLEE__    _strtoi_callee(char *nptr, char **endptr, int base);
+extern uint16_t  __LIB__ __CALLEE__    _strtou_callee(char *nptr, char **endptr, int base);
+extern void      __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar);
+extern char      __LIB__ __CALLEE__   *itoa_callee(int num, char *buf, int radix);
+extern char      __LIB__ __CALLEE__   *ltoa_callee(long num, char *buf, int radix);
+extern void      __LIB__ __CALLEE__    qsort_callee(void *base, size_t nmemb, size_t size, void *compar);
+extern long      __LIB__ __CALLEE__    strtol_callee(char *nptr, char **endptr, int base);
+extern uint32_t  __LIB__ __CALLEE__    strtoul_callee(char *nptr, char **endptr, int base);
+extern char      __LIB__ __CALLEE__   *ultoa_callee(uint32_t num, char *buf, int radix);
+extern char      __LIB__ __CALLEE__   *utoa_callee(uint16_t num, char *buf, int radix);
 
 #ifndef _ALLOC_MALLOC_H
 

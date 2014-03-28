@@ -2,44 +2,47 @@
 #ifndef _FONT_FZX_H
 #define _FONT_FZX_H
 
+#include <_DEVELOPMENT/stddef.h>
+#include <_DEVELOPMENT/stdint.h>
+
 // DATA STRUCTURES
 
 struct fzx_char                     // FONT'S CHAR DESCRIPTOR
 {
 
-   uint             kern_offset;    // kern in bits 15..14, offset to bitmap from fzx_char address
-   uchar            shift_width_1;  // shift in bits 7..4, width-1 in bits 3..0
+   uint16_t             kern_offset;    // kern in bits 15..14, offset to bitmap from fzx_char address
+   uint8_t              shift_width_1;  // shift in bits 7..4, width-1 in bits 3..0
 
 };
 
 struct fzx_font                     // FONT STRUCTURE
 {
 
-   uchar            height;         // row height in pixels
-   uchar            tracking;       // horizontal gap between chars in pixels
-   uchar            last_char;      // last defined char bitmap in 32..255
-   struct fzx_char  bmp[0];         // begin char bitmap definitions at char code 32
+   uint8_t              height;         // row height in pixels
+   uint8_t              tracking;       // horizontal gap between chars in pixels
+   uint8_t              last_char;      // last defined char bitmap in 32..255
+   struct fzx_char  bmp[0];             // begin char bitmap definitions at char code 32
 
 };
 
 struct fzx_cmetric                  // FONT CHARACTER METRICS
 {
 
-   uchar            kern;           // num pixels to leftshift rendered char within string, 0-3
-   uchar            width;          // width of glyph, 1-16
-   uchar            shift;          // num pixels to downshift rendered char from top of line, 0-15
-   void            *bitmap;         // address of glyph bitmap
+   uint8_t              kern;           // num pixels to leftshift rendered char within string, 0-3
+   uint8_t              width;          // width of glyph, 1-16
+   uint8_t              shift;          // num pixels to downshift rendered char from top of line, 0-15
+   void                *bitmap;         // address of glyph bitmap
    
 };
 
 struct fzx_state                    // FZX STATE
 {
 
-   struct fzx_font *font;           // current font
-   uchar            lm;             // left margin in pixels
-   uchar            flags;          // reserved, set to 0 to reset
-   uchar            x;              // current x coordinate in pixels
-   uchar            y;              // current y coordinate in pixels
+   struct fzx_font     *font;           // current font
+   uint8_t              lm;             // left margin in pixels
+   uint8_t              flags;          // reserved, set to 0 to reset
+   uint8_t              x;              // current x coordinate in pixels
+   uint8_t              y;              // current y coordinate in pixels
 
 };
 
@@ -51,29 +54,29 @@ extern struct fzx_state fzx;
 
 // SCCZ80
 
-extern uint   __LIB__               fzx_buffer_extent(void *buf, size_t len);
-extern char   __LIB__              *fzx_buffer_partition(void *buf, size_t len, uint width);
-extern char   __LIB__              *fzx_buffer_partition_ww(void *buf, size_t len, uint width);
-extern int    __LIB__               fzx_char_metrics(struct fzx_cmetric *m, char c);
-extern int    __LIB__ __FASTCALL__  fzx_mode(int mode);
-extern int    __LIB__ __FASTCALL__  fzx_putc(char c);
-extern int    __LIB__ __FASTCALL__  fzx_puts(char *s);
-extern int    __LIB__               fzx_setat(uint y, uint x);
-extern uint   __LIB__ __FASTCALL__  fzx_string_extent(char *s);
-extern char   __LIB__              *fzx_string_partition(char *s, uint width);
-extern char   __LIB__              *fzx_string_partition_ww(char *s, uint width);
-extern int    __LIB__               fzx_write(void *buf, size_t len);
+extern uint16_t   __LIB__               fzx_buffer_extent(void *buf, size_t len);
+extern char       __LIB__              *fzx_buffer_partition(void *buf, size_t len, uint16_t width);
+extern char       __LIB__              *fzx_buffer_partition_ww(void *buf, size_t len, uint16_t width);
+extern int        __LIB__               fzx_char_metrics(struct fzx_cmetric *m, char c);
+extern int        __LIB__ __FASTCALL__  fzx_mode(int mode);
+extern int        __LIB__ __FASTCALL__  fzx_putc(char c);
+extern int        __LIB__ __FASTCALL__  fzx_puts(char *s);
+extern int        __LIB__               fzx_setat(uint16_t y, uint16_t x);
+extern uint16_t   __LIB__ __FASTCALL__  fzx_string_extent(char *s);
+extern char       __LIB__              *fzx_string_partition(char *s, uint16_t width);
+extern char       __LIB__              *fzx_string_partition_ww(char *s, uint16_t width);
+extern int        __LIB__               fzx_write(void *buf, size_t len);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern uint   __LIB__ __CALLEE__    fzx_buffer_extent_callee(void *buf, size_t len);
-extern char   __LIB__ __CALLEE__   *fzx_buffer_partition_callee(void *buf, size_t len, uint width);
-extern char   __LIB__ __CALLEE__   *fzx_buffer_partition_ww_callee(void *buf, size_t len, uint width);
-extern int    __LIB__ __CALLEE__    fzx_char_metrics_callee(struct fzx_cmetric *m, char c);
-extern int    __LIB__ __CALLEE__    fzx_setat_callee(uint y, uint x);
-extern char   __LIB__ __CALLEE__   *fzx_string_partition_callee(char *s, uint width);
-extern char   __LIB__ __CALLEE__   *fzx_string_partition_ww_callee(char *s, uint width);
-extern int    __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
+extern uint16_t   __LIB__ __CALLEE__    fzx_buffer_extent_callee(void *buf, size_t len);
+extern char       __LIB__ __CALLEE__   *fzx_buffer_partition_callee(void *buf, size_t len, uint16_t width);
+extern char       __LIB__ __CALLEE__   *fzx_buffer_partition_ww_callee(void *buf, size_t len, uint16_t width);
+extern int        __LIB__ __CALLEE__    fzx_char_metrics_callee(struct fzx_cmetric *m, char c);
+extern int        __LIB__ __CALLEE__    fzx_setat_callee(uint16_t y, uint16_t x);
+extern char       __LIB__ __CALLEE__   *fzx_string_partition_callee(char *s, uint16_t width);
+extern char       __LIB__ __CALLEE__   *fzx_string_partition_ww_callee(char *s, uint16_t width);
+extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 

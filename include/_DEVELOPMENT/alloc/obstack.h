@@ -2,6 +2,8 @@
 #ifndef _ALLOC_OBSTACK_H
 #define _ALLOC_OBSTACK_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 struct obstack

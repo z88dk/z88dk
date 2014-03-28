@@ -27,7 +27,7 @@
 
 // SCCZ80
 
-extern void   __LIB__ __FASTCALL__  zx_border(uchar colour);
+extern void   __LIB__ __FASTCALL__  zx_border(int colour);
 
 // display
 
@@ -59,57 +59,57 @@ extern void   __LIB__ __FASTCALL__  zx_border(uchar colour);
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern uint   __LIB__ __FASTCALL__  zx_aaddr2cx(void *aaddr);
-extern uint   __LIB__ __FASTCALL__  zx_aaddr2cy(void *aaddr);
-extern uint   __LIB__ __FASTCALL__  zx_aaddr2px(void *aaddr);
-extern uint   __LIB__ __FASTCALL__  zx_aaddr2py(void *aaddr);
+extern int   __LIB__ __FASTCALL__  zx_aaddr2cx(void *aaddr);
+extern int   __LIB__ __FASTCALL__  zx_aaddr2cy(void *aaddr);
+extern int   __LIB__ __FASTCALL__  zx_aaddr2px(void *aaddr);
+extern int   __LIB__ __FASTCALL__  zx_aaddr2py(void *aaddr);
 extern void   __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *aaddr);
 extern void   __LIB__ __FASTCALL__ *zx_aaddrcdown(void *aaddr);
 extern void   __LIB__ __FASTCALL__ *zx_aaddrcleft(void *aaddr);
 extern void   __LIB__ __FASTCALL__ *zx_aaddrcright(void *aaddr);
 extern void   __LIB__ __FASTCALL__ *zx_aaddrcup(void *aaddr);
-extern uint   __LIB__ __FASTCALL__  zx_bitmask2px(uchar bitmask);
-extern void   __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);
-extern void   __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row);
-extern void   __LIB__              *zx_cyx2aaddr(uchar row, uchar col);
-extern void   __LIB__              *zx_cyx2saddr(uchar row, uchar col);
-extern uint   __LIB__ __FASTCALL__  zx_px2bitmask(uchar x);
-extern void   __LIB__              *zx_pxy2aaddr(uchar x, uchar y);
-extern void   __LIB__              *zx_pxy2saddr(uchar x, uchar y);
-extern void   __LIB__ __FASTCALL__ *zx_py2aaddr(uchar y);
-extern void   __LIB__ __FASTCALL__ *zx_py2saddr(uchar y);
+extern int   __LIB__ __FASTCALL__  zx_bitmask2px(int bitmask);
+extern void   __LIB__ __FASTCALL__ *zx_cy2aaddr(int row);
+extern void   __LIB__ __FASTCALL__ *zx_cy2saddr(int row);
+extern void   __LIB__              *zx_cyx2aaddr(int row, int col);
+extern void   __LIB__              *zx_cyx2saddr(int row, int col);
+extern int   __LIB__ __FASTCALL__  zx_px2bitmask(int x);
+extern void   __LIB__              *zx_pxy2aaddr(int x, int y);
+extern void   __LIB__              *zx_pxy2saddr(int x, int y);
+extern void   __LIB__ __FASTCALL__ *zx_py2aaddr(int y);
+extern void   __LIB__ __FASTCALL__ *zx_py2saddr(int y);
 extern void   __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *saddr);
-extern uint   __LIB__ __FASTCALL__  zx_saddr2cx(void *saddr);
-extern uint   __LIB__ __FASTCALL__  zx_saddr2cy(void *saddr);
-extern uint   __LIB__ __FASTCALL__  zx_saddr2px(void *saddr);
-extern uint   __LIB__ __FASTCALL__  zx_saddr2py(void *saddr);
+extern int   __LIB__ __FASTCALL__  zx_saddr2cx(void *saddr);
+extern int   __LIB__ __FASTCALL__  zx_saddr2cy(void *saddr);
+extern int   __LIB__ __FASTCALL__  zx_saddr2px(void *saddr);
+extern int   __LIB__ __FASTCALL__  zx_saddr2py(void *saddr);
 extern void   __LIB__ __FASTCALL__ *zx_saddrcdown(void *saddr);
 extern void   __LIB__ __FASTCALL__ *zx_saddrcleft(void *saddr);
 extern void   __LIB__ __FASTCALL__ *zx_saddrcright(void *saddr);
 extern void   __LIB__ __FASTCALL__ *zx_saddrcup(void *saddr);
 extern void   __LIB__ __FASTCALL__ *zx_saddrpdown(void *saddr);
-extern void   __LIB__              *zx_saddrpleft(void *saddr, uchar bitmask);
-extern void   __LIB__              *zx_saddrpright(void *saddr, uchar bitmask);
+extern void   __LIB__              *zx_saddrpleft(void *saddr, int bitmask);
+extern void   __LIB__              *zx_saddrpright(void *saddr, int bitmask);
 extern void   __LIB__ __FASTCALL__ *zx_saddrpup(void *saddr);
 
 // graphics
 
-extern int    __LIB__               zx_pattern_fill(uint x, uint y, void *pattern, uint depth);
+extern int    __LIB__               zx_pattern_fill(int x, int y, void *pattern, int depth);
 
 // SCCZ80 CALLEE LINKAGE
 
 // display
 
-extern void   __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col);
-extern void   __LIB__ __CALLEE__   *zx_cyx2saddr_callee(uchar row, uchar col);
-extern void   __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar x, uchar y);
-extern void   __LIB__ __CALLEE__   *zx_pxy2saddr_callee(uchar x, uchar y);
-extern void   __LIB__ __CALLEE__   *zx_saddrpleft_callee(void *saddr, uchar bitmask);
-extern void   __LIB__ __CALLEE__   *zx_saddrpright_callee(void *saddr, uchar bitmask);
+extern void   __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(int row, int col);
+extern void   __LIB__ __CALLEE__   *zx_cyx2saddr_callee(int row, int col);
+extern void   __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(int x, int y);
+extern void   __LIB__ __CALLEE__   *zx_pxy2saddr_callee(int x, int y);
+extern void   __LIB__ __CALLEE__   *zx_saddrpleft_callee(void *saddr, int bitmask);
+extern void   __LIB__ __CALLEE__   *zx_saddrpright_callee(void *saddr, int bitmask);
 
 // graphics
 
-extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(uint x, uint y, void *pattern, uint depth);
+extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(int x, int y, void *pattern, int depth);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 

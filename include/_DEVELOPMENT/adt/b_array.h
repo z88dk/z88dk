@@ -2,6 +2,8 @@
 #ifndef _ADT_B_ARRAY_H
 #define _ADT_B_ARRAY_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typdef struct b_array_s

@@ -2,6 +2,8 @@
 #ifndef _ADT_P_STACK_H
 #define _ADT_P_STACK_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef void* p_stack_t;

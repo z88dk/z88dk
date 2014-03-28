@@ -2,6 +2,8 @@
 #ifndef _ALLOC_MALLOC_H
 #define _ALLOC_MALLOC_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // SCCZ80
 
 extern void   __LIB__              *_falloc(void *p, size_t size);

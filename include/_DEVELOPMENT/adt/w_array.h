@@ -2,6 +2,8 @@
 #ifndef _ADT_W_ARRAY_H
 #define _ADT_W_ARRAY_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct w_array_s

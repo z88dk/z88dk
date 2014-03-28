@@ -2,6 +2,8 @@
 #ifndef _ADT_P_LIST_H
 #define _ADT_P_LIST_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct p_list_s

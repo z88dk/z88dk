@@ -2,6 +2,8 @@
 #ifndef _ALLOC_BALLOC_H
 #define _ALLOC_BALLOC_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // SCCZ80
 
 extern void   __LIB__              *balloc_addmem(int q, size_t num, size_t size, void *p);

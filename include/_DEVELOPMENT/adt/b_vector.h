@@ -2,6 +2,8 @@
 #ifndef _ADT_B_VECTOR_H
 #define _ADT_B_VECTOR_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct b_vector_s

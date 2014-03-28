@@ -2,6 +2,8 @@
 #ifndef _ADT_P_FORWARD_LIST_ALT
 #define _ADT_P_FORWARD_LIST_ALT
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct p_forward_list_alt_s

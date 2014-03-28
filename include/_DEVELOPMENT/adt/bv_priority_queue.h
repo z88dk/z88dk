@@ -2,6 +2,8 @@
 #ifndef _ADT_BV_PRIORITY_QUEUE_H
 #define _ADT_BV_PRIORITY_QUEUE_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct bv_priority_queue_s

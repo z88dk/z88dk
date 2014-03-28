@@ -2,16 +2,18 @@
 #ifndef _THREADS_H
 #define _THREADS_H
 
+#include <_DEVELOPMENT/stdint.h>
+
 // DATA STRUCTURES
 
 typedef struct mtx_s
 {
 
-   uchar thrd_owner;
-   uchar mutex_type;
-   uchar lock_count;
+   uint8_t thrd_owner;
+   uint8_t mutex_type;
+   uint8_t lock_count;
    
-   uchar spinlock;
+   uint8_t spinlock;
    forward_list *q;
 
 } mtx_t;

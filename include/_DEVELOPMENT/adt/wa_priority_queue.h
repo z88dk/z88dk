@@ -2,6 +2,8 @@
 #ifndef _ADT_WA_PRIORITY_QUEUE_H
 #define _ADT_WA_PRIORITY_QUEUE_H
 
+#include <_DEVELOPMENT/stddef.h>
+
 // DATA STRUCTURES
 
 typedef struct wa_priority_queue_s

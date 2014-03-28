@@ -2,6 +2,45 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
+#include <_DEVELOPMENT/stdint.h>
+
+// DATA STRUCTURES
+
+#ifndef _STDDEF_H
+
+   typedef unsigned int size_t;
+   #define NULL ((void*)(0))
+
+#endif
+
+typedef unsigned long fpos_t;
+typedef struct { unsigned char file[13];} FILE;
+
+extern FILE **_stdio_file_stdin;
+extern FILE **_stdio_file_stdout;
+extern FILE **_stdio_file_stderr; 
+
+#define stdin   (*_stdio_file_stdin)
+#define stdout  (*_stdio_file_stdout)
+#define stderr  (*_stdio_file_stderr)
+
+#define _IOFBF          0
+#define _IOLBF          1
+#define _IONBF          2
+#define BUFSIZ        128
+
+#define EOF            -1
+
+#define FOPEN_MAX       8
+#define FILENAME_MAX  256
+
+#define L_tmpnam        8
+#define TMP_MAX       256
+
+#define SEEK_SET        0
+#define SEEK_CUR        1
+#define SEEK_END        2
+
 // SCCZ80
 
 extern FILE   __LIB__              *_fmemopen(void **bufp, size_t *sizep, char *mode);
@@ -22,7 +61,7 @@ extern size_t __LIB__               fread(void *ptr, size_t size, size_t nmemb, 
 extern int    __LIB__               fscanf(FILE *stream, char *format, ...);
 extern int    __LIB__               fseek(FILE *stream, long offset, int whence);
 extern int    __LIB__               fsetpos(FILE *stream, fpos_t *pos);
-extern ulong  __LIB__ __FASTCALL__  ftell(FILE *stream);
+extern uint32_t  __LIB__ __FASTCALL__  ftell(FILE *stream);
 extern int    __LIB__ __FASTCALL__  ftrylockfile(FILE *stream);
 extern void   __LIB__ __FASTCALL__  funlockfile(FILE *stream);
 extern size_t __LIB__               fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -67,7 +106,7 @@ extern size_t __LIB__               fread_unlocked(void *ptr, size_t size, size_
 extern int    __LIB__               fscanf_unlocked(FILE *stream, char *format, ...);
 extern int    __LIB__               fseek_unlocked(FILE *stream, long offset, int whence);
 extern int    __LIB__               fsetpos_unlocked(FILE *stream, fpos_t *pos);
-extern ulong  __LIB__ __FASTCALL__  ftell_unlocked(FILE *stream);
+extern uint32_t  __LIB__ __FASTCALL__  ftell_unlocked(FILE *stream);
 extern size_t __LIB__               fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
 extern int    __LIB__ __FASTCALL__  getc_unlocked(FILE *stream);
 extern int    __LIB__               getchar_unlocked(void);
