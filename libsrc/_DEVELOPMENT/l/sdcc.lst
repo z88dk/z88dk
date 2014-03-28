@@ -1,0 +1,9 @@
+l/sdcc/divmixed
+l/sdcc/divsigned
+l/sdcc/divunsigned
+l/sdcc/modmixed
+l/sdcc/modsigned
+l/sdcc/modunsigned
+l/sdcc/mul
+l/sdcc/mulchar
+l/sdcc/shift
