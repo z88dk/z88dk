@@ -45,9 +45,12 @@ state_1t:
    ; advance format string past whitespace
    
    ex de,hl
+   
+   inc hl
    call asm_strstrip
-   ex de,hl
 
+   ex de,hl
+   
    ld hl,state_1
    ld a,c                      ; a = stream char
 
