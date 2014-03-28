@@ -16,13 +16,13 @@
 typedef unsigned long fpos_t;
 typedef struct { unsigned char file[13];} FILE;
 
-extern FILE **_stdio_file_stdin;
-extern FILE **_stdio_file_stdout;
-extern FILE **_stdio_file_stderr; 
+extern FILE *_stdio_file_stdin;
+extern FILE *_stdio_file_stdout;
+extern FILE *_stdio_file_stderr; 
 
-#define stdin   (*_stdio_file_stdin)
-#define stdout  (*_stdio_file_stdout)
-#define stderr  (*_stdio_file_stderr)
+#define stdin   (_stdio_file_stdin)
+#define stdout  (_stdio_file_stdout)
+#define stderr  (_stdio_file_stderr)
 
 #define _IOFBF          0
 #define _IOLBF          1
