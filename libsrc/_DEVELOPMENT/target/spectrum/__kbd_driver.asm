@@ -1,7 +1,7 @@
 
 ;; simple keyboard driver ;;;;;
 
-LIB l_jphl
+LIB l_jphl, asm_fzx_putc
 LIB error_enotsup_zc, error_znc, error_lznc
 
 __kbd_driver:
@@ -34,7 +34,14 @@ __kbd_getc:
    
    call __kbd_getchar
    
+   push hl
+   
+   call __kbd_echo
+   
+   pop hl
    ld h,0
+   
+   or a
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -72,6 +79,15 @@ __kbd_eatc_loop:
    exx
    
    jr c, __kbd_eatc_exit       ; if char is disqualified
+   
+   push bc
+   push de
+   
+   ld a,l
+   call __kbd_echo
+   
+   pop de
+   pop bc
    
    dec bc                      ; num chars remaining to consume -= 1
    jr __kbd_eatc_loop
@@ -119,6 +135,14 @@ __kbd_read_loop:
    
    ld (de),a                   ; write char to buffer
    inc de
+   
+   push bc
+   push de
+   
+   call __kbd_echo
+   
+   pop de
+   pop bc
    
    jr __kbd_read_loop
 
@@ -196,5 +220,11 @@ __kbd_getchar:
    
    ld a,l
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__kbd_echo:
+
+   jp asm_fzx_putc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
