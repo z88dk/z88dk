@@ -43,7 +43,7 @@ defgroup
    STDIO_MSG_READ,
    STDIO_MSG_SEEK,
    STDIO_MSG_FLSH,
-   STDIO_MSG_CLOSE
+   STDIO_MSG_CLOS
 }
 
 XDEF STDIO_SEEK_SET, STDIO_SEEK_CUR, STDIO_SEEK_END
@@ -57,9 +57,14 @@ defc STDIO_SEEK_END = 2
 ;; threads
 ;;;;;;;;;;
 
+XDEF mtx_plain, mtx_recursive, mtx_timed
+
 defc mtx_plain     = $01
 defc mtx_recursive = $02
 defc mtx_timed     = $04
+
+XDEF thrd_success, thrd_error, thrd_nomem
+XDEF thrd_busy, thrd_timedout
 
 defc thrd_success  = $0000
 defc thrd_error    = $0001

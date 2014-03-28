@@ -1,10 +1,24 @@
 
 ; zx spectrum crt0 for testing purposes
 
-org 32768
+;; origin ;;;;;;;;;;;;;;;;;;;;;
+
+INCLUDE "zcc_opt.def"
+
+IF !myzorg
+
+   defc myzorg = 32768
+
+ENDIF
+
+org myzorg
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB start
 XDEF _Exit
+
+XREF _main
 
 LIB _ff_ao_SoixanteQuatre, asm_memset
 
@@ -13,11 +27,17 @@ LIB _ff_ao_SoixanteQuatre, asm_memset
 INCLUDE "../crt_defs.inc"      ; crt defines
 INCLUDE "crt_zx_defs.inc"      ; crt defines varying by target
 
+;; crt configuration ;;;;;;;;;;
+
 defc __heap_sz = 2048          ; malloc's heap, eliminate if not required
 defc __qtbl_sz = 6             ; balloc's qtable, eliminate if not required
 
 defc __exit_stack_sz      = 6  ; set to 0 if not required, default is 32
 defc __quickexit_stack_sz = 6  ; set to 0 if not required, default is 32
+
+defc __HAVE_FILE_STDIN    = 1  ; set to 0 if stdin not available
+defc __HAVE_FILE_STDOUT   = 1  ; set to 0 if stdout not available
+defc __HAVE_FILE_STDERR   = 1  ; set to 0 if stderr not available
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -60,6 +80,11 @@ _Exit:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+INCLUDE "../crt_vars.asm"      ; crt variable declarations
+INCLUDE "../crt_stubs.asm"     ; crt stubs for unimplemented lib functions
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 __FILE_STDIN:
    
    defb 195                    ; jp driver
@@ -95,11 +120,6 @@ __FILE_STDERR:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-INCLUDE "../crt_vars.asm"      ; crt variable declarations
-INCLUDE "../crt_stubs.asm"     ; crt stubs for unimplemented lib functions
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; fzx state
 
 XDEF _fzx
@@ -118,7 +138,7 @@ cls:
 
    ; attributes
    
-   ld e,0
+   ld e,56
    ld hl,$5800
    ld bc,768
    

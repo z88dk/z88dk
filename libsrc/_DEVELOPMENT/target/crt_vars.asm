@@ -34,11 +34,12 @@ IF __heap_sz > 14
    
    IF __heap_loc
    
-      defc __heap = __heap_loc
+      __heap:                  defw __heap_loc
    
    ELSE
    
-      __heap:                  defs __heap_sz
+      __heap:                  defw __heap_loc
+      __heap_loc:              defs __heap_sz
 
    ENDIF
 
@@ -50,11 +51,12 @@ IF __qtbl_sz > 0
    
    IF __qtbl_loc
    
-      defc __qtbl = __qtbl_loc
+      __qtbl:                  defw __qtbl_loc
    
    ELSE
 
-      __qtbl:                     defs __qtbl_sz * 2
+      __qtbl:                  defw __qtbl_loc
+      __qtbl_loc:              defs __qtbl_sz * 2
 
    ENDIF
 
@@ -159,7 +161,7 @@ ENDIF
 
 ;;;;;;;;;;; stdio
 
-IF __FILE_STDIN
+IF __HAVE_FILE_STDIN
 
    XDEF __stdio_file_stdin
    
@@ -167,7 +169,7 @@ IF __FILE_STDIN
 
 ENDIF
 
-IF __FILE_STDOUT
+IF __HAVE_FILE_STDOUT
 
    XDEF __stdio_file_stdout
    
@@ -175,7 +177,7 @@ IF __FILE_STDOUT
 
 ENDIF
 
-IF __FILE_STDERR
+IF __HAVE_FILE_STDERR
 
    XDEF __stdio_file_stderr
    

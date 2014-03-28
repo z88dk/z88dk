@@ -6,6 +6,7 @@
 @font/fzx/fzx_rl_sdcc.lst
 @font/fzx/arch/spectrum/spectrum_rl_sdcc.lst
 @l/l_fast.lst
+@l/sdcc.lst
 @locale/locale.lst
 @stdio/stdio_rl_sdcc.lst
 @stdlib/stdlib_rl_sdcc.lst

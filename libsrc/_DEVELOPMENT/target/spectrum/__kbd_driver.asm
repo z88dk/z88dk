@@ -19,12 +19,23 @@ __kbd_driver:
    jr z, __kbd_seek
    
    cp STDIO_MSG_FLSH
-   jp z, error_znc             ; do nothing, report no error
+   jr z, __kbd_flsh
    
    cp STDIO_MSG_CLOS
    jp z, error_znc             ; do nothing, report no error
    
    jp error_enotsup_zc         ; hl = 0 puts stream in error state
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__kbd_getc:
+
+   ; return hl = char
+   
+   call __kbd_getchar
+   
+   ld h,0
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -158,6 +169,17 @@ __kbd_seek_loop:
    call __kbd_getchar
    jr __kbd_seek_loop
    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__kbd_flsh:
+
+   ; just zero LASTK
+   
+   xor a
+   ld (23560),a
+   
+   ret                         ; carry reset
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __kbd_getchar:
