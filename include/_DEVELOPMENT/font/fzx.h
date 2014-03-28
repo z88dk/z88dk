@@ -177,4 +177,42 @@ extern void __LIB__ _ff_Vickers(void);
 extern void __LIB__ _ff_Videotex(void);
 extern void __LIB__ _ff_Zaibatsu(void);
 
+// FZX FONTS BY UTZ
+
+#define ff_utz_1stGrade        ((struct fzx_font *)(_ff_utz_1stGrade))
+#define ff_utz_Blokz           ((struct fzx_font *)(_ff_utz_Blokz))
+#define ff_utz_GridDrop0       ((struct fzx_font *)(_ff_utz_GridDrop0))
+#define ff_utz_GridDrop1       ((struct fzx_font *)(_ff_utz_GridDrop1))
+#define ff_utz_Handpress       ((struct fzx_font *)(_ff_utz_Handpress))
+#define ff_utz_KickDrop        ((struct fzx_font *)(_ff_utz_KickDrop))
+#define ff_utz_Notez           ((struct fzx_font *)(_ff_utz_Notez))
+#define ff_utz_PhatKidzBRK     ((struct fzx_font *)(_ff_utz_PhatKidzBRK))
+#define ff_utz_Phraktur        ((struct fzx_font *)(_ff_utz_Phraktur))
+#define ff_utz_SkoolBrkCD      ((struct fzx_font *)(_ff_utz_SkoolBrkCD))
+#define ff_utz_SkoolBrkEXT     ((struct fzx_font *)(_ff_utz_SkoolBrkEXT))
+#define ff_utz_SkoolBrkU       ((struct fzx_font *)(_ff_utz_SkoolBrkU))
+#define ff_utz_ShadowFlower    ((struct fzx_font *)(_ff_utz_ShadowFlower))
+#define ff_utz_Skyscrap        ((struct fzx_font *)(_ff_utz_Skyscrap))
+#define ff_utz_TinyTexanS      ((struct fzx_font *)(_ff_utz_TinyTexanS))
+#define ff_utz_TinyTexanXS     ((struct fzx_font *)(_ff_utz_TinyTexanXS))
+#define ff_utz_TinyTexanXXS    ((struct fzx_font *)(_ff_utz_TinyTexanXXS))
+
+extern void __LIB__ _ff_utz_1stGrade(void);
+extern void __LIB__ _ff_utz_Blokz(void);
+extern void __LIB__ _ff_utz_GridDrop0(void);
+extern void __LIB__ _ff_utz_GridDrop1(void);
+extern void __LIB__ _ff_utz_Handpress(void);
+extern void __LIB__ _ff_utz_KickDrop(void);
+extern void __LIB__ _ff_utz_Notez(void);
+extern void __LIB__ _ff_utz_PhatKidzBRK(void);
+extern void __LIB__ _ff_utz_Phraktur(void);
+extern void __LIB__ _ff_utz_SkoolBrkCD(void);
+extern void __LIB__ _ff_utz_SkoolBrkEXT(void);
+extern void __LIB__ _ff_utz_SkoolBrkU(void);
+extern void __LIB__ _ff_utz_ShadowFlower(void);
+extern void __LIB__ _ff_utz_Skyscrap(void);
+extern void __LIB__ _ff_utz_TinyTexanS(void);
+extern void __LIB__ _ff_utz_TinyTexanXS(void);
+extern void __LIB__ _ff_utz_TinyTexanXXS(void);
+
 #endif
