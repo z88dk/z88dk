@@ -67,12 +67,14 @@ asm_vsscanf:
    ; create a fake FILE structure on the stack
    
    push hl                     ; char *s is stored in the FILE *
-   ld hl,$8000 + (sscanf_inchar / 256)
+   ld hl,$0280
    push hl
-   ld hl,195 + ((sscanf_inchar % 256) * 256)
+   ld hl,sscanf_inchar
+   push hl
+   ld hl,$c3c3
    push hl
    
-   ld ix,0
+   ld ix,1
    add ix,sp                   ; ix = sscanf FILE *
    
    ; scan the string
@@ -80,6 +82,7 @@ asm_vsscanf:
    call asm0_vfscanf_unlocked
    
    pop bc                      ; repair stack
+   pop bc
    pop bc
    pop bc                      ; bc = char *s (next unexamined char)
 
@@ -109,8 +112,8 @@ _eatc:
    
    ld de,$ffff                 ; de = number of chars read - 1
    
-   ld l,(ix+4)
-   ld h,(ix+5)
+   ld l,(ix+5)
+   ld h,(ix+6)
    dec hl                      ; hl = char *s - 1
 
 _eatc_loop:
@@ -137,8 +140,8 @@ _eatc_loop:
 
 return_unqualified:
    
-   ld (ix+4),l
-   ld (ix+5),h                 ; write char *s to file structure
+   ld (ix+5),l
+   ld (ix+6),h                 ; write char *s to file structure
    
    ld l,a
    ld h,0                      ; hl = next unconsumed char
@@ -169,13 +172,13 @@ _read:
 
    exx
    
-   ld l,(ix+4)
-   ld h,(ix+5)                 ; hl = char *s
+   ld l,(ix+5)
+   ld h,(ix+6)                 ; hl = char *s
    
    call asm__memstrcpy
    
-   ld (ix+4),l
-   ld (ix+5),h                 ; update char *s
+   ld (ix+5),l
+   ld (ix+6),h                 ; update char *s
    
    push bc
    
@@ -208,14 +211,14 @@ _seek:
    ld c,l
    ld b,h                      ; bc = seek forward length
    
-   ld l,(ix+4)
-   ld h,(ix+5)                 ; hl = char *s
+   ld l,(ix+5)
+   ld h,(ix+6)                 ; hl = char *s
    
    call asm_strnlen
    add hl,de                   ; hl = new char *s
    
-   ld (ix+4),l
-   ld (ix+5),h
+   ld (ix+5),l
+   ld (ix+6),h
    
    exx
       
