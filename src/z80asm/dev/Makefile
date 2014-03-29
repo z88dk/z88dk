@@ -14,28 +14,38 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.5 2014-02-11 15:18:56 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.6 2014-03-29 00:08:27 pauloscustodio Exp $
 
-#------------------------------------------------------------------------------
-# EXESUFFIX needs to be defined as .exe for windows
-#------------------------------------------------------------------------------
-ifndef EXESUFFIX
-  ifeq ($(OS),Windows_NT)
-    EXESUFFIX := .exe
-  else
-    EXESUFFIX := 
-  endif
-endif
+ASTYLE = astyle \
+	--mode=c \
+	--lineend=linux \
+	--indent=spaces=4 \
+	--style=ansi \
+	--break-blocks \
+	--pad-oper --pad-paren-in --pad-header --unpad-paren \
+	--align-pointer=name \
+	--suffix=none
 
 #------------------------------------------------------------------------------
 # ragel lexer generator
 #------------------------------------------------------------------------------
-all : scan.c
+all : scan_rules.h
 
-scan.c : scan.rl dev/Makefile
-	ragel -G2 scan.rl
-	perl -i.bak -pe "s/^#line/\/\/#line/; s/\x24Header/:Header/; s/\x24Log/:Log/;" scan.c
-	$(RM) scan.c.bak
+scan_rules.h : scan_rules.rl token_def.h legacy.h
+	$(CC) -E -xc scan_rules.rl > scan_rules.1.tmp
+	perl -pe "s/^#.*//; s/^\x22\x22.*//; s/\t+/ /g; s/ *<CAT> *//g; s/ *<NL> */\n/g; s/ *<TAB> */\t/g;" < scan_rules.1.tmp > scan_rules.2.tmp
+	ragel -G2 -oscan_rules.3.tmp scan_rules.2.tmp
+	perl -pe "s/^#line.*//; s/\x24Header/:Header/; s/\x24Log/:Log/;" < scan_rules.3.tmp > scan_rules.h
+	$(ASTYLE) scan_rules.h
+	
+all:
+	$(MAKE)
+
+#------------------------------------------------------------------------------
+# formatting style
+#------------------------------------------------------------------------------
+astyle:
+	$(ASTYLE) *.c *.h $(LOCAL_LIB)/*.c $(LOCAL_LIB)/*.h
 
 #------------------------------------------------------------------------------
 # Lemon parser generator
@@ -57,14 +67,6 @@ scan.c : scan.rl dev/Makefile
 #
 #
 #------------------------------------------------------------------------------
-# flex
-#------------------------------------------------------------------------------
-#scan.c scan.h : scan.l
-#	flex -L scan.l
-#	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
-#	$(RM) scan.c.bak scan.h.bak
-
-#------------------------------------------------------------------------------
 # bison
 #------------------------------------------------------------------------------
 #parse.c parse.h : parse.y
@@ -73,7 +75,11 @@ scan.c : scan.rl dev/Makefile
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.5  2014-02-11 15:18:56  pauloscustodio
+# Revision 1.6  2014-03-29 00:08:27  pauloscustodio
+# Moved astyle to dev/Makefile
+# Added code to generate scan_rules.h from scan_rules.rl by calling preprocessor and ragel.
+#
+# Revision 1.5  2014/02/11 15:18:56  pauloscustodio
 # Add (commented) lemon parser generation.
 #
 # Revision 1.4  2013/12/15 23:38:49  pauloscustodio

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.135 2014-03-11 22:59:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.136 2014-03-29 00:08:27 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -105,16 +105,6 @@ OBJS = 	\
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-ASTYLE = astyle \
-	--mode=c \
-	--lineend=linux \
-	--indent=spaces=4 \
-	--style=ansi \
-	--break-blocks \
-	--pad-oper --pad-paren-in --pad-header --unpad-paren \
-	--align-pointer=name \
-	--suffix=none
-
 TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
@@ -128,11 +118,13 @@ all: $(TARGET) gccmake.bat
 
 legacy:
 	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
+	$(MAKE) -f dev\Makefile
 	$(MAKE) depend
 	$(MAKE)
 
 new:
 	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
+	$(MAKE) -f dev\Makefile
 	$(MAKE) depend
 	$(MAKE)
 
@@ -157,7 +149,7 @@ install:
 # clean
 #------------------------------------------------------------------------------
 clean :
-	$(RM) *.o $(LOCAL_LIB)/*.o *.exe $(LOCAL_LIB)/*.exe *~ $(LOCAL_LIB)/*~
+	$(RM) *.o $(LOCAL_LIB)/*.o *.exe $(LOCAL_LIB)/*.exe *~ $(LOCAL_LIB)/*~ *.tmp
 	$(RM) *.bak $(LOCAL_LIB)/*.bak *.orig $(LOCAL_LIB)/*.orig core $(LOCAL_LIB)/core
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
@@ -189,12 +181,6 @@ testzcc : $(TARGET)
 $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
 	@exit 1
-
-#------------------------------------------------------------------------------
-# formatting style
-#------------------------------------------------------------------------------
-astyle:
-	$(ASTYLE) *.c *.h $(LOCAL_LIB)/*.c $(LOCAL_LIB)/*.h
 
 #------------------------------------------------------------------------------
 # gccmake.bat - work arround impossibility of writing a '$' in the perl code
@@ -245,7 +231,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.135  2014-03-11 22:59:20  pauloscustodio
+# Revision 1.136  2014-03-29 00:08:27  pauloscustodio
+# Moved astyle to dev/Makefile
+# Added code to generate scan_rules.h from scan_rules.rl by calling preprocessor and ragel.
+#
+# Revision 1.135  2014/03/11 22:59:20  pauloscustodio
 # Move EOL flag to scanner
 #
 # Revision 1.134  2014/03/11 00:15:13  pauloscustodio
@@ -834,9 +824,9 @@ exprprsr.o: z80asm.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
 ldinstr.o: errors_def.h options.h lib/list.h lib/class.h lib/queue.h
-ldinstr.o: options_def.h scan.h symbol.h model.h objfile.h symtab.h
-ldinstr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
-ldinstr.o: symref.h lib/classlist.h token.h token_def.h legacy.h z80asm.h
+ldinstr.o: options_def.h scan.h token.h token_def.h legacy.h symbol.h model.h
+ldinstr.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h
+ldinstr.o: lib/die.h sym.h symref.h lib/classlist.h z80asm.h
 listfile.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 listfile.o: lib/strutil.h symref.h lib/classlist.h lib/fileutil.h lib/list.h
 listfile.o: options.h options_def.h z80asm.h config.h  sym.h
@@ -852,12 +842,12 @@ model.o: codearea.h errors.h errors_def.h lib/init.h lib/die.h listfile.h
 model.o: lib/strutil.h symref.h lib/classlist.h options.h options_def.h
 model.o: lib/srcfile.h
 modlink.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
-modlink.o: errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
-modlink.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
-modlink.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
-modlink.o: symref.h lib/classlist.h token.h token_def.h legacy.h expr_def.h
+modlink.o: errors_def.h lib/except.h lib/die.h expr.h lib/array.h lib/class.h
+modlink.o: lib/queue.h lib/strutil.h symbol.h model.h lib/list.h objfile.h
+modlink.o: symtab.h lib/classhash.h lib/strhash.h lib/uthash.h sym.h symref.h
+modlink.o: lib/classlist.h token.h token_def.h legacy.h expr_def.h
 modlink.o: lib/fileutil.h listfile.h options.h options_def.h scan.h
-modlink.o: lib/strpool.h lib/except.h z80asm.h
+modlink.o: lib/strpool.h z80asm.h
 module.o: lib/xmalloc.h module.h lib/class.h lib/queue.h lib/types.h
 module.o: lib/classlist.h lib/strutil.h symtab.h lib/classhash.h
 module.o: lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
@@ -872,17 +862,18 @@ options.o: sym.h symref.h lib/classlist.h z80asm.h config.h
 prsident.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 prsident.o: errors.h errors_def.h listfile.h lib/class.h lib/queue.h
 prsident.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
-prsident.o: options_def.h scan.h symbol.h model.h objfile.h symtab.h
-prsident.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
-prsident.o: token.h token_def.h legacy.h z80asm.h
+prsident.o: options_def.h scan.h token.h token_def.h legacy.h symbol.h
+prsident.o: model.h objfile.h symtab.h lib/classhash.h lib/strhash.h
+prsident.o: lib/uthash.h lib/die.h sym.h z80asm.h
 prsline.o: lib/xmalloc.h codearea.h lib/types.h config.h  errors.h
-prsline.o: errors_def.h lib/init.h lib/die.h lib/list.h lib/class.h
-prsline.o: lib/queue.h listfile.h lib/strutil.h symref.h lib/classlist.h
-prsline.o: options.h options_def.h scan.h symbol.h model.h objfile.h symtab.h
-prsline.o: lib/classhash.h lib/strhash.h lib/uthash.h sym.h token.h
-prsline.o: token_def.h legacy.h z80asm.h
-scan.o: lib/xmalloc.h errors.h errors_def.h scan.h lib/types.h lib/strutil.h
-scan.o: lib/class.h lib/queue.h
+prsline.o: errors_def.h listfile.h lib/class.h lib/queue.h lib/strutil.h
+prsline.o: symref.h lib/classlist.h options.h lib/list.h options_def.h scan.h
+prsline.o: token.h token_def.h legacy.h symbol.h model.h objfile.h symtab.h
+prsline.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
+prsline.o: z80asm.h
+scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/die.h
+scan.o: lib/list.h lib/class.h lib/queue.h model.h scan.h token.h token_def.h
+scan.o: legacy.h lib/strutil.h scan_rules.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h model.h objfile.h symtab.h
@@ -898,12 +889,12 @@ symtab.o: token.h token_def.h legacy.h z80asm.h config.h
 token.o: lib/xmalloc.h token.h lib/types.h token_def.h legacy.h lib/init.h
 token.o: lib/die.h
 z80asm.o: lib/xmalloc.h codearea.h lib/types.h config.h  deffile.h
-z80asm.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
-z80asm.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
-z80asm.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
-z80asm.o: lib/classlist.h token.h token_def.h legacy.h expr_def.h
+z80asm.o: errors.h errors_def.h lib/except.h lib/die.h expr.h lib/array.h
+z80asm.o: lib/class.h lib/queue.h lib/strutil.h symbol.h model.h lib/list.h
+z80asm.o: objfile.h symtab.h lib/classhash.h lib/strhash.h lib/uthash.h sym.h
+z80asm.o: symref.h lib/classlist.h token.h token_def.h legacy.h expr_def.h
 z80asm.o: lib/fileutil.h hist.h listfile.h mapfile.h options.h options_def.h
-z80asm.o: scan.h lib/strpool.h lib/except.h z80asm.h
+z80asm.o: scan.h lib/strpool.h z80asm.h
 z80instr.o: lib/xmalloc.h codearea.h lib/types.h config.h 
 z80instr.o: errors.h errors_def.h expr.h lib/array.h lib/class.h lib/queue.h
 z80instr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
@@ -916,7 +907,7 @@ z80pass.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
 z80pass.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
 z80pass.o: symref.h lib/classlist.h token.h token_def.h legacy.h expr_def.h
 z80pass.o: lib/fileutil.h hist.h listfile.h options.h options_def.h scan.h
-z80pass.o: z80asm.h
+z80pass.o: lib/srcfile.h z80asm.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
 lib/class.o: lib/init.h
 lib/die.o: lib/die.h
