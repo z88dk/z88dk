@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.85 2014-03-22 16:15:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.86 2014-03-29 00:11:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -230,7 +230,7 @@ DEFVARS( void )
         return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
     }
 
-    while ( tok != TK_EOF && tok != TK_LCURLY )
+    while ( tok != TK_END && tok != TK_LCURLY )
     {
         Skipline();
 
@@ -240,7 +240,7 @@ DEFVARS( void )
 
     if ( tok == TK_LCURLY )
     {
-        while ( tok != TK_EOF && GetSym() != TK_RCURLY )
+        while ( tok != TK_END && GetSym() != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -268,7 +268,7 @@ DEFGROUP( void )
     long constant, enumconst = 0;
 	DEFINE_STR( name, MAXLINE );
 
-    while ( tok != TK_EOF && GetSym() != TK_LCURLY )
+    while ( tok != TK_END && GetSym() != TK_LCURLY )
     {
         Skipline();
         EOL = FALSE;
@@ -276,7 +276,7 @@ DEFGROUP( void )
 
     if ( tok == TK_LCURLY )
     {
-        while ( tok != TK_EOF && tok != TK_RCURLY )
+        while ( tok != TK_END && tok != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -556,7 +556,7 @@ DEFB( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         ++bytepos;
 
-        if ( tok == TK_NEWLINE || tok == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_END )
         {
             break;
         }
@@ -588,7 +588,7 @@ DEFW( void )
         inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
         bytepos += 2;
 
-        if ( tok == TK_NEWLINE || tok == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_END )
         {
             break;
         }
@@ -636,7 +636,7 @@ DEFP( void )
         inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
         bytepos += 1;
 
-        if ( tok == TK_NEWLINE || tok == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_END )
         {
             break;
         }
@@ -668,7 +668,7 @@ DEFL( void )
         inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
         bytepos += 4;
 
-        if ( tok == TK_NEWLINE || tok == TK_EOF )
+        if ( tok == TK_NEWLINE || tok == TK_END )
         {
             break;
         }
@@ -701,7 +701,7 @@ DEFM( void )
 			}
 
             GetSym();
-            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_EOF)
+            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_END)
             {
                 error_syntax();
                 return;
@@ -714,7 +714,7 @@ DEFM( void )
                 break;    /* syntax error - get next line from file... */
             }
 
-            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_EOF)
+            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_END)
             {
                 error_syntax(); /* expression separator not found */
                 break;
@@ -724,7 +724,7 @@ DEFM( void )
             inc_PC( 1 );
         }
     }
-    while ( tok != TK_NEWLINE && tok != TK_EOF );
+    while ( tok != TK_NEWLINE && tok != TK_END );
 }
 
 
@@ -798,7 +798,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.85  2014-03-22 16:15:24  pauloscustodio
+ * Revision 1.86  2014-03-29 00:11:51  pauloscustodio
+ * TK_EOF renamed TK_END
+ *
+ * Revision 1.85  2014/03/22 16:15:24  pauloscustodio
  * Memory leak - delete expression if not defined
  *
  * Revision 1.84  2014/03/18 22:44:03  pauloscustodio
@@ -818,7 +821,7 @@ DeclModuleName( void )
  * GetSym() declared in scan.h
  *
  * Revision 1.80  2014/03/11 23:34:00  pauloscustodio
- * Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+ * Remove check for feof(z80asmfile), add token TK_END to return on EOF.
  * Allows decoupling of input file used in scanner from callers.
  * Removed TOTALLINES.
  * GetChar() made static to scanner, not called by other modules.
