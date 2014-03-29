@@ -73,6 +73,16 @@ loop:
 
             oflow_1:
 
+               ; tricky -- bc is actually 17-bits here
+               ; so must come back and increment the top byte
+               
+               call oflow_1a
+               
+               inc a
+               ret
+            
+            oflow_1a:
+            
                push de
                ld e,1
 
@@ -87,7 +97,8 @@ loop:
             oflow_3a:
 
                add hl,bc
-               rl e
+               jr nc, oflow_4a
+               inc e
 
             oflow_4a:
 
