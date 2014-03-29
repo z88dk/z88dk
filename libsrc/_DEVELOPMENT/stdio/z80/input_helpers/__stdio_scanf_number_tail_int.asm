@@ -5,6 +5,24 @@ __stdio_scanf_number_tail_int:
 
    ; enter : de = int *p
    ;         hl = integer
+   ;
+   ;         carry flag state set by strtoi / strtou
+   ;
+   ;             carry reset, number is valid
+   ;
+   ;             carry set, number valid only if hl != 0 
+
+   jr nc, number_valid
+   
+   ld a,h
+   or l
+   
+   jr z, number_invalid
+
+number_valid:
+
+   ; enter : de = int *p
+   ;         hl = integer
 
    ; WRITE INTEGER TO INT *P
    
@@ -21,6 +39,10 @@ __stdio_scanf_number_tail_int:
    ld (hl),e
    inc hl
    ld (hl),d                   ; *p = integer
-   
-   or a
+
+   ret
+
+number_invalid:
+
+   scf
    ret

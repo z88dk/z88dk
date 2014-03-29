@@ -38,7 +38,7 @@ __stdio_scanf_bkt:
 
    ld a,(de)
    and $fe
-   ld (de),a                   ; remove '\0' from the bitset
+   ld (de),a                   ; remove \0 from the bitset
 
    ; CONSUME STREAM CHARS
    
@@ -217,6 +217,7 @@ range_ok:
    
    push bc
    
+   ld a,c
    call l_bitset_locate
 
    pop bc
@@ -261,6 +262,12 @@ as_next_char:
    exx
    
    or a
+   ret nz
+   
+   exx
+   dec bc
+   exx
+   
    ret
 
 as_add_char:

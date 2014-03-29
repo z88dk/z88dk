@@ -40,12 +40,4 @@ __stdio_scanf_x:
    
    ; WRITE RESULT TO INT *P
    
-   ; check for conversion errors
-   
-   jp nc, __stdio_scanf_number_tail_int
-   jp p, __stdio_scanf_number_tail_int
-   
-   ; invalid number string
-   ; carry set
-   
-   ret
+   jp __stdio_scanf_number_tail_int

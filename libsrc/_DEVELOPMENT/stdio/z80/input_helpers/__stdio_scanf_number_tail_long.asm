@@ -5,6 +5,26 @@ __stdio_scanf_number_tail_long:
 
    ; enter :   bc = long *p
    ;         dehl = long
+   ;
+   ;         carry flag state set by strtol / strtoul
+   ;
+   ;            carry reset, number is valid
+   ;
+   ;            carry set, number valid only if dehl != 0
+   
+   jr nc, number_valid
+   
+   ld a,d
+   or e
+   or h
+   or l
+   
+   jr z, number_invalid
+
+number_valid:   
+
+   ; enter :   bc = long *p
+   ;         dehl = long
 
    ; WRITE LONG TO LONG *P
    
@@ -32,4 +52,9 @@ __stdio_scanf_number_tail_long:
    inc hl
    ld (hl),d                   ; *p = long
    
+   ret
+
+number_invalid:
+
+   scf
    ret

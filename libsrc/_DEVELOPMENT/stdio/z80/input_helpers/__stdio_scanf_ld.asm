@@ -42,12 +42,4 @@ __stdio_scanf_ld:
    
    ; WRITE RESULT TO LONG *P
    
-   ; check for conversion errors
-   
-   jp nc, __stdio_scanf_number_tail_long
-   jp p, __stdio_scanf_number_tail_long
-   
-   ; invalid number string
-   ; carry set
-   
-   ret
+   jp __stdio_scanf_number_tail_long
