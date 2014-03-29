@@ -236,7 +236,7 @@ ENDIF
 ;******************************
 
    or a
-   jp p, error_znc - 3         ; if array[child] >= array[parent], parent is in right place
+   jp p, error_znc - 2         ; if array[child] >= array[parent], parent is in right place
    
    ; swap(array[child], array[parent])
    

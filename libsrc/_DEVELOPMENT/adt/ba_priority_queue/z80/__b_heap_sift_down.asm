@@ -49,7 +49,6 @@ while:
    ; choose smallest child
    
    ; hl = child_index
-   ; de = & array[parent_index]
    ; bc = array
    ; stack = n, & array[parent_index], child_index
    
@@ -156,7 +155,7 @@ ENDIF
    
    ; hl = & array[child]
    ; de = & array[parent]
-   ; stack = n (*2), child_index (*2), array
+   ; stack = n, child_index, array
    
    ld c,(hl)
    ld a,(de)
@@ -166,7 +165,7 @@ ENDIF
    
    ex de,hl                    ; de = & array[child]
    pop bc                      ; bc = array
-   pop hl                      ; hl = child_index (*2)
+   pop hl                      ; hl = child_index
 
    ; child becomes parent
    
@@ -236,7 +235,7 @@ ENDIF
 ;******************************
 
    or a
-   jp p, error_znc - 3         ; if array[child] >= array[parent], parent is in right place
+   jp p, error_znc - 2         ; if array[child] >= array[parent], parent is in right place
    
    ; swap(array[child], array[parent])
    
