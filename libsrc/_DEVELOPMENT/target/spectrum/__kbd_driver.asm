@@ -4,6 +4,8 @@
 LIB l_jphl, asm_fzx_putc
 LIB error_enotsup_zc, error_znc, error_lznc
 
+defc LASTK = 23560
+
 __kbd_driver:
 
    cp STDIO_MSG_GETC
@@ -101,7 +103,7 @@ __kbd_eatc_exit:
    ld h,a                      ; hl = next consumed char
    
    ld a,l
-   ld (23560),a                ; shove unconsumed char back into LASTK, may not last
+   ld (LASTK),a                ; shove unconsumed char back into LASTK, may not last
 
    ld c,e
    ld b,d                      ; bc = num chars consumed
@@ -191,6 +193,11 @@ __kbd_seek_loop:
    dec de
 
    call __kbd_getchar
+   
+   push de
+   call __kbd_echo
+   pop de
+   
    jr __kbd_seek_loop
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,7 +207,7 @@ __kbd_flsh:
    ; just zero LASTK
    
    xor a
-   ld (23560),a
+   ld (LASTK),a
    
    ret                         ; carry reset
 
@@ -208,7 +215,7 @@ __kbd_flsh:
 
 __kbd_getchar:
 
-   ld a,(23560)                ; LASTK
+   ld a,(LASTK)                ; LASTK
    
    or a
    jr z, __kbd_getchar         ; if no keypress
@@ -216,7 +223,7 @@ __kbd_getchar:
    ld l,a
    
    xor a
-   ld (23560),a                ; consume the keypress
+   ld (LASTK),a                ; consume the keypress
    
    ld a,l
    ret
@@ -225,6 +232,11 @@ __kbd_getchar:
 
 __kbd_echo:
 
-   jp asm_fzx_putc
+   push ix
+
+   call asm_fzx_putc
+
+   pop ix
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
