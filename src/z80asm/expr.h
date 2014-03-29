@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.9 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.10 2014-03-29 00:12:56 pauloscustodio Exp $
 */
 
 #pragma once
@@ -113,17 +113,6 @@ extern void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type
 *----------------------------------------------------------------------------*/
 
 
-#if 0
-struct postfixlist
-{
-    struct postfixlist *nextoperand;	/* pointer to next element in postfix expression */
-    long               operandconst;
-    tokid_t			   operatortype;
-    char              *id;				/* pointer to identifier */
-    byte_t			   sym_type;		/* type of identifier (local, global, rel. address or constant) */
-};
-#endif
-
 struct expr
 {
     struct expr        *nextexpr;		/* pointer to next expression */
@@ -149,8 +138,6 @@ struct expression
 extern void ExprOp_compute( ExprOp *self, struct expr *pfixlist );
 
 
-
-
 #if 0
 
 CLASS( Expr )
@@ -160,7 +147,10 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.9  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.10  2014-03-29 00:12:56  pauloscustodio
+* Removed struct postfixlist
+*
+* Revision 1.9  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *
