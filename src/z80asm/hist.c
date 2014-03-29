@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.81 2014-03-29 01:20:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.82 2014-03-29 01:27:33 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.81 2014-03-29 01:20
 
 /*
 * $Log: hist.c,v $
-* Revision 1.81  2014-03-29 01:20:30  pauloscustodio
+* Revision 1.82  2014-03-29 01:27:33  pauloscustodio
+* version
+*
+* Revision 1.81  2014/03/29 01:20:30  pauloscustodio
 * Accept both "ex af,af" and "ex af,af'"
 *
 * Revision 1.80  2014/03/29 00:33:28  pauloscustodio
@@ -1656,7 +1659,7 @@ Based on 1.0.31
 		longer than the maximum allocated size (128). Changed to dynamic string.
 
 -------------------------------------------------------------------------------
-29.03.2014 [2.1.6] (pauloscustodio)
+xx.03.2014 [2.1.6] (pauloscustodio)
 -------------------------------------------------------------------------------
 	BUG_0044: binary constants with more than 8 bits not accepted
 		Limit of 8 bits removed.
@@ -1717,7 +1720,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.6"
+#define VERSION     "2.1.6a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
