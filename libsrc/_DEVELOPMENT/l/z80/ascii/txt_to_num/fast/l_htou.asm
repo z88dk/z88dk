@@ -66,24 +66,25 @@ done_shift:
    
    add a,a
    adc hl,hl
-   adc a,a
 
-   add a,a
-   adc hl,hl
    adc a,a
+   adc hl,hl
    
-   add a,a
-   adc hl,hl
    adc a,a
+   adc hl,hl
 
-   add a,a
-   adc hl,hl
    adc a,a
+   adc hl,hl
    
-   jr nz, unsigned_overflow
+   adc a,a
+   ret z
    
+   ; unsigned overflow
+   
+   scf
+   ret
+
 done:
 
    xor a
    ret
-
