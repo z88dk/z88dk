@@ -128,6 +128,8 @@ _fzx:   defs 6
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+XDEF cls
+
 cls:
 
    ; reset fzx
