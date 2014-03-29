@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.17 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.18 2014-03-29 00:33:29 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -29,13 +29,20 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.17 2014-
 #define TOKEN(name, string)
 #endif
 
-TOKEN(	TK_EOF,			"" )	/* = 0; end of file reached */
+/* used for alias */
+#ifndef TOKEN2
+#define TOKEN2(name, string)
+#endif
+
+
+TOKEN(	TK_END,			"" )	/* = 0; end of file reached */
 TOKEN(	TK_NIL,			"" )	/* returned for rubish */
 TOKEN(	TK_INVALID,		"" )	/* used as impossible to get token */
 TOKEN(	TK_NAME,		"" )
 TOKEN(	TK_LABEL,		"" )
 TOKEN(	TK_NUMBER,		"" )
 TOKEN(	TK_STRING,		"" )
+TOKEN(	TK_TERN_COND,	"" )	/* cond ? true : false */
 
 TOKEN(	TK_IF_STMT,		"" )
 TOKEN(	TK_ELSE_STMT,	"" )
@@ -91,8 +98,10 @@ TOKEN(	TK_COLON,		":" )
 TOKEN(	TK_LESS,		"<" )
 TOKEN(	TK_LEFT_SHIFT,	"<<" )
 TOKEN(	TK_LESS_EQ,		"<=" )
-TOKEN(	TK_NOT_EQ,		"<>" )	/* != */
-TOKEN(	TK_EQUAL,		"=" )	/* == */
+TOKEN(	TK_NOT_EQ,		"<>" )
+TOKEN2(	TK_NOT_EQ,		"!=" )
+TOKEN(	TK_EQUAL,		"=" )
+TOKEN2(	TK_EQUAL,		"==" )
 TOKEN(	TK_GREATER,		">" )
 TOKEN(	TK_RIGHT_SHIFT,	">>" )
 TOKEN(	TK_GREATER_EQ,	">=" )
@@ -113,6 +122,7 @@ TOKEN(	TK_RSQUARE,		"]" )
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
 TOKEN(	TK_POWER,		"^" )
+TOKEN2(	TK_POWER,		"**" )
 #else
 TOKEN(	TK_BIN_XOR,		"^" )
 TOKEN(	TK_POWER,		"**" )
@@ -132,9 +142,6 @@ TOKEN(	TK_BIN_AND,		"~" )
 TOKEN(	TK_BIN_NOT,		"~" )
 #endif
 
-/* semantical tokens */
-TOKEN(	TK_TERN_COND,	"" )	/* cond ? true : false */
-
 /* marker to get number of tokens */
 TOKEN(	NUM_TOKENS,		""	)
 
@@ -142,7 +149,22 @@ TOKEN(	NUM_TOKENS,		""	)
 
 /*
 * $Log: token_def.h,v $
-* Revision 1.17  2014-03-18 22:44:03  pauloscustodio
+* Revision 1.18  2014-03-29 00:33:29  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.17  2014/03/18 22:44:03  pauloscustodio
 * Scanner decodes a number into tok_number.
 * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
 * ident[] replaced by tok_name.

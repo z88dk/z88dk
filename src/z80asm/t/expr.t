@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.5 2014-03-11 00:15:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.6 2014-03-29 00:33:29 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -25,8 +25,6 @@ require 't/test_utils.pl';
 # lexer
 #------------------------------------------------------------------------------
 unlink_testfiles();
-
-diag "Should accept binary constant longer than 8 bits";
 
 my($COMMA, $AND, $XOR, $NOT,      $POWER) = get_legacy() ? 	
   ('&',    '~',  ':',  '0xFF :',  '^'   ) : 
@@ -40,13 +38,16 @@ my @asmbin = (
 	["defw ZERO+label_1,ZERO+_label_2",		"\x02\x00\x04\x00"],
 	["defw #label_1;comment",				"\x02\x00"],
 	["defw #ZERO+label_1;comment",			"\x02\x00"],
-	["defb 255,128D",						"\xFF\x80"],
-	["defb ZERO+255,ZERO+128D",				"\xFF\x80"],
+	["defb 255,128",						"\xFF\x80"],
+	["defb ZERO+255,ZERO+128",				"\xFF\x80"],
 	["defb \$FF,0xFE,0BEH,0ebh",			"\xFF\xFE\xBE\xEB"],
 	["defb ZERO+\$FF,ZERO+0xFE,ZERO+0BEH,ZERO+0ebh",
 											"\xFF\xFE\xBE\xEB"],
 	["defb \@1010,1010B",					"\x0A\x0A"],
 	["defb ZERO+\@1010,ZERO+1010B",			"\x0A\x0A"],
+	['defw @"####---###--##-#"',			"\xCD\xF1"],				# BUG_0044
+	['defw @01111000111001101 ',			"\xCD\xF1"],				# BUG_0044
+	['defl @"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"', "\xAA\xAA\xAA\xAA"],	# BUG_0044
 	["defm \"hello\"${COMMA}32,\"\",\"world\"",			"hello world"],
 	["defm \"hello\"${COMMA}ZERO+32,\"\",\"world\"",	"hello world"],
 	["defb 1<0,1<1,1<2",					"\0\0\1"],
@@ -116,6 +117,14 @@ my @asmbin = (
 	["defb 2 ** -3",						"\0"],
 	["defb ---+--+-2",						"\2"],
 	["EACH:DJNZ EACH",						"\x10\xFE"],	# CH_0021
+	['defb @"--------"',					"\x00"],		# CH_0022
+	['defb @"---##---"',					"\x18"],		# CH_0022
+	['defb @"--#--#--"',					"\x24"],		# CH_0022
+	['defb @"-#----#-"',					"\x42"],		# CH_0022
+	['defb @"-######-"',					"\x7E"],		# CH_0022
+	['defb @"-#----#-"',					"\x42"],		# CH_0022
+	['defb @"-#----#-"',					"\x42"],		# CH_0022
+	['defb @"--------"',					"\x00"],		# CH_0022
 );
 
 if ( ! get_legacy() ) {
@@ -217,7 +226,22 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.5  2014-03-11 00:15:13  pauloscustodio
+# Revision 1.6  2014-03-29 00:33:29  pauloscustodio
+# BUG_0044: binary constants with more than 8 bits not accepted
+# CH_0022: Added syntax to define binary numbers as bitmaps
+# Replaced tokenizer with Ragel based scanner.
+# Simplified scanning code by using ragel instead of hand-built scanner
+# and tokenizer.
+# Removed 'D' suffix to signal decimal number.
+# Parse AF' correctly.
+# Decimal numbers expressed as sequence of digits, e.g. 1234.
+# Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+# in which case they need to start with a digit, or start with a zero,
+# e.g. 0xFF, $ff, 0FFh.
+# Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+# e.g. 0b10101, @10101, 10101b.
+#
+# Revision 1.5  2014/03/11 00:15:13  pauloscustodio
 # Scanner reads input line-by-line instead of character-by-character.
 # Factor house-keeping at each new line read in the scanner getasmline().
 # Add interface to allow back-tacking of the recursive descent parser by

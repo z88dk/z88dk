@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.54 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.55 2014-03-29 00:33:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,8 +21,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.54 2014-03
 #include "codearea.h"
 #include "config.h"
 #include "errors.h"
-#include "init.h"
-#include "list.h"
 #include "listfile.h"
 #include "options.h"
 #include "scan.h"
@@ -41,440 +39,6 @@ int IndirectRegisters( void );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int CheckCondition( void );
-
-/* global variables */
-extern int currentline;
-extern struct module *CURRENTMODULE;
-
-/* current input buffer */
-static Str  *input_buffer = NULL;
-static char *input_ptr    = "";
-
-/* stack of previous contexts */
-static List *input_stack;
-
-/* current symbol */
-tokid_t		 tok = TK_NIL;
-static Str	*tok_name_str   = NULL;
-char		*tok_name       = "";	/* contains identifier to return with TK_NAME and TK_LABEL */
-static Str	*tok_string_str = NULL;
-char		*tok_string     = "";	/* contains double-quoted string without quotes
-									   to return with a TK_STRING */
-long		 tok_number;			/* contains number to return with a TK_NUMBER */
-
-/* scanner state */
-BOOL		 EOL;
-
-/*-----------------------------------------------------------------------------
-*   Init functions
-*----------------------------------------------------------------------------*/
-DEFINE_init()
-{
-	input_buffer = OBJ_NEW(Str);
-	input_ptr    = input_buffer->str;
-
-	input_stack	 = OBJ_NEW(List);
-	input_stack->free_data = xfreef;
-
-	tok_name_str = OBJ_NEW(Str);
-	tok_name	 = tok_name_str->str;
-
-	tok_string_str = OBJ_NEW(Str);
-	tok_string	 = tok_string_str->str;
-}
-
-DEFINE_fini()
-{
-	OBJ_DELETE(input_buffer);
-	OBJ_DELETE(input_stack);
-	OBJ_DELETE(tok_name_str);
-	OBJ_DELETE(tok_string_str);
-}
-
-/*-----------------------------------------------------------------------------
-*   
-*----------------------------------------------------------------------------*/
-
-/* set new input buffer */
-static void set_input_buffer( char *line )
-{
-	Str_set( input_buffer, line );
-	input_ptr = input_buffer->str;			/* point to start, to '\0' on eof */
-}
-
-/*-----------------------------------------------------------------------------
-*   Update tok_name
-*----------------------------------------------------------------------------*/
-static void tok_name_clear( void )
-{
-	Str_clear( tok_name_str );
-	tok_name = tok_name_str->str;
-}
-
-static void tok_name_append( char c )
-{
-	Str_append_char( tok_name_str, c );
-	tok_name = tok_name_str->str;			/* may have reallocated */
-}
-
-
-
-/* set a new input text */
-void SetTemporaryLine( char *line )
-{
-	init();
-
-	List_push( & input_stack, xstrdup(input_ptr) );		/* save current input */
-	set_input_buffer( line );
-}
-
-/* Unget the given char */
-static void UnGet( int c )
-{
-	assert( input_buffer != NULL );
-	assert( input_ptr > input_buffer->str && input_ptr <= input_buffer->str + input_buffer->len );
-
-	input_ptr--;
-	*input_ptr = c;
-}
-
-/* save scan position and retrieve it, for back-tracking */
-char *ScanGetPos( void )
-{
-	init();
-
-	return input_ptr;
-}
-
-void ScanSetPos( char *pos )
-{
-	init();
-
-	assert( pos != NULL );
-	assert( pos >= input_buffer->str && pos <= input_buffer->str + input_buffer->len );
-
-	input_ptr = pos;
-}
-
-/* get a character from file */
-static int GetChar( void )
-{
-    int c;
-	char *line;
-
-	init();
-
-	while (TRUE)
-	{
-		/* get character from current buffer */
-		c = *input_ptr;
-		if ( c != '\0' )
-		{
-			input_ptr++;
-			return c;
-		}
-
-		/* get last buffer from stack, if any */
-		line = List_pop( input_stack );
-		if ( line != NULL )
-		{
-			set_input_buffer( line );
-			xfree( line );
-		}
-		else 
-		{
-			/* get next line from input file */
-			line = src_getline();
-			if ( line == NULL )
-				return EOF;
-
-			/* got new line */
-			set_input_buffer( line );
-		}
-	}
-}
-
-/* check for multi-char tokens */
-static BOOL GetComposed( char *expect )
-{
-	size_t len = strlen(expect);
-
-	if ( strncmp( input_ptr, expect, len ) == 0 )
-	{
-		input_ptr += len;
-		return TRUE;
-	}
-	else 
-		return FALSE;
-}
-
-/* check for numbers */
-static int get_digit( char c )
-{
-	c = toupper(c);
-	if ( c >= '0' && c <= '9' )
-		return c - '0';
-	else if ( c >= 'A' && c <= 'F' )
-		return 10 + c - 'A';
-	else 
-		return -1;
-}
-
-static BOOL get_digits( int base, int start, int *pend, long *pvalue )
-{
-	long value = 0;
-	int i, digit;
-
-	for (i = start; TRUE; i++)
-	{
-		digit = get_digit( input_ptr[i] );
-		if (digit < 0 || digit >= base)
-			break;
-
-		value = base * value + digit;
-	}
-
-	/* no digits found */
-	if (i == start)
-		return FALSE;
-
-	/* return value and index of end */
-	*pend = i;
-	*pvalue = value;
-	return TRUE;
-}
-
-static int is_alnum_bar(int c) { return c == '_' || isalnum(c); }
-
-static BOOL ParseNumber( long *pvalue )
-{
-	int end;
-
-	/* parse prefix */
-	if ( input_ptr[0] == '$' && 
-		 get_digits(16, 1, &end, pvalue) &&
-		 ! is_alnum_bar( input_ptr[end] ) ) 
-	{
-		input_ptr += end;
-		return TRUE;
-	}
-	else if ( (input_ptr[0] == '@' || input_ptr[0] == '%') && 
-			  get_digits(2, 1, &end, pvalue) &&
-			  ! is_alnum_bar( input_ptr[end] ) ) 
-	{
-		input_ptr += end;
-		return TRUE;
-	}
-	else if ( (input_ptr[0] == '0' && tolower(input_ptr[1]) == 'x') && 
-			  get_digits(16, 2, &end, pvalue) &&
-			  ! is_alnum_bar( input_ptr[end] ) ) 
-	{
-		input_ptr += end;
-		return TRUE;
-	}
-	else if ( isdigit( input_ptr[0] ) && 
-			  get_digits(16, 0, &end, pvalue) &&
-			  tolower( input_ptr[end] ) == 'h' &&
-			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
-	{
-		input_ptr += end + 1;
-		return TRUE;
-	}
-	else if ( isdigit( input_ptr[0] ) && 
-			  get_digits(10, 0, &end, pvalue) &&
-			  tolower( input_ptr[end] ) == 'd' &&
-			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
-	{
-		input_ptr += end + 1;
-		return TRUE;
-	}
-	else if ( isdigit( input_ptr[0] ) && 
-			  get_digits(2, 0, &end, pvalue) &&
-			  tolower( input_ptr[end] ) == 'b' &&
-			  ! is_alnum_bar( input_ptr[end + 1] ) ) 
-	{
-		input_ptr += end + 1;
-		return TRUE;
-	}
-	else if ( isdigit( input_ptr[0] ) && 
-			  get_digits(10, 0, &end, pvalue) &&
-			  ! is_alnum_bar( input_ptr[end] ) ) 
-	{
-		input_ptr += end;
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
-}
-
-/* get the next token */
-tokid_t GetSym( void )
-{
-    int c;
-
-	init();
-
-    if ( EOL )
-        return (tok = TK_NEWLINE);			/* assign and return */
-
-    for ( ;; )
-    {
-        /* Ignore leading white spaces, if any... */
-        c = GetChar();
-		if ( c == EOF )
-		{
-	        return (tok = TK_EOF);			/* assign and return */
-		}
-		else if ( c == '\n' )
-        {
-            EOL = TRUE;
-	        return (tok = TK_NEWLINE);		/* assign and return */
-        }
-        else if ( !isspace( c ) )
-        {
-            break;
-        }
-    }
-
-	/* comment */
-    if ( c == ';' )
-    {
-        Skipline();							/* ignore comment line, prepare for next line */
-        return (tok = TK_NEWLINE);			/* assign and return */
-    }
-
-	/* double-quoted string */
-	if ( c == '"' )
-	{
-		char *quote = strchr( input_ptr, '"' );
-		if ( quote == NULL )
-		{
-			error_unclosed_string();
-			quote = input_ptr + strlen(input_ptr);	/* consider string up to end of input */
-			if (quote > input_ptr && quote[-1] == '\n')
-				quote--;							/* exclude newline */
-		}
-
-		/* copy chars up to close quote */
-		Str_set( tok_string_str, input_ptr );
-		tok_string_str->str[ quote - input_ptr ] = '\0';
-		Str_sync_len( tok_string_str );
-
-		tok_string = tok_string_str->str;
-
-		input_ptr = quote;					/* advance past string */
-		if ( *input_ptr == '"' )
-			input_ptr++;					/* advance past quote */
-
-		return (tok = TK_STRING);			/* assign and return */
-	}
-
-	/* single-quoted string */
-	if ( c == '\'' )
-	{
-		char *quote = strchr( input_ptr, '\'' );
-		if ( quote == NULL || quote - input_ptr != 1 )	/* only 1-char quoted strings */
-		{
-			tok_number = 0;
-			error_invalid_squoted_string();
-			Skipline();
-		}
-		else
-		{
-			tok_number = (byte_t) input_ptr[0];
-			input_ptr = quote + 1;			/* advance past string */
-		}
-
-		return (tok = TK_NUMBER);			/* assign and return */
-	}
-
-	/* special cases for composed separators */
-	if ( ispunct(c) )
-	{
-		input_ptr--;
-
-		if ( GetComposed( "**" ) ) return (tok = TK_POWER);			/* assign and return */
-		if ( GetComposed( "==" ) ) return (tok = TK_EQUAL);			/* assign and return */
-		if ( GetComposed( "!=" ) ) return (tok = TK_NOT_EQ);		/* assign and return */
-		if ( GetComposed( "<>" ) ) return (tok = TK_NOT_EQ);		/* assign and return */
-		if ( GetComposed( "<=" ) ) return (tok = TK_LESS_EQ);		/* assign and return */
-		if ( GetComposed( ">=" ) ) return (tok = TK_GREATER_EQ);	/* assign and return */
-		if ( GetComposed( "<<" ) ) return (tok = TK_LEFT_SHIFT);	/* assign and return */
-		if ( GetComposed( ">>" ) ) return (tok = TK_RIGHT_SHIFT);	/* assign and return */
-		if ( GetComposed( "&&" ) ) return (tok = TK_LOG_AND);		/* assign and return */
-		if ( GetComposed( "||" ) ) return (tok = TK_LOG_OR);		/* assign and return */
-
-		input_ptr++;
-	}
-
-	/* single char separators */
-	tok = char_token( c );
-	if ( tok != TK_NIL )
-		return tok;
-
-	/* numbers */
-	if ( isdigit( c ) || c == '$' || c == '@' || c == '%' )
-	{
-		input_ptr--;
-
-		if ( ParseNumber(&tok_number) ) 
-			return (tok = TK_NUMBER);	/* assign and return */
-
-		input_ptr++;
-	}
-
-	/* identifiers */
-    if ( isalpha( c ) || c == '_' )
-	{
-		tok = TK_NAME;
-
-		tok_name_clear();
-		tok_name_append( toupper( c ) );
-
-        while (1)
-        {
-            c = GetChar();
-			if ( c == EOF )
-				break;
-
-			if ( ! is_alnum_bar( c ) )
-			{
-				if ( c == ':' )					/* eat ':' if any */
-					tok = TK_LABEL;
-				else
-					UnGet( c );
-				break;
-			}
-
-		    tok_name_append( toupper( c ) );
-		}
-
-        return tok;
-	}
-
-	/* rubish */
-	return (tok = TK_NIL);			/* assign and return */
-}
-
-
-void Skipline( void )
-{
-	init();
-
-	if ( ! EOL )
-	{
-		while ( *input_ptr != '\0' && *input_ptr != '\n' )
-			input_ptr++;
-
-		if ( *input_ptr == '\n' )
-			input_ptr++;
-		
-		EOL = TRUE;
-	}
-}
-
 
 struct
 {
@@ -511,8 +75,6 @@ CheckCondition( void )
     char   *text = tok_name;
     uint_t  len = strlen( text );
 
-	init();
-
     for ( i = 0; i < NUM_ELEMS( flags ); i++ )
     {
         if ( len != strlen( flags[i].name ) )
@@ -538,8 +100,6 @@ CheckCondition( void )
 int
 CheckRegister8( void )
 {
-	init();
-
     if ( tok == TK_NAME )
     {
         if ( *( tok_name + 1 ) == '\0' )
@@ -668,8 +228,6 @@ CheckRegister8( void )
 int
 CheckRegister16( void )
 {
-	init();
-
     if ( tok == TK_NAME )
     {
         if ( strcmp( tok_name, "HL" ) == 0 )
@@ -691,6 +249,10 @@ CheckRegister16( void )
         else if ( strcmp( tok_name, "AF" ) == 0 )
         {
             return REG16_AF;
+        }
+        else if ( strcmp( tok_name, "AF'" ) == 0 )
+        {
+            return REG16_AF1;
         }
         else if ( strcmp( tok_name, "IX" ) == 0 )
         {
@@ -718,8 +280,6 @@ int
 IndirectRegisters( void )
 {
     int reg16;
-
-	init();
 
     GetSym();
     reg16 = CheckRegister16();
@@ -758,7 +318,22 @@ IndirectRegisters( void )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.54  2014-03-18 22:44:03  pauloscustodio
+* Revision 1.55  2014-03-29 00:33:28  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.54  2014/03/18 22:44:03  pauloscustodio
 * Scanner decodes a number into tok_number.
 * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
 * ident[] replaced by tok_name.
@@ -772,7 +347,7 @@ IndirectRegisters( void )
 * GetSym() declared in scan.h
 *
 * Revision 1.51  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
 * GetChar() made static to scanner, not called by other modules.

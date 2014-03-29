@@ -1,5 +1,3 @@
-
-//#line 1 "scan.rl"
 /*
      ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
    ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
@@ -14,60 +12,93 @@
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-Scanner - to be processed by: ragel -G2 scan.rl
-Note: the scanner is not reentrant. scan_get() relies on state variables that
-need to be kept across calls.
+Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-:Header: /cvsroot/z88dk/z88dk/src/z80asm/scan.rl,v 1.14 2014/03/05 23:44:55 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.44 2014-03-29 00:33:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
+#include "init.h"
+#include "list.h"
+#include "model.h"
 #include "scan.h"
 #include "strutil.h"
-#include "types.h"
 #include <assert.h>
 #include <ctype.h>
 
-static long  scan_num( char *text, int num_suffix_chars, int base );
-static char *copy_token_str( char *text, uint_t len );
-
 /*-----------------------------------------------------------------------------
-* 	Globals that keep last token read
+* 	Globals - last token retrieved
 *----------------------------------------------------------------------------*/
-DEFINE_STR(	scan_buffer, MAXLINE );		/* keep a copy of string being scanned */
-DEFINE_STR(	token_str, MAXLINE );		/* keep a copy of last token string */
+tokid_t		 tok			= TK_NIL;
 
-Token	 last_token;
-long	 last_token_num;
-char	*last_token_str = "";
+char		*tok_text       = "";
+
+static Str	*tok_name_buf   = NULL;
+char		*tok_name       = "";
+
+static Str	*tok_string_buf = NULL;
+char		*tok_string     = "";
+
+long		 tok_number		= 0;
+
+void       (*tok_parser)(void) = NULL;
+
+BOOL EOL;								/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
 *----------------------------------------------------------------------------*/
-static BOOL	 at_bol;				/* true if at beginning of line */
+static Str  *input_buf	= NULL;			/* current input buffer */
+static List *input_stack;				/* stack of previous contexts */
 
-/* Ragel state variables */
-static int	 cs, act;			
-static char	*p, *pe, *eof, *ts, *te;
+static BOOL	 at_bol;					/* true if at beginning of line */
+
+static int	 cs, act;					/* Ragel state variables */
+static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
 /*-----------------------------------------------------------------------------
-* Z80ASM scanner
+*   Clear the current token
 *----------------------------------------------------------------------------*/
+static void init_tok( void )
+{
+	tok			= TK_END;
+	tok_text	= "";
+	tok_number	= 0;
+	tok_parser	= NULL;
 
-//#line 201 "scan.rl"
+	Str_clear( tok_name_buf );
+	Str_clear( tok_string_buf );
+}
 
+/*-----------------------------------------------------------------------------
+*   Init functions
+*----------------------------------------------------------------------------*/
+DEFINE_init()
+{
+	tok_name_buf = OBJ_NEW(Str);
+	Str_set_alias( tok_name_buf, &tok_name );
 
+	tok_string_buf = OBJ_NEW(Str);
+	Str_set_alias( tok_string_buf, &tok_string );
 
-//#line 64 "scan.c"
-static const int asm_start = 7;
-static const int asm_error = 0;
+	input_buf = OBJ_NEW(Str);
+	Str_set_alias( input_buf, &p );		/* Ragel pointer to current scan position */
 
-static const int asm_en_main = 7;
+	input_stack	 = OBJ_NEW(List);
+	input_stack->free_data = xfreef;
 
+	init_tok();
+}
 
-//#line 204 "scan.rl"
+DEFINE_fini()
+{
+	OBJ_DELETE(tok_name_buf);
+	OBJ_DELETE(tok_string_buf);
+	OBJ_DELETE(input_buf);
+	OBJ_DELETE(input_stack);
+}
 
 /*-----------------------------------------------------------------------------
 *	convert number to int, range warning if greater than INT_MAX
@@ -117,1861 +148,172 @@ static long scan_num ( char *text, int length, int base )
 	
 	if ( range_err )
 	{
+#if 0
 		warn_int_range( value );
+#endif
 	}
 		
 	return value;
 }
 
 /*-----------------------------------------------------------------------------
-*	copy characters into token string buffer, set last_token_str
+*   copy ts to te to text and name, upper case name
 *----------------------------------------------------------------------------*/
-static char *copy_token_str( char *text, uint_t len )
+static void set_tok_name( void )
 {
-	/* copy to buffer */
-	Str_set( token_str, text );								/* copy all chars */
-	token_str->str[ MIN( len, token_str->len ) ] = '\0';	/* truncate */
-	Str_sync_len( token_str );
-	
-	return token_str->str;
+	Str_set_n(  tok_name_buf, ts, te-ts );
+	strtoupper( tok_name_buf->str );
 }
 
 /*-----------------------------------------------------------------------------
-*	Scan API
+*   skip up to and not including newline
 *----------------------------------------------------------------------------*/
-
-void scan_reset( char *text, BOOL _at_bol )
+static void skip_to_newline( void )
 {
-	Str_set( scan_buffer, text );
-	
-	/* init state */
-	at_bol  = _at_bol;
-	p		= scan_buffer->str;
-	pe		= scan_buffer->str + scan_buffer->len;
-	eof		= pe;	/* tokens are not split acros input lines */
-	
-	
-//#line 155 "scan.c"
-	{
-	cs = asm_start;
-	ts = 0;
-	te = 0;
-	act = 0;
-	}
-
-//#line 287 "scan.rl"
-
-	last_token = T_END;
+	char *newline = strchr( p, '\n' );
+	if ( newline != NULL && newline > p )
+		p = newline - 1;
 }
 
-Token scan_get( void )
+/*-----------------------------------------------------------------------------
+*   Skip line past the newline, set EOL
+*----------------------------------------------------------------------------*/
+void Skipline( void )
 {
-	last_token = T_END;
+	init();
+	if ( ! EOL )
+	{
+		char *newline = strchr( p, '\n' );
+		if ( newline == NULL )
+			p += strlen(p);
+		else 
+			p = newline + 1;
+		
+		EOL = TRUE;
+	}
+}
 
-	
-//#line 173 "scan.c"
+
+/*-----------------------------------------------------------------------------
+*   Import scanner generated by ragel
+*----------------------------------------------------------------------------*/
+#include "scan_rules.h"
+
+/*-----------------------------------------------------------------------------
+*   Fill scan buffer if needed, return FALSE on end of file
+*----------------------------------------------------------------------------*/
+static BOOL fill_buffer( void )
+{
+	char *line;
+
+	while ( *p == '\0' )
 	{
-	short _widec;
-	if ( p == pe )
-		goto _test_eof;
-	switch ( cs )
-	{
-tr0:
-//#line 89 "scan.rl"
-	{{p = ((te))-1;}{ last_token = ts[0];		{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr2:
-//#line 145 "scan.rl"
-	{te = p+1;{ 
-		last_token_num = scan_num( ts + 2, te - ts - 3, 2 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr3:
-//#line 1 "NONE"
-	{	switch( act ) {
-	case 4:
-	{{p = ((te))-1;} last_token = ts[0];		{p++; cs = 7; goto _out;} }
-	break;
-	case 15:
-	{{p = ((te))-1;} 
-		last_token_num = scan_num( ts, te - ts, 10 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	case 17:
-	{{p = ((te))-1;} 
-		last_token_num = scan_num( ts + 1, te - ts - 1, 16 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	case 19:
-	{{p = ((te))-1;} 
-		last_token_num = scan_num( ts, te - ts - 1, 2 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	case 21:
-	{{p = ((te))-1;} 
-		last_token_num = scan_num( ts + 2, te - ts - 2, 2 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	case 23:
-	{{p = ((te))-1;} last_token = T_ADD;		{p++; cs = 7; goto _out;} }
-	break;
-	case 24:
-	{{p = ((te))-1;} last_token = T_LD;		{p++; cs = 7; goto _out;} }
-	break;
-	case 25:
-	{{p = ((te))-1;} last_token = T_NOP;		{p++; cs = 7; goto _out;} }
-	break;
-	case 26:
-	{{p = ((te))-1;}
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_NAME;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	case 27:
-	{{p = ((te))-1;}
-		/* remove '.' and ':' */
-		while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
-		while ( te[-1] == ':' || isspace(te[-1]) ) te--;
-		
-		/* copy token */
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_LABEL;
-		{p++; cs = 7; goto _out;}
-	}
-	break;
-	}
-	}
-	goto st7;
-tr5:
-//#line 109 "scan.rl"
-	{te = p+1;{ 
-		last_token_num = scan_num( ts, te - ts - 1, 16 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr6:
-//#line 103 "scan.rl"
-	{{p = ((te))-1;}{ 
-		last_token_num = scan_num( ts, te - ts, 10 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr11:
-//#line 166 "scan.rl"
-	{te = p+1;{
-		/* remove '.' and ':' */
-		while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
-		while ( te[-1] == ':' || isspace(te[-1]) ) te--;
-		
-		/* copy token */
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_LABEL;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr12:
-//#line 86 "scan.rl"
-	{te = p+1;}
-	goto st7;
-tr13:
-//#line 80 "scan.rl"
-	{te = p+1;{ last_token = T_NEWLINE; {p++; cs = 7; goto _out;} }}
-	goto st7;
-tr20:
-//#line 89 "scan.rl"
-	{te = p+1;{ last_token = ts[0];		{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr39:
-//#line 89 "scan.rl"
-	{te = p;p--;{ last_token = ts[0];		{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr40:
-//#line 92 "scan.rl"
-	{te = p+1;{ last_token = T_EXCLAM_EQ; {p++; cs = 7; goto _out;} }}
-	goto st7;
-tr41:
-//#line 198 "scan.rl"
-	{te = p;p--;{ error_unclosed_string(); }}
-	goto st7;
-tr42:
-//#line 193 "scan.rl"
-	{te = p+1;{
-		last_token_str = copy_token_str( ts+1, te-ts-2 );
-		last_token = T_STRING;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr46:
-//#line 133 "scan.rl"
-	{te = p;p--;{ 
-		last_token_num = scan_num( ts + 1, te - ts - 1, 2 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr47:
-//#line 96 "scan.rl"
-	{te = p+1;{ last_token = T_AND_AND; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr48:
-//#line 189 "scan.rl"
-	{te = p;p--;{ error_invalid_squoted_string(); }}
-	goto st7;
-tr49:
-//#line 179 "scan.rl"
-	{te = p+1;{
-		if ( te - ts == 3 )
+		/* get last buffer from stack, if any */
+		line = List_pop( input_stack );
+		if ( line != NULL )
 		{
-			last_token_num = ts[1];
-			last_token = T_NUMBER;
-			{p++; cs = 7; goto _out;}
+			set_scan_buf( line, FALSE );	/* read from stack - assume not at BOL */
+			xfree( line );
 		}
-		else
-			error_invalid_squoted_string();
-	}}
-	goto st7;
-tr50:
-//#line 99 "scan.rl"
-	{te = p+1;{ last_token = T_STAR_STAR; {p++; cs = 7; goto _out;} }}
-	goto st7;
-tr51:
-//#line 103 "scan.rl"
-	{te = p;p--;{ 
-		last_token_num = scan_num( ts, te - ts, 10 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr56:
-//#line 127 "scan.rl"
-	{te = p;p--;{ 
-		last_token_num = scan_num( ts, te - ts - 1, 2 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr58:
-//#line 121 "scan.rl"
-	{te = p;p--;{ 
-		last_token_num = scan_num( ts + 2, te - ts - 2, 16 ); 
-		last_token = T_NUMBER;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr59:
-//#line 83 "scan.rl"
-	{te = p;p--;}
-	goto st7;
-tr60:
-//#line 97 "scan.rl"
-	{te = p+1;{ last_token = T_LT_LT; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr61:
-//#line 93 "scan.rl"
-	{te = p+1;{ last_token = T_LT_EQ; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr62:
-//#line 91 "scan.rl"
-	{te = p+1;{ last_token = T_LT_GT; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr63:
-//#line 90 "scan.rl"
-	{te = p+1;{ last_token = T_EQ_EQ; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr64:
-//#line 94 "scan.rl"
-	{te = p+1;{ last_token = T_GT_EQ; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr65:
-//#line 98 "scan.rl"
-	{te = p+1;{ last_token = T_GT_GT; 	{p++; cs = 7; goto _out;} }}
-	goto st7;
-tr66:
-//#line 95 "scan.rl"
-	{te = p+1;{ last_token = T_VBAR_VBAR; {p++; cs = 7; goto _out;} }}
-	goto st7;
-tr67:
-//#line 158 "scan.rl"
-	{te = p;p--;{
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_NAME;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr71:
-//#line 158 "scan.rl"
-	{te = p+1;{
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_NAME;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-tr75:
-//#line 166 "scan.rl"
-	{te = p;p--;{
-		/* remove '.' and ':' */
-		while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
-		while ( te[-1] == ':' || isspace(te[-1]) ) te--;
-		
-		/* copy token */
-		last_token_str = strtoupper( copy_token_str( ts, te-ts ) );
-		last_token = T_LABEL;
-		{p++; cs = 7; goto _out;}
-	}}
-	goto st7;
-st7:
-//#line 1 "NONE"
-	{ts = 0;}
-	if ( ++p == pe )
-		goto _test_eof7;
-case 7:
-//#line 1 "NONE"
-	{ts = p;}
-//#line 444 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 65 ) {
-		if ( 46 <= (*p) && (*p) <= 46 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 90 ) {
-		if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) >= 95 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 10: goto tr13;
-		case 33: goto st8;
-		case 34: goto st9;
-		case 37: goto tr17;
-		case 38: goto st13;
-		case 39: goto st14;
-		case 42: goto st15;
-		case 47: goto tr20;
-		case 48: goto tr23;
-		case 59: goto st22;
-		case 60: goto st23;
-		case 61: goto st24;
-		case 62: goto st25;
-		case 64: goto tr17;
-		case 96: goto tr20;
-		case 124: goto st26;
-		case 127: goto tr12;
-		case 302: goto tr20;
-		case 321: goto st27;
-		case 332: goto st31;
-		case 334: goto st32;
-		case 351: goto tr31;
-		case 353: goto st27;
-		case 364: goto st31;
-		case 366: goto st32;
-		case 558: goto tr34;
-		case 577: goto tr35;
-		case 588: goto tr37;
-		case 590: goto tr38;
-		case 607: goto tr36;
-		case 609: goto tr35;
-		case 620: goto tr37;
-		case 622: goto tr38;
-	}
-	if ( _widec < 91 ) {
-		if ( _widec < 40 ) {
-			if ( _widec > 32 ) {
-				if ( 35 <= _widec && _widec <= 36 )
-					goto tr16;
-			} else
-				goto tr12;
-		} else if ( _widec > 45 ) {
-			if ( _widec > 57 ) {
-				if ( 58 <= _widec && _widec <= 63 )
-					goto tr20;
-			} else if ( _widec >= 49 )
-				goto tr24;
-		} else
-			goto tr20;
-	} else if ( _widec > 94 ) {
-		if ( _widec < 354 ) {
-			if ( _widec > 126 ) {
-				if ( 322 <= _widec && _widec <= 346 )
-					goto tr31;
-			} else if ( _widec >= 123 )
-				goto tr20;
-		} else if ( _widec > 378 ) {
-			if ( _widec > 602 ) {
-				if ( 610 <= _widec && _widec <= 634 )
-					goto tr36;
-			} else if ( _widec >= 578 )
-				goto tr36;
-		} else
-			goto tr31;
-	} else
-		goto tr20;
-	goto st0;
-st8:
-	if ( ++p == pe )
-		goto _test_eof8;
-case 8:
-	if ( (*p) == 61 )
-		goto tr40;
-	goto tr39;
-st9:
-	if ( ++p == pe )
-		goto _test_eof9;
-case 9:
-	switch( (*p) ) {
-		case 10: goto tr41;
-		case 34: goto tr42;
-	}
-	goto st9;
-tr16:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 89 "scan.rl"
-	{act = 4;}
-	goto st10;
-tr43:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 115 "scan.rl"
-	{act = 17;}
-	goto st10;
-st10:
-	if ( ++p == pe )
-		goto _test_eof10;
-case 10:
-//#line 573 "scan.c"
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr43;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto tr43;
-	} else
-		goto tr43;
-	goto tr3;
-tr17:
-//#line 1 "NONE"
-	{te = p+1;}
-	goto st11;
-st11:
-	if ( ++p == pe )
-		goto _test_eof11;
-case 11:
-//#line 591 "scan.c"
-	if ( (*p) == 34 )
-		goto st1;
-	if ( 48 <= (*p) && (*p) <= 49 )
-		goto st12;
-	goto tr39;
-st1:
-	if ( ++p == pe )
-		goto _test_eof1;
-case 1:
-	switch( (*p) ) {
-		case 35: goto st2;
-		case 45: goto st2;
-	}
-	goto tr0;
-st2:
-	if ( ++p == pe )
-		goto _test_eof2;
-case 2:
-	switch( (*p) ) {
-		case 34: goto tr2;
-		case 35: goto st2;
-		case 45: goto st2;
-	}
-	goto tr0;
-st12:
-	if ( ++p == pe )
-		goto _test_eof12;
-case 12:
-	if ( 48 <= (*p) && (*p) <= 49 )
-		goto st12;
-	goto tr46;
-st13:
-	if ( ++p == pe )
-		goto _test_eof13;
-case 13:
-	if ( (*p) == 38 )
-		goto tr47;
-	goto tr39;
-st14:
-	if ( ++p == pe )
-		goto _test_eof14;
-case 14:
-	switch( (*p) ) {
-		case 10: goto tr48;
-		case 39: goto tr49;
-	}
-	goto st14;
-st15:
-	if ( ++p == pe )
-		goto _test_eof15;
-case 15:
-	if ( (*p) == 42 )
-		goto tr50;
-	goto tr39;
-st0:
-cs = 0;
-	goto _out;
-tr23:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 103 "scan.rl"
-	{act = 15;}
-	goto st16;
-st16:
-	if ( ++p == pe )
-		goto _test_eof16;
-case 16:
-//#line 659 "scan.c"
-	switch( (*p) ) {
-		case 66: goto tr53;
-		case 72: goto tr5;
-		case 88: goto st4;
-		case 98: goto tr53;
-		case 104: goto tr5;
-		case 120: goto st4;
-	}
-	if ( (*p) < 50 ) {
-		if ( 48 <= (*p) && (*p) <= 49 )
-			goto tr24;
-	} else if ( (*p) > 57 ) {
-		if ( (*p) > 70 ) {
-			if ( 97 <= (*p) && (*p) <= 102 )
-				goto st3;
-		} else if ( (*p) >= 65 )
-			goto st3;
-	} else
-		goto tr52;
-	goto tr51;
-tr24:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 103 "scan.rl"
-	{act = 15;}
-	goto st17;
-st17:
-	if ( ++p == pe )
-		goto _test_eof17;
-case 17:
-//#line 690 "scan.c"
-	switch( (*p) ) {
-		case 66: goto tr55;
-		case 72: goto tr5;
-		case 98: goto tr55;
-		case 104: goto tr5;
-	}
-	if ( (*p) < 50 ) {
-		if ( 48 <= (*p) && (*p) <= 49 )
-			goto tr24;
-	} else if ( (*p) > 57 ) {
-		if ( (*p) > 70 ) {
-			if ( 97 <= (*p) && (*p) <= 102 )
-				goto st3;
-		} else if ( (*p) >= 65 )
-			goto st3;
-	} else
-		goto tr52;
-	goto tr51;
-tr52:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 103 "scan.rl"
-	{act = 15;}
-	goto st18;
-st18:
-	if ( ++p == pe )
-		goto _test_eof18;
-case 18:
-//#line 719 "scan.c"
-	switch( (*p) ) {
-		case 72: goto tr5;
-		case 104: goto tr5;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr52;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto st3;
-	} else
-		goto st3;
-	goto tr51;
-st3:
-	if ( ++p == pe )
-		goto _test_eof3;
-case 3:
-	switch( (*p) ) {
-		case 72: goto tr5;
-		case 104: goto tr5;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto st3;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto st3;
-	} else
-		goto st3;
-	goto tr3;
-tr55:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 127 "scan.rl"
-	{act = 19;}
-	goto st19;
-st19:
-	if ( ++p == pe )
-		goto _test_eof19;
-case 19:
-//#line 760 "scan.c"
-	switch( (*p) ) {
-		case 72: goto tr5;
-		case 104: goto tr5;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto st3;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto st3;
-	} else
-		goto st3;
-	goto tr56;
-tr53:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 127 "scan.rl"
-	{act = 19;}
-	goto st20;
-tr57:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 139 "scan.rl"
-	{act = 21;}
-	goto st20;
-st20:
-	if ( ++p == pe )
-		goto _test_eof20;
-case 20:
-//#line 790 "scan.c"
-	switch( (*p) ) {
-		case 72: goto tr5;
-		case 104: goto tr5;
-	}
-	if ( (*p) < 50 ) {
-		if ( 48 <= (*p) && (*p) <= 49 )
-			goto tr57;
-	} else if ( (*p) > 57 ) {
-		if ( (*p) > 70 ) {
-			if ( 97 <= (*p) && (*p) <= 102 )
-				goto st3;
-		} else if ( (*p) >= 65 )
-			goto st3;
-	} else
-		goto st3;
-	goto tr3;
-st4:
-	if ( ++p == pe )
-		goto _test_eof4;
-case 4:
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto st21;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto st21;
-	} else
-		goto st21;
-	goto tr6;
-st21:
-	if ( ++p == pe )
-		goto _test_eof21;
-case 21:
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto st21;
-	} else if ( (*p) > 70 ) {
-		if ( 97 <= (*p) && (*p) <= 102 )
-			goto st21;
-	} else
-		goto st21;
-	goto tr58;
-st22:
-	if ( ++p == pe )
-		goto _test_eof22;
-case 22:
-	if ( (*p) == 10 )
-		goto tr59;
-	goto st22;
-st23:
-	if ( ++p == pe )
-		goto _test_eof23;
-case 23:
-	switch( (*p) ) {
-		case 60: goto tr60;
-		case 61: goto tr61;
-		case 62: goto tr62;
-	}
-	goto tr39;
-st24:
-	if ( ++p == pe )
-		goto _test_eof24;
-case 24:
-	if ( (*p) == 61 )
-		goto tr63;
-	goto tr39;
-st25:
-	if ( ++p == pe )
-		goto _test_eof25;
-case 25:
-	switch( (*p) ) {
-		case 61: goto tr64;
-		case 62: goto tr65;
-	}
-	goto tr39;
-st26:
-	if ( ++p == pe )
-		goto _test_eof26;
-case 26:
-	if ( (*p) == 124 )
-		goto tr66;
-	goto tr39;
-st27:
-	if ( ++p == pe )
-		goto _test_eof27;
-case 27:
-	switch( (*p) ) {
-		case 68: goto st29;
-		case 70: goto st30;
-		case 95: goto tr31;
-		case 100: goto st29;
-		case 102: goto st30;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-tr31:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st28;
-tr70:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 152 "scan.rl"
-	{act = 23;}
-	goto st28;
-tr72:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 153 "scan.rl"
-	{act = 24;}
-	goto st28;
-tr74:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 154 "scan.rl"
-	{act = 25;}
-	goto st28;
-st28:
-	if ( ++p == pe )
-		goto _test_eof28;
-case 28:
-//#line 921 "scan.c"
-	if ( (*p) == 95 )
-		goto tr31;
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr3;
-st29:
-	if ( ++p == pe )
-		goto _test_eof29;
-case 29:
-	switch( (*p) ) {
-		case 68: goto tr70;
-		case 95: goto tr31;
-		case 100: goto tr70;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-st30:
-	if ( ++p == pe )
-		goto _test_eof30;
-case 30:
-	switch( (*p) ) {
-		case 39: goto tr71;
-		case 95: goto tr31;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-st31:
-	if ( ++p == pe )
-		goto _test_eof31;
-case 31:
-	switch( (*p) ) {
-		case 68: goto tr72;
-		case 95: goto tr31;
-		case 100: goto tr72;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-st32:
-	if ( ++p == pe )
-		goto _test_eof32;
-case 32:
-	switch( (*p) ) {
-		case 79: goto st33;
-		case 95: goto tr31;
-		case 111: goto st33;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-st33:
-	if ( ++p == pe )
-		goto _test_eof33;
-case 33:
-	switch( (*p) ) {
-		case 80: goto tr74;
-		case 95: goto tr31;
-		case 112: goto tr74;
-	}
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr31;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr31;
-	} else
-		goto tr31;
-	goto tr67;
-tr34:
-//#line 1 "NONE"
-	{te = p+1;}
-	goto st34;
-st34:
-	if ( ++p == pe )
-		goto _test_eof34;
-case 34:
-//#line 1030 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 65 ) {
-		if ( (*p) > 9 ) {
-			if ( 32 <= (*p) && (*p) <= 32 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) >= 9 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 90 ) {
-		if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) >= 95 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 521: goto st5;
-		case 544: goto st5;
-		case 607: goto tr9;
-	}
-	if ( _widec > 602 ) {
-		if ( 609 <= _widec && _widec <= 634 )
-			goto tr9;
-	} else if ( _widec >= 577 )
-		goto tr9;
-	goto tr39;
-st5:
-	if ( ++p == pe )
-		goto _test_eof5;
-case 5:
-	_widec = (*p);
-	if ( (*p) < 65 ) {
-		if ( (*p) > 9 ) {
-			if ( 32 <= (*p) && (*p) <= 32 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) >= 9 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 90 ) {
-		if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) >= 95 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 521: goto st5;
-		case 544: goto st5;
-		case 607: goto tr9;
-	}
-	if ( _widec > 602 ) {
-		if ( 609 <= _widec && _widec <= 634 )
-			goto tr9;
-	} else if ( _widec >= 577 )
-		goto tr9;
-	goto tr0;
-tr9:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 166 "scan.rl"
-	{act = 27;}
-	goto st35;
-st35:
-	if ( ++p == pe )
-		goto _test_eof35;
-case 35:
-//#line 1137 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 607: goto tr9;
-	}
-	if ( _widec < 577 ) {
-		if ( 560 <= _widec && _widec <= 569 )
-			goto tr9;
-	} else if ( _widec > 602 ) {
-		if ( 609 <= _widec && _widec <= 634 )
-			goto tr9;
-	} else
-		goto tr9;
-	goto tr75;
-st6:
-	if ( ++p == pe )
-		goto _test_eof6;
-case 6:
-	_widec = (*p);
-	if ( (*p) < 32 ) {
-		if ( 9 <= (*p) && (*p) <= 9 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 32 ) {
-		if ( 58 <= (*p) && (*p) <= 58 ) {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-	}
-	goto tr3;
-tr35:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st36;
-st36:
-	if ( ++p == pe )
-		goto _test_eof36;
-case 36:
-//#line 1243 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 324: goto st29;
-		case 326: goto st30;
-		case 351: goto tr31;
-		case 356: goto st29;
-		case 358: goto st30;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 580: goto tr76;
-		case 582: goto tr77;
-		case 607: goto tr36;
-		case 612: goto tr76;
-		case 614: goto tr77;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-tr36:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st37;
-tr78:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 152 "scan.rl"
-	{act = 23;}
-	goto st37;
-tr79:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 153 "scan.rl"
-	{act = 24;}
-	goto st37;
-tr81:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 154 "scan.rl"
-	{act = 25;}
-	goto st37;
-st37:
-	if ( ++p == pe )
-		goto _test_eof37;
-case 37:
-//#line 1354 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 351: goto tr31;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 607: goto tr36;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr3;
-tr76:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st38;
-st38:
-	if ( ++p == pe )
-		goto _test_eof38;
-case 38:
-//#line 1439 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 324: goto tr70;
-		case 351: goto tr31;
-		case 356: goto tr70;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 580: goto tr78;
-		case 607: goto tr36;
-		case 612: goto tr78;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-tr77:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st39;
-st39:
-	if ( ++p == pe )
-		goto _test_eof39;
-case 39:
-//#line 1528 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 39: goto tr71;
-		case 351: goto tr31;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 607: goto tr36;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-tr37:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st40;
-st40:
-	if ( ++p == pe )
-		goto _test_eof40;
-case 40:
-//#line 1614 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 324: goto tr72;
-		case 351: goto tr31;
-		case 356: goto tr72;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 580: goto tr79;
-		case 607: goto tr36;
-		case 612: goto tr79;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-tr38:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st41;
-st41:
-	if ( ++p == pe )
-		goto _test_eof41;
-case 41:
-//#line 1703 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 335: goto st33;
-		case 351: goto tr31;
-		case 367: goto st33;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 591: goto tr80;
-		case 607: goto tr36;
-		case 623: goto tr80;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-tr80:
-//#line 1 "NONE"
-	{te = p+1;}
-//#line 158 "scan.rl"
-	{act = 26;}
-	goto st42;
-st42:
-	if ( ++p == pe )
-		goto _test_eof42;
-case 42:
-//#line 1792 "scan.c"
-	_widec = (*p);
-	if ( (*p) < 58 ) {
-		if ( (*p) < 32 ) {
-			if ( 9 <= (*p) && (*p) <= 9 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 32 ) {
-			if ( 48 <= (*p) && (*p) <= 57 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else if ( (*p) > 58 ) {
-		if ( (*p) < 95 ) {
-			if ( 65 <= (*p) && (*p) <= 90 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else if ( (*p) > 95 ) {
-			if ( 97 <= (*p) && (*p) <= 122 ) {
-				_widec = (short)(128 + ((*p) - -128));
-				if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-			}
-		} else {
-			_widec = (short)(128 + ((*p) - -128));
-			if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-		}
-	} else {
-		_widec = (short)(128 + ((*p) - -128));
-		if ( 
-//#line 60 "scan.rl"
- at_bol  ) _widec += 256;
-	}
-	switch( _widec ) {
-		case 336: goto tr74;
-		case 351: goto tr31;
-		case 368: goto tr74;
-		case 521: goto st6;
-		case 544: goto st6;
-		case 570: goto tr11;
-		case 592: goto tr81;
-		case 607: goto tr36;
-		case 624: goto tr81;
-	}
-	if ( _widec < 353 ) {
-		if ( _widec > 313 ) {
-			if ( 321 <= _widec && _widec <= 346 )
-				goto tr31;
-		} else if ( _widec >= 304 )
-			goto tr31;
-	} else if ( _widec > 378 ) {
-		if ( _widec < 577 ) {
-			if ( 560 <= _widec && _widec <= 569 )
-				goto tr36;
-		} else if ( _widec > 602 ) {
-			if ( 609 <= _widec && _widec <= 634 )
-				goto tr36;
-		} else
-			goto tr36;
-	} else
-		goto tr31;
-	goto tr67;
-	}
-	_test_eof7: cs = 7; goto _test_eof; 
-	_test_eof8: cs = 8; goto _test_eof; 
-	_test_eof9: cs = 9; goto _test_eof; 
-	_test_eof10: cs = 10; goto _test_eof; 
-	_test_eof11: cs = 11; goto _test_eof; 
-	_test_eof1: cs = 1; goto _test_eof; 
-	_test_eof2: cs = 2; goto _test_eof; 
-	_test_eof12: cs = 12; goto _test_eof; 
-	_test_eof13: cs = 13; goto _test_eof; 
-	_test_eof14: cs = 14; goto _test_eof; 
-	_test_eof15: cs = 15; goto _test_eof; 
-	_test_eof16: cs = 16; goto _test_eof; 
-	_test_eof17: cs = 17; goto _test_eof; 
-	_test_eof18: cs = 18; goto _test_eof; 
-	_test_eof3: cs = 3; goto _test_eof; 
-	_test_eof19: cs = 19; goto _test_eof; 
-	_test_eof20: cs = 20; goto _test_eof; 
-	_test_eof4: cs = 4; goto _test_eof; 
-	_test_eof21: cs = 21; goto _test_eof; 
-	_test_eof22: cs = 22; goto _test_eof; 
-	_test_eof23: cs = 23; goto _test_eof; 
-	_test_eof24: cs = 24; goto _test_eof; 
-	_test_eof25: cs = 25; goto _test_eof; 
-	_test_eof26: cs = 26; goto _test_eof; 
-	_test_eof27: cs = 27; goto _test_eof; 
-	_test_eof28: cs = 28; goto _test_eof; 
-	_test_eof29: cs = 29; goto _test_eof; 
-	_test_eof30: cs = 30; goto _test_eof; 
-	_test_eof31: cs = 31; goto _test_eof; 
-	_test_eof32: cs = 32; goto _test_eof; 
-	_test_eof33: cs = 33; goto _test_eof; 
-	_test_eof34: cs = 34; goto _test_eof; 
-	_test_eof5: cs = 5; goto _test_eof; 
-	_test_eof35: cs = 35; goto _test_eof; 
-	_test_eof6: cs = 6; goto _test_eof; 
-	_test_eof36: cs = 36; goto _test_eof; 
-	_test_eof37: cs = 37; goto _test_eof; 
-	_test_eof38: cs = 38; goto _test_eof; 
-	_test_eof39: cs = 39; goto _test_eof; 
-	_test_eof40: cs = 40; goto _test_eof; 
-	_test_eof41: cs = 41; goto _test_eof; 
-	_test_eof42: cs = 42; goto _test_eof; 
+		else 
+		{
+			/* get next line from input source file */
+			line = src_getline();
+			if ( line == NULL )
+				return FALSE;
 
-	_test_eof: {}
-	if ( p == eof )
-	{
-	switch ( cs ) {
-	case 8: goto tr39;
-	case 9: goto tr41;
-	case 10: goto tr3;
-	case 11: goto tr39;
-	case 1: goto tr0;
-	case 2: goto tr0;
-	case 12: goto tr46;
-	case 13: goto tr39;
-	case 14: goto tr48;
-	case 15: goto tr39;
-	case 16: goto tr51;
-	case 17: goto tr51;
-	case 18: goto tr51;
-	case 3: goto tr3;
-	case 19: goto tr56;
-	case 20: goto tr3;
-	case 4: goto tr6;
-	case 21: goto tr58;
-	case 22: goto tr59;
-	case 23: goto tr39;
-	case 24: goto tr39;
-	case 25: goto tr39;
-	case 26: goto tr39;
-	case 27: goto tr67;
-	case 28: goto tr3;
-	case 29: goto tr67;
-	case 30: goto tr67;
-	case 31: goto tr67;
-	case 32: goto tr67;
-	case 33: goto tr67;
-	case 34: goto tr39;
-	case 5: goto tr0;
-	case 35: goto tr75;
-	case 6: goto tr3;
-	case 36: goto tr67;
-	case 37: goto tr3;
-	case 38: goto tr67;
-	case 39: goto tr67;
-	case 40: goto tr67;
-	case 41: goto tr67;
-	case 42: goto tr67;
-	}
+			/* got new line */
+			set_scan_buf( line, TRUE );		/* read from file - at BOL */
+		}
 	}
 
-	_out: {}
-	}
-
-//#line 296 "scan.rl"
-	
-	at_bol = (last_token == T_NEWLINE) ? TRUE : FALSE;
-	
-	return last_token;
+	return TRUE;
 }
 
+/*-----------------------------------------------------------------------------
+*   Get the next token, fill the corresponding tok* variables
+*----------------------------------------------------------------------------*/
+tokid_t GetSym( void )
+{
+	init();
+
+	init_tok();
+
+	/* keep returning TK_NEWLINE until EOL is cleared 
+	*  NOTE: HACK for inconsistent parser in handling newlines, should be removed */
+	if ( EOL )
+	{
+		at_bol = TRUE;
+		tok_text = "\n";
+		return (tok = TK_NEWLINE);			/* assign and return */
+	}
+
+	/* loop filling buffer when needed */
+	do 
+	{
+		/* refill buffer if needed, check for end of file */
+		if ( ! fill_buffer() )
+		{
+			tok = TK_END;
+			break;
+		}
+
+		/* run the state machine */
+		tok = _scan_get();
+
+	} while ( tok == TK_END );
+
+	at_bol = EOL = (tok == TK_NEWLINE) ? TRUE : FALSE;
+	return tok;
+}
+
+/*-----------------------------------------------------------------------------
+*   Save the current scan position and back-track to a saved position
+*----------------------------------------------------------------------------*/
+char *ScanGetPos( void )
+{
+	init();
+	return p;
+}
+
+void ScanSetPos( char *pos )
+{
+	init();
+
+	assert( pos != NULL );
+	assert( pos >= input_buf->str && pos <= input_buf->str + input_buf->len );
+
+	p = pos;
+}
+
+/*-----------------------------------------------------------------------------
+*   Insert the given text at the current scan position
+*----------------------------------------------------------------------------*/
+void SetTemporaryLine( char *line )
+{
+	init();
+	if ( *p != '\0' )
+		List_push( & input_stack, xstrdup( p ) );	/* save current input */
+	set_scan_buf( line, FALSE );					/* assume not at BOL */
+}
 
 /*
-* :Log: scan.rl,v $
+* $Log: scan.c,v $
+* Revision 1.44  2014-03-29 00:33:28  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
 * Revision 1.14  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *

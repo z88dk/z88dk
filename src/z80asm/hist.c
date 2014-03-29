@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.79 2014-03-06 00:29:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.80 2014-03-29 00:33:28 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.79 2014-03-06 00:29
 
 /*
 * $Log: hist.c,v $
-* Revision 1.79  2014-03-06 00:29:01  pauloscustodio
+* Revision 1.80  2014-03-29 00:33:28  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.79  2014/03/06 00:29:01  pauloscustodio
 * spelling
 *
 * Revision 1.78  2014/03/06 00:18:43  pauloscustodio
@@ -1387,7 +1402,6 @@ Based on 1.0.31
 	  symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 	  modified list_get_page_nr() to return -1 after the whole source is
 	  processed.
-	- Added flex-based scanner, not yet integrated into assembler
 	- Decouple module name creation from parsing, define CURRENTMODULE->mname
 	  directly instead of calling DeclModuleName()
 	- GetLibfile(), ReadName(), ReadNames(), CheckIfModuleWanted(),
@@ -1544,7 +1558,6 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 	- mkinit.pl to generate new main function that calls a set of initializers
 	  before user main()
-	- Replace Flex-based lexer by a Ragel-based one.
 	- Move FileStack implementation to scan.c, remove FileStack.
 	- Move getline_File() to scan.c.
 	- Move source code generation tools to dev/Makefile, only called on request,
@@ -1640,6 +1653,34 @@ Based on 1.0.31
 		longer than the maximum allocated size (128). Changed to dynamic string.
 
 -------------------------------------------------------------------------------
+29.03.2014 [2.1.6] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0044: binary constants with more than 8 bits not accepted
+		Limit of 8 bits removed.
+	
+	CH_0022: Added syntax to define binary numbers as bitmaps, e.g.
+			defb @"--------"	; 0x00
+			defb @"---##---"	; 0x18
+			defb @"--#--#--"	; 0x24
+			defb @"-#----#-"	; 0x42
+			defb @"-######-"	; 0x7E
+			defb @"-#----#-"	; 0x42
+			defb @"-#----#-"	; 0x42
+			defb @"--------"	; 0x00
+	  
+	- Replaced tokenizer with Ragel based scanner.
+	  Simplified scanning code by using ragel instead of hand-built scanner 
+	  and tokenizer.
+	  Removed 'D' suffix to signal decimal number.
+	  Parse AF' correctly.
+	  Decimal numbers expressed as sequence of digits, e.g. 1234.
+	  Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H', 
+	  in which case they need to start with a digit, or start with a zero,
+	  e.g. 0xFF, $ff, 0FFh.
+	  Binary numbers either prefixed with '0b' or '@', or suffixed with 'B', 
+	  e.g. 0b10101, @10101, 10101b.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1663,12 +1704,7 @@ FUTURE CHANGES - require change of the object file format
 		last in the command line - the -i sequence is not respected and the
 		data appears in the middle of other library modules.
 
-	CH_0019 : Replaced tokenizer with Flex based scanner
-		Simplified code by using flex instead of special-built scanner and
-		tokenizer.
-
     - Sections
-    - Standard operators in expressions
 
 */
 
@@ -1676,7 +1712,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.5"
+#define VERSION     "2.1.6"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.53 2014-03-16 23:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.54 2014-03-29 00:33:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -120,7 +120,7 @@ RET( void )
 
         break;
 
-	case TK_EOF:
+	case TK_END:
     case TK_NEWLINE:
         append_byte( 0xC9 );
         break;
@@ -224,10 +224,10 @@ EX( void )
 
             break;
 
-        case 4:
+        case REG16_AF:
             if ( GetSym() == TK_COMMA )      /* EX  AF,AF'   */
                 if ( GetSym() == TK_NAME )
-                    if ( CheckRegister16() == 4 )
+					if ( CheckRegister16() == REG16_AF1 )
                     {
                         append_byte( 0x08 );
                         inc_PC( 1 );
@@ -1594,7 +1594,22 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.53  2014-03-16 23:57:06  pauloscustodio
+* Revision 1.54  2014-03-29 00:33:29  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.53  2014/03/16 23:57:06  pauloscustodio
 * Removed global line[]
 *
 * Revision 1.52  2014/03/15 02:12:07  pauloscustodio
@@ -1602,7 +1617,7 @@ RotShift_instr( int opcode )
 * GetSym() declared in scan.h
 *
 * Revision 1.51  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
 * GetChar() made static to scanner, not called by other modules.

@@ -256,7 +256,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scan.rl">
+    <None Include="scan_rules.rl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

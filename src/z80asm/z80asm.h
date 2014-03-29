@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.49 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.50 2014-03-29 00:33:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,6 +34,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.49 2014-03-18 22:
 #define REG16_AF   4
 #define REG16_IX   5
 #define REG16_IY   6
+#define REG16_AF1  7
 
 #define FLAGS_NZ 0
 #define FLAGS_Z  1
@@ -59,7 +60,22 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.49  2014-03-18 22:44:03  pauloscustodio
+* Revision 1.50  2014-03-29 00:33:29  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.49  2014/03/18 22:44:03  pauloscustodio
 * Scanner decodes a number into tok_number.
 * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
 * ident[] replaced by tok_name.
@@ -72,7 +88,7 @@ extern void Z80pass1( char *filename );
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *
 * Revision 1.46  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
 * GetChar() made static to scanner, not called by other modules.

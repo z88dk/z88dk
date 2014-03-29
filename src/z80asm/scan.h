@@ -12,125 +12,66 @@
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-Scanner header corresponding to scan.rl
-Note: the scanner is not reentrant. scan_get() relies on state variables that
-need to be kept across calls.
+Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.31 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.32 2014-03-29 00:33:28 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "xmalloc.h"   /* before any other include */
-
 #include "token.h"
 #include "types.h"
 
-/* declare prsline.c externals */
-extern tokid_t GetSym( void );
-extern void SetTemporaryLine( char *line );
-extern char *ScanGetPos( void );
-extern void  ScanSetPos( char *pos );
-extern void  Skipline( void );
-
-extern tokid_t tok;			/* current token */
-extern char *tok_name;		/* contains identifier to return with TK_NAME and TK_LABEL */
-extern char *tok_string;	/* contains double-quoted string without quotes
-							   to return with a TK_STRING */
-extern long  tok_number;	/* contains number to return with TK_NUMBER */
-
-extern BOOL EOL;
-
-/*-----------------------------------------------------------------------------
-*   A scanner token is represented as an integer that is the ascii code for
-*	the single-character token.
-*	0 represents end of input.
-*	Special tokens have codes that do not overlap with the above.
-*----------------------------------------------------------------------------*/
-typedef enum token
-{
-    T_END		= 0,
-
-    T_NEWLINE 	= '\n',
-	
-    T_EXCLAM 	= '!',
-    T_HASH 		= '#',
-    T_DOLLAR 	= '$',
-    T_PERCENT 	= '%',
-    T_AND 		= '&',
-    T_LPAREN 	= '(',
-    T_RPAREN 	= ')',
-    T_STAR 		= '*',
-    T_PLUS 		= '+',
-    T_COMMA 	= ',',
-    T_MINUS 	= '-',
-    T_DOT 		= '.',
-    T_SLASH 	= '/',
-    T_COLON 	= ':',
-    T_LT 		= '<',
-    T_EQ 		= '=',
-    T_GT 		= '>',
-    T_QUESTION 	= '?',
-    T_AT 		= '@',
-    T_LSQUARE 	= '[',
-    T_BSLASH 	= '\\',
-    T_RSQUARE 	= ']',
-    T_CARET 	= '^',
-    T_BQUOTE 	= '`',
-    T_LCURLY 	= '{',
-    T_VBAR 		= '|',
-    T_RCURLY 	= '}',
-    T_TILDE 	= '~',
-
-    T_EQ_EQ		= 128,	/* "==" */
-    T_LT_GT,			/* "<>" */
-    T_EXCLAM_EQ,		/* "!=" */
-    T_LT_EQ,			/* "<=" */
-    T_GT_EQ,			/* ">=" */
-    T_VBAR_VBAR,		/* "||" */
-    T_AND_AND,			/* "&&" */
-    T_LT_LT,			/* "<<" */
-    T_GT_GT,			/* ">>" */
-    T_STAR_STAR,		/* "**" */
-
-    T_NAME,				/* identifier, sets last_token_str in upper case */
-    T_LABEL,			/* .identifier | identifier:, sets last_token_str 
-						   in upper case */
-    T_STRING,			/* double-quoted string, sets last_token_str 
-						   excluding quotes */
-    T_NUMBER,			/* number or single-quoted char, sets last_token_num */
-	
-	/* assembly keywords */
-	T_ADD,
-	T_LD,
-	T_NOP,
-	
-} Token;
-
 /*-----------------------------------------------------------------------------
 * 	Globals - last token retrieved
-*	last_token_num and last_token_str keep their values until a new token
-*	of the same type is retrieved.
 *----------------------------------------------------------------------------*/
-extern Token	 last_token;
-extern long		 last_token_num;
-extern char		*last_token_str;
+extern tokid_t tok;			/* current token */
+extern char	  *tok_text;	/* contains characters of the retrieved token, only for
+							   symbols used in the expression parser */
+extern char   *tok_name;	/* contains identifier to return with TK_NAME and TK_LABEL */
+extern char   *tok_string;	/* contains double-quoted string without quotes
+							   to return with a TK_STRING */
+extern long    tok_number;	/* contains number to return with TK_NUMBER */
+extern void  (*tok_parser)(void);	/* parser for this keyword as opcode */
+
+extern BOOL EOL;			/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
-* 	Scan API
+*	Scan API
 *----------------------------------------------------------------------------*/
 
-/* prepare for scanning string, bol = TRUE if string is at start of a line,
-   to detect label definitions */
-extern void scan_reset( char *text, BOOL _at_bol );
+/* get the next token, fill the corresponding tok* variables */
+extern tokid_t GetSym( void );
 
-/* get the next token, set last_tokenXXX as side-effect */
-extern Token scan_get( void );
+/* save the current scan position and back-track to a saved position */
+extern char *ScanGetPos( void );
+extern void  ScanSetPos( char *pos );
 
+/* insert the given text at the current scan position */
+extern void SetTemporaryLine( char *line );
+
+/* skip line past the newline, set EOL */
+extern void  Skipline( void );
+extern BOOL EOL;
 
 /*
 * $Log: scan.h,v $
-* Revision 1.31  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.32  2014-03-29 00:33:28  pauloscustodio
+* BUG_0044: binary constants with more than 8 bits not accepted
+* CH_0022: Added syntax to define binary numbers as bitmaps
+* Replaced tokenizer with Ragel based scanner.
+* Simplified scanning code by using ragel instead of hand-built scanner
+* and tokenizer.
+* Removed 'D' suffix to signal decimal number.
+* Parse AF' correctly.
+* Decimal numbers expressed as sequence of digits, e.g. 1234.
+* Hexadecimal numbers either prefixed with '0x' or '$' or suffixed with 'H',
+* in which case they need to start with a digit, or start with a zero,
+* e.g. 0xFF, $ff, 0FFh.
+* Binary numbers either prefixed with '0b' or '@', or suffixed with 'B',
+* e.g. 0b10101, @10101, 10101b.
+*
+* Revision 1.31  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *
