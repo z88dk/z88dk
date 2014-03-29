@@ -24,10 +24,10 @@ __strtou:
    ;             hl = 0
    ;             de = original char *
    ;
-   ;              a = 3/2 indicates unsigned overflow
+   ;              a = 2 indicates unsigned overflow
    ;             de = char * (& next unconsumed char following number)
    ;
-   ;              a = 1 indicates signed overflow
+   ;              a = 1 indicates negative underflow
    ;             de = char * (& next unconsumed char following number)
    ;
    ; uses  : af, bc, de, hl
@@ -208,11 +208,11 @@ unsigned_overflow:
    call l_eat_digits
    
    ex de,hl
-   ld a,3
+   ld a,2
    scf
    
    ; de = char * (next unconsumed char)
-   ;  a = 3
+   ;  a = 2
    ; carry set for error
    
    ret

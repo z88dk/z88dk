@@ -27,11 +27,11 @@ __strtoul:
    ;            ixl = base
    ;             bc = original char *
    ;
-   ;              a = 3/2 indicates unsigned overflow
+   ;              a = 2 indicates unsigned overflow
    ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
    ;
-   ;              a = 1 indicates signed overflow
+   ;              a = 1 indicates negative underflow
    ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
    ;
@@ -233,11 +233,11 @@ u_oflow:
    ld c,l
    ld b,h
    
-   ld a,3
+   ld a,2
    scf
    
    ;   bc = char * (next unconsumed char)
-   ;    a = 3 (error overflow)
+   ;    a = 2 (error overflow)
    ; carry set for error
 
    ret
