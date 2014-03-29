@@ -1,8 +1,8 @@
 
 XLIB __stdio_scanf_ii
 
-LIB __stdio_scanf_sm_i, __stdio_scanf_number_head, l_inc_sp, __stdio_scanf_sm_ii
-LIB __stdio_recv_input_eatc, error_einval_zc, asm__strtoi
+LIB __stdio_scanf_sm_i, __stdio_recv_input_eat_ws_repeat, l_inc_sp
+LIB __stdio_scanf_sm_ii, __stdio_recv_input_eatc, error_einval_zc, asm__strtoi
 
 __stdio_scanf_ii:
 
@@ -31,47 +31,79 @@ suppressed_0:
    push hl                     ; save long *p + 3b
    push de                     ; save void *buffer
 
-   ; READ FOUR %i NUMBERS INTO BUFFER, SEPARATE WITH DOTS
-      
-   ld a,7                      ; max seven dec/hex/oct digits taken for octet
-   ld hl,__stdio_scanf_sm_i    ; use the dec/hex/oct state machine
-   
-   call __stdio_scanf_number_head  ; skip leading whitespace and read first octet string
-   jp c, l_inc_sp - 4          ; if stream error, pop twice and exit
-
-   inc de
-
-   ; de = void *buffer_ptr (address after last char written)
-   ; bc'= field width
-   ; hl'= next unconsumed stream char
-   ; stack = long *p + 3b, void *buffer
-
-   ld b,3                      ; repeat three times
-
-octet_loop:
-
-   push bc                     ; save loop count
-    
-   ld bc,7                     ; max seven dec/hex/oct digits taken for octet
-   ld hl,__stdio_scanf_sm_ii   ; use dot + the dec/hex/oct state machine
-   
-   exx
+   ld h,4                      ; octet count
+   push hl
 
    ld a,b
    or c
-   jr z, width_exceeded_error  ; if remaining field width is zero
+   jr nz, width_specified
+   
+   dec bc                      ; consume as many bytes as we want
 
-   call __stdio_recv_input_eatc
+width_specified:
 
+   push bc                     ; save field width
+   push bc                     ; save field width
+   
+   ; CONSUME LEADING WHITESPACE
+   
+   call __stdio_recv_input_eat_ws_repeat
+      
+   ; READ FOUR %i NUMBERS INTO BUFFER, SEPARATE WITH DOTS
+
+   ; de = void *buffer
+   ; stack = long *p + 3b, void *buffer, octet count = 4, field width, field width
+
+   ld hl,__stdio_scanf_sm_i    ; use the %i state machine
+   jr enter_loop
+
+octet_loop:
+
+   ;  b = octet count
+   ; hl = remaining field width
+   ; de = void *buffer
+   ; stack = long *p + 3b, void *buffer
+   
+   push bc
+   push hl
+   push hl
+
+   ; de = void *buffer
+   ; stack = long *p + 3b, void *buffer, octet count, field width, field width
+
+   ld hl,__stdio_scanf_sm_ii   ; use the dot + %i state machine
+
+enter_loop:
+
+   ld bc,7                     ; max seven dec/hex/oct digits taken for octet
+   
    exx
-   pop bc                      ; b = loop count
-
-   jp c, l_inc_sp - 4          ; if stream error, pop twice and exit
+   
+   pop bc                      ; bc = remaining field width
+   
+   ld a,b
+   or c
+   jr z, width_exceeded_error
+   
+   call __stdio_recv_input_eatc
+   
+   push bc
+   
+   exx
+   
+   pop bc                      ; bc = number of bytes read in this operation
+   pop hl                      ; hl = remaining field width
+   
+   jp c, l_inc_sp - 6          ; if stream error, pop three times and exit
+   
+   sbc hl,bc                   ; hl = updated remaining field width
    
    xor a
-   ld (de),a                   ; write octet separator
    
+   ld (de),a                   ; write octet separator
    inc de
+   
+   pop bc                      ; b = octet count
    djnz octet_loop
 
    ; CONVERT THE DOTTED DECIMAL IPv4 ADDRESS IN THE BUFFER
@@ -98,9 +130,13 @@ conversion_loop:
 
    jp c, error_einval_zc       ; if conversion error
    
+   ld c,a
+   
    ld a,d
    or e
    jr z, suppressed_1          ; if assignment is suppressed
+   
+   ld a,c
    
    ld (de),a                   ; write byte to long *p
    dec de
@@ -145,9 +181,7 @@ width_exceeded_error:
 
    exx
    
-   ; stack = long *p + 3b, void *buffer, loop count
+   ; stack = long *p + 3b, void *buffer, octet count, field width
    
    pop bc
-   pop bc
-   
-   jp error_einval_zc - 1
+   jp error_einval_zc - 3
