@@ -40,7 +40,7 @@ asm0_atexit:
    
    ld c,(hl)
    ld b,0
-   inc hl
+   dec hl
    add hl,bc
    add hl,bc
    
