@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.10 2014-03-19 23:04:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.11 2014-03-29 22:04:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -98,6 +98,76 @@ char *strip( char *string )
     return chomp( string );
 }
 
+static int char_digit(char c)
+{
+	if (isdigit(c)) return c - '0';
+	if (isxdigit(c)) return 10 + toupper(c) - 'A';
+	return -1;
+}
+
+/* convert C-escape sequences - modify in place, return final length 
+   to allow strings with '\0' characters 
+   Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo
+   code borrowed from GLib */
+uint_t str_compress_escapes( char *string )
+{
+	char *p, *q, *num;
+	int base = 0, max_digits, digit;
+
+	for ( p = q = string; *p; p++ )
+	{
+		if (*p == '\\')
+		{
+			p++;
+			base = 0;							/* decision octal/hex */
+			switch (*p)
+			{
+            case '\0':	p--; break;				/* trailing backslash - ignore */
+			case 'a':	*q++ = '\a'; break;
+			case 'b':	*q++ = '\b'; break;
+			case 'e':	*q++ = '\x1B'; break;
+			case 'f':	*q++ = '\f'; break;
+			case 'n':	*q++ = '\n'; break;
+			case 'r':	*q++ = '\r'; break;
+			case 't':	*q++ = '\t'; break;
+			case 'v':	*q++ = '\v'; break;
+			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+				num = p;				/* start of number */
+				base = 8;
+				max_digits = 3;
+				/* fall through */
+			case 'x':
+				if ( base == 0 )		/* not octal */
+				{
+					num = ++p;
+					base = 16;
+					max_digits = 2;
+				}
+				/* convert octal or hex number */
+				*q = 0;
+				while ( p < num + max_digits && 
+					    (digit = char_digit(*p)) >= 0 &&
+						digit < base )
+				{
+					*q = *q * base + digit;
+					p++;
+				}
+				p--; 
+				q++;
+				break;
+			default:	*q++ = *p;		/* any other char */
+			}
+		}
+		else
+		{
+			*q++ = *p;
+		}
+	}
+	*q = '\0';
+
+	return q - string;
+}
+
 /*-----------------------------------------------------------------------------
 *   String class
 *----------------------------------------------------------------------------*/
@@ -175,6 +245,12 @@ void Str_strip( Str *self )
 {
 	strip( self->str );
 	Str_sync_len( self );
+}
+
+void Str_compress_escapes( Str *self )
+{
+	/* no Str_sync_len() as string may have '\0' */
+	self->len = str_compress_escapes( self->str );
 }
 
 /*-----------------------------------------------------------------------------
@@ -427,7 +503,11 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.10  2014-03-19 23:04:57  pauloscustodio
+* Revision 1.11  2014-03-29 22:04:11  pauloscustodio
+* Add str_compress_escapes() to compress C-like escape sequences.
+* Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
+*
+* Revision 1.10  2014/03/19 23:04:57  pauloscustodio
 * Add Str_set_alias() to define an alias char* that always points to self->str
 * Add Str_set_n() and Str_append_n() to copy substrings.
 *

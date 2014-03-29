@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.12 2014-03-19 23:04:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.13 2014-03-29 22:04:11 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,6 +31,11 @@ extern char *chomp( char *string );
 
 /* remove begin and end whitespace - modify in place, return address of string */
 extern char *strip( char *string );
+
+/* convert C-escape sequences - modify in place, return final length 
+   to allow strings with '\0' characters 
+   Accepts \b, \f, \n, \r, \t, \v, \xhh, \? \ooo */
+extern uint_t str_compress_escapes( char *string );
 
 /*-----------------------------------------------------------------------------
 *   String class - dual use
@@ -108,9 +113,10 @@ extern void Str_append_sprintf( Str *self, char *format, ... );
 extern void Str_vsprintf( Str *self, char *format, va_list argptr );
 extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
 
-/* chomp, strip */
+/* chomp, strip, compress_escapes */
 extern void Str_chomp( Str *self );
 extern void Str_strip( Str *self );
+extern void Str_compress_escapes( Str *self );
 
 /* get N characters from input, return FALSE on EOF */
 extern BOOL Str_getchars( Str *self, FILE *fp, uint_t num_chars );
@@ -123,7 +129,11 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.12  2014-03-19 23:04:57  pauloscustodio
+* Revision 1.13  2014-03-29 22:04:11  pauloscustodio
+* Add str_compress_escapes() to compress C-like escape sequences.
+* Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
+*
+* Revision 1.12  2014/03/19 23:04:57  pauloscustodio
 * Add Str_set_alias() to define an alias char* that always points to self->str
 * Add Str_set_n() and Str_append_n() to copy substrings.
 *

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.8 2014-03-19 23:04:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.9 2014-03-29 22:04:11 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -178,6 +178,95 @@ int main()
 
 		Str_strip(s1);
 		if(strcmp(s, s1->str))				ERROR;
+	}
+	
+	/* str_compress_escapes, Str_compress_escapes */
+	{
+		Str *s1 = OBJ_NEW(Str);
+		uint_t len;
+		int i;
+		
+		Str_set_alias(s1, &alias);
+		
+		/* trailing backslash ignored */
+		strcpy(s, "\\");
+		Str_set( s1, s );
+		
+		len = str_compress_escapes(s);		
+		assert( len == 0 ); assert( *s == '\0' );
+		
+		Str_compress_escapes( s1 );
+		assert( s1->len == 0 ); assert( *s1->str == '\0' );
+
+		/* escape any */
+		strcpy(s, "\\" "?" "\\" "\"" "\\" "'");
+		Str_set( s1, s );
+		
+		len = str_compress_escapes(s);		
+		assert( len == 3 ); 
+		assert( strcmp(s, "?\"'") == 0 );
+		
+		Str_compress_escapes( s1 );
+		assert( s1->len == 3 ); 
+		assert( strcmp(s1->str, s) == 0 );
+
+		/* escape chars */
+		strcpy(s, "0" "\\a" 
+				  "1" "\\b" 
+				  "2" "\\e" 
+				  "3" "\\f" 
+				  "4" "\\n" 
+				  "5" "\\r" 
+				  "6" "\\t" 
+				  "7" "\\v" 
+				  "8");
+		Str_set( s1, s );
+		
+		len = str_compress_escapes(s);		
+		assert( len == 17 ); 
+		assert( strcmp(s, "0" "\a" 
+						  "1" "\b" 
+						  "2" "\x1B" 
+						  "3" "\f" 
+						  "4" "\n" 
+						  "5" "\r" 
+						  "6" "\t" 
+						  "7" "\v" 
+						  "8" ) == 0 );
+		
+		Str_compress_escapes( s1 );
+		assert( s1->len == 17 ); 
+		assert( strcmp(s1->str, s) == 0 );
+
+		/* octal and hexadecimal, including '\0' */
+		for ( i = 0; i < 256; i++ )
+		{
+			sprintf(s, "\\%o \\x%x", i, i );
+			Str_set( s1, s );
+			
+			len = str_compress_escapes(s);		
+			assert( len  == 3 );
+			assert( s[0] == (char)i );
+			assert( s[1] == ' ' );
+			assert( s[2] == (char)i );
+			assert( s[3] == '\0' );
+
+			Str_compress_escapes( s1 );
+			assert( s1->len == 3 ); 
+			assert( memcmp(s1->str, s, 3) == 0 );
+		}
+		
+		/* octal and hexadecimal with longer digit string */
+		sprintf(s, "\\3770\\xff0");
+		Str_set( s1, s );
+		
+		len = str_compress_escapes(s);		
+		assert( len  == 4 );
+		assert( strcmp(s, "\xFF" "0" "\xFF" "0") == 0 );
+
+		Str_compress_escapes( s1 );
+		assert( s1->len == 4 ); 
+		assert( strcmp(s1->str, s) == 0 );
 	}
 	
 	/* Str */
@@ -650,7 +739,11 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.8  2014-03-19 23:04:57  pauloscustodio
+# Revision 1.9  2014-03-29 22:04:11  pauloscustodio
+# Add str_compress_escapes() to compress C-like escape sequences.
+# Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
+#
+# Revision 1.8  2014/03/19 23:04:57  pauloscustodio
 # Add Str_set_alias() to define an alias char* that always points to self->str
 # Add Str_set_n() and Str_append_n() to copy substrings.
 #
