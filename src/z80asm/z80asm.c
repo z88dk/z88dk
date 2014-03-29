@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.152 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.153 2014-03-29 00:30:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -655,7 +655,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.152  2014-03-18 22:44:03  pauloscustodio
+* Revision 1.153  2014-03-29 00:30:11  pauloscustodio
+* TK_EOF renamed TK_END
+*
+* Revision 1.152  2014/03/18 22:44:03  pauloscustodio
 * Scanner decodes a number into tok_number.
 * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
 * ident[] replaced by tok_name.
@@ -675,7 +678,7 @@ createsym( Symbol *symptr )
 * GetSym() declared in scan.h
 *
 * Revision 1.147  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
 * GetChar() made static to scanner, not called by other modules.

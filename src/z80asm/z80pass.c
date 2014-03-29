@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.87 2014-03-18 22:44:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.88 2014-03-29 00:32:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -74,7 +74,7 @@ void Z80pass1( char *filename )
 	{
 		src_open( filename, opts.inc_path );
 		tok = TK_NIL;
-		while ( tok != TK_EOF )
+		while ( tok != TK_END )
 			parseline( ON );              /* before parsing it */
 	}
 	src_pop();
@@ -120,7 +120,7 @@ parseline( enum flag interpret )
         ParseIdent( interpret );
         break;
 
-    case TK_EOF:
+    case TK_END:
     case TK_NEWLINE:
         break;                /* empty line, get next... */
 
@@ -152,7 +152,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is TRUE, interpret lines until #else or #endif */
-                if ( tok != TK_EOF )
+                if ( tok != TK_END )
                 {
                     parseline( ON );
                 }
@@ -168,7 +168,7 @@ ifstatement( enum flag interpret )
                 do
                 {
                     /* then ignore lines until #endif ... */
-                    if ( tok != TK_EOF )
+                    if ( tok != TK_END )
                     {
                         parseline( OFF );
                     }
@@ -185,7 +185,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is FALSE, ignore until #else or #endif */
-                if ( tok != TK_EOF )
+                if ( tok != TK_END )
                 {
                     parseline( OFF );
                 }
@@ -200,7 +200,7 @@ ifstatement( enum flag interpret )
             {
                 do
                 {
-                    if ( tok != TK_EOF )
+                    if ( tok != TK_END )
                     {
                         parseline( ON );
                     }
@@ -218,7 +218,7 @@ ifstatement( enum flag interpret )
         do
         {
             /* don't evaluate #if expression and ignore all lines until #endif */
-            if ( tok != TK_EOF )
+            if ( tok != TK_END )
             {
                 parseline( OFF );
             }
@@ -636,7 +636,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.87  2014-03-18 22:44:03  pauloscustodio
+* Revision 1.88  2014-03-29 00:32:46  pauloscustodio
+* TK_EOF renamed TK_END
+*
+* Revision 1.87  2014/03/18 22:44:03  pauloscustodio
 * Scanner decodes a number into tok_number.
 * GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
 * ident[] replaced by tok_name.
@@ -653,7 +656,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * GetSym() declared in scan.h
 *
 * Revision 1.83  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
+* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
 * Allows decoupling of input file used in scanner from callers.
 * Removed TOTALLINES.
 * GetChar() made static to scanner, not called by other modules.
