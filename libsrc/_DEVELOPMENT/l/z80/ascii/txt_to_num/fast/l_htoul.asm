@@ -101,7 +101,12 @@ done_shift:
    rl d
    
    adc a,a
-   jr nz, unsigned_overflow
+   ret z
+   
+   ; unsigned overflow
+   
+   scf
+   ret
    
 done:
 
