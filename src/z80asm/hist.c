@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.80 2014-03-29 00:33:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.81 2014-03-29 01:20:30 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.80 2014-03-29 00:33
 
 /*
 * $Log: hist.c,v $
-* Revision 1.80  2014-03-29 00:33:28  pauloscustodio
+* Revision 1.81  2014-03-29 01:20:30  pauloscustodio
+* Accept both "ex af,af" and "ex af,af'"
+*
+* Revision 1.80  2014/03/29 00:33:28  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.
@@ -1679,6 +1682,8 @@ Based on 1.0.31
 	  e.g. 0xFF, $ff, 0FFh.
 	  Binary numbers either prefixed with '0b' or '@', or suffixed with 'B', 
 	  e.g. 0b10101, @10101, 10101b.
+	  
+	- Accept both "ex af,af" and "ex af,af'"
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

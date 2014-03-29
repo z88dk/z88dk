@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.54 2014-03-29 00:33:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.55 2014-03-29 01:19:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -227,15 +227,18 @@ EX( void )
         case REG16_AF:
             if ( GetSym() == TK_COMMA )      /* EX  AF,AF'   */
                 if ( GetSym() == TK_NAME )
-					if ( CheckRegister16() == REG16_AF1 )
-                    {
+				{
+					switch ( CheckRegister16() )
+					{
+					case REG16_AF:
+					case REG16_AF1:
                         append_byte( 0x08 );
                         inc_PC( 1 );
+						break;
+					default:
+						error_illegal_ident();
                     }
-                    else
-                    {
-                        error_illegal_ident();
-                    }
+				}
                 else
                 {
                     error_syntax();
@@ -1594,7 +1597,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.54  2014-03-29 00:33:29  pauloscustodio
+* Revision 1.55  2014-03-29 01:19:41  pauloscustodio
+* Accept both "ex af,af" and "ex af,af'"
+*
+* Revision 1.54  2014/03/29 00:33:29  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.

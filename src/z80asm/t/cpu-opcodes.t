@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.5 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.6 2014-03-29 01:19:41 pauloscustodio Exp $
 # $Log: cpu-opcodes.t,v $
-# Revision 1.5  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.6  2014-03-29 01:19:41  pauloscustodio
+# Accept both "ex af,af" and "ex af,af'"
+#
+# Revision 1.5  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -426,6 +429,7 @@ pop  iy									=> xxxx 0xFD 0xE1
 #										   ||+-RCM2000
 #										   |||+RCM3000
 ex   de,hl								=> xxxx      0xEB
+ex   af,af								=> xxxx      0x08
 ex   af,af'								=> xxxx      0x08
 exx										=> xxxx      0xD9
 
