@@ -18,7 +18,7 @@
 ;       M - Delete lines: to be completed
 ;
 ;
-;       $Id: f_ansi.asm,v 1.10 2008-04-02 19:44:27 stefano Exp $
+;       $Id: f_ansi.asm,v 1.11 2014-03-30 10:46:03 pauloscustodio Exp $
 ;
 
         XLIB    f_ansi
@@ -370,7 +370,7 @@
 .fgp_may_quote
         cp      '"'
         jr      z, fgp_isquote
-        cp      '\'
+        cp      '\\'
         jp      nz, fgp_semi_or_cmd    ; jump to code shared with f_in_param
 .fgp_isquote
         ld      (string_term), a       ; save it for end of string

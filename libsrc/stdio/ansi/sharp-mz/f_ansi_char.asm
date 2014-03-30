@@ -9,7 +9,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2002-01-15 12:59:24 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2014-03-30 10:46:03 pauloscustodio Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -120,7 +120,7 @@
 	defb	']',$54
 	defb	'@',$55
 	defb	'>',$57
-	defb	'\',$59
+	defb	'\\',$59
 	defb	'!',$61
 	defb	'"',$62
 	defb	'#',$63
