@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.83 2014-03-29 01:46:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.84 2014-03-30 10:42:08 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.83 2014-03-29 01:46
 
 /*
 * $Log: hist.c,v $
-* Revision 1.83  2014-03-29 01:46:14  pauloscustodio
+* Revision 1.84  2014-03-30 10:42:08  pauloscustodio
+* CH_0023: Accept C-like escape sequences in character constants and strings
+* Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character}, \{octal}, \x{hexadecimal}, allows \0 within the string.
+* Existing code may have to be modified, e.g. defb '\' --> defb '\\'
+*
+* Revision 1.83  2014/03/29 01:46:14  pauloscustodio
 * version
 *
 * Revision 1.82  2014/03/29 01:27:33  pauloscustodio
@@ -1692,6 +1697,15 @@ Based on 1.0.31
 	- Accept both "ex af,af" and "ex af,af'"
 
 -------------------------------------------------------------------------------
+30.03.2014 [2.1.7] (pauloscustodio)
+-------------------------------------------------------------------------------
+	CH_0023: Accept C-like escape sequences in character constants and strings
+		Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character} 
+		\{octal}, \x{hexadecimal}, allows \0 within the string.
+		Existing code may have to be modified, e.g.
+			defb '\' 	--> defb '\\'	
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1723,7 +1737,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.6"
+#define VERSION     "2.1.7a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

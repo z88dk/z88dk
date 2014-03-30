@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.37 2014-03-29 00:33:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.38 2014-03-30 10:39:51 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -64,6 +64,10 @@ void list_start_line( size_t address, char *source_file, int source_line_nr, cha
 #define T_STRING( exp_string ) \
 	T_GET( TK_STRING, "" ); \
 	assert( strcmp( tok_string, exp_string ) == 0 );
+	
+#define T_STRING_N( exp_string, n ) \
+	T_GET( TK_STRING, "" ); \
+	assert( memcmp( tok_string, exp_string, n ) == 0 );
 	
 #define T_NEWLINE() \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
@@ -486,44 +490,79 @@ t_compile_module($init, <<'END', $objs);
 	
 	
 	/* strings - single-quote */
-	SetTemporaryLine(  "'		\n"
-					   "'a		\n"
-					   "''		\n"
-					   "'a'		\n"
-					   "'aa'	\n"
+	SetTemporaryLine(  "'\n"
+					   "'a\n"
+					   "''\n"
+					   "'a'\n"
+					   "'aa'\n"
+					   "'\\a''\\b''\\f''\\n''\\r''\\t''\\v'"
+					   "'\\\\''\\'''\\0''\\377''\\xff'\n"
 					   "0");
 	T_NUMBER(0);
 	T_NEWLINE();
+	
 	T_NUMBER(0);
 	T_NEWLINE();
+	
 	T_NUMBER(0);
 	T_NEWLINE();
+	
 	T_NUMBER('a');
 	T_NEWLINE();
+	
 	T_NUMBER(0);
 	T_NEWLINE();
+	
+	T_NUMBER(7); 
+	T_NUMBER(8); 
+	T_NUMBER(12); 
+	T_NUMBER(10); 
+	T_NUMBER(13); 
+	T_NUMBER(9); 
+	T_NUMBER(11); 
+	T_NUMBER('\\'); 
+	T_NUMBER('\''); 
+	T_NUMBER(0); 
+	T_NUMBER(-1); 
+	T_NUMBER(-1); 
+	T_NEWLINE();
+	
 	T_NUMBER(0);
 	T_END();
 	
 
 	/* strings - double-quote */
-	SetTemporaryLine(  "\"		\n"
-					   "\"a		\n"
-					   "\"\"	\n"
-					   "\"a\"	\n"
-					   "\"aa\"	\n"
-					   "\"\"");
+	SetTemporaryLine(  "\"\n"
+					   "\"a\n"
+					   "\"\"\n"
+					   "\"a\"\n"
+					   "\"aa\"\n"
+					   "\"\"\n"
+					   "\"\\a\\b\\f\\n\\r\\t\\v"
+					   "\\\\" "\\\"" "\\0\\377\\xff\"\n"
+					   "0");
 	T_STRING("");
 	T_NEWLINE();
+	
 	T_STRING("");
 	T_NEWLINE();
+	
 	T_STRING("");
 	T_NEWLINE();
+	
 	T_STRING("a");
 	T_NEWLINE();
+	
 	T_STRING("aa");
 	T_NEWLINE();
+	
 	T_STRING("");
+	T_NEWLINE();
+	
+	T_STRING_N("\a\b\f\n\r\t\v\\\"\0\xff\xff", 12);
+	T_NEWLINE();
+	
+	T_NUMBER(0);
 	T_END();
 
 	return 0;
@@ -543,7 +582,12 @@ done_testing;
 
 
 # $Log: whitebox-scan.t,v $
-# Revision 1.37  2014-03-29 00:33:29  pauloscustodio
+# Revision 1.38  2014-03-30 10:39:51  pauloscustodio
+# CH_0023: Accept C-like escape sequences in character constants and strings
+# Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character}, \{octal}, \x{hexadecimal}, allows \0 within the string.
+# Existing code may have to be modified, e.g. defb '\' --> defb '\\'
+#
+# Revision 1.37  2014/03/29 00:33:29  pauloscustodio
 # BUG_0044: binary constants with more than 8 bits not accepted
 # CH_0022: Added syntax to define binary numbers as bitmaps
 # Replaced tokenizer with Ragel based scanner.

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.1 2014-03-29 00:33:29 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.2 2014-03-30 10:39:51 pauloscustodio Exp $ 
 */
 
 #define TOKEN(name, string)				 \
@@ -145,36 +145,28 @@ main := |*
 	};
 	
 	/* Single Quote */
-	"'" (any - "'" - "\n") "'"
-	{
-		tok = TK_NUMBER;
-		tok_number = ts[1];
-		fbreak;
-	};
-	
 	"'"
 	{ 
 		tok = TK_NUMBER;
-		tok_number = 0;
-		error_invalid_squoted_string(); 
-		skip_to_newline();
+		if ( get_tok_string() && 		/* consumes input up to end quote or \n */
+		     tok_string_buf->len == 1 )
+		{
+			tok_number = tok_string[0];
+		}
+		else
+		{
+			tok_number = 0;
+			error_invalid_squoted_string(); 
+		}
 		fbreak;
 	};
 	
 	/* Double Quote */
-	'"' (any - '"' - "\n")* '"'
-	{
-		tok = TK_STRING;
-		Str_set_n( tok_string_buf, ts+1, te-ts-2 );
-		fbreak;
-	};
-	
 	'"'
 	{ 
 		tok = TK_STRING;
-		Str_clear( tok_string_buf );
-		error_unclosed_string(); 
-		skip_to_newline();
+		if ( ! get_tok_string() )	/* consumes input up to end quote or \n */
+			error_unclosed_string(); 
 		fbreak;
 	};
 	

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.44 2014-03-29 00:33:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.45 2014-03-30 10:39:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -166,6 +166,45 @@ static void set_tok_name( void )
 }
 
 /*-----------------------------------------------------------------------------
+*   copy tok_string, start with p pointing at the start quote (' or "),
+*	end with p pointing at the end quote, copy characters to tok_string
+*	handling C escape sequences. Return false if string not terminated.
+*----------------------------------------------------------------------------*/
+static BOOL get_tok_string( void )
+{
+	char quote;
+
+	/* mark token start */
+	quote = *p++;
+	assert( quote == '"' || quote == '\'' );
+	ts = p;
+
+	/* search for end quote or end of string */
+	while (TRUE)
+	{
+		if ( *p == '\\' && p[1] != '\0' )
+		{
+			p++;						/* skip char after backslash, may be a quote */
+		}
+		else if ( *p == quote )
+		{
+			te = p;
+			Str_set_n( tok_string_buf, ts, te - ts );
+			Str_compress_escapes( tok_string_buf );
+			return TRUE;
+		}
+		else if ( *p == '\n' || *p == '\0' )
+		{
+			te = p;
+			p--;						/* point to before separator */
+			Str_clear( tok_string_buf );
+			return FALSE;
+		}
+		p++;
+	}
+}
+
+/*-----------------------------------------------------------------------------
 *   skip up to and not including newline
 *----------------------------------------------------------------------------*/
 static void skip_to_newline( void )
@@ -299,7 +338,12 @@ void SetTemporaryLine( char *line )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.44  2014-03-29 00:33:28  pauloscustodio
+* Revision 1.45  2014-03-30 10:39:51  pauloscustodio
+* CH_0023: Accept C-like escape sequences in character constants and strings
+* Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character}, \{octal}, \x{hexadecimal}, allows \0 within the string.
+* Existing code may have to be modified, e.g. defb '\' --> defb '\\'
+*
+* Revision 1.44  2014/03/29 00:33:28  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.
