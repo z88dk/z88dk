@@ -1,0 +1,17 @@
+@adt/b_array/b_array_sdcc_iy.lst
+@adt/b_vector/b_vector_sdcc_iy.lst
+@adt/ba_priority_queue/ba_priority_queue_sdcc_iy.lst
+@adt/ba_stack/ba_stack_sdcc_iy.lst
+@adt/bv_priority_queue/bv_priority_queue_sdcc_iy.lst
+@adt/bv_stack/bv_stack_sdcc_iy.lst
+@adt/p_forward_list/p_forward_list_sdcc_iy.lst
+@adt/p_forward_list_alt/p_forward_list_alt_sdcc_iy.lst
+@adt/p_list/p_list_sdcc_iy.lst
+@adt/p_queue/p_queue_sdcc_iy.lst
+@adt/p_stack/p_stack_sdcc_iy.lst
+@adt/w_array/w_array_sdcc_iy.lst
+@adt/w_vector/w_vector_sdcc_iy.lst
+@adt/wa_priority_queue/wa_priority_queue_sdcc_iy.lst
+@adt/wa_stack/wa_stack_sdcc_iy.lst
+@adt/wv_priority_queue/wv_priority_queue_sdcc_iy.lst
+@adt/wv_stack/wv_stack_sdcc_iy.lst
