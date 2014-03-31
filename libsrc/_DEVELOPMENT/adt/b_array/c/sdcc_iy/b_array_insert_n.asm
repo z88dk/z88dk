@@ -9,18 +9,14 @@ b_array_insert_n:
    pop hl
    pop bc
    pop de
-   exx
-   pop bc
+   pop ix
    
-   push bc
-   exx
+   push ix
    push de
    push bc
    push hl
    push af
    
-   exx
-   ld a,c
-   exx
+   ld a,ixl
    
    INCLUDE "adt/b_array/z80/asm_b_array_insert_n.asm"
