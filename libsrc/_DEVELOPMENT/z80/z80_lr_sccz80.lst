@@ -1,6 +1,4 @@
 z80/c/lr_sccz80/z80_delay_ms
 z80/c/lr_sccz80/z80_delay_tstate
-z80/c/lr_sccz80/z80_pop_di
-z80/c/lr_sccz80/z80_pop_ei
-z80/c/lr_sccz80/z80_push_di
-z80/c/lr_sccz80/z80_push_ei
+z80/c/lr_sccz80/z80_pop_int_state
+z80/c/lr_sccz80/z80_push_int_state

@@ -1,17 +1,16 @@
-
-; ===============================================================
+======================================================
 ; Stefano Bodrato
 ; ===============================================================
 ;
-; void z80_push_ei(void)
+; void z80_push_int_state(void)
 ;
-; Save the current ei/di status on the stack and enable ints.
+; Save the current ei/di status on the stack.
 ;
 ; ===============================================================
 
-XLIB asm_z80_push_ei
+XLIB asm_z80_push_int_state
 
-asm_z80_push_ei:
+asm_z80_push_int_state:
 
    ; exit  : stack = ei_di_status
    ;
@@ -20,7 +19,6 @@ asm_z80_push_ei:
    pop hl                      ; hl = return address
    
    ld a,i                      ; ei_di_status into p/v flag
-   ei                          ; enable interrupts
-   
    push af                     ; save ei_di_status to stack
+
    jp (hl)                     ; ret
