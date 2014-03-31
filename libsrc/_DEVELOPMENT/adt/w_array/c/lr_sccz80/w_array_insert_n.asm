@@ -1,11 +1,11 @@
 
 ; size_t w_array_insert_n(w_array_t *a, size_t idx, size_t n, void *item)
 
-XLIB w_array_insert
+XLIB w_array_insert_n
 
-LIB asm_w_array_insert
+LIB asm_w_array_insert_n
 
-w_array_insert:
+w_array_insert_n:
 
    pop ix
    pop af
@@ -19,4 +19,4 @@ w_array_insert:
    push af
    push ix
    
-   jp asm_w_array_insert
+   jp asm_w_array_insert_n
