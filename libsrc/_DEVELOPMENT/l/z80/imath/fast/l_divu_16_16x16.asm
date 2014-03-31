@@ -75,18 +75,20 @@ begin:
    
    ; unroll divide eight times
    
-   scf
-
-   ; eliminating zeroes is not much faster than division loop
+   ; eliminating leading zeroes is only marginal
    
    ; general divide loop
+
+   scf
 
 loop_0:
 
    rl c
    rla
    adc hl,hl
-   
+
+loop_00:
+
    sbc hl,de
    jr nc, loop_1
    add hl,de
@@ -96,7 +98,9 @@ loop_1:
    rl c
    rla
    adc hl,hl
-   
+
+loop_11:
+
    sbc hl,de
    jr nc, loop_2
    add hl,de
@@ -106,7 +110,9 @@ loop_2:
    rl c
    rla
    adc hl,hl
-   
+
+loop_22:
+
    sbc hl,de
    jr nc, loop_3
    add hl,de
@@ -116,7 +122,9 @@ loop_3:
    rl c
    rla
    adc hl,hl
-   
+
+loop_33:
+
    sbc hl,de
    jr nc, loop_4
    add hl,de
@@ -126,7 +134,9 @@ loop_4:
    rl c
    rla
    adc hl,hl
-   
+
+loop_44:
+
    sbc hl,de
    jr nc, loop_5
    add hl,de
@@ -136,7 +146,9 @@ loop_5:
    rl c
    rla
    adc hl,hl
-   
+
+loop_55:
+
    sbc hl,de
    jr nc, loop_6
    add hl,de
@@ -146,7 +158,9 @@ loop_6:
    rl c
    rla
    adc hl,hl
-   
+
+loop_66:
+
    sbc hl,de
    jr nc, loop_7
    add hl,de
@@ -156,7 +170,9 @@ loop_7:
    rl c
    rla
    adc hl,hl
-   
+
+loop_77:
+
    sbc hl,de
    jr nc, exit_loop
    add hl,de

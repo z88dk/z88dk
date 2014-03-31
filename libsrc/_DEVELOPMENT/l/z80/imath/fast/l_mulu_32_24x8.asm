@@ -68,9 +68,8 @@ loop_00:
    jr c, loop_17
 
    sla c
-   ccf
-   ret nc
-   
+   jr c, exit_18
+      
    xor a
    
    ld e,a

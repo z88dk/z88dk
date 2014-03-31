@@ -4,12 +4,10 @@ XDEF l0_divu_32_32x32
 
 LIB l0_divu_32_32x24, error_divide_by_zero_mc
 
-
-
 divu_32_32x24:
 
    ; dehl'= 32-bit dividend
-   ;  ehl = 32-bit divisor
+   ;  ehl = 24-bit divisor
 
    ld d,e
    ld b,h
@@ -439,7 +437,8 @@ exit_loop:
    exx
    
    ld l,a
-   ld h,0
+   xor a
+   ld h,a
    
    ld e,h
    ld d,h

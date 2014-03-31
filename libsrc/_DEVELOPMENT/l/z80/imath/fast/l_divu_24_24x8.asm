@@ -100,12 +100,14 @@ loop_00:
    jr c, loop_70
 
    add hl,hl
+   rl e
+   
    rla
    
-   cp e
+   cp c
    jr c, loop_80
    
-   sub e
+   sub c
    inc l
 
 loop_80:
@@ -122,10 +124,13 @@ loop_0:
 loop_10:
 
    rla
+   jr c, loop_101
    
    cp c
    jr c, loop_1
-   
+
+loop_101:
+
    sub c
    inc l
 
@@ -137,9 +142,12 @@ loop_1:
 loop_20:
 
    rla
+   jr c, loop_201
    
    cp c
    jr c, loop_2
+
+loop_201:
    
    sub c
    inc l
@@ -152,10 +160,13 @@ loop_2:
 loop_30:
 
    rla
+   jr c, loop_301
    
    cp c
    jr c, loop_3
-   
+
+loop_301:
+
    sub c
    inc l
 
@@ -167,10 +178,13 @@ loop_3:
 loop_40:
 
    rla
+   jr c, loop_401
    
    cp c
    jr c, loop_4
-   
+
+loop_401:
+
    sub c
    inc l
 
@@ -182,10 +196,13 @@ loop_4:
 loop_50:
 
    rla
+   jr c, loop_501
    
    cp c
    jr c, loop_5
-   
+
+loop_501:
+
    sub c
    inc l
 
@@ -197,9 +214,12 @@ loop_5:
 loop_60:
 
    rla
+   jr c, loop_601
    
    cp c
    jr c, loop_6
+
+loop_601:
    
    sub c
    inc l
@@ -212,10 +232,13 @@ loop_6:
 loop_70:
 
    rla
+   jr c, loop_701
    
    cp c
    jr c, loop_7
-   
+
+loop_701:
+
    sub c
    inc l
 
@@ -224,10 +247,13 @@ loop_7:
    add hl,hl
    rl e
    rla
+   jr c, loop_801
    
    cp c
    jr c, loop_8
-   
+
+loop_801:
+
    sub c
    inc l
 

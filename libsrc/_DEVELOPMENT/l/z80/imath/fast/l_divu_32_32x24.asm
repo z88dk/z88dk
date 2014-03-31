@@ -19,11 +19,13 @@ divu_32_24x24:
 
    ; ehl / dbc'
 
-   push de
+   ld a,e
    push hl
+   
    exx
+      
    pop hl
-   pop de
+   ld e,a
    
    call l0_divu_24_24x24
    
@@ -46,7 +48,6 @@ divu_32_24x24:
 
 divide_by_zero:
 
-   exx
    ld de,$ffff
    jp error_divide_by_zero_mc
 
@@ -122,6 +123,7 @@ loop_00:
 
    exx
    add hl,hl
+   inc l
    rl e
    rl d
    exx
@@ -157,7 +159,7 @@ loop_00:
    exx
    adc hl,hl
    
-   jr c, loop_40
+   jp c, loop_40
 
    exx
    add hl,hl
@@ -167,7 +169,7 @@ loop_00:
    exx
    adc hl,hl
    
-   jr c, loop_50
+   jp c, loop_50
 
    exx
    add hl,hl
@@ -177,7 +179,7 @@ loop_00:
    exx
    adc hl,hl
    
-   jr c, loop_60
+   jp c, loop_60
 
    exx
    add hl,hl
@@ -187,10 +189,26 @@ loop_00:
    exx
    adc hl,hl
    
-   jr c, loop_70
+   jp c, loop_70
 
    scf
    jp loop_7
+
+loop_100:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_1
+
+loop_200:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_2
 
    ; general divide loop
 
@@ -205,7 +223,8 @@ loop_0:
 
 loop_10:
 
-   adc a,a
+   rla
+   jr c, loop_100
    
    sbc hl,bc
    sbc a,d
@@ -224,7 +243,8 @@ loop_1:
 
 loop_20:
 
-   adc a,a
+   rla
+   jr c, loop_200
    
    sbc hl,bc
    sbc a,d
@@ -243,7 +263,8 @@ loop_2:
 
 loop_30:
 
-   adc a,a
+   rla
+   jr c, loop_300
    
    sbc hl,bc
    sbc a,d
@@ -262,7 +283,8 @@ loop_3:
 
 loop_40:
 
-   adc a,a
+   rla
+   jr c, loop_400
    
    sbc hl,bc
    sbc a,d
@@ -281,7 +303,8 @@ loop_4:
 
 loop_50:
 
-   adc a,a
+   rla
+   jr c, loop_500
    
    sbc hl,bc
    sbc a,d
@@ -300,7 +323,8 @@ loop_5:
 
 loop_60:
 
-   adc a,a
+   rla
+   jr c, loop_600
    
    sbc hl,bc
    sbc a,d
@@ -319,7 +343,8 @@ loop_6:
 
 loop_70:
 
-   adc a,a
+   rla
+   jr c, loop_700
    
    sbc hl,bc
    sbc a,d
@@ -335,7 +360,8 @@ loop_7:
    rl d
    exx
    adc hl,hl
-   adc a,a
+   rla
+   jr c, loop_800
    
    sbc hl,bc
    sbc a,d
@@ -360,4 +386,53 @@ loop_8:
    rl e
    rl d
    
+   or a
    jp l_cpl_dehl
+
+loop_300:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_3
+
+loop_400:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_4
+
+loop_500:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_5
+   
+loop_600:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_6
+
+loop_700:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_7
+
+loop_800:
+
+   or a
+   sbc hl,bc
+   sbc a,d
+   or a
+   jp loop_8

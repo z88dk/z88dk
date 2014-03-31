@@ -141,7 +141,7 @@ begin:
    ld a,l
    exx
    ld e,a
-   ld hl,0
+   ld hl,$ffff
    exx
    ld l,h
    ld h,e
@@ -155,6 +155,7 @@ loop_00:
 
    exx
    add hl,hl
+   inc l
    rl e
    exx
    adc hl,hl
@@ -215,12 +216,8 @@ loop_00:
    
    jr c, loop_70
 
-   exx
-   add hl,hl
-   inc l
-   rl e
-   
-   jp loop_80
+   scf
+   jp loop_7
 
    ; general divide loop
 
@@ -424,4 +421,5 @@ exit_loop:
    pop bc
    ld c,b
    
+   or a
    ret

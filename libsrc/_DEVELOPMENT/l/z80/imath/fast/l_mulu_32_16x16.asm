@@ -65,7 +65,6 @@ l_mulu_32_16x16:
    or a
    ret
 
-
 ; loop code
 ;
 ; loop_12:

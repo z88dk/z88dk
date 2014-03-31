@@ -111,7 +111,7 @@ loop_30:
    rla
 
    cp e
-   jr nc, loop_13
+   jr c, loop_13
    
    sub e
    inc l

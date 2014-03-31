@@ -123,11 +123,96 @@ l0_divu_32_32x16:
    
    ld ixh,3
 
-   ; eliminate leading zeroes will not save much time
-   
-   ; general divide loop
+   ; eliminate leading zeroes
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_000
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_111
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_222
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_333
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_444
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_555
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_666
 
    scf
+   jp loop_7
+
+loop_00:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_1
+
+   ; general divide loop
 
 loop_0:
 
@@ -137,7 +222,10 @@ loop_0:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_00
+
+loop_000:
+
    sbc hl,bc
    jr nc, loop_1
    add hl,bc
@@ -150,7 +238,10 @@ loop_1:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_11
+
+loop_111:
+
    sbc hl,bc
    jr nc, loop_2
    add hl,bc
@@ -163,7 +254,10 @@ loop_2:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_22
+
+loop_222:
+
    sbc hl,bc
    jr nc, loop_3
    add hl,bc
@@ -176,7 +270,10 @@ loop_3:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_33
+
+loop_333:
+
    sbc hl,bc
    jr nc, loop_4
    add hl,bc
@@ -189,7 +286,10 @@ loop_4:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_44
+
+loop_444:
+
    sbc hl,bc
    jr nc, loop_5
    add hl,bc
@@ -202,7 +302,10 @@ loop_5:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_55
+
+loop_555:
+
    sbc hl,bc
    jr nc, loop_6
    add hl,bc
@@ -215,7 +318,10 @@ loop_6:
    rl d
    exx
    adc hl,hl
-   
+   jr c, loop_66
+
+loop_666:
+
    sbc hl,bc
    jr nc, loop_7
    add hl,bc
@@ -228,6 +334,7 @@ loop_7:
    rl d
    exx
    adc hl,hl
+   jr c, loop_77
    
    sbc hl,bc
    jr nc, loop_8
@@ -236,7 +343,7 @@ loop_7:
 loop_8:
 
    dec ixh
-   jr nz, loop_0
+   jp nz, loop_0
 
    ; hl = remainder, dehl'=~quotient with one more shift left
 
@@ -248,4 +355,54 @@ loop_8:
    rl e
    rl d
    
+   or a
    jp l_cpl_dehl
+
+loop_11:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_2
+
+loop_22:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_3
+
+loop_33:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_4
+
+loop_44:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_5
+
+loop_55:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_6
+
+loop_66:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_7
+
+loop_77:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_8

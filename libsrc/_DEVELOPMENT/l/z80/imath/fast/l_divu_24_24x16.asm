@@ -83,10 +83,75 @@ l0_divu_24_24x16:
 
    ld ixh,2
    
-   ; eliminating zeroes is not much faster than division loop
+   ; eliminating leading zeroes
    
    scf
+
+   rl c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_00
+
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_11
    
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_22
+   
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_33
+   
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_44
+   
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_55   
+   
+   rl c
+   inc c
+   rl b
+   rla
+   adc hl,hl
+   inc h
+   dec h
+   jr nz, loop_66
+
+   scf
+   jp loop_7
+
    ; general divide loop
 
 loop_0:
@@ -95,7 +160,10 @@ loop_0:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_000
+
+loop_00:
+
    sbc hl,de
    jr nc, loop_1
    add hl,de
@@ -106,7 +174,10 @@ loop_1:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_111
+
+loop_11:
+
    sbc hl,de
    jr nc, loop_2
    add hl,de
@@ -117,7 +188,10 @@ loop_2:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_222
+
+loop_22:
+
    sbc hl,de
    jr nc, loop_3
    add hl,de
@@ -128,7 +202,10 @@ loop_3:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_333
+
+loop_33:
+
    sbc hl,de
    jr nc, loop_4
    add hl,de
@@ -139,7 +216,10 @@ loop_4:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_444
+
+loop_44:
+
    sbc hl,de
    jr nc, loop_5
    add hl,de
@@ -150,7 +230,10 @@ loop_5:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_555
+
+loop_55:
+
    sbc hl,de
    jr nc, loop_6
    add hl,de
@@ -161,7 +244,10 @@ loop_6:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_666
+
+loop_66:
+
    sbc hl,de
    jr nc, loop_7
    add hl,de
@@ -172,7 +258,10 @@ loop_7:
    rl b
    rla
    adc hl,hl
-   
+   jr c, loop_777
+
+loop_77:
+
    sbc hl,de
    jr nc, loop_8
    add hl,de
@@ -200,3 +289,59 @@ exit_loop:
    
    or a
    ret
+
+loop_000:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_1
+
+loop_111:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_2
+
+loop_222:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_3
+
+loop_333:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_4
+
+loop_444:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_5
+
+loop_555:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_6
+
+loop_666:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_7
+
+loop_777:
+
+   or a
+   sbc hl,de
+   or a
+   jp loop_8

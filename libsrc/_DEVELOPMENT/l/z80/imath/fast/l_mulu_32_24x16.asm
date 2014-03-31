@@ -36,7 +36,7 @@ l_mulu_32_24x16:
    
    inc d
    dec d
-   jr nz, overflow
+   jr nz, overflow_0
 
    ; shift left 8 bits
    
@@ -49,8 +49,8 @@ l_mulu_32_24x16:
    ex (sp),hl                  ; hl = HL
    push de
    
-   ld a,b
-   ld e,c
+   ld a,c
+   ld e,b
    call l_mulu_32_24x8         ; dehl = C * EHL
 
    ; add the two results
@@ -63,12 +63,17 @@ l_mulu_32_24x16:
    pop bc
    adc hl,bc
    
-   jr c, overflow
+   jr c, overflow_1
    
    ex de,hl
    ret
 
-overflow:
+overflow_0:
+
+   pop de
+   pop hl
+   
+overflow_1:
 
    call error_mulu_overflow_mc
    
