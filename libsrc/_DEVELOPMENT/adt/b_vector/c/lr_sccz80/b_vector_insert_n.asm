@@ -8,9 +8,7 @@ LIB asm_b_vector_insert_n
 b_vector_insert_n:
 
    pop af
-   exx
-   pop bc
-   exx
+   pop ix
    pop de
    pop bc
    pop hl
@@ -18,10 +16,8 @@ b_vector_insert_n:
    push hl
    push bc
    push de
-   exx
-   push bc
+   push ix
    push af
-   ld a,c
-   exx
    
+   ld a,ixl   
    jp asm_b_vector_insert_n
