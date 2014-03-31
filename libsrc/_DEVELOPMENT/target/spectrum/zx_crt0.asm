@@ -1,173 +1,24 @@
 
-; zx spectrum crt0 for testing purposes
+; Select crt0 from STARTUP option
 
-;; origin ;;;;;;;;;;;;;;;;;;;;;
+IF !STARTUP
 
-INCLUDE "zcc_opt.def"
-
-IF !myzorg
-
-   defc myzorg = 32768
+   ; STARTUP undefined so select a default
+   
+   defc STARTUP = 0
 
 ENDIF
 
-org myzorg
+IF STARTUP = 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-XLIB start
-XDEF _Exit
-
-XREF _main
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-INCLUDE "../crt_defs.inc"      ; crt defines
-INCLUDE "crt_zx_defs.inc"      ; crt defines varying by target
-
-;; crt configuration ;;;;;;;;;;
-
-defc __heap_sz = 2048          ; malloc's heap, eliminate if not required
-defc __qtbl_sz = 6             ; balloc's qtable, eliminate if not required
-
-defc __exit_stack_sz      = 6  ; set to 0 if not required, default is 32
-defc __quickexit_stack_sz = 6  ; set to 0 if not required, default is 32
-
-defc __HAVE_FILE_STDIN    = 1  ; set to 0 if stdin not available
-defc __HAVE_FILE_STDOUT   = 1  ; set to 0 if stdout not available
-defc __HAVE_FILE_STDERR   = 1  ; set to 0 if stderr not available
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-start:
-
-   push iy                     ; target requires saving iy
-   exx
-   push hl                     ; target requires saving hl'
+   ; zx spectrum test target
    
-   ld (__sp),sp
-
-   IF STACKPTR                 ; pragma to locate stack
+   ; myzorg selects org address, default 32768
    
-      ld sp,STACKPTR
+   ; STDIN attached to keyboard driver that reads LASTK for keypresses, no edit buffer
+   ; STDOUT attached to fzx driver, default font is ff_ao_SoixanteQuatre
+   ; STDERR attached to fzx driver, default font is ff_ao_SoixanteQuatre
    
-   ENDIF
+   INCLUDE "startup/zx_crt0.asm"
 
-   INCLUDE "../crt_init.asm"   ; intialize crt state
-
-   ; clear screen 
-
-   call cls                    ; clear screen, reset fzx state
-      
-   ; initialize fzx state
-   
-   LIB _ff_ao_SoixanteQuatre
-   ld hl,_ff_ao_SoixanteQuatre
-   ld (_fzx),hl                ; initial font
-   
-   ; call user program
-
-   call _main                  ; hl holds return status
-
-   INCLUDE "../crt_exit.asm"   ; run exit stack
-   
-_Exit:
-
-   INCLUDE "../crt_cleanup.asm"  ; close files 
-
-   ld c,l
-   ld b,h                      ; return status to basic
-
-   ld sp,(__sp)
-   
-   exx
-   pop hl                      ; restore hl'
-   exx
-   pop iy                      ; restore iy
-   
-   im 1
-   
-   ei   
-   ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-INCLUDE "../crt_vars.asm"      ; crt variable declarations
-INCLUDE "../crt_stubs.asm"     ; crt stubs for unimplemented lib functions
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__FILE_STDIN:
-   
-   defb 195                    ; jp driver
-   defw __kbd_driver
-   defb $80                    ; open for reading
-   defb $02                    ; last op was read, to skip auto-flush
-   defb 0
-   defb 0
-   defs 6                      ; mutex
-
-__FILE_STDOUT:
-
-   defb 195                    ; jp driver
-   defw __fzx_driver
-   defb $40                    ; open for writing
-   defb 0
-   defb 0
-   defb 0
-   defs 6                      ; mutex
-
-__FILE_STDERR:
-
-   ; separate from stdout allows output
-   ; even when stdout is in an error state
-
-   defb 195                    ; jp driver
-   defw __fzx_driver
-   defb $40                    ; open for writing
-   defb 0
-   defb 0
-   defb 0
-   defs 6                      ; mutex
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; fzx state
-
-XDEF _fzx
-
-_fzx:   defs 6
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-XDEF cls
-
-cls:
-
-   ; reset fzx
-   
-   ld hl,0
-   ld (_fzx + 2),hl
-   ld (_fzx + 4),hl
-
-   ; attributes
-   
-   ld e,56
-   ld hl,$5800
-   ld bc,768
-   
-   LIB asm_memset
-   call asm_memset
-
-   ; pixels
-   
-   ld e,0
-   ld hl,$4000
-   ld bc,6144
-   
-   jp asm_memset
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-INCLUDE "__fzx_driver.asm"     ; output driver
-INCLUDE "__kbd_driver.asm"     ; input driver
+ENDIF
