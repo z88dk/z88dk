@@ -20,8 +20,6 @@ XDEF _Exit
 
 XREF _main
 
-LIB _ff_ao_SoixanteQuatre, asm_memset
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "../crt_defs.inc"      ; crt defines
@@ -43,6 +41,10 @@ defc __HAVE_FILE_STDERR   = 1  ; set to 0 if stderr not available
 
 start:
 
+   push iy                     ; target requires saving iy
+   exx
+   push hl                     ; target requires saving hl'
+   
    ld (__sp),sp
 
    IF STACKPTR                 ; pragma to locate stack
@@ -59,6 +61,7 @@ start:
       
    ; initialize fzx state
    
+   LIB _ff_ao_SoixanteQuatre
    ld hl,_ff_ao_SoixanteQuatre
    ld (_fzx),hl                ; initial font
    
@@ -76,6 +79,15 @@ _Exit:
    ld b,h                      ; return status to basic
 
    ld sp,(__sp)
+   
+   exx
+   pop hl                      ; restore hl'
+   exx
+   pop iy                      ; restore iy
+   
+   im 1
+   
+   ei   
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -144,6 +156,7 @@ cls:
    ld hl,$5800
    ld bc,768
    
+   LIB asm_memset
    call asm_memset
 
    ; pixels
