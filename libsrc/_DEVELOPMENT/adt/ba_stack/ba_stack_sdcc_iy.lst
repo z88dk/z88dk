@@ -1,0 +1,9 @@
+adt/ba_stack/c/sdcc_iy/ba_stack_capacity
+adt/ba_stack/c/sdcc_iy/ba_stack_clear
+adt/ba_stack/c/sdcc_iy/ba_stack_destroy
+adt/ba_stack/c/sdcc_iy/ba_stack_empty
+adt/ba_stack/c/sdcc_iy/ba_stack_init
+adt/ba_stack/c/sdcc_iy/ba_stack_pop
+adt/ba_stack/c/sdcc_iy/ba_stack_push
+adt/ba_stack/c/sdcc_iy/ba_stack_size
+adt/ba_stack/c/sdcc_iy/ba_stack_top

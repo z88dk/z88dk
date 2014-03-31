@@ -1,0 +1,12 @@
+adt/bv_stack/c/sdcc_iy/bv_stack_capacity
+adt/bv_stack/c/sdcc_iy/bv_stack_clear
+adt/bv_stack/c/sdcc_iy/bv_stack_destroy
+adt/bv_stack/c/sdcc_iy/bv_stack_empty
+adt/bv_stack/c/sdcc_iy/bv_stack_init
+adt/bv_stack/c/sdcc_iy/bv_stack_max_size
+adt/bv_stack/c/sdcc_iy/bv_stack_pop
+adt/bv_stack/c/sdcc_iy/bv_stack_push
+adt/bv_stack/c/sdcc_iy/bv_stack_reserve
+adt/bv_stack/c/sdcc_iy/bv_stack_shrink_to_fit
+adt/bv_stack/c/sdcc_iy/bv_stack_size
+adt/bv_stack/c/sdcc_iy/bv_stack_top
