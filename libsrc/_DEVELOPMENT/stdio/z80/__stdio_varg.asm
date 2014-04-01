@@ -7,9 +7,9 @@ LIB __stdio_nextarg_de
 ;
 ; n = number of return addresses on stack
 
-;******************************
-IF __PARAM_ORDER_RL
-;******************************
+;********************************
+IF __SDCC | __SDCC_IX | __SDCC_IY
+;********************************
 
 __stdio_varg_2:
 
@@ -23,7 +23,7 @@ __stdio_varg_2:
    ;
    ; uses  : af, de, hl
 
-IF __SDCC
+IF __SDCC_IX
 
    ld hl,8                     ; all vararg functions save ix and have extra call
 
@@ -37,9 +37,9 @@ ENDIF
    
    jp __stdio_nextarg_de
 
-;******************************
+;********************************
 ELSE
-;******************************
+;********************************
    
 __stdio_varg_2:
 
@@ -54,7 +54,7 @@ __stdio_varg_2:
    ;
    ; uses  : af, de, hl
 
-IF __SDCC
+IF __SDCC_IX
 
    inc a
    inc a                       ; all vararg functions save ix and have extra call
@@ -71,6 +71,6 @@ ENDIF
    
    jp __stdio_nextarg_de
 
-;******************************
+;********************************
 ENDIF
-;******************************
+;********************************
