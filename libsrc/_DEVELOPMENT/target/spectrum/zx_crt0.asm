@@ -1,15 +1,15 @@
 
-; Select crt0 from STARTUP option
+; Select crt0 from __STARTUP option
 
-IF !STARTUP
+IF !__STARTUP
 
    ; STARTUP undefined so select a default
    
-   defc STARTUP = 0
+   defc __STARTUP = 0
 
 ENDIF
 
-IF STARTUP = 0
+IF __STARTUP = 0
 
    ; zx spectrum test target
    

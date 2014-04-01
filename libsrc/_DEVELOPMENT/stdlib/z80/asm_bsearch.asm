@@ -79,7 +79,7 @@ bsearch_loop:
    push ix                     ; save compar
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl

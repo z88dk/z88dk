@@ -121,7 +121,7 @@ left_squeeze:
    push ix                     ; push compare
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push de
@@ -179,7 +179,7 @@ right_loop:
    push ix                     ; push compare
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl
