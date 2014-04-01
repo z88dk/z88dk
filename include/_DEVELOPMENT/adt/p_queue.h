@@ -13,7 +13,7 @@ typedef struct p_queue_s
 
 } p_queue_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -48,4 +48,5 @@ extern void       __LIB__ __CALLEE__    p_queue_push_callee(p_queue_t *q, void *
 #define p_queue_push(a,b)                        p_queue_push_callee(a,b)
 
 #endif
+
 #endif

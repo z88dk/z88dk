@@ -8,7 +8,7 @@
 
 typedef void* p_stack_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -41,4 +41,5 @@ extern void       __LIB__ __CALLEE__    p_stack_push_callee(p_stack_t *s, void *
 #define p_stack_push(a,b)                        p_stack_push_callee(a,b)
 
 #endif
+
 #endif

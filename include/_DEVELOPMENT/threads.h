@@ -18,7 +18,7 @@ typedef struct mtx_s
 
 } mtx_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -65,4 +65,5 @@ extern int    __LIB__ __CALLEE__    mtx_timedlock_callee(mtx_t *m, struct timesp
 #define mtx_timedlock(a,b)          mtx_timedlock_callee(a,b)
 
 #endif
+
 #endif

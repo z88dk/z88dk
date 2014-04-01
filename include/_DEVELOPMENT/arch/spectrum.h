@@ -25,7 +25,7 @@
 #define BRIGHT                      0x40
 #define FLASH                       0x80
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -170,4 +170,5 @@ extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(int x, int y, void *p
 #define zx_pattern_fill(a,b,c,d)    zx_pattern_fill_callee(a,b,c,d)
 
 #endif
+
 #endif

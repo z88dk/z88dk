@@ -15,7 +15,7 @@ typedef struct wa_stack_s
 
 } wa_stack_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -54,4 +54,5 @@ extern int        __LIB__ __CALLEE__    wa_stack_push_callee(wa_stack_t *s, void
 #define wa_stack_push(a,b)                       wa_stack_push_callee(a,b)
 
 #endif
+
 #endif

@@ -15,7 +15,7 @@ typdef struct b_array_s
 
 } b_array_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -107,5 +107,7 @@ extern size_t    __LIB__ __CALLEE__    b_array_write_block_callee(void *src, siz
 #define b_array_read_block(a,b,c,d)              b_array_read_block_callee(void *dst, size_t n, b_array_t *a, size_t idx);
 #define b_array_resize(a,b)                      b_array_resize_callee(b_array_t *a, size_t n);
 #define b_array_write_block(a,b,c,d)             b_array_write_block_callee(void *src, size_t n, b_array_t *a, size_t idx);
+
+#endif
 
 #endif

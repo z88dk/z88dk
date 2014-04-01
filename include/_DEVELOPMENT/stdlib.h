@@ -25,7 +25,7 @@ typedef struct ldiv_s
 
 #define RAND_MAX 32767
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -148,4 +148,5 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 #endif
 
 #endif
+
 #endif

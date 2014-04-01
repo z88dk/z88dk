@@ -15,7 +15,7 @@ typedef struct ba_stack_s
 
 } ba_stack_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -54,4 +54,5 @@ extern int        __LIB__ __CALLEE__    ba_stack_push_callee(ba_stack_t *s, int 
 #define ba_stack_push(a,b)                       ba_stack_push_callee(a,b)
 
 #endif
+
 #endif

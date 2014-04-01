@@ -16,7 +16,7 @@ typedef struct b_vector_s
 
 } b_vector_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -117,5 +117,7 @@ extern size_t     __LIB__ __CALLEE__    b_vector_write_block_callee(void *src, s
 #define b_vector_reserve(a,b)                    b_vector_reserve_callee(a,b)
 #define b_vector_resize(a,b)                     b_vector_resize_callee(a,b)
 #define b_vector_write_block(a,b,c,d)            b_vector_write_block_callee(a,b,c,d)
+
+#endif
 
 #endif

@@ -2,7 +2,7 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -49,4 +49,5 @@ extern int __LIB__ __FASTCALL__ tolower(int);
 extern int __LIB__ __FASTCALL__ toupper(int);
 
 #endif
+
 #endif

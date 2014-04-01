@@ -4,7 +4,7 @@
 
 #include <_DEVELOPMENT/stddef.h>
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -37,4 +37,5 @@ extern void   __LIB__ __CALLEE__   *balloc_firstfit_callee(int q, int numq);
 #define balloc_firstfit(a,b)        balloc_firstfit_callee(a,b)
 
 #endif
+
 #endif

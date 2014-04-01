@@ -4,7 +4,7 @@
 
 #include <_DEVELOPMENT/stddef.h>
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -215,4 +215,5 @@ extern size_t __LIB__ __CALLEE__     strxfrm_callee(char *dst, char *src, size_t
 #define strxfrm(a,b,c)               strxfrm_callee(a,b,c)
 
 #endif
+
 #endif

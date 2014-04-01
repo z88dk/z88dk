@@ -15,7 +15,7 @@ typedef struct w_array_s
 
 } w_array_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -90,4 +90,5 @@ extern int        __LIB__ __CALLEE__    w_array_resize_callee(w_array_t *a, size
 #define w_array_resize(a,b)                      w_array_resize_callee(a,b)
 
 #endif
+
 #endif

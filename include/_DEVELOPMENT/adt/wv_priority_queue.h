@@ -17,7 +17,7 @@ typedef struct wv_priority_queue_s
 
 } wv_priority_queue_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -70,4 +70,5 @@ extern int                 __LIB__ __CALLEE__    wv_priority_queue_resize_callee
 #define wv_priority_queue_resize(a,b)            wv_priority_queue_resize_callee(a,b)
 
 #endif
+
 #endif

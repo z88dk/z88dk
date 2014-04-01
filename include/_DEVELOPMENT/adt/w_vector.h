@@ -16,7 +16,7 @@ typedef struct w_vector_s
 
 } w_vector_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -99,4 +99,5 @@ extern int        __LIB__ __CALLEE__    w_vector_resize_callee(w_vector_t *v, si
 #define w_vector_resize(a,b)                     w_vector_resize_callee(a,b)
 
 #endif
+
 #endif

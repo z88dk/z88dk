@@ -4,7 +4,7 @@
 
 #include <_DEVELOPMENT/stdint.h>
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -27,4 +27,5 @@ extern void   __LIB__               z80_push_int_state(void);
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
 #endif
+
 #endif

@@ -16,7 +16,7 @@ typedef struct ba_priority_queue_s
 
 } ba_priority_queue_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -61,4 +61,5 @@ extern int                 __LIB__ __CALLEE__    ba_priority_queue_resize_callee
 #define ba_priority_queue_resize(a,b)            ba_priority_queue_resize_callee(a,b)
 
 #endif
+
 #endif

@@ -52,7 +52,7 @@ extern struct fzx_state fzx;
 #define FZX_MODE_XOR   0xae00
 #define FZX_MODE_RESET 0xa62f
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -113,7 +113,7 @@ extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 
 // FZX FONTS BY ANDREW OWEN
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 extern struct fzx_font *ff_ao_Aribeth14;
 extern struct fzx_font *ff_ao_Aribeth6;
@@ -251,7 +251,7 @@ extern void __LIB__ _ff_ao_Zaibatsu(void);
 
 // FZX FONTS BY UTZ
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 extern struct fzx_font *ff_utz_1stGrade;
 extern struct fzx_font *ff_utz_Blokz;

@@ -16,7 +16,7 @@ typedef struct wa_priority_queue_s
 
 } wa_priority_queue_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -59,4 +59,5 @@ extern int                 __LIB__ __CALLEE__    wa_priority_queue_resize_callee
 #define wa_priority_queue_resize(a,b)            wa_priority_queue_resize_callee(a,b)
 
 #endif
+
 #endif

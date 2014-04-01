@@ -8,7 +8,7 @@
 
 typedef void* p_forward_list_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -59,4 +59,5 @@ extern void       __LIB__ __CALLEE__   *p_forward_list_remove_callee(p_forward_l
 #define p_forward_list_remove(a,b)               p_forward_list_remove_callee(a,b)
 
 #endif
+
 #endif

@@ -27,7 +27,7 @@ extern FILE *_stdio_file_stderr;
 #define _IOFBF          0
 #define _IOLBF          1
 #define _IONBF          2
-#define BUFSIZ        128
+#define BUFSIZ          1      // this clib uses an alternative to buffering
 
 #define EOF            -1
 
@@ -41,7 +41,7 @@ extern FILE *_stdio_file_stderr;
 #define SEEK_CUR        1
 #define SEEK_END        2
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -300,4 +300,5 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 #define vscanf_unlocked(a,b)        vscanf_unlocked_callee(a,b)
 
 #endif
+
 #endif

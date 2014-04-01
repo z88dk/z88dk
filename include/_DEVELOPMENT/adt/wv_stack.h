@@ -16,7 +16,7 @@ typedef struct wv_stack_s
 
 } wv_stack_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -63,4 +63,5 @@ extern int        __LIB__ __CALLEE__    wv_stack_reserve_callee(wv_stack_t *s, s
 #define wv_stack_reserve(a,b)                    wv_stack_reserve_callee(a,b)
 
 #endif
+
 #endif

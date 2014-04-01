@@ -13,7 +13,7 @@ struct obstack
    void       *end;
 };
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -100,4 +100,5 @@ extern void   __LIB__ __CALLEE__   *obstack_int_grow_fast_callee(struct obstack 
 #define obstack_int_grow_fast(a,b)  obstack_int_grow_fast_callee(a,b)
 
 #endif
+
 #endif

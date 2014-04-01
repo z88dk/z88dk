@@ -14,7 +14,7 @@ typedef struct p_list_s
 
 } p_list_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -71,4 +71,5 @@ extern void       __LIB__ __CALLEE__   *p_list_remove_after_callee(p_list_t *ls,
 #define p_list_remove_after(a,b)                 p_list_remove_after_callee(a,b)
 
 #endif
+
 #endif

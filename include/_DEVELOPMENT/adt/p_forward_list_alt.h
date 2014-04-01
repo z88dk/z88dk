@@ -14,7 +14,7 @@ typedef struct p_forward_list_alt_s
 
 } p_forward_list_alt_t;
 
-#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+#if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
@@ -67,4 +67,5 @@ extern void       __LIB__ __CALLEE__   *p_forward_list_alt_remove_after_callee(p
 #define p_forward_list_alt_remove_after(a,b)     p_forward_list_alt_remove_after_callee(a,b)
 
 #endif
+
 #endif
