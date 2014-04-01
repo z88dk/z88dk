@@ -66,7 +66,7 @@ while:
    push ix                     ; save compar
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl
@@ -124,7 +124,7 @@ small_child_found:
    push ix                     ; save compar
    
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl
@@ -210,7 +210,7 @@ end_while:
    push hl                     ; save & array[parent]
    
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl

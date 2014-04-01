@@ -37,7 +37,7 @@ __w_heap_sift_up:
    push ix                     ; save compar
    
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push hl
