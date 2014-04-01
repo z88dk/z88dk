@@ -122,7 +122,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -v -O2 -I. -IDESTDIR/include/rex -lrex_clib -make-app -DZ80 -DSMALL_C -DREX -D__REX__ -M -Wn39 -Wn40 -DSCCZ80 -Cz+rex
+OPTIONS		 -v -O2 -I. -IDESTDIR/include/rex -lrex_clib -make-app -DZ80  -DREX -D__REX__ -M -Wn39 -Wn40  -Cz+rex
 
 
 # Additional config options for the alternate assemblers

@@ -123,7 +123,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -v -O2 -I. -bna.exe -losca_clib -DZ80 -DSMALL_C -DOSCA -D__OSCA__ -M -DSCCZ80 -Cz+osca
+OPTIONS		 -v -O2 -I. -bna.exe -losca_clib -DZ80  -DOSCA -D__OSCA__ -M  -Cz+osca
 
 
 # Additional config options for the alternate assemblers

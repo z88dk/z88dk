@@ -122,7 +122,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -v -O2 -I. -lpc6001ansi_clib  -DZ80 -DSMALL_C -DPC6001 -D__PC6001__ -M -DSCCZ80 -Cz+nec
+OPTIONS		 -v -O2 -I. -lpc6001ansi_clib  -DZ80  -DPC6001 -D__PC6001__ -M  -Cz+nec
 
 
 # Additional config options for the alternate assemblers

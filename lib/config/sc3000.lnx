@@ -122,7 +122,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -v -O2 -I. -lsc3000_clib -lndos -DZ80 -DSMALL_C -DSC3000 -D__SC3000__ -M -DSCCZ80 -Cz+sc3000
+OPTIONS		 -v -O2 -I. -lsc3000_clib -lndos -DZ80  -DSC3000 -D__SC3000__ -M  -Cz+sc3000
 
 
 # Additional config options for the alternate assemblers
