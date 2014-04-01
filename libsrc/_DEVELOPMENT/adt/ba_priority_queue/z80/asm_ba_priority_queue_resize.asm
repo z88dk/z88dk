@@ -20,11 +20,11 @@
 ;
 ; ===============================================================
 
-XLIB ba_priority_queue_resize
+XLIB asm_ba_priority_queue_resize
 
 LIB __ba_pq_setsize, __b_heap_sift_down, error_einval_mc, error_znc, error_zc
 
-ba_priority_queue_resize:
+asm_ba_priority_queue_resize:
 
    ; enter : hl = queue *
    ;         de = n = desired size in bytes
