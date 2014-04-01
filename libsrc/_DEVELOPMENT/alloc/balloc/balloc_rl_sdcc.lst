@@ -1,6 +1,0 @@
-alloc/balloc/c/rl_sdcc/balloc_addmem
-alloc/balloc/c/rl_sdcc/balloc_alloc
-alloc/balloc/c/rl_sdcc/balloc_blockcount
-alloc/balloc/c/rl_sdcc/balloc_firstfit
-alloc/balloc/c/rl_sdcc/balloc_free
-alloc/balloc/c/rl_sdcc/balloc_init

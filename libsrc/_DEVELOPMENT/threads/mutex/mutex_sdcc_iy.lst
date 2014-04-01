@@ -1,0 +1,9 @@
+threads/mutex/c/sdcc_iy/mtx_destroy
+threads/mutex/c/sdcc_iy/mtx_init
+threads/mutex/c/sdcc_iy/mtx_lock
+threads/mutex/c/sdcc_iy/mtx_timedlock
+threads/mutex/c/sdcc_iy/mtx_trylock
+threads/mutex/c/sdcc_iy/mtx_unlock
+threads/mutex/c/sdcc_iy/spinlock_acquire
+threads/mutex/c/sdcc_iy/spinlock_release
+threads/mutex/c/sdcc_iy/spinlock_tryacquire

@@ -1,0 +1,3 @@
+arch/spectrum/c/sdcc_ix/zx_border
+@arch/spectrum/display/display_sdcc_ix.lst
+@arch/spectrum/graphics/graphics_prims_sdcc_ix.lst

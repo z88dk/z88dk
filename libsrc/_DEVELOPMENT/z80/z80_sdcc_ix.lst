@@ -1,0 +1,4 @@
+z80/c/sdcc_ix/z80_delay_ms
+z80/c/sdcc_ix/z80_delay_tstate
+z80/c/sdcc_ix/z80_pop_int_state
+z80/c/sdcc_ix/z80_push_int_state
