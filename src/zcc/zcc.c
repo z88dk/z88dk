@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.64 2014-04-01 21:00:58 dom Exp $
+ *      $Id: zcc.c,v 1.65 2014-04-01 21:13:21 dom Exp $
  */
 
 
@@ -744,10 +744,25 @@ int main(int argc, char **argv)
 int copy_file(char *name1, char *ext1, char *name2, char *ext2)
 {
     char            buffer[LINEMAX + 1];
+    char           *cmd;
+    int             ret;
+    
     snprintf(buffer, sizeof(buffer), "%s %s%s %s%s",c_copycmd, name1, ext1, name2, ext2);
+#ifdef WIN32
+	/* Argh....annoying */
+	if ( strcmp(c_copycmd,"copy") == 0 ) {
+		cmd = replace_str(buffer, "/", "\\");
+	} else {
+	    cmd = strdup(buffer);
+	}
+#else
+    cmd = strdup(buffer);
+#endif
     if (verbose)
         printf("%s\n", buffer);
-    return (system(buffer));
+    ret = (system(buffer));
+    free(cmd);
+    return ret;
 }
 
 
