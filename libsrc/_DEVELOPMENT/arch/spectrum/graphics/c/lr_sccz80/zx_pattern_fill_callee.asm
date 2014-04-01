@@ -9,12 +9,10 @@ zx_pattern_fill_callee:
    pop bc
    pop de
    pop hl
-   exx
-   pop bc
+   pop ix
    push af
    
-   ld a,c
-   exx
+   ld a,ixl
    ld h,l
    ld l,a
    

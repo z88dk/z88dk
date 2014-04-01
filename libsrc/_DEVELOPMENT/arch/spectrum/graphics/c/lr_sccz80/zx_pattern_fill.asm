@@ -11,20 +11,16 @@ zx_pattern_fill:
    pop bc
    pop de
    pop hl
-   exx
-   pop bc
+   pop ix
    
-   push bc
-   exx
+   push ix
    push hl
    push de
    push bc
    push af
    
+   ld a,ixl
    ld h,l
-   exx
-   ld a,c
-   exx
    ld l,a
    
    jp asm_zx_pattern_fill
