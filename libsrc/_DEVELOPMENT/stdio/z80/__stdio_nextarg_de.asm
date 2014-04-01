@@ -13,7 +13,7 @@ __stdio_nextarg_de:
    ; uses  : de, hl
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    ld e,(hl)

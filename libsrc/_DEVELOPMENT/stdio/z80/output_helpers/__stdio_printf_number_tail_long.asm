@@ -31,7 +31,7 @@ __stdio_printf_number_tail_long:
    jr z, zero                  ; if integer is zero
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    ex de,hl                    ; dehl = long
@@ -76,7 +76,7 @@ __stdio_printf_number_tail_ulong:
    jr z, zero                  ; if long is zero
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    ex de,hl                    ; dehl = long

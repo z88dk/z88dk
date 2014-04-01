@@ -28,7 +28,7 @@ __stdio_printf_ii:
    ; write octets to buffer
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    push de                     ; save LSW of long

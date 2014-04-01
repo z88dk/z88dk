@@ -13,7 +13,7 @@ __stdio_nextarg_bc:
    ; uses  : bc, hl
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    ld c,(hl)

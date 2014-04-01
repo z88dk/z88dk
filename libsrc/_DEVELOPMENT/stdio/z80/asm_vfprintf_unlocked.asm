@@ -706,7 +706,7 @@ printf_return_4:
    pop bc
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    inc bc
@@ -737,7 +737,7 @@ printf_return_2:
 _return_join:
 
 ;******************************
-IF __PARAM_ORDER_RL
+IF __SDCC | __SDCC_IX | __SDCC_IY
 ;******************************
 
    inc bc
