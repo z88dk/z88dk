@@ -16,6 +16,35 @@ typedef struct w_vector_s
 
 } w_vector_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern size_t      w_vector_append(w_vector_t *v, void *item);
+extern size_t      w_vector_append_n(w_vector_t *v, size_t n, void *item);
+extern void        w_vector_at(w_vector_t *v, size_t idx);
+extern void       *w_vector_back(w_vector_t *v);
+extern size_t      w_vector_capacity(w_vector_t *v);
+extern void        w_vector_clear(w_vector_t *v);
+extern void       *w_vector_data(w_vector_t *v);
+extern void        w_vector_destroy(w_vector_t *v);
+extern void        w_vector_empty(w_vector_t *v);
+extern size_t      w_vector_erase(w_vector_t *v, size_t idx);
+extern size_t      w_vector_erase_range(w_vector_t *v, size_t idx_first, size_t idx_last);
+extern void       *w_vector_front(w_vector_t *v);
+extern w_vector_t *w_vector_init(void *p, size_t capacity, size_t max_size);
+extern size_t      w_vector_insert(w_vector_t *v, size_t idx, void *item);
+extern size_t      w_vector_insert_n(w_vector_t *v, size_t idx, size_t n, void *item);
+extern void       *w_vector_max_size(w_vector_t *v);
+extern void       *w_vector_pop_back(w_vector_t *v);
+extern size_t      w_vector_push_back(w_vector_t *v, void *item);
+extern int         w_vector_reserve(w_vector_t *v, size_t n);
+extern int         w_vector_resize(w_vector_t *v, size_t n);
+extern int         w_vector_shrink_to_fit(w_vector_t *v);
+extern size_t      w_vector_size(w_vector_t *v);
+
+#else
+
 // SCCZ80
 
 extern size_t     __LIB__               w_vector_append(w_vector_t *v, void *item);
@@ -69,4 +98,5 @@ extern int        __LIB__ __CALLEE__    w_vector_resize_callee(w_vector_t *v, si
 #define w_vector_reserve(a,b)                    w_vector_reserve_callee(a,b)
 #define w_vector_resize(a,b)                     w_vector_resize_callee(a,b)
 
+#endif
 #endif

@@ -13,6 +13,21 @@ typedef struct p_queue_s
 
 } p_queue_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void       *p_queue_back(p_queue_t *q);
+extern void        p_queue_clear(p_queue_t *q);
+extern int         p_queue_empty(p_queue_t *q);
+extern void       *p_queue_front(p_queue_t *q);
+extern void        p_queue_init(void *p);
+extern void       *p_queue_pop(p_queue_t *q);
+extern void        p_queue_push(p_queue_t *q, void *item);
+extern size_t      p_queue_size(p_queue_t *q);
+
+#else
+
 // SCCZ80
 
 extern void       __LIB__ __FASTCALL__ *p_queue_back(p_queue_t *q);
@@ -32,4 +47,5 @@ extern void       __LIB__ __CALLEE__    p_queue_push_callee(p_queue_t *q, void *
 
 #define p_queue_push(a,b)                        p_queue_push_callee(a,b)
 
+#endif
 #endif

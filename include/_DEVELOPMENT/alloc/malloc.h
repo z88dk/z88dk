@@ -4,6 +4,50 @@
 
 #include <_DEVELOPMENT/stddef.h>
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void   *_falloc(void *p, size_t size);
+extern void   *heap_alloc(void *heap, size_t size);
+extern void   *heap_alloc_aligned(void *heap, size_t alignment, size_t size);
+extern void   *heap_alloc_fixed(void *heap, void *p, size_t size);
+extern void   *heap_calloc(void *heap, size_t nmemb, size_t size);
+extern void   *heap_destroy(void *heap);
+extern void    heap_free(void *heap, void *p);
+extern void   *heap_init(void *heap, size_t size);
+extern void   *heap_realloc(void *heap, void *p, size_t size);
+extern void   *memalign(size_t alignment, size_t size);
+extern int     posix_memalign(void **memptr, size_t alignment, size_t size);
+
+extern void   *_falloc_unlocked(void *p, size_t size);
+extern void   *heap_alloc_unlocked(void *heap, size_t size);
+extern void   *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size);
+extern void   *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size);
+extern void   *heap_calloc_unlocked(void *heap, size_t nmemb, size_t size);
+extern void    heap_free_unlocked(void *heap, void *p);
+extern void   *heap_realloc_unlocked(void *heap, void *p, size_t size);
+extern void   *memalign_unlocked(size_t alignment, size_t size);
+extern int     posix_memalign_unlocked(void **memptr, size_t alignment, size_t size);
+
+extern void   *aligned_alloc_unlocked(size_t alignment, size_t size);
+extern void   *calloc_unlocked(size_t nmemb, size_t size);
+extern void    free_unlocked(void *p);
+extern void   *malloc_unlocked(size_t size);
+extern void   *realloc_unlocked(void *p, size_t size);
+
+#ifndef _STDLIB_H
+
+extern void   *aligned_alloc(size_t alignment, size_t size);
+extern void   *calloc(size_t nmemb, size_t size);
+extern void    free(void *p);
+extern void   *malloc(size_t size);
+extern void   *realloc(void *p, size_t size);
+
+#endif
+
+#else
+
 // SCCZ80
 
 extern void   __LIB__              *_falloc(void *p, size_t size);
@@ -114,4 +158,5 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 
 #endif
 
+#endif
 #endif

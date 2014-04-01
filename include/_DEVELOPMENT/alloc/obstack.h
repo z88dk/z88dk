@@ -13,6 +13,33 @@ struct obstack
    void       *end;
 };
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void   *obstack_1grow(struct obstack *ob, int c);
+extern void   *obstack_1grow_fast(struct obstack *ob, int c);
+extern size_t  obstack_align_distance(struct obstack *ob, size_t alignment);
+extern int     obstack_align_to(struct obstack *ob, size_t alignment);
+extern void   *obstack_alloc(struct obstack *ob, size_t size);
+extern void   *obstack_base(struct obstack *ob);
+extern void   *obstack_blank(struct obstack *ob, int size);
+extern void   *obstack_blank_fast(struct obstack *ob, int size);
+extern void   *obstack_copy(struct obstack *ob, void *p, size_t size);
+extern void   *obstack_copy0(struct obstack *ob, void *p, size_t size);
+extern void   *obstack_finish(struct obstack *ob);
+extern void   *obstack_free(struct obstack *ob, void *object);
+extern int     obstack_grow(struct obstack *ob, void *data, size_t size);
+extern int     obstack_grow0(struct obstack *ob, void *data, size_t size);
+extern void   *obstack_init(struct obstack *ob, size_t size);
+extern void   *obstack_int_grow(struct obstack *ob, int data);
+extern void   *obstack_int_grow_fast(struct obstack *ob, int data);
+extern void   *obstack_next_free(struct obstack *ob);
+extern size_t  obstack_object_size(struct obstack *ob);
+extern size_t  obstack_room(struct obstack *ob);
+
+#else
+
 // SCCZ80
 
 extern void   __LIB__              *obstack_1grow(struct obstack *ob, int c);
@@ -72,4 +99,5 @@ extern void   __LIB__ __CALLEE__   *obstack_int_grow_fast_callee(struct obstack 
 #define obstack_int_grow(a,b)       obstack_int_grow_callee(a,b)
 #define obstack_int_grow_fast(a,b)  obstack_int_grow_fast_callee(a,b)
 
+#endif
 #endif

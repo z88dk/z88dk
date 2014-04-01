@@ -16,6 +16,25 @@ typedef struct bv_stack_s
 
 } bv_stack_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern size_t      bv_stack_capacity(bv_stack_t *s);
+extern void        bv_stack_clear(bv_stack_t *s);
+extern void        bv_stack_destroy(bv_stack_t *s);
+extern int         bv_stack_empty(bv_stack_t *s);
+extern bv_stack_t *bv_stack_init(void *p, size_t capacity, size_t max_size);
+extern size_t      bv_stack_max_size(bv_stack_t *s);
+extern int         bv_stack_pop(bv_stack_t *s);
+extern int         bv_stack_push(bv_stack_t *s, int c);
+extern int         bv_stack_reserve(bv_stack_t *s, size_t n);
+extern int         bv_stack_shrink_to_fit(bv_stack_t *s);
+extern size_t      bv_stack_size(bv_stack_t *s);
+extern int         bv_stack_top(bv_stack_t *s);
+
+#else
+
 // SCCZ80
 
 extern size_t     __LIB__ __FASTCALL__  bv_stack_capacity(bv_stack_t *s);
@@ -43,4 +62,5 @@ extern int        __LIB__ __CALLEE__    bv_stack_reserve_callee(bv_stack_t *s, s
 #define bv_stack_push(a,b)                       bv_stack_push_callee(a,b)
 #define bv_stack_reserve(a,b)                    bv_stack_reserve_callee(a,b)
 
+#endif
 #endif

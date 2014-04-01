@@ -4,6 +4,67 @@
 
 #include <_DEVELOPMENT/stddef.h>
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern char   *_memlwr(void *p, size_t n);
+extern char   *_memstrcpy(void *p, char *s, size_t n);
+extern char   *_memupr(void *p, size_t n);
+extern char   *_strrstrip(char *s);
+extern int     ffs(int i);
+extern int     ffsl(long i);
+extern void   *memccpy(void *dst, void *src, int c, size_t n);
+extern void   *memchr(void *s, int c, size_t n);
+extern int     memcmp(void *s1, void *s2, size_t n);
+extern void   *memcpy(void *dst, void *src, size_t n);
+extern void   *memmem(void *haystack, size_t haystack_len, void *needle, size_t needle_len);
+extern void   *memmove(void *dst, void *src, size_t n);
+extern void   *memrchr(void *s, int c, size_t n);
+extern void   *memset(void *s, int c, size_t n);
+extern void   *memswap(void *s1, void *s2, size_t n);
+extern char   *stpcpy(char *dst, char *src);
+extern char   *stpncpy(char *dst, char *src, size_t n);
+extern int     strcasecmp(char *s1, char *s2);
+extern char   *strcat(char *dst, char *src);
+extern char   *strchr(char *s, int c);
+extern char   *strchrnul(char *s, int c);
+extern int     strcmp(char *s1, char *s2);
+extern int     strcoll(char *s1, char *s2);
+extern char   *strcpy(char *dst, char *src);
+extern size_t  strcspn(char *s, char *nspn);
+extern char   *strdup(char *s);
+extern char   *strerror(int errnum);
+extern int     stricmp(char *s1, char *s2);
+extern size_t  strlcat(char *dst, char *src, size_t n);
+extern size_t  strlcpy(char *dst, char *src, size_t n);
+extern size_t  strlen(char *s);
+extern char    strlwr(char *s);
+extern int     strncasecmp(char *s1, char *s2, size_t n);
+extern char   *strncat(char *dst, char *src, size_t n);
+extern char   *strnchr(char *s, size_t n, int c);
+extern int     strncmp(char *s1, char *s2, size_t n);
+extern char   *strncpy(char *dst, char *src, size_t n);
+extern char   *strndup(char *s, size_t n);
+extern int     strnicmp(char *s1, char *s2, size_t n);
+extern size_t  strnlen(char *s, size_t max_len);
+extern char    strpbrk(char *s, char *set);
+extern char   *strrchr(char *s, int c);
+extern size_t  strrcspn(char *s, char *set);
+extern char   *strrev(char *s);
+extern size_t  strrspn(char *s, char *set);
+extern char   *strrstrip(char *s);
+extern char   *strsep(char **s, char *delim);
+extern size_t  strspn(char *s, char *pfx);
+extern char   *strstr(char *s, char *subs);
+extern char   *strstrip(char *s);
+extern char   *strtok(char *s, char *delim);
+extern char   *strtok_r(char *s, char *delim, char **last_s);
+extern char    strupr(char *s);
+extern size_t  strxfrm(char *dst, char *src, size_t n);
+
+#else
+
 // SCCZ80 
 
 extern char   __LIB__               *_memlwr(void *p, size_t n);
@@ -153,4 +214,5 @@ extern size_t __LIB__ __CALLEE__     strxfrm_callee(char *dst, char *src, size_t
 #define strtok_r(a,b,c)              strtok_r_callee(a,b,c)
 #define strxfrm(a,b,c)               strxfrm_callee(a,b,c)
 
+#endif
 #endif

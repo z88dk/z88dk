@@ -41,6 +41,93 @@ extern FILE *_stdio_file_stderr;
 #define SEEK_CUR        1
 #define SEEK_END        2
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern FILE   *_fmemopen(void **bufp, size_t *sizep, char *mode);
+extern int     asprintf(char **ptr, char *format, ...);
+extern void    clearerr(FILE *stream);
+extern int     feof(FILE *stream);
+extern int     ferror(FILE *stream);
+extern int     fflush(FILE *stream);
+extern int     fgetc(FILE *stream);
+extern int     fgetpos(FILE *stream, fpos_t *pos);
+extern char   *fgets(char *s, int n, FILE *stream);
+extern void    flockfile(FILE *stream);
+extern FILE   *fmemopen(void *buf, size_t size, char *mode);
+extern int     fprintf(FILE *stream, char *format, ...);
+extern int     fputc(int c, FILE *stream);
+extern int     fputs(char *s, FILE *stream);
+extern size_t  fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern int     fscanf(FILE *stream, char *format, ...);
+extern int     fseek(FILE *stream, long offset, int whence);
+extern int     fsetpos(FILE *stream, fpos_t *pos);
+extern uint32_t  ftell(FILE *stream);
+extern int     ftrylockfile(FILE *stream);
+extern void    funlockfile(FILE *stream);
+extern size_t  fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern int     getc(FILE *stream);
+extern int     getchar(void);
+extern size_t  getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
+extern size_t  getline(char **lineptr, size_t *n, FILE *stream);
+extern char    gets(char *s);
+extern int     obstack_printf(struct obstack *ob, char *format, ...);
+extern int     obstack_vprintf(struct obstack *ob, char *format, void *arg);
+extern FILE   *open_memstream(char **bufp, size_t *sizep);
+extern void    perror(char *s);
+extern int     printf(char *format, ...);
+extern int     putc(int c, FILE *stream);
+extern int     putchar(int c);
+extern int     puts(char *s);
+extern int     scanf(char *format, ...);
+extern int     snprintf(char *s, size_t n, char *format, ...);
+extern int     sprintf(char *s, char *format, ...);
+extern int     sscanf(char *s, char *format, ...);
+extern int     ungetc(int c, FILE *stream);
+extern int     vasprintf(char **ptr, char *format, void *arg);
+extern int     vfprintf(FILE *stream, char *format, void *arg);
+extern int     vfscanf(FILE *stream, char *format, void *arg);
+extern int     vprintf(char *format, void *arg);
+extern int     vscanf(char *format, void *arg);
+extern int     vsnprintf(char *s, size_t n, char *format, void *arg);
+extern int     vsprintf(char *s, char *format, void *arg);
+extern int     vsscanf(char *s, char *format, void *arg);
+
+extern void    clearerr_unlocked(FILE *stream);
+extern int     feof_unlocked(FILE *stream);
+extern int     ferror_unlocked(FILE *stream);
+extern int     fflush_unlocked(FILE *stream);
+extern int     fgetc_unlocked(FILE *stream);
+extern int     fgetpos_unlocked(FILE *stream, fpos_t *pos);
+extern char   *fgets_unlocked(char *s, int n, FILE *stream);
+extern int     fprintf_unlocked(FILE *stream, char *format, ...);
+extern int     fputc_unlocked(int c, FILE *stream);
+extern int     fputs_unlocked(char *s, FILE *stream);
+extern size_t  fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern int     fscanf_unlocked(FILE *stream, char *format, ...);
+extern int     fseek_unlocked(FILE *stream, long offset, int whence);
+extern int     fsetpos_unlocked(FILE *stream, fpos_t *pos);
+extern uint32_t  ftell_unlocked(FILE *stream);
+extern size_t  fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern int     getc_unlocked(FILE *stream);
+extern int     getchar_unlocked(void);
+extern size_t  getdelim_unlocked(char **lineptr, size_t *n, int delim, FILE *stream);
+extern size_t  getline_unlocked(char **lineptr, size_t *n, FILE *stream);
+extern char    gets_unlocked(char *s);
+extern int     printf_unlocked(char *format, ...);
+extern int     putc_unlocked(int c, FILE *stream);
+extern int     putchar_unlocked(int c);
+extern int     puts_unlocked(char *s);
+extern int     scanf_unlocked(char *format, ...);
+extern int     ungetc_unlocked(int c, FILE *stream);
+extern int     vfprintf_unlocked(FILE *stream, char *format, void *arg);
+extern int     vfscanf_unlocked(FILE *stream, char *format, void *arg);
+extern int     vprintf_unlocked(char *format, void *arg);
+extern int     vscanf_unlocked(char *format, void *arg);
+
+#else
+
 // SCCZ80
 
 extern FILE   __LIB__              *_fmemopen(void **bufp, size_t *sizep, char *mode);
@@ -212,4 +299,5 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 #define vprintf_unlocked(a,b)       vprintf_unlocked_callee(a,b)
 #define vscanf_unlocked(a,b)        vscanf_unlocked_callee(a,b)
 
+#endif
 #endif

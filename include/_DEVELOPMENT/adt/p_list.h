@@ -14,6 +14,27 @@ typedef struct p_list_s
 
 } p_list_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void       *p_list_back(p_list_t *ls);
+extern void        p_list_clear(p_list_t *ls);
+extern int         p_list_empty(p_list_t *ls);
+extern void       *p_list_front(p_list_t *ls);
+extern void        p_list_init(void *p);
+extern void       *p_list_insert(p_list_t *ls, void *ls_item, void *item);
+extern void       *p_list_insert_after(p_list_t *ls, void *ls_item, void *item);
+extern void       *p_list_pop_back(p_list_t *ls);
+extern void       *p_list_pop_front(p_list_t *ls);
+extern void       *p_list_push_back(p_list_t *ls, void *item);
+extern void       *p_list_push_front(p_list_t *ls, void *item);
+extern void       *p_list_remove(p_list_t *ls, void *item);
+extern void       *p_list_remove_after(p_list_t *ls, void *ls_item);
+extern size_t      p_list_size(p_list_t *ls);
+
+#else
+
 // SCCZ80
 
 extern void       __LIB__ __FASTCALL__ *p_list_back(p_list_t *ls);
@@ -49,4 +70,5 @@ extern void       __LIB__ __CALLEE__   *p_list_remove_after_callee(p_list_t *ls,
 #define p_list_remove(a,b)                       p_list_remove_callee(a,b)
 #define p_list_remove_after(a,b)                 p_list_remove_after_callee(a,b)
 
+#endif
 #endif

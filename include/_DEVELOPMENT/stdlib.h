@@ -23,6 +23,48 @@ typedef struct ldiv_s
 
 } ldiv_t;
 
+#define RAND_MAX 32767
+
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void      _div(div_t *d, int numer, int denom);
+extern void      _ldiv(ldiv_t *ld, long numer, long denom);
+extern int       _strtoi(char *nptr, char **endptr, int base);
+extern uint16_t  _strtou(char *nptr, char **endptr, int base);
+extern int       abs(int j);
+extern int       at_quick_exit(void *func);
+extern int       atexit(void *func);
+extern int       atoi(char *buf);
+extern long      atol(char *buf);
+extern void      bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
+extern void      exit(int status);
+extern char     *itoa(int num, char *buf, int radix);
+extern long      labs(long j);
+extern char     *ltoa(long num, char *buf, int radix);
+extern void      qsort(void *base, size_t nmemb, size_t size, void *compar);
+extern void      quick_exit(int status);
+extern int       rand(void);
+extern void      srand(uint16_t seed);
+extern long      strtol(char *nptr, char **endptr, int base);
+extern uint32_t  strtoul(char *nptr, char **endptr, int base);
+extern int       system(char *s);
+extern char     *ultoa(uint32_t num, char *buf, int radix);
+extern char     *utoa(uint16_t num, char *buf, int radix);
+
+#ifndef _ALLOC_MALLOC_H
+
+extern void  *aligned_alloc(size_t alignment, size_t size);
+extern void  *calloc(size_t nmemb, size_t size);
+extern void   free(void *p);
+extern void  *malloc(size_t size);
+extern void  *realloc(void *p, size_t size);
+
+#endif
+
+#else
+
 // SCCZ80
 
 extern void      __LIB__               _div(div_t *d, int numer, int denom);
@@ -105,4 +147,5 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 
 #endif
 
+#endif
 #endif

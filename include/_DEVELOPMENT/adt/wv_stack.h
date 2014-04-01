@@ -16,6 +16,25 @@ typedef struct wv_stack_s
 
 } wv_stack_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern size_t      wv_stack_capacity(wv_stack_t *s);
+extern void        wv_stack_clear(wv_stack_t *s);
+extern void        wv_stack_destroy(wv_stack_t *s);
+extern int         wv_stack_empty(wv_stack_t *s);
+extern wv_stack_t *wv_stack_init(void *p, size_t capacity, size_t max_size);
+extern size_t      wv_stack_max_size(wv_stack_t *s);
+extern void       *wv_stack_pop(wv_stack_t *s);
+extern int         wv_stack_push(wv_stack_t *s, void *item);
+extern int         wv_stack_reserve(wv_stack_t *s, size_t n);
+extern int         wv_stack_shrink_to_fit(wv_stack_t *s);
+extern size_t      wv_stack_size(wv_stack_t *s);
+extern void       *wv_stack_top(wv_stack_t *s);
+
+#else
+
 // SCCZ80
 
 extern size_t     __LIB__ __FASTCALL__  wv_stack_capacity(wv_stack_t *s);
@@ -43,4 +62,5 @@ extern int        __LIB__ __CALLEE__    wv_stack_reserve_callee(wv_stack_t *s, s
 #define wv_stack_push(a,b)                       wv_stack_push_callee(a,b)
 #define wv_stack_reserve(a,b)                    wv_stack_reserve_callee(a,b)
 
+#endif
 #endif

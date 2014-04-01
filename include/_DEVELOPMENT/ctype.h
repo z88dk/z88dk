@@ -2,6 +2,31 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern int isalnum(int);
+extern int isalpha(int);
+extern int isascii(int);
+extern int isbdigit(int);
+extern int isblank(int);
+extern int iscntrl(int);
+extern int isdigit(int);
+extern int isgraph(int);
+extern int islower(int);
+extern int isodigit(int);
+extern int isprint(int);
+extern int ispunct(int);
+extern int isspace(int);
+extern int isupper(int);
+extern int isxdigit(int);
+extern int toascii(int);
+extern int tolower(int);
+extern int toupper(int);
+
+#else
+
 // SCCZ80
 
 extern int __LIB__ __FASTCALL__ isalnum(int);
@@ -23,4 +48,5 @@ extern int __LIB__ __FASTCALL__ toascii(int);
 extern int __LIB__ __FASTCALL__ tolower(int);
 extern int __LIB__ __FASTCALL__ toupper(int);
 
+#endif
 #endif

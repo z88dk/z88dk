@@ -25,9 +25,11 @@
 #define BRIGHT                      0x40
 #define FLASH                       0x80
 
-// SCCZ80
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
 
-extern void   __LIB__ __FASTCALL__  zx_border(int colour);
+// SDCC
+
+extern void    zx_border(int colour);
 
 // display
 
@@ -58,6 +60,51 @@ extern void   __LIB__ __FASTCALL__  zx_border(int colour);
 // to test the carry flag and determine if invalid results are returned.  Check with the
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
+
+extern int     zx_aaddr2cx(void *aaddr);
+extern int     zx_aaddr2cy(void *aaddr);
+extern int     zx_aaddr2px(void *aaddr);
+extern int     zx_aaddr2py(void *aaddr);
+extern void   *zx_aaddr2saddr(void *aaddr);
+extern void   *zx_aaddrcdown(void *aaddr);
+extern void   *zx_aaddrcleft(void *aaddr);
+extern void   *zx_aaddrcright(void *aaddr);
+extern void   *zx_aaddrcup(void *aaddr);
+extern int     zx_bitmask2px(int bitmask);
+extern void   *zx_cy2aaddr(int row);
+extern void   *zx_cy2saddr(int row);
+extern void   *zx_cyx2aaddr(int row, int col);
+extern void   *zx_cyx2saddr(int row, int col);
+extern int     zx_px2bitmask(int x);
+extern void   *zx_pxy2aaddr(int x, int y);
+extern void   *zx_pxy2saddr(int x, int y);
+extern void   *zx_py2aaddr(int y);
+extern void   *zx_py2saddr(int y);
+extern void   *zx_saddr2aaddr(void *saddr);
+extern int     zx_saddr2cx(void *saddr);
+extern int     zx_saddr2cy(void *saddr);
+extern int     zx_saddr2px(void *saddr);
+extern int     zx_saddr2py(void *saddr);
+extern void   *zx_saddrcdown(void *saddr);
+extern void   *zx_saddrcleft(void *saddr);
+extern void   *zx_saddrcright(void *saddr);
+extern void   *zx_saddrcup(void *saddr);
+extern void   *zx_saddrpdown(void *saddr);
+extern void   *zx_saddrpleft(void *saddr, int bitmask);
+extern void   *zx_saddrpright(void *saddr, int bitmask);
+extern void   *zx_saddrpup(void *saddr);
+
+// graphics
+
+extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
+
+#else
+
+// SCCZ80
+
+extern void   __LIB__ __FASTCALL__  zx_border(int colour);
+
+// display
 
 extern int   __LIB__ __FASTCALL__  zx_aaddr2cx(void *aaddr);
 extern int   __LIB__ __FASTCALL__  zx_aaddr2cy(void *aaddr);
@@ -122,4 +169,5 @@ extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(int x, int y, void *p
 
 #define zx_pattern_fill(a,b,c,d)    zx_pattern_fill_callee(a,b,c,d)
 
+#endif
 #endif

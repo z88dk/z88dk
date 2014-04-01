@@ -4,6 +4,19 @@
 
 #include <_DEVELOPMENT/stddef.h>
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern void   *balloc_addmem(int q, size_t num, size_t size, void *p);
+extern void   *balloc_alloc(int q);
+extern size_t  balloc_blockcount(int q);
+extern void   *balloc_firstfit(int q, int numq);
+extern void    balloc_free(void *p);
+extern void    balloc_init(int numq);
+
+#else
+
 // SCCZ80
 
 extern void   __LIB__              *balloc_addmem(int q, size_t num, size_t size, void *p);
@@ -23,4 +36,5 @@ extern void   __LIB__ __CALLEE__   *balloc_firstfit_callee(int q, int numq);
 #define balloc_addmem(a,b,c,d)      balloc_addmem_callee(a,b,c,d)
 #define balloc_firstfit(a,b)        balloc_firstfit_callee(a,b)
 
+#endif
 #endif

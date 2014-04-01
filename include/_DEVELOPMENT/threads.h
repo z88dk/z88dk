@@ -18,6 +18,24 @@ typedef struct mtx_s
 
 } mtx_t;
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+// mutex
+
+extern void   mtx_destroy(mtx_t *m);
+extern int    mtx_init(mtx_t *m, int type);
+extern int    mtx_lock(mtx_t *m);
+extern int    mtx_timedlock(mtx_t *m, struct timespec *ts);
+extern int    mtx_trylock(mtx_t *m);
+extern int    mtx_unlock(mtx_t *m);
+extern void   spinlock_acquire(char *spinlock);
+extern void   spinlock_release(char *spinlock);
+extern int    spinlock_tryacquire(char *spinlock);
+
+#else
+
 // SCCZ80
 
 // mutex
@@ -46,4 +64,5 @@ extern int    __LIB__ __CALLEE__    mtx_timedlock_callee(mtx_t *m, struct timesp
 #define mtx_init(a,b)               mtx_init_callee(a,b)
 #define mtx_timedlock(a,b)          mtx_timedlock_callee(a,b)
 
+#endif
 #endif

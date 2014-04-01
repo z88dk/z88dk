@@ -52,6 +52,25 @@ extern struct fzx_state fzx;
 #define FZX_MODE_XOR   0xae00
 #define FZX_MODE_RESET 0xa62f
 
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+// SDCC
+
+extern uint16_t   fzx_buffer_extent(void *buf, size_t len);
+extern char      *fzx_buffer_partition(void *buf, size_t len, uint16_t width);
+extern char      *fzx_buffer_partition_ww(void *buf, size_t len, uint16_t width);
+extern int        fzx_char_metrics(struct fzx_cmetric *m, char c);
+extern int        fzx_mode(int mode);
+extern int        fzx_putc(char c);
+extern int        fzx_puts(char *s);
+extern int        fzx_setat(uint16_t y, uint16_t x);
+extern uint16_t   fzx_string_extent(char *s);
+extern char      *fzx_string_partition(char *s, uint16_t width);
+extern char      *fzx_string_partition_ww(char *s, uint16_t width);
+extern int        fzx_write(void *buf, size_t len);
+
+#else
+
 // SCCZ80
 
 extern uint16_t   __LIB__               fzx_buffer_extent(void *buf, size_t len);
@@ -89,7 +108,57 @@ extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 #define fzx_string_partition_ww(a,b)       fzx_string_partition_callee(a,b)
 #define fzx_write(a,b)                     fzx_write_callee(a,b)
 
+#endif
+
+
 // FZX FONTS BY ANDREW OWEN
+
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_ao_Aribeth14;
+extern struct fzx_font *ff_ao_Aribeth6;
+extern struct fzx_font *ff_ao_Aribeth8;
+extern struct fzx_font *ff_ao_Arkade;
+extern struct fzx_font *ff_ao_Blackadder;
+extern struct fzx_font *ff_ao_Cayeux;
+extern struct fzx_font *ff_ao_Cheveron;
+extern struct fzx_font *ff_ao_Chloe;
+extern struct fzx_font *ff_ao_Dutch;
+extern struct fzx_font *ff_ao_GenevaMonoBold;
+extern struct fzx_font *ff_ao_GenevaMonoBoldItalic;
+extern struct fzx_font *ff_ao_GenevaMonoCyrillic;
+extern struct fzx_font *ff_ao_GenevaMonoItalic;
+extern struct fzx_font *ff_ao_GenevaMonoRoman;
+extern struct fzx_font *ff_ao_GenevaMonoSymbol;
+extern struct fzx_font *ff_ao_Grotesk;
+extern struct fzx_font *ff_ao_Hemery;
+extern struct fzx_font *ff_ao_Hiroshi;
+extern struct fzx_font *ff_ao_Jangeborg;
+extern struct fzx_font *ff_ao_Kaitaia;
+extern struct fzx_font *ff_ao_Klausjahn;
+extern struct fzx_font *ff_ao_Lettera;
+extern struct fzx_font *ff_ao_Napier;
+extern struct fzx_font *ff_ao_Newbrand;
+extern struct fzx_font *ff_ao_OldEnglish;
+extern struct fzx_font *ff_ao_OpenDyslexic;
+extern struct fzx_font *ff_ao_Orion;
+extern struct fzx_font *ff_ao_Prefect;
+extern struct fzx_font *ff_ao_Programmer;
+extern struct fzx_font *ff_ao_RoundelSans;
+extern struct fzx_font *ff_ao_RoundelSerif;
+extern struct fzx_font *ff_ao_Sabon;
+extern struct fzx_font *ff_ao_Sinclair;
+extern struct fzx_font *ff_ao_SoixanteQuatre;
+extern struct fzx_font *ff_ao_Soxz;
+extern struct fzx_font *ff_ao_SpecDings;
+extern struct fzx_font *ff_ao_Swiss;
+extern struct fzx_font *ff_ao_Trader;
+extern struct fzx_font *ff_ao_Twombly;
+extern struct fzx_font *ff_ao_Vickers;
+extern struct fzx_font *ff_ao_Videotex;
+extern struct fzx_font *ff_ao_Zaibatsu;
+
+#else
 
 #define ff_ao_Aribeth14             ((struct fzx_font *)(_ff_ao_Aribeth14))
 #define ff_ao_Aribeth6              ((struct fzx_font *)(_ff_ao_Aribeth6))
@@ -177,7 +246,32 @@ extern void __LIB__ _ff_ao_Vickers(void);
 extern void __LIB__ _ff_ao_Videotex(void);
 extern void __LIB__ _ff_ao_Zaibatsu(void);
 
+#endif
+
+
 // FZX FONTS BY UTZ
+
+#ifdef __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_utz_1stGrade;
+extern struct fzx_font *ff_utz_Blokz;
+extern struct fzx_font *ff_utz_GridDrop0;
+extern struct fzx_font *ff_utz_GridDrop1;
+extern struct fzx_font *ff_utz_Handpress;
+extern struct fzx_font *ff_utz_KickDrop;
+extern struct fzx_font *ff_utz_Notez;
+extern struct fzx_font *ff_utz_PhatKidzBRK;
+extern struct fzx_font *ff_utz_Phraktur;
+extern struct fzx_font *ff_utz_SkoolBrkCD;
+extern struct fzx_font *ff_utz_SkoolBrkEXT;
+extern struct fzx_font *ff_utz_SkoolBrkU;
+extern struct fzx_font *ff_utz_ShadowFlower;
+extern struct fzx_font *ff_utz_Skyscrap;
+extern struct fzx_font *ff_utz_TinyTexanS;
+extern struct fzx_font *ff_utz_TinyTexanXS;
+extern struct fzx_font *ff_utz_TinyTexanXXS;
+
+#else
 
 #define ff_utz_1stGrade        ((struct fzx_font *)(_ff_utz_1stGrade))
 #define ff_utz_Blokz           ((struct fzx_font *)(_ff_utz_Blokz))
@@ -214,5 +308,7 @@ extern void __LIB__ _ff_utz_Skyscrap(void);
 extern void __LIB__ _ff_utz_TinyTexanS(void);
 extern void __LIB__ _ff_utz_TinyTexanXS(void);
 extern void __LIB__ _ff_utz_TinyTexanXXS(void);
+
+#endif
 
 #endif
