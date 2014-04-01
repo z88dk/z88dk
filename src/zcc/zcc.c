@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.62 2014-04-01 19:52:34 dom Exp $
+ *      $Id: zcc.c,v 1.63 2014-04-01 20:14:02 dom Exp $
  */
 
 
@@ -67,7 +67,7 @@ static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix);
-static void            parse_config_file(char *config_line);
+static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 
 static void            configure_assembler();
@@ -86,7 +86,7 @@ static void            parse_option(char *option);
 static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt,...);
 static char           *replace_str(const char *str, const char *old, const char *new);
-
+static void            setup_default_configuration();
 
 
 
@@ -157,6 +157,7 @@ struct arg_s {
     void (*setfunc)(arg_t *arg, char *);
     void  *data;
     char  *help;
+    char  *defvalue;
 };
 
 
@@ -191,20 +192,20 @@ static char  *c_copycmd = "cp";
 static char  *c_copycmd = "copy";
 #endif
 static char  *c_extension_config = "o";
-static char  *c_incpath = "-I" PREFIX "/include";
-static char  *c_coptrules1 = PREFIX "/lib/z80rules.1";
-static char  *c_coptrules2 = PREFIX "/lib/z80rules.2";
-static char  *c_coptrules3 = PREFIX "/lib/z80rules.0";
+static char  *c_incpath = NULL;
+static char  *c_coptrules1 = NULL;
+static char  *c_coptrules2 = NULL;
+static char  *c_coptrules3 = NULL;
 static char  *c_crt0 = NULL;
-static char  *c_linkopts = "-a -m -Mo -L" PREFIX "/lib/clibs -I" PREFIX "/lib";
-static char  *c_asmopts = "";
+static char  *c_linkopts = NULL;
+static char  *c_asmopts = NULL;
 static char  *c_z88mathlib = NULL;
 static char  *c_z88mathflg = "-math-z88 -D__NATIVE_MATH__";
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "gen_math";
 static int    c_stylecpp = outspecified;
-static char  *c_vasmopts = "-quiet -Fvobj -I" PREFIX "/lib";
-static char  *c_vlinkopts = "-L"PREFIX"/lib/vlink/";
+static char  *c_vasmopts = NULL;
+static char  *c_vlinkopts = NULL;
 static char  *c_asz80opts = "";
 static char  *c_aslinkopts = "";
 static char  *c_gnuasopts = "";
@@ -220,18 +221,18 @@ static arg_t  config[] = {
     
     {"MPMEXE", 0, SetStringConfig, &c_mpm_exe, "Name of the mpm binary"},
     
-    {"VASMEXE", 0, SetStringConfig, &c_vasm_exe, "Name of the vasm binary"},
-    {"VLINKEXE", 0, SetStringConfig, &c_vlink_exe, "Name of the vlink binary"},
-    {"VASMOPTS", 0, SetStringConfig, &c_vasmopts, ""},
-    {"VLINKOPTS", 0, SetStringConfig, &c_vlinkopts, ""},
+    {"VASMEXE", 0, SetStringConfig, &c_vasm_exe, "Name of the vasm binary" },
+    {"VLINKEXE", 0, SetStringConfig, &c_vlink_exe, "Name of the vlink binary" },
+    {"VASMOPTS", 0, SetStringConfig, &c_vasmopts, "Options for VASM", "-quiet -Fvobj -IDESTDIR/lib" },
+    {"VLINKOPTS", 0, SetStringConfig, &c_vlinkopts, "", "-LDESTDIR/lib/vlink/" },
     
-    {"GNUASEXE", 0, SetStringConfig, &c_gnuas_exe, "Name of the GNU as binary"},
-    {"GNULDEXE", 0, SetStringConfig, &c_gnuld_exe, "Name of the GNU ld binary"},
+    {"GNUASEXE", 0, SetStringConfig, &c_gnuas_exe, "Name of the GNU as binary" },
+    {"GNULDEXE", 0, SetStringConfig, &c_gnuld_exe, "Name of the GNU ld binary" },
     {"GNUASOPTS", 0, SetStringConfig, &c_gnuasopts, ""},
     {"GNULINKOPTS", 0, SetStringConfig, &c_gnulinkopts, ""},
     
-    {"ASZ80EXE", 0, SetStringConfig, &c_asz80_exe, "Name of the asz80 binary"},
-    {"ASLINKEXE", 0, SetStringConfig, &c_aslink_exe, "Name of the aslink binary"},
+    {"ASZ80EXE", 0, SetStringConfig, &c_asz80_exe, "Name of the asz80 binary" },
+    {"ASLINKEXE", 0, SetStringConfig, &c_aslink_exe, "Name of the aslink binary" },
     {"ASZ80OPTS", 0, SetStringConfig, &c_asz80opts, ""},
     {"ASLINKOPTS", 0, SetStringConfig, &c_aslinkopts, ""},
     
@@ -241,8 +242,8 @@ static arg_t  config[] = {
 
     {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, "Name of the z80asm binary"},
     {"LINKER", 0, SetStringConfig, &c_linker, "Name of the z80asm linker binary"},
-    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, "Options for z80asm as linker"},
-    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, "Options for z80asm as assembler"},
+    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, "Options for z80asm as linker", "-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
+    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, "Name of sccz80 binary (use SCCZ80EXE)"},
     {"SCCZ80EXE", 0, SetStringConfig, &c_compiler, "Name of sccz80 binary"},
@@ -255,10 +256,10 @@ static arg_t  config[] = {
     {"COPTEXE", 0, SetStringConfig, &c_copt_exe, ""},
     {"COPYCMD", 0, SetStringConfig, &c_copycmd, ""},
     
-    {"INCPATH", 0, SetStringConfig, &c_incpath, ""},
-    {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, ""},
-    {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, ""},
-    {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, ""},
+    {"INCPATH", 0, SetStringConfig, &c_incpath, "", "-IDESTDIR/include" },
+    {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, "", "DESTDIR/lib/z80rules.1" },
+    {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, "", "DESTDIR/lib/z80rules.2"},
+    {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, "", "DESTDIR/lib/z80rules.0"},
     {"CRT0", 0, SetStringConfig, &c_crt0, ""},
 
     {"Z88MATHLIB", 0, SetStringConfig, &c_z88mathlib, ""},
@@ -534,6 +535,7 @@ int main(int argc, char **argv)
     	c_install_dir = strdup(config_filename);
     }
     
+    setup_default_configuration();
     
     gc = find_zcc_config_fileFile(argv[gc], gc, config_filename, sizeof(config_filename));
     /* Okay, so now we read in the options file and get some info for us */
@@ -544,7 +546,7 @@ int main(int argc, char **argv)
     while (fgets(buffer, LINEMAX, fp) != NULL) {
         if (!isupper(buffer[0]))
             continue;
-        parse_config_file(buffer);
+        parse_configfile_line(buffer);
     }
     fclose(fp);
 
@@ -1063,7 +1065,7 @@ void parse_cmdline_arg(char *arg)
     add_option_to_compiler(arg);
 }
 
-void parse_config_file(char *arg)
+void parse_configfile_line(char *arg)
 {
     arg_t          *pargs = config;
 
@@ -1601,6 +1603,20 @@ char *replace_str(const char *str, const char *old, const char *new)
 	strcpy(r, p);
 
 	return ret;
+}
+
+static void setup_default_configuration()
+{
+	char    buf[1024];
+	arg_t  *pargs = config;
+	
+	while ( pargs->setfunc ) {
+		if ( pargs->defvalue ) {
+			snprintf(buf,sizeof(buf),"%s %s",pargs->name, pargs->defvalue);
+			parse_configfile_line(buf);
+		}
+		pargs++;
+	}
 }
 
 /*
