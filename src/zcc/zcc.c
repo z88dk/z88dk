@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.63 2014-04-01 20:14:02 dom Exp $
+ *      $Id: zcc.c,v 1.64 2014-04-01 21:00:58 dom Exp $
  */
 
 
@@ -87,7 +87,7 @@ static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt,...);
 static char           *replace_str(const char *str, const char *old, const char *new);
 static void            setup_default_configuration();
-
+static void            print_specs();
 
 
 
@@ -108,6 +108,7 @@ static int             mapon = 0;
 static int             preprocessonly = 0;
 static int             relocate = 0;
 static int             crtcopied = 0;    /* Copied the crt0 code over? */
+static int             c_print_specs = 0;
 static int             max_argc;
 static int             gargc;
 static char          **gargv;
@@ -173,7 +174,7 @@ static char  *c_options = NULL;
 
 static char  *c_z80asm_exe = "z80asm";
 static char  *c_mpm_exe = "mpm";
-static char  *c_vasm_exe = "vasm";
+static char  *c_vasm_exe = "vasmz80";
 static char  *c_vlink_exe = "vlink";
 static char  *c_gnuas_exe = "z80-unknown-coff-as";
 static char  *c_gnuld_exe = "z80-unknown-coff-ld";
@@ -200,7 +201,7 @@ static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
 static char  *c_z88mathlib = NULL;
-static char  *c_z88mathflg = "-math-z88 -D__NATIVE_MATH__";
+static char  *c_z88mathflg = NULL; // "-math-z88 -D__NATIVE_MATH__";
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "gen_math";
 static int    c_stylecpp = outspecified;
@@ -241,12 +242,11 @@ static arg_t  config[] = {
     {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, "Name of the zpragma binary"},
 
     {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, "Name of the z80asm binary"},
-    {"LINKER", 0, SetStringConfig, &c_linker, "Name of the z80asm linker binary"},
     {"LINKOPTS", 0, SetStringConfig, &c_linkopts, "Options for z80asm as linker", "-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
     {"ASMOPTS", 0, SetStringConfig, &c_asmopts, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, "Name of sccz80 binary (use SCCZ80EXE)"},
-    {"SCCZ80EXE", 0, SetStringConfig, &c_compiler, "Name of sccz80 binary"},
+    {"SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, "Name of sccz80 binary"},
     {"SDCCEXE", 0, SetStringConfig, &c_sdcc_exe, "Name of the sdcc binary"},
     
     {"APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, ""},
@@ -263,7 +263,7 @@ static arg_t  config[] = {
     {"CRT0", 0, SetStringConfig, &c_crt0, ""},
 
     {"Z88MATHLIB", 0, SetStringConfig, &c_z88mathlib, ""},
-    {"Z88MATHFLG", 0, SetStringConfig, &c_z88mathflg, ""},
+    {"Z88MATHFLG", 0, SetStringConfig, &c_z88mathflg, "Additional options for non-generic maths"},
     {"STARTUPLIB", 0, SetStringConfig, &c_startuplib, ""},
     {"GENMATHLIB", 0, SetStringConfig, &c_genmathlib, ""},
     
@@ -286,6 +286,7 @@ static arg_t     myargs[] = {
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
+    {"specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, "Print out compiler specs" },
     {"asm", AF_MORE, SetString, &c_assembler_type, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetString, &c_compiler_type, "Set the compiler type from the command line (sccz80, sdcc)"},
     { "pragma-define",AF_MORE,PragmaDefine,NULL,"Define the option in zcc_opt.def" },
@@ -562,7 +563,7 @@ int main(int argc, char **argv)
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
-        parse_option(c_options);
+        parse_option(strdup(c_options));
     }
     
     
@@ -575,6 +576,11 @@ int main(int argc, char **argv)
             parse_cmdline_arg(argv[gargc]);
         else
             add_file_to_process(argv[gargc]);
+    }
+    
+    if ( c_print_specs ) {
+    	print_specs();
+    	exit(0);
     }
     
     configure_assembler();
@@ -911,6 +917,10 @@ void AddLinkLibrary(arg_t *argument, char *arg)
      */
     if (strcmp(arg, "-lmz") == 0) {
         parse_option(c_z88mathflg);
+        if ( c_z88mathlib == NULL ) {
+            fprintf(stderr, "No Z88MATHLIB defined in configuration file - cannot use -lmz option\n");
+            exit(1);
+        }
         snprintf(buffer, sizeof(buffer), "-l%s ", c_z88mathlib);
         BuildOptions_start(&linkargs, buffer);
         return;
@@ -1617,6 +1627,23 @@ static void setup_default_configuration()
 		}
 		pargs++;
 	}
+}
+
+static void print_specs()
+{
+	arg_t  *pargs = config;
+
+	while ( pargs->setfunc ) {
+		if ( (pargs->flags & AF_DEPRECATED) == 0 && pargs->setfunc == SetStringConfig ) {
+			if ( *(char **)pargs->data != NULL && strlen(*(char **)pargs->data)) {
+				printf("%-20s\t%s\n",pargs->name, *(char **)pargs->data);
+			} else {
+				printf("%-20s\t[undefined]\n",pargs->name);
+			}
+		}
+		pargs++;
+	}
+
 }
 
 /*
