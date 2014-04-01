@@ -9,4 +9,4 @@ ba_stack_init:
 
    jp b_array_init
 
-   INCLUDE "adt/ba_stack/asm_ba_stack_init.asm"
+   INCLUDE "adt/ba_stack/z80/asm_ba_stack_init.asm"

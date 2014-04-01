@@ -5,7 +5,7 @@ XDEF bv_priority_queue_size
 
 LIB ba_priority_queue_size
 
-defc bv_priority_queue_size:
+bv_priority_queue_size:
 
    jp ba_priority_queue_size
 

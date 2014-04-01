@@ -4,8 +4,6 @@
 
 XDEF wa_priority_queue_init
 
-LIB asm_wa_priority_queue_init
-
 wa_priority_queue_init:
 
    pop af

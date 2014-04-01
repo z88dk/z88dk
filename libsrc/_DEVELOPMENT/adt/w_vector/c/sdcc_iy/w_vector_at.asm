@@ -1,7 +1,7 @@
 
 ; void *w_vector_at(b_vector_t *v, size_t idx)
 
-XLIB w_vector_at
+XDEF w_vector_at
 
 LIB w_array_at
 
