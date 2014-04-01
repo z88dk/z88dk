@@ -4,7 +4,7 @@
 
 #
 # Names of the various programs, if they're in your path you won't need to
-# alter these settings - except for COPYCMD, on unix set it to: cp
+# alter these settings  
 #
 
 Z80EXE  	z80asm
@@ -13,7 +13,7 @@ CPP 		zcpp
 LINKER 		z80asm
 COMPILER	sccz80
 COPTEXE		copt
-COPYCMD		cp
+
 APPMAKER	appmake
 
 #
