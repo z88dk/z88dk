@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.61 2014-03-19 22:44:57 dom Exp $
+ *      $Id: zcc.c,v 1.62 2014-04-01 19:52:34 dom Exp $
  */
 
 
@@ -1131,8 +1131,6 @@ static void configure_assembler()
         c_asmopts = c_vasmopts;
         c_linkopts = c_vlinkopts;
         
-        printf("Assembler opts = %s\n", c_asmopts);
-        
         style = outspecified_flag;
         linker_output_separate_arg = 1;
     } else if (strcasecmp(name, "binutils") == 0 ) {
@@ -1160,7 +1158,7 @@ static void configure_assembler()
 
 static void configure_compiler()
 {
-    char *preprocarg = " -DZ88DK_USES_SDCC=1";
+    char *preprocarg;
     char  buf[256];
 
     compiler_type = CC_SCCZ80;
@@ -1170,6 +1168,7 @@ static void configure_compiler()
         compiler_type = CC_SDCC;
         snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
         add_option_to_compiler(buf);
+        preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
         if ( assembler_type == ASM_Z80ASM ) {
             parse_cmdline_arg("-Ca-sdcc");
@@ -1177,6 +1176,8 @@ static void configure_compiler()
         c_compiler = c_sdcc_exe;
         compiler_style = filter_outspecified_flag;
     } else {
+        preprocarg = " -DSCCZ80 -DSMALL_C";
+        BuildOptions(&cpparg, preprocarg);
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf,sizeof(buf),"-asm=%s",c_assembler_type);
         add_option_to_compiler(buf);
