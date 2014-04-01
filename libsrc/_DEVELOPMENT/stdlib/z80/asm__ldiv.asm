@@ -32,7 +32,7 @@ asm__ldiv:
    ;         dehl' = numer % denom
    ;         dehl  = numer / denom
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+   ; uses  : af, bc, de, hl, bc', de', hl', ixh
    
    push bc                     ; save ldiv_t *
       
