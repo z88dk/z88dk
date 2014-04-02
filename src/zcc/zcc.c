@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.65 2014-04-01 21:13:21 dom Exp $
+ *      $Id: zcc.c,v 1.66 2014-04-02 08:26:55 dom Exp $
  */
 
 
@@ -910,7 +910,7 @@ void AddToArgs(arg_t *argument, char *arg)
 
     /* If this is the assembler and the linker is the same program then add to both */
     if ( argument->data == &asmargs ) {
-        if (strcmp(c_linker, c_z80asm_exe) == 0) {
+        if (IS_ASM(ASM_Z80ASM)) {
             BuildOptions(&linkargs, arg + 3);
         }
     }
