@@ -33,5 +33,5 @@ stdlib/c/lr_sccz80/_strtoi
 stdlib/c/lr_sccz80/_strtoi_callee
 stdlib/c/lr_sccz80/_strtou
 stdlib/c/lr_sccz80/_strtou_callee
-stdlib/z80/__strtou
+stdlib/z80/__strtou_
 stdlib/z80/__strtoul

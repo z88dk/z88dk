@@ -16,7 +16,7 @@ org myzorg
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB start
-XDEF _Exit
+XDEF __Exit
 
 XREF _main
 
@@ -71,7 +71,7 @@ start:
 
    INCLUDE "../crt_exit.asm"   ; run exit stack
    
-_Exit:
+__Exit:
 
    INCLUDE "../crt_cleanup.asm"  ; close files 
 
