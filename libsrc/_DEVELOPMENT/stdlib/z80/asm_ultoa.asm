@@ -152,7 +152,7 @@ decimal:
 ENDIF
 
 
-IF IF __CLIB_OPT_NUM2TXT & $f0
+IF __CLIB_OPT_NUM2TXT & $f0
 
 terminate:
 
