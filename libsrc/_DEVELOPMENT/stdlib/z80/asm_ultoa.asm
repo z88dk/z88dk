@@ -13,8 +13,9 @@
 XLIB asm_ultoa
 XDEF asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
 
-LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8
-LIB l_num2char, l_ultoa, l_ultoh, l_ultoo, l_ultob
+LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
+
+INCLUDE "clib_cfg.asm"
 
 asm_ultoa:
 
@@ -46,17 +47,33 @@ asm0_ultoa:                    ; bypasses NULL check of buf
 
 asm1_ultoa:                    ; entry for ltoa()
 
+IF __CLIB_OPT_NUM2TXT & $40
+
    cp 10
    jr z, decimal
+
+ENDIF
+
+IF __CLIB_OPT_NUM2TXT & $80
 
    cp 16
    jr z, hex
 
+ENDIF
+
+IF __CLIB_OPT_NUM2TXT & $20
+
    cp 8
    jr z, octal
 
+ENDIF
+
+IF __CLIB_OPT_NUM2TXT & $10
+
    cp 2
    jr z, binary
+
+ENDIF
 
    ; use generic radix method
    
@@ -122,12 +139,21 @@ exit_radix_no_good:
    jp error_einval_zc
 
 
+IF __CLIB_OPT_NUM2TXT & $40
+
 decimal:
+
+   LIB l_ultoa
 
    ld c,ixl
    ld b,ixh
    call l_ultoa
-   
+
+ENDIF
+
+
+IF IF __CLIB_OPT_NUM2TXT & $f0
+
 terminate:
 
    xor a
@@ -136,26 +162,46 @@ terminate:
    ex de,hl
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $80
 
 hex:
+   
+   LIB l_ultoh
    
    ld c,ixl
    ld b,ixh
    call l_ultoh
    jr terminate
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $20
 
 octal:
+
+   LIB l_ultoo
 
    ld c,ixl
    ld b,ixh
    call l_ultoo
    jr terminate
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $10
 
 binary:
 
+   LIB l_ultob
+   
    ld c,ixl
    ld b,ixh
    call l_ultob
    jr terminate
+
+ENDIF

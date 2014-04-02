@@ -2,8 +2,9 @@
 XLIB __strtoul
 
 LIB l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
-LIB l_neg_dehl, l_char2num, l_mulu_40_32x8
-LIB l_btoul, l_otoul, l_atoul, l_htoul, l_eat_base_prefix
+LIB l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
+
+INCLUDE "clib_cfg.asm"
 
 __strtoul:
 
@@ -135,18 +136,34 @@ positive:
 
    ld e,a
    ld a,ixl
-   
+
+IF __CLIB_OPT_TXT2NUM & $40
+
    cp 10
    jr z, decimal
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & $80
    
    cp 16
    jr z, hex
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & $20
    
    cp 8
    jr z, octal
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & $10
    
    cp 2
    jr z, binary
+
+ENDIF
 
    ; use generic algorithm
    
@@ -272,9 +289,13 @@ number_complete:
    ret
 
 
+IF __CLIB_OPT_TXT2NUM & $40
+
 decimal:
 
    ;  hl = char *
+   
+   LIB l_atoul
    
    ex de,hl
    call l_atoul
@@ -283,10 +304,16 @@ decimal:
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $80
 
 hex:
 
    ;  hl = char *
+   
+   LIB l_htoul
    
    ex de,hl
    call l_htoul
@@ -295,10 +322,16 @@ hex:
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $20
 
 octal:
 
    ; hl = char *
+   
+   LIB l_otoul
    
    ex de,hl
    call l_otoul
@@ -307,10 +340,16 @@ octal:
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $10
 
 binary:
 
    ; hl = char *
+   
+   LIB l_btoul
    
    ex de,hl
    call l_btoul
@@ -318,3 +357,5 @@ binary:
    
    xor a
    ret
+
+ENDIF

@@ -13,8 +13,9 @@
 XLIB asm_utoa
 XDEF asm0_utoa, asm1_utoa
 
-LIB error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x8
-LIB l_num2char, l_utoa, l_utoh, l_utoo, l_utob
+LIB error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x8, l_num2char
+
+INCLUDE "clib_cfg.asm"
 
 asm_utoa:
 
@@ -46,17 +47,33 @@ asm0_utoa:                     ; bypasses NULL check of buf
 
 asm1_utoa:                     ; entry for itoa()
 
+IF __CLIB_OPT_NUM2TXT & $44
+
    cp 10
    jr z, decimal
+
+ENDIF
+
+IF __CLIB_OPT_NUM2TXT & $88
 
    cp 16
    jr z, hex
 
+ENDIF
+
+IF IF __CLIB_OPT_NUM2TXT & $22
+
    cp 8
    jr z, octal
 
+ENDIF
+
+IF __CLIB_OPT_NUM2TXT & $11
+
    cp 2
    jr z, binary
+
+ENDIF
 
    ld ixl,e
    ld ixh,d
@@ -118,10 +135,19 @@ write_lp:
    ret
 
 
+IF __CLIB_OPT_NUM2TXT & $44
+
 decimal:
 
-   call l_utoa
+   LIB l_utoa
    
+   call l_utoa
+
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $ff
+
 terminate:
 
    xor a
@@ -130,20 +156,40 @@ terminate:
    ex de,hl
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $88
 
 hex:
+   
+   LIB l_utoh
    
    call l_utoh
    jr terminate
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $22
 
 octal:
 
+   LIB l_utoo
+   
    call l_utoo
    jr terminate
 
+ENDIF
+
+
+IF __CLIB_OPT_NUM2TXT & $11
 
 binary:
 
+   LIB l_utob
+   
    call l_utob
    jr terminate
+
+ENDIF

@@ -1,8 +1,10 @@
 
 XLIB __strtou
 
-LIB l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix, l_char2num
-LIB l_mulu_24_16x8, l_eat_digits, l_atou, l_htou, l_otou, l_btou
+LIB l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix
+LIB l_char2num, l_mulu_24_16x8, l_eat_digits
+
+INCLUDE "clib_cfg.asm"
 
 __strtou:
 
@@ -132,18 +134,34 @@ positive:
    ld a,c
    
    ex de,hl
-   
+
+IF __CLIB_OPT_TXT2NUM & $44
+
    cp 10
    jr z, decimal
-   
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & $88
+
    cp 16
    jr z, hex
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & $22
    
    cp 8
    jr z, octal
+
+ENDIF
+
+IF __CLIB_OPT_TXT2NUM & 11
    
    cp 2
    jr z, binary
+
+ENDIF
    
    ; use generic algorithm
    
@@ -249,20 +267,30 @@ number_complete:
    ret
 
 
+IF __CLIB_OPT_TXT2NUM & $44
+
 decimal:
 
    ; de = char *
 
+   LIB l_atou
+   
    call l_atou
    jr c, unsigned_overflow
 
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $88
 
 hex:
 
    ; de = char *
+   
+   LIB l_htou
    
    call l_htou
    jr c, unsigned_overflow
@@ -270,10 +298,16 @@ hex:
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $22
 
 octal:
 
    ; de = char *
+   
+   LIB l_otou
    
    call l_otou
    jr c, unsigned_overflow
@@ -281,13 +315,21 @@ octal:
    xor a
    ret
 
+ENDIF
+
+
+IF __CLIB_OPT_TXT2NUM & $11
 
 binary:
 
    ; de = char *
+   
+   LIB l_btou
    
    call l_btou
    jr c, unsigned_overflow
    
    xor a
    ret
+
+ENDIF
