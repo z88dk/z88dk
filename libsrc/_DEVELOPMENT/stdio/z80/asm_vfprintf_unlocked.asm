@@ -9,12 +9,21 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 XLIB asm_vfprintf_unlocked
 XDEF asm0_vfprintf_unlocked
 
 LIB __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
-LIB l_utod_hl, __stdio_nextarg_de, l_neg_hl, l_atou, __stdio_length_modifier
-LIB error_einval_zc, error_erange_zc
+LIB l_utod_hl, l_neg_hl, error_einval_zc
+
+
+IF __CLIB_OPT_PRINTF != 0
+
+LIB __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
+
+ENDIF
+
 
 asm_vfprintf_unlocked:
 
@@ -49,9 +58,15 @@ asm_vfprintf_unlocked:
 
 asm0_vfprintf_unlocked:
 
+
+IF __CLIB_OPT_PRINTF != 0
+
    ld hl,-44
    add hl,sp
    ld sp,hl                    ; create 44 bytes of workspace
+
+ENDIF
+
 
    push bc
    
@@ -89,7 +104,18 @@ _format_loop:
    call nz, __stdio_send_output_buffer
    
    pop de
+
+
+IF __CLIB_OPT_PRINTF = 0
+
+   jr c, error_stream          ; if stream error
+
+ELSE
+
    jp c, error_stream          ; if stream error
+
+ENDIF
+   
    
    ; de = address of format char stopped on ('%' or '\0')
    ; stack = WORKSPACE_44, stack_param
@@ -117,9 +143,19 @@ format_end:
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
 
+
+IF __CLIB_OPT_PRINTF = 0
+
+   pop hl
+
+ELSE
+
    ld hl,46
    add hl,sp
    ld sp,hl                    ; repair stack
+
+ENDIF
+   
    
    exx
    push hl
@@ -128,6 +164,31 @@ format_end:
    
    or a
    jp l_utod_hl                ; hl = max $7fff
+
+; * AA ********************************************************
+
+IF __CLIB_OPT_PRINTF = 0
+
+   ; completely disable % logic
+   ; printf can only be used to output format text
+   
+interpret:
+
+   dec de
+   
+   ; de = address of format char '%'
+   ; stack = stack_param
+
+   call error_einval_zc
+   jr error_stream
+
+ENDIF
+
+; * BB ********************************************************
+
+IF __CLIB_OPT_PRINTF != 0
+
+   ; regular % processing
 
 flag_chars:
 
@@ -366,45 +427,93 @@ converter_specifier:
 
    ; no long modifier
 
+IF __CLIB_OPT_PRINTF & $01
+
    cp 'd'
    jr z, _printf_d
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $02
 
    cp 'u'
    jp z, _printf_u
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $04
+
    cp 'x'
    jp z, _printf_x
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $08
    
    cp 'X'
    jp z, _printf_xx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10
    
    cp 'o'
    jp z, _printf_o
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20
    
    cp 'n'
    jr z, _printf_n
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $40
    
    cp 'i'
    jr z, _printf_d             ; %i is the same as %d 
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80
    
    cp 'p'
    jp z, _printf_p
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $100
    
    cp 'B'
    jr z, _printf_bb
+
+ENDIF
 
 more_spec:
 
    ; converters unaffected by long modifier (in this implementation)
 
+IF __CLIB_OPT_PRINTF & $200
+
    cp 's'
    jp z, _printf_s
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $400
    
    cp 'c'
    jr z, _printf_c
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $800
    
    cp 'I'
    jp z, _printf_I
+
+ENDIF
    
 error_spec_unknown:
 
@@ -418,32 +527,68 @@ error_spec_unknown:
 
 long_spec:
 
+IF __CLIB_OPT_PRINTF & $1000
+
    cp 'd'
    jr z, _printf_ld
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000
 
    cp 'u'
    jp z, _printf_lu
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000
+
    cp 'x'
    jp z, _printf_lx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000
    
    cp 'X'
    jp z, _printf_lxx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10000
    
    cp 'o'
    jr z, _printf_lo
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000
    
    cp 'n'
    jr z, _printf_ln
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $40000
    
    cp 'i'
    jr z, _printf_ld            ; %i is the same as %d
-   
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80000
+
    cp 'p'
    jr z, _printf_lp
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $100000
    
    cp 'B'
    jr z, _printf_lbb
+
+ENDIF
 
    jr more_spec
 
@@ -469,6 +614,8 @@ long_spec:
 
    ; bcdinopsuxIX
 
+IF __CLIB_OPT_PRINTF & $100
+
 _printf_bb:
 
    LIB __stdio_printf_bb
@@ -477,6 +624,10 @@ _printf_bb:
    ld hl,__stdio_printf_bb
    
    jp printf_invoke_2 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $100000
 
 _printf_lbb:
 
@@ -487,12 +638,20 @@ _printf_lbb:
 
    jr printf_invoke_4 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $400
+
 _printf_c:
 
    LIB __stdio_printf_c
 
    ld hl,__stdio_printf_c
    jr printf_invoke_2 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $41
 
 _printf_d:
 
@@ -504,6 +663,10 @@ _printf_d:
    ld hl,__stdio_printf_d
    jr printf_invoke_2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $41000
+
 _printf_ld:
 
    LIB __stdio_printf_ld
@@ -514,6 +677,10 @@ _printf_ld:
    ld hl,__stdio_printf_ld
    jr printf_invoke_4
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20
+
 _printf_n:
 
    LIB __stdio_printf_n
@@ -521,12 +688,20 @@ _printf_n:
    ld hl,__stdio_printf_n
    jr printf_invoke_2 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000
+
 _printf_ln:
 
    LIB __stdio_printf_ln
 
    ld hl,__stdio_printf_ln
    jr printf_invoke_4 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10
 
 _printf_o:
 
@@ -537,6 +712,10 @@ _printf_o:
    
    jr printf_invoke_2 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10000
+
 _printf_lo:
 
    LIB __stdio_printf_lo
@@ -546,6 +725,10 @@ _printf_lo:
 
    jr printf_invoke_4 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80
+
 _printf_p:
 
    LIB __stdio_printf_p
@@ -553,12 +736,19 @@ _printf_p:
    ld hl,__stdio_printf_p
    jr printf_invoke_2 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80000
+
 _printf_lp:
 
    LIB __stdio_printf_lp
 
    ld hl,__stdio_printf_lp
    jr printf_invoke_4 - 2
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $200
 
 _printf_s:
 
@@ -566,6 +756,10 @@ _printf_s:
  
    ld hl,__stdio_printf_s
    jr printf_invoke_2 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $02
 
 _printf_u:
 
@@ -576,6 +770,10 @@ _printf_u:
    
    jr printf_invoke_2 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000
+
 _printf_lu:
 
    LIB __stdio_printf_lu
@@ -585,6 +783,10 @@ _printf_lu:
    
    jr printf_invoke_4 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $08
+
 _printf_xx:
 
    LIB __stdio_printf_x
@@ -592,12 +794,20 @@ _printf_xx:
    ld hl,__stdio_printf_x
    jr printf_invoke_2 - 2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000
+
 _printf_lxx:
 
    LIB __stdio_printf_lx
       
    ld hl,__stdio_printf_lx
    jr printf_invoke_4 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $04
 
 _printf_x:
 
@@ -607,6 +817,10 @@ _printf_x:
    ld hl,__stdio_printf_x
    jr printf_invoke_2
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000
+
 _printf_lx:
 
    LIB __stdio_printf_lx
@@ -615,12 +829,18 @@ _printf_lx:
    ld hl,__stdio_printf_lx
    jr printf_invoke_4
 
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $800
+
 _printf_I:
 
    LIB __stdio_printf_ii
 
    ld hl,__stdio_printf_ii
    jr printf_invoke_4 - 2
+
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -792,7 +1012,18 @@ error_format_width:
 
    ; fall through
 
+ENDIF
+
+; *************************************************************
+; all clib options have this code
+
 error_stream:
+
+IF __CLIB_OPT_PRINTF = 0
+
+   pop hl
+
+ELSE
 
    ; de = address of format char stopped on ('%' or '\0')
    ; stack = WORKSPACE_44, stack_param
@@ -803,6 +1034,9 @@ _error_stream:
 
    add hl,sp
    ld sp,hl                    ; repair stack
+
+ENDIF
+
 
    exx
    push hl
@@ -815,6 +1049,10 @@ _error_stream:
    scf                         ; indicate error
    jp l_neg_hl                 ; hl = - (chars out + 1) < 0
 
+; ** BB *******************************************************
+
+IF __CLIB_OPT_PRINTF != 0
+
 error_printf_converter:
 
    ; de = address of next format char to examine
@@ -822,3 +1060,5 @@ error_printf_converter:
 
    ld hl,36
    jr _error_stream
+
+ENDIF
