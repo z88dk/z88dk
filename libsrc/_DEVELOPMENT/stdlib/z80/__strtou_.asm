@@ -1,12 +1,12 @@
 
-XLIB __strtou
+XLIB __strtou_
 
 LIB l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix
 LIB l_char2num, l_mulu_24_16x8, l_eat_digits
 
 INCLUDE "clib_cfg.asm"
 
-__strtou:
+__strtou_:
 
    ; _strtoi, _strtou helper
    ;

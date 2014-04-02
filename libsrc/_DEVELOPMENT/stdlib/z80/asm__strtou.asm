@@ -14,7 +14,7 @@
 
 XLIB asm__strtou
 
-LIB __strtou, error_erange_mc, error_erange_zc, error_einval_zc
+LIB __strtou_, error_erange_mc, error_erange_zc, error_einval_zc
 
 asm__strtou:
 
@@ -46,7 +46,7 @@ asm__strtou:
    ;
    ; uses  : af, bc, de, hl
 
-   call __strtou
+   call __strtou_
    ret nc                      ; if no errors
    
    ; what kind of error was it
