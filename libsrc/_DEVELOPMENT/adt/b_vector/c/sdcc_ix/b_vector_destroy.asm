@@ -11,6 +11,6 @@ _b_vector_destroy:
    push hl
    push af
 
-   jr asm__b_vector_destroy
+   jr asm_b_vector_destroy
    
    INCLUDE "adt/b_vector/z80/asm_b_vector_destroy.asm"
