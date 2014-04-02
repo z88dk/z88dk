@@ -9,12 +9,19 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 XLIB asm_vfscanf_unlocked
 XDEF asm0_vfscanf_unlocked
 
-LIB __stdio_verify_input, __stdio_recv_input_eatc, __stdio_nextarg_bc
-LIB __stdio_scanf_sm_format, __stdio_scanf_sm_format_pct, __stdio_length_modifier
-LIB error_einval_zc, error_erange_zc, l_atou
+LIB __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
+LIB __stdio_scanf_sm_format_pct, error_einval_zc
+
+IF __CLIB_OPT_SCANF != 0
+
+LIB __stdio_nextarg_bc, __stdio_length_modifier, error_erange_zc, l_atou
+
+ENDIF
 
 asm_vfscanf_unlocked:
 
@@ -52,12 +59,16 @@ asm_vfscanf_unlocked:
 
 asm0_vfscanf_unlocked:
 
+IF __CLIB_OPT_SCANF != 0
+
    ld hl,-40
    add hl,sp
    ld sp,hl                    ; create forty bytes of workspace
    
    push bc                     ; save stack_param
-   
+
+ENDIF
+
    exx
    ld de,0                     ; de = num chars read from stream = 0
    ld l,e
@@ -102,11 +113,15 @@ percent_join:
 
 exit_success:
 
+IF __CLIB_OPT_SCANF != 0
+
    ; stack = WORKSPACE_40, stack_param
 
    ld hl,42
    add hl,sp
    ld sp,hl                    ; repair stack
+
+ENDIF
 
    exx
    push hl
@@ -122,11 +137,15 @@ mismatch_error:
 
 exit_failure:
 
+IF __CLIB_OPT_SCANF != 0
+
    ; stack = WORKSPACE_40, stack_param
 
    ld hl,42
    add hl,sp
    ld sp,hl                    ; repair stack
+
+ENDIF
 
    exx
    push hl
@@ -172,6 +191,9 @@ stream_consume_pct:
    
    jr mismatch_error
 
+
+IF __CLIB_OPT_SCANF != 0
+
 error_format_width:
 
    ; stack = WORKSPACE_40, stack_param, void *p
@@ -186,12 +208,29 @@ assignment_suppressed:
    ld bc,0                     ; void *p = 0
    jr suppressed_rejoin
 
+ENDIF
+
+
 possible_conversion_1:
 
    ; only one % in format string
    
    or a
    jr z, stream_consume_pct    ; if format string ends in %
+
+
+IF __CLIB_OPT_SCANF = 0
+
+   ; completely disable % logic
+   ; scanf can only match format chars to the input stream
+   
+   ; de = address char after % in char *format
+   
+   jr mismatch_error
+
+ELSE
+
+   ; regular % processing
 
 ;*******************************
 ; * PROCESS CONVERSION SPECIFIER
@@ -270,9 +309,13 @@ suppressed_rejoin:
    jr nz, spec_long
 
    ; no long modifier
-   
+
+IF __CLIB_OPT_SCANF & $200000
+
    cp '['
    jr z, _scanf_bkt            ; special treatment for '%['
+
+ENDIF
 
    call spec_unmodified
 
@@ -290,51 +333,95 @@ spec_return:
 
 spec_unmodified:
 
+IF __CLIB_OPT_SCANF & $01
+
    cp 'd'
    LIB __stdio_scanf_d
    jp z, __stdio_scanf_d
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $02
    
    cp 'u'
    LIB __stdio_scanf_u
    jp z, __stdio_scanf_u
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $40
    
    cp 'i'
    LIB __stdio_scanf_i
    jp z, __stdio_scanf_i
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $c0
    
    cp 'x'
    LIB __stdio_scanf_x
    jp z, __stdio_scanf_x
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $10
    
    cp 'o'
    LIB __stdio_scanf_o
    jp z, __stdio_scanf_o
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $80
    
    cp 'p'
    LIB __stdio_scanf_p
    jp z, __stdio_scanf_p
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $20
    
    cp 'n'
    LIB __stdio_scanf_n
    jp z, __stdio_scanf_n
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $100
    
    cp 'B'
    LIB __stdio_scanf_bb
    jp z, __stdio_scanf_bb
 
+ENDIF
+
 spec_constant:
+
+IF __CLIB_OPT_SCANF & $200
 
    cp 's'
    LIB __stdio_scanf_s
    jp z, __stdio_scanf_s
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $400
    
    cp 'c'
    LIB __stdio_scanf_c
    jp z, __stdio_scanf_c
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $800
    
    cp 'I'
    LIB __stdio_scanf_ii
    jp z, __stdio_scanf_ii
+
+ENDIF
 
    ; UNRECOGNIZED CONVERSION
 
@@ -349,48 +436,86 @@ spec_constant:
 spec_long:
 
    ; long modifier
-   
+
+IF __CLIB_OPT_SCANF & $200000
+
    cp '['
    jr z, _scanf_bkt            ; special treatment for '%['
+
+ENDIF 
 
    call _spec_long
    jr spec_return
 
 _spec_long:
 
+IF __CLIB_OPT_SCANF & $1000
+
    cp 'd'
    LIB __stdio_scanf_ld
    jp z, __stdio_scanf_ld
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $2000
    
    cp 'u'
    LIB __stdio_scanf_lu
    jp z, __stdio_scanf_lu
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $40000
    
    cp 'i'
    LIB __stdio_scanf_li
    jp z, __stdio_scanf_li
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $c000
    
    cp 'x'
    LIB __stdio_scanf_lx
    jp z, __stdio_scanf_lx
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $10000
    
    cp 'o'
    LIB __stdio_scanf_lo
    jp z, __stdio_scanf_lo
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $80000
    
    cp 'p'
    LIB __stdio_scanf_lp
    jp z, __stdio_scanf_lp
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $20000
    
    cp 'n'
    LIB __stdio_scanf_ln
    jp z, __stdio_scanf_ln
+
+ENDIF
+
+IF __CLIB_OPT_SCANF & $100000
    
    cp 'B'
    LIB __stdio_scanf_lbb
    jp z, __stdio_scanf_lbb
 
+ENDIF
+
    jr spec_constant
+
+IF __CLIB_OPT_SCANF & $200000
 
 _scanf_bkt:
 
@@ -410,3 +535,7 @@ _scanf_bkt:
    exx
 
    jr spec_return
+
+ENDIF
+
+ENDIF
