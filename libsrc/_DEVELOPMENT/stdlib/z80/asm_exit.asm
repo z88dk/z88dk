@@ -15,7 +15,7 @@ XDEF asm0_exit
 
 XREF __exit_stack
 
-LIB _Exit, l_jphl
+LIB __Exit, l_jphl
 
 asm_exit:
 
@@ -27,7 +27,7 @@ asm0_exit:
 
    ld a,(de)                   ; number of registered functions
    or a
-   jp z, _Exit
+   jp z, __Exit
    
    push hl                     ; save status
    
@@ -55,4 +55,4 @@ loop:
    djnz loop
 
    pop hl                      ; restore status
-   jp _Exit
+   jp __Exit
