@@ -156,7 +156,7 @@ IF __CLIB_OPT_TXT2NUM & $22
 
 ENDIF
 
-IF __CLIB_OPT_TXT2NUM & 11
+IF __CLIB_OPT_TXT2NUM & $11
    
    cp 2
    jr z, binary
