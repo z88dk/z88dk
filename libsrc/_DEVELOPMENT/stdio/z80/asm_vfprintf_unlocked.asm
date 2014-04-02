@@ -58,17 +58,15 @@ asm_vfprintf_unlocked:
 
 asm0_vfprintf_unlocked:
 
-
 IF __CLIB_OPT_PRINTF != 0
 
    ld hl,-44
    add hl,sp
    ld sp,hl                    ; create 44 bytes of workspace
 
-ENDIF
-
-
    push bc
+
+ENDIF
    
    exx
    ld hl,0                     ; initial output count is zero
@@ -143,19 +141,13 @@ format_end:
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
 
-
-IF __CLIB_OPT_PRINTF = 0
-
-   pop hl
-
-ELSE
+IF __CLIB_OPT_PRINTF != 0
 
    ld hl,46
    add hl,sp
    ld sp,hl                    ; repair stack
 
 ENDIF
-   
    
    exx
    push hl
@@ -173,14 +165,11 @@ IF __CLIB_OPT_PRINTF = 0
    ; printf can only be used to output format text
    
 interpret:
-
-   dec de
    
-   ; de = address of format char '%'
-   ; stack = stack_param
+   ; de = address of format char after '%'
 
    call error_einval_zc
-   jr error_stream
+   jr error_stream             ; could probably just fall through but let's be safe
 
 ENDIF
 
@@ -1014,16 +1003,12 @@ error_format_width:
 
 ENDIF
 
-; *************************************************************
+; ** AA BB ****************************************************
 ; all clib options have this code
 
 error_stream:
 
-IF __CLIB_OPT_PRINTF = 0
-
-   pop hl
-
-ELSE
+IF __CLIB_OPT_PRINTF != 0
 
    ; de = address of format char stopped on ('%' or '\0')
    ; stack = WORKSPACE_44, stack_param
@@ -1037,7 +1022,6 @@ _error_stream:
 
 ENDIF
 
-
    exx
    push hl
    exx
@@ -1048,8 +1032,6 @@ ENDIF
    
    scf                         ; indicate error
    jp l_neg_hl                 ; hl = - (chars out + 1) < 0
-
-; ** BB *******************************************************
 
 IF __CLIB_OPT_PRINTF != 0
 
