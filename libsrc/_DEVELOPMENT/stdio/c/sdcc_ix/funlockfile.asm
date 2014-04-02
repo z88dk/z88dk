@@ -1,9 +1,9 @@
 
 ; void funlockfile(FILE *file)
 
-XDEF funlockfile
+XDEF _funlockfile
 
-funlockfile:
+_funlockfile:
 
    pop af
    pop bc

@@ -1,9 +1,9 @@
 
 ; size_t ba_priority_queue_capacity(ba_priority_queue_t *q)
 
-XDEF ba_priority_queue_capacity
+XDEF _ba_priority_queue_capacity
 
-ba_priority_queue_capacity:
+_ba_priority_queue_capacity:
 
    pop af
    pop hl

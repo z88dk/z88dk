@@ -1,9 +1,9 @@
 
 ; int posix_memalign_unlocked(void **memptr, size_t alignment, size_t size)
 
-XDEF posix_memalign_unlocked
+XDEF _posix_memalign_unlocked
 
-posix_memalign_unlocked:
+_posix_memalign_unlocked:
 
    pop af
    pop de

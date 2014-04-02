@@ -1,9 +1,9 @@
 
 ; size_t w_array_capacity(w_array_t *a)
 
-XDEF w_array_capacity
+XDEF _w_array_capacity
 
-w_array_capacity:
+_w_array_capacity:
 
    pop af
    pop hl

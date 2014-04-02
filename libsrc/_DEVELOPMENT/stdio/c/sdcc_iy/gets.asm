@@ -1,9 +1,9 @@
 
 ; char *gets(char *s)
 
-XDEF gets
+XDEF _gets
 
-gets:
+_gets:
 
    pop af
    pop hl

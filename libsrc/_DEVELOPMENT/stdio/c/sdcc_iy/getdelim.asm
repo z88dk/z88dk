@@ -1,9 +1,9 @@
 
 ; size_t getdelim(char **lineptr, size_t *n, int delimiter, FILE *stream)
 
-XDEF getdelim
+XDEF _getdelim
 
-getdelim:
+_getdelim:
 
    pop af
    pop hl

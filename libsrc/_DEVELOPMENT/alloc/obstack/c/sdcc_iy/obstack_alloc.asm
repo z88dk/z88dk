@@ -1,9 +1,9 @@
 
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 
-XDEF obstack_alloc
+XDEF _obstack_alloc
 
-obstack_alloc:
+_obstack_alloc:
 
    pop af
    pop hl

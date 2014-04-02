@@ -1,9 +1,9 @@
 
 ; char *stpncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF stpncpy
+XDEF _stpncpy
 
-stpncpy:
+_stpncpy:
 
    pop af
    pop de

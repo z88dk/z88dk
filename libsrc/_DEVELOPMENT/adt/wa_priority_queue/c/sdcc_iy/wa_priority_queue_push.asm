@@ -1,9 +1,9 @@
 
 ; int wa_priority_queue_push(wa_priority_queue_t *q, void *item)
 
-XDEF wa_priority_queue_push
+XDEF _wa_priority_queue_push
 
-wa_priority_queue_push:
+_wa_priority_queue_push:
 
    pop af
    pop hl

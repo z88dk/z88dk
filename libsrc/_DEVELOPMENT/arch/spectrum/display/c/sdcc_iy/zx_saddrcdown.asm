@@ -1,9 +1,9 @@
 
 ; void *zx_saddrcdown(void *saddr)
 
-XDEF zx_saddrcdown
+XDEF _zx_saddrcdown
 
-zx_saddrcdown:
+_zx_saddrcdown:
 
    pop af
    pop hl

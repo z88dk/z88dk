@@ -1,9 +1,9 @@
 
 ; int wv_priority_queue_reserve(wv_priority_queue_t *q, size_t n)
 
-XDEF wv_priority_queue_reserve
+XDEF _wv_priority_queue_reserve
 
-wv_priority_queue_reserve:
+_wv_priority_queue_reserve:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *b_array_insert_block(b_array_t *a, size_t idx, size_t n)
 
-XDEF b_array_insert_block
+XDEF _b_array_insert_block
 
-b_array_insert_block:
+_b_array_insert_block:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void perror(const char *s)
 
-XDEF perror
+XDEF _perror
 
-perror:
+_perror:
 
    pop af
    pop hl

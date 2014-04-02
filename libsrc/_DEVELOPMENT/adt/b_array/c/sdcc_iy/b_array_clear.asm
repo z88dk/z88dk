@@ -1,9 +1,9 @@
 
 ; void b_array_clear(b_array_t *a)
 
-XDEF b_array_clear
+XDEF _b_array_clear
 
-b_array_clear:
+_b_array_clear:
 
    pop af
    pop hl

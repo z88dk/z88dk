@@ -1,9 +1,9 @@
 
 ; unsigned long strtoul( const char * restrict nptr, char ** restrict endptr, int base)
 
-XDEF strtoul
+XDEF _strtoul
 
-strtoul:
+_strtoul:
 
    pop af
    pop hl

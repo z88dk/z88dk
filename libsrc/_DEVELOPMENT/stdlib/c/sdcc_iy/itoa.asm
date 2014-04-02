@@ -1,9 +1,9 @@
 
 ; char *itoa(int num, char *buf, int radix)
 
-XDEF itoa
+XDEF _itoa
 
-itoa:
+_itoa:
 
    pop af
    pop hl

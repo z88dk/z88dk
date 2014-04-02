@@ -1,9 +1,9 @@
 
 ; void srand(unsigned int seed)
 
-XDEF srand
+XDEF _srand
 
-srand:
+_srand:
 
    pop af
    pop hl

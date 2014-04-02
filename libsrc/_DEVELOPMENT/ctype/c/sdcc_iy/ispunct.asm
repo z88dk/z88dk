@@ -1,11 +1,11 @@
 
 ; int ispunct(int c)
 
-XLIB ispunct
+XLIB _ispunct
 
 LIB asm_ispunct, error_zc
 
-ispunct:
+_ispunct:
 
    pop af
    pop hl

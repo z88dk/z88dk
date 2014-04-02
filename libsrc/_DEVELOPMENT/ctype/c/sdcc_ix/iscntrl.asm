@@ -1,11 +1,11 @@
 
 ; int iscntrl(int c)
 
-XLIB iscntrl
+XLIB _iscntrl
 
 LIB asm_iscntrl, error_znc
 
-iscntrl:
+_iscntrl:
 
    pop af
    pop hl

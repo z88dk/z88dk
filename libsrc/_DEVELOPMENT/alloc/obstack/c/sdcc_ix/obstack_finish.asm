@@ -1,9 +1,9 @@
 
 ; void *obstack_finish(struct obstack *ob)
 
-XDEF obstack_finish
+XDEF _obstack_finish
 
-obstack_finish:
+_obstack_finish:
 
    pop af
    pop hl

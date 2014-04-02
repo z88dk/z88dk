@@ -1,9 +1,9 @@
 
 ; _Noreturn void exit(int status)
 
-XDEF exit
+XDEF _exit
 
-exit:
+_exit:
 
    pop af
    pop hl

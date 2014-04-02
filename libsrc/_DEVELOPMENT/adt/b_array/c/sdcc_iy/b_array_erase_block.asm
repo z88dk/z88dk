@@ -1,9 +1,9 @@
 
 ; size_t b_array_erase_block(b_array_t *a, size_t idx, size_t n)
 
-XDEF b_array_erase_block
+XDEF _b_array_erase_block
 
-b_array_erase_block:
+_b_array_erase_block:
 
    pop af
    pop hl

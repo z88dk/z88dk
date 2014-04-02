@@ -1,9 +1,9 @@
 
 ; char *strupr(char *s)
 
-XDEF strupr
+XDEF _strupr
 
-strupr:
+_strupr:
 
    pop af
    pop hl

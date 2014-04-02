@@ -1,9 +1,9 @@
 
 ; void *memset(void *s, int c, size_t n)
 
-XDEF memset
+XDEF _memset
 
-memset:
+_memset:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; char *strndup(const char *s, size_t n)
 
-XDEF strndup
+XDEF _strndup
 
-strndup:
+_strndup:
 
    pop af
    pop hl

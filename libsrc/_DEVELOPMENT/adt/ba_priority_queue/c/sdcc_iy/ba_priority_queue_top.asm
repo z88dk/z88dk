@@ -1,9 +1,9 @@
 
 ; int ba_priority_queue_top(ba_priority_queue_t *q)
 
-XDEF ba_priority_queue_top
+XDEF _ba_priority_queue_top
 
-ba_priority_queue_top:
+_ba_priority_queue_top:
 
    pop af
    pop hl

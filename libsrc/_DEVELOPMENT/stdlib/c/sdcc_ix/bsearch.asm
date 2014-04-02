@@ -3,9 +3,9 @@
 ;               size_t nmemb, size_t size,
 ;               int (*compar)(const void *, const void *))
 
-XDEF bsearch
+XDEF _bsearch
 
-bsearch:
+_bsearch:
 
    pop af
    exx

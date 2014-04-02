@@ -1,9 +1,9 @@
 
 ; char *strnchr(const char *s, size_t n, int c)
 
-XDEF strnchr
+XDEF _strnchr
 
-strnchr:
+_strnchr:
 
    pop af
    pop hl

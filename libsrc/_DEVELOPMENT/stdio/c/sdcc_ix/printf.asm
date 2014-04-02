@@ -1,9 +1,9 @@
 
 ; int printf(const char *format, ...)
 
-XDEF printf
+XDEF _printf
 
-printf:
+_printf:
 
    push ix
    

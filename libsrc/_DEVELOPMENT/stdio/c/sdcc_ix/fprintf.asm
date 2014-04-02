@@ -1,9 +1,9 @@
 
 ; int fprintf(FILE *stream, const char *format, ...)
 
-XDEF fprintf
+XDEF _fprintf
 
-fprintf:
+_fprintf:
 
    push ix
    

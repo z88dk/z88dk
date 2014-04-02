@@ -1,9 +1,9 @@
 
 ; int vsnprintf(char *s, size_t n, const char *format, void *arg)
 
-XDEF vsnprintf
+XDEF _vsnprintf
 
-vsnprintf:
+_vsnprintf:
 
    pop af
    exx

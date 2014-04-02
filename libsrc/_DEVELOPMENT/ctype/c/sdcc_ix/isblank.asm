@@ -1,11 +1,11 @@
 
 ; int isblank(int c)
 
-XLIB isblank
+XLIB _isblank
 
 LIB asm_isblank, error_znc
 
-isblank:
+_isblank:
 
    pop af
    pop hl

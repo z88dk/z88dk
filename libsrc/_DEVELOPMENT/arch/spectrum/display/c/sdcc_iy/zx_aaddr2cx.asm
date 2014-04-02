@@ -1,9 +1,9 @@
 
 ; uint zx_aaddr2cx(void *attraddr)
 
-XDEF zx_aaddr2cx
+XDEF _zx_aaddr2cx
 
-zx_aaddr2cx:
+_zx_aaddr2cx:
 
    pop af
    pop hl

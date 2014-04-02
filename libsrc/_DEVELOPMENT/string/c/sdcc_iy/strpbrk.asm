@@ -1,9 +1,9 @@
 
 ; char *strpbrk(const char *s1, const char *s2)
 
-XDEF strpbrk
+XDEF _strpbrk
 
-strpbrk:
+_strpbrk:
 
    pop af
    pop hl

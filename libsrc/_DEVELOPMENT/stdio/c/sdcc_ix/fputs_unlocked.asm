@@ -1,9 +1,9 @@
 
 ; int fputs_unlocked(const char *s, FILE *stream)
 
-XDEF fputs_unlocked
+XDEF _fputs_unlocked
 
-fputs_unlocked:
+_fputs_unlocked:
 
    pop af
    pop hl

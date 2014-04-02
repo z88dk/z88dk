@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_insert_after(void *list_item, void *item)
 
-XDEF p_forward_list_insert_after
+XDEF _p_forward_list_insert_after
 
-p_forward_list_insert_after:
+_p_forward_list_insert_after:
 
    pop af
    pop hl

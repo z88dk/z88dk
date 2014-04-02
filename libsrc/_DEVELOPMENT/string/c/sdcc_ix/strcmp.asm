@@ -1,9 +1,9 @@
 
 ; int strcmp(const char *s1, const char *s2)
 
-XDEF strcmp
+XDEF _strcmp
 
-strcmp:
+_strcmp:
 
    pop af
    pop de

@@ -1,9 +1,9 @@
 
 ; int b_vector_reserve(b_vector_t *v, size_t n)
 
-XDEF b_vector_reserve
+XDEF _b_vector_reserve
 
-b_vector_reserve:
+_b_vector_reserve:
 
    pop af
    pop hl

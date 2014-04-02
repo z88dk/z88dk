@@ -1,9 +1,9 @@
 
 ; int fscanf_unlocked(FILE *stream, const char *format, ...)
 
-XDEF fscanf_unlocked
+XDEF _fscanf_unlocked
 
-fscanf_unlocked:
+_fscanf_unlocked:
 
    push ix
    

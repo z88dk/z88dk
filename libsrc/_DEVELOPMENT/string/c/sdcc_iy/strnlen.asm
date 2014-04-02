@@ -1,9 +1,9 @@
 
 ; size_t strnlen(const char *s, size_t maxlen)
 
-XDEF strnlen
+XDEF _strnlen
 
-strnlen:
+_strnlen:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int putchar_unlocked(int c)
 
-XDEF putchar_unlocked
+XDEF _putchar_unlocked
 
-putchar_unlocked:
+_putchar_unlocked:
 
    pop af
    pop hl

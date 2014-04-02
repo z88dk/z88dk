@@ -1,11 +1,11 @@
 
 ; void *b_array_append_block(b_array_t *a, size_t n)
 
-XDEF b_array_append_block
+XDEF _b_array_append_block
 
 LIB error_enomem_zc
 
-b_array_append_block:
+_b_array_append_block:
 
    pop af
    pop hl

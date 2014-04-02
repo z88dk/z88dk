@@ -1,9 +1,9 @@
 
 ; int ftrylockfile (FILE *stream)
 
-XDEF ftrylockfile
+XDEF _ftrylockfile
 
-ftrylockfile:
+_ftrylockfile:
 
    pop af
    pop bc

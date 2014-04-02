@@ -1,9 +1,9 @@
 
 ; char *strchrnul(const char *s, int c)
 
-XDEF strchrnul
+XDEF _strchrnul
 
-strchrnul:
+_strchrnul:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int ba_priority_queue_resize(ba_priority_queue_t *q, size_t n)
 
-XDEF ba_priority_queue_resize
+XDEF _ba_priority_queue_resize
 
-ba_priority_queue_resize:
+_ba_priority_queue_resize:
 
    pop af
    pop hl

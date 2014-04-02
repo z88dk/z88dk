@@ -1,9 +1,9 @@
 
 ; void *zx_aaddrcup(void *aaddr)
 
-XDEF zx_aaddrcup
+XDEF _zx_aaddrcup
 
-zx_aaddrcup:
+_zx_aaddrcup:
 
    pop af
    pop hl

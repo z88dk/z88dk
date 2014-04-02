@@ -1,9 +1,9 @@
 
 ; size_t fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XDEF fwrite_unlocked
+XDEF _fwrite_unlocked
 
-fwrite_unlocked:
+_fwrite_unlocked:
 
    pop af
    pop hl

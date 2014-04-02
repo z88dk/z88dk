@@ -1,9 +1,9 @@
 
 ; char *_strrstrip(const char *s)
 
-XDEF _strrstrip
+XDEF __strrstrip
 
-_strrstrip:
+__strrstrip:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int w_array_resize(w_array_t *a, size_t n)
 
-XDEF w_array_resize
+XDEF _w_array_resize
 
-w_array_resize:
+_w_array_resize:
 
    pop af
    pop hl

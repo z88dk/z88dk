@@ -1,9 +1,9 @@
 
 ; FILE *open_memstream(char **bufp, size_t *sizep)
 
-XDEF open_memstream
+XDEF _open_memstream
 
-open_memstream:
+_open_memstream:
 
    pop af
    pop de

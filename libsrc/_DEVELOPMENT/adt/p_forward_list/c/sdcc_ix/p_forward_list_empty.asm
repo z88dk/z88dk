@@ -1,9 +1,9 @@
 
 ; int p_forward_list_empty(p_forward_list_t *list)
 
-XDEF p_forward_list_empty
+XDEF _p_forward_list_empty
 
-p_forward_list_empty:
+_p_forward_list_empty:
 
    pop af
    pop hl

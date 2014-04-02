@@ -1,9 +1,9 @@
 
 ; int obstack_align_to(struct obstack *ob, size_t alignment)
 
-XDEF obstack_align_to
+XDEF _obstack_align_to
 
-obstack_align_to:
+_obstack_align_to:
 
    pop af
    pop hl

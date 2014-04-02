@@ -1,9 +1,9 @@
 
 ; size_t b_array_read_block(void *dst, size_t n, b_array_t *a, size_t idx)
 
-XDEF b_array_read_block
+XDEF _b_array_read_block
 
-b_array_read_block:
+_b_array_read_block:
 
    pop af
    exx

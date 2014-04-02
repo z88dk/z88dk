@@ -1,9 +1,9 @@
 
 ; int vfscanf(FILE *stream, const char *format, void *arg)
 
-XDEF vfscanf
+XDEF _vfscanf
 
-vfscanf:
+_vfscanf:
 
    pop af
    exx

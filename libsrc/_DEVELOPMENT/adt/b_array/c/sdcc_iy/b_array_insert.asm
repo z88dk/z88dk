@@ -1,9 +1,9 @@
 
 ; size_t b_array_insert(b_array_t *a, size_t idx, int c)
 
-XDEF b_array_insert
+XDEF _b_array_insert
 
-b_array_insert:
+_b_array_insert:
 
    pop af
    pop hl

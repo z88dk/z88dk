@@ -1,9 +1,9 @@
 
 ; int b_array_empty(b_array_t *a)
 
-XDEF b_array_empty
+XDEF _b_array_empty
 
-b_array_empty:
+_b_array_empty:
 
    pop af
    pop hl

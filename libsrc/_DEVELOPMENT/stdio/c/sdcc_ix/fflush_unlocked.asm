@@ -1,9 +1,9 @@
 
 ; int fflush_unlocked(FILE *stream)
 
-XDEF fflush_unlocked
+XDEF _fflush_unlocked
 
-fflush_unlocked:
+_fflush_unlocked:
 
    pop af
    pop bc

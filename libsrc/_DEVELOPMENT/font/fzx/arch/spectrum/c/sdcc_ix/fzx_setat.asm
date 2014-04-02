@@ -1,9 +1,9 @@
 
 ; int fzx_setat(uchar y, uchar x)
 
-XDEF fzx_setat
+XDEF _fzx_setat
 
-fzx_setat:
+_fzx_setat:
 
    pop af
    pop de

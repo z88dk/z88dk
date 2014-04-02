@@ -1,9 +1,9 @@
 
 ; char *fzx_string_partition(char *s, uint width)
 
-XDEF fzx_string_partition
+XDEF _fzx_string_partition
 
-fzx_string_partition:
+_fzx_string_partition:
 
    pop af
    pop de

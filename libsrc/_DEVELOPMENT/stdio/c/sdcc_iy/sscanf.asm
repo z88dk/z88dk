@@ -1,8 +1,8 @@
 
 ; int sscanf(const char *s, const char *format, ...)
 
-XDEF sscanf
+XDEF _sscanf
 
-sscanf:
+_sscanf:
 
    INCLUDE "stdio/z80/asm_sscanf.asm"

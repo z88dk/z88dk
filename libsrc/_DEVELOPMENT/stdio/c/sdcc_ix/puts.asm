@@ -1,9 +1,9 @@
 
 ; int puts(const char *s)
 
-XDEF puts
+XDEF _puts
 
-puts:
+_puts:
 
    pop af
    pop hl

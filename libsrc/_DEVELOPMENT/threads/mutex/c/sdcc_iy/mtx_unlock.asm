@@ -1,9 +1,9 @@
 
 ; int mtx_unlock(mtx_t *m)
 
-XDEF mtx_unlock
+XDEF _mtx_unlock
 
-mtx_unlock:
+_mtx_unlock:
 
    pop af
    pop hl

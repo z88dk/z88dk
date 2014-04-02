@@ -1,11 +1,11 @@
 
 ; int isspace(int c)
 
-XLIB isspace
+XLIB _isspace
 
 LIB asm_isspace, error_zc
 
-isspace:
+_isspace:
 
    pop af
    pop hl

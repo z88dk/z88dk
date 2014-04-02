@@ -1,9 +1,9 @@
 
 ; size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XDEF fread
+XDEF _fread
 
-fread:
+_fread:
 
    pop af
    pop de

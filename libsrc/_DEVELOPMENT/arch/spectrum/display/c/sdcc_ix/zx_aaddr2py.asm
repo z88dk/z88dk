@@ -1,9 +1,9 @@
 
 ; uint zx_aaddr2py(void *attraddr)
 
-XDEF zx_aaddr2py
+XDEF _zx_aaddr2py
 
-zx_aaddr2py:
+_zx_aaddr2py:
 
    pop af
    pop hl

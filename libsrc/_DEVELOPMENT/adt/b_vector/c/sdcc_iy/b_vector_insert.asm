@@ -1,9 +1,9 @@
 
 ; size_t b_vector_insert(b_vector_t *v, size_t idx, int c)
 
-XDEF b_vector_insert
+XDEF _b_vector_insert
 
-b_vector_insert:
+_b_vector_insert:
 
    pop af
    pop hl

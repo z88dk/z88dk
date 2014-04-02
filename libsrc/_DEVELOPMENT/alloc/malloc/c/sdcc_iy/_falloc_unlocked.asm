@@ -1,9 +1,9 @@
 
 ; void *_falloc_unlocked(void *p, size_t size)
 
-XDEF _falloc_unlocked
+XDEF __falloc_unlocked
 
-_falloc_unlocked:
+__falloc_unlocked:
 
    pop af
    pop bc

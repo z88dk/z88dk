@@ -27,9 +27,10 @@ l_readword_2_hl:
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a
    
    srl h
-   rr l
+   rra
+   
+   ld l,a
    
    ret

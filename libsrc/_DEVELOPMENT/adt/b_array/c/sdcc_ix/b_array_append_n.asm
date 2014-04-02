@@ -1,9 +1,9 @@
 
 ; size_t b_array_append_n(b_array_t *a, size_t n, int c)
 
-XDEF b_array_append_n
+XDEF _b_array_append_n
 
-b_array_append_n:
+_b_array_append_n:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *wa_priority_queue_pop(wa_priority_queue_t *q)
 
-XDEF wa_priority_queue_pop
+XDEF _wa_priority_queue_pop
 
-wa_priority_queue_pop:
+_wa_priority_queue_pop:
 
    pop af
    pop hl

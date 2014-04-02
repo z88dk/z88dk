@@ -1,9 +1,9 @@
 
 ; void *heap_alloc_fixed(void *heap, void *p, size_t size)
 
-XDEF heap_alloc_fixed
+XDEF _heap_alloc_fixed
 
-heap_alloc_fixed:
+_heap_alloc_fixed:
 
    pop af
    pop de

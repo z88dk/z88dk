@@ -1,9 +1,9 @@
 
 ; void spinlock_release(char *spinlock)
 
-XDEF spinlock_release
+XDEF _spinlock_release
 
-spinlock_release:
+_spinlock_release:
 
    pop af
    pop hl

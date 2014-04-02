@@ -1,9 +1,9 @@
 
 ; void *balloc_firstfit(unsigned int queue, unsigned char num)
 
-XDEF balloc_firstfit
+XDEF _balloc_firstfit
 
-balloc_firstfit:
+_balloc_firstfit:
 
    pop af
    pop hl

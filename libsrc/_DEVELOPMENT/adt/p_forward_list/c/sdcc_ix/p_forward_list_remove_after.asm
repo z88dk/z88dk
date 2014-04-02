@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_remove_after(void *list_item)
 
-XDEF p_forward_list_remove_after
+XDEF _p_forward_list_remove_after
 
-p_forward_list_remove_after:
+_p_forward_list_remove_after:
 
    pop af
    pop hl

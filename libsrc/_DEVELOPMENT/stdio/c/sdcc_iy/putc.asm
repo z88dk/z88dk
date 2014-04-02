@@ -1,12 +1,12 @@
 
 ; int putc(int c, FILE *stream)
 
-XDEF putc
+XDEF _putc
 
-LIB fputc
+LIB _fputc
 
-putc:
+_putc:
 
-   jp fputc
+   jp _fputc
 
    INCLUDE "stdio/z80/asm_putc.asm"

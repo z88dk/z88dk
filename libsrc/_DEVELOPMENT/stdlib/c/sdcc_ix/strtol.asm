@@ -1,9 +1,9 @@
 
 ; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
 
-XDEF strtol
+XDEF _strtol
 
-strtol:
+_strtol:
 
    pop af
    pop hl

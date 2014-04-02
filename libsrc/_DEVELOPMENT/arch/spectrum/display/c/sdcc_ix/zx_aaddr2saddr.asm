@@ -1,9 +1,9 @@
 
 ; void *zx_aaddr2saddr(void *attraddr)
 
-XDEF zx_aaddr2saddr
+XDEF _zx_aaddr2saddr
 
-zx_aaddr2saddr:
+_zx_aaddr2saddr:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; long labs(long j)
 
-XDEF labs
+XDEF _labs
 
-labs:
+_labs:
 
    pop af
    pop hl

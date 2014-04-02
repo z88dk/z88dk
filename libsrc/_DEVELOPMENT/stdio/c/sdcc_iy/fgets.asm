@@ -1,9 +1,9 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
-XDEF fgets
+XDEF _fgets
 
-fgets:
+_fgets:
 
    pop af
    pop de

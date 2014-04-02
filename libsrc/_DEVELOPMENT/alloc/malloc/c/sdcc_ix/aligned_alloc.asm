@@ -1,9 +1,9 @@
 
 ; void *aligned_alloc(size_t alignment, size_t size)
 
-XDEF aligned_alloc
+XDEF _aligned_alloc
 
-aligned_alloc:
+_aligned_alloc:
 
    pop af
    pop bc

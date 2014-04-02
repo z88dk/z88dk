@@ -1,9 +1,9 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
-XDEF strcasecmp
+XDEF _strcasecmp
 
-strcasecmp:
+_strcasecmp:
 
    pop af
    pop de

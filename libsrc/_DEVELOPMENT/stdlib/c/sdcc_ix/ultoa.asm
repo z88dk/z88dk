@@ -1,9 +1,9 @@
 
 ; char *ultoa(unsigned long num, char *buf, int radix)
 
-XDEF ultoa
+XDEF _ultoa
 
-ultoa:
+_ultoa:
 
    pop af
    pop hl

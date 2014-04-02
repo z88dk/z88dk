@@ -1,9 +1,9 @@
 
 ; void *obstack_1grow_fast(struct obstack *ob, char c)
 
-XDEF obstack_1grow_fast
+XDEF _obstack_1grow_fast
 
-obstack_1grow_fast:
+_obstack_1grow_fast:
 
    pop af
    pop hl

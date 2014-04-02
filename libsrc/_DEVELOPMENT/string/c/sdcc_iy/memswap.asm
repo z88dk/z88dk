@@ -1,9 +1,9 @@
 
 ; void *memswap(void *s1, void *s2, size_t n)
 
-XDEF memswap
+XDEF _memswap
 
-memswap:
+_memswap:
 
    pop af
    pop hl

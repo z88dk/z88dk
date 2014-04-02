@@ -1,9 +1,9 @@
 
 ; void *heap_alloc(void *heap, size_t size)
 
-XDEF heap_alloc
+XDEF _heap_alloc
 
-heap_alloc:
+_heap_alloc:
 
    pop af
    pop de

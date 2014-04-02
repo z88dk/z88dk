@@ -1,9 +1,9 @@
 
 ; int posix_memalign(void **memptr, size_t alignment, size_t size)
 
-XDEF posix_memalign
+XDEF _posix_memalign
 
-posix_memalign:
+_posix_memalign:
 
    pop af
    pop de

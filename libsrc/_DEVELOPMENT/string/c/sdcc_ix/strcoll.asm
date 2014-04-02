@@ -1,9 +1,9 @@
 
 ; int strcoll(const char *s1, const char *s2)
 
-XDEF strcoll
+XDEF _strcoll
 
-strcoll:
+_strcoll:
 
    pop af
    pop de

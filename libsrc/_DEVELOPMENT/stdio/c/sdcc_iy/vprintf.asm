@@ -1,9 +1,9 @@
 
 ; int vprintf(const char *format, void *arg)
 
-XDEF vprintf
+XDEF _vprintf
 
-vprintf:
+_vprintf:
 
    pop af
    pop de

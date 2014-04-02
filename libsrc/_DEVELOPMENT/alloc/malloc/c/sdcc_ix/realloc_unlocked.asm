@@ -1,9 +1,9 @@
 
 ; void *realloc_unlocked(void *p, size_t size)
 
-XDEF realloc_unlocked
+XDEF _realloc_unlocked
 
-realloc_unlocked:
+_realloc_unlocked:
 
    pop af
    pop hl

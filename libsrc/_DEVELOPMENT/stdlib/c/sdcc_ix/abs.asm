@@ -1,9 +1,9 @@
 
 ; int abs(int j)
 
-XDEF abs
+XDEF _abs
 
-abs:
+_abs:
 
    pop af
    pop hl

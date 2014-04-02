@@ -1,9 +1,9 @@
 
 ; uint zx_bitmask2px(uchar bitmask)
 
-XDEF zx_bitmask2px
+XDEF _zx_bitmask2px
 
-zx_bitmask2px:
+_zx_bitmask2px:
 
    pop af
    pop hl

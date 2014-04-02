@@ -1,9 +1,9 @@
 
 ; uint zx_saddr2py(void *saddr)
 
-XDEF zx_saddr2py
+XDEF _zx_saddr2py
 
-zx_saddr2py:
+_zx_saddr2py:
 
    pop af
    pop hl

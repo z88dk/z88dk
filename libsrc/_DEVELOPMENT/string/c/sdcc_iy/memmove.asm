@@ -1,9 +1,9 @@
 
 ; void *memmove(void *s1, const void *s2, size_t n)
 
-XDEF memmove
+XDEF _memmove
 
-memmove:
+_memmove:
 
    pop af
    pop de

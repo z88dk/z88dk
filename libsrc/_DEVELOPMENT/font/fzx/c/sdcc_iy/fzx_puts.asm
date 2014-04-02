@@ -1,7 +1,9 @@
 
 ; int fzx_puts(char *s)
 
-fzx_puts:
+XDEF _fzx_puts
+
+_fzx_puts:
 
    pop af
    pop hl

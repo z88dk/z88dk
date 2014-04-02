@@ -1,9 +1,9 @@
 
 ; size_t strlcpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF strlcpy
+XDEF _strlcpy
 
-strlcpy:
+_strlcpy:
 
    pop af
    pop de

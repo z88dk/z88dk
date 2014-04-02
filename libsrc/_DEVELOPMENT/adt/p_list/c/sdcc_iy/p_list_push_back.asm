@@ -1,9 +1,9 @@
 
 ; void *p_list_push_back(p_list_t *list, void *item)
 
-XDEF p_list_push_back
+XDEF _p_list_push_back
 
-p_list_push_back:
+_p_list_push_back:
 
    pop af
    pop hl

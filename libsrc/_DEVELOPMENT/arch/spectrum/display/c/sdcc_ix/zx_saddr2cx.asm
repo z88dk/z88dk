@@ -1,9 +1,9 @@
 
 ; uint zx_saddr2cx(void *saddr)
 
-XDEF zx_saddr2cx
+XDEF _zx_saddr2cx
 
-zx_saddr2cx:
+_zx_saddr2cx:
 
    pop af
    pop hl

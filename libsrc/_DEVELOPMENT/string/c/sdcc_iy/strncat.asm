@@ -1,9 +1,9 @@
 
 ; char *strncat(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF strncat
+XDEF _strncat
 
-strncat:
+_strncat:
 
    pop af
    pop de

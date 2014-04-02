@@ -1,9 +1,9 @@
 
 ; void *ba_priority_queue_data(ba_priority_queue_t *q)
 
-XDEF ba_priority_queue_data
+XDEF _ba_priority_queue_data
 
-ba_priority_queue_data:
+_ba_priority_queue_data:
 
    pop af
    pop hl

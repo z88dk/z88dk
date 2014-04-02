@@ -1,9 +1,9 @@
 
 ; size_t getline_unlocked(char **lineptr, size_t *n, FILE *stream)
 
-XDEF getline_unlocked
+XDEF _getline_unlocked
 
-getline_unlocked:
+_getline_unlocked:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; uint fzx_string_extent(char *s)
 
-XDEF fzx_string_extent
+XDEF _fzx_string_extent
 
-fzx_string_extent:
+_fzx_string_extent:
 
    pop af
    pop hl

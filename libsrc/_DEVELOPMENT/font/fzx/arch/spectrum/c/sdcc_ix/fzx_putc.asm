@@ -1,9 +1,9 @@
 
 ; int fzx_putc(uchar c)
 
-XDEF fzx_putc
+XDEF _fzx_putc
 
-fzx_putc:
+_fzx_putc:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int vasprintf(char **ptr, const char *format, void *arg)
 
-XDEF vasprintf
+XDEF _vasprintf
 
-vasprintf:
+_vasprintf:
 
    pop af
    exx

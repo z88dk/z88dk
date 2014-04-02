@@ -1,9 +1,9 @@
 
 ; long atol(const char *buf)
 
-XDEF atol
+XDEF _atol
 
-atol:
+_atol:
 
    pop af
    pop hl

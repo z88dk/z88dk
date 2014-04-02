@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_reserve(bv_priority_queue_t *q, size_t n)
 
-XDEF bv_priority_queue_reserve
+XDEF _bv_priority_queue_reserve
 
-bv_priority_queue_reserve:
+_bv_priority_queue_reserve:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int fseek(FILE *stream, long offset, int whence)
 
-XDEF fseek
+XDEF _fseek
 
-fseek:
+_fseek:
 
    pop af
    pop ix

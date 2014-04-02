@@ -1,9 +1,9 @@
 
 ; void *w_array_back(w_array_t *a)
 
-XDEF w_array_back
+XDEF _w_array_back
 
-w_array_back:
+_w_array_back:
 
    pop af
    pop hl

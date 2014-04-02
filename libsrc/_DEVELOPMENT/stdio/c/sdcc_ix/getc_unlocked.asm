@@ -1,12 +1,12 @@
 
 ; int getc_unlocked(FILE *stream)
 
-XDEF getc_unlocked
+XDEF _getc_unlocked
 
-LIB fgetc_unlocked
+LIB _fgetc_unlocked
 
-getc_unlocked:
+_getc_unlocked:
 
-   jp fgetc_unlocked
+   jp _fgetc_unlocked
 
    INCLUDE "stdio/z80/asm_getc_unlocked.asm"

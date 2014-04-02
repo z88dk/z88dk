@@ -1,9 +1,9 @@
 
 ; int ferror(FILE *stream)
 
-XDEF ferror
+XDEF _ferror
 
-ferror:
+_ferror:
 
    pop af
    pop bc

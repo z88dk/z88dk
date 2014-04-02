@@ -1,9 +1,9 @@
 
 ; char *strerror(int errnum)
 
-XDEF strerror
+XDEF _strerror
 
-strerror:
+_strerror:
 
    pop af
    pop hl

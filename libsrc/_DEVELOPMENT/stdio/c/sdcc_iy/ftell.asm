@@ -1,9 +1,9 @@
 
 ; unsigned long ftell(FILE *stream)
 
-XDEF ftell
+XDEF _ftell
 
-ftell:
+_ftell:
 
    pop af
    pop ix

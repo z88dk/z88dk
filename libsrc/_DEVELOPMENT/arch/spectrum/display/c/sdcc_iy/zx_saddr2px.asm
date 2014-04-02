@@ -1,9 +1,9 @@
 
 ; uint zx_saddr2px(void *saddr)
 
-XDEF zx_saddr2px
+XDEF _zx_saddr2px
 
-zx_saddr2px:
+_zx_saddr2px:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; _Noreturn void quick_exit(int status)
 
-XDEF quick_exit
+XDEF _quick_exit
 
-quick_exit:
+_quick_exit:
 
    pop af
    pop hl

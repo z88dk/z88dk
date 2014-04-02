@@ -1,9 +1,9 @@
 
 ; void *zx_saddrpup(void *saddr)
 
-XDEF zx_saddrpup
+XDEF _zx_saddrpup
 
-zx_saddrpup:
+_zx_saddrpup:
 
    pop af
    pop hl

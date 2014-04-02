@@ -1,8 +1,8 @@
 
 ; int printf(const char *format, ...)
 
-XDEF printf
+XDEF _printf
 
-printf:
+_printf:
 
    INCLUDE "stdio/z80/asm_printf.asm"

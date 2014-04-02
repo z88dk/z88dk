@@ -1,11 +1,11 @@
 
 ; int isupper(int c)
 
-XLIB isupper
+XLIB _isupper
 
 LIB asm_isupper, error_zc
 
-isupper:
+_isupper:
 
    pop af
    pop hl

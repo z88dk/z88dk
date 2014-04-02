@@ -1,12 +1,12 @@
 
 ; size_t ba_stack_size(ba_stack_t *s)
 
-XDEF ba_stack_size
+XDEF _ba_stack_size
 
-LIB b_array_size
+LIB _b_array_size
 
-ba_stack_size:
+_ba_stack_size:
 
-   jp b_array_size
+   jp _b_array_size
 
    INCLUDE "adt/ba_stack/z80/asm_ba_stack_size.asm"

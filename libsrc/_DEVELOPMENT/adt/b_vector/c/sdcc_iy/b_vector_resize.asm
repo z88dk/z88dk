@@ -1,9 +1,9 @@
 
 ; int b_vector_resize(b_vector_t *v, size_t n)
 
-XDEF b_vector_resize
+XDEF _b_vector_resize
 
-b_vector_resize:
+_b_vector_resize:
 
    pop af
    pop hl

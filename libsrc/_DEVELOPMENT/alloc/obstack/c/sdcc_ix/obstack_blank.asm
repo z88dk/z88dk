@@ -1,9 +1,9 @@
 
 ; void *obstack_blank(struct obstack *ob, int size)
 
-XDEF obstack_blank
+XDEF _obstack_blank
 
-obstack_blank:
+_obstack_blank:
 
    pop af
    pop hl

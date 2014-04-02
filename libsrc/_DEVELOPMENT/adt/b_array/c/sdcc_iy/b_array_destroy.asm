@@ -1,9 +1,9 @@
 
 ; void b_array_destroy(b_array_t *a)
 
-XDEF b_array_destroy
+XDEF _b_array_destroy
 
-b_array_destroy:
+_b_array_destroy:
 
    pop af
    pop hl

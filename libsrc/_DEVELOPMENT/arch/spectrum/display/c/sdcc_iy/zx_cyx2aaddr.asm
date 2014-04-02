@@ -1,9 +1,9 @@
 
 ; void *zx_cyx2aaddr(uchar row, uchar col)
 
-XDEF zx_cyx2aaddr
+XDEF _zx_cyx2aaddr
 
-zx_cyx2aaddr:
+_zx_cyx2aaddr:
 
    pop af
    pop de

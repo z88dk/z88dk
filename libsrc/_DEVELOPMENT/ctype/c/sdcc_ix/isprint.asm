@@ -1,11 +1,11 @@
 
 ; int isprint(int c)
 
-XLIB isprint
+XLIB _isprint
 
 LIB asm_isprint, error_zc
 
-isprint:
+_isprint:
 
    pop af
    pop hl

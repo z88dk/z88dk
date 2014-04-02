@@ -1,9 +1,9 @@
 
 ; char *strtok(char * restrict s1, const char * restrict s2)
 
-XDEF strtok
+XDEF _strtok
 
-strtok:
+_strtok:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int spinlock_tryacquire(char *spinlock)
 
-XDEF spinlock_tryacquire
+XDEF _spinlock_tryacquire
 
-spinlock_tryacquire:
+_spinlock_tryacquire:
 
    pop af
    pop hl

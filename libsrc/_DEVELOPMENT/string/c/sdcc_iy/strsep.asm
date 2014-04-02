@@ -1,9 +1,9 @@
 
 ; char *strsep(char ** restrict stringp, const char * restrict delim)
 
-XDEF strsep
+XDEF _strsep
 
-strsep:
+_strsep:
 
    pop af
    pop bc

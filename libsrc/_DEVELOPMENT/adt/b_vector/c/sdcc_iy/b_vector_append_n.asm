@@ -1,9 +1,9 @@
 
 ; size_t b_vector_append_n(b_vector_t *v, size_t n, int c)
 
-XDEF b_vector_append_n
+XDEF _b_vector_append_n
 
-b_vector_append_n:
+_b_vector_append_n:
 
    pop af
    pop hl

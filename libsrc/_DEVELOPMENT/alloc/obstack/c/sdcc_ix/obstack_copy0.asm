@@ -1,9 +1,9 @@
 
 ; void *obstack_copy0(struct obstack *ob, void *address, size_t size)
 
-XDEF obstack_copy0
+XDEF _obstack_copy0
 
-obstack_copy0:
+_obstack_copy0:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int obstack_vprintf(struct obstack *obstack, const char *format, void *arg)
 
-XDEF obstack_vprintf
+XDEF _obstack_vprintf
 
-obstack_vprintf:
+_obstack_vprintf:
 
    pop af
    pop hl

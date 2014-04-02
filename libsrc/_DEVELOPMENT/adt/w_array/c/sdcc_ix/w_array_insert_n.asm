@@ -1,9 +1,9 @@
 
 ; size_t w_array_insert_n(w_array_t *a, size_t idx, size_t n, void *item)
 
-XDEF w_array_insert_n
+XDEF _w_array_insert_n
 
-w_array_insert_n:
+_w_array_insert_n:
 
    exx
    pop bc

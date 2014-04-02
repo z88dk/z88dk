@@ -1,9 +1,9 @@
 
 ; void *zx_saddrcleft(void *saddr)
 
-XDEF zx_saddrcleft
+XDEF _zx_saddrcleft
 
-zx_saddrcleft:
+_zx_saddrcleft:
 
    pop af
    pop hl

@@ -1,8 +1,8 @@
 
 ; int snprintf(char *s, size_t n, const char *format, ...)
 
-XDEF snprintf
+XDEF _snprintf
 
-snprintf:
+_snprintf:
 
    INCLUDE "stdio/z80/asm_snprintf.asm"

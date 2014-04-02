@@ -1,9 +1,9 @@
 
 ; void *realloc(void *p, size_t size)
 
-XDEF realloc
+XDEF _realloc
 
-realloc:
+_realloc:
 
    pop af
    pop hl

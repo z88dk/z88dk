@@ -1,11 +1,11 @@
 
 ; int isalnum(int c)
 
-XLIB isalnum
+XLIB _isalnum
 
 LIB asm_isalnum, error_zc
 
-isalnum:
+_isalnum:
 
    pop af
    pop hl

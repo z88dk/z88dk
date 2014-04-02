@@ -1,9 +1,9 @@
 
 ; int getchar(void)
 
-XDEF getchar
+XDEF _getchar
 
-getchar:
+_getchar:
 
    push ix
    

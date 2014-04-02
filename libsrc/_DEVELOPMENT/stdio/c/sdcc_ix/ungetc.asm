@@ -1,9 +1,9 @@
 
 ; int ungetc(int c, FILE *stream)
 
-XDEF ungetc
+XDEF _ungetc
 
-ungetc:
+_ungetc:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *b_array_data(b_array_t *a)
 
-XDEF b_array_data
+XDEF _b_array_data
 
-b_array_data:
+_b_array_data:
 
    pop af
    pop hl

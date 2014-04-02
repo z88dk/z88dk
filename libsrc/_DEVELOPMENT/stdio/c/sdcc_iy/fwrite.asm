@@ -1,9 +1,9 @@
 
 ; size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XDEF fwrite
+XDEF _fwrite
 
-fwrite:
+_fwrite:
 
    pop af
    pop hl

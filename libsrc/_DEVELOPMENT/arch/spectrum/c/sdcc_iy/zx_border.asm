@@ -1,9 +1,9 @@
 
 ; void zx_border(uchar colour)
 
-XDEF zx_border
+XDEF _zx_border
 
-zx_border:
+_zx_border:
 
    pop af
    pop hl

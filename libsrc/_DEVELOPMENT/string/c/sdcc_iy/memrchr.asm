@@ -1,9 +1,9 @@
 
 ; void *memrchr(const void *s, int c, size_t n)
 
-XDEF memrchr
+XDEF _memrchr
 
-memrchr:
+_memrchr:
 
    pop af
    pop hl

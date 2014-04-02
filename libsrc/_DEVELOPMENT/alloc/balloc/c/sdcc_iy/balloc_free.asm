@@ -1,9 +1,9 @@
 
 ; void balloc_free(void *m)
 
-XDEF balloc_free
+XDEF _balloc_free
 
-balloc_free:
+_balloc_free:
 
    pop af
    pop hl

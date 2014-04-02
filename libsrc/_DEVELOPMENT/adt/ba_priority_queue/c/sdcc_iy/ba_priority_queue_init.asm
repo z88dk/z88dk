@@ -2,9 +2,9 @@
 ; ba_priority_queue_t *
 ; ba_priority_queue_init(void *p, void *data, size_t capacity, int (*compar)(const void *, const void *))
 
-XDEF ba_priority_queue_init
+XDEF _ba_priority_queue_init
 
-ba_priority_queue_init:
+_ba_priority_queue_init:
 
    pop af
    pop hl

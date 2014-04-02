@@ -1,11 +1,11 @@
 
 ; int isgraph(int c)
 
-XLIB isgraph
+XLIB _isgraph
 
 LIB asm_isgraph, error_zc
 
-isgraph:
+_isgraph:
 
    pop af
    pop hl

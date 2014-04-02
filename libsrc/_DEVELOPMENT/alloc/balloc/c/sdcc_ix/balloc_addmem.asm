@@ -1,9 +1,9 @@
 
 ; void *balloc_addmem(unsigned char q, size_t num, size_t size, void *addr)
 
-XDEF balloc_addmem
+XDEF _balloc_addmem
 
-balloc_addmem:
+_balloc_addmem:
 
    pop af
    exx

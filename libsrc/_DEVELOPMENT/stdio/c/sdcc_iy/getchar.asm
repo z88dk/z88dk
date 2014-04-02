@@ -1,8 +1,8 @@
 
 ; int getchar(void)
 
-XDEF getchar
+XDEF _getchar
 
-getchar:
+_getchar:
 
    INCLUDE "stdio/z80/asm_getchar.asm"

@@ -1,9 +1,9 @@
 
 ; int ferror_unlocked(FILE *stream)
 
-XDEF ferror_unlocked
+XDEF _ferror_unlocked
 
-ferror_unlocked:
+_ferror_unlocked:
 
    pop af
    pop bc

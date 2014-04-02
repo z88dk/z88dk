@@ -1,11 +1,11 @@
 
 ; int isdigit(int c)
 
-XLIB isdigit
+XLIB _isdigit
 
 LIB asm_isdigit, error_zc
 
-isdigit:
+_isdigit:
 
    pop af
    pop hl

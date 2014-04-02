@@ -1,9 +1,9 @@
 
 ; int mtx_init(mtx_t *mtx, int type)
 
-XDEF mtx_init
+XDEF _mtx_init
 
-mtx_init:
+_mtx_init:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void clearerr(FILE *stream)
 
-XDEF clearerr
+XDEF _clearerr
 
-clearerr:
+_clearerr:
 
    pop af
    pop bc

@@ -1,11 +1,11 @@
 
 ; int isascii(int c)
 
-XLIB isascii
+XLIB _isascii
 
 LIB error_znc
 
-isascii:
+_isascii:
 
    pop af
    pop hl

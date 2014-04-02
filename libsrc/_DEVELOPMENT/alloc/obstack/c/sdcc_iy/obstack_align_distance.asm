@@ -1,9 +1,9 @@
 
 ; size_t obstack_align_distance(struct obstack *ob, size_t alignment)
 
-XDEF obstack_align_distance
+XDEF _obstack_align_distance
 
-obstack_align_distance:
+_obstack_align_distance:
 
    pop af
    pop hl

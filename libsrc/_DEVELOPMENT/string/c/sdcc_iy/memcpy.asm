@@ -1,9 +1,9 @@
 
 ; void *memcpy(void * restrict s1, const void * restrict s2, size_t n)
 
-XDEF memcpy
+XDEF _memcpy
 
-memcpy:
+_memcpy:
 
    pop af
    pop de

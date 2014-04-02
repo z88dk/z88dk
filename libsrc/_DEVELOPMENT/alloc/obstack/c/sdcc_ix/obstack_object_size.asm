@@ -1,9 +1,9 @@
 
 ; size_t obstack_object_size(struct obstack *ob)
 
-XDEF obstack_object_size
+XDEF _obstack_object_size
 
-obstack_object_size:
+_obstack_object_size:
 
    pop af
    pop hl

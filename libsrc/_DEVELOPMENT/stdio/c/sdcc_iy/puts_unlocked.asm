@@ -1,9 +1,9 @@
 
 ; int puts_unlocked(const char *s)
 
-XDEF puts_unlocked
+XDEF _puts_unlocked
 
-puts_unlocked:
+_puts_unlocked:
 
    pop af
    pop hl

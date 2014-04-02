@@ -1,9 +1,9 @@
 
 ; int fputc_unlocked(int c, FILE *stream)
 
-XDEF fputc_unlocked
+XDEF _fputc_unlocked
 
-fputc_unlocked:
+_fputc_unlocked:
 
    pop af
    pop de

@@ -1,9 +1,9 @@
 
 ; int mtx_trylock(mtx_t *m)
 
-XDEF mtx_trylock
+XDEF _mtx_trylock
 
-mtx_trylock:
+_mtx_trylock:
 
    pop af
    pop hl

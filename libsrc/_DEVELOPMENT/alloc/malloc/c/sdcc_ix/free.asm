@@ -1,9 +1,9 @@
 
 ; void free(void *p)
 
-XDEF free
+XDEF _free
 
-free:
+_free:
 
    pop af
    pop hl

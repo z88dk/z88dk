@@ -1,9 +1,9 @@
 
 ; int obstack_grow0(struct obstack *ob, void *data, size_t size)
 
-XDEF obstack_grow0
+XDEF _obstack_grow0
 
-obstack_grow0:
+_obstack_grow0:
 
    pop af
    pop hl

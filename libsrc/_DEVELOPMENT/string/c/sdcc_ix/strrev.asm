@@ -1,9 +1,9 @@
 
 ; char *strrev(char *s)
 
-XDEF strrev
+XDEF _strrev
 
-strrev:
+_strrev:
 
    pop af
    pop hl

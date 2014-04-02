@@ -1,8 +1,8 @@
 
 ; int rand(void)
 
-XDEF rand
+XDEF _rand
 
-rand:
+_rand:
 
    INCLUDE "stdlib/z80/asm_rand.asm"

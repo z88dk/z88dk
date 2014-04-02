@@ -1,9 +1,9 @@
 
 ; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
 
-XDEF zx_pattern_fill
+XDEF _zx_pattern_fill
 
-zx_pattern_fill:
+_zx_pattern_fill:
 
    pop af
    pop hl

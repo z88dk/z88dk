@@ -1,9 +1,9 @@
 
 ; void *b_vector_insert_block(b_vector_t *v, size_t idx, size_t n)
 
-XDEF b_vector_insert_block
+XDEF _b_vector_insert_block
 
-b_vector_insert_block:
+_b_vector_insert_block:
 
    pop af
    pop hl

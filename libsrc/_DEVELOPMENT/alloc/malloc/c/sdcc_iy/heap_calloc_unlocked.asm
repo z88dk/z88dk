@@ -1,9 +1,9 @@
 
 ; void *heap_calloc_unlocked(void *heap, size_t nmemb, size_t size)
 
-XDEF heap_calloc_unlocked
+XDEF _heap_calloc_unlocked
 
-heap_calloc_unlocked:
+_heap_calloc_unlocked:
 
    pop af
    pop de

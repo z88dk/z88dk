@@ -1,11 +1,11 @@
 
 ; int tolower(int c)
 
-XLIB tolower
+XLIB _tolower
 
 LIB asm_tolower
 
-tolower:
+_tolower:
 
    pop af
    pop hl

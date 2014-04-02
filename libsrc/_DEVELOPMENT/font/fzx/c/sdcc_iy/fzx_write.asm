@@ -1,9 +1,9 @@
 
 ; int fzx_write(void *buf, uint len)
 
-XDEF fzx_write
+XDEF _fzx_write
 
-fzx_write:
+_fzx_write:
 
    pop af
    pop de

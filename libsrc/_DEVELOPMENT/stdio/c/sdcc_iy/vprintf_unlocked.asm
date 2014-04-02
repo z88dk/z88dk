@@ -1,9 +1,9 @@
 
 ; int vprintf_unlocked(const char *format, void *arg)
 
-XDEF vprintf_unlocked
+XDEF _vprintf_unlocked
 
-vprintf_unlocked:
+_vprintf_unlocked:
 
    pop af
    pop de

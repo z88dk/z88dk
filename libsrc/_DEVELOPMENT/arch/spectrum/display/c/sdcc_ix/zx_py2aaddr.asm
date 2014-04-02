@@ -1,9 +1,9 @@
 
 ; void *zx_py2aaddr(uchar y)
 
-XDEF zx_py2aaddr
+XDEF _zx_py2aaddr
 
-zx_py2aaddr:
+_zx_py2aaddr:
 
    pop af
    pop hl

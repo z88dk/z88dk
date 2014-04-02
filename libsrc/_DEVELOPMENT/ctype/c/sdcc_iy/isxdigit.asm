@@ -1,11 +1,11 @@
 
 ; int isxdigit(int c)
 
-XLIB isxdigit
+XLIB _isxdigit
 
 LIB asm_isxdigit, error_zc
 
-isxdigit:
+_isxdigit:
 
    pop af
    pop hl

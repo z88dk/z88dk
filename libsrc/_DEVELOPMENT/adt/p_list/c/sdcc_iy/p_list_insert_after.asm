@@ -1,9 +1,9 @@
 
 ; void *p_list_insert_after(p_list_t *list, void *list_item, void *item)
 
-XDEF p_list_insert_after
+XDEF _p_list_insert_after
 
-p_list_insert_after:
+_p_list_insert_after:
 
    pop af
    pop bc

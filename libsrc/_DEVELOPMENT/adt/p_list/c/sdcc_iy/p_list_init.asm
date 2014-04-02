@@ -1,9 +1,9 @@
 
 ; void p_list_init(void *p)
 
-XDEF p_list_init
+XDEF _p_list_init
 
-p_list_init:
+_p_list_init:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *p_list_remove(p_list_t *list, void *item)
 
-XDEF p_list_remove
+XDEF _p_list_remove
 
-p_list_remove:
+_p_list_remove:
 
    pop af
    pop bc

@@ -1,9 +1,9 @@
 
 ; size_t w_vector_append_n(b_vector_t *v, size_t n, void *item)
 
-XDEF w_vector_append_n
+XDEF _w_vector_append_n
 
-w_vector_append_n:
+_w_vector_append_n:
 
    pop af
    pop hl

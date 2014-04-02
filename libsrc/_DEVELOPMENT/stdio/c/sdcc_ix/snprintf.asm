@@ -1,9 +1,9 @@
 
 ; int snprintf(char *s, size_t n, const char *format, ...)
 
-XDEF snprintf
+XDEF _snprintf
 
-snprintf:
+_snprintf:
 
    push ix
    

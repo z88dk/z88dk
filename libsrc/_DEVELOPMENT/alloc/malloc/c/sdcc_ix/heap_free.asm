@@ -1,9 +1,9 @@
 
 ; void heap_free(void *heap, void *p)
 
-XDEF heap_free
+XDEF _heap_free
 
-heap_free:
+_heap_free:
 
    pop af
    pop de

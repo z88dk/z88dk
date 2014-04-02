@@ -1,9 +1,9 @@
 
 ; void *obstack_next_free(struct obstack *ob)
 
-XDEF obstack_next_free
+XDEF _obstack_next_free
 
-obstack_next_free:
+_obstack_next_free:
 
    pop af
    pop hl

@@ -1,11 +1,11 @@
 
 ; int isodigit(int c)
 
-XLIB isodigit
+XLIB _isodigit
 
 LIB asm_isodigit, error_zc
 
-isodigit:
+_isodigit:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int fzx_mode(int mode)
 
-XDEF fzx_mode
+XDEF _fzx_mode
 
-fzx_mode:
+_fzx_mode:
 
    pop af
    pop hl

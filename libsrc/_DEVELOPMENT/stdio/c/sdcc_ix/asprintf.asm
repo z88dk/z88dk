@@ -1,9 +1,9 @@
  
 ; int asprintf (char **ptr, const char *format, ...)
 
-XDEF asprintf
+XDEF _asprintf
 
-asprintf:
+_asprintf:
 
    push ix
    

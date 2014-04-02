@@ -1,9 +1,9 @@
 
 ; int b_array_pop_back(b_array_t *a)
 
-XDEF b_array_pop_back
+XDEF _b_array_pop_back
 
-b_array_pop_back:
+_b_array_pop_back:
 
    pop af
    pop hl

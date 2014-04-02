@@ -1,9 +1,9 @@
 
 ; void *zx_saddrpright(void *saddr, uint bitmask)
 
-XDEF zx_saddrpright
+XDEF _zx_saddrpright
 
-zx_saddrpright:
+_zx_saddrpright:
 
    pop af
    pop hl

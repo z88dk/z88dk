@@ -1,9 +1,9 @@
 
 ; void *heap_realloc(void *heap, void *p, size_t size)
 
-XDEF heap_realloc
+XDEF _heap_realloc
 
-heap_realloc:
+_heap_realloc:
 
    pop af
    pop de

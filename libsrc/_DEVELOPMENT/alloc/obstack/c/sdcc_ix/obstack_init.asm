@@ -1,9 +1,9 @@
 
 ; void *obstack_init(struct obstack *ob, size_t size)
 
-XDEF obstack_init
+XDEF _obstack_init
 
-obstack_init:
+_obstack_init:
 
    pop af
    pop de

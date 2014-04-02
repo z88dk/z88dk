@@ -1,9 +1,9 @@
 
 ; void *zx_pxy2aaddr_callee(uchar x, uchar y)
 
-XDEF zx_pxy2aaddr
+XDEF _zx_pxy2aaddr
 
-zx_pxy2aaddr:
+_zx_pxy2aaddr:
 
    pop af
    pop hl

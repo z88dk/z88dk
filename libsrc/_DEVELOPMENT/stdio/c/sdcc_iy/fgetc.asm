@@ -1,9 +1,9 @@
 
 ; int fgetc(FILE *stream)
 
-XDEF fgetc
+XDEF _fgetc
 
-fgetc:
+_fgetc:
 
    pop af
    pop ix

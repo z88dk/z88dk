@@ -1,9 +1,9 @@
 
 ; int ffsl(long i)
 
-XDEF ffsl
+XDEF _ffsl
 
-ffsl:
+_ffsl:
 
    pop af
    pop hl

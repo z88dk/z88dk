@@ -1,9 +1,9 @@
 
 ; char *strtok_r(char * restrict s, const char * restrict sep, char ** restrict lasts)
 
-XDEF strtok_r
+XDEF _strtok_r
 
-strtok_r:
+_strtok_r:
 
    pop af
    pop hl

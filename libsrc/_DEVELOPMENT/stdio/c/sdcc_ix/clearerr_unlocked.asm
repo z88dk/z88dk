@@ -1,9 +1,9 @@
 
 ; void clearerr_unlocked(FILE *stream)
 
-XDEF clearerr_unlocked
+XDEF _clearerr_unlocked
 
-clearerr_unlocked:
+_clearerr_unlocked:
 
    pop af
    pop bc

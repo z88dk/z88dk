@@ -1,9 +1,9 @@
 
 ; int vfscanf_unlocked(FILE *stream, const char *format, void *arg)
 
-XDEF vfscanf_unlocked
+XDEF _vfscanf_unlocked
 
-vfscanf_unlocked:
+_vfscanf_unlocked:
 
    pop af
    exx

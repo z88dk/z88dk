@@ -1,9 +1,9 @@
 
 ; int atoi(const char *buf)
 
-XDEF atoi
+XDEF _atoi
 
-atoi:
+_atoi:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *zx_saddrpleft(void *saddr, uchar bitmask)
 
-XDEF zx_saddrpleft
+XDEF _zx_saddrpleft
 
-zx_saddrpleft:
+_zx_saddrpleft:
 
    pop af
    pop hl

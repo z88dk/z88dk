@@ -1,9 +1,9 @@
 
 ; int mtx_timedlock(mtx_t *m, struct timespec *ts)
 
-XDEF mtx_timedlock
+XDEF _mtx_timedlock
 
-mtx_timedlock:
+_mtx_timedlock:
 
    pop af
    pop hl

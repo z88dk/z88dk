@@ -1,9 +1,9 @@
 
 ; void *zx_pxy2saddr(uchar x, uchar y)
 
-XDEF zx_pxy2saddr
+XDEF _zx_pxy2saddr
 
-zx_pxy2saddr:
+_zx_pxy2saddr:
 
    pop af
    pop hl

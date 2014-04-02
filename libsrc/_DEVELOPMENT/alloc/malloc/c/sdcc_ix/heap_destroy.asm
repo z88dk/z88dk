@@ -1,12 +1,12 @@
 
 ; void *heap_destroy(void *heap)
 
-XDEF heap_destroy
+XDEF _heap_destroy
 
-LIB mtx_destroy
+LIB _mtx_destroy
 
-heap_destroy:
+_heap_destroy:
 
-   jp mtx_destroy
+   jp _mtx_destroy
 
    INCLUDE "alloc/malloc/z80/asm_heap_destroy.asm"

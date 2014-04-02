@@ -1,9 +1,9 @@
 
 ; size_t w_array_erase(w_array_t *a, size_t idx)
 
-XDEF w_array_erase
+XDEF _w_array_erase
 
-w_array_erase:
+_w_array_erase:
 
    pop af
    pop hl

@@ -1,11 +1,11 @@
 
 ; int toupper(int c)
 
-XLIB toupper
+XLIB _toupper
 
 LIB asm_toupper
 
-toupper:
+_toupper:
 
    pop af
    pop hl

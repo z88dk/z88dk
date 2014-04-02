@@ -1,9 +1,9 @@
 
 ; size_t getline(char **lineptr, size_t *n, FILE *stream)
 
-XDEF getline
+XDEF _getline
 
-getline:
+_getline:
 
    pop af
    pop hl

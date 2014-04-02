@@ -1,9 +1,9 @@
 
 ; int vscanf_unlocked(const char *format, void *arg)
 
-XDEF vscanf_unlocked
+XDEF _vscanf_unlocked
 
-vscanf_unlocked:
+_vscanf_unlocked:
 
    pop af
    pop de

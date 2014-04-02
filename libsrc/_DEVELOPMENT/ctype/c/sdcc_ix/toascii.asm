@@ -1,9 +1,9 @@
 
 ; int toascii(int c)
 
-XLIB toascii
+XLIB _toascii
 
-toascii:
+_toascii:
 
    pop af
    pop hl

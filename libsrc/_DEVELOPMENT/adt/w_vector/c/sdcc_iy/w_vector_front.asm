@@ -1,12 +1,12 @@
 
 ; void *w_vector_front(w_vector_t *v)
 
-XDEF w_vector_front
+XDEF _w_vector_front
 
-LIB w_array_front
+LIB _w_array_front
 
-w_vector_front:
+_w_vector_front:
 
-   jp w_array_front
+   jp _w_array_front
 
    INCLUDE "adt/w_vector/z80/asm_w_vector_front.asm"

@@ -1,9 +1,9 @@
 
 ; int fgetpos_unlocked(FILE *stream, fpos_t *pos)
 
-XDEF fgetpos_unlocked
+XDEF _fgetpos_unlocked
 
-fgetpos_unlocked:
+_fgetpos_unlocked:
 
    pop af
    pop bc

@@ -1,9 +1,9 @@
 
 ; size_t obstack_room(struct obstack *ob)
 
-XDEF obstack_room
+XDEF _obstack_room
 
-obstack_room:
+_obstack_room:
 
    pop af
    pop hl

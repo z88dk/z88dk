@@ -1,9 +1,9 @@
 
 ; void wv_priority_queue_destroy(wv_priority_queue_t *q)
 
-XDEF wv_priority_queue_destroy
+XDEF _wv_priority_queue_destroy
 
-wv_priority_queue_destroy:
+_wv_priority_queue_destroy:
 
    pop af
    pop hl

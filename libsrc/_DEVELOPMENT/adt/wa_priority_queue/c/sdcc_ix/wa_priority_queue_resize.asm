@@ -1,9 +1,9 @@
 
 ; int wa_priority_queue_resize(wa_priority_queue_t *q, size_t n)
 
-XDEF wa_priority_queue_resize
+XDEF _wa_priority_queue_resize
 
-wa_priority_queue_resize:
+_wa_priority_queue_resize:
 
    pop af
    pop hl

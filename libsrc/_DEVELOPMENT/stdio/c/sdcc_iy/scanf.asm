@@ -1,8 +1,8 @@
 
 ; int scanf(const char *format, ...)
 
-XDEF scanf
+XDEF _scanf
 
-scanf:
+_scanf:
 
    INCLUDE "stdio/z80/asm_scanf.asm"

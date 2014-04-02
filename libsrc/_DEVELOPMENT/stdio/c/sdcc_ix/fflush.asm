@@ -1,9 +1,9 @@
 
 ; int fflush(FILE *stream)
 
-XDEF fflush
+XDEF _fflush
 
-fflush:
+_fflush:
 
    pop af
    pop bc

@@ -1,9 +1,9 @@
 
 ; void *balloc_alloc(unsigned int queue)
 
-XDEF balloc_alloc
+XDEF _balloc_alloc
 
-balloc_alloc:
+_balloc_alloc:
 
    pop af
    pop hl

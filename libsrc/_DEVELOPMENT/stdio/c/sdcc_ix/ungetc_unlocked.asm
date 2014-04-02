@@ -1,9 +1,9 @@
 
 ; int ungetc_unlocked(int c, FILE *stream)
 
-XDEF ungetc_unlocked
+XDEF _ungetc_unlocked
 
-ungetc_unlocked:
+_ungetc_unlocked:
 
    pop af
    pop hl

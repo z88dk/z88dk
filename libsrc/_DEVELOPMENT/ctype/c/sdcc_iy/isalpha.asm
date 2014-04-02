@@ -1,11 +1,11 @@
 
 ; int isalpha(int c)
 
-XLIB isalpha
+XLIB _isalpha
 
 LIB asm_isalpha, error_zc
 
-isalpha:
+_isalpha:
 
    pop af
    pop hl

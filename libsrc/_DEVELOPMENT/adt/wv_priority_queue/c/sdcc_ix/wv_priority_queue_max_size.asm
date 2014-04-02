@@ -1,9 +1,9 @@
 
 ; size_t wv_priority_queue_max_size(wv_priority_queue_t *q)
 
-XDEF wv_priority_queue_max_size
+XDEF _wv_priority_queue_max_size
 
-wv_priority_queue_max_size:
+_wv_priority_queue_max_size:
 
    pop af
    pop hl

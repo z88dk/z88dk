@@ -1,9 +1,9 @@
 
 ; size_t w_array_append_n(w_array_t *a, size_t n, void *item)
 
-XDEF w_array_append_n
+XDEF _w_array_append_n
 
-w_array_append_n:
+_w_array_append_n:
 
    pop af
    pop hl

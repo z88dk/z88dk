@@ -1,9 +1,9 @@
 
 ; size_t strlcat(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF strlcat
+XDEF _strlcat
 
-strlcat:
+_strlcat:
 
    pop af
    pop hl

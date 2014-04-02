@@ -1,9 +1,9 @@
 
 ; void *heap_alloc_aligned(void *heap, size_t alignment, size_t size)
 
-XDEF heap_alloc_aligned
+XDEF _heap_alloc_aligned
 
-heap_alloc_aligned:
+_heap_alloc_aligned:
 
    pop af
    pop de

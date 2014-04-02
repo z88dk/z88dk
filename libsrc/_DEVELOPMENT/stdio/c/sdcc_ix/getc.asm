@@ -1,12 +1,12 @@
 
 ; int getc(FILE *stream)
 
-XDEF getc
+XDEF _getc
 
-LIB fgetc
+LIB _fgetc
 
 getc:
 
-   jp fgetc
+   jp _fgetc
 
    INCLUDE "stdio/z80/asm_getc.asm"

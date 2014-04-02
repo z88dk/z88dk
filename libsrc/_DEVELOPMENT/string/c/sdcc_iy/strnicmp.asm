@@ -1,12 +1,12 @@
 
 ; int strnicmp(const char *s1, const char *s2, size_t n)
 
-XDEF strnicmp
+XDEF _strnicmp
 
-LIB strncasecmp
+LIB _strncasecmp
 
-strnicmp:
+_strnicmp:
 
-   jp strncasecmp
+   jp _strncasecmp
 
    INCLUDE "string/z80/asm_strnicmp.asm"

@@ -1,9 +1,9 @@
 
 ; void *obstack_base(struct obstack *ob)
 
-XDEF obstack_base
+XDEF _obstack_base
 
-obstack_base:
+_obstack_base:
 
    pop af
    pop hl

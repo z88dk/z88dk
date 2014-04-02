@@ -1,9 +1,9 @@
 
 ; int fseek_unlocked(FILE *stream, long offset, int whence)
 
-XDEF fseek_unlocked
+XDEF _fseek_unlocked
 
-fseek_unlocked:
+_fseek_unlocked:
 
    pop af
    exx

@@ -1,8 +1,8 @@
  
 ; int asprintf (char **ptr, const char *format, ...)
 
-XDEF asprintf
+XDEF _asprintf
 
-asprintf:
+_asprintf:
 
    INCLUDE "stdio/z80/asm_asprintf.asm"

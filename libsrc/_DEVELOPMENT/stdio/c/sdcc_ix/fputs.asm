@@ -1,9 +1,9 @@
 
 ; int fputs(const char *s, FILE *stream)
 
-XDEF fputs
+XDEF _fputs
 
-fputs:
+_fputs:
 
    pop af
    pop hl

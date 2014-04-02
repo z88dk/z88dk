@@ -1,9 +1,9 @@
 
 ; size_t p_forward_list_size(p_forward_list_t *list)
 
-XDEF p_forward_list_size
+XDEF _p_forward_list_size
 
-p_forward_list_size:
+_p_forward_list_size:
 
    pop af
    pop hl

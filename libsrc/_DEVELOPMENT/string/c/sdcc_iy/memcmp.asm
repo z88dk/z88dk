@@ -1,9 +1,9 @@
 
 ; int memcmp(const void *s1, const void *s2, size_t n)
 
-XDEF memcmp
+XDEF _memcmp
 
-memcmp:
+_memcmp:
 
    pop af
    pop de

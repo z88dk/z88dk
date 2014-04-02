@@ -1,12 +1,12 @@
 
 ; int ba_stack_top(ba_stack_t *s)
 
-XDEF ba_stack_top
+XDEF _ba_stack_top
 
-LIB b_array_back
+LIB _b_array_back
 
-ba_stack_top:
+_ba_stack_top:
 
-   jp b_array_back
+   jp _b_array_back
 
    INCLUDE "adt/ba_stack/z80/asm_ba_stack_top.asm"

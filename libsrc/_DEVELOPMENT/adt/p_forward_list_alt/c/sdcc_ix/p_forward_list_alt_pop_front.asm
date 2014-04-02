@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_alt_pop_front(p_forward_list_alt_t *list)
 
-XDEF p_forward_list_alt_pop_front
+XDEF _p_forward_list_alt_pop_front
 
-p_forward_list_alt_pop_front:
+_p_forward_list_alt_pop_front:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *calloc_unlocked(size_t nmemb, size_t size)
 
-XDEF calloc_unlocked
+XDEF _calloc_unlocked
 
-calloc_unlocked:
+_calloc_unlocked:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void *calloc(size_t nmemb, size_t size)
 
-XDEF calloc
+XDEF _calloc
 
-calloc:
+_calloc:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
-XDEF utoa
+XDEF _utoa
 
-utoa:
+_utoa:
 
    pop af
    pop hl

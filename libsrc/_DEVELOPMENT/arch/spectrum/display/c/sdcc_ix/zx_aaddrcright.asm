@@ -1,9 +1,9 @@
 
 ; void *zx_aaddrcright(void *attraddr)
 
-XDEF zx_aaddrcright
+XDEF _zx_aaddrcright
 
-zx_aaddrcright:
+_zx_aaddrcright:
 
    pop af
    pop hl

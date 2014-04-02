@@ -1,9 +1,9 @@
 
 ; void flockfile(FILE *file)
 
-XDEF flockfile
+XDEF _flockfile
 
-flockfile:
+_flockfile:
 
    pop af
    pop bc

@@ -1,9 +1,9 @@
 
 ; int fscanf(FILE *stream, const char *format, ...)
 
-XDEF fscanf
+XDEF _fscanf
 
-fscanf:
+_fscanf:
 
    push ix
    

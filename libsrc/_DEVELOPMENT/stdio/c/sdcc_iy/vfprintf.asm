@@ -1,9 +1,9 @@
 
 ; int vfprintf(FILE *stream, const char *format, void *arg)
 
-XDEF vfprintf
+XDEF _vfprintf
 
-vfprintf:
+_vfprintf:
 
    pop af
    pop ix

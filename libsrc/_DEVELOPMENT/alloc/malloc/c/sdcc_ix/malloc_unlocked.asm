@@ -1,9 +1,9 @@
 
 ; void *malloc_unlocked(size_t size)
 
-XDEF malloc_unlocked
+XDEF _malloc_unlocked
 
-malloc_unlocked:
+_malloc_unlocked:
 
    pop af
    pop hl

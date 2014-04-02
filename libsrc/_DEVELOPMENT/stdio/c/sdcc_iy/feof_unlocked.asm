@@ -1,9 +1,9 @@
 
 ; int feof_unlocked(FILE *stream)
 
-XDEF feof_unlocked
+XDEF _feof_unlocked
 
-feof_unlocked:
+_feof_unlocked:
 
    pop af
    pop ix

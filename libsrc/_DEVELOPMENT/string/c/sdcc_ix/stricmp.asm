@@ -1,12 +1,12 @@
 
 ; int stricmp(const char *s1, const char *s2)
 
-XDEF stricmp
+XDEF _stricmp
 
-LIB strcasecmp
+LIB _strcasecmp
 
-stricmp:
+_stricmp:
 
-   jp strcasecmp
+   jp _strcasecmp
 
    INCLUDE "string/z80/asm_stricmp.asm"

@@ -1,9 +1,9 @@
 
 ; void *p_list_pop_back(p_list_t *list)
 
-XDEF p_list_pop_back
+XDEF _p_list_pop_back
 
-p_list_pop_back:
+_p_list_pop_back:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int wv_priority_queue_shrink_to_fit(wv_priority_queue_t *q)
 
-XDEF wv_priority_queue_shrink_to_fit
+XDEF _wv_priority_queue_shrink_to_fit
 
-wv_priority_queue_shrink_to_fit:
+_wv_priority_queue_shrink_to_fit:
 
    pop af
    pop hl

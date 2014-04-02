@@ -1,9 +1,9 @@
 
 ; int putchar(int c)
 
-XDEF putchar
+XDEF _putchar
 
-putchar:
+_putchar:
 
    pop af
    pop hl

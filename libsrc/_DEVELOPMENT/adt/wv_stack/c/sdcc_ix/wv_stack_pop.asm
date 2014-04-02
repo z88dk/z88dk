@@ -1,12 +1,12 @@
 
 ; void *wv_stack_pop(wv_stack_t *s)
 
-XDEF wv_stack_pop
+XDEF _wv_stack_pop
 
-LIB w_array_pop_back
+LIB _w_array_pop_back
 
-wv_stack_pop:
+_wv_stack_pop:
 
-   jp w_array_pop_back
+   jp _w_array_pop_back
 
    INCLUDE "adt/wv_stack/z80/asm_wv_stack_pop.asm"

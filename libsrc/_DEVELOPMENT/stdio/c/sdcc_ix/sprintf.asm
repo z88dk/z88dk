@@ -1,9 +1,9 @@
 
 ; int sprintf(char *s, const char *format, ...)
 
-XDEF sprintf
+XDEF _sprintf
 
-sprintf:
+_sprintf:
 
    push ix
    

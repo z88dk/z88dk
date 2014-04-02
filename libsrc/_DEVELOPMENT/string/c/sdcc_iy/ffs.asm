@@ -1,9 +1,9 @@
 
 ; int ffs(int i)
 
-XDEF ffs
+XDEF _ffs
 
-ffs:
+_ffs:
 
    pop af
    pop hl

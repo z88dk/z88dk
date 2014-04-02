@@ -1,9 +1,9 @@
 
 ; void *heap_init(void *heap, size_t size)
 
-XDEF heap_init
+XDEF _heap_init
 
-heap_init:
+_heap_init:
 
    pop af
    pop hl

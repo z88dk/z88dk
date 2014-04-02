@@ -1,9 +1,9 @@
 
 ; int mtx_lock(mtx_t *m)
 
-XDEF mtx_lock
+XDEF _mtx_lock
 
-mtx_lock:
+_mtx_lock:
 
    pop af
    pop hl

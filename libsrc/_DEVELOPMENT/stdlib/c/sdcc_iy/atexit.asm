@@ -1,9 +1,9 @@
 
 ; int atexit(void (*func)(void))
 
-XDEF atexit
+XDEF _atexit
 
-atexit:
+_atexit:
 
    pop af
    pop hl

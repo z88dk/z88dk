@@ -1,9 +1,9 @@
 
 ; void _div(div_t *d, int numer, int denom)
 
-XDEF _div
+XDEF __div
 
-_div:
+__div:
 
    pop af
    pop bc

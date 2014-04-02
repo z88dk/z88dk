@@ -1,9 +1,9 @@
 
 ; int feof(FILE *stream)
 
-XDEF feof
+XDEF _feof
 
-feof:
+_feof:
 
    pop af
    pop bc

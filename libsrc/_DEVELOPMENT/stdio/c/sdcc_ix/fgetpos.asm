@@ -1,9 +1,9 @@
 
 ; int fgetpos(FILE *stream, fpos_t *pos)
 
-XDEF fgetpos
+XDEF _fgetpos
 
-fgetpos:
+_fgetpos:
 
    pop af
    pop bc

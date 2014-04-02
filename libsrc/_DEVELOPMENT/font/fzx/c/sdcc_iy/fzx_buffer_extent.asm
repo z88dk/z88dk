@@ -1,9 +1,9 @@
 
 ; uint fzx_buffer_extent(void *buf, uint len)
 
-XDEF fzx_buffer_extent
+XDEF _fzx_buffer_extent
 
-fzx_buffer_extent:
+_fzx_buffer_extent:
 
    pop af
    pop hl

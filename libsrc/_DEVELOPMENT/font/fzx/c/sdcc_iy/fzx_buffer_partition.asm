@@ -1,9 +1,9 @@
 
 ; void *fzx_buffer_partition(void *buf, uint len, uint width)
 
-XDEF fzx_buffer_partition
+XDEF _fzx_buffer_partition
 
-fzx_buffer_partition:
+_fzx_buffer_partition:
 
    pop af
    pop de

@@ -1,9 +1,9 @@
 
 ; void *b_vector_init(void *p, size_t capacity, size_t max_size)
 
-XDEF b_vector_init
+XDEF _b_vector_init
 
-b_vector_init:
+_b_vector_init:
 
    pop af
    pop de

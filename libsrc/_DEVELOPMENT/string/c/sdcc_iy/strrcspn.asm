@@ -1,9 +1,9 @@
 
 ; size_t strrcspn(const char *str, const char *cset)
 
-XDEF strrcspn
+XDEF _strrcspn
 
-strrcspn:
+_strrcspn:
 
    pop af
    pop hl

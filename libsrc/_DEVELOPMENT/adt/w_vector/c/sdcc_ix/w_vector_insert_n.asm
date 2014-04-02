@@ -1,9 +1,9 @@
 
 ; size_t w_vector_insert_n(w_vector_t *v, size_t idx, size_t n, void *item)
 
-XDEF w_vector_insert_n
+XDEF _w_vector_insert_n
 
-w_vector_insert_n:
+_w_vector_insert_n:
 
    exx
    pop bc

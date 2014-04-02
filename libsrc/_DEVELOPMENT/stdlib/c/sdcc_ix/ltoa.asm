@@ -1,9 +1,9 @@
 
 ; char *ltoa(unsigned long num, char *buf, int radix)
 
-XDEF ltoa
+XDEF _ltoa
 
-ltoa:
+_ltoa:
 
    pop af
    pop hl

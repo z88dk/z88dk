@@ -1,9 +1,9 @@
 
 ; char *gets_unlocked(char *s)
 
-XDEF gets_unlocked
+XDEF _gets_unlocked
 
-gets_unlocked:
+_gets_unlocked:
 
    pop af
    pop hl

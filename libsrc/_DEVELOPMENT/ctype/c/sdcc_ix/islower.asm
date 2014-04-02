@@ -1,11 +1,11 @@
 
 ; int islower(int c)
 
-XLIB islower
+XLIB _islower
 
 LIB asm_islower, error_zc
 
-islower:
+_islower:
 
    pop af
    pop hl

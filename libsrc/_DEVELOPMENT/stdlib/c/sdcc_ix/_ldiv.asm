@@ -1,9 +1,9 @@
 
 ; void _ldiv(ldiv_t *ld, long numer, long denom)
 
-XDEF _ldiv
+XDEF __ldiv
 
-_ldiv:
+__ldiv:
 
    pop af
    pop bc

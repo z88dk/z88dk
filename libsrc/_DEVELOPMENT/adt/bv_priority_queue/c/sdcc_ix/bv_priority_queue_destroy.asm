@@ -1,9 +1,9 @@
 
 ; void bv_priority_queue_destroy(bv_priority_queue_t *q)
 
-XDEF bv_priority_queue_destroy
+XDEF _bv_priority_queue_destroy
 
-bv_priority_queue_destroy:
+_bv_priority_queue_destroy:
 
    pop af
    pop hl

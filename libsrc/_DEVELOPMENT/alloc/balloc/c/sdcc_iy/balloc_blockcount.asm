@@ -1,9 +1,9 @@
 
 ; size_t balloc_blockcount(unsigned int queue)
 
-XDEF balloc_blockcount
+XDEF _balloc_blockcount
 
-balloc_blockcount:
+_balloc_blockcount:
 
    pop af
    pop hl

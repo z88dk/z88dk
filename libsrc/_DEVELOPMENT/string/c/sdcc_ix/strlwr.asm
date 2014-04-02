@@ -1,9 +1,9 @@
 
 ; char *strlwr(char *s)
 
-XDEF strlwr
+XDEF _strlwr
 
-strlwr:
+_strlwr:
 
    pop af
    pop hl

@@ -1,12 +1,12 @@
 
 ; void *p_forward_list_alt_front(p_forward_list_alt_t *list)
 
-XDEF p_forward_list_alt_front
+XDEF _p_forward_list_alt_front
 
-LIB p_forward_list_front
+LIB _p_forward_list_front
 
-p_forward_list_alt_front:
+_p_forward_list_alt_front:
 
-   jp p_forward_list_front
+   jp _p_forward_list_front
 
    INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_front.asm"

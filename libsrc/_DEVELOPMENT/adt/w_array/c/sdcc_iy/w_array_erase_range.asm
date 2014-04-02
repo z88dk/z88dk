@@ -1,9 +1,9 @@
 
 ; size_t w_array_erase_range(w_array_t *a, size_t idx_first, size_t idx_last)
 
-XDEF w_array_erase_range
+XDEF _w_array_erase_range
 
-w_array_erase_range:
+_w_array_erase_range:
 
    pop af
    pop de

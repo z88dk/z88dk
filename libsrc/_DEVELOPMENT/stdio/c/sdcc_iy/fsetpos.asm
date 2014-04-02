@@ -1,9 +1,9 @@
 
 ; int fsetpos(FILE *stream, const fpos_t *pos)
 
-XDEF fsetpos
+XDEF _fsetpos
 
-fsetpos:
+_fsetpos:
 
    pop af
    pop ix

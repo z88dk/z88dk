@@ -1,13 +1,13 @@
 
 ; void *memalign(size_t alignment, size_t size)
 
-XDEF memalign
+XDEF _memalign
 
-LIB aligned_alloc
+LIB _aligned_alloc
 
-memalign:
+_memalign:
 
-   jp aligned_alloc
+   jp _aligned_alloc
 
    INCLUDE "alloc/malloc/z80/asm_memalign.asm"
 

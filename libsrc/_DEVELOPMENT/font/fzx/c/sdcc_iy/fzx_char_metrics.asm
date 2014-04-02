@@ -1,9 +1,9 @@
 
 ; int fzx_char_metrics(struct fzx_cmetric *m, uchar c)
 
-XDEF fzx_char_metrics
+XDEF _fzx_char_metrics
 
-fzx_char_metrics:
+_fzx_char_metrics:
 
    pop af
    pop de

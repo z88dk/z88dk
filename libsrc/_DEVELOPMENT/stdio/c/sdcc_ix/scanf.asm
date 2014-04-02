@@ -1,9 +1,9 @@
 
 ; int scanf(const char *format, ...)
 
-XDEF scanf
+XDEF _scanf
 
-scanf:
+_scanf:
 
    push ix
    

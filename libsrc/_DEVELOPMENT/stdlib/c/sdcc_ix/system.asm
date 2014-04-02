@@ -1,9 +1,9 @@
 
 ; int system(const char *string)
 
-XDEF system
+XDEF _system
 
-system:
+_system:
 
    pop af
    pop hl

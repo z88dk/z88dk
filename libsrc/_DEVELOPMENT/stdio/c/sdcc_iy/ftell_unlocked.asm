@@ -1,9 +1,9 @@
 
 ; unsigned long ftell_unlocked(FILE *stream)
 
-XDEF ftell_unlocked
+XDEF _ftell_unlocked
 
-ftell_unlocked:
+_ftell_unlocked:
 
    pop af
    pop ix

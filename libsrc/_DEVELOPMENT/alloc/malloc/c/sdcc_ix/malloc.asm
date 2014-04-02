@@ -1,9 +1,9 @@
 
 ; void *malloc(size_t size)
 
-XDEF malloc
+XDEF _malloc
 
-malloc:
+_malloc:
 
    pop af
    pop hl

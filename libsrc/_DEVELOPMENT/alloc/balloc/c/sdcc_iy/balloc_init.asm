@@ -1,9 +1,9 @@
 
 ; void balloc_init(unsigned char num)
 
-XDEF balloc_init
+XDEF _balloc_init
 
-balloc_init:
+_balloc_init:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; int vsscanf(const char *s, const char *format, va_list arg)
 
-XDEF vsscanf
+XDEF _vsscanf
 
-vsscanf:
+_vsscanf:
 
    pop af
    pop hl

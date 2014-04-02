@@ -1,9 +1,9 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
-XDEF fgets_unlocked
+XDEF _fgets_unlocked
 
-fgets_unlocked:
+_fgets_unlocked:
 
    pop af
    pop hl

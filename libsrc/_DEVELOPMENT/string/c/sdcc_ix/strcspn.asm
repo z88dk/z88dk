@@ -1,9 +1,9 @@
 
 ; size_t strcspn(const char *s1, const char *s2)
 
-XDEF strcspn
+XDEF _strcspn
 
-strcspn:
+_strcspn:
 
    pop af
    pop hl

@@ -1,9 +1,9 @@
 
 ; void ba_priority_queue_clear(ba_priority_queue_t *q)
 
-XDEF ba_priority_queue_clear
+XDEF _ba_priority_queue_clear
 
-ba_priority_queue_clear:
+_ba_priority_queue_clear:
 
    pop af
    pop hl

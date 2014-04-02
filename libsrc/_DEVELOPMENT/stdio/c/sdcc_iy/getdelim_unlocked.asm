@@ -1,9 +1,9 @@
 
 ; size_t getdelim_unlocked(char **lineptr, size_t *n, int delimiter, FILE *stream)
 
-XDEF getdelim_unlocked
+XDEF _getdelim_unlocked
 
-getdelim_unlocked:
+_getdelim_unlocked:
 
    pop af
    pop hl

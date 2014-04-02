@@ -1,9 +1,9 @@
 
 ; int vfprintf_unlocked(FILE *stream, const char *format, void *arg)
 
-XDEF vfprintf_unlocked
+XDEF _vfprintf_unlocked
 
-vfprintf_unlocked:
+_vfprintf_unlocked:
 
    pop af
    exx

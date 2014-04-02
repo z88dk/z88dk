@@ -1,9 +1,9 @@
 
 ; uint zx_px2bitmask(uchar x)
 
-XDEF zx_px2bitmask
+XDEF _zx_px2bitmask
 
-zx_px2bitmask:
+_zx_px2bitmask:
 
    pop af
    pop hl

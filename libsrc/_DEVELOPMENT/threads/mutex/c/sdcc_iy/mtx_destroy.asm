@@ -1,9 +1,9 @@
 
 ; void mtx_destroy(mtx_t *m)
 
-XDEF mtx_destroy
+XDEF _mtx_destroy
 
-mtx_destroy:
+_mtx_destroy:
 
    pop af
    pop hl
