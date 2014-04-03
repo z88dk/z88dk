@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.35 2014-03-16 19:19:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.36 2014-04-03 21:31:13 pauloscustodio Exp $
 #
 # Test options
 
@@ -880,7 +880,7 @@ unlink_testfiles($lib);
 # -D, --define
 #------------------------------------------------------------------------------
 
-$asm = "ld a,value";
+$asm = "ld a,_value23";		# BUG_0045
 
 # no -D
 t_z80asm_error($asm, "Error at file 'test.asm' module 'TEST' line 1: symbol not defined");
@@ -895,7 +895,7 @@ for my $options ('-D23', '-Da*') {
 
 # -D
 for my $options ('-D', '-D=', '--define', '--define=') {
-	t_z80asm_ok(0, $asm, "\x3E\x01", $options."Value");
+	t_z80asm_ok(0, $asm, "\x3E\x01", $options."_value23");
 }
 
 #------------------------------------------------------------------------------
@@ -1107,7 +1107,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.35  2014-03-16 19:19:49  pauloscustodio
+# Revision 1.36  2014-04-03 21:31:13  pauloscustodio
+# BUG_0045: -D did not accept symbols starting with '_':
+# (reported and fixed by alvin_albrecht@hotmail.com)
+# Added test code.
+#
+# Revision 1.35  2014/03/16 19:19:49  pauloscustodio
 # Integrate use of srcfile in scanner, removing global variable z80asmfile
 # and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 #
