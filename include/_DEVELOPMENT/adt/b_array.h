@@ -2,7 +2,7 @@
 #ifndef _ADT_B_ARRAY_H
 #define _ADT_B_ARRAY_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

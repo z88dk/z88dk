@@ -2,7 +2,7 @@
 #ifndef _ADT_P_FORWARD_LIST_ALT
 #define _ADT_P_FORWARD_LIST_ALT
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

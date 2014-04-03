@@ -2,13 +2,13 @@
 #ifndef _ALLOC_MALLOC_H
 #define _ALLOC_MALLOC_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
-extern void   *_falloc(void *p, size_t size);
+extern void   *_falloc_(void *p, size_t size);
 extern void   *heap_alloc(void *heap, size_t size);
 extern void   *heap_alloc_aligned(void *heap, size_t alignment, size_t size);
 extern void   *heap_alloc_fixed(void *heap, void *p, size_t size);
@@ -20,7 +20,7 @@ extern void   *heap_realloc(void *heap, void *p, size_t size);
 extern void   *memalign(size_t alignment, size_t size);
 extern int     posix_memalign(void **memptr, size_t alignment, size_t size);
 
-extern void   *_falloc_unlocked(void *p, size_t size);
+extern void   *_falloc__unlocked(void *p, size_t size);
 extern void   *heap_alloc_unlocked(void *heap, size_t size);
 extern void   *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size);
 extern void   *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size);
@@ -50,7 +50,7 @@ extern void   *realloc(void *p, size_t size);
 
 // SCCZ80
 
-extern void   __LIB__              *_falloc(void *p, size_t size);
+extern void   __LIB__              *_falloc_(void *p, size_t size);
 extern void   __LIB__              *heap_alloc(void *heap, size_t size);
 extern void   __LIB__              *heap_alloc_aligned(void *heap, size_t alignment, size_t size);
 extern void   __LIB__              *heap_alloc_fixed(void *heap, void *p, size_t size);
@@ -62,7 +62,7 @@ extern void   __LIB__              *heap_realloc(void *heap, void *p, size_t siz
 extern void   __LIB__              *memalign(size_t alignment, size_t size);
 extern int    __LIB__               posix_memalign(void **memptr, size_t alignment, size_t size);
 
-extern void   __LIB__              *_falloc_unlocked(void *p, size_t size);
+extern void   __LIB__              *_falloc__unlocked(void *p, size_t size);
 extern void   __LIB__              *heap_alloc_unlocked(void *heap, size_t size);
 extern void   __LIB__              *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size);
 extern void   __LIB__              *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size);
@@ -90,7 +90,7 @@ extern void   __LIB__              *realloc(void *p, size_t size);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern void   __LIB__ __CALLEE__   *_falloc_callee(void *p, size_t size);
+extern void   __LIB__ __CALLEE__   *_falloc__callee(void *p, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_callee(void *heap, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_aligned_callee(void *heap, size_t alignment, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_fixed_callee(void *heap, void *p, size_t size);
@@ -101,7 +101,7 @@ extern void   __LIB__ __CALLEE__   *heap_realloc_callee(void *heap, void *p, siz
 extern void   __LIB__ __CALLEE__   *memalign_callee(size_t alignment, size_t size);
 extern int    __LIB__ __CALLEE__    posix_memalign_callee(void **memptr, size_t alignment, size_t size);
 
-extern void   __LIB__ __CALLEE__   *_falloc_unlocked_callee(void *p, size_t size);
+extern void   __LIB__ __CALLEE__   *_falloc__unlocked_callee(void *p, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_unlocked_callee(void *heap, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_aligned_unlocked_callee(void *heap, size_t alignment, size_t size);
 extern void   __LIB__ __CALLEE__   *heap_alloc_fixed_unlocked_callee(void *heap, void *p, size_t size);
@@ -125,7 +125,7 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define _falloc(a,b)                _falloc_callee(a,b)
+#define _falloc_(a,b)               _falloc__callee(a,b)
 #define heap_alloc(a,b)             heap_alloc_callee(a,b)
 #define heap_alloc_aligned(a,b,c)   heap_alloc_aligned_callee(a,b,c)
 #define heap_alloc_fixed(a,b,c)     heap_alloc_fixed_callee(a,b,c)
@@ -136,7 +136,7 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 #define memalign(a,b)               memalign_callee(a,b)
 #define posix_memalign(a,b,c)       posix_memalign_callee(a,b,c)
 
-#define _falloc_unlocked(a,b)                _falloc_unlocked_callee(a,b)
+#define _falloc__unlocked(a,b)               _falloc__unlocked_callee(a,b)
 #define heap_alloc_unlocked(a,b)             heap_alloc_unlocked_callee(a,b)
 #define heap_alloc_aligned_unlocked(a,b,c)   heap_alloc_aligned_unlocked_callee(a,b,c)
 #define heap_alloc_fixed_unlocked(a,b,c)     heap_alloc_fixed_unlocked_callee(a,b,c)

@@ -2,7 +2,7 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
-#include <_DEVELOPMENT/stdint.h>
+#include <stdint.h>
 
 // DATA STRUCTURES
 
@@ -45,7 +45,7 @@ extern FILE *_stdio_file_stderr;
 
 // SDCC
 
-extern FILE   *_fmemopen(void **bufp, size_t *sizep, char *mode);
+extern FILE   *_fmemopen_(void **bufp, size_t *sizep, char *mode);
 extern int     asprintf(char **ptr, char *format, ...);
 extern void    clearerr(FILE *stream);
 extern int     feof(FILE *stream);
@@ -130,7 +130,7 @@ extern int     vscanf_unlocked(char *format, void *arg);
 
 // SCCZ80
 
-extern FILE   __LIB__              *_fmemopen(void **bufp, size_t *sizep, char *mode);
+extern FILE   __LIB__              *_fmemopen_(void **bufp, size_t *sizep, char *mode);
 extern int    __LIB__               asprintf(char **ptr, char *format, ...);
 extern void   __LIB__ __FASTCALL__  clearerr(FILE *stream);
 extern int    __LIB__ __FASTCALL__  feof(FILE *stream);
@@ -213,7 +213,7 @@ extern int    __LIB__               vscanf_unlocked(char *format, void *arg);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern FILE   __LIB__ __CALLEE__   *_fmemopen_callee(void **bufp, size_t *sizep, char *mode);
+extern FILE   __LIB__ __CALLEE__   *_fmemopen__callee(void **bufp, size_t *sizep, char *mode);
 extern int    __LIB__ __CALLEE__    fgetpos_callee(FILE *stream, fpos_t *pos);
 extern char   __LIB__ __CALLEE__   *fgets_callee(char *s, int n, FILE *stream);
 extern FILE   __LIB__ __CALLEE__   *fmemopen_callee(void *buf, size_t size, char *mode);
@@ -257,7 +257,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define _fmemopen(a,b,c)            _fmemopen_callee(a,b,c)
+#define _fmemopen_(a,b,c)           _fmemopen__callee(a,b,c)
 #define fgetpos(a,b)                fgetpos_callee(a,b)
 #define fgets(a,b,c)                fgets_callee(a,b,c)
 #define fmemopen(a,b,c)             fmemopen_callee(a,b,c)

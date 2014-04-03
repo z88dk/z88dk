@@ -2,16 +2,16 @@
 #ifndef _STRING_H
 #define _STRING_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
-extern char   *_memlwr(void *p, size_t n);
-extern char   *_memstrcpy(void *p, char *s, size_t n);
-extern char   *_memupr(void *p, size_t n);
-extern char   *_strrstrip(char *s);
+extern char   *_memlwr_(void *p, size_t n);
+extern char   *_memstrcpy_(void *p, char *s, size_t n);
+extern char   *_memupr_(void *p, size_t n);
+extern char   *_strrstrip_(char *s);
 extern int     ffs(int i);
 extern int     ffsl(long i);
 extern void   *memccpy(void *dst, void *src, int c, size_t n);
@@ -67,10 +67,10 @@ extern size_t  strxfrm(char *dst, char *src, size_t n);
 
 // SCCZ80 
 
-extern char   __LIB__               *_memlwr(void *p, size_t n);
-extern char   __LIB__               *_memstrcpy(void *p, char *s, size_t n);
-extern char   __LIB__               *_memupr(void *p, size_t n);
-extern char   __LIB__ __FASTCALL__  *_strrstrip(char *s);
+extern char   __LIB__               *_memlwr_(void *p, size_t n);
+extern char   __LIB__               *_memstrcpy_(void *p, char *s, size_t n);
+extern char   __LIB__               *_memupr_(void *p, size_t n);
+extern char   __LIB__ __FASTCALL__  *_strrstrip_(char *s);
 extern int    __LIB__ __FASTCALL__   ffs(int i);
 extern int    __LIB__ __FASTCALL__   ffsl(long i);
 extern void   __LIB__               *memccpy(void *dst, void *src, int c, size_t n);
@@ -124,9 +124,9 @@ extern size_t __LIB__                strxfrm(char *dst, char *src, size_t n);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern char   __LIB__ __CALLEE__    *_memlwr_callee(void *p, size_t n);
-extern char   __LIB__ __CALLEE__    *_memstrcpy_callee(void *p, char *s, size_t n);
-extern char   __LIB__ __CALLEE__    *_memupr_callee(void *p, size_t n);
+extern char   __LIB__ __CALLEE__    *_memlwr__callee(void *p, size_t n);
+extern char   __LIB__ __CALLEE__    *_memstrcpy__callee(void *p, char *s, size_t n);
+extern char   __LIB__ __CALLEE__    *_memupr__callee(void *p, size_t n);
 extern void   __LIB__ __CALLEE__    *memccpy_callee(void *dst, void *src, int c, size_t n);
 extern void   __LIB__ __CALLEE__    *memchr_callee(void *s, int c, size_t n);
 extern int    __LIB__ __CALLEE__     memcmp_callee(void *s1, void *s2, size_t n);
@@ -170,9 +170,9 @@ extern size_t __LIB__ __CALLEE__     strxfrm_callee(char *dst, char *src, size_t
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define _memlwr(a,b)                 _memlwr_callee(a,b)
-#define _memstrcpy(a,b,c)            _memstrcpy_callee(a,b,c)
-#define _memupr(a,b)                 _memupr_callee(a,b)
+#define _memlwr_(a,b)                _memlwr__callee(a,b)
+#define _memstrcpy_(a,b,c)           _memstrcpy__callee(a,b,c)
+#define _memupr_(a,b)                _memupr__callee(a,b)
 #define memccpy(a,b,c,d)             memccpy_callee(a,b,c,d)
 #define memchr(a,b,c)                memchr_callee(a,b,c)
 #define memcmp(a,b,c)                memcmp_callee(a,b,c)

@@ -2,7 +2,7 @@
 #ifndef _ADT_BA_PRIORITY_QUEUE_H
 #define _ADT_BA_PRIORITY_QUEUE_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

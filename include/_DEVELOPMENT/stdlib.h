@@ -2,8 +2,8 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H
 
-#include <_DEVELOPMENT/stddef.h>
-#include <_DEVELOPMENT/stdint.h>
+#include <stddef.h>
+#include <stdint.h>
 
 // DATA STRUCTURES
 
@@ -29,10 +29,10 @@ typedef struct ldiv_s
 
 // SDCC
 
-extern void      _div(div_t *d, int numer, int denom);
-extern void      _ldiv(ldiv_t *ld, long numer, long denom);
-extern int       _strtoi(char *nptr, char **endptr, int base);
-extern uint16_t  _strtou(char *nptr, char **endptr, int base);
+extern void      _div_(div_t *d, int numer, int denom);
+extern void      _ldiv_(ldiv_t *ld, long numer, long denom);
+extern int       _strtoi_(char *nptr, char **endptr, int base);
+extern uint16_t  _strtou_(char *nptr, char **endptr, int base);
 extern int       abs(int j);
 extern int       at_quick_exit(void *func);
 extern int       atexit(void *func);
@@ -67,10 +67,10 @@ extern void  *realloc(void *p, size_t size);
 
 // SCCZ80
 
-extern void      __LIB__               _div(div_t *d, int numer, int denom);
-extern void      __LIB__               _ldiv(ldiv_t *ld, long numer, long denom);
-extern int       __LIB__               _strtoi(char *nptr, char **endptr, int base);
-extern uint16_t  __LIB__               _strtou(char *nptr, char **endptr, int base);
+extern void      __LIB__               _div_(div_t *d, int numer, int denom);
+extern void      __LIB__               _ldiv_(ldiv_t *ld, long numer, long denom);
+extern int       __LIB__               _strtoi_(char *nptr, char **endptr, int base);
+extern uint16_t  __LIB__               _strtou_(char *nptr, char **endptr, int base);
 extern int       __LIB__ __FASTCALL__  abs(int j);
 extern int       __LIB__ __FASTCALL__  at_quick_exit(void *func);
 extern int       __LIB__ __FASTCALL__  atexit(void *func);
@@ -103,10 +103,10 @@ extern void   __LIB__              *realloc(void *p, size_t size);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern void      __LIB__ __CALLEE__    _div_callee(div_t *d, int numer, int denom);
-extern void      __LIB__ __CALLEE__    _ldiv_callee(ldiv_t *ld, long numer, long denom);
-extern int       __LIB__ __CALLEE__    _strtoi_callee(char *nptr, char **endptr, int base);
-extern uint16_t  __LIB__ __CALLEE__    _strtou_callee(char *nptr, char **endptr, int base);
+extern void      __LIB__ __CALLEE__    _div__callee(div_t *d, int numer, int denom);
+extern void      __LIB__ __CALLEE__    _ldiv__callee(ldiv_t *ld, long numer, long denom);
+extern int       __LIB__ __CALLEE__    _strtoi__callee(char *nptr, char **endptr, int base);
+extern uint16_t  __LIB__ __CALLEE__    _strtou__callee(char *nptr, char **endptr, int base);
 extern void      __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar);
 extern char      __LIB__ __CALLEE__   *itoa_callee(int num, char *buf, int radix);
 extern char      __LIB__ __CALLEE__   *ltoa_callee(long num, char *buf, int radix);
@@ -126,10 +126,10 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define _div(a,b,c)                 _div_callee(a,b,c)
-#define _ldiv(a,b,c)                _ldiv_callee(a,b,c)
-#define _strtoi(a,b,c)              _strtoi_callee(a,b,c)
-#define _strtou(a,b,c)              _strtou_callee(a,b,c)
+#define _div_(a,b,c)                _div__callee(a,b,c)
+#define _ldiv_(a,b,c)               _ldiv__callee(a,b,c)
+#define _strtoi_(a,b,c)             _strtoi__callee(a,b,c)
+#define _strtou_(a,b,c)             _strtou__callee(a,b,c)
 #define bsearch(a,b,c,d,e)          bsearch_callee(a,b,c,d,e)
 #define itoa(a,b,c)                 itoa_callee(a,b,c)
 #define ltoa(a,b,c)                 ltoa_callee(a,b,c)

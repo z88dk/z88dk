@@ -2,7 +2,7 @@
 #ifndef _ADT_W_VECTOR_H
 #define _ADT_W_VECTOR_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

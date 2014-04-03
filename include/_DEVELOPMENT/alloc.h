@@ -2,8 +2,8 @@
 #ifndef _ALLOC_H
 #define _ALLOC_H
 
-#include <_DEVELOPMENT/alloc/balloc.h>
-#include <_DEVELOPMENT/alloc/malloc.h>
-#include <_DEVELOPMENT/alloc/obstack.h>
+#include <alloc/balloc.h>
+#include <alloc/malloc.h>
+#include <alloc/obstack.h>
 
 #endif

@@ -2,7 +2,7 @@
 #ifndef _ADT_P_QUEUE_H
 #define _ADT_P_QUEUE_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

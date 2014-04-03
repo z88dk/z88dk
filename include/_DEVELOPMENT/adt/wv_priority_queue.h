@@ -2,7 +2,7 @@
 #ifndef _ADT_WV_PRIORITY_QUEUE_H
 #define _ADT_WV_PRIORITY_QUEUE_H
 
-#include <_DEVELOPMENT/stddef.h>
+#include <stddef.h>
 
 // DATA STRUCTURES
 

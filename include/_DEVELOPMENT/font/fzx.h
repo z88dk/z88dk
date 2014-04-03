@@ -2,8 +2,8 @@
 #ifndef _FONT_FZX_H
 #define _FONT_FZX_H
 
-#include <_DEVELOPMENT/stddef.h>
-#include <_DEVELOPMENT/stdint.h>
+#include <stddef.h>
+#include <stdint.h>
 
 // DATA STRUCTURES
 
@@ -20,10 +20,14 @@ struct fzx_font                     // FONT STRUCTURE
 
    uint8_t              height;         // row height in pixels
    uint8_t              tracking;       // horizontal gap between chars in pixels
-   uint8_t              last_char;      // last defined char bitmap in 32..255
-   struct fzx_char  bmp[0];             // begin char bitmap definitions at char code 32
+   uint8_t              last_char;      // last defined char bitmap, in 32..255
 
 };
+
+// FZX_FONT_BITMAP returns a struct_fzx_char array for the font that is indexed by ascii code
+// fzx fonts only define bitmaps for ascii codes >= 32 and up to some maximum code defined in the font structure
+
+#define FZX_FONT_BITMAP(font) ((struct fzx_char *)((char *)(font) + sizeof(struct fzx_font) - sizeof(struct fzx_char)*32))
 
 struct fzx_cmetric                  // FONT CHARACTER METRICS
 {

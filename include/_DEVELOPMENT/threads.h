@@ -2,7 +2,7 @@
 #ifndef _THREADS_H
 #define _THREADS_H
 
-#include <_DEVELOPMENT/stdint.h>
+#include <stdint.h>
 
 // DATA STRUCTURES
 
