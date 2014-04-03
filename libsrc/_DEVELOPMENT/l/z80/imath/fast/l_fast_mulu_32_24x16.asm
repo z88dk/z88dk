@@ -1,9 +1,9 @@
 
-XLIB l_mulu_32_24x16
+XLIB l_fast_mulu_32_24x16
 
-LIB l0_mulu_32_24x8, l_mulu_32_24x8, error_mulu_overflow_mc
+LIB l0_fast_mulu_32_24x8, l_fast_mulu_32_24x8, error_mulu_overflow_mc
 
-l_mulu_32_24x16:
+l_fast_mulu_32_24x16:
 
    ; unsigned multiplication of 24-bit and 16-bit
    ; multiplicands into a 40-bit product
@@ -32,7 +32,7 @@ l_mulu_32_24x16:
    push de                     ; save HLCE
    
    ld a,b
-   call l0_mulu_32_24x8        ; dehl = B * EHL
+   call l0_fast_mulu_32_24x8        ; dehl = B * EHL
    
    inc d
    dec d
@@ -51,7 +51,7 @@ l_mulu_32_24x16:
    
    ld a,c
    ld e,b
-   call l_mulu_32_24x8         ; dehl = C * EHL
+   call l_fast_mulu_32_24x8         ; dehl = C * EHL
 
    ; add the two results
    

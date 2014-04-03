@@ -1,9 +1,9 @@
 
-XLIB l_muls_16_16x16
+XLIB l_fast_muls_16_16x16
 
-LIB l_mulu_16_16x16, l_neg_de, l_neg_hl, error_mulu_overflow_mc
+LIB l_fast_mulu_16_16x16, l_neg_de, l_neg_hl, error_mulu_overflow_mc
 
-l_muls_16_16x16:
+l_fast_muls_16_16x16:
 
    ; signed multiply of two 16-bit signed numbers
    ;
@@ -40,7 +40,7 @@ l_muls_16_16x16:
 
    ; multiply & check for overflow
    
-   call l_mulu_16_16x16
+   call l_fast_mulu_16_16x16
    jr c, unsigned_overflow
 
    bit 7,h

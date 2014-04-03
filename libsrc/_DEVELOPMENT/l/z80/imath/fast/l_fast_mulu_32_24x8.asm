@@ -1,10 +1,10 @@
 
-XLIB l_mulu_32_24x8
-XDEF l0_mulu_32_24x8
+XLIB l_fast_mulu_32_24x8
+XDEF l0_fast_mulu_32_24x8
 
-LIB l1_mulu_24_16x8
+LIB l1_fast_mulu_24_16x8
 
-l0_mulu_32_24x8:
+l0_fast_mulu_32_24x8:
 
    ; enter : ehl = 24-bit multiplicand
    ;           a = 8-bit multiplicand
@@ -13,7 +13,7 @@ l0_mulu_32_24x8:
    ld e,a
    ld a,d
 
-l_mulu_32_24x8:
+l_fast_mulu_32_24x8:
 
    ; unsigned multiplication of 24-bit and 8-bit
    ; multiplicands into a 32-bit product
@@ -30,7 +30,7 @@ l_mulu_32_24x8:
    ; try to reduce the multiplication
    
    or a
-   jp z, l1_mulu_24_16x8
+   jp z, l1_fast_mulu_24_16x8
 
    ; two full size multiplicands
 

@@ -1,10 +1,10 @@
 
-XLIB l_mulu_40_32x8
-XDEF l0_mulu_40_32x8
+XLIB l_fast_mulu_40_32x8
+XDEF l0_fast_mulu_40_32x8
 
-LIB l0_mulu_32_24x8, l_mulu_16_8x8
+LIB l0_fast_mulu_32_24x8, l_fast_mulu_16_8x8
 
-l_mulu_40_32x8:
+l_fast_mulu_40_32x8:
 
    ; enter :  dehl = 32-bit multiplicand
    ;             a = 8-bit multiplicand
@@ -18,9 +18,9 @@ l_mulu_40_32x8:
    
    inc d
    dec d
-   jp z, l0_mulu_32_24x8
+   jp z, l0_fast_mulu_32_24x8
 
-l0_mulu_40_32x8:
+l0_fast_mulu_40_32x8:
 
    ; two full size multiplicands
 
@@ -31,13 +31,13 @@ l0_mulu_40_32x8:
    
    push bc                     ; save DA
    
-   call l0_mulu_32_24x8        ; dehl = EHL * A
+   call l0_fast_mulu_32_24x8        ; dehl = EHL * A
    
    ex (sp),hl                  ; hl = DA
    push de                     ; stack = hlde
    
    ld e,h
-   call l_mulu_16_8x8          ; hl = D * A
+   call l_fast_mulu_16_8x8          ; hl = D * A
    
    pop de                      ; de = MSW(EHL * A)
    

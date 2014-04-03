@@ -1,8 +1,8 @@
 
-XLIB l_divu_24_24x24
-XDEF l0_divu_24_24x24
+XLIB l_fast_divu_24_24x24
+XDEF l0_fast_divu_24_24x24
 
-LIB l0_divu_16_16x16, l0_divu_24_24x16, error_divide_by_zero_mc
+LIB l0_fast_divu_16_16x16, l0_fast_divu_24_24x16, error_divide_by_zero_mc
 
 
 divu_24_16x24:
@@ -20,7 +20,7 @@ divu_24_16x16:
    ld e,c
    ld d,b
    
-   call l0_divu_16_16x16
+   call l0_fast_divu_16_16x16
    
    ; ahl = quotient
    ;  de = remainder
@@ -32,7 +32,7 @@ divu_24_24x16:
 
    ; ehl / bc
    
-   call l0_divu_24_24x16
+   call l0_fast_divu_24_24x16
    
    ; ahl = quotient
    ;  de = remainder
@@ -62,7 +62,7 @@ divide_by_zero:
    jp error_divide_by_zero_mc
 
 
-l_divu_24_24x24:
+l_fast_divu_24_24x24:
 
    ; unsigned division of two 24-bit numbers
    ;
@@ -90,7 +90,7 @@ l_divu_24_24x24:
    or c
    jr z, divide_by_zero
 
-l0_divu_24_24x24:
+l0_fast_divu_24_24x24:
 
    ; try to reduce the division
    

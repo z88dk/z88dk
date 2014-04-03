@@ -1,7 +1,7 @@
 
-XLIB l_mulu_16_8x8
+XLIB l_fast_mulu_16_8x8
 
-l_mulu_16_8x8:
+l_fast_mulu_16_8x8:
 
    ; unsigned multiplication of two 8-bit
    ; multiplicands into a sixteen bit product

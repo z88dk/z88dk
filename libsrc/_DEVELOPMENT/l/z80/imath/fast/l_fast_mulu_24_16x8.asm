@@ -1,8 +1,8 @@
 
-XLIB l_mulu_24_16x8
-XDEF l0_mulu_24_16x8, l1_mulu_24_16x8
+XLIB l_fast_mulu_24_16x8
+XDEF l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
 
-l_mulu_24_16x8:
+l_fast_mulu_24_16x8:
 
    ; unsigned multiplication of 16-bit and 8-bit
    ; multiplicands into a 24-bit product
@@ -137,11 +137,11 @@ loop_17:
 
 ; versions to return 32-bit result
 
-l0_mulu_24_16x8:
+l0_fast_mulu_24_16x8:
 
    ex de,hl
 
-l1_mulu_24_16x8:
+l1_fast_mulu_24_16x8:
 
    ; enter :  e = 8-bit multiplicand
    ;         hl = 16-bit multiplicand
@@ -154,7 +154,7 @@ l1_mulu_24_16x8:
    ;
    ; uses  : af, c, de, hl
    
-   call l_mulu_24_16x8
+   call l_fast_mulu_24_16x8
    
    ld e,a
    ld d,c

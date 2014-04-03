@@ -1,272 +1,243 @@
 
-XLIB l_divu_32_32x8
-XDEF l0_divu_32_32x8
+XLIB l_fast_divu_16_16x8
+XDEF l0_fast_divu_16_16x8
 
-LIB l0_divu_24_24x8, error_divide_by_zero_mc
+LIB l0_fast_divu_8_8x8, error_divide_by_zero_mc
 
+l_fast_divu_16_16x8:
 
-divu_32_24x8:
-
-   ; ehl / c
-   
-   call l0_divu_24_24x8
-   
-   ld c,a
-   ld a,e
-   ld e,c
-   
-   ret
-
-divide_by_zero:
-
-   exx
-   
-   ld de,$ffff
-   jp error_divide_by_zero_mc
-
-
-l_divu_32_32x8:
-
-   ; unsigned division of a 32-bit number
-   ; by an 8-bit number
+   ; unsigned division of a 16-bit dividend
+   ; by an 8-bit divisor
    ;
-   ; enter : dehl = 32-bit dividend
-   ;            c = 8-bit divisor
+   ; enter : hl = 16-bit dividend
+   ;          e = 8-bit divisor
    ;
-   ; exit  : success
+   ; exit  : d = 0
    ;
-   ;            dehl = 32-bit quotient
-   ;               a = remainder
+   ;         success
+   ;
+   ;             a = 0
+   ;            hl = hl / e
+   ;             e = hl % e
    ;            carry reset
    ;
    ;         divide by zero
    ;
-   ;            dehl = $ffffffff = ULONG_MAX
-   ;            dehl'= dividend
+   ;            hl = $ffff = UINT_MAX
+   ;            de = dividend
    ;            carry set, errno = EDOM
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+   ; uses  : af, b, de, hl
 
    ; test for divide by zero
-
-   inc c
-   dec c
+   
+   inc e
+   dec e
    jr z, divide_by_zero
 
-l0_divu_32_32x8:
-
-   ; uses  : af, bc, de, hl
+l0_fast_divu_16_16x8:
 
    ; try to reduce the division
-
-   inc d
-   dec d
-   jr z, divu_32_24x8
-
-   ; dehl >= $ 01 00 00 00
-   ;    c >= $          01
+   
+   inc h
+   dec h
+   jp z, l0_fast_divu_8_8x8
 
    xor a
-   
+   ld d,a
+
    ; unroll divide eight times
    
-   ld b,4
+   ld b,2
 
    ; eliminate leading zeroes
 
 loop_00:
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_10
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_20
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_30
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_40
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_50
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_60
 
    add hl,hl
-   rl e
-   rl d
    jr c, loop_70
 
-   jp loop_7
+   add hl,hl
+   rla
+   
+   cp e
+   jr c, loop_80
+   
+   sub e
+   inc l
+
+loop_80:
+
+   dec b
    
    ; general divide loop
 
 loop_0:
 
    add hl,hl
-   rl e
-   rl d
-
+   
 loop_10:
 
    rla
    jr c, loop_101
    
-   cp c
+   cp e
    jr c, loop_1
 
 loop_101:
 
-   sub c
+   sub e
    inc l
 
 loop_1:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_20:
 
    rla
    jr c, loop_201
    
-   cp c
+   cp e
    jr c, loop_2
 
 loop_201:
-   
-   sub c
+
+   sub e
    inc l
 
 loop_2:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_30:
 
    rla
    jr c, loop_301
    
-   cp c
+   cp e
    jr c, loop_3
 
 loop_301:
-
-   sub c
+   
+   sub e
    inc l
 
 loop_3:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_40:
 
    rla
    jr c, loop_401
    
-   cp c
+   cp e
    jr c, loop_4
 
 loop_401:
 
-   sub c
+   sub e
    inc l
 
 loop_4:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_50:
 
    rla
    jr c, loop_501
    
-   cp c
+   cp e
    jr c, loop_5
 
 loop_501:
 
-   sub c
+   sub e
    inc l
 
 loop_5:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_60:
 
    rla
    jr c, loop_601
    
-   cp c
+   cp e
    jr c, loop_6
 
 loop_601:
 
-   sub c
+   sub e
    inc l
 
 loop_6:
 
    add hl,hl
-   rl e
-   rl d
 
 loop_70:
 
    rla
    jr c, loop_701
    
-   cp c
+   cp e
    jr c, loop_7
 
 loop_701:
-
-   sub c
+   
+   sub e
    inc l
 
 loop_7:
 
    add hl,hl
-   rl e
-   rl d
    rla
    jr c, loop_801
    
-   cp c
+   cp e
    jr c, loop_8
 
 loop_801:
-
-   sub c
+   
+   sub e
    inc l
 
 loop_8:
 
    djnz loop_0
 
-   or a
+exit_loop:
+
+   ;  a = remainder
+   ; hl = quotient
+
+   ld e,a
+   
+   xor a
    ret
+
+divide_by_zero:
+
+   ex de,hl
+   jp error_divide_by_zero_mc

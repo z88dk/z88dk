@@ -1,9 +1,9 @@
 
-XLIB l_muls_8_8x8
+XLIB l_fast_muls_8_8x8
 
-LIB l_mulu_16_8x8, error_mulu_overflow_mc
+LIB l_fast_mulu_16_8x8, error_mulu_overflow_mc
 
-l_muls_8_8x8:
+l_fast_muls_8_8x8:
 
    ; signed multiply of two 8-bit numbers
    ;
@@ -54,7 +54,7 @@ ok_1:
 
    ; mutliply and check for overflow
    
-   call l_mulu_16_8x8
+   call l_fast_mulu_16_8x8
    
    inc h
    dec h

@@ -1,10 +1,10 @@
 
-XLIB l_divs_8_8x8
-XDEF l0_divs_8_8x8
+XLIB l_fast_divs_8_8x8
+XDEF l0_fast_divs_8_8x8
 
-LIB l0_divu_8_8x8, error_divide_by_zero_mc
+LIB l0_fast_divu_8_8x8, error_divide_by_zero_mc
 
-l_divs_8_8x8:
+l_fast_divs_8_8x8:
 
    ; signed division of two 8-bit numbers
    ;
@@ -31,7 +31,7 @@ l_divs_8_8x8:
    dec e
    jr z, divide_by_zero
 
-l0_divs_8_8x8:
+l0_fast_divs_8_8x8:
 
    ; C standard requires that the result of division satisfy
    ; a = (a/b)*b + a%b
@@ -62,7 +62,7 @@ divisor_ok:
 
    ; perform unsigned division
    
-   call l0_divu_8_8x8
+   call l0_fast_divu_8_8x8
    
    ; l = unsigned quotient
    ; e = unsigned remainder

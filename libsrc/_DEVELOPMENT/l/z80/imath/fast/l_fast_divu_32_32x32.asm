@@ -1,8 +1,8 @@
 
-XLIB l_divu_32_32x32
-XDEF l0_divu_32_32x32
+XLIB l_fast_divu_32_32x32
+XDEF l0_fast_divu_32_32x32
 
-LIB l0_divu_32_32x24, error_divide_by_zero_mc
+LIB l0_fast_divu_32_32x24, error_divide_by_zero_mc
 
 divu_32_32x24:
 
@@ -13,7 +13,7 @@ divu_32_32x24:
    ld b,h
    ld c,l
    
-   jp l0_divu_32_32x24
+   jp l0_fast_divu_32_32x24
 
 result_zero:
 
@@ -36,7 +36,7 @@ divide_by_zero:
    jp error_divide_by_zero_mc
 
 
-l_divu_32_32x32:
+l_fast_divu_32_32x32:
 
    ; unsigned division of two 32-bit numbers
    ;
@@ -64,7 +64,7 @@ l_divu_32_32x32:
    or l
    jr z, divide_by_zero
 
-l0_divu_32_32x32:
+l0_fast_divu_32_32x32:
    
    ; try to reduce the division
    

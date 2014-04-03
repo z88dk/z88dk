@@ -1,10 +1,10 @@
 
-XLIB l_mulu_32_32x32
+XLIB l_fast_mulu_32_32x32
 
-LIB l_mulu_40_32x8, l0_mulu_40_32x8, l0_mulu_32_24x8
-LIB error_mulu_overflow_mc, l_mulu_32_16x16, l_mulu_32_24x16
+LIB l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8, l0_fast_mulu_32_24x8
+LIB error_mulu_overflow_mc, l_fast_mulu_32_16x16, l_fast_mulu_32_24x16
 
-l_mulu_32_32x32:
+l_fast_mulu_32_32x32:
 
    ; unsigned multiplication of two 32-bit
    ; multiplicands into a 32-bit product
@@ -47,7 +47,7 @@ _8_32:
    ld a,l
    exx
 
-   call l_mulu_40_32x8
+   call l_fast_mulu_40_32x8
    
    or a
    ret z
@@ -86,7 +86,7 @@ _32_8:
    ld a,l
    exx
    
-   call l0_mulu_40_32x8
+   call l0_fast_mulu_40_32x8
    
    or a
    ret z
@@ -118,7 +118,7 @@ _24_8:
    ld a,l
    exx
    
-   jp l0_mulu_32_24x8
+   jp l0_fast_mulu_32_24x8
 
 _8b_x:
 
@@ -146,7 +146,7 @@ _24_16:
    exx
    pop bc
    
-   jp l_mulu_32_24x16
+   jp l_fast_mulu_32_24x16
 
 _16_16:
 
@@ -156,4 +156,4 @@ _16_16:
    exx
    pop de
    
-   jp l_mulu_32_16x16
+   jp l_fast_mulu_32_16x16

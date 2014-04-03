@@ -1,10 +1,10 @@
 
-XLIB l_divs_32_32x32
-XDEF l0_divs_32_32x32
+XLIB l_fast_divs_32_32x32
+XDEF l0_fast_divs_32_32x32
 
-LIB l0_divu_32_32x32, l_neg_dehl, error_divide_by_zero_mc
+LIB l0_fast_divu_32_32x32, l_neg_dehl, error_divide_by_zero_mc
 
-l_divs_32_32x32:
+l_fast_divs_32_32x32:
 
    ; signed division of two 32-bit numbers
    ;
@@ -32,7 +32,7 @@ l_divs_32_32x32:
    or l
    jr z, divide_by_zero
    
-l0_divs_32_32x32:
+l0_fast_divs_32_32x32:
 
    ; C standard requires that the result of division satisfy
    ; a = (a/b)*b + a%b
@@ -57,7 +57,7 @@ l0_divs_32_32x32:
 
    ; perform unsigned division
    
-   call l0_divu_32_32x32
+   call l0_fast_divu_32_32x32
 
    ; dehl = unsigned quotient
    ; dehl'= unsigned remainder

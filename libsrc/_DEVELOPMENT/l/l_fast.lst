@@ -26,7 +26,7 @@ l/z80/ascii/l_num2char
 l/z80/ascii/l_valid_base
 @l/z80/ascii/num_to_txt/num_to_txt_fast.lst
 @l/z80/ascii/txt_to_num/txt_to_num_fast.lst
-@l/z80/imath/imath_fast.lst
+@l/z80/imath/imath.lst
 l/z80/integer/l_addu_hl_bc
 l/z80/integer/l_addu_hl_de
 l/z80/integer/l_incu_bc

@@ -1,10 +1,10 @@
 
-XLIB l_divu_16_16x16
-XDEF l0_divu_16_16x16
+XLIB l_fast_divu_16_16x16
+XDEF l0_fast_divu_16_16x16
 
-LIB l0_divu_16_16x8, error_divide_by_zero_mc
+LIB l0_fast_divu_16_16x8, error_divide_by_zero_mc
 
-l_divu_16_16x16:
+l_fast_divu_16_16x16:
 
    ; unsigned division of two 16-bit numbers
    ;
@@ -32,13 +32,13 @@ l_divu_16_16x16:
    or e
    jr z, divide_by_zero
 
-l0_divu_16_16x16:
+l0_fast_divu_16_16x16:
 
    ; try to reduce the division
    
    inc d
    dec d
-   jp z, l0_divu_16_16x8
+   jp z, l0_fast_divu_16_16x8
    
    ; check divisor size
    

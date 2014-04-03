@@ -1,9 +1,9 @@
 
-XLIB l_mulu_32_16x16
+XLIB l_fast_mulu_32_16x16
 
-LIB l_mulu_24_16x8, l0_mulu_24_16x8, l1_mulu_24_16x8
+LIB l_fast_mulu_24_16x8, l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
 
-l_mulu_32_16x16:
+l_fast_mulu_32_16x16:
 
    ; unsigned multiplication of two 16-bit
    ; multiplicands into a 32-bit product
@@ -20,11 +20,11 @@ l_mulu_32_16x16:
 
    inc d
    dec d
-   jp z, l1_mulu_24_16x8
+   jp z, l1_fast_mulu_24_16x8
 
    inc h
    dec h
-   jp z, l0_mulu_24_16x8
+   jp z, l0_fast_mulu_24_16x8
 
    ; two full size multiplicands
 
@@ -34,14 +34,14 @@ l_mulu_32_16x16:
    ld b,d                      ; b = D
    push hl                     ; save HL
 
-   call l_mulu_24_16x8         ; ahl = HL * E
+   call l_fast_mulu_24_16x8         ; ahl = HL * E
 
    ex (sp),hl                  ; save LSW(HL * E)
    
    ld e,b                      ; e = D
    ld b,a                      ; b = MSB(HL * E)
    
-   call l_mulu_24_16x8         ; ahl = HL * D
+   call l_fast_mulu_24_16x8         ; ahl = HL * D
    
    ld c,b
    ld b,0                      ; bc = MSW(HL * E)

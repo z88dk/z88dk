@@ -1,9 +1,9 @@
 
-XLIB l_mulu_8_8x8
+XLIB l_fast_mulu_8_8x8
 
-LIB l_mulu_16_8x8, error_mulu_overflow_mc
+LIB l_fast_mulu_16_8x8, error_mulu_overflow_mc
 
-l_mulu_8_8x8:
+l_fast_mulu_8_8x8:
 
    ; unsigned multiplication of two 8-bit
    ; multiplicands into a sixteen bit product
@@ -30,7 +30,7 @@ l_mulu_8_8x8:
    ;
    ; uses  : af, de, hl
 
-   call l_mulu_16_8x8
+   call l_fast_mulu_16_8x8
    
    inc h
    dec h

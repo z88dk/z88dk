@@ -1,10 +1,10 @@
 
-XLIB l_divu_8_8x8
-XDEF l0_divu_8_8x8
+XLIB l_fast_divu_8_8x8
+XDEF l0_fast_divu_8_8x8
 
 LIB error_divide_by_zero_mc
 
-l_divu_8_8x8:
+l_fast_divu_8_8x8:
 
    ; unsigned division of two 8-bit numbers
    ;
@@ -35,7 +35,7 @@ l_divu_8_8x8:
    dec e
    jr z, divide_by_zero
 
-l0_divu_8_8x8:
+l0_fast_divu_8_8x8:
 
    ; check divisor size
    

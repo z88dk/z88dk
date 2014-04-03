@@ -1,9 +1,9 @@
 
-XLIB l_muls_32_32x32
+XLIB l_fast_muls_32_32x32
 
-LIB l_mulu_32_32x32, l_neg_dehl, error_mulu_overflow_mc
+LIB l_fast_mulu_32_32x32, l_neg_dehl, error_mulu_overflow_mc
 
-l_muls_32_32x32:
+l_fast_muls_32_32x32:
 
    ; signed multiplication of two 32-bit signed numbers
    ;
@@ -44,7 +44,7 @@ l_muls_32_32x32:
    
    ; multiply & check for overflow
    
-   call l_mulu_32_32x32
+   call l_fast_mulu_32_32x32
    jr c, unsigned_overflow
    
    bit 7,d

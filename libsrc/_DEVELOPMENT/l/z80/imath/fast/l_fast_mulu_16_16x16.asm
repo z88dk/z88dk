@@ -1,9 +1,9 @@
 
-XLIB l_mulu_16_16x16
+XLIB l_fast_mulu_16_16x16
 
-LIB l_mulu_24_16x8, error_mulu_overflow_mc
+LIB l_fast_mulu_24_16x8, error_mulu_overflow_mc
 
-l_mulu_16_16x16:
+l_fast_mulu_16_16x16:
 
    ; unsigned multiplication of two 16-bit
    ; multiplicands into a 16-bit product
@@ -43,7 +43,7 @@ reduce_0:
    ;  e = 8-bit multiplicand
    ; hl = 16-bit multiplicand
    
-   call l_mulu_24_16x8
+   call l_fast_mulu_24_16x8
    
    or a
    ret z                       ; if result confined to hl

@@ -1,11 +1,11 @@
 
-XLIB l_divs_16_16x16
-XDEF l0_divs_16_16x16
+XLIB l_fast_divs_16_16x16
+XDEF l0_fast_divs_16_16x16
 
 LIB l_neg_hl, l_neg_de
-LIB l0_divu_16_16x16, error_divide_by_zero_mc
+LIB l0_fast_divu_16_16x16, error_divide_by_zero_mc
 
-l_divs_16_16x16:
+l_fast_divs_16_16x16:
 
    ; signed division of two 16-bit numbers
    ;
@@ -32,7 +32,7 @@ l_divs_16_16x16:
    or e
    jr z, divide_by_zero
 
-l0_divs_16_16x16:
+l0_fast_divs_16_16x16:
 
    ; C standard requires that the result of division satisfy
    ; a = (a/b)*b + a%b
@@ -51,7 +51,7 @@ l0_divs_16_16x16:
 
    ; perform unsigned division
    
-   call l0_divu_16_16x16
+   call l0_fast_divu_16_16x16
    
    ; hl = unsigned quotient
    ; de = unsigned remainder

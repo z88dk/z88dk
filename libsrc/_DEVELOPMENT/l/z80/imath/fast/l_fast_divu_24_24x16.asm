@@ -1,8 +1,8 @@
 
-XLIB l_divu_24_24x16
-XDEF l0_divu_24_24x16
+XLIB l_fast_divu_24_24x16
+XDEF l0_fast_divu_24_24x16
 
-LIB l0_divu_16_16x16, l00_divu_24_24x8, error_divide_by_zero_mc
+LIB l0_fast_divu_16_16x16, l00_fast_divu_24_24x8, error_divide_by_zero_mc
 
 
 divu_24_16x16:
@@ -12,7 +12,7 @@ divu_24_16x16:
    ld e,c
    ld d,b
    
-   jp l0_divu_16_16x16
+   jp l0_fast_divu_16_16x16
 
 divide_by_zero:
 
@@ -22,7 +22,7 @@ divide_by_zero:
    ld a,$ff
    jp error_divide_by_zero_mc
 
-l_divu_24_24x16:
+l_fast_divu_24_24x16:
 
    ; unsigned division of 24-bit number by 16-bit number
    ;
@@ -49,7 +49,7 @@ l_divu_24_24x16:
    or c
    jr z, divide_by_zero
 
-l0_divu_24_24x16:
+l0_fast_divu_24_24x16:
 
    ; try to reduce the division
    
@@ -59,7 +59,7 @@ l0_divu_24_24x16:
 
    inc b
    dec b
-   jp z, l00_divu_24_24x8
+   jp z, l00_fast_divu_24_24x8
 
    ; ehl >= $ 01 00 00
    ;  bc >= $    01 00
