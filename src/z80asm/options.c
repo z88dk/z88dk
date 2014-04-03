@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.77 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.78 2014-04-03 06:00:10 aralbrec Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -457,7 +457,7 @@ static void option_define( char *symbol )
     strtoupper( symbol );			/* convert to upper case */
 
     /* check syntax */
-    if ( ! isalpha( symbol[0] ) )
+    if ( (! isalpha( symbol[0] )) && (symbol[0] != '_') )
     {
         error_illegal_ident();
         return;
@@ -573,7 +573,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.77  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.78  2014-04-03 06:00:10  aralbrec
+* allow define names on the command line to contain leading _
+*
+* Revision 1.77  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.76  2014/02/25 22:39:34  pauloscustodio
