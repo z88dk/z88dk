@@ -2,23 +2,23 @@
 ; Stefano Bodrato
 ; ===============================================================
 ;
-; void z80_push_int_state(void)
+; unsigned int z80_get_int_state(void)
 ;
-; Save the current ei/di status on the stack.
+; Retrieve the current ei/di status.
 ;
 ; ===============================================================
 
-XLIB asm_z80_push_int_state
+XLIB asm_z80_get_int_state
 
-asm_z80_push_int_state:
+asm_z80_get_int_state:
 
-   ; exit  : stack = ei_di_status
+   ; exit  : hl = ei/di status
    ;
    ; uses  : af, hl
-
-   pop hl                      ; hl = return address
    
    ld a,i                      ; ei_di_status into p/v flag
-   push af                     ; save ei_di_status to stack
+   
+   push af
+   pop hl
 
-   jp (hl)                     ; ret
+   ret

@@ -1,4 +1,4 @@
 z80/z80/asm_z80_delay_ms
 z80/z80/asm_z80_delay_tstate
-z80/z80/asm_z80_pop_int_state
-z80/z80/asm_z80_push_int_state
+z80/z80/asm_z80_get_int_state
+z80/z80/asm_z80_set_int_state
