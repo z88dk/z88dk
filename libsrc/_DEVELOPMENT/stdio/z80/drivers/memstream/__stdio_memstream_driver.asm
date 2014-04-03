@@ -448,7 +448,7 @@ SEEK:
 _seek_set:
 
    ld hl,0
-   jr _seek
+   jr __seek
 
 _seek_end:
 
@@ -464,7 +464,7 @@ _seek_0:
    ld l,c
    ld h,b
 
-_seek:
+__seek:
 
    ld de,0                     ; dehl = current position
    

@@ -1,9 +1,9 @@
 
-; FILE *_fmemopen(void **bufp, size_t *sizep, const char *mode)
+; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
-XDEF __fmemopen
+XDEF __fmemopen_
 
-__fmemopen:
+__fmemopen_:
 
    pop af
    pop hl

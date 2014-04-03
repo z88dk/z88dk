@@ -115,8 +115,8 @@ stdio/c/lr_sccz80/vsprintf
 stdio/c/lr_sccz80/vsprintf_callee
 stdio/c/lr_sccz80/vsscanf
 stdio/c/lr_sccz80/vsscanf_callee
-stdio/c/lr_sccz80/_fmemopen
-stdio/c/lr_sccz80/_fmemopen_callee
+stdio/c/lr_sccz80/_fmemopen_
+stdio/c/lr_sccz80/_fmemopen__callee
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier

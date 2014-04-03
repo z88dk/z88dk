@@ -444,10 +444,10 @@ IF __CLIB_OPT_SCANF & $200000
 
 ENDIF 
 
-   call _spec_long
+   call __spec_long
    jr spec_return
 
-_spec_long:
+__spec_long:
 
 IF __CLIB_OPT_SCANF & $1000
 

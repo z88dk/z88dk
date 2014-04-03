@@ -83,7 +83,7 @@ format_loop:
    ld l,e
    ld h,d
 
-_format_loop:
+__format_loop:
 
    ld c,'%'
    call asm_strchrnul
@@ -134,7 +134,7 @@ ENDIF
    ld h,d
    
    inc hl                      ; next char to examine is past %%
-   jr _format_loop
+   jr __format_loop
 
 format_end:
 
@@ -512,7 +512,7 @@ error_spec_unknown:
    call error_einval_zc        ; set errno
    
    ld hl,50
-   jp _error_stream
+   jp __error_stream
 
 long_spec:
 
@@ -1015,7 +1015,7 @@ IF __CLIB_OPT_PRINTF != 0
 
    ld hl,46
  
-_error_stream:
+__error_stream:
 
    add hl,sp
    ld sp,hl                    ; repair stack
@@ -1041,6 +1041,6 @@ error_printf_converter:
    ; stack = WORKSPACE_36
 
    ld hl,36
-   jr _error_stream
+   jr __error_stream
 
 ENDIF

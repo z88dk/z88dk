@@ -1,11 +1,11 @@
 
-; FILE *_fmemopen(void **bufp, size_t *sizep, const char *mode)
+; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
-XLIB _fmemopen
+XLIB _fmemopen_
 
 LIB asm__fmemopen
 
-_fmemopen:
+_fmemopen_:
 
    pop af
    pop de

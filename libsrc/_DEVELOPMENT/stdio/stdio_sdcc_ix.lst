@@ -76,7 +76,7 @@ stdio/c/sdcc_ix/vscanf_unlocked
 stdio/c/sdcc_ix/vsnprintf
 stdio/c/sdcc_ix/vsprintf
 stdio/c/sdcc_ix/vsscanf
-stdio/c/sdcc_ix/_fmemopen
+stdio/c/sdcc_ix/_fmemopen_
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier
