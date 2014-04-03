@@ -1,11 +1,11 @@
 
 XLIB l_neg_dehl
 
-LIB _l_neg_dehl
+LIB _l_neg_dehl_
 
 l_neg_dehl:
 
-   jp _l_neg_dehl
+   jp _l_neg_dehl_
 
 ;defc l_neg_dehl = _l_neg_dehl
 
