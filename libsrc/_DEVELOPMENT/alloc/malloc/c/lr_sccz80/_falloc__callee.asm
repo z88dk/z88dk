@@ -1,9 +1,9 @@
 
-; void *_falloc(void *p, size_t size)
+; void *_falloc_(void *p, size_t size)
 
-XDEF _falloc_callee
+XDEF _falloc__callee
 
-_falloc_callee:
+_falloc__callee:
 
    pop af
    pop hl

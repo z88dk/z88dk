@@ -48,10 +48,10 @@ alloc/malloc/c/lr_sccz80/realloc
 alloc/malloc/c/lr_sccz80/realloc_callee
 alloc/malloc/c/lr_sccz80/realloc_unlocked
 alloc/malloc/c/lr_sccz80/realloc_unlocked_callee
-alloc/malloc/c/lr_sccz80/_falloc
-alloc/malloc/c/lr_sccz80/_falloc_callee
-alloc/malloc/c/lr_sccz80/_falloc_unlocked
-alloc/malloc/c/lr_sccz80/_falloc_unlocked_callee
+alloc/malloc/c/lr_sccz80/_falloc_
+alloc/malloc/c/lr_sccz80/_falloc__callee
+alloc/malloc/c/lr_sccz80/_falloc__unlocked
+alloc/malloc/c/lr_sccz80/_falloc__unlocked_callee
 alloc/malloc/z80/__heap_allocate_block
 alloc/malloc/z80/__heap_lock_acquire
 alloc/malloc/z80/__heap_lock_release

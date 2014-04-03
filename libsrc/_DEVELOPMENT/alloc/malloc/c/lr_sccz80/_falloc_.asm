@@ -1,11 +1,11 @@
 
-; void *_falloc(void *p, size_t size)
+; void *_falloc_(void *p, size_t size)
 
-XLIB _falloc
+XLIB _falloc_
 
 LIB asm__falloc
 
-_falloc:
+_falloc_:
 
    pop af
    pop hl

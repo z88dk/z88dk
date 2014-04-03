@@ -26,8 +26,8 @@ alloc/malloc/c/sdcc_ix/posix_memalign
 alloc/malloc/c/sdcc_ix/posix_memalign_unlocked
 alloc/malloc/c/sdcc_ix/realloc
 alloc/malloc/c/sdcc_ix/realloc_unlocked
-alloc/malloc/c/sdcc_ix/_falloc
-alloc/malloc/c/sdcc_ix/_falloc_unlocked
+alloc/malloc/c/sdcc_ix/_falloc_
+alloc/malloc/c/sdcc_ix/_falloc__unlocked
 alloc/malloc/z80/__heap_allocate_block
 alloc/malloc/z80/__heap_lock_acquire
 alloc/malloc/z80/__heap_lock_release

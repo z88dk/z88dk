@@ -1,11 +1,11 @@
 
-; void *_falloc_unlocked(void *p, size_t size)
+; void *_falloc__unlocked(void *p, size_t size)
 
-XLIB _falloc_unlocked
+XLIB _falloc__unlocked
 
 LIB asm__falloc_unlocked
 
-_falloc_unlocked:
+_falloc__unlocked:
 
    pop af
    pop hl
