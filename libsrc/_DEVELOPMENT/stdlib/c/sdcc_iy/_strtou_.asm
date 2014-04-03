@@ -1,9 +1,9 @@
 
-; unsigned int _strtou(const char *nptr, char **endptr, int base)
+; unsigned int _strtou_(const char *nptr, char **endptr, int base)
 
-XDEF __strtou
+XDEF __strtou_
 
-__strtou:
+__strtou_:
 
    pop af
    pop hl

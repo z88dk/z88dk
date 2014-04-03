@@ -21,5 +21,5 @@ stdlib/z80/asm__div
 stdlib/z80/asm__ldiv
 stdlib/z80/asm__strtoi
 stdlib/z80/asm__strtou
-stdlib/z80/__strtou_
-stdlib/z80/__strtoul
+stdlib/z80/__strtou__
+stdlib/z80/__strtoul__

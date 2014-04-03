@@ -14,7 +14,7 @@
 
 XLIB asm_strtol
 
-LIB __strtoul, error_erange_mc, error_erange_zc, error_einval_zc
+LIB __strtoul__, error_erange_mc, error_erange_zc, error_einval_zc
 
 asm_strtol:
 
@@ -49,7 +49,7 @@ asm_strtol:
    ;
    ; uses  : af, bc, de, hl, ix
    
-   call __strtoul
+   call __strtoul__
    jr c, check_errors
    
    ; unsigned conversion was successful but signed

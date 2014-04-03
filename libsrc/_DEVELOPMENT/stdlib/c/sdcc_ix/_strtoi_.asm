@@ -1,9 +1,9 @@
 
-; int _strtoi(const char *nptr, char **endptr, int base)
+; int _strtoi_(const char *nptr, char **endptr, int base)
 
-XDEF __strtoi
+XDEF __strtoi_
 
-__strtoi:
+__strtoi_:
 
    pop af
    pop hl

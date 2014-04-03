@@ -1,12 +1,12 @@
 
-XLIB __strtoul
+XLIB __strtoul__
 
 LIB l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
 LIB l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
 
 INCLUDE "clib_cfg.asm"
 
-__strtoul:
+__strtoul__:
 
    ; strtol, strtoul helper
    ;

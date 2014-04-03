@@ -14,7 +14,7 @@
 
 XLIB asm_strtoul
 
-LIB __strtoul, error_einval_zc, error_erange_mc, error_erange_zc
+LIB __strtoul__, error_einval_zc, error_erange_mc, error_erange_zc
 
 asm_strtoul:
 
@@ -49,7 +49,7 @@ asm_strtoul:
    ;
    ; uses  : af, bc, de, hl, ix
 
-   call __strtoul
+   call __strtoul__
    ret nc                      ; no errors
    
    ; what kind of error was it

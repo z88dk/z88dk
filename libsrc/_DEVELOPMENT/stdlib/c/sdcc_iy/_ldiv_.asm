@@ -1,9 +1,9 @@
 
-; void _ldiv(ldiv_t *ld, long numer, long denom)
+; void _ldiv_(ldiv_t *ld, long numer, long denom)
 
-XDEF __ldiv
+XDEF __ldiv_
 
-__ldiv:
+__ldiv_:
 
    pop af
    pop bc
@@ -22,12 +22,5 @@ __ldiv:
    exx
    push bc
    push af
-   
-   push ix
-   
-   call asm__ldiv
-   
-   pop ix
-   ret
    
    INCLUDE "stdlib/z80/asm__ldiv.asm"

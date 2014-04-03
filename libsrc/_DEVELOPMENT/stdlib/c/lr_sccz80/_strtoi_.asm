@@ -1,11 +1,11 @@
 
 ; int _strtoi(const char *nptr, char **endptr, int base)
 
-XLIB _strtoi
+XLIB _strtoi_
 
 LIB asm__strtoi
 
-_strtoi:
+_strtoi_:
 
    pop af
    pop bc

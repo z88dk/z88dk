@@ -1,11 +1,11 @@
 
-; void _ldiv(ldiv_t *ld, long numer, long denom)
+; void _ldiv_(ldiv_t *ld, long numer, long denom)
 
-XLIB _ldiv
+XLIB _ldiv_
 
 LIB asm__ldiv
 
-_ldiv:
+_ldiv_:
 
    pop af
    pop hl

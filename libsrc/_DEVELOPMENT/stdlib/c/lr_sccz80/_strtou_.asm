@@ -1,11 +1,11 @@
 
-; unsigned int _strtou(const char *nptr, char **endptr, int base)
+; unsigned int _strtou_(const char *nptr, char **endptr, int base)
 
-XLIB _strtou
+XLIB _strtou_
 
 LIB asm__strtou
 
-_strtou:
+_strtou_:
 
    pop af
    pop bc

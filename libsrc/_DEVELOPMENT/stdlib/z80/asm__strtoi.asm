@@ -14,7 +14,7 @@
 
 XLIB asm__strtoi
 
-LIB __strtou_, error_erange_mc, error_erange_zc, error_einval_zc
+LIB __strtou__, error_erange_mc, error_erange_zc, error_einval_zc
 
 asm__strtoi:
 
@@ -46,7 +46,7 @@ asm__strtoi:
    ;
    ; uses  : af, bc, de, hl
    
-   call __strtou_
+   call __strtou__
    jr c, check_errors
    
    ; unsigned conversion was successful but signed

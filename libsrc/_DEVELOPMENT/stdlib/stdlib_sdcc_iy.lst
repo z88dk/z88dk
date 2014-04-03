@@ -17,9 +17,9 @@ stdlib/c/sdcc_iy/strtoul
 stdlib/c/sdcc_iy/system
 stdlib/c/sdcc_iy/ultoa
 stdlib/c/sdcc_iy/utoa
-stdlib/c/sdcc_iy/_div
-stdlib/c/sdcc_iy/_ldiv
-stdlib/c/sdcc_iy/_strtoi
-stdlib/c/sdcc_iy/_strtou
-stdlib/z80/__strtou_
-stdlib/z80/__strtoul
+stdlib/c/sdcc_iy/_div_
+stdlib/c/sdcc_iy/_ldiv_
+stdlib/c/sdcc_iy/_strtoi_
+stdlib/c/sdcc_iy/_strtou_
+stdlib/z80/__strtou__
+stdlib/z80/__strtoul__
