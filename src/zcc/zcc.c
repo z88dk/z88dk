@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.66 2014-04-02 08:26:55 dom Exp $
+ *      $Id: zcc.c,v 1.67 2014-04-03 20:28:46 dom Exp $
  */
 
 
@@ -532,7 +532,11 @@ int main(int argc, char **argv)
     
     /* Setup the install prefix based on ZCCCFG */
     if ( ( ptr = getenv("ZCCCFG") ) != NULL ) {
+#ifdef WIN32
+    	snprintf(config_filename, sizeof(config_filename),"%s\\..\\..\\", ptr);
+#else
     	snprintf(config_filename, sizeof(config_filename),"%s/../../", ptr);
+#endif
     	c_install_dir = strdup(config_filename);
     }
     
@@ -751,7 +755,7 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
 #ifdef WIN32
 	/* Argh....annoying */
 	if ( strcmp(c_copycmd,"copy") == 0 ) {
-		cmd = replace_str(buffer, "/", "\\");
+ 	    cmd = replace_str(buffer, "/", "\\");
 	} else {
 	    cmd = strdup(buffer);
 	}
@@ -760,7 +764,7 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
 #endif
     if (verbose)
         printf("%s\n", buffer);
-    ret = (system(buffer));
+    ret = (system(cmd));
     free(cmd);
     return ret;
 }
