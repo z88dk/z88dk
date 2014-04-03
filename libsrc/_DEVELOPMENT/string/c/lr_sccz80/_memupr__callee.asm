@@ -1,9 +1,9 @@
 
-; char *_memupr(void *p, size_t n)
+; char *_memupr_(void *p, size_t n)
 
-XDEF _memupr_callee
+XDEF _memupr__callee
 
-_memupr_callee:
+_memupr__callee:
 
    pop hl
    pop bc

@@ -1,11 +1,11 @@
 
-; char *_memlwr(void *p, size_t n)
+; char *_memlwr_(void *p, size_t n)
 
-XLIB _memlwr
+XLIB _memlwr_
 
 LIB asm__memlwr
 
-_memlwr:
+_memlwr_:
 
    pop af
    pop bc

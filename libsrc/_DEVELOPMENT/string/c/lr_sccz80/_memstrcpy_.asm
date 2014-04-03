@@ -1,11 +1,11 @@
 
-; char *_memstrcpy(void *p, char *s, size_t n)
+; char *_memstrcpy_(void *p, char *s, size_t n)
 
-XLIB _memstrcpy
+XLIB _memstrcpy_
 
 LIB asm__memstrcpy
 
-_memstrcpy:
+_memstrcpy_:
 
    pop af
    pop bc

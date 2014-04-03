@@ -1,11 +1,11 @@
 
-; char *_memupr(void *p, size_t n)
+; char *_memupr_(void *p, size_t n)
 
-XLIB _memupr
+XLIB _memupr_
 
 LIB asm__memupr
 
-_memupr:
+_memupr_:
 
    pop af
    pop bc

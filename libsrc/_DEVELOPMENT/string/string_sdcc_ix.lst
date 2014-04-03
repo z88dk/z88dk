@@ -48,8 +48,8 @@ string/c/sdcc_ix/strtok
 string/c/sdcc_ix/strtok_r
 string/c/sdcc_ix/strupr
 string/c/sdcc_ix/strxfrm
-string/c/sdcc_ix/_memlwr
-string/c/sdcc_ix/_memstrcpy
-string/c/sdcc_ix/_memupr
-string/c/sdcc_ix/_strrstrip
+string/c/sdcc_ix/_memlwr_
+string/c/sdcc_ix/_memstrcpy_
+string/c/sdcc_ix/_memupr_
+string/c/sdcc_ix/_strrstrip_
 string/z80/__str_locate_nul

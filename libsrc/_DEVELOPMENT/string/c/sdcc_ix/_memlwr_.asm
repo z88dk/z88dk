@@ -1,9 +1,9 @@
 
-; char *_memlwr(void *p, size_t n)
+; char *_memlwr_(void *p, size_t n)
 
-XDEF __memlwr
+XDEF __memlwr_
 
-__memlwr:
+__memlwr_:
 
    pop af
    pop hl

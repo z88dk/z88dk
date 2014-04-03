@@ -1,9 +1,9 @@
 
-; char *_memupr(void *p, size_t n)
+; char *_memupr_(void *p, size_t n)
 
-XDEF __memupr
+XDEF __memupr_
 
-__memupr:
+__memupr_:
 
    pop af
    pop hl

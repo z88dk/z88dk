@@ -1,9 +1,9 @@
 
-; char *_memstrcpy(void *p, char *s, size_t n)
+; char *_memstrcpy_(void *p, char *s, size_t n)
 
-XDEF __memstrcpy
+XDEF __memstrcpy_
 
-__memstrcpy:
+__memstrcpy_:
 
    pop af
    pop de
