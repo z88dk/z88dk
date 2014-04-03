@@ -140,10 +140,9 @@ _fzx:   defs 6
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF cls, _cls
+XDEF cls
 
 cls:
-_cls:
 
    ; reset fzx
    
