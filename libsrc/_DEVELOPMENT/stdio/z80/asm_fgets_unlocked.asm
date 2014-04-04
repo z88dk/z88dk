@@ -17,7 +17,7 @@
 XLIB asm_fgets_unlocked
 XDEF asm0_fgets_unlocked
 
-LIB error_zc
+LIB error_zc, __stdio_recv_input_raw_getc
 LIB __stdio_verify_input, __stdio_input_sm_fgets, __stdio_recv_input_raw_eatc
 
 asm_fgets_unlocked:
@@ -78,15 +78,31 @@ asm0_fgets_unlocked:             ; entry for gets()
    
    push de                     ; save char *s
 
-   push bc
    exx
-   pop hl                      ; hl = max num chars to consume
-   
+
+   ld hl,$ffff                 ; consume as many chars as we can (state machine controls how many)   
    call __stdio_recv_input_raw_eatc
    
    exx
    jr c, stream_error
+   
+   dec l                       ; if l == 1, state machine says remove \n from stream
+   jr nz, success
+   
+   ; \n was left on the stream
+   
+   push de
+   
+   exx
+   push bc
+   
+   call __stdio_recv_input_raw_getc  ; throw away \n
 
+   pop bc
+   exx
+   
+   pop de
+   
 success:
 
    xor a

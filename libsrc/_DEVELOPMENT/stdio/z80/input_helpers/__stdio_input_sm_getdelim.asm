@@ -8,7 +8,11 @@ __stdio_input_sm_getdelim:
    ; GETDELIM STATE MACHINE
    ;
    ; Qualify function for STDIO_MSG_EATC
-   ; accepts all chars up to and including the delim char
+   ;
+   ; Write all chars up to and including the delim char
+   ; into the buffer but reject the delim char to cause
+   ; immediate return.  The caller must explicitly
+   ; remove the delim char from the stream.
    ;
    ; enter : de = b_vector *
    ;         bc = delim_char, delim_char > 255 never matches
@@ -42,9 +46,11 @@ state_0:
    
 delim_matches:
 
-   ld hl,state_1               ; next time reject char
-   ret                         ; carry reset to accept delim_char
+   ld l,1                      ; indicate to caller that delim char needs to be removed
 
+   scf                         ; reject delim char, leaving it on the stream
+   ret
+   
 delim_no_match:
 
    ld hl,state_0
@@ -52,16 +58,11 @@ delim_no_match:
    or a
    ret                         ; carry reset to accept char
 
-state_1:
-
-   ; delim char has been seen, reject the char
-   
-   scf
-   ret
-
 exit:
 
    ; vector cannot grow so reject
+   
+   ; hl = 0
 
    pop af
    pop bc

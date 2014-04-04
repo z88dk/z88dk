@@ -25,7 +25,7 @@
 
 XLIB asm_getdelim_unlocked
 
-LIB error_mc, asm_b_vector_resize, l_ltu_bc_hl
+LIB error_mc, asm_b_vector_resize, l_ltu_bc_hl, __stdio_recv_input_raw_getc
 LIB __stdio_verify_input, __stdio_recv_input_raw_eatc, __stdio_input_sm_getdelim
 
 asm_getdelim_unlocked:
@@ -71,8 +71,21 @@ asm_getdelim_unlocked:
    
    ; if char *line == 0, make sure the size is 0 too
    
+   pop hl
+   pop de                      ; de = size_t *n
+   
+   ld (de),a
+   inc de
+   ld (de),a                   ; *n = 0, to prevent leaks
+   dec de
+   
+   push de
+   push hl
+   
    ld l,a
    ld h,a
+   ld e,a
+   ld d,a
    
    jr create_vector
 
@@ -133,14 +146,26 @@ create_vector:
    ld hl,$ffff                 ; no limit on number of chars read from stream
    call __stdio_recv_input_raw_eatc
 
-   ld a,b
-   or c
-   
    exx
-   jr z, error_exit            ; if no chars consumed from stream
+   
+   dec l                       ; if l == 1, state machine says remove delim char
+   jr nz, no_delim
+
+remove_delim:
+
+   ; delim char is still on the stream
+      
+   call __stdio_recv_input_raw_getc  ; throw delim away
+
+   exx
+   ld bc,1
+   exx
+
+no_delim:
 
    ; loose ends prior to exit
    
+   ; bc'= 0 if error
    ; stack = size_t *n, char **lineptr, vector.max_size,
    ;         vector.capacity, vector.size, vector.array
 
@@ -165,7 +190,7 @@ create_vector:
    call l_ltu_bc_hl
    
    dec hl                      ; hl = num bytes written less the '\0'
-   ret nc                      ; if bc >= hl, old_n >= new_n
+   jr nc, check_error          ; if bc >= hl, old_n >= new_n
 
    ; new_n is larger so store new size
    
@@ -181,6 +206,16 @@ create_vector:
    
    or a
    ret
+
+check_error:
+
+   exx
+   ld a,b
+   or c
+   exx
+   
+   ret nz
+   jp error_mc
 
 error_exit:
 

@@ -6,30 +6,47 @@ __stdio_input_sm_fgets:
    ; FGETS STATE MACHINE
    ;
    ; Qualify function for STDIO_MSG_EATC
-   ; Accepts all chars up to and including '\n'
+   ;
+   ; Write all chars up to and including '\n'
+   ; to the buffer.  '\n' is rejected to cause
+   ; immediate return to the caller so the caller
+   ; must remove the '\n' from the stream. 
    ;
    ; set-up: hl = state machine function address
    ;         de = char *s = destination array
+   ;         bc = num chars to consume
    ;
    ; return: de = void *s_ptr (address past last byte written)
+   ;          l = 1 if caller should remove \n
+
+   inc c
+   dec c
+   jr nz, space
+
+   inc b
+   djnz space
+   
+   ; ran out of room
+   
+   ld l,0                      ; tell caller not to remove \n from stream
+   
+   scf                         ; reject char
+   ret
+
+space:
 
    ld (de),a                   ; write char to buffer
    inc de
    
    cp 13                       ; '\n'
-   jr z, state_1t
+   jr z, delim_met
    
    or a                        ; indicate accepted
    ret
 
-state_1t:
+delim_met:
 
-   ; seen the last char '\n'
-
-   ld hl,state_1               ; next time reject
-   ret
-
-state_1:
-
-   scf                         ; reject to end
+   ld l,1                      ; tell caller to remove \n from stream
+   
+   scf                         ; reject char to return
    ret
