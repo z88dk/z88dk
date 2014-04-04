@@ -35,6 +35,8 @@ __stdio_input_sm_fgets:
 
 space:
 
+   dec bc                      ; space remaining
+   
    ld (de),a                   ; write char to buffer
    inc de
    
