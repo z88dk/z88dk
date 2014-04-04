@@ -154,8 +154,8 @@ ENDIF
    pop hl
    ex (sp),hl                  ; hl = j, stack = hi, lo
 
-   or a
-   jp p, partition             ; if item[lo] >= item[i] continue
+   rla
+   jr nc, partition            ; if item[lo] >= item[i] continue
 
 right_squeeze:
 
@@ -210,8 +210,8 @@ ENDIF
    pop hl
    ex (sp),hl                  ; hl = i, stack = lo
    
-   or a
-   jp m, swap_ij               ; if item[j] < item[lo] stop
+   rla
+   jr c, swap_ij               ; if item[j] < item[lo] stop
    
    ex de,hl
    sbc hl,bc                   ; j -= size
