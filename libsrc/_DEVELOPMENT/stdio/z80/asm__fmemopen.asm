@@ -43,6 +43,8 @@ asm__fmemopen:
    ;
    ; uses  : af, bc, de, hl, ix
 
+   ld ixh,a                    ; ixh = mode mask
+   
    ld a,h
    or l
    jp z, error_einval_zc       ; if bufp == 0
@@ -53,7 +55,7 @@ asm__fmemopen:
 
    push hl                     ; save bufp
    push bc                     ; save sizep
-   push af                     ; save mode mask
+   push ix                     ; save mode mask
    
    call __stdio_parse_permission
    jp c, error_einval_zc - 3   ; if mode string is invalid
