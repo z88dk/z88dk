@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.85 2014-04-03 21:31:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.86 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.85 2014-04-03 21:31
 
 /*
 * $Log: hist.c,v $
-* Revision 1.85  2014-04-03 21:31:13  pauloscustodio
+* Revision 1.86  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.85  2014/04/03 21:31:13  pauloscustodio
 * BUG_0045: -D did not accept symbols starting with '_':
 * (reported and fixed by alvin_albrecht@hotmail.com)
 * Added test code.
@@ -1702,7 +1709,7 @@ Based on 1.0.31
 	- Accept both "ex af,af" and "ex af,af'"
 
 -------------------------------------------------------------------------------
-30.03.2014 [2.1.7] (pauloscustodio)
+03.04.2014 [2.1.7] (pauloscustodio)
 -------------------------------------------------------------------------------
 	CH_0023: Accept C-like escape sequences in character constants and strings
 		Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character} 
@@ -1712,6 +1719,15 @@ Based on 1.0.31
 
 	BUG_0045: -D did not accept symbols starting with '_'
 		(reported and fixed by alvin_albrecht@hotmail.com)
+	
+-------------------------------------------------------------------------------
+xx.xx.2014 [2.1.8] (pauloscustodio)
+-------------------------------------------------------------------------------
+	CH_0024: Case-preserving, case-insensitive symbols
+		Symbols no longer converted to upper-case, but still case-insensitive 
+		searched. Warning when a symbol is used with different case than
+		defined. Intermidiate stage before making z80asm case-sensitive, to
+		be more C-code friendly.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1745,7 +1761,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.7"
+#define VERSION     "2.1.8a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

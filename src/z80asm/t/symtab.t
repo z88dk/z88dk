@@ -13,29 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.5 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: symtab.t,v $
-# Revision 1.5  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.4  2013/09/08 00:43:59  pauloscustodio
-# New error module with one error function per error, no need for the error
-# constants. Allows compiler to type-check error message arguments.
-# Included the errors module in the init() mechanism, no need to call
-# error initialization from main(). Moved all error-testing scripts to
-# one file errors.t.
-#
-# Revision 1.3  2013/06/11 23:16:06  pauloscustodio
-# Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
-# Add error message for invalid symbol and scope chars in object file.
-#
-# Revision 1.2  2013/06/01 01:24:23  pauloscustodio
-# CH_0022 : Replace avltree by hash table for symbol table
-#
-# Revision 1.1  2013/05/28 23:39:04  pauloscustodio
-# test definition of symbols in all possible combinations
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.6 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -323,7 +301,7 @@ t_z80asm(
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=3 : defb VAR",
 	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
-	linkerr	=> "Error at module 'TEST1': symbol 'VAR' already defined in module 'TEST'",
+	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
 );
 
 
@@ -331,10 +309,51 @@ t_z80asm(
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=2",
 	asm1	=> "xdef VAR : defc VAR=3",
-	linkerr	=> "Error at module 'TEST1': symbol 'VAR' already defined in module 'TEST'",
+	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
 );
 
+# CH_0024: Case-preserving, case-insensitive symbols
+unlink_testfiles();
+write_file(asm_file(), "Defc Loc = 1 \n ld a, LOC \n Xdef Var \n defc VAR = 2");
+write_file(asm1_file(), "Xref var \n ld a, VAR");
+t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
+Warning at file 'test.asm' line 2: symbol 'Loc' used as 'LOC'
+Warning at file 'test.asm' line 4: symbol 'Var' used as 'VAR'
+Warning at file 'test1.asm' line 2: symbol 'var' used as 'VAR'
+Warning at file 'test1.asm' module 'test1': symbol 'Var' used as 'VAR'
+ERR
+t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02");
 
 # delete directories and files
 unlink_testfiles();
 done_testing;
+
+# $Log: symtab.t,v $
+# Revision 1.6  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.5  2014/01/11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.4  2013/09/08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.3  2013/06/11 23:16:06  pauloscustodio
+# Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+# Add error message for invalid symbol and scope chars in object file.
+#
+# Revision 1.2  2013/06/01 01:24:23  pauloscustodio
+# CH_0022 : Replace avltree by hash table for symbol table
+#
+# Revision 1.1  2013/05/28 23:39:04  pauloscustodio
+# test definition of symbols in all possible combinations
+#

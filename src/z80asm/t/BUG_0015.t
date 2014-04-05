@@ -13,28 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: BUG_0015.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2013/12/11 23:33:55  pauloscustodio
-# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
-#
-# Revision 1.2  2013/01/20 21:24:28  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2011/10/07 17:53:05  pauloscustodio
-# BUG_0015 : Relocation issue - dubious addresses come out of linking
-# (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-# - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-# - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
-# The effect was that all address calculations at link phase were considering
-#  a start offset of zero for all modules.
-# - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
-# - Consequence of these two issues were all linked addresses wrong.
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.5 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 # Error in linking of addresses:
 # Base address of each module is independent of start address of the module in
@@ -74,16 +53,16 @@ my $testa_asm = "
 		jp a1		; 8013  C3 00 80
 				; 8016
 	   ";
-my $testa_obj = objfile(NAME => 'TESTA',
-			EXPR => [['C', 0x0003, 'B1'],
-				 ['C', 0x0006, 'L1'],
-				 ['C', 0x000E, 'B2'],
-				 ['C', 0x0011, 'L1'],
-				 ['C', 0x0014, 'A1'],
-				 ['C', 0x0009, 'A2']],
-			SYMBOLS => [['G', 'A', 0x0000, 'A1'],
-				    ['G', 'A', 0x000B, 'A2']],
-			LIBS => ['B1','B2','L1'],
+my $testa_obj = objfile(NAME => 'testa',
+			EXPR => [['C', 0x0003, 'b1'],
+				 ['C', 0x0006, 'l1'],
+				 ['C', 0x000E, 'b2'],
+				 ['C', 0x0011, 'l1'],
+				 ['C', 0x0014, 'a1'],
+				 ['C', 0x0009, 'a2']],
+			SYMBOLS => [['G', 'A', 0x0000, 'a1'],
+				    ['G', 'A', 0x000B, 'a2']],
+			LIBS => ['b1','b2','l1'],
 			CODE => "\x3E\x01".
 				"\xCD\x00\x00".
 				"\xCD\x00\x00".
@@ -112,16 +91,16 @@ my $testb_asm = "
 		jp b1		; 8029  C3 16 80
 				; 802C
 	   ";
-my $testb_obj = objfile(NAME => 'TESTB',
-			EXPR => [['C', 0x0003, 'A1'],
-				 ['C', 0x0006, 'L1'],
-				 ['C', 0x000E, 'A2'],
-				 ['C', 0x0011, 'L1'],
-				 ['C', 0x0014, 'B1'],
-				 ['C', 0x0009, 'B2']],
-			SYMBOLS => [['G', 'A', 0x0000, 'B1'],
-				    ['G', 'A', 0x000B, 'B2']],
-			LIBS => ['A1','A2','L1'],
+my $testb_obj = objfile(NAME => 'testb',
+			EXPR => [['C', 0x0003, 'a1'],
+				 ['C', 0x0006, 'l1'],
+				 ['C', 0x000E, 'a2'],
+				 ['C', 0x0011, 'l1'],
+				 ['C', 0x0014, 'b1'],
+				 ['C', 0x0009, 'b2']],
+			SYMBOLS => [['G', 'A', 0x0000, 'b1'],
+				    ['G', 'A', 0x000B, 'b2']],
+			LIBS => ['a1','a2','l1'],
 			CODE => "\x06\x01".
 				"\xCD\x00\x00".
 				"\xCD\x00\x00".
@@ -142,11 +121,11 @@ my $testl_asm = "
 		jp l1		; 8033  C3 2C 80
 				; 8036
 	   ";
-my $testl_obj = objfile(NAME => 'L1',
-			EXPR => [['C', 0x0008, 'L1'],
-				 ['C', 0x0003, 'L2']],
-			SYMBOLS => [['L', 'A', 0x0005, 'L2'],
-				    ['X', 'A', 0x0000, 'L1']],
+my $testl_obj = objfile(NAME => 'l1',
+			EXPR => [['C', 0x0008, 'l1'],
+				 ['C', 0x0003, 'l2']],
+			SYMBOLS => [['L', 'A', 0x0005, 'l2'],
+				    ['X', 'A', 0x0000, 'l1']],
 			CODE => "\x2E\x01".
 				"\xC3\x05\x00".
 				"\x2E\x02".
@@ -196,3 +175,32 @@ t_binary(read_binfile('testa.bin'), $testa_bin);
 
 unlink_testfiles(@testfiles);
 done_testing();
+
+# $Log: BUG_0015.t,v $
+# Revision 1.5  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
+# Extend copyright to 2014.
+# Move CVS log to bottom of file.
+#
+# Revision 1.3  2013/12/11 23:33:55  pauloscustodio
+# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+#
+# Revision 1.2  2013/01/20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2011/10/07 17:53:05  pauloscustodio
+# BUG_0015 : Relocation issue - dubious addresses come out of linking
+# (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+# - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+# - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+# The effect was that all address calculations at link phase were considering
+#  a start offset of zero for all modules.
+# - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+# - Consequence of these two issues were all linked addresses wrong.
+#

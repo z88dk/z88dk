@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.38 2014-03-30 10:39:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.39 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -169,28 +169,28 @@ t_compile_module($init, <<'END', $objs);
 	/* at_bol = TRUE */
 	SetTemporaryLine("\n \t start \t : \t . start : \n");
 	T_NEWLINE();
-	T_LABEL("START");
+	T_LABEL("start");
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
 	
 	SetTemporaryLine("\n \t . \t start \t : \t . start : \n");
 	T_NEWLINE();
-	T_LABEL("START");
+	T_LABEL("start");
 	T_COLON();
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
 	
 	SetTemporaryLine("\n \t . \t start \t . start : \n");
 	T_NEWLINE();
-	T_LABEL("START");
+	T_LABEL("start");
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
@@ -200,7 +200,7 @@ t_compile_module($init, <<'END', $objs);
 	T_DOT();
 	T_COLON();
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
@@ -208,29 +208,29 @@ t_compile_module($init, <<'END', $objs);
 	
 	/* at_bol = FALSE */
 	SetTemporaryLine(" \t start \t : \t . start : \n");
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
 	
 	SetTemporaryLine(" \t . \t start \t : \t . start : \n");
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
 	
 	SetTemporaryLine(" \t . \t start \t . start : \n");
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
@@ -239,7 +239,7 @@ t_compile_module($init, <<'END', $objs);
 	T_DOT();
 	T_COLON();
 	T_DOT();
-	T_NAME("START");
+	T_NAME("start");
 	T_COLON();
 	T_NEWLINE();
 	T_END();
@@ -293,12 +293,12 @@ t_compile_module($init, <<'END', $objs);
 	
 	/* names */
 	SetTemporaryLine(" _Abc_123 Abc_123 123_Abc_0 0 af' ");
-	T_NAME("_ABC_123");	
-	T_NAME("ABC_123");
+	T_NAME("_Abc_123");	
+	T_NAME("Abc_123");
 	T_NUMBER(123);
-	T_NAME("_ABC_0");
+	T_NAME("_Abc_0");
 	T_NUMBER(0);
-	T_NAME("AF'");
+	T_NAME("af'");
 	T_END();
 	
 	
@@ -308,34 +308,34 @@ t_compile_module($init, <<'END', $objs);
 					   "\n . abc : . def ghi : . jkl : "
 					   "\n");
 	T_NEWLINE();
-	T_LABEL("ABC");
+	T_LABEL("abc");
 	T_DOT();
-	T_NAME("DEF");
-	T_NAME("GHI");
+	T_NAME("def");
+	T_NAME("ghi");
 	T_COLON();
 	T_DOT();
-	T_NAME("JKL");
+	T_NAME("jkl");
 	T_COLON();
 	
 	T_NEWLINE();
-	T_LABEL("ABC");
+	T_LABEL("abc");
 	T_DOT();
-	T_NAME("DEF");
-	T_NAME("GHI");
+	T_NAME("def");
+	T_NAME("ghi");
 	T_COLON();
 	T_DOT();
-	T_NAME("JKL");
+	T_NAME("jkl");
 	T_COLON();
 
 	T_NEWLINE();
-	T_LABEL("ABC");
+	T_LABEL("abc");
 	T_COLON();
 	T_DOT();
-	T_NAME("DEF");
-	T_NAME("GHI");
+	T_NAME("def");
+	T_NAME("ghi");
 	T_COLON();
 	T_DOT();
-	T_NAME("JKL");
+	T_NAME("jkl");
 	T_COLON();
 
 	T_NEWLINE();
@@ -582,7 +582,14 @@ done_testing;
 
 
 # $Log: whitebox-scan.t,v $
-# Revision 1.38  2014-03-30 10:39:51  pauloscustodio
+# Revision 1.39  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.38  2014/03/30 10:39:51  pauloscustodio
 # CH_0023: Accept C-like escape sequences in character constants and strings
 # Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character}, \{octal}, \x{hexadecimal}, allows \0 within the string.
 # Existing code may have to be modified, e.g. defb '\' --> defb '\\'

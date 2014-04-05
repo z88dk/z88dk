@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.27 2014-03-03 02:44:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.28 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -44,6 +44,9 @@ ERR( ErrError,	error_expr( char *expr ),				"error in expression '%s'" _C_ expr 
 ERR( ErrError,	error_invalid_squoted_string( void ),	"invalid single quoted character" )
 ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
 ERR( ErrError,	error_divide_by_zero( void ),			"division by zero" )
+
+ERR( ErrWarn,	warn_symbol_diff_case( char *name, char *used ),
+														"symbol '%s' used as '%s'" _C_ name _C_ used )
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
 ERR( ErrError,	error_not_defined_expr( char *expr ),	"symbol not defined in expression '%s'" _C_ expr )
@@ -80,7 +83,14 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.27  2014-03-03 02:44:15  pauloscustodio
+* Revision 1.28  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.27  2014/03/03 02:44:15  pauloscustodio
 * Division by zero error was causing memory leaks - made non-fatal.
 * Moved calculator stack to expr.c, made it singleton and based on array.h - no
 * need to allocate on every expression computed, elements are stored in

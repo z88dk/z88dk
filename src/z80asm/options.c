@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.79 2014-04-03 21:31:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.80 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -142,7 +142,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
 /*-----------------------------------------------------------------------------
 *   process all options
 *----------------------------------------------------------------------------*/
-/* check if this oprion is matched, return char pointer after option, ready
+/* check if this option is matched, return char pointer after option, ready
    to retrieve an argument, if any */
 static char *check_option( char *arg, char *opt )
 {
@@ -454,8 +454,6 @@ static void option_define( char *symbol )
 {
     int i;
 
-    strtoupper( symbol );			/* convert to upper case */
-
     /* check syntax - BUG_0045 */
     if ( (! isalpha( symbol[0] )) && (symbol[0] != '_') )
     {
@@ -573,7 +571,14 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.79  2014-04-03 21:31:13  pauloscustodio
+* Revision 1.80  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.79  2014/04/03 21:31:13  pauloscustodio
 * BUG_0045: -D did not accept symbols starting with '_':
 * (reported and fixed by alvin_albrecht@hotmail.com)
 * Added test code.

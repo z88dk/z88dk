@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.9 2014-03-16 19:19:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.10 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -149,11 +149,11 @@ t_z80asm_error("ld a,1+", "Error at file 'test.asm' line 1: syntax error in expr
 #------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "TEST", CODE => "\0\0", EXPR => [ [C => 0, "*+VAL"] ] ));
+write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", EXPR => [ [C => 0, "*+VAL"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
-				 "Error at file 'test.asm' module 'TEST': syntax error in expression\n".
-				 "Error at file 'test.asm' module 'TEST': error in expression '*+VAL'\n".
+				 "Error at file 'test.asm' module 'test': syntax error in expression\n".
+				 "Error at file 'test.asm' module 'test': error in expression '*+VAL'\n".
 				 "2 errors occurred during assembly\n",
 				 1);
 
@@ -185,21 +185,21 @@ t_z80asm(
 t_z80asm(
 	asm  	=> "ld a,N : defc N = -129",
 	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '-129' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-129' out of range",
 );
 
 t_z80asm(
 	asm  	=> "xref value : ld a,value",
 	asm1	=> "xdef value : defc value = -129",
 	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '-129' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm		=> "xdef value : defc value = 0",
 	asm1	=> "xref value : ld a,value-129",
 	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test1.asm' module 'TEST1': integer '-129' out of range in expression 'VALUE-129'",
+	err		=> "Warning at file 'test1.asm' module 'test1': integer '-129' out of range in expression 'value-129'",
 );
 
 # Byte = -128
@@ -260,21 +260,21 @@ t_z80asm(
 t_z80asm(
 	asm  	=> "ld a,N : defc N = 256",
 	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '256' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '256' out of range",
 );
 
 t_z80asm(
 	asm  	=> "xref value : ld a,value",
 	asm1	=> "xdef value : defc value = 256",
 	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '256' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm		=> "xdef value : defc value = 0",
 	asm1	=> "xref value : ld a,value+256",
 	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test1.asm' module 'TEST1': integer '256' out of range in expression 'VALUE+256'",
+	err		=> "Warning at file 'test1.asm' module 'test1': integer '256' out of range in expression 'value+256'",
 );
 
 
@@ -288,21 +288,21 @@ t_z80asm(
 t_z80asm(
 	asm  	=> "ld (ix+value),-1 : defc value = -129",
 	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '-129' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-129' out of range",
 );
 
 t_z80asm(
 	asm  	=> "xref value : ld (ix+value),-1",
 	asm1	=> "xdef value : defc value = -129",
 	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '-129' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm		=> "xref value : ld (ix+value-129),-1",
 	asm1	=> "xdef value : defc value = 0",
 	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '-129' out of range in expression 'VALUE-129'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value-129'",
 );
 
 
@@ -364,21 +364,21 @@ t_z80asm(
 t_z80asm(
 	asm		=> "ld (ix+value),-1 : defc value = 128",
 	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '128' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '128' out of range",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld (ix+value),-1",
 	asm1	=> "xdef value : defc value = 128",
 	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '128' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld (ix+value+128),-1",
 	asm1	=> "xdef value : defc value = 0",
 	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '128' out of range in expression 'VALUE+128'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value+128'",
 );
 
 
@@ -392,21 +392,21 @@ t_z80asm(
 t_z80asm(
 	asm		=> "ld bc,N : defc N = -32769",
 	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '-32769' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-32769' out of range",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld bc,value",
 	asm1	=> "xdef value : defc value = -32769",
 	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '-32769' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld bc,value-32769",
 	asm1	=> "xdef value : defc value = 0",
 	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '-32769' out of range in expression 'VALUE-32769'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value-32769'",
 );
 
 
@@ -468,21 +468,21 @@ t_z80asm(
 t_z80asm(
 	asm		=> "ld bc,N : defc N = 65536",
 	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'TEST' line 1: integer '65536' out of range",
+	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '65536' out of range",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld bc,value",
 	asm1	=> "xdef value : defc value = 65536",
 	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '65536' out of range in expression 'VALUE'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value'",
 );
 
 t_z80asm(
 	asm 	=> "xref value : ld bc,value+65536",
 	asm1	=> "xdef value : defc value = 0",
 	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'TEST': integer '65536' out of range in expression 'VALUE+65536'",
+	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value+65536'",
 );
 
 
@@ -656,47 +656,47 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 	my($jump, $opcode) = @$_;
 		
 	t_z80asm(
-		asm		=> "$jump asmpc+2-129",
+		asm		=> "$jump ASMPC+2-129",
 		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
 	);
 
 	t_z80asm(
-		asm		=> "$jump label : defc label = asmpc-129",
-		err		=> "Error at file 'test.asm' module 'TEST' line 1: integer '-129' out of range",
+		asm		=> "$jump label : defc label = ASMPC-129",
+		err		=> "Error at file 'test.asm' module 'test' line 1: integer '-129' out of range",
 	);
 
 	t_z80asm(
-		asm		=> "$jump asmpc+2+128",
+		asm		=> "$jump ASMPC+2+128",
 		err		=> "Error at file 'test.asm' line 1: integer '128' out of range",
 	);
 
 	t_z80asm(
-		asm		=> "$jump label : defc label = asmpc+128",
-		err		=> "Error at file 'test.asm' module 'TEST' line 1: integer '128' out of range",
+		asm		=> "$jump label : defc label = ASMPC+128",
+		err		=> "Error at file 'test.asm' module 'test' line 1: integer '128' out of range",
 	);
 
 	for my $org (0, 0x8000, 0xFFFE) {
 		t_z80asm(
 			org		=> $org,
-			asm		=> "$jump asmpc+2-128",
+			asm		=> "$jump ASMPC+2-128",
 			bin		=> "$opcode\x80",
 		);
 
 		t_z80asm(
 			org		=> $org,
-			asm		=> "$jump label : defc label = asmpc-128",
+			asm		=> "$jump label : defc label = ASMPC-128",
 			bin		=> "$opcode\x80",
 		);
 
 		t_z80asm(
 			org		=> $org, 
-			asm		=> "$jump asmpc+2+127",
+			asm		=> "$jump ASMPC+2+127",
 			bin		=> "$opcode\x7F",
 		);
 
 		t_z80asm(
 			org		=> $org, 
-			asm		=> "$jump label : defc label = asmpc+127",
+			asm		=> "$jump label : defc label = ASMPC+127",
 			bin		=> "$opcode\x7F",
 		);
 
@@ -717,7 +717,7 @@ t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: syntax error i
 #------------------------------------------------------------------------------
 # error_not_defined
 unlink_testfiles();
-t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' module 'TEST' line 1: symbol not defined");
+t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' module 'test' line 1: symbol not defined");
 
 #------------------------------------------------------------------------------
 # error_not_defined_expr
@@ -728,7 +728,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "lib main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' module 'TEST': symbol not defined in expression 'MAIN'\n".
+		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
 		"1 errors occurred during assembly\n", 
 		1);
 
@@ -848,7 +848,7 @@ t_binary(read_binfile(bin_file()),
 
 write_file(asm_file(), "defs 65536, 0xAA");
 t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "",
-	"Error at module 'TEST2': max. code size of 65536 bytes reached\n".
+	"Error at module 'test2': max. code size of 65536 bytes reached\n".
 	"1 errors occurred during assembly\n", 1);
 
 # parseline
@@ -901,9 +901,9 @@ my($stdout, $stderr, $return) = capture {
 	system z80asm()." -l -b ".asm_file();
 };
 is $stdout, "", "output";
-is $stderr, "Error at module 'TEST': ORG not defined\n1 errors occurred during assembly\n", "error";
+is $stderr, "Error at module 'test': ORG not defined\n1 errors occurred during assembly\n", "error";
 ok -f err_file(), "error file";
-is read_file( err_file() ), "Error at module 'TEST': ORG not defined\n", "error file ok";
+is read_file( err_file() ), "Error at module 'test': ORG not defined\n", "error file ok";
 ok -f lst_file(), "lst generated in assembly phase, ok";
 ok -f obj_file(), "obj generated in assembly phase, ok";
 ok ! -f bin_file(), "no bin file";
@@ -914,7 +914,7 @@ unlink_testfiles();
 t_z80asm_error("
 	XREF loop
 	jr loop
-", "Error at file 'test.asm' module 'TEST' line 3: relative jump address must be local");
+", "Error at file 'test.asm' module 'test' line 3: relative jump address must be local");
 
 
 #------------------------------------------------------------------------------
@@ -982,7 +982,7 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-r0 -b -d ".obj_file(), "", "", 0);
-t_binary(read_binfile(obj_file()), objfile(NAME => "TEST", CODE => "\x00", ORG => 0));
+t_binary(read_binfile(obj_file()), objfile(NAME => "test", CODE => "\x00", ORG => 0));
 t_binary(read_binfile(bin_file()), "\x00");
 	
 # CreateLib uses a different error call
@@ -990,15 +990,15 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
-t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "TEST", CODE => "\x00")));
+t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", CODE => "\x00")));
 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "TEST", CODE => "\0\0", 
+write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", 
 								   SYMBOLS => [ [Z => Z => 0, "ABCD"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
-				 "Error at module 'TEST': file 'test.obj' not an object file\n".
-				 "Error at module 'TEST': file 'test.obj' not an object file\n".
+				 "Error at module 'test': file 'test.obj' not an object file\n".
+				 "Error at module 'test': file 'test.obj' not an object file\n".
 				 "2 errors occurred during assembly\n",
 				 1);
 
@@ -1028,7 +1028,14 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.9  2014-03-16 19:19:49  pauloscustodio
+# Revision 1.10  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.9  2014/03/16 19:19:49  pauloscustodio
 # Integrate use of srcfile in scanner, removing global variable z80asmfile
 # and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 #

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.55 2014-03-29 00:33:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.56 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -82,7 +82,7 @@ CheckCondition( void )
             continue;
         }
 
-        if ( strcmp( text, flags[i].name ) == 0 )
+        if ( stricompare( text, flags[i].name ) == 0 )
         {
             if ( ( opts.cpu & flags[i].cpu ) == 0 )
             {
@@ -104,7 +104,7 @@ CheckRegister8( void )
     {
         if ( *( tok_name + 1 ) == '\0' )
         {
-            switch ( *tok_name )
+            switch ( toupper(*tok_name) )
             {
             case 'A':
                 return 7;
@@ -155,7 +155,7 @@ CheckRegister8( void )
         }
         else
         {
-            if ( strcmp( tok_name, "IXL" ) == 0 )
+            if ( stricompare( tok_name, "IXL" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -167,7 +167,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( tok_name, "IXH" ) == 0 )
+            else if ( stricompare( tok_name, "IXH" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -179,7 +179,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( tok_name, "IYL" ) == 0 )
+            else if ( stricompare( tok_name, "IYL" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -191,7 +191,7 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( tok_name, "IYH" ) == 0 )
+            else if ( stricompare( tok_name, "IYH" ) == 0 )
             {
                 if ( opts.swap_ix_iy )
                 {
@@ -203,14 +203,14 @@ CheckRegister8( void )
                 }
             }
 
-            else if ( strcmp( tok_name, "IIR" ) == 0 ) /** Was 'I' register */
+            else if ( stricompare( tok_name, "IIR" ) == 0 ) /** Was 'I' register */
             {
                 if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     return 8;
                 }
             }
-            else if ( strcmp( tok_name, "EIR" ) == 0 ) /** Was 'R' register */
+            else if ( stricompare( tok_name, "EIR" ) == 0 ) /** Was 'R' register */
             {
                 if ( ( opts.cpu & CPU_RABBIT ) )
                 {
@@ -230,35 +230,35 @@ CheckRegister16( void )
 {
     if ( tok == TK_NAME )
     {
-        if ( strcmp( tok_name, "HL" ) == 0 )
+        if ( stricompare( tok_name, "HL" ) == 0 )
         {
             return REG16_HL;
         }
-        else if ( strcmp( tok_name, "BC" ) == 0 )
+        else if ( stricompare( tok_name, "BC" ) == 0 )
         {
             return REG16_BC;
         }
-        else if ( strcmp( tok_name, "DE" ) == 0 )
+        else if ( stricompare( tok_name, "DE" ) == 0 )
         {
             return REG16_DE;
         }
-        else if ( strcmp( tok_name, "SP" ) == 0 )
+        else if ( stricompare( tok_name, "SP" ) == 0 )
         {
             return REG16_SP;
         }
-        else if ( strcmp( tok_name, "AF" ) == 0 )
+        else if ( stricompare( tok_name, "AF" ) == 0 )
         {
             return REG16_AF;
         }
-        else if ( strcmp( tok_name, "AF'" ) == 0 )
+        else if ( stricompare( tok_name, "AF'" ) == 0 )
         {
             return REG16_AF1;
         }
-        else if ( strcmp( tok_name, "IX" ) == 0 )
+        else if ( stricompare( tok_name, "IX" ) == 0 )
         {
             return opts.swap_ix_iy ? REG16_IY : REG16_IX;
         }
-        else if ( strcmp( tok_name, "IY" ) == 0 )
+        else if ( stricompare( tok_name, "IY" ) == 0 )
         {
             return opts.swap_ix_iy ? REG16_IX : REG16_IY;
         }
@@ -318,7 +318,14 @@ IndirectRegisters( void )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.55  2014-03-29 00:33:28  pauloscustodio
+* Revision 1.56  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.55  2014/03/29 00:33:28  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.

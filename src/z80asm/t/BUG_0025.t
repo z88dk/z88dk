@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0025.t,v 1.3 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0025.t,v 1.4 2014-04-05 23:36:11 pauloscustodio Exp $
 # $Log: BUG_0025.t,v $
-# Revision 1.3  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.4  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.3  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -44,12 +51,12 @@ require 't/test_utils.pl';
 for my $jump (qw( jr djnz ))
 {
 	t_z80asm(
-		asm		=> "$jump asmpc+2-129",
+		asm		=> "$jump ASMPC+2-129",
 		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
 	);
 
 	t_z80asm(
-		asm		=> "$jump asmpc+2+128",
+		asm		=> "$jump ASMPC+2+128",
 		err		=> "Error at file 'test.asm' line 1: integer '128' out of range",
 	);
 }

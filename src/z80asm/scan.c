@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.45 2014-03-30 10:39:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.46 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -162,7 +162,6 @@ static long scan_num ( char *text, int length, int base )
 static void set_tok_name( void )
 {
 	Str_set_n(  tok_name_buf, ts, te-ts );
-	strtoupper( tok_name_buf->str );
 }
 
 /*-----------------------------------------------------------------------------
@@ -338,7 +337,14 @@ void SetTemporaryLine( char *line )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.45  2014-03-30 10:39:51  pauloscustodio
+* Revision 1.46  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.45  2014/03/30 10:39:51  pauloscustodio
 * CH_0023: Accept C-like escape sequences in character constants and strings
 * Accepts \a, \b, \e (0x1B), \f, \n, \r, \t, \v, \{any character}, \{octal}, \x{hexadecimal}, allows \0 within the string.
 * Existing code may have to be modified, e.g. defb '\' --> defb '\\'

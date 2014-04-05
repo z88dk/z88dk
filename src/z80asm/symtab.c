@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.24 2014-04-05 22:07:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.25 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -41,7 +41,7 @@ SymbolHash *static_symtab = NULL;
 /*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
-DEF_CLASS_HASH( Symbol, FALSE );			/* defines SymbolHash */
+DEF_CLASS_HASH( Symbol, TRUE );			/* defines SymbolHash */
 
 /*-----------------------------------------------------------------------------
 *   join two symbol tables, adding all symbols from source to the target
@@ -70,12 +70,16 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 
     sym = SymbolHash_get( symtab, name );
 
-    /* Bodge for handling underscores (sdcc hack) */
+	/* Bodge for handling underscores (sdcc hack) */
     if ( sym == NULL && opts.sdcc && name[0] == '_' )
         sym = SymbolHash_get( symtab, name + 1 );
 
-    if ( sym != NULL )
-        sym->sym_type |= SYM_TOUCHED;
+	if ( sym != NULL )
+	{
+		sym->sym_type |= SYM_TOUCHED;
+		if ( strcmp( sym->name, name ) != 0 )
+			warn_symbol_diff_case( sym->name, name );
+	}
 
     return sym;
 }
@@ -523,7 +527,14 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.24  2014-04-05 22:07:32  pauloscustodio
+* Revision 1.25  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.24  2014/04/05 22:07:32  pauloscustodio
 * Added ignore_case attribute to allow case-insensitive class hashes
 *
 * Revision 1.23  2014/03/03 14:09:20  pauloscustodio

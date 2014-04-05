@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.86 2014-03-29 00:11:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.87 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -68,7 +68,7 @@ DEFSP( void )
 {
     if ( GetSym() == TK_DOT )
         if ( GetSym() == TK_NAME )
-            switch ( tok_name[0] )
+            switch ( toupper(tok_name[0]) )
             {
             case 'B':
                 return 1;
@@ -107,7 +107,7 @@ Parsevarsize( void )
 
     long offset = 0, varsize, size_multiplier;
 
-    if ( strcmp( tok_name, "DS" ) != 0 )
+    if ( stricompare( tok_name, "DS" ) != 0 )
     {
         error_illegal_ident();
     }
@@ -159,7 +159,7 @@ Parsedefvarsize( long offset )
     switch ( tok )
     {
     case TK_NAME:
-        if ( strcmp( tok_name, "DS" ) != 0 )
+        if ( stricompare( tok_name, "DS" ) != 0 )
         {
             define_symbol( tok_name, offset, 0 );
             GetSym();
@@ -798,7 +798,14 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.86  2014-03-29 00:11:51  pauloscustodio
+ * Revision 1.87  2014-04-05 23:36:11  pauloscustodio
+ * CH_0024: Case-preserving, case-insensitive symbols
+ * Symbols no longer converted to upper-case, but still case-insensitive
+ * searched. Warning when a symbol is used with different case than
+ * defined. Intermidiate stage before making z80asm case-sensitive, to
+ * be more C-code friendly.
+ *
+ * Revision 1.86  2014/03/29 00:11:51  pauloscustodio
  * TK_EOF renamed TK_END
  *
  * Revision 1.85  2014/03/22 16:15:24  pauloscustodio

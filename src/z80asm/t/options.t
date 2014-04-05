@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.36 2014-04-03 21:31:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.37 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 # Test options
 
@@ -310,9 +310,14 @@ ERR
 #------------------------------------------------------------------------------
 unlink_testfiles();
 t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"Error at file 'test.asm' module 'TEST' line 2: symbol not defined");
+		"Error at file 'test.asm' module 'test' line 2: symbol not defined");
 for my $options ('-sdcc', '--sdcc') {
-	t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", $options);
+	t_z80asm(
+		options	=> $options,
+		asm		=> "defc main = 0x1234\ncall _main",
+		bin		=> "\xCD\x34\x12", 
+		err		=> "Warning at file 'test.asm' line 2: symbol 'main' used as '_main'",
+	);
 }
 
 #------------------------------------------------------------------------------
@@ -408,20 +413,20 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-FUNC                            = 0006, G: TEST2
-LOOP                            = 0002, L: TEST
-LOOP                            = 0008, L: TEST2
-MAIN                            = 0000, G: TEST
-X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
-X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
+func                            = 0006, G: test2
+loop                            = 0002, L: test
+loop                            = 0008, L: test2
+main                            = 0000, G: test
+x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
+x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
 
 
-MAIN                            = 0000, G: TEST
-LOOP                            = 0002, L: TEST
-X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
-X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
-FUNC                            = 0006, G: TEST2
-LOOP                            = 0008, L: TEST2
+main                            = 0000, G: test
+loop                            = 0002, L: test
+x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
+x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
+func                            = 0006, G: test2
+loop                            = 0008, L: test2
 END
 }
 
@@ -462,10 +467,10 @@ for my $options ('-g', '--globaldef') {
 	);
 	ok -f def_file(), def_file();
 	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
-DEFC MAIN                            = $0000 ; Module TEST
-DEFC X31_X31_X31_X31_X31_X31_X31_X31 = $0004 ; Module TEST
-DEFC X_32_X32_X32_X32_X32_X32_X32_X32 = $0005 ; Module TEST
-DEFC FUNC                            = $0006 ; Module TEST2
+DEFC main                            = $0000 ; Module test
+DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; Module test
+DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; Module test
+DEFC func                            = $0006 ; Module test2
 END
 }
 
@@ -757,7 +762,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "lib main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' module 'TEST': symbol not defined in expression 'MAIN'\n".
+		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
 		"1 errors occurred during assembly\n", 
 		1);
 
@@ -787,12 +792,12 @@ loop:	djnz loop
 ";
 $bin = "\x06\x0A\x10\xFE\xC9";
 my $map = <<'END';
-LOOP                            = 0002, L: TEST
-MAIN                            = 0000, G: TEST
+loop                            = 0002, L: test
+main                            = 0000, G: test
 
 
-MAIN                            = 0000, G: TEST
-LOOP                            = 0002, L: TEST
+main                            = 0000, G: test
+loop                            = 0002, L: test
 END
 
 
@@ -883,7 +888,7 @@ unlink_testfiles($lib);
 $asm = "ld a,_value23";		# BUG_0045
 
 # no -D
-t_z80asm_error($asm, "Error at file 'test.asm' module 'TEST' line 1: symbol not defined");
+t_z80asm_error($asm, "Error at file 'test.asm' module 'test' line 1: symbol not defined");
 
 # invalid -D
 for my $options ('-D23', '-Da*') {
@@ -1107,7 +1112,14 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.36  2014-04-03 21:31:13  pauloscustodio
+# Revision 1.37  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.36  2014/04/03 21:31:13  pauloscustodio
 # BUG_0045: -D did not accept symbols starting with '_':
 # (reported and fixed by alvin_albrecht@hotmail.com)
 # Added test code.

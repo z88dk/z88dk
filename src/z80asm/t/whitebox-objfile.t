@@ -93,12 +93,12 @@ t_compile_module($init, <<'END', $objs);
 	TRY_OK( obj = ObjFile_open_read("test.obj", FALSE) );
 	ASSERT( obj == NULL );
 	
-	TITLE("TEST1 Object file, read mode");
+	TITLE("test1 Object file, read mode");
 	TRY_OK( obj = ObjFile_open_read("test1.obj", FALSE) );
 	ASSERT( obj != NULL );
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
-	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->in_library == FALSE );
 	ASSERT( obj->writing == FALSE );
 	ASSERT( obj->org_addr == -1 );
@@ -111,12 +111,12 @@ t_compile_module($init, <<'END', $objs);
 	OBJ_DELETE(obj);
 	ASSERT( obj == NULL );
 	
-	TITLE("TEST1 Object file, test mode");
+	TITLE("test1 Object file, test mode");
 	TRY_OK( obj = ObjFile_open_read("test1.obj", TRUE) );
 	ASSERT( obj != NULL );
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
-	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->in_library == FALSE );
 	ASSERT( obj->writing == FALSE );
 	ASSERT( obj->org_addr == -1 );
@@ -129,7 +129,7 @@ t_compile_module($init, <<'END', $objs);
 	OBJ_DELETE(obj);
 	ASSERT( obj == NULL );
 	
-	TITLE("TEST1 Library file");
+	TITLE("test1 Library file");
 	TRY_OK( file = xfopen("test1.lib", "rb") );
 	ASSERT( file != NULL );
 	fseek( file, 16, SEEK_SET );
@@ -137,7 +137,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj != NULL );
 	ASSERT( obj->start_ptr == 16 );
 	ASSERT( strcmp(obj->filename, "test1.lib") == 0 );
-	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->in_library == TRUE );
 	ASSERT( obj->writing == FALSE );
 	ASSERT( obj->org_addr == -1 );
@@ -155,7 +155,7 @@ END
 
 # write test object file
 for my $code_size (0, 1, 65536) {
-	my $obj1 = objfile(NAME => "TEST1", CODE => "\x00" x $code_size);
+	my $obj1 = objfile(NAME => "test1", CODE => "\x00" x $code_size);
 	write_binfile(obj1_file(), $obj1); 
 	write_binfile(lib1_file(), libfile($obj1));
 
@@ -182,13 +182,13 @@ Error: file 'test.obj' not an object file
 
 Error: file 'test.obj' not an object file
 
----- TEST: TEST1 Object file, read mode ----
+---- TEST: test1 Object file, read mode ----
 
 
----- TEST: TEST1 Object file, test mode ----
+---- TEST: test1 Object file, test mode ----
 
 
----- TEST: TEST1 Library file ----
+---- TEST: test1 Library file ----
 
 
 ---- TEST: End ----
@@ -202,9 +202,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.24 2014-02-08 18:30:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.25 2014-04-05 23:36:11 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.24  2014-02-08 18:30:49  pauloscustodio
+# Revision 1.25  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.24  2014/02/08 18:30:49  pauloscustodio
 # lib/srcfile.c to read source files and handle recursive includes,
 # used to read @lists, removed opts.files;
 # model.c to hold global data model

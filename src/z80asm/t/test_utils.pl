@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.57 2014-03-16 19:19:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.58 2014-04-05 23:36:11 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -430,7 +430,7 @@ sub store_ptr {
 #------------------------------------------------------------------------------
 sub pack_string {
 	my($string) = @_;
-	return pack("C", length($string)).uc($string);
+	return pack("C", length($string)).$string;
 }
 
 #------------------------------------------------------------------------------
@@ -869,7 +869,7 @@ sub sym_lines {
 	push @sym, "Local Module Symbols:";
 	push @sym, "";
 	
-	for (sort {uc($a) cmp uc($b)} keys %LABEL_ADDR) {
+	for (sort {$a cmp $b} keys %LABEL_ADDR) {
 		push @sym, format_sym_line($_, $show_pages) unless $LABEL_GLOBAL{$_};
 	}
 	
@@ -878,7 +878,7 @@ sub sym_lines {
 	push @sym, "Global Module Symbols:";
 	push @sym, "";
 	
-	for (sort {uc($a) cmp uc($b)} keys %LABEL_ADDR) {
+	for (sort {$a cmp $b} keys %LABEL_ADDR) {
 		push @sym, format_sym_line($_, $show_pages) if $LABEL_GLOBAL{$_};
 	}
 	
@@ -890,7 +890,7 @@ sub format_sym_line {
 	my($label, $show_pages) = @_;
 	my @ret;
 	
-	my $line = uc($label);
+	my $line = $label;
 	if (length($line) >= $COLUMN_WIDTH) {
 		push @ret, $line;
 		$line = '';
@@ -1016,7 +1016,14 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.57  2014-03-16 19:19:49  pauloscustodio
+# Revision 1.58  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.57  2014/03/16 19:19:49  pauloscustodio
 # Integrate use of srcfile in scanner, removing global variable z80asmfile
 # and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 #

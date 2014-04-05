@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.153 2014-03-29 00:30:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.154 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -162,7 +162,6 @@ static void query_assemble( char *src_filename, char *obj_filename )
 *----------------------------------------------------------------------------*/
 static void do_assemble( char *src_filename, char *obj_filename )
 {
-    DEFINE_FILE_STR( module_name );
     int start_errors = get_num_errors();     /* count errors in this source file */
 
     /* try-catch to delete incomplete files in case of fatal error */
@@ -200,11 +199,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
         list_end();                    /* get_used_symbol will only generate page references until list_end() */
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
-        {
-			Str_set( module_name, path_remove_ext(path_basename(src_filename)) );
-            strtoupper( module_name->str );
-            CURRENTMODULE->mname = xstrdup( module_name->str );
-        }
+			CURRENTMODULE->mname = xstrdup( path_remove_ext(path_basename(src_filename)) );
 
         set_error_null();
         set_error_module( CURRENTMODULE->mname );
@@ -655,7 +650,14 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.153  2014-03-29 00:30:11  pauloscustodio
+* Revision 1.154  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.153  2014/03/29 00:30:11  pauloscustodio
 * TK_EOF renamed TK_END
 *
 * Revision 1.152  2014/03/18 22:44:03  pauloscustodio

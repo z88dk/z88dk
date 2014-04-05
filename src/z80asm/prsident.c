@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.65 2014-03-29 00:21:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.66 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -193,9 +193,9 @@ struct Z80sym Z80ident[] =
 
 
 int
-idcmp( const char *idptr, const struct Z80sym *symptr )
+idcmp( char *idptr, const struct Z80sym *symptr )
 {
-    return strcmp( idptr, symptr->z80mnem );
+    return stricompare( idptr, symptr->z80mnem );
 }
 
 
@@ -1068,7 +1068,14 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.65  2014-03-29 00:21:35  pauloscustodio
+* Revision 1.66  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.65  2014/03/29 00:21:35  pauloscustodio
 * TK_EOF renamed TK_END
 *
 * Revision 1.64  2014/03/18 22:44:03  pauloscustodio

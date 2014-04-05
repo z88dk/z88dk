@@ -126,11 +126,11 @@ t_compile_module($init, <<'END', $objs);
 	CURRENTMODULE->nextmodule = NULL;
 
 	TITLE("Create symbol");	
-	sym = Symbol_create(S("VAR1"), 123, 0, NULL);
+	sym = Symbol_create(S("Var1"), 123, 0, NULL);
 	dump_Symbol(sym);
 	OBJ_DELETE(sym);
 
-	sym = Symbol_create(S("VAR1"), 123, 0, CURRENTMODULE);
+	sym = Symbol_create(S("Var1"), 123, 0, CURRENTMODULE);
 	dump_Symbol(sym);
 	CURRENTMODULE->mname = "MODULE";
 	dump_Symbol(sym);
@@ -144,15 +144,30 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Concat symbol tables");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	_define_sym(S("VAR1"),  1, 0, NULL, &symtab); page_nr++;
-	_define_sym(S("VAR2"),  2, 0, NULL, &symtab); page_nr++; 
-	_define_sym(S("VAR3"), -3, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("Var1"),  1, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("Var2"),  2, 0, NULL, &symtab); page_nr++; 
+	_define_sym(S("Var3"), -3, 0, NULL, &symtab); page_nr++;
+	dump_SymbolHash(symtab, "tab1");
+	
+	/* check case insensitive - CH_0024 */
+	ASSERT( find_symbol(S("Var1"), symtab)->value ==  1 );
+	ASSERT( find_symbol(S("VAR1"), symtab)->value ==  1 );
+	ASSERT( find_symbol(S("var1"), symtab)->value ==  1 );
+
+	ASSERT( find_symbol(S("Var2"), symtab)->value ==  2 );
+	ASSERT( find_symbol(S("VAR2"), symtab)->value ==  2 );
+	ASSERT( find_symbol(S("var2"), symtab)->value ==  2 );
+
+	ASSERT( find_symbol(S("Var3"), symtab)->value == -3 );
+	ASSERT( find_symbol(S("VAR3"), symtab)->value == -3 );
+	ASSERT( find_symbol(S("var3"), symtab)->value == -3 );
+	
 	dump_SymbolHash(symtab, "tab1");
 	
 	ASSERT( symtab2 = OBJ_NEW(SymbolHash) );
-	_define_sym(S("VAR3"), 3, 0, NULL, &symtab2); page_nr++;
-	_define_sym(S("VAR4"), 4, 0, NULL, &symtab2); page_nr++;
-	_define_sym(S("VAR5"), 5, 0, NULL, &symtab2); page_nr++;
+	_define_sym(S("Var3"), 3, 0, NULL, &symtab2); page_nr++;
+	_define_sym(S("Var4"), 4, 0, NULL, &symtab2); page_nr++;
+	_define_sym(S("Var5"), 5, 0, NULL, &symtab2); page_nr++;
 	dump_SymbolHash(symtab2, "tab2");
 	
 	SymbolHash_cat( &symtab, symtab2 );
@@ -163,10 +178,10 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Sort");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	_define_sym(S("ONE"), 	1, 0, NULL, &symtab); page_nr++;
-	_define_sym(S("TWO"),	2, 0, NULL, &symtab); page_nr++; 
-	_define_sym(S("THREE"),	3, 0, NULL, &symtab); page_nr++;
-	_define_sym(S("FOUR"),	4, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("One"), 	1, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("Two"),	2, 0, NULL, &symtab); page_nr++; 
+	_define_sym(S("Three"),	3, 0, NULL, &symtab); page_nr++;
+	_define_sym(S("Four"),	4, 0, NULL, &symtab); page_nr++;
 
 	dump_SymbolHash(symtab, "tab");
 	
@@ -224,9 +239,9 @@ t_run_module([], '', <<'ERR', 0);
 
 ---- TEST: Create symbol ----
 
-Symbol VAR1 (VAR1) = 123, type = 0x00 [], ref = [1 ], owner = NULL
-Symbol VAR1 (VAR1) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
-Symbol VAR1 (VAR1@MODULE) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+Symbol Var1 (Var1) = 123, type = 0x00 [], ref = [1 ], owner = NULL
+Symbol Var1 (Var1) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+Symbol Var1 (Var1@MODULE) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
 
 ---- TEST: Delete symbol ----
 
@@ -239,37 +254,47 @@ Symtab "static": EMPTY
 ---- TEST: Concat symbol tables ----
 
 Symtab "tab1": 
-  Symbol VAR1 (VAR1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
-  Symbol VAR2 (VAR2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
-  Symbol VAR3 (VAR3) = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
+  Symbol Var1 (Var1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol Var3 (Var3) = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
+Warning: symbol 'Var1' used as 'VAR1'
+Warning: symbol 'Var1' used as 'var1'
+Warning: symbol 'Var2' used as 'VAR2'
+Warning: symbol 'Var2' used as 'var2'
+Warning: symbol 'Var3' used as 'VAR3'
+Warning: symbol 'Var3' used as 'var3'
+Symtab "tab1": 
+  Symbol Var1 (Var1) = 1, type = 0x03 [DEFINED TOUCHED ], ref = [1 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x03 [DEFINED TOUCHED ], ref = [2 ], owner = NULL
+  Symbol Var3 (Var3) = -3, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
 Symtab "tab2": 
-  Symbol VAR3 (VAR3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
-  Symbol VAR4 (VAR4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
-  Symbol VAR5 (VAR5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
+  Symbol Var3 (Var3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol Var4 (Var4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol Var5 (Var5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
 Symtab "merged_tab": 
-  Symbol VAR1 (VAR1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
-  Symbol VAR2 (VAR2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
-  Symbol VAR3 (VAR3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
-  Symbol VAR4 (VAR4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
-  Symbol VAR5 (VAR5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
+  Symbol Var1 (Var1) = 1, type = 0x03 [DEFINED TOUCHED ], ref = [1 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x03 [DEFINED TOUCHED ], ref = [2 ], owner = NULL
+  Symbol Var3 (Var3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol Var4 (Var4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol Var5 (Var5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
 
 ---- TEST: Sort ----
 
 Symtab "tab": 
-  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
-  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
 Symtab "tab by name": 
-  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
-  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
 Symtab "tab by value": 
-  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
-  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
 
 ---- TEST: Use local symbol before definition ----
 
@@ -312,9 +337,16 @@ unlink_testfiles();
 done_testing;
 
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.37 2014-03-03 14:09:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.38 2014-04-05 23:36:11 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.37  2014-03-03 14:09:20  pauloscustodio
+# Revision 1.38  2014-04-05 23:36:11  pauloscustodio
+# CH_0024: Case-preserving, case-insensitive symbols
+# Symbols no longer converted to upper-case, but still case-insensitive
+# searched. Warning when a symbol is used with different case than
+# defined. Intermidiate stage before making z80asm case-sensitive, to
+# be more C-code friendly.
+#
+# Revision 1.37  2014/03/03 14:09:20  pauloscustodio
 # Renamed symbol type attribute
 #
 # Revision 1.36  2014/03/03 13:27:07  pauloscustodio

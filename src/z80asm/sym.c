@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.13 2014-03-03 14:09:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.14 2014-04-05 23:36:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -56,10 +56,10 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
-    self->name 		= strpool_add( name );			/* name in strpool, not freed */
-    self->value 	= value;
-    self->sym_type	= type;
-    self->owner 	= owner;
+	self->name 		= strpool_add( name );			/* name in strpool, not freed */
+	self->value 	= value;
+	self->sym_type	= type;
+	self->owner 	= owner;
 
     /* add reference */
     add_symbol_ref( self->references, list_get_page_nr(), FALSE );
@@ -88,7 +88,14 @@ char *Symbol_fullname( Symbol *sym )
 
 /*
 * $Log: sym.c,v $
-* Revision 1.13  2014-03-03 14:09:20  pauloscustodio
+* Revision 1.14  2014-04-05 23:36:11  pauloscustodio
+* CH_0024: Case-preserving, case-insensitive symbols
+* Symbols no longer converted to upper-case, but still case-insensitive
+* searched. Warning when a symbol is used with different case than
+* defined. Intermidiate stage before making z80asm case-sensitive, to
+* be more C-code friendly.
+*
+* Revision 1.13  2014/03/03 14:09:20  pauloscustodio
 * Renamed symbol type attribute
 *
 * Revision 1.12  2014/01/11 01:29:40  pauloscustodio
