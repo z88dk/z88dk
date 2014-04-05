@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.23 2014-03-03 14:09:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.24 2014-04-05 22:07:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -41,7 +41,7 @@ SymbolHash *static_symtab = NULL;
 /*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
-DEF_CLASS_HASH( Symbol );				/* defines SymbolHash */
+DEF_CLASS_HASH( Symbol, FALSE );			/* defines SymbolHash */
 
 /*-----------------------------------------------------------------------------
 *   join two symbol tables, adding all symbols from source to the target
@@ -523,7 +523,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.23  2014-03-03 14:09:20  pauloscustodio
+* Revision 1.24  2014-04-05 22:07:32  pauloscustodio
+* Added ignore_case attribute to allow case-insensitive class hashes
+*
+* Revision 1.23  2014/03/03 14:09:20  pauloscustodio
 * Renamed symbol type attribute
 *
 * Revision 1.22  2014/03/03 13:27:07  pauloscustodio

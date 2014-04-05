@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.136 2014-03-29 00:08:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.137 2014-04-05 22:07:32 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -231,7 +231,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.136  2014-03-29 00:08:27  pauloscustodio
+# Revision 1.137  2014-04-05 22:07:32  pauloscustodio
+# Added ignore_case attribute to allow case-insensitive class hashes
+#
+# Revision 1.136  2014/03/29 00:08:27  pauloscustodio
 # Moved astyle to dev/Makefile
 # Added code to generate scan_rules.h from scan_rules.rl by calling preprocessor and ragel.
 #
@@ -920,7 +923,7 @@ lib/srcfile.o: lib/xmalloc.h lib/srcfile.h lib/class.h lib/queue.h
 lib/srcfile.o: lib/types.h lib/list.h lib/strutil.h lib/fileutil.h
 lib/srcfile.o: lib/strpool.h
 lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
-lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h
+lib/strhash.o: lib/queue.h lib/uthash.h lib/die.h lib/strpool.h lib/strutil.h
 lib/strpool.o: lib/xmalloc.h lib/die.h lib/init.h lib/types.h lib/queue.h
 lib/strpool.o: lib/strpool.h lib/uthash.h
 lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h lib/class.h
