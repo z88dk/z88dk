@@ -6,12 +6,13 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.6 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.7 2014-04-05 14:37:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 #include "strhash.h"
 #include "strpool.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class
@@ -22,6 +23,7 @@ void StrHash_init( StrHash *self )
 {
     self->hash = NULL;
     self->count = 0;
+    self->ignore_case = FALSE;
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
@@ -60,6 +62,27 @@ void StrHash_remove_all( StrHash *self )
 }
 
 /*-----------------------------------------------------------------------------
+*	Upper-case a key if hash has ignore_case on, return address of key
+*	keeps input unmodified.
+*	NOTE: not reentrant
+*----------------------------------------------------------------------------*/
+static char *StrHash_norm_key( StrHash *self, char *key )
+{
+	static Str *KEY;			/* static object to keep upper case key */
+	
+	if ( self->ignore_case )
+	{
+		INIT_OBJ( Str, &KEY );	/* init before first use, will be reclaimed 
+								   by class.c */
+								   
+		Str_set( KEY, key );
+		return strtoupper( KEY->str );
+	}
+	else
+		return key;
+}
+
+/*-----------------------------------------------------------------------------
 *	Find a hash entry
 *----------------------------------------------------------------------------*/
 StrHashElem *StrHash_find( StrHash *self, char *key )
@@ -70,6 +93,7 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
     if ( self == NULL || key == NULL )
         return NULL;
 
+	key = StrHash_norm_key( self, key );
     num_chars = strlen( key );
     HASH_FIND( hh, self->hash, key, num_chars, elem );
     return elem;
@@ -108,7 +132,9 @@ void StrHash_set( StrHash **pself, char *key, void *value )
     /* create new element if not found, value is updated at the end */
     if ( elem == NULL )
     {
-        elem = xnew( StrHashElem );
+		key = StrHash_norm_key( *pself, key );
+        
+		elem = xnew( StrHashElem );
         elem->key = strpool_add( key );
 
         /* add to hash, need to store elem->key instead of key, as it is invariant */
@@ -150,7 +176,6 @@ BOOL StrHash_exists( StrHash *self, char *key )
     StrHashElem *elem;
 
     elem = StrHash_find( self, key );
-
     if ( elem != NULL )
         return TRUE;
     else
@@ -206,7 +231,10 @@ void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 
 /*
 * $Log: strhash.c,v $
-* Revision 1.6  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.7  2014-04-05 14:37:54  pauloscustodio
+* Added ignore_case attribute to allow case-insensitive string hashes
+*
+* Revision 1.6  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.5  2014/02/19 23:59:27  pauloscustodio

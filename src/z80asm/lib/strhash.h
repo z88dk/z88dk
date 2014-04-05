@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.7 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.8 2014-04-05 14:37:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,8 +30,9 @@ typedef struct StrHashElem
 } StrHashElem;
 
 CLASS( StrHash )
-	uint_t count;					/* number of objects */
-	void ( *free_data )( void * );	/* function to free an element
+	uint_t 	count;					/* number of objects */
+	BOOL 	ignore_case;			/* TRUE to ignore case of keys */
+	void  (*free_data)(void *);		/* function to free an element
 									   called by StrHash_remove_all() */
 	StrHashElem		*hash;			/* hash table of all keys */
 END_CLASS;
@@ -76,7 +77,10 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /*
 * $Log: strhash.h,v $
-* Revision 1.7  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.8  2014-04-05 14:37:54  pauloscustodio
+* Added ignore_case attribute to allow case-insensitive string hashes
+*
+* Revision 1.7  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.6  2014/03/04 11:51:08  pauloscustodio

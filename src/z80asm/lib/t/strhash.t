@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.4 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.5 2014-04-05 14:37:54 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -12,11 +12,12 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c strpool.c die.c";
+my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c strpool.c strutil.c die.c";
 
 write_file("test.c", <<'END');
 #include "strhash.h"
 #include "die.h"
+#include <assert.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -181,6 +182,7 @@ int main()
 
 	OBJ_DELETE( hash1 );
 	
+	
 	/* init object */
 	hash1 = OBJ_NEW(StrHash);
 	if (StrHash_first(hash1) != NULL)			ERROR;
@@ -198,6 +200,7 @@ int main()
 	StrHash_set(&hash1, S("def"), "456");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	
+
 	/* clone */
 	hash2 = StrHash_clone(hash1);
 	check_list(hash1, "abc 123 def 456 ghi 789");
@@ -293,6 +296,7 @@ int main()
 	
 	if (StrHash_empty(hash1)) ERROR;
 	
+	
 	/* sort */
 	OBJ_DELETE(hash1);
 	hash1 = OBJ_NEW(StrHash);
@@ -314,6 +318,25 @@ int main()
 	
 	StrHash_sort(hash1, descending);
 	check_list(hash1, "ghi 789 def 457 abc 123");
+	
+
+	/* case-insensitive */
+	hash1 = OBJ_NEW(StrHash);
+	hash1->ignore_case = TRUE;
+	if (StrHash_first(hash1) != NULL)			ERROR;
+	check_list(hash1, "");
+	
+	StrHash_set(&hash1, S("abc"), "123");
+	check_list(hash1, "ABC 123");
+	
+	StrHash_set(&hash1, S("Def"), "456");
+	check_list(hash1, "ABC 123 DEF 456");
+	
+	StrHash_set(&hash1, S("GHI"), "789");
+	check_list(hash1, "ABC 123 DEF 456 GHI 789");
+	
+	StrHash_set(&hash1, S("def"), "456");
+	check_list(hash1, "ABC 123 DEF 456 GHI 789");
 	
 	
 	/* free_data */
@@ -343,7 +366,6 @@ END
 system($compile) and die "compile failed: $compile\n";
 t_capture("test", "", "", 0);
 
-
 unlink <test.*>;
 done_testing;
 
@@ -360,7 +382,10 @@ sub t_capture {
 
 
 # $Log: strhash.t,v $
-# Revision 1.4  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.5  2014-04-05 14:37:54  pauloscustodio
+# Added ignore_case attribute to allow case-insensitive string hashes
+#
+# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
