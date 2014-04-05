@@ -26,12 +26,14 @@
 ; ===============================================================
 
 XLIB asm_realloc_unlocked
+XDEF asm_realloc_unlocked_lib
 
 XREF __heap
 
 LIB asm_heap_realloc_unlocked
 
 asm_realloc_unlocked:
+asm_realloc_unlocked_lib:
 
    ; Realloc using the thread's default heap without locking
    ;

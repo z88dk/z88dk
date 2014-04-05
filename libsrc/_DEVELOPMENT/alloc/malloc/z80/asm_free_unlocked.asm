@@ -13,10 +13,12 @@
 ; ===============================================================
 
 XLIB asm_free_unlocked
+XDEF asm_free_unocked_lib
 
 LIB asm_heap_free_unlocked
 
 asm_free_unlocked:
+asm_free_unlocked_lib:
 
    jp asm_heap_free_unlocked
 

@@ -26,12 +26,14 @@
 ; ===============================================================
 
 XLIB asm_realloc
+XDEF asm_realloc_lib
 
 XREF __heap
 
 LIB asm_heap_realloc
 
 asm_realloc:
+asm_realloc_lib:
 
    ; Realloc using the thread's default heap
    ;

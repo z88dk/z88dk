@@ -13,12 +13,14 @@
 ; ===============================================================
 
 XLIB asm_free
+XDEF asm_free_lib
 
 XREF __heap
 
 LIB asm_heap_free
 
 asm_free:
+asm_free_lib:
 
    ; Return the memory block to the thread's default heap
    ;

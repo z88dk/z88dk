@@ -13,12 +13,14 @@
 ; ===============================================================
 
 XLIB asm_malloc
+XDEF asm_malloc_lib
 
 XREF __heap
 
 LIB asm_heap_alloc
 
 asm_malloc:
+asm_malloc_lib:
 
    ; Allocate memory from the thread's default heap
    ;
