@@ -6,7 +6,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.6 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.7 2014-04-05 22:02:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.6 2014-03-
 CLASS_HASH(T);			// T is declared by CLASS(T); defines THash
 
 // define the hash class
-DEF_CLASS_HASH(T);
+DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
+										// keys
 
 *----------------------------------------------------------------------------*/
 
@@ -81,13 +82,14 @@ DEF_CLASS_HASH(T);
 /*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
-#define DEF_CLASS_HASH(T)													\
+#define DEF_CLASS_HASH(T, _ignore_case)										\
 	/* define the class */													\
 	DEF_CLASS(T##Hash);														\
 																			\
 	void T##Hash_init ( T##Hash *self )										\
 	{																		\
 		self->hash = OBJ_NEW(StrHash);										\
+		self->hash->ignore_case = _ignore_case;								\
 		self->count = 0;													\
 	}																		\
 																			\
@@ -221,7 +223,10 @@ DEF_CLASS_HASH(T);
 
 /*
 * $Log: classhash.h,v $
-* Revision 1.6  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.7  2014-04-05 22:02:06  pauloscustodio
+* Added ignore_case attribute to allow case-insensitive class hashes
+*
+* Revision 1.6  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.5  2014/02/19 23:59:27  pauloscustodio

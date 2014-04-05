@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.4 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.5 2014-04-05 22:02:06 pauloscustodio Exp $
 #
 # Test classhash.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strhash.c strpool.c class.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c strhash.c strpool.c strutil.c class.c xmalloc.c die.c";
 
 write_file("test.c", <<'END');
 #include "classhash.h"
@@ -39,7 +39,7 @@ Obj *new_obj(char *text)
 }
 
 CLASS_HASH(Obj);
-DEF_CLASS_HASH(Obj);
+DEF_CLASS_HASH(Obj, TRUE);
 
 int _count;
 #define T_START(hash)							\
@@ -102,7 +102,7 @@ int main()
 	ObjHash_set(&hash, S("abc"), new_obj("321"));
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "ABC", "321");
 	T_END(hash);
 	
 
@@ -116,88 +116,88 @@ int main()
 	ObjHash_set(&hash, S("abc"), new_obj("321"));
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "ABC", "321");
 	T_END(hash);
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "ABC", "321");
 	T_END(hash);
 
 	ObjHash_set(&hash, S("def"), new_obj("456"));
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
-	T_NEXT(hash, "def", "456");
+	T_NEXT(hash, "ABC", "321");
+	T_NEXT(hash, "DEF", "456");
 	T_END(hash);
 
 	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "321");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	/* set new object, old is deleted */
 	ObjHash_set(&hash, S("abc"), new_obj("123"));
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	/* clone */
 	hash2 = ObjHash_clone(hash);
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove(hash, S("def"));
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove(hash, S("def"));
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove(hash, S("ghi"));
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
+	T_NEXT(hash, "ABC", "123");
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove(hash, S("abc"));
@@ -206,9 +206,9 @@ int main()
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove_all(hash);
@@ -217,9 +217,9 @@ int main()
 	T_END(hash);
 
 	T_START(hash2);
-	T_NEXT(hash2, "abc", "123");
-	T_NEXT(hash2, "def", "456");
-	T_NEXT(hash2, "ghi", "789");
+	T_NEXT(hash2, "ABC", "123");
+	T_NEXT(hash2, "DEF", "456");
+	T_NEXT(hash2, "GHI", "789");
 	T_END(hash2);
 
 	ObjHash_remove_all(hash2);
@@ -231,38 +231,38 @@ int main()
 	T_END(hash2);
 
 	/* first / remove_elem */
-	ObjHash_set(&hash, S("abc"), new_obj("123"));
-	ObjHash_set(&hash, S("def"), new_obj("456"));
-	ObjHash_set(&hash, S("ghi"), new_obj("789"));
+	ObjHash_set(&hash, S("ABC"), new_obj("123"));
+	ObjHash_set(&hash, S("DEF"), new_obj("456"));
+	ObjHash_set(&hash, S("GHI"), new_obj("789"));
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "abc")) ERROR;
+	if (strcmp(elem->key, "ABC")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "def")) ERROR;
+	if (strcmp(elem->key, "DEF")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "ghi")) ERROR;
+	if (strcmp(elem->key, "GHI")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
@@ -280,33 +280,33 @@ int main()
 	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	elem = ObjHash_find(hash, "def"); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "def")) ERROR;
+	if (strcmp(elem->key, "DEF")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	elem = ObjHash_find(hash, "ghi"); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "ghi")) ERROR;
+	if (strcmp(elem->key, "GHI")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "123");
+	T_NEXT(hash, "ABC", "123");
 	T_END(hash);
 
 	elem = ObjHash_find(hash, "abc"); 
 	if (elem == NULL) ERROR;
-	if (strcmp(elem->key, "abc")) ERROR;
+	if (strcmp(elem->key, "ABC")) ERROR;
 	ObjHash_remove_elem(hash, elem);
 	
 	T_START(hash);
@@ -337,25 +337,25 @@ int main()
 	ObjHash_set(&hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "abc", "321");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "ABC", "321");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	ObjHash_sort(hash, ascending);
 	
 	T_START(hash);
-	T_NEXT(hash, "abc", "321");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "ABC", "321");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
 	T_END(hash);
 
 	ObjHash_sort(hash, descending);
 	
 	T_START(hash);
-	T_NEXT(hash, "ghi", "789");
-	T_NEXT(hash, "def", "456");
-	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "GHI", "789");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "ABC", "321");
 	T_END(hash);
 	
 	return 0;
@@ -364,7 +364,6 @@ END
 
 system($compile) and die "compile failed: $compile\n";
 t_capture("test", "", "", 0);
-
 
 unlink <test.*>;
 done_testing;
@@ -382,7 +381,10 @@ sub t_capture {
 
 
 # $Log: classhash.t,v $
-# Revision 1.4  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.5  2014-04-05 22:02:06  pauloscustodio
+# Added ignore_case attribute to allow case-insensitive class hashes
+#
+# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
