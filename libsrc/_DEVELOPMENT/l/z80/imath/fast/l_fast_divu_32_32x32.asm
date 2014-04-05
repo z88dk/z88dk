@@ -2,6 +2,8 @@
 XLIB l_fast_divu_32_32x32
 XDEF l0_fast_divu_32_32x32
 
+INCLUDE "clib_cfg.asm"
+
 LIB l0_fast_divu_32_32x24, error_divide_by_zero_mc
 
 divu_32_32x24:
@@ -143,6 +145,13 @@ begin:
    ; hlhl'= remainder
    ; dede'= divisor
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $01
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
+
    ; eliminate leading zeroes
 
 loop_z0:
@@ -244,6 +253,20 @@ loop_z6:
 
    scf
    jp loop_7
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   add a,a
+   
+   exx
+   adc hl,hl
+   exx
+   adc hl,hl
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; general divide loop
 
@@ -447,3 +470,95 @@ exit_loop:
    ; dehl'= remainder
    
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DISABLE LOOP UNROLLING ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld ixh,8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
+
+   ; eliminate leading zeroes
+
+loop_00:
+
+   add a,a
+      
+   exx
+   adc hl,hl
+   exx
+   adc hl,hl
+   
+   inc h
+   dec h
+   jr nz, loop_01
+   
+   dec ixh
+   jp loop_00
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; general divide loop
+
+loop_11:
+
+   adc a,a
+   
+   exx
+   adc hl,hl
+   exx
+   adc hl,hl
+
+loop_01:
+   
+   exx
+   sbc hl,de
+   exx
+   sbc hl,de
+   
+   jr nc, loop_02
+
+   exx
+   add hl,de
+   exx
+   adc hl,de
+
+loop_02:
+
+   dec ixh
+   jp nz, loop_11
+
+   ; form last quotient bit
+   
+   adc a,a
+      
+   ;    a = ~quotient
+   ; hlhl'= remainder
+
+   cpl
+   
+   push hl
+   exx
+   pop de
+   exx
+   
+   ld l,a
+   xor a
+   ld h,a
+   
+   ld e,h
+   ld d,h
+   
+   ; dehl = quotient
+   ; dehl'= remainder
+   
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

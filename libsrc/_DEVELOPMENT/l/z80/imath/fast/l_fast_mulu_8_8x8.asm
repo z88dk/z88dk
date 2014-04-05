@@ -28,7 +28,7 @@ l_fast_mulu_8_8x8:
    ;            l = $ff = UCHAR_MAX
    ;            carry set, errno = ERANGE
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, b, de, hl
 
    call l_fast_mulu_16_8x8
    

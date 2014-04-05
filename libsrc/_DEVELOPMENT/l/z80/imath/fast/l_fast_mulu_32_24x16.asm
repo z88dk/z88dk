@@ -23,7 +23,7 @@ l_fast_mulu_32_24x16:
    ;            dehl = $ffffffff = ULONG_MAX
    ;            carry set, errno = ERANGE
    
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, (ixh if loop unrolling disabled)
 
    ; split into two multiplications
 

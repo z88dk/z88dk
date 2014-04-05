@@ -2,6 +2,8 @@
 XLIB l_fast_divu_32_32x16
 XDEF l0_fast_divu_32_32x16
 
+INCLUDE "clib_cfg.asm"
+
 LIB l0_fast_divu_24_24x16, l0_fast_divu_32_32x8, l_cpl_dehl, error_divide_by_zero_mc
 
 
@@ -118,10 +120,19 @@ l0_fast_divu_32_32x16:
    ld l,$ff
    
    exx
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $01
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ENABLE LOOP UNROLLING ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ; unroll eight times
    
    ld ixh,3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
 
    ; eliminate leading zeroes
 
@@ -204,6 +215,16 @@ l0_fast_divu_32_32x16:
 
    scf
    jp loop_7
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   scf
+   jp loop_0
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 loop_00:
 
@@ -406,3 +427,91 @@ loop_77:
    sbc hl,bc
    or a
    jp loop_8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DISABLE LOOP UNROLLING ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld ixh,24
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
+
+   ; eliminate leading zeroes
+
+loop_00:
+
+   exx
+   add hl,hl
+   inc l
+   rl e
+   rl d
+   exx
+   adc hl,hl
+   
+   inc h
+   dec h
+   
+   jr nz, loop_01
+   
+   dec ixh
+   jp loop_00
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   scf
+   
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; general divide loop
+
+loop_11:
+
+   exx
+   adc hl,hl
+   rl e
+   rl d
+   exx
+   
+   adc hl,hl
+   jr c, loop_03
+
+loop_01:
+
+   sbc hl,bc
+   jr nc, loop_02
+   add hl,bc
+
+loop_02:
+
+   dec ixh
+   jp nz, loop_11
+
+   ; hl = remainder, dehl'=~quotient with one more shift left
+
+   ld de,0
+   
+   exx
+   
+   adc hl,hl
+   rl e
+   rl d
+   
+   or a
+   jp l_cpl_dehl
+
+loop_03:
+
+   or a
+   sbc hl,bc
+   or a
+   jp loop_02
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -23,7 +23,7 @@ l_fast_divs_8_8x8:
    ;             e = dividend
    ;             carry set, errno = EDOM
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, b, de, hl
 
    ; test for divide by zero
    

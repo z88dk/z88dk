@@ -2,6 +2,8 @@
 XLIB l_fast_divu_16_16x8
 XDEF l0_fast_divu_16_16x8
 
+INCLUDE "clib_cfg.asm"
+
 LIB l0_fast_divu_8_8x8, error_divide_by_zero_mc
 
 l_fast_divu_16_16x8:
@@ -46,9 +48,18 @@ l0_fast_divu_16_16x8:
    xor a
    ld d,a
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $01
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ENABLE LOOP UNROLLING ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ; unroll divide eight times
    
    ld b,2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
 
    ; eliminate leading zeroes
 
@@ -87,7 +98,10 @@ loop_00:
 loop_80:
 
    dec b
-   
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ; general divide loop
 
 loop_0:
@@ -236,6 +250,66 @@ exit_loop:
    
    xor a
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DISABLE LOOP UNROLLING ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld b,16
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $02
+
+   ; eliminate leading zeroes
+   
+loop_00:
+
+   add hl,hl
+   jr c, loop_01
+   
+   djnz loop_00
+   
+   ; will never get here
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; general divide loop
+
+loop_11:
+
+   add hl,hl
+
+loop_01:
+
+   rla
+   jr c, loop_02
+   
+   cp e
+   jr c, loop_03
+
+loop_02:
+
+   sub e
+   inc l
+
+loop_03:
+
+   djnz loop_11
+
+   ;  a = remainder
+   ; hl = quotient
+
+   ld e,a
+   
+   xor a
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 divide_by_zero:
 

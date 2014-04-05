@@ -24,7 +24,7 @@ l_fast_mulu_16_16x16:
    ;            hl = $ffff = UINT_MAX
    ;            carry set, errno = ERANGE
    ;
-   ; uses  : af, c, de, hl
+   ; uses  : af, bc, de, hl
 
    ; try to reduce the multiplication
 
