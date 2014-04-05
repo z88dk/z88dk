@@ -1,10 +1,12 @@
 
+IF !_CLIB_CFG_ASM_
+defc _CLIB_CFG_ASM_ = 1
+
 ;;;;;;;;;;;;;;;;;;;;
 ; CLIB CONFIGURATION
 ;;;;;;;;;;;;;;;;;;;;
 
 ; Set these flags prior to making libraries
-
 
 ;;;;;;;;;;;;;;;;;
 ; multi-threading
@@ -12,7 +14,9 @@
 
 ; Setting to non-zero enables the multi-threading version of
 ; the library to be built.
-;
+
+defc __CLIB_OPT_MULTITHREAD = 1
+
 ; This means:
 ; 
 ; * All FILEs are protected by recursive locks.
@@ -28,11 +32,11 @@
 ;
 ; When multi-threading is disabled, there is no difference
 ; between the _unlocked and regular function entry points.
-
-defc __CLIB_OPT_MULTITHREAD = 1
-
-; Note:  This option is not currently implemented.
-; The multi-threading version of the library is always built.
+; However, the locks are still present in the data structures
+; and, for example, FILEs can still be locked via flockfile()
+; and family.  Note that the stdio functions will not be
+; blocked by a lock but the user program can perform its own
+; synchronization by using flockfile() and family appropriately.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -49,8 +53,20 @@ defc __CLIB_OPT_MULTITHREAD = 1
 
 defc __CLIB_OPT_IMATH = $00
 
-; Note: This option is not currently implemented.
-; The library always uses the largest and fastest imath lib.
+; ALL = selects fast integer math lib
+
+
+; The specific integer math library selected above
+; can be further tailored by choosing options below.
+
+; FAST INTEGER MATH LIB OPTIONS
+
+defc __CLIB_OPT_IMATH_FAST = $00
+
+; bit 0 = enable loop unrolling in division
+; bit 1 = enable leading zero elimination in division
+; bit 2 = enable loop unrolling in multiplication
+; bit 3 = enable leading zero elimination in multiplication
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -68,7 +84,7 @@ defc __CLIB_OPT_IMATH = $00
 ;    _strtoi, _strtou, strtol, strtoul, scanf
 ;
 
-defc __CLIB_OPT_TXT2NUM = $ff
+defc __CLIB_OPT_TXT2NUM = $04
 
 ; bit 0 = $01 = enable specialized binary conversion for integers
 ; bit 1 = $02 = enable specialized octal conversion for integers
@@ -109,7 +125,7 @@ defc __CLIB_OPT_TXT2NUM = $ff
 ;    itoa, utoa, ltoa, ultoa, printf
 ;
 
-defc __CLIB_OPT_NUM2TXT = $ff
+defc __CLIB_OPT_NUM2TXT = $00
 
 ; bit 0 = $01 = enable specialized binary conversion for integers
 ; bit 1 = $02 = enable specialized octal conversion for integers
@@ -205,3 +221,4 @@ defc __CLIB_OPT_SCANF = $ffffffff
 ; entirely, meaning scanf can only be used to match
 ; format text against the stream.
 
+ENDIF

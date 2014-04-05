@@ -1,4 +1,7 @@
 
+IF !_CLIB_CFG_ASM_
+defc _CLIB_CFG_ASM_ = 1
+
 ; backup of "clib_cfg.asm"
 ; contains a sensible default configuration
 
@@ -207,3 +210,5 @@ defc __CLIB_OPT_SCANF = $2ff6ff
 ; Setting to zero will remove the % logic from scanf
 ; entirely, meaning scanf can only be used to match
 ; format text against the stream.
+
+ENDIF
