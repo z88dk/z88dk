@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.39 2014-04-05 23:36:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.1 2014-04-06 22:31:42 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -581,8 +581,11 @@ unlink_testfiles();
 done_testing;
 
 
-# $Log: whitebox-scan.t,v $
-# Revision 1.39  2014-04-05 23:36:11  pauloscustodio
+# $Log: scan.t,v $
+# Revision 1.1  2014-04-06 22:31:42  pauloscustodio
+# Renamed whitebox-scan.t scan.t
+#
+# Revision 1.39  2014/04/05 23:36:11  pauloscustodio
 # CH_0024: Case-preserving, case-insensitive symbols
 # Symbols no longer converted to upper-case, but still case-insensitive
 # searched. Warning when a symbol is used with different case than
