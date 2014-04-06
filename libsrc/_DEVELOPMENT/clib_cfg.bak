@@ -2,15 +2,11 @@
 IF !_CLIB_CFG_ASM_
 defc _CLIB_CFG_ASM_ = 1
 
-; backup of "clib_cfg.asm"
-; contains a sensible default configuration
-
 ;;;;;;;;;;;;;;;;;;;;
 ; CLIB CONFIGURATION
 ;;;;;;;;;;;;;;;;;;;;
 
 ; Set these flags prior to making libraries
-
 
 ;;;;;;;;;;;;;;;;;
 ; multi-threading
@@ -18,7 +14,9 @@ defc _CLIB_CFG_ASM_ = 1
 
 ; Setting to non-zero enables the multi-threading version of
 ; the library to be built.
-;
+
+defc __CLIB_OPT_MULTITHREAD = 0
+
 ; This means:
 ; 
 ; * All FILEs are protected by recursive locks.
@@ -34,11 +32,11 @@ defc _CLIB_CFG_ASM_ = 1
 ;
 ; When multi-threading is disabled, there is no difference
 ; between the _unlocked and regular function entry points.
-
-defc __CLIB_OPT_MULTITHREAD = 0
-
-; Note:  This option is not currently implemented.
-; The multi-threading version of the library is always built.
+; However, the locks are still present in the data structures
+; and, for example, FILEs can still be locked via flockfile()
+; and family.  Note that the stdio functions will not be
+; blocked by a lock but the user program can perform its own
+; synchronization by using flockfile() and family appropriately.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -55,8 +53,20 @@ defc __CLIB_OPT_MULTITHREAD = 0
 
 defc __CLIB_OPT_IMATH = $00
 
-; Note: This option is not currently implemented.
-; The library always uses the largest and fastest imath lib.
+; ALL = selects fast integer math lib
+
+
+; The specific integer math library selected above
+; can be further tailored by choosing options below.
+
+; FAST INTEGER MATH LIB OPTIONS
+
+defc __CLIB_OPT_IMATH_FAST = $00
+
+; bit 0 = enable loop unrolling in division
+; bit 1 = enable leading zero elimination in division
+; bit 2 = enable loop unrolling in multiplication
+; bit 3 = enable leading zero elimination in multiplication
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -144,7 +154,7 @@ defc __CLIB_OPT_NUM2TXT = $00
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
-defc __CLIB_OPT_PRINTF = $2ff6ff
+defc __CLIB_OPT_PRINTF = $2ffeff
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
@@ -182,7 +192,7 @@ defc __CLIB_OPT_PRINTF = $2ff6ff
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for printf.
 
-defc __CLIB_OPT_SCANF = $2ff6ff
+defc __CLIB_OPT_SCANF = $2ffeff
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u

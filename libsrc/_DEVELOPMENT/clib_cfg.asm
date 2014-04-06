@@ -15,7 +15,7 @@ defc _CLIB_CFG_ASM_ = 1
 ; Setting to non-zero enables the multi-threading version of
 ; the library to be built.
 
-defc __CLIB_OPT_MULTITHREAD = 1
+defc __CLIB_OPT_MULTITHREAD = 0
 
 ; This means:
 ; 
