@@ -1,6 +1,12 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF _fgets
 
 _fgets:
@@ -27,3 +33,21 @@ _fgets:
    ret
    
    INCLUDE "stdio/z80/asm_fgets.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF _fgets
+
+LIB _fgets_unlocked
+
+_fgets:
+
+   jp _fgets_unlocked
+   
+   INCLUDE "stdio/z80/asm_fgets.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

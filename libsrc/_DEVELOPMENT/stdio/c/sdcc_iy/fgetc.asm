@@ -1,6 +1,12 @@
 
 ; int fgetc(FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF _fgetc
 
 _fgetc:
@@ -12,3 +18,21 @@ _fgetc:
    push af
    
    INCLUDE "stdio/z80/asm_fgetc.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF _fgetc
+
+LIB _fgetc_unlocked
+
+_fgetc:
+
+   jp _fgetc_unlocked
+   
+   INCLUDE "stdio/z80/asm_fgetc.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

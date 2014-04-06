@@ -1,6 +1,12 @@
 
 ; int vfscanf(FILE *stream, const char *format, void *arg)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB vfscanf
 
 LIB asm_vfscanf
@@ -18,3 +24,19 @@ vfscanf:
    push af
    
    jp asm_vfscanf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB vfscanf
+
+LIB vfscanf_unlocked
+
+vfscanf:
+
+   jp vfscanf_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,6 +1,12 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB fgets
 
 LIB asm_fgets
@@ -18,3 +24,19 @@ fgets:
    push af
    
    jp asm_fgets
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB fgets
+
+LIB fgets_unlocked
+
+fgets:
+
+   jp fgets_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

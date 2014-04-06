@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_fputs
 
 LIB asm_fputs_unlocked
@@ -38,3 +44,19 @@ asm_fputs:
    
    call asm_fputs_unlocked
    jp __stdio_lock_release
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_fputs
+
+LIB asm_fputs_unlocked
+
+asm_fputs:
+
+   jp asm_fputs_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

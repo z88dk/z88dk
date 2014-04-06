@@ -1,6 +1,12 @@
 
 ; int vscanf(const char *format, void *arg)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF vscanf_callee
 
 vscanf_callee:
@@ -11,3 +17,21 @@ vscanf_callee:
    push af
    
    INCLUDE "stdio/z80/asm_vscanf.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF vscanf_callee
+
+LIB vscanf_unlocked_callee
+
+vscanf_callee:
+
+   jp vscanf_unlocked_callee
+   
+   INCLUDE "stdio/z80/asm_vscanf.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,6 +1,12 @@
 
 ; int fseek(FILE *stream, long offset, int whence)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB fseek
 
 LIB asm_fseek
@@ -20,3 +26,19 @@ fseek:
    push af
    
    jp asm_fseek
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB fseek
+
+LIB fseek_unlocked
+
+fseek:
+
+   jp fseek_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

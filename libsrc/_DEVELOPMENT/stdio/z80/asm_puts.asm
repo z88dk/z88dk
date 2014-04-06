@@ -10,6 +10,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_puts
 
 XREF __stdio_file_stdout
@@ -42,3 +48,19 @@ asm_puts:
    
    call asm0_puts_unlocked
    jp __stdio_lock_release
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_puts
+
+LIB asm_puts_unlocked
+
+asm_puts:
+
+   jp asm_puts_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_ungetc
 
 LIB asm_ungetc_unlocked
@@ -38,3 +44,19 @@ asm_ungetc:
    
    call asm_ungetc_unlocked
    jp __stdio_lock_release
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_ungetc
+
+LIB asm_ungetc_unlocked
+
+asm_ungetc:
+
+   jp asm_ungetc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

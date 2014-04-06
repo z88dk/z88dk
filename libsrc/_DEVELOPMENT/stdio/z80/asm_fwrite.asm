@@ -11,6 +11,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_fwrite
 
 LIB asm_fwrite_unlocked, fwrite_immediate_error_enolck
@@ -45,3 +51,19 @@ asm_fwrite:
    
    call asm_fwrite_unlocked
    jp __stdio_lock_release
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_fwrite
+
+LIB asm_fwrite_unlocked
+
+asm_fwrite:
+
+   jp asm_fwrite_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

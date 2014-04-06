@@ -3,7 +3,7 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; FILE *_fmemopen(void **bufp, size_t *sizep, const char *mode)
+; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 ;
 ; Associate a memory buffer with a stream.
 ;

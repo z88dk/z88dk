@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_fscanf
 
 LIB asm_vfscanf, __stdio_varg_2, __stdio_nextarg_de
@@ -56,3 +62,19 @@ asm_fscanf:
    ld b,h                      ; bc = void *arg
    
    jp asm_vfscanf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_fscanf
+
+LIB asm_fscanf_unlocked
+
+asm_fscanf:
+
+   jp asm_fscanf_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

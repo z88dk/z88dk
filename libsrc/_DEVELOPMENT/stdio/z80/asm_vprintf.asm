@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_vprintf
 
 XREF __stdio_file_stdout
@@ -45,3 +51,19 @@ asm_vprintf:
 
    ld ix,(__stdio_file_stdout)
    jp asm_vfprintf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_vprintf
+
+LIB asm_vprintf_unlocked
+
+asm_vprintf:
+
+   jp asm_vprintf_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_getchar
 
 XREF __stdio_file_stdin
@@ -35,3 +41,19 @@ asm_getchar:
 
    ld ix,(__stdio_file_stdin)
    jp asm_fgetc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_getchar
+
+LIB asm_getchar_unlocked
+
+asm_getchar:
+
+   jp asm_getchar_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

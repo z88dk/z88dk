@@ -1,6 +1,12 @@
 
 ; int ungetc(int c, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB ungetc
 
 LIB asm_ungetc
@@ -16,3 +22,19 @@ ungetc:
    push af
    
    jp asm_ungetc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB ungetc
+
+LIB ungetc_unlocked
+
+ungetc:
+
+   jp ungetc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

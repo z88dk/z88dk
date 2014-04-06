@@ -1,6 +1,12 @@
 
 ; int fputc(int c, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB fputc
 
 LIB asm_fputc
@@ -16,3 +22,19 @@ fputc:
    push af
    
    jp asm_fputc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB fputc
+
+LIB fputc_unlocked
+
+fputc:
+
+   jp fputc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

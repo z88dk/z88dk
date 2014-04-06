@@ -1,6 +1,12 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF fgets_callee
 
 fgets_callee:
@@ -12,3 +18,21 @@ fgets_callee:
    push af
    
    INCLUDE "stdio/z80/asm_fgets.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF fgets_callee
+
+LIB fgets_unlocked_callee
+
+fgets_callee:
+
+   jp fgets_unlocked_callee
+   
+   INCLUDE "stdio/z80/asm_fgets.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

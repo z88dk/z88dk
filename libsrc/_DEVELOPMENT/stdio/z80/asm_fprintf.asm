@@ -9,6 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_fprintf
 
 LIB asm_vfprintf, __stdio_varg_2, __stdio_nextarg_de
@@ -53,3 +59,19 @@ asm_fprintf:
    ld b,h                      ; bc = void *arg
       
    jp asm_vfprintf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_fprintf
+
+LIB asm_fprintf_unlocked
+
+asm_fprintf:
+
+   jp asm_fprintf_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

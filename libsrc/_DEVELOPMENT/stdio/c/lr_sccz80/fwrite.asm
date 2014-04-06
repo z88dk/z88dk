@@ -1,6 +1,12 @@
 
 ; size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB fwrite
 
 LIB asm_fwrite
@@ -20,3 +26,19 @@ fwrite:
    push af
    
    jp asm_fwrite
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB fwrite
+
+LIB fwrite_unlocked
+
+fwrite:
+
+   jp fwrite_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

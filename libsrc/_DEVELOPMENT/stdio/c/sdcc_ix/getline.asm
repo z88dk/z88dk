@@ -1,6 +1,12 @@
 
 ; size_t getline(char **lineptr, size_t *n, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF _getline
 
 _getline:
@@ -26,3 +32,21 @@ _getline:
    ret
    
    INCLUDE "stdio/z80/asm_getline.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF _getline
+
+LIB _getline_unlocked
+
+_getline:
+
+   jp _getline_unlocked
+   
+   INCLUDE "stdio/z80/asm_getline.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

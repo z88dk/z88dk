@@ -1,6 +1,12 @@
 
 ; void clearerr(FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF _clearerr
 
 _clearerr:
@@ -12,3 +18,21 @@ _clearerr:
    push af
    
    INCLUDE "stdio/z80/asm_clearerr.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF _clearerr
+
+LIB _clearerr_unlocked
+
+_clearerr:
+
+   jp _clearerr_unlocked
+   
+   INCLUDE "stdio/z80/asm_clearerr.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

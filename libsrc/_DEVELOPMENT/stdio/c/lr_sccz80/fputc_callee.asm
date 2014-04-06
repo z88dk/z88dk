@@ -1,6 +1,12 @@
 
 ; int fputc(int c, FILE *stream)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XDEF fputc_callee
 
 fputc_callee:
@@ -11,3 +17,19 @@ fputc_callee:
    push af
    
    INCLUDE "stdio/z80/asm_fputc.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XDEF fputc_callee
+
+LIB fputc_unlocked_callee
+
+fputc_callee:
+
+   jp fputc_unlocked_callee
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
