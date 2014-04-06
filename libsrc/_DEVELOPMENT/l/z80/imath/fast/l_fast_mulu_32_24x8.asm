@@ -135,6 +135,9 @@ loop_11:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_12
+   inc c
 
 loop_12:
 
@@ -146,6 +149,9 @@ loop_12:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_13
+   inc c
 
 loop_13:
 
@@ -157,6 +163,9 @@ loop_13:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_14
+   inc c
 
 loop_14:
 
@@ -168,6 +177,9 @@ loop_14:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_15
+   inc c
 
 loop_15:
 
@@ -179,6 +191,9 @@ loop_15:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_16
+   inc c
 
 loop_16:
 
@@ -190,6 +205,9 @@ loop_16:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_17
+   inc c
 
 loop_17:
 
@@ -201,6 +219,9 @@ loop_17:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_18
+   inc c
 
 exit_18:
 
@@ -257,6 +278,9 @@ loop_11:
    
    add hl,de
    adc a,b
+   
+   jp nc, loop_01
+   inc c
 
 loop_01:
 
