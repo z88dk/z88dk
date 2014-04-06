@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.86 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.87 2014-04-06 23:32:24 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.86 2014-04-05 23:36
 
 /*
 * $Log: hist.c,v $
-* Revision 1.86  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.87  2014-04-06 23:32:24  pauloscustodio
+* .
+*
+* Revision 1.86  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than
@@ -1728,6 +1731,9 @@ xx.xx.2014 [2.1.8] (pauloscustodio)
 		searched. Warning when a symbol is used with different case than
 		defined. Intermidiate stage before making z80asm case-sensitive, to
 		be more C-code friendly.
+		
+	- Merge test files.
+	- Remove token.c module - no longer needed with the ragel scanner.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
