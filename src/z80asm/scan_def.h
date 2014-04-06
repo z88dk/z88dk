@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.18 2014-03-29 00:33:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.1 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -148,8 +148,12 @@ TOKEN(	NUM_TOKENS,		""	)
 #undef TOKEN
 
 /*
-* $Log: token_def.h,v $
-* Revision 1.18  2014-03-29 00:33:29  pauloscustodio
+* $Log: scan_def.h,v $
+* Revision 1.1  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.18  2014/03/29 00:33:29  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.

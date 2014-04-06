@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.10 2014-03-29 00:12:56 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.11 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.10 2014-03-29 00:12
 #include "array.h"
 #include "class.h"
 #include "symbol.h"
-#include "token.h"
+#include "scan.h"
 #include "strutil.h"
 
 /*-----------------------------------------------------------------------------
@@ -147,7 +147,11 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.10  2014-03-29 00:12:56  pauloscustodio
+* Revision 1.11  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.10  2014/03/29 00:12:56  pauloscustodio
 * Removed struct postfixlist
 *
 * Revision 1.9  2014/03/15 02:12:07  pauloscustodio

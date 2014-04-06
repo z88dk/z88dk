@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.154 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.155 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -35,7 +35,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.154 2014-04-05 23
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
-#include "token.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -650,7 +649,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.154  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.155  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.154  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than

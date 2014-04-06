@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.72 2014-03-29 00:13:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.73 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -28,7 +28,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.72 2014-0
 #include "options.h"
 #include "scan.h"
 #include "symbol.h"
-#include "token.h"
 #include "except.h"
 #include "expr.h"
 #include "expr_def.h"
@@ -70,7 +69,7 @@ extern struct module *CURRENTMODULE;
 		while ( condition )										\
 		{														\
 			op = tok;											\
-			Str_append(pfixexpr->text, token_string(tok));		\
+			Str_append(pfixexpr->text, tok_text);				\
 			GetSym();											\
 			if ( ! prev_name(pfixexpr) )						\
 				return FALSE;									\
@@ -137,7 +136,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 	switch (tok) 
 	{
     case TK_MINUS:
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -151,7 +150,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
         return UnaryTerm( pfixexpr );
 
     case TK_BIN_NOT:
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         GetSym();
 		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -161,7 +160,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 		return TRUE;
 
     case TK_LOG_NOT:
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         GetSym();
 
         if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
@@ -173,7 +172,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         open_paren = tok;
         GetSym();
 
@@ -185,7 +184,7 @@ static BOOL UnaryTerm( struct expr *pfixexpr )
              ( open_paren == TK_LSQUARE && tok != TK_RSQUARE ) )
 			return FALSE;
 
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         GetSym();
 		return TRUE;
 
@@ -202,7 +201,7 @@ static BOOL PowerTerm( struct expr *pfixexpr )
 
     while ( tok == TK_POWER )
     {
-        Str_append(pfixexpr->text, token_string(tok));
+        Str_append(pfixexpr->text, tok_text);
         GetSym();
 		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
 			return FALSE;
@@ -291,7 +290,7 @@ ParseNumExpr( void )
 
     if ( tok == TK_CONST_EXPR )
     {
-		Str_append(pfixhdr->text, token_string(tok));
+		Str_append(pfixhdr->text, tok_text);
 
 		GetSym();               /* leading '#' : ignore relocatable address expression */
         is_const_expr = TRUE;        /* convert to constant expression */
@@ -629,7 +628,11 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.72  2014-03-29 00:13:34  pauloscustodio
+* Revision 1.73  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.72  2014/03/29 00:13:34  pauloscustodio
 * TK_EOF renamed TK_END
 *
 * Revision 1.71  2014/03/18 22:44:03  pauloscustodio

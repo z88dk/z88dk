@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.6 2014-03-29 00:08:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.7 2014-04-06 23:29:27 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -31,7 +31,7 @@ ASTYLE = astyle \
 #------------------------------------------------------------------------------
 all : scan_rules.h
 
-scan_rules.h : scan_rules.rl token_def.h legacy.h
+scan_rules.h : scan_rules.rl scan_def.h legacy.h
 	$(CC) -E -xc scan_rules.rl > scan_rules.1.tmp
 	perl -pe "s/^#.*//; s/^\x22\x22.*//; s/\t+/ /g; s/ *<CAT> *//g; s/ *<NL> */\n/g; s/ *<TAB> */\t/g;" < scan_rules.1.tmp > scan_rules.2.tmp
 	ragel -G2 -oscan_rules.3.tmp scan_rules.2.tmp
@@ -75,7 +75,11 @@ astyle:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.6  2014-03-29 00:08:27  pauloscustodio
+# Revision 1.7  2014-04-06 23:29:27  pauloscustodio
+# Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+# Moved the token definitions from token_def.h to scan_def.h.
+#
+# Revision 1.6  2014/03/29 00:08:27  pauloscustodio
 # Moved astyle to dev/Makefile
 # Added code to generate scan_rules.h from scan_rules.rl by calling preprocessor and ragel.
 #

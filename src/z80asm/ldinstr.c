@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.32 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.33 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -24,7 +24,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.32 2014-03
 #include "options.h"
 #include "scan.h"
 #include "symbol.h"
-#include "token.h"
 #include "z80asm.h"
 #include <stdio.h>
 
@@ -710,7 +709,11 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.32  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.33  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.32  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

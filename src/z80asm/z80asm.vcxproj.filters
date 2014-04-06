@@ -75,9 +75,6 @@
     <ClInclude Include="legacy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="token_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="options_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -139,9 +136,6 @@
       <Filter>Header Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="expr_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -249,9 +243,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="expr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="token.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

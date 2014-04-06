@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.2 2014-03-30 10:39:51 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.3 2014-04-06 23:29:26 pauloscustodio Exp $ 
 */
 
 #define TOKEN(name, string)				 \
@@ -172,7 +172,7 @@ main := |*
 	
 
 /* import token state machines */
-#include "token_def.h"	
+#include "scan_def.h"	
 	
 	/* default */
 	any

@@ -14,13 +14,22 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.32 2014-03-29 00:33:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.33 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "token.h"
 #include "types.h"
+
+/*-----------------------------------------------------------------------------
+*	Token IDs
+*----------------------------------------------------------------------------*/
+#define TOKEN(name, string) name,
+#define TOKEN2(name, string)
+typedef enum tokid_t
+{
+#include "scan_def.h"
+} tokid_t;
 
 /*-----------------------------------------------------------------------------
 * 	Globals - last token retrieved
@@ -56,7 +65,11 @@ extern BOOL EOL;
 
 /*
 * $Log: scan.h,v $
-* Revision 1.32  2014-03-29 00:33:28  pauloscustodio
+* Revision 1.33  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.32  2014/03/29 00:33:28  pauloscustodio
 * BUG_0044: binary constants with more than 8 bits not accepted
 * CH_0022: Added syntax to define binary numbers as bitmaps
 * Replaced tokenizer with Ragel based scanner.

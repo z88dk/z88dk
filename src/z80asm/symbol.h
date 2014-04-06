@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.41 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.42 2014-04-06 23:29:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.41 2014-03-16 19:
 #include "objfile.h"
 #include "symtab.h"
 #include "types.h"
-#include "token.h"
+#include "scan.h"
 #include <stdlib.h>
 
 /* Structured data types : */
@@ -94,7 +94,11 @@ extern struct module *NewModule( void );
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.41  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.42  2014-04-06 23:29:26  pauloscustodio
+* Removed lookup functions in token.c, no longer needed with the ragel based scanner.
+* Moved the token definitions from token_def.h to scan_def.h.
+*
+* Revision 1.41  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *
