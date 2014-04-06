@@ -85,7 +85,7 @@ ELSE
 
 loop_10:
 
-   add hl,hl
+   sla h
    jr nc, loop_11
    add hl,de
 
