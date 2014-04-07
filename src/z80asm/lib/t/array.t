@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.2 2014-03-02 14:08:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.3 2014-04-07 21:06:23 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	assert( p == (Point*)points->items->str );
 	assert( PointArray_size(points) == 1 );
 	assert( points->items->len == sizeof(Point) );
-	assert( points->items->size == 256 );
+	assert( points->items->size == 16 );
 
 	PointArray_unreserve(points);
 	assert( points->items->len == 12 );
@@ -202,7 +202,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.2  2014-03-02 14:08:42  pauloscustodio
+# Revision 1.3  2014-04-07 21:06:23  pauloscustodio
+# Reduce default size to 16 to waste less space when used as base for array.h
+#
+# Revision 1.2  2014/03/02 14:08:42  pauloscustodio
 # Add methods to set size, push, pop and lookup top item
 #
 # Revision 1.1  2014/02/17 22:05:20  pauloscustodio

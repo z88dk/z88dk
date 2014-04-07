@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.9 2014-03-29 22:04:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.10 2014-04-07 21:01:51 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -125,7 +125,7 @@ int main()
 	{
 		Str *s1 = OBJ_NEW(Str);
 		Str_set( s1, "hello" );
-		check_str( s1, 256, 5, "hello", TRUE);
+		check_str( s1, 16, 5, "hello", TRUE);
 	}
 	
 	/* chomp, Str_chomp */
@@ -279,7 +279,7 @@ int main()
 
 		Str_set_alias(s1, &alias);
 		
-		check_str( s1, 256, 0, "", TRUE);
+		check_str( s1,  16, 0, "", TRUE);
 		check_str( s3,   5, 0, "", FALSE);
 		check_str( s4,  10, 0, "", FALSE);
 
@@ -303,7 +303,7 @@ int main()
 		Str_append_char( s3, 0 );
 		Str_append_char( s4, 0 );
 
-		check_str( s1, 256, 1, "\0", TRUE);
+		check_str( s1,  16, 1, "\0", TRUE);
 		check_str( s3,   5, 1, "\0", FALSE);
 		check_str( s4,  10, 1, "\0", FALSE);
 
@@ -311,7 +311,7 @@ int main()
 		Str_append_char( s3, 1 );
 		Str_append_char( s4, 1 );
 
-		check_str( s1, 256, 2, "\0\1", TRUE);
+		check_str( s1,  16, 2, "\0\1", TRUE);
 		check_str( s3,   5, 2, "\0\1", FALSE);
 		check_str( s4,  10, 2, "\0\1", FALSE);
 
@@ -319,7 +319,7 @@ int main()
 		Str_append_char( s3, 2 );
 		Str_append_char( s4, 2 );
 
-		check_str( s1, 256, 3, "\0\1\2", TRUE);
+		check_str( s1,  16, 3, "\0\1\2", TRUE);
 		check_str( s3,   5, 3, "\0\1\2", FALSE);
 		check_str( s4,  10, 3, "\0\1\2", FALSE);
 
@@ -327,7 +327,7 @@ int main()
 		Str_append_char( s3, 3 );
 		Str_append_char( s4, 3 );
 
-		check_str( s1, 256, 4, "\0\1\2\3", TRUE);
+		check_str( s1,  16, 4, "\0\1\2\3", TRUE);
 		check_str( s3,   5, 4, "\0\1\2\3", FALSE);
 		check_str( s4,  10, 4, "\0\1\2\3", FALSE);
 
@@ -335,7 +335,7 @@ int main()
 		Str_append_char( s3, 4 );
 		Str_append_char( s4, 4 );
 
-		check_str( s1, 256, 5, "\0\1\2\3\4", TRUE);
+		check_str( s1,  16, 5, "\0\1\2\3\4", TRUE);
 		check_str( s3,   5, 4, "\0\1\2\3",   FALSE);
 		check_str( s4,  10, 5, "\0\1\2\3\4", FALSE);
 
@@ -349,7 +349,7 @@ int main()
 		Str_append( s3, "h" );
 		Str_append( s4, "h" );
 
-		check_str( s1, 256, 1, "h", TRUE);
+		check_str( s1,  16, 1, "h", TRUE);
 		check_str( s3,   5, 1, "h", FALSE);
 		check_str( s4,  10, 1, "h", FALSE);
 
@@ -357,7 +357,7 @@ int main()
 		Str_append_bytes( s3, "el\0o", 4 );
 		Str_append_bytes( s4, "el\0o", 4 );
 
-		check_str( s1, 256, 5, "hel\0o", TRUE);
+		check_str( s1,  16, 5, "hel\0o", TRUE);
 		check_str( s3,   5, 4, "hel\0",  FALSE);
 		check_str( s4,  10, 5, "hel\0o", FALSE);
 
@@ -365,7 +365,7 @@ int main()
 		Str_append_char( s3, 32 );
 		Str_append_char( s4, 32 );
 
-		check_str( s1, 256, 6, "hel\0o ", TRUE);
+		check_str( s1,  16, 6, "hel\0o ", TRUE);
 		check_str( s3,   5, 4, "hel\0",   FALSE);
 		check_str( s4,  10, 6, "hel\0o ", FALSE);
 
@@ -373,7 +373,7 @@ int main()
 		Str_append( s3, "world" );
 		Str_append( s4, "world" );
 
-		check_str( s1, 256, 11, "hel\0o world", TRUE);
+		check_str( s1,  16, 11, "hel\0o world", TRUE);
 		check_str( s3,   5,  4, "hel\0",        FALSE);
 		check_str( s4,  10,  9, "hel\0o wor",   FALSE);
 
@@ -388,7 +388,7 @@ int main()
 		Str_set( s3, "X" );
 		Str_set( s4, "X" );
 
-		check_str( s1, 256, 1, "X", TRUE);
+		check_str( s1,  16, 1, "X", TRUE);
 		check_str( s3,   5, 1, "X", FALSE);
 		check_str( s4,  10, 1, "X", FALSE);
 
@@ -396,7 +396,7 @@ int main()
 		Str_set_bytes( s3, "\0\1", 2 );
 		Str_set_bytes( s4, "\0\1", 2 );
 
-		check_str( s1, 256, 2, "\0\1", TRUE);
+		check_str( s1,  16, 2, "\0\1", TRUE);
 		check_str( s3,   5, 2, "\0\1", FALSE);
 		check_str( s4,  10, 2, "\0\1", FALSE);
 
@@ -404,7 +404,7 @@ int main()
 		Str_set_char( s3, 33 );
 		Str_set_char( s4, 33 );
 
-		check_str( s1, 256, 1, "!", TRUE);
+		check_str( s1,  16, 1, "!", TRUE);
 		check_str( s3,   5, 1, "!", FALSE);
 		check_str( s4,  10, 1, "!", FALSE);
 
@@ -419,7 +419,7 @@ int main()
 		Str_set_n( s3, "1234567890", 3 );
 		Str_set_n( s4, "1234567890", 3 );
 
-		check_str( s1, 256, 3, "123", TRUE);
+		check_str( s1,  16, 3, "123", TRUE);
 		check_str( s3,   5, 3, "123", FALSE);
 		check_str( s4,  10, 3, "123", FALSE);
 
@@ -427,7 +427,7 @@ int main()
 		Str_append_n( s3, "1234567890", 3 );
 		Str_append_n( s4, "1234567890", 3 );
 
-		check_str( s1, 256, 6, "123123", TRUE);
+		check_str( s1,  16, 6, "123123", TRUE);
 		check_str( s3,   5, 4, "1231",   FALSE);
 		check_str( s4,  10, 6, "123123", FALSE);
 
@@ -436,7 +436,7 @@ int main()
 		Str_set_n( s3, "123", 10 );
 		Str_set_n( s4, "123", 10 );
 
-		check_str( s1, 256, 3, "123", TRUE);
+		check_str( s1,  16, 3, "123", TRUE);
 		check_str( s3,   5, 3, "123", FALSE);
 		check_str( s4,  10, 3, "123", FALSE);
 
@@ -444,7 +444,7 @@ int main()
 		Str_append_n( s3, "123", 10 );
 		Str_append_n( s4, "123", 10 );
 
-		check_str( s1, 256, 6, "123123", TRUE);
+		check_str( s1,  16, 6, "123123", TRUE);
 		check_str( s3,   5, 4, "1231",   FALSE);
 		check_str( s4,  10, 6, "123123", FALSE);
 
@@ -469,28 +469,28 @@ int main()
 		Str_clear( s4 ); Str_unreserve( s4 );
 		
 
-		/* reserve in 256-byte blocks */
-		Str_reserve( s1, 255 );
-		Str_reserve( s3, 255 );
-		Str_reserve( s4, 255 );
+		/* reserve in 16-byte blocks */
+		Str_reserve( s1, 15 );
+		Str_reserve( s3, 15 );
+		Str_reserve( s4, 15 );
 		
-		check_str( s1, 256, 0, "", TRUE);
+		check_str( s1,  16, 0, "", TRUE);
 		check_str( s3,   5, 0, "", FALSE);
 		check_str( s4,  10, 0, "", FALSE);
 			
-		Str_reserve( s1, 256 );
-		Str_reserve( s3, 256 );
-		Str_reserve( s4, 256 );
+		Str_reserve( s1,  16 );
+		Str_reserve( s3,  16 );
+		Str_reserve( s4,  16 );
 		
-		check_str( s1, 512, 0, "", TRUE);
+		check_str( s1,  32, 0, "", TRUE);
 		check_str( s3,   5, 0, "", FALSE);
 		check_str( s4,  10, 0, "", FALSE);
 			
-		Str_reserve( s1, 511 );
-		Str_reserve( s3, 511 );
-		Str_reserve( s4, 511 );
+		Str_reserve( s1, 31 );
+		Str_reserve( s3, 31 );
+		Str_reserve( s4, 31 );
 		
-		check_str( s1, 512, 0, "", TRUE);
+		check_str( s1,  32, 0, "", TRUE);
 		check_str( s3,   5, 0, "", FALSE);
 		check_str( s4,  10, 0, "", FALSE);
 
@@ -505,12 +505,12 @@ int main()
 		Str_set( s3, "hello" );
 		Str_set( s4, "hello" );
 		
-		check_str( s1, 256, 5, "hello", TRUE);
+		check_str( s1,  16, 5, "hello", TRUE);
 		check_str( s3,   5, 4, "hell",  FALSE);
 		check_str( s4,  10, 5, "hello", FALSE);
 
 		s2 = Str_clone( s1 );
-		check_str( s2, 256, 5, "hello", TRUE);
+		check_str( s2,  16, 5, "hello", TRUE);
 		if (s1 == s2)					ERROR;
 		if (s1->str == s2->str)			ERROR;
 		OBJ_DELETE( s2 );
@@ -527,7 +527,7 @@ int main()
 		Str_sprintf( s3, "%s %d", "hello", 123);
 		Str_sprintf( s4, "%s %d", "hello", 123);
 		
-		check_str( s1, 256, 9, "hello 123", TRUE);
+		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 
@@ -536,7 +536,7 @@ int main()
 		Str_append_sprintf( s3, "%s", "");	/* empty */
 		Str_append_sprintf( s4, "%s", "");	/* empty */
 		
-		check_str( s1, 256, 9, "hello 123", TRUE);
+		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 
@@ -544,7 +544,7 @@ int main()
 		Str_append_sprintf( s3, "%s", " and world");
 		Str_append_sprintf( s4, "%s", " and world");
 		
-		check_str( s1, 256, 19, "hello 123 and world", TRUE);
+		check_str( s1,  32, 19, "hello 123 and world", TRUE);
 		check_str( s3,   5,  4, "hell",                FALSE);
 		check_str( s4,  10,  9, "hello 123",           FALSE);
 
@@ -559,7 +559,7 @@ int main()
 		call_vsprintf( s3, "%s %d", "hello", 123);
 		call_vsprintf( s4, "%s %d", "hello", 123);
 		
-		check_str( s1, 256, 9, "hello 123", TRUE);
+		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 		
@@ -568,7 +568,7 @@ int main()
 		call_append_vsprintf( s3, "%s", "");	/* empty */
 		call_append_vsprintf( s4, "%s", "");	/* empty */
 		
-		check_str( s1, 256, 9, "hello 123", TRUE);
+		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 		
@@ -576,7 +576,7 @@ int main()
 		call_append_vsprintf( s3, "%s", " and world");
 		call_append_vsprintf( s4, "%s", " and world");
 
-		check_str( s1, 256, 19, "hello 123 and world", TRUE);
+		check_str( s1,  32, 19, "hello 123 and world", TRUE);
 		check_str( s3,   5,  4, "hell",                FALSE);
 		check_str( s4,  10,  9, "hello 123",           FALSE);
 
@@ -591,7 +591,7 @@ int main()
 		Str_sprintf( s3, "%d", 12345 );
 		Str_sprintf( s4, "%d", 12345 );
 		
-		check_str( s1, 256, 5, "12345", TRUE);
+		check_str( s1,  16, 5, "12345", TRUE);
 		check_str( s3,   5, 4, "1234",  FALSE);
 		check_str( s4,  10, 5, "12345", FALSE);
 	}
@@ -611,7 +611,7 @@ int main()
 		Str_set( static_s1, "1234567890" );
 		Str_set( static_s2, "1234567890" );
 
-		check_str( static_s1, 256, 10, "1234567890", TRUE);
+		check_str( static_s1,  16, 10, "1234567890", TRUE);
 		check_str( static_s2,   5,  4, "1234",       FALSE);
 	}
 	
@@ -739,7 +739,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.9  2014-03-29 22:04:11  pauloscustodio
+# Revision 1.10  2014-04-07 21:01:51  pauloscustodio
+# Reduce default size to 16 to waste less space when used as base for array.h
+#
+# Revision 1.9  2014/03/29 22:04:11  pauloscustodio
 # Add str_compress_escapes() to compress C-like escape sequences.
 # Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
 #

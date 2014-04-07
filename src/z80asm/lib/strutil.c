@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.11 2014-03-29 22:04:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.12 2014-04-07 21:01:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -175,7 +175,7 @@ uint_t str_compress_escapes( char *string )
 /*-----------------------------------------------------------------------------
 *   Constants
 *----------------------------------------------------------------------------*/
-#define SIZE_MASK       0xFF        /* size will increment in blocks of 256 */
+#define SIZE_MASK       0x0F        /* size will increment in blocks of 16 */
 
 /*-----------------------------------------------------------------------------
 *   Class inplementation
@@ -255,7 +255,7 @@ void Str_compress_escapes( Str *self )
 
 /*-----------------------------------------------------------------------------
 *   expand if needed to store at least more num_chars plus a zero byte
-*   increment size in blocks of SIZE_MASK (256)
+*   increment size in blocks of SIZE_MASK
 *----------------------------------------------------------------------------*/
 void Str_reserve( Str *self, uint_t num_chars )
 {
@@ -274,7 +274,7 @@ void Str_reserve( Str *self, uint_t num_chars )
 
 		if ( self->size < need_size )
 		{
-			/* round up in blocks of 256 */
+			/* round up in blocks of SIZE_MASK */
 			new_size = need_size & ~SIZE_MASK;
 
 			if ( new_size < need_size )
@@ -416,7 +416,7 @@ void Str_append_vsprintf( Str *self, char *format, va_list argptr )
         {
             if ( self->alloc_str )
             {
-                /* increase the size by 256 and try again */
+                /* increase the size by SIZE_MASK and try again */
                 /* +1 -> overflow -> cause new block to be requested */
                 Str_reserve( self, self->size - self->len + 1 );
             }
@@ -503,7 +503,10 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.11  2014-03-29 22:04:11  pauloscustodio
+* Revision 1.12  2014-04-07 21:01:51  pauloscustodio
+* Reduce default size to 16 to waste less space when used as base for array.h
+*
+* Revision 1.11  2014/03/29 22:04:11  pauloscustodio
 * Add str_compress_escapes() to compress C-like escape sequences.
 * Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
 *
