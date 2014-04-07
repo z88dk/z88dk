@@ -17,6 +17,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_heap_alloc_aligned
 
 LIB asm_heap_alloc_aligned_unlocked
@@ -59,3 +65,19 @@ asm_heap_alloc_aligned:
    call asm_heap_alloc_aligned_unlocked
 
    jp __heap_lock_release_0
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_heap_alloc_aligned
+
+LIB asm_heap_alloc_aligned_unlocked
+
+asm_heap_alloc_aligned:
+
+   jp asm_heap_alloc_aligned_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

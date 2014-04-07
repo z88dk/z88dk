@@ -16,6 +16,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_memalign
 
 LIB asm_aligned_alloc
@@ -53,3 +59,19 @@ asm_memalign:
    ;            carry set, errno = ENOLCK
    ;
    ; uses   : af, bc, de, hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_memalign
+
+LIB asm_memalign_unlocked
+
+asm_memalign:
+
+   jp asm_memalign_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

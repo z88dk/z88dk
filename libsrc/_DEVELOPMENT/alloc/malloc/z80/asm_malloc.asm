@@ -12,6 +12,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_malloc
 XDEF asm_malloc_lib
 
@@ -45,3 +51,21 @@ asm_malloc_lib:
    
    ld de,(__heap)
    jp asm_heap_alloc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_malloc
+XDEF asm_malloc_lib
+
+LIB asm_malloc_unlocked
+
+asm_malloc:
+asm_malloc_lib:
+
+   jp asm_malloc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

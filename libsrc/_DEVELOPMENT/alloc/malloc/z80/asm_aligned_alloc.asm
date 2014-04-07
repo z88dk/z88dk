@@ -16,6 +16,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_aligned_alloc
 
 XREF __heap
@@ -54,3 +60,19 @@ asm_aligned_alloc:
 
    ld de,(__heap)
    jp asm_heap_alloc_aligned
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_aligned_alloc
+
+LIB asm_aligned_alloc_unlocked
+
+asm_aligned_alloc:
+
+   jp asm_aligned_alloc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

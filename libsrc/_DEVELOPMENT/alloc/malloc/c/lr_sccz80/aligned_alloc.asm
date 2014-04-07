@@ -1,6 +1,12 @@
 
 ; void *aligned_alloc(size_t alignment, size_t size)
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB aligned_alloc
 
 LIB asm_aligned_alloc
@@ -16,3 +22,19 @@ aligned_alloc:
    push af
    
    jp asm_aligned_alloc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB aligned_alloc
+
+LIB aligned_alloc_unlocked
+
+aligned_alloc:
+
+   jp aligned_alloc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

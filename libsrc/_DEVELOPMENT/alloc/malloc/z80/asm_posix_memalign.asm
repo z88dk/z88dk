@@ -17,6 +17,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_posix_memalign
 
 XREF __heap
@@ -51,3 +57,19 @@ asm_posix_memalign:
    call asm_heap_alloc_aligned
    
    jp asm0_posix_memalign_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_posix_memalign
+
+LIB asm_posix_memalign_unlocked
+
+asm_posix_memalign:
+
+   jp asm_posix_memalign_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

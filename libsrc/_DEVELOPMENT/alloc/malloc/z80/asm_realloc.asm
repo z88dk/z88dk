@@ -25,6 +25,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 XLIB asm_realloc
 XDEF asm_realloc_lib
 
@@ -59,3 +65,21 @@ asm_realloc_lib:
 
    ld de,(__heap)
    jp asm_heap_realloc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+XLIB asm_realloc
+XDEF asm_realloc_lib
+
+LIB asm_realloc_unlocked
+
+asm_realloc:
+asm_realloc_lib:
+
+   jp asm_realloc_unlocked
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
