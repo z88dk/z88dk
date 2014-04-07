@@ -253,6 +253,102 @@ extern void __LIB__ _ff_ao_Zaibatsu(void);
 #endif
 
 
+// FZX FONTS FROM KLUB UZIVATELU DESKTOPU
+// http://www.worldofspectrum.org/infoseekid.cgi?id=0023578
+
+#if __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_dkud1_Beerland2;
+extern struct fzx_font *ff_dkud1_Cinema;
+extern struct fzx_font *ff_dkud1_Cobretti;
+extern struct fzx_font *ff_dkud1_Consul1;
+extern struct fzx_font *ff_dkud1_Consul2;
+extern struct fzx_font *ff_dkud1_Crusade;
+extern struct fzx_font *ff_dkud1_DoubleBold;
+extern struct fzx_font *ff_dkud1_Edice13;
+extern struct fzx_font *ff_dkud1_JmenoRuze;
+extern struct fzx_font *ff_dkud1_Kurziva;
+extern struct fzx_font *ff_dkud1_Little;
+extern struct fzx_font *ff_dkud1_MahJongg;
+extern struct fzx_font *ff_dkud1_Overline;
+extern struct fzx_font *ff_dkud1_Phones2;
+extern struct fzx_font *ff_dkud1_RightBold;
+extern struct fzx_font *ff_dkud1_SciFi;
+extern struct fzx_font *ff_dkud1_Sinclair;
+extern struct fzx_font *ff_dkud1_Subtitles;
+extern struct fzx_font *ff_dkud1_Transcript;
+extern struct fzx_font *ff_dkud1_UpnUp1;
+extern struct fzx_font *ff_dkud1_UpnUp2;
+
+#else
+
+#define ff_dkud1_Beerland2     ((struct fzx_font *)(_ff_dkud1_Beerland2))
+#define ff_dkud1_Cinema        ((struct fzx_font *)(_ff_dkud1_Cinema))
+#define ff_dkud1_Cobretti      ((struct fzx_font *)(_ff_dkud1_Cobretti))
+#define ff_dkud1_Consul1       ((struct fzx_font *)(_ff_dkud1_Consul1))
+#define ff_dkud1_Consul2       ((struct fzx_font *)(_ff_dkud1_Consul2))
+#define ff_dkud1_Crusade       ((struct fzx_font *)(_ff_dkud1_Crusade))
+#define ff_dkud1_DoubleBold    ((struct fzx_font *)(_ff_dkud1_DoubleBold))
+#define ff_dkud1_Edice13       ((struct fzx_font *)(_ff_dkud1_Edice13))
+#define ff_dkud1_JmenoRuze     ((struct fzx_font *)(_ff_dkud1_JmenoRuze))
+#define ff_dkud1_Kurziva       ((struct fzx_font *)(_ff_dkud1_Kurziva))
+#define ff_dkud1_Little        ((struct fzx_font *)(_ff_dkud1_Little))
+#define ff_dkud1_MahJongg      ((struct fzx_font *)(_ff_dkud1_MahJongg))
+#define ff_dkud1_Overline      ((struct fzx_font *)(_ff_dkud1_Overline))
+#define ff_dkud1_Phones2       ((struct fzx_font *)(_ff_dkud1_Phones2))
+#define ff_dkud1_RightBold     ((struct fzx_font *)(_ff_dkud1_RightBold))
+#define ff_dkud1_SciFi         ((struct fzx_font *)(_ff_dkud1_SciFi))
+#define ff_dkud1_Sinclair      ((struct fzx_font *)(_ff_dkud1_Sinclair2))
+#define ff_dkud1_Subtitles     ((struct fzx_font *)(_ff_dkud1_Subtitles))
+#define ff_dkud1_Transcript    ((struct fzx_font *)(_ff_dkud1_Transcript))
+#define ff_dkud1_UpnUp1        ((struct fzx_font *)(_ff_dkud1_UpnUp1))
+#define ff_dkud1_UpnUp2        ((struct fzx_font *)(_ff_dkud1_UpnUp2))
+
+extern void __LIB__ _fzxfonts_names_dkud1(void);
+extern void __LIB__ _fzxfonts_enum_dkud1_A(void);
+extern void __LIB__ _fzxfonts_enum_dkud1_B(void);
+extern void __LIB__ _fzxfonts_enum_dkud1_C(void);
+
+extern void __LIB__ _ff_dkud1_Beerland2(void);
+extern void __LIB__ _ff_dkud1_Cinema(void);
+extern void __LIB__ _ff_dkud1_Cobretti(void);
+extern void __LIB__ _ff_dkud1_Consul1(void);
+extern void __LIB__ _ff_dkud1_Consul2(void);
+extern void __LIB__ _ff_dkud1_Crusade(void);
+extern void __LIB__ _ff_dkud1_DoubleBold(void);
+extern void __LIB__ _ff_dkud1_Edice13(void);
+extern void __LIB__ _ff_dkud1_JmenoRuze(void);
+extern void __LIB__ _ff_dkud1_Kurziva(void);
+extern void __LIB__ _ff_dkud1_Little(void);
+extern void __LIB__ _ff_dkud1_MahJongg(void);
+extern void __LIB__ _ff_dkud1_Overline(void);
+extern void __LIB__ _ff_dkud1_Phones2(void);
+extern void __LIB__ _ff_dkud1_RightBold(void);
+extern void __LIB__ _ff_dkud1_SciFi(void);
+extern void __LIB__ _ff_dkud1_Sinclair(void);
+extern void __LIB__ _ff_dkud1_Subtitles(void);
+extern void __LIB__ _ff_dkud1_Transcript(void);
+extern void __LIB__ _ff_dkud1_UpnUp1(void);
+extern void __LIB__ _ff_dkud1_UpnUp2(void);
+
+#endif
+
+
+// FZX FONTS BY VARIOUS DESIGNERS
+
+#if __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_ind_vga;
+
+#else
+
+#define ff_ind_vga             ((struct fzx_font *)(_ff_ind_vga))
+
+extern void __LIB__ _ff_ind_vga(void);
+
+#endif
+
+
 // FZX FONTS BY UTZ
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
