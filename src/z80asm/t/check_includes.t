@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.4 2014-03-15 01:41:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.5 2014-04-07 22:14:08 pauloscustodio Exp $
 #
 # Check that xmalloc.h is included before any other include
 
@@ -43,7 +43,7 @@ sub check_file {
 			if ($1 ne 'xmalloc.h') {
 				ok 0, "File $file:$. includes $1 before xmalloc.h";
 			}
-			return;
+			last;
 		}
 	}
 	ok 1, "File $file ok";
@@ -51,7 +51,10 @@ sub check_file {
 
 __END__
 # $Log: check_includes.t,v $
-# Revision 1.4  2014-03-15 01:41:44  pauloscustodio
+# Revision 1.5  2014-04-07 22:14:08  pauloscustodio
+# Test failed if all files OK
+#
+# Revision 1.4  2014/03/15 01:41:44  pauloscustodio
 # Check that xmalloc.h is first include only in source files
 #
 # Revision 1.3  2014/01/11 01:29:46  pauloscustodio
