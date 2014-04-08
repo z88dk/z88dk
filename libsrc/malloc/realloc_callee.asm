@@ -19,6 +19,6 @@ XREF _heap, ASMDISP_HEAPREALLOC_CALLEE
    ; bc = size
    
    ld de,_heap
-   jp HeapRealloc_CALLEE + ASMDISP_HEAPREALLOC_CALLEE
+   jp HeapRealloc_callee + ASMDISP_HEAPREALLOC_CALLEE
 
 DEFC ASMDISP_REALLOC_CALLEE = asmentry - realloc_callee
