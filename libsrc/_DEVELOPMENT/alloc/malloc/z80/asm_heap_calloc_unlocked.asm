@@ -16,7 +16,7 @@
 
 XLIB asm_heap_calloc_unlocked
 
-LIB l_mulu_16_16x16, asm_heap_alloc_unlocked, asm_memset
+LIB l_mulu_16_16x16, asm_heap_alloc_unlocked, asm_memset, error_enomem_zc
 
 asm_heap_calloc_unlocked:
 
@@ -47,7 +47,9 @@ asm_heap_calloc_unlocked:
    
    ld e,c
    ld d,b
+   
    call l_mulu_16_16x16        ; hl = nmemb * size = request size
+   jp c, error_enomem_zc - 1
 
    pop de                      ; de = void *heap
    push hl                     ; save request size
