@@ -1,16 +1,11 @@
 
 ; ===============================================================
-; Jan 2014
+; Apr 2014
 ; ===============================================================
 ; 
-; int fflush(FILE *stream)
+; int fclose(FILE *stream)
 ;
-; Flush the stream.  For streams most recently written to, this
-; means sending any buffered output to the device.  For streams
-; most recently read from, this means seeking backward to unread
-; any unconsumed input.
-;
-; If stream == 0, all streams are flushed.
+; Close the file.
 ;
 ; ===============================================================
 
@@ -20,55 +15,46 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fflush
-XDEF asm0_fflush
+XLIB asm_fclose
 
-LIB asm0_fflush_unlocked, asm__fflushall
+LIB asm_fclose_unlocked
 LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
 
-asm_fflush:
+asm_fclose:
 
    ; enter : ix = FILE *
-   ;
+   ; 
    ; exit  : ix = FILE *
    ;
-   ;         if success
+   ;         success
    ;
    ;            hl = 0
    ;            carry reset
    ;
-   ;         if lock could not be acquired
-   ;         if stream is in error state
-   ;         if write failed
+   ;         fail
    ;
    ;            hl = -1
-   ;            carry set
+   ;            carry set, errno set
    ;
    ; uses  : all except ix
-
-   ld a,ixl
-   or ixh
-   jp z, asm__fflushall
-
-asm0_fflush:
 
    call __stdio_lock_acquire
    jp c, error_enolck_mc
    
-   call asm0_fflush_unlocked
+   call asm_fclose_unlocked
    jp __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fflush
+XLIB asm_fclose
 
-LIB asm_fflush_unlocked
+LIB asm_fclose_unlocked
 
-asm_fflush:
+asm_fclose:
 
-   jp asm_fflush_unlocked
+   jp asm_fclose_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

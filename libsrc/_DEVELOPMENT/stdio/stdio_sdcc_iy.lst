@@ -1,6 +1,8 @@
 stdio/c/sdcc_iy/asprintf
 stdio/c/sdcc_iy/clearerr
 stdio/c/sdcc_iy/clearerr_unlocked
+stdio/c/sdcc_iy/fclose
+stdio/c/sdcc_iy/fclose_unlocked
 stdio/c/sdcc_iy/feof
 stdio/c/sdcc_iy/feof_unlocked
 stdio/c/sdcc_iy/ferror
@@ -77,6 +79,8 @@ stdio/c/sdcc_iy/vsnprintf
 stdio/c/sdcc_iy/vsprintf
 stdio/c/sdcc_iy/vsscanf
 stdio/c/sdcc_iy/_fmemopen_
+stdio/z80/asm__fflushall
+stdio/z80/asm__fflushall_unlocked
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier

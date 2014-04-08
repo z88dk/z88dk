@@ -239,4 +239,13 @@ carry set on error (write buffers could not be flushed)
 * STDIO_MSG_CLOS
 ****************
 
-....
+Flush the file and then perform any cleanup.
+
+input:
+
+ A = STDIO_MSG_CLOS
+
+return:
+
+carry set on error (file will be closed regardless)
+

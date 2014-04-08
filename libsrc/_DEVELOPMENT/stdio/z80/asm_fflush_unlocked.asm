@@ -19,7 +19,7 @@ XDEF asm0_fflush_unlocked
 
 XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK, STDIO_MSG_FLSH
 
-LIB asm__fflushall, l_jpix, error_mc, error_znc
+LIB asm__fflushall_unlocked, l_jpix, error_mc, error_znc
 
 asm_fflush_unlocked:
 
@@ -42,7 +42,7 @@ asm_fflush_unlocked:
 
    ld a,ixl
    or ixh
-   jp z, asm__fflushall
+   jp z, asm__fflushall_unlocked
 
 asm0_fflush_unlocked:
 

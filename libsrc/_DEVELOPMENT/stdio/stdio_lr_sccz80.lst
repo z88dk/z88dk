@@ -1,6 +1,8 @@
 stdio/c/lr_sccz80/asprintf
 stdio/c/lr_sccz80/clearerr
 stdio/c/lr_sccz80/clearerr_unlocked
+stdio/c/lr_sccz80/fclose
+stdio/c/lr_sccz80/fclose_unlocked
 stdio/c/lr_sccz80/feof
 stdio/c/lr_sccz80/feof_unlocked
 stdio/c/lr_sccz80/ferror
@@ -117,6 +119,8 @@ stdio/c/lr_sccz80/vsscanf
 stdio/c/lr_sccz80/vsscanf_callee
 stdio/c/lr_sccz80/_fmemopen_
 stdio/c/lr_sccz80/_fmemopen__callee
+stdio/z80/asm__fflushall
+stdio/z80/asm__fflushall_unlocked
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier

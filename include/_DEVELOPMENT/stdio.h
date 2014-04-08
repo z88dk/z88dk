@@ -31,7 +31,10 @@ extern FILE *_stdio_file_stderr;
 
 #define EOF            -1
 
+#ifndef FOPEN_MAX
 #define FOPEN_MAX       8
+#endif
+
 #define FILENAME_MAX  256
 
 #define L_tmpnam        8
@@ -48,6 +51,7 @@ extern FILE *_stdio_file_stderr;
 extern FILE   *_fmemopen_(void **bufp, size_t *sizep, char *mode);
 extern int     asprintf(char **ptr, char *format, ...);
 extern void    clearerr(FILE *stream);
+extern int     fclose(FILE *stream);
 extern int     feof(FILE *stream);
 extern int     ferror(FILE *stream);
 extern int     fflush(FILE *stream);
@@ -95,6 +99,7 @@ extern int     vsprintf(char *s, char *format, void *arg);
 extern int     vsscanf(char *s, char *format, void *arg);
 
 extern void    clearerr_unlocked(FILE *stream);
+extern int     fclose_unlocked(FILE *stream);
 extern int     feof_unlocked(FILE *stream);
 extern int     ferror_unlocked(FILE *stream);
 extern int     fflush_unlocked(FILE *stream);
@@ -133,6 +138,7 @@ extern int     vscanf_unlocked(char *format, void *arg);
 extern FILE   __LIB__              *_fmemopen_(void **bufp, size_t *sizep, char *mode);
 extern int    __LIB__               asprintf(char **ptr, char *format, ...);
 extern void   __LIB__ __FASTCALL__  clearerr(FILE *stream);
+extern int    __LIB__ __FASTCALL__  fclose(FILE *stream);
 extern int    __LIB__ __FASTCALL__  feof(FILE *stream);
 extern int    __LIB__ __FASTCALL__  ferror(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fflush(FILE *stream);
@@ -180,6 +186,7 @@ extern int    __LIB__               vsprintf(char *s, char *format, void *arg);
 extern int    __LIB__               vsscanf(char *s, char *format, void *arg);
 
 extern void   __LIB__ __FASTCALL__  clearerr_unlocked(FILE *stream);
+extern void   __LIB__ __FASTCALL__  fclose_unlocked(FILE *stream);
 extern int    __LIB__ __FASTCALL__  feof_unlocked(FILE *stream);
 extern int    __LIB__ __FASTCALL__  ferror_unlocked(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fflush_unlocked(FILE *stream);
