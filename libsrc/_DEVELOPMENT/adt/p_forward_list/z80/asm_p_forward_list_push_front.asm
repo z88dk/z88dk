@@ -15,7 +15,7 @@ XLIB asm_p_forward_list_push_front
 
 LIB asm_p_forward_list_insert_after
 
-asm_p_foward_list_push_front:
+asm_p_forward_list_push_front:
 
    jp asm_p_forward_list_insert_after
 
