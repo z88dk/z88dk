@@ -8,8 +8,8 @@
 ;       negate FA, and push address of MINUSFA
 ;       called to evaluate functions f(x) when the argument is
 ;       negative and f() satisfies f(-x)=-f(x)
-.ODD    CALL    MINUSFA
-        LD      HL,MINUSFA
+.odd    CALL    minusfa
+        LD      HL,minusfa
         EX      (SP),HL
         JP      (HL)
 ;

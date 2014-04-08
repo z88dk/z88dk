@@ -10,9 +10,9 @@
 ;
 ;       amin(a,b)
 
-.aMIN   LD      HL,8
+.amin   LD      HL,8
         ADD     HL,SP
-        CALL    LDBCHL
-        CALL    COMPARE
-        JP      P,LDFABC
+        CALL    ldbchl
+        CALL    compare
+        JP      P,ldfabc
         RET

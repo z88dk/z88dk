@@ -9,6 +9,6 @@
 
 ;
 
-.HLSUB  CALL    LDBCHL
-        JP      FSUB
+.hlsub  CALL    ldbchl
+        JP      fsub
 ;

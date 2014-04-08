@@ -22,8 +22,8 @@
 ;
 ;       transcendental functions: sin, cos, tan
 ;
-.COS    LD      HL,HALFPI	;local copy..
-        CALL    HLADD   
+.cos    LD      HL,halfpi	;local copy..
+        CALL    hladd   
         jp      sin
 
 .halfpi	DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2

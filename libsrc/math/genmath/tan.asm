@@ -7,11 +7,11 @@
 
                 LIB     sin
                 LIB     cos
-                LIB	ldfabc
+                LIB     ldfabc
 
-                LIB	pushfa
+                LIB     pushfa
                 XREF    pushf2
-                LIB	div1
+                LIB     div1
 
 
 
@@ -22,13 +22,13 @@
 
 
 ;
-.TAN    CALL    PUSHFA  
-        CALL    SIN    
+.tan    CALL    pushfa  
+        CALL    sin    
         POP     BC
         POP     IX
         POP     DE
-        CALL    PUSHF2
+        CALL    pushf2
         EX      DE,HL
-        CALL    LDFABC  
-        CALL    COS    
-        JP      DIV1    
+        CALL    ldfabc  
+        CALL    cos    
+        JP      div1    

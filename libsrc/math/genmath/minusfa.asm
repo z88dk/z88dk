@@ -5,7 +5,7 @@
 
                 XREF    fa
 
-.MINUSFA LD     HL,FA+4
+.minusfa LD     HL,fa+4
         LD      A,(HL)
         XOR     $80
         LD      (HL),A

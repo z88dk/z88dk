@@ -3,7 +3,7 @@
 ;
 ;       set flags per FA - ( bc ix de )
 ;
-;       $Id: compare.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: compare.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 		XLIB	compare
 
@@ -12,26 +12,26 @@
 		XREF	setflgs
 		XREF	fa
 
-.COMPARE 
+.compare 
 	LD     A,B
         OR      A
-        JP      Z,SGN           ;bc ix de = 0, so
+        JP      Z,sgn           ;bc ix de = 0, so
 ;                               sign of FA is result
-        CALL    SGN
+        CALL    sgn
         LD      A,C
-        JP      Z,SETFLGS       ;FA = 0, so sign of
+        JP      Z,setflgs       ;FA = 0, so sign of
 ;                               -(bc ix de) is result
-        LD      HL,FA+4
+        LD      HL,fa+4
         XOR     (HL)
         LD      A,C
-        JP      M,SETFLGS       ;operands have opposite
+        JP      M,setflgs       ;operands have opposite
 ;                               signs, so result is sign
 ;                               of -(bc ix de)
 
         CALL    CPFRAC
         RRA                     ;recover cy bit
         XOR     C       ;reverse sign if numbers are negative
-        JP      SETFLGS
+        JP      setflgs
 
 .CPFRAC INC     HL      ;compare  bc ix de  to (HL)
         LD      A,B

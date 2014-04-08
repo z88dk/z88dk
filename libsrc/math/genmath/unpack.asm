@@ -3,13 +3,13 @@
 ;
 ;       Unpack FP number
 ;
-;       $Id: unpack.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $:
+;       $Id: unpack.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
 
 		XLIB	unpack
 
 		XREF	fa
 
-.UNPACK LD      HL,FA+4
+.unpack LD      HL,fa+4
         LD      A,(HL)  ;get MSB of fraction
         RLCA            ;rotate sign bit into lsb
         SCF             ;set carry

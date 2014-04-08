@@ -12,7 +12,7 @@
 
 
 ;
-.FABS  CALL    SGN
+.fabs  CALL    sgn
         RET     P
         jp      minusfa
 

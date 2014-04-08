@@ -3,7 +3,7 @@
 ;
 ;	divide bc ix de by FA, leave result in FA
 ;
-;	$Id: fdiv_noafiy.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $
+;	$Id: fdiv_noafiy.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $
 
 
 
@@ -15,9 +15,8 @@
 		LIB	norm4
 		LIB	afswap
 
-
-		XREF	FA
-		XREF	EXTRA
+		XREF	fa
+		XREF	extra
 
 .ixsave		defw	0
 
@@ -25,7 +24,7 @@
 	call	sgn
 	ret	z		;dividing by zero..
         LD      L,$FF  ;"quotient" flag
-        CALL    DIV14   ;find quotient exponent
+        CALL    div14   ;find quotient exponent
         ;PUSH    IY
         INC     (HL)
         INC     (HL)
@@ -56,7 +55,7 @@
         LD      D,A
         LD      E,A
         LD      IX,0
-        LD      (EXTRA),A
+        LD      (extra),A
 .DIV2   PUSH    HL      ;save b iy hl in case the subtraction
         ;PUSH    IY      ; proves to be unnecessary
 		push    hl
@@ -89,11 +88,11 @@
         EXX
         POP     HL
         LD      B,A
-        LD      A,(EXTRA)
+        LD      A,(extra)
         SBC     A,0
         CCF
         JR      NC,DIV4 ; nc => subtraction caused carry
-        LD      (EXTRA),A
+        LD      (extra),A
         POP     AF      ;discard saved value of dividend...
         POP     AF
         POP     AF
@@ -146,9 +145,9 @@
 		pop		hl
 
         RL      B
-        LD      A,(EXTRA)
+        LD      A,(extra)
         RLA
-        LD      (EXTRA),A  ;...end of  EXTRA b iy hl  shifting
+        LD      (extra),A  ;...end of  EXTRA b iy hl  shifting
         LD      A,C     ;test  c ix de...
         OR      D
         OR      E
@@ -156,7 +155,7 @@
         OR      IXL       ;...end of  c ix de  testing
         JR      NZ,DIV2 ;nz => dividend nonzero
         PUSH    HL
-        LD      HL,FA+5
+        LD      HL,fa+5
         DEC     (HL)
         POP     HL
         JR      NZ,DIV2
@@ -164,7 +163,7 @@
 ;        JR      OFLOW2
 ;
 .DIV12  ;POP     IY
-        JP      PACK2
+        JP      pack2
 
 
 

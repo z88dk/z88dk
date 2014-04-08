@@ -5,7 +5,7 @@
 ;	current exponent in fa+5
 ;	Result -> fa +5
 ;
-;       $Id: norm_noaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: norm_noaf.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	norm
@@ -16,7 +16,7 @@
 
 		XREF	fa
 
-.NORM   LD      L,B
+.norm   LD      L,B
         LD      H,E
         XOR     A
 .NORM2  LD      B,A
@@ -37,7 +37,8 @@
         SUB     8       ;adjust exponent
         CP      $D0
         JR      NZ,NORM2
-	jp	norm4
+        jp      norm4
+
 ;
 .NORM8  DEC     B
 ;                       shift  c ix d hl  left one bit...
@@ -60,10 +61,10 @@
         LD      E,H
         LD      B,L
         OR      A
-        JP      Z,PACK  ;z => exponent unchanged
-        LD      HL,FA+5         ;update exponent
+        JP      Z,pack  ;z => exponent unchanged
+        LD      HL,fa+5         ;update exponent
         ADD     A,(HL)
         LD      (HL),A
-        Jp      NC,NORM4        ;nc => underflow (set to 0)
+        JP      NC,norm4        ;nc => underflow (set to 0)
         RET     Z               ;z => underflow (leave as 0)
-	jp	pack
+        jp      pack

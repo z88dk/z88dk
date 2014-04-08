@@ -3,13 +3,13 @@
 ;
 ;       Complement FASIGN and negate the fraction c ix de b
 ;
-;       $Id: minusbc.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: minusbc.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	minusbc
 		XREF	fasign
 
-.MINUSBC LD     HL,FASIGN
+.minusbc LD     HL,fasign
         LD      A,(HL)
         CPL
         LD      (HL),A

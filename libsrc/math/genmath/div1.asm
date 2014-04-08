@@ -2,14 +2,14 @@
 ;       Z88dk Generic Floating Point Math Library
 ;
 ;
-;	$Id: div1.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $
+;	$Id: div1.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $
 
 		XLIB	div1
 
 		LIB	fdiv
 
-.DIV1   POP     BC
+.div1   POP     BC
         POP     IX
         POP     DE
-        jp      FDIV
+        jp      fdiv
 

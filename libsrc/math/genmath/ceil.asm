@@ -5,9 +5,9 @@
                 XLIB    ceil
 
                 LIB     floor
-                LIB	odd
+                LIB     odd
 
 
 ;       return -(floor(-x))
-.CEIL   CALL    ODD
+.ceil   CALL    odd
         jp      floor

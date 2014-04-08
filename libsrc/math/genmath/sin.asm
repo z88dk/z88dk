@@ -3,20 +3,20 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB    sin
-		LIB	hlsub
-		LIB	hladd
-		LIB	addhalf
+                XLIB  sin
+                LIB   hlsub
+                LIB   hladd
+                LIB   addhalf
 
-                LIB     evenpol
-                LIB     floor
+                LIB   evenpol
+                LIB   floor
 
-                LIB	pushfa
-                LIB	ldfabc
-                LIB	fsub
-                LIB	sgn
-                LIB	minusfa
-                LIB	fdiv
+                LIB   pushfa
+                LIB   ldfabc
+                LIB   fsub
+                LIB   sgn
+                LIB   minusfa
+                LIB   fdiv
 
 
 
@@ -27,37 +27,37 @@
 
 
 
-.SIN   CALL    PUSHFA  
+.sin    CALL    pushfa
         LD      BC,$8349       ;6.283185308... = 2*pi
         LD      IX,$0FDA
         LD      DE,$A222
-        CALL    LDFABC  
+        CALL    ldfabc
         POP     BC
         POP     IX
         POP     DE
-        CALL    FDIV    
-        CALL    PUSHFA  
-        CALL    FLOOR  
+        CALL    fdiv
+        CALL    pushfa
+        CALL    floor
         POP     BC
         POP     IX
         POP     DE
-        CALL    FSUB    
+        CALL    fsub
         LD      HL,KWARTER
-        CALL    HLSUB   
-        CALL    SGN     
+        CALL    hlsub
+        CALL    sgn
         SCF     
         JP      P,SIN5  
-        CALL    ADDHALF 
-        CALL    SGN     
+        CALL    addhalf 
+        CALL    sgn     
         OR      A
 .SIN5   PUSH    AF
-        CALL    P,MINUSFA
+        CALL    P,minusfa
         LD      HL,KWARTER
-        CALL    HLADD   
+        CALL    hladd   
         POP     AF
-        CALL    NC,MINUSFA
+        CALL    NC,minusfa
         LD      HL,SINCOEF
-        JP      EVENPOL
+        JP      evenpol
 ;
 .KWARTER
         defw     0

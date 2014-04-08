@@ -3,7 +3,7 @@
 ;
 ;	Add bc ix de to FA
 ;
-;       $Id: fadd.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: fadd.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	fadd
@@ -19,43 +19,43 @@
 		XREF	rsh8
 		XREF	fa
 
-.FADD   LD      A,B
+.fadd   LD      A,B
         OR      A
         RET     Z       ;z => number to be added is zero
-        LD      A,(FA+5)
+        LD      A,(fa+5)
         OR      A
-        JP      Z,LDFABC ;z => accumulator is zero,
+        JP      Z,ldfabc ;z => accumulator is zero,
 ;                               just load number
         SUB     B
         JR      NC,ADD2 ;nc => accumulator has larger number
         NEG             ;reverse accumulator & bc ix de...
         EXX
         PUSH    IX
-        CALL    LDBCFA
+        CALL    ldbcfa
         EXX
         EX      (SP),IX
-        CALL    LDFABC
+        CALL    ldfabc
         EXX
         POP     IX      ;...end of reversing
 .ADD2   CP      $29
         RET     NC      ;nc => addition makes no change
         PUSH    AF      ;save difference of exponents
-        CALL    UNPACK  ;restore hidden bit & compare signs
+        CALL    unpack  ;restore hidden bit & compare signs
         LD      H,A     ;save difference in signs
         POP     AF      ;recall difference of exponents
-        CALL    RSHIFT  ;shift  c ix de b  right by (a)
+        CALL    rshift  ;shift  c ix de b  right by (a)
         OR      H
-        LD      HL,FA
+        LD      HL,fa
         JP      P,ADD4  ;p => opposite signs, must subtract
-        CALL    FRADD   ;c ix de += FA
-        JP      NC,PACK ;nc => adding caused no carry
+        CALL    fradd   ;c ix de += FA
+        JP      NC,pack ;nc => adding caused no carry
         INC     HL
         INC     (HL)    ;increment exponent
         ret     z
 ;        JP      Z,OFLOW
         LD      L,1
-        CALL    RSH8    ;shift  c ix de b  right by 1
-        JP      PACK    ;round, hide msb, & load into FA
+        CALL    rsh8    ;shift  c ix de b  right by 1
+        JP      pack    ;round, hide msb, & load into FA
 ;
 .ADD4   XOR     A       ;negate b...
         SUB     B
@@ -79,6 +79,6 @@
         LD      A,(HL)
         SBC     A,C
         LD      C,A     ;...end of subtraction, fall into...
-	jp      norma
+        jp      norma
 
 

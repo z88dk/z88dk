@@ -10,9 +10,9 @@
 
 ;
 ;       amax(a,b)       returns the greater of a and b
-.AMAX   LD      HL,8    ;offset for 1st argument
+.amax   LD      HL,8    ;offset for 1st argument
         ADD     HL,SP
-        CALL    LDBCHL  ;bcixde := 1st argument
-        CALL    COMPARE
-        JP      M,LDFABC
+        CALL    ldbchl  ;bcixde := 1st argument
+        CALL    compare
+        JP      M,ldfabc
         RET

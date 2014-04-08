@@ -3,7 +3,7 @@
 ;
 ;       Find exponent for product (l=0) or quotient(l=ff)
 ;
-;       $Id: div14.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: div14.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	div14
@@ -11,13 +11,13 @@
 		LIB	unpack
 		LIB	norm4
 
-		XREF	FA
+		XREF	fa
 
-.DIV14  LD      A,B
+.div14  LD      A,B
         OR      A
         JR      Z,DIV20
         LD      A,L     ;get product/quotient flag
-        LD      HL,FA+5
+        LD      HL,fa+5
         XOR     (HL)    ;get +-FA exponent
         ADD     A,B     ;find and...
         LD      B,A     ;...load new exponent
@@ -28,7 +28,7 @@
         ADD     A,$80
         LD      (HL),A
         Jr      Z,div14_1
-        CALL    UNPACK  ;restore hidden bits & compare signs
+        CALL    unpack  ;restore hidden bits & compare signs
         LD      (HL),A  ;save difference of signs
         DEC     HL      ;point to MSB of fraction
         RET
@@ -36,7 +36,7 @@
 	pop	hl
 	ret
 
-.div18	or	a
-.div20	pop	hl
-	jp	p,norm4
-	ret		;jp oflow
+.DIV18	or	a
+.DIV20	pop	hl
+        jp  p,norm4
+        ret            ;jp oflow

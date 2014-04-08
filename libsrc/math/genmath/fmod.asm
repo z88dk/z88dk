@@ -14,7 +14,7 @@
                 LIB	fdiv
                 LIB	floor
                 LIB	fsub
-		LIB	fmul
+                LIB	fmul
 
 
 ;
@@ -24,7 +24,7 @@
 ;
 
 
-.FMOD   POP     HL      ;return addr
+.fmod   POP     HL      ;return addr
         POP     DE      ;discard next number
         POP     DE      ; (already in FA)
         POP     DE
@@ -41,17 +41,17 @@
         PUSH    DE      ;save another copy of z
         PUSH    IX
         PUSH    BC
-        CALL    PUSHFA  ;save a copy of 2nd operand ("x")
-        CALL    FDIV    ;z/x
-        CALL    FLOOR  ;floor(z/x)
+        CALL    pushfa  ;save a copy of 2nd operand ("x")
+        CALL    fdiv    ;z/x
+        CALL    floor  ;floor(z/x)
         POP     BC
         POP     IX
         POP     DE
-        CALL    FMUL    ;x*floor(z/x)
+        CALL    fmul    ;x*floor(z/x)
         POP     BC
         POP     IX
         POP     DE
 ;               to find mod(z,x)=z-x*floor(z/x), fall into...
-        jp      FSUB
+        jp      fsub
 
 

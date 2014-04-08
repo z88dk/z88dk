@@ -3,7 +3,7 @@
 ;
 ;       Multiply fa y bc ix de
 ;
-;       $Id: fmul.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: fmul.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	fmul
@@ -15,10 +15,10 @@
 		XREF	fa
 
 
-.FMUL   CALL    SGN
+.fmul   CALL    sgn
         RET     Z       ; z => accumulator has zero
         LD      L,0     ;"product" flag
-        CALL    DIV14   ;find exponent of product
+        CALL    div14   ;find exponent of product
         LD      A,C  ;c' h'l' d'e' (multiplicand) = c ix de...
         PUSH    DE
         EXX
@@ -31,14 +31,14 @@
         LD      D,B
         LD      E,B
         LD      IX,0
-        LD      HL,NORM ; push addr of normalize routine
+        LD      HL,norm ; push addr of normalize routine
         PUSH    HL
         LD      HL,MULLOOP      ; push addr of top of loop
         PUSH    HL      ; (5 iterations wanted,
         PUSH    HL      ; once per byte of fraction)
         PUSH    HL
         PUSH    HL
-        LD      HL,FA   ;point to LSB
+        LD      HL,fa   ;point to LSB
 .MULLOOP LD     A,(HL)  ;get next byte of multiplier
         INC     HL
         OR      A

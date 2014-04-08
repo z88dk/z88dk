@@ -5,8 +5,8 @@
 
                 XLIB     float
 
-		LIB	norm
-		LIB	l_long_neg
+                LIB      norm
+                LIB      l_long_neg
 
                 XDEF    float1
                 XREF    fasign
@@ -22,19 +22,19 @@
 .float  LD      A,d     ;fetch MSB
 .float1
         CPL             ;reverse sign bit
-        LD      (FASIGN),A ;save sign (msb)
+        LD      (fasign),A ;save sign (msb)
         RLA             ;move sign into cy
         JR      C,FL4   ;c => nonnegative number
-	call	l_long_neg
+        call	l_long_neg
 ; fp number is c ix de b
 .FL4	ld	c,d
-	ld	ixh,e
-	ld	a,h
-	ld	ixl,a
-	ld	d,l
-	ld	e,0
-	ld	b,e
+        ld	ixh,e
+        ld	a,h
+        ld	ixl,a
+        ld	d,l
+        ld	e,0
+        ld	b,e
         LD      A,32+128
-        LD      (FA+5),A ;preset exponent
-        JP      NORM    ;go normalize c ix de b
+        LD      (fa+5),A ;preset exponent
+        JP      norm    ;go normalize c ix de b
 

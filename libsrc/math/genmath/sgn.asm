@@ -3,7 +3,7 @@
 ;
 ;       set z and Z flags per fa
 ;
-;	$Id: sgn.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $:
+;	$Id: sgn.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	sgn
@@ -12,12 +12,12 @@
 
 		XREF	fa
 
-.SGN    LD      A,(FA+5)
+.sgn    LD      A,(fa+5)
         OR      A
         RET     Z
-        LD      A,(FA+4)
+        LD      A,(fa+4)
         DEFB    $FE    ;"ignore next byte"
-.SETFLGS
+.setflgs
         CPL
         RLA
         SBC     A,A

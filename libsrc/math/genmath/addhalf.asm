@@ -11,4 +11,4 @@
 	jp	hladd
 
 
-.HALF   DEFB    0,0,0,0,0,$80   ;0.5
+.half   DEFB    0,0,0,0,0,$80   ;0.5

@@ -6,7 +6,7 @@
 
 
                 LIB	int2
-		LIB	norma
+                LIB	norma
 
 
                 XREF    fa
@@ -14,19 +14,19 @@
 
 ;
 ;       return largest integer not greater than
-.FLOOR  LD      HL,FA+5
+.floor  LD      HL,fa+5
         LD      A,(HL)  ;fetch exponent
         CP      $A8
-        LD      A,(FA)
+        LD      A,(fa)
         RET     NC      ;nc => binary point is right of lsb
         LD      A,(HL)
-        CALL    INT2
+        CALL    int2
         LD      (HL),$A8  ;place binary pt at end of fraction
         LD      A,E
         PUSH    AF
         LD      A,C
         RLA
-        CALL    NORMA
+        CALL    norma
         POP     AF
         RET
 ;

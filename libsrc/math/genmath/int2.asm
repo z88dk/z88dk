@@ -3,7 +3,7 @@
 ;
 ;       ???
 ;
-;       $Id: int2.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: int2.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	int2
@@ -14,7 +14,7 @@
 		LIB	minusbc
 		LIB	unpack
 
-.INT2   LD      B,A     ;if a==0, return with  bc ix de = 0...
+.int2   LD      B,A     ;if a==0, return with  bc ix de = 0...
         LD      C,A
         LD      D,A
         LD      E,A
@@ -23,8 +23,8 @@
         OR      A
         RET     Z
         PUSH    HL
-        CALL    LDBCFA  ;copy FA into bc ix de,
-        CALL    UNPACK  ; restore hidden bits
+        CALL    ldbcfa  ;copy FA into bc ix de,
+        CALL    unpack  ; restore hidden bits
         XOR     (HL)
         LD      H,A     ;put sign in msb of h
         JP      P,INT4 ;p => positive number
@@ -42,12 +42,12 @@
 ;
 .INT4   LD      A,$A8  ;shift  c ix de  right so bits to
         SUB     B       ; the right of the binary point
-        CALL    RSHIFT  ; are discarded
+        CALL    rshift  ; are discarded
         LD      A,H
         RLA
-        CALL    C,INCR  ;c => negative, increment  c ix de
+        CALL    C,incr  ;c => negative, increment  c ix de
         LD      B,0
-        CALL    C,MINUSBC ;negate the fraction c ix de
+        CALL    C,minusbc ;negate the fraction c ix de
         POP     HL
         RET
 

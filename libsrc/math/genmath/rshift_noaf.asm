@@ -3,7 +3,7 @@
 ;
 ;	Shift c ix de b right by a
 ;
-;       $Id: rshift_noaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: rshift_noaf.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
 
 
 		XLIB	rshift
@@ -11,7 +11,7 @@
 		XDEF	rsh8
 
 
-.RSHIFT LD      B,0
+.rshift LD      B,0
 .RSH2   SUB     8
         JR      C,RSH4  ;c => 7 or fewer shifts remain
         LD      B,E     ;shift  c ix de b  right by 8...
@@ -33,7 +33,7 @@
         DEC     L
         RET     Z       ;z => requested shift is complete
         LD      A,C
-.RSH8   RRA             ;shift  c ix de b  right by one...
+.rsh8   RRA             ;shift  c ix de b  right by one...
         LD      C,A
         LD      A,IXH
         RRA

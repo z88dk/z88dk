@@ -3,11 +3,11 @@
 ;
 ;	increment c ix de
 ;
-;       $Id: incr.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: incr.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 		XLIB	incr
 
-.INCR   INC     E       ;increment c ix de
+.incr   INC     E       ;increment c ix de
         RET     NZ
         INC     D
         RET     NZ

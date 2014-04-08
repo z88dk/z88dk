@@ -6,15 +6,15 @@
 
                 XLIB    exp
 
-		LIB	sgn
+                LIB     sgn
                 LIB     floor
                 LIB     poly
 
-                LIB	fmul
-                LIB	pushfa
-		LIB	norm4
+                LIB     fmul
+                LIB     pushfa
+                LIB     norm4
                 XREF    fa
-                LIB	fsub
+                LIB     fsub
 
 ;
 
@@ -22,23 +22,23 @@
 
 ;
 
-.EXP    LD      BC,$8138        ;1.442695041
+.exp    LD      BC,$8138        ;1.442695041
         LD      IX,$AA3B
         LD      DE,$295C        
-        CALL    FMUL    
-        LD      A,(FA+5)
+        CALL    fmul    
+        LD      A,(fa+5)
         CP      $88
         JP      NC,DIV17
-        CALL    PUSHFA  
-        CALL    FLOOR  
+        CALL    pushfa  
+        CALL    floor  
         POP     BC
         POP     IX
         POP     DE
         PUSH    AF
-        CALL    FSUB    
+        CALL    fsub    
         LD      HL,EXPCOEF
-        CALL    POLY    
-        LD      HL,FA+5 
+        CALL    poly    
+        LD      HL,fa+5 
         POP     AF
         OR      A
         JP      M,EXP5  
@@ -48,14 +48,14 @@
         CCF     
         LD      (HL),A
         RET     NC
-        JP      DIV17   
+        JP      DIV17
 
-.div17	call	sgn
-	cpl
-	or	a
-	pop	hl
-	jp	p,norm4
-	ret		;jp oflow
+.DIV17	call	sgn
+        cpl
+        or      a
+        pop     hl
+        jp      p,norm4
+        ret     ;jp oflow
 
 ;
 

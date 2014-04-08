@@ -3,11 +3,11 @@
 ;
 ;       fraction add c ix de += (hl)
 ;
-;       $Id: fradd.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: fradd.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
 
 		XLIB	fradd
 
-.FRADD  LD      A,(HL)
+.fradd  LD      A,(HL)
         ADD     A,E
         LD      E,A
         INC     HL

@@ -3,19 +3,19 @@
 
                 XLIB    poly
 
-                LIB	pushfa
-                LIB	ldbchl
-                LIB	fadd
-                LIB	fmul
+                LIB     pushfa
+                LIB     ldbchl
+                LIB     fadd
+                LIB     fmul
 
                 XREF    dload
 
 ;
-.POLY   CALL    PUSHFA  
+.poly   CALL    pushfa  
         LD      A,(HL)
         INC     HL
-        CALL    DLOAD   
-        DEFB      $FE    ;"ignore next byte"
+        CALL    dload   
+        DEFB    $FE    ;"ignore next byte"
 .POL3   POP     AF
         POP     BC
         POP     IX
@@ -27,11 +27,11 @@
         PUSH    BC
         PUSH    AF
         PUSH    HL
-        CALL    FMUL    
+        CALL    fmul    
         POP     HL
-        CALL    LDBCHL  
+        CALL    ldbchl  
         PUSH    HL
-        CALL    FADD    
+        CALL    fadd    
         POP     HL
         JR      POL3    
 ;

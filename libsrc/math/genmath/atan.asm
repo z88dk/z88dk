@@ -18,9 +18,9 @@
 		XDEF	__halfpi
 		XDEF	__pi
 
-.__PI  
+.__pi  
         DEFB    $22,$A2,$DA,$0F,$49,$82   ;pi
-.__HALFPI        
+.__halfpi        
         DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
 
 
@@ -31,21 +31,21 @@
 
 
 .atan
-	CALL    SGN     
-        CALL    M,ODD           ;negate argument & answer
-        LD      A,(FA+5)
+	CALL    sgn     
+        CALL    M,odd           ;negate argument & answer
+        LD      A,(fa+5)
         CP      $81
         JR      C,ATAN5         ;c => argument less than 1
         LD      BC,$8100        ;1.0
         LD      IX,0
         LD      D,C
         LD      E,C
-        CALL    FDIV    
+        CALL    fdiv    
 	ld	hl,hlsub
 	push	hl
 .ATAN5  LD      HL,ATNCOEF
-        CALL    EVENPOL
-        LD      HL,__HALFPI      ;may use for subtraction
+        CALL    evenpol
+        LD      HL,__halfpi      ;may use for subtraction
 	ret
 
 ;

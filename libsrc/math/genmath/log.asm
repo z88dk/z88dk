@@ -4,8 +4,8 @@
 
                 XLIB    log
 
-		LIB 	hlsub
-		LIB	evenpol
+                LIB	hlsub
+                LIB	evenpol
                 LIB	sgn
                 LIB	fdiv
                 LIB	fmul
@@ -38,10 +38,10 @@
 
 
 ;
-.LOG    CALL    SGN     
+.log    CALL    sgn
         OR      A
         ret     pe      ;urk!..
-        LD      HL,FA+5 
+        LD      HL,fa+5 
         LD      A,(HL)
         LD      BC,$8035        ; 1/sqrt(2)
         LD      IX,$04F3
@@ -52,41 +52,41 @@
         PUSH    DE
         PUSH    IX
         PUSH    BC
-        CALL    FADD    
+        CALL    fadd    
         POP     BC
         POP     IX
         POP     DE
         INC     B
-        CALL    FDIV    
-        LD      HL,ONE  
-        CALL    HLSUB   
+        CALL    fdiv    
+        LD      HL,ONE
+        CALL    hlsub
         LD      HL,LOGCOEF
-        CALL    EVENPOL
+        CALL    evenpol
         LD      BC,$8080        ; -0.5
         LD      IX,0
         LD      DE,0
-        CALL    FADD    
+        CALL    fadd
         POP     AF
-        CALL    L247E   
+        CALL    L247E
         LD      BC,$8031        ; ln(2)
         LD      IX,$7217
         LD      DE,$F7D2
-        JP      FMUL    
+        JP      fmul
 ;
 ;
 ; don't know what this is, it seems to be part of log()
 ;
-.L247E  CALL    PUSHFA
+.L247E  CALL    pushfa
         CALL    L27EC
         POP     BC
         POP     IX
         POP     DE
-        JP      FADD
+        JP      fadd
 ;
 ;
 .L27EC  LD      B,$88   ; 128.
         LD      DE,0
-.L27F1  LD      HL,FA+5
+.L27F1  LD      HL,fa+5
         LD      C,A
         PUSH    DE
         POP     IX
@@ -96,7 +96,7 @@
         INC     HL
         LD      (HL),$80        ;store minus sign
         RLA
-        JP      NORMA
+        JP      norma
 ;
         EX      DE,HL
         XOR     A

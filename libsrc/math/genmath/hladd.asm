@@ -8,6 +8,6 @@
 
 
 ;
-.HLADD  
-        CALL    LDBCHL
-        JP      FADD
+.hladd  
+        CALL    ldbchl
+        JP      fadd
