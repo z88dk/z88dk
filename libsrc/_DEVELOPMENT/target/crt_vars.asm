@@ -185,6 +185,12 @@ IF __HAVE_FILE_STDERR
 
 ENDIF
 
+XDEF __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
+
+__stdio_file_list_lock:        defs 6
+__stdio_file_list_open:        defs 2
+__stdio_file_list_avail:       defs 4
+
 ;;;;;;;;;; stdlib
 
 XDEF __seed

@@ -23,35 +23,64 @@ IF __qtbl_sz > 0
    call asm_balloc_init
    
 ENDIF
-   
+
+; initialize stdio FILE queues
+
+LIB asm_mtx_init, l_zeroword_hl
+
+ld c,mtx_plain
+ld hl,__stdio_file_list_lock
+call asm_mtx_init
+
+ld hl,__stdio_file_list_open
+call l_zeroword_hl
+
+ld hl,__stdio_file_list_avail
+call l_zeroword_hl
+ld (__stdio_file_list_avail+2),hl
+
 ; initialize statically allocated FILEs
    
 IF __HAVE_FILE_STDIN | __HAVE_FILE_STDOUT | __HAVE_FILE_STDERR
    
-   LIB asm_mtx_init
-   ld c,mtx_recursive
+   LIB asm_p_forward_list_push_front
    
 ENDIF
    
 IF __HAVE_FILE_STDIN
-      
+   
+   ld c,mtx_recursive
    ld hl,__FILE_STDIN + 7
    call asm_mtx_init
+   
+   ld de,__FILE_STDIN - 2
+   ld hl,__stdio_file_list_open
+   call asm_p_forward_list_push_front
    
 ENDIF
    
 IF __HAVE_FILE_STDOUT
    
+   ld c,mtx_recursive
    ld hl,__FILE_STDOUT + 7
    call asm_mtx_init
-   
+
+   ld de,__FILE_STDOUT - 2
+   ld hl,__stdio_file_list_open
+   call asm_p_forward_list_push_front
+
 ENDIF
    
 IF __HAVE_FILE_STDERR
    
+   ld c,mtx_recursive
    ld hl,__FILE_STDERR + 7
    call asm_mtx_init
-   
+
+   ld de,__FILE_STDERR - 2
+   ld hl,__stdio_file_list_open
+   call asm_p_forward_list_push_front
+
 ENDIF
 
 ; crt variables that need initial values

@@ -97,6 +97,8 @@ INCLUDE "../crt_stubs.asm"     ; crt stubs for unimplemented lib functions
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   defw 0
+   
 __FILE_STDIN:
    
    defb 195                    ; jp driver
@@ -107,6 +109,8 @@ __FILE_STDIN:
    defb 0
    defs 6                      ; mutex
 
+   defw 0
+   
 __FILE_STDOUT:
 
    defb 195                    ; jp driver
@@ -117,6 +121,8 @@ __FILE_STDOUT:
    defb 0
    defs 6                      ; mutex
 
+   defw 0
+   
 __FILE_STDERR:
 
    ; separate from stdout allows output
