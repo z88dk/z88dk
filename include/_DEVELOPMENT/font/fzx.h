@@ -304,11 +304,6 @@ extern struct fzx_font *ff_dkud1_UpnUp2;
 #define ff_dkud1_UpnUp1        ((struct fzx_font *)(_ff_dkud1_UpnUp1))
 #define ff_dkud1_UpnUp2        ((struct fzx_font *)(_ff_dkud1_UpnUp2))
 
-extern void __LIB__ _fzxfonts_names_dkud1(void);
-extern void __LIB__ _fzxfonts_enum_dkud1_A(void);
-extern void __LIB__ _fzxfonts_enum_dkud1_B(void);
-extern void __LIB__ _fzxfonts_enum_dkud1_C(void);
-
 extern void __LIB__ _ff_dkud1_Beerland2(void);
 extern void __LIB__ _ff_dkud1_Cinema(void);
 extern void __LIB__ _ff_dkud1_Cobretti(void);
@@ -334,7 +329,7 @@ extern void __LIB__ _ff_dkud1_UpnUp2(void);
 #endif
 
 
-// FZX FONTS BY VARIOUS DESIGNERS
+// FZX FONTS BY INDEPENDENT DESIGNERS
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
 
