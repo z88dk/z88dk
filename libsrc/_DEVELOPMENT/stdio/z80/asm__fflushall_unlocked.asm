@@ -1,7 +1,7 @@
 
-XLIB asm__fflushall_unlocked
-
 INCLUDE "clib_cfg.asm"
+
+XLIB asm__fflushall_unlocked
 
 XREF __stdio_file_list_open
 
@@ -10,8 +10,7 @@ LIB asm0_fflush_unlocked, asm_p_forward_list_front
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-XREF __stdio_file_list_lock
-LIB asm_mtx_lock, asm_mtx_unlock
+LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,12 +27,7 @@ asm__fflushall_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-lock_acquire:
-
-   ld hl,__stdio_file_list_lock
-   call asm_mtx_lock           ; acquire list lock
-   
-   jr c, lock_acquire          ; do not accept lock error on stdio lock
+   call __stdio_lock_file_list   ; acquire list lock
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -50,7 +44,7 @@ file_loop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-   jr c, end_loop
+   jp c, __stdio_unlock_file_list  ; if no more open files in list
 
 ELSE
 
@@ -65,14 +59,3 @@ ENDIF
    pop hl
    
    jr file_loop
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
-
-end_loop:
-
-   ld hl,__stdio_file_list_lock
-   jp asm_mtx_unlock           ; release list lock
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

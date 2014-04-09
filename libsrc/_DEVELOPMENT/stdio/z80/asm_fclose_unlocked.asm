@@ -23,8 +23,7 @@ LIB error_znc, error_mc, error_ebadf_mc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-XREF __stdio_file_list_lock
-LIB asm_mtx_lock, asm_mtx_unlock
+LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -62,12 +61,7 @@ asm_fclose_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-lock_acquire:
-
-   ld hl,__stdio_file_list_lock
-   call asm_mtx_lock           ; acquire list lock
-   
-   jr c, lock_acquire          ; do not accept lock error on stdio lock
+   call __stdio_lock_file_list   ; acquire stdio lock
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -94,8 +88,7 @@ file_invalid:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD
 
-   ld hl,__stdio_file_list_lock
-   call asm_mtx_unlock         ; release list lock
+   call __stdio_unlock_file_list  ; release stdio lock
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
