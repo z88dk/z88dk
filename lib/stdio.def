@@ -4,20 +4,22 @@ lstoff
 
 ; The information below is defined	in Developers Notes, release 3.00
 ; (c) Cambridge Computer	1989
+;
+; $Id: stdio.def,v 1.3 2014-04-09 08:17:11 stefano Exp $
 
-	DEFC	 OS_In	 = $2A		; read a byte from std. input	(keyboard)
-	DEFC	 OS_Tin	 = $2D		; read a byte from std. input, with timeout
-	DEFC	 OS_Out	 = $27		; write a	byte	to std. output
-	DEFC	 OS_Xin	 = $30		; examine	input (e.g. check for pre-emption)
+	DEFC	 os_in	 = $2A		; read a byte from std. input	(keyboard)
+	DEFC	 os_tin	 = $2D		; read a byte from std. input, with timeout
+	DEFC	 os_out	 = $27		; write a	byte	to std. output
+	DEFC	 os_xin	 = $30		; examine	input (e.g. check for pre-emption)
 
-	DEFC	 GN_Nln	 = $2E09		; send newline	(CR/LF) to std. output
-	DEFC	 GN_Sop	 = $3A09		; write string	to std. output
-	DEFC	 GN_Soe	 = $3C09		; write string	from	extended address
-	DEFC	 GN_Sip	 = $3809		; system input	line	routine
+	DEFC	 gn_nln	 = $2E09		; send newline	(CR/LF) to std. output
+	DEFC	 gn_sop	 = $3A09		; write string	to std. output
+	DEFC	 gn_soe	 = $3C09		; write string	from	extended address
+	DEFC	 gn_sip	 = $3809		; system input	line	routine
 
-	DEFC	 OS_Pur	 = $33		; purge keyboard buffer (and reset	timeout)
+	DEFC	 os_pur	 = $33		; purge keyboard buffer (and reset	timeout)
 
-; Standard input key definitions (Returned by OS_IN, OS_TIN, GN_SIP)
+; Standard input key definitions (Returned by os_IN, os_TIN, gn_SIP)
 ;
 ; The following codes are NOT	zero	prefixed:
 ; IN_ESC,	IN_ENT, IN_TAB, IN_SPC &	IN_DEL

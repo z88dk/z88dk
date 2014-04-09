@@ -4,44 +4,46 @@ lstoff
 
 ; The information below is defined	in Developers Notes, release 3.00
 ; (c) Cambridge Computer	1989-95
+;
+; $Id: dor.def,v 1.3 2014-04-09 08:17:11 stefano Exp $
 
 ; DOR interface:
 
-	DEFC	OS_Dor = $87			; DOR interface
+	DEFC	os_dor = $87			; DOR interface
 
-	; DOR codes when using OS_Dor	:
-		DEFC	DR_Get	= $01	; Get handle for a DOR name (internal use)
-		DEFC	DR_Dup	= $02	; Duplicate DOR
-		DEFC	DR_Sib	= $03	; Return brother DOR
-		DEFC	DR_Son	= $04	; Return child	DOR
-		DEFC	DR_Fre	= $05	; Free (release) DOR handle
-		DEFC	DR_Cre	= $06	; Create blank	DOR
-		DEFC	DR_Del	= $07	; Delete DOR
-		DEFC	DR_Ins	= $08	; Insert DOR
-		DEFC	DR_Rd	= $09	; Read DOR record
-		DEFC	DR_Wr	= $0A	; Write DOR record
+	; DOR codes when using os_Dor	:
+		DEFC	dr_get	= $01	; Get handle for a DOR name (internal use)
+		DEFC	dr_fup	= $02	; Duplicate DOR
+		DEFC	dr_sib	= $03	; Return brother DOR
+		DEFC	dr_son	= $04	; Return child	DOR
+		DEFC	dr_fre	= $05	; Free (release) DOR handle
+		DEFC	dr_cre	= $06	; Create blank	DOR
+		DEFC	dr_del	= $07	; Delete DOR
+		DEFC	dr_ins	= $08	; Insert DOR
+		DEFC	dr_rd	= $09	; Read DOR record
+		DEFC	dr_wr	= $0A	; Write DOR record
 
 	; Major DOR types:
 
-		DEFC	Dm_Dev	= $81	; File Device
-		DEFC	Dm_Chd	= $82	; Character Device
-		DEFC	Dm_Rom	= $83	; ROM information
+		DEFC	dm_dev	= $81	; File Device
+		DEFC	dm_chd	= $82	; Character Device
+		DEFC	dm_rom	= $83	; ROM information
 
 	; Minor DOR types:
 
-		DEFC	Dn_Fil	= $11	; File type
-		DEFC	Dn_Dir	= $12	; Directory type
-		DEFC	Dn_Apl	= $13	; Application front	DOR type,
-		DEFC	Dn_Del	= $7F	; Deleted	Entry type.
+		DEFC	dn_fil	= $11	; File type
+		DEFC	dn_dir	= $12	; Directory type
+		DEFC	dn_apl	= $13	; Application front	DOR type,
+		DEFC	dn_del	= $7F	; Deleted	Entry type.
 
 	; Record DOR types:
 
-		DEFC	Dt_Nam	= $4E	; filename
-		DEFC	Dt_Cre	= $43	; creation time
-		DEFC	Dt_Upd	= $55	; update time
-		DEFC	Dt_Ext	= $58	; Extent (length of	file)
-		DEFC	Dt_Atr	= $41	; Not currently used
-		DEFC	Dt_Hlp	= $48	; Help type
-		DEFC	Dt_Inf	= $40	; Information
+		DEFC	dt_nam	= $4E	; filename
+		DEFC	dt_cre	= $43	; creation time
+		DEFC	dt_upd	= $55	; update time
+		DEFC	dt_ext	= $58	; Extent (length of	file)
+		DEFC	dt_atr	= $41	; Not currently used
+		DEFC	dt_hlp	= $48	; Help type
+		DEFC	dt_inf	= $40	; Information
 
 lston

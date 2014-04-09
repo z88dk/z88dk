@@ -4,142 +4,144 @@ lstoff
 
 ; The information below is defined	in Developers Notes, release 3.00
 ; (c) Cambridge Computer	1989
+;
+; $Id: syspar.def,v 1.3 2014-04-09 08:17:11 stefano Exp $
 
-	DEFC	OS_Nq   =	$66	; enquire	(fetch) parameter
-	DEFC	OS_Sp   =	$69	; specify	(set) parameter
+	DEFC	os_nq   =	$66	; enquire	(fetch) parameter
+	DEFC	os_sp   =	$69	; specify	(set) parameter
 
-; Enquiries, read by OS_Nq:
+; Enquiries, read by os_Nq:
 
 ;		<Symbol>	<Value>	<Meaning>
 
-	DEFC	NQ_Wbox  = $8300	; return window information
-	DEFC	NQ_Wcur  = $8303	; return cursor information
-	DEFC	NQ_Rds   = $8306	; read text from screen
+	DEFC	nq_wbox  = $8300	; return window information
+	DEFC	nq_wcur  = $8303	; return cursor information
+	DEFC	nq_rds   = $8306	; read text from screen
 
-	DEFC	NQ_Ain   = $8600	; application enquiry
-	DEFC	NQ_Khn   = $8603	; read keyboard handle
-	DEFC	NQ_Shn   = $8606	; read screen handle
-	DEFC	NQ_Phn   = $8609	; read printer	indirected handle
-	DEFC	NQ_Nhn   = $860C	; read null handle
-	DEFC	NQ_Wai   = $860F	; Who am I?
-	DEFC	NQ_Com   = $8612	; read comms handle
-	DEFC	NQ_Ihn   = $8615	; read IN	handle
-	DEFC	NQ_Ohn   = $8618	; read OUT handle
-	DEFC	NQ_Rhn   = $861B	; read direct printer handle
+	DEFC	nq_ain   = $8600	; application enquiry
+	DEFC	nq_khn   = $8603	; read keyboard handle
+	DEFC	nq_shn   = $8606	; read screen handle
+	DEFC	nq_phn   = $8609	; read printer	indirected handle
+	DEFC	nq_nhn   = $860C	; read null handle
+	DEFC	nq_wai   = $860F	; Who am I?
+	DEFC	nq_com   = $8612	; read comms handle
+	DEFC	nq_ihn   = $8615	; read IN	handle
+	DEFC	nq_ohn   = $8618	; read OUT handle
+	DEFC	nq_rhn   = $861B	; read direct printer handle
 
-	DEFC	NQ_Mfs   = $8900	; read free space information
-	DEFC	NQ_Slt   = $8903	; read slot type information
+	DEFC	nq_mfs   = $8900	; read free space information
+	DEFC	nq_slt   = $8903	; read slot type information
 
-	DEFC	NQ_Dev   = $8C00	; fetch current device
-	DEFC	NQ_Dir   = $8C03	; fetch current directory
-	DEFC	NQ_Fnm   = $8C06	; fetch current filename	match string
-	DEFC	NQ_Dmh   = $8C09	; fetch Director special	memory handle
-	DEFC	NQ_Inp   = $8C0C	; read std. input handle
-	DEFC	NQ_Out   = $8C0F	; read std. output handle
-	DEFC	NQ_Prt   = $8C12	; read printer	stream handle
-	DEFC	NQ_Tin   = $8C15	; read input-T	handle
-	DEFC	NQ_Tot   = $8C18	; read output-T handle
-	DEFC	NQ_Tpr   = $8C1B	; read printer-T stream handle
-	DEFC	NQ_Chn   = $8C1E	; read comms handle
+	DEFC	nq_dev   = $8C00	; fetch current device
+	DEFC	nq_dir   = $8C03	; fetch current directory
+	DEFC	nq_fnm   = $8C06	; fetch current filename	match string
+	DEFC	nq_dmh   = $8C09	; fetch Director special	memory handle
+	DEFC	nq_onp   = $8C0C	; read std. input handle
+	DEFC	nq_out   = $8C0F	; read std. output handle
+	DEFC	nq_prt   = $8C12	; read printer	stream handle
+	DEFC	nq_tin   = $8C15	; read input-T	handle
+	DEFC	nq_tot   = $8C18	; read output-T handle
+	DEFC	nq_tpr   = $8C1B	; read printer-T stream handle
+	DEFC	nq_chn   = $8C1E	; read comms handle
 
-; Specifies, set by	OS_Sp:
+; Specifies, set by	os_Sp:
 
 	; Panel definitions	(serial port parameters,	timeout, defaults, etc.)	:
 
 	;	<Symbol>	<Value>	<Meaning>
 
-	DEFC	PA_Gfi   = $8000	; Install	changed settings
-	DEFC	PA_Mct   = $8001	; Timeout	in minutes
-	DEFC	PA_Rep   = $8002	; Repeat rate
-	DEFC	PA_Kcl   = $8003	; Keyclick 'Y'	or 'N'
-	DEFC	PA_Snd   = $8004	; Sound 'Y' or	'N'
-	DEFC	PA_Bad   = $8005	; Default	bad process size in	K
-	DEFC	PA_Iov   = $8010	; Insert/Overtype 'I' or	'O'
-	DEFC	PA_Dat   = $8011	; Date format 'E' or 'A'
-	DEFC	PA_Map   = $8012	; PipeDream map 'Y'	or 'N'
-	DEFC	PA_Msz   = $8013	; Map size in pixels
-	DEFC	PA_Dir   = $8014	; Default	directory
-	DEFC	PA_Dev   = $8015	; Default	device
-	DEFC	PA_Txb   = $8016	; Transmit baud rate - binary
-	DEFC	PA_Rxb   = $8017	; Receive	baud	rate	- binary
-	DEFC	PA_Xon   = $8018	; Xon/Xoff 'Y'	or 'N'
-	DEFC	PA_Par   = $8019	; Parity 'O', 'E', 'M', 'S' or 'N'
+	DEFC	pa_gfi   = $8000	; Install	changed settings
+	DEFC	pa_mct   = $8001	; Timeout	in minutes
+	DEFC	pa_rep   = $8002	; Repeat rate
+	DEFC	pa_kcl   = $8003	; Keyclick 'Y'	or 'N'
+	DEFC	pa_snd   = $8004	; Sound 'Y' or	'N'
+	DEFC	pa_bad   = $8005	; Default	bad process size in	K
+	DEFC	pa_tov   = $8010	; Insert/Overtype 'I' or	'O'
+	DEFC	pa_dat   = $8011	; Date format 'E' or 'A'
+	DEFC	pa_map   = $8012	; PipeDream map 'Y'	or 'N'
+	DEFC	pa_msz   = $8013	; Map size in pixels
+	DEFC	pa_dir   = $8014	; Default	directory
+	DEFC	pa_dev   = $8015	; Default	device
+	DEFC	pa_txb   = $8016	; Transmit baud rate - binary
+	DEFC	pa_rxb   = $8017	; Receive	baud	rate	- binary
+	DEFC	pa_xon   = $8018	; Xon/Xoff 'Y'	or 'N'
+	DEFC	pa_par   = $8019	; Parity 'O', 'E', 'M', 'S' or 'N'
 
 ; PrinterED definitions (highlights $ translation	tables) :
 
-	DEFC	PA_Ptr   = $8020	; Printer	name
-	DEFC	PA_Alf   = $8021	; Allow Linefeed, 'Y' or	'N'
-	DEFC	PA_Pon   = $8022	; Printer	On sequense
-	DEFC	PA_Pof   = $8023	; Printer	Off sequense
-	DEFC	PA_Eop   = $8024	; End of page sequense
-	DEFC	PA_Mip   = $8025	; HMI prefix sequense
-	DEFC	PA_Mis   = $8026	; HMI suffix sequense
-	DEFC	PA_Mio   = $8027	; HMI offset sequense
+	DEFC	pa_ptr   = $8020	; Printer	name
+	DEFC	pa_alf   = $8021	; Allow Linefeed, 'Y' or	'N'
+	DEFC	pa_pon   = $8022	; Printer	On sequense
+	DEFC	pa_pof   = $8023	; Printer	Off sequense
+	DEFC	pa_eop   = $8024	; End of page sequense
+	DEFC	pa_mip   = $8025	; HMI prefix sequense
+	DEFC	pa_mis   = $8026	; HMI suffix sequense
+	DEFC	pa_mio   = $8027	; HMI offset sequense
 
 ; The format of each highlight sequense	is as follows:
-		;	PA_On<n>		Highlight	ON sequense
-		;	PA_On<n>+1	Highlight	OFF sequense
-		;	PA_On<n>+2	OFF at CR	'Y' or 'N'
-		;	PA_On<n>+3	Highlight	n special	character
+		;	pa_on<n>		Highlight	ON sequense
+		;	pa_on<n>+1	Highlight	OFF sequense
+		;	pa_on<n>+2	OFF at CR	'Y' or 'N'
+		;	pa_on<n>+3	Highlight	n special	character
 
-		DEFC	PA_On1	= $8028	; Underline
-		DEFC	PA_On2	= $802C	; Bold
-		DEFC	PA_On3	= $8030	; Extended sequense
-		DEFC	PA_On4	= $8034	; Italics
-		DEFC	PA_On5	= $8038	; Subscript
-		DEFC	PA_On6	= $803C	; Superscript
-		DEFC	PA_On7	= $8040	; Alternate font
-		DEFC	PA_On8	= $8044	; User Defined
+		DEFC	pa_on1	= $8028	; Underline
+		DEFC	pa_on2	= $802C	; Bold
+		DEFC	pa_on3	= $8030	; Extended sequense
+		DEFC	pa_on4	= $8034	; Italics
+		DEFC	pa_on5	= $8038	; Subscript
+		DEFC	pa_on6	= $803C	; Superscript
+		DEFC	pa_on7	= $8040	; Alternate font
+		DEFC	pa_on8	= $8044	; User Defined
 
 		; The format of each translation code sequense is	as follows:
-		;	PA_Tr<n>		Translate	from	character
-		;	PA_Tr<n>+1	Translate	to sequense
+		;	pa_tr<n>		Translate	from	character
+		;	pa_tr<n>+1	Translate	to sequense
 
-		DEFC	PA_Tr1	= $8048	; Row 1, Entry	A
-		DEFC	PA_Tr2	= $804A	;			B
-		DEFC	PA_Tr3	= $804C	;			C
-		DEFC	PA_Tr4	= $804E	; Row 2, Entry	A
-		DEFC	PA_Tr5	= $8050	;			B
-		DEFC	PA_Tr6	= $8052	;			C
-		DEFC	PA_Tr7	= $8054	; Row 3, Entry	A
-		DEFC	PA_Tr8	= $8056	;			B
-		DEFC	PA_Tr9	= $8058	;			C
+		DEFC	pa_tr1	= $8048	; Row 1, Entry	A
+		DEFC	pa_tr2	= $804A	;			B
+		DEFC	pa_tr3	= $804C	;			C
+		DEFC	pa_tr4	= $804E	; Row 2, Entry	A
+		DEFC	pa_tr5	= $8050	;			B
+		DEFC	pa_tr6	= $8052	;			C
+		DEFC	pa_tr7	= $8054	; Row 3, Entry	A
+		DEFC	pa_tr8	= $8056	;			B
+		DEFC	pa_tr9	= $8058	;			C
 
 		; ISO translations 1 - 28:
 
-		DEFC	PA_Tr10	= $8080	; Row 1, Entry	1	(ISO	1)
-		DEFC	PA_Tr11	= $8082	;			2	(ISO	2)
-		DEFC	PA_Tr12	= $8084	;			3	(ISO	3)
-		DEFC	PA_Tr13	= $8086	;			4	...
-		DEFC	PA_Tr14	= $8088	;			5
-		DEFC	PA_Tr15	= $808A	;			6
-		DEFC	PA_Tr16	= $808C	;			7
-		DEFC	PA_Tr17	= $808E	; Row 2, Entry	1
-		DEFC	PA_Tr18	= $8090	;			2
-		DEFC	PA_Tr19	= $8092	;			3
-		DEFC	PA_Tr20	= $8094	;			4
-		DEFC	PA_Tr21	= $8096	;			5
-		DEFC	PA_Tr22	= $8098	;			6
-		DEFC	PA_Tr23	= $809A	;			7
-		DEFC	PA_Tr24	= $809C	; Row 3, Entry	1
-		DEFC	PA_Tr25	= $809E	;			2
-		DEFC	PA_Tr26	= $80A0	;			3
-		DEFC	PA_Tr27	= $80A2	;			4
-		DEFC	PA_Tr28	= $80A4	;			5
-		DEFC	PA_Tr29	= $80A6	;			6
-		DEFC	PA_Tr30	= $80A8	;			7
-		DEFC	PA_Tr31	= $80AA	; Row 4, Entry	1
-		DEFC	PA_Tr32	= $80AC	;			2
-		DEFC	PA_Tr33	= $80AE	;			3
-		DEFC	PA_Tr34	= $80B0	;			4
-		DEFC	PA_Tr35	= $80B2	;			5	...
-		DEFC	PA_Tr36	= $80B4	;			6	...
-		DEFC	PA_Tr37	= $80B6	;			7	(ISO	28)
+		DEFC	pa_tr10	= $8080	; Row 1, Entry	1	(ISO	1)
+		DEFC	pa_tr11	= $8082	;			2	(ISO	2)
+		DEFC	pa_tr12	= $8084	;			3	(ISO	3)
+		DEFC	pa_tr13	= $8086	;			4	...
+		DEFC	pa_tr14	= $8088	;			5
+		DEFC	pa_tr15	= $808A	;			6
+		DEFC	pa_tr16	= $808C	;			7
+		DEFC	pa_tr17	= $808E	; Row 2, Entry	1
+		DEFC	pa_tr18	= $8090	;			2
+		DEFC	pa_tr19	= $8092	;			3
+		DEFC	pa_tr20	= $8094	;			4
+		DEFC	pa_tr21	= $8096	;			5
+		DEFC	pa_tr22	= $8098	;			6
+		DEFC	pa_tr23	= $809A	;			7
+		DEFC	pa_tr24	= $809C	; Row 3, Entry	1
+		DEFC	pa_tr25	= $809E	;			2
+		DEFC	pa_tr26	= $80A0	;			3
+		DEFC	pa_tr27	= $80A2	;			4
+		DEFC	pa_tr28	= $80A4	;			5
+		DEFC	pa_tr29	= $80A6	;			6
+		DEFC	pa_tr30	= $80A8	;			7
+		DEFC	pa_tr31	= $80AA	; Row 4, Entry	1
+		DEFC	pa_tr32	= $80AC	;			2
+		DEFC	pa_tr33	= $80AE	;			3
+		DEFC	pa_tr34	= $80B0	;			4
+		DEFC	pa_tr35	= $80B2	;			5	...
+		DEFC	pa_tr36	= $80B4	;			6	...
+		DEFC	pa_tr37	= $80B6	;			7	(ISO	28)
 
     ; File system parameters:
 
-		DEFC	SP_Dev	= $8C00	; Set current device
-		DEFC	SP_Dir	= $8C03	; Set current directory
-		DEFC	SP_Fnm	= $8C06	; Set current name match
+		DEFC	sp_dev	= $8C00	; Set current device
+		DEFC	sp_dir	= $8C03	; Set current directory
+		DEFC	sp_fnm	= $8C06	; Set current name match
 
 lston

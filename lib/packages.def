@@ -1,4 +1,6 @@
 ; Package handling package definitions
+;
+; $Id: packages.def,v 1.2 2014-04-09 08:17:11 stefano Exp $
 
 	defc	pkg_ayt=$0000		; Are you there; package-handling
 
@@ -22,15 +24,15 @@
 	defc	pkg_pid=$1c0f		; get current process ID
 	defc	pkg_ozcr=$1e0f		; register OZ call substitution
 	defc	pkg_ozcd=$200f		; deregister OZ call substitution
-        defc    pkg_slow=$220f          ; SlowMo interrupt call
+	defc    pkg_slow=$220f          ; SlowMo interrupt call
 	defc	pkg_bal=$240f		; allocate bank
 	defc	pkg_bfr=$260f		; free bank
 	defc	pkg_boot=$280f		; package autoboot facility
 
 ; Reason codes
 
-        defc    int_pkg=$00
-        defc    int_prc=$01
+	defc    int_pkg=$00
+	defc    int_prc=$01
 
 	defc	bnk_any=$00
 	defc	bnk_even=$01

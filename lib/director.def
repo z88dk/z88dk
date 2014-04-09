@@ -4,23 +4,25 @@ lstoff
 
 ; The information below is defined	in developers Notes, release 3.00
 ; (c) Cambridge Computer	1989-95
+;
+; $Id: director.def,v 1.3 2014-04-09 08:17:11 stefano Exp $
 
 ; Director/CLI	low level	access:
 
-	DEFC	Dc_Alt = $1A0C			; Pass an	alternative character
-	DEFC	Dc_Bye = $080C			; Exiting	current application	(internal)
-	DEFC	Dc_Ent = $0A0C			; Enter new application (internal)
-	DEFC	Dc_Gen = $200C			; Screen driver call (internal)
-	DEFC	Dc_Icl = $140C			; Invoke new CLI
-	DEFC	Dc_In  = $0E0C			; Read from CLI (internal)
-	DEFC	Dc_Ini = $060C			; Initialize the Director (internal)
-	DEFC	Dc_Nam = $0C0C			; Name current	application
-	DEFC	Dc_Nq  = $160C			; Handle Director/CLI enquiries (internal)
-	DEFC	Dc_Out = $100C			; Write to CLI	(internal)
-	DEFC	Dc_Pol = $220C			; Poll for card usage (internal)
-	DEFC	Dc_Prt = $120C			; Print to CLI	(internal)
+	DEFC	dc_alt = $1A0C			; Pass an	alternative character
+	DEFC	dc_bye = $080C			; Exiting	current application	(internal)
+	DEFC	dc_ent = $0A0C			; Enter new application (internal)
+	DEFC	dc_gen = $200C			; Screen driver call (internal)
+	DEFC	dc_icl = $140C			; Invoke new CLI
+	DEFC	dc_in  = $0E0C			; Read from CLI (internal)
+	DEFC	dc_ini = $060C			; Initialize the Director (internal)
+	DEFC	dc_nam = $0C0C			; Name current	application
+	DEFC	dc_nq  = $160C			; Handle Director/CLI enquiries (internal)
+	DEFC	dc_out = $100C			; Write to CLI	(internal)
+	DEFC	dc_pol = $220C			; Poll for card usage (internal)
+	DEFC	dc_prt = $120C			; Print to CLI	(internal)
 
-	DEFC	Dc_Rbd = $1C0C			; Rebind streams
+	DEFC	dc_rbd = $1C0C			; Rebind streams
 	; arguments:
 		DEFC	RB_IN = $00		; input stream	- new source of input
 		DEFC	RB_OUT = $01		; output stream - new destination for output
@@ -29,16 +31,16 @@ lstoff
 		DEFC	RB_OPT = $04		; output stream T -	copy	of output
 		DEFC	RB_PTT = $05		; printer	stream T -  copy of	output
 
-	DEFC	Dc_Scn = $240C			; Scan for card usage (internal)
-	DEFC	Dc_Sp  = $180C			; Handle Director/CLI settings (internal)
-	DEFC	Dc_Xin = $1E0C			; Examine	CLI input	(internal)
+	DEFC	dc_scn = $240C			; Scan for card usage (internal)
+	DEFC	dc_sp  = $180C			; Handle Director/CLI settings (internal)
+	DEFC	dc_xin = $1E0C			; Examine	CLI input	(internal)
 
-	DEFC	Os_Use = $EE06			; Fetch information	about process card usage	(internal)
-	DEFC	Os_Bye = $21			; Application exit.
-	DEFC	Os_Exit= $F606			; Quit process	(internal)
-	DEFC	Os_Ent = $FA06			; Enter an application (internal)
+	DEFC	os_use = $EE06			; Fetch information	about process card usage	(internal)
+	DEFC	os_bye = $21			; Application exit.
+	DEFC	os_exit= $F606			; Quit process	(internal)
+	DEFC	os_ent = $FA06			; Enter an application (internal)
 
-	DEFC	Os_Cli = $84			; CLI interface (internal)
+	DEFC	os_cli = $84			; CLI interface (internal)
 	; arguments:
 		DEFC	CL_RIM = $01		; get raw	input
 		DEFC	CL_MBC = $02		; meta/base to	character	conversion
@@ -50,16 +52,16 @@ lstoff
 		DEFC	CLM_SH = $01		; SHIFT key (bit) mask
 		DEFC	CLM_CT = $02		; DIAMOND	(bit) mask
 
-	DEFC	Os_Dom = $FE06			; Open director memory (internal)
-	DEFC	Os_Poll= $FC06			; Poll for an application (internal)
-	DEFC	Os_Stk = $F806			; Stack file current process (internal)
-	DEFC	Os_Wait= $7E			; Wait for event (internal)
+	DEFC	os_dom = $FE06			; Open director memory (internal)
+	DEFC	os_poll= $FC06			; Poll for an application (internal)
+	DEFC	os_stk = $F806			; Stack file current process (internal)
+	DEFC	os_wait= $7E			; Wait for event (internal)
 	; arguments:
 		DEFC	WT_ANY = $FF		; infinite
 
-	DEFC	Os_Fth = $DE06			; Free tri-handle (internal)
-	DEFC	Os_Gth = $E206			; Allocate tri-handle (internal)
-	DEFC	Os_Vth = $E006			; Verify tri-handle	(internal)
+	DEFC	os_fth = $DE06			; Free tri-handle (internal)
+	DEFC	os_gth = $E206			; Allocate tri-handle (internal)
+	DEFC	os_vth = $E006			; Verify tri-handle	(internal)
 	; arguments for all	three handle calls:
 		DEFC	TH_FILT =	$F0		; verify filter handle
 		DEFC	TH_WMG  =	$F1		; verify wildcard manager handle
@@ -67,21 +69,21 @@ lstoff
 
 ; Application Type manifests 1 (type byte1 in Application DOR):
 
-	DEFC	AT_Good =	1	 ; (BIT 0) well behaved
-	DEFC	AT_Bad  =	2	 ; (BIT 1) not	well	behaved, not killed	on pre-emption
-	DEFC	AT_Ugly =	4	 ; (BIT 2) not	well	behaved, killed on pre-emption
-	DEFC	AT_Popd =	8	 ; (BIT 3) popdown (if not set then an application)
-	DEFC	AT_Ones =	16	 ; (BIT 4) only one	application instance allowed
-	DEFC	AT_Draw =	32	 ; (BIT 5) OZ to redraw screen is possible (2K file)
-	DEFC	AT_Film =	64	 ; (BIT 6) File Manager Application (internal usage)
-	DEFC	AT_Boot =	128	 ; (BIT 7) Application Auto Boot (after	soft	reset)
+	DEFC	at_good =	1	 ; (BIT 0) well behaved
+	DEFC	at_bad  =	2	 ; (BIT 1) not	well	behaved, not killed	on pre-emption
+	DEFC	at_ugly =	4	 ; (BIT 2) not	well	behaved, killed on pre-emption
+	DEFC	at_popd =	8	 ; (BIT 3) popdown (if not set then an application)
+	DEFC	at_ones =	16	 ; (BIT 4) only one	application instance allowed
+	DEFC	at_draw =	32	 ; (BIT 5) OZ to redraw screen is possible (2K file)
+	DEFC	at_film =	64	 ; (BIT 6) File Manager Application (internal usage)
+	DEFC	at_boot =	128	 ; (BIT 7) Application Auto Boot (after	soft	reset)
 
 
 ; Application Type manifests 2 (type byte2 in Application DOR):
 ; (Bits 3	- 6 are ignored - should	be reset)
 
-	DEFC	AT2_Cl  =	1	 ; (BIT 0) Set	Caps	Lock	on creation entry
-	DEFC	AT2_Icl =	2	 ; (BIT 1) Set	'inverted' Caps Lock on creation entry
-	DEFC	AT2_Ie  =	128	 ; (BIT 7) Ignore error returns (should	be avoided).
+	DEFC	at2_cl  =	1	 ; (BIT 0) Set	Caps	Lock	on creation entry
+	DEFC	at2_icl =	2	 ; (BIT 1) Set	'inverted' Caps Lock on creation entry
+	DEFC	at2_ie  =	128	 ; (BIT 7) Ignore error returns (should	be avoided).
 
 lston
