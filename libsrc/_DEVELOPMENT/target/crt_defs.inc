@@ -7,7 +7,7 @@
 
 XDEF __EOK, __EDOM, __EINVAL, __ENOMEM, __ERANGE
 XDEF __EACCES, __ENOLCK, __EOVERFLOW, __ENOTSUP
-XDEF __EFBIG, __EBADF, __EUNKWN
+XDEF __EFBIG, __EBADF, __EMFILE, __EUNKWN
 
 defgroup
 {
@@ -22,6 +22,7 @@ defgroup
    __ENOTSUP,
    __EFBIG,
    __EBADF,
+   __EMFILE,
    __EUNKWN
 }
 

@@ -4,7 +4,8 @@ XDEF __error_string_default
 
 XREF __EOK, __EDOM, __EINVAL, __ENOMEM
 XREF __ERANGE, __EACCES, __ENOLCK, __EOVERFLOW
-XREF __ENOTSUP, __EFBIG, __EBADF, __EUNKWN
+XREF __ENOTSUP, __EFBIG, __EBADF, __EMFILE
+XREF __EUNKWN
 
 __error_strings:
 
@@ -50,6 +51,10 @@ __error_strings:
    
    defb __EBADF
    defm "EBADF - Invalid file"
+   defb 0
+   
+   defb __EMFILE
+   defm "EMFILE - Too many files"
    defb 0
    
    defb 0                      ; strings terminator
