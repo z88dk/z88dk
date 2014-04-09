@@ -84,7 +84,7 @@ defc __CLIB_OPT_IMATH_FAST = $00
 ;    _strtoi, _strtou, strtol, strtoul, scanf
 ;
 
-defc __CLIB_OPT_TXT2NUM = $04
+defc __CLIB_OPT_TXT2NUM = $00
 
 ; bit 0 = $01 = enable specialized binary conversion for integers
 ; bit 1 = $02 = enable specialized octal conversion for integers
