@@ -60,6 +60,7 @@ extern int     fgetpos(FILE *stream, fpos_t *pos);
 extern char   *fgets(char *s, int n, FILE *stream);
 extern void    flockfile(FILE *stream);
 extern FILE   *fmemopen(void *buf, size_t size, char *mode);
+extern FILE   *fopen(const char *filename, const char *mode);
 extern int     fprintf(FILE *stream, char *format, ...);
 extern int     fputc(int c, FILE *stream);
 extern int     fputs(char *s, FILE *stream);
@@ -106,6 +107,7 @@ extern int     fflush_unlocked(FILE *stream);
 extern int     fgetc_unlocked(FILE *stream);
 extern int     fgetpos_unlocked(FILE *stream, fpos_t *pos);
 extern char   *fgets_unlocked(char *s, int n, FILE *stream);
+extern FILE   *fopen_unlocked(const char *filename, const char *mode);
 extern int     fprintf_unlocked(FILE *stream, char *format, ...);
 extern int     fputc_unlocked(int c, FILE *stream);
 extern int     fputs_unlocked(char *s, FILE *stream);
@@ -147,6 +149,7 @@ extern int    __LIB__               fgetpos(FILE *stream, fpos_t *pos);
 extern char   __LIB__              *fgets(char *s, int n, FILE *stream);
 extern void   __LIB__ __FASTCALL__  flockfile(FILE *stream);
 extern FILE   __LIB__              *fmemopen(void *buf, size_t size, char *mode);
+extern FILE   __LIB__              *fopen(const char *filename, const char *mode);
 extern int    __LIB__               fprintf(FILE *stream, char *format, ...);
 extern int    __LIB__               fputc(int c, FILE *stream);
 extern int    __LIB__               fputs(char *s, FILE *stream);
@@ -193,6 +196,7 @@ extern int    __LIB__ __FASTCALL__  fflush_unlocked(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fgetc_unlocked(FILE *stream);
 extern int    __LIB__               fgetpos_unlocked(FILE *stream, fpos_t *pos);
 extern char   __LIB__              *fgets_unlocked(char *s, int n, FILE *stream);
+extern FILE   __LIB__              *fopen_unlocked(const char *filename, const char *mode);
 extern int    __LIB__               fprintf_unlocked(FILE *stream, char *format, ...);
 extern int    __LIB__               fputc_unlocked(int c, FILE *stream);
 extern int    __LIB__               fputs_unlocked(char *s, FILE *stream);
@@ -224,6 +228,7 @@ extern FILE   __LIB__ __CALLEE__   *_fmemopen__callee(void **bufp, size_t *sizep
 extern int    __LIB__ __CALLEE__    fgetpos_callee(FILE *stream, fpos_t *pos);
 extern char   __LIB__ __CALLEE__   *fgets_callee(char *s, int n, FILE *stream);
 extern FILE   __LIB__ __CALLEE__   *fmemopen_callee(void *buf, size_t size, char *mode);
+extern FILE   __LIB__ __CALLEE__   *fopen_callee(const char *filename, const char *mode);
 extern int    __LIB__ __CALLEE__    fputc_callee(int c, FILE *stream);
 extern int    __LIB__ __CALLEE__    fputs_callee(char *s, FILE *stream);
 extern size_t __LIB__ __CALLEE__    fread_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -247,6 +252,7 @@ extern int    __LIB__ __CALLEE__    vsscanf_callee(char *s, char *format, void *
 
 extern int    __LIB__ __CALLEE__    fgetpos_unlocked_callee(FILE *stream, fpos_t *pos);
 extern char   __LIB__ __CALLEE__   *fgets_unlocked_callee(char *s, int n, FILE *stream);
+extern FILE   __LIB__ __CALLEE__   *fopen_unlocked_callee(const char *filename, const char *mode);
 extern int    __LIB__ __CALLEE__    fputc_unlocked_callee(int c, FILE *stream);
 extern int    __LIB__ __CALLEE__    fputs_unlocked_callee(char *s, FILE *stream);
 extern size_t __LIB__ __CALLEE__    fread_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -268,6 +274,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 #define fgetpos(a,b)                fgetpos_callee(a,b)
 #define fgets(a,b,c)                fgets_callee(a,b,c)
 #define fmemopen(a,b,c)             fmemopen_callee(a,b,c)
+#define fopen(a,b)                  fopen_callee(a,b)
 #define fputc(a,b)                  fputc_callee(a,b)
 #define fputs(a,b)                  fputs_callee(a,b)
 #define fread(a,b,c,d)              fread_callee(a,b,c,d)
@@ -291,6 +298,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 
 #define fgetpos_unlocked(a,b)       fgetpos_unlocked_callee(a,b)
 #define fgets_unlocked(a,b,c)       fgets_unlocked_callee(a,b,c)
+#define fopen_unlocked(a,b)         fopen_unlocked_callee(a,b)
 #define fputc_unlocked(a,b)         fputc_unlocked_callee(a,b)
 #define fputs_unlocked(a,b)         fputs_unlocked_callee(a,b)
 #define fread_unlocked(a,b,c,d)     fread_unlocked_callee(a,b,c,d)
