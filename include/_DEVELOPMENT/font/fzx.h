@@ -334,12 +334,15 @@ extern void __LIB__ _ff_dkud1_UpnUp2(void);
 #if __SDCC | __SDCC_IX | __SDCC_IY
 
 extern struct fzx_font *ff_ind_vga;
+extern struct fzx_font *ff_ind_SinclairLatin1;
 
 #else
 
 #define ff_ind_vga             ((struct fzx_font *)(_ff_ind_vga))
+#define ff_ind_SinclairLatin1  ((struct fzx_font *)(_ff_ind_SinclairLatin1))
 
 extern void __LIB__ _ff_ind_vga(void);
+extern void __LIB__ _ff_ind_SinclairLatin1(void);
 
 #endif
 
