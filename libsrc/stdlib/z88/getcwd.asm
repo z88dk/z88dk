@@ -11,10 +11,10 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.6 2009-06-22 21:44:17 dom Exp $
+; $Id: getcwd.asm,v 1.7 2014-04-09 08:05:57 stefano Exp $
 
                 INCLUDE "syspar.def"
-		INCLUDE	"memory.def"
+                INCLUDE	"memory.def"
 
                 XLIB    getcwd
                 LIB    readbyte        ;standard.lib
@@ -36,7 +36,7 @@
 
         push    de
         push    bc
-        ld      bc,NQ_dir       ;ask for current directory
+        ld      bc,nq_dir       ;ask for current directory
         call_oz(os_nq)
         exx
         pop     bc              ;max len

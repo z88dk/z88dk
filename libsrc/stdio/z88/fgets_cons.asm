@@ -12,11 +12,11 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: fgets_cons.asm,v 1.5 2014-04-09 08:05:57 stefano Exp $
 ;
 
                 INCLUDE "stdio.def"
-		INCLUDE	"syspar.def"
+                INCLUDE	"syspar.def"
 
                 XLIB    fgets_cons
                 XREF    processcmd
@@ -26,7 +26,7 @@
 ;
 .fgets_cons
 	xor	a
-	ld	bc,NQ_Wcur
+	ld	bc,nq_wcur
 	call_oz(os_nq)		;gives x in c, y in b
 	push	bc		;keep it
         ld      hl,4

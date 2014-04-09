@@ -12,11 +12,11 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: gets.asm,v 1.3 2014-04-09 08:05:57 stefano Exp $
 ;
 
                 INCLUDE "stdio.def"
-		INCLUDE	"syspar.def"
+                INCLUDE	"syspar.def"
 
                 XLIB    gets
                 XREF    processcmd
@@ -26,7 +26,7 @@
 ;
 .gets
 	xor	a
-	ld	bc,NQ_Wcur
+	ld	bc,nq_wcur
 	call_oz(os_nq)		;gives x in c, y in b
 	push	bc		;keep it
         ld      hl,4
