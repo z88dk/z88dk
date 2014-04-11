@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.26 2013-10-21 14:23:44 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.27 2014-04-11 04:59:09 aralbrec Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -22,6 +22,12 @@
 ;
 
                 INCLUDE "zcc_opt.def"
+
+
+===============================================================================
+IF startup != 3
+===============================================================================
+
 
 ;--------
 ; Some scope definitions
@@ -417,3 +423,137 @@ fasign:         defb    0
 
 ENDIF
 
+
+===============================================================================
+ELSE
+===============================================================================
+
+; startup == 3
+; msx cartridge rom
+
+; April 2014
+; submitted by Timmy
+
+; For cartridge I am not sure what facilities are available from the MSX
+; system, if any.  So this CRT only provides the bare minimum.
+
+;
+;  Declarations
+;
+
+	XREF _main		; main() entrance point
+	XDEF	l_dcal	; jp(hl) instruction
+	XDEF cleanup
+
+;
+;  Main Code Entrance Point
+;
+
+	org $4000
+
+; ROM header
+
+	defb $41,$42,$10,$40,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+	jp start
+
+defm  "wai's msx rom"
+
+start:
+	di
+	ld sp, ($FC4A)
+	ei
+
+; port fixing; required for ROMs
+
+	in a,($A8)
+	and a, $CF
+	ld d,a
+	in a,($A8)
+	and a, $0C
+	add a,a
+	add a,a
+	or d
+	out ($A8),a
+
+; init fp seed
+
+	ld hl, $8080
+	ld (fp_seed),hl
+
+; init int seed
+
+        ld hl,1
+        ld (_std_seed),hl
+
+; init heap
+
+        ld hl,0
+        ld (_heap),hl
+        ld (_heap+2),hl
+        
+IF HEAPSIZE > 4
+        
+        ld hl,_heap_area
+        ld bc,HEAPSIZE
+        ld de,_heap
+        
+        LIB HeapSbrk_callee
+        XREF ASMDISP_HEAPSBRK_CALLEE
+        
+        call HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
+
+ENDIF
+
+; call main now
+
+	call _main
+
+; end program
+
+cleanup:
+endloop:
+	jr endloop
+
+
+l_dcal:	jp	(hl)		;Used for call by function pointer
+
+
+;--------
+; Static variables are kept in RAM in high memory
+;--------
+
+XDEF _std_seed
+XDEF _heap
+XDEF CRT_AVAILABLE_MEMORY
+
+DEFVARS $C000
+{
+
+_std_seed	ds.w	1	;Integer seed
+fp_seed		ds.w	3	;Floating point seed, unused ATM
+extra		ds.w	3	;Floating point temp variable
+fa		ds.w	3	;Floating point accumulator
+fasign		ds.b	1	;Floating point temp store
+_heap           ds.l    1       ;process heap pointer
+
+IF HEAPSIZE > 4
+
+   _heap_area   ds.b    HEAPSIZE  ; initial heap
+
+ENDIF
+
+CRT_AVAILABLE_MEMORY
+}
+
+
+;--------
+; Now, include the math routines if needed..
+;--------
+
+IF NEED_floatpack
+        INCLUDE "float.asm"
+ENDIF
+
+===============================================================================
+ENDIF
+===============================================================================
