@@ -1,13 +1,15 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; l_mulu_24_16x8
 ; called by __strtou
-
+;
 ; compute: ahl = hl * e
 ; can alter: af, bc, de, hl
-
-XLIB l_mulu_24_16x8
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "clib_cfg.asm"
+
+XLIB l_mulu_24_16x8
 
 l_mulu_24_16x8:
 

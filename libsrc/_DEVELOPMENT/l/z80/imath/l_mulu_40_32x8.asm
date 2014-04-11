@@ -1,13 +1,15 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; l_mulu_40_32x8
 ; called by __strtoul
-
+;
 ; compute:  adehl = dehl * a
 ; can alter: af, bc, de, hl, ixh
-
-XLIB l_mulu_40_32x8
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "clib_cfg.asm"
+
+XLIB l_mulu_40_32x8
 
 l_mulu_40_32x8:
 

@@ -1,14 +1,16 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; l_mulu_16_16x16
 ; called by asm_heap_calloc, asm_bsearch, asm_qsort
-
+;
 ; compute: hl = hl * de
 ; can alter: af, bc, de, hl
 ; carry set on overflow
-
-XLIB l_mulu_16_16x16
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "clib_cfg.asm"
+
+XLIB l_mulu_16_16x16
 
 l_mulu_16_16x16:
 

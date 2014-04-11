@@ -1,14 +1,16 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; l_divs_32_32x32
 ; called by asm__ldiv
-
+;
 ; compute:  dehl = dehl' / dehl, dehl' = dehl' % dehl
 ; test for divide by zero
 ; can alter: af, bc, de, hl, bc, de, hl, ix
-
-XLIB l_divs_32_32x32
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "clib_cfg.asm"
+
+XLIB l_divs_32_32x32
 
 l_divs_32_32x32:
 
