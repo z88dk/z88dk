@@ -5,7 +5,7 @@
 ;
 ;       Exchange FA with top of stack (under ret address)
 ;
-;	$Id: dswap.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;	$Id: dswap.asm,v 1.2 2014-04-11 11:14:01 stefano Exp $
 
 
 		XLIB	dswap
@@ -14,12 +14,12 @@
 
 		XREF	dpush
 
-.DSWAP  POP     HL      ;return addr
+.dswap  POP     HL      ;return addr
         POP     DE
         POP     IX
         POP     BC
         EXX             ;protect the values
-        CALL    DPUSH   ;push FA
+        CALL    dpush   ;push FA
         EXX             ;recover the values
         PUSH    HL      ;replace return addr, fall into...
         jp      ldfabc

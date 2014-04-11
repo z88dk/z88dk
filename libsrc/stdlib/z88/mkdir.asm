@@ -8,7 +8,7 @@
 ; This doesn't check for validity of filename at all.
 ;
 ; -----
-; $Id: mkdir.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+; $Id: mkdir.asm,v 1.5 2014-04-11 11:14:01 stefano Exp $
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
@@ -24,7 +24,7 @@
 
 .mkdir
 ;Repeating stuff from fopen, very bad but...
-        ld      d,op_dir        ;make directory
+        ld      d,OP_DIR        ;make directory
 ;Try to open the file
 ;d=access mode..
 ;Create some room on the stack for the filename to be expanded into..

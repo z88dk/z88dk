@@ -12,7 +12,7 @@
  *   2  SEEK_END from end of file (always -ve)
  *
  * -----
- * $Id: lseek.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: lseek.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
  */
 
 
@@ -42,7 +42,7 @@ long lseek(int fd, long posn, int whence)
         ld      de,-1
         ret     c               ;error
 ; Get the position of the file, use frm to do it
-        ld      a,fa_ptr
+        ld      a,FA_PTR
         call_oz(os_frm)         ;must succeed if we get this far!
         ld      l,c             ;hl=bc
         ld      h,b

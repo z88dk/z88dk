@@ -4,6 +4,8 @@ lstoff
 
 ; The information below is defined in Developers Notes, release 2.00
 ; (C) Cambridge Computer 1989
+;
+; $Id: error.def,v 1.3 2014-04-11 11:13:56 stefano Exp $
 
 
 ; Error return codes:
@@ -63,9 +65,9 @@ lstoff
 		DEFC SC_ENA = $05	; Enable Escape Detection
 		DEFC SC_DIS = $06	; Disable Escape Detection
 
-	DEFC Os_Erh = $75		; Set (install) Error Handler
-	DEFC Os_Erc = $72		; Get error context
-	DEFC Gn_Err = $4A09		; Display an interactive error box
-	DEFC Gn_Esp = $4C09		; Return pointer to a system error message
+	DEFC os_erh = $75		; Set (install) Error Handler
+	DEFC os_erc = $72		; Get error context
+	DEFC gn_err = $4A09		; Display an interactive error box
+	DEFC gn_esp = $4C09		; Return pointer to a system error message
 
 lston

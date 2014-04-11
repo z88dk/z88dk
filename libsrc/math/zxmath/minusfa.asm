@@ -4,7 +4,7 @@
 ;
 ;       8/1/03 - Stefano Bodrato
 ;
-;       $Id: minusfa.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: minusfa.asm,v 1.3 2014-04-11 11:14:01 stefano Exp $
 ;
 ;       Negate a floating point number
 ;
@@ -25,7 +25,7 @@ ENDIF
 
                 XREF    fa
 
-.MINUSFA LD     HL,FA+4
+.minusfa LD     HL,fa+4
         LD      A,(HL)
         XOR     $80
         LD      (HL),A

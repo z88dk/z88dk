@@ -27,7 +27,7 @@
 	ld	c,(ix+6+5)	;number
 	ld	e,(ix+2)	;buffer
 	ld	d,(ix+3)
-	fpp(fp_str)
+	fpp(FP_STR)
 	ret
 
 	

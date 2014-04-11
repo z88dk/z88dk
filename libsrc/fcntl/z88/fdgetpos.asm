@@ -5,7 +5,7 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+;	$Id: fdgetpos.asm,v 1.4 2014-04-11 11:14:00 stefano Exp $
 ;
 
                 INCLUDE "fileio.def"
@@ -25,7 +25,7 @@
 	push	de
 	push	bc
         push    de              ;store dumping place
-        ld      a,fa_ptr
+        ld      a,FA_PTR
         call_oz(os_frm)
         pop     hl              ;dumping place
 	jr	c,fdgetpos_error

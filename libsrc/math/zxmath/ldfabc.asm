@@ -8,7 +8,7 @@
 
 		XREF	fa
 
-.LDFABC LD      (FA),DE
-        LD      (FA+2),IX
-        LD      (FA+4),BC
+.ldfabc LD      (fa),DE
+        LD      (fa+2),IX
+        LD      (fa+4),BC
         RET

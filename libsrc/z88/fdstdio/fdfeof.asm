@@ -34,7 +34,7 @@
 .feof1
         push    de
         pop     ix
-        ld      a,fa_eof
+        ld      a,FA_EOF
         call_oz(os_frm)
         jp      nz,feof_abort
         jp      c,feof_abort

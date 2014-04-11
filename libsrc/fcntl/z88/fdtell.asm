@@ -7,7 +7,7 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 ;
 ;
-;	$Id: fdtell.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+;	$Id: fdtell.asm,v 1.4 2014-04-11 11:14:00 stefano Exp $
 ;
 
                 INCLUDE "fileio.def"
@@ -21,7 +21,7 @@
 	pop	ix	;fd
 	push	ix
 	push	bc
-        ld      a,fa_ptr
+        ld      a,FA_PTR
         call_oz(os_frm)
         push    bc              ;get the var into our preferred regs
         pop     hl

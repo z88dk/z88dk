@@ -4,26 +4,28 @@ lstoff
 
 ; The information below is defined	in Developers Notes, release 3.00
 ; (c) Cambridge Computer	1989
+;
+; $Id: time.def,v 1.3 2014-04-11 11:13:57 stefano Exp $
 
-	DEFC	Gn_Gmt = $1A09		; get (read) machine time in internal format
-	DEFC	Gn_Pmt = $1E09		; put (set) machine	date
-	DEFC	Gn_Msc = $2009		; Miscellaneous time operations
-	DEFC	Gn_Gtm = $0A09		; convert	ASCII string to internal	time	format
-	DEFC	Gn_Ptm = $0C09		; convert	internal time to ASCII string
-	DEFC	Gn_Sdo = $0E09		; convert	real	time	to time to elapse
-	DEFC	Os_Dly = $D606		; delay a	given period
-	DEFC	Gn_Gdt = $0609		; convert	ASCII string to internal	date
-	DEFC	Gn_Pdt = $0809		; convert	internal date to ASCII string
-	DEFC	Gn_Die = $1409		; convert	from	internal to zoned format
-	DEFC	Gn_Dei = $1609		; convert	from	zoned format to internal	format
-	DEFC	Gn_Gmd = $1809		; get current machine date in	internal format
-	DEFC	Gn_Pmd = $1C09		; set machine date
+	DEFC	gn_gmt = $1A09		; get (read) machine time in internal format
+	DEFC	gn_pmt = $1E09		; put (set) machine	date
+	DEFC	gn_msc = $2009		; Miscellaneous time operations
+	DEFC	gn_gtm = $0A09		; convert	ASCII string to internal	time	format
+	DEFC	gn_ptm = $0C09		; convert	internal time to ASCII string
+	DEFC	gn_sdo = $0E09		; convert	real	time	to time to elapse
+	DEFC	os_dly = $D606		; delay a	given period
+	DEFC	gn_gdt = $0609		; convert	ASCII string to internal	date
+	DEFC	gn_pdt = $0809		; convert	internal date to ASCII string
+	DEFC	gn_die = $1409		; convert	from	internal to zoned format
+	DEFC	gn_dei = $1609		; convert	from	zoned format to internal	format
+	DEFC	gn_gmd = $1809		; get current machine date in	internal format
+	DEFC	gn_pmd = $1C09		; set machine date
 
-	DEFC	Os_Ht  = $F206		; hardware time manipulation (internal OZ usage)
+	DEFC	os_ht  = $F206		; hardware time manipulation (internal OZ usage)
 		DEFC	HT_RES = $01	; reset hardware timer
 		DEFC	HT_RD  = $02	; read hardware timer
 		DEFC	HT_MDT = $03	; read monthy/date/time address
 
-	DEFC	Os_Ust = $78		; update small	timer (internal)
+	DEFC	os_ust = $78		; update small	timer (internal)
 
 lston

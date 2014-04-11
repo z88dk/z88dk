@@ -4,7 +4,7 @@
 	lib leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea.asm,v 1.1 2002-03-28 09:41:14 stefano Exp $
+;	$Id: clrarea.asm,v 1.2 2014-04-11 11:14:00 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -48,7 +48,7 @@
 				ld	(ix+0),l		; remember y
 				ld	(ix+1),c		; remember height
 				push	bc
-				call	PixelAddress	; adr0, bitpos0 = PixelAddress(x,y)
+				call	pixeladdress	; adr0, bitpos0 = PixelAddress(x,y)
 				ld	(ix+2),e
 				ld	(ix+3),d
 				call	leftbitmask
@@ -59,7 +59,7 @@
 				dec	a
 				ld	h,a
 				push	de
-				call	PixelAddress	; adr1, bitpos1 = PixelAddress(x+width-1,y)
+				call	pixeladdress	; adr1, bitpos1 = PixelAddress(x+width-1,y)
 				call	rightbitmask
 				ld	(ix+5),a		; bitmask1 = LeftBitMask(bitpos0)
 				pop	hl

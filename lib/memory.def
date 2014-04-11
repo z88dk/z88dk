@@ -4,51 +4,52 @@ lstoff
 
 ; The information below is defined	in Developers Notes, release 3.00
 ; (c) Cambridge Computer	1989-95
+; $Id: memory.def,v 1.3 2014-04-11 11:13:57 stefano Exp $
 
 ; Memory allocation, deallocation:
 
-	DEFC	Os_Mop = $4E			; Open memory (allocate memory pool)
-	DEFC	Os_Mal = $54			; Allocate memory
-	DEFC	Os_Axp = $D206			; Allocate explicit	page	(internal	OZ usage)
-	DEFC	Os_Mfr = $57			; Free memory
-	DEFC	Os_Mcl = $51			; Close memory	(free memory pool)
+	DEFC	os_mop = $4E			; Open memory (allocate memory pool)
+	DEFC	os_mal = $54			; Allocate memory
+	DEFC	os_axp = $D206			; Allocate explicit	page	(internal	OZ usage)
+	DEFC	os_mfr = $57			; Free memory
+	DEFC	os_mcl = $51			; Close memory	(free memory pool)
 
 ; Memory information movement:
 
-	DEFC	Os_Bde = $DA06			; Copy bytes to extended	address
-	DEFC	Os_Bhl = $DC06			; Copy bytes from extended address
-	DEFC	Gn_Rbe = $3E09			; Read byte at	extended address
-	DEFC	Gn_Wbe = $4009			; Write byte to extended	address
+	DEFC	os_bde = $DA06			; Copy bytes to extended	address
+	DEFC	os_bhl = $DC06			; Copy bytes from extended address
+	DEFC	gn_rbe = $3E09			; Read byte at	extended address
+	DEFC	gn_wbe = $4009			; Write byte to extended	address
 
 ; Memory comparison:
 
-    DEFC Gn_Cme  = $4209			; compare	null-terminated strings
+    DEFC gn_cme  = $4209			; compare	null-terminated strings
 
 ; Memory/bank binding:
 
-	DEFC	Os_Mgb = $5A			; Get current binding
-	DEFC	Os_Mpb = $5D			; Set (Put) new binding
-	DEFC	Os_Bix = $60			; Bind in	extended address (internal)
-	DEFC	Os_Box = $63			; Restore	bindings after	OS_BIX (internal)
+	DEFC	os_mgb = $5A			; Get current binding
+	DEFC	os_mpb = $5D			; Set (Put) new binding
+	DEFC	os_bix = $60			; Bind in	extended address (internal)
+	DEFC	os_box = $63			; Restore	bindings after	os_BIX (internal)
 
 ; Fast code interface for bank switching (A=1)
 
-	DEFC	Os_Fc  = $8A
+	DEFC	os_fc  = $8A
 
-; Linked list manipulation calls (often	used	in combination	with	Os_Mal):
+; Linked list manipulation calls (often	used	in combination	with	os_Mal):
 
-	DEFC	Gn_Xin = $4609
-	DEFC	Gn_Xnx = $4409
-	DEFC	Gn_Xdl = $4809
+	DEFC	gn_xin = $4609
+	DEFC	gn_xnx = $4409
+	DEFC	gn_xdl = $4809
 
-; Memory Masks	used	by Os_Mop:
+; Memory Masks	used	by os_Mop:
 
 	DEFC	MM_S0 = $00			; Segment	0 mask
 	DEFC	MM_S1 = $40			; Segment	1 mask
 	DEFC	MM_S2 = $80			; Segment	2 mask
 	DEFC	MM_S3 = $C0			; Segment	3 mask
 
-; additional allocation directives	for Os_Mop:
+; additional allocation directives	for os_Mop:
 	; Source of memory (to be allocated):
 	DEFC	MM_FIX = $02			; fixed workspace (not subject to swapping)
 
@@ -63,7 +64,7 @@ lstoff
 	DEFC	MM_MUL = $20			; use multiple	banks
 
 
-; Segment	specifiers used by Os_Mgb, Os_Mpb:
+; Segment	specifiers used by os_Mgb, os_Mpb:
 
 	DEFC	MS_S0 = $00			; Segment	0 specifier
 	DEFC	MS_S1 = $01			; Segment	1 specifier
@@ -72,7 +73,7 @@ lstoff
 
 ; Low level OZ	memory organisation	definitions:
 ; (these manifests represents	bit identifiers in a configuration	byte	that
-; is	(returned	by OS_NQ,	NQ_SLT):
+; is	(returned	by os_NQ,	NQ_SLT):
 
 	DEFC	BU_EPR = 1			; bank is	EPROM
 	DEFC	BU_ROM = 2			; bank is	ROM

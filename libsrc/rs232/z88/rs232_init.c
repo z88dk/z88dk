@@ -16,7 +16,7 @@ u8_t __FASTCALL__ rs232_init()
 {
 #asm
 	INCLUDE	"serintfc.def"
-	ld	l,si_sft
+	ld	l,SI_SFT
 	call_oz(os_si)
 	ld	hl,RS_ERR_OK
 #endasm

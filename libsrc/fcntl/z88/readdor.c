@@ -6,7 +6,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: readdor.c,v 1.4 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: readdor.c,v 1.5 2014-04-11 11:14:00 stefano Exp $
  */
 
 
@@ -26,7 +26,7 @@ void readdor(int handle, char type, char len, void *buf)
 	ld	h,(iy+9)
 	push	hl
 	pop	ix		;os_dor wants it in ix
-	ld	a,DR_Rd		;read dor
+	ld	a,dr_rd		;read dor
 	call_oz(os_dor)
 #endasm
 }

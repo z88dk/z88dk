@@ -6,7 +6,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: closedor.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: closedor.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
  */
 
 #include <z88.h>
@@ -19,7 +19,7 @@ void closedor(int handle)
 	pop	ix
 	push	ix
 	push	de
-	ld	a,DR_Fre
+	ld	a,dr_fre
 	call_oz(os_dor)
 #endasm
 }

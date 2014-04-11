@@ -1,13 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
 	
-	XLIB	w_Line
+	XLIB	w_line
 
-	LIB	w_Line_r
+	LIB	w_line_r
 
 	XREF	COORDS
 
 ;
-;	$Id: w_line.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_line.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -18,7 +18,7 @@
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
 
-.w_Line
+.w_line
 		ex	de,hl
 		ld	bc,(COORDS+2)
 		or	a

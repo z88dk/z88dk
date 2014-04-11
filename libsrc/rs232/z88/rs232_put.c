@@ -17,7 +17,7 @@ u8_t rs232_put(i8_t char)
 #asm
 	INCLUDE	"serintfc.def"
 	ld	a,l	;get byte
-	ld	l,si_pbt
+	ld	l,SI_PBT
 	ld	bc,0	;timeout
 	call_oz(os_si)
 	ld	hl,RS_ERR_OK

@@ -4,7 +4,7 @@
 	lib leftbitmask, rightbitmask
 
 ;
-;	$Id: lftscrol.asm,v 1.2 2001-04-18 13:21:37 stefano Exp $
+;	$Id: lftscrol.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -49,7 +49,7 @@
 				ld	(ix+1),l		; remember y
 				ld	(ix+2),c		; remember height
 				push	bc
-				call	PixelAddress	; adr0, bitpos0 = PixelAddress(x,y)
+				call	pixeladdress	; adr0, bitpos0 = PixelAddress(x,y)
 				ld	(ix+3),e
 				ld	(ix+4),d
 				call	leftbitmask
@@ -60,7 +60,7 @@
 				dec	a
 				ld	h,a
 				push	de
-				call	PixelAddress	; adr1, bitpos1 = PixelAddress(x+width-1,y)
+				call	pixeladdress	; adr1, bitpos1 = PixelAddress(x+width-1,y)
 				ld	(ix+5),e
 				ld	(ix+6),d
 				call	rightbitmask
@@ -205,6 +205,6 @@
 ;
 ; OUT: H = scrolled	byte
 ;
-.ScrollLeft		add	hl,hl
+.scrollleft		add	hl,hl
 				djnz	scrollleft
 				ret

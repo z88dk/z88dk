@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: float.asm,v 1.3 2014-04-11 11:14:01 stefano Exp $
 ;
 
 
@@ -43,7 +43,7 @@ IF TINYMODE
 	jr	z,nointneg
 
 	rst	ZXFP_BEGIN_CALC
-	defb	ZXFP_negate
+	defb	ZXFP_NEGATE
 	defb	ZXFP_END_CALC
 
 .nointneg
@@ -78,7 +78,7 @@ ELSE
 	jr	z,nointneg
 
 	rst	ZXFP_BEGIN_CALC
-	defb	ZXFP_negate
+	defb	ZXFP_NEGATE
 	defb	ZXFP_END_CALC
 
 .nointneg

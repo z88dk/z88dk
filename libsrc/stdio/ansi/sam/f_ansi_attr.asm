@@ -14,7 +14,7 @@
 ;
 ;       Frode Tennebø - 29/12/2002
 ;
-;       $Id: f_ansi_attr.asm,v 1.1 2003-02-04 09:10:20 stefano Exp $
+;       $Id: f_ansi_attr.asm,v 1.2 2014-04-11 11:14:01 stefano Exp $
 ;
 
         XLIB    ansi_attr
@@ -130,7 +130,7 @@
 ;        ld      (23109),a
         ld      a,16            ; INK
         rst     16
-        ld      a,(backgr)      ; fetch colour
+        ld      a,(BACKGR)      ; fetch colour
         rst     16
         ret
 ;.oldattr
@@ -142,7 +142,7 @@
 ;        ld      (23109),a
         ld      a,16            ; INK
         rst     16
-        ld      a,(foregr)      ; fetch colour
+        ld      a,(FOREGR)      ; fetch colour
         rst     16
         ret
 .nocinvis
@@ -164,7 +164,7 @@
         ld      a,16            ; INK
         rst     16
         ld      a,e             ; colour
-        ld      (foregr),a      ; store
+        ld      (FOREGR),a      ; store
         rst     16
 ;        ld      a,(23109)
 ;        and     @11111000
@@ -193,7 +193,7 @@
         ld      a,17            ; PAPER
         rst     16
         ld      a,e             ; colour
-        ld      (backgr),a      ; store
+        ld      (BACKGR),a      ; store
         rst     16
 
 ;        ld      a,(23109)

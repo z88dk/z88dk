@@ -18,7 +18,7 @@
 ;       M - Delete lines: to be completed
 ;
 ;
-;       $Id: f_ansi.asm,v 1.11 2014-03-30 10:46:03 pauloscustodio Exp $
+;       $Id: f_ansi.asm,v 1.12 2014-04-11 11:14:01 stefano Exp $
 ;
 
         XLIB    f_ansi
@@ -75,7 +75,7 @@
 ;------------------------
  cp     12  ; Form Feed (CLS) ?
 ;------------------------
-        jr     nz,NoFF
+        jr     nz,noFF
         call   docls
         jr     loopn
 .noFF
@@ -938,7 +938,7 @@ push de
         ld      a,(hl)
         cp      6
         jp      z, f_cmd_exit ; only mode 6 is supported
-        call    ansi_dsr6
+        call    ansi_DSR6
         jp      f_cmd_exit
 .no_n
 

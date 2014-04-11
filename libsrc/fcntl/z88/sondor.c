@@ -8,7 +8,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: sondor.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: sondor.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
  */
 
 
@@ -22,7 +22,7 @@ int sondor(int handle, char *type)
 	pop	ix
 	push	ix
 	push	de
-	ld	a,DR_Son
+	ld	a,dr_son
 	call_oz(os_dor)
 	pop	de
 	pop	hl

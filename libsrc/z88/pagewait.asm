@@ -20,7 +20,7 @@
                 INCLUDE "saverst.def"
 
 .pagewait
-        ld      a,SR_pwt
+        ld      a,SR_PWT
         call_oz(os_sr)
         ld      l,a
         ld      h,0

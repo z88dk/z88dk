@@ -8,7 +8,7 @@
 
 		XREF	fa
 
-.LDBCFA LD      DE,(FA)
-        LD      IX,(FA+2)
-        LD      BC,(FA+4)
+.ldbcfa LD      DE,(fa)
+        LD      IX,(fa+2)
+        LD      BC,(fa+4)
         RET

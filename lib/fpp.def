@@ -4,6 +4,9 @@ lstoff
 
 ; The information below is copied from Developers	Notes, release	3.00
 ; (c) Cambridge Computer	1989-95
+;
+; $Id: fpp.def,v 1.3 2014-04-11 11:13:57 stefano Exp $
+
 
 ; Floating point package	(FPP):
 

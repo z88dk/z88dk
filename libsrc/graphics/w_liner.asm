@@ -8,7 +8,7 @@
         XREF    COORDS
 
 ;
-;       $Id: w_liner.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;       $Id: w_liner.asm,v 1.2 2014-04-11 11:14:00 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -257,7 +257,7 @@
 ;       ..BCDEHL/IXIY   same
 ;       AF....../....   different
 ;
-.SGN                    ld      a,h
+.sgn                    ld      a,h
                         or      l
                         ld	a,2
                         ret     z               ; integer is zero, return 0...
@@ -280,7 +280,7 @@
 ;       A.BCDE../IXIY   same
 ;       .F....HL/....   different
 ;
-.ABS                    bit     7,h
+.abs                    bit     7,h
                         ret     z               ; integer is positive...
                         push    de
                         ex      de,hl

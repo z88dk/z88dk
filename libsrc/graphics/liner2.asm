@@ -5,7 +5,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: liner2.asm,v 1.2 2011-08-12 17:04:59 pauloscustodio Exp $
+;	$Id: liner2.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
 ;
 
 ;	...SLLLOOOW Variant by Stefano Bodrato
@@ -306,7 +306,7 @@
 ;	..BCDEHL/IXIY	same
 ;	AF....../....	different
 ;
-.SGN				ld	a,h
+.sgn				ld	a,h
 				or	l
 				ret	z				; integer	is zero, return 0...
 				bit	7,h
@@ -328,7 +328,7 @@
 ;	A.BCDE../IXIY	same
 ;	.F....HL/....	different
 ;
-.ABS				bit	7,h
+.abs				bit	7,h
 				ret	z				; integer	is positive...
 				push	de
 				ex	de,hl
