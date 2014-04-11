@@ -106,4 +106,6 @@ memstream:
    push ix
    pop hl
    
-   jp asm_free
+   call asm_free
+   jp error_znc
+
