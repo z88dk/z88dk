@@ -5,7 +5,7 @@
 @error/error.lst
 @font/fzx/fzx_asm.lst
 @font/fzx/arch/spectrum/spectrum_asm.lst
-@l/l_fast.lst
+@l/l.lst
 @locale/locale.lst
 @stdio/stdio_asm.lst
 @stdlib/stdlib_asm.lst
