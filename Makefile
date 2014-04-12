@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.42 2014-02-22 21:43:30 dom Exp $
+#	$Id: Makefile,v 1.43 2014-04-12 12:10:51 pauloscustodio Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -90,7 +90,7 @@ test:
 
 clean: clean-bins
 	cd libsrc ; $(MAKE) clean
-	cd lib/config ; $(RM) *.cfg
+#	cd lib/config ; $(RM) *.cfg		# .cfg are now stored in CVS
 	cd lib/clibs ; $(RM) *.lib
 	find . -name "*.o" -type f -exec rm -f {} \;
 
