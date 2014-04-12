@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.11 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.12 2014-04-12 11:57:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -36,6 +36,7 @@ typedef enum
 	NUMBER_OP, NAME_OP, CONST_EXPR_OP, 
 	UNARY_OP, BINARY_OP, TERNARY_OP,
 } op_type_t;
+
 typedef enum { ASSOC_NONE, ASSOC_LEFT, ASSOC_RIGHT } assoc_t;
 
 /*-----------------------------------------------------------------------------
@@ -112,7 +113,6 @@ extern void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type
 *	Expression
 *----------------------------------------------------------------------------*/
 
-
 struct expr
 {
     struct expr        *nextexpr;		/* pointer to next expression */
@@ -147,7 +147,10 @@ END_CLASS
 
 /*
 * $Log: expr.h,v $
-* Revision 1.11  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.12  2014-04-12 11:57:02  pauloscustodio
+* whitespace
+*
+* Revision 1.11  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *

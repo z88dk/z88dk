@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.5 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.6 2014-04-12 11:57:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,7 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.5 2014-01-11 01:2
 *   Cross reference list of symbol usage
 *----------------------------------------------------------------------------*/
 CLASS( SymbolRef )
-int		page_nr;			/* page where symbol used/defined */
+	int		page_nr;			/* page where symbol used/defined */
 END_CLASS;
 
 CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with
@@ -42,7 +42,10 @@ extern void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined );
 
 /*
 * $Log: symref.h,v $
-* Revision 1.5  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.6  2014-04-12 11:57:02  pauloscustodio
+* whitespace
+*
+* Revision 1.5  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
