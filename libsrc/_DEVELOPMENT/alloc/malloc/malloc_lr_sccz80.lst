@@ -28,6 +28,10 @@ alloc/malloc/c/lr_sccz80/heap_destroy
 alloc/malloc/c/lr_sccz80/heap_free
 alloc/malloc/c/lr_sccz80/heap_free_callee
 alloc/malloc/c/lr_sccz80/heap_free_unlocked
+alloc/malloc/c/lr_sccz80/heap_info
+alloc/malloc/c/lr_sccz80/heap_info_callee
+alloc/malloc/c/lr_sccz80/heap_info_unlocked
+alloc/malloc/c/lr_sccz80/heap_info_unlocked_callee
 alloc/malloc/c/lr_sccz80/heap_init
 alloc/malloc/c/lr_sccz80/heap_init_callee
 alloc/malloc/c/lr_sccz80/heap_realloc
