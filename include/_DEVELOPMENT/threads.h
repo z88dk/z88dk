@@ -14,7 +14,7 @@ typedef struct mtx_s
    uint8_t lock_count;
    
    uint8_t spinlock;
-   forward_list *q;
+   void   *q;             // p_forward_list *
 
 } mtx_t;
 
