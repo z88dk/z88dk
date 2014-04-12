@@ -185,9 +185,6 @@
     <ClCompile Include="listfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model_symref.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="model.c">
       <Filter>Source Files</Filter>
     </ClCompile>

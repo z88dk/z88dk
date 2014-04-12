@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.138 2014-04-06 23:29:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.139 2014-04-12 11:56:45 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -75,7 +75,6 @@ OBJS = 	\
 	listfile.o		\
 	mapfile.o		\
 	model.o			\
-	model_symref.o	\
 	modlink.o		\
 	module.o		\
 	objfile.o		\
@@ -230,7 +229,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.138  2014-04-06 23:29:26  pauloscustodio
+# Revision 1.139  2014-04-12 11:56:45  pauloscustodio
+# Removed model_symref.c
+#
+# Revision 1.138  2014/04/06 23:29:26  pauloscustodio
 # Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 # Moved the token definitions from token_def.h to scan_def.h.
 #

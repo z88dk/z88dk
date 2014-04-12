@@ -149,7 +149,6 @@
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />
     <ClCompile Include="model.c" />
-    <ClCompile Include="model_symref.c" />
     <ClCompile Include="modlink.c" />
     <ClCompile Include="module.c" />
     <ClCompile Include="objfile.c" />
