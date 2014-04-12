@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.139 2014-04-12 11:56:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.140 2014-04-12 15:18:03 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -89,6 +89,7 @@ OBJS = 	\
 	z80instr.o		\
 	z80pass.o		\
 	\
+	lib/array.o		\
 	lib/class.o		\
 	lib/die.o		\
 	lib/except.o	\
@@ -229,7 +230,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.139  2014-04-12 11:56:45  pauloscustodio
+# Revision 1.140  2014-04-12 15:18:03  pauloscustodio
+# Add intArray and longArray to array.c
+#
+# Revision 1.139  2014/04/12 11:56:45  pauloscustodio
 # Removed model_symref.c
 #
 # Revision 1.138  2014/04/06 23:29:26  pauloscustodio
@@ -817,8 +821,8 @@ errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/die.h
 errors.o: lib/types.h lib/fileutil.h lib/list.h lib/class.h lib/queue.h
 errors.o: lib/strutil.h lib/srcfile.h lib/strpool.h lib/strhash.h
 errors.o: lib/uthash.h lib/init.h
-expr.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h lib/types.h
-expr.o: lib/strutil.h symbol.h model.h lib/list.h objfile.h symtab.h
+expr.o: lib/xmalloc.h lib/array.h lib/class.h lib/queue.h lib/types.h
+expr.o: lib/strutil.h expr.h symbol.h model.h lib/list.h objfile.h symtab.h
 expr.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h symref.h
 expr.o: lib/classlist.h scan.h scan_def.h legacy.h expr_def.h errors.h
 expr.o: errors_def.h lib/init.h lib/strpool.h
@@ -913,6 +917,8 @@ z80pass.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h sym.h
 z80pass.o: symref.h lib/classlist.h scan.h scan_def.h legacy.h expr_def.h
 z80pass.o: lib/fileutil.h hist.h listfile.h options.h options_def.h
 z80pass.o: lib/srcfile.h z80asm.h
+lib/array.o: lib/xmalloc.h lib/array.h lib/class.h lib/queue.h lib/types.h
+lib/array.o: lib/strutil.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
 lib/class.o: lib/init.h
 lib/die.o: lib/die.h

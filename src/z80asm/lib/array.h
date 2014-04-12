@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.4 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.5 2014-04-12 15:18:05 pauloscustodio Exp $
 */
 
 #pragma once
@@ -14,6 +14,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.4 2014-03-05 2
 #include "class.h"
 #include "types.h"
 #include "strutil.h"
+#include <assert.h>
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
@@ -47,6 +48,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.4 2014-03-05 2
 	extern T	   *T##Array_push(T##Array *self);							\
 	extern T	   *T##Array_top(T##Array *self);							\
 	extern void		T##Array_pop(T##Array *self);							\
+
+
+/* default types */
+ARRAY( int );
+ARRAY( long );
 
 /* define */
 #define DEF_ARRAY( T )														\
@@ -145,7 +151,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.4 2014-03-05 2
 
 /*
 * $Log: array.h,v $
-* Revision 1.4  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.5  2014-04-12 15:18:05  pauloscustodio
+* Add intArray and longArray to array.c
+*
+* Revision 1.4  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.3  2014/03/02 14:08:42  pauloscustodio

@@ -242,6 +242,9 @@
     <ClCompile Include="expr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\array.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scan_rules.rl">

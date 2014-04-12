@@ -136,6 +136,7 @@
     <ClCompile Include="exprprsr.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />
+    <ClCompile Include="lib\array.c" />
     <ClCompile Include="lib\class.c" />
     <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\except.c" />

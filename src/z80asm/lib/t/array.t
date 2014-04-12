@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.3 2014-04-07 21:06:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.4 2014-04-12 15:18:06 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strutil.c class.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c array.c strutil.c class.c xmalloc.c die.c";
 
 write_file("test.c", <<'END');
 #include "xmalloc.h"
@@ -36,10 +36,15 @@ ARRAY( Point );
 DEF_ARRAY( Point );
 
 PointArray *points;
+intArray *ints;
+longArray *longs;
 
 int main(int argc, char *argv[])
 {
 	Point *p;
+	long *lp;
+	int *ip;
+	long l;
 	int i;
 	
 	points = OBJ_NEW( PointArray );
@@ -180,6 +185,46 @@ int main(int argc, char *argv[])
 	p = PointArray_top(points);
 	PointArray_unreserve(points);
 	assert( p == NULL );
+	
+	/* int array */
+	ints = OBJ_NEW( intArray );
+	for ( i = 10; i >= 0; i-- ) 
+	{
+		ip = intArray_item(ints, i);
+		*ip = i;
+	}
+	for ( i = 0; i <= 10; i++ )
+	{
+		ip = intArray_item(ints, i);
+		assert( *ip == i );
+	}
+	
+	/* int array */
+	ints = OBJ_NEW( intArray );
+	for ( i = 10; i >= 0; i-- ) 
+	{
+		ip = intArray_item(ints, i);
+		*ip = i;
+	}
+	for ( i = 0; i <= 10; i++ )
+	{
+		ip = intArray_item(ints, i);
+		assert( *ip == i );
+	}
+	
+	/* long array */
+	longs = OBJ_NEW( longArray );
+	for ( l = 10; l >= 0; l-- ) 
+	{
+		lp = longArray_item(longs, l);
+		*lp = l;
+	}
+	for ( l = 0; l <= 10; l++ )
+	{
+		lp = longArray_item(longs, l);
+		assert( *lp == l );
+	}
+	
 
 	return 0;
 }
@@ -202,7 +247,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.3  2014-04-07 21:06:23  pauloscustodio
+# Revision 1.4  2014-04-12 15:18:06  pauloscustodio
+# Add intArray and longArray to array.c
+#
+# Revision 1.3  2014/04/07 21:06:23  pauloscustodio
 # Reduce default size to 16 to waste less space when used as base for array.h
 #
 # Revision 1.2  2014/03/02 14:08:42  pauloscustodio

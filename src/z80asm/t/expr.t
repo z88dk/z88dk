@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.6 2014-03-29 00:33:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.7 2014-04-12 15:18:06 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -182,7 +182,7 @@ my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
 		   "options.o model.o hist.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o lib/srcfile.o ".
 		   "lib/except.o ".
-		   "lib/list.o lib/class.o";
+		   "lib/list.o lib/array.o lib/class.o";
 
 my $init = <<'END';
 struct module the_module;
@@ -226,7 +226,10 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.6  2014-03-29 00:33:29  pauloscustodio
+# Revision 1.7  2014-04-12 15:18:06  pauloscustodio
+# Add intArray and longArray to array.c
+#
+# Revision 1.6  2014/03/29 00:33:29  pauloscustodio
 # BUG_0044: binary constants with more than 8 bits not accepted
 # CH_0022: Added syntax to define binary numbers as bitmaps
 # Replaced tokenizer with Ragel based scanner.

@@ -16,11 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.8 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.9 2014-04-12 15:18:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "array.h"
 #include "expr.h"
 #include "errors.h"
 #include "init.h"
@@ -159,9 +160,6 @@ Operator *Operator_get( tokid_t tok, op_type_t op_type )
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
 *----------------------------------------------------------------------------*/
-ARRAY( long );
-DEF_ARRAY( long );
-
 static longArray *calc_stack;
 
 void Calc_push( long value )
@@ -361,7 +359,10 @@ void Expr_fini (Expr *self)
 
 /*
 * $Log: expr.c,v $
-* Revision 1.8  2014-03-15 02:12:07  pauloscustodio
+* Revision 1.9  2014-04-12 15:18:03  pauloscustodio
+* Add intArray and longArray to array.c
+*
+* Revision 1.8  2014/03/15 02:12:07  pauloscustodio
 * Rename last token to tok*
 * GetSym() declared in scan.h
 *
