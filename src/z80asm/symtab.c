@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.25 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.26 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -192,12 +192,7 @@ Symbol *define_local_sym( char *name, long value, byte_t type )
 
 Symbol *define_global_sym( char *name, long value, byte_t type )
 {
-    return _define_sym( name, value, type | SYM_GLOBAL, CURRENTMODULE, &global_symtab );
-}
-
-Symbol *define_library_sym( char *name, long value, byte_t type )
-{
-    return _define_sym( name, value, type | SYM_GLOBAL | SYM_DEFINE, CURRENTMODULE, &global_symtab );
+    return _define_sym( name, value, type | SYM_PUBLIC, CURRENTMODULE, &global_symtab );
 }
 
 /*-----------------------------------------------------------------------------
@@ -322,7 +317,7 @@ void define_symbol( char *name, long value, byte_t type )
     {
         define_local_symbol( name, value, type );
     }
-    else if ( sym->sym_type & SYM_GLOBAL )		/* symbol declared global */
+    else if ( sym->sym_type & SYM_PUBLIC )		/* symbol declared global */
     {
         if ( sym->sym_type & SYM_DEFINED )	/* global symbol already defined */
         {
@@ -346,9 +341,9 @@ void define_symbol( char *name, long value, byte_t type )
 }
 
 /*-----------------------------------------------------------------------------
-*   declare a global symbol; type = 0 for XDEF, SYM_DEFINE for XLIB
+*   declare a PUBLIC symbol
 *----------------------------------------------------------------------------*/
-static void declare_global_symbol( char *name, byte_t type )
+void declare_public_symbol( char *name )
 {
     Symbol     *sym, *cloned_sym;
 
@@ -362,7 +357,7 @@ static void declare_global_symbol( char *name, byte_t type )
         if ( sym == NULL )
         {
             /* not local, not global -> declare symbol as global */
-            sym = Symbol_create( name, 0, SYM_GLOBAL | type, CURRENTMODULE );
+            sym = Symbol_create( name, 0, SYM_PUBLIC, CURRENTMODULE );
             SymbolHash_set( &global_symtab, name, sym );
         }
         else
@@ -374,8 +369,8 @@ static void declare_global_symbol( char *name, byte_t type )
                 if ( sym->sym_type & SYM_EXTERN )
                 {
                     sym->owner = CURRENTMODULE;		/* symbol now owned by this module */
-                    sym->sym_type &= ~ SYM_EXTERN;		/* re-declare symbol as global if symbol was */
-                    sym->sym_type |= SYM_GLOBAL | type;	/* declared extern in another module */
+                    sym->sym_type &= ~ SYM_EXTERN;	/* re-declare symbol as global if symbol was */
+                    sym->sym_type |= SYM_PUBLIC;	/* declared extern in another module */
                 }
                 else								/* cannot declare two identical global's */
                 {
@@ -384,7 +379,7 @@ static void declare_global_symbol( char *name, byte_t type )
                     assert(0);
                 }
             }
-            else if ( ( sym->sym_type & ( SYM_GLOBAL | type ) ) != ( SYM_GLOBAL | type ) )
+            else if ( ( sym->sym_type & SYM_PUBLIC ) != SYM_PUBLIC )
             {
                 /* re-declaration not allowed */
                 error_symbol_redecl( name );
@@ -399,9 +394,10 @@ static void declare_global_symbol( char *name, byte_t type )
         if ( cloned_sym == NULL )
         {
             /* local, not global */
-            /* If no global symbol of identical name has been created, then re-declare local symbol as global symbol */
+            /* If no global symbol of identical name has been created, 
+			   then re-declare local symbol as global symbol */
             sym->sym_type &= ~ SYM_LOCAL;
-            sym->sym_type |= SYM_GLOBAL;
+            sym->sym_type |= SYM_PUBLIC;
             cloned_sym = Symbol_create( sym->name, sym->value, sym->sym_type, CURRENTMODULE );
             SymbolHash_set( &global_symtab, name, cloned_sym );
 
@@ -417,20 +413,10 @@ static void declare_global_symbol( char *name, byte_t type )
     }
 }
 
-/* declare a global symbol XDEF or XLIB */
-void declare_global_obj_symbol( char *name )
-{
-    declare_global_symbol( name, 0 );
-}
-void declare_global_lib_symbol( char *name )
-{
-    declare_global_symbol( name, SYM_DEFINE );
-}
-
 /*-----------------------------------------------------------------------------
-*   declare an external symbol; type = 0 for XREF, SYM_DEFINE for LIB
+*   declare an EXTERN symbol
 *----------------------------------------------------------------------------*/
-static void declare_extern_symbol( char *name, byte_t type )
+void declare_extern_symbol( char *name )
 {
     Symbol     *sym, *ext_sym;
 
@@ -444,7 +430,7 @@ static void declare_extern_symbol( char *name, byte_t type )
         if ( sym == NULL )
         {
             /* not local, not global -> declare symbol as extern */
-            sym = Symbol_create( name, 0, SYM_EXTERN | type, CURRENTMODULE );
+            sym = Symbol_create( name, 0, SYM_EXTERN, CURRENTMODULE );
             SymbolHash_set( &global_symtab, name, sym );
         }
         else
@@ -452,17 +438,10 @@ static void declare_extern_symbol( char *name, byte_t type )
             /* not local, global */
             if ( sym->owner == CURRENTMODULE )
             {
-                if ( ( sym->sym_type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
+                if ( ( sym->sym_type & SYM_EXTERN ) != SYM_EXTERN )
                 {
-                    if ( opts.sdcc )
-                    {
-                        sym->sym_type = SYM_EXTERN | type ;
-                    }
-                    else
-                    {
-                        /* Re-declaration not allowed */
-                        error_symbol_redecl( name );
-                    }
+                    /* Re-declaration not allowed */
+                    error_symbol_redecl( name );
                 }
             }
         }
@@ -479,7 +458,7 @@ static void declare_extern_symbol( char *name, byte_t type )
             if ( ( sym->sym_type & SYM_DEFINED ) == 0 )
             {
                 sym->sym_type &= ~ SYM_LOCAL;
-                sym->sym_type |= ( SYM_EXTERN | type );
+                sym->sym_type |= SYM_EXTERN;
                 ext_sym = Symbol_create( name, 0, sym->sym_type, CURRENTMODULE );
                 SymbolHash_set( &global_symtab, name, ext_sym );
 
@@ -492,24 +471,13 @@ static void declare_extern_symbol( char *name, byte_t type )
                 error_symbol_decl_local( name );
             }
         }
-        else if ( ( sym->sym_type & ( SYM_EXTERN | type ) ) != ( SYM_EXTERN | type ) )
+        else if ( ( sym->sym_type & SYM_EXTERN ) != SYM_EXTERN )
         {
             /* re-declaration not allowed */
             error_symbol_redecl( name );
         }
     }
 }
-
-/* declare an external symbol XREF or LIB */
-void declare_extern_obj_symbol( char *name )
-{
-    declare_extern_symbol( name, 0 );
-}
-void declare_extern_lib_symbol( char *name )
-{
-    declare_extern_symbol( name, SYM_DEFINE );
-}
-
 
 /*-----------------------------------------------------------------------------
 *   sort functions for SymbolHash_sort
@@ -527,7 +495,16 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.25  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.26  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.25  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than

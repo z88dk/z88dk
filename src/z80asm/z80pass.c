@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.88 2014-03-29 00:32:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.89 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -262,16 +262,8 @@ StoreName( Symbol *node, byte_t scope )
         xfput_uint8(objfile, 'L');
         break;
 
-    case SYM_GLOBAL:
-        if ( node->sym_type & SYM_DEFINE )
-        {
-            xfput_uint8(objfile, 'X');
-        }
-        else
-        {
-            xfput_uint8(objfile, 'G');
-        }
-
+    case SYM_PUBLIC:
+        xfput_uint8(objfile, 'G');
         break;
     }
 
@@ -301,9 +293,9 @@ StoreGlobalNames( SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->sym_type & SYM_GLOBAL ) && ( sym->sym_type & SYM_TOUCHED ) )
+        if ( ( sym->sym_type & SYM_PUBLIC ) && ( sym->sym_type & SYM_TOUCHED ) )
         {
-            StoreName( sym, SYM_GLOBAL );
+            StoreName( sym, SYM_PUBLIC );
         }
     }
 }
@@ -621,7 +613,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
         if ( sym->owner == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
-            if ( ( sym->sym_type & SYM_LOCAL ) || ( sym->sym_type & SYM_GLOBAL ) )
+            if ( ( sym->sym_type & SYM_LOCAL ) || ( sym->sym_type & SYM_PUBLIC ) )
             {
                 if ( ( sym->sym_type & SYM_TOUCHED ) )
                 {
@@ -636,7 +628,16 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.88  2014-03-29 00:32:46  pauloscustodio
+* Revision 1.89  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.88  2014/03/29 00:32:46  pauloscustodio
 * TK_EOF renamed TK_END
 *
 * Revision 1.87  2014/03/18 22:44:03  pauloscustodio

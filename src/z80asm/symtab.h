@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.13 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.14 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -64,7 +64,6 @@ extern Symbol *define_local_def_sym( char *name, long value );
 /* define a new symbol in the local, global or global lib tabs */
 extern Symbol *define_local_sym( char *name, long value, byte_t type );
 extern Symbol *define_global_sym( char *name, long value, byte_t type );
-extern Symbol *define_library_sym( char *name, long value, byte_t type );
 
 /* get the list of symbols that match the given type mask,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
@@ -92,13 +91,11 @@ extern SymbolHash *static_symtab;
    d) if in global table and not global/extern -> define a new local symbol */
 extern void define_symbol( char *name, long value, byte_t type );
 
-/* declare a global symbol XDEF or XLIB */
-extern void declare_global_obj_symbol( char *name );
-extern void declare_global_lib_symbol( char *name );
+/* declare a PUBLIC symbol */
+extern void declare_public_symbol( char *name );
 
-/* declare an external symbol XREF or LIB */
-extern void declare_extern_obj_symbol( char *name );
-extern void declare_extern_lib_symbol( char *name );
+/* declare an EXTERN symbol */
+extern void declare_extern_symbol( char *name );
 
 /* sort functions for SymbolHash_sort */
 extern int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b );
@@ -107,7 +104,16 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.13  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.14  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.13  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

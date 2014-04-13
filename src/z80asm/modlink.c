@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.106 2014-03-29 00:20:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.107 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -113,11 +113,8 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
             break;
 
         case 'G':
-            define_global_sym( name->str, value, symboltype );
-            break;
-
         case 'X':
-            define_library_sym( name->str, value, symboltype );
+            define_global_sym( name->str, value, symboltype );
             break;
 
         default:
@@ -966,7 +963,16 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.106  2014-03-29 00:20:39  pauloscustodio
+* Revision 1.107  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.106  2014/03/29 00:20:39  pauloscustodio
 * TK_EOF renamed TK_END
 *
 * Revision 1.105  2014/03/18 22:44:03  pauloscustodio

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.9 2014-03-15 14:35:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.10 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -38,10 +38,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.9 2014-03-15 14:35
 
 #define SYM_ADDR		8       	/* 00001000 symbol is address */
 #define SYM_LOCAL		16      	/* 00010000 symbol is local */
-#define SYM_GLOBAL		32      	/* 00100000 symbol is global (SYM_GLOBAL) 
-									   or global library (SYM_GLOBAL|SYM_DEFINE) */
-#define SYM_EXTERN		64      	/* 01000000 symbol is external (SYM_EXTERN) 
-									   or external library (SYM_EXTERN|SYM_DEFINE) */
+#define SYM_PUBLIC		32      	/* 00100000 symbol is PUBLIC */
+#define SYM_EXTERN		64      	/* 01000000 symbol is EXTERN */
 
 #define SYM_NOTDEFINED  0
 
@@ -63,7 +61,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.9 2014-03-15 14:35
 
 #define EXPR_ADDR		SYM_ADDR	/* 00001000 Expression contains reloc. address label */
 #define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
-#define EXPR_GLOBAL		SYM_GLOBAL 	/* 00100000 Expression contains global symbol */
+#define EXPR_PUBLIC		SYM_PUBLIC 	/* 00100000 Expression contains global symbol */
 #define EXPR_EXTERN		SYM_EXTERN	/* 01000000 Expression contains extern symbol */
 
 #define NOT_EVALUABLE	128     	/* 10000000 Expression is not evaluable */
@@ -89,7 +87,16 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.9  2014-03-15 14:35:51  pauloscustodio
+* Revision 1.10  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.9  2014/03/15 14:35:51  pauloscustodio
 * Add interface to lookup current file name and line number
 *
 * Revision 1.8  2014/03/03 13:43:50  pauloscustodio

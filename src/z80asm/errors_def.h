@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.28 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.29 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -37,6 +37,13 @@ ERR( ErrError,	error_illegal_option( char *option ),	"illegal option '%s'" _C_ o
 ERR( ErrError,	error_illegal_src_filename( char *filename ),
      "illegal source filename '%s'" _C_ filename )
 
+/* warnings */
+ERR( ErrWarn,	warn_symbol_diff_case( char *name, char *used ),
+											"symbol '%s' used as '%s'" _C_ name _C_ used )
+ERR( ErrWarn,	warn_deprecated( char *old_stmt, char *new_stmt ),
+											"'%s' is deprecated, use '%s' instead" 
+											_C_ old_stmt _C_ new_stmt )
+
 /* assembly errors */
 ERR( ErrError,	error_syntax( void ),					"syntax error" )
 ERR( ErrError,	error_syntax_expr( void ),				"syntax error in expression" )
@@ -44,9 +51,6 @@ ERR( ErrError,	error_expr( char *expr ),				"error in expression '%s'" _C_ expr 
 ERR( ErrError,	error_invalid_squoted_string( void ),	"invalid single quoted character" )
 ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
 ERR( ErrError,	error_divide_by_zero( void ),			"division by zero" )
-
-ERR( ErrWarn,	warn_symbol_diff_case( char *name, char *used ),
-														"symbol '%s' used as '%s'" _C_ name _C_ used )
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
 ERR( ErrError,	error_not_defined_expr( char *expr ),	"symbol not defined in expression '%s'" _C_ expr )
@@ -83,7 +87,16 @@ ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.28  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.29  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.28  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than

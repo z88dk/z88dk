@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.10 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.11 2014-04-13 11:54:00 pauloscustodio Exp $
 
 */
 
@@ -77,8 +77,8 @@ void write_def_file( void )
         puts( "Creating global definition file..." );
     }
 
-    def_symtab = get_all_syms( SYM_ADDR | SYM_LOCAL | SYM_GLOBAL | SYM_DEFINE,
-                               SYM_ADDR | 0         | SYM_GLOBAL | 0 );
+    def_symtab = get_all_syms( SYM_ADDR | SYM_LOCAL | SYM_PUBLIC | SYM_DEFINE,
+                               SYM_ADDR | 0         | SYM_PUBLIC | 0 );
 
     /* Write symbols by address */
     SymbolHash_sort( def_symtab, SymbolHash_by_value );
@@ -92,7 +92,16 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.10  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.11  2014-04-13 11:54:00  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.10  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

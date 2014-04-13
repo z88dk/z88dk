@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.7 2014-04-06 23:04:19 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.8 2014-04-13 11:54:01 pauloscustodio Exp $
 #
 
 use strict;
@@ -174,8 +174,8 @@ mult:	ret
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
-t_binary($obj, objfile(NAME => 'mult',
-		       SYMBOLS => [["X", "A", 0, "mult"]],
+t_binary($obj, objfile(NAME => 'test',
+		       SYMBOLS => [["G", "A", 0, "mult"]],
 		       CODE => "\xC9"));
 
 
@@ -393,7 +393,16 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.7  2014-04-06 23:04:19  pauloscustodio
+# Revision 1.8  2014-04-13 11:54:01  pauloscustodio
+# CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+# Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+# Remove 'X' scope for symbols in object files used before for XLIB -
+# all PUBLIC symbols have scope 'G'.
+# Remove SDCC hack on object files trating XLIB and XDEF the same.
+# Created a warning to say XDEF et.al. are deprecated, but for the
+# momment keep it commented.
+#
+# Revision 1.7  2014/04/06 23:04:19  pauloscustodio
 # Merged objfile.t and whitebox-objfile.t
 #
 # Revision 1.6  2014/04/05 23:36:11  pauloscustodio

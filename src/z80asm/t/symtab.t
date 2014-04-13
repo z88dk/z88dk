@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.7 2014-04-06 11:07:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.8 2014-04-13 11:54:01 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -50,25 +50,13 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm		=> "xdef VAR : defb VAR",
+	asm		=> "PUBLIC VAR : defb VAR",
 	bin		=> "\1",
 	options	=> "-DVAR"
 );
 
 t_z80asm(
-	asm		=> "xref VAR",
-	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already declared local",
-	options	=> "-DVAR"
-);
-
-t_z80asm(
-	asm		=> "xlib VAR : defb VAR",
-	bin		=> "\1",
-	options	=> "-DVAR"
-);
-
-t_z80asm(
-	asm		=> "lib VAR",
+	asm		=> "EXTERN VAR",
 	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already declared local",
 	options	=> "-DVAR"
 );
@@ -100,22 +88,12 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm		=> "define VAR : xdef VAR : defb VAR",
+	asm		=> "define VAR : PUBLIC VAR : defb VAR",
 	bin		=> "\1",
 );
 
 t_z80asm(
-	asm		=> "define VAR : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
-);
-
-t_z80asm(
-	asm		=> "define VAR : xlib VAR : defb VAR",
-	bin		=> "\1",
-);
-
-t_z80asm(
-	asm		=> "define VAR : lib VAR",
+	asm		=> "define VAR : EXTERN VAR",
 	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
@@ -141,22 +119,12 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm		=> "defc VAR=1 : xdef VAR : defb VAR",
+	asm		=> "defc VAR=1 : PUBLIC VAR : defb VAR",
 	bin		=> "\1",
 );
 
 t_z80asm(
-	asm		=> "defc VAR=1 : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
-);
-
-t_z80asm(
-	asm		=> "defc VAR=1 : xlib VAR : defb VAR",
-	bin		=> "\1",
-);
-
-t_z80asm(
-	asm		=> "defc VAR=1 : lib VAR",
+	asm		=> "defc VAR=1 : EXTERN VAR",
 	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
@@ -187,139 +155,66 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm		=> "VAR: : xdef VAR : defb VAR",
+	asm		=> "VAR: : PUBLIC VAR : defb VAR",
 	bin		=> "\0",
 );
 
 t_z80asm(
-	asm		=> "xdef VAR : VAR: : defb VAR",
+	asm		=> "PUBLIC VAR : VAR: : defb VAR",
 	bin		=> "\0",
 );
 
 t_z80asm(
-	asm		=> "VAR: : xref VAR",
+	asm		=> "VAR: : EXTERN VAR",
 	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
+# PUBLIC
 t_z80asm(
-	asm		=> "VAR: : xlib VAR : defb VAR",
+	asm		=> "PUBLIC VAR : PUBLIC VAR : VAR: defb VAR",
 	bin		=> "\0",
 );
 
 t_z80asm(
-	asm		=> "VAR: : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
-);
-
-# XDEF
-t_z80asm(
-	asm		=> "xdef VAR : xdef VAR : VAR: defb VAR",
-	bin		=> "\0",
-);
-
-t_z80asm(
-	asm		=> "xdef VAR : xref VAR",
+	asm		=> "PUBLIC VAR : EXTERN VAR",
 	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
-	asm		=> "xdef VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "xdef VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "xdef VAR",
-	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
+	asm		=> "EXTERN VAR : defb VAR",
+	asm1	=> "PUBLIC VAR : defc VAR=3",
 	bin		=> "\3",
 );
 
-# XREF
+# EXTERN
 t_z80asm(
-	asm		=> "xref VAR : xdef VAR",
+	asm		=> "EXTERN VAR : PUBLIC VAR",
 	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
-	asm		=> "xref VAR : xref VAR : VAR: defb VAR",	# local hides global
+	asm		=> "EXTERN VAR : EXTERN VAR : VAR: defb VAR",	# local hides global
 	bin		=> "\0",
-);
-
-t_z80asm(
-	asm		=> "xref VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "xref VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-# LIB
-t_z80asm(
-	asm		=> "lib VAR : xdef VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "lib VAR : xref VAR : VAR: defb VAR",	# local hides global
-	bin		=> "\0",
-);
-
-t_z80asm(
-	asm		=> "lib VAR : lib VAR : VAR: defb VAR",	# local hides global
-	bin		=> "\0",
-);
-
-t_z80asm(
-	asm		=> "lib VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-# XLIB
-t_z80asm(
-	asm		=> "xlib VAR : xdef VAR : VAR: defb VAR",
-	bin		=> "\0",
-);
-
-t_z80asm(
-	asm		=> "xlib VAR : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "xlib VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "xlib VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: module name already defined",
 );
 
 # Symbol redefined
 t_z80asm(
-	asm		=> "xdef VAR : defc VAR=3 : defb VAR",
-	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
+	asm		=> "PUBLIC VAR : defc VAR=3 : defb VAR",
+	asm1	=> "PUBLIC VAR : defc VAR=3 : defb VAR",
 	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
 );
 
-
 # Symbol declared global in another module
 t_z80asm(
-	asm		=> "xdef VAR : defc VAR=2",
-	asm1	=> "xdef VAR : defc VAR=3",
+	asm		=> "PUBLIC VAR : defc VAR=2",
+	asm1	=> "PUBLIC VAR : defc VAR=3",
 	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
 );
 
 # CH_0024: Case-preserving, case-insensitive symbols
 unlink_testfiles();
-write_file(asm_file(), "Defc Loc = 1 \n ld a, LOC \n Xdef Var \n defc VAR = 2");
-write_file(asm1_file(), "Xref var \n ld a, VAR");
+write_file(asm_file(), "Defc Loc = 1 \n ld a, LOC \n PUBLIC Var \n defc VAR = 2");
+write_file(asm1_file(), "EXTERN var \n ld a, VAR");
 t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
 Warning at file 'test.asm' line 2: symbol 'Loc' used as 'LOC'
 Warning at file 'test.asm' line 4: symbol 'Var' used as 'VAR'
@@ -328,6 +223,34 @@ Warning at file 'test1.asm' module 'test1': symbol 'Var' used as 'VAR'
 ERR
 t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02");
 
+# CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+write_file(asm_file(), "
+	PUBLIC 	var1
+	DEFC 	var1 = 1
+	
+	XDEF	var2
+	DEFC 	var2 = 2
+	
+	XLIB	var3
+	DEFC 	var3 = 3
+");
+write_file(asm1_file(), "
+	EXTERN 	var1
+	DEFB 	var1
+	
+	XREF	var2
+	DEFB 	var2
+	
+	LIB		var3
+	DEFB 	var3
+");
+t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", "", 0);
+#Warning at file 'test.asm' line 5: 'XDEF' is deprecated, use 'PUBLIC' instead
+#Warning at file 'test.asm' line 8: 'XLIB' is deprecated, use 'PUBLIC' instead
+#Warning at file 'test1.asm' line 5: 'XREF' is deprecated, use 'EXTERN' instead
+#Warning at file 'test1.asm' line 8: 'LIB' is deprecated, use 'EXTERN' instead
+#ERR
+t_binary(read_binfile(bin_file()), "\x01\x02\x03");
 
 #------------------------------------------------------------------------------
 # White box tests
@@ -382,7 +305,7 @@ void dump_Symbol ( Symbol *sym )
 	if (sym->sym_type & SYM_DEFINE)		warn("DEF ");
 	if (sym->sym_type & SYM_ADDR)		warn("ADDR ");
 	if (sym->sym_type & SYM_LOCAL)		warn("LOCAL ");
-	if (sym->sym_type & SYM_GLOBAL)		warn("GLOBAL ");
+	if (sym->sym_type & SYM_PUBLIC)		warn("GLOBAL ");
 	if (sym->sym_type & SYM_EXTERN)		warn("EXTERN ");
 	warn("], ref = [");
 	dump_SymbolRefList(sym->references);
@@ -654,7 +577,16 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.7  2014-04-06 11:07:11  pauloscustodio
+# Revision 1.8  2014-04-13 11:54:01  pauloscustodio
+# CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+# Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+# Remove 'X' scope for symbols in object files used before for XLIB -
+# all PUBLIC symbols have scope 'G'.
+# Remove SDCC hack on object files trating XLIB and XDEF the same.
+# Created a warning to say XDEF et.al. are deprecated, but for the
+# momment keep it commented.
+#
+# Revision 1.7  2014/04/06 11:07:11  pauloscustodio
 # Merged symtab.t and whitebox-symtab.t
 #
 # Revision 1.6  2014/04/05 23:36:11  pauloscustodio

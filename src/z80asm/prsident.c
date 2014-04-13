@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.66 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.67 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -72,6 +72,7 @@ void LIB( void ), XLIB( void );
 void IF( void ), ELSE( void ), ENDIF( void );
 void MODULE( void );
 void LINE( void );
+void PUBLIC( void ); void EXTERN( void ); 
 
 /* global variables */
 extern struct module *CURRENTMODULE;
@@ -90,107 +91,108 @@ struct Z80sym
 #define DEF_ENTRY(func)     { #func, func }
 struct Z80sym Z80ident[] =
 {
-    DEF_ENTRY( ADC ),                  /* 0 */
+    DEF_ENTRY( ADC ),
     DEF_ENTRY( ADD ),
     DEF_ENTRY( AND ),
     DEF_ENTRY( BINARY ),
     DEF_ENTRY( BIT ),
-    DEF_ENTRY( CALL ),                /* 5 */
+    DEF_ENTRY( CALL ),
     DEF_ENTRY( CALL_OZ ),
     DEF_ENTRY( CALL_PKG ),
     DEF_ENTRY( CCF ),
     DEF_ENTRY( CP ),
-    DEF_ENTRY( CPD ),                  /* 10 */
+    DEF_ENTRY( CPD ),
     DEF_ENTRY( CPDR ),
     DEF_ENTRY( CPI ),
     DEF_ENTRY( CPIR ),
     DEF_ENTRY( CPL ),
-    DEF_ENTRY( DAA ),                  /* 15 */
+    DEF_ENTRY( DAA ),
     DEF_ENTRY( DEC ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
     DEF_ENTRY( DEFGROUP ),
-    DEF_ENTRY( DEFINE ),            /* 20 */
+    DEF_ENTRY( DEFINE ),
     DEF_ENTRY( DEFL ),
     DEF_ENTRY( DEFM ),
     DEF_ENTRY( DEFP ),
     DEF_ENTRY( DEFS ),
-    DEF_ENTRY( DEFVARS ),          /* 25 */
+    DEF_ENTRY( DEFVARS ),
     DEF_ENTRY( DEFW ),
     DEF_ENTRY( DI ),
     DEF_ENTRY( DJNZ ),
     DEF_ENTRY( EI ),
-    DEF_ENTRY( ELSE ),            /* 30 */
+    DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
     DEF_ENTRY( EX ),
+    DEF_ENTRY( EXTERN ),
     DEF_ENTRY( EXX ),
     DEF_ENTRY( FPP ),
-    DEF_ENTRY( HALT ),                /* 35 */
+    DEF_ENTRY( HALT ),
     DEF_ENTRY( IF ),
     DEF_ENTRY( IM ),
     DEF_ENTRY( IN ),
     DEF_ENTRY( INC ),
-    DEF_ENTRY( INCLUDE ),      /* 40 */
+    DEF_ENTRY( INCLUDE ),
     DEF_ENTRY( IND ),
     DEF_ENTRY( INDR ),
     DEF_ENTRY( INI ),
     DEF_ENTRY( INIR ),
-    DEF_ENTRY( INVOKE ),            /* 45 */
+    DEF_ENTRY( INVOKE ),
     DEF_ENTRY( JP ),
     DEF_ENTRY( JR ),
     DEF_ENTRY( LD ),
     DEF_ENTRY( LDD ),
-    DEF_ENTRY( LDDR ),                /* 50 */
+    DEF_ENTRY( LDDR ),
     DEF_ENTRY( LDI ),
     DEF_ENTRY( LDIR ),
     DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
-    DEF_ENTRY( LSTOFF ),        /* 55 */
+    DEF_ENTRY( LSTOFF ),
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( MODULE ),
     DEF_ENTRY( NEG ),
     DEF_ENTRY( NOP ),
-    DEF_ENTRY( OR ),                    /* 60 */
+    DEF_ENTRY( OR ),
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OTDR ),
     DEF_ENTRY( OTIR ),
     DEF_ENTRY( OUT ),
-    DEF_ENTRY( OUTD ),                /* 65 */
+    DEF_ENTRY( OUTD ),
     DEF_ENTRY( OUTI ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( POP ),
+    DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( PUSH ),
-    DEF_ENTRY( RES ),                  /* 70 */
+    DEF_ENTRY( RES ),
     DEF_ENTRY( RET ),
     DEF_ENTRY( RETI ),
     DEF_ENTRY( RETN ),
     DEF_ENTRY( RL ),
-    DEF_ENTRY( RLA ),                  /* 75 */
+    DEF_ENTRY( RLA ),
     DEF_ENTRY( RLC ),
     DEF_ENTRY( RLCA ),
     DEF_ENTRY( RLD ),
     DEF_ENTRY( RR ),
-    DEF_ENTRY( RRA ),                  /* 80 */
+    DEF_ENTRY( RRA ),
     DEF_ENTRY( RRC ),
     DEF_ENTRY( RRCA ),
     DEF_ENTRY( RRD ),
     DEF_ENTRY( RST ),
-    DEF_ENTRY( SBC ),                  /* 85 */
+    DEF_ENTRY( SBC ),
     DEF_ENTRY( SCF ),
     DEF_ENTRY( SET ),
     DEF_ENTRY( SLA ),
     DEF_ENTRY( SLL ),
-    DEF_ENTRY( SRA ),                  /* 90 */
+    DEF_ENTRY( SRA ),
     DEF_ENTRY( SRL ),
     DEF_ENTRY( SUB ),
     DEF_ENTRY( UNDEFINE ),
     DEF_ENTRY( XDEF ),
-    DEF_ENTRY( XLIB ),  /* 95 */
+    DEF_ENTRY( XLIB ),
     DEF_ENTRY( XOR ),
     DEF_ENTRY( XREF )
 };
 #undef DEF_ENTRY
-
 
 int
 idcmp( char *idptr, const struct Z80sym *symptr )
@@ -308,104 +310,87 @@ ENDIF( void )
 }
 
 
+void
+PUBLIC( void )
+{
+    do
+    {
+        if ( GetSym() == TK_NAME )
+        {
+            declare_public_symbol( tok_name );
+        }
+        else
+        {
+            error_syntax();
+            return;
+        }
+    }
+    while ( GetSym() == TK_COMMA );
+
+    if ( tok != TK_NEWLINE && tok != TK_END )
+    {
+        error_syntax();
+    }
+}
 
 void
 XDEF( void )
 {
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-            declare_global_obj_symbol( tok_name );
-        }
-        else
-        {
-            error_syntax();
-            return;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-
-    if ( tok != TK_NEWLINE && tok != TK_END )
-    {
-        error_syntax();
-    }
+#if 0
+	warn_deprecated("XDEF", "PUBLIC");
+#endif
+	PUBLIC();
 }
-
-
 
 void
 XLIB( void )
 {
-    if ( GetSym() == TK_NAME )
-    {
-        DeclModuleName();         /* XLIB name is implicit MODULE name */
-        declare_global_lib_symbol( tok_name );
-    }
-    else
-    {
-        error_syntax();
-        return;
-    }
+#if 0
+	warn_deprecated("XLIB", "PUBLIC");
+#endif
+	PUBLIC();
 }
 
+void
+EXTERN( void )
+{
+    do
+    {
+        if ( GetSym() == TK_NAME )
+        {
+            declare_extern_symbol( tok_name );    /* Define symbol as extern */
+        }
+        else
+        {
+            error_syntax();
+            return;
+        }
+    }
+    while ( GetSym() == TK_COMMA );
 
+    if ( tok != TK_NEWLINE && tok != TK_END )
+    {
+        error_syntax();
+    }
+}
 
 void
 XREF( void )
 {
-    if ( opts.sdcc )
-    {
-        LIB();
-        return;
-    }
-
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-            declare_extern_obj_symbol( tok_name );    /* Define symbol as extern */
-        }
-        else
-        {
-            error_syntax();
-            return;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-
-    if ( tok != TK_NEWLINE && tok != TK_END )
-    {
-        error_syntax();
-    }
+#if 0
+	warn_deprecated("XREF", "EXTERN");
+#endif
+	EXTERN();
 }
-
-
 
 void
 LIB( void )
 {
-
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-            declare_extern_lib_symbol( tok_name );     /* Define symbol as extern LIB reference */
-        }
-        else
-        {
-            error_syntax();
-            return;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-
-    if ( tok != TK_NEWLINE && tok != TK_END )
-    {
-        error_syntax();
-    }
+#if 0
+	warn_deprecated("LIB", "EXTERN");
+#endif
+	EXTERN();
 }
-
 
 
 void
@@ -1068,7 +1053,16 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.66  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.67  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.66  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than

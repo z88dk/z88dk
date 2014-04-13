@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.87 2014-04-06 23:32:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.88 2014-04-13 11:54:01 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.87 2014-04-06 23:32
 
 /*
 * $Log: hist.c,v $
-* Revision 1.87  2014-04-06 23:32:24  pauloscustodio
+* Revision 1.88  2014-04-13 11:54:01  pauloscustodio
+* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+* Remove 'X' scope for symbols in object files used before for XLIB -
+* all PUBLIC symbols have scope 'G'.
+* Remove SDCC hack on object files trating XLIB and XDEF the same.
+* Created a warning to say XDEF et.al. are deprecated, but for the
+* momment keep it commented.
+*
+* Revision 1.87  2014/04/06 23:32:24  pauloscustodio
 * .
 *
 * Revision 1.86  2014/04/05 23:36:11  pauloscustodio
@@ -1724,7 +1733,7 @@ Based on 1.0.31
 		(reported and fixed by alvin_albrecht@hotmail.com)
 	
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.1.8] (pauloscustodio)
+13.04.2014 [2.1.8] (pauloscustodio)
 -------------------------------------------------------------------------------
 	CH_0024: Case-preserving, case-insensitive symbols
 		Symbols no longer converted to upper-case, but still case-insensitive 
@@ -1732,6 +1741,14 @@ xx.xx.2014 [2.1.8] (pauloscustodio)
 		defined. Intermidiate stage before making z80asm case-sensitive, to
 		be more C-code friendly.
 		
+	CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+		Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+		Remove 'X' scope for symbols in object files used before for XLIB -
+		all PUBLIC symbols have scope 'G'.
+		Remove SDCC hack on object files trating XLIB and XDEF the same.
+		Created a warning to say XDEF et.al. are deprecated, but for the 
+		momment keep it commented.
+
 	- Merge test files.
 	- Remove token.c module - no longer needed with the ragel scanner.
 
@@ -1767,7 +1784,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.8a"
+#define VERSION     "2.1.8"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

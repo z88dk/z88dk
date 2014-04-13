@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.5 2014-04-05 23:36:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.6 2014-04-13 11:54:01 pauloscustodio Exp $
 #
 # Error in linking of addresses:
 # Base address of each module is independent of start address of the module in
@@ -121,11 +121,11 @@ my $testl_asm = "
 		jp l1		; 8033  C3 2C 80
 				; 8036
 	   ";
-my $testl_obj = objfile(NAME => 'l1',
+my $testl_obj = objfile(NAME => 'testl',
 			EXPR => [['C', 0x0008, 'l1'],
 				 ['C', 0x0003, 'l2']],
 			SYMBOLS => [['L', 'A', 0x0005, 'l2'],
-				    ['X', 'A', 0x0000, 'l1']],
+				    ['G', 'A', 0x0000, 'l1']],
 			CODE => "\x2E\x01".
 				"\xC3\x05\x00".
 				"\x2E\x02".
@@ -177,7 +177,16 @@ unlink_testfiles(@testfiles);
 done_testing();
 
 # $Log: BUG_0015.t,v $
-# Revision 1.5  2014-04-05 23:36:11  pauloscustodio
+# Revision 1.6  2014-04-13 11:54:01  pauloscustodio
+# CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+# Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
+# Remove 'X' scope for symbols in object files used before for XLIB -
+# all PUBLIC symbols have scope 'G'.
+# Remove SDCC hack on object files trating XLIB and XDEF the same.
+# Created a warning to say XDEF et.al. are deprecated, but for the
+# momment keep it commented.
+#
+# Revision 1.5  2014/04/05 23:36:11  pauloscustodio
 # CH_0024: Case-preserving, case-insensitive symbols
 # Symbols no longer converted to upper-case, but still case-insensitive
 # searched. Warning when a symbol is used with different case than
