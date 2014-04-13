@@ -8,13 +8,15 @@
  *	which takes a length argument..
  *
  * --------
- * $Id: fgets_cons.c,v 1.6 2003-01-26 17:39:48 dom Exp $
+ * $Id: fgets_cons.c,v 1.7 2014-04-13 05:49:58 aralbrec Exp $
  */
 
 #include <stdio.h>
 
 int fgets_cons(unsigned char *str, int max)
 {
+   static int cursor_state = 0;
+   
    unsigned char c;
    int ptr;
    ptr=0;
@@ -23,14 +25,26 @@ int fgets_cons(unsigned char *str, int max)
       c = fgetc_cons();
 
       if (ptr == max-1) return str;
-      if (c == 12 || c == 8 ) {
-	if ( ptr > 0 ) {
+      
+      if (c == 6)
+      {
+         cursor_state = ! cursor_state;   // toggle CAPS LOCK
+      }
+      else if (c == 12 || c == 8 )
+      {
+	if ( ptr > 0 )
+	{
            str[--ptr] = 0;
 	   fputc_cons(8);
 	   fputc_cons(32);
 	   fputc_cons(8);
         }
-      } else {
+      }
+      else
+      {
+         if (cursor_state)
+            c = toupper(c);
+            
          str[ptr++] = c;
          str[ptr] = 0;
 	 fputc_cons(c);
