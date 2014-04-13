@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.6 2013-10-30 16:09:18 stefano Exp $
+;	$Id: cnvtab.asm,v 1.7 2014-04-13 05:50:34 aralbrec Exp $
 ;
 
 	XLIB	zx81_cnvtab
@@ -27,6 +27,8 @@ IF FORzx81
 	defb	12
 	defb	118	; Newline
 	defb	13
+	defb    116     ; Graphics
+	defb    6
 	defb	11
 	defb	'"'
 	defb	9
@@ -99,6 +101,8 @@ ELSE
 	defb	12
 	defb	118	; Newline
 	defb	13
+	defb    116     ; Graphics
+	defb    6
 	defb	11
 	defb	'"'
 	defb	10
