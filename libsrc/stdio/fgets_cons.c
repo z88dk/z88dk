@@ -8,10 +8,11 @@
  *	which takes a length argument..
  *
  * --------
- * $Id: fgets_cons.c,v 1.7 2014-04-13 05:49:58 aralbrec Exp $
+ * $Id: fgets_cons.c,v 1.8 2014-04-13 05:53:03 aralbrec Exp $
  */
 
 #include <stdio.h>
+#include <ctype.h>
 
 int fgets_cons(unsigned char *str, int max)
 {
