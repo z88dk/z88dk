@@ -12,16 +12,14 @@ defc _CLIB_CFG_ASM_ = 1
 ; multi-threading
 ;;;;;;;;;;;;;;;;;
 
-; Setting to non-zero enables the multi-threading version of
-; the library to be built.
+; Enables multi-threading features of the library.
 
 defc __CLIB_OPT_MULTITHREAD = 0
 
-; This means:
-; 
-; * All FILEs are protected by recursive locks.
-; * The process heap is protected by a mutex.
-;
+; bit 0 = $01 = enable locking on heaps
+; bit 1 = $02 = enable recursive locks on FILEs
+; bit 2 = $04 = enable stdio lock on lists of FILEs
+
 ; Setting to zero will reduce code size and slightly speed
 ; up execution.
 ;
@@ -36,7 +34,7 @@ defc __CLIB_OPT_MULTITHREAD = 0
 ; and, for example, FILEs can still be locked via flockfile()
 ; and family.  Note that the stdio functions will not be
 ; blocked by a lock but the user program can perform its own
-; synchronization by using flockfile() and family appropriately.
+; synchronization by using flockfile() appropriately.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -51,22 +49,25 @@ defc __CLIB_OPT_MULTITHREAD = 0
 ; selection of an integer math lib that ranges from
 ; very fast and very large to very slow and very small.
 
-defc __CLIB_OPT_IMATH = $00
+defc __CLIB_OPT_IMATH = 0
 
-; ALL = selects fast integer math lib
+; < 50 = select small integer math library
+; > 50 = select fast integer math library
 
+; Note: currently the fast integer math library is
+;       always selected.
 
 ; The specific integer math library selected above
 ; can be further tailored by choosing options below.
 
-; FAST INTEGER MATH LIB OPTIONS
+; FAST INTEGER MATH LIBRARY OPTIONS
 
 defc __CLIB_OPT_IMATH_FAST = $00
 
-; bit 0 = enable loop unrolling in division
-; bit 1 = enable leading zero elimination in division
-; bit 2 = enable loop unrolling in multiplication
-; bit 3 = enable leading zero elimination in multiplication
+; bit 0 = $01 = enable loop unrolling in division
+; bit 1 = $02 = enable leading zero elimination in division
+; bit 2 = $04 = enable loop unrolling in multiplication
+; bit 3 = $08 = enable leading zero elimination in multiplication
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;

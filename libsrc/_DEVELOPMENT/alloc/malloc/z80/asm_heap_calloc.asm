@@ -17,7 +17,7 @@
 INCLUDE "clib_cfg.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB asm_heap_calloc
