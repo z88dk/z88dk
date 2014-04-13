@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.37 2014-04-05 23:36:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.38 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # Test options
 
@@ -103,7 +103,7 @@ Code Generation Options:
   --sdcc                 Assemble for Small Device C Compiler
   -plus, --ti83plus      Interpret 'Invoke' as RST 28h
   -IXIY, --swap-ix-iy    Swap IX and IY registers
-  --forcexlib            Force XLIB call on MODULE directive
+  --forcexlib            Force PUBLIC call on MODULE directive
   -C, --line-mode        Enable LINE directive
 
 Environment:
@@ -326,7 +326,7 @@ for my $options ('-sdcc', '--sdcc') {
 unlink_testfiles();
 
 my $asm = "
-	xdef main
+	PUBLIC main
 main:	ld b,10
 loop:	djnz loop
 	ret
@@ -373,7 +373,7 @@ for my $options ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
 $asm = "
 	define not_shown
 	defc zero=0
-	xdef main
+	PUBLIC main
 main: ld b,10
 loop: djnz loop
 x31_x31_x31_x31_x31_x31_x31_x31: defb zero
@@ -381,7 +381,7 @@ x_32_x32_x32_x32_x32_x32_x32_x32: defb zero
 ";
 my $asm2 = "
 	define not_shown
-	xdef func
+	PUBLIC func
 func: ld b,10
 loop: djnz loop
 	  ret
@@ -445,14 +445,14 @@ for my $options ('-m -nm', '--map --no-map') {
 # -g, --globaldef, -ng, --no-globaldef
 #------------------------------------------------------------------------------
 $asm = "
-	xdef main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
+	PUBLIC main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
 main: ld b,10
 loop: djnz loop
 x31_x31_x31_x31_x31_x31_x31_x31: defb 0
 x_32_x32_x32_x32_x32_x32_x32_x32: defb 0
 ";
 $asm2 = "
-	xdef func
+	PUBLIC func
 func: ret
 ";
 $bin = "\x06\x0A\x10\xFE\x00\x00\xC9";
@@ -748,19 +748,19 @@ my $lib = lib_file(); $lib =~ s/\.lib$/2.lib/i;
 
 # OK case
 unlink_testfiles();
-write_file(asm_file(), "xlib main \n main: ret");
+write_file(asm_file(), "PUBLIC main \n main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
-t_z80asm_ok(0, "lib main \n call main", 
+t_z80asm_ok(0, "EXTERN main \n call main", 
 		"\xCD\x03\x00\xC9",
 		"-i".$lib);
 
-# no XLIB - error
+# no PUBLIC - error
 unlink_testfiles($lib);
 write_file(asm_file(), "module main \n main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
-write_file(asm_file(), "lib main \n call main");
+write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
 		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
 		"1 errors occurred during assembly\n", 
@@ -772,7 +772,7 @@ for my $options ('-forcexlib', '--forcexlib') {
 	write_file(asm_file(), "module main \n main: ret");
 	t_z80asm_capture("$options -x".$lib." ".asm_file(), "", "", 0);
 	ok -f $lib;
-	t_z80asm_ok(0, "lib main \n call main", 
+	t_z80asm_ok(0, "EXTERN main \n call main", 
 			"\xCD\x03\x00\xC9",
 			"-i".$lib);
 
@@ -785,7 +785,7 @@ unlink_testfiles($lib);
 #------------------------------------------------------------------------------
 
 $asm = "
-	xdef main
+	PUBLIC main
 main:	ld b,10
 loop:	djnz loop
 	ret
@@ -858,11 +858,11 @@ $lib = 't/data/'.basename(lib_file());
 my $lib_base = basename($lib);
 my $lib_dir  = dirname($lib);
 
-write_file(asm_file(), "xlib main \n main: ret ");
+write_file(asm_file(), "PUBLIC main \n main: ret ");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 
-$asm = "lib main \n call main \n ret";
+$asm = "EXTERN main \n call main \n ret";
 $bin = "\xCD\x04\x00\xC9\xC9";
 
 # no -L, full path : OK
@@ -917,7 +917,7 @@ unlink $lib;
 # create a library without Z80_STDLIB
 delete $ENV{Z80_STDLIB};
 write_file(asm_file(), "
-	xlib one
+	PUBLIC one
 one: 
 	ld a,1
 	ret
@@ -944,7 +944,7 @@ ok copy(lib_file(), $lib), "create $lib";
 delete $ENV{Z80_STDLIB};
 for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 	t_z80asm_ok(0, "
-		lib one
+		EXTERN one
 		jp one
 	", "\xC3\x03\x00\x3E\x01\xC9", $options.$lib);
 }
@@ -954,7 +954,7 @@ for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 $ENV{Z80_STDLIB} = $lib;
 for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 	t_z80asm_ok(0, "
-		lib one
+		EXTERN one
 		jp one
 	", "\xC3\x03\x00\x3E\x01\xC9", $options);
 }
@@ -971,13 +971,13 @@ SKIP: { skip "BUG_0038";
 # libobj6 requires libobj7;
 # libobj7 requires libobj5;
 unlink_testfiles();
-write_file(asm_file(),  "xdef A1 \n xref A3 \n lib A7 \n A1: defb 1,A7,A3");	# A1 at addr 0, len 3
-write_file(asm2_file(), "xdef A2 \n xref A3 \n lib A6 \n A2: defb 2,A6,A3");	# A2 at addr 3, len 3
-write_file(asm3_file(), "xdef A3 \n xref A1 \n lib A5 \n A3: defb 3,A5,A1");	# A3 at addr 6, len 3
+write_file(asm_file(),  "PUBLIC A1 \n EXTERN A3 \n EXTERN A7 \n A1: defb 1,A7,A3");	# A1 at addr 0, len 3
+write_file(asm2_file(), "PUBLIC A2 \n EXTERN A3 \n EXTERN A6 \n A2: defb 2,A6,A3");	# A2 at addr 3, len 3
+write_file(asm3_file(), "PUBLIC A3 \n EXTERN A1 \n EXTERN A5 \n A3: defb 3,A5,A1");	# A3 at addr 6, len 3
 
-write_file(asm5_file(), "xlib A5 \n lib A6 \n A5: defb 5,A6");					# A5 at addr 9, len 2
-write_file(asm6_file(), "xlib A6 \n lib A7 \n A6: defb 6,A7");					# A6 at addr 11, len 2
-write_file(asm7_file(), "xlib A7 \n lib A5 \n A7: defb 7,A5");					# A7 at addr 13, len 2
+write_file(asm5_file(), "PUBLIC A5 \n EXTERN A6 \n A5: defb 5,A6");					# A5 at addr 9, len 2
+write_file(asm6_file(), "PUBLIC A6 \n EXTERN A7 \n A6: defb 6,A7");					# A6 at addr 11, len 2
+write_file(asm7_file(), "PUBLIC A7 \n EXTERN A5 \n A7: defb 7,A5");					# A7 at addr 13, len 2
 
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
@@ -1001,12 +1001,12 @@ t_binary(read_binfile(bin_file()),
 
 };
 
-# test BUG_0039: library not pulled in if XLIB symbol not referenced in expression
+# test BUG_0039: library not pulled in if PUBLIC symbol not referenced in expression
 unlink_testfiles();
 
-write_file(asm_file(),  "xref A51 \n defb A51");
+write_file(asm_file(),  "EXTERN A51 \n defb A51");
 
-write_file(asm5_file(), "xlib A5 \n xdef A51 \n A5: defc A51 = 51");
+write_file(asm5_file(), "PUBLIC A5 \n PUBLIC A51 \n A5: defc A51 = 51");
 
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
@@ -1019,25 +1019,25 @@ t_binary(read_binfile(bin_file()), pack("C*", 51 ));
 # link objects and libs
 # library modules are loaded in alpha-sequence of labels, starting at 10
 unlink_testfiles();
-write_file(asm1_file(), "xlib A1 \n A1: defb 1");
-write_file(asm2_file(), "xlib A2 \n A2: defb 2");
-write_file(asm3_file(), "xlib A3 \n A3: defb 3");
+write_file(asm1_file(), "PUBLIC A1 \n A1: defb 1");
+write_file(asm2_file(), "PUBLIC A2 \n A2: defb 2");
+write_file(asm3_file(), "PUBLIC A3 \n A3: defb 3");
 t_z80asm_capture("-x".lib1_file()." ".asm1_file()." ".asm2_file()." ".asm3_file(), "", "", 0);
 ok -f lib1_file();
 
-write_file(asm4_file(), "xlib A4 \n A4: defb 4");
-write_file(asm5_file(), "xlib A5 \n A5: defb 5");
-write_file(asm6_file(), "xlib A6 \n A6: defb 6");
+write_file(asm4_file(), "PUBLIC A4 \n A4: defb 4");
+write_file(asm5_file(), "PUBLIC A5 \n A5: defb 5");
+write_file(asm6_file(), "PUBLIC A6 \n A6: defb 6");
 t_z80asm_capture("-x".lib2_file()." ".asm4_file()." ".asm5_file()." ".asm6_file(), "", "", 0);
 ok -f lib2_file();
 
 write_file(asm_file(),  "A0: \n ".
-						"lib  A1,A2,A3,A4,A5,A6 \n xref A7,A8,A9 \n ".
+						"EXTERN  A1,A2,A3,A4,A5,A6 \n EXTERN A7,A8,A9 \n ".
 						"defb A1,A2,A3,A4,A5,A6,        A7,A8,A9 \n ".
 						"defb 0 \n");
-write_file(asm7_file(), "xdef A7 \n A7: defb 7");
-write_file(asm8_file(), "xdef A8 \n A8: defb 8");
-write_file(asm9_file(), "xdef A9 \n A9: defb 9");
+write_file(asm7_file(), "PUBLIC A7 \n A7: defb 7");
+write_file(asm8_file(), "PUBLIC A8 \n A8: defb 8");
+write_file(asm9_file(), "PUBLIC A9 \n A9: defb 9");
 t_z80asm_capture("-l -b -r0 -i".lib1_file()." -i".lib2_file()." ".
 				 asm_file()." ".asm7_file()." ".asm8_file()." ".asm9_file(), "", "", 0);
 ok -f bin_file();
@@ -1048,12 +1048,12 @@ t_binary($binary, pack("C*",
 						7, 8, 9, 1, 2, 3, 4, 5, 6,
 						));
 
-# XLIB, XDEF and LIB, without -sdcc
+# PUBLIC and EXTERN, without -sdcc
 unlink_testfiles();
 
 write_file(asm1_file(), "
-	XLIB func_1
-	XDEF func_2
+	PUBLIC func_1
+	PUBLIC func_2
 func_1:
 	ld a,1
 func_2:
@@ -1062,7 +1062,7 @@ func_2:
 ");
 
 write_file(asm2_file(), "
-	LIB  func_2
+	EXTERN  func_2
 	call func_2
 	ret
 ");
@@ -1077,12 +1077,12 @@ t_z80asm_capture("-r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 
-# XLIB, XDEF and XREF, with -sdcc
+# PUBLIC and EXTERN, with -sdcc
 unlink_testfiles();
 
 write_file(asm1_file(), "
-	XLIB func_1
-	XDEF func_2
+	PUBLIC func_1
+	PUBLIC func_2
 func_1:
 	ld a,1
 func_2:
@@ -1091,7 +1091,7 @@ func_2:
 ");
 
 write_file(asm2_file(), "
-	XREF func_2
+	EXTERN func_2
 	call func_2
 	ret
 ");
@@ -1112,7 +1112,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.37  2014-04-05 23:36:11  pauloscustodio
+# Revision 1.38  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.37  2014/04/05 23:36:11  pauloscustodio
 # CH_0024: Case-preserving, case-insensitive symbols
 # Symbols no longer converted to upper-case, but still case-insensitive
 # searched. Warning when a symbol is used with different case than

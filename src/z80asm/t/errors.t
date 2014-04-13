@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.11 2014-04-06 22:55:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.12 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -194,15 +194,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm  	=> "xref value : ld a,value",
-	asm1	=> "xdef value : defc value = -129",
+	asm  	=> "EXTERN value : ld a,value",
+	asm1	=> "PUBLIC value : defc value = -129",
 	bin		=> "\x3E\x7F",
 	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm		=> "xdef value : defc value = 0",
-	asm1	=> "xref value : ld a,value-129",
+	asm		=> "PUBLIC value : defc value = 0",
+	asm1	=> "EXTERN value : ld a,value-129",
 	bin		=> "\x3E\x7F",
 	err		=> "Warning at file 'test1.asm' module 'test1': integer '-129' out of range in expression 'value-129'",
 );
@@ -219,14 +219,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld a,value",
-	asm1	=> "xdef value : defc value = -128",
+	asm 	=> "EXTERN value : ld a,value",
+	asm1	=> "PUBLIC value : defc value = -128",
 	bin		=> "\x3E\x80",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld a,value-128",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld a,value-128",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x3E\x80",
 );
 
@@ -243,14 +243,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld a,value",
-	asm1	=> "xdef value : defc value = 255",
+	asm 	=> "EXTERN value : ld a,value",
+	asm1	=> "PUBLIC value : defc value = 255",
 	bin		=> "\x3E\xFF",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld a,value+255",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld a,value+255",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x3E\xFF",
 );
 
@@ -269,15 +269,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm  	=> "xref value : ld a,value",
-	asm1	=> "xdef value : defc value = 256",
+	asm  	=> "EXTERN value : ld a,value",
+	asm1	=> "PUBLIC value : defc value = 256",
 	bin		=> "\x3E\x00",
 	err		=> "Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm		=> "xdef value : defc value = 0",
-	asm1	=> "xref value : ld a,value+256",
+	asm		=> "PUBLIC value : defc value = 0",
+	asm1	=> "EXTERN value : ld a,value+256",
 	bin		=> "\x3E\x00",
 	err		=> "Warning at file 'test1.asm' module 'test1': integer '256' out of range in expression 'value+256'",
 );
@@ -297,15 +297,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm  	=> "xref value : ld (ix+value),-1",
-	asm1	=> "xdef value : defc value = -129",
+	asm  	=> "EXTERN value : ld (ix+value),-1",
+	asm1	=> "PUBLIC value : defc value = -129",
 	bin		=> "\xDD\x36\x7F\xFF",
 	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm		=> "xref value : ld (ix+value-129),-1",
-	asm1	=> "xdef value : defc value = 0",
+	asm		=> "EXTERN value : ld (ix+value-129),-1",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\xDD\x36\x7F\xFF",
 	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value-129'",
 );
@@ -323,14 +323,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value),-1",
-	asm1	=> "xdef value : defc value = -128",
+	asm 	=> "EXTERN value : ld (ix+value),-1",
+	asm1	=> "PUBLIC value : defc value = -128",
 	bin		=> "\xDD\x36\x80\xFF",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value-128),-1",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld (ix+value-128),-1",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\xDD\x36\x80\xFF",
 );
 
@@ -347,14 +347,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value),-1",
-	asm1	=> "xdef value : defc value = 127",
+	asm 	=> "EXTERN value : ld (ix+value),-1",
+	asm1	=> "PUBLIC value : defc value = 127",
 	bin		=> "\xDD\x36\x7F\xFF",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value+127),-1",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld (ix+value+127),-1",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\xDD\x36\x7F\xFF",
 );
 
@@ -373,15 +373,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value),-1",
-	asm1	=> "xdef value : defc value = 128",
+	asm 	=> "EXTERN value : ld (ix+value),-1",
+	asm1	=> "PUBLIC value : defc value = 128",
 	bin		=> "\xDD\x36\x80\xFF",
 	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld (ix+value+128),-1",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld (ix+value+128),-1",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\xDD\x36\x80\xFF",
 	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value+128'",
 );
@@ -401,15 +401,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value",
-	asm1	=> "xdef value : defc value = -32769",
+	asm 	=> "EXTERN value : ld bc,value",
+	asm1	=> "PUBLIC value : defc value = -32769",
 	bin		=> "\x01\xFF\x7F",
 	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value-32769",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld bc,value-32769",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x01\xFF\x7F",
 	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value-32769'",
 );
@@ -427,14 +427,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value",
-	asm1	=> "xdef value : defc value = -32768",
+	asm 	=> "EXTERN value : ld bc,value",
+	asm1	=> "PUBLIC value : defc value = -32768",
 	bin		=> "\x01\x00\x80",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value-32768",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld bc,value-32768",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x01\x00\x80",
 );
 
@@ -451,14 +451,14 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value",
-	asm1	=> "xdef value : defc value = 65535",
+	asm 	=> "EXTERN value : ld bc,value",
+	asm1	=> "PUBLIC value : defc value = 65535",
 	bin		=> "\x01\xFF\xFF",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value+65535",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld bc,value+65535",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x01\xFF\xFF",
 );
 
@@ -477,15 +477,15 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value",
-	asm1	=> "xdef value : defc value = 65536",
+	asm 	=> "EXTERN value : ld bc,value",
+	asm1	=> "PUBLIC value : defc value = 65536",
 	bin		=> "\x01\x00\x00",
 	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value'",
 );
 
 t_z80asm(
-	asm 	=> "xref value : ld bc,value+65536",
-	asm1	=> "xdef value : defc value = 0",
+	asm 	=> "EXTERN value : ld bc,value+65536",
+	asm1	=> "PUBLIC value : defc value = 0",
 	bin		=> "\x01\x00\x00",
 	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value+65536'",
 );
@@ -731,7 +731,7 @@ unlink_testfiles($lib);
 write_file(asm_file(), "module main \n main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
-write_file(asm_file(), "lib main \n call main");
+write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
 		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
 		"1 errors occurred during assembly\n", 
@@ -917,7 +917,7 @@ ok ! -f bin_file(), "no bin file";
 # error_jr_not_local
 unlink_testfiles();
 t_z80asm_error("
-	XREF loop
+	EXTERN loop
 	jr loop
 ", "Error at file 'test.asm' module 'test' line 3: relative jump address must be local");
 
@@ -933,7 +933,7 @@ unlink_testfiles($lib);
 # create a library without Z80_STDLIB
 delete $ENV{Z80_STDLIB};
 write_file(asm_file(), "
-	xlib one
+	PUBLIC one
 one: 
 	ld a,1
 	ret
@@ -963,14 +963,14 @@ ok -f lib_file(), lib_file()." created";
 # link with the library without Z80_STDLIB
 delete $ENV{Z80_STDLIB};
 t_z80asm_ok(0, "
-	lib one
+	EXTERN one
 	jp one
 ", "\xC3\x03\x00\x3E\x01\xC9", "-i$lib");
 
 # link with the library with Z80_STDLIB
 $ENV{Z80_STDLIB} = $lib;
 t_z80asm_ok(0, "
-	lib one
+	EXTERN one
 	jp one
 ", "\xC3\x03\x00\x3E\x01\xC9", "-i");
 
@@ -1190,7 +1190,10 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.11  2014-04-06 22:55:54  pauloscustodio
+# Revision 1.12  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.11  2014/04/06 22:55:54  pauloscustodio
 # Merged errors.t and whitebox-errors.t
 #
 # Revision 1.10  2014/04/05 23:36:11  pauloscustodio

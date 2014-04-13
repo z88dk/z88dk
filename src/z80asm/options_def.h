@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.33 2014-02-08 18:30:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.34 2014-04-13 20:32:06 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
 #define OPT_HELP_SDCC			"Assemble for Small Device C Compiler"
 #define OPT_HELP_TI83PLUS		"Interpret 'Invoke' as RST 28h"
 #define OPT_HELP_SWAP_IX_IY		"Swap IX and IY registers"
-#define OPT_HELP_FORCE_XLIB		"Force XLIB call on MODULE directive"
+#define OPT_HELP_FORCE_XLIB		"Force PUBLIC call on MODULE directive"
 #define OPT_HELP_LINE_MODE		"Enable LINE directive"
 
 #define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
@@ -186,7 +186,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.33  2014-02-08 18:30:49  pauloscustodio
+* Revision 1.34  2014-04-13 20:32:06  pauloscustodio
+* PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+*
+* Revision 1.33  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,
 * used to read @lists, removed opts.files;
 * model.c to hold global data model

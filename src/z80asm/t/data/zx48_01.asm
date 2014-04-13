@@ -2,25 +2,25 @@
 ;** An Assembly File Listing to generate a 16K ROM for the ZX Spectrum **
 ;************************************************************************
 
-        XDEF L0018
-        XDEF L0055
-        XDEF L0074
-        XDEF L0077
-        XDEF L0078
-        XDEF L0095
-        XDEF L0205
-        XDEF L022C
-        XDEF L0246
-        XDEF L0260
-        XDEF L026A
-        XDEF L0284
+        PUBLIC L0018
+        PUBLIC L0055
+        PUBLIC L0074
+        PUBLIC L0077
+        PUBLIC L0078
+        PUBLIC L0095
+        PUBLIC L0205
+        PUBLIC L022C
+        PUBLIC L0246
+        PUBLIC L0260
+        PUBLIC L026A
+        PUBLIC L0284
 
-        XREF L02BF
-        XREF L11CB
-        XREF L15F2
-        XREF L169E
-        XREF L16C5
-        XREF L335B
+        EXTERN L02BF
+        EXTERN L11CB
+        EXTERN L15F2
+        EXTERN L169E
+        EXTERN L16C5
+        EXTERN L335B
 
 ; -------------------------
 ; Last updated: 13-DEC-2004

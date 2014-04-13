@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.10 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.11 2014-04-13 20:32:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,8 +31,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.10 2014-04-13 11:5
 #define SYM_DEFINED		1       	/* 00000001 symbol is defined */
 #define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
 									   a symbol table search */
-#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, 
-									   global library; not output in sym list */
+#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, ASMPC, OS_ID
+									   not output in sym list */
 
 #define SYM_TYPE		120     	/* 01111000 */
 
@@ -87,7 +87,10 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.10  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.11  2014-04-13 20:32:06  pauloscustodio
+* PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+*
+* Revision 1.10  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -

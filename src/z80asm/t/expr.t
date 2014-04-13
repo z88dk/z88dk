@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.7 2014-04-12 15:18:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.8 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -149,8 +149,8 @@ for (@asmbin) {
 }
 
 t_z80asm(
-	asm		=> "XDEF ZERO : DEFC ZERO = 0",
-	asm1	=> "XREF ZERO\n".$asm,
+	asm		=> "PUBLIC ZERO : DEFC ZERO = 0",
+	asm1	=> "EXTERN ZERO\n".$asm,
 	bin		=> $bin
 );
 
@@ -169,8 +169,8 @@ if ( ! get_legacy() ) {
 
 # text BUG_0043
 t_z80asm(
-	asm		=> "XDEF ZERO : DEFC ZERO = 0",
-	asm1	=> "XREF ZERO : DEFB ZERO".("+0" x 122),	# line lenght = 255, expression len > 128
+	asm		=> "PUBLIC ZERO : DEFC ZERO = 0",
+	asm1	=> "EXTERN ZERO : DEFB ZERO".("+0" x 122),	# line lenght = 255, expression len > 128
 	bin		=> "\0",
 );
 
@@ -226,7 +226,10 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.7  2014-04-12 15:18:06  pauloscustodio
+# Revision 1.8  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.7  2014/04/12 15:18:06  pauloscustodio
 # Add intArray and longArray to array.c
 #
 # Revision 1.6  2014/03/29 00:33:29  pauloscustodio

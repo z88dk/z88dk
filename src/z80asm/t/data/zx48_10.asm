@@ -2,40 +2,40 @@
 ;** Part 10. FLOATING-POINT CALCULATOR **
 ;****************************************
 
-        XDEF L335B
-        XDEF L33A9
-        XDEF L33B4
-        XDEF L33C0
-        XDEF L3406
-        XDEF L346E
-        XDEF L34E9
-        XDEF L350B
+        PUBLIC L335B
+        PUBLIC L33A9
+        PUBLIC L33B4
+        PUBLIC L33C0
+        PUBLIC L3406
+        PUBLIC L346E
+        PUBLIC L34E9
+        PUBLIC L350B
 
-        XREF L15E6
-        XREF L1601
-        XREF L1615
-        XREF L1C8A
-        XREF L1E94
-        XREF L1E99
-        XREF L1E9F
-        XREF L1F05
-        XREF L24FB
-        XREF L2AB2
-        XREF L2BF1
-        XREF L2C8D
-        XREF L2D28
-        XREF L2D2B
-        XREF L2D4F
-        XREF L2D7F
-        XREF L2D8E
-        XREF L2DD5
-        XREF L2DE3
-        XREF L300F
-        XREF L3014
-        XREF L30CA
-        XREF L31AF
-        XREF L3214
-        XREF L3297
+        EXTERN L15E6
+        EXTERN L1601
+        EXTERN L1615
+        EXTERN L1C8A
+        EXTERN L1E94
+        EXTERN L1E99
+        EXTERN L1E9F
+        EXTERN L1F05
+        EXTERN L24FB
+        EXTERN L2AB2
+        EXTERN L2BF1
+        EXTERN L2C8D
+        EXTERN L2D28
+        EXTERN L2D2B
+        EXTERN L2D4F
+        EXTERN L2D7F
+        EXTERN L2D8E
+        EXTERN L2DD5
+        EXTERN L2DE3
+        EXTERN L300F
+        EXTERN L3014
+        EXTERN L30CA
+        EXTERN L31AF
+        EXTERN L3214
+        EXTERN L3297
 	
 ; As a general rule the calculator avoids using the IY register.
 ; exceptions are val, val$ and str$.

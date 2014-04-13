@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.6 2014-04-13 11:54:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0015.t,v 1.7 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # Error in linking of addresses:
 # Base address of each module is independent of start address of the module in
@@ -36,11 +36,11 @@ my @testfiles = qw( testa.asm testa.lst testa.sym testa.obj testa.map testa.bin
 
 #------------------------------------------------------------------------------
 my $testa_asm = "
-		xdef a1
-		xdef a2
-		xref b1
-		xref b2
-		lib  l1
+		PUBLIC a1
+		PUBLIC a2
+		EXTERN b1
+		EXTERN b2
+		EXTERN l1
 
 	    a1:	ld a,1		; 8000  3E 01
 		call b1		; 8002  CD 16 80
@@ -74,11 +74,11 @@ my $testa_obj = objfile(NAME => 'testa',
 
 #------------------------------------------------------------------------------
 my $testb_asm = "
-		xdef b1
-		xdef b2
-		xref a1
-		xref a2
-		lib  l1
+		PUBLIC b1
+		PUBLIC b2
+		EXTERN a1
+		EXTERN a2
+		EXTERN l1
 
 	    b1:	ld b,1		; 8016  06 01
 		call a1		; 8018  CD 00 80
@@ -112,7 +112,7 @@ my $testb_obj = objfile(NAME => 'testb',
 
 #------------------------------------------------------------------------------
 my $testl_asm = "
-		xlib l1
+		PUBLIC l1
 
 	    l1:	ld l,1		; 802C  2E 01
 		jp l2		; 802E  C3 31 80
@@ -177,7 +177,10 @@ unlink_testfiles(@testfiles);
 done_testing();
 
 # $Log: BUG_0015.t,v $
-# Revision 1.6  2014-04-13 11:54:01  pauloscustodio
+# Revision 1.7  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.6  2014/04/13 11:54:01  pauloscustodio
 # CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 # Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 # Remove 'X' scope for symbols in object files used before for XLIB -

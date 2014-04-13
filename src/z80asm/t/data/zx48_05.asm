@@ -2,46 +2,46 @@
 ;** Part 5. SCREEN AND PRINTER HANDLING ROUTINES **
 ;**************************************************
 
-        XDEF L09F4
-        XDEF L0BDB
-        XDEF L0C0A
-        XDEF L0D4D
-        XDEF L0D6B
-        XDEF L0D6E
-        XDEF L0DAF
-        XDEF L0DD9
-        XDEF L0E44
-        XDEF L0EAC
-        XDEF L0ECD
-        XDEF L0EDF
-        XDEF L0F2C
-        XDEF L0F81
-        XDEF L1097
-        XDEF L10A8
-        XDEF L111D
-        XDEF L11A7
+        PUBLIC L09F4
+        PUBLIC L0BDB
+        PUBLIC L0C0A
+        PUBLIC L0D4D
+        PUBLIC L0D6B
+        PUBLIC L0D6E
+        PUBLIC L0DAF
+        PUBLIC L0DD9
+        PUBLIC L0E44
+        PUBLIC L0EAC
+        PUBLIC L0ECD
+        PUBLIC L0EDF
+        PUBLIC L0F2C
+        PUBLIC L0F81
+        PUBLIC L1097
+        PUBLIC L10A8
+        PUBLIC L111D
+        PUBLIC L11A7
 
-        XREF L0095
-        XREF L03B5
-        XREF L15D4
-        XREF L1601
-        XREF L1615
-        XREF L1652
-        XREF L1655
-        XREF L1695
-        XREF L1795
-        XREF L1855
-        XREF L187D
-        XREF L18E1
-        XREF L190F
-        XREF L191C
-        XREF L196E
-        XREF L19E5
-        XREF L19E8
-        XREF L1E9F
-        XREF L1F05
-        XREF L1F54
-        XREF L2211
+        EXTERN L0095
+        EXTERN L03B5
+        EXTERN L15D4
+        EXTERN L1601
+        EXTERN L1615
+        EXTERN L1652
+        EXTERN L1655
+        EXTERN L1695
+        EXTERN L1795
+        EXTERN L1855
+        EXTERN L187D
+        EXTERN L18E1
+        EXTERN L190F
+        EXTERN L191C
+        EXTERN L196E
+        EXTERN L19E5
+        EXTERN L19E8
+        EXTERN L1E9F
+        EXTERN L1F05
+        EXTERN L1F54
+        EXTERN L2211
 
 ; --------------------------
 ; THE 'PRINT OUTPUT' ROUTINE

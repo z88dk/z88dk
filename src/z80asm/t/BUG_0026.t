@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.5 2014-03-16 19:47:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.6 2014-04-13 20:32:10 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 for (0 .. 255) {
-	list_push_asm("XDEF GLOBAL$_");
+	list_push_asm("PUBLIC GLOBAL$_");
 	list_push_asm("GLOBAL$_: defb $_", $_);
 	list_push_asm("LOCAL$_: defb $_", $_);
 }
@@ -31,7 +31,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: BUG_0026.t,v $
-# Revision 1.5  2014-03-16 19:47:33  pauloscustodio
+# Revision 1.6  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.5  2014/03/16 19:47:33  pauloscustodio
 # comments
 #
 # Revision 1.4  2014/01/11 01:29:46  pauloscustodio

@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.5 2014-04-13 20:32:10 pauloscustodio Exp $
 # $Log: listfile.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.5  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -54,12 +57,12 @@ list_push_asm("defb B", 2);
 list_push_asm("defw B", 2, 0);
 list_push_asm("defl B", 2, 0, 0, 0);
 list_push_asm("defc B = 2");
-list_push_asm("xdef B");
+list_push_asm("PUBLIC B");
 
 # create several pages of local and global referenced
 for (0..255) {
 	my $label = sprintf("%03d", $_);
-	list_push_asm("xdef C$label");
+	list_push_asm("PUBLIC C$label");
 	list_push_asm("C$label: defb $_", $_);
 	list_push_asm("D$label: defb $_", $_);
 }

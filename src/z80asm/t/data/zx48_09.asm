@@ -2,27 +2,27 @@
 ;** Part 9. ARITHMETIC ROUTINES **
 ;*********************************
 
-        XDEF L2D4F
-        XDEF L2D7F
-        XDEF L2D8E
-        XDEF L2DA2
-        XDEF L2DD5
-        XDEF L2DE3
-        XDEF L300F
-        XDEF L3014
-        XDEF L30A9
-        XDEF L30CA
-        XDEF L31AD
-        XDEF L31AF
-        XDEF L3214
-        XDEF L3297
+        PUBLIC L2D4F
+        PUBLIC L2D7F
+        PUBLIC L2D8E
+        PUBLIC L2DA2
+        PUBLIC L2DD5
+        PUBLIC L2DE3
+        PUBLIC L300F
+        PUBLIC L3014
+        PUBLIC L30A9
+        PUBLIC L30CA
+        PUBLIC L31AD
+        PUBLIC L31AF
+        PUBLIC L3214
+        PUBLIC L3297
 
-        XREF L15EF
-        XREF L1A1B
-        XREF L2AB6
-        XREF L346E
-        XREF L34E9
-        XREF L350B
+        EXTERN L15EF
+        EXTERN L1A1B
+        EXTERN L2AB6
+        EXTERN L346E
+        EXTERN L34E9
+        EXTERN L350B
 
 ; --------------------------
 ; E-format to floating point

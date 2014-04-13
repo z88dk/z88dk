@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.58 2014-04-05 23:36:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.59 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -746,7 +746,7 @@ sub list_push_asm {
 			$LABEL_PAGE{$1} ||= [];
 			$LABEL_ADDR{$1} = 0+eval($2);
 		}
-		elsif ($asm =~ /(?i:xdef|xlib)\s+($LABEL_RE)/) {	# global label
+		elsif ($asm =~ /(?i:xdef|xlib|public)\s+($LABEL_RE)/) {	# global label
 			push @{$LABEL_PAGE{$1}}, $PAGENR;
 			$LABEL_GLOBAL{$1}++;
 		}
@@ -1016,7 +1016,10 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.58  2014-04-05 23:36:11  pauloscustodio
+# Revision 1.59  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.58  2014/04/05 23:36:11  pauloscustodio
 # CH_0024: Case-preserving, case-insensitive symbols
 # Symbols no longer converted to upper-case, but still case-insensitive
 # searched. Warning when a symbol is used with different case than

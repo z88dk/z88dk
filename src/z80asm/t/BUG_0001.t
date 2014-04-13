@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.7 2014-01-11 01:29:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.8 2014-04-13 20:32:10 pauloscustodio Exp $
 # $Log: BUG_0001.t,v $
-# Revision 1.7  2014-01-11 01:29:45  pauloscustodio
+# Revision 1.8  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.7  2014/01/11 01:29:45  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -63,8 +66,8 @@ t_z80asm(
 
 # Test bugfix of BUG_0001(a)
 t_z80asm(
-	asm		=> " xref value : ld a,value-0 ",
-	asm2	=> " xdef value : defc value=10 ",
+	asm		=> " EXTERN value : ld a,value-0 ",
+	asm2	=> " PUBLIC value : defc value=10 ",
 	bin		=> "\x3E\x0A",
 );
 

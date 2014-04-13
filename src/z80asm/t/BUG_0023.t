@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0023.t,v 1.5 2014-04-05 23:36:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0023.t,v 1.6 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 # BUG_0023 : Error file with warning is removed in link phase
 
@@ -29,8 +29,8 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm  	=> "xref value : ld a,value : ld b,256",
-	asm1	=> "xdef value : defc value = -129",
+	asm  	=> "EXTERN value : ld a,value : ld b,256",
+	asm1	=> "PUBLIC value : defc value = -129",
 	bin		=> "\x3E\x7F\x06\x00",
 	err		=> "Warning at file 'test.asm' line 3: integer '256' out of range\n".
 			   "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
@@ -41,7 +41,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: BUG_0023.t,v $
-# Revision 1.5  2014-04-05 23:36:11  pauloscustodio
+# Revision 1.6  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.5  2014/04/05 23:36:11  pauloscustodio
 # CH_0024: Case-preserving, case-insensitive symbols
 # Symbols no longer converted to upper-case, but still case-insensitive
 # searched. Warning when a symbol is used with different case than

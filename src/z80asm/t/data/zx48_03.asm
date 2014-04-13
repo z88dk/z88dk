@@ -2,13 +2,13 @@
 ;** Part 3. LOUDSPEAKER ROUTINES **
 ;**********************************
 
-        XDEF L03B5
-        XDEF L03F8
+        PUBLIC L03B5
+        PUBLIC L03F8
 
-        XREF L1E94
-        XREF L1E99
-        XREF L33B4
-        XREF L3406
+        EXTERN L1E94
+        EXTERN L1E99
+        EXTERN L33B4
+        EXTERN L3406
 
 ; Documented by Alvin Albrecht.
 

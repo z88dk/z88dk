@@ -2,17 +2,17 @@
 ;** Part 2. KEYBOARD ROUTINES **
 ;*******************************
 
-        XDEF L028E
-        XDEF L02BF
-        XDEF L031E
-        XDEF L0333
+        PUBLIC L028E
+        PUBLIC L02BF
+        PUBLIC L031E
+        PUBLIC L0333
 
-        XREF L0205
-        XREF L022C
-        XREF L0246
-        XREF L0260
-        XREF L026A
-        XREF L0284
+        EXTERN L0205
+        EXTERN L022C
+        EXTERN L0246
+        EXTERN L0260
+        EXTERN L026A
+        EXTERN L0284
 	
 ;   Using shift keys and a combination of modes the Spectrum 40-key keyboard
 ;   can be mapped to 256 input characters

@@ -2,28 +2,28 @@
 ;** Part 4. CASSETTE HANDLING ROUTINES **
 ;****************************************
 
-        XDEF L0605
+        PUBLIC L0605
 
-        XREF L0C0A
-        XREF L15D4
-        XREF L1601
-        XREF L1655
-        XREF L19B8
-        XREF L19E5
-        XREF L19E8
-        XREF L1ADF
-        XREF L1BEE
-        XREF L1C82
-        XREF L1C8A
-        XREF L1C8C
-        XREF L1CE6
-        XREF L1E99
-        XREF L1F05
-        XREF L2048
-        XREF L24FB
-        XREF L2530
-        XREF L28B2
-        XREF L2BF1
+        EXTERN L0C0A
+        EXTERN L15D4
+        EXTERN L1601
+        EXTERN L1655
+        EXTERN L19B8
+        EXTERN L19E5
+        EXTERN L19E8
+        EXTERN L1ADF
+        EXTERN L1BEE
+        EXTERN L1C82
+        EXTERN L1C8A
+        EXTERN L1C8C
+        EXTERN L1CE6
+        EXTERN L1E99
+        EXTERN L1F05
+        EXTERN L2048
+        EXTERN L24FB
+        EXTERN L2530
+        EXTERN L28B2
+        EXTERN L2BF1
 
 ;   These routines begin with the service routines followed by a single
 ;   command entry point.

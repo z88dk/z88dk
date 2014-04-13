@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.67 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.68 2014-04-13 20:32:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -398,7 +398,7 @@ MODULE( void )
 {
     if ( opts.force_xlib )
     {
-        XLIB();
+        PUBLIC();
     }
     else
     {
@@ -477,7 +477,7 @@ CPI( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_cpi\ncall rcmx_cpi\n" );
+        SetTemporaryLine( "\n extern rcmx_cpi \n call rcmx_cpi \n" );
         return;
     }
 
@@ -493,7 +493,7 @@ CPIR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_cpir\ncall rcmx_cpir\n" );
+        SetTemporaryLine( "\n extern rcmx_cpir \n call rcmx_cpir \n" );
         return;
     }
 
@@ -509,7 +509,7 @@ CPD( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_cpd\ncall rcmx_cpd\n" );
+        SetTemporaryLine( "\n extern rcmx_cpd \n call rcmx_cpd \n" );
         return;
     }
 
@@ -525,7 +525,7 @@ CPDR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_cpdr\ncall rcmx_cpdr\n" );
+        SetTemporaryLine( "\n extern rcmx_cpdr \n call rcmx_cpdr \n" );
         return;
     }
 
@@ -937,7 +937,7 @@ RLD( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_rld\ncall rcmx_rld\n" );
+        SetTemporaryLine( "\n extern rcmx_rld \n call rcmx_rld \n" );
         return;
     }
 
@@ -953,7 +953,7 @@ RRD( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\nlib rcmx_rrd\ncall rcmx_rrd\n" );
+        SetTemporaryLine( "\n extern rcmx_rrd \n call rcmx_rrd \n" );
         return;
     }
 
@@ -1053,7 +1053,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.67  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.68  2014-04-13 20:32:06  pauloscustodio
+* PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+*
+* Revision 1.67  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -

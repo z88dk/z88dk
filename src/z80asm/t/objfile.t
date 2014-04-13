@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.8 2014-04-13 11:54:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.9 2014-04-13 20:32:10 pauloscustodio Exp $
 #
 
 use strict;
@@ -145,9 +145,9 @@ t_binary($obj, objfile(NAME => 'test',
 # local and global symbols
 unlink_testfiles();
 write_file(asm_file(), "
-	xdef global
-	xref extobj
-	lib  extlib
+	PUBLIC global
+	EXTERN extobj
+	EXTERN extlib
 
 local:	nop
 global:	call extobj
@@ -168,7 +168,7 @@ t_binary($obj, objfile(NAME => 'test',
 # library
 unlink_testfiles();
 write_file(asm_file(), "
-	xlib mult
+	PUBLIC mult
 
 mult:	ret
 ");
@@ -187,14 +187,14 @@ t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test', CODE => ""));
 
-write_file(asm1_file(), "xdef main \n main:");
+write_file(asm1_file(), "PUBLIC main \n main:");
 t_z80asm_capture(asm1_file(), "", "", 0);
 $obj = read_binfile(obj1_file());
 t_binary($obj, objfile(NAME => 'test1',
 				SYMBOLS => [["G", "A", 0, "main"]],
 				CODE => ""));
 
-write_file(asm2_file(), "xref main \n jp main");
+write_file(asm2_file(), "EXTERN main \n jp main");
 t_z80asm_capture(asm2_file(), "", "", 0);
 $obj = read_binfile(obj2_file());
 t_binary($obj, objfile(NAME => 'test2',
@@ -393,7 +393,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.8  2014-04-13 11:54:01  pauloscustodio
+# Revision 1.9  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.8  2014/04/13 11:54:01  pauloscustodio
 # CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 # Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 # Remove 'X' scope for symbols in object files used before for XLIB -

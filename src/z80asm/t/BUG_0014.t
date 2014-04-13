@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0014.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0014.t,v 1.5 2014-04-13 20:32:10 pauloscustodio Exp $
 # $Log: BUG_0014.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.5  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -48,7 +51,7 @@ for my $lib (   'zx_clib',    'zx_clib.lib',
 	
     unlink_testfiles('zx_clib.lib');
     ok ! -f 'zx_clib.lib', "zx_clib.lib deleted, building $lib";
-    write_file(asm_file(), "xlib main \n main: ret");
+    write_file(asm_file(), "PUBLIC main \n main: ret");
     t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
     ok -f 'zx_clib.lib', "zx_clib.lib exists, built $lib";
 }

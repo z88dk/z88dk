@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.5 2014-04-13 20:32:10 pauloscustodio Exp $
 # $Log: op-ASMSIZE-ASMTAIL.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.5  2014-04-13 20:32:10  pauloscustodio
+# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -39,7 +42,7 @@ my @testfiles = qw( testa.asm testa.lst testa.sym testa.obj testa.map testa.bin
 				);
 
 my $asm = "
-	XREF ASMSIZE, ASMTAIL
+	EXTERN ASMSIZE, ASMTAIL
 	
 	DEFB 0,1,2,3
 	DEFW ASMSIZE
