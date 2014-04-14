@@ -20,7 +20,7 @@ LIB asm_open, __stdio_parse_permission, asm_mtx_init
 LIB asm_p_forward_list_alt_pop_front, asm_p_forward_list_alt_push_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
@@ -56,7 +56,7 @@ asm_fopen_unlocked:
    push bc                     ; save mode byte
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
    
    call __stdio_lock_file_list   ; acquire stdio lock
 
@@ -67,7 +67,7 @@ ENDIF
    call asm_p_forward_list_alt_pop_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    push hl                     ; save & FILE.link
    push af                     ; save error status
@@ -139,7 +139,7 @@ ENDIF
 open_failed:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
   
    call __stdio_lock_file_list   ; acquire stdio lock
    
@@ -152,7 +152,7 @@ ENDIF
    call asm_p_forward_list_alt_push_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
    
    call __stdio_unlock_file_list  ; release stdio lock
 

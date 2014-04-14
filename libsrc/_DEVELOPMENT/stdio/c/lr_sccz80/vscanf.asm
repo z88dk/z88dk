@@ -4,7 +4,7 @@
 INCLUDE "clib_cfg.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB vscanf

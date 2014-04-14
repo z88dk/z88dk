@@ -2,7 +2,7 @@
 INCLUDE "clib_cfg.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB asm__fflushall

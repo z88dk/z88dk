@@ -21,7 +21,7 @@ LIB asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
 LIB error_znc, error_mc, error_ebadf_mc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
 LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
@@ -59,7 +59,7 @@ asm_fclose_unlocked:
    call __stdio_file_destroy   ; FILE structure is disassociated
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    call __stdio_lock_file_list   ; acquire stdio lock
 
@@ -86,7 +86,7 @@ ENDIF
 file_invalid:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    call __stdio_unlock_file_list  ; release stdio lock
 

@@ -8,7 +8,7 @@ XREF __stdio_file_list_open
 LIB asm0_fflush_unlocked, asm_p_forward_list_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
 LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
@@ -25,7 +25,7 @@ asm__fflushall_unlocked:
    ; uses  : all
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    call __stdio_lock_file_list   ; acquire list lock
 
@@ -42,7 +42,7 @@ file_loop:
    pop ix
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $04
 
    jp c, __stdio_unlock_file_list  ; if no more open files in list
 

@@ -18,7 +18,7 @@ XREF __stdio_file_stderr, _errno
 LIB asm_strerror, asm_fputs_unlocked, asm_fputc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 LIB __stdio_lock_acquire, __stdio_lock_release, error_mc
@@ -39,7 +39,7 @@ asm_perror:
    ld ix,(__stdio_file_stderr)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    call __stdio_lock_acquire   ; so that output is contiguous
@@ -75,7 +75,7 @@ errno_string:
    ld e,13                     ; '\n'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD
+IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    call asm_fputc_unlocked
