@@ -13,14 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.4 2014-04-15 22:31:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.5 2014-04-15 23:12:04 pauloscustodio Exp $
 
 use strict;
 use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-assemble(<<'END');
+
+# Z80 | RABBIT
+assemble("", <<'END');
 start:
 	call_oz(1)		; E7 01
 	call_oz(255)	; E7 FF
@@ -34,6 +36,9 @@ start:
 	im	0			; ED 46			Z80
 	im	1			; ED 56			Z80
 	im	2			; ED 5E			Z80
+	invoke(0)		; CD 00 00
+	invoke(1)		; CD 01 00
+	invoke(65535)	; CD FF FF
 	rst	0x00		; C7			Z80
 	rst	0x08		; CF			Z80
 	rst	0x10		; D7          
@@ -44,56 +49,49 @@ start:
 	rst	0x38		; FF          
 END
 
+
+# TI83PLUS
+assemble("--ti83plus", <<'END');
+	invoke(0)		; EF 00 00
+	invoke(1)		; EF 01 00
+	invoke(65535)	; EF FF FF
+END
+
+
 # invalid arguments
-write_file(asm_file(), <<'ASM');
-	im 	-1
-	im 	3
-	im 	undefined
-	rst -1
-	rst	undefined
-	call_oz(0)
-	call_oz(65536)
-	call_pkg(-1)
-	call_pkg(65536)
+check_errors("", <<'ASM');
+	call_oz(0)      ; integer '0' out of range
+	call_oz(65536)	; integer '65536' out of range
+	call_pkg(-1)    ; integer '-1' out of range
+	call_pkg(65536) ; integer '65536' out of range
+	invoke(-1)    	; integer '-1' out of range
+	invoke(65536) 	; integer '65536' out of range
+	im 	-1			; integer '-1' out of range
+	im 	3			; integer '3' out of range
+	im 	undefined	; symbol not defined
+	rst	undefined   ; symbol not defined
+	rst -1			; integer '-1' out of range
 ASM
-t_z80asm_capture(asm_file(), "", <<'ERR', 1 );
-Error at file 'test.asm' line 1: integer '-1' out of range
-Error at file 'test.asm' line 2: integer '3' out of range
-Error at file 'test.asm' line 3: symbol not defined
-Error at file 'test.asm' line 4: integer '-1' out of range
-Error at file 'test.asm' line 5: symbol not defined
-Error at file 'test.asm' line 6: integer '0' out of range
-Error at file 'test.asm' line 7: integer '65536' out of range
-Error at file 'test.asm' line 8: integer '-1' out of range
-Error at file 'test.asm' line 9: integer '65536' out of range
-9 errors occurred during assembly
-ERR
+
 
 # not in RABBIT
-write_file(asm_file(), <<'ASM');
-	im	0
-	im	1
-	im	2
-	rst	0x00
-	rst	0x08
-	rst	0x30
+check_errors("--RCMX000", <<'ASM');
+	im	0			; illegal identifier
+	im	1           ; illegal identifier
+	im	2           ; illegal identifier
+	rst	0x00        ; illegal identifier
+	rst	0x08        ; illegal identifier
+	rst	0x30        ; illegal identifier
 ASM
-t_z80asm_capture("--RCMX000 ".asm_file(), "", <<'ERR', 1 );
-Error at file 'test.asm' line 1: illegal identifier
-Error at file 'test.asm' line 2: illegal identifier
-Error at file 'test.asm' line 3: illegal identifier
-Error at file 'test.asm' line 4: illegal identifier
-Error at file 'test.asm' line 5: illegal identifier
-Error at file 'test.asm' line 6: illegal identifier
-6 errors occurred during assembly
-ERR
+
 
 unlink_testfiles();
 done_testing();
 
+
 # assemble the given code, compare
 sub assemble {
-	my($code) = @_;
+	my($options, $code) = @_;
 	
 	my $addr = 0;
 	my %label;
@@ -106,13 +104,13 @@ sub assemble {
 		if (/^(\w+):/) {
 			# label:  ; all line copied
 			$label{$1} = $addr;
-			$asm_z80    .= "$_\n";
-			$asm_rabbit .= "$_\n";
+			$asm_z80      .= "$_\n";
+			$asm_rabbit   .= "$_\n";
 		}
 		else {
 			# opcode ; bytes [Z80|RABBIT|""]
 			my $variant;
-			$variant = $1 if s/\s+(Z80|RABBIT)\s*$//;		# Z80 or RABBIT
+			$variant = $1 if s/\s+(Z80|RABBIT)\s*$//;		# cpu type
 		
 			my $bytes = $_; $bytes =~ s/^[^;]+;\s*//;
 			my $defb = "\tdefb "; 
@@ -124,16 +122,20 @@ sub assemble {
 			$defb =~ s/,$//;
 			
 			if ( ! $variant ) {
-				$asm_z80    .= "$_\n";
-				$asm_rabbit .= "$_\n";
+				$asm_z80      .= "$_\n";
+				$asm_rabbit   .= "$_\n";
 			}
 			elsif ( $variant eq 'Z80' ) {
-				$asm_z80    .= "$_\n";
-				$asm_rabbit .= "$defb\n";
+				$asm_z80      .= "$_\n";
+				$asm_rabbit   .= "$defb\n";
 			}
 			elsif ( $variant eq 'RABBIT' ) {
-				$asm_z80    .= "$defb\n";
-				$asm_rabbit .= "$_\n";
+				$asm_z80      .= "$defb\n";
+				$asm_rabbit   .= "$_\n";
+			}
+			elsif ( $variant eq 'TI83PLUS' ) {
+				$asm_z80      .= "$defb\n";
+				$asm_rabbit   .= "$defb\n";
 			}
 			else {
 				die;
@@ -147,27 +149,52 @@ sub assemble {
 	t_z80asm(
 		asm		=> uc($asm_z80),
 		bin		=> $bin,
+		options	=> $options,
 	);
 
 	# test asm 
 	t_z80asm(
 		asm		=> $asm_z80,
 		bin		=> $bin,
+		options	=> $options,
 	);
 	
 	# test asm for RABBIT
 	t_z80asm(
 		asm		=> $asm_rabbit,
 		bin		=> $bin,
-		options	=> "--RCMX000",
+		options	=> $options." --RCMX000",
 	);
-	
-	
 }
 
+# assemble, check errors
+sub check_errors {	
+	my($options, $code) = @_;
+	
+	my $line = 0;
+	my $asm = "";
+	my $errors = "";
+	
+	for (split(/\n/, $code)) {
+		next unless /\S/;
+		
+		$line++;
+		$asm .= "$_\n";
+		my($error_text) = /;\s*(.*)/ or die;
+		$errors .= "Error at file '".asm_file()."' line ".$line.": ".$error_text."\n";
+	}
+	$errors .= $line." errors occurred during assembly\n";
+	
+	write_file(asm_file(), $asm);
+	t_z80asm_capture($options." ".asm_file(), "", $errors, 1 );
+}
 
 # $Log: opcodes.t,v $
-# Revision 1.4  2014-04-15 22:31:17  pauloscustodio
+# Revision 1.5  2014-04-15 23:12:04  pauloscustodio
+# INVOKE: no need for special treatment for parenthesis surrounding expression,
+# as any axpression can be surrounded by parenthesis
+#
+# Revision 1.4  2014/04/15 22:31:17  pauloscustodio
 # CALL_PKG: no need for special treatment for parenthesis surrounding expression,
 # as any axpression can be surrounded by parenthesis
 #
