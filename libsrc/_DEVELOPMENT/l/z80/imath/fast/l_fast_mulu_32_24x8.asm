@@ -220,7 +220,7 @@ loop_17:
    add hl,de
    adc a,b
    
-   jp nc, loop_18
+   jp nc, exit_18
    inc c
 
 exit_18:

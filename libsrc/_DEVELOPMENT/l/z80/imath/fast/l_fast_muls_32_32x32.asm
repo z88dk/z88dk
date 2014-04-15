@@ -1,7 +1,17 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_muls_32_32x32
 
-LIB l_fast_mulu_32_32x32, l_neg_dehl, error_mulu_overflow_mc
+LIB l_fast_mulu_32_32x32, l_neg_dehl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+   LIB error_mulu_overflow_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 l_fast_muls_32_32x32:
 
@@ -17,7 +27,7 @@ l_fast_muls_32_32x32:
    ;            dehl = signed 32-bit product
    ;            carry reset
    ;
-   ;         signed overflow
+   ;         signed overflow (LIA-1 enabled only)
    ;
    ;            dehl = LONG_MAX or LONG_MIN
    ;            carry set, errno = ERANGE
@@ -45,6 +55,11 @@ l_fast_muls_32_32x32:
    ; multiply & check for overflow
    
    call l_fast_mulu_32_32x32
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    jr c, unsigned_overflow
    
    bit 7,d
@@ -78,3 +93,18 @@ unsigned_overflow:
    inc de
    inc hl                      ; dehl = LONG_MIN
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   pop af
+   ret p
+   
+   ; correct sign of result
+   
+   jp l_neg_dehl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,7 +1,17 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_mulu_8_8x8
 
-LIB l_fast_mulu_16_8x8, error_mulu_overflow_mc
+LIB l_fast_mulu_16_8x8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+   LIB error_mulu_overflow_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 l_fast_mulu_8_8x8:
 
@@ -18,17 +28,20 @@ l_fast_mulu_8_8x8:
    ;
    ;         success
    ;
-   ;            h = 0
+   ;            h = 0 (LIA-1 enabled only)
    ;            l = 8-bit product
    ;            carry reset
    ;
-   ;         unsigned overflow
+   ;         unsigned overflow (LIA-1 enabled only)
    ;
    ;            h = $ff
    ;            l = $ff = UCHAR_MAX
    ;            carry set, errno = ERANGE
    ;
    ; uses  : af, b, de, hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
 
    call l_fast_mulu_16_8x8
    
@@ -37,3 +50,10 @@ l_fast_mulu_8_8x8:
    ret z
    
    jp error_mulu_overflow_mc
+
+ELSE
+
+   jp l_fast_mulu_16_8x8
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

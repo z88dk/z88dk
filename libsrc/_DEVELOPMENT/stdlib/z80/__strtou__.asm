@@ -135,28 +135,28 @@ positive:
    
    ex de,hl
 
-IF __CLIB_OPT_TXT2NUM & $44
+IF __CLIB_OPT_TXT2NUM & $04
 
    cp 10
    jr z, decimal
 
 ENDIF
 
-IF __CLIB_OPT_TXT2NUM & $88
+IF __CLIB_OPT_TXT2NUM & $08
 
    cp 16
    jr z, hex
 
 ENDIF
 
-IF __CLIB_OPT_TXT2NUM & $22
+IF __CLIB_OPT_TXT2NUM & $02
    
    cp 8
    jr z, octal
 
 ENDIF
 
-IF __CLIB_OPT_TXT2NUM & $11
+IF __CLIB_OPT_TXT2NUM & $01
    
    cp 2
    jr z, binary
@@ -267,7 +267,7 @@ number_complete:
    ret
 
 
-IF __CLIB_OPT_TXT2NUM & $44
+IF __CLIB_OPT_TXT2NUM & $04
 
 decimal:
 
@@ -284,7 +284,7 @@ decimal:
 ENDIF
 
 
-IF __CLIB_OPT_TXT2NUM & $88
+IF __CLIB_OPT_TXT2NUM & $08
 
 hex:
 
@@ -301,7 +301,7 @@ hex:
 ENDIF
 
 
-IF __CLIB_OPT_TXT2NUM & $22
+IF __CLIB_OPT_TXT2NUM & $02
 
 octal:
 
@@ -318,7 +318,7 @@ octal:
 ENDIF
 
 
-IF __CLIB_OPT_TXT2NUM & $11
+IF __CLIB_OPT_TXT2NUM & $01
 
 binary:
 

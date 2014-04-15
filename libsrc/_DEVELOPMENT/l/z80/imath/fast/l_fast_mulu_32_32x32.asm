@@ -1,8 +1,23 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_mulu_32_32x32
 
 LIB l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8, l0_fast_mulu_32_24x8
-LIB error_mulu_overflow_mc, l_fast_mulu_32_16x16, l_fast_mulu_32_24x16
+LIB l_fast_mulu_32_16x16, l_fast_mulu_32_24x16
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+   LIB error_mulu_overflow_mc
+
+ELSE
+
+   LIB l_fast_mulu_16_8x8, l_fast_mulu_24_16x8
+   
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 l_fast_mulu_32_32x32:
 
@@ -19,12 +34,12 @@ l_fast_mulu_32_32x32:
    ;            dehl = 32-bit product
    ;            carry reset
    ;
-   ;         unsigned overflow
+   ;         unsigned overflow (LIA-1 enabled only)
    ;
    ;            dehl = $ffffffff = ULONG_MAX
    ;            carry set, errno = ERANGE
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl', (ixh if loop unrolling disabled)
+   ; uses  : af, bc, de, hl, bc', de', hl', (ixh if loop unrolling disabled, ix if LIA-1 disabled)
 
    ; try to reduce multiplication
    
@@ -47,6 +62,10 @@ _8_32:
    ld a,l
    exx
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    call l_fast_mulu_40_32x8
    
    or a
@@ -61,12 +80,26 @@ overflow:
    
    ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   jp l_fast_mulu_40_32x8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _24b_x:
 
    ; dehl * dehl'
 
    exx
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    inc d
    dec d
    jr nz, overflow             ; 24b_24b = 48b
@@ -79,13 +112,36 @@ _24b_x:
    dec h
    jr nz, overflow             ; 24b_8b = 32b
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   inc d
+   dec d
+   jr nz, _24b_24b
+   
+   inc e
+   dec e
+   jr nz, _24b_16b
+   
+   inc h
+   dec h
+   jr nz, _24b_8b
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _32_8:
 
    ; l * dehl'
    
    ld a,l
    exx
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
    call l0_fast_mulu_40_32x8
    
    or a
@@ -93,11 +149,22 @@ _32_8:
 
    jr overflow
 
+ELSE
+
+   jp l0_fast_mulu_40_32x8
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _16b_x:
 
    ; ehl * dehl'
 
    exx
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    inc d
    dec d
@@ -106,6 +173,22 @@ _16b_x:
    inc e
    dec e
    jr nz, overflow             ; 16b_16b = 32b
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   inc d
+   dec d
+   jr nz, _16b_24b
+   
+   inc e
+   dec e
+   jr nz, _16b_16b
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    inc h
    dec h
@@ -125,10 +208,22 @@ _8b_x:
    ; hl * dehl'
 
    exx
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
    inc d
    dec d
    jr nz, overflow             ; 8b_24b = 32b
+
+ELSE
+
+   inc d
+   dec d
+   jr nz, _8b_24b
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    inc e
    dec e
@@ -157,3 +252,178 @@ _16_16:
    pop de
    
    jp l_fast_mulu_32_16x16
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF (__CLIB_OPT_IMATH_FAST & $80) = 0
+
+_24b_24b:
+
+   ; dehl' * dehl
+
+   push hl                     ; save L
+   
+   exx
+   
+   push de                     ; save d
+
+   call _24b_16b
+   
+   exx
+   
+   pop de
+   ld e,d
+   pop hl
+   
+   call l_fast_mulu_16_8x8
+   
+   ld a,l
+   
+   exx
+   
+   add a,d
+   ld d,a
+   
+   or a
+   ret
+
+_24b_16b:
+
+   ; dehl' * ehl
+   
+   exx
+
+_16b_24b:
+
+   ; ehl' * dehl
+
+   push de
+   push hl
+   
+   exx
+   
+   ld c,h
+   ld b,e
+   
+   ld a,l
+   
+   pop hl
+   pop de
+   
+   push af
+   
+   call l_fast_mulu_32_24x16
+   
+   ld d,e
+   ld e,h
+   ld h,l
+   ld l,0
+   
+   exx
+   
+   pop af
+   
+   call l0_fast_mulu_40_32x8
+   
+   push de
+   push hl
+   
+   exx
+   
+   pop bc
+   add hl,bc
+   
+   ex de,hl
+   
+   pop bc
+   adc hl,bc
+
+   ex de,hl
+   
+   or a
+   ret
+
+_8b_24b:
+
+   ; hl' * dehl
+
+   exx
+   
+_24b_8b:
+
+   ; dehl' * hl
+
+   ld a,l
+   
+   exx
+   
+   push de
+   push hl
+   
+   call l0_fast_mulu_40_32x8
+
+   exx
+   
+   ld a,h
+   
+   pop hl
+   pop de
+   
+   call l0_fast_mulu_32_24x8
+
+   ld d,e
+   ld e,h
+   ld h,l
+   ld l,0
+   
+   push de
+   push hl
+   
+   exx
+   
+   pop bc
+   add hl,bc
+   
+   ex de,hl
+   
+   pop bc
+   adc hl,bc
+   
+   ex de,hl
+   
+   or a
+   ret
+
+_16b_16b:
+
+   ; ehl' * ehl
+
+   push hl
+   
+   exx
+   
+   pop bc
+   push hl
+   
+   call l_fast_mulu_32_24x16
+   
+   exx
+   
+   pop hl
+   
+   call l_fast_mulu_24_16x8
+   
+   push hl
+   
+   exx
+   
+   pop bc
+   
+   ex de,hl
+   add hl,bc
+   ex de,hl
+   
+   or a
+   ret
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

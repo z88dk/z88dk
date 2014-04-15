@@ -61,6 +61,8 @@ stdio/c/sdcc_iy/putchar_unlocked
 stdio/c/sdcc_iy/putc_unlocked
 stdio/c/sdcc_iy/puts
 stdio/c/sdcc_iy/puts_unlocked
+stdio/c/sdcc_iy/rewind
+stdio/c/sdcc_iy/rewind_unlocked
 stdio/c/sdcc_iy/scanf
 stdio/c/sdcc_iy/scanf_unlocked
 stdio/c/sdcc_iy/snprintf

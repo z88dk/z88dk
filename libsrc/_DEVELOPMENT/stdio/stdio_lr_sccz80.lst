@@ -88,6 +88,8 @@ stdio/c/lr_sccz80/putc_unlocked
 stdio/c/lr_sccz80/putc_unlocked_callee
 stdio/c/lr_sccz80/puts
 stdio/c/lr_sccz80/puts_unlocked
+stdio/c/lr_sccz80/rewind
+stdio/c/lr_sccz80/rewind_unlocked
 stdio/c/lr_sccz80/scanf
 stdio/c/lr_sccz80/scanf_unlocked
 stdio/c/lr_sccz80/snprintf

@@ -1,7 +1,17 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_muls_8_8x8
 
-LIB l_fast_mulu_16_8x8, error_mulu_overflow_mc
+LIB l_fast_mulu_16_8x8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+   LIB error_mulu_overflow_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 l_fast_muls_8_8x8:
 
@@ -19,13 +29,17 @@ l_fast_muls_8_8x8:
    ;            hl = sign extended 8-bit product
    ;            carry reset
    ;
-   ;         signed overflow
+   ;         signed overflow (LIA-1 enabled only)
    ;
    ;            hl = sign extended CHAR_MIN or CHAR_MAX
    ;            carry set, errno = ERANGE
    ;
-   ; uses  : af, de, hl
-   
+   ; uses  : af, b, de, hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  
    ; determine sign of result
    
    ld a,l
@@ -93,3 +107,23 @@ signed_overflow:
    dec l                       ; return CHAR_MAX
    
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call l_fast_mulu_16_8x8
+   
+   ld a,l
+   
+   rla
+   sbc a,a
+   
+   ld h,a                      ; sign extend L into H
+   
+   or a
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

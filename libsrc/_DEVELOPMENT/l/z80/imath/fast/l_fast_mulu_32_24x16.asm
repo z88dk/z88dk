@@ -1,12 +1,22 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_mulu_32_24x16
 
-LIB l0_fast_mulu_32_24x8, l_fast_mulu_32_24x8, error_mulu_overflow_mc
+LIB l0_fast_mulu_32_24x8, l_fast_mulu_32_24x8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+LIB error_mulu_overflow_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 l_fast_mulu_32_24x16:
 
    ; unsigned multiplication of 24-bit and 16-bit
-   ; multiplicands into a 40-bit product
+   ; multiplicands into a 32-bit product
    ;
    ; error reported on overflow
    ; 
@@ -18,7 +28,7 @@ l_fast_mulu_32_24x16:
    ;            dehl = 32-bit product
    ;            carry reset
    ;
-   ;         unsigned overflow
+   ;         unsigned overflow (LIA-1 enabled only)
    ;
    ;            dehl = $ffffffff = ULONG_MAX
    ;            carry set, errno = ERANGE
@@ -33,10 +43,16 @@ l_fast_mulu_32_24x16:
    
    ld a,b
    call l0_fast_mulu_32_24x8        ; dehl = B * EHL
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
    inc d
    dec d
    jr nz, overflow_0
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; shift left 8 bits
    
@@ -62,11 +78,24 @@ l_fast_mulu_32_24x16:
    
    pop bc
    adc hl,bc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
    
    jr c, overflow_1
-   
+
+ELSE
+
+   or a
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ex de,hl
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
 
 overflow_0:
 
@@ -81,3 +110,6 @@ overflow_1:
    ld d,h
    
    ret
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

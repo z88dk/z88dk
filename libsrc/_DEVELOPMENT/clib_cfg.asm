@@ -62,13 +62,27 @@ defc __CLIB_OPT_IMATH = 0
 
 ; FAST INTEGER MATH LIBRARY OPTIONS
 
-defc __CLIB_OPT_IMATH_FAST = $00
+defc __CLIB_OPT_IMATH_FAST = $80
 
 ; bit 0 = $01 = enable loop unrolling in division
 ; bit 1 = $02 = enable leading zero elimination in division
 ; bit 2 = $04 = enable loop unrolling in multiplication
 ; bit 3 = $08 = enable leading zero elimination in multiplication
+; bit 7 = $80 = enable LIA-1 overflow saturation for multiplication
 
+; Notes:
+;
+; The C standard specifies that unsigned multiplication
+; is performed modulo the bit width of the type size
+; (ie multiplies "wrap").  In contrast, LIA-1 specifies
+; that overflowing multiplies should saturate.  The LIA-1
+; option causes multiplications to adopt this behaviour :-
+; overflowing multiplies saturate to maximum value and
+; errno is set to indicate an overflow condition.  Adopting
+; this option not only leads to more correct results but
+; also leads to faster multiplication code.
+;
+; sdcc cannot generate code for LIA-1 mode.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; text to number conversion
@@ -101,9 +115,9 @@ defc __CLIB_OPT_TXT2NUM = $00
 ; cause their integer counterparts to be pulled into the user code.
 ; This is because the specialized long functions will try to
 ; perform the conversion using faster 16-bit code when it can.
-; In these cases, the library will also use the specialized
-; integer function when it is already there even if it is not
-; explicitly enabled here.
+; If you use a specialized long function, you may want to try
+; enabling the specialized integer function to see if code
+; size remains unchanged.
 ;
 ; Note: Some library functions such as printf and scanf may
 ; use the specialized integer text to decimal conversion
@@ -142,9 +156,9 @@ defc __CLIB_OPT_NUM2TXT = $00
 ; cause their integer counterparts to be pulled into the user code.
 ; This is because the specialized long functions will try to
 ; perform the conversion using faster 16-bit code when it can.
-; In these cases, the library will also use the specialized
-; integer function when it is already there even if it is not
-; explicitly enabled here.
+; If you use a specialized long function, you may want to try
+; enabling the specialized integer function to see if code
+; size remains unchanged.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;

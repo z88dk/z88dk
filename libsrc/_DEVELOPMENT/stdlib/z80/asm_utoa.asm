@@ -47,28 +47,28 @@ asm0_utoa:                     ; bypasses NULL check of buf
 
 asm1_utoa:                     ; entry for itoa()
 
-IF __CLIB_OPT_NUM2TXT & $44
+IF __CLIB_OPT_NUM2TXT & $04
 
    cp 10
    jr z, decimal
 
 ENDIF
 
-IF __CLIB_OPT_NUM2TXT & $88
+IF __CLIB_OPT_NUM2TXT & $08
 
    cp 16
    jr z, hex
 
 ENDIF
 
-IF IF __CLIB_OPT_NUM2TXT & $22
+IF IF __CLIB_OPT_NUM2TXT & $02
 
    cp 8
    jr z, octal
 
 ENDIF
 
-IF __CLIB_OPT_NUM2TXT & $11
+IF __CLIB_OPT_NUM2TXT & $01
 
    cp 2
    jr z, binary
@@ -135,7 +135,7 @@ write_lp:
    ret
 
 
-IF __CLIB_OPT_NUM2TXT & $44
+IF __CLIB_OPT_NUM2TXT & $04
 
 decimal:
 
@@ -146,7 +146,7 @@ decimal:
 ENDIF
 
 
-IF __CLIB_OPT_NUM2TXT & $ff
+IF __CLIB_OPT_NUM2TXT & $0f
 
 terminate:
 
@@ -159,7 +159,7 @@ terminate:
 ENDIF
 
 
-IF __CLIB_OPT_NUM2TXT & $88
+IF __CLIB_OPT_NUM2TXT & $08
 
 hex:
    
@@ -171,7 +171,7 @@ hex:
 ENDIF
 
 
-IF __CLIB_OPT_NUM2TXT & $22
+IF __CLIB_OPT_NUM2TXT & $02
 
 octal:
 
@@ -183,7 +183,7 @@ octal:
 ENDIF
 
 
-IF __CLIB_OPT_NUM2TXT & $11
+IF __CLIB_OPT_NUM2TXT & $01
 
 binary:
 

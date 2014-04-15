@@ -247,5 +247,5 @@ input:
 
 return:
 
-carry set on error (file will be closed regardless)
+carry set if file is invalid (file will always be closed)
 

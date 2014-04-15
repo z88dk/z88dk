@@ -61,6 +61,8 @@ stdio/z80/asm_putchar_unlocked
 stdio/z80/asm_putc_unlocked
 stdio/z80/asm_puts
 stdio/z80/asm_puts_unlocked
+stdio/z80/asm_rewind
+stdio/z80/asm_rewind_unlocked
 stdio/z80/asm_scanf
 stdio/z80/asm_scanf_unlocked
 stdio/z80/asm_snprintf

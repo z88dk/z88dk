@@ -61,6 +61,8 @@ stdio/c/sdcc_ix/putchar_unlocked
 stdio/c/sdcc_ix/putc_unlocked
 stdio/c/sdcc_ix/puts
 stdio/c/sdcc_ix/puts_unlocked
+stdio/c/sdcc_ix/rewind
+stdio/c/sdcc_ix/rewind_unlocked
 stdio/c/sdcc_ix/scanf
 stdio/c/sdcc_ix/scanf_unlocked
 stdio/c/sdcc_ix/snprintf

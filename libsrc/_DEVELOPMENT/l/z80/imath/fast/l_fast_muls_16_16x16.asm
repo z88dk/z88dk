@@ -1,7 +1,18 @@
 
+INCLUDE "clib_cfg.asm"
+
 XLIB l_fast_muls_16_16x16
 
-LIB l_fast_mulu_16_16x16, l_neg_de, l_neg_hl, error_mulu_overflow_mc
+LIB l_fast_mulu_16_16x16, l_neg_de, l_neg_hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+
+   LIB error_mulu_overflow_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 l_fast_muls_16_16x16:
 
@@ -17,12 +28,12 @@ l_fast_muls_16_16x16:
    ;            hl = signed product
    ;            carry reset
    ;
-   ;         signed overflow
+   ;         signed overflow (LIA-1 enabled only)
    ;
    ;            hl = INT_MAX or INT_MIN
    ;            carry set, errno = ERANGE
    ;
-   ; uses  : af, c, de, hl
+   ; uses  : af, bc, de, hl
 
    ; determine sign of result
 
@@ -41,6 +52,11 @@ l_fast_muls_16_16x16:
    ; multiply & check for overflow
    
    call l_fast_mulu_16_16x16
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $80
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    jr c, unsigned_overflow
 
    bit 7,h
@@ -70,3 +86,18 @@ unsigned_overflow:
    
    inc hl                      ; return INT_MIN
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   pop af
+   ret p
+   
+   ; correct sign of result
+   
+   jp l_neg_hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
