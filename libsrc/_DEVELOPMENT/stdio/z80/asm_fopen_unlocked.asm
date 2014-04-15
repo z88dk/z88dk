@@ -12,6 +12,7 @@
 INCLUDE "clib_cfg.asm"
 
 XLIB asm_fopen_unlocked
+XDEF asm0_fopen_unlocked
 
 XREF __stdio_file_list_avail, mtx_recursive
 
@@ -101,6 +102,8 @@ ENDIF
    
    inc hl
    inc hl                      ; hl = FILE*
+
+asm0_fopen_unlocked:
 
    ;  c = mode byte
    ; de = driver_function
