@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.4 2013-03-08 13:40:20 stefano Exp $
+ *        $Id: mc.c,v 1.5 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -99,7 +99,7 @@ int mc_exec(char *target)
     }
 
 	if ( origin == -1 )
-		origin = parameter_search(crtfile,".sym","MYZORG");
+		origin = parameter_search(crtfile,".sym","myzorg");
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);

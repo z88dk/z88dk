@@ -5,7 +5,7 @@
  *
  *        Stefano Bodrato Jun 2010
  *
- *        $Id: sc3000.c,v 1.2 2010-07-07 15:23:56 stefano Exp $
+ *        $Id: sc3000.c,v 1.3 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -139,7 +139,7 @@ int sc3000_exec(char *target)
         pos = origin;
     } else {
 		if ( !sf7000 )
-			if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
     }

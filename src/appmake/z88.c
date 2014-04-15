@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.3 2009-06-13 19:16:42 dom Exp $
+ *      $Id: z88.c,v 1.4 2014-04-15 19:53:07 dom Exp $
  */
 
 
@@ -128,15 +128,15 @@ int z88_exec(char *target)
     if ( outfile == NULL )
         outfile = binname;
 
-    zorg = parameter_search(crtfile,".sym","MYZORG");
+    zorg = parameter_search(crtfile,".sym","myzorg");
     if ( zorg == -1 ) 
         myexit("Could not find parameter ZORG (compiled as BASIC?)\n",1);
-    indor = parameter_search(crtfile,".map","IN_DOR");
+    indor = parameter_search(crtfile,".map","in_dor");
     if ( indor == -1 ) 
-        myexit("Could not find parameter IN_DOR - no app dor present\n",1);
-    indorseg = parameter_search(crtfile,".map","IN_DOR_SEG_SETUP");
+        myexit("Could not find parameter in_dor - no app dor present\n",1);
+    indorseg = parameter_search(crtfile,".map","in_dor_seg_setup");
     if ( indorseg == -1 ) 
-        myexit("Could not find parameter IN_DOR_SEG_SETUP - no app dor present\n",1);
+        myexit("Could not find parameter in_dor_seg_setup - no app dor present\n",1);
 
 
     pages = ( (65536L - (long)(zorg+1))/16384L);

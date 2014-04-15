@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato,  April 2008
  *
- *        $Id: trs80.c,v 1.3 2009-06-13 19:16:42 dom Exp $
+ *        $Id: trs80.c,v 1.4 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -43,7 +43,7 @@ int trs80_exec()
     if ( origin != -1 ) {
         pos = origin;
     } else {
-        if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+        if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
             myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
     }

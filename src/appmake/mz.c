@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.12 2013-12-03 13:42:32 stefano Exp $
+ *        $Id: mz.c,v 1.13 2014-04-15 19:53:07 dom Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -758,7 +758,7 @@ int mz_exec(char *target)
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 			}
 		}

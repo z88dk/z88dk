@@ -59,7 +59,7 @@ int zxvgs_exec(char *target)
         outfile = binname;
 
 
-    zorg = parameter_search(crtfile,".sym","MYZORG");
+    zorg = parameter_search(crtfile,".sym","myzorg");
     if ( zorg == -1 ) 
         myexit("Could not find parameter ZORG (compiled as BASIC?)\n",1);
 

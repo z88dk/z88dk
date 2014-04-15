@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 5/2000
  *
- *        $Id: abc80.c,v 1.4 2009-06-13 19:16:42 dom Exp $
+ *        $Id: abc80.c,v 1.5 2014-04-15 19:53:06 dom Exp $
  */
 
 #include "appmake.h"
@@ -46,7 +46,7 @@ int abc80_exec()
     if ( origin != -1 ) {
         pos = origin;
     } else {
-        if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+        if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
             myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
     }

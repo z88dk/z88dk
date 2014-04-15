@@ -6,7 +6,7 @@
  * 
  *        MC loader by Stefano Bodrato, (c) 2013
  *
- *        $Id: nec.c,v 1.2 2013-01-28 08:14:47 stefano Exp $
+ *        $Id: nec.c,v 1.3 2014-04-15 19:53:07 dom Exp $
  */
 
 
@@ -234,7 +234,7 @@ int nec_exec(char *target)
 //	} else {
 		
 		if ( origin == -1 )
-			origin = parameter_search(crtfile,".sym","MYZORG");
+			origin = parameter_search(crtfile,".sym","myzorg");
 
 		if (mode == -1)
 		{

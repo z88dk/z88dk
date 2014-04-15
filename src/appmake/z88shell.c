@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: z88shell.c,v 1.4 2009-06-13 19:16:42 dom Exp $
+ *      $Id: z88shell.c,v 1.5 2014-04-15 19:53:07 dom Exp $
  */
 
 
@@ -59,16 +59,16 @@ int z88shell_exec(char *target)
         outfile = binname;
 
 
-    header_start = parameter_search(crtfile,".map","HEADER_START");
+    header_start = parameter_search(crtfile,".map","header_start");
     if      ( header_start == -1) 
-        myexit("Could not find parameter HEADER_START (not a Shell Compile?)\n",1);
-    shell_length = parameter_search(crtfile,".map","SHELL_LENGTH");
+        myexit("Could not find parameter header_start (not a Shell Compile?)\n",1);
+    shell_length = parameter_search(crtfile,".map","shell_length");
     if      ( shell_length == -1) 
-        myexit("Could not find parameter SHELL_LENGTH (not a Shell Compile?)\n",1);
+        myexit("Could not find parameter shell_length (not a Shell Compile?)\n",1);
 
-    start = parameter_search(crtfile,".map","START");
+    start = parameter_search(crtfile,".map","start");
     if      ( shell_length == -1) 
-        myexit("Could not find parameter START (not a Shell Compile?)\n",1);
+        myexit("Could not find parameter start (not a Shell Compile?)\n",1);
 
     /* allocate some memory */        
     memory=calloc( 65536 - header_start,1);

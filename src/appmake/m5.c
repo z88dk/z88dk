@@ -1,7 +1,7 @@
 /*
  *        Sord M5 CAS and WAV generator/converter
  *
- *        $Id: m5.c,v 1.1 2010-07-07 15:23:56 stefano Exp $
+ *        $Id: m5.c,v 1.2 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -108,7 +108,7 @@ int m5_exec(char *target)
     if ( origin != -1 ) {
         pos = origin;
     } else {
-        if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+        if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
             myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
     }

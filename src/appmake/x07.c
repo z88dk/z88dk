@@ -6,7 +6,7 @@
  *
  *        Stefano Bodrato Jun 2011
  *
- *        $Id: x07.c,v 1.2 2011-06-15 15:22:59 stefano Exp $
+ *        $Id: x07.c,v 1.3 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -141,7 +141,7 @@ int x07_exec(char *target)
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 			}
 		}

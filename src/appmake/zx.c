@@ -39,7 +39,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.20 2013-02-19 12:47:37 stefano Exp $
+ *        $Id: zx.c,v 1.21 2014-04-15 19:53:07 dom Exp $
  */
 
 #include "appmake.h"
@@ -281,7 +281,7 @@ int zx_exec(char *target)
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 			}
 		}
