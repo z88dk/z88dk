@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.69 2014-04-15 20:51:15 dom Exp $
+ *      $Id: zcc.c,v 1.70 2014-04-15 21:26:35 dom Exp $
  */
 
 
@@ -71,6 +71,7 @@ static void            BuildOptions_start(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
+static int             add_variant_args(char *wanted, int num_choices, char **choices);
 
 static void            configure_assembler();
 static void            configure_compiler();
@@ -127,6 +128,7 @@ static char           *asmargs;
 static char           *appmakeargs;
 static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
+static char           *c_clib = NULL;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -222,6 +224,8 @@ static char  *c_linker = NULL;
 static char  *c_compiler = NULL;
 static char **c_subtype_array = NULL;
 static int    c_subtype_array_num = 0;
+static char **c_clib_array = NULL;
+static int    c_clib_array_num = 0;
 
 static arg_t  config[] = {    
     {"OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port"},
@@ -273,7 +277,7 @@ static arg_t  config[] = {
     {"STARTUPLIB", 0, SetStringConfig, &c_startuplib, NULL, ""},
     {"GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, ""},
     {"SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
-    
+    {"CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     {"", 0, NULL, NULL}
 };
 
@@ -300,6 +304,7 @@ static arg_t     myargs[] = {
     { "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
     { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
     { "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
+    { "clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
     {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
@@ -598,22 +603,14 @@ int main(int argc, char **argv)
     configure_assembler();
     configure_compiler();
     
-      
-    if ( c_subtype != NULL ) {
-        size_t len = strlen(c_subtype);
-        for ( i = 0; i < c_subtype_array_num; i++ ) {
-            if ( strncmp(c_subtype, c_subtype_array[i], len) == 0 && isspace(c_subtype_array[i][len]) ) {
-                parse_option(strdup(c_subtype_array[i] + len));
-                break;
-            }
-        }
-        if ( i == c_subtype_array_num ) {
-            fprintf(stderr, "Cannot find extra options for target subtype %s\n",c_subtype);
-            exit(1);
-        }
+    if ( add_variant_args(c_subtype, c_subtype_array_num, c_subtype_array) == -1 ) {
+	fprintf(stderr,"Cannot find definition for target -subtype=%s\n",c_subtype);
+        exit(1);
     }
-    
-
+    if ( add_variant_args(c_clib, c_clib_array_num, c_clib_array) == -1 ) {
+	fprintf(stderr,"Cannot find definition for target -clib=%s\n",c_clib);
+        exit(1);
+    }
 
     /* Add the default cpp path */
     BuildOptions(&cpparg, c_incpath);
@@ -815,6 +812,26 @@ int get_filetype_by_suffix(char *name)
     return 0;
 }
 
+
+int add_variant_args(char *wanted, int num_choices, char **choices)
+{
+    int  i;
+
+    if ( wanted != NULL ) {
+        size_t len = strlen(wanted);
+        for ( i = 0; i < num_choices ; i++ ) {
+            if ( strncmp(wanted, choices[i], len) == 0 && isspace(choices[i][len]) ) {
+                parse_option(strdup(choices[i] + len));
+                break;
+            }
+        }
+        if ( i == c_subtype_array_num ) {
+            return -1;
+        }
+    }
+    return 0;
+}
+    
 
 void BuildAsmLine(char *dest, char *prefix)
 {
