@@ -27,6 +27,8 @@ stdio/c/sdcc_ix/fputs
 stdio/c/sdcc_ix/fputs_unlocked
 stdio/c/sdcc_ix/fread
 stdio/c/sdcc_ix/fread_unlocked
+stdio/c/sdcc_ix/freopen
+stdio/c/sdcc_ix/freopen_unlocked
 stdio/c/sdcc_ix/fscanf
 stdio/c/sdcc_ix/fscanf_unlocked
 stdio/c/sdcc_ix/fseek

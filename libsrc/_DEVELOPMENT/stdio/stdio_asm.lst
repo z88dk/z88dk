@@ -27,6 +27,8 @@ stdio/z80/asm_fputs
 stdio/z80/asm_fputs_unlocked
 stdio/z80/asm_fread
 stdio/z80/asm_fread_unlocked
+stdio/z80/asm_freopen
+stdio/z80/asm_freopen_unlocked
 stdio/z80/asm_fscanf
 stdio/z80/asm_fscanf_unlocked
 stdio/z80/asm_fseek

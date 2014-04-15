@@ -40,6 +40,10 @@ stdio/c/lr_sccz80/fread
 stdio/c/lr_sccz80/fread_callee
 stdio/c/lr_sccz80/fread_unlocked
 stdio/c/lr_sccz80/fread_unlocked_callee
+stdio/c/lr_sccz80/freopen
+stdio/c/lr_sccz80/freopen_callee
+stdio/c/lr_sccz80/freopen_unlocked
+stdio/c/lr_sccz80/freopen_unlocked_callee
 stdio/c/lr_sccz80/fscanf
 stdio/c/lr_sccz80/fscanf_unlocked
 stdio/c/lr_sccz80/fseek
