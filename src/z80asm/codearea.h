@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.18 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.19 2014-04-15 21:07:18 pauloscustodio Exp $
 */
 
 #pragma once
@@ -63,6 +63,9 @@ extern void append_word( int word );
 extern void  patch_long( uint_t *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
+/* Append opcode - append the bytes HI to LO (max 4), and inc PC */
+extern void append_opcode( long bytes );
+
 /*-----------------------------------------------------------------------------
 *   get a byte at the given address
 *	the patch address is incremented after fetch
@@ -72,7 +75,10 @@ extern byte_t get_byte( uint_t *paddr );
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.18  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.19  2014-04-15 21:07:18  pauloscustodio
+* append_opcode() to append_byte() and inc_PC() in one go
+*
+* Revision 1.18  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.17  2014/02/25 22:39:34  pauloscustodio

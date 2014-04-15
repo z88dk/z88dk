@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.26 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.27 2014-04-15 21:07:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -228,10 +228,25 @@ byte_t get_byte( uint_t *paddr )
     return byte;
 }
 
+/* Append opcode - append the bytes HI to LO (max 4), and inc PC */
+void append_opcode( long bytes )
+{
+	size_t count = 0;
+	if (bytes & 0xFF000000) { append_byte( (bytes >> 24) & 0xFF ); count++; }
+	if (bytes & 0x00FF0000) { append_byte( (bytes >> 16) & 0xFF ); count++; }
+	if (bytes & 0x0000FF00) { append_byte( (bytes >>  8) & 0xFF ); count++; }
+	append_byte( bytes & 0xFF ); count++;
+	inc_PC( count );
+}
+
+
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.26  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.27  2014-04-15 21:07:18  pauloscustodio
+* append_opcode() to append_byte() and inc_PC() in one go
+*
+* Revision 1.26  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.25  2014/02/25 22:39:34  pauloscustodio
