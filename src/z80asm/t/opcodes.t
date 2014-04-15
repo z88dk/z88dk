@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.3 2014-04-15 22:14:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.4 2014-04-15 22:31:17 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -26,18 +26,21 @@ start:
 	call_oz(255)	; E7 FF
 	call_oz(256)	; E7 00 01
 	call_oz(65535)	; E7 FF FF
+	call_pkg(0)		; CF 00 00
+	call_pkg(1)		; CF 01 00
+	call_pkg(65535)	; CF FF FF
 	ex	af,af		; 08
 	ex	af,af'		; 08
-	im	0			; ED 46		Z80
-	im	1			; ED 56		Z80
-	im	2			; ED 5E		Z80
-	rst	0x00		; C7		Z80
-	rst	0x08		; CF		Z80
+	im	0			; ED 46			Z80
+	im	1			; ED 56			Z80
+	im	2			; ED 5E			Z80
+	rst	0x00		; C7			Z80
+	rst	0x08		; CF			Z80
 	rst	0x10		; D7          
 	rst	0x18		; DF          
 	rst	0x20		; E7          
 	rst	0x28		; EF          
-	rst	0x30		; F7		Z80
+	rst	0x30		; F7			Z80
 	rst	0x38		; FF          
 END
 
@@ -49,6 +52,9 @@ write_file(asm_file(), <<'ASM');
 	rst -1
 	rst	undefined
 	call_oz(0)
+	call_oz(65536)
+	call_pkg(-1)
+	call_pkg(65536)
 ASM
 t_z80asm_capture(asm_file(), "", <<'ERR', 1 );
 Error at file 'test.asm' line 1: integer '-1' out of range
@@ -57,7 +63,10 @@ Error at file 'test.asm' line 3: symbol not defined
 Error at file 'test.asm' line 4: integer '-1' out of range
 Error at file 'test.asm' line 5: symbol not defined
 Error at file 'test.asm' line 6: integer '0' out of range
-6 errors occurred during assembly
+Error at file 'test.asm' line 7: integer '65536' out of range
+Error at file 'test.asm' line 8: integer '-1' out of range
+Error at file 'test.asm' line 9: integer '65536' out of range
+9 errors occurred during assembly
 ERR
 
 # not in RABBIT
@@ -158,7 +167,11 @@ sub assemble {
 
 
 # $Log: opcodes.t,v $
-# Revision 1.3  2014-04-15 22:14:27  pauloscustodio
+# Revision 1.4  2014-04-15 22:31:17  pauloscustodio
+# CALL_PKG: no need for special treatment for parenthesis surrounding expression,
+# as any axpression can be surrounded by parenthesis
+#
+# Revision 1.3  2014/04/15 22:14:27  pauloscustodio
 # CALL_OZ: no need for special treatment for parenthesis surrounding expression,
 # as any axpression can be surrounded by parenthesis
 #

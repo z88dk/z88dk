@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.59 2014-04-15 22:14:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.60 2014-04-15 22:31:17 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -515,8 +515,7 @@ void CALL_OZ( void )
     long constant;
     struct expr *postfixexpr;
 
-    append_byte( 0xE7 );          /* RST 20H instruction */
-    inc_PC( 1 );
+    append_opcode( 0xE7 );          /* RST 20H instruction */
 
     GetSym();
 
@@ -532,7 +531,7 @@ void CALL_OZ( void )
 
             if ( ( constant > 0 ) && ( constant <= 255 ) )
             {
-                append_byte( constant ); /* 1 byte OZ parameter */
+                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else if ( ( constant > 255 ) && ( constant <= 65535 ) )
@@ -563,13 +562,9 @@ CALL_PKG( void )
     long constant;
     struct expr *postfixexpr;
 
-    append_byte( 0xCF );          /* RST 08H instruction */
-    inc_PC( 1 );
+    append_opcode( 0xCF );          /* RST 08H instruction */
 
-    if ( GetSym() == TK_LPAREN )
-    {
-        GetSym();    /* Optional parenthesis around expression */
-    }
+	GetSym();
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -1581,7 +1576,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.59  2014-04-15 22:14:27  pauloscustodio
+* Revision 1.60  2014-04-15 22:31:17  pauloscustodio
+* CALL_PKG: no need for special treatment for parenthesis surrounding expression,
+* as any axpression can be surrounded by parenthesis
+*
+* Revision 1.59  2014/04/15 22:14:27  pauloscustodio
 * CALL_OZ: no need for special treatment for parenthesis surrounding expression,
 * as any axpression can be surrounded by parenthesis
 *
