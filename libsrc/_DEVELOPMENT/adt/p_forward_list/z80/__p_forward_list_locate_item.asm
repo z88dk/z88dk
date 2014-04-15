@@ -50,21 +50,16 @@ loop:
    
    ld a,(hl)
    cp c
-
-   jr nz, not_found
    
    inc hl
+   jr z, match_possible
+
    or (hl)
-   
-   ld a,(hl)
    dec hl
    
    jr z, list_end
-   
-   cp b
-   ret z                       ; item found
-   
-not_found:
+
+try_next:
 
    ld e,l
    ld d,h                      ; de = new lagger
@@ -72,9 +67,20 @@ not_found:
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a                      ; hl = new current
+   ld l,a
    
    jr loop
+
+match_possible:
+
+   ld a,(hl)
+   cp b
+   
+   dec hl
+   ret z                       ; item found
+
+   or (hl)
+   jr nz, try_next             ; if not at end of list
 
 list_end:
    
