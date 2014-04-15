@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.58 2014-04-15 21:07:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.59 2014-04-15 22:14:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -487,7 +487,7 @@ RST( void )
         {
             constant = EvalPfixExpr( postfixexpr );
 
-            if ( ( constant >= 0 && constant <= 56 ) && ( constant % 8 == 0 ) )
+            if ( ( constant >= 0 && constant <= 0x38 ) && ( constant % 8 == 0 ) )
             {
                 if ( ( opts.cpu & CPU_RABBIT ) &&
                         ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
@@ -496,8 +496,7 @@ RST( void )
                 }
                 else
                 {
-                    append_byte( ( byte_t )( 0xC7 + constant ) ); /* RST  00H, ... 38H */
-                    inc_PC( 1 );
+                    append_opcode( 0xC7 + constant );
                 }
             }
             else
@@ -519,10 +518,7 @@ void CALL_OZ( void )
     append_byte( 0xE7 );          /* RST 20H instruction */
     inc_PC( 1 );
 
-    if ( GetSym() == TK_LPAREN )
-    {
-        GetSym();    /* Optional parenthesis around expression */
-    }
+    GetSym();
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -536,7 +532,7 @@ void CALL_OZ( void )
 
             if ( ( constant > 0 ) && ( constant <= 255 ) )
             {
-                append_byte( ( byte_t )constant ); /* 1 byte OZ parameter */
+                append_byte( constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else if ( ( constant > 255 ) && ( constant <= 65535 ) )
@@ -1585,7 +1581,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.58  2014-04-15 21:07:18  pauloscustodio
+* Revision 1.59  2014-04-15 22:14:27  pauloscustodio
+* CALL_OZ: no need for special treatment for parenthesis surrounding expression,
+* as any axpression can be surrounded by parenthesis
+*
+* Revision 1.58  2014/04/15 21:07:18  pauloscustodio
 * append_opcode() to append_byte() and inc_PC() in one go
 *
 * Revision 1.57  2014/04/15 20:51:28  pauloscustodio
