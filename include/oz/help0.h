@@ -29,7 +29,7 @@
 
 
 #ifdef TOPIC2HELP1
-.in_TOPIC2_hlp
+.in_topic2_hlp
         defb    $7F
         HELPTEXT(TOPIC2HELP1)
 #ifdef TOPIC2HELP2
@@ -52,7 +52,7 @@
 
 
 #ifdef TOPIC3HELP1
-.in_TOPIC3_hlp
+.in_topic3_hlp
         defb    $7F
         HELPTEXT(TOPIC3HELP1)
 #ifdef TOPIC3HELP2
@@ -75,7 +75,7 @@
 
 
 #ifdef TOPIC4HELP1
-.in_TOPIC4_hlp
+.in_topic4_hlp
         defb    $7F
         HELPTEXT(TOPIC4HELP1)
 #ifdef TOPIC4HELP2
@@ -98,7 +98,7 @@
 
 
 #ifdef TOPIC5HELP1
-.in_TOPIC5_hlp
+.in_topic5_hlp
         defb    $7F
         HELPTEXT(TOPIC5HELP1)
 #ifdef TOPIC5HELP2
@@ -121,7 +121,7 @@
 
 
 #ifdef TOPIC6HELP1
-.in_TOPIC6_hlp
+.in_topic6_hlp
         defb    $7F
         HELPTEXT(TOPIC6HELP1)
 #ifdef TOPIC6HELP2
@@ -144,7 +144,7 @@
 
 
 #ifdef TOPIC7HELP1
-.in_TOPIC7_hlp
+.in_topic7_hlp
         defb    $7F
         HELPTEXT(TOPIC7HELP1)
 #ifdef TOPIC7HELP2
