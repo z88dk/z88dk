@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.67 2014-04-03 20:28:46 dom Exp $
+ *      $Id: zcc.c,v 1.68 2014-04-15 20:40:47 dom Exp $
  */
 
 
@@ -55,6 +55,8 @@ static void            SetString(arg_t *arg,char *);
 static void            PragmaDefine(arg_t *arg,char *);
 static void            PragmaNeed(arg_t *arg,char *);
 static void            PragmaBytes(arg_t *arg,char *);
+static void            AddArray(arg_t *arg,char *);
+
 
 static void           *mustmalloc(size_t);
 static int             hassuffix(char *file, char *suffix_to_check);
@@ -124,6 +126,7 @@ static char           *linkargs;
 static char           *asmargs;
 static char           *appmakeargs;
 static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
+static char           *c_subtype = NULL;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -157,6 +160,7 @@ struct arg_s {
     int    flags;
     void (*setfunc)(arg_t *arg, char *);
     void  *data;
+    int   *num_ptr;
     char  *help;
     char  *defvalue;
 };
@@ -216,56 +220,59 @@ static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
 static char  *c_linker = NULL;
 static char  *c_compiler = NULL;
+static char **c_subtype_array = NULL;
+static int    c_subtype_array_num = 0;
 
 static arg_t  config[] = {    
-    {"OPTIONS", 0, SetStringConfig, &c_options, "Extra options for port"},
+    {"OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port"},
     
-    {"MPMEXE", 0, SetStringConfig, &c_mpm_exe, "Name of the mpm binary"},
+    {"MPMEXE", 0, SetStringConfig, &c_mpm_exe, NULL,"Name of the mpm binary"},
     
-    {"VASMEXE", 0, SetStringConfig, &c_vasm_exe, "Name of the vasm binary" },
-    {"VLINKEXE", 0, SetStringConfig, &c_vlink_exe, "Name of the vlink binary" },
-    {"VASMOPTS", 0, SetStringConfig, &c_vasmopts, "Options for VASM", "-quiet -Fvobj -IDESTDIR/lib" },
-    {"VLINKOPTS", 0, SetStringConfig, &c_vlinkopts, "", "-LDESTDIR/lib/vlink/" },
+    {"VASMEXE", 0, SetStringConfig, &c_vasm_exe, NULL, "Name of the vasm binary" },
+    {"VLINKEXE", 0, SetStringConfig, &c_vlink_exe, NULL, "Name of the vlink binary" },
+    {"VASMOPTS", 0, SetStringConfig, &c_vasmopts, NULL, "Options for VASM", "-quiet -Fvobj -IDESTDIR/lib" },
+    {"VLINKOPTS", 0, SetStringConfig, &c_vlinkopts, NULL, "", "-LDESTDIR/lib/vlink/" },
     
-    {"GNUASEXE", 0, SetStringConfig, &c_gnuas_exe, "Name of the GNU as binary" },
-    {"GNULDEXE", 0, SetStringConfig, &c_gnuld_exe, "Name of the GNU ld binary" },
-    {"GNUASOPTS", 0, SetStringConfig, &c_gnuasopts, ""},
-    {"GNULINKOPTS", 0, SetStringConfig, &c_gnulinkopts, ""},
+    {"GNUASEXE", 0, SetStringConfig, &c_gnuas_exe, NULL, "Name of the GNU as binary" },
+    {"GNULDEXE", 0, SetStringConfig, &c_gnuld_exe, NULL, "Name of the GNU ld binary" },
+    {"GNUASOPTS", 0, SetStringConfig, &c_gnuasopts, NULL, ""},
+    {"GNULINKOPTS", 0, SetStringConfig, &c_gnulinkopts, NULL, ""},
     
-    {"ASZ80EXE", 0, SetStringConfig, &c_asz80_exe, "Name of the asz80 binary" },
-    {"ASLINKEXE", 0, SetStringConfig, &c_aslink_exe, "Name of the aslink binary" },
-    {"ASZ80OPTS", 0, SetStringConfig, &c_asz80opts, ""},
-    {"ASLINKOPTS", 0, SetStringConfig, &c_aslinkopts, ""},
+    {"ASZ80EXE", 0, SetStringConfig, &c_asz80_exe, NULL, "Name of the asz80 binary" },
+    {"ASLINKEXE", 0, SetStringConfig, &c_aslink_exe, NULL, "Name of the aslink binary" },
+    {"ASZ80OPTS", 0, SetStringConfig, &c_asz80opts, NULL, ""},
+    {"ASLINKOPTS", 0, SetStringConfig, &c_aslinkopts, NULL, ""},
     
-    {"CPP", 0, SetStringConfig, &c_cpp_exe, "Name of the cpp binary" },
-    {"STYLECPP", 0, SetNumber, &c_stylecpp, ""},
-    {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, "Name of the zpragma binary"},
+    {"CPP", 0, SetStringConfig, &c_cpp_exe, NULL, "Name of the cpp binary" },
+    {"STYLECPP", 0, SetNumber, &c_stylecpp, NULL, ""},
+    {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, NULL, "Name of the zpragma binary"},
 
-    {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, "Name of the z80asm binary"},
-    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, "Options for z80asm as linker", "-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
-    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
+    {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, NULL, "Name of the z80asm binary"},
+    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
+    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, NULL, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
     
-    {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, "Name of sccz80 binary (use SCCZ80EXE)"},
-    {"SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, "Name of sccz80 binary"},
-    {"SDCCEXE", 0, SetStringConfig, &c_sdcc_exe, "Name of the sdcc binary"},
+    {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)"},
+    {"SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary"},
+    {"SDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary"},
     
-    {"APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, ""},
-    {"APPMAKER", AF_DEPRECATED, SetStringConfig, &c_appmake_exe, "Name of the applink binary (use APPMAKEEXE)"},
+    {"APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, NULL, ""},
+    {"APPMAKER", AF_DEPRECATED, SetStringConfig, &c_appmake_exe, NULL, "Name of the applink binary (use APPMAKEEXE)"},
 
     
-    {"COPTEXE", 0, SetStringConfig, &c_copt_exe, ""},
-    {"COPYCMD", 0, SetStringConfig, &c_copycmd, ""},
+    {"COPTEXE", 0, SetStringConfig, &c_copt_exe, NULL, ""},
+    {"COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, ""},
     
-    {"INCPATH", 0, SetStringConfig, &c_incpath, "", "-IDESTDIR/include" },
-    {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, "", "DESTDIR/lib/z80rules.1" },
-    {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, "", "DESTDIR/lib/z80rules.2"},
-    {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, "", "DESTDIR/lib/z80rules.0"},
-    {"CRT0", 0, SetStringConfig, &c_crt0, ""},
+    {"INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-IDESTDIR/include" },
+    {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
+    {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
+    {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
+    {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
-    {"Z88MATHLIB", 0, SetStringConfig, &c_z88mathlib, ""},
-    {"Z88MATHFLG", 0, SetStringConfig, &c_z88mathflg, "Additional options for non-generic maths"},
-    {"STARTUPLIB", 0, SetStringConfig, &c_startuplib, ""},
-    {"GENMATHLIB", 0, SetStringConfig, &c_genmathlib, ""},
+    {"Z88MATHLIB", 0, SetStringConfig, &c_z88mathlib, NULL, ""},
+    {"Z88MATHFLG", 0, SetStringConfig, &c_z88mathflg, NULL, "Additional options for non-generic maths"},
+    {"STARTUPLIB", 0, SetStringConfig, &c_startuplib, NULL, ""},
+    {"GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, ""},
+    {"SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     
     {"", 0, NULL, NULL}
 };
@@ -277,45 +284,46 @@ static arg_t  config[] = {
 
 
 static arg_t     myargs[] = {
-    {"z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, "Make the assembler more verbose"},
-    {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup,     "(default) Cleanup temporary files"},
-    {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup,  "Don't cleanup temporary files"},
-    {"make-lib", AF_BOOL_TRUE, SetBoolean, &makelib, "Compile as if to make a library"},
-    {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, "Don't remove zcc_opt.def at start of run"},
-    {"make-app", AF_BOOL_TRUE, SetBoolean, &makeapp, "Create binary suitable for generated application"},
-    {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
-    {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
-    {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
-    {"specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, "Print out compiler specs" },
-    {"asm", AF_MORE, SetString, &c_assembler_type, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
-    {"compiler", AF_MORE, SetString, &c_compiler_type, "Set the compiler type from the command line (sccz80, sdcc)"},
-    { "pragma-define",AF_MORE,PragmaDefine,NULL,"Define the option in zcc_opt.def" },
-    { "pragma-need",AF_MORE,PragmaNeed,NULL,"NEED the option in zcc_opt.def" },
-    { "pragma-bytes",AF_MORE,PragmaBytes,NULL,"Dump a string of bytes zcc_opt.def" },
-    {"Cp", AF_MORE, AddToArgs, &cpparg, "Add an option to the preprocessor"},
-    {"Ca", AF_MORE, AddToArgs, &asmargs, "Add an option to the assembler"},
-    {"Cl", AF_MORE, AddToArgs, &linkargs, "Add an option to the linker"},
-    {"Cz", AF_MORE, AddToArgs, &appmakeargs, "Add an option to appmake"},
-    {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, "Only preprocess files"},
-    {"R", AF_BOOL_TRUE, SetBoolean, &relocate, "Generate relocatable code"},
-    {"D", AF_MORE, AddPreProc, NULL, "Define a preprocessor option"},
-    {"U", AF_MORE, AddPreProc, NULL, "Undefine a preprocessor option"},
-    {"I", AF_MORE, AddPreProc, NULL, "Add an include directory for the preprocessor"},
-    {"L", AF_MORE, AddLinkOption, NULL, "Add a library search path"},
-    {"l", AF_MORE, AddLinkLibrary, NULL, "Add a library"},
-    {"O", AF_MORE, SetNumber, &peepholeopt, "Set the peephole optimiser setting"},
-    {"h", 0, print_help_config, NULL, "Display this text"},
-    {"v", AF_BOOL_TRUE, SetBoolean, &verbose, "Output all commands that are run (-vn suppresses)"},
-    {"bn", AF_MORE, SetString, &c_linker_output_file,"Set the output file for the linker stage"},
-    {"vn", AF_BOOL_FALSE, SetBoolean, &verbose, "Run the compile stages silently" },
-    {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, "Only compile the .c files to .o files"},
-    {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly,"Only compile the .c files to .asm/.opt files"},
-    {"m", AF_BOOL_TRUE, SetBoolean, &mapon, "Generate an output map of the final executable"},
-    {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, "Generate a symbol map of the final executable"},
-    {"o", AF_MORE, SetString, &outputfile, "Set the output files"},
-    {"nt", 0, AddAppmake, NULL, "Set notruncate on the appmake options"},
-    {"M",  AF_MORE, SetString, &c_extension_config, "Define the suffix of the object files (eg -Mo)"},
-    {"+", NO, AddPreProc, NULL, NULL},    /* Strips // comments in vcpp */
+    {"z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, NULL, "Make the assembler more verbose"},
+    {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files"},
+    {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files"},
+    {"make-lib", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Compile as if to make a library"},
+    {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run"},
+    {"make-app", AF_BOOL_TRUE, SetBoolean, &makeapp, NULL, "Create binary suitable for generated application"},
+    {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file"},
+    {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, NULL, "(default) Use the temporary directory for intermediate files"},
+    {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, NULL, "Don't use the temporary directory for intermediate files"},
+    {"specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
+    {"asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
+    {"compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
+    { "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
+    { "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
+    { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
+    { "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
+    {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
+    {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
+    {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
+    {"Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake"},
+    {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Only preprocess files"},
+    {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code"},
+    {"D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option"},
+    {"U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option"},
+    {"I", AF_MORE, AddPreProc, NULL, NULL, "Add an include directory for the preprocessor"},
+    {"L", AF_MORE, AddLinkOption, NULL, NULL, "Add a library search path"},
+    {"l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library"},
+    {"O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting"},
+    {"h", 0, print_help_config, NULL, NULL, "Display this text"},
+    {"v", AF_BOOL_TRUE, SetBoolean, &verbose, NULL, "Output all commands that are run (-vn suppresses)"},
+    {"bn", AF_MORE, SetString, &c_linker_output_file, NULL, "Set the output file for the linker stage"},
+    {"vn", AF_BOOL_FALSE, SetBoolean, &verbose, NULL, "Run the compile stages silently" },
+    {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile the .c files to .o files"},
+    {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
+    {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
+    {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
+    {"o", AF_MORE, SetString, &outputfile, NULL, "Set the output files"},
+    {"nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options"},
+    {"M",  AF_MORE, SetString, &c_extension_config, NULL, "Define the suffix of the object files (eg -Mo)"},
+    {"+", NO, AddPreProc, NULL, NULL, NULL},    /* Strips // comments in vcpp */
     {"", 0, NULL, NULL}
 };
 
@@ -533,11 +541,11 @@ int main(int argc, char **argv)
     /* Setup the install prefix based on ZCCCFG */
     if ( ( ptr = getenv("ZCCCFG") ) != NULL ) {
 #ifdef WIN32
-    	snprintf(config_filename, sizeof(config_filename),"%s\\..\\..\\", ptr);
+        snprintf(config_filename, sizeof(config_filename),"%s\\..\\..\\", ptr);
 #else
-    	snprintf(config_filename, sizeof(config_filename),"%s/../../", ptr);
+        snprintf(config_filename, sizeof(config_filename),"%s/../../", ptr);
 #endif
-    	c_install_dir = strdup(config_filename);
+        c_install_dir = strdup(config_filename);
     }
     
     setup_default_configuration();
@@ -551,6 +559,7 @@ int main(int argc, char **argv)
     while (fgets(buffer, LINEMAX, fp) != NULL) {
         if (!isupper(buffer[0]))
             continue;
+            printf("Config: %s",buffer);
         parse_configfile_line(buffer);
     }
     fclose(fp);
@@ -583,12 +592,29 @@ int main(int argc, char **argv)
     }
     
     if ( c_print_specs ) {
-    	print_specs();
-    	exit(0);
+        print_specs();
+        exit(0);
     }
     
     configure_assembler();
     configure_compiler();
+    
+      
+    if ( c_subtype != NULL ) {
+        size_t len = strlen(c_subtype);
+        for ( i = 0; i < c_subtype_array_num; i++ ) {
+            if ( strncmp(c_subtype, c_subtype_array[i], len) == 0 && isspace(c_subtype_array[i][len]) ) {
+                parse_option(strdup(c_subtype_array[i] + len));
+                break;
+            }
+        }
+        if ( i == c_subtype_array_num ) {
+            fprintf(stderr, "Cannot find extra options for target subtype %s\n",c_subtype);
+            exit(1);
+        }
+    }
+    
+
 
     /* Add the default cpp path */
     BuildOptions(&cpparg, c_incpath);
@@ -622,6 +648,7 @@ int main(int argc, char **argv)
     }
     
     configure_misc_options();
+  
     
     /* We can't create an app and make a library.... */
     if (createapp && makelib) {
@@ -753,12 +780,12 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
     
     snprintf(buffer, sizeof(buffer), "%s %s%s %s%s",c_copycmd, name1, ext1, name2, ext2);
 #ifdef WIN32
-	/* Argh....annoying */
-	if ( strcmp(c_copycmd,"copy") == 0 ) {
- 	    cmd = replace_str(buffer, "/", "\\");
-	} else {
-	    cmd = strdup(buffer);
-	}
+    /* Argh....annoying */
+    if ( strcmp(c_copycmd,"copy") == 0 ) {
+         cmd = replace_str(buffer, "/", "\\");
+    } else {
+        cmd = strdup(buffer);
+    }
 #else
     cmd = strdup(buffer);
 #endif
@@ -855,25 +882,25 @@ void SetStringConfig(arg_t *argument, char *arg)
     
     start = value;
     while ( (ptr = strchr(start,'$')) != NULL ) {
-    	if ( *(ptr + 1) == '{' ) {
-    		char  *end = strchr(ptr+1,'}');
-    		
-    		if ( end != NULL ) {
-    			snprintf(varname, sizeof(varname), "%.*s", ( end - ptr - 2 ), ptr + 2);
-    			rep = getenv(varname);
-				if ( rep == NULL ) {
-					rep = "";
-				}
-				
-				snprintf(varname, sizeof(varname), "%.*s", end - ptr + 1, ptr);
-				nval = replace_str(value, varname, rep);
-				free(value);
-				value = nval;
-				start = value + (ptr - start); 
-    		}
-    	} else {
-    		start++;
-    	}
+        if ( *(ptr + 1) == '{' ) {
+            char  *end = strchr(ptr+1,'}');
+            
+            if ( end != NULL ) {
+                snprintf(varname, sizeof(varname), "%.*s", ( end - ptr - 2 ), ptr + 2);
+                rep = getenv(varname);
+                if ( rep == NULL ) {
+                    rep = "";
+                }
+                
+                snprintf(varname, sizeof(varname), "%.*s", end - ptr + 1, ptr);
+                nval = replace_str(value, varname, rep);
+                free(value);
+                value = nval;
+                start = value + (ptr - start); 
+            }
+        } else {
+            start++;
+        }
     }
     
     nval = replace_str(value, "DESTDIR", c_install_dir);
@@ -900,6 +927,17 @@ void SetNumber(arg_t *argument, char *arg)
         *(int *)argument->data = atoi(ptr);
     }
 }
+
+void AddArray(arg_t *argument, char *arg)
+{
+    int   i = *argument->num_ptr;
+    char **arr = *(char ***)argument->data;
+    *argument->num_ptr = *argument->num_ptr + 1;
+    arr = realloc(arr, *argument->num_ptr * sizeof(char *));
+    arr[i] = strdup(arg);
+    *(char ***)argument->data = arr;
+}
+
 
 
 void AddAppmake(arg_t *argument, char *arg)
@@ -1415,19 +1453,19 @@ ShowErrors(char *filen, char *orig)
             fprintf(stderr, "%s", buffer);
 
             /* Dig into asm source file and show the corresponding line.. */
-			if (strstr(buffer, " line ") >0) {    /* ..only if a line number is given */
-				linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
-				strcpy(filenamebuf,strstr(buffer,"'") + strlen("'"));
-				sprintf(strstr(filenamebuf,"'"),"");
-				if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
-					for (j = 1; j < linepos; j++)
-						fgets(buffer2, LINEMAX, fp2);
-					fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
-				}
-				fclose(fp2);
-			}
+            if (strstr(buffer, " line ") >0) {    /* ..only if a line number is given */
+                linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
+                strcpy(filenamebuf,strstr(buffer,"'") + strlen("'"));
+                sprintf(strstr(filenamebuf,"'"),"");
+                if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
+                    for (j = 1; j < linepos; j++)
+                        fgets(buffer2, LINEMAX, fp2);
+                    fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
+                }
+                fclose(fp2);
+            }
 
-		}
+        }
         fclose(fp);
 
     }
@@ -1605,63 +1643,69 @@ void add_zccopt(char *fmt,...)
 /* From: http://creativeandcritical.net/str-replace-c/ */
 char *replace_str(const char *str, const char *old, const char *new)
 {
-	char *ret, *r;
-	const char *p, *q;
-	size_t oldlen = strlen(old);
-	size_t count, retlen, newlen = strlen(new);
+    char *ret, *r;
+    const char *p, *q;
+    size_t oldlen = strlen(old);
+    size_t count, retlen, newlen = strlen(new);
 
-	if (oldlen != newlen) {
-		for (count = 0, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen)
-			count++;
-		/* this is undefined if p - str > PTRDIFF_MAX */
-		retlen = p - str + strlen(p) + count * (newlen - oldlen);
-	} else
-		retlen = strlen(str);
+    if (oldlen != newlen) {
+        for (count = 0, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen)
+            count++;
+        /* this is undefined if p - str > PTRDIFF_MAX */
+        retlen = p - str + strlen(p) + count * (newlen - oldlen);
+    } else
+        retlen = strlen(str);
 
-	if ((ret = malloc(retlen + 1)) == NULL)
-		return NULL;
+    if ((ret = malloc(retlen + 1)) == NULL)
+        return NULL;
 
-	for (r = ret, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen) {
-		/* this is undefined if q - p > PTRDIFF_MAX */
-		ptrdiff_t l = q - p;
-		memcpy(r, p, l);
-		r += l;
-		memcpy(r, new, newlen);
-		r += newlen;
-	}
-	strcpy(r, p);
+    for (r = ret, p = str; (q = strstr(p, old)) != NULL; p = q + oldlen) {
+        /* this is undefined if q - p > PTRDIFF_MAX */
+        ptrdiff_t l = q - p;
+        memcpy(r, p, l);
+        r += l;
+        memcpy(r, new, newlen);
+        r += newlen;
+    }
+    strcpy(r, p);
 
-	return ret;
+    return ret;
 }
 
 static void setup_default_configuration()
 {
-	char    buf[1024];
-	arg_t  *pargs = config;
-	
-	while ( pargs->setfunc ) {
-		if ( pargs->defvalue ) {
-			snprintf(buf,sizeof(buf),"%s %s",pargs->name, pargs->defvalue);
-			parse_configfile_line(buf);
-		}
-		pargs++;
-	}
+    char    buf[1024];
+    arg_t  *pargs = config;
+    
+    while ( pargs->setfunc ) {
+        if ( pargs->defvalue ) {
+            snprintf(buf,sizeof(buf),"%s %s",pargs->name, pargs->defvalue);
+            parse_configfile_line(buf);
+        }
+        pargs++;
+    }
 }
 
 static void print_specs()
 {
-	arg_t  *pargs = config;
+    arg_t  *pargs = config;
+    int     i;
 
-	while ( pargs->setfunc ) {
-		if ( (pargs->flags & AF_DEPRECATED) == 0 && pargs->setfunc == SetStringConfig ) {
-			if ( *(char **)pargs->data != NULL && strlen(*(char **)pargs->data)) {
-				printf("%-20s\t%s\n",pargs->name, *(char **)pargs->data);
-			} else {
-				printf("%-20s\t[undefined]\n",pargs->name);
-			}
-		}
-		pargs++;
-	}
+    while ( pargs->setfunc ) {
+        if ( (pargs->flags & AF_DEPRECATED) == 0 && pargs->setfunc == SetStringConfig ) {
+            if ( *(char **)pargs->data != NULL && strlen(*(char **)pargs->data)) {
+                printf("%-20s\t%s\n",pargs->name, *(char **)pargs->data);
+            } else {
+                printf("%-20s\t[undefined]\n",pargs->name);
+            }
+        } else if ( pargs->setfunc == AddArray ) {
+            for ( i = 0; i < *pargs->num_ptr; i++ ) {
+                printf("%-20s\t%s\n",pargs->name, (*(char ***)pargs->data)[i]);
+            }
+        }
+        pargs++;
+    }
+
 
 }
 
