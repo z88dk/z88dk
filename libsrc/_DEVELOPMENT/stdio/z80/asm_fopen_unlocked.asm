@@ -91,7 +91,6 @@ ENDIF
    
    ;  c = mode byte
    ; de = filename
-   ; hl = & FILE.link
    ; stack = mode byte, FILE.link
    
    call asm_open               ; pass details to target open()

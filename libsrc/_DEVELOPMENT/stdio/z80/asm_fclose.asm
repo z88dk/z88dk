@@ -18,7 +18,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 XLIB asm_fclose
 
 LIB asm_fclose_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+LIB __stdio_lock_acquire, error_enolck_mc
 
 asm_fclose:
 
