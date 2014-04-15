@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.68 2014-04-15 20:40:47 dom Exp $
+ *      $Id: zcc.c,v 1.69 2014-04-15 20:51:15 dom Exp $
  */
 
 
@@ -559,7 +559,6 @@ int main(int argc, char **argv)
     while (fgets(buffer, LINEMAX, fp) != NULL) {
         if (!isupper(buffer[0]))
             continue;
-            printf("Config: %s",buffer);
         parse_configfile_line(buffer);
     }
     fclose(fp);
