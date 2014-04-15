@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.56 2014-04-15 20:45:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.57 2014-04-15 20:51:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -474,6 +474,7 @@ IM( void )
                 append_byte( 0x5E );      /* IM 2  */
 	            inc_PC( 2 );
                 break;
+
 			default:
 				error_int_range( constant );
 				break;
@@ -1602,7 +1603,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.56  2014-04-15 20:45:05  pauloscustodio
+* Revision 1.57  2014-04-15 20:51:28  pauloscustodio
+* whitespace
+*
+* Revision 1.56  2014/04/15 20:45:05  pauloscustodio
 * Added error message for invalid interrupt mode in IM, e.g. for "IM 3":
 * Error at file 'test.asm' line 2: integer '3' out of range
 *
