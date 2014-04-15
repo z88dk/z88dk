@@ -169,7 +169,7 @@ interpret:
    ; de = address of format char after '%'
 
    call error_einval_zc
-   jr error_stream             ; could probably just fall through but let's be safe
+;;;;   jr error_stream             ; could probably just fall through but let's be safe
 
 ENDIF
 
