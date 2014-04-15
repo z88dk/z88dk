@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.55 2014-03-29 01:19:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.56 2014-04-15 20:45:05 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -460,20 +460,25 @@ IM( void )
             case 0:
                 append_byte( 0xED );
                 append_byte( 0x46 );      /* IM 0   */
+	            inc_PC( 2 );
                 break;
 
             case 1:
                 append_byte( 0xED );
                 append_byte( 0x56 );      /* IM 1  */
+	            inc_PC( 2 );
                 break;
 
             case 2:
                 append_byte( 0xED );
                 append_byte( 0x5E );      /* IM 2  */
+	            inc_PC( 2 );
                 break;
+			default:
+				error_int_range( constant );
+				break;
             }
 
-            inc_PC( 2 );
         }
 
         RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
@@ -1597,7 +1602,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.55  2014-03-29 01:19:41  pauloscustodio
+* Revision 1.56  2014-04-15 20:45:05  pauloscustodio
+* Added error message for invalid interrupt mode in IM, e.g. for "IM 3":
+* Error at file 'test.asm' line 2: integer '3' out of range
+*
+* Revision 1.55  2014/03/29 01:19:41  pauloscustodio
 * Accept both "ex af,af" and "ex af,af'"
 *
 * Revision 1.54  2014/03/29 00:33:29  pauloscustodio
