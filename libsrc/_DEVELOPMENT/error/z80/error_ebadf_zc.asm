@@ -6,6 +6,7 @@ XREF __EBADF
 LIB errno_zc
 
    pop hl
+   pop hl
    
 error_ebadf_zc:
 
