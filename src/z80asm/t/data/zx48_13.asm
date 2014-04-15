@@ -24,6 +24,4 @@
 ;
 ;   Note. The Sinclair Interface 1 ROM written by Dr. Ian Logan and Martin 
 ;   Brennan calls numerous routines in this ROM.  
-;   Non-standard entry points have a label beginning with X. 
-
-
+;   Non-standard entry points have a label beginning with X.

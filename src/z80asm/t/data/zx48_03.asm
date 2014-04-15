@@ -276,5 +276,3 @@ L046E:  DEFB    $89, $02, $D0, $12, $86;  261.625565290         C
 
 ;   "Music is the hidden mathematical endeavour of a soul unconscious it 
 ;    is calculating" - Gottfried Wilhelm Liebnitz 1646 - 1716
-
-

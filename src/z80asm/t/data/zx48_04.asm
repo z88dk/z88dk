@@ -1571,5 +1571,3 @@ L09C0:  DEFB    '.'+$80
         DEFB    $0D
         DEFM    "Bytes:"
         DEFB    ' '+$80
-
-

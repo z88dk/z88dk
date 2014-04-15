@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.5 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.6 2014-04-15 20:06:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -38,7 +38,10 @@ END_CLASS;
 
 /*
 * $Log: module.h,v $
-* Revision 1.5  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.6  2014-04-15 20:06:43  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.5  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -60,4 +63,3 @@ END_CLASS;
 * Embryo of Module structure
 * 
 */
-

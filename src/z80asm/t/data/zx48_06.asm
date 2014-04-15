@@ -2470,5 +2470,3 @@ L1A42:  CALL    L15EF           ; routine OUT-CODE for final digit.
         POP     HL              ; restore the
         POP     DE              ; registers and
         RET                     ; return.
-
-

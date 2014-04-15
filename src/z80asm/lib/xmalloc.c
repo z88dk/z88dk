@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.7 2014-02-11 15:20:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.8 2014-04-15 20:06:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -357,7 +357,10 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
 /*
 * $Log: xmalloc.c,v $
-* Revision 1.7  2014-02-11 15:20:20  pauloscustodio
+* Revision 1.8  2014-04-15 20:06:44  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.7  2014/02/11 15:20:20  pauloscustodio
 * Add xmallocf() to be used when a function pointer compatible with malloc is needed.
 *
 * Revision 1.6  2014/01/11 01:29:40  pauloscustodio
@@ -436,4 +439,3 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 * Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 *
 */
-

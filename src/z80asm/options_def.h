@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.34 2014-04-13 20:32:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.35 2014-04-15 20:06:43 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -186,7 +186,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.34  2014-04-13 20:32:06  pauloscustodio
+* Revision 1.35  2014-04-15 20:06:43  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.34  2014/04/13 20:32:06  pauloscustodio
 * PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 *
 * Revision 1.33  2014/02/08 18:30:49  pauloscustodio
@@ -324,4 +327,3 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 * Parse command line options via look-up tables:
 * --help, --verbose
 */
-

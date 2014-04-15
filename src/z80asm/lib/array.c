@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.c,v 1.1 2014-04-12 15:18:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.c,v 1.2 2014-04-15 20:06:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -16,7 +16,10 @@ DEF_ARRAY( long );
 
 /*
 * $Log: array.c,v $
-* Revision 1.1  2014-04-12 15:18:05  pauloscustodio
+* Revision 1.2  2014-04-15 20:06:44  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.1  2014/04/12 15:18:05  pauloscustodio
 * Add intArray and longArray to array.c
 *
 *

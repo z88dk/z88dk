@@ -1,8 +1,11 @@
 ; TITLE	'Z80 Instruction Set in alphabetical order'
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80ops.asm,v 1.2 2011-07-09 17:36:09 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80ops.asm,v 1.3 2014-04-15 20:06:44 pauloscustodio Exp $
 ; $Log: z80ops.asm,v $
-; Revision 1.2  2011-07-09 17:36:09  pauloscustodio
+; Revision 1.3  2014-04-15 20:06:44  pauloscustodio
+; Solve warning: no newline at end of file
+;
+; Revision 1.2  2011/07/09 17:36:09  pauloscustodio
 ; Copied cvs log into $Log$ history
 ;
 ; Revision 1.1  2011/07/09 01:06:38  pauloscustodio
@@ -737,4 +740,3 @@ Z80OPS:
 	XOR	N
 
 NN:	DEFS	2
-

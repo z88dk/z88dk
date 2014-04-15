@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.89 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.90 2014-04-15 20:06:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -628,7 +628,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.89  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.90  2014-04-15 20:06:44  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.89  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -
@@ -1121,4 +1124,3 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 /* User: Gbs          Date: 20-06-98   Time: 15:10 */
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
-

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.4 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.5 2014-04-15 20:06:44 pauloscustodio Exp $
 #
 # Test strpool.c
 
@@ -90,7 +90,10 @@ sub t_capture {
 }
 
 # $Log: strpool.t,v $
-# Revision 1.4  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.5  2014-04-15 20:06:44  pauloscustodio
+# Solve warning: no newline at end of file
+#
+# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -146,4 +149,3 @@ sub t_capture {
 #
 # Revision 1.1  2012/05/24 17:16:28  pauloscustodio
 # CH_0009 : new CLASS to define simple classes
-

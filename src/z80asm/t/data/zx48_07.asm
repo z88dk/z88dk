@@ -4104,6 +4104,3 @@ L24F7:  JR      Z,L24EC         ; to D-L-PLOT
 ;; REPORT-Bc
 L24F9:  RST     08H             ; ERROR-1
         DEFB    $0A             ; Error Report: Integer out of range
-
-
-

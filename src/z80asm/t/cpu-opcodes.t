@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.6 2014-03-29 01:19:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.7 2014-04-15 20:06:44 pauloscustodio Exp $
 # $Log: cpu-opcodes.t,v $
-# Revision 1.6  2014-03-29 01:19:41  pauloscustodio
+# Revision 1.7  2014-04-15 20:06:44  pauloscustodio
+# Solve warning: no newline at end of file
+#
+# Revision 1.6  2014/03/29 01:19:41  pauloscustodio
 # Accept both "ex af,af" and "ex af,af'"
 #
 # Revision 1.5  2014/01/11 01:29:46  pauloscustodio
@@ -727,4 +730,3 @@ outi									=> xx-- 0xED 0xA3
 otir									=> xx-- 0xED 0xB3
 outd									=> xx-- 0xED 0xAB
 otdr									=> xx-- 0xED 0xBB
-

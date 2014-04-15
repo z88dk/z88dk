@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.59 2014-04-13 20:32:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.60 2014-04-15 20:06:44 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -1016,7 +1016,10 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.59  2014-04-13 20:32:10  pauloscustodio
+# Revision 1.60  2014-04-15 20:06:44  pauloscustodio
+# Solve warning: no newline at end of file
+#
+# Revision 1.59  2014/04/13 20:32:10  pauloscustodio
 # PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 #
 # Revision 1.58  2014/04/05 23:36:11  pauloscustodio
@@ -1248,4 +1251,3 @@ __END__
 # Revision 1.1	2011/07/09 01:02:45  pauloscustodio
 # Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
 # Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
-

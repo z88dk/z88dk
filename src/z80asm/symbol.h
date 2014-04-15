@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.42 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.43 2014-04-15 20:06:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -94,7 +94,10 @@ extern struct module *NewModule( void );
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.42  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.43  2014-04-15 20:06:43  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.42  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *
@@ -301,4 +304,3 @@ extern struct module *NewModule( void );
 * First import of z88dk into the sourceforge system <gulp>
 *
 */
-

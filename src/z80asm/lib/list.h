@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.8 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.9 2014-04-15 20:06:44 pauloscustodio Exp $
 */
 
 #pragma once
@@ -71,7 +71,10 @@ extern BOOL List_empty( List *self );
 
 /*
 * $Log: list.h,v $
-* Revision 1.8  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.9  2014-04-15 20:06:44  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.8  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.7  2014/02/19 23:59:27  pauloscustodio

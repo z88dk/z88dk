@@ -2384,5 +2384,3 @@ L11A7:  LD      A,(HL)          ; fetch character
         JR      NZ,L11A7        ; back to REMOVE-FP until entire line done.
 
         RET                     ; return.
-
-

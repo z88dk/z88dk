@@ -2984,5 +2984,3 @@ L2D40:  CALL    L2D22           ; routine STK-DIGIT puts 0-9 on stack
 
         CALL    L0074           ; routine CH-ADD+1 get next character
         JR      L2D40           ; back to NXT-DGT-2 to process as a digit
-
-

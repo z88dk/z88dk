@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.4 2014-04-12 15:18:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.5 2014-04-15 20:06:44 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -247,7 +247,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.4  2014-04-12 15:18:06  pauloscustodio
+# Revision 1.5  2014-04-15 20:06:44  pauloscustodio
+# Solve warning: no newline at end of file
+#
+# Revision 1.4  2014/04/12 15:18:06  pauloscustodio
 # Add intArray and longArray to array.c
 #
 # Revision 1.3  2014/04/07 21:06:23  pauloscustodio
@@ -260,4 +263,4 @@ sub t_capture {
 # Template array that grows on request. Items may move in memory on reallocation.
 # Uses strutil.h for implementation.
 #
-# 
+#

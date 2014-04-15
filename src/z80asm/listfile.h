@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.14 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.15 2014-04-15 20:06:43 pauloscustodio Exp $
 
 */
 
@@ -122,7 +122,10 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.14  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.15  2014-04-15 20:06:43  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.14  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.13  2014/02/19 23:59:26  pauloscustodio
@@ -186,4 +189,3 @@ extern int  list_get_page_nr( void );
 * New listfile.c with all the listing related code
 *
 */
-

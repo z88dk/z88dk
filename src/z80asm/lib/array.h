@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.5 2014-04-12 15:18:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.6 2014-04-15 20:06:44 pauloscustodio Exp $
 */
 
 #pragma once
@@ -151,7 +151,10 @@ ARRAY( long );
 
 /*
 * $Log: array.h,v $
-* Revision 1.5  2014-04-12 15:18:05  pauloscustodio
+* Revision 1.6  2014-04-15 20:06:44  pauloscustodio
+* Solve warning: no newline at end of file
+*
+* Revision 1.5  2014/04/12 15:18:05  pauloscustodio
 * Add intArray and longArray to array.c
 *
 * Revision 1.4  2014/03/05 23:44:55  pauloscustodio

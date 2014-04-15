@@ -717,5 +717,3 @@ L0284:  DEFB    $D0             ; FORMAT
         DEFB    $D2             ; ERASE
         DEFB    $A9             ; POINT
         DEFB    $CF             ; CAT
-
-
