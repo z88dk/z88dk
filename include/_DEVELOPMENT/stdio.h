@@ -65,6 +65,7 @@ extern int     fprintf(FILE *stream, char *format, ...);
 extern int     fputc(int c, FILE *stream);
 extern int     fputs(char *s, FILE *stream);
 extern size_t  fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   *freopen(char *filename, char *mode, FILE *stream);
 extern int     fscanf(FILE *stream, char *format, ...);
 extern int     fseek(FILE *stream, long offset, int whence);
 extern int     fsetpos(FILE *stream, fpos_t *pos);
@@ -113,6 +114,7 @@ extern int     fprintf_unlocked(FILE *stream, char *format, ...);
 extern int     fputc_unlocked(int c, FILE *stream);
 extern int     fputs_unlocked(char *s, FILE *stream);
 extern size_t  fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   *freopen_unlocked(char *filename, char *mode, FILE *stream)
 extern int     fscanf_unlocked(FILE *stream, char *format, ...);
 extern int     fseek_unlocked(FILE *stream, long offset, int whence);
 extern int     fsetpos_unlocked(FILE *stream, fpos_t *pos);
@@ -156,6 +158,7 @@ extern int    __LIB__               fprintf(FILE *stream, char *format, ...);
 extern int    __LIB__               fputc(int c, FILE *stream);
 extern int    __LIB__               fputs(char *s, FILE *stream);
 extern size_t __LIB__               fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   __LIB__              *freopen(char *filename, char *mode, FILE *stream);
 extern int    __LIB__               fscanf(FILE *stream, char *format, ...);
 extern int    __LIB__               fseek(FILE *stream, long offset, int whence);
 extern int    __LIB__               fsetpos(FILE *stream, fpos_t *pos);
@@ -204,6 +207,7 @@ extern int    __LIB__               fprintf_unlocked(FILE *stream, char *format,
 extern int    __LIB__               fputc_unlocked(int c, FILE *stream);
 extern int    __LIB__               fputs_unlocked(char *s, FILE *stream);
 extern size_t __LIB__               fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   __LIB__              *freopen_unlocked(char *filename, char *mode, FILE *stream);
 extern int    __LIB__               fscanf_unlocked(FILE *stream, char *format, ...);
 extern int    __LIB__               fseek_unlocked(FILE *stream, long offset, int whence);
 extern int    __LIB__               fsetpos_unlocked(FILE *stream, fpos_t *pos);
@@ -236,6 +240,7 @@ extern FILE   __LIB__ __CALLEE__   *fopen_callee(const char *filename, const cha
 extern int    __LIB__ __CALLEE__    fputc_callee(int c, FILE *stream);
 extern int    __LIB__ __CALLEE__    fputs_callee(char *s, FILE *stream);
 extern size_t __LIB__ __CALLEE__    fread_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   __LIB__ __CALLEE__   *freopen_callee(char *filename, char *mode, FILE *stream);
 extern int    __LIB__ __CALLEE__    fseek_callee(FILE *stream, long offset, int whence);
 extern int    __LIB__ __CALLEE__    fsetpos_callee(FILE *stream, fpos_t *pos);
 extern size_t __LIB__ __CALLEE__    fwrite_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -260,6 +265,7 @@ extern FILE   __LIB__ __CALLEE__   *fopen_unlocked_callee(const char *filename, 
 extern int    __LIB__ __CALLEE__    fputc_unlocked_callee(int c, FILE *stream);
 extern int    __LIB__ __CALLEE__    fputs_unlocked_callee(char *s, FILE *stream);
 extern size_t __LIB__ __CALLEE__    fread_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern FILE   __LIB__ __CALLEE__   *freopen_unlocked_callee(char *filename, char *mode, FILE *stream);
 extern int    __LIB__ __CALLEE__    fseek_unlocked_callee(FILE *stream, long offset, int whence);
 extern int    __LIB__ __CALLEE__    fsetpos_unlocked_callee(FILE *stream, fpos_t *pos);
 extern size_t __LIB__ __CALLEE__    fwrite_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -282,6 +288,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 #define fputc(a,b)                  fputc_callee(a,b)
 #define fputs(a,b)                  fputs_callee(a,b)
 #define fread(a,b,c,d)              fread_callee(a,b,c,d)
+#define freopen(a,b,c)              freopen_callee(a,b,c)
 #define fseek(a,b,c)                fseek_callee(a,b,c)
 #define fsetpos(a,b)                fsetpos_callee(a,b)
 #define fwrite(a,b,c,d)             fwrite_callee(a,b,c,d)
@@ -306,6 +313,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 #define fputc_unlocked(a,b)         fputc_unlocked_callee(a,b)
 #define fputs_unlocked(a,b)         fputs_unlocked_callee(a,b)
 #define fread_unlocked(a,b,c,d)     fread_unlocked_callee(a,b,c,d)
+#define freopen_unlocked(a,b,c)     freopen_unlocked_callee(a,b,c)
 #define fseek_unlocked(a,b,c)       fseek_unlocked_callee(a,b,c)
 #define fsetpos_unlocked(a,b)       fsetpos_unlocked_callee(a,b)
 #define fwrite_unlocked(a,b,c,d)    fwrite_unlocked_callee(a,b,c,d)
