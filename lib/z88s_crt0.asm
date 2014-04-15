@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.12 2013-10-21 14:23:44 stefano Exp $
+;	$Id: z88s_crt0.asm,v 1.13 2014-04-15 20:09:20 dom Exp $
 
 
 
@@ -172,14 +172,14 @@ processcmd:			;processcmd is called after os_tin
 ;-----------
 errhand:
         ret     z   		;Fatal error
-        cp      rc_esc
+        cp      RC_Esc
         jr     z,errescpressed
         ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
         scf
 l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
-        call_oz(os_esc)		;Acknowledge escape pressed
+        call_oz(Os_Esc)		;Acknowledge escape pressed
         jr      cleanup		;Exit the program
 
 

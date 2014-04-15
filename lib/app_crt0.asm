@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
+;	$Id: app_crt0.asm,v 1.11 2014-04-15 20:09:20 dom Exp $
 
 
 ;--------
@@ -80,7 +80,7 @@ app_entrypoint:
 ; has been set appropriately to page in Intuition in segment 0
 ; Call intuition if that set (assumes no bad memory and DOR is setup)
 ;-------
-IF (intuition <> 0 ) ~ (reqpag=0)
+IF (intuition <> 0 ) & (reqpag=0)
         call    $2000
 ENDIF
 IF (reqpag <> 0)
@@ -122,8 +122,8 @@ init_error:			;Code to deal with an initialisation error
 ENDIF
 
 init_continue:			;We had enough memory
-        ld   a,sc_dis		;Disable escape 
-        call_oz(os_esc)
+        ld   a,SC_DIS		;Disable escape 
+        call_oz(Os_Esc)
         xor     a		;Setup our error handler
         ld      b,a
         ld      hl,errhan
@@ -208,14 +208,14 @@ ENDIF
 errhan:	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
         XREF    _redrawscreen
-        cp      rc_draw		;(Rc_susp for BASIC!)
+        cp      RC_Draw		;(Rc_susp for BASIC!)
         jr      nz,errhan2
         push    af		;Call users screen redraw fn if defined
         call    _redrawscreen
         pop     af
 ENDIF
 errhan2:
-        cp      rc_quit		;they don't like us!
+        cp      RC_Quit		;they don't like us!
         jr      nz,keine_error
 IF DEFINED_applicationquit
 	XREF	_applicationquit	;Call users routine if defined
