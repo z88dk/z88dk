@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.18 2014-02-18 22:26:58 dom Exp $
+# $Id: Makefile,v 1.19 2014-04-15 22:22:58 dom Exp $
 
 lcpc:
 	cd cpc ; $(MAKE) ; cd ..
@@ -53,6 +53,6 @@ clean:
 	$(MAKE) -C sprinter clean
 	$(MAKE) -C z88 clean
 	$(MAKE) -C zxvgs clean
-	$(MAKE) -C cpc clean
+	$(MAKE) -C cpm clean
 	$(MAKE) -C osca clean
 	#$(MAKE) -C sos clean
