@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.61 2014-04-15 23:12:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.62 2014-04-15 23:22:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -635,13 +635,9 @@ FPP( void )
     long constant;
     struct expr *postfixexpr;
 
-    append_byte( 0xDF );          /* RST 18H instruction */
-    inc_PC( 1 );
+    append_opcode( 0xDF );          /* RST 18H instruction */
 
-    if ( GetSym() == TK_LPAREN )
-    {
-        GetSym();    /* Optional parenthesis around expression */
-    }
+	GetSym();
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
@@ -1567,7 +1563,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.61  2014-04-15 23:12:04  pauloscustodio
+* Revision 1.62  2014-04-15 23:22:18  pauloscustodio
+* FPP: no need for special treatment for parenthesis surrounding expression,
+* as any axpression can be surrounded by parenthesis
+*
+* Revision 1.61  2014/04/15 23:12:04  pauloscustodio
 * INVOKE: no need for special treatment for parenthesis surrounding expression,
 * as any axpression can be surrounded by parenthesis
 *

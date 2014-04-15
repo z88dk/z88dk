@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.5 2014-04-15 23:12:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.6 2014-04-15 23:22:18 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -33,6 +33,8 @@ start:
 	call_pkg(65535)	; CF FF FF
 	ex	af,af		; 08
 	ex	af,af'		; 08
+	fpp(1)			; DF 01
+	fpp(254)		; DF FE
 	im	0			; ED 46			Z80
 	im	1			; ED 56			Z80
 	im	2			; ED 5E			Z80
@@ -64,6 +66,8 @@ check_errors("", <<'ASM');
 	call_oz(65536)	; integer '65536' out of range
 	call_pkg(-1)    ; integer '-1' out of range
 	call_pkg(65536) ; integer '65536' out of range
+	fpp(0)    		; integer '0' out of range
+	fpp(256)	 	; integer '256' out of range
 	invoke(-1)    	; integer '-1' out of range
 	invoke(65536) 	; integer '65536' out of range
 	im 	-1			; integer '-1' out of range
@@ -190,7 +194,11 @@ sub check_errors {
 }
 
 # $Log: opcodes.t,v $
-# Revision 1.5  2014-04-15 23:12:04  pauloscustodio
+# Revision 1.6  2014-04-15 23:22:18  pauloscustodio
+# FPP: no need for special treatment for parenthesis surrounding expression,
+# as any axpression can be surrounded by parenthesis
+#
+# Revision 1.5  2014/04/15 23:12:04  pauloscustodio
 # INVOKE: no need for special treatment for parenthesis surrounding expression,
 # as any axpression can be surrounded by parenthesis
 #
