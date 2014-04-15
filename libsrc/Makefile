@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.198 2014-02-18 22:26:58 dom Exp $
+# $Id: Makefile,v 1.199 2014-04-15 22:25:13 dom Exp $
 
 
 include Make.config
@@ -1575,6 +1575,7 @@ clean:
 	$(MAKE) -C stdio_new clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
+	$(MAKE) -C x1 clean
 	$(RM) *.lib
 
 install:
