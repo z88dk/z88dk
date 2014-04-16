@@ -64,8 +64,8 @@ asm_freopen_unlocked:
    pop de                      ; de = filename
    jp c, error_einval_zc       ; if mode string is invalid
    
-   ld a,h
-   or l
+   ld a,d
+   or e
    jp z, error_enotsup_zc      ; filename == NULL not currently supported
    
    ;  c = mode byte
