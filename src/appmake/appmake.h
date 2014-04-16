@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.30 2014-04-15 19:53:07 dom Exp $
+ *   $Id: appmake.h,v 1.31 2014-04-16 20:21:39 stefano Exp $
  */
 
 
@@ -80,6 +80,9 @@ extern option_t  nascom_options;
 
 extern int       nec_exec(char *target);
 extern option_t  nec_options;
+
+extern int       p2000_exec(char *target);
+extern option_t  p2000_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
@@ -185,6 +188,9 @@ struct {
     { "hex2cas",   "nec",       "(C) 2003,2007 Takahide Matsutsuka",
       "PC-6001 (and others) CAS format conversion utility",
       nec_exec,    &nec_options },
+    { "mc2cas",   "p2000",       "(C) 2014 Stefano Bodrato",
+      "Philips P2000 MicroCassette to CAS format conversion",
+      p2000_exec,    &p2000_options },
     { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
       "Packaging for Sorcerer Exidy, --audio for WAV format",
       sorcerer_exec,    &sorcerer_options },
@@ -249,7 +255,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optional WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 36
+#define APPMAKE_TARGETS 37
 #endif
 
 

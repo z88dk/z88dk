@@ -1,12 +1,12 @@
-;       Stub for the SHARP MZ family
+;       Stub for the Philips P2000 family
 ;
-;       Stefano Bodrato - 5/5/2000
+;       Stefano Bodrato - 7/4/2014
 ;
-;       $Id: mz_crt0.asm,v 1.14 2014-04-16 20:21:39 stefano Exp $
+;       $Id: p2000_crt0.asm,v 1.1 2014-04-16 20:21:39 stefano Exp $
 ;
 
 
-                MODULE  mz_crt0
+                MODULE  p2000_crt0
 
 ;--------
 ; Include zcc_opt.def to find out some info
@@ -43,11 +43,39 @@
 ; Now, getting to the real stuff now!
 
         IF      !myzorg
-                defc    myzorg  = $1300
+                defc    myzorg  = $6547
         ENDIF
 
 
         org     myzorg
+
+basic_block:
+
+	defw line_20
+	defw 10
+	defb $83	; REM
+	defm " Z88DK - Small C+ P2000 "
+	defb 0
+line_20:
+	defw basic_end
+	defw 20
+	defb $A3	; DEF
+	defb $B5	; USR
+	defb $CA	; '='
+	defm "&H6630"
+	defb ':'
+	defb 'A'
+	defb $CA	; '='
+	defb $B5	; USR
+	defm "(0)"
+	defb 0
+
+basic_end:
+
+; 49 bytes so far
+
+	defs $6630 - myzorg - (basic_end - basic_block)
+
 
 start:
         ld      (start1+1),sp	;Save entry stack
@@ -91,7 +119,7 @@ ENDIF
 
 start1:
         ld      sp,0
-        jp	$AD	; Go back to monitor
+        ret
 
 
 
@@ -134,7 +162,7 @@ ENDIF
 ; Now some variables
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    $D000   ; Address of the Graphics map
+base_graphics:  defw    $5000   ; Address of the Graphics map
 
 _std_seed:       defw    0       ; Seed for integer rand() routines
 
@@ -160,8 +188,8 @@ snd_tick:       defb	0	; Sound variable
 bit_irqstatus:	defw	0
 ENDIF
 
-		defm  "Small C+ SHARP MZ"
-		defb	0
+;		defm  "Small C+ P2000"
+;		defb	0
 
 ;-----------------------
 ; Floating point support
