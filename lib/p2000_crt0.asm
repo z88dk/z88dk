@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 7/4/2014
 ;
-;       $Id: p2000_crt0.asm,v 1.1 2014-04-16 20:21:39 stefano Exp $
+;       $Id: p2000_crt0.asm,v 1.2 2014-04-16 20:33:41 stefano Exp $
 ;
 
 
@@ -53,7 +53,7 @@ basic_block:
 
 	defw line_20
 	defw 10
-	defb $83	; REM
+	defb $8E	; REM
 	defm " Z88DK - Small C+ P2000 "
 	defb 0
 line_20:
@@ -62,7 +62,7 @@ line_20:
 	defb $A3	; DEF
 	defb $B5	; USR
 	defb $CA	; '='
-	defm "&H6630"
+	defm "&H6580"
 	defb ':'
 	defb 'A'
 	defb $CA	; '='
@@ -72,9 +72,9 @@ line_20:
 
 basic_end:
 
-; 49 bytes so far
+; BASIC is abt 50 bytes long
 
-	defs $6630 - myzorg - (basic_end - basic_block)
+	defs $6580 - myzorg - (basic_end - basic_block)
 
 
 start:
