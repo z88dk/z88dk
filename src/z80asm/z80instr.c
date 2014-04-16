@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.62 2014-04-15 23:22:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.63 2014-04-16 23:00:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -825,45 +825,12 @@ JP_instr( int opc0, int opc )
 }
 
 
-void
-JR( void )
+static void RelativeJump( byte_t opcode )
 {
-    struct expr *postfixexpr;
     long constant;
+    struct expr *postfixexpr;
 
-    if ( GetSym() == TK_NAME )
-    {
-        switch ( constant = CheckCondition() )
-        {
-            /* check for a condition */
-        case FLAGS_NZ:
-        case FLAGS_Z:
-        case FLAGS_NC:
-        case FLAGS_C:
-            append_byte( ( byte_t )( 0x20 + constant * 0x08 ) );
-
-            if ( GetSym() == TK_COMMA )
-            {
-                GetSym();         /* point at start of address expression */
-                break;
-            }
-            else
-            {
-                error_syntax(); /* comma missing */
-                return;
-            }
-
-        case -1:
-            append_byte( 0x18 );  /* opcode for JR  e */
-            break;                /* identifier not a condition id - check for legal expression */
-
-        default:
-            error_syntax();      /* illegal condition, syntax
-                                                                     * error  */
-            return;
-        }
-    }
-
+	append_byte( opcode );
     inc_PC( 2 );                  /* assembler PC points at next instruction */
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
@@ -894,48 +861,58 @@ JR( void )
     }
 }
 
+void
+JR( void )
+{
+    long constant;
+	byte_t opcode;
+
+    if ( GetSym() == TK_NAME )
+    {
+        switch ( constant = CheckCondition() )
+        {
+            /* check for a condition */
+        case FLAGS_NZ:
+        case FLAGS_Z:
+        case FLAGS_NC:
+        case FLAGS_C:
+            opcode = (byte_t)( 0x20 + constant * 0x08 );
+
+            if ( GetSym() == TK_COMMA )
+            {
+                GetSym();         /* point at start of address expression */
+                break;
+            }
+            else
+            {
+                error_syntax(); /* comma missing */
+                return;
+            }
+
+        case -1:
+            opcode = 0x18;  	/* opcode for JR  e */
+            break;              /* identifier not a condition id - check for legal expression */
+
+        default:
+            error_syntax();      /* illegal condition, syntax
+                                                                     * error  */
+            return;
+        }
+    }
+
+	RelativeJump( opcode );
+}
+
 
 void
 DJNZ( void )
 {
-    struct expr *postfixexpr;
-    long constant;
-
-    append_byte( 0x10 );          /* DJNZ opcode */
-
     if ( GetSym() == TK_COMMA )
     {
         GetSym();                         /* optional comma */
     }
 
-    inc_PC( 2 );
-
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        /* get numerical expression */
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
-        {
-            NewJRaddr();          /* Amend another JR PC address to the list */
-            Pass2info( postfixexpr, RANGE_JROFFSET, 1 );
-            append_byte( 0 );     /* update code pointer */
-        }
-        else
-        {
-            constant = EvalPfixExpr( postfixexpr );
-            constant -= get_PC();
-            RemovePfixlist( postfixexpr );        /* remove linked list - expression evaluated. */
-
-            if ( ( constant >= -128 ) && ( constant <= 127 ) )
-            {
-                append_byte( ( byte_t )( constant ) );  /* opcode is stored, now store relative jump */
-            }
-            else
-            {
-                append_byte( 0 );								/* BUG_0025 - store dummy offset */
-                error_int_range( constant );
-            }
-        }
-    }
+	RelativeJump( 0x10 );
 }
 
 
@@ -1563,7 +1540,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.62  2014-04-15 23:22:18  pauloscustodio
+* Revision 1.63  2014-04-16 23:00:40  pauloscustodio
+* Factor common code of JR and DJNZ
+*
+* Revision 1.62  2014/04/15 23:22:18  pauloscustodio
 * FPP: no need for special treatment for parenthesis surrounding expression,
 * as any axpression can be surrounded by parenthesis
 *
