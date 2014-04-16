@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.70 2014-04-15 21:26:35 dom Exp $
+ *      $Id: zcc.c,v 1.71 2014-04-16 11:58:20 dom Exp $
  */
 
 
@@ -608,7 +608,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     if ( add_variant_args(c_clib, c_clib_array_num, c_clib_array) == -1 ) {
-	fprintf(stderr,"Cannot find definition for target -clib=%s\n",c_clib);
+	fprintf(stderr,"Cannot find definition for -clib=%s\n",c_clib);
         exit(1);
     }
 
@@ -825,7 +825,7 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
                 break;
             }
         }
-        if ( i == c_subtype_array_num ) {
+        if ( i == num_choices ) {
             return -1;
         }
     }
@@ -1381,21 +1381,21 @@ void remove_temporary_files(void)
             remove_file_with_extension(filelist[j], ".op1");
             remove_file_with_extension(filelist[j], ".op2");
             remove_file_with_extension(filelist[j], ".opt");
-            remove_file_with_extension(filelist[j], c_extension);
+            if (c_extension) remove_file_with_extension(filelist[j], c_extension );
             remove_file_with_extension(filelist[j], ".sym");
         }
         if (crtcopied != 0) {
             remove_file_with_extension(c_crt0, ".asm");
             remove_file_with_extension(c_crt0, ".opt");
             remove_file_with_extension(c_crt0, ".err");
-            remove_file_with_extension(c_crt0, c_extension);
+            if (c_extension) remove_file_with_extension(c_crt0, c_extension);
             remove_file_with_extension(c_crt0, ".map");
             remove_file_with_extension(c_crt0, ".sym");
         }
     } else if (usetemp == NO) {
         /* Remove crt0.o file for -notemp compiles */
         remove_file_with_extension(c_crt0, ".err");
-        remove_file_with_extension(c_crt0, c_extension);
+        if (c_extension) remove_file_with_extension(c_crt0, c_extension);
     }
 }
 
