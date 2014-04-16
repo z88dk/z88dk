@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.63 2014-04-16 23:00:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.64 2014-04-16 23:23:10 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -907,10 +907,7 @@ JR( void )
 void
 DJNZ( void )
 {
-    if ( GetSym() == TK_COMMA )
-    {
-        GetSym();                         /* optional comma */
-    }
+	GetSym();
 
 	RelativeJump( 0x10 );
 }
@@ -1540,7 +1537,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.63  2014-04-16 23:00:40  pauloscustodio
+* Revision 1.64  2014-04-16 23:23:10  pauloscustodio
+* DJNZ accepted extra comma before argument, removed
+*
+* Revision 1.63  2014/04/16 23:00:40  pauloscustodio
 * Factor common code of JR and DJNZ
 *
 * Revision 1.62  2014/04/15 23:22:18  pauloscustodio
