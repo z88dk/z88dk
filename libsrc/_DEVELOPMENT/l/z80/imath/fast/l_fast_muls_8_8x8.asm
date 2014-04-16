@@ -51,8 +51,8 @@ IF __CLIB_OPT_IMATH_FAST & $80
    bit 7,l
    jr z, ok_0
    
-   ld a,l
-   neg
+   xor a
+   sub l
    ld l,a
 
 ok_0:
@@ -60,8 +60,8 @@ ok_0:
    bit 7,e
    jr z, ok_1
    
-   ld a,e
-   neg 
+   xor a
+   sub e
    ld e,a
 
 ok_1:

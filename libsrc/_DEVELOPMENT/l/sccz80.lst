@@ -34,7 +34,6 @@ l/sccz80/crt0/l_jpiy
 l/sccz80/crt0/l_le
 l/sccz80/crt0/l_lneg
 l/sccz80/crt0/l_lt
-l/sccz80/crt0/l_mul
 l/sccz80/crt0/l_ne
 l/sccz80/crt0/l_neg
 l/sccz80/crt0/l_or
@@ -71,8 +70,6 @@ l/sccz80/crt0_long/l_long_case
 l/sccz80/crt0_long/l_long_cmp
 l/sccz80/crt0_long/l_long_com
 l/sccz80/crt0_long/l_long_dec
-l/sccz80/crt0_long/l_long_div
-l/sccz80/crt0_long/l_long_div_u
 l/sccz80/crt0_long/l_long_eq
 l/sccz80/crt0_long/l_long_ge
 l/sccz80/crt0_long/l_long_gt
@@ -80,7 +77,6 @@ l/sccz80/crt0_long/l_long_inc
 l/sccz80/crt0_long/l_long_le
 l/sccz80/crt0_long/l_long_lneg
 l/sccz80/crt0_long/l_long_lt
-l/sccz80/crt0_long/l_long_mult
 l/sccz80/crt0_long/l_long_ne
 l/sccz80/crt0_long/l_long_neg
 l/sccz80/crt0_long/l_long_or
@@ -93,3 +89,7 @@ l/sccz80/crt0_long/l_long_ult
 l/sccz80/crt0_long/l_long_xor
 l/sccz80/crt0_long/long2int_s
 l/sccz80/crt0_long/lpush2
+l/z80/imath/sccz80_l_long_div
+l/z80/imath/sccz80_l_long_div_u
+l/z80/imath/sccz80_l_long_mult
+l/z80/imath/sccz80_l_mult

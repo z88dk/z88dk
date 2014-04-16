@@ -31,17 +31,47 @@ l_fast_mulu_32_16x16:
    ; de = 16-bit multiplicand DE
    ; hl = 16-bit multiplicand HL
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $04
+
    ld b,d                      ; b = D
    push hl                     ; save HL
 
    call l_fast_mulu_24_16x8         ; ahl = HL * E
 
-   ex (sp),hl                  ; save LSW(HL * E)
+ELSE
+
+   push hl
+   push de
    
+   call l_fast_mulu_24_16x8
+   
+   pop bc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ex (sp),hl                  ; save LSW(HL * E)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $04
+
    ld e,b                      ; e = D
    ld b,a                      ; b = MSB(HL * E)
    
    call l_fast_mulu_24_16x8         ; ahl = HL * D
+
+ELSE
+
+   ld e,b
+   push af
+   
+   call l_fast_mulu_24_16x8
+   
+   pop bc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ld c,b
    ld b,0                      ; bc = MSW(HL * E)

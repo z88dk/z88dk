@@ -17,7 +17,6 @@ l_mulu_16_16x16:
 ;; IF __CLIB_OPT_IMATH > 50
 
    LIB l_fast_mulu_16_16x16
-   
    jp l_fast_mulu_16_16x16
 
 ;; ENDIF

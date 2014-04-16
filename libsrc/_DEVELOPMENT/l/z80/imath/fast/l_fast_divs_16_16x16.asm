@@ -42,12 +42,32 @@ l0_fast_divs_16_16x16:
    ld c,d                      ; c = MSB of divisor
    
    push bc                     ; save sign info
+
+   ld a,h
+   rla
+   jr nc, dividend_ok
+
+   xor a
+   sub l
+   ld l,a
+   sbc a,a
+   sub h
+   ld h,a                      ; take absolute value of dividend
+
+dividend_ok:
+
+   ld a,d
+   rla
+   jr nc, divisor_ok
    
-   bit 7,h
-   call nz, l_neg_hl           ; take absolute value of dividend
-   
-   bit 7,d
-   call nz, l_neg_de           ; take absolute value of divisor
+   xor a
+   sub e
+   ld e,a
+   sbc a,a
+   sub d
+   ld d,a                      ; take absolute value of divisor
+
+divisor_ok:
 
    ; perform unsigned division
    
@@ -60,13 +80,32 @@ l0_fast_divs_16_16x16:
    
    ld a,b
    xor c
-   call m, l_neg_hl            ; negate quotient if signs differ
+   jp p, quotient_ok
+   
+   xor a
+   sub l
+   ld l,a
+   sbc a,a
+   sub h
+   ld h,a                      ; negate quotient if signs differ
+
+quotient_ok:
    
    bit 7,b
+   
+   or a
    ret z                       ; if dividend > 0
    
-   jp l_neg_de                 ; make remainder negative
+   xor a
+   sub e
+   ld e,a
+   sbc a,a
+   sub d
+   ld d,a                      ; make remainder negative
 
+   or a
+   ret
+   
 divide_by_zero:
 
    ex de,hl                      ; de = dividend

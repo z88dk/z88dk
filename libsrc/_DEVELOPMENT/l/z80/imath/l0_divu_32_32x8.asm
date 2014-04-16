@@ -17,7 +17,6 @@ l0_divu_32_32x8:
 ;; IF __CLIB_OPT_IMATH > 50
 
    LIB l0_fast_divu_32_32x8
-   
    jp l0_fast_divu_32_32x8
 
 ;; ENDIF

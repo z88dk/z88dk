@@ -17,7 +17,6 @@ l0_divu_16_16x8:
 ;; IF __CLIB_OPT_MATH > 50
 
    LIB l0_fast_divu_16_16x8
-   
    jp l0_fast_divu_16_16x8
 
 ;; ENDIF
