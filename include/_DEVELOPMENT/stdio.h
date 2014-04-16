@@ -114,7 +114,7 @@ extern int     fprintf_unlocked(FILE *stream, char *format, ...);
 extern int     fputc_unlocked(int c, FILE *stream);
 extern int     fputs_unlocked(char *s, FILE *stream);
 extern size_t  fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream);
-extern FILE   *freopen_unlocked(char *filename, char *mode, FILE *stream)
+extern FILE   *freopen_unlocked(char *filename, char *mode, FILE *stream);
 extern int     fscanf_unlocked(FILE *stream, char *format, ...);
 extern int     fseek_unlocked(FILE *stream, long offset, int whence);
 extern int     fsetpos_unlocked(FILE *stream, fpos_t *pos);
