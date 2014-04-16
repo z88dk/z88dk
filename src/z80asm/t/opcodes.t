@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.6 2014-04-15 23:22:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.7 2014-04-16 22:50:34 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -23,7 +23,75 @@ require 't/test_utils.pl';
 
 # Z80 | RABBIT
 assemble("", <<'END');
+; Call - need to be at fixed address
 start:
+	call    start	;          CD 00 01    	
+	call    -1   	;          CD FF FF    
+
+	call nz,start	;          C4 00 01		Z80
+	call nz,start	; 28 03    CD 00 01		RABBIT
+	call  z,start	;          CC 00 01		Z80
+	call  z,start	; 20 03    CD 00 01		RABBIT
+	call nc,start	;          D4 00 01		Z80
+	call nc,start	; 38 03    CD 00 01		RABBIT
+	call  c,start	;          DC 00 01		Z80
+	call  c,start	; 30 03    CD 00 01		RABBIT
+	call po,start	;          E4 00 01		Z80
+	call po,start	; EA 2F 00 CD 00 01		RABBIT
+call1:
+	call pe,start	;          EC 00 01		Z80
+	call pe,start	; E2 38 00 CD 00 01		RABBIT
+call2:
+	call  p,start	;          F4 00 01		Z80
+	call  p,start	; FA 41 00 CD 00 01		RABBIT
+call3:
+	call  m,start	;          FC 00 01		Z80
+	call  m,start	; F2 4A 00 CD 00 01		RABBIT
+call4:
+
+; Jump relative
+	djnz ASMPC		; 10 FE
+	djnz ASMPC+0x81	; 10 7F
+	jr	 ASMPC		; 18 FE
+	jr	 ASMPC-0x7E	; 18 80
+	djnz addr1		; 10 00       
+addr1:
+	jr	addr1		; 18 FE
+	jr 	addr2		; 18 00
+addr2:
+	jr	nz,addr1	; 20 FA       
+	jr	 z,addr1	; 28 F8       
+	jr	nc,addr1	; 30 F6       
+	jr	 c,addr1	; 38 F4
+	djnz addr1		; 10 F2     
+	jr	addr4		; 18 7E
+	jr	addr4		; 18 7C
+addr3:
+	defs 124
+addr4:
+	jr	addr3		; 18 82
+	jr	addr3		; 18 80
+	djnz addr5		; 10 7F
+	djnz addr5		; 10 7D
+	defs 125
+addr5:
+
+; Jump absolute
+	jp	(hl)		; E9          
+	jp	(ix)		; DD E9       
+	jp	(iy)		; FD E9       
+	jp	   start	; C3 00 01    
+	jp	   -1		; C3 FF FF
+	jp	nz,start	; C2 00 01    
+	jp	 z,start	; CA 00 01    
+	jp	nc,start	; D2 00 01    
+	jp	 c,start	; DA 00 01    
+	jp	po,start	; E2 00 01    
+	jp	pe,start	; EA 00 01    
+	jp	 p,start	; F2 00 01    
+	jp	 m,start	; FA 00 01    
+
+; All other opcodes	
 	call_oz(1)		; E7 01
 	call_oz(255)	; E7 FF
 	call_oz(256)	; E7 00 01
@@ -49,6 +117,7 @@ start:
 	rst	0x28		; EF          
 	rst	0x30		; F7			Z80
 	rst	0x38		; FF          
+
 END
 
 
@@ -62,19 +131,31 @@ END
 
 # invalid arguments
 check_errors("", <<'ASM');
-	call_oz(0)      ; integer '0' out of range
-	call_oz(65536)	; integer '65536' out of range
-	call_pkg(-1)    ; integer '-1' out of range
-	call_pkg(65536) ; integer '65536' out of range
-	fpp(0)    		; integer '0' out of range
-	fpp(256)	 	; integer '256' out of range
-	invoke(-1)    	; integer '-1' out of range
-	invoke(65536) 	; integer '65536' out of range
-	im 	-1			; integer '-1' out of range
-	im 	3			; integer '3' out of range
-	im 	undefined	; symbol not defined
-	rst	undefined   ; symbol not defined
-	rst -1			; integer '-1' out of range
+	call_oz(0)      	; integer '0' out of range
+	call_oz(65536)		; integer '65536' out of range
+	call_pkg(-1)    	; integer '-1' out of range
+	call_pkg(65536) 	; integer '65536' out of range
+	fpp(0)    			; integer '0' out of range
+	fpp(256)	 		; integer '256' out of range
+	invoke(-1)    		; integer '-1' out of range
+	invoke(65536) 		; integer '65536' out of range
+	im 	-1				; integer '-1' out of range
+	im 	3				; integer '3' out of range
+	im 	undefined		; symbol not defined
+	rst	undefined   	; symbol not defined
+	rst -1				; integer '-1' out of range
+	djnz ASMPC-0x7F		; integer '-129' out of range
+	djnz ASMPC+0x82		; integer '128' out of range
+	jr ASMPC-0x7F		; integer '-129' out of range
+	jr ASMPC+0x82		; integer '128' out of range
+	jr nz,ASMPC-0x7F	; integer '-129' out of range
+	jr nz,ASMPC+0x82	; integer '128' out of range
+	jr  z,ASMPC-0x7F	; integer '-129' out of range
+	jr  z,ASMPC+0x82	; integer '128' out of range
+	jr nc,ASMPC-0x7F	; integer '-129' out of range
+	jr nc,ASMPC+0x82	; integer '128' out of range
+	jr  c,ASMPC-0x7F	; integer '-129' out of range
+	jr  c,ASMPC+0x82	; integer '128' out of range
 ASM
 
 
@@ -104,12 +185,21 @@ sub assemble {
 	my $bin = "";
 	
 	for (split(/\n/, $code)) {
+		next if /^\s*;/;
 		next unless /\S/;
 		if (/^(\w+):/) {
 			# label:  ; all line copied
 			$label{$1} = $addr;
 			$asm_z80      .= "$_\n";
 			$asm_rabbit   .= "$_\n";
+		}
+		elsif (/^\s*defs\s+(\d+)(\s*,\s*(\d+))?/) {
+			my($size, $has_byte, $byte) = ($1, $2, $3);
+			$byte = 0 unless $has_byte;
+
+			$asm_z80      .= "$_\n";
+			$asm_rabbit   .= "$_\n";
+			$bin .= chr($byte) x $size;
 		}
 		else {
 			# opcode ; bytes [Z80|RABBIT|""]
@@ -137,21 +227,20 @@ sub assemble {
 				$asm_z80      .= "$defb\n";
 				$asm_rabbit   .= "$_\n";
 			}
-			elsif ( $variant eq 'TI83PLUS' ) {
-				$asm_z80      .= "$defb\n";
-				$asm_rabbit   .= "$defb\n";
-			}
 			else {
 				die;
 			}
 		}
 	}
 	
+	diag("Code $options: ",length($bin)," bytes\n");
+	
 	length($bin) >= 0x10000 and die;
 
 	# test asm in upper case
 	t_z80asm(
 		asm		=> uc($asm_z80),
+		org		=> 0x100,
 		bin		=> $bin,
 		options	=> $options,
 	);
@@ -159,6 +248,7 @@ sub assemble {
 	# test asm 
 	t_z80asm(
 		asm		=> $asm_z80,
+		org		=> 0x100,
 		bin		=> $bin,
 		options	=> $options,
 	);
@@ -166,6 +256,7 @@ sub assemble {
 	# test asm for RABBIT
 	t_z80asm(
 		asm		=> $asm_rabbit,
+		org		=> 0x100,
 		bin		=> $bin,
 		options	=> $options." --RCMX000",
 	);
@@ -194,7 +285,10 @@ sub check_errors {
 }
 
 # $Log: opcodes.t,v $
-# Revision 1.6  2014-04-15 23:22:18  pauloscustodio
+# Revision 1.7  2014-04-16 22:50:34  pauloscustodio
+# Move JR and DJNZ test code to opcodes.t
+#
+# Revision 1.6  2014/04/15 23:22:18  pauloscustodio
 # FPP: no need for special treatment for parenthesis surrounding expression,
 # as any axpression can be surrounded by parenthesis
 #
@@ -350,15 +444,6 @@ List of all opcodes not yet in test list:
 	bit	7,e			; CB 7B       
 	bit	7,h			; CB 7C       
 	bit	7,l			; CB 7D       
-	call	c,nn			; DC 84 05    
-	call	m,nn			; FC 84 05    
-	call	nc,nn			; D4 84 05    
-	call	nn			; CD 84 05    
-	call	nz,nn			; C4 84 05    
-	call	p,nn			; F4 84 05    
-	call	pe,nn			; EC 84 05    
-	call	po,nn			; E4 84 05    
-	call	z,nn			; CC 84 05    
 	ccf			; 3F          
 	cp	(hl)			; BE          
 	cp	(ix+ind)			; DD BE 05    
@@ -394,7 +479,6 @@ List of all opcodes not yet in test list:
 	dec	l			; 2D          
 	dec	sp			; 3B          
 	di			; F3          
-	djnz	asmpc+dis			; 10 2E       
 	ei			; FB          
 	ex	(sp),hl			; E3          
 	ex	(sp),ix			; DD E3       
@@ -431,23 +515,6 @@ List of all opcodes not yet in test list:
 	indr			; ED BA       
 	ini			; ED A2       
 	inir			; ED B2       
-	jp	(hl)			; E9          
-	jp	(ix)			; DD E9       
-	jp	(iy)			; FD E9       
-	jp	c,nn			; DA 84 05    
-	jp	m,nn			; FA 84 05    
-	jp	nc,nn			; D2 84 05    
-	jp	nn			; C3 84 05    
-	jp	nz,nn			; C2 84 05    
-	jp	p,nn			; F2 84 05    
-	jp	pe,nn			; EA 84 05    
-	jp	po,nn			; E2 84 05    
-	jp	z,nn			; CA 84 05    
-	jr	c,asmpc+dis			; 38 2E       
-	jr	asmpc+dis			; 18 2E       
-	jr	nc,asmpc+dis			; 30 2E       
-	jr	nz,asmpc+dis			; 20 2E       
-	jr	z,asmpc+dis			; 28 2E       
 	ld	(bc),a			; 02          
 	ld	(de),a			; 12          
 	ld	(hl),a			; 77          
