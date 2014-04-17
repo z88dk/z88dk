@@ -17,7 +17,7 @@ asm_z80_set_int_state:
    ;
    ; uses  : f
 
-   bit 6,l
+   bit 2,l
    jr z, di_state
    
 ei_state:
