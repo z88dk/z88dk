@@ -1,0 +1,7 @@
+stdio/p2000/fgetc_cons
+stdio/p2000/getk
+stdio/p2000/fputc_cons
+stdio/puts_cons
+time/p2000/clock
+@gfxbase.lst
+@z80.lst

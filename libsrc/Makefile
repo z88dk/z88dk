@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.199 2014-04-15 22:25:13 dom Exp $
+# $Id: Makefile,v 1.200 2014-04-17 06:16:05 stefano Exp $
 
 
 include Make.config
@@ -19,7 +19,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib mc1000ansi_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
-	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib \
+	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib p2000_clib.lib \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib\
@@ -424,6 +424,21 @@ mzx_tiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd math/zxmath ; $(MAKE) mzx_tiny ; cd ../..
+
+# Philips P2000 lib - Stefano
+p2000_clib.lib:
+	@echo ''
+	@echo '--- Building Philips P2000 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd psg ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/P2000.lst
 
 # PC6001 lib - Stefano
 pc6001_clib.lib:
