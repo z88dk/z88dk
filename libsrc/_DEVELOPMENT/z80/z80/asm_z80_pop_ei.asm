@@ -19,19 +19,25 @@ asm_z80_pop_ei:
 
    ; enter  : stack = ei_di_status, ret
    ;
-   ; uses  : af, hl
+   ; uses  : af
 
-   pop hl                      ; hl = return address
+   ex (sp),hl
+   pop af                      ; af = old hl
    
-   pop af                      ; f = ei_di_status
+   ex (sp),hl                  ; hl = ei_di_status
+   push af
+   
+   ex (sp),hl                  ; hl restored
+   pop af                      ; af = ei_di_status
+   
    jp po, di_state
 
 ei_state:
 
    ei
-   jp (hl)
+   ret
 
 di_state:
 
    di
-   jp (hl)
+   ret
