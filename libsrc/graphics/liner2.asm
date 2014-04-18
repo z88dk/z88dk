@@ -2,10 +2,10 @@
 
 	XLIB	Line_r
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: liner2.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
+;	$Id: liner2.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ;	...SLLLOOOW Variant by Stefano Bodrato
@@ -267,7 +267,7 @@
 
 .check_plot		ex	(sp),hl			;	preserve H,L distances on stack
 				ex	de,hl			;	D,E = ix,	iy
-				ld	hl,(COORDS)
+				ld	hl,(coords)
 				ld	a,l
 				add	a,e				;
 				ld	l,a				;	y0 =	y0 +	iy (y0 is	checked by plot)

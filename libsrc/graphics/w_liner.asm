@@ -5,10 +5,10 @@
         LIB     line
         LIB     l_cmp
 
-        XREF    COORDS
+        XREF    coords
 
 ;
-;       $Id: w_liner.asm,v 1.2 2014-04-11 11:14:00 stefano Exp $
+;       $Id: w_liner.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -204,7 +204,7 @@
                         push    de
 ;                        ex      de,hl                   ;       D,E = inx, iny
 
-			ld	de,(COORDS+2)           ;       y0 = y0 + iny (range is checked by plot func.)
+			ld	de,(coords+2)           ;       y0 = y0 + iny (range is checked by plot func.)
 			dec	l			;       iny
 			jp	z,incy
 			dec	l
@@ -214,7 +214,7 @@
 .incy			inc	de
 .zy
 			ld	a,h
-			ld	hl,(COORDS)             ;       x0 = x0 + inx (range is checked by plot func.)
+			ld	hl,(coords)             ;       x0 = x0 + inx (range is checked by plot func.)
 			dec	a			;       inx
 			jp	z,incx
 			dec	a

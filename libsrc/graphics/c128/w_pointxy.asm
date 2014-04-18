@@ -5,10 +5,10 @@
         ;LIB     l_cmp
         LIB     w_pixeladdress
 
-        XREF    COORDS
+        XREF    coords
 
 ;
-;       $Id: w_pointxy.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;       $Id: w_pointxy.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************

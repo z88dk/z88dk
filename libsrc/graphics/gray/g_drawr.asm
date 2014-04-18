@@ -4,14 +4,14 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawr.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: g_drawr.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 
                 XLIB    g_drawr
 
-		XREF	COORDS
+		XREF	coords
 
                 LIB     line_r
                 LIB     plotpixel
@@ -28,7 +28,7 @@
 		ld	l,(ix+6)	;px
 		ld	h,(ix+7)
 
-		ld	bc,(COORDS)
+		ld	bc,(coords)
 		push	bc
 		push	af
 		xor	a
@@ -49,7 +49,7 @@
 		pop	af
 
 		pop	bc
-		ld	(COORDS),bc
+		ld	(coords),bc
 		push	af
 		ld	a,1
 		call	graypage

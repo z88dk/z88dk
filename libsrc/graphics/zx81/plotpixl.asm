@@ -1,10 +1,10 @@
 
 	XLIB	plotpixel
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.8 2007-10-04 10:28:47 stefano Exp $
+;	$Id: plotpixl.asm,v 1.9 2014-04-18 09:30:32 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -24,7 +24,7 @@
 				cp	48
 				ret	nc		; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 				
 				push	bc
 

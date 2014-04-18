@@ -2,10 +2,10 @@
 	XLIB	plotpixel
 
 	LIB pixeladdress
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.3 2002-04-22 14:45:49 stefano Exp $
+;	$Id: plotpixl.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -27,7 +27,7 @@
 				cp	64
 				ret	nc		; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 				
 				push	bc
 

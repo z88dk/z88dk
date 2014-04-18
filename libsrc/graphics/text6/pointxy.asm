@@ -8,7 +8,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.2 2008-04-07 17:43:30 stefano Exp $
+;	$Id: pointxy.asm,v 1.3 2014-04-18 09:30:32 stefano Exp $
 ;
 
 
@@ -18,7 +18,7 @@
 
 			LIB	textpixl
 			LIB	div3
-			XREF	COORDS
+			XREF	coords
 			XREF	base_graphics
 
 .pointxy
@@ -34,7 +34,7 @@
 			push	de
 			push	hl			
 			
-			ld	(COORDS),hl
+			ld	(coords),hl
 			
 			ld	c,a	; y
 			ld	b,h	; x

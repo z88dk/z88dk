@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.1 2006-12-23 21:33:10 stefano Exp $
+;	$Id: plotpixl.asm,v 1.2 2014-04-18 09:30:32 stefano Exp $
 ;
 
 
@@ -18,7 +18,7 @@
 
 			LIB	textpixl
 			LIB	div3
-			XREF	COORDS
+			XREF	coords
 			XREF	base_graphics
 
 .plotpixel
@@ -30,7 +30,7 @@
 			ret	nc		; y0	out of range
 			inc	a
 			
-			ld	(COORDS),hl
+			ld	(coords),hl
 			
 			push	bc
 

@@ -8,7 +8,7 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.2 2007-01-08 18:01:48 stefano Exp $
+;	$Id: respixl.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
 ;
 
 
@@ -18,7 +18,6 @@
 
 			LIB	textpixl
 			LIB	div3
-			XREF	COORDS
 			XREF	base_graphics
 
 .respixel
@@ -31,8 +30,6 @@
 
 			dec	a
 			dec	a
-			
-			ld	(COORDS),hl
 			
 			push	bc
 

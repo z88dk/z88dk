@@ -4,7 +4,7 @@
 	lib leftbitmask, rightbitmask
 
 ;
-;	$Id: lftscrol.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
+;	$Id: lftscrol.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ***********************************************************************

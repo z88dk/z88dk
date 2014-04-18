@@ -3,10 +3,10 @@
 	XLIB	xorpixel
 
 	LIB pixeladdress
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.4 2009-01-21 16:00:08 stefano Exp $
+;	$Id: xorpixl.asm,v 1.5 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -41,7 +41,7 @@
 				cp	maxy
 				ret	nc			; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 
 				push	bc
 				call	pixeladdress

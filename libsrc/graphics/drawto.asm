@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawto.asm,v 1.2 2009-10-23 14:25:50 stefano Exp $
+;	$Id: drawto.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
 ;
 
 
@@ -17,7 +17,7 @@
                 LIB     swapgfxbk
                 XREF	swapgfxbk1
 
-				XREF	COORDS
+				XREF	coords
 
                 LIB     line
                 LIB     plotpixel
@@ -27,7 +27,7 @@
 .drawto
 		ld	ix,0
 		add	ix,sp
-		ld	hl,(COORDS)
+		ld	hl,(coords)
 		ld	e,(ix+2)	;y
 		ld	d,(ix+4)	;x
 

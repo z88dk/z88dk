@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_lineto.asm,v 1.3 2010-12-24 11:59:35 stefano Exp $
+;	$Id: stencil_add_lineto.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
@@ -20,7 +20,7 @@
                 LIB     line
                 LIB     stencil_add_pixel 
 
-				XREF	COORDS
+				XREF	coords
 
                 LIB     swapgfxbk
                 XREF    swapgfxbk1
@@ -35,7 +35,7 @@
 		ld	h,(ix+3)
 		ld	(stencil_ptr),hl
 
-		ld	hl,(COORDS)
+		ld	hl,(coords)
 		ld	e,(ix+4)	;y1
 		ld	d,(ix+6)	;x1
 

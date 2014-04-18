@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_add_pixel.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_stencil_add_pixel.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; registers changed after return:
@@ -23,7 +23,7 @@
 
                 XLIB    stencil_add_pixel
                 XDEF	stencil_ptr
-                XREF	COORDS
+                XREF	coords
                 
                 LIB		l_cmp
 
@@ -43,8 +43,8 @@
 		pop     de
 		ret     c               ; Return if X overflows
 
-		ld      (COORDS),hl     ; store X
-		ld      (COORDS+2),de   ; store Y: COORDS must be 2 bytes wider
+		ld      (coords),hl     ; store X
+		ld      (coords+2),de   ; store Y: COORDS must be 2 bytes wider
 
 		push hl			; X
 		ld	hl,(stencil_ptr) ; right side vector
@@ -67,7 +67,7 @@
 		push de			; X
 		ld	de,maxy*2
 		add	hl,de		; move to the right side vector
-		;ld	de,(COORDS)
+		;ld	de,(coords)
 		;push de
 		ld	e,(hl)
 		inc hl

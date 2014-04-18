@@ -7,7 +7,7 @@
 ;       Inverts pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.2 2002-02-01 14:37:50 stefano Exp $
+;	$Id: xorpixl.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
 ;
 
 
@@ -16,7 +16,7 @@
 			XLIB	xorpixel
 
 			LIB	textpixl
-			XREF	COORDS
+			XREF	coords
 			XREF	base_graphics
 
 
@@ -28,7 +28,7 @@
 			cp	maxy
 			ret	nc		; y0	out of range
 			
-			ld	(COORDS),hl
+			ld	(coords),hl
 			
 			push	bc
 

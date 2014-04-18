@@ -1,10 +1,10 @@
 	INCLUDE	"graphics/grafix.inc"
 	XLIB	setxy
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: setxy.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: setxy.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -31,5 +31,5 @@
 			ld	a,l
 			cp	maxy
 			ret	nc			; out of range...
-			ld	(COORDS),hl
+			ld	(coords),hl
 			ret

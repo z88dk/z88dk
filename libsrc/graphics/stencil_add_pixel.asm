@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_pixel.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
+;	$Id: stencil_add_pixel.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; registers changed after return:
@@ -23,13 +23,13 @@
 
                 XLIB    stencil_add_pixel
                 XDEF	stencil_ptr
-                XREF	COORDS
+                XREF	coords
 
 .stencil_ptr	defw	0
 
 
 .stencil_add_pixel
-		ld	(COORDS),hl	; update plot coordinates
+		ld	(coords),hl	; update plot coordinates
 		ld	d,0
 		ld	e,l
 		ld	a,h		; current X coordinate

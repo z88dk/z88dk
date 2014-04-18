@@ -11,7 +11,7 @@
 ;       Plot/unplot/invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pixel.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: pixel.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
 ;
 
 
@@ -19,7 +19,7 @@
 			
 			XDEF	pixmode
 
-			XREF	COORDS
+			XREF	coords
 
 .pixel
 			ld	d,l
@@ -31,7 +31,7 @@
 			cp	2
 			ret	c
 
-			ld	(COORDS),hl
+			ld	(coords),hl
 			
 			push	bc
 			ld	b,0

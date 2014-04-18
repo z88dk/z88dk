@@ -5,10 +5,10 @@
         LIB     l_cmp
         LIB     w_pixeladdress
 
-        XREF    COORDS
+        XREF    coords
 
 ;
-;       $Id: w_respixl.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;       $Id: w_respixl.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -40,8 +40,8 @@
         pop     de
         ret     c                ; Return if X overflows
         
-        ld      (COORDS),hl      ; store X
-        ld      (COORDS+2),de    ; store Y: COORDS must be 2 bytes wider
+        ld      (coords),hl      ; store X
+        ld      (coords+2),de    ; store Y: COORDS must be 2 bytes wider
 
 	call	w_pixeladdress
 

@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: w_stencil_add_lineto.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_stencil_add_lineto.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
@@ -19,8 +19,6 @@
 
                 LIB     w_line
                 LIB     stencil_add_pixel 
-
-				XREF	COORDS
 
                 LIB     swapgfxbk
                 XREF    swapgfxbk1

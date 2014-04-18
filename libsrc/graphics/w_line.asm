@@ -4,10 +4,10 @@
 
 	LIB	w_line_r
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: w_line.asm,v 1.3 2014-04-11 11:14:00 stefano Exp $
+;	$Id: w_line.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -20,12 +20,12 @@
 
 .w_line
 		ex	de,hl
-		ld	bc,(COORDS+2)
+		ld	bc,(coords+2)
 		or	a
 		sbc	hl,bc
 		ex	de,hl
 
-		ld	bc,(COORDS)
+		ld	bc,(coords)
 		or	a
 		sbc	hl,bc
 .nocrossx

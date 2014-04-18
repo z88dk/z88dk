@@ -3,10 +3,10 @@
 	XLIB	plotpixel
 
 	LIB pixeladdress
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: plotpixl.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -34,7 +34,7 @@
 				cp	maxy
 				ret	nc			; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 
 				push	bc
 				call	pixeladdress

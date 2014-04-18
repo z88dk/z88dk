@@ -1,10 +1,8 @@
 
 	XLIB	respixel
 
-	XREF	COORDS
-
 ;
-;	$Id: respixl.asm,v 1.4 2007-10-04 10:28:47 stefano Exp $
+;	$Id: respixl.asm,v 1.5 2014-04-18 09:30:32 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -23,8 +21,6 @@
 				;cp	maxy
 				cp	48
 				ret	nc		; y0	out of range
-				
-				ld	(COORDS),hl
 				
 				push	bc
 

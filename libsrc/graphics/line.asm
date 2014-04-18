@@ -4,10 +4,10 @@
 
 	LIB	Line_r
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: line.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: line.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -56,7 +56,7 @@
 				ld	a,e
 				cp	maxy
 				jr	nc, exit_line		; y1	coordinate out	of range
-				ld	(COORDS),hl		; the starting	point is now default
+				ld	(coords),hl		; the starting	point is now default
 				push	hl
 				push	de
 				ld	l,h				; L = x0
