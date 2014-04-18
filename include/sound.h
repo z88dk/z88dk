@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.17 2013-03-13 21:02:56 stefano Exp $
+ *	$Id: sound.h,v 1.18 2014-04-18 07:38:58 stefano Exp $
  */
 
 
@@ -70,6 +70,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef MC1000
   #define BEEP_TSTATES 447443.1 /* 3.579545 Mhz */
+#endif
+
+#ifdef P2000
+  #define BEEP_TSTATES 312500.0 /* 2.5 Mhz */
 #endif
 
 #ifdef SPECTRUM

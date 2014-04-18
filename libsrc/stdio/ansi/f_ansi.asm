@@ -18,14 +18,14 @@
 ;       M - Delete lines: to be completed
 ;
 ;
-;       $Id: f_ansi.asm,v 1.12 2014-04-11 11:14:01 stefano Exp $
+;       $Id: f_ansi.asm,v 1.13 2014-04-18 07:38:58 stefano Exp $
 ;
 
         XLIB    f_ansi
         LIB     ansi_putc
         LIB     ansi_attr
         LIB     ansi_CHAR
-        LIB     ansi_CLS
+        LIB     ansi_cls
         LIB     ansi_LF
         LIB     ansi_DSR6
         LIB     ansi_BEL
@@ -198,7 +198,7 @@
         push   hl
         push   de
         push   bc
-        call   ansi_CLS
+        call   ansi_cls
         xor    a                ; HOME cursor
         ld     (ansi_ROW),a
         ld     (ansi_COLUMN),a
