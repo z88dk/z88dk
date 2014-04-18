@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.11 2014-04-13 11:54:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.12 2014-04-18 17:46:18 pauloscustodio Exp $
 
 */
 
@@ -52,7 +52,7 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
             fprintf( file, "= $%04lX ; ", sym->value );
         }
 
-        fprintf( file, "Module %s\n", sym->owner->mname );
+        fprintf( file, "Module %s\n", sym->owner->modname );
     }
 }
 
@@ -92,7 +92,14 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.11  2014-04-13 11:54:00  pauloscustodio
+* Revision 1.12  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.11  2014/04/13 11:54:00  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -

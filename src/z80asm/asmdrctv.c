@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.88 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.89 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -28,6 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.88 2014-0
 #include "expr_def.h"
 #include "options.h"
 #include "scan.h"
+#include "strpool.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"
@@ -42,10 +43,7 @@ int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
 int ExprLong( int listoffset );
 int DEFSP( void );
-long EvalPfixExpr( struct expr *pfixexpr );
-void Pass2info( struct expr *expression, char constrange, long lfileptr );
-void RemovePfixlist( struct expr *pfixexpr );
-struct expr *ParseNumExpr( void );
+void Pass2info( Expr *expr, char constrange, long lfileptr );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
@@ -102,7 +100,7 @@ long
 Parsevarsize( void )
 {
 
-    struct expr *postfixexpr;
+    Expr *expr;
 
     long offset = 0, varsize, size_multiplier;
 
@@ -120,17 +118,17 @@ Parsevarsize( void )
         {
             GetSym();
 
-            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+            if ( ( expr = expr_parse() ) != NULL )
             {
-                if ( postfixexpr->expr_type & NOT_EVALUABLE )
+                if ( expr->expr_type & NOT_EVALUABLE )
                 {
                     error_not_defined();
-                    RemovePfixlist( postfixexpr );
+                    OBJ_DELETE( expr );
                 }
                 else
                 {
-                    size_multiplier = EvalPfixExpr( postfixexpr );
-                    RemovePfixlist( postfixexpr );
+                    size_multiplier = Expr_eval( expr );
+                    OBJ_DELETE( expr );
 
                     if ( size_multiplier > 0 && size_multiplier <= MAXCODESIZE )
                     {
@@ -183,26 +181,26 @@ Parsedefvarsize( long offset )
 void
 DEFVARS( void )
 {
-    struct expr *postfixexpr;
+    Expr *expr;
 
     long offset;
     enum flag globaldefv;
 
     GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+        if ( expr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
-            RemovePfixlist( postfixexpr );
+            OBJ_DELETE( expr );
             return;
         }
         else
         {
-            offset = EvalPfixExpr( postfixexpr ); /* offset expression must not contain undefined symbols */
-            RemovePfixlist( postfixexpr );
+            offset = Expr_eval( expr ); /* offset expression must not contain undefined symbols */
+            OBJ_DELETE( expr );
         }
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
@@ -226,7 +224,7 @@ DEFVARS( void )
     }
     else
     {
-        return;    /* syntax error raised in ParseNumExpr() - get next line from file... */
+        return;    /* syntax error raised in expr_parse() - get next line from file... */
     }
 
     while ( tok != TK_END && tok != TK_LCURLY )
@@ -263,7 +261,7 @@ DEFVARS( void )
 void
 DEFGROUP( void )
 {
-    struct expr *postfixexpr;
+    Expr *expr;
     long constant, enumconst = 0;
 	DEFINE_STR( name, MAXLINE );
 
@@ -300,20 +298,20 @@ DEFGROUP( void )
                         {
                             GetSym();
 
-                            if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+                            if ( ( expr = expr_parse() ) != NULL )
                             {
-                                if ( postfixexpr->expr_type & NOT_EVALUABLE )
+                                if ( expr->expr_type & NOT_EVALUABLE )
                                 {
                                     error_not_defined();
                                 }
                                 else
                                 {
-                                    constant = EvalPfixExpr( postfixexpr );
+                                    constant = Expr_eval( expr );
                                     enumconst = constant;
                                     define_symbol( name->str, enumconst++, 0 );
                                 }
 
-                                RemovePfixlist( postfixexpr );
+                                OBJ_DELETE( expr );
                             }
 
                             /* BUG_0032 - removed: GetSym(); */
@@ -342,25 +340,25 @@ DEFGROUP( void )
 void
 DEFS()
 {
-    struct expr *postfixexpr;
-    struct expr *constexpr;
+    Expr *expr;
+    Expr *constexpr;
 
     long constant = 0, val = 0;
 
     GetSym();                     /* get numerical expression */
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+        if ( expr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
+            constant = Expr_eval( expr );
             /* BUG_0007 : memory leaks - was not being released in case of error */
-            RemovePfixlist( postfixexpr ); /* remove linked list, expression evaluated */
+            OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
 
             if ( tok != TK_COMMA )
             {
@@ -370,7 +368,7 @@ DEFS()
             {
                 GetSym();
 
-                if ( ( constexpr = ParseNumExpr() ) != NULL )
+                if ( ( constexpr = expr_parse() ) != NULL )
                 {
                     if ( constexpr->expr_type & NOT_EVALUABLE )
                     {
@@ -378,10 +376,10 @@ DEFS()
                     }
                     else
                     {
-                        val = EvalPfixExpr( constexpr );
+                        val = Expr_eval( constexpr );
                     }
 
-                    RemovePfixlist( constexpr );
+                    OBJ_DELETE( constexpr );
                 }
             }
 
@@ -450,7 +448,7 @@ DEFINE( void )
 void
 DEFC( void )
 {
-    struct expr *postfixexpr;
+    Expr *expr;
     long constant;
 	DEFINE_STR( name, MAXLINE );
 
@@ -464,22 +462,22 @@ DEFC( void )
             {
                 GetSym();         /* get numerical expression */
 
-                if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+                if ( ( expr = expr_parse() ) != NULL )
                 {
                     /* expr. must not be stored in
                        * relocatable file */
-                    if ( postfixexpr->expr_type & NOT_EVALUABLE )
+                    if ( expr->expr_type & NOT_EVALUABLE )
                     {
                         error_not_defined();
-	                    RemovePfixlist( postfixexpr );
+	                    OBJ_DELETE( expr );
                         break;
                     }
                     else
                     {
-                        constant = EvalPfixExpr( postfixexpr );    /* DEFC expression must not
+                        constant = Expr_eval( expr );    /* DEFC expression must not
                                                                  * contain undefined symbols */
                         define_symbol( name->str, constant, 0 );
-	                    RemovePfixlist( postfixexpr );
+	                    OBJ_DELETE( expr );
                     }
                 }
                 else
@@ -508,20 +506,20 @@ void
 ORG( void )
 {
 
-    struct expr *postfixexpr;
+    Expr *expr;
     long constant;
 
     GetSym();                     /* get numerical expression */
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+        if ( expr->expr_type & NOT_EVALUABLE )
         {
             error_not_defined();
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );       /* ORG expression must not contain undefined symbols */
+            constant = Expr_eval( expr );       /* ORG expression must not contain undefined symbols */
 
             if ( constant >= 0 && constant <= 65535 )
             {
@@ -533,7 +531,7 @@ ORG( void )
             }
         }
 
-        RemovePfixlist( postfixexpr );
+        OBJ_DELETE( expr );
     }
 }
 
@@ -777,11 +775,11 @@ BINARY( void )
 void
 DeclModuleName( void )
 {
-    if ( CURRENTMODULE->mname == NULL )
+    if ( CURRENTMODULE->modname == NULL )
     {
         if ( tok == TK_NAME )
         {
-            CURRENTMODULE->mname = xstrdup( tok_name );
+            CURRENTMODULE->modname = strpool_add( tok_name );
         }
         else
         {
@@ -797,7 +795,14 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.88  2014-04-06 23:29:26  pauloscustodio
+ * Revision 1.89  2014-04-18 17:46:18  pauloscustodio
+ * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+ *   manipulating.
+ * - Factor parsing and evaluating contants.
+ * - Factor symbol-not-defined error during expression evaluation.
+ * - Store module name in strpool instead of xstrdup/xfree.
+ *
+ * Revision 1.88  2014/04/06 23:29:26  pauloscustodio
  * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
  * Moved the token definitions from token_def.h to scan_def.h.
  *

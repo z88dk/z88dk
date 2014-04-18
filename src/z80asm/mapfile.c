@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.16 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.17 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 
@@ -59,7 +59,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
         else
             fputc( 'G', file );
 
-        fprintf( file, ": %s\n", sym->owner->mname );
+        fprintf( file, ": %s\n", sym->owner->modname );
     }
 }
 
@@ -113,7 +113,14 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.16  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.17  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.16  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

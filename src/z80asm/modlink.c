@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.107 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.108 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -38,11 +38,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.107 2014-04-13 1
 #include <string.h>
 
 /* external functions */
-void RemovePfixlist( struct expr *pfixexpr );
 struct libfile *NewLibrary( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
-long EvalPfixExpr( struct expr *pass2expr );
-struct expr *ParseNumExpr( void );
 
 /* local functions */
 int LinkModule( char *filename, long fptr_base );
@@ -131,9 +128,9 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 {
     int type;
     long constant;
-    struct expr *postfixexpr;
+    Expr *expr;
     uint_t patchptr, offsetptr;
-	DEFINE_STR( expr, MAXLINE );
+	DEFINE_STR( expr_text, MAXLINE );
 
     do
     {
@@ -145,56 +142,56 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 
         ASMPC->value = get_PC();
 
-		xfget_count_byte_Str( file, expr );			/* get expression */
+		xfget_count_byte_Str( file, expr_text );	/* get expression */
 		xfget_uint8( file );						/* skip zero byte */
 
-        nextexpr += 1 + 2 + 1 + expr->len + 1;
+        nextexpr += 1 + 2 + 1 + expr_text->len + 1;
 
 		/* read expression followed by newline */
-		Str_append_char( expr, '\n');
-		SetTemporaryLine( expr->str );				/* read expression */
-		Str_chomp( expr );							/* remove newline for error messages below */
+		Str_append_char( expr_text, '\n');
+		SetTemporaryLine( expr_text->str );			/* read expression */
+		Str_chomp( expr_text );						/* remove newline for error messages below */
 
         EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
         GetSym();
 
-        if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+        if ( ( expr = expr_parse() ) != NULL )
         {
             /* parse numerical expression */
-            if ( postfixexpr->expr_type & NOT_EVALUABLE )
+            if ( expr->expr_type & NOT_EVALUABLE )
             {
-                error_not_defined_expr( expr->str );
+                error_not_defined_expr( expr_text->str );
             }
             else
             {
-                constant = EvalPfixExpr( postfixexpr );
+                constant = Expr_eval( expr );
                 patchptr = CURRENTMODULE->startoffset + offsetptr;        /* index to memory buffer */
 
                 switch ( type )
                 {
                 case 'U':
                     if ( constant < -128 || constant > 255 )
-                        warn_int_range_expr( constant, expr->str );
+                        warn_int_range_expr( constant, expr_text->str );
 
                     patch_byte( &patchptr, ( byte_t ) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
-                        warn_int_range_expr( constant, expr->str );
+                        warn_int_range_expr( constant, expr_text->str );
 
                     patch_byte( &patchptr, ( byte_t ) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
                     if ( constant < -32768 || constant > 65535 )
-                        warn_int_range_expr( constant, expr->str );
+                        warn_int_range_expr( constant, expr_text->str );
 
                     patch_word( &patchptr, constant );
 
                     if ( opts.relocatable )
-                        if ( postfixexpr->expr_type & SYM_ADDR )
+                        if ( expr->expr_type & SYM_ADDR )
                         {
                             /* Expression contains relocatable address */
                             constant = get_PC() - curroffset;
@@ -220,18 +217,18 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 
                 case 'L':
                     if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range_expr( constant, expr->str );
+                        warn_int_range_expr( constant, expr_text->str );
 
                     patch_long( &patchptr, constant );
                     break;
                 }
             }
 
-            RemovePfixlist( postfixexpr );
+            OBJ_DELETE( expr );
         }
         else
         {
-            error_expr( expr->str );
+            error_expr( expr_text->str );
         }
     }
     while ( nextexpr < endexpr );
@@ -284,7 +281,7 @@ LinkModules( void )
         do                                      /* link machine code & read symbols in all modules */
         {
             set_error_null();
-            set_error_module( CURRENTMODULE->mname );
+            set_error_module( CURRENTMODULE->modname );
 
             if ( opts.library )
             {
@@ -632,7 +629,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     tmpmodule = CURRENTMODULE;  /* remember current module */
 
     CURRENTMODULE = NewModule();
-    CURRENTMODULE->mname = xstrdup( modname );  /* get a copy of module name */
+    CURRENTMODULE->modname = strpool_add( modname );  /* get a copy of module name */
 
     if ( opts.verbose )
     {
@@ -667,8 +664,8 @@ ModuleExpr( void )
         fptr_base = curlink->modulestart;
 
         set_error_null();
-        set_error_module( CURRENTMODULE->mname );
-        set_error_file( CURRENTMODULE->filename );
+        set_error_module( CURRENTMODULE->modname );
+        set_error_file(   CURRENTMODULE->filename );
 
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
@@ -825,7 +822,7 @@ CreateLib( char *lib_filename )
         do
         {
             set_error_null();
-            set_error_module( CURRENTMODULE->mname );
+            set_error_module( CURRENTMODULE->modname );
 
             /* replace fname with the .obj extension */
             CURRENTMODULE->filename = get_obj_filename( CURRENTMODULE->filename );
@@ -963,7 +960,14 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.107  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.108  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.107  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -

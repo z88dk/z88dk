@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.155 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.156 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -44,7 +44,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.155 2014-04-06 23
 #include <time.h>
 
 /* external functions */
-void RemovePfixlist( struct expr *pfixexpr );
 void Z80pass2( void );
 void CreateLib( char *lib_filename );
 void LinkModules( void );
@@ -58,7 +57,6 @@ void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
 void ReleaseOwnedFile( struct usedfile *ownedfile );
 void ReleaseModules( void );
-void ReleaseExprns( struct expression *express );
 void CloseFiles( void );
 Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
@@ -197,11 +195,11 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         list_end();                    /* get_used_symbol will only generate page references until list_end() */
 
-        if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
-			CURRENTMODULE->mname = xstrdup( path_remove_ext(path_basename(src_filename)) );
+        if ( CURRENTMODULE->modname == NULL )     /* Module name must be defined */
+			CURRENTMODULE->modname = path_remove_ext(path_basename(src_filename));
 
         set_error_null();
-        set_error_module( CURRENTMODULE->mname );
+        set_error_module( CURRENTMODULE->modname );
 
         if ( start_errors == get_num_errors() )
         {
@@ -270,7 +268,7 @@ BOOL load_module_object( char *filename )
         else
             inc_codesize( obj_file->code_size );	/* BUG_0015 */
 
-        CURRENTMODULE->mname	= xstrdup( obj_file->modname );
+        CURRENTMODULE->modname	= obj_file->modname;
         CURRENTMODULE->obj_file = obj_file;
 
         return TRUE;
@@ -394,18 +392,13 @@ struct module *NewModule( void )
     newm = xnew( struct module );
 
     newm->nextmodule = NULL;
-    newm->mname = NULL;
+    newm->modname  = NULL;
 	newm->filename = NULL;
 	newm->startoffset = get_codesize();
     newm->origin = 65535;
     newm->local_symtab = OBJ_NEW( SymbolHash );
 
-    newm->mexpr = xnew( struct expression );
-
-    /* Allocate room for expression header */
-    newm->mexpr->firstexpr = NULL;
-    newm->mexpr->currexpr = NULL;
-    /* Module expression header initialised */
+    newm->exprs = OBJ_NEW( ExprList );
 
     newm->JRaddr = xnew( struct JRPC_Hdr );
 
@@ -480,11 +473,7 @@ ReleaseModules( void )
     while ( curptr != NULL )    /* until all modules are released */
     {
         OBJ_DELETE( curptr->local_symtab );
-
-        if ( curptr->mexpr != NULL )
-        {
-            ReleaseExprns( curptr->mexpr );
-        }
+		OBJ_DELETE( curptr->exprs );
 
         /* BUG_0007 : memory leaks */
         if ( curptr->JRaddr != NULL )
@@ -500,11 +489,6 @@ ReleaseModules( void )
 
             xfree( curptr->JRaddr );
             curptr->JRaddr = NULL;
-        }
-
-        if ( curptr->mname != NULL )
-        {
-            xfree( curptr->mname );
         }
 
         OBJ_DELETE( curptr->obj_file );
@@ -543,23 +527,6 @@ ReleaseLibraries( void )
 }
 
 
-
-void
-ReleaseExprns( struct expression *express )
-{
-    struct expr *tmpexpr, *curexpr;
-
-    curexpr = express->firstexpr;
-
-    while ( curexpr != NULL )
-    {
-        tmpexpr = curexpr->nextexpr;
-        RemovePfixlist( curexpr );
-        curexpr = tmpexpr;
-    }
-
-    xfree( express );
-}
 
 /***************************************************************************************************
  * Main entry of Z80asm
@@ -649,7 +616,14 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.155  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.156  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.155  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.64 2014-04-16 23:23:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.65 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,10 +31,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.64 2014-0
 #include <string.h>
 
 /* external functions */
-struct expr *ParseNumExpr( void );
-void RemovePfixlist( struct expr *pfixexpr );
-void Pass2info( struct expr *expression, char constrange, long lfileptr );
-long EvalPfixExpr( struct expr *pfixexpr );
+void Pass2info( Expr *expr, char constrange, long lfileptr );
 int ExprSigned8( int listpatchoffset );
 int CheckRegister8( void );
 int IndirectRegisters( void );
@@ -435,9 +432,8 @@ void
 IM( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
-    if ( ( opts.cpu & CPU_RABBIT ) )
+    if ( opts.cpu & CPU_RABBIT )
     {
         error_illegal_ident();
         return;
@@ -445,27 +441,16 @@ IM( void )
 
     GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        switch ( constant )
         {
-            error_not_defined();
+        case 0:	append_opcode( 0xED46 ); break;
+        case 1:	append_opcode( 0xED56 ); break;
+        case 2: append_opcode( 0xED5E ); break;
+		default: error_int_range( constant ); break;
         }
-        else
-        {
-            constant = EvalPfixExpr( postfixexpr );
-
-            switch ( constant )
-            {
-            case 0:	append_opcode( 0xED46 ); break;
-            case 1:	append_opcode( 0xED56 ); break;
-            case 2: append_opcode( 0xED5E ); break;
-			default: error_int_range( constant ); break;
-            }
-        }
-
-        RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
-    }
+	}
 }
 
 
@@ -473,39 +458,27 @@ void
 RST( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
     GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        if ( ( constant >= 0 && constant <= 0x38 ) && ( constant % 8 == 0 ) )
         {
-            error_not_defined();
-        }
-        else
-        {
-            constant = EvalPfixExpr( postfixexpr );
-
-            if ( ( constant >= 0 && constant <= 0x38 ) && ( constant % 8 == 0 ) )
+            if ( ( opts.cpu & CPU_RABBIT ) &&
+                    ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
             {
-                if ( ( opts.cpu & CPU_RABBIT ) &&
-                        ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
-                {
-                    error_illegal_ident();
-                }
-                else
-                {
-                    append_opcode( 0xC7 + constant );
-                }
+                error_illegal_ident();
             }
             else
             {
-                error_int_range( constant );
+                append_opcode( 0xC7 + constant );
             }
         }
-
-        RemovePfixlist( postfixexpr );
+        else
+        {
+            error_int_range( constant );
+        }
     }
 }
 
@@ -513,39 +486,27 @@ RST( void )
 void CALL_OZ( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
     append_opcode( 0xE7 );          /* RST 20H instruction */
 
     GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        if ( ( constant > 0 ) && ( constant <= 255 ) )
         {
-            error_not_defined();    /* CALL_OZ expression must be evaluable */
+            append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
+            inc_PC( 1 );
+        }
+        else if ( ( constant > 255 ) && ( constant <= 65535 ) )
+        {
+            append_word( constant );  /* 2 byte OZ parameter */
+            inc_PC( 2 );
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
-
-            if ( ( constant > 0 ) && ( constant <= 255 ) )
-            {
-                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
-                inc_PC( 1 );
-            }
-            else if ( ( constant > 255 ) && ( constant <= 65535 ) )
-            {
-                append_word( constant );  /* 2 byte OZ parameter */
-                inc_PC( 2 );
-            }
-            else
-            {
-                error_int_range( constant );
-            }
+            error_int_range( constant );
         }
-
-        RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
     }
 }
 
@@ -560,34 +521,22 @@ void
 CALL_PKG( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
     append_opcode( 0xCF );          /* RST 08H instruction */
 
 	GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        if ( ( constant >= 0 ) && ( constant <= 65535 ) )
         {
-            error_not_defined();    /* CALL_OZ expression must be evaluable */
+            append_word( constant );    /* 2 byte parameter always */
+            inc_PC( 2 );
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
-
-            if ( ( constant >= 0 ) && ( constant <= 65535 ) )
-            {
-                append_word( constant );    /* 2 byte parameter always */
-                inc_PC( 2 );
-            }
-            else
-            {
-                error_int_range( constant );
-            }
+            error_int_range( constant );
         }
-
-        RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
     }
 }
 
@@ -595,7 +544,6 @@ void
 INVOKE( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
     if ( opts.ti83plus )
         append_opcode( 0xEF );    /* Ti83Plus: RST 28H instruction */
@@ -604,28 +552,17 @@ INVOKE( void )
 
 	GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        if ( ( constant >= 0 ) && ( constant <= 65535 ) )
         {
-            error_not_defined();    /* INVOKE expression must be evaluable */
+            append_word( constant );    /* 2 byte parameter always */
+            inc_PC( 2 );
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
-
-            if ( ( constant >= 0 ) && ( constant <= 65535 ) )
-            {
-                append_word( constant );    /* 2 byte parameter always */
-                inc_PC( 2 );
-            }
-            else
-            {
-                error_int_range( constant );
-            }
+            error_int_range( constant );
         }
-
-        RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
     }
 }
 
@@ -633,34 +570,22 @@ void
 FPP( void )
 {
     long constant;
-    struct expr *postfixexpr;
 
     append_opcode( 0xDF );          /* RST 18H instruction */
 
 	GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &constant ) )
+	{
+        if ( ( constant > 0 ) && ( constant < 255 ) )
         {
-            error_not_defined();    /* FPP expression must be evaluable */
+            append_byte( ( byte_t )constant ); /* 1 byte OZ parameter */
+            inc_PC( 1 );
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
-
-            if ( ( constant > 0 ) && ( constant < 255 ) )
-            {
-                append_byte( ( byte_t )constant ); /* 1 byte OZ parameter */
-                inc_PC( 1 );
-            }
-            else
-            {
-                error_int_range( constant );
-            }
+            error_int_range( constant );
         }
-
-        RemovePfixlist( postfixexpr );    /* remove linked list, because expr. was evaluated */
     }
 }
 
@@ -828,25 +753,25 @@ JP_instr( int opc0, int opc )
 static void RelativeJump( byte_t opcode )
 {
     long constant;
-    struct expr *postfixexpr;
+    Expr *expr;
 
 	append_byte( opcode );
     inc_PC( 2 );                  /* assembler PC points at next instruction */
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* get numerical expression */
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+        if ( expr->expr_type & NOT_EVALUABLE )
         {
             NewJRaddr();          /* Amend another JR PC address to the list */
-            Pass2info( postfixexpr, RANGE_JROFFSET, 1 );
+            Pass2info( expr, RANGE_JROFFSET, 1 );
             append_byte( 0 );     /* update code pointer */
         }
         else
         {
-            constant = EvalPfixExpr( postfixexpr );
+            constant = Expr_eval( expr );
             constant -= get_PC();
-            RemovePfixlist( postfixexpr );        /* remove linked list - expression evaluated. */
+            OBJ_DELETE( expr );        /* remove linked list - expression evaluated. */
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
@@ -1389,91 +1314,78 @@ void
 BitTest_instr( int opcode )
 {
     long bitnumber, reg;
-    struct expr *postfixexpr;
 
     GetSym();
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        /* Expression must not be stored in object file */
-        if ( postfixexpr->expr_type & NOT_EVALUABLE )
+	if ( expr_parse_eval( &bitnumber ) )
+	{
+        if ( bitnumber >= 0 && bitnumber <= 7 )
         {
-            error_not_defined();
-        }
-        else
-        {
-            bitnumber = EvalPfixExpr( postfixexpr );
-
-            if ( bitnumber >= 0 && bitnumber <= 7 )
+            /* bit 0 - 7 */
+            if ( tok == TK_COMMA )
             {
-                /* bit 0 - 7 */
-                if ( tok == TK_COMMA )
+                if ( GetSym() == TK_LPAREN )
                 {
-                    if ( GetSym() == TK_LPAREN )
+                    switch ( ( reg = IndirectRegisters() ) )
                     {
-                        switch ( ( reg = IndirectRegisters() ) )
+                    case 2:
+                        append_byte( 0xCB );  /* (HL)  */
+                        append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
+                        inc_PC( 2 );
+                        break;
+
+                    case 5:
+                    case 6:
+                        if ( reg == 5 )
                         {
-                        case 2:
-                            append_byte( 0xCB );  /* (HL)  */
-                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
-                            inc_PC( 2 );
-                            break;
-
-                        case 5:
-                        case 6:
-                            if ( reg == 5 )
-                            {
-                                append_byte( 0xDD );
-                            }
-                            else
-                            {
-                                append_byte( 0xFD );
-                            }
-
-                            append_byte( 0xCB );
-                            ExprSigned8( 2 );
-                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
-                            inc_PC( 4 );
-                            break;
-
-                        default:
-                            error_syntax();
-                            break;
+                            append_byte( 0xDD );
                         }
-                    }
-                    else
-                    {
-                        /* no indirect addressing, try to get an 8bit register */
-                        reg = CheckRegister8();
-
-                        switch ( reg )
+                        else
                         {
-                        case 6:
-                        case 8:
-                        case 9:
-                        case -1:
-                            error_illegal_ident();
-                            break;
-
-                        default:
-                            append_byte( 0xCB );
-                            append_byte( ( byte_t )( opcode + bitnumber * 0x08 + reg ) );
-                            inc_PC( 2 );
+                            append_byte( 0xFD );
                         }
+
+                        append_byte( 0xCB );
+                        ExprSigned8( 2 );
+                        append_byte( ( byte_t )( opcode + bitnumber * 0x08 + 0x06 ) );
+                        inc_PC( 4 );
+                        break;
+
+                    default:
+                        error_syntax();
+                        break;
                     }
                 }
                 else
                 {
-                    error_syntax();
+                    /* no indirect addressing, try to get an 8bit register */
+                    reg = CheckRegister8();
+
+                    switch ( reg )
+                    {
+                    case 6:
+                    case 8:
+                    case 9:
+                    case -1:
+                        error_illegal_ident();
+                        break;
+
+                    default:
+                        append_byte( 0xCB );
+                        append_byte( ( byte_t )( opcode + bitnumber * 0x08 + reg ) );
+                        inc_PC( 2 );
+                    }
                 }
             }
             else
             {
-                error_int_range( bitnumber );
+                error_syntax();
             }
         }
-
-        RemovePfixlist( postfixexpr );
+        else
+        {
+            error_int_range( bitnumber );
+        }
     }
 }
 
@@ -1537,7 +1449,14 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.64  2014-04-16 23:23:10  pauloscustodio
+* Revision 1.65  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.64  2014/04/16 23:23:10  pauloscustodio
 * DJNZ accepted extra comma before argument, removed
 *
 * Revision 1.63  2014/04/16 23:00:40  pauloscustodio

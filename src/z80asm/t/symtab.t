@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.8 2014-04-13 11:54:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.9 2014-04-18 17:46:18 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -371,7 +371,7 @@ t_compile_module($init, <<'END', $objs);
 
 	sym = Symbol_create(S("Var1"), 123, 0, CURRENTMODULE);
 	dump_Symbol(sym);
-	CURRENTMODULE->mname = "MODULE";
+	CURRENTMODULE->modname = "MODULE";
 	dump_Symbol(sym);
 	
 	TITLE("Delete symbol");	
@@ -577,7 +577,14 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.8  2014-04-13 11:54:01  pauloscustodio
+# Revision 1.9  2014-04-18 17:46:18  pauloscustodio
+# - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+#   manipulating.
+# - Factor parsing and evaluating contants.
+# - Factor symbol-not-defined error during expression evaluation.
+# - Store module name in strpool instead of xstrdup/xfree.
+#
+# Revision 1.8  2014/04/13 11:54:01  pauloscustodio
 # CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 # Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 # Remove 'X' scope for symbols in object files used before for XLIB -

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.9 2014-04-15 20:06:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.10 2014-04-18 17:46:18 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -179,21 +179,20 @@ t_z80asm(
 #------------------------------------------------------------------------------
 unlink_testfiles();
 my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
-		   "options.o model.o hist.o ".
+		   "options.o model.o hist.o codearea.o scan.o listfile.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o lib/srcfile.o ".
 		   "lib/except.o ".
 		   "lib/list.o lib/array.o lib/class.o";
 
 my $init = <<'END';
+#include "symbol.h"
+
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
 struct modules the_modules;
 struct modules *modulehdr = &the_modules;
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
-size_t get_PC( void ) { return 0; }
-int list_get_page_nr() { return 1; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
 
 long add3(long a, long b, long c) { return 3+a+b+c; }
 long add2(long a, long b) { return 2+a+b; }
@@ -226,7 +225,14 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.9  2014-04-15 20:06:44  pauloscustodio
+# Revision 1.10  2014-04-18 17:46:18  pauloscustodio
+# - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+#   manipulating.
+# - Factor parsing and evaluating contants.
+# - Factor symbol-not-defined error during expression evaluation.
+# - Store module name in strpool instead of xstrdup/xfree.
+#
+# Revision 1.9  2014/04/15 20:06:44  pauloscustodio
 # Solve warning: no newline at end of file
 #
 # Revision 1.8  2014/04/13 20:32:10  pauloscustodio

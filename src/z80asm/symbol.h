@@ -13,13 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.43 2014-04-15 20:06:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.44 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "expr.h"
 #include "model.h"
 #include "objfile.h"
 #include "symtab.h"
@@ -51,15 +52,15 @@ struct modules
 
 struct module
 {
-    struct module     *nextmodule;		/* pointer to next module */
-    char              *mname;			/* pointer to string of module name */
-	char			  *filename;		/* source file name, kept in strpool */
-    uint_t             startoffset;		/* this module's start offset from start of code buffer */
-    long               origin;			/* Address Origin of current machine code module during linking */
-    SymbolHash        *local_symtab;	/* pointer to root of local symbols tree */
-    struct expression *mexpr;			/* pointer to expressions in this module */
-    struct JRPC_Hdr   *JRaddr;			/* pointer to list of JR PC addresses */
-    ObjFile			  *obj_file;		/* ObjFile structure describing the object file */
+    struct module   *nextmodule;	/* pointer to next module */
+    char            *modname;		/* module name, kept in strpool*/
+	char			*filename;		/* source file name, kept in strpool */
+    uint_t           startoffset;	/* this module's start offset from start of code buffer */
+    long             origin;		/* Address Origin of current machine code module during linking */
+    SymbolHash      *local_symtab;	/* pointer to root of local symbols tree */
+    ExprList		*exprs;			/* pointer to expressions in this module */
+    struct JRPC_Hdr *JRaddr;		/* pointer to list of JR PC addresses */
+    ObjFile			*obj_file;		/* ObjFile structure describing the object file */
 };
 
 struct liblist
@@ -94,7 +95,14 @@ extern struct module *NewModule( void );
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.43  2014-04-15 20:06:43  pauloscustodio
+* Revision 1.44  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.43  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.42  2014/04/06 23:29:26  pauloscustodio

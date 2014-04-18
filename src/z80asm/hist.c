@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.88 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.89 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.88 2014-04-13 11:54
 
 /*
 * $Log: hist.c,v $
-* Revision 1.88  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.89  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.88  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -
@@ -1751,6 +1758,15 @@ Based on 1.0.31
 
 	- Merge test files.
 	- Remove token.c module - no longer needed with the ragel scanner.
+
+-------------------------------------------------------------------------------
+xx.xx.2014 [2.1.9] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Change struct expr to Expr class, use CLASS_LIST instead of linked list
+	  manipulating.
+	- Factor parsing and evaluating contants.
+	- Factor symbol-not-defined error during expression evaluation.
+	- Store module name in strpool instead of xstrdup/xfree.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

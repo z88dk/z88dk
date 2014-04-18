@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.14 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.15 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -76,10 +76,10 @@ char *Symbol_fullname( Symbol *sym )
 
     Str_set( name, sym->name );
 
-    if ( sym->owner && sym->owner->mname )
+    if ( sym->owner && sym->owner->modname )
     {
         Str_append_char( name, '@' );
-        Str_append( name, sym->owner->mname );
+        Str_append( name, sym->owner->modname );
     }
 
     return strpool_add( name->str );
@@ -88,7 +88,14 @@ char *Symbol_fullname( Symbol *sym )
 
 /*
 * $Log: sym.c,v $
-* Revision 1.14  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.15  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.14  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than

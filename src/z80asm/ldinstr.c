@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.33 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.34 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -28,13 +28,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.33 2014-04
 #include <stdio.h>
 
 /* external functions */
-void RemovePfixlist( struct expr *pfixexpr );
 int ExprUnsigned8( int listoffset );
 int ExprSigned8( int listoffset );
 int ExprAddress( int listoffset );
 int CheckRegister16( void );
 int CheckRegister8( void );
-struct expr *ParseNumExpr( void );
 int IndirectRegisters( void );
 
 /* local functions */
@@ -480,15 +478,15 @@ LD_address_indrct( char *exprptr )
 {
     int sourcereg;
     long bytepos;
-    struct expr *addrexpr;
+    Expr *addrexpr;
 
-    if ( ( addrexpr = ParseNumExpr() ) == NULL )
+    if ( ( addrexpr = expr_parse() ) == NULL )
     {
         return;    /* parse to right bracket */
     }
     else
     {
-        RemovePfixlist( addrexpr );    /* remove this expression again */
+        OBJ_DELETE( addrexpr );    /* remove this expression again */
     }
 
     if ( tok != TK_RPAREN )
@@ -709,7 +707,14 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.33  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.34  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.33  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.12 2014-04-12 11:57:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.13 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.12 2014-04-12 11:57
 #include "xmalloc.h"   /* before any other include */
 #include "array.h"
 #include "class.h"
-#include "symbol.h"
+#include "classlist.h"
 #include "scan.h"
 #include "strutil.h"
 
@@ -38,14 +38,6 @@ typedef enum
 } op_type_t;
 
 typedef enum { ASSOC_NONE, ASSOC_LEFT, ASSOC_RIGHT } assoc_t;
-
-/*-----------------------------------------------------------------------------
-*	Calculation functions for all operators, template:
-*	long calc_<symbol> (long a [, long b [, long c ] ] );
-*----------------------------------------------------------------------------*/
-#define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)	\
-	extern long calc_##_operation _args;
-#include "expr_def.h"
 
 /*-----------------------------------------------------------------------------
 *	Operator descriptors
@@ -66,15 +58,6 @@ typedef struct Operator
 
 /* get the operator descriptor for the given (sym, op_type) */
 extern Operator *Operator_get( tokid_t tok, op_type_t op_type );
-
-/*-----------------------------------------------------------------------------
-*	Stack for calculator
-*----------------------------------------------------------------------------*/
-extern void Calc_push( long value );
-extern long Calc_pop( void );
-extern void Calc_compute_unary(   long (*calc)(long a) );
-extern void Calc_compute_binary(  long (*calc)(long a, long b) );
-extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 /*-----------------------------------------------------------------------------
 *	Expression operations
@@ -103,51 +86,61 @@ typedef struct ExprOp				/* hold one operation or operand */
 
 ARRAY( ExprOp );					/* hold list of Expr operations/operands */
 
-/* init each type of ExprOp */
-extern void ExprOp_init_number(     ExprOp *self, long value );
-extern void ExprOp_init_name(       ExprOp *self, char *name, byte_t sym_type );
-extern void ExprOp_init_const_expr( ExprOp *self );
-extern void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type );
-
 /*-----------------------------------------------------------------------------
 *	Expression
 *----------------------------------------------------------------------------*/
+CLASS( Expr )
+	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
+	Str			*text;			/* expression in infix text */
+	byte_t		 expr_type;		/* range type of evaluated expression */
+    BOOL		 is_stored;		/* Flag to indicate that expression has been stored to object file */
+    uint_t		 codepos;		/* rel. position in module code to patch (in pass 2) */
+    char		*filename;		/* file and line where expression defined, string in strpool */
+    int			 line_nr;		/* source line */
+    long		 listpos;		/* position in listing file to patch (in pass 2) */
+END_CLASS;
 
-struct expr
-{
-    struct expr        *nextexpr;		/* pointer to next expression */
-
-	ExprOpArray		*rpn_ops;			/* list of operands / operators in reverse polish notation */
-	Str				*text;				/* expression in infix text */
-
-	byte_t			   expr_type;		/* range type of evaluated expression */
-    enum flag          stored;			/* Flag to indicate that expression has been stored to object file */
-    uint_t             codepos;			/* rel. position in module code to patch (in pass 2) */
-    char               *srcfile;		/* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
-    int                curline;			/* expression in line of source file */
-    long               listpos;			/* position in listing file to patch (in pass 2) */
-};
-
-struct expression
-{
-    struct expr        *firstexpr;		/* header of list of expressions in current module */
-    struct expr        *currexpr;
-};
+CLASS_LIST( Expr );				/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
-extern void ExprOp_compute( ExprOp *self, struct expr *pfixlist );
+extern void ExprOp_compute( ExprOp *self, Expr *expr );
 
+/* parse expression at current input, return new Expr object;
+   return NULL and issue syntax error on error */
+extern Expr *expr_parse( void );
 
-#if 0
+/* parse and eval an expression, 
+   return FALSE and issue syntax error on parse error
+   return FALSE and issue symbol not defined error on NOT_EVALUABLE */
+extern BOOL expr_parse_eval( long *presult );
 
-CLASS( Expr )
+/* parse and eval an expression as argument to IF, 
+   return expression value, ignoring symbol-not-defined errors  */
+extern long expr_parse_eval_if( void );
 
-END_CLASS
-#endif
+/* evaluate expression if possible, set NOT_EVALUABLE if failed
+   e.g. symbol not defined */
+extern long Expr_eval( Expr *self );
+
+/*-----------------------------------------------------------------------------
+*	Stack for calculator
+*----------------------------------------------------------------------------*/
+extern void Calc_push( long value );
+extern long Calc_pop( void );
+extern void Calc_compute_unary(   long (*calc)(long a) );
+extern void Calc_compute_binary(  long (*calc)(long a, long b) );
+extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.12  2014-04-12 11:57:02  pauloscustodio
+* Revision 1.13  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.12  2014/04/12 11:57:02  pauloscustodio
 * whitespace
 *
 * Revision 1.11  2014/04/06 23:29:26  pauloscustodio

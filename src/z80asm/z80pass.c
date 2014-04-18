@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.90 2014-04-15 20:06:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.91 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -43,15 +43,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.90 2014-04-15 20
 /* external functions */
 void LinkModules( void );
 void ParseIdent( enum flag interpret );
-void RemovePfixlist( struct expr *pfixexpr );
-void StoreExpr( struct expr *pfixexpr, char range );
-long EvalPfixExpr( struct expr *pass2expr );
-struct expr *ParseNumExpr( void );
+void StoreExpr( Expr *expr, char range );
 
 /* local functions */
 void ifstatement( enum flag interpret );
 void parseline( enum flag interpret );
-void Pass2info( struct expr *expression, char constrange, long lfileptr );
+void Pass2info( Expr *expression, char constrange, long lfileptr );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
 long Evallogexpr( void );
@@ -238,16 +235,11 @@ ifstatement( enum flag interpret )
 long
 Evallogexpr( void )
 {
-    struct expr *postfixexpr;
-    long constant = 0;
+    long constant;
 
-    GetSym();                     /* get logical expression */
+    GetSym();							/* get logical expression */
 
-    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
-    {
-        constant = EvalPfixExpr( postfixexpr );
-        RemovePfixlist( postfixexpr );    /* remove linked list, expression evaluated */
-    }
+	constant = expr_parse_eval_if();	/* ignore errors */
 
     return constant;
 }
@@ -347,150 +339,143 @@ StoreExternReferences( SymbolHash *symtab )
 void
 Z80pass2( void )
 {
-    struct expr *pass2expr, *prevexpr;
+    Expr *expr;
     struct JRPC *curJR, *prevJR;
     long constant;
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     uint_t patchptr;
 
+    curJR = CURRENTMODULE->JRaddr->firstref;  /* point at first JR PC address in this module */
 
-    if ( ( pass2expr = CURRENTMODULE->mexpr->firstexpr ) != NULL )
-    {
-        curJR = CURRENTMODULE->JRaddr->firstref;  /* point at first JR PC address in this module */
+	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
+	{
+        /* set error location */
+        set_error_file( expr->filename );
+        set_error_line( expr->line_nr );
 
-        do
+        constant = Expr_eval( expr );
+
+        if ( ! expr->is_stored )
         {
-            /* set error location */
-            set_error_file( pass2expr->srcfile );
-            set_error_line( pass2expr->curline );
-
-            constant = EvalPfixExpr( pass2expr );
-
-            if ( pass2expr->stored == OFF )
+            if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
             {
-                if ( ( pass2expr->expr_type & EXPR_EXTERN ) || ( pass2expr->expr_type & EXPR_ADDR ) )
+                /*
+                    * Expression contains symbol declared as external or defined as a relocatable
+                    * address,
+                    */
+                /* store expression in relocatable file */
+                switch ( expr->expr_type & RANGE )
                 {
-                    /*
-                     * Expression contains symbol declared as external or defined as a relocatable
-                     * address,
-                     */
-                    /* store expression in relocatable file */
-                    switch ( pass2expr->expr_type & RANGE )
-                    {
-                    case RANGE_32SIGN:
-                        StoreExpr( pass2expr, 'L' );
-                        break;
+                case RANGE_32SIGN:
+                    StoreExpr( expr, 'L' );
+                    break;
 
-                    case RANGE_16CONST:
-                        StoreExpr( pass2expr, 'C' );
-                        break;
+                case RANGE_16CONST:
+                    StoreExpr( expr, 'C' );
+                    break;
 
-                    case RANGE_8UNSIGN:
-                        StoreExpr( pass2expr, 'U' );
-                        break;
+                case RANGE_8UNSIGN:
+                    StoreExpr( expr, 'U' );
+                    break;
 
-                    case RANGE_8SIGN:
-                        StoreExpr( pass2expr, 'S' );
-                        break;
-                    }
+                case RANGE_8SIGN:
+                    StoreExpr( expr, 'S' );
+                    break;
                 }
             }
+        }
 
-            if ( ( pass2expr->expr_type & NOT_EVALUABLE ) && ( pass2expr->stored == OFF ) )
+        if ( ( expr->expr_type & NOT_EVALUABLE ) && ( ! expr->is_stored ) )
+        {
+            if ( ( expr->expr_type & RANGE ) == RANGE_JROFFSET )
             {
-                if ( ( pass2expr->expr_type & RANGE ) == RANGE_JROFFSET )
+                if ( expr->expr_type & EXPR_EXTERN )
                 {
-                    if ( pass2expr->expr_type & EXPR_EXTERN )
-                    {
-                        /* JR, DJNZ used an external label - */
-                        error_jr_not_local();
-                    }
-                    else
-                    {
-                        error_not_defined();
-                    }
-
-                    prevJR = curJR;
-                    curJR = curJR->nextref;       /* get ready for next JR instruction */
-                    xfree( prevJR );
+                    /* JR, DJNZ used an external label - */
+                    error_jr_not_local();
                 }
                 else
                 {
                     error_not_defined();
                 }
+
+                prevJR = curJR;
+                curJR = curJR->nextref;       /* get ready for next JR instruction */
+                xfree( prevJR );
             }
             else
             {
-                patchptr = pass2expr->codepos;            /* index in memory buffer */
-
-                switch ( pass2expr->expr_type & RANGE )
-                {
-                case RANGE_JROFFSET:
-                    constant -= curJR->PCaddr;    /* get module PC at JR instruction */
-
-                    if ( constant >= -128 && constant <= 127 )
-                    {
-                        patch_byte( &patchptr, ( byte_t ) constant );
-                        /* opcode is stored, now store relative jump */
-                    }
-                    else
-                    {
-                        error_int_range( constant );
-                    }
-
-                    prevJR = curJR;
-                    curJR = curJR->nextref;       /* get ready for JR instruction */
-                    xfree( prevJR );
-                    break;
-
-                case RANGE_8UNSIGN:
-                    if ( constant < -128 || constant > 255 )
-                        warn_int_range( constant );
-
-                    patch_byte( &patchptr, ( byte_t ) constant );
-                    break;
-
-                case RANGE_8SIGN:
-                    if ( constant < -128 || constant > 127 )
-                        warn_int_range( constant );
-
-                    patch_byte( &patchptr, ( byte_t ) constant );
-                    break;
-
-                case RANGE_16CONST:
-                    if ( constant < -32768 || constant > 65535 )
-                        warn_int_range( constant );
-
-                    patch_word( &patchptr, ( int ) constant );
-                    break;
-
-                case RANGE_32SIGN:
-                    if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range( constant );
-
-                    patch_long( &patchptr, constant );
-                    break;
-                }
+                error_not_defined();
             }
-
-            if ( opts.list )
-            {
-                list_patch_data( pass2expr->listpos, constant, RANGE_SIZE( pass2expr->expr_type ) );
-            }
-
-            prevexpr = pass2expr;
-            pass2expr = pass2expr->nextexpr;      /* get next pass2 expression */
-            RemovePfixlist( prevexpr );   /* release current expression */
         }
-        while ( pass2expr != NULL );      /* re-evaluate expressions and patch in code */
+        else
+        {
+            patchptr = expr->codepos;            /* index in memory buffer */
+
+            switch ( expr->expr_type & RANGE )
+            {
+            case RANGE_JROFFSET:
+                constant -= curJR->PCaddr;    /* get module PC at JR instruction */
+
+                if ( constant >= -128 && constant <= 127 )
+                {
+                    patch_byte( &patchptr, ( byte_t ) constant );
+                    /* opcode is stored, now store relative jump */
+                }
+                else
+                {
+                    error_int_range( constant );
+                }
+
+                prevJR = curJR;
+                curJR = curJR->nextref;       /* get ready for JR instruction */
+                xfree( prevJR );
+                break;
+
+            case RANGE_8UNSIGN:
+                if ( constant < -128 || constant > 255 )
+                    warn_int_range( constant );
+
+                patch_byte( &patchptr, ( byte_t ) constant );
+                break;
+
+            case RANGE_8SIGN:
+                if ( constant < -128 || constant > 127 )
+                    warn_int_range( constant );
+
+                patch_byte( &patchptr, ( byte_t ) constant );
+                break;
+
+            case RANGE_16CONST:
+                if ( constant < -32768 || constant > 65535 )
+                    warn_int_range( constant );
+
+                patch_word( &patchptr, ( int ) constant );
+                break;
+
+            case RANGE_32SIGN:
+                if ( constant < LONG_MIN || constant > LONG_MAX )
+                    warn_int_range( constant );
+
+                patch_long( &patchptr, constant );
+                break;
+            }
+        }
+
+        if ( opts.list )
+        {
+            list_patch_data( expr->listpos, constant, RANGE_SIZE( expr->expr_type ) );
+        }
+
+		OBJ_DELETE( expr );
 
         /* clean error location */
         set_error_file( NULL );
         set_error_line( 0 );
-
-        xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
-        xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
     }
+
+    OBJ_DELETE( CURRENTMODULE->exprs );   /* Release header of expressions list */
+    xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
 
     if ( ! get_num_errors() && opts.symtable )
     {
@@ -512,7 +497,7 @@ Z80pass2( void )
     StoreExternReferences( global_symtab );
 
     fptr_modname = ftell( objfile );
-	xfput_count_byte_strz( objfile, CURRENTMODULE->mname );		/* write module name */
+	xfput_count_byte_strz( objfile, CURRENTMODULE->modname );		/* write module name */
 
     if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
     {
@@ -570,28 +555,14 @@ Z80pass2( void )
 
 
 void
-Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expression linked list */
+Pass2info( Expr *expr,       /* pointer to header of postfix expression linked list */
            char constrange,				/* allowed size of value to be parsed */
            long byteoffset )			/* position in listing file to patch */
 {
-    pfixexpr->nextexpr = NULL;
-    pfixexpr->expr_type = constrange;
-    pfixexpr->srcfile = src_filename();	/* pointer to record containing current source file name */
-    pfixexpr->curline = src_line_nr();	/* pointer to record containing current line number */
-    pfixexpr->listpos = list_patch_pos( byteoffset );
-    /* now calculated as absolute file pointer */
+    expr->expr_type = constrange;
+    expr->listpos = list_patch_pos( byteoffset );	    /* now calculated as absolute file pointer */
 
-    if ( CURRENTMODULE->mexpr->firstexpr == NULL )
-    {
-        CURRENTMODULE->mexpr->firstexpr = pfixexpr;
-        CURRENTMODULE->mexpr->currexpr = pfixexpr;        /* Expression header points at first expression */
-    }
-    else
-    {
-        CURRENTMODULE->mexpr->currexpr->nextexpr = pfixexpr;      /* Current expr. node points to new expression
-                                                                   * node */
-        CURRENTMODULE->mexpr->currexpr = pfixexpr;				  /* Pointer to current expr. node updated */
-    }
+	ExprList_push( & CURRENTMODULE->exprs, expr );
 }
 
 
@@ -628,7 +599,14 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.90  2014-04-15 20:06:44  pauloscustodio
+* Revision 1.91  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.90  2014/04/15 20:06:44  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.89  2014/04/13 11:54:01  pauloscustodio

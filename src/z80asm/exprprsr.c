@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.73 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.74 2014-04-18 17:46:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -40,327 +40,31 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.73 2014-0
 #include <string.h>
 
 /* external functions */
-void Pass2info( struct expr *expression, char constrange, long lfileptr );
+void Pass2info( Expr *expr, char constrange, long lfileptr );
 
 /* local functions */
-void list_PfixExpr( struct expr *pfixlist );
-void RemovePfixlist( struct expr *pfixexpr );
-void StoreExpr( struct expr *pfixexpr, char range );
+void list_PfixExpr( Expr *pfixlist );
+void StoreExpr( Expr *expr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
-static BOOL TernaryCondition( struct expr *pfixexpr );
-
-long EvalPfixExpr( struct expr *pfixexpr );
-struct expr *ParseNumExpr( void );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
 
 
-#define DEFINE_PARSER( name, prev_name, condition )				\
-	static BOOL name( struct expr *pfixexpr )					\
-	{															\
-		tokid_t op = TK_NIL;									\
-																\
-		if ( ! prev_name(pfixexpr) )							\
-			return FALSE;										\
-																\
-		while ( condition )										\
-		{														\
-			op = tok;											\
-			Str_append(pfixexpr->text, tok_text);				\
-			GetSym();											\
-			if ( ! prev_name(pfixexpr) )						\
-				return FALSE;									\
-																\
-			ExprOp_init_operator(								\
-				ExprOpArray_push( pfixexpr->rpn_ops ),			\
-				op, BINARY_OP );								\
-		}														\
-																\
-		return TRUE;											\
-	}
-
-/* parse value */
-static BOOL Factor( struct expr *pfixexpr )
-{
-    Symbol *symptr;
-
-    switch ( tok )
-    {
-    case TK_NAME:
-        symptr = get_used_symbol( tok_name );
-
-        if ( symptr->sym_type & SYM_DEFINED )
-        {
-            /* copy appropriate type bits */
-            pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE );
-			ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
-								symptr->value );
-        }
-        else
-        {
-            /* copy appropriate declaration bits */
-            pfixexpr->expr_type |= ( symptr->sym_type & SYM_TYPE ) | NOT_EVALUABLE;
-
-            /* symbol only declared, store symbol name */
-			ExprOp_init_name( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  tok_name, symptr->sym_type );
-        }
-
-        Str_append(pfixexpr->text, tok_name);		/* add identifier to infix expr */
-
-        GetSym();
-        break;
-
-	case TK_NUMBER:
-		Str_append_sprintf(pfixexpr->text, "%ld", tok_number);
-		ExprOp_init_number( ExprOpArray_push( pfixexpr->rpn_ops ),
-							tok_number );
-        GetSym();
-        break;
-
-    default:
-        return 0;
-    }
-
-    return 1;                   /* syntax OK */
-}
-
-/* parse unary operators */
-static BOOL UnaryTerm( struct expr *pfixexpr )
-{
-    tokid_t open_paren;
-
-	switch (tok) 
-	{
-    case TK_MINUS:
-        Str_append(pfixexpr->text, tok_text);
-        GetSym();
-		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
-			return FALSE;
-
-		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  TK_MINUS, UNARY_OP );
-		return TRUE;
-
-    case TK_PLUS:
-        GetSym();
-        return UnaryTerm( pfixexpr );
-
-    case TK_BIN_NOT:
-        Str_append(pfixexpr->text, tok_text);
-        GetSym();
-		if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
-			return FALSE;
-
-		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  TK_BIN_NOT, UNARY_OP );
-		return TRUE;
-
-    case TK_LOG_NOT:
-        Str_append(pfixexpr->text, tok_text);
-        GetSym();
-
-        if ( ! UnaryTerm( pfixexpr ) )		/* right-associative, recurse */
-			return FALSE;
-
-		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  TK_LOG_NOT, UNARY_OP );
-		return TRUE;
-
-    case TK_LPAREN:
-    case TK_LSQUARE:
-        Str_append(pfixexpr->text, tok_text);
-        open_paren = tok;
-        GetSym();
-
-        if ( ! TernaryCondition( pfixexpr ) )
-			return FALSE;
-
-		/* chack parentheses balance */
-        if ( ( open_paren == TK_LPAREN  && tok != TK_RPAREN ) ||
-             ( open_paren == TK_LSQUARE && tok != TK_RSQUARE ) )
-			return FALSE;
-
-        Str_append(pfixexpr->text, tok_text);
-        GetSym();
-		return TRUE;
-
-	default:
-		return Factor( pfixexpr );
-	}
-}
-
-/* parse A ** B */
-static BOOL PowerTerm( struct expr *pfixexpr )
-{
-    if ( ! UnaryTerm( pfixexpr ) )
-        return FALSE;
-
-    while ( tok == TK_POWER )
-    {
-        Str_append(pfixexpr->text, tok_text);
-        GetSym();
-		if ( ! PowerTerm( pfixexpr ) )		/* right-associative, recurse */
-			return FALSE;
-
-		ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
-							  TK_POWER, BINARY_OP );
-    }
-
-    return TRUE;
-}
-
-
-/* parse A * B, A / B, A % B */
-DEFINE_PARSER( Multiplication, PowerTerm, tok == TK_MULTIPLY || tok == TK_DIVIDE || tok == TK_MOD )
-
-/* parse A + B, A - B */
-DEFINE_PARSER( Addition, Multiplication, tok == TK_PLUS || tok == TK_MINUS )
-
-/* parse A << B, A >> B */
-DEFINE_PARSER( BinaryShift, Addition, tok == TK_LEFT_SHIFT || tok == TK_RIGHT_SHIFT )
-
-/* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
-DEFINE_PARSER( Condition, BinaryShift, tok == TK_LESS	|| tok == TK_LESS_EQ ||
-									   tok == TK_EQUAL	|| tok == TK_NOT_EQ  ||
-									   tok == TK_GREATER|| tok == TK_GREATER_EQ )
-
-/* parse A & B */
-DEFINE_PARSER( BinaryAnd, Condition, tok == TK_BIN_AND )
-
-/* parse A | B, A ^ B */
-DEFINE_PARSER( BinaryOr, BinaryAnd, tok == TK_BIN_OR || tok == TK_BIN_XOR )
-
-/* parse A && B */
-DEFINE_PARSER( LogicalAnd, BinaryOr, tok == TK_LOG_AND )
-
-/* parse A || B */
-DEFINE_PARSER( LogicalOr, LogicalAnd, tok == TK_LOG_OR )
-
-/* parse cond ? true : false */
-static BOOL TernaryCondition( struct expr *pfixexpr )
-{
-	if ( ! LogicalOr(pfixexpr) )		/* get cond or expression */
-		return FALSE;
-
-	if ( tok != TK_QUESTION )
-		return TRUE;
-
-	/* ternary construct found */
-    Str_append_char(pfixexpr->text, '?');
-	GetSym();						/* consume '?' */
-		
-	if ( ! TernaryCondition(pfixexpr) )	/* get true */
-		return FALSE;
-
-	if ( tok != TK_COLON )
-		return FALSE;
-    Str_append_char(pfixexpr->text, ':');
-	GetSym();						/* consume ':' */
-
-	if ( ! TernaryCondition(pfixexpr) )	/* get false */
-		return FALSE;
-
-	ExprOp_init_operator( ExprOpArray_push( pfixexpr->rpn_ops ),
-						  TK_TERN_COND, TERNARY_OP );
-	return TRUE;
-}
-
-
-struct expr *
-ParseNumExpr( void )
-{
-    struct expr *pfixhdr;
-    BOOL is_const_expr = FALSE;
-
-    pfixhdr = xnew( struct expr );
-
-    pfixhdr->rpn_ops = OBJ_NEW( ExprOpArray );
-	OBJ_AUTODELETE( pfixhdr->rpn_ops ) = FALSE;
-
-    pfixhdr->text = OBJ_NEW( Str );
-	OBJ_AUTODELETE( pfixhdr->text ) = FALSE;
-
-    pfixhdr->expr_type = 0;
-    pfixhdr->stored = OFF;
-    pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
-
-    if ( tok == TK_CONST_EXPR )
-    {
-		Str_append(pfixhdr->text, tok_text);
-
-		GetSym();               /* leading '#' : ignore relocatable address expression */
-        is_const_expr = TRUE;        /* convert to constant expression */
-    }
-
-    if ( TernaryCondition( pfixhdr ) )
-    {
-        /* convert to constant expression */
-        if ( is_const_expr )
-			ExprOp_init_const_expr( ExprOpArray_push( pfixhdr->rpn_ops ) );
-    }
-    else
-    {
-        RemovePfixlist( pfixhdr );
-        pfixhdr = NULL;         /* syntax error in expression or no room for postfix expression */
-		error_syntax_expr();
-	}
-
-    return pfixhdr;
-}
-
 
 
 void
-StoreExpr( struct expr *pfixexpr, char range )
+StoreExpr( Expr *expr, char range )
 {
     xfput_uint8(			objfile, range );				/* range of expression */
-    xfput_uint16(			objfile, pfixexpr->codepos );	/* patchptr */
-	xfput_count_byte_strz(	objfile, pfixexpr->text->str );	/* expression */
+    xfput_uint16(			objfile, expr->codepos );	/* patchptr */
+	xfput_count_byte_strz(	objfile, expr->text->str );	/* expression */
     xfput_uint8(			objfile, 0 );					/* nul-terminate expression */
 
-    pfixexpr->stored = ON;
+    expr->is_stored = TRUE;
 }
-
-
-
-long
-EvalPfixExpr( struct expr *pfixlist )
-{
-	uint_t i;
-
-	pfixlist->expr_type &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
-
-	for ( i = 0; i < ExprOpArray_size( pfixlist->rpn_ops ); i++ )
-	{
-		ExprOp *expr_op = ExprOpArray_item( pfixlist->rpn_ops, i );
-
-		ExprOp_compute( expr_op, pfixlist );
-	}
-
-    return Calc_pop();
-}
-
-
-
-
-
-
-void
-RemovePfixlist( struct expr *pfixexpr )
-{
-    if ( pfixexpr == NULL )
-        return;
-
-	OBJ_DELETE( pfixexpr->rpn_ops );
-	OBJ_DELETE( pfixexpr->text );
-
-    xfree( pfixexpr );           /* release header of postfix expression */
-}
-
 
 
 
@@ -368,41 +72,41 @@ int
 ExprLong( int listoffset )
 {
 
-    struct expr *pfixexpr;
+    Expr *expr;
     long constant;
     int flag = 1;
     uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
-    if ( ( pfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->expr_type & EXPR_EXTERN ) || ( pfixexpr->expr_type & EXPR_ADDR ) )
+        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
-            StoreExpr( pfixexpr, 'L' );
+            StoreExpr( expr, 'L' );
         }
 
-        if ( pfixexpr->expr_type & EXPR_EXTERN )
+        if ( expr->expr_type & EXPR_EXTERN )
         {
-            RemovePfixlist( pfixexpr );
+            OBJ_DELETE( expr );
         }
         else
         {
-            if ( ( pfixexpr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
-                RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
+                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->expr_type & NOT_EVALUABLE )
+                if ( expr->expr_type & NOT_EVALUABLE )
                 {
-                    Pass2info( pfixexpr, RANGE_32SIGN, listoffset );
+                    Pass2info( expr, RANGE_32SIGN, listoffset );
                 }
                 else
                 {
-                    constant = EvalPfixExpr( pfixexpr );
-                    RemovePfixlist( pfixexpr );
+                    constant = Expr_eval( expr );
+                    OBJ_DELETE( expr );
 
                     if ( constant < LONG_MIN || constant > LONG_MAX )
                         warn_int_range( constant );
@@ -430,41 +134,41 @@ ExprLong( int listoffset )
 int
 ExprAddress( int listoffset )
 {
-    struct expr *pfixexpr;
+    Expr *expr;
     long constant;
     int flag = 1;
     uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
-    if ( ( pfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->expr_type & EXPR_EXTERN ) || ( pfixexpr->expr_type & EXPR_ADDR ) )
+        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
-            StoreExpr( pfixexpr, 'C' );
+            StoreExpr( expr, 'C' );
         }
 
-        if ( pfixexpr->expr_type & EXPR_EXTERN )
+        if ( expr->expr_type & EXPR_EXTERN )
         {
-            RemovePfixlist( pfixexpr );
+            OBJ_DELETE( expr );
         }
         else
         {
-            if ( ( pfixexpr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
-                RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
+                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->expr_type & NOT_EVALUABLE )
+                if ( expr->expr_type & NOT_EVALUABLE )
                 {
-                    Pass2info( pfixexpr, RANGE_16CONST, listoffset );
+                    Pass2info( expr, RANGE_16CONST, listoffset );
                 }
                 else
                 {
-                    constant = EvalPfixExpr( pfixexpr );
-                    RemovePfixlist( pfixexpr );
+                    constant = Expr_eval( expr );
+                    OBJ_DELETE( expr );
 
                     if ( constant < -32768 || constant > 65535 )
                         warn_int_range( constant );
@@ -491,41 +195,41 @@ ExprAddress( int listoffset )
 int
 ExprUnsigned8( int listoffset )
 {
-    struct expr *pfixexpr;
+    Expr *expr;
     long constant;
     int flag = 1;
     uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
-    if ( ( pfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->expr_type & EXPR_EXTERN ) || ( pfixexpr->expr_type & EXPR_ADDR ) )
+        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
-            StoreExpr( pfixexpr, 'U' );
+            StoreExpr( expr, 'U' );
         }
 
-        if ( pfixexpr->expr_type & EXPR_EXTERN )
+        if ( expr->expr_type & EXPR_EXTERN )
         {
-            RemovePfixlist( pfixexpr );
+            OBJ_DELETE( expr );
         }
         else
         {
-            if ( ( pfixexpr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
+            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
-                RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
+                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->expr_type & NOT_EVALUABLE )
+                if ( expr->expr_type & NOT_EVALUABLE )
                 {
-                    Pass2info( pfixexpr, RANGE_8UNSIGN, listoffset );
+                    Pass2info( expr, RANGE_8UNSIGN, listoffset );
                 }
                 else
                 {
-                    constant = EvalPfixExpr( pfixexpr );
-                    RemovePfixlist( pfixexpr );
+                    constant = Expr_eval( expr );
+                    OBJ_DELETE( expr );
 
                     if ( constant < -128 || constant > 255 )
                         warn_int_range( constant );
@@ -553,7 +257,7 @@ ExprUnsigned8( int listoffset )
 int
 ExprSigned8( int listoffset )
 {
-    struct expr *pfixexpr;
+    Expr *expr;
     long constant;
     int flag = 1;
     uint_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
@@ -574,35 +278,35 @@ ExprSigned8( int listoffset )
         return 0;           /* FAIL */
     }
 
-    if ( ( pfixexpr = ParseNumExpr() ) != NULL )
+    if ( ( expr = expr_parse() ) != NULL )
     {
         /* parse numerical expression */
-        if ( ( pfixexpr->expr_type & EXPR_EXTERN ) || ( pfixexpr->expr_type & EXPR_ADDR ) )
+        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
             /* expression contains external reference or address label, must be recalculated during linking */
         {
-            StoreExpr( pfixexpr, 'S' );
+            StoreExpr( expr, 'S' );
         }
 
-        if ( pfixexpr->expr_type & EXPR_EXTERN )
+        if ( expr->expr_type & EXPR_EXTERN )
         {
-            RemovePfixlist( pfixexpr );
+            OBJ_DELETE( expr );
         }
         else
         {
-            if ( ( pfixexpr->expr_type & EXPR_ADDR ) && ! opts.cur_list ) /* expression contains address label */
+            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list ) /* expression contains address label */
             {
-                RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
+                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
             }
             else
             {
-                if ( pfixexpr->expr_type & NOT_EVALUABLE )
+                if ( expr->expr_type & NOT_EVALUABLE )
                 {
-                    Pass2info( pfixexpr, RANGE_8SIGN, listoffset );
+                    Pass2info( expr, RANGE_8SIGN, listoffset );
                 }
                 else
                 {
-                    constant = EvalPfixExpr( pfixexpr );
-                    RemovePfixlist( pfixexpr );
+                    constant = Expr_eval( expr );
+                    OBJ_DELETE( expr );
 
                     if ( constant < -128 || constant > 127 )
                         warn_int_range( constant );
@@ -628,7 +332,14 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.73  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.74  2014-04-18 17:46:18  pauloscustodio
+* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
+*   manipulating.
+* - Factor parsing and evaluating contants.
+* - Factor symbol-not-defined error during expression evaluation.
+* - Store module name in strpool instead of xstrdup/xfree.
+*
+* Revision 1.73  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *
@@ -1018,7 +729,7 @@ ExprSigned8( int listoffset )
 /* *****************  Version 8  ***************** */
 /* User: Gbs          Date: 2-05-99    Time: 18:04 */
 /* Updated in $/Z80asm */
-/* General improvements on EvalPfixExpr(), due to changes in declaration */
+/* General improvements on Expr_eval(), due to changes in declaration */
 /* rules of XDEF, XREF and LIB. */
 /*  */
 /* *****************  Version 6  ***************** */
