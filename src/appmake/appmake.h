@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.31 2014-04-16 20:21:39 stefano Exp $
+ *   $Id: appmake.h,v 1.32 2014-04-18 14:07:09 stefano Exp $
  */
 
 
@@ -95,6 +95,9 @@ extern option_t  newbrain_options;
 
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
+
+extern int       rom_exec(char *target);
+extern option_t  rom_options;
 
 extern int       sc3000_exec(char *target);
 extern option_t  sc3000_options;
@@ -188,16 +191,19 @@ struct {
     { "hex2cas",   "nec",       "(C) 2003,2007 Takahide Matsutsuka",
       "PC-6001 (and others) CAS format conversion utility",
       nec_exec,    &nec_options },
-    { "mc2cas",   "p2000",       "(C) 2014 Stefano Bodrato",
+    { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       p2000_exec,    &p2000_options },
     { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
       "Packaging for Sorcerer Exidy, --audio for WAV format",
       sorcerer_exec,    &sorcerer_options },
-    { "sentinel",   "sos",       "(C) 2013 Stefano Bodrato",
+    { "rompad",    "rom",       "(C) 2014 Stefano Bodrato",
+      "Expand a binary block to a given size (pad to create a ROM)",
+      rom_exec,    &rom_options },
+    { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
       "Add a header for S-OS (The Sentinel)",
       sos_exec,    &sos_options },
-    { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",
+    { "bin2nwbn",  "newbrain",       "(C) 2007 Stefano Bodrato",
       "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       newbrain_exec,    &newbrain_options },
     { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",
@@ -255,7 +261,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optional WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 37
+#define APPMAKE_TARGETS 38
 #endif
 
 
