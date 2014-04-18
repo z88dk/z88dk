@@ -56,7 +56,13 @@
     <ClCompile Include="newbrain.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="p2000.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="rex6000.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rom.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sms.c">
