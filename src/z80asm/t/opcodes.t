@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.7 2014-04-16 22:50:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.8 2014-04-18 16:46:19 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -23,58 +23,12 @@ require 't/test_utils.pl';
 
 # Z80 | RABBIT
 assemble("", <<'END');
-; Call - need to be at fixed address
+
+	defc ind = 5
+	defc n   = 32
+
 start:
-	call    start	;          CD 00 01    	
-	call    -1   	;          CD FF FF    
 
-	call nz,start	;          C4 00 01		Z80
-	call nz,start	; 28 03    CD 00 01		RABBIT
-	call  z,start	;          CC 00 01		Z80
-	call  z,start	; 20 03    CD 00 01		RABBIT
-	call nc,start	;          D4 00 01		Z80
-	call nc,start	; 38 03    CD 00 01		RABBIT
-	call  c,start	;          DC 00 01		Z80
-	call  c,start	; 30 03    CD 00 01		RABBIT
-	call po,start	;          E4 00 01		Z80
-	call po,start	; EA 2F 00 CD 00 01		RABBIT
-call1:
-	call pe,start	;          EC 00 01		Z80
-	call pe,start	; E2 38 00 CD 00 01		RABBIT
-call2:
-	call  p,start	;          F4 00 01		Z80
-	call  p,start	; FA 41 00 CD 00 01		RABBIT
-call3:
-	call  m,start	;          FC 00 01		Z80
-	call  m,start	; F2 4A 00 CD 00 01		RABBIT
-call4:
-
-; Jump relative
-	djnz ASMPC		; 10 FE
-	djnz ASMPC+0x81	; 10 7F
-	jr	 ASMPC		; 18 FE
-	jr	 ASMPC-0x7E	; 18 80
-	djnz addr1		; 10 00       
-addr1:
-	jr	addr1		; 18 FE
-	jr 	addr2		; 18 00
-addr2:
-	jr	nz,addr1	; 20 FA       
-	jr	 z,addr1	; 28 F8       
-	jr	nc,addr1	; 30 F6       
-	jr	 c,addr1	; 38 F4
-	djnz addr1		; 10 F2     
-	jr	addr4		; 18 7E
-	jr	addr4		; 18 7C
-addr3:
-	defs 124
-addr4:
-	jr	addr3		; 18 82
-	jr	addr3		; 18 80
-	djnz addr5		; 10 7F
-	djnz addr5		; 10 7D
-	defs 125
-addr5:
 
 ; Jump absolute
 	jp	(hl)		; E9          
@@ -91,7 +45,273 @@ addr5:
 	jp	 p,start	; F2 00 01    
 	jp	 m,start	; FA 00 01    
 
+
+; Jump relative
+	djnz ASMPC		; 10 FE
+	djnz ASMPC+0x81	; 10 7F
+	jr	 ASMPC		; 18 FE
+	jr	 ASMPC-0x7E	; 18 80
+	djnz jr1		; 10 00       
+jr1:
+	jr	jr1			; 18 FE
+	jr 	jr2			; 18 00
+jr2:
+	jr	nz,jr1		; 20 FA       
+	jr	 z,jr1		; 28 F8       
+	jr	nc,jr1		; 30 F6       
+	jr	 c,jr1		; 38 F4
+	djnz jr1		; 10 F2     
+	jr	jr4			; 18 7E
+	jr	jr4			; 18 7C
+jr3:
+	defs 124
+jr4:
+	jr	jr3			; 18 82
+	jr	jr3			; 18 80
+	djnz jr5		; 10 7F
+	djnz jr5		; 10 7D
+	defs 125
+jr5:
+
+
+; Call
+	call    call4	;          	 CD {call4}    	
+	call    -1   	;          	 CD FF FF    
+
+	call nz,call4	;          	 C4 {call4}		Z80
+	call nz,call4	; 28 03    	 CD {call4}		RABBIT
+	call  z,call4	;          	 CC {call4}		Z80
+	call  z,call4	; 20 03    	 CD {call4}		RABBIT
+	call nc,call4	;          	 D4 {call4}		Z80
+	call nc,call4	; 38 03    	 CD {call4}		RABBIT
+	call  c,call4	;          	 DC {call4}		Z80
+	call  c,call4	; 30 03      CD {call4}		RABBIT
+	call po,call4	;            E4 {call4}		Z80
+;****	call po,call4	; EA {call1} CD {call4}		RABBIT
+call1:
+	call pe,call4	;            EC {call4}		Z80
+;****	call pe,call4	; E2 {call2} CD {call4}		RABBIT
+call2:
+	call  p,call4	;            F4 {call4}		Z80
+;****	call  p,call4	; FA {call3} CD {call4}		RABBIT
+call3:
+	call  m,call4	;            FC {call4}		Z80
+;****	call  m,call4	; F2 {call4} CD {call4}		RABBIT
+call4:
+	ret				; C9
+
+
+; IF ELSE ENDIF
+	if	1
+	  defb 1		; 01
+	  if 1
+		defb 2		; 02
+	  else
+	    defb 3
+	  endif
+	else
+	  defb 4
+	  if 1
+	    defb 5
+      else
+	    defb 6
+	  endif
+	endif
+
+	if 0
+	  defb 7
+	endif
+	
+	if 1
+	  defb 8		; 08
+	endif
+	
+	if 0
+	  defb 9
+	else
+	  defb 10		; 0A
+	endif
+	
+	if undefined
+	  defb 11
+	else
+	  defb 12		; 0C
+	endif
+
+	if undefined | 1
+	  defb 13		; 0D
+	else
+	  defb 14
+	endif
+
 ; All other opcodes	
+	adc	a,(hl)		; 8E          
+	adc	a,(ix+ind)	; DD 8E 05    
+	adc	a,(iy+ind)	; FD 8E 05    
+	adc	a,a			; 8F          
+	adc	a,b			; 88          
+	adc	a,c			; 89          
+	adc	a,d			; 8A          
+	adc	a,e			; 8B          
+	adc	a,h			; 8C          
+	adc	a,l			; 8D          
+	adc	a,n			; CE 20       
+	adc	(hl)		; 8E          
+	adc	(ix+ind)	; DD 8E 05    
+	adc	(iy+ind)	; FD 8E 05    
+	adc	a			; 8F          
+	adc	b			; 88          
+	adc	c			; 89          
+	adc	d			; 8A          
+	adc	e			; 8B          
+	adc	h			; 8C          
+	adc	l			; 8D          
+	adc	n			; CE 20       
+	adc	hl,bc		; ED 4A       
+	adc	hl,de		; ED 5A       
+	adc	hl,hl		; ED 6A       
+	adc	hl,sp		; ED 7A       
+	add	a,(hl)		; 86          
+	add	a,(ix+ind)	; DD 86 05    
+	add	a,(iy+ind)	; FD 86 05    
+	add	a,a			; 87          
+	add	a,b			; 80          
+	add	a,c			; 81          
+	add	a,d			; 82          
+	add	a,e			; 83          
+	add	a,h			; 84          
+	add	a,l			; 85          
+	add	a,n			; C6 20       
+	add	(hl)		; 86          
+	add	(ix+ind)	; DD 86 05    
+	add	(iy+ind)	; FD 86 05    
+	add	a			; 87          
+	add	b			; 80          
+	add	c			; 81          
+	add	d			; 82          
+	add	e			; 83          
+	add	h			; 84          
+	add	l			; 85          
+	add	n			; C6 20       
+	add	hl,bc		; 09          
+	add	hl,de		; 19          
+	add	hl,hl		; 29          
+	add	hl,sp		; 39          
+	add	ix,bc		; DD 09       
+	add	ix,de		; DD 19       
+	add	ix,ix		; DD 29       
+	add	ix,sp		; DD 39       
+	add	iy,bc		; FD 09       
+	add	iy,de		; FD 19       
+	add	iy,iy		; FD 29       
+	add	iy,sp		; FD 39       
+	and	(hl)		; A6          
+	and	(ix+ind)	; DD A6 05    
+	and	(iy+ind)	; FD A6 05    
+	and	a			; A7          
+	and	b			; A0          
+	and	c			; A1          
+	and	d			; A2          
+	and	e			; A3          
+	and	h			; A4          
+	and	l			; A5          
+	and	n			; E6 20       
+	and	a,(hl)		; A6          
+	and	a,(ix+ind)	; DD A6 05    
+	and	a,(iy+ind)	; FD A6 05    
+	and	a,a			; A7          
+	and	a,b			; A0          
+	and	a,c			; A1          
+	and	a,d			; A2          
+	and	a,e			; A3          
+	and	a,h			; A4          
+	and	a,l			; A5          
+	and	a,n			; E6 20       
+	bit	0,(hl)		; CB 46       
+	bit	0,(ix)		; DD CB 00 46 
+	bit	0,(ix+0)	; DD CB 00 46 
+	bit	0,(ix+127)	; DD CB 7F 46 
+	bit	0,(ix+ind)	; DD CB 05 46 
+	bit	0,(ix-0)	; DD CB 00 46 
+	bit	0,(ix-128)	; DD CB 80 46 
+	bit	0,(iy+ind)	; FD CB 05 46 
+	bit	0,a			; CB 47       
+	bit	0,b			; CB 40       
+	bit	0,c			; CB 41       
+	bit	0,d			; CB 42       
+	bit	0,e			; CB 43       
+	bit	0,h			; CB 44       
+	bit	0,l			; CB 45       
+	bit	1,(hl)		; CB 4E       
+	bit	1,(ix+ind)	; DD CB 05 4E 
+	bit	1,(iy+ind)	; FD CB 05 4E 
+	bit	1,a			; CB 4F       
+	bit	1,b			; CB 48       
+	bit	1,c			; CB 49       
+	bit	1,d			; CB 4A       
+	bit	1,e			; CB 4B       
+	bit	1,h			; CB 4C       
+	bit	1,l			; CB 4D       
+	bit	2,(hl)		; CB 56       
+	bit	2,(ix+ind)	; DD CB 05 56 
+	bit	2,(iy+ind)	; FD CB 05 56 
+	bit	2,a			; CB 57       
+	bit	2,b			; CB 50       
+	bit	2,c			; CB 51       
+	bit	2,d			; CB 52       
+	bit	2,e			; CB 53       
+	bit	2,h			; CB 54       
+	bit	2,l			; CB 55       
+	bit	3,(hl)		; CB 5E       
+	bit	3,(ix+ind)	; DD CB 05 5E 
+	bit	3,(iy+ind)	; FD CB 05 5E 
+	bit	3,a			; CB 5F       
+	bit	3,b			; CB 58       
+	bit	3,c			; CB 59       
+	bit	3,d			; CB 5A       
+	bit	3,e			; CB 5B       
+	bit	3,h			; CB 5C       
+	bit	3,l			; CB 5D       
+	bit	4,(hl)		; CB 66       
+	bit	4,(ix+ind)	; DD CB 05 66 
+	bit	4,(iy+ind)	; FD CB 05 66 
+	bit	4,a			; CB 67       
+	bit	4,b			; CB 60       
+	bit	4,c			; CB 61       
+	bit	4,d			; CB 62       
+	bit	4,e			; CB 63       
+	bit	4,h			; CB 64       
+	bit	4,l			; CB 65       
+	bit	5,(hl)		; CB 6E       
+	bit	5,(ix+ind)	; DD CB 05 6E 
+	bit	5,(iy+ind)	; FD CB 05 6E 
+	bit	5,a			; CB 6F       
+	bit	5,b			; CB 68       
+	bit	5,c			; CB 69       
+	bit	5,d			; CB 6A       
+	bit	5,e			; CB 6B       
+	bit	5,h			; CB 6C       
+	bit	5,l			; CB 6D       
+	bit	6,(hl)		; CB 76       
+	bit	6,(ix+ind)	; DD CB 05 76 
+	bit	6,(iy+ind)	; FD CB 05 76 
+	bit	6,a			; CB 77       
+	bit	6,b			; CB 70       
+	bit	6,c			; CB 71       
+	bit	6,d			; CB 72       
+	bit	6,e			; CB 73       
+	bit	6,h			; CB 74       
+	bit	6,l			; CB 75       
+	bit	7,(hl)		; CB 7E       
+	bit	7,(ix+ind)	; DD CB 05 7E 
+	bit	7,(iy+ind)	; FD CB 05 7E 
+	bit	7,a			; CB 7F       
+	bit	7,b			; CB 78       
+	bit	7,c			; CB 79       
+	bit	7,d			; CB 7A       
+	bit	7,e			; CB 7B       
+	bit	7,h			; CB 7C       
+	bit	7,l			; CB 7D       
 	call_oz(1)		; E7 01
 	call_oz(255)	; E7 FF
 	call_oz(256)	; E7 00 01
@@ -99,6 +319,35 @@ addr5:
 	call_pkg(0)		; CF 00 00
 	call_pkg(1)		; CF 01 00
 	call_pkg(65535)	; CF FF FF
+	ccf				; 3F          
+	cp	a,(hl)		; BE          
+	cp	a,(ix+ind)	; DD BE 05    
+	cp	a,(iy+ind)	; FD BE 05    
+	cp	a,a			; BF          
+	cp	a,b			; B8          
+	cp	a,c			; B9          
+	cp	a,d			; BA          
+	cp	a,e			; BB          
+	cp	a,h			; BC          
+	cp	a,l			; BD          
+	cp	a,n			; FE 20       
+	cp	(hl)		; BE          
+	cp	(ix+ind)	; DD BE 05    
+	cp	(iy+ind)	; FD BE 05    
+	cp	a			; BF          
+	cp	b			; B8          
+	cp	c			; B9          
+	cp	d			; BA          
+	cp	e			; BB          
+	cp	h			; BC          
+	cp	l			; BD          
+	cp	n			; FE 20       
+;****	cpd				; ED A9       
+;****	cpdr			; ED B9       
+;****	cpi				; ED A1       
+;****	cpir			; ED B1       
+	cpl				; 2F          
+	daa				; 27          	Z80
 	ex	af,af		; 08
 	ex	af,af'		; 08
 	fpp(1)			; DF 01
@@ -109,6 +358,86 @@ addr5:
 	invoke(0)		; CD 00 00
 	invoke(1)		; CD 01 00
 	invoke(65535)	; CD FF FF
+	res	0,(hl)		; CB 86       
+	res	0,(ix+ind)	; DD CB 05 86 
+	res	0,(iy+ind)	; FD CB 05 86 
+	res	0,a			; CB 87       
+	res	0,b			; CB 80       
+	res	0,c			; CB 81       
+	res	0,d			; CB 82       
+	res	0,e			; CB 83       
+	res	0,h			; CB 84       
+	res	0,l			; CB 85       
+	res	1,(hl)		; CB 8E       
+	res	1,(ix+ind)	; DD CB 05 8E 
+	res	1,(iy+ind)	; FD CB 05 8E 
+	res	1,a			; CB 8F       
+	res	1,b			; CB 88       
+	res	1,c			; CB 89       
+	res	1,d			; CB 8A       
+	res	1,e			; CB 8B       
+	res	1,h			; CB 8C       
+	res	1,l			; CB 8D       
+	res	2,(hl)		; CB 96       
+	res	2,(ix+ind)	; DD CB 05 96 
+	res	2,(iy+ind)	; FD CB 05 96 
+	res	2,a			; CB 97       
+	res	2,b			; CB 90       
+	res	2,c			; CB 91       
+	res	2,d			; CB 92       
+	res	2,e			; CB 93       
+	res	2,h			; CB 94       
+	res	2,l			; CB 95       
+	res	3,(hl)		; CB 9E       
+	res	3,(ix+ind)	; DD CB 05 9E 
+	res	3,(iy+ind)	; FD CB 05 9E 
+	res	3,a			; CB 9F       
+	res	3,b			; CB 98       
+	res	3,c			; CB 99       
+	res	3,d			; CB 9A       
+	res	3,e			; CB 9B       
+	res	3,h			; CB 9C       
+	res	3,l			; CB 9D       
+	res	4,(hl)		; CB A6       
+	res	4,(ix+ind)	; DD CB 05 A6 
+	res	4,(iy+ind)	; FD CB 05 A6 
+	res	4,a			; CB A7       
+	res	4,b			; CB A0       
+	res	4,c			; CB A1       
+	res	4,d			; CB A2       
+	res	4,e			; CB A3       
+	res	4,h			; CB A4       
+	res	4,l			; CB A5       
+	res	5,(hl)		; CB AE       
+	res	5,(ix+ind)	; DD CB 05 AE 
+	res	5,(iy+ind)	; FD CB 05 AE 
+	res	5,a			; CB AF       
+	res	5,b			; CB A8       
+	res	5,c			; CB A9       
+	res	5,d			; CB AA       
+	res	5,e			; CB AB       
+	res	5,h			; CB AC       
+	res	5,l			; CB AD       
+	res	6,(hl)		; CB B6       
+	res	6,(ix+ind)	; DD CB 05 B6 
+	res	6,(iy+ind)	; FD CB 05 B6 
+	res	6,a			; CB B7       
+	res	6,b			; CB B0       
+	res	6,c			; CB B1       
+	res	6,d			; CB B2       
+	res	6,e			; CB B3       
+	res	6,h			; CB B4       
+	res	6,l			; CB B5       
+	res	7,(hl)		; CB BE       
+	res	7,(ix+ind)	; DD CB 05 BE 
+	res	7,(iy+ind)	; FD CB 05 BE 
+	res	7,a			; CB BF       
+	res	7,b			; CB B8       
+	res	7,c			; CB B9       
+	res	7,d			; CB BA       
+	res	7,e			; CB BB       
+	res	7,h			; CB BC       
+	res	7,l			; CB BD       
 	rst	0x00		; C7			Z80
 	rst	0x08		; CF			Z80
 	rst	0x10		; D7          
@@ -117,6 +446,86 @@ addr5:
 	rst	0x28		; EF          
 	rst	0x30		; F7			Z80
 	rst	0x38		; FF          
+	set	0,(hl)		; CB C6       
+	set	0,(ix+ind)	; DD CB 05 C6 
+	set	0,(iy+ind)	; FD CB 05 C6 
+	set	0,a			; CB C7       
+	set	0,b			; CB C0       
+	set	0,c			; CB C1       
+	set	0,d			; CB C2       
+	set	0,e			; CB C3       
+	set	0,h			; CB C4       
+	set	0,l			; CB C5       
+	set	1,(hl)		; CB CE       
+	set	1,(ix+ind)	; DD CB 05 CE 
+	set	1,(iy+ind)	; FD CB 05 CE 
+	set	1,a			; CB CF       
+	set	1,b			; CB C8       
+	set	1,c			; CB C9       
+	set	1,d			; CB CA       
+	set	1,e			; CB CB       
+	set	1,h			; CB CC       
+	set	1,l			; CB CD       
+	set	2,(hl)		; CB D6       
+	set	2,(ix+ind)	; DD CB 05 D6 
+	set	2,(iy+ind)	; FD CB 05 D6 
+	set	2,a			; CB D7       
+	set	2,b			; CB D0       
+	set	2,c			; CB D1       
+	set	2,d			; CB D2       
+	set	2,e			; CB D3       
+	set	2,h			; CB D4       
+	set	2,l			; CB D5       
+	set	3,(hl)		; CB DE       
+	set	3,(ix+ind)	; DD CB 05 DE 
+	set	3,(iy+ind)	; FD CB 05 DE 
+	set	3,a			; CB DF       
+	set	3,b			; CB D8       
+	set	3,c			; CB D9       
+	set	3,d			; CB DA       
+	set	3,e			; CB DB       
+	set	3,h			; CB DC       
+	set	3,l			; CB DD       
+	set	4,(hl)		; CB E6       
+	set	4,(ix+ind)	; DD CB 05 E6 
+	set	4,(iy+ind)	; FD CB 05 E6 
+	set	4,a			; CB E7       
+	set	4,b			; CB E0       
+	set	4,c			; CB E1       
+	set	4,d			; CB E2       
+	set	4,e			; CB E3       
+	set	4,h			; CB E4       
+	set	4,l			; CB E5       
+	set	5,(hl)		; CB EE       
+	set	5,(ix+ind)	; DD CB 05 EE 
+	set	5,(iy+ind)	; FD CB 05 EE 
+	set	5,a			; CB EF       
+	set	5,b			; CB E8       
+	set	5,c			; CB E9       
+	set	5,d			; CB EA       
+	set	5,e			; CB EB       
+	set	5,h			; CB EC       
+	set	5,l			; CB ED       
+	set	6,(hl)		; CB F6       
+	set	6,(ix+ind)	; DD CB 05 F6 
+	set	6,(iy+ind)	; FD CB 05 F6 
+	set	6,a			; CB F7       
+	set	6,b			; CB F0       
+	set	6,c			; CB F1       
+	set	6,d			; CB F2       
+	set	6,e			; CB F3       
+	set	6,h			; CB F4       
+	set	6,l			; CB F5       
+	set	7,(hl)		; CB FE       
+	set	7,(ix+ind)	; DD CB 05 FE 
+	set	7,(iy+ind)	; FD CB 05 FE 
+	set	7,a			; CB FF       
+	set	7,b			; CB F8       
+	set	7,c			; CB F9       
+	set	7,d			; CB FA       
+	set	7,e			; CB FB       
+	set	7,h			; CB FC       
+	set	7,l			; CB FD       
 
 END
 
@@ -131,6 +540,15 @@ END
 
 # invalid arguments
 check_errors("", <<'ASM');
+	bit -1,a			; integer '-1' out of range
+	bit 8,a				; integer '8' out of range
+	bit undefined,a		; symbol not defined
+	res -1,a			; integer '-1' out of range
+	res 8,a				; integer '8' out of range
+	res undefined,a		; symbol not defined
+	set -1,a			; integer '-1' out of range
+	set 8,a				; integer '8' out of range
+	set undefined,a		; symbol not defined
 	call_oz(0)      	; integer '0' out of range
 	call_oz(65536)		; integer '65536' out of range
 	call_pkg(-1)    	; integer '-1' out of range
@@ -178,8 +596,10 @@ done_testing();
 sub assemble {
 	my($options, $code) = @_;
 	
-	my $addr = 0;
+	my $org = 0x100;
+	my $addr = $org;
 	my %label;
+	my @patch;		# list of [address, label] to patch at the end
 	my $asm_z80 = ""; 
 	my $asm_rabbit = "";
 	my $bin = "";
@@ -200,20 +620,35 @@ sub assemble {
 			$asm_z80      .= "$_\n";
 			$asm_rabbit   .= "$_\n";
 			$bin .= chr($byte) x $size;
+			$addr += $size;
 		}
 		else {
 			# opcode ; bytes [Z80|RABBIT|""]
 			my $variant;
 			$variant = $1 if s/\s+(Z80|RABBIT)\s*$//;		# cpu type
-		
-			my $bytes = $_; $bytes =~ s/^[^;]+;\s*//;
-			my $defb = "\tdefb "; 
-			for (split(' ', $bytes)) {
-				$defb .= "0x".$_.",";
-				$bin  .= chr(hex($_));
-				$addr++;
+			my $defb;
+			
+			if ( /;\s+([0-9A-F]{2}\b.*)/ ) {
+				my $bytes = $1;
+				$defb = "\tdefb "; 
+				for (split(' ', $bytes)) {
+					if (/\{(\w+)\}/) {			# {label} to patch at the end
+						push @patch, [length($bin), $1];
+						$defb .= "$1 % 256, $1 / 256,";
+						$bin  .= "\0\0";
+						$addr += 2;
+					}
+					else {
+						$defb .= "0x".$_.",";
+						$bin  .= chr(hex($_));
+						$addr++;
+					}
+				}
+				$defb =~ s/,$//;
 			}
-			$defb =~ s/,$//;
+			else {
+				$defb = $_;
+			}
 			
 			if ( ! $variant ) {
 				$asm_z80      .= "$_\n";
@@ -233,6 +668,13 @@ sub assemble {
 		}
 	}
 	
+	# patch all addresses
+	for (@patch) {
+		my($addr, $label) = @$_;
+		exists $label{$label} or die "$label not found";
+		substr($bin, $addr, 2) = pack("v", $label{$label});
+	}
+	
 	diag("Code $options: ",length($bin)," bytes\n");
 	
 	length($bin) >= 0x10000 and die;
@@ -240,25 +682,33 @@ sub assemble {
 	# test asm in upper case
 	t_z80asm(
 		asm		=> uc($asm_z80),
-		org		=> 0x100,
+		org		=> $org,
 		bin		=> $bin,
-		options	=> $options,
+		options	=> $options." -m",
 	);
-
+	
 	# test asm 
 	t_z80asm(
 		asm		=> $asm_z80,
-		org		=> 0x100,
+		org		=> $org,
 		bin		=> $bin,
-		options	=> $options,
+		options	=> $options." -m",
 	);
 	
+	# check map file against our internal symbols
+	open(my $fh, map_file()) or die;
+	while (<$fh>) {
+		/^(\w+)\s+=\s+([0-9A-F]+)/ or next;
+		is sprintf("%04X", $label{$1}), $2, "label $1 = 0x$2";
+	}
+	close($fh);
+
 	# test asm for RABBIT
 	t_z80asm(
 		asm		=> $asm_rabbit,
-		org		=> 0x100,
+		org		=> $org,
 		bin		=> $bin,
-		options	=> $options." --RCMX000",
+		options	=> $options." --RCMX000 -m",
 	);
 }
 
@@ -285,7 +735,11 @@ sub check_errors {
 }
 
 # $Log: opcodes.t,v $
-# Revision 1.7  2014-04-16 22:50:34  pauloscustodio
+# Revision 1.8  2014-04-18 16:46:19  pauloscustodio
+# Add patching of labels to opcodes.t.
+# Emulation of call po|pe|p|m in rcmx000 test commented.
+#
+# Revision 1.7  2014/04/16 22:50:34  pauloscustodio
 # Move JR and DJNZ test code to opcodes.t
 #
 # Revision 1.6  2014/04/15 23:22:18  pauloscustodio
@@ -315,153 +769,6 @@ sub check_errors {
 __END__
 List of all opcodes not yet in test list:
 
-	adc	a,(hl)			; 8E          
-	adc	a,(ix+ind)			; DD 8E 05    
-	adc	a,(iy+ind)			; FD 8E 05    
-	adc	a,a			; 8F          
-	adc	a,b			; 88          
-	adc	a,c			; 89          
-	adc	a,d			; 8A          
-	adc	a,e			; 8B          
-	adc	a,h			; 8C          
-	adc	a,l			; 8D          
-	adc	a,n			; CE 20       
-	adc	hl,bc			; ED 4A       
-	adc	hl,de			; ED 5A       
-	adc	hl,hl			; ED 6A       
-	adc	hl,sp			; ED 7A       
-	add	a,(hl)			; 86          
-	add	a,(ix+ind)			; DD 86 05    
-	add	a,(iy+ind)			; FD 86 05    
-	add	a,a			; 87          
-	add	a,b			; 80          
-	add	a,c			; 81          
-	add	a,d			; 82          
-	add	a,e			; 83          
-	add	a,h			; 84          
-	add	a,l			; 85          
-	add	a,n			; C6 20       
-	add	hl,bc			; 09          
-	add	hl,de			; 19          
-	add	hl,hl			; 29          
-	add	hl,sp			; 39          
-	add	ix,bc			; DD 09       
-	add	ix,de			; DD 19       
-	add	ix,ix			; DD 29       
-	add	ix,sp			; DD 39       
-	add	iy,bc			; FD 09       
-	add	iy,de			; FD 19       
-	add	iy,iy			; FD 29       
-	add	iy,sp			; FD 39       
-	and	(hl)			; A6          
-	and	(ix+ind)			; DD A6 05    
-	and	(iy+ind)			; FD A6 05    
-	and	a			; A7          
-	and	b			; A0          
-	and	c			; A1          
-	and	d			; A2          
-	and	e			; A3          
-	and	h			; A4          
-	and	l			; A5          
-	and	n			; E6 20       
-	bit	0,(hl)			; CB 46       
-	bit	0,(ix+ind)			; DD CB 05 46 
-	bit	0,(iy+ind)			; FD CB 05 46 
-	bit	0,a			; CB 47       
-	bit	0,b			; CB 40       
-	bit	0,c			; CB 41       
-	bit	0,d			; CB 42       
-	bit	0,e			; CB 43       
-	bit	0,h			; CB 44       
-	bit	0,l			; CB 45       
-	bit	1,(hl)			; CB 4E       
-	bit	1,(ix+ind)			; DD CB 05 4E 
-	bit	1,(iy+ind)			; FD CB 05 4E 
-	bit	1,a			; CB 4F       
-	bit	1,b			; CB 48       
-	bit	1,c			; CB 49       
-	bit	1,d			; CB 4A       
-	bit	1,e			; CB 4B       
-	bit	1,h			; CB 4C       
-	bit	1,l			; CB 4D       
-	bit	2,(hl)			; CB 56       
-	bit	2,(ix+ind)			; DD CB 05 56 
-	bit	2,(iy+ind)			; FD CB 05 56 
-	bit	2,a			; CB 57       
-	bit	2,b			; CB 50       
-	bit	2,c			; CB 51       
-	bit	2,d			; CB 52       
-	bit	2,e			; CB 53       
-	bit	2,h			; CB 54       
-	bit	2,l			; CB 55       
-	bit	3,(hl)			; CB 5E       
-	bit	3,(ix+ind)			; DD CB 05 5E 
-	bit	3,(iy+ind)			; FD CB 05 5E 
-	bit	3,a			; CB 5F       
-	bit	3,b			; CB 58       
-	bit	3,c			; CB 59       
-	bit	3,d			; CB 5A       
-	bit	3,e			; CB 5B       
-	bit	3,h			; CB 5C       
-	bit	3,l			; CB 5D       
-	bit	4,(hl)			; CB 66       
-	bit	4,(ix+ind)			; DD CB 05 66 
-	bit	4,(iy+ind)			; FD CB 05 66 
-	bit	4,a			; CB 67       
-	bit	4,b			; CB 60       
-	bit	4,c			; CB 61       
-	bit	4,d			; CB 62       
-	bit	4,e			; CB 63       
-	bit	4,h			; CB 64       
-	bit	4,l			; CB 65       
-	bit	5,(hl)			; CB 6E       
-	bit	5,(ix+ind)			; DD CB 05 6E 
-	bit	5,(iy+ind)			; FD CB 05 6E 
-	bit	5,a			; CB 6F       
-	bit	5,b			; CB 68       
-	bit	5,c			; CB 69       
-	bit	5,d			; CB 6A       
-	bit	5,e			; CB 6B       
-	bit	5,h			; CB 6C       
-	bit	5,l			; CB 6D       
-	bit	6,(hl)			; CB 76       
-	bit	6,(ix+ind)			; DD CB 05 76 
-	bit	6,(iy+ind)			; FD CB 05 76 
-	bit	6,a			; CB 77       
-	bit	6,b			; CB 70       
-	bit	6,c			; CB 71       
-	bit	6,d			; CB 72       
-	bit	6,e			; CB 73       
-	bit	6,h			; CB 74       
-	bit	6,l			; CB 75       
-	bit	7,(hl)			; CB 7E       
-	bit	7,(ix+ind)			; DD CB 05 7E 
-	bit	7,(iy+ind)			; FD CB 05 7E 
-	bit	7,a			; CB 7F       
-	bit	7,b			; CB 78       
-	bit	7,c			; CB 79       
-	bit	7,d			; CB 7A       
-	bit	7,e			; CB 7B       
-	bit	7,h			; CB 7C       
-	bit	7,l			; CB 7D       
-	ccf			; 3F          
-	cp	(hl)			; BE          
-	cp	(ix+ind)			; DD BE 05    
-	cp	(iy+ind)			; FD BE 05    
-	cp	a			; BF          
-	cp	b			; B8          
-	cp	c			; B9          
-	cp	d			; BA          
-	cp	e			; BB          
-	cp	h			; BC          
-	cp	l			; BD          
-	cp	n			; FE 20       
-	cpd			; ED A9       
-	cpdr			; ED B9       
-	cpi			; ED A1       
-	cpir			; ED B1       
-	cpl			; 2F          
-	daa			; 27          
 	dec	(hl)			; 35          
 	dec	(ix+ind)			; DD 35 05    
 	dec	(iy+ind)			; FD 35 05    
@@ -686,86 +993,6 @@ List of all opcodes not yet in test list:
 	push	hl			; E5          
 	push	ix			; DD E5       
 	push	iy			; FD E5       
-	res	0,(hl)			; CB 86       
-	res	0,(ix+ind)			; DD CB 05 86 
-	res	0,(iy+ind)			; FD CB 05 86 
-	res	0,a			; CB 87       
-	res	0,b			; CB 80       
-	res	0,c			; CB 81       
-	res	0,d			; CB 82       
-	res	0,e			; CB 83       
-	res	0,h			; CB 84       
-	res	0,l			; CB 85       
-	res	1,(hl)			; CB 8E       
-	res	1,(ix+ind)			; DD CB 05 8E 
-	res	1,(iy+ind)			; FD CB 05 8E 
-	res	1,a			; CB 8F       
-	res	1,b			; CB 88       
-	res	1,c			; CB 89       
-	res	1,d			; CB 8A       
-	res	1,e			; CB 8B       
-	res	1,h			; CB 8C       
-	res	1,l			; CB 8D       
-	res	2,(hl)			; CB 96       
-	res	2,(ix+ind)			; DD CB 05 96 
-	res	2,(iy+ind)			; FD CB 05 96 
-	res	2,a			; CB 97       
-	res	2,b			; CB 90       
-	res	2,c			; CB 91       
-	res	2,d			; CB 92       
-	res	2,e			; CB 93       
-	res	2,h			; CB 94       
-	res	2,l			; CB 95       
-	res	3,(hl)			; CB 9E       
-	res	3,(ix+ind)			; DD CB 05 9E 
-	res	3,(iy+ind)			; FD CB 05 9E 
-	res	3,a			; CB 9F       
-	res	3,b			; CB 98       
-	res	3,c			; CB 99       
-	res	3,d			; CB 9A       
-	res	3,e			; CB 9B       
-	res	3,h			; CB 9C       
-	res	3,l			; CB 9D       
-	res	4,(hl)			; CB A6       
-	res	4,(ix+ind)			; DD CB 05 A6 
-	res	4,(iy+ind)			; FD CB 05 A6 
-	res	4,a			; CB A7       
-	res	4,b			; CB A0       
-	res	4,c			; CB A1       
-	res	4,d			; CB A2       
-	res	4,e			; CB A3       
-	res	4,h			; CB A4       
-	res	4,l			; CB A5       
-	res	5,(hl)			; CB AE       
-	res	5,(ix+ind)			; DD CB 05 AE 
-	res	5,(iy+ind)			; FD CB 05 AE 
-	res	5,a			; CB AF       
-	res	5,b			; CB A8       
-	res	5,c			; CB A9       
-	res	5,d			; CB AA       
-	res	5,e			; CB AB       
-	res	5,h			; CB AC       
-	res	5,l			; CB AD       
-	res	6,(hl)			; CB B6       
-	res	6,(ix+ind)			; DD CB 05 B6 
-	res	6,(iy+ind)			; FD CB 05 B6 
-	res	6,a			; CB B7       
-	res	6,b			; CB B0       
-	res	6,c			; CB B1       
-	res	6,d			; CB B2       
-	res	6,e			; CB B3       
-	res	6,h			; CB B4       
-	res	6,l			; CB B5       
-	res	7,(hl)			; CB BE       
-	res	7,(ix+ind)			; DD CB 05 BE 
-	res	7,(iy+ind)			; FD CB 05 BE 
-	res	7,a			; CB BF       
-	res	7,b			; CB B8       
-	res	7,c			; CB B9       
-	res	7,d			; CB BA       
-	res	7,e			; CB BB       
-	res	7,h			; CB BC       
-	res	7,l			; CB BD       
 	ret			; C9          
 	ret	c			; D8          
 	ret	m			; F8          
@@ -839,86 +1066,6 @@ List of all opcodes not yet in test list:
 	sbc	hl,hl			; ED 62       
 	sbc	hl,sp			; ED 72       
 	scf			; 37          
-	set	0,(hl)			; CB C6       
-	set	0,(ix+ind)			; DD CB 05 C6 
-	set	0,(iy+ind)			; FD CB 05 C6 
-	set	0,a			; CB C7       
-	set	0,b			; CB C0       
-	set	0,c			; CB C1       
-	set	0,d			; CB C2       
-	set	0,e			; CB C3       
-	set	0,h			; CB C4       
-	set	0,l			; CB C5       
-	set	1,(hl)			; CB CE       
-	set	1,(ix+ind)			; DD CB 05 CE 
-	set	1,(iy+ind)			; FD CB 05 CE 
-	set	1,a			; CB CF       
-	set	1,b			; CB C8       
-	set	1,c			; CB C9       
-	set	1,d			; CB CA       
-	set	1,e			; CB CB       
-	set	1,h			; CB CC       
-	set	1,l			; CB CD       
-	set	2,(hl)			; CB D6       
-	set	2,(ix+ind)			; DD CB 05 D6 
-	set	2,(iy+ind)			; FD CB 05 D6 
-	set	2,a			; CB D7       
-	set	2,b			; CB D0       
-	set	2,c			; CB D1       
-	set	2,d			; CB D2       
-	set	2,e			; CB D3       
-	set	2,h			; CB D4       
-	set	2,l			; CB D5       
-	set	3,(hl)			; CB DE       
-	set	3,(ix+ind)			; DD CB 05 DE 
-	set	3,(iy+ind)			; FD CB 05 DE 
-	set	3,a			; CB DF       
-	set	3,b			; CB D8       
-	set	3,c			; CB D9       
-	set	3,d			; CB DA       
-	set	3,e			; CB DB       
-	set	3,h			; CB DC       
-	set	3,l			; CB DD       
-	set	4,(hl)			; CB E6       
-	set	4,(ix+ind)			; DD CB 05 E6 
-	set	4,(iy+ind)			; FD CB 05 E6 
-	set	4,a			; CB E7       
-	set	4,b			; CB E0       
-	set	4,c			; CB E1       
-	set	4,d			; CB E2       
-	set	4,e			; CB E3       
-	set	4,h			; CB E4       
-	set	4,l			; CB E5       
-	set	5,(hl)			; CB EE       
-	set	5,(ix+ind)			; DD CB 05 EE 
-	set	5,(iy+ind)			; FD CB 05 EE 
-	set	5,a			; CB EF       
-	set	5,b			; CB E8       
-	set	5,c			; CB E9       
-	set	5,d			; CB EA       
-	set	5,e			; CB EB       
-	set	5,h			; CB EC       
-	set	5,l			; CB ED       
-	set	6,(hl)			; CB F6       
-	set	6,(ix+ind)			; DD CB 05 F6 
-	set	6,(iy+ind)			; FD CB 05 F6 
-	set	6,a			; CB F7       
-	set	6,b			; CB F0       
-	set	6,c			; CB F1       
-	set	6,d			; CB F2       
-	set	6,e			; CB F3       
-	set	6,h			; CB F4       
-	set	6,l			; CB F5       
-	set	7,(hl)			; CB FE       
-	set	7,(ix+ind)			; DD CB 05 FE 
-	set	7,(iy+ind)			; FD CB 05 FE 
-	set	7,a			; CB FF       
-	set	7,b			; CB F8       
-	set	7,c			; CB F9       
-	set	7,d			; CB FA       
-	set	7,e			; CB FB       
-	set	7,h			; CB FC       
-	set	7,l			; CB FD       
 	sla	(hl)			; CB 26       
 	sla	(ix+ind)			; DD CB 05 26 
 	sla	(iy+ind)			; FD CB 05 26 
@@ -970,4 +1117,4 @@ List of all opcodes not yet in test list:
 	xor	e			; AB          
 	xor	h			; AC          
 	xor	l			; AD          
-	xor	n			; EE 20       
+	xor	n			; EE 20
