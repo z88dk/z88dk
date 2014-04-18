@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.201 2014-04-18 07:38:58 stefano Exp $
+# $Id: Makefile,v 1.202 2014-04-18 12:51:32 stefano Exp $
 
 
 include Make.config
@@ -437,6 +437,7 @@ p2000_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lp2000 ; cd ..
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/P2000.lst
@@ -453,6 +454,7 @@ p2000ansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lp2000 ; cd ..
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000ansi_clib @$(LISTFILE_DIRECTORY)/P2000ansi.lst
@@ -1434,6 +1436,7 @@ trs80_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ltrs80 ; cd ..
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 
