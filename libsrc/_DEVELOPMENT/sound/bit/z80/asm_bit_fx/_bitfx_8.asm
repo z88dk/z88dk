@@ -1,0 +1,119 @@
+
+XLIB _bitfx_8
+
+INCLUDE "clib_target_cfg.asm"
+
+_bitfx_8:
+
+   ; deep space
+      
+   ld b,100
+   
+ds_loop:
+
+   dec h
+   jr nz, ds_jump
+   
+   xor __sound_bit_toggle
+
+   IF __sound_bit_method = 1
+   
+      out (__sound_bit_port),a
+   
+   ELSE IF __sound_bit_method = 2
+   
+      exx
+      out (c),a
+      exx
+   
+   ELSE IF __sound_bit_method = 3
+   
+      ld (__sound_bit_port),a
+   
+   ENDIF
+
+   push bc
+   ld b,250
+
+loosetime1:
+
+   djnz loosetime1
+   
+   pop bc
+   xor __sound_bit_toggle
+
+   IF __sound_bit_method = 1
+   
+      out (__sound_bit_port),a
+   
+   ELSE IF __sound_bit_method = 2
+   
+      exx
+      out (c),a
+      exx
+   
+   ELSE IF __sound_bit_method = 3
+   
+      ld (__sound_bit_port),a
+   
+   ENDIF
+
+ds_FR_1:
+
+   ld h,254
+
+ds_jump:
+
+   dec l
+   jr nz, ds_loop
+   
+   xor __sound_bit_toggle
+
+   IF __sound_bit_method = 1
+   
+      out (__sound_bit_port),a
+   
+   ELSE IF __sound_bit_method = 2
+   
+      exx
+      out (c),a
+      exx
+   
+   ELSE IF __sound_bit_method = 3
+   
+      ld (__sound_bit_port),a
+   
+   ENDIF
+
+   push bc
+   ld b,200
+
+loosetime2:
+
+   djnz loosetime2
+   
+   pop bc
+   xor __sound_bit_toggle
+
+   IF __sound_bit_method = 1
+   
+      out (__sound_bit_port),a
+   
+   ELSE IF __sound_bit_method = 2
+   
+      exx
+      out (c),a
+      exx
+   
+   ELSE IF __sound_bit_method = 3
+   
+      ld (__sound_bit_port),a
+   
+   ENDIF
+
+ds_FR_2:
+
+   ld l,255
+   djnz ds_loop
+   
+   ret

@@ -1,0 +1,64 @@
+
+XLIB _bitfx_20
+
+INCLUDE "clib_target_cfg.asm"
+
+_bitfx_20:
+
+   ; descending buzzer
+
+   ld hl,1000
+
+desc1:
+
+   push hl
+   ld b,16
+
+desc2:
+
+   rl l
+   rl h
+   
+   jr nc, desc3
+   
+   xor __sound_bit_toggle
+
+   IF __sound_bit_method = 1
+   
+      out (__sound_bit_port),a
+   
+   ELSE IF __sound_bit_method = 2
+   
+      exx
+      out (c),a
+      exx
+   
+   ELSE IF __sound_bit_method = 3
+   
+      ld (__sound_bit_port),a
+   
+   ENDIF
+
+desc3:
+
+   ld e,5
+
+desc4:
+
+   dec e
+   jr nz, desc4
+   
+   djnz desc2
+   
+   pop hl
+   dec hl
+   
+   ld c,a
+   
+   ld a,h
+   or l
+   
+   ld a,c
+   jr nz, desc1
+   
+   ret
