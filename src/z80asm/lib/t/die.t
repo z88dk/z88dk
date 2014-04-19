@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/die.t,v 1.4 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/die.t,v 1.5 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test die.c
 
@@ -26,7 +26,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 1);
+t_capture("./test", "", <<'ERR', 1);
 Hello John
 Bye John
 ERR
@@ -52,7 +52,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 end
 fini2
 fini1
@@ -73,7 +73,10 @@ sub t_capture {
 }
 
 # $Log: die.t,v $
-# Revision 1.4  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.5  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

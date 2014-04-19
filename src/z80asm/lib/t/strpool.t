@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.5 2014-04-15 20:06:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.6 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test strpool.c
 
@@ -64,7 +64,7 @@ int main()
 END
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 first run - create pool for all strings
 strpool: add HELLO
 strpool: add WORLD
@@ -90,7 +90,10 @@ sub t_capture {
 }
 
 # $Log: strpool.t,v $
-# Revision 1.5  2014-04-15 20:06:44  pauloscustodio
+# Revision 1.6  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.5  2014/04/15 20:06:44  pauloscustodio
 # Solve warning: no newline at end of file
 #
 # Revision 1.4  2014/01/11 01:29:41  pauloscustodio

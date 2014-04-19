@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.9 2014-04-13 20:32:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.10 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 
 use strict;
@@ -247,12 +247,12 @@ t_compile_module($init, <<'END', $objs);
 	code_size = atoi(argv[1]);
 	
 	TITLE("File not found, test mode");	
-	unlink("test.obj");
+	remove("test.obj");
 	TRY_OK( obj = ObjFile_open_read("test.obj", TRUE) );
 	ASSERT( obj == NULL );
 
 	TITLE("File not found, read mode");	
-	unlink("test.obj");
+	remove("test.obj");
 	obj = NULL;
 	TRY_NOK( obj = ObjFile_open_read("test.obj", FALSE) );
 	ASSERT( obj == NULL );
@@ -393,7 +393,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.9  2014-04-13 20:32:10  pauloscustodio
+# Revision 1.10  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.9  2014/04/13 20:32:10  pauloscustodio
 # PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 #
 # Revision 1.8  2014/04/13 11:54:01  pauloscustodio

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.5 2014-04-15 20:06:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.6 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
+t_capture("./test", "", "", 0);
 
 unlink <test.*>;
 done_testing;
@@ -247,7 +247,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.5  2014-04-15 20:06:44  pauloscustodio
+# Revision 1.6  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.5  2014/04/15 20:06:44  pauloscustodio
 # Solve warning: no newline at end of file
 #
 # Revision 1.4  2014/04/12 15:18:06  pauloscustodio

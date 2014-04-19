@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.12 2014-03-05 23:44:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.13 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -129,7 +129,7 @@ int main()
 END
 
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
+t_capture("./test", "", "", 0);
 
 
 #------------------------------------------------------------------------------
@@ -612,7 +612,7 @@ END
 
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("test", "", "", 0); is read_binfile("test.1.bin"), "123";
+t_capture("./test", "", "", 0); is read_binfile("test.1.bin"), "123";
 
 #------------------------------------------------------------------------------
 # cleanup and exit
@@ -636,7 +636,10 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.12  2014-03-05 23:44:55  pauloscustodio
+# Revision 1.13  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.12  2014/03/05 23:44:55  pauloscustodio
 # Renamed 64-bit portability to BUG_0042
 #
 # Revision 1.11  2014/02/19 23:59:27  pauloscustodio

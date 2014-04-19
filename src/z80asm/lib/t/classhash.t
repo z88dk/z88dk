@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.5 2014-04-05 22:02:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.6 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test classhash.c
 
@@ -363,7 +363,7 @@ int main()
 END
 
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
+t_capture("./test", "", "", 0);
 
 unlink <test.*>;
 done_testing;
@@ -381,7 +381,10 @@ sub t_capture {
 
 
 # $Log: classhash.t,v $
-# Revision 1.5  2014-04-05 22:02:06  pauloscustodio
+# Revision 1.6  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.5  2014/04/05 22:02:06  pauloscustodio
 # Added ignore_case attribute to allow case-insensitive class hashes
 #
 # Revision 1.4  2014/01/11 01:29:41  pauloscustodio

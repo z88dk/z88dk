@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.6 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.7 2014-04-19 14:57:58 pauloscustodio Exp $
 #
 # Test xmalloc.c
 
@@ -25,7 +25,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", "", 0);
+t_capture("./test", "", "", 0);
 
 
 # allocate and no free no debug
@@ -44,7 +44,7 @@ int main()
 }
 END
 system($nodebug) and die "compile failed: $nodebug\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
 xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
 ERR
@@ -64,7 +64,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): alloc (2)
@@ -88,7 +88,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): free (1) allocated at test.c(4)
@@ -96,21 +96,21 @@ xmalloc: cleanup
 ERR
 
 
-# alloc failed
-write_file("test.c", <<'END');
-#include "xmalloc.h"
-int main()
-{
-	xmalloc(0x80000000);
-	return 0;
-}
-END
-system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 1);
-xmalloc: init
-xmalloc test.c(4): alloc (2147483680) failed
-xmalloc: cleanup
-ERR
+# alloc failed - not portable to 64-bit
+#write_file("test.c", <<'END');
+##include "xmalloc.h"
+#int main()
+#{
+#	xmalloc(0x80000000);
+#	return 0;
+#}
+#END
+#system($compile) and die "compile failed: $compile\n";
+#t_capture("./test", "", <<'ERR', 1);
+#xmalloc: init
+#xmalloc test.c(4): alloc (2147483680) failed
+#xmalloc: cleanup
+#ERR
 
 
 # unmatched block
@@ -124,7 +124,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 1);
+t_capture("./test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(5): block not found
 xmalloc: cleanup
@@ -143,7 +143,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 1);
+t_capture("./test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(6): free (1) allocated at test.c(4)
@@ -164,7 +164,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 1);
+t_capture("./test", "", <<'ERR', 1);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(6): free (1) allocated at test.c(4)
@@ -187,7 +187,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (0)
 xmalloc test.c(5): alloc (1)
@@ -211,7 +211,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
@@ -232,7 +232,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc: cleanup
@@ -253,7 +253,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
@@ -275,7 +275,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc: cleanup
@@ -300,7 +300,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc test.c(7): free (2) allocated at test.c(4)
@@ -328,7 +328,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(7): free (1) allocated at test.c(4)
@@ -350,7 +350,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (6)
 xmalloc: cleanup
@@ -370,7 +370,7 @@ int main()
 }
 END
 system($compile) and die "compile failed: $compile\n";
-t_capture("test", "", <<'ERR', 0);
+t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc: cleanup
 ERR
@@ -399,7 +399,10 @@ sub t_capture {
 }
 
 # $Log: xmalloc.t,v $
-# Revision 1.6  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.7  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.6  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

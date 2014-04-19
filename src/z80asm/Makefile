@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.141 2014-04-18 17:46:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.142 2014-04-19 14:57:58 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -117,13 +117,13 @@ all: $(TARGET) gccmake.bat
 
 legacy:
 	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) -f dev\Makefile
+	$(MAKE) -f dev/Makefile
 	$(MAKE) depend
 	$(MAKE)
 
 new:
 	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) -f dev\Makefile
+	$(MAKE) -f dev/Makefile
 	$(MAKE) depend
 	$(MAKE)
 
@@ -230,7 +230,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.141  2014-04-18 17:46:18  pauloscustodio
+# Revision 1.142  2014-04-19 14:57:58  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.141  2014/04/18 17:46:18  pauloscustodio
 # - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 #   manipulating.
 # - Factor parsing and evaluating contants.
