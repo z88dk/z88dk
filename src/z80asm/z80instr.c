@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.65 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.66 2014-04-19 14:58:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -823,9 +823,11 @@ JR( void )
                                                                      * error  */
             return;
         }
-    }
 
-	RelativeJump( opcode );
+		RelativeJump( opcode );
+    }
+	else
+		error_syntax();
 }
 
 
@@ -1449,7 +1451,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.65  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.66  2014-04-19 14:58:40  pauloscustodio
+* Syntax error if JR without arguments
+*
+* Revision 1.65  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.
