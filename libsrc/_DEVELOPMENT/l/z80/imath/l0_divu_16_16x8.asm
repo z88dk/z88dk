@@ -1,9 +1,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; l0_divu_16_16x8
-; called by asm_utoa
+; called by asm_utoa, asm_bit_play
 ;
-; compute:  hl = hl / de, e = hl % de
+; compute:  hl = hl / e, e = hl % e
 ; test for divide by zero unnecessary
 ; can alter: af, bc, de, hl
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

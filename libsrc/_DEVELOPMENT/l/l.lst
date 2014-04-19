@@ -6,6 +6,7 @@ l/z80/l_ex_bc_de
 l/z80/l_ex_bc_hl
 l/z80/l_inc_hl
 l/z80/l_inc_sp
+l/z80/l_jp_table
 l/z80/l_jphl
 l/z80/l_jpix
 l/z80/l_readword_2_hl
@@ -58,11 +59,15 @@ l/z80/ascii/txt_to_num/fast/l_fast_otou
 l/z80/ascii/txt_to_num/fast/l_fast_otoul
 l/z80/imath/l_divs_16_16x16
 l/z80/imath/l_divs_32_32x32
+l/z80/imath/l_mulu_16_8x8
+l/z80/imath/l_mulu_16_16x8
 l/z80/imath/l_mulu_16_16x16
 l/z80/imath/l_mulu_24_16x8
+l/z80/imath/l_mulu_32_16x16
 l/z80/imath/l_mulu_40_32x8
 l/z80/imath/l0_divu_16_16x8
 l/z80/imath/l0_divu_32_32x8
+l/z80/imath/l0_divu_32_32x16
 l/z80/imath/fast/l_fast_divs_16_16x16
 l/z80/imath/fast/l_fast_divs_32_32x32
 l/z80/imath/fast/l_fast_divs_8_8x8
