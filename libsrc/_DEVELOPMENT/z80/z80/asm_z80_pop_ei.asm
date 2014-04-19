@@ -13,6 +13,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_target_cfg.asm"
+
 XLIB asm_z80_pop_ei
 
 asm_z80_pop_ei:
@@ -30,8 +32,16 @@ asm_z80_pop_ei:
    ex (sp),hl                  ; hl restored
    pop af                      ; af = ei_di_status
    
-   jp po, di_state
+   IF __z80_nmos = 1
+   
+      jr nc, di_state
+   
+   ELSE
+   
+      jp po, di_state
 
+   ENDIF
+   
 ei_state:
 
    ei

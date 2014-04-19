@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_target_cfg.asm"
+
 XLIB asm_z80_set_int_state
 
 asm_z80_set_int_state:
@@ -17,7 +19,16 @@ asm_z80_set_int_state:
    ;
    ; uses  : f
 
-   bit 2,l
+   IF __z80_nmos = 1
+   
+      bit 0,l                  ; check carry flag
+   
+   ELSE
+   
+      bit 2,l                  ; check p/v flag
+   
+   ENDIF
+   
    jr z, di_state
    
 ei_state:
