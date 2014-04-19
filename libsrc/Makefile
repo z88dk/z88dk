@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.202 2014-04-18 12:51:32 stefano Exp $
+# $Id: Makefile,v 1.203 2014-04-19 07:17:23 stefano Exp $
 
 
 include Make.config
@@ -440,7 +440,7 @@ p2000_clib.lib:
 	$(MAKE) gamesdeps
 	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lp2000 ; cd ..
-	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/P2000.lst
+	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
 # Philips P2000 ansi lib - Stefano
 p2000ansi_clib.lib:
@@ -457,7 +457,7 @@ p2000ansi_clib.lib:
 	$(MAKE) gamesdeps
 	cd psg ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lp2000 ; cd ..
-	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000ansi_clib @$(LISTFILE_DIRECTORY)/P2000ansi.lst
+	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000ansi_clib @$(LISTFILE_DIRECTORY)/p2000ansi.lst
 
 # PC6001 lib - Stefano
 pc6001_clib.lib:
