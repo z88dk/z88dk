@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.1 2014-04-06 22:31:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.2 2014-04-19 17:55:51 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -364,8 +364,7 @@ t_compile_module($init, <<'END', $objs);
 					   "@\"#-------------------\"									"
 					   "@\"#-----------------------\" 								"
 					   "@\"#---------------------------\" 							"
-					   "@\"#-------------------------------\"						"
-					   "@\"#--------------------------------\"						");
+					   "@\"#-------------------------------\"						");
 	T_NUMBER(0x00000000);
 	T_NUMBER(0x00000003);
 	T_NUMBER(0x7FFFFFFF);
@@ -391,7 +390,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0x00800000);
 	T_NUMBER(0x08000000);
 	T_NUMBER(0x80000000);
-	T_NUMBER(0x00000000);
 	T_END();
 
 
@@ -582,7 +580,10 @@ done_testing;
 
 
 # $Log: scan.t,v $
-# Revision 1.1  2014-04-06 22:31:42  pauloscustodio
+# Revision 1.2  2014-04-19 17:55:51  pauloscustodio
+# Update for 64-bit architecture
+#
+# Revision 1.1  2014/04/06 22:31:42  pauloscustodio
 # Renamed whitebox-scan.t scan.t
 #
 # Revision 1.39  2014/04/05 23:36:11  pauloscustodio
