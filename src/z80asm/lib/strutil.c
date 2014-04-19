@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.12 2014-04-07 21:01:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.13 2014-04-19 14:57:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -389,66 +389,75 @@ void Str_append_char( Str *self, char ch )
 /*-----------------------------------------------------------------------------
 *   set / append with printf-like parameters
 *----------------------------------------------------------------------------*/
-void Str_vsprintf( Str *self, char *format, va_list argptr )
+BOOL Str_vsprintf( Str *self, char *format, va_list argptr )
 {
     Str_clear( self );
-    Str_append_vsprintf( self, format, argptr );
+    return Str_append_vsprintf( self, format, argptr );
 }
 
-void Str_append_vsprintf( Str *self, char *format, va_list argptr )
+BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr )
 {
     int     free_space;      /* may be negative */
     int     need_space;
 
     /* BUG_0022 : Linux vsnprintf always terminates string;
     			  Win32 only if there is enough space */
-    while ( 1 )
+	/* BUG_0046: cannot retry, return FALSE if user needs to retry */
+    free_space = self->size - self->len;
+
+    if ( free_space > 0 )
+        need_space = vsnprintf( self->str + self->len, ( uint_t ) free_space,
+                                format, argptr );
+
+    if ( free_space <= 0 ||					/* no free space */
+		 need_space >= free_space || 		/* or not enough space */
+		 need_space < 0 )    				/* or error */
     {
-        free_space = self->size - self->len;
-
-        if ( free_space > 0 )
-            need_space = vsnprintf( self->str + self->len, ( uint_t ) free_space,
-                                    format, argptr );
-
-        if ( free_space <= 0 ||					/* no free space */
-			 need_space >= free_space || 		/* or not enough space */
-			 need_space < 0 )    				/* or error */
+        if ( self->alloc_str )
         {
-            if ( self->alloc_str )
-            {
-                /* increase the size by SIZE_MASK and try again */
-                /* +1 -> overflow -> cause new block to be requested */
-                Str_reserve( self, self->size - self->len + 1 );
-            }
-            else
-            {
-                self->str[ self->size - 1 ] = '\0';	/* string may not be terminated */
-                Str_sync_len( self );
-                break;							/* cannot expand, return truncated */
-            }
+            /* increase the size by SIZE_MASK and return FALSE */
+            /* +1 -> overflow -> cause new block to be requested */
+            Str_reserve( self, self->size - self->len + 1 );
+			return FALSE;
         }
-        else                                    /* string was terminated */
+        else
         {
-            self->len += need_space;
-            break;								/* output OK */
+            self->str[ self->size - 1 ] = '\0';	/* string may not be terminated */
+            Str_sync_len( self );
+            return TRUE;					/* cannot expand, return truncated */
         }
+    }
+    else                                    /* string was terminated */
+    {
+        self->len += need_space;
+        return TRUE;						/* output OK */
     }
 }
 
 void Str_sprintf( Str *self, char *format, ... )
 {
     va_list argptr;
-    va_start( argptr, format ); /* init variable args */
+	BOOL ok;
 
-    Str_vsprintf( self, format, argptr );
+	do								/* BUG_0046 */
+	{
+		va_start( argptr, format );
+		ok = Str_vsprintf( self, format, argptr );
+		va_end( argptr );
+	} while ( ! ok );
 }
 
 void Str_append_sprintf( Str *self, char *format, ... )
 {
     va_list argptr;
-    va_start( argptr, format ); /* init variable args */
+	BOOL ok;
 
-    Str_append_vsprintf( self, format, argptr );
+	do								/* BUG_0046 */
+	{
+		va_start( argptr, format );
+		ok = Str_append_vsprintf( self, format, argptr );
+		va_end( argptr );
+	} while ( ! ok );
 }
 
 /*-----------------------------------------------------------------------------
@@ -503,7 +512,14 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.12  2014-04-07 21:01:51  pauloscustodio
+* Revision 1.13  2014-04-19 14:57:37  pauloscustodio
+* BUG_0046: Expressions stored in object file with wrong values in MacOS
+* Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+* Problem caused by non-portable way of repeating a call to vsnprintf without
+* calling va_start in between. The repeated call is necessary when the
+* dynamically allocated string needs to grow to fit the value to be stored.
+*
+* Revision 1.12  2014/04/07 21:01:51  pauloscustodio
 * Reduce default size to 16 to waste less space when used as base for array.h
 *
 * Revision 1.11  2014/03/29 22:04:11  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.17 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.18 2014-04-19 14:57:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -88,15 +88,14 @@ static void ListFile_write_header( ListFile *self );
 static void ListFile_fprintf( ListFile *self, char *msg, ... )
 {
     DEFINE_STR( str, MAXLINE );
-    char *p;
     va_list argptr;
-
-    va_start( argptr, msg ); /* init variable args */
-
+    char *p;
 
     if ( self->file != NULL )
     {
-        Str_vsprintf( str, msg, argptr );			/* build list line */
+	    va_start( argptr, msg );				/* BUG_0046 */
+        Str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
+		va_end( argptr );
 
         /* output to list file, advance line if newline, insert header on new page */
         for ( p = str->str ; *p ; p++ )
@@ -581,7 +580,14 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.17  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.18  2014-04-19 14:57:37  pauloscustodio
+* BUG_0046: Expressions stored in object file with wrong values in MacOS
+* Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+* Problem caused by non-portable way of repeating a call to vsnprintf without
+* calling va_start in between. The repeated call is necessary when the
+* dynamically allocated string needs to grow to fit the value to be stored.
+*
+* Revision 1.17  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.16  2014/02/19 23:59:26  pauloscustodio

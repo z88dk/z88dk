@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.89 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.90 2014-04-19 14:57:37 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.89 2014-04-18 17:46
 
 /*
 * $Log: hist.c,v $
-* Revision 1.89  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.90  2014-04-19 14:57:37  pauloscustodio
+* BUG_0046: Expressions stored in object file with wrong values in MacOS
+* Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+* Problem caused by non-portable way of repeating a call to vsnprintf without
+* calling va_start in between. The repeated call is necessary when the
+* dynamically allocated string needs to grow to fit the value to be stored.
+*
+* Revision 1.89  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.
@@ -1762,11 +1769,18 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 xx.xx.2014 [2.1.9] (pauloscustodio)
 -------------------------------------------------------------------------------
+	BUG_0046: Expressions stored in object file with wrong values in MacOS
+		Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+		Problem caused by non-portable way of repeating a call to vsnprintf without 
+		calling va_start in between. The repeated call is necessary when the 
+		dynamically allocated string needs to grow to fit the value to be stored.
+
 	- Change struct expr to Expr class, use CLASS_LIST instead of linked list
 	  manipulating.
 	- Factor parsing and evaluating contants.
 	- Factor symbol-not-defined error during expression evaluation.
 	- Store module name in strpool instead of xstrdup/xfree.
+	- Fix test scripts to run in UNIX
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1800,7 +1814,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.8"
+#define VERSION     "2.1.9a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

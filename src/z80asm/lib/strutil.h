@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.13 2014-03-29 22:04:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.14 2014-04-19 14:57:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -110,8 +110,16 @@ extern void Str_append_char( Str *self, char ch );
 extern void Str_sprintf( Str *self, char *format, ... );
 extern void Str_append_sprintf( Str *self, char *format, ... );
 
-extern void Str_vsprintf( Str *self, char *format, va_list argptr );
-extern void Str_append_vsprintf( Str *self, char *format, va_list argptr );
+/* set / append with va_list argument
+   vsnprintf() in some platforms cannot be called twice with same va_list (BUG_0046), 
+   need to call va_start/va_end between calls; therefore this API does not retry.
+   If the string fits, the funtion returns TRUE.
+   If the string does not fit and can be expanded, it is expanded and the function
+   returns FALSE; the user has to call va_end, va_start and retry.
+   If the string does not fit and cannot be expanded, it is truncated and the function
+   returns TRUE. */ 
+extern BOOL Str_vsprintf( Str *self, char *format, va_list argptr );
+extern BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr );
 
 /* chomp, strip, compress_escapes */
 extern void Str_chomp( Str *self );
@@ -129,7 +137,14 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.13  2014-03-29 22:04:11  pauloscustodio
+* Revision 1.14  2014-04-19 14:57:37  pauloscustodio
+* BUG_0046: Expressions stored in object file with wrong values in MacOS
+* Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+* Problem caused by non-portable way of repeating a call to vsnprintf without
+* calling va_start in between. The repeated call is necessary when the
+* dynamically allocated string needs to grow to fit the value to be stored.
+*
+* Revision 1.13  2014/03/29 22:04:11  pauloscustodio
 * Add str_compress_escapes() to compress C-like escape sequences.
 * Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
 *

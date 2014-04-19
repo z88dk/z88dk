@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.10 2014-04-07 21:01:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.11 2014-04-19 14:57:37 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -77,18 +77,28 @@ void _check_str(Str *str, size_t size, size_t len, char *text, BOOL alloc_str,
 #define check_str(str,size,len,text,alloc_str)	\
        _check_str(str,size,len,text,alloc_str,__FILE__,__LINE__)
 
-void call_vsprintf (Str *str, char *format, ...)
+BOOL call_vsprintf (Str *str, char *format, ...)
 {
 	va_list argptr;
+	BOOL ret;
+	
 	va_start(argptr, format);
-	Str_vsprintf(str, format, argptr);
+	ret = Str_vsprintf(str, format, argptr);
+	va_end(argptr);
+	
+	return ret;
 }
 
-void call_append_vsprintf (Str *str, char *format, ...)
+BOOL call_append_vsprintf (Str *str, char *format, ...)
 {
 	va_list argptr;
+	BOOL ret;
+	
 	va_start(argptr, format);
-	Str_append_vsprintf(str, format, argptr);
+	ret = Str_append_vsprintf(str, format, argptr);
+	va_end(argptr);
+	
+	return ret;
 }
 
 Str * static_s1;
@@ -523,7 +533,7 @@ int main()
 		
 		
 		/* sprintf */
-		Str_sprintf( s1, "%s %d", "hello", 123);
+		Str_sprintf( s1, "%s %d", "hello", 123);		/* BUG_0046 */
 		Str_sprintf( s3, "%s %d", "hello", 123);
 		Str_sprintf( s4, "%s %d", "hello", 123);
 		
@@ -555,26 +565,28 @@ int main()
 
 
 		/* vsprintf */
-		call_vsprintf( s1, "%s %d", "hello", 123);
-		call_vsprintf( s3, "%s %d", "hello", 123);
-		call_vsprintf( s4, "%s %d", "hello", 123);
+		assert( ! call_vsprintf( s1, "%s %d", "hello", 123) );		/* BUG_0046 */
+		assert(   call_vsprintf( s1, "%s %d", "hello", 123) );
+		assert(   call_vsprintf( s3, "%s %d", "hello", 123) );
+		assert(   call_vsprintf( s4, "%s %d", "hello", 123) );
 		
 		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 		
 		/* append_vsprintf */
-		call_append_vsprintf( s1, "%s", "");	/* empty */
-		call_append_vsprintf( s3, "%s", "");	/* empty */
-		call_append_vsprintf( s4, "%s", "");	/* empty */
+		assert(   call_append_vsprintf( s1, "%s", "") );	/* empty */
+		assert(   call_append_vsprintf( s3, "%s", "") );	/* empty */
+		assert(   call_append_vsprintf( s4, "%s", "") );	/* empty */
 		
 		check_str( s1,  16, 9, "hello 123", TRUE);
 		check_str( s3,   5, 4, "hell",      FALSE);
 		check_str( s4,  10, 9, "hello 123", FALSE);
 		
-		call_append_vsprintf( s1, "%s", " and world");
-		call_append_vsprintf( s3, "%s", " and world");
-		call_append_vsprintf( s4, "%s", " and world");
+		assert( ! call_append_vsprintf( s1, "%s", " and world") );	/* BUG_0046 */
+		assert(   call_append_vsprintf( s1, "%s", " and world") );
+		assert(   call_append_vsprintf( s3, "%s", " and world") );
+		assert(   call_append_vsprintf( s4, "%s", " and world") );
 
 		check_str( s1,  32, 19, "hello 123 and world", TRUE);
 		check_str( s3,   5,  4, "hell",                FALSE);
@@ -721,7 +733,7 @@ int main()
 END
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("test", "", "", 0);
+t_capture("./test", "", "", 0);
 
 unlink <test.*>;
 done_testing;
@@ -739,7 +751,14 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.10  2014-04-07 21:01:51  pauloscustodio
+# Revision 1.11  2014-04-19 14:57:37  pauloscustodio
+# BUG_0046: Expressions stored in object file with wrong values in MacOS
+# Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
+# Problem caused by non-portable way of repeating a call to vsnprintf without
+# calling va_start in between. The repeated call is necessary when the
+# dynamically allocated string needs to grow to fit the value to be stored.
+#
+# Revision 1.10  2014/04/07 21:01:51  pauloscustodio
 # Reduce default size to 16 to waste less space when used as base for array.h
 #
 # Revision 1.9  2014/03/29 22:04:11  pauloscustodio
