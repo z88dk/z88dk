@@ -220,3 +220,6 @@ ELSE
 ENDIF
 
 ; =============================
+
+
+__sound_bit_state:  defb 0
