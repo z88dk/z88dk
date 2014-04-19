@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.6 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.7 2014-04-19 15:15:40 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
 	assert( p == (Point*)points->items->str );
 	assert( PointArray_size(points) == 1 );
 	assert( points->items->len == sizeof(Point) );
-	assert( points->items->size == 16 );
+	assert( points->items->size >= sizeof(Point)+1 );
 
 	PointArray_unreserve(points);
-	assert( points->items->len == 12 );
-	assert( points->items->size == 13 );
+	assert( points->items->len == sizeof(Point) );
+	assert( points->items->size == sizeof(Point)+1 );
 	
 	assert( p->name == NULL );
 	assert( p->x == 0 );
@@ -247,7 +247,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.6  2014-04-19 14:57:58  pauloscustodio
+# Revision 1.7  2014-04-19 15:15:40  pauloscustodio
+# Update for 64-bit architecture
+#
+# Revision 1.6  2014/04/19 14:57:58  pauloscustodio
 # Fix test scripts to run in UNIX
 #
 # Revision 1.5  2014/04/15 20:06:44  pauloscustodio
