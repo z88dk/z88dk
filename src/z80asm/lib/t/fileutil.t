@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.13 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.14 2014-04-19 17:42:43 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -177,11 +177,11 @@ int main(int argc, char *argv[])
 END
 
 system($compile) and die "compile failed: $compile\n";
-t_capture("test 0", "", "captured error test.1xxxx.bin 0\n", 1);
-t_capture("test 1", "", "captured error x/x/x/x/test.1.bin 1\n", 1);
-t_capture("test 2", "", "captured error test.1xxxx.bin 0\n".
+t_capture("./test 0", "", "captured error test.1xxxx.bin 0\n", 1);
+t_capture("./test 1", "", "captured error x/x/x/x/test.1.bin 1\n", 1);
+t_capture("./test 2", "", "captured error test.1xxxx.bin 0\n".
 						"Error: cannot read file 'test.1xxxx.bin'\n", 1);
-t_capture("test 3", "", "captured error x/x/x/x/test.1.bin 1\n".
+t_capture("./test 3", "", "captured error x/x/x/x/test.1.bin 1\n".
 						"Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
 
 
@@ -200,14 +200,6 @@ write_file("test.c", <<'END');
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"123456" 
-
-
-/* to avoid waring "this decimal constant is unsigned only in ISO C90"
-   compute numbers with bit 31=1 */
-unsigned long ulong( long g, long m, long k, long u )
-{
-	return 1000000000 * g + 1000000 * m + 1000 * k + u;
-}
 
 int main(int argc, char *argv[])
 {
@@ -401,10 +393,10 @@ int main(int argc, char *argv[])
 					xfput_uint16( file,       65535 );
 					xfput_int16(  file,       65536 );
 					xfput_uint16( file,       65536 );
-					xfput_int32(  file, ulong(2,147,483,648) );
-					xfput_uint32( file, ulong(2,147,483,648) );
-					xfput_int32(  file, ulong(2,147,483,649) );
-					xfput_uint32( file, ulong(2,147,483,649) );
+					xfput_int32(  file,  0x80000000 ); /* -2,147,483,648 */
+					xfput_uint32( file,  0x80000000 ); /*  2,147,483,648 */
+					xfput_int32(  file,  0x80000001 ); /* -2,147,483,647 */
+					xfput_uint32( file,  0x80000001 ); /*  2,147,483,649 */
 					xfput_int32(  file,           0 );
 					xfput_uint32( file,           0 );
 					xfput_int32(  file,           1 );
@@ -415,12 +407,12 @@ int main(int argc, char *argv[])
 					xfput_uint32( file,       65536 );
 					xfput_int32(  file,    16777216 );
 					xfput_uint32( file,    16777216 );
-					xfput_int32(  file,  2147483647 );
-					xfput_uint32( file,  2147483647 );
-					xfput_int32(  file, ulong(2,147,483,648) );
-					xfput_uint32( file, ulong(2,147,483,648) );
-					xfput_int32(  file, ulong(4,294,967,295) );
-					xfput_uint32( file, ulong(4,294,967,295) );
+					xfput_int32(  file,  0x7FFFFFFF ); /*  2,147,483,647 */
+					xfput_uint32( file,  0x7FFFFFFF ); /*  2,147,483,647 */
+					xfput_int32(  file,  0x80000000 ); /* -2,147,483,648 */
+					xfput_uint32( file,  0x80000000 ); /*  2,147,483,648 */
+					xfput_int32(  file,          -1 ); /*  4,294,967,295 */
+					xfput_uint32( file,  0xFFFFFFFF ); /*  4,294,967,295 */
 					xfclose(file);
 
 					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
@@ -452,10 +444,14 @@ int main(int argc, char *argv[])
 					uvalue = xfget_uint16( file ); if ( uvalue !=       65535 ) ERROR;
 					ivalue = xfget_int16(  file ); if ( ivalue !=           0 ) ERROR;
 					uvalue = xfget_uint16( file ); if ( uvalue !=           0 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,649) ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,649) ) ERROR;
+					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
+															   !=  0x80000000 
+													   || ilvalue >= 0        ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000000 ) ERROR;
+					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
+															   !=  0x80000001 
+													   || ilvalue >= 0        ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000001 ) ERROR;
 					ilvalue = xfget_int32( file ); if (ilvalue !=           0 ) ERROR;
 					ulvalue = xfget_uint32(file ); if (ulvalue !=           0 ) ERROR;
 					ilvalue = xfget_int32( file ); if (ilvalue !=           1 ) ERROR;
@@ -466,12 +462,14 @@ int main(int argc, char *argv[])
 					ulvalue = xfget_uint32(file ); if (ulvalue !=       65536 ) ERROR;
 					ilvalue = xfget_int32( file ); if (ilvalue !=    16777216 ) ERROR;
 					ulvalue = xfget_uint32(file ); if (ulvalue !=    16777216 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,647) ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,647) ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue != ulong(2,147,483,648) ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(2,147,483,648) ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue != ulong(4,294,967,295) ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue != ulong(4,294,967,295) ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=  2147483647 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=  2147483647 ) ERROR;
+					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
+															   !=  0x80000000 
+													   || ilvalue >= 0        ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000000 ) ERROR;
+					ilvalue = xfget_int32( file ); if (ilvalue !=          -1 ) ERROR;
+					ulvalue = xfget_uint32(file ); if (ulvalue !=  0xFFFFFFFF ) ERROR;
 					xfclose(file);
 					break;
 
@@ -529,27 +527,27 @@ END
 
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("test 0", "", "Error: cannot read file 'test.1xxxx.bin'\n", 1);
-t_capture("test 1", "", "Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
-t_capture("test 2", "", "", 0); is read_binfile("test.1.bin"), "";
-t_capture("test 4", "", "", 0); is read_binfile("test.1.bin"), "1234";
-t_capture("test 5", "", "Error: cannot write file 'test.1.bin'\n", 1);
-t_capture("test 6", "", "Error: cannot read file 'test.1.bin'\n", 1);
-t_capture("test 7", "", "", 0); is read_binfile("test.1.bin"), "1234123";
-t_capture("test 8", "", "Error: cannot read file 'test.1.bin'\n", 1);
-t_capture("test 9", "", "", 0); is read_binfile("test.1.bin"), "1234abc";
-t_capture("test A", "", "Error: cannot read file 'test.1.bin'\n", 1);
-t_capture("test B", "", "", 0); is read_binfile("test.1.bin"), "\0\1\2\3";
-t_capture("test C", "", "", 0); is read_binfile("test.1.bin"), 
+t_capture("./test 0", "", "Error: cannot read file 'test.1xxxx.bin'\n", 1);
+t_capture("./test 1", "", "Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
+t_capture("./test 2", "", "", 0); is read_binfile("test.1.bin"), "";
+t_capture("./test 4", "", "", 0); is read_binfile("test.1.bin"), "1234";
+t_capture("./test 5", "", "Error: cannot write file 'test.1.bin'\n", 1);
+t_capture("./test 6", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test 7", "", "", 0); is read_binfile("test.1.bin"), "1234123";
+t_capture("./test 8", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test 9", "", "", 0); is read_binfile("test.1.bin"), "1234abc";
+t_capture("./test A", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test B", "", "", 0); is read_binfile("test.1.bin"), "\0\1\2\3";
+t_capture("./test C", "", "", 0); is read_binfile("test.1.bin"), 
 									pack("C",   0)."".
 									pack("C",   4)."1234".
 									pack("C",  11)."hello world".
 									pack("v",   0)."".
 									pack("v", 256).("1234567890" x 25)."123456".
 									pack("v",  11)."hello world";
-t_capture("test D", "", "Error: cannot write file 'test.1.bin'\n", 1);
-t_capture("test E", "", "Error: cannot write file 'test.1.bin'\n", 1);
-t_capture("test F", "", "", 0); is read_binfile("test.1.bin"), 
+t_capture("./test D", "", "Error: cannot write file 'test.1.bin'\n", 1);
+t_capture("./test E", "", "Error: cannot write file 'test.1.bin'\n", 1);
+t_capture("./test F", "", "", 0); is read_binfile("test.1.bin"), 
 									pack("C*", 
 										 128, 128, 129, 129, 0, 0, 127, 127, 
 										 128, 128, 255, 255, 0, 0).
@@ -565,17 +563,17 @@ t_capture("test F", "", "", 0); is read_binfile("test.1.bin"),
 										 2147483647, 2147483647,
 										 2147483648, 2147483648,
 										 4294967295, 4294967295);
-t_capture("test G", "", "", 0); 
+t_capture("./test G", "", "", 0); 
 	ok ! -f '~$1$test.1.c';
 	ok ! -f '~$2$test.1.c';
 	ok ! -f '~$3$test.2.c';
 	ok ! -f 'test.x1\\~$4$x.c';
-t_capture("test H", "", "", 0); is read_binfile("test.1.bin"), "123";
-t_capture("test I", "", "", 0); 
+t_capture("./test H", "", "", 0); is read_binfile("test.1.bin"), "123";
+t_capture("./test I", "", "", 0); 
 	ok ! -f 'test.bin';
 	ok ! -f '~$1$test.bin';
 	ok ! -f '~$2$test.bin';
-t_capture("test J", "", "", 0); 
+t_capture("./test J", "", "", 0); 
 	ok ! -f 'test.bin';
 	ok ! -f '~$1$test.bin';
 	ok ! -f '~$2$test.bin';
@@ -636,7 +634,10 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.13  2014-04-19 14:57:58  pauloscustodio
+# Revision 1.14  2014-04-19 17:42:43  pauloscustodio
+# Update for 64-bit architecture
+#
+# Revision 1.13  2014/04/19 14:57:58  pauloscustodio
 # Fix test scripts to run in UNIX
 #
 # Revision 1.12  2014/03/05 23:44:55  pauloscustodio
