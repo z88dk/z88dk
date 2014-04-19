@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.3 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.4 2014-04-19 17:44:01 pauloscustodio Exp $
 #
 # Test except.c
 
@@ -88,13 +88,13 @@ END
 system($compile) and die "compile failed: $compile\n";
 
 # THROW outside of TRY
-t_capture("test 0", "", <<'ERR', 1);
+t_capture("./test 0", "", <<'ERR', 1);
 Throw without try
 Uncaught runtime exception at test.c(13)
 ERR
 
 # run FatalErrorException
-t_capture("test 1", "", <<'ERR', 0);
+t_capture("./test 1", "", <<'ERR', 0);
 Before try
 In try
 Throw FatalErrorException
@@ -103,7 +103,7 @@ End of main
 ERR
 
 # run AssertionException
-t_capture("test 2", "", <<'ERR', 0);
+t_capture("./test 2", "", <<'ERR', 0);
 Before try
 In try
 Throw AssertionException
@@ -113,7 +113,7 @@ End of main
 ERR
 
 # run second-level try and rethrow
-t_capture("test 3", "", <<'ERR', 0);
+t_capture("./test 3", "", <<'ERR', 0);
 Before try
 In try
 In test 3, new try
@@ -140,7 +140,10 @@ sub t_capture {
 }
 
 # $Log: except.t,v $
-# Revision 1.3  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.4  2014-04-19 17:44:01  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.3  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #

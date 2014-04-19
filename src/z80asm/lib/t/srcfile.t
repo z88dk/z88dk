@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.4 2014-03-26 00:12:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.5 2014-04-19 17:44:01 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 END
 
 system($compile) and die "compile failed: $compile\n";
-t_capture("test A", "", <<END, 1);
+t_capture("./test A", "", <<END, 1);
 read first file, no new line callback
 (test.f0:1)F0 1
 (test.f0:2)
@@ -357,7 +357,7 @@ recursive include, with callback
 Recursive include test.x1/test.f1
 END
 
-t_capture("test B", "", "", 0);
+t_capture("./test B", "", "", 0);
 
 #------------------------------------------------------------------------------
 # cleanup and exit
@@ -383,7 +383,10 @@ sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @
 
 
 # $Log: srcfile.t,v $
-# Revision 1.4  2014-03-26 00:12:28  pauloscustodio
+# Revision 1.5  2014-04-19 17:44:01  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.4  2014/03/26 00:12:28  pauloscustodio
 # Integrate use of srcfile in scanner, removing global variable z80asmfile
 # and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 #

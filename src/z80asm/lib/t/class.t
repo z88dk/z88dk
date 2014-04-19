@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.5 2014-01-11 01:29:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.6 2014-04-19 17:44:01 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -124,10 +124,10 @@ END
 system($compile) and die "compile failed: $compile\n";
 
 # no allocation
-t_capture("test 0", "", "", 0);
+t_capture("./test 0", "", "", 0);
 
 # alloc one, no free
-t_capture("test 1", "", <<'END', 0);
+t_capture("./test 1", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -141,7 +141,7 @@ Name_fini
 END
 
 # alloc one, clone another, no free
-t_capture("test 2", "", <<'END', 0);
+t_capture("./test 2", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -163,7 +163,7 @@ Name_fini
 END
 
 # alloc one, clone another, free first
-t_capture("test 3", "", <<'END', 0);
+t_capture("./test 3", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -185,7 +185,7 @@ Name_fini
 END
 
 # alloc one, clone another, free first and then second
-t_capture("test 4", "", <<'END', 0);
+t_capture("./test 4", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -207,7 +207,7 @@ class: cleanup
 END
 
 # INIT_OBJ
-t_capture("test 5", "", <<'END', 0);
+t_capture("./test 5", "", <<'END', 0);
 Person_init
 Name_init
 class: init
@@ -251,7 +251,10 @@ sub t_capture {
 }
 
 # $Log: class.t,v $
-# Revision 1.5  2014-01-11 01:29:41  pauloscustodio
+# Revision 1.6  2014-04-19 17:44:01  pauloscustodio
+# Fix test scripts to run in UNIX
+#
+# Revision 1.5  2014/01/11 01:29:41  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
