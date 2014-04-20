@@ -98,9 +98,11 @@ tone_modifier:
 plus_two:
 
    inc b
+   inc b
 
 plus_one:
 
+   inc b
    inc b
    inc de                      ; step past # / b
 
@@ -221,7 +223,7 @@ play_pause:
 pause_done:
 
    pop bc                      ; c = note_duration
-   jr note_loop
+   jp note_loop
 
 parse_duration:
 
