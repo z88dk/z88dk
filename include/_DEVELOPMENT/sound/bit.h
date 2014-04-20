@@ -20,14 +20,14 @@ extern void                       bit_beep_raw(uint16_t cycles_num, uint16_t per
 extern void                       bit_click(void);
 extern void                       bit_fx(void (*bfx)(void));
 extern char                      *bit_play(char *melody);
-extern void                       bit_synth(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void                       bit_synth(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 extern void                       bit_beep_di(uint16_t dur_ms, uint16_t freq_hz);
 extern void                       bit_beep_raw_di(uint16_t cycles_num, uint16_t period_T);
 extern void                       bit_click_di(void);
 extern void                       bit_fx_di(void (*bfx)(void));
 extern char                      *bit_play_di(char *melody);
-extern void                       bit_synth_di(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void                       bit_synth_di(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 #else
 
@@ -38,24 +38,24 @@ extern void __LIB__               bit_beep_raw(uint16_t cycles_num, uint16_t per
 extern void __LIB__               bit_click(void);
 extern void __LIB__ __FASTCALL__  bit_fx(void *bfx);
 extern char __LIB__ __FASTCALL__ *bit_play(char *melody);
-extern void __LIB__               bit_synth(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void __LIB__               bit_synth(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 extern void __LIB__               bit_beep_di(uint16_t dur_ms, uint16_t freq_hz);
 extern void __LIB__               bit_beep_raw_di(uint16_t cycles_num, uint16_t period_T);
 extern void __LIB__               bit_click_di(void);
 extern void __LIB__ __FASTCALL__  bit_fx_di(void *bfx);
 extern char __LIB__ __FASTCALL__ *bit_play_di(char *melody);
-extern void __LIB__               bit_synth_di(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void __LIB__               bit_synth_di(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 // SCCZ80 CALLEE LINKAGE
 
 extern void __LIB__ __CALLEE__    bit_beep_callee(uint16_t dur_ms, uint16_t freq_hz);
 extern void __LIB__ __CALLEE__    bit_beep_raw_callee(uint16_t cycles_num, uint16_t period_T);
-extern void __LIB__ __CALLEE__    bit_synth_callee(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void __LIB__ __CALLEE__    bit_synth_callee(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 extern void __LIB__ __CALLEE__    bit_beep_di_callee(uint16_t dur_ms, uint16_t freq_hz);
 extern void __LIB__ __CALLEE__    bit_beep_raw_di_callee(uint16_t cycles_num, uint16_t period_T);
-extern void __LIB__ __CALLEE__    bit_synth_di_callee(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint_8t freq_3, uint8_t freq_4);
+extern void __LIB__ __CALLEE__    bit_synth_di_callee(uint8_t dur, uint8_t freq_1, uint8_t freq_2, uint8_t freq_3, uint8_t freq_4);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
@@ -82,12 +82,12 @@ extern void __LIB__ __CALLEE__    bit_synth_di_callee(uint8_t dur, uint8_t freq_
 #define BFX_DEEP_SPACE            bitfx_8
 #define BFX_DUAL_NOTE_FUZZY       bitfx_9
 #define BFX_DUAL_NOTE_FUZZY_2     bitfx_10
-#define BFX_KLAXON                bitfx_11
+#define BFX_KLAXON_2              bitfx_11
 #define BFX_TSPACE                bitfx_12
 #define BFX_TSPACE_2              bitfx_13
 #define BFX_SQUOINK               bitfx_14
 #define BFX_EXPLOSION             bitfx_15
-#define BFX_BLIRP_1               bitfx_16
+#define BFX_BLIRP                 bitfx_16
 #define BFX_BLIRP_2               bitfx_17
 #define BFX_STEAM_ENGINE          bitfx_18
 #define BFX_BLURP                 bitfx_19
