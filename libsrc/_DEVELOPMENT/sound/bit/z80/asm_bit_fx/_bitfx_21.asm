@@ -48,7 +48,7 @@ hdesc3:
    djnz hdesc2
    
    pop hl
-   inc hl
+   dec hl
    
    ld c,a
    
