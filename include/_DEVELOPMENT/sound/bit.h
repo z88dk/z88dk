@@ -65,7 +65,7 @@ extern void __LIB__ __CALLEE__    bit_synth_di_callee(uint8_t dur, uint8_t freq_
 
 #define bit_beep_di(a,b)          bit_beep_di_callee(a,b)
 #define bit_beep_raw_di(a,b)      bit_beep_raw_di_callee(a,b)
-#define bit_synth_di(a,b,c,d,e)   bit_synth__di_callee(a,b,c,d,e)
+#define bit_synth_di(a,b,c,d,e)   bit_synth_di_callee(a,b,c,d,e)
 
 #endif
 
