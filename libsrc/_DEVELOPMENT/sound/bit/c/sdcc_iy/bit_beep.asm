@@ -13,4 +13,4 @@ _bit_beep:
    push de
    push af
    
-   INCLUDE "sound/bit/z80/asm_bit_beep,asm"
+   INCLUDE "sound/bit/z80/asm_bit_beep.asm"

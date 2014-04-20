@@ -51,7 +51,7 @@ fx8_2:
    jr nc, fx8_2
    
    pop bc
-   djnz fx81_1
+   djnz fx8_1
    
    scf
    ret

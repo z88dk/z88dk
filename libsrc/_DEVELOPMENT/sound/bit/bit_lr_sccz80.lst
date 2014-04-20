@@ -16,6 +16,8 @@ sound/bit/c/lr_sccz80/bit_synth
 sound/bit/c/lr_sccz80/bit_synth_callee
 sound/bit/c/lr_sccz80/bit_synth_di
 sound/bit/c/lr_sccz80/bit_synth_di_callee
+sound/bit/z80/asm_bit_close
+sound/bit/z80/asm_bit_open
 sound/bit/z80/asm_bit_fx/_bitfx_0
 sound/bit/z80/asm_bit_fx/_bitfx_1
 sound/bit/z80/asm_bit_fx/_bitfx_10

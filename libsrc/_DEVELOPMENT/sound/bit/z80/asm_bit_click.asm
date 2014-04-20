@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_click
 
@@ -28,12 +28,16 @@ asm_bit_click:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
 
       ld bc,__sound_bit_port
       out (c),a
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    

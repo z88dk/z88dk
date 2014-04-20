@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_beep
 XDEF asm0_bit_beep

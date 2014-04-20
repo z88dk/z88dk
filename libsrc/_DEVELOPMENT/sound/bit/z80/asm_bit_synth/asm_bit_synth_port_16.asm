@@ -31,7 +31,7 @@ LEN:
 
    ld b,50
 
-loop:
+loop1:
 
    ld c,4
 

@@ -18,8 +18,8 @@
 ;		bit_play("G8Ab4G8FEb4DC");
 ;		bit_play("C8G-C");
 ;		bit_play("C8G-C");
-:
-: TONE: C, C#, D, D#, Db, E, Eb, F, F#, G, G#, Gb, A, A#, Ab, B, Bb
+;
+; TONE: C, C#, D, D#, Db, E, Eb, F, F#, G, G#, Gb, A, A#, Ab, B, Bb
 ; OCTAVE ADJUST: +, -
 ; DURATION: 0..9
 ;

@@ -10,6 +10,8 @@ sound/bit/c/sdcc_iy/bit_play
 sound/bit/c/sdcc_iy/bit_play_di
 sound/bit/c/sdcc_iy/bit_synth
 sound/bit/c/sdcc_iy/bit_synth_di
+sound/bit/z80/asm_bit_close
+sound/bit/z80/asm_bit_open
 sound/bit/z80/asm_bit_fx/_bitfx_0
 sound/bit/z80/asm_bit_fx/_bitfx_1
 sound/bit/z80/asm_bit_fx/_bitfx_10

@@ -10,7 +10,7 @@ _bitfx_12:
    ; TSpace 2
    
    ld a,230
-   ld (t2_FR_1 + 1),a
+   ld (ts_FR_1 + 1),a
    
    xor a
    ld (ts_FR_2 + 1),a
@@ -29,13 +29,17 @@ t2_loop:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       exx
       out (c),a
       exx
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    
@@ -55,13 +59,17 @@ wait1:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       exx
       out (c),a
       exx
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    
@@ -78,9 +86,9 @@ t2_jump:
    
    push af
    
-   ld a,(t2_FR_2 + 1)
+   ld a,(ts_FR_2 + 1)
    inc a
-   ld (t2_FR_2 + 1),a
+   ld (ts_FR_2 + 1),a
    
    pop af
    xor __sound_bit_toggle
@@ -89,13 +97,17 @@ t2_jump:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       exx
       out (c),a
       exx
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    
@@ -115,19 +127,23 @@ wait2:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       exx
       out (c),a
       exx
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    
    ENDIF
 
-t2_FR_2:
+ts_FR_2:
 
    ld l,0
    djnz t2_loop

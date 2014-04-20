@@ -20,4 +20,4 @@ _bit_beep:
    pop ix
    ret
    
-   INCLUDE "sound/bit/z80/asm_bit_beep,asm"
+   INCLUDE "sound/bit/z80/asm_bit_beep.asm"

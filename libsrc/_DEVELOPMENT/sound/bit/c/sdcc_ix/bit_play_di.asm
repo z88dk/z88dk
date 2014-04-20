@@ -18,4 +18,4 @@ _bit_play_di:
    pop ix
    ret
 
-   INCLUDE "sound/bit/z80/asm_bit_play.asm"
+   INCLUDE "sound/bit/z80/asm_bit_play_di.asm"

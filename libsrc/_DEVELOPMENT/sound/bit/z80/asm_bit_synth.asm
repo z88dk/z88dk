@@ -16,7 +16,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_synth
 
@@ -96,11 +96,15 @@ fr4_blank:
    
       INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_port_8.asm"
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_port_16.asm"
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_memory.asm"
    

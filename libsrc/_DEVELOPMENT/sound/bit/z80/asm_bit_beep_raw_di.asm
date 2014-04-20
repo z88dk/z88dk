@@ -12,7 +12,7 @@
 
 XLIB asm_bit_beep_raw_di
 
-LIB asm_bit_beep_raw, asm_z80_push_di, asm_z80_pop_ei
+LIB asm_bit_beep_raw, asm_z80_push_di, asm0_z80_pop_ei
 
 asm_bit_beep_raw_di:
 
@@ -25,4 +25,4 @@ asm_bit_beep_raw_di:
 
    call asm_bit_beep_raw
 
-   jp asm_z80_pop_ei
+   jp asm0_z80_pop_ei

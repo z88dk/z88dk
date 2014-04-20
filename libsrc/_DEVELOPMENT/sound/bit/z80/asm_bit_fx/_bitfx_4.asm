@@ -18,13 +18,17 @@ zap1_1:
    
       out (__sound_bit_port),a
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       exx
       out (c),a
       exx
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       ld (__sound_bit_port),a
    

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_beep_raw
 
@@ -30,15 +30,21 @@ asm_bit_beep_raw:
    
       INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_port_8.asm"
    
-   ELSE IF __sound_bit_method = 2
+   ENDIF
+   
+   IF __sound_bit_method = 2
    
       INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_port_16.asm"
    
-   ELSE IF __sound_bit_method = 3
+   ENDIF
+   
+   IF __sound_bit_method = 3
    
       INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_memory.asm"
    
-   ELSE
+   ENDIF
+   
+   IF (__sound_bit_method < 1) | (__sound_bit_method > 3)
    
       ret
       
