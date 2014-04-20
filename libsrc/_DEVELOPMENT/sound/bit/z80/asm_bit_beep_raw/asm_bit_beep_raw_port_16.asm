@@ -17,7 +17,6 @@ beeper:
    ld a,l
    srl l
    srl l
-   srl l
    cpl
    and $03
    ld c,a
