@@ -169,7 +169,7 @@ defc __CLIB_OPT_NUM2TXT = $00
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
-defc __CLIB_OPT_PRINTF = $ffffffff
+defc __CLIB_OPT_PRINTF = $f61f
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
@@ -207,7 +207,7 @@ defc __CLIB_OPT_PRINTF = $ffffffff
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for printf.
 
-defc __CLIB_OPT_SCANF = $ffffffff
+defc __CLIB_OPT_SCANF = $f61f
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u

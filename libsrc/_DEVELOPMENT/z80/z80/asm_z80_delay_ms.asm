@@ -12,7 +12,7 @@
 
 XLIB asm_z80_delay_ms
 
-XREF __clock_freq
+INCLUDE "clib_target_cfg.asm"
 
 LIB asm_z80_delay_tstate
 

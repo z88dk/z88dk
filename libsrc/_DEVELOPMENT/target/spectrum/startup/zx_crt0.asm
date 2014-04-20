@@ -23,7 +23,6 @@ XREF _main
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "../crt_defs.inc"      ; crt defines
-INCLUDE "crt_zx_defs.inc"      ; crt defines varying by target
 
 ;; crt configuration ;;;;;;;;;;
 
