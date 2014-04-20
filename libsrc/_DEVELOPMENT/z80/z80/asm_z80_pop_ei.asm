@@ -16,6 +16,7 @@
 INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_z80_pop_ei
+XDEF asm0_z80_pop_ei
 
 asm_z80_pop_ei:
 
@@ -30,6 +31,13 @@ asm_z80_pop_ei:
    push af
    
    ex (sp),hl                  ; hl restored
+
+asm0_z80_pop_ei:
+
+   ; enter : stack = ret, ei_di_status
+   ;
+   ; uses  : af
+
    pop af                      ; af = ei_di_status
    
    IF __z80_nmos = 1
