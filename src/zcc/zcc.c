@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.71 2014-04-16 11:58:20 dom Exp $
+ *      $Id: zcc.c,v 1.72 2014-04-20 20:38:11 dom Exp $
  */
 
 
@@ -300,6 +300,7 @@ static arg_t     myargs[] = {
     {"specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     {"asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
+    {"crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
     { "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
     { "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
     { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
@@ -568,11 +569,7 @@ int main(int argc, char **argv)
     }
     fclose(fp);
 
-    /* We must have at least a crt file - we can rely on defaults for everything else */
-    if ( c_crt0 == NULL ) {
-        fprintf(stderr, "No CRT0 defined in configuration file <%s>\n",config_filename);
-        exit(1);
-    }
+
 
     /* Add the startup library to the linker arguments */
     snprintf(buffer, sizeof(buffer), "-l%s ", c_startuplib);
@@ -600,17 +597,25 @@ int main(int argc, char **argv)
         exit(0);
     }
     
-    configure_assembler();
-    configure_compiler();
     
     if ( add_variant_args(c_subtype, c_subtype_array_num, c_subtype_array) == -1 ) {
-	fprintf(stderr,"Cannot find definition for target -subtype=%s\n",c_subtype);
+        fprintf(stderr,"Cannot find definition for target -subtype=%s\n",c_subtype);
         exit(1);
     }
     if ( add_variant_args(c_clib, c_clib_array_num, c_clib_array) == -1 ) {
-	fprintf(stderr,"Cannot find definition for -clib=%s\n",c_clib);
+        fprintf(stderr,"Cannot find definition for -clib=%s\n",c_clib);
         exit(1);
     }
+    
+    /* We must have at least a crt file - we can rely on defaults for everything else */
+    if ( c_crt0 == NULL ) {
+        fprintf(stderr, "No CRT0 defined in configuration file <%s>\n",config_filename);
+        exit(1);
+    }
+    
+    
+    configure_assembler();
+    configure_compiler();
 
     /* Add the default cpp path */
     BuildOptions(&cpparg, c_incpath);
