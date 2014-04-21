@@ -22,30 +22,25 @@ asm_z80_delay_ms:
    ;
    ; uses  : af, bc, de, hl
 
-   ex de,hl
-   
-   ld hl,+(__clock_freq / 1000) - 49
-   call asm_z80_delay_tstate
-   
-   ex de,hl
+   ld e,l
+   ld d,h
 
 ms_loop:
 
-   dec hl
-
-   ld a,h
-   or l
-
-   jr nz, not_done             ; must slow down the return path
-   ret
-
-not_done:
-
-   ret z                       ; never taken
-   ex de,hl
+   dec de
    
-   ld hl,+(__clock_freq / 1000) - 61
+   ld a,d
+   or e
+   jr z, last_ms
+
+   ld hl,+(__clock_freq / 1000) - 43
    call asm_z80_delay_tstate
-   
-   ex de,hl
+
    jr ms_loop
+
+last_ms:
+
+   ; we will be exact
+   
+   ld hl,+(__clock_freq / 1000) - 6
+   jp asm_z80_delay_tstate
