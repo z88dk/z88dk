@@ -42,5 +42,5 @@ last_ms:
 
    ; we will be exact
    
-   ld hl,+(__clock_freq / 1000) - 6
+   ld hl,+(__clock_freq / 1000) - 54
    jp asm_z80_delay_tstate
