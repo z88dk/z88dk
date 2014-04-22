@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.12 2013-12-10 23:56:11 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.13 2014-04-22 23:04:56 pauloscustodio Exp $
  */
 
 
@@ -29,7 +29,7 @@ enum { showlocal = 1, showexpr = 2 };
 
 static void usage(char *name)
 {
-	fprintf(stderr,"Usage %s [-l] library\n",name);
+	fprintf(stderr,"Usage %s [-h][-l][-e] library\n",name);
 	fprintf(stderr,"Display the contents of a z80asm library file\n");
 	fprintf(stderr,"\n-l\tShow local symbols\n");
 	fprintf(stderr,"-e\tShow expression patches\n");
@@ -98,16 +98,16 @@ static char *patch_type(int type)
 {
 	switch ( type ) {
 	case 'U':
-		return "8U";
+		return " 8u";
 	case 'S':
-		return "8S";
+		return " 8s";
 	case 'C':
-		return "16S";
+		return "16s";
 	case 'L':
-		return "32S";
+		return "32s";
 		break;
 	}
-	return "??";
+	return "???";
 }
 
 void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
@@ -117,14 +117,17 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 	unsigned int  org;
 	char		  c;
 	int 		  len;
+	int			  version = 0;
 
 	fread(buf,8,1,fp); buf[8] = '\0';
 
 	if ( strcmp(buf,"Z80RMF01") != 0 &&
-	     strcmp(buf,"Z80RMF02") != 0 ) {
+	     strcmp(buf,"Z80RMF02") != 0 &&
+	     strcmp(buf,"Z80RMF03") != 0 ) {
 		fprintf(stderr,"File %s: not object file\n",filename);
 		return;
 	}
+	sscanf( buf + 6, "%d", &version ); 
 
 	org 	  = read_intel16(fp,&red);
 	modname   = read_intel32(fp,&red);
@@ -134,6 +137,7 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 	code	  = read_intel32(fp,&red);
 
 	fseek(fp,start+modname,SEEK_SET);
+	puts("");
 	read_name(fp,&red,stdout);
 
 	if ( code != 0xFFFFFFFF ) {
@@ -146,7 +150,7 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 		len = 0;
 	}
 
-	printf("\t\t%s: %s @ %08x (%d bytes)\n",buf,filename,start,len);
+	printf("\n     %s: %s @ %08X (%d bytes)\n\n",buf,filename,start,len);
 
 
 	/* Now print any dependencies under that */
@@ -170,12 +174,13 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 			if ( ( ( flags & showlocal) || scope != 'L' ) ) {
 				printf("  %c%c ",scope, type == 'C' ? 'C' : ' ' );
 				read_name(fp,&red,stdout);
-				printf("\t+%04x\n",value);
+				printf("\t+%04X\n",value);
 			}
 			else {
 				read_name(fp,&red,NULL);
 			}
 		}
+		puts("");
 	}
 		
 	if ( externsym != 0xFFFFFFFF ) {
@@ -186,11 +191,12 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 			read_name(fp,&red,stdout);
 			printf("\n");
 		}
+		puts("");
 	}
 
 	if ( expr != 0xFFFFFFFF && (flags & showexpr ) ) {
 		char type;
-		int  patch;
+		int  asmpc, patch;
 		unsigned long end;
 		fseek(fp,start+expr,SEEK_SET);
 		red = 0;
@@ -199,13 +205,19 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 			  modname;
 		while ( red < ( end - expr) ) {
 			type = fgetc(fp); red++;
+			if ( version >= 3 )
+				asmpc = read_intel16(fp,&red);
 			patch = read_intel16(fp,&red);
 			printf("  E  ");
 			read_name(fp,&red,stdout);
-			printf("\t%c(%s) @ %04x\n",type,patch_type(type),patch);
+			printf("\t%c(%s) @ %04X",type,patch_type(type),patch);
+			if ( version >= 3 )
+				printf(", PC %04X",asmpc);
+			puts("");
 			c = fgetc(fp); red++;
 			assert(c == 0);
 		}
+		puts("");
 	}
 }
 
@@ -221,7 +233,8 @@ FILE *open_library(char *filename)
 	fread(buf,8,1,fp); buf[8] = '\0';
 
 	if ( strcmp(buf,"Z80LMF01") == 0 ||
-	     strcmp(buf,"Z80LMF02") == 0 ) {
+	     strcmp(buf,"Z80LMF02") == 0 ||
+	     strcmp(buf,"Z80LMF03") == 0 ) {
 		printf("%s: %s\n",buf,filename);
 		return fp;
 	}
@@ -259,20 +272,30 @@ static unsigned int  read_intel16(FILE *fp, unsigned long *offs)
 
 static void read_name(FILE *fp, unsigned long *offs, FILE *out)
 {
+	static int max_len = 32;
 	int len, i, c;
 
 	len = fgetc(fp); (*offs)++;
+	if ( max_len < len )
+		max_len = len;
 	for ( i = 0; i < len; i++ ) {
 		c = fgetc(fp);
 		if (out != NULL)
 			fputc(c,out);
 		(*offs)++;
 	}
+	for ( i = len; i < max_len; i++ ) {
+		fputc(i % 5 ? ' ' : '.', out);
+	}
 }
 
 /*
  * $Log: ar.c,v $
- * Revision 1.12  2013-12-10 23:56:11  pauloscustodio
+ * Revision 1.13  2014-04-22 23:04:56  pauloscustodio
+ * Update for version 03 object and library files of z80asm.
+ * Improved readability of output.
+ *
+ * Revision 1.12  2013/12/10 23:56:11  pauloscustodio
  * Update to new object file format Z80RMF02, Z80LMF02 (C-type expressions in z80asm).
  * Factor reading of names.
  * Show file name and file version in dump.
