@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.90 2014-04-19 14:57:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.91 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,39 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.90 2014-04-19 14:57
 
 /*
 * $Log: hist.c,v $
-* Revision 1.90  2014-04-19 14:57:37  pauloscustodio
+* Revision 1.91  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.90  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS
 * Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
 * Problem caused by non-portable way of repeating a call to vsnprintf without
@@ -263,7 +295,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.90 2014-04-19 14:57
 * Revision 1.41  2013/06/08 23:37:32  pauloscustodio
 * Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 *  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* Define keywords for special symbols ASMSIZE, ASMTAIL
 *
 * Revision 1.40  2013/06/01 01:26:26  pauloscustodio
 * Version 1.2.0
@@ -1767,24 +1799,38 @@ Based on 1.0.31
 	- Remove token.c module - no longer needed with the ragel scanner.
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.1.9] (pauloscustodio)
+23.04.2014 [2.2.0] (pauloscustodio)
 -------------------------------------------------------------------------------
+	- Object file format changed to version 03, to include address of start
+	  of the opcode of each expression stored in the object file, to allow 
+	  ASMPC to refer to the start of the opcode instead of the patch pointer.
+	  This solves long standing BUG_0011 and BUG_0048.
+
+	- ASMPC no longer stored in the symbol table and evaluated as a separate 
+	  token, to allow expressions including ASMPC to be relocated. This solves
+	  long standing and never detected BUG_0047.
+
+	- Handling ASMPC during assembly simplified - no need to call inc_PC() on
+	  every assembled instruction, no need to store list of JRPC addresses as
+	  ASMPC is now stored in the expression.
+
 	BUG_0046: Expressions stored in object file with wrong values in MacOS
 		Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
 		Problem caused by non-portable way of repeating a call to vsnprintf without 
 		calling va_start in between. The repeated call is necessary when the 
 		dynamically allocated string needs to grow to fit the value to be stored.
 
-	- Change struct expr to Expr class, use CLASS_LIST instead of linked list
-	  manipulating.
-	- Factor parsing and evaluating contants.
-	- Factor symbol-not-defined error during expression evaluation.
-	- Store module name in strpool instead of xstrdup/xfree.
-	- Fix test scripts to run in UNIX
+	BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+		ASMPC is computed on zero-base address of the code section and expressions
+		including ASMPC are not relocated at link time.
+		"call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+		The expression ASMPC+3 is not marked as relocateable, and the resulting
+		code only works when linked at address 0.
 
--------------------------------------------------------------------------------
-FUTURE CHANGES - require change of the object file format
--------------------------------------------------------------------------------
+	BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+		In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead 
+		of instruction-address.
+
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
         - Bug only happens with forward references to relative addresses in
           expressions.
@@ -1792,6 +1838,16 @@ FUTURE CHANGES - require change of the object file format
         - Need to change object file format to correct - need patchptr and
           address of instruction start.
 
+	- Change struct expr to Expr class, use CLASS_LIST instead of linked list
+	  manipulating.
+	- Factor parsing and evaluating contants.
+	- Factor symbol-not-defined error during expression evaluation.
+	- Store module name in strpool instead of xstrdup/xfree.
+	- Fix test scripts to run in UNIX.
+
+-------------------------------------------------------------------------------
+FUTURE CHANGES - require change of the object file format
+-------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
 		The library modules loaded to the linked binary file should respect
 		the order given on the command line.
@@ -1814,7 +1870,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.1.9a"
+#define VERSION     "2.2.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

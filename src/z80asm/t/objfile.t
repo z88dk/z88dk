@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.10 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.11 2014-04-22 23:32:42 pauloscustodio Exp $
 #
 
 use strict;
@@ -131,10 +131,11 @@ t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
 		       ORG => 3,
-		       EXPR => [["U", 1, "label*4"],
-				["S", 4, "label*5"],
-				["C", 6, "label2*4"],
-				["L", 8, "label2*6"]],
+		       EXPR => [
+				["U", 0, 1, "label*4"],
+				["S", 2, 4, "label*5"],
+				["C", 5, 6, "label2*4"],
+				["L", 8, 8, "label2*6"]],
 		       SYMBOLS => [["L", "A", 0, "label"],
 				   ["L", "A", 5, "label2"]],
 		       CODE => "\x3E\x00".
@@ -156,8 +157,9 @@ global:	call extobj
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
-		       EXPR => [["C", 2, "extobj"],
-				["C", 5, "extlib"]],
+		       EXPR => [
+				["C", 1, 2, "extobj"],
+				["C", 4, 5, "extlib"]],
 		       SYMBOLS => [["L", "A", 0, "local"],
 				   ["G", "A", 1, "global"]],
 		       LIBS => ["extlib","extobj"],
@@ -198,7 +200,7 @@ write_file(asm2_file(), "EXTERN main \n jp main");
 t_z80asm_capture(asm2_file(), "", "", 0);
 $obj = read_binfile(obj2_file());
 t_binary($obj, objfile(NAME => 'test2',
-				EXPR => [["C", 1, "main"]],
+				EXPR => [["C", 0, 1, "main"]],
 				LIBS => ["main"],
 				CODE => "\xC3\0\0"));
 write_binfile(obj3_file(), $obj);
@@ -393,7 +395,39 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.10  2014-04-19 14:57:58  pauloscustodio
+# Revision 1.11  2014-04-22 23:32:42  pauloscustodio
+# Release 2.2.0 with major fixes:
+#
+# - Object file format changed to version 03, to include address of start
+# of the opcode of each expression stored in the object file, to allow
+# ASMPC to refer to the start of the opcode instead of the patch pointer.
+# This solves long standing BUG_0011 and BUG_0048.
+#
+# - ASMPC no longer stored in the symbol table and evaluated as a separate
+# token, to allow expressions including ASMPC to be relocated. This solves
+# long standing and never detected BUG_0047.
+#
+# - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+# every assembled instruction, no need to store list of JRPC addresses as
+# ASMPC is now stored in the expression.
+#
+# BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+# ASMPC is computed on zero-base address of the code section and expressions
+# including ASMPC are not relocated at link time.
+# "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+# The expression ASMPC+3 is not marked as relocateable, and the resulting
+# code only works when linked at address 0.
+#
+# BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+# In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+# of instruction-address.
+#
+# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+# Bug only happens with forward references to relative addresses in expressions.
+# See example from zx48.asm ROM image in t/BUG_0011.t test file.
+# Need to change object file format to correct - need patchptr and address of instruction start.
+#
+# Revision 1.10  2014/04/19 14:57:58  pauloscustodio
 # Fix test scripts to run in UNIX
 #
 # Revision 1.9  2014/04/13 20:32:10  pauloscustodio

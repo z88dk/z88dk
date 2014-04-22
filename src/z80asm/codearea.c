@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.27 2014-04-15 21:07:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.28 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,7 +39,8 @@ static uint_t codeindex;                /* point to current address of codearea 
 static uint_t codesize;                 /* size of all modules before current,
                                            i.e. base address of current module
                                            BUG_0015 */
-static uint_t PC;		                /* Program Counter */
+static uint_t g_PC;		                /* Program Counter */
+static uint_t g_opcode_size;			/* Number of bytes added after last set_PC() or next_PC() */
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
@@ -59,24 +60,38 @@ DEFINE_fini()
 }
 
 /*-----------------------------------------------------------------------------
-*   modify program counter
+*   Handle ASMPC
+*	set_PC() defines the instruction start address
+*	every byte added increments an offset but keeps ASMPC with start of opcode
+*	next_PC() moves to the next opcode
+*	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
-uint_t set_PC( uint_t n )
+void set_PC( uint_t n )
 {
-    init();
-    return PC = n;
+	g_PC = n;
+	g_opcode_size = 0;
 }
 
-uint_t inc_PC( uint_t n )
+uint_t next_PC( void )
 {
-    init();
-    return PC += n;
+	g_PC += g_opcode_size;
+	g_opcode_size = 0;
+	return g_PC;
 }
 
 uint_t get_PC( void )
 {
-    init();
-    return PC;
+	return g_PC;
+}
+
+uint_t get_opcode_size( void )
+{
+	return g_opcode_size;
+}
+
+static void inc_PC( uint_t n )
+{
+    g_opcode_size += n;
 }
 
 /*-----------------------------------------------------------------------------
@@ -147,6 +162,7 @@ void fread_codearea( FILE *stream, uint_t size )
     check_space( codeindex, size );
     xfget_chars( stream, codearea + codeindex, size );
     codeindex += size;
+	inc_PC( size );
 }
 
 /* read to codearea at offset - BUG_0015 */
@@ -178,6 +194,7 @@ void append_byte( byte_t byte )
     init();
     patch_byte( &codeindex, byte );
     list_append_byte( byte );
+	inc_PC( 1 );
 }
 
 void patch_word( uint_t *paddr, int word )
@@ -195,6 +212,7 @@ void append_word( int word )
     init();
     patch_word( &codeindex, word );
     list_append_word( word );
+	inc_PC( 2 );
 }
 
 void patch_long( uint_t *paddr, long dword )
@@ -216,6 +234,7 @@ void append_long( long dword )
     init();
     patch_long( &codeindex, dword );
     list_append_long( dword );
+	inc_PC( 4 );
 }
 
 byte_t get_byte( uint_t *paddr )
@@ -236,14 +255,45 @@ void append_opcode( long bytes )
 	if (bytes & 0x00FF0000) { append_byte( (bytes >> 16) & 0xFF ); count++; }
 	if (bytes & 0x0000FF00) { append_byte( (bytes >>  8) & 0xFF ); count++; }
 	append_byte( bytes & 0xFF ); count++;
-	inc_PC( count );
 }
 
 
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.27  2014-04-15 21:07:18  pauloscustodio
+* Revision 1.28  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.27  2014/04/15 21:07:18  pauloscustodio
 * append_opcode() to append_byte() and inc_PC() in one go
 *
 * Revision 1.26  2014/03/05 23:44:55  pauloscustodio

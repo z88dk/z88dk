@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.60 2014-04-15 20:06:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.61 2014-04-22 23:32:42 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -368,7 +368,7 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF02";
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF03";
 	$obj .= pack("v", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
@@ -382,8 +382,8 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$obj, $expr_addr);
 		for (@{$args{EXPR}}) {
-			my($type, $ptr, $string) = @$_;
-			$obj .= $type . pack("v", $ptr) . pack_string($string) ."\0";
+			my($type, $asmptr, $ptr, $string) = @$_;
+			$obj .= $type . pack("vv", $asmptr, $ptr) . pack_string($string) ."\0";
 		}
 	}
 
@@ -450,7 +450,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF02";
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF03";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?
@@ -1016,7 +1016,39 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.60  2014-04-15 20:06:44  pauloscustodio
+# Revision 1.61  2014-04-22 23:32:42  pauloscustodio
+# Release 2.2.0 with major fixes:
+#
+# - Object file format changed to version 03, to include address of start
+# of the opcode of each expression stored in the object file, to allow
+# ASMPC to refer to the start of the opcode instead of the patch pointer.
+# This solves long standing BUG_0011 and BUG_0048.
+#
+# - ASMPC no longer stored in the symbol table and evaluated as a separate
+# token, to allow expressions including ASMPC to be relocated. This solves
+# long standing and never detected BUG_0047.
+#
+# - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+# every assembled instruction, no need to store list of JRPC addresses as
+# ASMPC is now stored in the expression.
+#
+# BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+# ASMPC is computed on zero-base address of the code section and expressions
+# including ASMPC are not relocated at link time.
+# "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+# The expression ASMPC+3 is not marked as relocateable, and the resulting
+# code only works when linked at address 0.
+#
+# BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+# In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+# of instruction-address.
+#
+# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+# Bug only happens with forward references to relative addresses in expressions.
+# See example from zx48.asm ROM image in t/BUG_0011.t test file.
+# Need to change object file format to correct - need patchptr and address of instruction start.
+#
+# Revision 1.60  2014/04/15 20:06:44  pauloscustodio
 # Solve warning: no newline at end of file
 #
 # Revision 1.59  2014/04/13 20:32:10  pauloscustodio

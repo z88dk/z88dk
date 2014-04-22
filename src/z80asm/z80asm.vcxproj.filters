@@ -138,6 +138,12 @@
     <ClInclude Include="expr_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scan_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scan_rules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">

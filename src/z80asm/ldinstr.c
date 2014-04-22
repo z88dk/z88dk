@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.34 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.35 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -77,8 +77,7 @@ LD( void )
 
                 if ( CheckRegister8() == 7 )
                 {
-                    append_byte( 0x02 );
-                    inc_PC( 1 );
+                    append_opcode( 0x02 );
                 }
                 else
                 {
@@ -100,8 +99,7 @@ LD( void )
 
                 if ( CheckRegister8() == 7 )
                 {
-                    append_byte( 0x12 );
-                    inc_PC( 1 );
+                    append_opcode( 0x12 );
                 }
                 else
                 {
@@ -139,9 +137,7 @@ LD( void )
                 if ( CheckRegister8() == 7 )
                 {
                     /* LD  I,A */
-                    append_byte( 0xED );
-                    append_byte( 0x47 );
-                    inc_PC( 2 );
+                    append_opcode( 0xED47 );
                 }
                 else
                 {
@@ -163,9 +159,7 @@ LD( void )
                 if ( CheckRegister8() == 7 )
                 {
                     /* LD  R,A */
-                    append_byte( 0xED );
-                    append_byte( 0x4F );
-                    inc_PC( 2 );
+                    append_opcode( 0xED4F );
                 }
                 else
                 {
@@ -203,7 +197,6 @@ LD( void )
                             }
 
                             append_byte( 0xDD );    /* LD IXl,n or LD IXh,n */
-                            inc_PC( 1 );
                         }
                         else if ( destreg & 16 )
                         {
@@ -214,13 +207,11 @@ LD( void )
                             }
 
                             append_byte( 0xFD );    /* LD  IYl,n or LD  IYh,n */
-                            inc_PC( 1 );
                         }
 
                         destreg &= 7;
                         append_byte( ( byte_t )( destreg * 0x08 + 0x06 ) );
                         ExprUnsigned8( 1 );
-                        inc_PC( 2 );
                         return;
                     }
 
@@ -234,18 +225,14 @@ LD( void )
                     if ( ( sourcereg == 8 ) && ( destreg == 7 ) )
                     {
                         /* LD A,I */
-                        append_byte( 0xED );
-                        append_byte( 0x57 );
-                        inc_PC( 2 );
+                        append_opcode( 0xED57 );
                         return;
                     }
 
                     if ( ( sourcereg == 9 ) && ( destreg == 7 ) )
                     {
                         /* LD A,R */
-                        append_byte( 0xED );
-                        append_byte( 0x5F );
-                        inc_PC( 2 );
+                        append_opcode( 0xED5F );
                         return;
                     }
 
@@ -259,7 +246,6 @@ LD( void )
                         }
 
                         append_byte( 0xDD );
-                        inc_PC( 1 );
                     }
                     else if ( ( destreg & 16 ) || ( sourcereg & 16 ) )
                     {
@@ -271,14 +257,12 @@ LD( void )
                         }
 
                         append_byte( 0xFD );
-                        inc_PC( 1 );
                     }
 
                     sourcereg &= 7;
                     destreg &= 7;
 
                     append_byte( ( byte_t )( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
-                    inc_PC( 1 );
                 }
             }
             else
@@ -314,12 +298,10 @@ LD_HL8bit_indrct( void )
         case -1:                /* LD  (HL),n  */
             append_byte( 0x36 );
             ExprUnsigned8( 1 );
-            inc_PC( 2 );
             break;
 
         default:
             append_byte( ( byte_t )( 0x70 + sourcereg ) );       /* LD  (HL),r  */
-            inc_PC( 1 );
             break;
         }
     }
@@ -377,12 +359,10 @@ LD_index8bit_indrct( int destreg )
 
         case -1:
             ExprUnsigned8( 3 );   /* Execute, store & patch 8bit expression for <n> */
-            inc_PC( 4 );
             break;
 
         default:
             patch_byte( &opcodeptr, ( byte_t )( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
-            inc_PC( 3 );
             break;
         }                       /* end switch */
     }
@@ -405,7 +385,6 @@ LD_r_8bit_indrct( int destreg )
     {
     case 2:
         append_byte( ( byte_t )( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
-        inc_PC( 1 );
         break;
 
     case 5:
@@ -421,7 +400,6 @@ LD_r_8bit_indrct( int destreg )
 
         append_byte( ( byte_t )( 0x40 + destreg * 0x08 + 0x06 ) );
         ExprSigned8( 2 );
-        inc_PC( 3 );
         break;
 
     case 7:                     /* LD  A,(nn)  */
@@ -429,7 +407,6 @@ LD_r_8bit_indrct( int destreg )
         {
             append_byte( 0x3A );
             ExprAddress( 1 );
-            inc_PC( 3 );
         }
         else
         {
@@ -442,8 +419,7 @@ LD_r_8bit_indrct( int destreg )
         if ( destreg == 7 )
         {
             /* LD   A,(BC)  */
-            append_byte( 0x0A );
-            inc_PC( 1 );
+            append_opcode( 0x0A );
         }
         else
         {
@@ -456,8 +432,7 @@ LD_r_8bit_indrct( int destreg )
         if ( destreg == 7 )
         {
             /* LD   A,(DE)  */
-            append_byte( 0x1A );
-            inc_PC( 1 );
+            append_opcode( 0x1A );
         }
         else
         {
@@ -504,7 +479,6 @@ LD_address_indrct( char *exprptr )
         case 2:
             append_byte( 0x22 );  /* LD  (nn),HL  */
             bytepos = 1;
-            inc_PC( 1 );
             break;
 
         case 0:
@@ -513,7 +487,6 @@ LD_address_indrct( char *exprptr )
             append_byte( 0xED );
             append_byte( ( byte_t )( 0x43 + sourcereg * 0x10 ) );
             bytepos = 2;
-            inc_PC( 2 );
             break;
 
         case 5:         /* LD  (nn),IX    ;    LD  (nn),IY   */
@@ -529,14 +502,12 @@ LD_address_indrct( char *exprptr )
 
             append_byte( 0x22 );
             bytepos = 2;
-            inc_PC( 2 );
             break;
 
         case -1:
             if ( CheckRegister8() == 7 )
             {
                 append_byte( 0x32 );      /* LD  (nn),A  */
-                inc_PC( 1 );
                 bytepos = 1;
             }
             else
@@ -561,7 +532,6 @@ LD_address_indrct( char *exprptr )
     ScanSetPos( exprptr );			/* rewind fileptr to beginning of address expression */
     GetSym();
     ExprAddress( bytepos );			/* re-parse, evaluate, etc. */
-    inc_PC( 2 );
 }
 
 
@@ -586,7 +556,6 @@ LD_16bit_reg( void )
                 case 2:
                     append_byte( 0x2A );      /* LD   HL,(nn)  */
                     bytepos = 1;
-                    inc_PC( 1 );
                     break;
 
                 case 5:             /* LD  IX,(nn)    LD  IY,(nn)  */
@@ -602,20 +571,17 @@ LD_16bit_reg( void )
 
                     append_byte( 0x2A );
                     bytepos = 2;
-                    inc_PC( 2 );
                     break;
 
                 default:
                     append_byte( 0xED );
                     append_byte( ( byte_t )( 0x4B + destreg * 0x10 ) );
                     bytepos = 2;
-                    inc_PC( 2 );
                     break;
                 }
 
                 GetSym();
                 ExprAddress( bytepos );
-                inc_PC( 2 );
             }
             else
                 switch ( sourcereg = CheckRegister16() )
@@ -640,26 +606,22 @@ LD_16bit_reg( void )
 
                         append_byte( 0x21 );
                         bytepos = 2;
-                        inc_PC( 2 );
                         break;
 
                     default:
                         append_byte( ( byte_t )( destreg * 0x10 + 0x01 ) );
                         bytepos = 1;
-                        inc_PC( 1 );
                         break;
                     }
 
                     ExprAddress( bytepos );
-                    inc_PC( 2 );
                     break;
 
                 case 2:
                     if ( destreg == 3 )
                     {
                         /* LD  SP,HL  */
-                        append_byte( 0xF9 );
-                        inc_PC( 1 );
+                        append_opcode( 0xF9 );
                     }
                     else
                     {
@@ -682,7 +644,6 @@ LD_16bit_reg( void )
                         }
 
                         append_byte( 0xF9 );
-                        inc_PC( 2 );
                     }
                     else
                     {
@@ -707,7 +668,39 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.34  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.35  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.34  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.

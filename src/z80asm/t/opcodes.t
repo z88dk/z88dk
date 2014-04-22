@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.8 2014-04-18 16:46:19 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.9 2014-04-22 23:32:42 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -27,26 +27,41 @@ assemble("", <<'END');
 	defc ind = 5
 	defc n   = 32
 
-start:
+;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+expr1:	
+	defw	ASMPC,ASMPC,ASMPC	; {expr1} {expr1} {expr1}		# BUG_0047
+expr2:	
+	jp		ASMPC				; C3 {expr2}					# BUG_0048
 
+bug11_1:
+	defb    bug11_2-ASMPC, bug11_2-ASMPC	; 06 06				# BUG_0011
+	defb    bug11_2-ASMPC, bug11_2-ASMPC	; 04 04				# BUG_0011
+	defb    bug11_2-ASMPC, bug11_2-ASMPC	; 02 02				# BUG_0011
+bug11_2:
 
+;------------------------------------------------------------------------------
 ; Jump absolute
+;------------------------------------------------------------------------------
+jp1:
 	jp	(hl)		; E9          
 	jp	(ix)		; DD E9       
 	jp	(iy)		; FD E9       
-	jp	   start	; C3 00 01    
+	jp	   jp1		; C3 {jp1}    
 	jp	   -1		; C3 FF FF
-	jp	nz,start	; C2 00 01    
-	jp	 z,start	; CA 00 01    
-	jp	nc,start	; D2 00 01    
-	jp	 c,start	; DA 00 01    
-	jp	po,start	; E2 00 01    
-	jp	pe,start	; EA 00 01    
-	jp	 p,start	; F2 00 01    
-	jp	 m,start	; FA 00 01    
+	jp	nz,jp1		; C2 {jp1}    
+	jp	 z,jp1		; CA {jp1}    
+	jp	nc,jp1		; D2 {jp1}    
+	jp	 c,jp1		; DA {jp1}    
+	jp	po,jp1		; E2 {jp1}    
+	jp	pe,jp1		; EA {jp1}    
+	jp	 p,jp1		; F2 {jp1}    
+	jp	 m,jp1		; FA {jp1}    
 
-
+;------------------------------------------------------------------------------
 ; Jump relative
+;------------------------------------------------------------------------------
 	djnz ASMPC		; 10 FE
 	djnz ASMPC+0x81	; 10 7F
 	jr	 ASMPC		; 18 FE
@@ -74,7 +89,9 @@ jr4:
 jr5:
 
 
+;------------------------------------------------------------------------------
 ; Call
+;------------------------------------------------------------------------------
 	call    call4	;          	 CD {call4}    	
 	call    -1   	;          	 CD FF FF    
 
@@ -87,21 +104,22 @@ jr5:
 	call  c,call4	;          	 DC {call4}		Z80
 	call  c,call4	; 30 03      CD {call4}		RABBIT
 	call po,call4	;            E4 {call4}		Z80
-;****	call po,call4	; EA {call1} CD {call4}		RABBIT
+	call po,call4	; EA {call1} CD {call4}		RABBIT
 call1:
 	call pe,call4	;            EC {call4}		Z80
-;****	call pe,call4	; E2 {call2} CD {call4}		RABBIT
+	call pe,call4	; E2 {call2} CD {call4}		RABBIT
 call2:
 	call  p,call4	;            F4 {call4}		Z80
-;****	call  p,call4	; FA {call3} CD {call4}		RABBIT
+	call  p,call4	; FA {call3} CD {call4}		RABBIT
 call3:
 	call  m,call4	;            FC {call4}		Z80
-;****	call  m,call4	; F2 {call4} CD {call4}		RABBIT
+	call  m,call4	; F2 {call4} CD {call4}		RABBIT
 call4:
 	ret				; C9
 
-
+;------------------------------------------------------------------------------
 ; IF ELSE ENDIF
+;------------------------------------------------------------------------------
 	if	1
 	  defb 1		; 01
 	  if 1
@@ -144,7 +162,9 @@ call4:
 	  defb 14
 	endif
 
+;------------------------------------------------------------------------------
 ; All other opcodes	
+;------------------------------------------------------------------------------
 	adc	a,(hl)		; 8E          
 	adc	a,(ix+ind)	; DD 8E 05    
 	adc	a,(iy+ind)	; FD 8E 05    
@@ -598,7 +618,7 @@ sub assemble {
 	
 	my $org = 0x100;
 	my $addr = $org;
-	my %label;
+	my %labels;
 	my @patch;		# list of [address, label] to patch at the end
 	my $asm_z80 = ""; 
 	my $asm_rabbit = "";
@@ -609,7 +629,7 @@ sub assemble {
 		next unless /\S/;
 		if (/^(\w+):/) {
 			# label:  ; all line copied
-			$label{$1} = $addr;
+			$labels{$1} = $addr;
 			$asm_z80      .= "$_\n";
 			$asm_rabbit   .= "$_\n";
 		}
@@ -623,12 +643,15 @@ sub assemble {
 			$addr += $size;
 		}
 		else {
+			# remove '#' comment
+			s/\#.*//;
+			
 			# opcode ; bytes [Z80|RABBIT|""]
 			my $variant;
 			$variant = $1 if s/\s+(Z80|RABBIT)\s*$//;		# cpu type
 			my $defb;
 			
-			if ( /;\s+([0-9A-F]{2}\b.*)/ ) {
+			if ( /;\s+(([0-9A-F]{2}\b|\{\w+\}).*)/ ) {
 				my $bytes = $1;
 				$defb = "\tdefb "; 
 				for (split(' ', $bytes)) {
@@ -669,12 +692,8 @@ sub assemble {
 	}
 	
 	# patch all addresses
-	for (@patch) {
-		my($addr, $label) = @$_;
-		exists $label{$label} or die "$label not found";
-		substr($bin, $addr, 2) = pack("v", $label{$label});
-	}
-	
+	$bin = patch_bin($bin, \%labels, \@patch);
+
 	diag("Code $options: ",length($bin)," bytes\n");
 	
 	length($bin) >= 0x10000 and die;
@@ -694,15 +713,9 @@ sub assemble {
 		bin		=> $bin,
 		options	=> $options." -m",
 	);
+	check_list_file($bin, \%labels, \@patch);
+	check_map_file(\%labels);
 	
-	# check map file against our internal symbols
-	open(my $fh, map_file()) or die;
-	while (<$fh>) {
-		/^(\w+)\s+=\s+([0-9A-F]+)/ or next;
-		is sprintf("%04X", $label{$1}), $2, "label $1 = 0x$2";
-	}
-	close($fh);
-
 	# test asm for RABBIT
 	t_z80asm(
 		asm		=> $asm_rabbit,
@@ -710,6 +723,53 @@ sub assemble {
 		bin		=> $bin,
 		options	=> $options." --RCMX000 -m",
 	);
+	check_list_file($bin, \%labels, \@patch);
+	check_map_file(\%labels);
+}
+
+# check map file against our internal symbols
+sub check_map_file {
+	my($labels) = @_;
+	
+	open(my $fh, map_file()) or die "open ",map_file()," failed";
+	while (<$fh>) {
+		/^(\w+)\s+=\s+([0-9A-F]+)/ or next;
+		is sprintf("%04X", $labels->{$1}), $2, "label $1 = 0x$2";
+	}
+	close($fh);
+}
+
+# check list file against our internal code
+sub check_list_file {
+	my($bin, $labels, $patch) = @_;
+	
+	# read BIN code from list file
+	my $found_bin = "";
+	open(my $fh, lst_file()) or die "open ",lst_file()," failed";
+	while (<$fh>) {
+		/^\d*\s+[0-9A-F]{4}  ([0-9A-F]{2}( [0-9A-F]{2})*)/ or next;
+		for (split(' ', $1)) {
+			$found_bin .= chr(hex($_));
+		}
+	}
+	close($fh);
+	
+	$found_bin = patch_bin($found_bin, $labels, $patch);
+
+	t_binary($found_bin, $bin);
+}
+
+# patch a bin string with the given labels and patch list
+sub patch_bin {
+	my($bin, $labels, $patch) = @_;
+	
+	for (@$patch) {
+		my($addr, $label) = @$_;
+		exists $labels->{$label} or die "$label not found";
+		substr($bin, $addr, 2) = pack("v", $labels->{$label});
+	}
+	
+	return $bin;
 }
 
 # assemble, check errors
@@ -735,7 +795,39 @@ sub check_errors {
 }
 
 # $Log: opcodes.t,v $
-# Revision 1.8  2014-04-18 16:46:19  pauloscustodio
+# Revision 1.9  2014-04-22 23:32:42  pauloscustodio
+# Release 2.2.0 with major fixes:
+#
+# - Object file format changed to version 03, to include address of start
+# of the opcode of each expression stored in the object file, to allow
+# ASMPC to refer to the start of the opcode instead of the patch pointer.
+# This solves long standing BUG_0011 and BUG_0048.
+#
+# - ASMPC no longer stored in the symbol table and evaluated as a separate
+# token, to allow expressions including ASMPC to be relocated. This solves
+# long standing and never detected BUG_0047.
+#
+# - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+# every assembled instruction, no need to store list of JRPC addresses as
+# ASMPC is now stored in the expression.
+#
+# BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+# ASMPC is computed on zero-base address of the code section and expressions
+# including ASMPC are not relocated at link time.
+# "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+# The expression ASMPC+3 is not marked as relocateable, and the resulting
+# code only works when linked at address 0.
+#
+# BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+# In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+# of instruction-address.
+#
+# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+# Bug only happens with forward references to relative addresses in expressions.
+# See example from zx48.asm ROM image in t/BUG_0011.t test file.
+# Need to change object file format to correct - need patchptr and address of instruction start.
+#
+# Revision 1.8  2014/04/18 16:46:19  pauloscustodio
 # Add patching of labels to opcodes.t.
 # Emulation of call po|pe|p|m in rcmx000 test commented.
 #

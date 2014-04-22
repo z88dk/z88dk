@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.5 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.6 2014-04-22 23:32:42 pauloscustodio Exp $
 #
 # Build ZX Spectrum 48K ROM, compare result
 
@@ -23,7 +23,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 my $src = 	  "t/data/zx48.asm";
-my $bmk_bin = 	  "t/data/zx48.rom";
+my $bmk_bin = "t/data/zx48.rom";
 my $patched_src = "zx48.asm";
 my $err = 	  "zx48.err";
 my $obj = 	  "zx48.obj";
@@ -54,9 +54,6 @@ while (<$in_src>) {
     s/^([a-z]\w*) /$1:/i;
     s/(?<![\w\'])\$(?![\w\'])/ASMPC/;
     s/%([01]+)/\@$1/;
-
-    # ASMPC cannot be used in second expression of DEFB, see BUG_0011.t
-    s/(L\w+-ASMPC)-1/$1/;
 
     print $out_src $_;
 }

@@ -314,19 +314,19 @@ L2580:  CALL    L2307           ; routine STK-TO-BC fetches line to C,
 ; An expression that begins with a quote requires special treatment.
 
 ;; scan-func
-L2596:  DEFB    $22, L25B3-ASMPC  ; $1C offset to S-QUOTE
-        DEFB    '(', L25E8-ASMPC  ; $4F offset to S-BRACKET
-        DEFB    '.', L268D-ASMPC  ; $F2 offset to S-DECIMAL
-        DEFB    '+', L25AF-ASMPC  ; $12 offset to S-U-PLUS
+L2596:  DEFB    $22, L25B3-ASMPC-1  ; $1C offset to S-QUOTE
+        DEFB    '(', L25E8-ASMPC-1  ; $4F offset to S-BRACKET
+        DEFB    '.', L268D-ASMPC-1  ; $F2 offset to S-DECIMAL
+        DEFB    '+', L25AF-ASMPC-1  ; $12 offset to S-U-PLUS
 
-        DEFB    $A8, L25F5-ASMPC  ; $56 offset to S-FN
-        DEFB    $A5, L25F8-ASMPC  ; $57 offset to S-RND
-        DEFB    $A7, L2627-ASMPC  ; $84 offset to S-PI
-        DEFB    $A6, L2634-ASMPC  ; $8F offset to S-INKEY$
-        DEFB    $C4, L268D-ASMPC  ; $E6 offset to S-BIN
-        DEFB    $AA, L2668-ASMPC  ; $BF offset to S-SCREEN$
-        DEFB    $AB, L2672-ASMPC  ; $C7 offset to S-ATTR
-        DEFB    $A9, L267B-ASMPC  ; $CE offset to S-POINT
+        DEFB    $A8, L25F5-ASMPC-1  ; $56 offset to S-FN
+        DEFB    $A5, L25F8-ASMPC-1  ; $57 offset to S-RND
+        DEFB    $A7, L2627-ASMPC-1  ; $84 offset to S-PI
+        DEFB    $A6, L2634-ASMPC-1  ; $8F offset to S-INKEY$
+        DEFB    $C4, L268D-ASMPC-1  ; $E6 offset to S-BIN
+        DEFB    $AA, L2668-ASMPC-1  ; $BF offset to S-SCREEN$
+        DEFB    $AB, L2672-ASMPC-1  ; $C7 offset to S-ATTR
+        DEFB    $A9, L267B-ASMPC-1  ; $CE offset to S-POINT
 
         DEFB    $00             ; zero end marker
 

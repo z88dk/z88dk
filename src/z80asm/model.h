@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.11 2014-04-13 20:32:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.12 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,7 +31,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.11 2014-04-13 20:3
 #define SYM_DEFINED		1       	/* 00000001 symbol is defined */
 #define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
 									   a symbol table search */
-#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, ASMPC, OS_ID
+#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, OS_ID
 									   not output in sym list */
 
 #define SYM_TYPE		120     	/* 01111000 */
@@ -87,7 +87,39 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.11  2014-04-13 20:32:06  pauloscustodio
+* Revision 1.12  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.11  2014/04/13 20:32:06  pauloscustodio
 * PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 *
 * Revision 1.10  2014/04/13 11:54:01  pauloscustodio

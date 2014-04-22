@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0011.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0011.t,v 1.5 2014-04-22 23:32:42 pauloscustodio Exp $
 #
 # BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
 # Bug only happens with forward references in expressions
@@ -23,10 +23,6 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm";
-    skip "This test should not fail, BUG in z80asm", 1;
-
 t_z80asm_ok(0x162D, <<'END',
 L162D:  DEFB    'K', L1634-ASMPC-1  ; offset $06 to CHAN-K
         DEFB    'S', ' '
@@ -35,10 +31,8 @@ L162D:  DEFB    'K', L1634-ASMPC-1  ; offset $06 to CHAN-K
         DEFB    $00             ; end marker.
 
 L1634:
-
 END
 	"K\x06S P \x00");
-}
 
 unlink_testfiles();
 done_testing();

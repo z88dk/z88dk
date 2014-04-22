@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.91 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.92 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -82,8 +82,8 @@ void Z80pass1( char *filename )
 void
 parseline( enum flag interpret )
 {
-    ASMPC->value = get_PC();   /* update assembler program counter */
-    EOL = FALSE;                /* reset END OF LINE flag */
+    next_PC();				/* update assembler program counter */
+    EOL = FALSE;			/* reset END OF LINE flag */
     GetSym();
 
     if ( tok == TK_DOT || tok == TK_LABEL )
@@ -340,12 +340,9 @@ void
 Z80pass2( void )
 {
     Expr *expr;
-    struct JRPC *curJR, *prevJR;
     long constant;
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     uint_t patchptr;
-
-    curJR = CURRENTMODULE->JRaddr->firstref;  /* point at first JR PC address in this module */
 
 	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
 	{
@@ -353,7 +350,9 @@ Z80pass2( void )
         set_error_file( expr->filename );
         set_error_line( expr->line_nr );
 
-        constant = Expr_eval( expr );
+		set_PC( expr->asmpc );		/* BUG_0048 */
+
+		constant = Expr_eval( expr );
 
         if ( ! expr->is_stored )
         {
@@ -366,6 +365,9 @@ Z80pass2( void )
                 /* store expression in relocatable file */
                 switch ( expr->expr_type & RANGE )
                 {
+	            case RANGE_JROFFSET:
+					break;					/* JR must be local */
+
                 case RANGE_32SIGN:
                     StoreExpr( expr, 'L' );
                     break;
@@ -398,10 +400,6 @@ Z80pass2( void )
                 {
                     error_not_defined();
                 }
-
-                prevJR = curJR;
-                curJR = curJR->nextref;       /* get ready for next JR instruction */
-                xfree( prevJR );
             }
             else
             {
@@ -410,12 +408,12 @@ Z80pass2( void )
         }
         else
         {
-            patchptr = expr->codepos;            /* index in memory buffer */
+            patchptr = expr->code_pos;            /* index in memory buffer */
 
             switch ( expr->expr_type & RANGE )
             {
             case RANGE_JROFFSET:
-                constant -= curJR->PCaddr;    /* get module PC at JR instruction */
+                constant -= get_PC() + 2;		/* get module PC at JR instruction */
 
                 if ( constant >= -128 && constant <= 127 )
                 {
@@ -426,10 +424,6 @@ Z80pass2( void )
                 {
                     error_int_range( constant );
                 }
-
-                prevJR = curJR;
-                curJR = curJR->nextref;       /* get ready for JR instruction */
-                xfree( prevJR );
                 break;
 
             case RANGE_8UNSIGN:
@@ -475,7 +469,6 @@ Z80pass2( void )
     }
 
     OBJ_DELETE( CURRENTMODULE->exprs );   /* Release header of expressions list */
-    xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
 
     if ( ! get_num_errors() && opts.symtable )
     {
@@ -599,7 +592,39 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.91  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.92  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.91  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.
@@ -790,7 +815,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * Revision 1.51  2013/06/08 23:37:32  pauloscustodio
 * Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 *  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* Define keywords for special symbols ASMSIZE, ASMTAIL
 * 
 * Revision 1.50  2013/06/08 23:07:53  pauloscustodio
 * Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.

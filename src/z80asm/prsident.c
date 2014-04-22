@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.68 2014-04-13 20:32:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.69 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -411,8 +411,7 @@ MODULE( void )
 void
 NOP( void )
 {
-    append_byte( 0x00 );
-    inc_PC( 1 );
+    append_opcode( 0x00 );
 }
 
 
@@ -426,8 +425,7 @@ HALT( void )
         return;
     }
 
-    append_byte( 0x76 );
-    inc_PC( 1 );
+    append_opcode( 0x76 );
 }
 
 
@@ -435,9 +433,7 @@ HALT( void )
 void
 LDI( void )
 {
-    append_byte( 0xED );
-    append_byte( 0xA0 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA0 );
 }
 
 
@@ -445,9 +441,7 @@ LDI( void )
 void
 LDIR( void )
 {
-    append_byte( 0xED );
-    append_byte( 0xB0 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB0 );
 }
 
 
@@ -455,9 +449,7 @@ LDIR( void )
 void
 LDD( void )
 {
-    append_byte( 0xED );
-    append_byte( 0xA8 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA8 );
 }
 
 
@@ -465,9 +457,7 @@ LDD( void )
 void
 LDDR( void )
 {
-    append_byte( 0xED );
-    append_byte( 0xB8 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB8 );
 }
 
 
@@ -481,9 +471,7 @@ CPI( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xA1 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA1 );
 }
 
 
@@ -497,9 +485,7 @@ CPIR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xB1 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB1 );
 }
 
 
@@ -513,9 +499,7 @@ CPD( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xA9 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA9 );
 }
 
 
@@ -529,9 +513,7 @@ CPDR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xB9 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB9 );
 }
 
 
@@ -545,9 +527,7 @@ IND( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xAA );
-    inc_PC( 2 );
+    append_opcode( 0xEDAA );
 }
 
 
@@ -561,9 +541,7 @@ INDR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xBA );
-    inc_PC( 2 );
+    append_opcode( 0xEDBA );
 }
 
 
@@ -577,9 +555,7 @@ INI( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xA2 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA2 );
 }
 
 
@@ -593,9 +569,7 @@ INIR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xB2 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB2 );
 }
 
 
@@ -609,9 +583,7 @@ OUTI( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xA3 );
-    inc_PC( 2 );
+    append_opcode( 0xEDA3 );
 }
 
 
@@ -625,9 +597,7 @@ OUTD( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xAB );
-    inc_PC( 2 );
+    append_opcode( 0xEDAB );
 }
 
 
@@ -641,9 +611,7 @@ OTIR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xB3 );
-    inc_PC( 2 );
+    append_opcode( 0xEDB3 );
 }
 
 
@@ -657,9 +625,7 @@ OTDR( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0xBB );
-    inc_PC( 2 );
+    append_opcode( 0xEDBB );
 }
 
 
@@ -838,8 +804,7 @@ SRL( void )
 void
 CPL( void )
 {
-    append_byte( 0x2F );
-    inc_PC( 1 );
+    append_opcode( 0x2F );
 }
 
 
@@ -847,8 +812,7 @@ CPL( void )
 void
 RLA( void )
 {
-    append_byte( 0x17 );
-    inc_PC( 1 );
+    append_opcode( 0x17 );
 }
 
 
@@ -856,8 +820,7 @@ RLA( void )
 void
 RRA( void )
 {
-    append_byte( 0x1F );
-    inc_PC( 1 );
+    append_opcode( 0x1F );
 }
 
 
@@ -865,8 +828,7 @@ RRA( void )
 void
 RRCA( void )
 {
-    append_byte( 0x0F );
-    inc_PC( 1 );
+    append_opcode( 0x0F );
 }
 
 
@@ -874,8 +836,7 @@ RRCA( void )
 void
 RLCA( void )
 {
-    append_byte( 0x07 );
-    inc_PC( 1 );
+    append_opcode( 0x07 );
 }
 
 
@@ -883,8 +844,7 @@ RLCA( void )
 void
 EXX( void )
 {
-    append_byte( 0xD9 );
-    inc_PC( 1 );
+    append_opcode( 0xD9 );
 }
 
 
@@ -909,9 +869,7 @@ POP( void )
 void
 RETI( void )
 {
-    append_byte( 0xED );
-    append_byte( 0x4D );
-    inc_PC( 2 );
+    append_opcode( 0xED4D );
 }
 
 
@@ -925,9 +883,7 @@ RETN( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0x45 );
-    inc_PC( 2 );
+    append_opcode( 0xED45 );
 }
 
 
@@ -941,9 +897,7 @@ RLD( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0x6F );
-    inc_PC( 2 );
+    append_opcode( 0xED6F );
 }
 
 
@@ -957,9 +911,7 @@ RRD( void )
         return;
     }
 
-    append_byte( 0xED );
-    append_byte( 0x67 );
-    inc_PC( 2 );
+    append_opcode( 0xED67 );
 }
 
 
@@ -967,9 +919,7 @@ RRD( void )
 void
 NEG( void )
 {
-    append_byte( 0xED );
-    append_byte( 0x44 );
-    inc_PC( 2 );
+    append_opcode( 0xED44 );
 }
 
 
@@ -993,8 +943,7 @@ JP( void )
 void
 CCF( void )
 {
-    append_byte( 0x3F );
-    inc_PC( 1 );
+    append_opcode( 0x3F );
 }
 
 
@@ -1002,8 +951,7 @@ CCF( void )
 void
 SCF( void )
 {
-    append_byte( 0x37 );
-    inc_PC( 1 );
+    append_opcode( 0x37 );
 }
 
 
@@ -1017,8 +965,7 @@ DI( void )
         return;
     }
 
-    append_byte( 0xF3 );
-    inc_PC( 1 );
+    append_opcode( 0xF3 );
 }
 
 
@@ -1032,8 +979,7 @@ EI( void )
         return;
     }
 
-    append_byte( 0xFB );
-    inc_PC( 1 );
+    append_opcode( 0xFB );
 }
 
 
@@ -1047,13 +993,44 @@ DAA( void )
         return;
     }
 
-    append_byte( 0x27 );
-    inc_PC( 1 );
+    append_opcode( 0x27 );
 }
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.68  2014-04-13 20:32:06  pauloscustodio
+* Revision 1.69  2014-04-22 23:32:42  pauloscustodio
+* Release 2.2.0 with major fixes:
+*
+* - Object file format changed to version 03, to include address of start
+* of the opcode of each expression stored in the object file, to allow
+* ASMPC to refer to the start of the opcode instead of the patch pointer.
+* This solves long standing BUG_0011 and BUG_0048.
+*
+* - ASMPC no longer stored in the symbol table and evaluated as a separate
+* token, to allow expressions including ASMPC to be relocated. This solves
+* long standing and never detected BUG_0047.
+*
+* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+* every assembled instruction, no need to store list of JRPC addresses as
+* ASMPC is now stored in the expression.
+*
+* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+* ASMPC is computed on zero-base address of the code section and expressions
+* including ASMPC are not relocated at link time.
+* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+* The expression ASMPC+3 is not marked as relocateable, and the resulting
+* code only works when linked at address 0.
+*
+* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+* of instruction-address.
+*
+* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+* Bug only happens with forward references to relative addresses in expressions.
+* See example from zx48.asm ROM image in t/BUG_0011.t test file.
+* Need to change object file format to correct - need patchptr and address of instruction start.
+*
+* Revision 1.68  2014/04/13 20:32:06  pauloscustodio
 * PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 *
 * Revision 1.67  2014/04/13 11:54:01  pauloscustodio
@@ -1184,7 +1161,7 @@ DAA( void )
 * Revision 1.40  2013/06/08 23:37:32  pauloscustodio
 * Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 *  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+* Define keywords for special symbols ASMSIZE, ASMTAIL
 *
 * Revision 1.39  2013/06/01 01:24:22  pauloscustodio
 * CH_0022 : Replace avltree by hash table for symbol table

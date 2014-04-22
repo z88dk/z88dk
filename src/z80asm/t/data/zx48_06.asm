@@ -914,9 +914,9 @@ L162C:  JP      (HL)            ; jump to the routine
 ; A zero end-marker is required as channel 'R' is not present.
 
 ;; chn-cd-lu
-L162D:  DEFB    'K', L1634-ASMPC  ; offset $06 to CHAN-K
-        DEFB    'S', L1642-ASMPC  ; offset $12 to CHAN-S
-        DEFB    'P', L164D-ASMPC  ; offset $1B to CHAN-P
+L162D:  DEFB    'K', L1634-ASMPC-1  ; offset $06 to CHAN-K
+        DEFB    'S', L1642-ASMPC-1  ; offset $12 to CHAN-S
+        DEFB    'P', L164D-ASMPC-1  ; offset $1B to CHAN-P
 
         DEFB    $00             ; end marker.
 
@@ -1313,9 +1313,9 @@ L1708:  INC     HL              ; to address channel's letter
 ;   picked up from a channel that has an open stream.
 
 ;; cl-str-lu
-L1716:  DEFB    'K', L171C-ASMPC  ; offset 5 to CLOSE-STR
-        DEFB    'S', L171C-ASMPC  ; offset 3 to CLOSE-STR
-        DEFB    'P', L171C-ASMPC  ; offset 1 to CLOSE-STR
+L1716:  DEFB    'K', L171C-ASMPC-1  ; offset 5 to CLOSE-STR
+        DEFB    'S', L171C-ASMPC-1  ; offset 3 to CLOSE-STR
+        DEFB    'P', L171C-ASMPC-1  ; offset 1 to CLOSE-STR
 
 
 ; ------------------------------
@@ -1472,9 +1472,9 @@ L1767:  PUSH    BC              ; save the length of the string.
 ; provided by the user and not the operating system.
 
 ;; op-str-lu
-L177A:  DEFB    'K', L1781-ASMPC  ; $06 offset to OPEN-K
-        DEFB    'S', L1785-ASMPC  ; $08 offset to OPEN-S
-        DEFB    'P', L1789-ASMPC  ; $0A offset to OPEN-P
+L177A:  DEFB    'K', L1781-ASMPC-1  ; $06 offset to OPEN-K
+        DEFB    'S', L1785-ASMPC-1  ; $08 offset to OPEN-S
+        DEFB    'P', L1789-ASMPC-1  ; $0A offset to OPEN-P
 
         DEFB    $00             ; end-marker.
 

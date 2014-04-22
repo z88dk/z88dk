@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.89 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.90 2014-04-22 23:32:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -385,8 +385,6 @@ DEFS()
 
             if ( constant >= 0 )
             {
-                inc_PC( constant );
-
                 while ( constant-- )
                 {
                     append_byte( ( byte_t ) val );
@@ -550,8 +548,7 @@ DEFB( void )
             break;    /* syntax error - get next line from file... */
         }
 
-        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
-        ++bytepos;
+        bytepos++;
 
         if ( tok == TK_NEWLINE || tok == TK_END )
         {
@@ -582,7 +579,6 @@ DEFW( void )
             break;    /* syntax error - get next line from file... */
         }
 
-        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
         bytepos += 2;
 
         if ( tok == TK_NEWLINE || tok == TK_END )
@@ -614,7 +610,6 @@ DEFP( void )
             break;    /* syntax error - get next line from file... */
         }
 
-        inc_PC( 2 );                      /* DEFW allocated, update assembler PC */
         bytepos += 2;
 
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
@@ -630,8 +625,7 @@ DEFP( void )
             break;    /* syntax error - get next line from file... */
         }
 
-        inc_PC( 1 );                      /* DEFB allocated, update assembler PC */
-        bytepos += 1;
+        bytepos++;
 
         if ( tok == TK_NEWLINE || tok == TK_END )
         {
@@ -662,7 +656,6 @@ DEFL( void )
             break;    /* syntax error - get next line from file... */
         }
 
-        inc_PC( 4 );                      /* DEFL allocated, update assembler PC */
         bytepos += 4;
 
         if ( tok == TK_NEWLINE || tok == TK_END )
@@ -694,7 +687,6 @@ DEFM( void )
 			{
                 append_byte( ( byte_t ) *p );
                 ++bytepos;
-                inc_PC( 1 );
 			}
 
             GetSym();
@@ -718,7 +710,6 @@ DEFM( void )
             }
 
             ++bytepos;
-            inc_PC( 1 );
         }
     }
     while ( tok != TK_NEWLINE && tok != TK_END );
@@ -760,7 +751,6 @@ BINARY( void )
         fseek( binfile, 0L, SEEK_SET ); /* file pointer to start of file */
 
         fread_codearea( binfile, Codesize );  /* read binary code */
-        inc_PC( Codesize );
 
         xfclose( binfile );
         binfile = NULL;
@@ -795,7 +785,39 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.89  2014-04-18 17:46:18  pauloscustodio
+ * Revision 1.90  2014-04-22 23:32:42  pauloscustodio
+ * Release 2.2.0 with major fixes:
+ *
+ * - Object file format changed to version 03, to include address of start
+ * of the opcode of each expression stored in the object file, to allow
+ * ASMPC to refer to the start of the opcode instead of the patch pointer.
+ * This solves long standing BUG_0011 and BUG_0048.
+ *
+ * - ASMPC no longer stored in the symbol table and evaluated as a separate
+ * token, to allow expressions including ASMPC to be relocated. This solves
+ * long standing and never detected BUG_0047.
+ *
+ * - Handling ASMPC during assembly simplified - no need to call inc_PC() on
+ * every assembled instruction, no need to store list of JRPC addresses as
+ * ASMPC is now stored in the expression.
+ *
+ * BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+ * ASMPC is computed on zero-base address of the code section and expressions
+ * including ASMPC are not relocated at link time.
+ * "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
+ * The expression ASMPC+3 is not marked as relocateable, and the resulting
+ * code only works when linked at address 0.
+ *
+ * BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
+ * In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
+ * of instruction-address.
+ *
+ * BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+ * Bug only happens with forward references to relative addresses in expressions.
+ * See example from zx48.asm ROM image in t/BUG_0011.t test file.
+ * Need to change object file format to correct - need patchptr and address of instruction start.
+ *
+ * Revision 1.89  2014/04/18 17:46:18  pauloscustodio
  * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
  *   manipulating.
  * - Factor parsing and evaluating contants.
@@ -987,7 +1009,7 @@ DeclModuleName( void )
  * Revision 1.46  2013/06/08 23:37:32  pauloscustodio
  * Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  *  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
- * Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+ * Define keywords for special symbols ASMSIZE, ASMTAIL
  *
  * Revision 1.45  2013/06/01 01:24:21  pauloscustodio
  * CH_0022 : Replace avltree by hash table for symbol table
