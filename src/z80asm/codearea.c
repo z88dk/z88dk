@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.28 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.29 2014-04-22 23:52:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -197,6 +197,12 @@ void append_byte( byte_t byte )
 	inc_PC( 1 );
 }
 
+void append_2bytes( byte_t byte1, byte_t byte2 )
+{
+	append_byte( byte1 );
+	append_byte( byte2 );
+}
+
 void patch_word( uint_t *paddr, int word )
 {
     init();
@@ -247,21 +253,14 @@ byte_t get_byte( uint_t *paddr )
     return byte;
 }
 
-/* Append opcode - append the bytes HI to LO (max 4), and inc PC */
-void append_opcode( long bytes )
-{
-	size_t count = 0;
-	if (bytes & 0xFF000000) { append_byte( (bytes >> 24) & 0xFF ); count++; }
-	if (bytes & 0x00FF0000) { append_byte( (bytes >> 16) & 0xFF ); count++; }
-	if (bytes & 0x0000FF00) { append_byte( (bytes >>  8) & 0xFF ); count++; }
-	append_byte( bytes & 0xFF ); count++;
-}
-
-
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.28  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.29  2014-04-22 23:52:55  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.28  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.35 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.36 2014-04-22 23:52:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -77,7 +77,7 @@ LD( void )
 
                 if ( CheckRegister8() == 7 )
                 {
-                    append_opcode( 0x02 );
+                    append_byte( 0x02 );
                 }
                 else
                 {
@@ -99,7 +99,7 @@ LD( void )
 
                 if ( CheckRegister8() == 7 )
                 {
-                    append_opcode( 0x12 );
+                    append_byte( 0x12 );
                 }
                 else
                 {
@@ -137,7 +137,7 @@ LD( void )
                 if ( CheckRegister8() == 7 )
                 {
                     /* LD  I,A */
-                    append_opcode( 0xED47 );
+                    append_2bytes( 0xED, 0x47 );
                 }
                 else
                 {
@@ -159,7 +159,7 @@ LD( void )
                 if ( CheckRegister8() == 7 )
                 {
                     /* LD  R,A */
-                    append_opcode( 0xED4F );
+                    append_2bytes( 0xED, 0x4F );
                 }
                 else
                 {
@@ -225,14 +225,14 @@ LD( void )
                     if ( ( sourcereg == 8 ) && ( destreg == 7 ) )
                     {
                         /* LD A,I */
-                        append_opcode( 0xED57 );
+                        append_2bytes( 0xED, 0x57 );
                         return;
                     }
 
                     if ( ( sourcereg == 9 ) && ( destreg == 7 ) )
                     {
                         /* LD A,R */
-                        append_opcode( 0xED5F );
+                        append_2bytes( 0xED, 0x5F );
                         return;
                     }
 
@@ -419,7 +419,7 @@ LD_r_8bit_indrct( int destreg )
         if ( destreg == 7 )
         {
             /* LD   A,(BC)  */
-            append_opcode( 0x0A );
+            append_byte( 0x0A );
         }
         else
         {
@@ -432,7 +432,7 @@ LD_r_8bit_indrct( int destreg )
         if ( destreg == 7 )
         {
             /* LD   A,(DE)  */
-            append_opcode( 0x1A );
+            append_byte( 0x1A );
         }
         else
         {
@@ -621,7 +621,7 @@ LD_16bit_reg( void )
                     if ( destreg == 3 )
                     {
                         /* LD  SP,HL  */
-                        append_opcode( 0xF9 );
+                        append_byte( 0xF9 );
                     }
                     else
                     {
@@ -668,7 +668,11 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.35  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.36  2014-04-22 23:52:55  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.35  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

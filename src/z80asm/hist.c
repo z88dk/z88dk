@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.91 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.92 2014-04-22 23:55:18 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.91 2014-04-22 23:32
 
 /*
 * $Log: hist.c,v $
-* Revision 1.91  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.92  2014-04-22 23:55:18  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.91  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start
@@ -1844,6 +1848,8 @@ Based on 1.0.31
 	- Factor symbol-not-defined error during expression evaluation.
 	- Store module name in strpool instead of xstrdup/xfree.
 	- Fix test scripts to run in UNIX.
+	- As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+	  Removed append_opcode() and created a new helper append_2bytes().
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

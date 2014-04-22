@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.67 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.68 2014-04-22 23:52:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -66,11 +66,11 @@ PushPop_instr( int opcode )
         case REG16_BC:
         case REG16_DE:
         case REG16_HL:
-            append_opcode( ( byte_t )( opcode + qq * 0x10 ) );
+            append_byte( ( byte_t )( opcode + qq * 0x10 ) );
             break;
 
         case REG16_AF:
-            append_opcode( ( byte_t )( opcode + 0x30 ) );
+            append_byte( ( byte_t )( opcode + 0x30 ) );
             break;
 
         case REG16_IX:
@@ -103,7 +103,7 @@ RET( void )
     case TK_NAME:
         if ( ( constant = CheckCondition() ) != -1 )
         {
-            append_opcode( ( byte_t )( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
+            append_byte( ( byte_t )( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
         }
         else
         {
@@ -114,7 +114,7 @@ RET( void )
 
 	case TK_END:
     case TK_NEWLINE:
-        append_opcode( 0xC9 );
+        append_byte( 0xC9 );
         break;
 
     default:
@@ -140,21 +140,21 @@ EX( void )
                                 if ( ( opts.cpu & CPU_RABBIT ) )
                                 {
                                     /* Instruction code changed */
-                                    append_opcode( 0xED54 );
+                                    append_2bytes( 0xED, 0x54 );
                                 }
                                 else
                                 {
-                                    append_opcode( 0xE3 );      /* EX  (SP),HL  */
+                                    append_byte( 0xE3 );      /* EX  (SP),HL  */
                                 }
 
                                 break;
 
                             case REG16_IX:
-                                append_opcode( 0xDDE3 );  /* EX  (SP),IX  */
+                                append_2bytes( 0xDD, 0xE3 );  /* EX  (SP),IX  */
                                 break;
 
                             case REG16_IY:
-                                append_opcode( 0xFDE3 );  /* EX  (SP),IY  */
+                                append_2bytes( 0xFD, 0xE3 );  /* EX  (SP),IY  */
                                 break;
 
                             default:
@@ -189,7 +189,7 @@ EX( void )
                 if ( GetSym() == TK_NAME )
                     if ( CheckRegister16() == 2 )
                     {
-                        append_opcode( 0xEB );
+                        append_byte( 0xEB );
                     }
                     else
                     {
@@ -214,7 +214,7 @@ EX( void )
 					{
 					case REG16_AF:
 					case REG16_AF1:
-                        append_opcode( 0x08 );
+                        append_byte( 0x08 );
 						break;
 					default:
 						error_illegal_ident();
@@ -423,9 +423,9 @@ IM( void )
 	{
         switch ( constant )
         {
-        case 0:	append_opcode( 0xED46 ); break;
-        case 1:	append_opcode( 0xED56 ); break;
-        case 2: append_opcode( 0xED5E ); break;
+        case 0:	append_2bytes( 0xED, 0x46 ); break;
+        case 1:	append_2bytes( 0xED, 0x56 ); break;
+        case 2: append_2bytes( 0xED, 0x5E ); break;
 		default: error_int_range( constant ); break;
         }
 	}
@@ -450,7 +450,7 @@ RST( void )
             }
             else
             {
-                append_opcode( 0xC7 + constant );
+                append_byte( 0xC7 + constant );
             }
         }
         else
@@ -465,7 +465,7 @@ void CALL_OZ( void )
 {
     long constant;
 
-    append_opcode( 0xE7 );          /* RST 20H instruction */
+    append_byte( 0xE7 );          /* RST 20H instruction */
 
     GetSym();
 
@@ -498,7 +498,7 @@ CALL_PKG( void )
 {
     long constant;
 
-    append_opcode( 0xCF );          /* RST 08H instruction */
+    append_byte( 0xCF );          /* RST 08H instruction */
 
 	GetSym();
 
@@ -521,9 +521,9 @@ INVOKE( void )
     long constant;
 
     if ( opts.ti83plus )
-        append_opcode( 0xEF );    /* Ti83Plus: RST 28H instruction */
+        append_byte( 0xEF );    /* Ti83Plus: RST 28H instruction */
     else
-        append_opcode( 0xCD );    /* Ti83: CALL */
+        append_byte( 0xCD );    /* Ti83: CALL */
 
 	GetSym();
 
@@ -545,7 +545,7 @@ FPP( void )
 {
     long constant;
 
-    append_opcode( 0xDF );          /* RST 18H instruction */
+    append_byte( 0xDF );          /* RST 18H instruction */
 
 	GetSym();
 
@@ -586,7 +586,7 @@ Subroutine_addr( int opcode0, int opcode )
             switch ( constant )
             {
             case FLAGS_NZ:  /* nz */
-                append_opcode( 0x2803 ); /* jr z */
+                append_2bytes( 0x28, 0x03 ); /* jr z */
 				listoffset = 2;
 				next_PC();
 
@@ -594,7 +594,7 @@ Subroutine_addr( int opcode0, int opcode )
                 break;
 
             case FLAGS_Z:  /* z */
-                append_opcode( 0x2003 ); /* jr nz */
+                append_2bytes( 0x20, 0x03 ); /* jr nz */
 				listoffset = 2;
 				next_PC();
 
@@ -602,7 +602,7 @@ Subroutine_addr( int opcode0, int opcode )
                 break;
 
             case FLAGS_NC:  /* nc */
-                append_opcode( 0x3803 ); /* jr c */
+                append_2bytes( 0x38, 0x03 ); /* jr c */
 				listoffset = 2;
 				next_PC();
 
@@ -610,7 +610,7 @@ Subroutine_addr( int opcode0, int opcode )
                 break;
 
             case FLAGS_C:  /* c */
-                append_opcode( 0x3003 ); /* jr nc */
+                append_2bytes( 0x30, 0x03 ); /* jr nc */
 				listoffset = 2;
 				next_PC();
 
@@ -700,15 +700,15 @@ JP_instr( int opc0, int opc )
         switch ( CheckRegister16() )
         {
         case 2:         /* JP (HL) */
-            append_opcode( 0xE9 );
+            append_byte( 0xE9 );
             break;
 
         case 5:         /* JP (IX) */
-            append_opcode( 0xDDE9 );
+            append_2bytes( 0xDD, 0xE9 );
             break;
 
         case 6:         /* JP (IY) */
-            append_opcode( 0xFDE9 );
+            append_2bytes( 0xFD, 0xE9 );
             break;
 
         case -1:
@@ -1115,15 +1115,15 @@ INC( void )
         break;
 
     case 5:
-        append_opcode( 0xDD23 );
+        append_2bytes( 0xDD, 0x23 );
         break;
 
     case 6:
-        append_opcode( 0xFD23 );
+        append_2bytes( 0xFD, 0x23 );
         break;
 
     default:
-        append_opcode( ( byte_t )( 0x03 + reg16 * 0x10 ) );
+        append_byte( ( byte_t )( 0x03 + reg16 * 0x10 ) );
         break;
     }
 }
@@ -1147,15 +1147,15 @@ DEC( void )
         break;
 
     case 5:
-        append_opcode( 0xDD2B );
+        append_2bytes( 0xDD, 0x2B );
         break;
 
     case 6:
-        append_opcode( 0xFD2B );
+        append_2bytes( 0xFD, 0x2B );
         break;
 
     default:
-        append_opcode( ( byte_t )( 0x0B + reg16 * 0x10 ) );
+        append_byte( ( byte_t )( 0x0B + reg16 * 0x10 ) );
         break;
     }
 }
@@ -1171,7 +1171,7 @@ IncDec_8bit_instr( int opcode )
         switch ( reg = IndirectRegisters() )
         {
         case 2:
-            append_opcode( ( byte_t )( 0x30 + opcode ) ); /* INC/DEC (HL) */
+            append_byte( ( byte_t )( 0x30 + opcode ) ); /* INC/DEC (HL) */
             break;
 
         case 5:         /* INC/DEC (IX+d) */
@@ -1234,7 +1234,7 @@ IncDec_8bit_instr( int opcode )
             break;
 
         default:
-            append_opcode( ( byte_t )( reg * 0x08 + opcode ) ); /* INC/DEC  r */
+            append_byte( ( byte_t )( reg * 0x08 + opcode ) ); /* INC/DEC  r */
             break;
         }
     }
@@ -1375,7 +1375,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.67  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.68  2014-04-22 23:52:55  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.67  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

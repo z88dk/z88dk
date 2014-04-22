@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.69 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.70 2014-04-22 23:52:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -411,7 +411,7 @@ MODULE( void )
 void
 NOP( void )
 {
-    append_opcode( 0x00 );
+    append_byte( 0x00 );
 }
 
 
@@ -425,7 +425,7 @@ HALT( void )
         return;
     }
 
-    append_opcode( 0x76 );
+    append_byte( 0x76 );
 }
 
 
@@ -433,7 +433,7 @@ HALT( void )
 void
 LDI( void )
 {
-    append_opcode( 0xEDA0 );
+    append_2bytes( 0xED, 0xA0 );
 }
 
 
@@ -441,7 +441,7 @@ LDI( void )
 void
 LDIR( void )
 {
-    append_opcode( 0xEDB0 );
+    append_2bytes( 0xED, 0xB0 );
 }
 
 
@@ -449,7 +449,7 @@ LDIR( void )
 void
 LDD( void )
 {
-    append_opcode( 0xEDA8 );
+    append_2bytes( 0xED, 0xA8 );
 }
 
 
@@ -457,7 +457,7 @@ LDD( void )
 void
 LDDR( void )
 {
-    append_opcode( 0xEDB8 );
+    append_2bytes( 0xED, 0xB8 );
 }
 
 
@@ -471,7 +471,7 @@ CPI( void )
         return;
     }
 
-    append_opcode( 0xEDA1 );
+    append_2bytes( 0xED, 0xA1 );
 }
 
 
@@ -485,7 +485,7 @@ CPIR( void )
         return;
     }
 
-    append_opcode( 0xEDB1 );
+    append_2bytes( 0xED, 0xB1 );
 }
 
 
@@ -499,7 +499,7 @@ CPD( void )
         return;
     }
 
-    append_opcode( 0xEDA9 );
+    append_2bytes( 0xED, 0xA9 );
 }
 
 
@@ -513,7 +513,7 @@ CPDR( void )
         return;
     }
 
-    append_opcode( 0xEDB9 );
+    append_2bytes( 0xED, 0xB9 );
 }
 
 
@@ -527,7 +527,7 @@ IND( void )
         return;
     }
 
-    append_opcode( 0xEDAA );
+    append_2bytes( 0xED, 0xAA );
 }
 
 
@@ -541,7 +541,7 @@ INDR( void )
         return;
     }
 
-    append_opcode( 0xEDBA );
+    append_2bytes( 0xED, 0xBA );
 }
 
 
@@ -555,7 +555,7 @@ INI( void )
         return;
     }
 
-    append_opcode( 0xEDA2 );
+    append_2bytes( 0xED, 0xA2 );
 }
 
 
@@ -569,7 +569,7 @@ INIR( void )
         return;
     }
 
-    append_opcode( 0xEDB2 );
+    append_2bytes( 0xED, 0xB2 );
 }
 
 
@@ -583,7 +583,7 @@ OUTI( void )
         return;
     }
 
-    append_opcode( 0xEDA3 );
+    append_2bytes( 0xED, 0xA3 );
 }
 
 
@@ -597,7 +597,7 @@ OUTD( void )
         return;
     }
 
-    append_opcode( 0xEDAB );
+    append_2bytes( 0xED, 0xAB );
 }
 
 
@@ -611,7 +611,7 @@ OTIR( void )
         return;
     }
 
-    append_opcode( 0xEDB3 );
+    append_2bytes( 0xED, 0xB3 );
 }
 
 
@@ -625,7 +625,7 @@ OTDR( void )
         return;
     }
 
-    append_opcode( 0xEDBB );
+    append_2bytes( 0xED, 0xBB );
 }
 
 
@@ -804,7 +804,7 @@ SRL( void )
 void
 CPL( void )
 {
-    append_opcode( 0x2F );
+    append_byte( 0x2F );
 }
 
 
@@ -812,7 +812,7 @@ CPL( void )
 void
 RLA( void )
 {
-    append_opcode( 0x17 );
+    append_byte( 0x17 );
 }
 
 
@@ -820,7 +820,7 @@ RLA( void )
 void
 RRA( void )
 {
-    append_opcode( 0x1F );
+    append_byte( 0x1F );
 }
 
 
@@ -828,7 +828,7 @@ RRA( void )
 void
 RRCA( void )
 {
-    append_opcode( 0x0F );
+    append_byte( 0x0F );
 }
 
 
@@ -836,7 +836,7 @@ RRCA( void )
 void
 RLCA( void )
 {
-    append_opcode( 0x07 );
+    append_byte( 0x07 );
 }
 
 
@@ -844,7 +844,7 @@ RLCA( void )
 void
 EXX( void )
 {
-    append_opcode( 0xD9 );
+    append_byte( 0xD9 );
 }
 
 
@@ -869,7 +869,7 @@ POP( void )
 void
 RETI( void )
 {
-    append_opcode( 0xED4D );
+    append_2bytes( 0xED, 0x4D );
 }
 
 
@@ -883,7 +883,7 @@ RETN( void )
         return;
     }
 
-    append_opcode( 0xED45 );
+    append_2bytes( 0xED, 0x45 );
 }
 
 
@@ -897,7 +897,7 @@ RLD( void )
         return;
     }
 
-    append_opcode( 0xED6F );
+    append_2bytes( 0xED, 0x6F );
 }
 
 
@@ -911,7 +911,7 @@ RRD( void )
         return;
     }
 
-    append_opcode( 0xED67 );
+    append_2bytes( 0xED, 0x67 );
 }
 
 
@@ -919,7 +919,7 @@ RRD( void )
 void
 NEG( void )
 {
-    append_opcode( 0xED44 );
+    append_2bytes( 0xED, 0x44 );
 }
 
 
@@ -943,7 +943,7 @@ JP( void )
 void
 CCF( void )
 {
-    append_opcode( 0x3F );
+    append_byte( 0x3F );
 }
 
 
@@ -951,7 +951,7 @@ CCF( void )
 void
 SCF( void )
 {
-    append_opcode( 0x37 );
+    append_byte( 0x37 );
 }
 
 
@@ -965,7 +965,7 @@ DI( void )
         return;
     }
 
-    append_opcode( 0xF3 );
+    append_byte( 0xF3 );
 }
 
 
@@ -979,7 +979,7 @@ EI( void )
         return;
     }
 
-    append_opcode( 0xFB );
+    append_byte( 0xFB );
 }
 
 
@@ -993,12 +993,16 @@ DAA( void )
         return;
     }
 
-    append_opcode( 0x27 );
+    append_byte( 0x27 );
 }
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.69  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.70  2014-04-22 23:52:55  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.69  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.20 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.21 2014-04-22 23:52:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -61,15 +61,13 @@ extern void fread_codearea_offset( FILE *stream, uint_t offset, uint_t size );  
 *----------------------------------------------------------------------------*/
 extern void  patch_byte( uint_t *paddr, byte_t byte );		/* one byte */
 extern void append_byte( byte_t byte );
+extern void append_2bytes( byte_t byte1, byte_t byte2 );
 
 extern void  patch_word( uint_t *paddr, int word );			/* 2-byte word */
 extern void append_word( int word );
 
 extern void  patch_long( uint_t *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
-
-/* Append opcode - append the bytes HI to LO (max 4), and inc PC */
-extern void append_opcode( long bytes );
 
 /*-----------------------------------------------------------------------------
 *   get a byte at the given address
@@ -80,7 +78,11 @@ extern byte_t get_byte( uint_t *paddr );
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.20  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.21  2014-04-22 23:52:55  pauloscustodio
+* As inc_PC() is no longer needed, append_opcode() no longer makes sense.
+* Removed append_opcode() and created a new helper append_2bytes().
+*
+* Revision 1.20  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start
