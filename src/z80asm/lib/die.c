@@ -3,7 +3,7 @@ Exit with a fatal error, warn on stderr
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.c,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.c,v 1.4 2014-04-22 23:33:50 pauloscustodio Exp $
 */
 
 #include "die.h"
@@ -18,9 +18,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/die.c,v 1.3 2014-01-
 void die( char *msg, ... )
 {
     va_list argptr;
-    va_start( argptr, msg ); /* init variable args */
+    
+	va_start( argptr, msg ); /* init variable args */
+	vfprintf( stderr, msg, argptr );
+	va_end( argptr );
 
-    vfprintf( stderr, msg, argptr );
     exit( 1 );
 }
 
@@ -30,14 +32,18 @@ void die( char *msg, ... )
 void warn( char *msg, ... )
 {
     va_list argptr;
-    va_start( argptr, msg ); /* init variable args */
-
+    
+	va_start( argptr, msg ); /* init variable args */
     vfprintf( stderr, msg, argptr );
+	va_end( argptr );
 }
 
 /*
 * $Log: die.c,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.4  2014-04-22 23:33:50  pauloscustodio
+* Allways call va_end() after va_start()
+*
+* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
