@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: z88shell.c,v 1.5 2014-04-15 19:53:07 dom Exp $
+ *      $Id: z88shell.c,v 1.6 2014-04-22 22:53:17 dom Exp $
  */
 
 
@@ -30,7 +30,7 @@ option_t z88shell_options[] = {
 
 
 /* Prototypes for our functions */
-void save_block(long filesize, char *base, char *ext);
+static void save_block(long filesize, char *base, char *ext);
 
 
 /*

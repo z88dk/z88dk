@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.32 2014-04-18 14:07:09 stefano Exp $
+ *   $Id: appmake.h,v 1.33 2014-04-22 22:53:17 dom Exp $
  */
 
 
@@ -98,6 +98,9 @@ extern option_t  rex_options;
 
 extern int       rom_exec(char *target);
 extern option_t  rom_options;
+
+extern int       residos_exec(char *target);
+extern option_t  residos_options;
 
 extern int       sc3000_exec(char *target);
 extern option_t  sc3000_options;
@@ -194,12 +197,15 @@ struct {
     { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       p2000_exec,    &p2000_options },
-    { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
-      "Packaging for Sorcerer Exidy, --audio for WAV format",
-      sorcerer_exec,    &sorcerer_options },
+    { "bin2pkg",    "residos",       "(C) 2014 Dominic Morris",
+      "Create the header for a Residos package",
+      residos_exec,    &residos_options },
     { "rompad",    "rom",       "(C) 2014 Stefano Bodrato",
       "Expand a binary block to a given size (pad to create a ROM)",
       rom_exec,    &rom_options },
+    { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
+      "Packaging for Sorcerer Exidy, --audio for WAV format",
+      sorcerer_exec,    &sorcerer_options },
     { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
       "Add a header for S-OS (The Sentinel)",
       sos_exec,    &sos_options },
