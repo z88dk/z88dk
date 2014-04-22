@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.6 2014-04-15 20:06:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.7 2014-04-22 23:34:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,15 +30,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.6 2014-04-15 20:0
 *   Code section, one assembly instruction
 *----------------------------------------------------------------------------*/
 CLASS( CodeSection )
-char    *source_filename;		/* input file name, kept in strpool */
-int		line_nr;				/* input line number */
-Str    *bytes;					/* bytes of this opcode */
+	char	*source_filename;		/* input file name, kept in strpool */
+	int		 line_nr;				/* input line number */
+	Str		*bytes;					/* bytes of this opcode */
 END_CLASS;
 
 
 /*
 * $Log: module.h,v $
-* Revision 1.6  2014-04-15 20:06:43  pauloscustodio
+* Revision 1.7  2014-04-22 23:34:26  pauloscustodio
+* whitespace
+*
+* Revision 1.6  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.5  2014/01/11 01:29:40  pauloscustodio
