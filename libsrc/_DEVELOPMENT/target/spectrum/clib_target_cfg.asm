@@ -66,6 +66,19 @@ defc SP1V_UPDATELISTT   = $d1ef        ; address of 2-byte variable holding the 
 ; d000 - d100     IM2.LIB  im 2 vector table (257 bytes)
 ; ce00 - cfff     -------  z80 stack (512 bytes) set SP=d000
 
+;;;;;;;;
+;; INPUT
+;;;;;;;;
+
+;__input_amx_mouse_x  defs 2
+;__input_amx_mouse_y  defs 2
+;__input_amx_mouse_dx defs 2
+;__input_amx_mouse_dy defs 2
+
+;__input_kempston_mouse_x  defs 2
+;__input_kempston_mouse_y  defs 2
+
+
 ;;;;;;;;;;;;
 ;; SOUND/BIT
 ;;;;;;;;;;;;
@@ -81,6 +94,6 @@ defc __sound_bit_write_mask   = $e8    ; part of state byte to be preserved on w
 
 defc __sound_bit_beep_use_rom = 1      ; spectrum uses ROM routine (di/ei affected) -- TODO asm_bit_beep_raw
 
-; __sound_bit_state
+; __sound_bit_state  defs 1
 
 ENDIF
