@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.45 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.46 2014-04-23 22:07:12 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,7 +47,10 @@ struct module
     long             origin;		/* Address Origin of current machine code module during linking */
     SymbolHash      *local_symtab;	/* pointer to root of local symbols tree */
     ExprList		*exprs;			/* pointer to expressions in this module */
-    ObjFile			*obj_file;		/* ObjFile structure describing the object file */
+#if 0
+	/* error: too many open files - cannot keep all object files open */
+	ObjFile			*obj_file;		/* ObjFile structure describing the object file */
+#endif
 };
 
 struct liblist
@@ -82,7 +85,10 @@ extern struct module *NewModule( void );
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.45  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.46  2014-04-23 22:07:12  pauloscustodio
+* Too many open files was caused by all modules loaded during assembly keeping the FILE* open.
+*
+* Revision 1.45  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

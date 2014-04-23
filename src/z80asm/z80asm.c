@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.157 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.158 2014-04-23 22:07:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -266,7 +266,13 @@ BOOL load_module_object( char *filename )
             inc_codesize( obj_file->code_size );	/* BUG_0015 */
 
         CURRENTMODULE->modname	= obj_file->modname;
-        CURRENTMODULE->obj_file = obj_file;
+        
+#if 0
+		/* error: too many open files - cannot keep all object files open */
+		CURRENTMODULE->obj_file = obj_file;
+#else
+		OBJ_DELETE( obj_file );
+#endif
 
         return TRUE;
     }
@@ -464,7 +470,10 @@ ReleaseModules( void )
     {
         OBJ_DELETE( curptr->local_symtab );
 		OBJ_DELETE( curptr->exprs );
+#if 0
+		/* error: too many open files - cannot keep all object files open */
         OBJ_DELETE( curptr->obj_file );
+#endif
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;
@@ -589,7 +598,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.157  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.158  2014-04-23 22:07:12  pauloscustodio
+* Too many open files was caused by all modules loaded during assembly keeping the FILE* open.
+*
+* Revision 1.157  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.92 2014-04-22 23:55:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.93 2014-04-23 22:07:12 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.92 2014-04-22 23:55
 
 /*
 * $Log: hist.c,v $
-* Revision 1.92  2014-04-22 23:55:18  pauloscustodio
+* Revision 1.93  2014-04-23 22:07:12  pauloscustodio
+* Too many open files was caused by all modules loaded during assembly keeping the FILE* open.
+*
+* Revision 1.92  2014/04/22 23:55:18  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 * Removed append_opcode() and created a new helper append_2bytes().
 *
@@ -1852,6 +1855,11 @@ Based on 1.0.31
 	  Removed append_opcode() and created a new helper append_2bytes().
 
 -------------------------------------------------------------------------------
+xx.xx.2014 [2.2.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Too many open files
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -1876,7 +1884,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.0"
+#define VERSION     "2.2.1a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
