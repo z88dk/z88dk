@@ -1,0 +1,18 @@
+
+XLIB asm_z80_pop_registers_8080
+
+asm_z80_pop_registers_8080:
+
+   ; pop the main registers from the stack
+   ; must be called
+   
+   ; uses : af, bc, de, hl
+   
+   pop hl
+   
+   pop de
+   pop bc
+   pop af
+   ex (sp),hl
+   
+   ret
