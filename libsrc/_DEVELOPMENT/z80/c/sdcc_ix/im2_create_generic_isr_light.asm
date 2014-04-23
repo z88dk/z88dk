@@ -1,9 +1,9 @@
 
 ; void *im2_create_generic_isr_light(uint8_t num_callback, void *address)
 
-XDEF im2_create_generic_isr_light
+XDEF _im2_create_generic_isr_light
 
-im2_create_generic_isr_light:
+_im2_create_generic_isr_light:
 
    pop af
    pop hl

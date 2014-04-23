@@ -1,9 +1,9 @@
 
 ; void im2_init(void *im2_table)
 
-XDEF im2_init
+XDEF _im2_init
 
-im2_init:
+_im2_init:
 
    pop af
    pop hl

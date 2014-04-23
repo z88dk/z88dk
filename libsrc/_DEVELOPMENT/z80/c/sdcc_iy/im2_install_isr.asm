@@ -1,9 +1,9 @@
 
 ; void im2_install_isr(uint8_t vector, void *isr)
 
-XDEF im2_install_isr
+XDEF _im2_install_isr
 
-im2_install_isr:
+_im2_install_isr:
 
    pop af
    pop hl
