@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.68 2014-04-22 23:52:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.69 2014-04-23 22:07:57 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -450,7 +450,7 @@ RST( void )
             }
             else
             {
-                append_byte( 0xC7 + constant );
+                append_byte( (byte_t)( 0xC7 + constant ) );
             }
         }
         else
@@ -1375,7 +1375,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.68  2014-04-22 23:52:55  pauloscustodio
+* Revision 1.69  2014-04-23 22:07:57  pauloscustodio
+* warning
+*
+* Revision 1.68  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 * Removed append_opcode() and created a new helper append_2bytes().
 *
