@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.72 2014-04-20 20:38:11 dom Exp $
+ *      $Id: zcc.c,v 1.73 2014-04-24 22:11:50 dom Exp $
  */
 
 
@@ -591,7 +591,7 @@ int main(int argc, char **argv)
         else
             add_file_to_process(argv[gargc]);
     }
-    
+
     if ( c_print_specs ) {
         print_specs();
         exit(0);
@@ -1286,7 +1286,7 @@ static void configure_compiler()
 
 void PragmaDefine(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val + strlen(arg->name) + 2;
     int   value = 0;
     char *eql;
 
@@ -1303,7 +1303,7 @@ void PragmaDefine(arg_t *arg,char *val)
 
 void PragmaNeed(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val + strlen(arg->name) + 2;
 
     add_zccopt("\nIF !NEED_%s\n",ptr);
     add_zccopt("\tDEFINE\tNEED_%s\n",ptr);
@@ -1313,7 +1313,7 @@ void PragmaNeed(arg_t *arg,char *val)
 
 void PragmaBytes(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val + strlen(arg->name) + 2;
     char *value;
 
     if ( (value = strchr(ptr,'=') ) != NULL ) {
