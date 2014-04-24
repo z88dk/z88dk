@@ -3,7 +3,7 @@
 ; Apr 2004, Feb 2008
 ; ===============================================================
 ;
-; void im2_install_isr(uint8_t vector, void *isr)
+; void *im2_install_isr(uint8_t vector, void *isr)
 ;
 ; Install the isr on the vector given.
 ;
