@@ -14,7 +14,3 @@ __THREAD_UNBLOCK:
    ret
 
 ; =============================
-
-XDEF l_dcal
-l_dcal:
-        jp      (hl)
