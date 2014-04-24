@@ -9,7 +9,7 @@ isalpha:
 
    inc h
    dec h
-   jp z, error_zc
+   jp nz, error_zc
 
    ld a,l
    call asm_isalpha
