@@ -45,7 +45,7 @@ int RegisterInt(func,type,tick)
 	push	ix
 	push	iy
 	ld	hl,(packintrout)
-	call	l_dcal	;jp (hl)
+	call	l_jphl
 	pop	iy
 	pop	ix
 	pop	bc
