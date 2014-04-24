@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.73 2014-04-24 22:11:50 dom Exp $
+ *      $Id: zcc.c,v 1.74 2014-04-24 22:35:57 dom Exp $
  */
 
 
@@ -61,7 +61,7 @@ static void            AddArray(arg_t *arg,char *);
 static void           *mustmalloc(size_t);
 static int             hassuffix(char *file, char *suffix_to_check);
 static char           *changesuffix(char *, char *);
-static int             process(char *, char *, char *, char *, enum iostyle, int, int);
+static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
 static void            BuildAsmLine(char *, char *);
@@ -375,63 +375,49 @@ static char *changesuffix(char *name, char *suffix)
 }
 
 int 
-process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
-    char           *suffix, *nextsuffix, *processor, *extraargs;
-    enum iostyle    ios;
-    int             number;
-    int             needsuffix;    /* Should dump suffix (z80) oi! */
+process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
     int             tstore;
-    char           *buffer, *outname;
+    char            buffer[8192], *outname;
 
     errs = 0;
     if (!hassuffix(filelist[number], suffix))
         return (0);
     switch (ios) {
     case outimplied:
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs) + strlen(filelist[number]) + 3);
-
         /* Dropping the suffix for Z80..cheating! */
         tstore = strlen(filelist[number]) - strlen(suffix);
 
         if (!needsuffix)
             filelist[number][tstore] = 0;
 
-        sprintf(buffer, "%s %s %s", processor, extraargs,
+        snprintf(buffer, sizeof(buffer), "%s %s %s", processor, extraargs,
             filelist[number]);
         filelist[number][tstore] = '.';
         break;
     case outspecified:
         outname = changesuffix(filelist[number], nextsuffix);
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(original_filenames[number]) + strlen(outname) + 4);
-        sprintf(buffer, "%s %s %s %s", processor, extraargs,
-            original_filenames[number], outname);
+        snprintf(buffer,sizeof(buffer), "%s %s %s %s", processor, extraargs,
+            src_is_original ? original_filenames[number] : filelist[number], outname);
         free(outname);
         break;
     case outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(original_filenames[number]) + strlen(outname) + 7);
-        sprintf(buffer, "%s %s %s -o %s", processor, extraargs,
-            filelist[number], outname);
+        snprintf(buffer,sizeof(buffer), "%s %s %s -o %s", processor, extraargs,
+            src_is_original ? original_filenames[number] : filelist[number], outname);
         free(outname);
         break;
     case filter:
         outname = changesuffix(filelist[number], nextsuffix);
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(filelist[number]) + strlen(outname) + 8);
-        sprintf(buffer, "%s %s < %s > %s", processor, extraargs,
-            filelist[number], outname);
+        snprintf(buffer,sizeof(buffer), "%s %s < %s > %s", processor, extraargs,
+            src_is_original ? original_filenames[number] : filelist[number], outname);
         free(outname);
         break;
     case filter_outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(filelist[number]) + strlen(outname) + 9);
-        sprintf(buffer, "%s %s < %s -o %s", processor, extraargs,
-            filelist[number], outname);
+        snprintf(buffer,sizeof(buffer), "%s %s < %s -o %s", processor, extraargs,
+            src_is_original ? original_filenames[number] : filelist[number], outname);
         free(outname);
         break;
     }
@@ -447,7 +433,6 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
         free(filelist[number]);
         filelist[number] = outname;
     }
-    free(buffer);
     return (errs);
 }
 
@@ -670,12 +655,12 @@ int main(int argc, char **argv)
         switch (get_filetype_by_suffix(filelist[i])) {
         case CFILE:
             if ( compiler_type == CC_SDCC) {
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
-                if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES))
+                if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
                     exit(1);
             } else {
-                if (process(".c", ".i", c_cpp_exe, cpparg, c_stylecpp, i, YES))
+                if (process(".c", ".i", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
             }
             if (preprocessonly) {
@@ -684,20 +669,20 @@ int main(int argc, char **argv)
                 exit(0);
             }
         case PFILE:
-            if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES))
+            if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
                 exit(1);
         case AFILE:
             switch (peepholeopt) {
             case 1:
-                if (process(".asm", ".opt", c_copt_exe, c_coptrules1, filter, i, YES))
+                if (process(".asm", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                     exit(1);
                 break;
             case 2:
                 /* Double optimization! */
-                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES))
+                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
                     exit(1);
 
-                if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES))
+                if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                     exit(1);
                 break;
             case 3:
@@ -705,23 +690,23 @@ int main(int argc, char **argv)
                  * Triple opt (last level adds routines but
                  * can save space..)
                  */
-                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES))
+                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
                     exit(1);
-                if (process(".op1", ".op2",  c_copt_exe, c_coptrules1, filter, i, YES))
+                if (process(".op1", ".op2",  c_copt_exe, c_coptrules1, filter, i, YES, NO))
                     exit(1);
-                if (process(".op2", ".opt",  c_copt_exe, c_coptrules3, filter, i, YES))
+                if (process(".op2", ".opt",  c_copt_exe, c_coptrules3, filter, i, YES, NO))
                     exit(1);
                 break;
             default:
                 BuildAsmLine(asmarg, "-easm");
                 if (!assembleonly && !lateassemble)
-                    if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES))
+                    if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                         exit(1);
             }
         case OFILE:
             BuildAsmLine(asmarg, "-eopt");
             if (!assembleonly && !lateassemble)
-                if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES))
+                if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
             break;
         }
@@ -1264,6 +1249,9 @@ static void configure_compiler()
             parse_cmdline_arg("-Ca-sdcc");
         }
         c_compiler = c_sdcc_exe;
+        snprintf(buf, sizeof(buf),"%s -E", c_sdcc_exe);
+        c_cpp_exe = strdup(buf);
+        c_stylecpp = outspecified_flag;
         compiler_style = filter_outspecified_flag;
     } else {
         preprocarg = " -DSCCZ80 -DSMALL_C";
