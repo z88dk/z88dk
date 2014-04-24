@@ -46,6 +46,7 @@ asm_bit_beep_raw:
    
    IF (__sound_bit_method < 1) | (__sound_bit_method > 3)
    
-      ret
+      LIB error_enotsup_zc
+      jp error_enotsup_zc
       
    ENDIF

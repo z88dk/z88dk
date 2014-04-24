@@ -23,8 +23,8 @@
 ; OCTAVE ADJUST: +, -
 ; DURATION: 0..9
 ;
-; Repeat last note: TONE = R
-; Quiet: TONE = Q(temporary duration)
+; Repeat last note: TONE = *
+; Quiet: TONE = R(temporary duration)
 ;
 ; ===============================================================
 
@@ -65,10 +65,10 @@ note_loop:
 
    inc de
 
-   cp 'Q'
+   cp 'R'
    jr z, play_pause            ; if quiet
    
-   cp 'R'
+   cp '*'
    jr z, play_note             ; if repeat
    
    sub 'A'
