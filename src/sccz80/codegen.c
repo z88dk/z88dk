@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.28 2011-06-26 16:07:29 dom Exp $
+ *      $Id: codegen.c,v 1.29 2014-04-24 22:09:26 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -801,7 +801,7 @@ void callstk(int n)
         postlabel(label);
     } else {
         loadargc(n) ;
-        callrts( "l_dcal" ) ;
+        callrts( "l_jphl" ) ;
     }
 }
 
