@@ -26,12 +26,12 @@ extern void       z80_set_int_state(uint16_t state);
 // SCCZ80
 
 extern void       __LIB__ __FASTCALL__  im2_init(void *im2_table_address);
-extern void       __LIB__              *im2_install_isr(uint8_t vector, void (*isr)(void));
+extern void       __LIB__              *im2_install_isr(uint8_t vector, void *isr);
 extern void       __LIB__              *im2_create_generic_isr(uint8_t num_callbacks, void *address);
 extern void       __LIB__              *im2_create_generic_isr_light(uint8_t num_callbacks, void *address);
-extern void       __LIB__               im2_append_generic_callback(uint8_t vector, void (*callback)(void));
-extern void       __LIB__               im2_prepend_generic_callback(uint8_t vector, void (*callback)(void));
-extern int        __LIB__               im2_remove_generic_callback(uint8_t vector, void (*callback)(void));
+extern void       __LIB__               im2_append_generic_callback(uint8_t vector, void *callback);
+extern void       __LIB__               im2_prepend_generic_callback(uint8_t vector, void *callback);
+extern int        __LIB__               im2_remove_generic_callback(uint8_t vector, void *callback);
 
 extern void       __LIB__ __FASTCALL__  z80_delay_ms(uint16_t ms);
 extern void       __LIB__ __FASTCALL__  z80_delay_tstate(uint16_t tstates);
@@ -40,12 +40,12 @@ extern void       __LIB__ __FASTCALL__  z80_set_int_state(uint16_t state);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern void       __LIB__ __CALLEE__   *im2_install_isr_callee(uint8_t vector, void (*isr)(void));
+extern void       __LIB__ __CALLEE__   *im2_install_isr_callee(uint8_t vector, void *isr);
 extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_callee(uint8_t num_callbacks, void *address);
 extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_light_callee(uint8_t num_callbacks, void *address);
-extern void       __LIB__ __CALLEE__    im2_append_generic_callback_callee(uint8_t vector, void (*callback)(void));
-extern void       __LIB__ __CALLEE__    im2_prepend_generic_callback_callee(uint8_t vector, void (*callback)(void));
-extern int        __LIB__ __CALLEE__    im2_remove_generic_callback_callee(uint8_t vector, void (*callback)(void));
+extern void       __LIB__ __CALLEE__    im2_append_generic_callback_callee(uint8_t vector, void *callback);
+extern void       __LIB__ __CALLEE__    im2_prepend_generic_callback_callee(uint8_t vector, void *callback);
+extern int        __LIB__ __CALLEE__    im2_remove_generic_callback_callee(uint8_t vector, void *callback);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
