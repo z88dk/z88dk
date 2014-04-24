@@ -11,22 +11,22 @@
 
 XLIB asm_zx_border
 
+XREF __sound_bit_state
+
 asm_zx_border:
 
    ; enter :  l = border colour 0..7
    ;
    ; uses  : af, hl
    
-   in a,($fe)
-   and $40                     ; current beeper state
+   ld a,l
+   and $07
+   ld l,a
    
-   rra
-   rra
+   ld a,(__sound_bit_state)
+   and $f8
    or l
+   ld (__sound_bit_state),a
    
    out ($fe),a
-
-   ; will have to fix this up
-   ; once sound code is added
-
    ret
