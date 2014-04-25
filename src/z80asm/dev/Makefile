@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.7 2014-04-06 23:29:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.8 2014-04-25 23:39:13 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -40,6 +40,19 @@ scan_rules.h : scan_rules.rl scan_def.h legacy.h
 	
 all:
 	$(MAKE)
+
+#------------------------------------------------------------------------------
+# Generate test scripts using  Udo Munk's z80asm as a reference implementation
+#------------------------------------------------------------------------------
+BUILD_OPCODES	= dev/build_z80opcodes.pl
+OPCODES_DAT		= t/data/z80opcodes.dat
+OPCODES_OUT		= t/data/z80opcodes
+
+all : $(OPCODES_OUT).asm $(OPCODES_OUT).bin $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin 
+
+$(OPCODES_OUT).asm $(OPCODES_OUT).bin $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin : $(OPCODES_DAT) $(BUILD_OPCODES)
+	perl $(BUILD_OPCODES)          $(OPCODES_DAT) $(OPCODES_OUT).asm        $(OPCODES_OUT).bin
+	perl $(BUILD_OPCODES) -DRABBIT $(OPCODES_DAT) $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin
 
 #------------------------------------------------------------------------------
 # formatting style
@@ -75,7 +88,11 @@ astyle:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.7  2014-04-06 23:29:27  pauloscustodio
+# Revision 1.8  2014-04-25 23:39:13  pauloscustodio
+# Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
+# to test the z80asm assembler. These files are used during testing.
+#
+# Revision 1.7  2014/04/06 23:29:27  pauloscustodio
 # Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 # Moved the token definitions from token_def.h to scan_def.h.
 #

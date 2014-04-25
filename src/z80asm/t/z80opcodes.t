@@ -13,13 +13,39 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/opcodes.t,v 1.9 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/z80opcodes.t,v 1.1 2014-04-25 23:39:14 pauloscustodio Exp $
 
 use strict;
 use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
+# build z80emu.lib
+my $z80emu_lib = 'z80emu.lib';
+my @z80emu_src = <../../libsrc/z80_crt0s/z80_emu/*.asm>;
+t_z80asm_capture("-l -d -x$z80emu_lib @z80emu_src", "", "", 0);
+
+# external ZERO constant
+write_file(asm1_file(), " public zero \n defc zero = 0 \n");
+
+# Z80
+t_z80asm_capture("-l -b -otest.bin               t/data/z80opcodes.asm ".asm1_file(), "", "", 0);
+t_binary(read_binfile("test.bin"), read_binfile("t/data/z80opcodes.bin"));
+
+# RABBIT
+t_z80asm_capture("-l -b -otest.bin -RCMX000 -DRABBIT -i$z80emu_lib t/data/z80opcodes_rabbit.asm ".asm1_file(), "", "", 0);
+t_binary(read_binfile("test.bin"), read_binfile("t/data/z80opcodes_rabbit.bin"));
+
+# cleanup
+unlink_testfiles( <t/data/z80opcodes*.lst>,
+				  <t/data/z80opcodes*.map>, 
+				  <t/data/z80opcodes*.obj>, 
+				  <t/data/z80opcodes*.sym> );
+done_testing();
+
+
+
+__END__
 
 # Z80 | RABBIT
 assemble("", <<'END');
@@ -597,15 +623,6 @@ check_errors("", <<'ASM');
 ASM
 
 
-# not in RABBIT
-check_errors("--RCMX000", <<'ASM');
-	im	0			; illegal identifier
-	im	1           ; illegal identifier
-	im	2           ; illegal identifier
-	rst	0x00        ; illegal identifier
-	rst	0x08        ; illegal identifier
-	rst	0x30        ; illegal identifier
-ASM
 
 
 unlink_testfiles();
@@ -794,8 +811,12 @@ sub check_errors {
 	t_z80asm_capture($options." ".asm_file(), "", $errors, 1 );
 }
 
-# $Log: opcodes.t,v $
-# Revision 1.9  2014-04-22 23:32:42  pauloscustodio
+# $Log: z80opcodes.t,v $
+# Revision 1.1  2014-04-25 23:39:14  pauloscustodio
+# Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
+# to test the z80asm assembler. These files are used during testing.
+#
+# Revision 1.9  2014/04/22 23:32:42  pauloscustodio
 # Release 2.2.0 with major fixes:
 #
 # - Object file format changed to version 03, to include address of start

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.13 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.14 2014-04-25 23:39:14 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -758,10 +758,43 @@ unlink_testfiles();
 t_z80asm_error("ldx", "Error at file 'test.asm' line 1: unknown identifier");
 
 #------------------------------------------------------------------------------
-# error_illegal_ident
+# error_illegal_ident on RABBIT
 unlink_testfiles();
-t_z80asm_error("daa", "Error at file 'test.asm' line 1: illegal identifier", "-RCMX000");
-t_z80asm_error("ld (bc),b", "Error at file 'test.asm' line 1: illegal identifier");
+write_file(asm_file(), <<'ASM');
+	daa
+	inc ixl
+	inc ixh
+	inc iyl
+	inc iyh
+	ld (bc),b
+	di 		
+	ei	 	
+	halt	
+	im	0	
+	im	1   
+	im	2   
+	retn
+	rst	0x00
+	rst	0x08
+	rst	0x30
+	in a,(N)
+	in a,(c)
+	in d,(c)
+	ini
+	inir
+	ind
+	indr
+	out (N),a
+	out (c),a
+	out (c),d
+	outi
+	otir
+	outd
+	otdr
+ASM
+my @errors; for (1..30) { push @errors, "Error at file 'test.asm' line $_: illegal identifier\n"; }
+push @errors, scalar(@errors)." errors occurred during assembly\n";
+t_z80asm_capture("-RCMX000 ".asm_file(), "", join("", @errors), 1);
 
 #------------------------------------------------------------------------------
 # fatal_max_codesize
@@ -1190,7 +1223,11 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.13  2014-04-22 23:32:42  pauloscustodio
+# Revision 1.14  2014-04-25 23:39:14  pauloscustodio
+# Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
+# to test the z80asm assembler. These files are used during testing.
+#
+# Revision 1.13  2014/04/22 23:32:42  pauloscustodio
 # Release 2.2.0 with major fixes:
 #
 # - Object file format changed to version 03, to include address of start
