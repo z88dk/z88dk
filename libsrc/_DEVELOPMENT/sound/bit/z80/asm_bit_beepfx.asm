@@ -66,24 +66,7 @@ read_data:
    ; leave 1-bit device in 0 position
    
    ld a,h
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-
-      out (c),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
    exx
    
@@ -184,24 +167,8 @@ sample_loop_2:
    and l                       ; confine to toggle bits
    or h                        ; mix with sound_bit_state
    
-   IF __sound_bit_method = 1
+   INCLUDE "sound/bit/z80/output_bit_device_1.inc"
    
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-
-      out (c),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
-
    exx
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -349,24 +316,8 @@ tone_loop_1:
    and __sound_bit_toggle      ; set toggle bit if yes
    or h                        ; mix with bit_state
 
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-
-      out (c),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
-   
+   INCLUDE "sound/bit/z80/output_bit_device_1.inc"
+      
    exx
 
    ;; note: original inner loop time    = 77T
@@ -533,24 +484,8 @@ noise_loop_1:
    and l                       ; toggle bits are random
    or h                        ; mix with bit_state
 
-   IF __sound_bit_method = 1
+   INCLUDE "sound/bit/z80/output_bit_device_1.inc"
    
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-
-      out (c),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
-
    exx
    
    dec d                       ; noise_count -= 1

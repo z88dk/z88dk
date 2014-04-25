@@ -15,26 +15,7 @@ ds_loop:
    jr nz, ds_jump
    
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
    ld b,250
@@ -44,27 +25,9 @@ loosetime1:
    djnz loosetime1
    
    pop bc
+   
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ds_FR_1:
 
@@ -76,28 +39,10 @@ ds_jump:
    jr nz, ds_loop
    
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
+   
    ld b,200
 
 loosetime2:
@@ -105,27 +50,9 @@ loosetime2:
    djnz loosetime2
    
    pop bc
+   
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ds_FR_2:
 

@@ -25,7 +25,5 @@ asm_bit_synth_di:
    ; uses  : af, bc, de, hl, (bc' if port_16)
 
    call asm_z80_push_di
-
    call asm_bit_synth
-
    jp asm0_z80_pop_ei

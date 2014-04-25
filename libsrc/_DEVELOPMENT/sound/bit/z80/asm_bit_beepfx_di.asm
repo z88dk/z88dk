@@ -21,7 +21,5 @@ asm_bit_beepfx_di:
    ; uses  : af, bc, de, hl, bc', de', hl', ix
 
    call asm_z80_push_di
-   
    call asm_bit_beepfx
-   
    jp asm0_z80_pop_ei

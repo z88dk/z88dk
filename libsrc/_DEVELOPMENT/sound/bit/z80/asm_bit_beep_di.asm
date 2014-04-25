@@ -22,7 +22,5 @@ asm_bit_beep_di:
    ; uses  : af, bc, de, hl, (bc', de', hl', ix for integer division)
 
    call asm_z80_push_di
-
    call asm_bit_beep
-
    jp asm0_z80_pop_ei

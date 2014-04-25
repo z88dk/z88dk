@@ -20,7 +20,5 @@ asm_bit_fx_di:
    ; uses  : af, bc, de, hl, ix, (bc' if port_16)
 
    call asm_z80_push_di
-   
    call asm_bit_fx
-   
    jp asm0_z80_pop_ei

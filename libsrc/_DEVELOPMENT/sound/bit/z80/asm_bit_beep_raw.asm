@@ -1,6 +1,7 @@
 
 ; ===============================================================
-; 2014
+; ported by Dominic Morris, adapted by Stefano Bodrato
+; from ZX Spectrum ROM
 ; ===============================================================
 ;
 ; void bit_beep_raw(uint16_t num_cycles, uint16_t tone_period_T)
@@ -12,6 +13,8 @@
 INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_beep_raw
+
+LIB asm_bit_open, asm_bit_close
 
 asm_bit_beep_raw:
 
@@ -26,27 +29,73 @@ asm_bit_beep_raw:
    
    dec de
 
-   IF __sound_bit_method = 1
-   
-      INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_port_8.asm"
-   
-   ENDIF
-   
    IF __sound_bit_method = 2
    
-      INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_port_16.asm"
+      exx
+      ld bc,__sound_bit_port
+      exx
    
    ENDIF
+
+beeper:
+
+   ld a,l
+   srl l
+   srl l
+   cpl
+   and $03
+   ld c,a
+   ld b,0
    
-   IF __sound_bit_method = 3
+   ld ix,beixp3
+   add ix,bc
+
+   call asm_bit_open
    
-      INCLUDE "sound/bit/z80/asm_bit_beep_raw/asm_bit_beep_raw_memory.asm"
+beixp3:
+
+   nop
+   nop
+   nop
+   inc b
+   inc c
+
+behllp:
+
+   dec c
+   jr nz, behllp
    
-   ENDIF
+   ld c,$3f
+
+   dec b
+   jp nz, behllp
+
+   xor __sound_bit_toggle
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
    
-   IF (__sound_bit_method < 1) | (__sound_bit_method > 3)
+   ld b,h
+   ld c,a
    
-      LIB error_enotsup_zc
-      jp error_enotsup_zc
-      
-   ENDIF
+   bit __sound_bit_toggle_pos,a
+   jr nz, be_again
+   
+   ld a,d
+   or e
+   jr z, be_end
+
+   ld a,c
+   ld c,l
+   
+   dec de
+   jp (ix)
+
+be_again:
+
+   ld c,l
+   
+   inc c
+   jp (ix)
+
+be_end:
+
+   jp asm_bit_close

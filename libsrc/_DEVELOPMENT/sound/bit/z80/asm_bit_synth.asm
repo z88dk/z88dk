@@ -20,6 +20,8 @@ INCLUDE "clib_target_cfg.asm"
 
 XLIB asm_bit_synth
 
+LIB asm_bit_open, asm_bit_close
+
 asm_bit_synth:
 
    ; enter :  a = duration
@@ -92,20 +94,88 @@ fr4_blank:
    
    ; begin synthesis
 
-   IF __sound_bit_method = 1
-   
-      INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_port_8.asm"
-   
-   ENDIF
-   
    IF __sound_bit_method = 2
    
-      INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_port_16.asm"
+      exx
+      ld bc,__sound_bit_port
+      exx
    
    ENDIF
+
+   call asm_bit_open
    
-   IF __sound_bit_method = 3
+   ld h,1
+   ld l,h
+   ld d,h
+   ld e,h
    
-      INCLUDE "sound/bit/z80/asm_bit_synth/asm_bit_synth_memory.asm"
+LEN:
+
+   ld b,50
+
+loop1:
+
+   ld c,4
+
+loop2:
+
+   dec h
+   jr nz, jump
    
-   ENDIF
+FR1_tick:
+
+   xor __sound_bit_toggle
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
+   
+FR_1:
+
+   ld h,80
+
+jump:
+
+   dec l
+   jr nz, jump2
+
+FR2_tick:
+
+   xor __sound_bit_toggle
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
+
+FR_2:
+
+   ld l,81
+
+jump2:
+
+   dec d
+   jr nz, jump3
+
+FR3_tick:
+
+   xor __sound_bit_toggle
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
+   
+FR_3:
+
+   ld d,162
+
+jump3:
+
+   dec e
+   jr nz, loop2
+
+FR4_tick:
+
+   xor __sound_bit_toggle
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
+
+FR_4:
+
+   ld e,163
+   
+   dec c
+   jr nz, loop2
+   
+   djnz loop1
+
+   jp asm_bit_close

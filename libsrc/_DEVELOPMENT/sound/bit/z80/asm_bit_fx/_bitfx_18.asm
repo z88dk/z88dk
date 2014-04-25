@@ -18,27 +18,9 @@ coff2:
    ld b,a
    
    pop af
+   
    xor b
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    ld b,(hl)
 

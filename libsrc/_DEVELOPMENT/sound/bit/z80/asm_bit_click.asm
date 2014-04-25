@@ -24,25 +24,14 @@ asm_bit_click:
    and __sound_bit_read_mask
    xor __sound_bit_toggle
    
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
    IF __sound_bit_method = 2
-
+   
       ld bc,__sound_bit_port
-      out (c),a
    
    ENDIF
    
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
-   
+   INCLUDE "sound/bit/z80/output_bit_device_1.inc"
+      
    ld c,a
    ld a,(__sound_bit_state)
    

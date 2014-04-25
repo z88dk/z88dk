@@ -13,4 +13,5 @@ asm_bit_open:
    
    ld a,(__sound_bit_state)
    and __sound_bit_read_mask
+   
    ret

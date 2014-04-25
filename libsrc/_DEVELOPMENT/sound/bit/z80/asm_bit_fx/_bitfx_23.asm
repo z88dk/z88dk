@@ -19,27 +19,9 @@ fx71:
    ld l,a
    
    pop af
+   
    xor l
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    pop hl
    dec hl

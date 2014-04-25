@@ -12,26 +12,7 @@ zap3_1:
    push bc
    
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push af
    
@@ -47,26 +28,7 @@ zap3_2:
    djnz zap3_2
    
    xor __sound_bit_toggle
-   
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    pop bc
    push bc

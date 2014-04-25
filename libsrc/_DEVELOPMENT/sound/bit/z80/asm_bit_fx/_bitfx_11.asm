@@ -15,26 +15,7 @@ cs_loop:
    jr nz, cs_jump
    
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
    ld b,250
@@ -44,27 +25,9 @@ cswait1:
    djnz cswait1
    
    pop bc
+   
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 cs_FR_1:
 
@@ -76,26 +39,7 @@ cs_jump:
    jr nz, cs_loop
    
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
    ld b,200
@@ -105,27 +49,9 @@ cswait2:
    djnz cswait2
    
    pop bc
+   
    xor __sound_bit_toggle
-
-   IF __sound_bit_method = 1
-   
-      out (__sound_bit_port),a
-   
-   ENDIF
-   
-   IF __sound_bit_method = 2
-   
-      exx
-      out (c),a
-      exx
-   
-   ENDIF
-   
-   IF __sound_bit_method = 3
-   
-      ld (__sound_bit_port),a
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 cs_FR_2:
 
