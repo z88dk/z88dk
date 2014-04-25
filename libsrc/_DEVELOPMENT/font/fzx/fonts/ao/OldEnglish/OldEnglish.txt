@@ -1,3 +1,4 @@
 OldEnglish 18pt Roman
 copyright (c) 2013 Andrew Owen
 - a caligraphic font inspired by Susan Kare
+minor correction contributed by Crisis
