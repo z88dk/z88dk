@@ -4,7 +4,6 @@
 ; The code is assembled by z80pack and transformed into code and binary form:
 ;		z80asm-code ;; addr hh hh hh hh
 ; This is file used to test the assembly of z80asm
-;
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
