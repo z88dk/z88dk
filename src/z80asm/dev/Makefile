@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.8 2014-04-25 23:39:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.9 2014-04-25 23:52:17 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -45,7 +45,7 @@ all:
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation
 #------------------------------------------------------------------------------
 BUILD_OPCODES	= dev/build_z80opcodes.pl
-OPCODES_DAT		= t/data/z80opcodes.dat
+OPCODES_DAT		= t/data/z80opcodes_templ.asm
 OPCODES_OUT		= t/data/z80opcodes
 
 all : $(OPCODES_OUT).asm $(OPCODES_OUT).bin $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin 
@@ -88,7 +88,10 @@ astyle:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.8  2014-04-25 23:39:13  pauloscustodio
+# Revision 1.9  2014-04-25 23:52:17  pauloscustodio
+# Rename input file for z80opcodes generation
+#
+# Revision 1.8  2014/04/25 23:39:13  pauloscustodio
 # Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
 # to test the z80asm assembler. These files are used during testing.
 #

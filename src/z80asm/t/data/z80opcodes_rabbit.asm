@@ -4,11 +4,10 @@
 ; The code is assembled by z80pack and transformed into code and binary form:
 ;		z80asm-code ;; addr hh hh hh hh
 ; This is file used to test the assembly of z80asm
-;
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_rabbit.asm,v 1.1 2014-04-25 23:39:14 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_rabbit.asm,v 1.2 2014-04-25 23:52:17 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -1372,9 +1371,8 @@ jr1:
 
 ;------------------------------------------------------------------------------
 ; $Log: z80opcodes_rabbit.asm,v $
-; Revision 1.1  2014-04-25 23:39:14  pauloscustodio
-; Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
-; to test the z80asm assembler. These files are used during testing.
+; Revision 1.2  2014-04-25 23:52:17  pauloscustodio
+; Rename input file for z80opcodes generation
 ;
 ;
                                         ;=> 070D  38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 32 07 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 7B 07 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD A6 07 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD C8 07 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9

@@ -4,11 +4,10 @@
 ; The code is assembled by z80pack and transformed into code and binary form:
 ;		z80asm-code ;; addr hh hh hh hh
 ; This is file used to test the assembly of z80asm
-;
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes.asm,v 1.1 2014-04-25 23:39:14 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes.asm,v 1.2 2014-04-25 23:52:17 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -1513,8 +1512,8 @@ jr1:
 
 ;------------------------------------------------------------------------------
 ; $Log: z80opcodes.asm,v $
-; Revision 1.1  2014-04-25 23:39:14  pauloscustodio
-; Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
-; to test the z80asm assembler. These files are used during testing.
+; Revision 1.2  2014-04-25 23:52:17  pauloscustodio
+; Rename input file for z80opcodes generation
 ;
 ;
+
