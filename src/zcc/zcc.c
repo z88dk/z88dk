@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.74 2014-04-24 22:35:57 dom Exp $
+ *      $Id: zcc.c,v 1.75 2014-04-26 16:17:07 dom Exp $
  */
 
 
@@ -56,6 +56,7 @@ static void            PragmaDefine(arg_t *arg,char *);
 static void            PragmaNeed(arg_t *arg,char *);
 static void            PragmaBytes(arg_t *arg,char *);
 static void            AddArray(arg_t *arg,char *);
+static void            write_zcc_defined(char *name, int value);
 
 
 static void           *mustmalloc(size_t);
@@ -129,6 +130,7 @@ static char           *appmakeargs;
 static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
+static int             c_startup = -1;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -306,6 +308,7 @@ static arg_t     myargs[] = {
     { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
     { "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
     { "clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
+    { "startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
     {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
@@ -619,6 +622,8 @@ int main(int argc, char **argv)
         }
     }
 
+    configure_misc_options();
+
     if ((fp = fopen(DEFFILE, "a")) != NULL) {
         fprintf(fp,"%s", zccopt ? zccopt : "");
         fclose(fp);
@@ -633,7 +638,6 @@ int main(int argc, char **argv)
         exit(0);
     }
     
-    configure_misc_options();
   
     
     /* We can't create an app and make a library.... */
@@ -1169,6 +1173,10 @@ static void configure_misc_options()
     if ( makelib ) {
         compileonly = YES;
     }
+
+    if ( c_startup != -1 ) {
+        write_zcc_defined("startup", c_startup);
+    }
 }
 
 static void configure_assembler()
@@ -1282,10 +1290,14 @@ void PragmaDefine(arg_t *arg,char *val)
         *eql = 0;
         value = atoi(eql+1);
     }
+    write_zcc_defined(ptr, value);
+}
 
-    add_zccopt("\nIF !DEFINED_%s\n",ptr);
-    add_zccopt("\tdefc\tDEFINED_%s = 1\n",ptr);
-    if (value) add_zccopt("\tdefc %s = %d\n",ptr,value);
+void write_zcc_defined(char *name, int value)
+{
+    add_zccopt("\nIF !DEFINED_%s\n",name);
+    add_zccopt("\tdefc\tDEFINED_%s = 1\n",name);
+    if (value) add_zccopt("\tdefc %s = %d\n",name,value);
     add_zccopt("ENDIF\n\n");
 }
 
