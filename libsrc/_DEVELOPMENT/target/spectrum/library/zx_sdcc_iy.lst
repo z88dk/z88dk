@@ -5,6 +5,7 @@
 @error/error.lst
 @font/fzx/fzx_sdcc_iy.lst
 @font/fzx/arch/spectrum/spectrum_sdcc_iy.lst
+@input/spectrum/input_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
 @locale/locale.lst

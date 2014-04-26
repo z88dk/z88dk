@@ -5,6 +5,7 @@
 @error/error.lst
 @font/fzx/fzx_asm.lst
 @font/fzx/arch/spectrum/spectrum_asm.lst
+@input/spectrum/input_asm.lst
 @l/l.lst
 @locale/locale.lst
 @sound/sound_asm.lst
