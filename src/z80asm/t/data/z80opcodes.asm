@@ -1516,4 +1516,3 @@ jr1:
 ; Rename input file for z80opcodes generation
 ;
 ;
-
