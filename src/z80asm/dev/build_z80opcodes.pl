@@ -17,7 +17,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 # 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.1 2014-04-25 23:55:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.2 2014-04-26 08:28:30 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -25,6 +25,7 @@ use File::Basename;
 use File::Slurp;
 use Iterator::Array::Jagged;
 use Iterator::Simple::Lookahead;
+use List::Util qw( max );
 
 my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
 my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
@@ -285,13 +286,20 @@ sub merge_asm_hex {
 	
 	# write z80asm code with hex representation
 	open(my $out, ">", $out_file) or die "write $out_file: $!";
-	for my $i (0 .. $#$asm) {
+	for my $i (0 .. max( $#$asm, $#$hex ) ) {
 		local $_ = $asm->[$i];
 		chomp;
 		
-		if (/^\s*;/) {
-			die if $hex->[$i];
+		if (! defined $_) {
+			if ($hex->[$i]) {
+				print $out sprintf("%-39s ;=> %s\n", "", $hex->[$i]);
+			}
+		}
+		elsif (/^\s*;/) {
 			print $out "$_\n";
+			if ($hex->[$i]) {
+				print $out sprintf("%-39s ;=> %s\n", "", $hex->[$i]);
+			}
 		}
 		else {
 			s/;.*//;
@@ -319,7 +327,10 @@ sub build_z80emu {
 
 
 # $Log: build_z80opcodes.pl,v $
-# Revision 1.1  2014-04-25 23:55:48  pauloscustodio
+# Revision 1.2  2014-04-26 08:28:30  pauloscustodio
+# Was missing z80emu library code at end of benchmark asm file
+#
+# Revision 1.1  2014/04/25 23:55:48  pauloscustodio
 # Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
 # to test the z80asm assembler. These files are used during testing.
 #

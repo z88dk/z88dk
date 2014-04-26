@@ -7,7 +7,7 @@
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; Header: /cvsroot/z88dk/z88dk/src/z80asm/t/data/z80opcodes_templ.asm,v 1.1 2014/04/25 23:52:17 pauloscustodio Exp $
+; Header: /cvsroot/z88dk/z88dk/src/z80asm/t/data/z80opcodes_templ.asm,v 1.2 2014/04/26 08:14:01 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -1512,6 +1512,9 @@ jr1:
 
 ;------------------------------------------------------------------------------
 ; Log: z80opcodes_templ.asm,v $
+; Revision 1.2  2014/04/26 08:14:01  pauloscustodio
+; ws
+;
 ; Revision 1.1  2014/04/25 23:52:17  pauloscustodio
 ; Rename input file for z80opcodes generation
 ;
