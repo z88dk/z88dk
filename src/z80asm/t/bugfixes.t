@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.1 2014-04-26 08:12:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.2 2014-04-26 09:25:32 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -27,8 +27,8 @@ use Test::More;
 require 't/test_utils.pl';
 
 #------------------------------------------------------------------------------
-# BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 diag "BUG_0049";
+# Making a library with -d and 512 object files fails - Too many open files
 #------------------------------------------------------------------------------
 {
 	unlink_testfiles();
@@ -52,7 +52,21 @@ diag "BUG_0049";
 	unlink_testfiles(@asm_list, @obj_list);
 }
 
-ok 1;
+#------------------------------------------------------------------------------
+diag "BUG_0050";
+# Making a library with more than 64K and -d option fails - max. code size reached
+#------------------------------------------------------------------------------
+{
+	unlink_testfiles();
+	write_file(asm1_file(), " public test1 \ntest1: defs 65000\n");
+	write_file(asm2_file(), " public test2 \ntest2: defs 65000\n");
+	
+	# assemble all first
+	t_z80asm_capture('-ns -nm '.asm1_file().' '.asm2_file(), "", "", 0);
+	
+	# assemble all with -d, make lib - failed with too many open files
+	t_z80asm_capture('-d -ns -nm '.asm1_file().' '.asm2_file(), "", "", 0);
+}
 
 
 
@@ -61,7 +75,12 @@ unlink_testfiles();
 done_testing();
 
 # $Log: bugfixes.t,v $
-# Revision 1.1  2014-04-26 08:12:04  pauloscustodio
+# Revision 1.2  2014-04-26 09:25:32  pauloscustodio
+# BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
+# When a library is built with -d, and the total size of the loaded
+# modules is more than 64K, z80asm fails with "max. code size reached".
+#
+# Revision 1.1  2014/04/26 08:12:04  pauloscustodio
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 # Error caused by z80asm not closing the intermediate object files, when
 # assembling with -d.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.94 2014-04-26 08:12:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.95 2014-04-26 09:25:32 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.94 2014-04-26 08:12
 
 /*
 * $Log: hist.c,v $
-* Revision 1.94  2014-04-26 08:12:04  pauloscustodio
+* Revision 1.95  2014-04-26 09:25:32  pauloscustodio
+* BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
+* When a library is built with -d, and the total size of the loaded
+* modules is more than 64K, z80asm fails with "max. code size reached".
+*
+* Revision 1.94  2014/04/26 08:12:04  pauloscustodio
 * BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 * Error caused by z80asm not closing the intermediate object files, when
 * assembling with -d.
@@ -1866,6 +1871,10 @@ xx.xx.2014 [2.2.1] (pauloscustodio)
 		Error caused by z80asm not closing the intermediate object files, when
 		assembling with -d.
 
+	BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
+		When a library is built with -d, and the total size of the loaded 
+		modules is more than 64K, z80asm fails with "max. code size reached".
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1891,7 +1900,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.1a"
+#define VERSION     "2.2.1b"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

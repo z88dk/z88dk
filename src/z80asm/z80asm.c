@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.159 2014-04-26 08:12:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.160 2014-04-26 09:25:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -255,17 +255,7 @@ BOOL load_module_object( char *filename )
 
     if ( obj_file != NULL )
     {
-#if 1
-        if ( CURRENTMODULE->startoffset + obj_file->code_size > MAXCODESIZE )
-        {
-            /* return TRUE in this case; module is OK, but we cannot link because total
-               size > 64K */
-            set_error_file( filename );
-            fatal_max_codesize( ( long )MAXCODESIZE );
-        }
-        else
-#endif
-            inc_codesize( obj_file->code_size );	/* BUG_0015 */
+        inc_codesize( obj_file->code_size );		/* BUG_0015, BUG_0050 */
 
         CURRENTMODULE->modname	= obj_file->modname;
         
@@ -591,7 +581,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.159  2014-04-26 08:12:04  pauloscustodio
+* Revision 1.160  2014-04-26 09:25:32  pauloscustodio
+* BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
+* When a library is built with -d, and the total size of the loaded
+* modules is more than 64K, z80asm fails with "max. code size reached".
+*
+* Revision 1.159  2014/04/26 08:12:04  pauloscustodio
 * BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 * Error caused by z80asm not closing the intermediate object files, when
 * assembling with -d.
