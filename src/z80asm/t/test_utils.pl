@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.61 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.62 2014-04-26 08:12:04 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -31,7 +31,7 @@ my $test	 = "test";
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err 
-					exe c o asmlst ));
+					exe c o asmlst prj ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);
@@ -1016,7 +1016,12 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.61  2014-04-22 23:32:42  pauloscustodio
+# Revision 1.62  2014-04-26 08:12:04  pauloscustodio
+# BUG_0049: Making a library with -d and 512 object files fails - Too many open files
+# Error caused by z80asm not closing the intermediate object files, when
+# assembling with -d.
+#
+# Revision 1.61  2014/04/22 23:32:42  pauloscustodio
 # Release 2.2.0 with major fixes:
 #
 # - Object file format changed to version 03, to include address of start

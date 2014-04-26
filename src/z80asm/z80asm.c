@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.158 2014-04-23 22:07:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.159 2014-04-26 08:12:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -255,6 +255,7 @@ BOOL load_module_object( char *filename )
 
     if ( obj_file != NULL )
     {
+#if 1
         if ( CURRENTMODULE->startoffset + obj_file->code_size > MAXCODESIZE )
         {
             /* return TRUE in this case; module is OK, but we cannot link because total
@@ -263,16 +264,12 @@ BOOL load_module_object( char *filename )
             fatal_max_codesize( ( long )MAXCODESIZE );
         }
         else
+#endif
             inc_codesize( obj_file->code_size );	/* BUG_0015 */
 
         CURRENTMODULE->modname	= obj_file->modname;
         
-#if 0
-		/* error: too many open files - cannot keep all object files open */
-		CURRENTMODULE->obj_file = obj_file;
-#else
-		OBJ_DELETE( obj_file );
-#endif
+		OBJ_DELETE( obj_file );						/* BUG_0049 */
 
         return TRUE;
     }
@@ -470,10 +467,6 @@ ReleaseModules( void )
     {
         OBJ_DELETE( curptr->local_symtab );
 		OBJ_DELETE( curptr->exprs );
-#if 0
-		/* error: too many open files - cannot keep all object files open */
-        OBJ_DELETE( curptr->obj_file );
-#endif
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;
@@ -598,7 +591,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.158  2014-04-23 22:07:12  pauloscustodio
+* Revision 1.159  2014-04-26 08:12:04  pauloscustodio
+* BUG_0049: Making a library with -d and 512 object files fails - Too many open files
+* Error caused by z80asm not closing the intermediate object files, when
+* assembling with -d.
+*
+* Revision 1.158  2014/04/23 22:07:12  pauloscustodio
 * Too many open files was caused by all modules loaded during assembly keeping the FILE* open.
 *
 * Revision 1.157  2014/04/22 23:32:42  pauloscustodio
