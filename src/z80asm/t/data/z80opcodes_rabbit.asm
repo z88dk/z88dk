@@ -1368,6 +1368,9 @@ jr1:
 
 ;------------------------------------------------------------------------------
 ; 
+; Revision 1.3  2014/04/26 08:34:18  pauloscustodio
+; No RCS keywords in generated files
+;
 ; Revision 1.2  2014/04/26 08:14:01  pauloscustodio
 ; ws
 ;
