@@ -3,7 +3,7 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpir
 
-XLIB rcmx_cpir
+PUBLIC rcmx_cpir
 
 .rcmx_cpir
  

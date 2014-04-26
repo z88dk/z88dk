@@ -1,10 +1,10 @@
 ;
 ;       Replacement for "ex af,af"
 ;
-;       $Id: afswap.asm,v 1.1 2007-11-02 10:03:32 stefano Exp $:
+;       $Id: afswap.asm,v 1.2 2014-04-26 00:03:52 pauloscustodio Exp $:
 
 
-		XLIB	afswap
+		PUBLIC	afswap
 
 
 .af1	defw	0

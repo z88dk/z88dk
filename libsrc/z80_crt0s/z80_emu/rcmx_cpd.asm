@@ -2,7 +2,7 @@
 ; Substitute for z80 cpd instruction
 ; aralbrec 06.2007
 
-XLIB rcmx_cpd
+PUBLIC rcmx_cpd
 
 .rcmx_cpd
 

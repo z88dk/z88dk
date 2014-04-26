@@ -2,7 +2,7 @@
 ; Substitute for z80 rld instruction
 ; aralbrec 06.2007
 
-XLIB rcmx_rld
+PUBLIC rcmx_rld
 
 .rcmx_rld
 

@@ -1,10 +1,10 @@
 ;
 ;       Replacement for "exx"
 ;
-;       $Id: exxswap.asm,v 1.1 2007-11-02 10:03:32 stefano Exp $:
+;       $Id: exxswap.asm,v 1.2 2014-04-26 00:03:52 pauloscustodio Exp $:
 
 
-		XLIB	exxswap
+		PUBLIC	exxswap
 
 
 .altregs   defs   6

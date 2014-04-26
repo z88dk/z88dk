@@ -3,7 +3,7 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpdr
 
-XLIB rcmx_cpdr
+PUBLIC rcmx_cpdr
 
 .rcmx_cpdr
  

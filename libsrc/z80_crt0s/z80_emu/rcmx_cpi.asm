@@ -2,7 +2,7 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
-XLIB rcmx_cpi
+PUBLIC rcmx_cpi
 
 .rcmx_cpi
 
