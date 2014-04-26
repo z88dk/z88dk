@@ -14,6 +14,8 @@ sound/bit/z80/asm_bit_fx_di
 sound/bit/z80/asm_bit_open
 sound/bit/z80/asm_bit_play
 sound/bit/z80/asm_bit_play_di
+sound/bit/z80/asm_bit_play_tritone
+sound/bit/z80/asm_bit_play_tritone_di
 sound/bit/z80/asm_bit_synth
 sound/bit/z80/asm_bit_synth
 sound/bit/z80/asm_bit_synth_di

@@ -10,6 +10,8 @@ sound/bit/c/sdcc_ix/bit_fx
 sound/bit/c/sdcc_ix/bit_fx_di
 sound/bit/c/sdcc_ix/bit_play
 sound/bit/c/sdcc_ix/bit_play_di
+sound/bit/c/sdcc_ix/bit_play_tritone
+sound/bit/c/sdcc_ix/bit_play_tritone_di
 sound/bit/c/sdcc_ix/bit_synth
 sound/bit/c/sdcc_ix/bit_synth_di
 sound/bit/z80/asm_bit_close
