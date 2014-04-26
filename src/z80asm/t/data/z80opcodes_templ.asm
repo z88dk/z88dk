@@ -7,7 +7,7 @@
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.2 2014-04-26 08:14:01 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.3 2014-04-26 08:34:18 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -299,11 +299,12 @@ ELSE
 	rst {        10h 18h 20h 28h     38h}
 ENDIF
 
+
+IF !RABBIT
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
 
-IF !RABBIT
 	in a,(N)
 	in {b c d e h l a},(c)
 ;	in f,(c)
@@ -325,7 +326,10 @@ ENDIF
 
 ;------------------------------------------------------------------------------
 ; $Log: z80opcodes_templ.asm,v $
-; Revision 1.2  2014-04-26 08:14:01  pauloscustodio
+; Revision 1.3  2014-04-26 08:34:18  pauloscustodio
+; No RCS keywords in generated files
+;
+; Revision 1.2  2014/04/26 08:14:01  pauloscustodio
 ; ws
 ;
 ; Revision 1.1  2014/04/25 23:52:17  pauloscustodio

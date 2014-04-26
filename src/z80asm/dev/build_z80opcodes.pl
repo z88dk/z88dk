@@ -17,7 +17,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 # 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.2 2014-04-26 08:28:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.3 2014-04-26 08:34:18 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -80,7 +80,7 @@ sub expand_iter {
 		while (1) {
 			my $line = $in->next or return;
 
-			$line =~ s/\$(Header|Log|Id)/$1/;
+			$line =~ s/\$(Header|Log|Id).*//;
 			
 			my @args = split(/ ( \{ [^\}]+ \} ) /x, $line);		# separate lists
 			if (@args == 1) {
@@ -327,7 +327,10 @@ sub build_z80emu {
 
 
 # $Log: build_z80opcodes.pl,v $
-# Revision 1.2  2014-04-26 08:28:30  pauloscustodio
+# Revision 1.3  2014-04-26 08:34:18  pauloscustodio
+# No RCS keywords in generated files
+#
+# Revision 1.2  2014/04/26 08:28:30  pauloscustodio
 # Was missing z80emu library code at end of benchmark asm file
 #
 # Revision 1.1  2014/04/25 23:55:48  pauloscustodio
