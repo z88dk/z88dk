@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.29 2014-04-27 00:23:07 dom Exp $
+;	$Id: msx_crt0.asm,v 1.30 2014-04-27 21:55:55 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -420,8 +420,23 @@ fp_seed:        defb    $80,$80,0,0,0,0
 extra:          defs    6
 fa:             defs    6
 fasign:         defb    0
-
 ENDIF
+
+IF (startup=2)
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+redir_fopen_flag:
+                                defb 'w'
+                                defb 0
+redir_fopen_flagr:
+                                defb 'r'
+                                defb 0
+ENDIF
+ENDIF
+ENDIF
+ENDIF 
+
 
 
 ;===============================================================================
@@ -491,7 +506,7 @@ start:
         ld (_heap),hl
         ld (_heap+2),hl
         
-IF HEAPSIZE > 4
+IF (HEAPSIZE > 4)
         
         ld hl,_heap_area
         ld bc,HEAPSIZE
@@ -501,7 +516,8 @@ IF HEAPSIZE > 4
         XREF ASMDISP_HEAPSBRK_CALLEE
         
         call HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
-
+ELSE
+	defc HEAPSIZE = 4
 ENDIF
 
 ; call main now
@@ -535,12 +551,7 @@ extra		ds.w	3	;Floating point temp variable
 fa		ds.w	3	;Floating point accumulator
 fasign		ds.b	1	;Floating point temp store
 _heap           ds.l    1       ;process heap pointer
-
-IF HEAPSIZE > 4
-
-   _heap_area   ds.b    HEAPSIZE  ; initial heap
-
-ENDIF
+_heap_area   ds.b    HEAPSIZE  ; initial heap
 
 CRT_AVAILABLE_MEMORY
 }
