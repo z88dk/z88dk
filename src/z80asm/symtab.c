@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.28 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.29 2014-04-27 09:08:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -104,7 +104,7 @@ Symbol *_define_sym( char *name, long value, byte_t type,
 
     sym = find_symbol( name, *psymtab );
 
-    if ( sym == NULL )						/* new symbol */
+    if ( sym == NULL )								/* new symbol */
     {
         sym = Symbol_create( name, value, type | SYM_DEFINED, owner );
         SymbolHash_set( psymtab, name, sym );
@@ -115,7 +115,7 @@ Symbol *_define_sym( char *name, long value, byte_t type,
         sym->sym_type |= type | SYM_DEFINED;
         sym->owner = owner;
     }
-    else									/* already defined */
+    else											/* already defined */
     {
         if ( sym->owner && sym->owner != owner && sym->owner->modname )
             error_symbol_redefined_module( name, sym->owner->modname );
@@ -159,7 +159,7 @@ Symbol *get_used_symbol( char *name )
 }
 
 /*-----------------------------------------------------------------------------
-*   define a static symbol (from -D command line)
+*   define a static symbol (from -D command line, OS_ID)
 *----------------------------------------------------------------------------*/
 Symbol *define_static_def_sym( char *name, long value )
 {
@@ -167,7 +167,7 @@ Symbol *define_static_def_sym( char *name, long value )
 }
 
 /*-----------------------------------------------------------------------------
-*   define a global symbol
+*   define a global static symbol (e.g. ASMSIZE, ASMTAIL)
 *----------------------------------------------------------------------------*/
 Symbol *define_global_def_sym( char *name, long value )
 {
@@ -183,7 +183,7 @@ Symbol *define_local_def_sym( char *name, long value )
 }
 
 /*-----------------------------------------------------------------------------
-*   define a new symbol in the local, global or global lib tabs
+*   define a new symbol in the local or global tabs
 *----------------------------------------------------------------------------*/
 Symbol *define_local_sym( char *name, long value, byte_t type )
 {
@@ -495,7 +495,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.28  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.29  2014-04-27 09:08:15  pauloscustodio
+* comments
+*
+* Revision 1.28  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.15 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.16 2014-04-27 09:08:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,16 +52,16 @@ extern Symbol *find_global_symbol( char *name );
    create undefined symbol if not found, return symbol */
 extern Symbol *get_used_symbol( char *name );
 
-/* define a static DEF symbol (from -D command line) */
+/* define a static DEF symbol (e.g. from -D command line, OS_ID) */
 extern Symbol *define_static_def_sym( char *name, long value );
 
-/* define a global DEF symbol */
+/* define a global DEF symbol (e.g. ASMSIZE, ASMTAIL) */
 extern Symbol *define_global_def_sym( char *name, long value );
 
 /* define a local DEF symbol (e.g. DEFINE) */
 extern Symbol *define_local_def_sym( char *name, long value );
 
-/* define a new symbol in the local, global or global lib tabs */
+/* define a new symbol in the local or global tabs */
 extern Symbol *define_local_sym( char *name, long value, byte_t type );
 extern Symbol *define_global_sym( char *name, long value, byte_t type );
 
@@ -104,7 +104,10 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.15  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.16  2014-04-27 09:08:15  pauloscustodio
+* comments
+*
+* Revision 1.15  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start
