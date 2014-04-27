@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0016.t,v 1.4 2014-01-11 01:29:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0016.t,v 1.5 2014-04-27 09:06:25 pauloscustodio Exp $
 # $Log: BUG_0016.t,v $
-# Revision 1.4  2014-01-11 01:29:46  pauloscustodio
+# Revision 1.5  2014-04-27 09:06:25  pauloscustodio
+# Cleanup temporary files
+#
+# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
 # Extend copyright to 2014.
 # Move CVS log to bottom of file.
 #
@@ -47,6 +50,7 @@ my @z80emu_routines = qw(
 );
 my @z80emu_src = map {$z80emu_srcdir.'/'.$_.'.asm'} @z80emu_routines;
 my @z80emu_lst = map {$z80emu_srcdir.'/'.$_.'.lst'} @z80emu_routines;
+my @z80emu_obj = map {$z80emu_srcdir.'/'.$_.'.obj'} @z80emu_routines;
 my $cpi_emu = "\x38\x12\xBE\x23\x0B\xF5\xE3\xCB\x85\xCB\xD5\x78".
 			  "\xB1\x20\x02\xCB\x95\xE3\xF1\xC9\xBE\x23\x0B\xF5".
 			  "\xE3\xCB\xC5\x18\xEC";
@@ -71,5 +75,5 @@ for my $list ("", "-l") {
 	t_binary(read_binfile(bin_file()), "\xCD\x03\x00".$cpi_emu);
 }
 
-unlink_testfiles($z80emu_lib, @z80emu_lst);
+unlink_testfiles($z80emu_lib, @z80emu_lst, @z80emu_obj);
 done_testing();

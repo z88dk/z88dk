@@ -17,7 +17,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 # 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.3 2014-04-26 08:34:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.4 2014-04-27 09:06:25 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -46,7 +46,6 @@ if (@ARGV && $ARGV[0] =~ /-D(.*)/) {
 @ARGV==3 or die "Usage: ",basename($0)," [-DDEFINE] DAT_FILE ASM_FILE BIN_FILE\n";
 
 my($dat_file, $asm_file, $bin_file) = @ARGV;
-build_z80emu();
 
 # compute assembly test file
 my @asm;
@@ -315,19 +314,12 @@ sub merge_asm_hex {
 	}
 }
 
-#------------------------------------------------------------------------------
-# build z80emu library
-#------------------------------------------------------------------------------
-sub build_z80emu {
-	my @z80emu_src = map {$Z80EMU_SRCDIR.'/'.$_.'.asm'} @Z80EMU;
-	my $cmd = "./z80asm -l -d @z80emu_src";	
-	print "$cmd\n";
-	system $cmd and die "assembly failed";
-}
-
 
 # $Log: build_z80opcodes.pl,v $
-# Revision 1.3  2014-04-26 08:34:18  pauloscustodio
+# Revision 1.4  2014-04-27 09:06:25  pauloscustodio
+# Cleanup temporary files
+#
+# Revision 1.3  2014/04/26 08:34:18  pauloscustodio
 # No RCS keywords in generated files
 #
 # Revision 1.2  2014/04/26 08:28:30  pauloscustodio

@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.7 2014-04-15 20:06:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.8 2014-04-27 09:06:25 pauloscustodio Exp $
 # $Log: cpu-opcodes.t,v $
-# Revision 1.7  2014-04-15 20:06:44  pauloscustodio
+# Revision 1.8  2014-04-27 09:06:25  pauloscustodio
+# Cleanup temporary files
+#
+# Revision 1.7  2014/04/15 20:06:44  pauloscustodio
 # Solve warning: no newline at end of file
 #
 # Revision 1.6  2014/03/29 01:19:41  pauloscustodio
@@ -64,6 +67,7 @@ my @z80emu_routines = qw(
 );
 my @z80emu_src = map {$z80emu_srcdir.'/'.$_.'.asm'} @z80emu_routines;
 my @z80emu_lst = map {$z80emu_srcdir.'/'.$_.'.lst'} @z80emu_routines;
+my @z80emu_obj = map {$z80emu_srcdir.'/'.$_.'.obj'} @z80emu_routines;
 
 my @CPUS = (qw( Z80 Z180 RCM2000 RCM3000 ));
 my %OPTION = (
@@ -79,7 +83,7 @@ t_z80asm_capture("-l -x$z80emu_lib @z80emu_src", "", "", 0);
 
 test_opcodes();
 
-unlink_testfiles($z80emu_lib, @z80emu_lst);
+unlink_testfiles($z80emu_lib, @z80emu_lst, @z80emu_obj);
 done_testing();
 
 #------------------------------------------------------------------------------

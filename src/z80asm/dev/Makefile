@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.9 2014-04-25 23:52:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.10 2014-04-27 09:06:25 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -37,6 +37,7 @@ scan_rules.h : scan_rules.rl scan_def.h legacy.h
 	ragel -G2 -oscan_rules.3.tmp scan_rules.2.tmp
 	perl -pe "s/^#line.*//; s/\x24Header/:Header/; s/\x24Log/:Log/;" < scan_rules.3.tmp > scan_rules.h
 	$(ASTYLE) scan_rules.h
+	$(RM) scan_rules.*.tmp
 	
 all:
 	$(MAKE)
@@ -88,7 +89,10 @@ astyle:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.9  2014-04-25 23:52:17  pauloscustodio
+# Revision 1.10  2014-04-27 09:06:25  pauloscustodio
+# Cleanup temporary files
+#
+# Revision 1.9  2014/04/25 23:52:17  pauloscustodio
 # Rename input file for z80opcodes generation
 #
 # Revision 1.8  2014/04/25 23:39:13  pauloscustodio
