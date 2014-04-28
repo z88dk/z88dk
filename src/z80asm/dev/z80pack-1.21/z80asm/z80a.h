@@ -17,7 +17,7 @@
 #define LENFN		2048	/* max. filename length */
 #define READA		"r"	/* file open mode read ascii */
 #define WRITEA		"w"	/* file open mode write ascii */
-#define WRITEB		"w"	/* file open mode write binary */
+#define WRITEB		"wb"	/* file open mode write binary */
 
 /*
  *	various constants
@@ -40,7 +40,7 @@
 #define MAXFN		512	/* max. no. source files */
 #define MAXLINE		128	/* max. line length source */
 #define PLENGTH		65	/* default lines/page in listing */
-#define SYMSIZE		8	/* max. symbol length */
+#define SYMSIZE		32	/* max. symbol length */
 #define INCNEST		5	/* max. INCLUDE nesting depth */
 #define IFNEST		5	/* max IF.. nesting depth */
 #define HASHSIZE	500	/* max. entries in symbol hash array */
