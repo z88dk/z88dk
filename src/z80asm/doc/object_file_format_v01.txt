@@ -1,101 +1,109 @@
 File formats
 ------------
+The object and library files are stored in binary form as a set of 
+contiguous objects, i.e. each section follows the previous one without 
+any end-markers. 
+
+The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.
+
+A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain 0xFFFFFFFF 
+if that section does not exist.
+
+The following object types exist in the file:
+* char    - one byte containing an ASCII character;
+* byte    - one 8-bit value;
+* word    - one 16-bit value, stored in low byte - high byte order 
+            (Little endian format - Z80/Intel notation);
+* long    - one 32-bit value, stored in low byte - high byte order, 
+            containing the file position where the corresponding 
+			section starts; the value is 0xFFFFFFFF (-1) if the section 
+			does not exist;
+* string  - one byte containing the string length followed by the 
+           characters of the string.
 
 Object file format
 ------------------
-The structure of the object file format is designed exclusively for 
-the Z80 Module Assembler. However, it may be useful for other 
-programmers if they wish to use the file format for other purposes. 
-We have included the documentation of the object file structure in this 
-document. Improvement suggestions are welcome. We hope to have designed 
-a simple and straightforward file format. The documentation may be 
-necessary if you want to use the object file format in other systems. 
-
-I have created the design structure of the object file format to be 
-suitable for future expansion. The primary aim of the design has been to 
-maintain structure simplicity and load efficiency during link 
-processing. 
-
 The format of the object file is as follows:
 
-0 [ 'Z80RMF01' <ORG Address> ]
-  [ <F.ptr to Module Name> ]
-  [ <F.ptr to Expression Declarations> ]
-  [ <F.ptr to Name Declarations> ]
-  [ <F.ptr to Library Name Declarations> ]
-  [ <F.ptr to Machine Code Block> ]
+Addr  Type    Object
+   0  char[8] 'Z80RMF01' (file signature and version)
+   8  word    <ORG Address>
+  10  long    File pointer to <Module Name>, always the last section
+  14  long    File pointer to <Expressions>, may be -1
+  18  long    File pointer to <Module Names>, may be -1
+  22  long    File pointer to <External Names>, may be -1
+  26  long    File pointer to <Machine Code>, may be -1
 
-  [ <Expression Declaration> ]
+  [ <Expressions> ]
   [ ... ] 
 
-  [ <Name Declaration> ] 
+  [ <Module Names> ] 
   [ ... ]
 
-  [ <Library Name Declaration> ]
+  [ <External Names> ]
   [ ... ]
 
   [ <Module Name> ]
+  
   [ <Machine Code> ]
-n
 
-The 0 (null) - <n> defines start to <n> total of bytes file length. The 
-above figure has deliberately been split into sections to clarify the 
-file structure, although there is no actual physical separation between 
-the sections in the file; each section is immediatly followed by the 
-next. 
 
-The file pointers are 32bit integers stored in low byte - high byte 
-order (Little endian format - Z80/Intel notation). 
-
-* <ORG Address> : Contains the ORG address for the linked machine code 
+* <ORG Address> Contains the ORG address for the linked machine code 
   or 0xFFFF for no ORG address defined. 
 
-* <Expression Declaration> : Contains the following: 
-  <type><patchptr><length><expression_string><0>
-
-  <type> defines the resulting evaluation type range: 
+* <Expressions> Contains a set of expressions up to the 
+  start of the next existing section. Each expression has the following
+  format:
+  <type><patchptr><expression><0>
+  
+  <type> (char) defines the resulting evaluation type range: 
   'U': 8bit integer (0 to 255) 
   'S': 8bit signed integer (-128 to 127) 
   'C': 16bit integer (-32768 to 65535) 
   'L': 32bit signed integer
 
-  <patchptr> defines the 16bit relative module code patch pointer to 
-  store result.
-  <length> defines byte length of expression string. 
-  <expression_string> contains the infix expression parsed from the 
-  source file.
-  <0> is a zero byte end marker, not part of the expression length.
+  <patchptr> (word) defines the relative module code patch pointer to 
+  store the result of evaluating the expression.
+  
+  <expression> (string) contains the expression text as parsed from the 
+  source file, in the original (legacy) expression syntax.
+  
+  <0> (byte) is a zero byte end marker, not part of the expression length.
 
-* <Name Declaration> 
-  Contains the following: 
-  <Scope><Type><Value><Length><Name>
+* <Module Names> Contains a set of names defined in this module 
+  up to the next existing section. Each name has the following format:
+  <scope><yype><value><name>
 
-  <Scope> defines the scope of the name:  
+  <scope> (char) defines the scope of the name:  
   'L' is local,  
   'G' is global,  
   'X' global library
 
-  <Type> defines whether it is a: 
+  <yype> (char) defines whether it is a: 
   'A' relocatable address, 
   'C' a constant'
 
-  <Length> defines length byte of the following <Name> string.
+  <name> (string) contains the name.
 
+* <External Names> Contains a set of external names referred 
+  by this module up to the next existing section. Each name has the 
+  following format:
+  <name>
 
-* <Library Name Declaration> 
-  Contains the following which defines library reference names: 
-  <Length><Name>
+  <name> (string) contains the name.
 
-  <Length> defines length byte of the following <Name> string.
+* <Module Name> (string) contains the module name.
 
-* <Module Name> 
-  Contains a preceeding byte identifying the length of the following 
-  string
-
-* <Machine Code> 
-  Contains a preceeding 16bit integer identifying the total length of
-  the following machine code block.
-  If the code block is 65536 bytes long, the length contains 0.
+* <Machine Code> Contains the binary code of the module with the 
+  following format:
+  <length><code>
+  
+  <length> (word) defines the total code lenght, and contains 0 if the 
+  code is 65536 bytes long.
+  
+  <code> (byte[length]) contains the binary code.
 
 
 Library file format
@@ -103,23 +111,21 @@ Library file format
 The library file format is a sequense of object files with additional
 structures.
 
-0 [ 'Z80LMF01' ]
-  [ <Object File Block> ]
-  [ ... ] 
-n
+Addr  Type    Object
+   0  char[8] 'Z80LMF01' (file signature and version)
 
-* <Object File Block> 
-  Contains the following: 
-  <Next Object File><Object File Length><'Z80RMF01' Object File>
-
-* <Next Object File> is a 32bit integer file pointer to the next 
-  <Object File Block>. If this file pointer is -1 (0xFFFFFFFF) then 
-  the current <Object File Block> is the last in the library file.
-
-* <Object File Length> is 32bit length integer of the 
-  <'Z80RMF01' Object File>. If this integer is 0 then it is indicated 
-  that the current <Object File Block> has been marked "deleted" and 
-  will not be used.
+   [ <Object File Block> ]
+   [ ... ] 
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.3 2014-04-28 22:44:55 pauloscustodio Exp $
+* <Object File Block> Contains the following format: 
+  <next><length><objectfile>
+
+  <next> (long) contains the file pointer of the next object file in the
+  library, or -1 if this object file is the last in the library.
+  
+  <length> (long) contains the length of this object file, or 0 if this
+  object files has been marked "deleted" and will not be used.
+
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.4 2014-04-28 23:36:35 pauloscustodio Exp $
