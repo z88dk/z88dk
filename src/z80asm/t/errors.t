@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.14 2014-04-25 23:39:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.15 2014-04-28 22:16:11 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -32,24 +32,8 @@ my $COMMA = get_legacy() ? "&" : ",";
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# info_total_errors
-unlink_testfiles();
-write_file(asm_file(), "ld");
-t_z80asm_capture(asm_file(), "",
-		"Error at file 'test.asm' line 1: syntax error\n".
-		"1 errors occurred during assembly\n",
-		1);
-
-#------------------------------------------------------------------------------
-# warn_option_deprecated
-unlink_testfiles();
-write_file(asm_file(), "nop");
-t_z80asm_capture("-t0 ".asm_file(), "",
-		"Warning: option '-t' is deprecated\n",
-		0);
-
-#------------------------------------------------------------------------------
-# fatal_divide_by_zero - BUG_0040
+# fatal_divide_by_zero
+diag "BUG_0040";
 unlink_testfiles();
 t_z80asm_error("ld a, 1/0",
 	"Error at file 'test.asm' line 1: division by zero",
@@ -142,14 +126,118 @@ t_z80asm_capture("-r0 -b -c ".asm_file(),
 remove_tree( bin_file() );
 
 #------------------------------------------------------------------------------
-# error_syntax
-unlink_testfiles();
-t_z80asm_error("ld", "Error at file 'test.asm' line 1: syntax error");
+# Errors
+check_errors("", <<'ASM');
+	ldx						; unknown identifier
+	ld						; syntax error
+	ld a,1+					; syntax error in expression
+
+	defm ";					; unclosed quoted string
+	defm "hello				; unclosed quoted string
+
+	defb '					; invalid single quoted character
+	defb 'x					; invalid single quoted character
+	defb ''					; invalid single quoted character
+	defb 'he'				; invalid single quoted character
+
+	call_oz		0      		; integer '0' out of range
+	call_oz		65536		; integer '65536' out of range
+	
+	call_pkg	-1    		; integer '-1' out of range
+	call_pkg	65536 		; integer '65536' out of range
+	
+	fpp			0    		; integer '0' out of range
+	fpp			255	 		; integer '255' out of range
+	fpp			256	 		; integer '256' out of range
+	
+	invoke		-1    		; integer '-1' out of range
+	invoke		65536 		; integer '65536' out of range
+	
+; RST out of range
+	rst	undefined		   	; symbol not defined
+	rst -1					; integer '-1' out of range
+	rst 1					; integer '1' out of range
+	rst 7					; integer '7' out of range
+	rst 9					; integer '9' out of range
+	rst 15					; integer '15' out of range
+	rst 17					; integer '17' out of range
+	rst 23					; integer '23' out of range
+	rst 25					; integer '25' out of range
+	rst 31					; integer '31' out of range
+	rst 33					; integer '33' out of range
+	rst 39					; integer '39' out of range
+	rst 41					; integer '41' out of range
+	rst 47					; integer '47' out of range
+	rst 49					; integer '49' out of range
+	rst 55					; integer '55' out of range
+	rst 57					; integer '57' out of range
+	
+; bit out of range
+	bit -1,a				; integer '-1' out of range
+	bit  8,a				; integer '8' out of range
+	bit undefined,a			; symbol not defined
+	res -1,a				; integer '-1' out of range
+	res  8,a				; integer '8' out of range
+	res undefined,a			; symbol not defined
+	set -1,a				; integer '-1' out of range
+	set  8,a				; integer '8' out of range
+	set undefined,a			; symbol not defined
+
+; im out of range
+	im 	-1					; integer '-1' out of range
+	im 	3					; integer '3' out of range
+	im 	undefined			; symbol not defined
+
+; jump relative out of range
+	djnz ASMPC-0x7F			; integer '-129' out of range
+	djnz ASMPC+0x82			; integer '128' out of range
+	jr ASMPC-0x7F			; integer '-129' out of range
+	jr ASMPC+0x82			; integer '128' out of range
+	jr nz,ASMPC-0x7F		; integer '-129' out of range
+	jr nz,ASMPC+0x82		; integer '128' out of range
+	jr  z,ASMPC-0x7F		; integer '-129' out of range
+	jr  z,ASMPC+0x82		; integer '128' out of range
+	jr nc,ASMPC-0x7F		; integer '-129' out of range
+	jr nc,ASMPC+0x82		; integer '128' out of range
+	jr  c,ASMPC-0x7F		; integer '-129' out of range
+	jr  c,ASMPC+0x82		; integer '128' out of range
+
+ASM
 
 #------------------------------------------------------------------------------
-# error_syntax_expr
-unlink_testfiles();
-t_z80asm_error("ld a,1+", "Error at file 'test.asm' line 1: syntax error in expression");
+# Errors on RABBIT
+check_errors("-RCMX000", <<'ASM');
+	daa						; illegal identifier
+	inc ixl					; illegal identifier
+	inc ixh					; illegal identifier
+	inc iyl					; illegal identifier
+	inc iyh					; illegal identifier
+	ld (bc),b				; illegal identifier
+	di 						; illegal identifier
+	ei	 					; illegal identifier
+	halt					; illegal identifier
+	im	0					; illegal identifier
+	im	1   				; illegal identifier
+	im	2   				; illegal identifier
+	retn					; illegal identifier
+	rst	0x00				; illegal identifier
+	rst	0x08				; illegal identifier
+	rst	0x30				; illegal identifier
+	in a,(N)				; illegal identifier
+	in a,(c)				; illegal identifier
+	in d,(c)				; illegal identifier
+	ini						; illegal identifier
+	inir					; illegal identifier
+	ind						; illegal identifier
+	indr					; illegal identifier
+	out (N),a				; illegal identifier
+	out (c),a				; illegal identifier
+	out (c),d				; illegal identifier
+	outi					; illegal identifier
+	otir					; illegal identifier
+	outd					; illegal identifier
+	otdr					; illegal identifier
+ASM
 
 #------------------------------------------------------------------------------
 # error_expression 
@@ -163,404 +251,262 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 				 1);
 
 #------------------------------------------------------------------------------
-# error_unclosed_string
-unlink_testfiles();
-t_z80asm_error('defm "', "Error at file 'test.asm' line 1: unclosed quoted string");
-t_z80asm_error('defm "hello', "Error at file 'test.asm' line 1: unclosed quoted string");
+# Warnings
+check_warnings("", <<'ASM');
+
+; Byte
+	ld a, -129			; 3E 7F			; integer '-129' out of range
+	ld a,-128			; 3E 80			;
+	ld a,0				; 3E 00			;
+	ld a,255			; 3E FF			;
+	ld a,256			; 3E 00			; integer '256' out of range
+
+; SignedByte
+	ld (ix-129),-1		; DD 36 7F FF	; integer '-129' out of range
+	ld (ix-128),-1		; DD 36 80 FF	;
+	ld (ix),-1			; DD 36 00 FF	;
+	ld (ix+127),-1		; DD 36 7F FF	;
+	ld (ix+128),-1		; DD 36 80 FF	; integer '128' out of range
+
+; Word
+	ld bc,-32769		; 01 FF 7F		; integer '-32769' out of range
+	ld bc,-32768		; 01 00 80		; 
+	ld bc, 65535		; 01 FF FF		; 
+	ld bc, 65536		; 01 00 00		; integer '65536' out of range
+
+; 32-bit arithmetic, long range is not tested on a 32bit long
+	defl 0xFFFFFFFF+1	; 00 00 00 00	; 
+
+; call out of range
+	call -32769			; CD FF 7F		; integer '-32769' out of range
+	call -32768			; CD 00 80		; 
+	call -1				; CD FF FF		; 
+	call 65535			; CD FF FF		; 
+	call 65536			; CD FF FF		; integer '65536' out of range
+
+ASM
 
 #------------------------------------------------------------------------------
-# error_invalid_squoted_string
+# warn_option_deprecated
 unlink_testfiles();
-t_z80asm_error("defb '", "Error at file 'test.asm' line 1: invalid single quoted character");
-t_z80asm_error("defb 'x", "Error at file 'test.asm' line 1: invalid single quoted character");
-t_z80asm_error("defb ''", "Error at file 'test.asm' line 1: invalid single quoted character");
-t_z80asm_error("defb 'he'", "Error at file 'test.asm' line 1: invalid single quoted character");
+write_file(asm_file(), "");
+t_z80asm_capture("-t0 ".asm_file(), "",
+		"Warning: option '-t' is deprecated\n",
+		0);
 
 #------------------------------------------------------------------------------
-# warn_int_range / error_int_range
+# warn_int_range / error_int_range on pass2 and multi-module assembly
 unlink_testfiles();
 
-# Byte = -129
-t_z80asm(
-	asm		=> "ld a,-129",
-	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test.asm' line 1: integer '-129' out of range",
-);
-
-t_z80asm(
-	asm  	=> "ld a,N : defc N = -129",
-	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-129' out of range",
-);
-
-t_z80asm(
-	asm  	=> "EXTERN value : ld a,value",
-	asm1	=> "PUBLIC value : defc value = -129",
-	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm		=> "PUBLIC value : defc value = 0",
-	asm1	=> "EXTERN value : ld a,value-129",
-	bin		=> "\x3E\x7F",
-	err		=> "Warning at file 'test1.asm' module 'test1': integer '-129' out of range in expression 'value-129'",
-);
-
-# Byte = -128
-t_z80asm(
-	asm		=> "ld a,-128",
-	bin		=> "\x3E\x80",
-);
-
-t_z80asm(
-	asm		=> "ld a,N : defc N = -128",
-	bin		=> "\x3E\x80",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld a,value",
-	asm1	=> "PUBLIC value : defc value = -128",
-	bin		=> "\x3E\x80",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld a,value-128",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x3E\x80",
-);
-
-
-# Byte = 255
-t_z80asm(
-	asm		=> "ld a,255",
-	bin		=> "\x3E\xFF",
-);
-
-t_z80asm(
-	asm		=> "ld a,N : defc N = 255",
-	bin		=> "\x3E\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld a,value",
-	asm1	=> "PUBLIC value : defc value = 255",
-	bin		=> "\x3E\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld a,value+255",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x3E\xFF",
-);
-
-
-# Byte = 256
-t_z80asm(
-	asm		=> "ld a,256",
-	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test.asm' line 1: integer '256' out of range",
-);
-
-t_z80asm(
-	asm  	=> "ld a,N : defc N = 256",
-	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '256' out of range",
-);
-
-t_z80asm(
-	asm  	=> "EXTERN value : ld a,value",
-	asm1	=> "PUBLIC value : defc value = 256",
-	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm		=> "PUBLIC value : defc value = 0",
-	asm1	=> "EXTERN value : ld a,value+256",
-	bin		=> "\x3E\x00",
-	err		=> "Warning at file 'test1.asm' module 'test1': integer '256' out of range in expression 'value+256'",
-);
-
-
-# SignedByte = -129
-t_z80asm(
-	asm  	=> "ld (ix-129),-1",
-	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' line 1: integer '-129' out of range",
-);
-
-t_z80asm(
-	asm  	=> "ld (ix+value),-1 : defc value = -129",
-	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-129' out of range",
-);
-
-t_z80asm(
-	asm  	=> "EXTERN value : ld (ix+value),-1",
-	asm1	=> "PUBLIC value : defc value = -129",
-	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm		=> "EXTERN value : ld (ix+value-129),-1",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\xDD\x36\x7F\xFF",
-	err		=> "Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value-129'",
-);
-
-
-# SignedByte = -128
-t_z80asm(
-	asm		=> "ld (ix-128),-1",
-	bin		=> "\xDD\x36\x80\xFF",
-);
-
-t_z80asm(
-	asm		=> "ld (ix+value),-1 : defc value = -128",
-	bin		=> "\xDD\x36\x80\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value),-1",
-	asm1	=> "PUBLIC value : defc value = -128",
-	bin		=> "\xDD\x36\x80\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value-128),-1",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\xDD\x36\x80\xFF",
-);
-
-
-# SignedByte = 127
-t_z80asm(
-	asm		=> "ld (ix+127),-1",
-	bin		=> "\xDD\x36\x7F\xFF",
-);
-
-t_z80asm(
-	asm		=> "ld (ix+value),-1 : defc value = 127",
-	bin		=> "\xDD\x36\x7F\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value),-1",
-	asm1	=> "PUBLIC value : defc value = 127",
-	bin		=> "\xDD\x36\x7F\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value+127),-1",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\xDD\x36\x7F\xFF",
-);
-
-
-# SignedByte = 128
-t_z80asm(
-	asm		=> "ld (ix+128),-1",
-	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' line 1: integer '128' out of range",
-);
-
-t_z80asm(
-	asm		=> "ld (ix+value),-1 : defc value = 128",
-	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '128' out of range",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value),-1",
-	asm1	=> "PUBLIC value : defc value = 128",
-	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld (ix+value+128),-1",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\xDD\x36\x80\xFF",
-	err		=> "Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'value+128'",
-);
-
-
-# Word = -32769
-t_z80asm(
-	asm		=> "ld bc,-32769",
-	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' line 1: integer '-32769' out of range",
-);
-
-t_z80asm(
-	asm		=> "ld bc,N : defc N = -32769",
-	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '-32769' out of range",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value",
-	asm1	=> "PUBLIC value : defc value = -32769",
-	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value-32769",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x01\xFF\x7F",
-	err		=> "Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'value-32769'",
-);
-
-
-# Word = -32768
-t_z80asm(
-	asm		=> "ld bc,-32768",
-	bin		=> "\x01\x00\x80",
-);
-
-t_z80asm(
-	asm		=> "ld bc,N : defc N = -32768",
-	bin		=> "\x01\x00\x80",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value",
-	asm1	=> "PUBLIC value : defc value = -32768",
-	bin		=> "\x01\x00\x80",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value-32768",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x01\x00\x80",
-);
-
-
-# Word = 65535
-t_z80asm(
-	asm		=> "ld bc,65535",
-	bin		=> "\x01\xFF\xFF",
-);
-
-t_z80asm(
-	asm		=> "ld bc,N : defc N = 65535",
-	bin		=> "\x01\xFF\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value",
-	asm1	=> "PUBLIC value : defc value = 65535",
-	bin		=> "\x01\xFF\xFF",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value+65535",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x01\xFF\xFF",
-);
-
-
-# Word = 65536
-t_z80asm(
-	asm		=> "ld bc,65536",
-	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' line 1: integer '65536' out of range",
-);
-
-t_z80asm(
-	asm		=> "ld bc,N : defc N = 65536",
-	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'test' line 1: integer '65536' out of range",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value",
-	asm1	=> "PUBLIC value : defc value = 65536",
-	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value'",
-);
-
-t_z80asm(
-	asm 	=> "EXTERN value : ld bc,value+65536",
-	asm1	=> "PUBLIC value : defc value = 0",
-	bin		=> "\x01\x00\x00",
-	err		=> "Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'value+65536'",
-);
-
-
-# 32-bit arithmetic, long range is not tested on a 32bit long
-t_z80asm(
-	asm		=> "defl 0xFFFFFFFF+1", 
-	bin		=> "\0\0\0\0",
-);
-
-
-# call out of range
-t_z80asm(
-	asm		=> "call -32769", 
-	bin		=> "\xCD\xFF\x7F",
-	err		=> "Warning at file 'test.asm' line 1: integer '-32769' out of range",
-);
-
-t_z80asm(
-	asm		=> "call -32768", 
-	bin		=> "\xCD\x00\x80",
-);
-
-t_z80asm(
-	asm		=> "call 65536", 
-	bin		=> "\xCD\x00\x00",
-	err		=> "Warning at file 'test.asm' line 1: integer '65536' out of range",
-);
-
-
-# RST out of range
-for ([0x00 => 0xC7], [0x08 => 0xCF], [0x10 => 0xD7], [0x18 => 0xDF], 
-     [0x20 => 0xE7], [0x28 => 0xEF], [0x30 => 0xF7], [0x38 => 0xFF])
-{
-    my($rst, $opcode) = @$_;
+write_file(asm_file(), <<'ASM');
+	extern G_32769, G_32768, G_129, G_128, G0, G127, G128, G255, G256, G65535, G65536
+
+; Byte = -129
+	ld	a, L_129
+	ld	a, G_129
+	ld	a, G0 - 129
 	
-    t_z80asm(
-		asm		=> "rst ".($rst-1), 
-		err		=> "Error at file 'test.asm' line 1: integer '".($rst-1)."' out of range",
-	);
+; Byte = -128
+	ld	a, L_128
+	ld	a, G_128
+	ld	a, G0 - 128
+
+; Byte = 255
+	ld	a, L255
+	ld	a, G255
+	ld	a, G0 + 255
+
+; Byte = 256
+	ld	a, L256
+	ld	a, G256
+	ld	a, G0 + 256
+
+; SignedByte = -129
+	ld	(ix + L_129), -1
+	ld	(ix + G_129), -1
+	ld	(ix + G0 -129), -1
+
+; SignedByte = -128
+	ld	(ix + L_128), -1
+	ld	(ix + G_128), -1
+	ld	(ix + G0 -128), -1
+
+; SignedByte = 127
+	ld	(ix + L127), -1
+	ld	(ix + G127), -1
+	ld	(ix + G0 + 127), -1
+
+; SignedByte = 128
+	ld	(ix + L128), -1
+	ld	(ix + G128), -1
+	ld	(ix + G0 + 128), -1
+
+; Word = -32769
+	ld	bc, L_32769
+	ld	bc, G_32769
+	ld	bc, G0 - 32769
+
+; Word = -32768
+	ld	bc, L_32768
+	ld	bc, G_32768
+	ld	bc, G0 - 32768
+
+; Word = 65535
+	ld	bc, L65535
+	ld	bc, G65535
+	ld	bc, G0 + 65535
+
+; Word = 65536
+	ld	bc, L65536
+	ld	bc, G65536
+	ld	bc, G0 + 65536
+
+; Local variables
+	defc L_32769 = -32769
+	defc L_32768 = -32768
+	defc L_129   = -129
+	defc L_128   = -128
+	defc L255    =  255
+	defc L256    =  256
+	defc L127    =  127
+	defc L128    =  128
+	defc L65535  =  65535
+	defc L65536  =  65536
+ASM
+
+write_file(asm1_file(), <<'ASM1');
+
+; Global variables
+	public G_32769, G_32768, G_129, G_128, G0, G127, G128, G255, G256, G65535, G65536
+	defc G_32769 = -32769
+	defc G_32768 = -32768
+	defc G_129   = -129
+	defc G_128   = -128
+	defc G0      =  0
+	defc G127    =  127
+	defc G128    =  128
+	defc G255    =  255
+	defc G256    =  256
+	defc G65535  =  65535
+	defc G65536  =  65536
+ASM1
+
+t_z80asm_capture("-r0 -b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
+Warning at file 'test.asm' module 'test' line 4: integer '-129' out of range
+Warning at file 'test.asm' module 'test' line 19: integer '256' out of range
+Warning at file 'test.asm' module 'test' line 24: integer '-129' out of range
+Warning at file 'test.asm' module 'test' line 39: integer '128' out of range
+Warning at file 'test.asm' module 'test' line 44: integer '-32769' out of range
+Warning at file 'test.asm' module 'test' line 59: integer '65536' out of range
+Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G_129'
+Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G0-129'
+Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'G256'
+Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'G0+256'
+Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G_129'
+Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G0-129'
+Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'G128'
+Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'G0+128'
+Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'G_32769'
+Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'G0-32769'
+Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'G65536'
+Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'G0+65536'
+ERR
+
+t_binary(read_binfile(bin_file()), pack("C*",
+		0x3E, 0x7F,
+		0x3E, 0x7F,
+		0x3E, 0x7F,
+		0x3E, 0x80,
+		0x3E, 0x80,
+		0x3E, 0x80,
+		0x3E, 0xFF,
+		0x3E, 0xFF,
+		0x3E, 0xFF,
+		0x3E, 0x00,
+		0x3E, 0x00,
+		0x3E, 0x00,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x7F, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0xDD, 0x36, 0x80, 0xFF,
+		0x01, 0xFF, 0x7F,
+		0x01, 0xFF, 0x7F,
+		0x01, 0xFF, 0x7F,
+		0x01, 0x00, 0x80,
+		0x01, 0x00, 0x80,
+		0x01, 0x00, 0x80,
+		0x01, 0xFF, 0xFF,
+		0x01, 0xFF, 0xFF,
+		0x01, 0xFF, 0xFF,
+		0x01, 0x00, 0x00,
+		0x01, 0x00, 0x00,
+		0x01, 0x00, 0x00,
+));
+
+#------------------------------------------------------------------------------
+# assemble, check errors
+#------------------------------------------------------------------------------
+sub check_errors {	
+	my($options, $code) = @_;
 	
-    t_z80asm(
-		asm		=> "rst $rst", 
-		bin		=> chr($opcode),
-	);
+	my $line = 0;
+	my $asm = "";
+	my $errors = "";
+	my $num_errors;
 	
-    t_z80asm(
-		asm		=> "rst ".($rst+1), 
-		err		=> "Error at file 'test.asm' line 1: integer '".($rst+1)."' out of range",
-	);
+	for (split(/\n/, $code)) {
+		$line++;
+		$asm .= "$_\n";
+		diag($1) if /;\s+((BUG_|CH_)\d+)/;
+		
+		my($error_text) = /\s+;\s*(.*)/ or next;
+		$errors .= "Error at file '".asm_file()."' line ".$line.": ".$error_text."\n";
+		$num_errors++;
+	}
+	$errors .= $num_errors." errors occurred during assembly\n";
+	
+	write_file(asm_file(), $asm);
+	t_z80asm_capture($options." ".asm_file(), "", $errors, 1 );
 }
 
-
-# bit out of range
-t_z80asm(
-	asm		=> "bit -1,a",
-	err		=> "Error at file 'test.asm' line 1: integer '-1' out of range",
-);
-
-t_z80asm(
-	asm		=> "bit 0,a",
-	bin		=> "\xCB\x47",
-);
-
-t_z80asm(
-	asm		=> "bit 7,a",
-	bin		=> "\xCB\x7F",
-);
-
-t_z80asm(
-	asm		=> "bit 8,a",
-	err		=> "Error at file 'test.asm' line 1: integer '8' out of range",
-);
-
+#------------------------------------------------------------------------------
+# assemble, check warnings
+#------------------------------------------------------------------------------
+sub check_warnings {	
+	my($options, $code, $add_options, $link_warnings) = @_;
+	
+	my $line = 0;
+	my $asm = "";
+	my $bin = "";
+	my $warnings = "";
+	
+	for (split(/\n/, $code)) {
+		$line++;
+		$asm .= "$_\n";
+		diag($1) if /;\s+((BUG_|CH_)\d+)/;
+		
+		my($hex, $warning_text) = /\s+;([0-9A-F \t]+);\s*((.+)?)/i or next;
+		for (split(' ', $hex)) {
+			$bin .= chr(hex($_));
+		}
+		if ($warning_text) {
+			$warnings .= "Warning at file '".asm_file()."' line ".
+						 $line.": ".$warning_text."\n";
+		}
+	}
+	
+	write_file(asm_file(), $asm);
+	t_z80asm_capture($options." ".asm_file()." ".($add_options || ""), "", 
+					 $warnings.($link_warnings || ""), 0 );
+}
 
 # defvar out of range
 t_z80asm(
@@ -751,50 +697,6 @@ write_file(asm_file(), "");
 t_z80asm_capture("-Zillegaloption ".asm_file(), "",
 		"Error: illegal option '-Zillegaloption'\n1 errors occurred during assembly\n",
 		1);
-
-#------------------------------------------------------------------------------
-# error_unknown_ident
-unlink_testfiles();
-t_z80asm_error("ldx", "Error at file 'test.asm' line 1: unknown identifier");
-
-#------------------------------------------------------------------------------
-# error_illegal_ident on RABBIT
-unlink_testfiles();
-write_file(asm_file(), <<'ASM');
-	daa
-	inc ixl
-	inc ixh
-	inc iyl
-	inc iyh
-	ld (bc),b
-	di 		
-	ei	 	
-	halt	
-	im	0	
-	im	1   
-	im	2   
-	retn
-	rst	0x00
-	rst	0x08
-	rst	0x30
-	in a,(N)
-	in a,(c)
-	in d,(c)
-	ini
-	inir
-	ind
-	indr
-	out (N),a
-	out (c),a
-	out (c),d
-	outi
-	otir
-	outd
-	otdr
-ASM
-my @errors; for (1..30) { push @errors, "Error at file 'test.asm' line $_: illegal identifier\n"; }
-push @errors, scalar(@errors)." errors occurred during assembly\n";
-t_z80asm_capture("-RCMX000 ".asm_file(), "", join("", @errors), 1);
 
 #------------------------------------------------------------------------------
 # fatal_max_codesize
@@ -1223,7 +1125,10 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.14  2014-04-25 23:39:14  pauloscustodio
+# Revision 1.15  2014-04-28 22:16:11  pauloscustodio
+# Merge tests in same compilation unit to speed up testing.
+#
+# Revision 1.14  2014/04/25 23:39:14  pauloscustodio
 # Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
 # to test the z80asm assembler. These files are used during testing.
 #
