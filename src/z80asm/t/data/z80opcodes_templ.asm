@@ -7,7 +7,7 @@
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.3 2014-04-26 08:34:18 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.4 2014-04-28 22:07:03 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -18,6 +18,101 @@
 	defc N   =	20h						;;N		equ	20h 
 	defc NN  =  30h						;;NN	equ 30h 
 	defc DIS =	40h						;;DIS	equ	40h 
+	
+;------------------------------------------------------------------------------
+; Value ranges
+;------------------------------------------------------------------------------
+
+										; z80pack does not allow negative indexes
+	ld	a,(ix-128)						;; 	defb 0DDh ;; ld a,(hl) ;; defb -128
+	ld	a,(iy-128)						;; 	defb 0FDh ;; ld a,(hl) ;; defb -128
+	ld	a,(ix)							;; 	defb 0DDh ;; ld a,(hl) ;; defb 0
+	ld	a,(iy)							;; 	defb 0FDh ;; ld a,(hl) ;; defb 0
+	ld	a,({ix iy}+{0 127})
+
+	ld	a,{-128 0 255}
+	ld 	bc,{-32768 -1 0 65535}
+	jp	{-32768 -1 0 65535}
+
+;------------------------------------------------------------------------------
+; Regression tests
+;------------------------------------------------------------------------------
+
+; BUG_0011: ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 6,6
+	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 4,4
+	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 2,2
+bug0011a:
+
+; BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+bug0047a:
+	defw	ASMPC,ASMPC,ASMPC			;;	defw bug0047a,bug0047a,bug0047a
+bug0047b:	
+	jp		ASMPC						;;	jp bug0047b
+
+;------------------------------------------------------------------------------
+; IF ELSE ENDIF
+;------------------------------------------------------------------------------
+	if	1								;;
+	  defb 1							;;	defb 1
+	  if 1								;;
+		defb 2							;;	defb 2
+	  else								;;
+	    defb 3							;;
+	  endif								;;
+	else								;;
+	  defb 4							;;
+	  if 1								;;
+	    defb 5							;;
+      else								;;
+	    defb 6							;;
+	  endif								;;
+	endif								;;
+
+	if 0								;;
+	  defb 7							;;
+	endif								;;
+	
+	if 1								;;
+	  defb 8							;; 	defb 8
+	endif								;;
+	
+	if 0								;;
+	  defb 9							;;
+	else								;;
+	  defb 10							;;	defb 10
+	endif								;;
+	
+	if undefined						;;
+	  defb 11							;;
+	else								;;
+	  defb 12							;;	defb 12
+	endif								;;
+
+	if undefined | 1					;;
+	  defb 13							;;	defb 13
+	else								;;
+	  defb 14							;;
+	endif								;;
+
+;------------------------------------------------------------------------------
+; Z88DK specific opcodes
+;------------------------------------------------------------------------------
+	call_oz	1							;; 	rst 20h ;; defb 1
+	call_oz	255							;; 	rst 20h ;; defb 255
+	call_oz	256							;; 	rst 20h ;; defw 256
+	call_oz	65535						;; 	rst 20h ;; defw 65535
+
+	call_pkg 0							;; 	rst 08h ;; defw 0
+	call_pkg 1							;; 	rst 08h ;; defw 1
+	call_pkg 65535						;; 	rst 08h ;; defw 65535
+	
+	fpp 1								;; 	rst 18h ;; defb 1
+	fpp 254								;; 	rst 18h ;; defb 254
+
+	invoke 0							;;	call 0
+	invoke 1							;;	call 1
+	invoke 65535						;;	call 65535
 	
 ;------------------------------------------------------------------------------
 ; 8 bit load group
@@ -180,7 +275,11 @@ ENDIF
 ;------------------------------------------------------------------------------
 
 	{add adc sbc}       a,{b c d e h l a (hl) (ix+DIS) (iy+DIS) N}
+	{add adc sbc}         {b c d e h l a (hl) (ix+DIS) (iy+DIS) N}	;; {1} a,{2}
+	
 	{sub and xor or cp}	  {b c d e h l a (hl) (ix+DIS) (iy+DIS) N}
+	{sub and xor or cp}	a,{b c d e h l a (hl) (ix+DIS) (iy+DIS) N}	;; {1}   {2}
+	
 	{inc dec}             {b c d e h l a (hl) (ix+DIS) (iy+DIS)}
 	
 IF !RABBIT
@@ -210,7 +309,6 @@ ENDIF
 	{rlca rrca rla rra}
 
 	{rlc rrc rl rr sla sra srl} {b c d e h l a (hl) (ix+DIS) (iy+DIS)}
-	{rlc rrc rl rr sla sra srl} {b c d e h l a (hl) (ix+DIS) (iy+DIS)}
 ;	{rlc rrc rl rr sla sra srl} (ix+DIS),{b c d e h l a}	=} 0xDD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{rlc rrc rl rr sla sra srl} (iy+DIS),{b c d e h l a}	=} 0xFD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{sll sli} ...
@@ -235,7 +333,6 @@ ENDIF
 ;
 ;	sra {bc  de  hl}				=} 0xCB 0x28+{<1} 0xCB 0x19+{<1}
 ;	srl {bc  de  hl}				=} 0xCB 0x38+{<1} 0xCB 0x19+{<1}
-
 
 ;------------------------------------------------------------------------------
 ; General purpose arithmetic and CPU control group
@@ -268,13 +365,34 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; Jump Group
 ;------------------------------------------------------------------------------
-jr1:
 	jp {NN (hl) (ix) (iy)}	
 	jp {nz z nc c po pe p m},NN
 
+										; max forward jump
+	jr	 jr2
+	jr	 jr2
+	jr	 jr2
+	
+	djnz ASMPC							;;	defb 10h, 0FEh
+	djnz ASMPC+0x81						;;	defb 10h, 07Fh
+	jr	 ASMPC							;;	defb 18h, 0FEh
+	jr	 ASMPC-0x7E						;;	defb 18h, 080h
+	
+	djnz jr1		; 10 00       
+jr1:
 	jr jr1
 	djnz jr1
 	jr {nz z nc c},jr1
+		
+	defs 127-26, 0FFh					;;	defs 127-26
+jr2:
+	defs 122, 0FFh						;; 	defs 122
+	jr	 jr2
+	jr	 jr2
+										; max backward jump - z80pack does not accept -128
+	jr	 jr2							;;	defb 18h, 80h
+	
+
 ;	jr {po pe p m},NN
 
 
@@ -326,7 +444,10 @@ ENDIF
 
 ;------------------------------------------------------------------------------
 ; $Log: z80opcodes_templ.asm,v $
-; Revision 1.3  2014-04-26 08:34:18  pauloscustodio
+; Revision 1.4  2014-04-28 22:07:03  pauloscustodio
+; Extend tests
+;
+; Revision 1.3  2014/04/26 08:34:18  pauloscustodio
 ; No RCS keywords in generated files
 ;
 ; Revision 1.2  2014/04/26 08:14:01  pauloscustodio
