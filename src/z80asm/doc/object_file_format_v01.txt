@@ -1,17 +1,20 @@
-10.0 File formats
+File formats
+------------
 
-o Object file format documentation 
-The structure of the object file format is designed exclusively for the Z80
-Module Assembler. However, it may be useful for other programmers if they wish
-to use the file format for other purposes. We have included the documentation of
-the object file structure in this document. Improvement suggestions are welcome.
-We hope to have designed a simple and straightforward file format. The
-documentation may be necessary if you want to use the object file format in
-other systems.
+Object file format
+------------------
+The structure of the object file format is designed exclusively for 
+the Z80 Module Assembler. However, it may be useful for other 
+programmers if they wish to use the file format for other purposes. 
+We have included the documentation of the object file structure in this 
+document. Improvement suggestions are welcome. We hope to have designed 
+a simple and straightforward file format. The documentation may be 
+necessary if you want to use the object file format in other systems. 
 
-I have created the design structure of the object file format to be suitable
-for future expansion. The primary aim of the design has been to maintain
-structure simplicity and load efficiency during link processing.
+I have created the design structure of the object file format to be 
+suitable for future expansion. The primary aim of the design has been to 
+maintain structure simplicity and load efficiency during link 
+processing. 
 
 The format of the object file is as follows:
 
@@ -35,65 +38,67 @@ The format of the object file is as follows:
   [ <Machine Code> ]
 n
 
-The 0 (null) - <n> defines start to <n> total of bytes file length. The above
-figure has deliberately been split into sections to clarify the file structure,
-allthough there is no actual physical separation between the sections in the
-file; each section is immediatly followed by the next. 
+The 0 (null) - <n> defines start to <n> total of bytes file length. The 
+above figure has deliberately been split into sections to clarify the 
+file structure, allthough there is no actual physical separation between 
+the sections in the file; each section is immediatly followed by the 
+next. 
 
-The file pointers are 32bit integers stored in low byte - high byte order
-(Little endian format - Z80/Intel notation).
+The file pointers are 32bit integers stored in low byte - high byte 
+order (Little endian format - Z80/Intel notation). 
 
-<ORG Address>
-Contains the ORG address for the linked machine code or FFFFh for no ORG address
-defined.
+* <ORG Address> : Contains the ORG address for the linked machine code 
+  or FFFFh for no ORG address defined. 
 
-<Expression Declaration> 
-Contains the following: 
-<type><patchptr><length><expression_string>
+* <Expression Declaration> : Contains the following: 
+  <type><patchptr><length><expression_string>
 
-<type> defines the resulting evaluation type range: 
-'U': 8bit integer (0 to 255) 
-'S': 8bit signed integer (-128 to 127) 
-'C': 16bit integer (-32768 to 65535) 
-'L': 32bit signed integer
+  <type> defines the resulting evaluation type range: 
+  'U': 8bit integer (0 to 255) 
+  'S': 8bit signed integer (-128 to 127) 
+  'C': 16bit integer (-32768 to 65535) 
+  'L': 32bit signed integer
 
-<patchptr> defines the 16bit relative module code patch pointer to store result.
-<length> defines byte length of expression string. 
-<expression_string> contains the infix expression parsed from the source file.
+  <patchptr> defines the 16bit relative module code patch pointer to 
+  store result.
+  <length> defines byte length of expression string. 
+  <expression_string> contains the infix expression parsed from the 
+  source file.
 
-<Name Declaration> 
-Contains the following: 
-<Scope><Type><Value><Length><Name>
+* <Name Declaration> 
+  Contains the following: 
+  <Scope><Type><Value><Length><Name>
 
-<Scope> defines the scope of the name:  
-'L' is local,  
-'G' is global,  
-'X' global library
+  <Scope> defines the scope of the name:  
+  'L' is local,  
+  'G' is global,  
+  'X' global library
 
-<Type> defines whether it is a: 
-'A' relocatable address, 
-'C' a constant'
+  <Type> defines whether it is a: 
+  'A' relocatable address, 
+  'C' a constant'
 
-<Length> defines length byte of the following <Name> string.
-
-
-<Library Name Declaration> 
-Contains the following which defines library reference names: 
-<Length><Name>
-
-<Length> defines length byte of the following <Name> string.
+  <Length> defines length byte of the following <Name> string.
 
 
-<Module Name> 
-Contains a preceeding byte identifying the length of the following string
+* <Library Name Declaration> 
+  Contains the following which defines library reference names: 
+  <Length><Name>
 
-<Machine Code> 
-Contains a preceeding 16bit integer identifying the total length of the
-following machine code block.
+  <Length> defines length byte of the following <Name> string.
+
+* <Module Name> 
+  Contains a preceeding byte identifying the length of the following 
+  string
+
+* <Machine Code> 
+  Contains a preceeding 16bit integer identifying the total length of
+  the following machine code block.
+  If the code block is 65536 bytes long, the length contains 0.
 
 
-
-o Library file format documentation 
+Library file format
+-------------------
 The library file format is a sequense of object files with additional
 structures.
 
@@ -102,19 +107,18 @@ structures.
   [ ... ] 
 n
 
-<Object File Block> 
-Contains the following: 
-<Next Object File><Object File Length><'Z80RMF01' Object File>
+* <Object File Block> 
+  Contains the following: 
+  <Next Object File><Object File Length><'Z80RMF01' Object File>
 
-<Next Object File> is a 32bit integer file pointer to the next 
+* <Next Object File> is a 32bit integer file pointer to the next 
+  <Object File Block>. If this file pointer is -1 (FFFFFFFFh) then 
+  the current <Object File Block> is the last in the library file.
 
-<Object File Block> 
-If this file pointer is -1 (FFFFFFFFh) then the current <Object File Block> is
-the last in the library file.
-
-<Object File Length> is 32bit length integer of <'Z80RMF01' Object File> 
-If this integer is 0 then it is indicated that the current <Object File Block>
-has been marked "deleted" and will not be used.
+* <Object File Length> is 32bit length integer of the 
+  <'Z80RMF01' Object File>. If this integer is 0 then it is indicated 
+  that the current <Object File Block> has been marked "deleted" and 
+  will not be used.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.1 2014-04-28 22:20:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.2 2014-04-28 22:41:17 pauloscustodio Exp $
