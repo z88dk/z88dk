@@ -17,7 +17,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 # 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.4 2014-04-27 09:06:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_z80opcodes.pl,v 1.5 2014-04-28 22:06:05 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -144,6 +144,7 @@ sub expand_iter {
 
 #------------------------------------------------------------------------------
 # Iterator to handle IF/ELSE/ENDIF based on $define_opt
+# Must be on column 1 and in upper case
 #------------------------------------------------------------------------------
 sub compute_if {
 	my($in) = @_;
@@ -152,17 +153,17 @@ sub compute_if {
 	return Iterator::Simple::Lookahead->new( sub {
 		while (1) {
 			my $line = $in->next or return;
-			if ($line =~ /^\s*IF\s+(.*)/i) {
+			if ($line =~ /^IF\s+(.*)/) {
 				my $expr = $1;
 				my $not = $expr =~ s/^\s*!\s*//;
 				$expr =~ /^(\w+)\s*(;.*)?$/ or die "IF expression must be identifier";
 				push @state, (uc($1) eq uc($define_opt || ""));
 				$state[-1] = ! $state[-1] if $not;
 			}
-			elsif ($line =~ /^\s*ELSE/i) {
+			elsif ($line =~ /^ELSE/) {
 				$state[-1] = ! $state[-1];
 			}
-			elsif ($line =~ /^\s*ENDIF/i) {
+			elsif ($line =~ /^ENDIF/) {
 				@state > 1 or die "ENDIF without IF";
 				pop @state;
 			}
@@ -316,7 +317,10 @@ sub merge_asm_hex {
 
 
 # $Log: build_z80opcodes.pl,v $
-# Revision 1.4  2014-04-27 09:06:25  pauloscustodio
+# Revision 1.5  2014-04-28 22:06:05  pauloscustodio
+# Allow template code to send IF/ELSE/ENDIF to benchmark file
+#
+# Revision 1.4  2014/04/27 09:06:25  pauloscustodio
 # Cleanup temporary files
 #
 # Revision 1.3  2014/04/26 08:34:18  pauloscustodio
