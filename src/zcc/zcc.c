@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.75 2014-04-26 16:17:07 dom Exp $
+ *      $Id: zcc.c,v 1.76 2014-04-28 21:55:58 dom Exp $
  */
 
 
@@ -65,7 +65,7 @@ static char           *changesuffix(char *, char *);
 static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
-static void            BuildAsmLine(char *, char *);
+static void            BuildAsmLine(char *, size_t, char *);
 static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
@@ -77,6 +77,7 @@ static int             add_variant_args(char *wanted, int num_choices, char **ch
 static void            configure_assembler();
 static void            configure_compiler();
 static void            configure_misc_options();
+static void            configure_maths_library();
 
 
 static void            remove_temporary_files(void);
@@ -92,6 +93,7 @@ static void            add_zccopt(char *fmt,...);
 static char           *replace_str(const char *str, const char *old, const char *new);
 static void            setup_default_configuration();
 static void            print_specs();
+static int             zcc_asprintf(char **s, const char *fmt, ...);
 
 
 
@@ -131,6 +133,7 @@ static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -1;
+static int             c_nostdlib = 0;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -208,8 +211,8 @@ static char  *c_coptrules3 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
-static char  *c_z88mathlib = NULL;
-static char  *c_z88mathflg = NULL; // "-math-z88 -D__NATIVE_MATH__";
+static char  *c_altmathlib = NULL;
+static char  *c_altmathflags = NULL; // "-math-z88 -D__NATIVE_MATH__";
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "gen_math";
 static int    c_stylecpp = outspecified;
@@ -274,8 +277,10 @@ static arg_t  config[] = {
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
     {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
-    {"Z88MATHLIB", 0, SetStringConfig, &c_z88mathlib, NULL, ""},
-    {"Z88MATHFLG", 0, SetStringConfig, &c_z88mathflg, NULL, "Additional options for non-generic maths"},
+    {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
+    {"ALTMATHFLG", 0, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths"},
+    {"Z88MATHLIB", AF_DEPRECATED, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library (use ALTMATHLIB)"},
+    {"Z88MATHFLG", AF_DEPRECATED, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths (use ALTMATHFLG)"},
     {"STARTUPLIB", 0, SetStringConfig, &c_startuplib, NULL, ""},
     {"GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, ""},
     {"SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
@@ -303,12 +308,13 @@ static arg_t     myargs[] = {
     {"asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     {"crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
-    { "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
-    { "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
-    { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
-    { "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
-    { "clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
-    { "startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
+    {"pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
+    {"pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
+    {"pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
+    {"subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
+    {"clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
+    {"startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
+    {"nostdlib", AF_BOOL_TRUE, SetBoolean, &c_nostdlib, NULL, "If set ignore INCPATH, STARTUPLIB" },
     {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
@@ -441,12 +447,11 @@ process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum i
 
 int linkthem(char *linker)
 {
-    int             i, n, status;
-    char           *p;
-    char           *asmline = "";    /* patch for z80asm */
+    int             i, len, offs, status;
+    char           *temp, *cmdline;
+    char           *asmline = ""; 
     char           *ext;
 
-    /* patch for z80asm */
     if (peepholeopt) {
         if (IS_ASM(ASM_Z80ASM)) {
             asmline = "-eopt ";
@@ -459,50 +464,38 @@ int linkthem(char *linker)
         ext = ".asm";
     }
 
-    n = (strlen(linker) + 1);
-    if (lateassemble)
-        n += strlen(asmline);    /* patch for z80asm */
-    n += (48 + strlen(outputfile));
-    n += (strlen(linkargs) + 1);
-    n += (strlen(c_crt0) + strlen(ext) + 2);
-    n += (2 * strlen(c_linkopts));
-    for (i = 0; i < nfiles; ++i) {
-        n += strlen(filelist[i]);
-    }
-    p = mustmalloc(n);
-
-
-    sprintf(p, "%s %s -o%s%s ", linker, c_linkopts, linker_output_separate_arg ? " " : "", outputfile);
-    if (lateassemble)    /* patch */
-        strcat(p, asmline);    /* patch */
-    if (z80verbose && IS_ASM(ASM_Z80ASM)) {
-        strcat(p, "-v ");
-    }
-    if (relocate) {
-        if (lateassemble)
-            fprintf(stderr, "Cannot relocate an application..\n");
-        else
-            strcat(p, "-R ");
-    }
     linkargs_mangle(linkargs);
-    strcat(p, linkargs);
-    /*
-     * Now insert the 0crt file (so main doesn't have to be the first
-     * file linkargs last character is space..
-     */
-    strcat(p, c_crt0);
-    strcat(p, ext);
-
+    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s", 
+            linker, 
+            c_linkopts, 
+            linker_output_separate_arg ? " " : "", 
+            outputfile,
+            lateassemble ? asmline : "",
+            (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
+            (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
+            linkargs,
+            c_crt0,
+            ext);
+            
+    for ( i = 0; i < nfiles; i++ ) {
+        len += strlen(filelist[i]) + 5;
+    }
+    len++;
+    
+    /* So the total length we need is now in len, let's malloc and do it */
+    cmdline = calloc(len, sizeof(char));
+    strcpy(cmdline, temp);
+            
     for (i = 0; i < nfiles; ++i) {
         if ((!lateassemble && hassuffix(filelist[i], c_extension)) || lateassemble) {
-            strcat(p, " ");
-            strcat(p, filelist[i]);
+            offs += snprintf(cmdline + offs, len - offs," %s", filelist[i]);
         }
     }
     if (verbose)
-        printf("%s\n", p);
-    status = system(p);
-    free(p);
+        printf("%s\n", cmdline);
+    status = system(cmdline);
+    free(cmdline);
+    free(temp);
     return (status);
 }
 
@@ -522,8 +515,8 @@ int main(int argc, char **argv)
     add_option_to_compiler("");
 
     /* allocate enough pointers for all files, slight overestimate */
-    filelist = (char **) mustmalloc(sizeof(char *) * argc);
-    original_filenames = (char **) mustmalloc(sizeof(char *) * argc);
+    filelist = mustmalloc(sizeof(char *) * argc);
+    original_filenames =  mustmalloc(sizeof(char *) * argc);
 
 
     gc = 1;            /* Set for the first argument to scan for */
@@ -559,9 +552,7 @@ int main(int argc, char **argv)
 
 
 
-    /* Add the startup library to the linker arguments */
-    snprintf(buffer, sizeof(buffer), "-l%s ", c_startuplib);
-    BuildOptions(&linkargs, buffer);
+
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
@@ -604,9 +595,20 @@ int main(int argc, char **argv)
     
     configure_assembler();
     configure_compiler();
-
-    /* Add the default cpp path */
-    BuildOptions(&cpparg, c_incpath);
+    
+    configure_misc_options();
+    
+    configure_maths_library();
+    
+    if ( c_nostdlib == 0 ) {
+        /* Add the startup library to the linker arguments */
+        if ( c_startuplib && strlen(c_startuplib) ) {
+            snprintf(buffer, sizeof(buffer), "-l%s ", c_startuplib);
+            BuildOptions(&linkargs, buffer);
+            /* Add the default cpp path */
+            BuildOptions(&cpparg, c_incpath);
+        }
+    }
     
 
     if (preserve == NO) {
@@ -622,7 +624,6 @@ int main(int argc, char **argv)
         }
     }
 
-    configure_misc_options();
 
     if ((fp = fopen(DEFFILE, "a")) != NULL) {
         fprintf(fp,"%s", zccopt ? zccopt : "");
@@ -638,17 +639,8 @@ int main(int argc, char **argv)
         exit(0);
     }
     
-  
-    
-    /* We can't create an app and make a library.... */
-    if (createapp && makelib) {
-        createapp = NO;
-    }
+   
 
-    /* We only have to do a late assembly hack for z80asm family */
-    if (createapp && makeapp && IS_ASM(ASM_Z80ASM)) {
-        lateassemble = YES;
-    }
 
 
     /* Copy crt0 to temporary directory */
@@ -702,13 +694,13 @@ int main(int argc, char **argv)
                     exit(1);
                 break;
             default:
-                BuildAsmLine(asmarg, "-easm");
+                BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
                 if (!assembleonly && !lateassemble)
                     if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                         exit(1);
             }
         case OFILE:
-            BuildAsmLine(asmarg, "-eopt");
+            BuildAsmLine(asmarg, sizeof(asmarg), "-eopt");
             if (!assembleonly && !lateassemble)
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
@@ -827,22 +819,20 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
 }
     
 
-void BuildAsmLine(char *dest, char *prefix)
+void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 {
-    if (asmargs)
-        strcpy(dest, asmargs);
-    else
-        strcpy(dest, "");
+    size_t offs = strlen(dest);
+       
+    offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : "");
+    
     if (IS_ASM(ASM_Z80ASM)) {
-        strcat(dest, prefix);
-        if ( z80verbose ) {
-            strcat(dest, " -v ");
-        }
-        if (!symbolson) {
-            strcat(dest, " -ns ");
-        }
+        offs += snprintf(dest + offs, destlen - offs,"%s%s%s",
+                        prefix,
+                        z80verbose ? " -v " : "",
+                        !symbolson ? " -ns " : "");
     }
-    strcat(dest, c_asmopts);
+    
+    snprintf(dest + offs, destlen - offs,"%s", c_asmopts);
 }
 
 
@@ -882,7 +872,7 @@ void SetString(arg_t *argument, char *arg)
     }
 }
 
-void SetStringConfig(arg_t *argument, char *arg)
+static char *expand_macros(char *arg)
 {
     char  *ptr, *nval;
     char  *rep, *start;
@@ -915,8 +905,12 @@ void SetStringConfig(arg_t *argument, char *arg)
     
     nval = replace_str(value, "DESTDIR", c_install_dir);
     free(value);
-    value = nval;
-    *(char **)argument->data = value;
+    return nval;
+}
+
+void SetStringConfig(arg_t *argument, char *arg)
+{
+    *(char **)argument->data = expand_macros(arg);
 }
 
 void SetNumber(arg_t *argument, char *arg)
@@ -944,7 +938,7 @@ void AddArray(arg_t *argument, char *arg)
     char **arr = *(char ***)argument->data;
     *argument->num_ptr = *argument->num_ptr + 1;
     arr = realloc(arr, *argument->num_ptr * sizeof(char *));
-    arr[i] = strdup(arg);
+    arr[i] = expand_macros(arg);
     *(char ***)argument->data = arr;
 }
 
@@ -959,13 +953,6 @@ void AddAppmake(arg_t *argument, char *arg)
 void AddToArgs(arg_t *argument, char *arg)
 {
     BuildOptions(argument->data, arg + 3);
-
-    /* If this is the assembler and the linker is the same program then add to both */
-    if ( argument->data == &asmargs ) {
-        if (IS_ASM(ASM_Z80ASM)) {
-            BuildOptions(&linkargs, arg + 3);
-        }
-    }
 }
 
 void AddPreProc(arg_t *argument, char *arg)
@@ -976,29 +963,7 @@ void AddPreProc(arg_t *argument, char *arg)
 
 void AddLinkLibrary(arg_t *argument, char *arg)
 {
-    char            buffer[LINEMAX + 1];    /* A little large! */
-    /*
-     * We still have the "problem" of switching between maths literals,
-     * so if -lmz is supplied (custom lib) then add in the special option
-     * this way we can be as generic as possible
-     */
-    if (strcmp(arg, "-lmz") == 0) {
-        parse_option(c_z88mathflg);
-        if ( c_z88mathlib == NULL ) {
-            fprintf(stderr, "No Z88MATHLIB defined in configuration file - cannot use -lmz option\n");
-            exit(1);
-        }
-        snprintf(buffer, sizeof(buffer), "-l%s ", c_z88mathlib);
-        BuildOptions_start(&linkargs, buffer);
-        return;
-    } else if (strcmp(arg, "-lm") == 0) {
-        snprintf(buffer, sizeof(buffer), "-l%s ", c_genmathlib);
-        BuildOptions_start(&linkargs, buffer);
-        return;
-    }
-    /* Add on the necessary prefix for libraries */
-    snprintf(buffer, sizeof(buffer), "-l%s ", arg + 2);
-    BuildOptions_start(&linkargs, buffer);
+    BuildOptions_start(&linkargs, arg);
 }
 
 void AddLinkOption(arg_t *arg, char *val)
@@ -1011,42 +976,24 @@ void AddLinkOption(arg_t *arg, char *val)
  */
 void BuildOptions(char **list, char *arg)
 {
-    char           *temparg;
-    int             len;
-    temparg = *list;
-
-    len = 2 + strlen(arg) + (temparg ? strlen(temparg) : 0);
-    temparg = realloc(temparg, len);
-    if (temparg) {
-        if (*list == 0)
-            *temparg = 0;
-        *list = temparg;
-    } else {
-        fprintf(stderr, "Out of memory\n");
-        exit(1);
-    }
-    strcat(temparg, arg);
-    strcat(temparg, " ");
+    char           *val;
+    char           *orig = *list;
+    
+    zcc_asprintf(&val, "%s%s ",orig ? orig : "",arg);
+    
+    free(orig);
+    *list = val;
 }
 
 void BuildOptions_start(char **list, char *arg)
 {
-    char           *temparg;
-    int             len;
+    char           *val;
     char           *orig = *list;
-
-    len = 2 + strlen(arg) + (orig ? strlen(orig) : 0);
-
-    if ((temparg = malloc(len)) == NULL) {
-        fprintf(stderr, "Out of memory\n");
-        exit(1);
-    }
-    *list = temparg;    /* Set the pointer to the new string */
-    strcpy(temparg, arg);
-    strcat(temparg, " ");
-    strcat(temparg, orig);
-
+    
+    zcc_asprintf(&val, "%s %s",arg,orig ? orig : "");
+    
     free(orig);
+    *list = val;
 }
 
 
@@ -1176,6 +1123,38 @@ static void configure_misc_options()
 
     if ( c_startup != -1 ) {
         write_zcc_defined("startup", c_startup);
+    }
+    
+    /* We can't create an app and make a library.... */
+    if (createapp && makelib) {
+        createapp = NO;
+    }
+
+    /* We only have to do a late assembly hack for z80asm family */
+    if (createapp && makeapp && IS_ASM(ASM_Z80ASM)) {
+        lateassemble = YES;
+    }
+}
+
+static void configure_maths_library()
+{
+    char   buf[1024];
+    
+    /* By convention, -lm refers to GENMATH, -lmz to Z88MATHLIB/ALTMATHLIB */
+    
+    if ( c_altmathlib ) {
+        if ( strstr(linkargs,"-lmz ") != NULL ) {
+            snprintf(buf, sizeof(buf),"-l%s ", c_altmathlib);
+            linkargs = replace_str(linkargs, "-lmz ", buf);
+            parse_option(c_altmathflags);
+        }
+    }
+    
+    if ( c_genmathlib ) {
+        if ( strstr(linkargs,"-lm ") != NULL ) {
+            snprintf(buf, sizeof(buf),"-l%s ", c_genmathlib);
+            linkargs = replace_str(linkargs, "-lm ", buf);
+        }    
     }
 }
 
@@ -1410,7 +1389,7 @@ void remove_file_with_extension(char *file, char *ext)
     char           *temp;
     temp = changesuffix(file, ext);
     remove(temp);
-    free(temp);        /* Being nice for once! */
+    free(temp);    
 }
 
 
@@ -1550,7 +1529,7 @@ void tempname(char *filen)
  *    Or as a first resort argv[1]
  *    Returns gc (or exits)
  *
- *    If ZCCCFG doesn't exist then we take the PREFIX
+ *    If ZCCCFG doesn't exist then we take the c_install_dir/lib/config/zcc.cfg
  */
 int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
 {
@@ -1621,16 +1600,18 @@ int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
 void parse_option(char *option)
 {
     char           *ptr;
+    
+    if ( option != NULL ) {
+        ptr = strtok(option, " \t\r\n");
 
-    ptr = strtok(option, " \t\r\n");
-
-    while (ptr != NULL) {
-        if (ptr[0] == '-') {
-            parse_cmdline_arg(ptr);
-        } else {
-            add_file_to_process(ptr);
+        while (ptr != NULL) {
+            if (ptr[0] == '-') {
+                parse_cmdline_arg(ptr);
+            } else {
+                add_file_to_process(ptr);
+            }
+            ptr = strtok(NULL, " \r\n");
         }
-        ptr = strtok(NULL, " \r\n");
     }
 }
 
@@ -1639,7 +1620,7 @@ void linkargs_mangle(char *linkargs)
 {
     char           *ptr = linkargs;
 
-    if (IS_ASM(ASM_Z80ASM) && strstr(c_linker, "z80asm")) {
+    if (IS_ASM(ASM_Z80ASM) ) {
         while ((ptr = strstr(linkargs, "-l")) != NULL) {
             ptr[1] = 'i';
         }
@@ -1726,8 +1707,49 @@ static void print_specs()
         }
         pargs++;
     }
+}
 
 
+static int zcc_vasprintf(char **s, const char *fmt, va_list ap)
+{
+    FILE       *fp;
+    va_list     saveap;
+    size_t      req;
+    char       *ret;
+    
+    va_copy(saveap, ap);
+    
+    /* This isn't performant, but we don't use it that much */
+    if ( 
+#ifndef WIN32
+         ( fp = fopen("/dev/null","w") ) != NULL 
+#else
+         ( fp = fopen("NUL","w") ) != NULL 
+#endif
+        ) {
+        req = vfprintf(fp, fmt, ap);
+        fclose(fp);
+        ret = calloc(req + 1, sizeof(char));
+        req = vsnprintf(ret, req + 1, fmt, saveap);    
+        *s = ret;
+    } else {
+        *s = NULL;
+        req = -1;
+    }
+    return req;
+}
+
+
+
+static int zcc_asprintf(char **s, const char *fmt, ...)
+{
+    va_list arg;
+    int     res;
+
+    va_start(arg, fmt);
+    res = zcc_vasprintf(s, fmt, arg);
+    va_end(arg);
+    return res;
 }
 
 /*
