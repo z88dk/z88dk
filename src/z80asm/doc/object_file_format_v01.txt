@@ -40,7 +40,7 @@ n
 
 The 0 (null) - <n> defines start to <n> total of bytes file length. The 
 above figure has deliberately been split into sections to clarify the 
-file structure, allthough there is no actual physical separation between 
+file structure, although there is no actual physical separation between 
 the sections in the file; each section is immediatly followed by the 
 next. 
 
@@ -48,10 +48,10 @@ The file pointers are 32bit integers stored in low byte - high byte
 order (Little endian format - Z80/Intel notation). 
 
 * <ORG Address> : Contains the ORG address for the linked machine code 
-  or FFFFh for no ORG address defined. 
+  or 0xFFFF for no ORG address defined. 
 
 * <Expression Declaration> : Contains the following: 
-  <type><patchptr><length><expression_string>
+  <type><patchptr><length><expression_string><0>
 
   <type> defines the resulting evaluation type range: 
   'U': 8bit integer (0 to 255) 
@@ -64,6 +64,7 @@ order (Little endian format - Z80/Intel notation).
   <length> defines byte length of expression string. 
   <expression_string> contains the infix expression parsed from the 
   source file.
+  <0> is a zero byte end marker, not part of the expression length.
 
 * <Name Declaration> 
   Contains the following: 
@@ -112,7 +113,7 @@ n
   <Next Object File><Object File Length><'Z80RMF01' Object File>
 
 * <Next Object File> is a 32bit integer file pointer to the next 
-  <Object File Block>. If this file pointer is -1 (FFFFFFFFh) then 
+  <Object File Block>. If this file pointer is -1 (0xFFFFFFFF) then 
   the current <Object File Block> is the last in the library file.
 
 * <Object File Length> is 32bit length integer of the 
@@ -121,4 +122,4 @@ n
   will not be used.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.2 2014-04-28 22:41:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.3 2014-04-28 22:44:55 pauloscustodio Exp $
