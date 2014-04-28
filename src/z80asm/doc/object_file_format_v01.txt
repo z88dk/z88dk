@@ -1,5 +1,8 @@
 File formats
 ------------
+This document describes the object and libary formats used by z80asm 
+up to version 1.2.10.
+
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
 any end-markers. 
@@ -128,4 +131,4 @@ Addr  Type    Object
   object files has been marked "deleted" and will not be used.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.4 2014-04-28 23:36:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.5 2014-04-28 23:41:39 pauloscustodio Exp $
