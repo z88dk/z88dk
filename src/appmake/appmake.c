@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.18 2014-04-29 20:36:30 dom Exp $
+ *   $Id: appmake.c,v 1.19 2014-04-29 21:09:02 dom Exp $
  */
 
 #define MAIN_C
@@ -16,7 +16,7 @@ static void         main_usage(void);
 
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
-static void         option_print(char *execname, char *ident, char *copyright, char *desc,option_t *opts);
+static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
 
 
 int main(int argc, char *argv[])
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
             option_parse(ac,av,machines[i].options);
             switch ( machines[i].exec(target,machines[i].ident) ) {
             case -1:
-                option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].options);
+                option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].longdesc, machines[i].options);
                 myexit(NULL,1);
             default:
                 myexit(NULL,0);
@@ -222,7 +222,7 @@ static int option_set(int pos, int max, char *argv[], option_t *option)
 }
 
 
-static void option_print(char *execname, char *ident, char *copyright, char *desc, option_t *opts)
+static void option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts)
 {
     option_t *opt = opts;
     char      optstr[4];
@@ -231,7 +231,10 @@ static void option_print(char *execname, char *ident, char *copyright, char *des
 
     if ( desc && strlen(desc) )
         fprintf(stderr,"\n%s\n",desc);
-
+        
+    if ( longdesc && strlen(longdesc) )
+        fprintf(stderr,"\n%s",longdesc);
+        
     fprintf(stderr,"\nOptions:\n\n");
     while ( opt->type != OPT_NONE ) {
         if ( opt->sopt ) {
@@ -472,5 +475,6 @@ int hexdigit(char digit) {
 
 	fprintf(stderr,"\nError in patch string\n");
 	myexit(NULL,1);
+	return 0; /* Not reached */
 }
 
