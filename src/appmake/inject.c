@@ -1,7 +1,7 @@
 /*
  *      Short program to inject files into other files
  *      
- *      $Id: inject.c,v 1.1 2014-04-29 21:09:02 dom Exp $
+ *      $Id: inject.c,v 1.2 2014-04-29 21:11:34 dom Exp $
  */
 
 
@@ -26,7 +26,7 @@ option_t inject_options[] = {
     { 'b', "binfile",   "File to insert into",            OPT_STR,   &binname },
     { 'o', "output",    "Name of output file",            OPT_STR,   &outfile },
     { 'i', "inject",    "File to inject",                 OPT_STR,   &inject },
-    { 's', "offset",    "File offset to inset at",        OPT_INT,   &offset },
+    { 's', "offset",    "File offset to inject at",        OPT_INT,   &offset },
     {  0,  NULL,       NULL,                              OPT_NONE,  NULL }
 };
 
