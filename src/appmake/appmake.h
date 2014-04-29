@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.33 2014-04-22 22:53:17 dom Exp $
+ *   $Id: appmake.h,v 1.34 2014-04-29 20:36:30 dom Exp $
  */
 
 
@@ -275,7 +275,9 @@ struct {
 
 #define LINEMAX         80
 
-extern int          myexit(char *str,int code);
+
+#define myexit(buf, code) exit_log(code, buf)
+extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(char *filen, char *ext,char *target);
 extern void         suffix_change(char *name, char *suffix);
 

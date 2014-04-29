@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.17 2013-02-19 12:56:09 stefano Exp $
+ *   $Id: appmake.c,v 1.18 2014-04-29 20:36:30 dom Exp $
  */
 
 #define MAIN_C
@@ -83,14 +83,17 @@ int main(int argc, char *argv[])
 
 
 /* Useful functions used by many targets */
-
-int myexit(char *str,int code)
+void exit_log(int code, char *fmt, ...)
 {
-        if ( str != NULL )
-            fputs(str,stderr);
-        exit(code);
+    va_list  ap;
+    
+    va_start(ap, fmt);
+    if ( fmt != NULL ) {
+        vfprintf(stderr, fmt, ap);
+    }
+    va_end(ap);
+    exit(code);
 }
-
 
 
 /* Search through debris from z80asm for some important parameters */
