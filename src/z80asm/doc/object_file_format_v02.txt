@@ -79,14 +79,14 @@ Addr  Type    Object
 
 * <Module Names> Contains a set of names defined in this module 
   up to the next existing section. Each name has the following format:
-  <scope><yype><value><name>
+  <scope><type><value><name>
 
   <scope> (char) defines the scope of the name:  
   'L' is local,  
   'G' is global,  
   'X' global library
 
-  <yype> (char) defines whether it is a: 
+  <type> (char) defines whether it is a: 
   'A' relocatable address, 
   'C' a constant'
 
@@ -133,4 +133,4 @@ Addr  Type    Object
   object files has been marked "deleted" and will not be used.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v02.txt,v 1.1 2014-04-28 23:47:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v02.txt,v 1.2 2014-04-29 22:51:38 pauloscustodio Exp $
