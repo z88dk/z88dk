@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.1 2014-04-18 14:07:09 stefano Exp $
+ *      $Id: rom.c,v 1.2 2014-04-29 09:18:20 dom Exp $
  */
 
 
@@ -50,11 +50,11 @@ int rom_exec(char *target)
         return -1;
     }
 
-	if ( size != -1 ) {
-		fillsize = size;
-	} else {
-			myexit("ROM block size not specified (use -s)\n",1);
-	}
+    if ( size != -1 ) {
+        fillsize = size;
+    } else {
+        myexit("ROM block size not specified (use -s)\n",1);
+    }
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
