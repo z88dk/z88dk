@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.19 2014-04-29 21:09:02 dom Exp $
+ *   $Id: appmake.c,v 1.20 2014-04-30 08:01:11 dom Exp $
  */
 
 #define MAIN_C
@@ -45,12 +45,14 @@ int main(int argc, char *argv[])
     }
 
     /* Now, search through for argv[0] calling convention */
-    for ( i = 0; i < APPMAKE_TARGETS; i++ ) {
+    i = 0;
+    while (machines[i].execname ) {
         if ( ( ptr = strstr(argv[0],machines[i].execname )  ) &&
              ( *(ptr + strlen(machines[i].execname) ) == '.' || *(ptr + strlen(machines[i].execname) ) == '\0' ) ) {
             target = machines[i].ident;     /* Ick, but there we go */
             break;
         }
+        i++;
     }
 
 
@@ -59,7 +61,8 @@ int main(int argc, char *argv[])
     }
 
 
-    for ( i = 0; i < APPMAKE_TARGETS; i++ ) {
+    i = 0;
+    while (machines[i].ident ) {
         if ( strcmp(target,machines[i].ident) == 0 ) {
             option_parse(ac,av,machines[i].options);
             switch ( machines[i].exec(target,machines[i].ident) ) {
@@ -70,6 +73,7 @@ int main(int argc, char *argv[])
                 myexit(NULL,0);
             }            
         }
+        i++;
     }
 
     fprintf(stderr,"Unknown machine target \"%s\"\n\n",target);
@@ -157,8 +161,10 @@ void main_usage(void)
             "emulators or on the real hardware. ");
 
     fprintf(stderr,"Supported targets are:\n\n");
-    for ( i = 0; i < APPMAKE_TARGETS; i++ ) {
+    i = 0;
+    while (machines[i].ident ) {
         fprintf(stderr,"+%-12s (%-8s) - %s\n",machines[i].ident,machines[i].execname,machines[i].copyright);
+        i++;
     }
     fprintf(stderr,"\nFor more usage information use +[target] with no options\n");
   

@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.35 2014-04-29 21:09:02 dom Exp $
+ *   $Id: appmake.h,v 1.36 2014-04-30 08:01:11 dom Exp $
  */
 
 
@@ -313,9 +313,9 @@ struct {
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
       "Generates a .P file suitable for use by emulators, optional WAV file",
       NULL,
-      zx81_exec,    &zx81_options }
+      zx81_exec,    &zx81_options },
+    { NULL, NULL, NULL, NULL, NULL, NULL }
 };
-#define APPMAKE_TARGETS 38
 #endif
 
 
