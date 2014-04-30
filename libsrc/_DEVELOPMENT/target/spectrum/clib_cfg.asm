@@ -54,15 +54,12 @@ defc __CLIB_OPT_IMATH = 0
 ; < 50 = select small integer math library
 ; > 50 = select fast integer math library
 
-; Note: currently the fast integer math library is
-;       always selected.
-
 ; The specific integer math library selected above
 ; can be further tailored by choosing options below.
 
 ; FAST INTEGER MATH LIBRARY OPTIONS
 
-defc __CLIB_OPT_IMATH_FAST = $80
+defc __CLIB_OPT_IMATH_FAST = $00
 
 ; bit 0 = $01 = enable loop unrolling in division
 ; bit 1 = $02 = enable leading zero elimination in division
