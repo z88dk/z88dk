@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_liner.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
+;	$Id: stencil_add_liner.asm,v 1.3 2014-04-30 18:34:18 stefano Exp $
 ;
 
 ;; void stencil_add_liner(int dx, int dy, unsigned char *stencil)
@@ -17,7 +17,7 @@
 
                 XLIB    stencil_add_liner
 
-                LIB     line_r
+                LIB     Line_r
                 LIB     stencil_add_pixel 
 
                 LIB     swapgfxbk
@@ -41,7 +41,7 @@
 				call    swapgfxbk
 		
                 ld      ix,stencil_add_pixel
-                call      line_r
+                call      Line_r
                 
                 jp      swapgfxbk1
 

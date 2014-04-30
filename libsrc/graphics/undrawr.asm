@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawr.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: undrawr.asm,v 1.4 2014-04-30 18:34:18 stefano Exp $
 ;
 
 
@@ -19,7 +19,7 @@
                 XREF	swapgfxbk1
 
 
-                LIB     line_r
+                LIB     Line_r
                 LIB     respixel
 
 
@@ -33,6 +33,6 @@
 		ld	h,(ix+5)
                 ld      ix,respixel
                 call    swapgfxbk
-                call    line_r
+                call    Line_r
                 jp      swapgfxbk1
 

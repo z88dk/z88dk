@@ -9,7 +9,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_side.asm,v 1.4 2010-12-24 11:59:35 stefano Exp $
+;	$Id: stencil_add_side.asm,v 1.5 2014-04-30 18:34:18 stefano Exp $
 ;
 
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
@@ -18,7 +18,7 @@
 
                 XLIB    stencil_add_side
 
-                LIB     line
+                LIB     Line
                 LIB	stencil_add_pixel 
                 LIB     swapgfxbk
                 XREF    swapgfxbk1
@@ -39,7 +39,7 @@
 
 				call	swapgfxbk
                 ld      ix,stencil_add_pixel
-                call    line
+                call    Line
                 jp      swapgfxbk1
 
 

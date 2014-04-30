@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.4 2008-06-30 16:43:00 stefano Exp $
+;	$Id: drawr.asm,v 1.5 2014-04-30 18:34:18 stefano Exp $
 ;
 
 
@@ -17,7 +17,7 @@
                 LIB     swapgfxbk
                 XREF	swapgfxbk1
 
-                LIB     line_r
+                LIB     Line_r
                 LIB     plotpixel
 
 
@@ -32,6 +32,6 @@
 
                 call    swapgfxbk
                 ld      ix,plotpixel
-                call    line_r
+                call    Line_r
                 jp      swapgfxbk1
 
