@@ -1,44 +1,17 @@
-;
-;       Z88 Small C+ Run Time Library 
-;       Long support functions
-;
-;       djm 25/2/99
-;       Rewritten for size and speed (untested, but should be OK)
-;
-;       aralbrec 01/2007
-;       sped up some more
 
+XLIB l_long_asr
 
-XLIB    l_long_asr
+LIB l_asr_dehl
 
-; Shift primary (on stack) right by secondary, 
-; We can only shift a maximum of 32 bits (or so), so the counter can
-; go in c
+l_long_asr:
 
-.l_long_asr
+   ;     l = shift amount
+   ; stack = dehl, ret
 
-        pop ix
+   pop af
+   pop hl
+   pop de
+   push af
    
-        ld      a,l     ;temporary store for counter
-        pop     hl
-        pop     de
-        
-        or a
-        jr z, done
-        
-        ld b,a
-        ld a,e          ; primary = dahl
-
-.loop
-
-        sra d
-        rra
-        rr h
-        rr l
-        djnz loop
-        
-        ld e,a
-
-.done
-
-        jp (ix)
+   ld a,l
+   jp l_asr_dehl

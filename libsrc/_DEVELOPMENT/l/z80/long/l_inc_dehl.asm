@@ -9,12 +9,12 @@ l_inc_dehl:
    ;
    ; exit  : dehl = dehl + 1
    ;
-   ; uses  : af, de, hl
+   ; uses  : f, de, hl
+
+   inc l
+   ret nz
    
-   inc hl
-   
-   ld a,h
-   or l
+   inc h
    ret nz
    
    inc de

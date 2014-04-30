@@ -1,35 +1,8 @@
-;       Small C+ Z88 Support Library
-;
-;       Increment long by 1
-;
-;       djm 21/2/99
-;       Rewritten so that I know it works properly!
 
-                XLIB    l_inclong
+XLIB l_inclong
 
-.l_inclong
+LIB l_inc_dehl
 
-   inc l
-   ret nz
-   inc h
-   ret nz
-   inc de
-   ret
-   
-;        inc     hl
-;        ld      a,h
-;        or      l
-;        ret     nz
-;        inc     de
-;        ret
+l_inclong:
 
-
-IF ARCHAIC
-
-.l_inclong
-        ld      bc,1
-        add     hl,bc
-        ret     nc
-        inc     de
-        ret
-ENDIF
+   jp l_inc_dehl

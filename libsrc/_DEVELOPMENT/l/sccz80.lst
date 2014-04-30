@@ -12,8 +12,6 @@ l/sccz80/crt0/l_cm_bc
 l/sccz80/crt0/l_cm_de
 l/sccz80/crt0/l_com
 l/sccz80/crt0/l_deneg
-l/sccz80/crt0/l_div
-l/sccz80/crt0/l_div_u
 l/sccz80/crt0/l_eq
 l/sccz80/crt0/l_gchar
 l/sccz80/crt0/l_gcharsp
@@ -28,9 +26,6 @@ l/sccz80/crt0/l_gint_eq
 l/sccz80/crt0/l_ghtonsint
 l/sccz80/crt0/l_glong
 l/sccz80/crt0/l_gt
-l/sccz80/crt0/l_jphl
-l/sccz80/crt0/l_jpix
-l/sccz80/crt0/l_jpiy
 l/sccz80/crt0/l_le
 l/sccz80/crt0/l_lneg
 l/sccz80/crt0/l_lt
@@ -89,6 +84,8 @@ l/sccz80/crt0_long/l_long_ult
 l/sccz80/crt0_long/l_long_xor
 l/sccz80/crt0_long/long2int_s
 l/sccz80/crt0_long/lpush2
+l/z80/imath/sccz80_l_div
+l/z80/imath/sccz80_l_divu
 l/z80/imath/sccz80_l_long_div
 l/z80/imath/sccz80_l_long_div_u
 l/z80/imath/sccz80_l_long_mult

@@ -1,18 +1,13 @@
-;       Z88 Small C+ Run time Library
-;       Moved functions over to proper libdefs
-;       To make startup code smaller and neater!
-;
-;       6/9/98  djm
 
-                XLIB    l_asl
+XLIB l_asl
 
+LIB l_lsl_hl
 
-; shift DE left arithmetically by HL, move to HL
+l_asl:
 
-.l_asl 
-        ex de,hl
-.l_asl1   
-        dec   e
-        ret   m
-        add   hl,hl
-        jp    l_asl1
+   ; hl = de << hl
+   
+   ex de,hl
+   ld a,e
+   
+   jp l_lsl_hl

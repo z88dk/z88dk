@@ -2,7 +2,9 @@ l/sdcc/divmixed
 l/sdcc/modmixed
 l/sdcc/modsigned
 l/sdcc/modunsigned
-l/sdcc/shift
+l/sdcc/rllong_rrx_s
+l/sdcc/rrslong_rrx_s
+l/sdcc/rrulong_rrx_s
 l/z80/imath/sdcc_divschar_rrx_s
 l/z80/imath/sdcc_divsint_rrx_s
 l/z80/imath/sdcc_divslong_rrx_s
