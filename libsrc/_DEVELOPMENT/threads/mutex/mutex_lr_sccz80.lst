@@ -1,3 +1,5 @@
+threads/mutex/c/lr_sccz80/call_once
+threads/mutex/c/lr_sccz80/call_once_callee
 threads/mutex/c/lr_sccz80/mtx_destroy
 threads/mutex/c/lr_sccz80/mtx_init
 threads/mutex/c/lr_sccz80/mtx_init_callee

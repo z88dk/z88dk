@@ -1,3 +1,4 @@
+threads/mutex/c/sdcc_ix/call_once
 threads/mutex/c/sdcc_ix/mtx_destroy
 threads/mutex/c/sdcc_ix/mtx_init
 threads/mutex/c/sdcc_ix/mtx_lock

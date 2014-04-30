@@ -1,3 +1,4 @@
+threads/mutex/z80/asm_call_once
 threads/mutex/z80/asm_mtx_destroy
 threads/mutex/z80/asm_mtx_init
 threads/mutex/z80/asm_mtx_lock

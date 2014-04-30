@@ -18,12 +18,16 @@ typedef struct mtx_s
 
 } mtx_t;
 
+typedef uint16_t       once_flag;
+#define ONCE_FLAG_INIT 0x00fe
+
 #if __SDCC | __SDCC_IX | __SDCC_IY
 
 // SDCC
 
 // mutex
 
+extern void   call_once(once_flag *flag, void (*func)(void));
 extern void   mtx_destroy(mtx_t *m);
 extern int    mtx_init(mtx_t *m, int type);
 extern int    mtx_lock(mtx_t *m);
@@ -40,6 +44,7 @@ extern int    spinlock_tryacquire(char *spinlock);
 
 // mutex
 
+extern void   __LIB__               call_once(once_flag *flag, void *func);
 extern void   __LIB__ __FASTCALL__  mtx_destroy(mtx_t *m);
 extern int    __LIB__               mtx_init(mtx_t *m, int type);
 extern int    __LIB__ __FASTCALL__  mtx_lock(mtx_t *m);
@@ -54,6 +59,7 @@ extern int    __LIB__ __FASTCALL__  spinlock_tryacquire(char *spinlock);
 
 // mutex
 
+extern void   __LIB__ __CALLEE__    call_once_callee(once_flag *flag, void *func);
 extern int    __LIB__ __CALLEE__    mtx_init_callee(mtx_t *m, int type);
 extern int    __LIB__ __CALLEE__    mtx_timedlock_callee(mtx_t *m, struct timespec *ts);
 
@@ -61,6 +67,7 @@ extern int    __LIB__ __CALLEE__    mtx_timedlock_callee(mtx_t *m, struct timesp
 
 // mutex
 
+#define call_once(a,b)              call_once_callee(a,b)
 #define mtx_init(a,b)               mtx_init_callee(a,b)
 #define mtx_timedlock(a,b)          mtx_timedlock_callee(a,b)
 
