@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inject.c"
+				>
+			</File>
+			<File
 				RelativePath=".\msx.c"
 				>
 			</File>
@@ -240,6 +244,10 @@
 			</File>
 			<File
 				RelativePath=".\newbrain.c"
+				>
+			</File>
+			<File
+				RelativePath=".\residos.c"
 				>
 			</File>
 			<File
