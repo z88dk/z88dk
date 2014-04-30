@@ -16,9 +16,32 @@ __divulong_rrx_s:
    ; exit  : dehl = quotient
    ;         dehl'= remainder (sdcc does not use remainder)
    ;
-   ; uses  : af, bc, de, hl, (iy if SDCC_IY)
+   ; uses  : af, bc, de, hl, bc', de', hl', (iy if SDCC_IY)
+
+IF __CLIB_OPT_IMATH <= 50
+
+   pop af
+   pop hl
+   pop de
+   exx
+   pop hl
+   pop de
    
-;; IF __CLIB_OPT_IMATH > 50
+   push de
+   push hl
+   exx
+   push de
+   push hl
+   push af
+   
+   exx
+   
+   LIB l_small_divu_32_32x32
+   jp l_small_divu_32_32x32
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
    pop af
    pop hl
@@ -53,4 +76,4 @@ __divulong_rrx_s:
       
    ENDIF
 
-;; ENDIF
+ENDIF

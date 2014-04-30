@@ -14,9 +14,22 @@ XLIB l0_divu_32_32x16
 
 l0_divu_32_32x16:
 
-;; IF __CLIB_OPT_IMATH > 50
+IF __CLIB_OPT_IMATH <= 50
+
+   LIB l0_small_divu_32_32x32
+   
+   push bc
+   exx
+   pop hl
+   ld de,0
+   
+   jp l0_small_divu_32_32x32
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
    LIB l0_fast_divu_32_32x16
    jp l0_fast_divu_32_32x16
 
-;; ENDIF
+ENDIF

@@ -18,11 +18,32 @@ __mullong_rrx_s:
 
    ; enter : stack = 32-bit multiplicand, 32-bit multiplicand, ret
    ;
-   ; exit  : hl = product
+   ; exit  : dehl = product
    ;
    ; uses  : af, bc, de, hl, bc', de', hl', (iy if SDCC_IY)
+
+IF __CLIB_OPT_IMATH <= 50
+
+   pop af
+   pop hl
+   pop de
+   exx
+   pop hl
+   pop de
    
-;; IF __CLIB_OPT_IMATH > 50
+   push de
+   push hl
+   exx
+   push de
+   push hl
+   push af
+   
+   LIB l_small_mul_32_32x32
+   jp l_small_mul_32_32x32
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
    pop af
    pop hl
@@ -55,4 +76,4 @@ __mullong_rrx_s:
    
    ENDIF
    
-;; ENDIF
+ENDIF

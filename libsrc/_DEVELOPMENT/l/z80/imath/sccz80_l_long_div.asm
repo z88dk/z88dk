@@ -18,8 +18,24 @@ l_long_div:
    ;         dehl'= remainder
    ;
    ; uses  : af, bc, de, hl, bc', de', hl', ix
+
+IF __CLIB_OPT_IMATH <= 50
+
+   exx
    
-;; IF __CLIB_OPT_IMATH > 50
+   pop af
+   pop hl
+   pop de
+   push af
+   
+   exx
+   
+   LIB l_small_divs_32_32x32
+   jp l_small_divs_32_32x32
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
    exx
    
@@ -33,4 +49,4 @@ l_long_div:
    LIB l_fast_divs_32_32x32
    jp l_fast_divs_32_32x32
 
-;; ENDIF
+ENDIF

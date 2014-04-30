@@ -17,8 +17,32 @@ __divschar_rrx_s:
    ;         de = remainder
    ;
    ; uses  : af, bc, de, hl
+
+IF __CLIB_OPT_IMATH <= 50
+
+   ld hl,3
+   add hl,sp
    
-;; IF __CLIB_OPT_IMATH > 50
+   ld e,(hl)
+   dec hl
+   ld l,(hl)
+   
+   ld a,e
+   rla
+   sbc a,a
+   ld d,a
+   
+   ld a,l
+   rla
+   sbc a,a
+   ld h,a
+   
+   LIB l_small_divs_16_16x16
+   jp l_small_divs_16_16x16
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
    
    ld hl,3
    add hl,sp
@@ -45,4 +69,4 @@ __divschar_rrx_s:
 
    ret
    
-;; ENDIF
+ENDIF

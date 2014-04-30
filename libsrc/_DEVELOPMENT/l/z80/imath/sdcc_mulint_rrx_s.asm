@@ -21,8 +21,23 @@ __mulint_rrx_s:
    ; exit  : hl = product
    ;
    ; uses  : af, bc, de, hl
+
+IF __CLIB_OPT_IMATH <= 50
+
+   pop af
+   pop hl
+   pop de
    
-;; IF __CLIB_OPT_IMATH > 50
+   push de
+   push hl
+   push af
+   
+   LIB l_small_mul_16_16x16
+   jp l_small_mul_16_16x16
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
    pop af
    pop hl
@@ -35,4 +50,4 @@ __mulint_rrx_s:
    LIB l_fast_mulu_16_16x16
    jp l_fast_mulu_16_16x16     ; hl = hl * de
 
-;; ENDIF
+ENDIF
