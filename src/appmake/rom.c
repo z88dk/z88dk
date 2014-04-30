@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.3 2014-04-30 04:54:00 aralbrec Exp $
+ *      $Id: rom.c,v 1.4 2014-04-30 19:00:01 dom Exp $
  */
 
 
@@ -20,8 +20,8 @@ static int               size         = -1;
 /* Options that are available for this module */
 option_t rom_options[] = {
     { 'h', "help",      "Display this help",              OPT_BOOL,  &help},
-    { 'b', "binfile",   "Linked binary file",             OPT_STR,   &binname },
-    { 'o', "output",    "Name of output file",            OPT_STR,   &outfile },
+    { 'b', "binfile",   "Linked binary file",             OPT_STR|OPT_INPUT,   &binname },
+    { 'o', "output",    "Name of output file",            OPT_STR|OPT_OUTPUT,   &outfile },
     { 'f', "filler",    "Filler byte (default: 0xFF)",    OPT_INT,   &filler },
     { 's', "blocksize", "ROM size to be reached",         OPT_INT,   &size },
     {  0,  NULL,       NULL,                              OPT_NONE,  NULL }
@@ -49,7 +49,7 @@ int rom_exec(char *target)
     if ( size != -1 ) {
         fillsize = size;
     } else {
-        myexit("ROM block size not specified (use -s)\n",1);
+        exit_log(1,"ROM block size not specified (use -s)\n");
     }
 
     if ( outfile == NULL )

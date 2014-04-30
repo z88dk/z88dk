@@ -11,7 +11,7 @@
  *
  * djm 26/6/2001
  *
- * $Id: hex.c,v 1.2 2009-06-13 19:16:42 dom Exp $
+ * $Id: hex.c,v 1.3 2014-04-30 19:00:01 dom Exp $
  */
 
 #include "appmake.h"
@@ -29,8 +29,8 @@ static char              help         = 0;
 /* Options that are available for this module */
 option_t hex_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &binname },
+    { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &outfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
@@ -65,7 +65,7 @@ static int bin2hex(FILE *input, FILE *output, int address)
     inbuf = outbuf + 5;
     outbuf[0] = ':';
   
-    do {    printf("%d\n",address);
+    do {    
 
         size = 0;
         while (size < RECSIZE) {
@@ -141,7 +141,8 @@ int hex_exec(char *target)
 
     fclose(input); 
     fclose(output);
-    exit(0);
+    
+    return 0;
 }
 
 

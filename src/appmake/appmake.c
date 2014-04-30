@@ -5,18 +5,29 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.20 2014-04-30 08:01:11 dom Exp $
+ *   $Id: appmake.c,v 1.21 2014-04-30 19:00:01 dom Exp $
  */
 
 #define MAIN_C
 #include "appmake.h"
 
+#if (_BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
+#define mktempfile(a) close(mkstemp(a))
+#else
+#define mktempfile(a) mktemp(a)
+#endif
+
+
+static char         chain_temp_filename[FILENAME_MAX+1];
+static char        *program_name = NULL;
 
 static void         main_usage(void);
-
+static void         execute_command(char *target, int argc, char **argv, int chainmode);
+static void         set_option_by_type(option_t *options, type_t type, char *value);
 static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
+static void         get_temporary_filename(char *filen);
 
 
 int main(int argc, char *argv[])
@@ -26,64 +37,91 @@ int main(int argc, char *argv[])
     char  **av;
     char   *ptr;
     char   *target = NULL;
-    char    targethelp;
-
-
-    av = calloc(argc,sizeof(char*));
-    ac = 0;
-
-    /* Run through the arguments, looking for the last machine target */
-    for ( i = 0; i < argc; i++ ) {
-        if ( argv[i][0] == '+' ) {
-            target = &argv[i][1];
-        } else {
-            if ( strcmp(argv[i],"-h") == 0 )
-                targethelp = 1;
-            av[ac] = argv[i];
-            ac++;
-        }
-    }
-
-    /* Now, search through for argv[0] calling convention */
+    
+    chain_temp_filename[0] = 0;
+    
+    /* If we're called by the name of one of the subprograms, that's the one we are */
     i = 0;
     while (machines[i].execname ) {
         if ( ( ptr = strstr(argv[0],machines[i].execname )  ) &&
              ( *(ptr + strlen(machines[i].execname) ) == '.' || *(ptr + strlen(machines[i].execname) ) == '\0' ) ) {
-            target = machines[i].ident;     /* Ick, but there we go */
-            break;
+            target = machines[i].ident;  
+            execute_command(target, argc, argv, 0);
+            exit(0);
         }
         i++;
     }
 
-
+    /* So, let's check for + style execution */
+    av = calloc(argc,sizeof(char*));
+    ac = 0;
+    
+    for ( i = 0; i < argc; i++ ) {
+        if ( argv[i][0] == '+' ) {
+            if ( target != NULL ) {
+                execute_command(target, ac, av, 1);
+            }
+            target = &argv[i][1];
+            ac = 0;
+        } else {
+            av[ac] = argv[i];
+            ac++;
+        }
+    }
+    
     if ( target == NULL ) {
         main_usage();
     }
+    
+    execute_command(target, ac, av, 2);
 
+    exit(0);
+}
 
+static void execute_command(char *target, int argc, char **argv, int chainmode)
+{
+    int   i;
+    char  output_file[FILENAME_MAX+1];
+    
     i = 0;
     while (machines[i].ident ) {
         if ( strcmp(target,machines[i].ident) == 0 ) {
-            option_parse(ac,av,machines[i].options);
-            switch ( machines[i].exec(target,machines[i].ident) ) {
-            case -1:
+            option_parse(argc,argv,machines[i].options);
+            program_name = target;
+            if ( chainmode ) {
+                /* Chained command, if we had a previous output, that's our input file for this stage */
+                if ( strlen(chain_temp_filename) ) {
+                    set_option_by_type(machines[i].options, OPT_STR|OPT_INPUT, chain_temp_filename);
+                }
+                /* Now, let's create a new temporary output file (but not if last in chain) */
+                if ( chainmode == 1 ) {
+                    get_temporary_filename(output_file);
+                    set_option_by_type(machines[i].options, OPT_STR|OPT_OUTPUT, output_file);
+                }
+            }
+            
+            if ( machines[i].exec(target, machines[i].ident) == -1 ) {
+                if ( strlen(chain_temp_filename) ) {
+                    remove(chain_temp_filename);
+                }
                 option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].longdesc, machines[i].options);
-                myexit(NULL,1);
-            default:
-                myexit(NULL,0);
-            }            
+                exit(1);
+            }
+            if ( strlen(chain_temp_filename) ) {
+                printf("%d\n",remove(chain_temp_filename));
+            }
+            if ( chainmode == 1 ) {
+                strcpy(chain_temp_filename, output_file);
+            }
+            program_name = NULL;
+            return;            
         }
         i++;
     }
 
     fprintf(stderr,"Unknown machine target \"%s\"\n\n",target);
-    main_usage();
-
-    return 0;
+    main_usage();  /* Never returns */
 }
-
-
-
 
 
 /* Useful functions used by many targets */
@@ -93,6 +131,9 @@ void exit_log(int code, char *fmt, ...)
     
     va_start(ap, fmt);
     if ( fmt != NULL ) {
+        if ( program_name ) {
+            fprintf(stderr, "%s: ", program_name);
+        }
         vfprintf(stderr, fmt, ap);
     }
     va_end(ap);
@@ -168,7 +209,25 @@ void main_usage(void)
     }
     fprintf(stderr,"\nFor more usage information use +[target] with no options\n");
   
-    myexit(NULL,1);
+    exit(1);
+}
+
+
+static void set_option_by_type(option_t *options, type_t type, char *value)
+{
+    char  *arr[2];
+    
+    arr[1] = value;
+    
+    do {
+        if ( options->type == type ) {
+            option_set(0, 2, arr, options);
+            return;
+        }
+        options++;
+    } while ( options->type != OPT_NONE );
+    
+    exit_log(1,"Cannot set option of type %s for chained command\n",type & OPT_INPUT ? "input" : "output");
 }
 
 /* Parse the options - NB. by this stage all options beginning with +
@@ -203,7 +262,7 @@ static int option_set(int pos, int max, char *argv[], option_t *option)
     int     val;
     int     ret;
 
-    switch ( option->type ) {
+    switch ( option->type & OPT_BASE_MASK) {
     case OPT_BOOL:
         *(char *)(option->dest) = TRUE;
         ret = pos;
@@ -248,7 +307,7 @@ static void option_print(char *execname, char *ident, char *copyright, char *des
         } else {
             sprintf(optstr,"  ");
         }
-        switch ( opt->type ) {
+        switch ( opt->type & OPT_BASE_MASK ) {
         case OPT_BOOL:
             fprintf(stderr,"%s   --%-15s (bool)    %s\n",optstr,opt->lopt,opt->desc);
             break;
@@ -482,5 +541,50 @@ int hexdigit(char digit) {
 	fprintf(stderr,"\nError in patch string\n");
 	myexit(NULL,1);
 	return 0; /* Not reached */
+}
+
+
+
+static void get_temporary_filename(char *filen)
+{
+#ifdef _WIN32
+    char           *ptr;
+
+    /* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
+    if (ptr = getenv("TEMP")) {    /* Under Windows 95 usually
+                     * C:\WINDOWS\TEMP */
+        strcpy(filen, ptr);    /* Directory is not guaranteed to
+                     * exist */
+        tmpnam(filen + strlen(filen));    /* Adds strings like
+                         * "\s3vvrm3t.",
+                         * "\s3vvrm3t.1",
+                         * "\s3vvrm3t.2" */
+    } else
+        tmpnam(filen);
+    if (ptr = strrchr(filen, '.'))
+        *ptr = '_';
+#elif defined(__MSDOS__) && defined(__TURBOC__)
+    /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+
+    if (ptr = getenv("TEMP")) {    /* From MS-DOS 5, C:\TEMP, C:\DOS,
+                     * C:\WINDOWS\TEMP or whatever or
+                     * nothing */
+        strcpy(filen, ptr);    /* Directory is not guaranteed to
+                     * exist */
+        strcat(filen, "\\");
+        tmpnam(filen + strlen(filen));    /* Adds strings like
+                         * TMP1.$$$, TMP2.$$$ */
+    }
+     /* Allways starts at TMP1.$$$. Does not */ 
+    else            /* check if file already exists. So is  */
+        tmpnam(filen);    /* not suitable for executing zcc more  */
+    if (ptr = strrchr(filen, '.'))    /* than once without cleaning out
+                     * files. */
+        *ptr = 0;    /* Don't want to risk too long filenames */
+
+#else
+    strcpy(filen, "/tmp/appmakechainXXXXXXXX");
+    mktempfile(filen);
+#endif
 }
 

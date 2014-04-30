@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.36 2014-04-30 08:01:11 dom Exp $
+ *   $Id: appmake.h,v 1.37 2014-04-30 19:00:01 dom Exp $
  */
 
 
@@ -18,7 +18,8 @@
 
 /* Conversion routines */
 
-typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR } type_t;
+#define OPT_BASE_MASK 127
+typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=256 } type_t;
 
 enum { FALSE = 0, TRUE };
 
