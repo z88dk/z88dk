@@ -83,7 +83,7 @@ l_fast_divu_24_24x24:
    ;            cde = dividend
    ;            carry set, errno = EDOM
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl', ixh
+   ; uses  : af, bc, de, hl, ixh
 
    ; test for divide by zero
    
@@ -137,16 +137,13 @@ begin:
    ; iterations of the division loop are known
    ;
    ; inside the loop the computation is
-   ; ehl'/dbc, ahl = remainder
+   ; e[hl']/dbc, ahl = remainder
    ; so initialize as if sixteen iterations done
-   
-   ld a,l
-   exx
-   ld e,a
-   ld hl,$ffff
-   exx
+
+   ld a,e
+   ld e,l
    ld l,h
-   ld h,e
+   ld h,a
    xor a
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -164,67 +161,38 @@ IF __CLIB_OPT_IMATH_FAST & $02
 
 loop_00:
 
-   exx
-   add hl,hl
-   inc l
    rl e
-   exx
    adc hl,hl
-   
    jr c, loop_10
-
-   exx
-   add hl,hl
-   inc l
-   rl e
-   exx
-   adc hl,hl
    
+   rl e
+   inc e
+   adc hl,hl
    jr c, loop_20
 
-   exx
-   add hl,hl
-   inc l
    rl e
-   exx
+   inc e
    adc hl,hl
-   
    jr c, loop_30
-
-   exx
-   add hl,hl
-   inc l
-   rl e
-   exx
-   adc hl,hl
    
+   rl e
+   inc e
+   adc hl,hl
    jr c, loop_40
-
-   exx
-   add hl,hl
-   inc l
-   rl e
-   exx
-   adc hl,hl
    
+   rl e
+   inc e
+   adc hl,hl
    jr c, loop_50
-
-   exx
-   add hl,hl
-   inc l
-   rl e
-   exx
-   adc hl,hl
    
+   rl e
+   inc e
+   adc hl,hl
    jr c, loop_60
-
-   exx
-   add hl,hl
-   inc l
-   rl e
-   exx
-   adc hl,hl
    
+   rl e
+   inc e
+   adc hl,hl
    jr c, loop_70
 
    scf
@@ -234,12 +202,7 @@ loop_00:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   exx
-   add hl,hl
-   inc l
    rl e
-   exx
-   
    adc hl,hl
 
 ENDIF
@@ -261,13 +224,7 @@ loop_10:
 
 loop_1:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_20:
@@ -284,13 +241,7 @@ loop_20:
 
 loop_2:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_30:
@@ -307,13 +258,7 @@ loop_30:
 
 loop_3:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_40:
@@ -330,13 +275,7 @@ loop_40:
 
 loop_4:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_50:
@@ -353,13 +292,7 @@ loop_50:
 
 loop_5:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_60:
@@ -376,13 +309,7 @@ loop_60:
 
 loop_6:
 
-   exx
-
-   adc hl,hl
    rl e
-   
-   exx
-   
    adc hl,hl
 
 loop_70:
@@ -399,15 +326,7 @@ loop_70:
 
 loop_7:
 
-   exx
-
-   adc hl,hl
    rl e
-
-loop_80:
-
-   exx
-   
    adc hl,hl
    rla
    
@@ -421,33 +340,21 @@ loop_80:
 
 exit_loop:
 
-   ; quotient  = ~ehl'
+   ; quotient  = ~e[hl']
    ; remainder =  ahl
    ; one more shift left on quotient
-   
-   push af
-   push hl
-   
-   exx
-   
-   adc hl,hl
+
+   ex de,hl
+   ld c,a
    
    ld a,l
-   cpl
-   ld l,a
-   ld a,h
-   cpl
-   ld h,a
-   
-   ld a,e
    rla
    cpl
+   ld l,a
    
-   pop de
-   pop bc
-   ld c,b
-   
-   or a
+   xor a
+   ld h,a
+
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -456,7 +363,7 @@ ELSE
 ;; DISABLE LOOP UNROLLING ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld e,8
+   ld ixh,8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -465,16 +372,13 @@ IF __CLIB_OPT_IMATH_FAST & $02
 
 loop_00:
 
-   exx
-   add hl,hl
-   inc l
    rl e
-   exx
+   inc e
    adc hl,hl
    
    jr c, loop_01
-
-   dec e
+   
+   dec ixh
    jp loop_00
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -490,10 +394,7 @@ ENDIF
 
 loop_11:
 
-   exx
-   adc hl,hl
    rl e
-   exx
    adc hl,hl
 
 loop_01:
@@ -510,36 +411,24 @@ loop_01:
 
 loop_02:
 
-   dec e
+   dec ixh
    jp nz, loop_11
 
-   ; quotient  = ~ehl'
+   ; quotient  = ~e[hl']
    ; remainder =  ahl
    ; one more shift left on quotient
    
-   push af
-   push hl
-   
-   exx
-   
-   adc hl,hl
+   ex de,hl
+   ld c,a
    
    ld a,l
-   cpl
-   ld l,a
-   ld a,h
-   cpl
-   ld h,a
-   
-   ld a,e
    rla
    cpl
+   ld l,a
    
-   pop de
-   pop bc
-   ld c,b
-   
-   or a
+   xor a
+   ld h,a
+
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -66,12 +66,10 @@ begin:
    ; iterations of the division loop are known
    ;
    ; inside the loop the computation is
-   ; ac / de, hl = remainder
+   ; a[c] / de, hl = remainder
    ; so initialize as if eight iterations done
    
-   ld a,l
-   ld c,$ff
-   
+   ld a,l   
    ld l,h
    ld h,0
 
@@ -89,7 +87,6 @@ IF __CLIB_OPT_IMATH_FAST & $01
 
 loop_0:
 
-   rl c
    rla
    adc hl,hl
 
@@ -101,7 +98,6 @@ loop_00:
 
 loop_1:
 
-   rl c
    rla
    adc hl,hl
 
@@ -113,7 +109,6 @@ loop_11:
 
 loop_2:
 
-   rl c
    rla
    adc hl,hl
 
@@ -125,7 +120,6 @@ loop_22:
 
 loop_3:
 
-   rl c
    rla
    adc hl,hl
 
@@ -137,7 +131,6 @@ loop_33:
 
 loop_4:
 
-   rl c
    rla
    adc hl,hl
 
@@ -149,7 +142,6 @@ loop_44:
 
 loop_5:
 
-   rl c
    rla
    adc hl,hl
 
@@ -161,7 +153,6 @@ loop_55:
 
 loop_6:
 
-   rl c
    rla
    adc hl,hl
 
@@ -173,7 +164,6 @@ loop_66:
 
 loop_7:
 
-   rl c
    rla
    adc hl,hl
 
@@ -185,21 +175,16 @@ loop_77:
 
 exit_loop:
 
-   rl c
    rla
    
-   ; ac = ~quotient, hl = remainder
+   ; a = ~quotient, hl = remainder
 
    cpl
-   ld d,a
-   
-   ld a,c
-   cpl
    ld e,a
-   
-   ex de,hl
-   
    xor a
+   ld d,a
+
+   ex de,hl
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -213,12 +198,9 @@ ELSE
    ; eliminating leading zeroes is marginal
    
    ; general divide loop
-   
-   scf
 
 loop_11:
 
-   rl c
    rla
    adc hl,hl
    
@@ -229,19 +211,14 @@ loop_11:
 loop_02:
 
    djnz loop_11
-   
-   rl c
+
    rla
    
-   ; ac = ~quotient, hl = remainder
+   ; a = ~quotient, hl = remainder
 
    cpl
-   ld d,a
-   
-   ld a,c
-   cpl
    ld e,a
-   
+   ld d,b   
    ex de,hl
    
    xor a

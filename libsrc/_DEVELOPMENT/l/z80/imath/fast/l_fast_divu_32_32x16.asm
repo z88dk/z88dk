@@ -73,7 +73,7 @@ l_fast_divu_32_32x16:
    ;            dehl'= dividend
    ;            carry set, errno = EDOM
    ;
-   ; uses : af, bc, de, hl, bc', de', hl', ixh
+   ; uses : af, bc, de, hl, bc', de', hl'
    
    ; test for divide by zero
    
@@ -100,26 +100,20 @@ l0_fast_divu_32_32x16:
    ; iterations of the division loop are known
    ;
    ; inside the loop the computation is
-   ; dehl'/ bc, hl = remainder
+   ; hl'a[*]/ de, hl = remainder
    ; so initialize as if eight iterations done
 
-   push de
-   push hl
-
-   ld h,0
+   ld a,l
    ld l,d
-
-   exx
-   
-   pop hl
-   pop de
-   
    ld d,e
    ld e,h
-   ld h,l
-   ld l,$ff
-   
+   ld h,0
+   push de
    exx
+   pop hl
+   exx
+   ld e,c
+   ld d,b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $01
@@ -129,7 +123,7 @@ IF __CLIB_OPT_IMATH_FAST & $01
 
    ; unroll eight times
    
-   ld ixh,3
+   ld b,3
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -137,10 +131,8 @@ IF __CLIB_OPT_IMATH_FAST & $02
    ; eliminate leading zeroes
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -148,10 +140,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_000
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -159,10 +150,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_111
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -170,10 +160,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_222
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -181,10 +170,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_333
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -192,10 +180,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_444
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -203,10 +190,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
    jr nz, loop_555
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    inc h
@@ -229,7 +215,7 @@ ENDIF
 loop_00:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_1
 
@@ -238,193 +224,189 @@ loop_00:
 loop_0:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_00
 
 loop_000:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_1
-   add hl,bc
+   add hl,de
 
 loop_1:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_11
 
 loop_111:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_2
-   add hl,bc
+   add hl,de
 
 loop_2:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_22
 
 loop_222:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_3
-   add hl,bc
+   add hl,de
 
 loop_3:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_33
 
 loop_333:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_4
-   add hl,bc
+   add hl,de
 
 loop_4:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_44
 
 loop_444:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_5
-   add hl,bc
+   add hl,de
 
 loop_5:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_55
 
 loop_555:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_6
-   add hl,bc
+   add hl,de
 
 loop_6:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_66
 
 loop_666:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_7
-   add hl,bc
+   add hl,de
 
 loop_7:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    adc hl,hl
    jr c, loop_77
    
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_8
-   add hl,bc
+   add hl,de
 
 loop_8:
 
-   dec ixh
-   jp nz, loop_0
+   djnz loop_0
+   
+   ; hl = remainder, hl'a=~quotient with one more shift left
 
-   ; hl = remainder, dehl'=~quotient with one more shift left
-
-   ld de,0
+   ld e,b
+   ld d,b
    
    exx
    
+   rla
    adc hl,hl
-   rl e
-   rl d
-   
+
+   ld d,$ff
+   ld e,h
+   ld h,l
+   ld l,a
+
    or a
    jp l_cpl_dehl
 
 loop_11:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_2
 
 loop_22:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_3
 
 loop_33:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_4
 
 loop_44:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_5
 
 loop_55:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_6
 
 loop_66:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_7
 
 loop_77:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_8
 
@@ -434,7 +416,7 @@ ELSE
 ;; DISABLE LOOP UNROLLING ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld ixh,24
+   ld b,24
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -444,10 +426,9 @@ IF __CLIB_OPT_IMATH_FAST & $02
 loop_00:
 
    exx
-   add hl,hl
-   inc l
-   rl e
-   rl d
+   add a,a
+   inc a
+   adc hl,hl
    exx
    adc hl,hl
    
@@ -455,9 +436,9 @@ loop_00:
    dec h
    
    jr nz, loop_01
+   djnz loop_00
    
-   dec ixh
-   jp loop_00
+   ; will never get here
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -473,9 +454,8 @@ ENDIF
 loop_11:
 
    exx
+   adc a,a
    adc hl,hl
-   rl e
-   rl d
    exx
    
    adc hl,hl
@@ -483,32 +463,36 @@ loop_11:
 
 loop_01:
 
-   sbc hl,bc
+   sbc hl,de
    jr nc, loop_02
-   add hl,bc
+   add hl,de
 
 loop_02:
 
-   dec ixh
-   jp nz, loop_11
+   djnz loop_11
+   
+   ; hl = remainder, hl'a=~quotient with one more shift left
 
-   ; hl = remainder, dehl'=~quotient with one more shift left
-
-   ld de,0
+   ld e,b
+   ld d,b
    
    exx
    
+   rla
    adc hl,hl
-   rl e
-   rl d
-   
+
+   ld d,$ff
+   ld e,h
+   ld h,l
+   ld l,a
+
    or a
    jp l_cpl_dehl
 
 loop_03:
 
    or a
-   sbc hl,bc
+   sbc hl,de
    or a
    jp loop_02
 

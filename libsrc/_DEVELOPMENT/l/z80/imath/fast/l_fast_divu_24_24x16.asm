@@ -43,7 +43,7 @@ l_fast_divu_24_24x16:
    ;            cde = dividend
    ;            carry set, errno = EDOM
    ;
-   ; uses  : af, bc, de, hl, ixh
+   ; uses  : af, bc, de, hl
 
    ; test for divide by zero
    
@@ -70,16 +70,16 @@ l0_fast_divu_24_24x16:
    ; iterations of the division loop are known
    ;
    ; inside the loop the computation is
-   ; abc / de, hl = remainder
+   ; ac[b] / de, hl = remainder
    ; so initialize as if eight iterations done
-   
+
    ld d,b
-   ld b,l
-   ld l,e
+   ld a,e
    ld e,c
+   ld c,l
+   ld l,a
    ld a,h
    ld h,0
-   ld c,$ff   
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $01
@@ -89,8 +89,7 @@ IF __CLIB_OPT_IMATH_FAST & $01
 
    ; unroll divide eight times
 
-   ld ixh,2
-   scf
+   ld b,2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -98,7 +97,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    ; eliminating leading zeroes
 
    rl c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -107,7 +105,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
 
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -116,7 +113,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -125,7 +121,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -134,7 +129,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -143,7 +137,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -152,7 +145,6 @@ IF __CLIB_OPT_IMATH_FAST & $02
    
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    inc h
@@ -170,7 +162,6 @@ ENDIF
 loop_0:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_000
@@ -184,7 +175,6 @@ loop_00:
 loop_1:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_111
@@ -198,7 +188,6 @@ loop_11:
 loop_2:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_222
@@ -212,7 +201,6 @@ loop_22:
 loop_3:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_333
@@ -226,7 +214,6 @@ loop_33:
 loop_4:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_444
@@ -240,7 +227,6 @@ loop_44:
 loop_5:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_555
@@ -254,7 +240,6 @@ loop_55:
 loop_6:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_666
@@ -268,7 +253,6 @@ loop_66:
 loop_7:
 
    rl c
-   rl b
    rla
    adc hl,hl
    jr c, loop_777
@@ -281,26 +265,24 @@ loop_77:
 
 loop_8:
 
-   dec ixh
-   jr nz, loop_0
-
+   djnz loop_0
+   
 exit_loop:
 
    rl c
-   rl b
    rla
    
-   ; abc = ~quotient, hl = remainder
+   ; ac = ~quotient, hl = remainder
    
    ex de,hl
 
-   scf
-   ld hl,0
-   sbc hl,bc                   ; hl = ~bc
-   
    cpl
+   ld h,a
+   ld a,c
+   cpl
+   ld l,a
    
-   or a
+   xor a
    ret
 
 loop_000:
@@ -365,7 +347,7 @@ ELSE
 ;; DISABLE LOOP UNROLLING ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld ixh,16
+   ld b,16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -376,7 +358,6 @@ loop_00:
 
    rl c
    inc c
-   rl b
    rla
    adc hl,hl
    
@@ -384,15 +365,9 @@ loop_00:
    dec h
    
    jr nz, loop_03
+   djnz loop_00
    
-   dec ixh
-   jp loop_00
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ELSE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   scf
+   ; will never get here
    
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -402,7 +377,6 @@ ENDIF
 loop_11:
 
    rl c
-   rl b
    rla
    adc hl,hl
    
@@ -416,24 +390,22 @@ loop_03:
 
 loop_02:
 
-   dec ixh
-   jp nz, loop_11
-
+   djnz loop_11
+   
    rl c
-   rl b
    rla
    
-   ; abc = ~quotient, hl = remainder
+   ; ac = ~quotient, hl = remainder
    
    ex de,hl
 
-   scf
-   ld hl,0
-   sbc hl,bc                   ; hl = ~bc
-   
    cpl
+   ld h,a
+   ld a,c
+   cpl
+   ld l,a
    
-   or a
+   xor a
    ret
 
 loop_01:

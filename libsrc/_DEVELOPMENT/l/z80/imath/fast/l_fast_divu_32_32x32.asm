@@ -34,7 +34,7 @@ result_zero:
 
 divide_by_zero:
 
-   ld de,$ffff
+   dec de
    jp error_divide_by_zero_mc
 
 
@@ -477,7 +477,7 @@ ELSE
 ;; DISABLE LOOP UNROLLING ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld ixh,8
+   ld b,8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $02
@@ -487,6 +487,7 @@ IF __CLIB_OPT_IMATH_FAST & $02
 loop_00:
 
    add a,a
+   inc a
       
    exx
    adc hl,hl
@@ -497,8 +498,9 @@ loop_00:
    dec h
    jr nz, loop_01
    
-   dec ixh
-   jp loop_00
+   djnz loop_00
+   
+   ; will never get here
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -530,8 +532,7 @@ loop_01:
 
 loop_02:
 
-   dec ixh
-   jp nz, loop_11
+   djnz loop_11
 
    ; form last quotient bit
    
