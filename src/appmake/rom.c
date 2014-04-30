@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.2 2014-04-29 09:18:20 dom Exp $
+ *      $Id: rom.c,v 1.3 2014-04-30 04:54:00 aralbrec Exp $
  */
 
 
@@ -46,37 +46,50 @@ int rom_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL ) {
-        return -1;
-    }
-
     if ( size != -1 ) {
         fillsize = size;
     } else {
         myexit("ROM block size not specified (use -s)\n",1);
     }
 
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
-        suffix_change(filename,".rom");
-    } else {
+    if ( outfile == NULL )
+    {
+       if ( binname == NULL )
+       {
+          myexit("No destination file specified\n", 1);
+       }
+       else
+       {
+          strcpy(filename,binname);
+          suffix_change(filename,".rom");
+       }
+    }
+    else
+    {
         strcpy(filename,outfile);
     }
 
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+    if ( binname == NULL)
+    {
+       len = 0;
+       fpin = NULL;
+    }
+    else if ( (fpin=fopen(binname,"rb") ) == NULL )
+    {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
-
-    if (fseek(fpin,0,SEEK_END)) {
+    else if (fseek(fpin,0,SEEK_END))
+    {
         fprintf(stderr,"Couldn't determine size of file\n");
         fclose(fpin);
         myexit(NULL,1);
     }
-
-    len=ftell(fpin);
-
-    fseek(fpin,0L,SEEK_SET);
+    else
+    {
+       len=ftell(fpin);
+       fseek(fpin,0L,SEEK_SET);
+    }
     
     if (len > fillsize) {
         fclose(fpin);
@@ -84,7 +97,7 @@ int rom_exec(char *target)
     }
 
     if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-        fclose(fpin);
+        if (fpin != NULL) fclose(fpin);
         myexit("Can't open output file\n",1);
     }
 
@@ -98,11 +111,8 @@ int rom_exec(char *target)
     for ( i = 0; i < fillsize; i++)
         writebyte(filler,fpout);
 
-    fclose(fpin);
+    if (fpin != NULL) fclose(fpin);
     fclose(fpout);
 
     return 0;
 }
-
-
-
