@@ -1,7 +1,8 @@
-File formats
-------------
-This document describes the object and libary formats used by z80asm 
-up to version 1.2.10.
+z80asm File formats (v01)
+=========================
+
+This document describes the object and libary formats used by *z80asm* 
+up to version *1.2.10*.
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -11,124 +12,129 @@ The files start with a signature that includes a version number and is
 verified by the assembler before trying to parse the file.
 
 A set of file pointers at the start of the object file point to the 
-start of each section existing the in the file, or contain 0xFFFFFFFF 
-if that section does not exist.
+start of each section existing the in the file, or contain *0xFFFFFFFF* 
+(-1) if that section does not exist.
 
 The following object types exist in the file:
-* char    - one byte containing an ASCII character;
-* byte    - one 8-bit value;
-* word    - one 16-bit value, stored in low byte - high byte order 
-            (Little endian format - Z80/Intel notation);
-* long    - one 32-bit value, stored in low byte - high byte order, 
-            containing the file position where the corresponding 
-			section starts; the value is 0xFFFFFFFF (-1) if the section 
-			does not exist;
-* string  - one byte containing the string length followed by the 
-           characters of the string.
+
+* *char* :	one byte containing an ASCII character;
+
+* *byte* :	one 8-bit value;
+
+* *word* :	one 16-bit value, stored in low byte - high byte order 
+	(Little endian format - Z80/Intel notation);
+
+* *long* :	one 32-bit value, stored in low byte - high byte order, 
+	containing the file position where the corresponding 
+	section starts; the value is *0xFFFFFFFF* (-1) if the section 
+	does not exist;
+
+* *string*:	one byte containing the string length followed by the 
+	characters of the string.
+
 
 Object file format
 ------------------
+
 The format of the object file is as follows:
 
-Addr  Type    Object
-   0  char[8] 'Z80RMF01' (file signature and version)
-   8  word    <ORG Address>
-  10  long    File pointer to <Module Name>, always the last section
-  14  long    File pointer to <Expressions>, may be -1
-  18  long    File pointer to <Module Names>, may be -1
-  22  long    File pointer to <External Names>, may be -1
-  26  long    File pointer to <Machine Code>, may be -1
-
-  [ <Expressions> ]
-  [ ... ] 
-
-  [ <Module Names> ] 
-  [ ... ]
-
-  [ <External Names> ]
-  [ ... ]
-
-  [ <Module Name> ]
-  
-  [ <Machine Code> ]
+|Addr | Type   | Object													|
+|:---:|:------:|:-------------------------------------------------------|
+|   0 | char[8]| 'Z80RMF01' (file signature and version)				|
+|   8 | word   | *ORG Address*											|
+|  10 | long   | File pointer to *Module Name*, always the last section	|
+|  14 | long   | File pointer to *Expressions*, may be -1				|
+|  18 | long   | File pointer to *Module Names*, may be -1				|
+|  22 | long   | File pointer to *External Names*, may be -1			|
+|  26 | long   | File pointer to *Machine Code*, may be -1				|
+|  30 |        | *Expressions*											|
+|     |  	   | ...													|
+|     |  	   | *Module Names*											|
+|     |  	   | ...													|
+|     |  	   | *External Names*										|
+|     |  	   | ...													|
+|     |  	   | *Module Name*											|
+|     |  	   | *Machine Code*											|
 
 
-* <ORG Address> Contains the ORG address for the linked machine code 
-  or 0xFFFF for no ORG address defined. 
+* *ORG Address* : contains the ORG address for the linked machine code 
+	or *0xFFFF* for no ORG address defined. 
 
-* <Expressions> Contains a set of expressions up to the 
-  start of the next existing section. Each expression has the following
-  format:
-  <type><patchptr><expression><0>
-  
-  <type> (char) defines the resulting evaluation type range: 
-  'U': 8bit integer (0 to 255) 
-  'S': 8bit signed integer (-128 to 127) 
-  'C': 16bit integer (-32768 to 65535) 
-  'L': 32bit signed integer
 
-  <patchptr> (word) defines the relative module code patch pointer to 
-  store the result of evaluating the expression.
-  
-  <expression> (string) contains the expression text as parsed from the 
-  source file, in the original (legacy) expression syntax.
-  
-  <0> (byte) is a zero byte end marker, not part of the expression length.
+* *Expressions* : contains a set of expressions up to the 
+	start of the next existing section. Each expression has the following
+	format:
 
-* <Module Names> Contains a set of names defined in this module 
+	* *type* (char) : defines the resulting evaluation type range:
+	
+		'U' : 8-bit integer (0 to 255)  
+		'S' : 8-bit signed integer (-128 to 127)  
+		'C' : 16-bit integer (-32768 to 65535)  
+		'L' : 32-bit signed integer  
+
+	* *patchptr* (word) : defines the relative module code patch pointer to 
+	store the result of evaluating the expression.
+
+	* *expression* (string) : contains the expression text as parsed from the 
+	source file, in the original (legacy) expression syntax.
+
+	* *0* (byte) : is a zero byte end marker, not part of the expression length.
+
+
+* *Module Names* : contains a set of names defined in this module 
   up to the next existing section. Each name has the following format:
-  <scope><type><value><name>
+  
+	* *scope* (char) : defines the scope of the name:
+  
+		'L' is local,  
+		'G' is global,  
+		'X' global library
 
-  <scope> (char) defines the scope of the name:  
-  'L' is local,  
-  'G' is global,  
-  'X' global library
+	* *type (char) : defines whether it is a: 
 
-  <type> (char) defines whether it is a: 
-  'A' relocatable address, 
-  'C' a constant'
+		'A' relocatable address,   
+		'C' a constant.
 
-  <name> (string) contains the name.
+	* *name* (string) : contains the name.
 
-* <External Names> Contains a set of external names referred 
+
+* *External Names* : contains a set of external names referred 
   by this module up to the next existing section. Each name has the 
   following format:
-  <name>
+  
+	* *name* (string) : contains the name.
 
-  <name> (string) contains the name.
 
-* <Module Name> (string) contains the module name.
+* *Module Name* (string) : contains the module name.
 
-* <Machine Code> Contains the binary code of the module with the 
+
+* *Machine Code* : contains the binary code of the module with the 
   following format:
-  <length><code>
-  
-  <length> (word) defines the total code lenght, and contains 0 if the 
-  code is 65536 bytes long.
-  
-  <code> (byte[length]) contains the binary code.
+
+
+	* *length* (word) : defines the total code lenght, and contains 0 if the 
+	  code is 65536 bytes long.
+	
+	* *code* (byte[length]) : contains the binary code.
 
 
 Library file format
 -------------------
+
 The library file format is a sequense of object files with additional
 structures.
 
-Addr  Type    Object
-   0  char[8] 'Z80LMF01' (file signature and version)
+|Addr | Type   | Object													|
+|:---:|:------:|:-------------------------------------------------------|
+|   0 | char[8]| 'Z80LMF01' (file signature and version)				|
+|   8 | word   | *Object File Block*									|
+|     |  	   | ...													|
 
-   [ <Object File Block> ]
-   [ ... ] 
 
+* *Object File Block* : contains the following format: 
 
-* <Object File Block> Contains the following format: 
-  <next><length><objectfile>
-
-  <next> (long) contains the file pointer of the next object file in the
-  library, or -1 if this object file is the last in the library.
+	* *next* (long) : contains the file pointer of the next object file 
+	  in the library, or *-1* if this object file is the last in the library.
   
-  <length> (long) contains the length of this object file, or 0 if this
-  object files has been marked "deleted" and will not be used.
-
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/object_file_format_v01.txt,v 1.6 2014-04-29 22:51:38 pauloscustodio Exp $
+	* *length* (long) : contains the length of this object file, 
+	  or *0* if this object files has been marked "deleted" and will not be used.
