@@ -25,16 +25,17 @@ defc __CLIB_OPT_MULTITHREAD = 0
 ;
 ; When multi-threading is enabled, the program can still
 ; bypass locking by calling the _unlocked versions of functions
-; but you do so at your own risk if there are synchronization
-; issues.
+; but if there are synchronization issues, you do so at
+; your own risk.
 ;
 ; When multi-threading is disabled, there is no difference
 ; between the _unlocked and regular function entry points.
 ; However, the locks are still present in the data structures
 ; and, for example, FILEs can still be locked via flockfile()
-; and family.  Note that the stdio functions will not be
-; blocked by a lock but the user program can perform its own
-; synchronization by using flockfile() appropriately.
+; and family.  Note that when multi-threading is disabled,
+; the stdio functions will not be blocked by a lock but the
+; user program can perform its own synchronization by using
+; flockfile() appropriately.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -81,6 +82,16 @@ defc __CLIB_OPT_IMATH_FAST = $00
 ;
 ; sdcc cannot generate code for LIA-1 mode.
 
+; The following flag allows selection between small+slow
+; and large+fast implementations of some integer math
+; operations:
+
+defc __CLIB_OPT_IMATH_SELECT = $00
+
+; bit 0 = $01 = choose fast arithmetic shift right operator
+; bit 1 = $02 = choose fast logical shift right operator
+; bit 2 = $04 = choose fast shift left operator
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; text to number conversion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -121,6 +132,17 @@ defc __CLIB_OPT_TXT2NUM = $00
 ; function directly, in which case enabling that bit will
 ; result in no additional code size.
 
+; There are two implementations of each specialized function.
+; One uses smaller but slower code and the other uses larger
+; but faster code.  Choose the faster code by setting the
+; appropriate bit in the following flag:
+
+defc __CLIB_OPT_TXT2NUM_SELECT = $00
+
+; bit 0 = $01 = choose fast binary conversion
+; bit 1 = $02 = choose fast octal conversion
+; bit 2 = $04 = choose fast decimal conversion
+; bit 3 = $08 = choose fast hex conversion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; number to text conversion
@@ -157,6 +179,17 @@ defc __CLIB_OPT_NUM2TXT = $00
 ; enabling the specialized integer function to see if code
 ; size remains unchanged.
 
+; There are two implementations of each specialized function.
+; One uses smaller but slower code and the other uses larger
+; but faster code.  Choose the faster code by setting the
+; appropriate bit in the following flag:
+
+defc __CLIB_OPT_NUM2TXT_SELECT = $00
+
+; bit 0 = $01 = choose fast binary conversion
+; bit 1 = $02 = choose fast octal conversion
+; bit 2 = $04 = choose fast decimal conversion
+; bit 3 = $08 = choose fast hex conversion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; printf converter selection
@@ -166,7 +199,7 @@ defc __CLIB_OPT_NUM2TXT = $00
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
-defc __CLIB_OPT_PRINTF = $f61f
+defc __CLIB_OPT_PRINTF = $ffffffff
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
@@ -204,7 +237,7 @@ defc __CLIB_OPT_PRINTF = $f61f
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for printf.
 
-defc __CLIB_OPT_SCANF = $f61f
+defc __CLIB_OPT_SCANF = $ffffffff
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
