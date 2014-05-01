@@ -122,5 +122,11 @@
     <ClCompile Include="sos.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="residos.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inject.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

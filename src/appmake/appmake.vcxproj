@@ -103,8 +103,8 @@
     <ClCompile Include="nec.c" />
     <ClCompile Include="newbrain.c" />
     <ClCompile Include="p2000.c" />
-    <ClCompile Include="rex6000.c" />
     <ClCompile Include="residos.c" />
+    <ClCompile Include="rex6000.c" />
     <ClCompile Include="rom.c" />
     <ClCompile Include="sc3000.c" />
     <ClCompile Include="sms.c" />

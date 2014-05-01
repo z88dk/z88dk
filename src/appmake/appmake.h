@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.37 2014-04-30 19:00:01 dom Exp $
+ *   $Id: appmake.h,v 1.38 2014-05-01 21:46:35 pauloscustodio Exp $
  */
 
 
@@ -350,3 +350,9 @@ extern void			zx_rawbit(FILE *fpout, int period);
 extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
 
 extern int			hexdigit(char digit);
+
+/* snprintf is _snprintf in _MSC_VER */
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#endif
