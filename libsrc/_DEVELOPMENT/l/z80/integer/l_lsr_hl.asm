@@ -1,6 +1,7 @@
 
 XLIB l_lsr_hl
-XDEF l0_lsr_hl
+
+INCLUDE "clib_cfg.asm"
 
 l_lsr_hl:
 
@@ -13,37 +14,14 @@ l_lsr_hl:
    ;
    ; uses  : af, b, hl
 
-   or a
-   ret z
-   ld b,8
+   IF __CLIB_OPT_IMATH_SELECT & $02
    
-   sub b
-   jr c, fine_shift
+      LIB l_fast_lsr_hl
+      jp l_fast_lsr_hl
    
-   ld l,h
-   ld h,0
-      
-   sub b
-   jr c, fine_shift
+   ELSE
    
-   ld l,h
-   ret
-
-l0_lsr_hl:
-fine_shift:
-
-   add a,b
-   ret z
+      LIB l_small_lsr_hl
+      jp l_small_lsr_hl
    
-   ld b,a
-   ld a,l
-
-fine_shift_loop:
-
-   srl h
-   rra
-   
-   djnz fine_shift_loop
-   
-   ld l,a
-   ret
+   ENDIF

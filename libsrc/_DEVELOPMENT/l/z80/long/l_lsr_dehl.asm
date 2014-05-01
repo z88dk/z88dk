@@ -1,7 +1,7 @@
 
 XLIB l_lsr_dehl
 
-LIB l0_lsr_hl
+INCLUDE "clib_cfg.asm"
 
 l_lsr_dehl:
 
@@ -13,54 +13,15 @@ l_lsr_dehl:
    ; exit  : dehl = dehl >> a
    ;
    ; uses  : af, b, de, hl
-   
-   or a
-   ret z
-   ld b,8
-   
-   sub b
-   jr c, fine_shift
 
-   ld l,h
-   ld h,e
-   ld e,d
-   ld d,0
-
-   sub b
-   jr c, fine_shift
+   IF __CLIB_OPT_IMATH_SELECT & $02
    
-   ld l,h
-   ld h,e
-   ld e,d
-
-   sub b
-   jp c, l0_lsr_hl
+      LIB l_fast_lsr_dehl
+      jp l_fast_lsr_dehl
    
-   ld l,h
-   ld h,e
+   ELSE
    
-   sub b
-   jp c, l0_lsr_hl
+      LIB l_small_lsr_dehl
+      jp l_small_lsr_dehl
    
-   ld l,h
-   ret
-
-fine_shift:
-
-   add a,b
-   ret z
-   
-   ld b,a
-   ld a,e
-
-fine_shift_loop:
-
-   srl d
-   rra
-   rr h
-   rr l
-   
-   djnz fine_shift_loop
-   
-   ld e,a
-   ret
+   ENDIF

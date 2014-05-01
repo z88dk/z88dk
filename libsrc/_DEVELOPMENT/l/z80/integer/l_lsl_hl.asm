@@ -1,6 +1,8 @@
 
 XLIB l_lsl_hl
 
+INCLUDE "clib_cfg.asm"
+
 l_lsl_hl:
 
    ; logical shift left 16-bit number
@@ -12,32 +14,14 @@ l_lsl_hl:
    ;
    ; uses  : af, b, hl
 
-   or a
-   ret z
-   ld b,8
+   IF __CLIB_OPT_IMATH_SELECT & $04
    
-   sub b
-   jr c, fine_shift
-
-   ld h,l
-   ld l,0
+      LIB l_fast_lsl_hl
+      jp l_fast_lsl_hl
    
-   sub b
-   jr c, fine_shift
-
-   ld h,l
-   ret
-
-fine_shift:
-
-   add a,b
-   ret z
+   ELSE
    
-   ld b,a
-
-fine_shift_loop:
-
-   add hl,hl
-   djnz fine_shift_loop
-
-   ret
+      LIB l_small_lsl_hl
+      jp l_small_lsl_hl
+   
+   ENDIF
