@@ -1,0 +1,230 @@
+<h1 id="z80asmfileformatsv03">z80asm File formats (v03)</h1>
+
+<p>This document describes the object and libary formats used by <em>z80asm</em>
+from version <em>2.2.0</em> onwards. </p>
+
+<p>The version changed to <em>03</em> to include the address of the start of the
+assembly instruction in the object file, so that expressions with ASMPC
+are correctly computed at link time.</p>
+
+<p>The object and library files are stored in binary form as a set of 
+contiguous objects, i.e. each section follows the previous one without 
+any end-markers. </p>
+
+<p>The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.</p>
+
+<p>A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain <em>0xFFFFFFFF</em> 
+(-1) if that section does not exist.</p>
+
+<p>The following object types exist in the file:</p>
+
+<ul>
+<li><p><em>char</em> :  one byte containing an ASCII character;</p></li>
+<li><p><em>byte</em> :  one 8-bit value;</p></li>
+<li><p><em>word</em> :  one 16-bit value, stored in low byte - high byte order 
+(Little endian format - Z80/Intel notation);</p></li>
+<li><p><em>long</em> :  one 32-bit value, stored in low byte - high byte order, 
+containing the file position where the corresponding 
+section starts; the value is <em>0xFFFFFFFF</em> (-1) if the section 
+does not exist;</p></li>
+<li><p><em>string</em>: one byte containing the string length followed by the 
+characters of the string.</p></li>
+</ul>
+
+<h2 id="objectfileformat">Object file format</h2>
+
+<p>The format of the object file is as follows:</p>
+
+<table>
+<col align="center" />
+<col align="center" />
+<col align="left" />
+<thead>
+<tr>
+	<th>Addr</th>
+	<th>Type</th>
+	<th>Object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td align="center">0</td>
+	<td align="center">char[8]</td>
+	<td align="left">'Z80RMF01' (file signature and version)</td>
+</tr>
+<tr>
+	<td align="center">8</td>
+	<td align="center">word</td>
+	<td align="left"><em>ORG Address</em></td>
+</tr>
+<tr>
+	<td align="center">10</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Module Name</em>, always the last section</td>
+</tr>
+<tr>
+	<td align="center">14</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Expressions</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">18</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Module Names</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">22</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>External Names</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">26</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Machine Code</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">30</td>
+	<td align="center"> </td>
+	<td align="left"><em>Expressions</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Module Names</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>External Names</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Module Name</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Machine Code</em></td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li><p><em>ORG Address</em> : contains the ORG address for the linked machine code 
+or <em>0xFFFF</em> for no ORG address defined. </p></li>
+<li><p><em>Expressions</em> : contains a set of expressions up to the 
+start of the next existing section. Each expression has the following
+format:</p>
+
+<ul>
+<li><p><em>type</em> (char) : defines the resulting evaluation type range:</p>
+
+<p>'U' : 8-bit integer (0 to 255) <br />
+'S' : 8-bit signed integer (-128 to 127) <br />
+'C' : 16-bit integer (-32768 to 65535) <br />
+'L' : 32-bit signed integer  </p></li>
+<li><p><em>ASMPC</em> (word) : defines the relative module code address of the 
+start of the assembly instruction to be used as <em>ASMPC</em> during
+expression evaluation.</p></li>
+<li><p><em>patchptr</em> (word) : defines the relative module code patch pointer to 
+store the result of evaluating the expression.</p></li>
+<li><p><em>expression</em> (string) : contains the expression text as parsed from the 
+source file, in the standard C-like expression syntax.</p></li>
+<li><p><em>0</em> (byte) : is a zero byte end marker, not part of the expression length.</p></li>
+</ul></li>
+<li><p><em>Module Names</em> : contains a set of names defined in this module 
+up to the next existing section. Each name has the following format:</p>
+
+<ul>
+<li><p><em>scope</em> (char) : defines the scope of the name:</p>
+
+<p>'L' is local, <br />
+'G' is global,  </p></li>
+<li><p>*type (char) : defines whether it is a: </p>
+
+<p>'A' relocatable address, <br />
+'C' a constant.</p></li>
+<li><p><em>name</em> (string) : contains the name.</p></li>
+</ul></li>
+<li><p><em>External Names</em> : contains a set of external names referred 
+by this module up to the next existing section. Each name has the 
+following format:</p>
+
+<ul>
+<li><em>name</em> (string) : contains the name.
+</li>
+</ul></li>
+<li><p><em>Module Name</em> (string) : contains the module name.</p></li>
+<li><p><em>Machine Code</em> : contains the binary code of the module with the 
+following format:</p>
+
+<ul>
+<li><p><em>length</em> (word) : defines the total code lenght, and contains 0 if the 
+code is 65536 bytes long.</p></li>
+<li><p><em>code</em> (byte[length]) : contains the binary code.</p></li>
+</ul></li>
+</ul>
+
+<h2 id="libraryfileformat">Library file format</h2>
+
+<p>The library file format is a sequense of object files with additional
+structures.</p>
+
+<table>
+<col align="center" />
+<col align="center" />
+<col align="left" />
+<thead>
+<tr>
+	<th>Addr</th>
+	<th>Type</th>
+	<th>Object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td align="center">0</td>
+	<td align="center">char[8]</td>
+	<td align="left">'Z80LMF01' (file signature and version)</td>
+</tr>
+<tr>
+	<td align="center">8</td>
+	<td align="center">word</td>
+	<td align="left"><em>Object File Block</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li><p><em>Object File Block</em> : contains the following format: </p>
+
+<ul>
+<li><p><em>next</em> (long) : contains the file pointer of the next object file 
+in the library, or <em>-1</em> if this object file is the last in the library.</p></li>
+<li><p><em>length</em> (long) : contains the length of this object file, 
+or <em>0</em> if this object files has been marked "deleted" and will not be used.</p></li>
+</ul></li>
+</ul>
