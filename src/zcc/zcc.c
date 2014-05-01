@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.76 2014-04-28 21:55:58 dom Exp $
+ *      $Id: zcc.c,v 1.77 2014-05-01 21:57:49 pauloscustodio Exp $
  */
 
 
@@ -1717,7 +1717,12 @@ static int zcc_vasprintf(char **s, const char *fmt, va_list ap)
     size_t      req;
     char       *ret;
     
+	/* MSC Visual Studio 2010 does not have va_copy and va_list is a simple pointer */
+#ifdef _MSC_VER
+	saveap = ap;
+#else
     va_copy(saveap, ap);
+#endif
     
     /* This isn't performant, but we don't use it that much */
     if ( 
