@@ -57,12 +57,22 @@ _24_bit:
 
 rejoin_24:
 
+   pop hl
+   ld b,6
+   
+   jr c, rejoin_24_lz
+
+   ld a,c
+   and $03
+
+   dec de
+   jp l3_fast_utoo_nlz
+
+rejoin_24_lz:
+
    ld a,c
    and $03
    
-   pop hl
-   
-   ld b,6
    jp l3_fast_utoo_lz
 
 leading_zeroes_24:

@@ -19,9 +19,15 @@ l_utoh:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_NUM2TXT ....
+IF __CLIB_OPT_NUM2TXT_SELECT & $08
 
    LIB l_fast_utoh
    jp l_fast_utoh
 
-;; ENDIF
+ELSE
+
+   LIB l_small_utoh
+   jp l_small_utoh
+
+ENDIF
+

@@ -21,9 +21,14 @@ l_otou:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_TXT2NUM ....
+IF __CLIB_OPT_TXT2NUM_SELECT & $02
 
    LIB l_fast_otou
    jp l_fast_otou
 
-;; ENDIF
+ELSE
+
+   LIB l_small_otou
+   jp l_small_otou
+
+ENDIF

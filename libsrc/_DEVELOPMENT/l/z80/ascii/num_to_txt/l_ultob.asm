@@ -19,9 +19,14 @@ l_ultob:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_NUM2TXT ....
+IF __CLIB_OPT_NUM2TXT_SELECT & $01
 
    LIB l_fast_ultob
    jp l_fast_ultob
 
-;; ENDIF
+ELSE
+
+   LIB l_small_ultob
+   jp l_small_ultob
+
+ENDIF

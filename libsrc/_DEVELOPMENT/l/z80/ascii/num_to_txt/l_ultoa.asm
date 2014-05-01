@@ -19,9 +19,14 @@ l_ultoa:
    ;
    ; uses  : af, bc, de, hl, bc', hl'
 
-;; IF __CLIB_OPT_NUM2TXT ....
+IF __CLIB_OPT_NUM2TXT_SELECT & $04
 
    LIB l_fast_ultoa
    jp l_fast_ultoa
 
-;; ENDIF
+ELSE
+
+   LIB l_small_ultoa
+   jp l_small_ultoa
+
+ENDIF

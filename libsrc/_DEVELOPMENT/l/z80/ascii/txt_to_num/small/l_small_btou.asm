@@ -1,13 +1,7 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_btou
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+XLIB l_small_btou
 
-INCLUDE "clib_cfg.asm"
-
-XLIB l_btou
-
-l_btou:
+l_small_btou:
 
    ; ascii binary string to unsigned integer
    ; whitespace is not skipped
@@ -19,17 +13,33 @@ l_btou:
    ;         hl = unsigned result (0 on invalid input)
    ;         carry set on unsigned overflow
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, de, hl
 
-IF __CLIB_OPT_TXT2NUM_SELECT & $01
+   ld hl,0
+   
+   dec de
+   push hl
 
-   LIB l_fast_btou
-   jp l_fast_btou
+loop:
 
-ELSE
-
-   LIB l_small_btou
-   jp l_small_btou
-
-ENDIF
-
+   pop af
+   
+   inc de
+   ld a,(de)
+   
+   sub '0'
+   ccf
+   ret nc
+   cp 2
+   ret nc
+   
+   push hl
+   
+   rra
+   adc hl,hl
+   
+   jr nc, loop
+   
+   pop hl
+   ret
+   

@@ -21,9 +21,15 @@ l_atoul:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_TXT2NUM ....
+IF __CLIB_OPT_TXT2NUM_SELECT & $04
 
    LIB l_fast_atoul
    jp l_fast_atoul
 
-;; ENDIF
+ELSE
+
+   LIB l_small_atoul
+   jp l_small_atoul
+
+ENDIF
+

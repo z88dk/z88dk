@@ -21,10 +21,16 @@ l_btoul:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_TXT2NUM ....
+IF __CLIB_OPT_TXT2NUM_SELECT & $01
 
    LIB l_fast_btoul
    jp l_fast_btoul
 
-;; ENDIF
+ELSE
+
+   LIB l_small_btoul
+   jp l_small_btoul
+
+ENDIF
+
    

@@ -19,9 +19,14 @@ l_utoa:
    ;
    ; uses  : af, bc, de, hl
 
-;; IF __CLIB_OPT_NUM2TXT ....
+IF __CLIB_OPT_NUM2TXT_SELECT & $04
 
    LIB l_fast_utoa
    jp l_fast_utoa
 
-;; ENDIF
+ELSE
+
+   LIB l_small_utoa
+   jp l_small_utoa
+
+ENDIF
