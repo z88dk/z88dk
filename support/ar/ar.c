@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.13 2014-04-22 23:04:56 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.14 2014-05-01 11:33:32 pauloscustodio Exp $
  */
 
 
@@ -21,7 +21,7 @@ static FILE *open_library(char *filename);
 
 static unsigned long read_intel32(FILE *fp, unsigned long *offs);
 static unsigned int  read_intel16(FILE *fp, unsigned long *offs);
-static void          read_name(FILE *fp, unsigned long *offs, FILE *out);
+static void          read_name(FILE *fp, unsigned long *offs, FILE *out, int add_tabs);
 
 static void object_dump(FILE *fp, char *filename, unsigned long start, char flags);
 
@@ -138,7 +138,7 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 
 	fseek(fp,start+modname,SEEK_SET);
 	puts("");
-	read_name(fp,&red,stdout);
+	read_name(fp,&red,stdout, 0);
 
 	if ( code != 0xFFFFFFFF ) {
 		fseek(fp,start+code,SEEK_SET);
@@ -173,11 +173,11 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 			value = read_intel32(fp,&red);
 			if ( ( ( flags & showlocal) || scope != 'L' ) ) {
 				printf("  %c%c ",scope, type == 'C' ? 'C' : ' ' );
-				read_name(fp,&red,stdout);
+				read_name(fp,&red,stdout, 1);
 				printf("\t+%04X\n",value);
 			}
 			else {
-				read_name(fp,&red,NULL);
+				read_name(fp,&red,NULL, 0);
 			}
 		}
 		puts("");
@@ -188,7 +188,7 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 		red = 0;
 		while ( red < (modname - externsym) ) {
 			printf("  U  ");
-			read_name(fp,&red,stdout);
+			read_name(fp,&red,stdout, 0);
 			printf("\n");
 		}
 		puts("");
@@ -209,7 +209,7 @@ void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
 				asmpc = read_intel16(fp,&red);
 			patch = read_intel16(fp,&red);
 			printf("  E  ");
-			read_name(fp,&red,stdout);
+			read_name(fp,&red,stdout, 1);
 			printf("\t%c(%s) @ %04X",type,patch_type(type),patch);
 			if ( version >= 3 )
 				printf(", PC %04X",asmpc);
@@ -270,7 +270,7 @@ static unsigned int  read_intel16(FILE *fp, unsigned long *offs)
 	return ( buf[1] << 8 | buf[0] );
 }
 
-static void read_name(FILE *fp, unsigned long *offs, FILE *out)
+static void read_name(FILE *fp, unsigned long *offs, FILE *out, int add_tabs)
 {
 	static int max_len = 32;
 	int len, i, c;
@@ -284,14 +284,19 @@ static void read_name(FILE *fp, unsigned long *offs, FILE *out)
 			fputc(c,out);
 		(*offs)++;
 	}
-	for ( i = len; i < max_len; i++ ) {
-		fputc(i % 5 ? ' ' : '.', out);
+	if (add_tabs) {
+		for ( i = len; i < max_len; i++ ) {
+			fputc(i % 5 ? ' ' : '.', out);
+		}
 	}
 }
 
 /*
  * $Log: ar.c,v $
- * Revision 1.13  2014-04-22 23:04:56  pauloscustodio
+ * Revision 1.14  2014-05-01 11:33:32  pauloscustodio
+ * Output formatting
+ *
+ * Revision 1.13  2014/04/22 23:04:56  pauloscustodio
  * Update for version 03 object and library files of z80asm.
  * Improved readability of output.
  *
