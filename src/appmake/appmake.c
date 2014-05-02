@@ -5,13 +5,13 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.21 2014-04-30 19:00:01 dom Exp $
+ *   $Id: appmake.c,v 1.22 2014-05-02 09:46:24 stefano Exp $
  */
 
 #define MAIN_C
 #include "appmake.h"
 
-#if (_BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
+#if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
 #define mktempfile(a) close(mkstemp(a))
 #else
 #define mktempfile(a) mktemp(a)
