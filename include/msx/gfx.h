@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.8 2013-11-16 09:27:24 stefano Exp $
+$Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 
 
 =========================================================================*/
@@ -191,9 +191,6 @@ extern void *put_sprite(unsigned char, int, int, unsigned char, unsigned char);
 
 // get value from psg register
 #define psg_get(reg) get_psg(reg)
-
-// initialize psg
-#define psg_init() msx_initpsg()
 
 
 #endif
