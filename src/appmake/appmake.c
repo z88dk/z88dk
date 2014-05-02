@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.22 2014-05-02 09:46:24 stefano Exp $
+ *   $Id: appmake.c,v 1.23 2014-05-02 21:24:39 dom Exp $
  */
 
 #define MAIN_C
@@ -108,7 +108,7 @@ static void execute_command(char *target, int argc, char **argv, int chainmode)
                 exit(1);
             }
             if ( strlen(chain_temp_filename) ) {
-                printf("%d\n",remove(chain_temp_filename));
+                remove(chain_temp_filename);
             }
             if ( chainmode == 1 ) {
                 strcpy(chain_temp_filename, output_file);
