@@ -30,18 +30,18 @@ typedef struct {
 #define MAX_POINT	256
 
 main() {
-	double	M_PI;
+	double	m_pi;
 	double	a;
 	int	c, i, l;
 	point_t	p[MAX_POINT];
 
 	printf("calculating, wait...");
 
-	M_PI = 8.0 * atan(1.0);
+	m_pi = 8.0 * atan(1.0);
 
 	// precalculate trajetory
 	for (c = 0; c < MAX_POINT; c++) {
-		a = (M_PI * (double)c) / (double)MAX_POINT;
+		a = (m_pi * (double)c) / (double)MAX_POINT;
 		p[c].x = ((int)(100.0 * cos(a))) + (128 - 8);
 		p[c].y = ((int)(80.0 * sin(a))) + (96 - 8);
 

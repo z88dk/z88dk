@@ -43,7 +43,7 @@ main() {
 	
 	//u_char* buf = (u_char*)malloc(MODE2_MAX);
 
-	double	M_PI;
+	double	m_pi;
 	double	a;
 	int	c, i;
 	surface_t surf;
@@ -51,11 +51,11 @@ main() {
 
 	printf("calculating, wait...\n");
 
-	M_PI = 8.0 * atan(1.0);
+	m_pi = 8.0 * atan(1.0);
 
 	// calculates points from circunference
 	for (c = 0; c < MAX_POINT; c++) {
-		a = (M_PI * (double)c) / (double)MAX_POINT;
+		a = (m_pi * (double)c) / (double)MAX_POINT;
 		p[c].x = (int)(100.0 * cos(a) + 128.0);
 		p[c].y = (int)(80.0 * sin(a) + 96.0);
 	}

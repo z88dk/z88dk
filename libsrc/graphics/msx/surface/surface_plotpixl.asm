@@ -7,10 +7,10 @@
 	XLIB	surface_plotpixel
 
 	LIB	surface_pixeladdress
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: surface_plotpixl.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: surface_plotpixl.asm,v 1.4 2014-05-02 10:37:52 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -38,7 +38,7 @@
 				cp	maxy
 				ret	nc			; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 
 				push	bc
 				call	surface_pixeladdress
