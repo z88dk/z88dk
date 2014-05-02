@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.11 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.12 2014-05-02 20:24:39 pauloscustodio Exp $
 #
 
 use strict;
@@ -213,25 +213,16 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "objfile.o lib/class.o errors.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o lib/srcfile.o hist.o";
+my $objs = "objfile.o lib/class.o lib/array.o errors.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o symref.o lib/srcfile.o hist.o expr.o listfile.o codearea.o";
 
 # get init code except init() and main()
 my $init = <<'END';
 
 #include "symbol.h"
 
-struct module *CURRENTMODULE;
 FILE *errfile;
-size_t get_PC( void ) { return 0; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
-{	
-	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
-}
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
-Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
-char ident[MAXLINE];
-char separators[MAXLINE];
 
 END
 
@@ -395,7 +386,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.11  2014-04-22 23:32:42  pauloscustodio
+# Revision 1.12  2014-05-02 20:24:39  pauloscustodio
+# New class Module to replace struct module and struct modules
+#
+# Revision 1.11  2014/04/22 23:32:42  pauloscustodio
 # Release 2.2.0 with major fixes:
 #
 # - Object file format changed to version 03, to include address of start

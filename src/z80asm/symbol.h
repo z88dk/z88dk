@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.47 2014-04-26 08:12:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.48 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,23 +31,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.47 2014-04-26 08:
 /* Structured data types : */
 
 enum flag           { OFF, ON };
-
-struct modules
-{
-    struct module      *first;			/* pointer to first module */
-    struct module      *last;			/* pointer to current/last module */
-};
-
-struct module
-{
-    struct module   *nextmodule;	/* pointer to next module */
-    char            *modname;		/* module name, kept in strpool*/
-	char			*filename;		/* source file name, kept in strpool */
-    uint_t           startoffset;	/* this module's start offset from start of code buffer */
-    long             origin;		/* Address Origin of current machine code module during linking */
-    SymbolHash      *local_symtab;	/* pointer to root of local symbols tree */
-    ExprList		*exprs;			/* pointer to expressions in this module */
-};
 
 struct liblist
 {
@@ -73,15 +56,16 @@ struct linkedmod
     struct linkedmod  *nextlink;		/* pointer to next module link */
     char              *objfilename;		/* filename of library/object file (incl. extension) */
     long              modulestart;		/* base pointer of beginning of object module */
-    struct module     *moduleinfo;		/* pointer to main module information */
+    Module		     *moduleinfo;		/* pointer to main module information */
 };
 
 
-extern struct module *NewModule( void );
-
 /*
 * $Log: symbol.h,v $
-* Revision 1.47  2014-04-26 08:12:04  pauloscustodio
+* Revision 1.48  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.47  2014/04/26 08:12:04  pauloscustodio
 * BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 * Error caused by z80asm not closing the intermediate object files, when
 * assembling with -d.

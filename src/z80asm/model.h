@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.12 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.13 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.12 2014-04-22 23:3
 #include "xmalloc.h"   /* before any other include */
 
 #include "list.h"
+#include "module.h"
 #include "types.h"
 
 /*-----------------------------------------------------------------------------
@@ -75,6 +76,18 @@ extern void model_init(void);
 *   Singleton interfaces
 *----------------------------------------------------------------------------*/
 
+/* list of modules and current module */
+extern ModuleList *module_list( void );
+extern void		   delete_module_list( void );
+
+extern void		   set_curr_module( Module *module );
+extern Module	  *get_curr_module( void );
+extern Module	  *new_curr_module( void );
+extern Module	  *get_first_module( void );
+extern Module	  *get_last_module( void );
+
+#define CURRENTMODULE	(get_curr_module())
+
 /* interface to SrcFile singleton */
 extern void  src_open( char *filename, List *dir_list );
 extern char *src_getline( void );
@@ -87,7 +100,10 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.12  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.13  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.12  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

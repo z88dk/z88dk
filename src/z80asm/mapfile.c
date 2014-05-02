@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.17 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.18 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 
@@ -74,7 +74,7 @@ void write_map_file( void )
     SymbolHash *map_symtab;
 
     /* use first module filename to create global map file */
-    filename = get_map_filename( modulehdr->first->filename ); /* set '.map' extension */
+    filename = get_map_filename( get_first_module()->filename ); /* set '.map' extension */
 
     /* Create MAP file */
     file = xfopen( filename, "w" );           /* CH_0012 */
@@ -113,7 +113,10 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.17  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.18  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.17  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.

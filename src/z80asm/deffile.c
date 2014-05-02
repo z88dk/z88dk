@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.12 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.13 2014-05-02 20:24:38 pauloscustodio Exp $
 
 */
 
@@ -67,7 +67,7 @@ void write_def_file( void )
     SymbolHash *def_symtab;
 
     /* use first module filename to create global def file */
-    filename = get_def_filename( modulehdr->first->filename ); /* set '.def' extension */
+    filename = get_def_filename( get_first_module()->filename ); /* set '.def' extension */
 
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
@@ -92,7 +92,10 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.12  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.13  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.12  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.36 2014-04-22 23:52:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.37 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -43,8 +43,6 @@ void LD_address_indrct( char *exprptr );
 void LD_r_8bit_indrct( int reg );
 
 
-/* global variables */
-extern struct module *CURRENTMODULE;
 
 
 
@@ -668,7 +666,10 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.36  2014-04-22 23:52:55  pauloscustodio
+* Revision 1.37  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.36  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 * Removed append_opcode() and created a new helper append_2bytes().
 *

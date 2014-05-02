@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.10 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.11 2014-05-02 20:24:39 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -256,12 +256,12 @@ t_binary(read_binfile(bin_file()), "\x01\x02\x03");
 # White box tests
 #------------------------------------------------------------------------------
 
-my $objs = "sym.o symtab.o symref.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o lib/array.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o scan.o module.o expr.o";
 
 my $init = <<'END';
-#include "symbol.h"
-
 size_t get_PC( void ) { return 0; }
+size_t get_codesize( void ) { return 0; }
+size_t get_codeindex( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
 {	
 	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
@@ -270,20 +270,13 @@ void list_start_line( size_t address, char *source_file, int source_line_nr, cha
 int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
 
-char ident[MAXLINE];
-char separators[MAXLINE];
 
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
-struct module the_module;
-struct module *CURRENTMODULE = &the_module;
-struct modules the_modules;
-struct modules *modulehdr = &the_modules;
-
 extern SymbolHash *get_static_tab(void);
 
-extern Symbol *_define_sym( char *name, long value, byte_t type, struct module *owner, SymbolHash **psymtab );
+extern Symbol *_define_sym( char *name, long value, byte_t type, Module *owner, SymbolHash **psymtab );
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
@@ -360,9 +353,7 @@ t_compile_module($init, <<'END', $objs);
 	opts.list     = TRUE;
 	
 	TITLE("Create current module");	
-    CURRENTMODULE->local_symtab   = OBJ_NEW(SymbolHash);
-	modulehdr->first = CURRENTMODULE;
-	CURRENTMODULE->nextmodule = NULL;
+	new_curr_module();
 
 	TITLE("Create symbol");	
 	sym = Symbol_create(S("Var1"), 123, 0, NULL);
@@ -577,7 +568,10 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.10  2014-04-22 23:32:42  pauloscustodio
+# Revision 1.11  2014-05-02 20:24:39  pauloscustodio
+# New class Module to replace struct module and struct modules
+#
+# Revision 1.10  2014/04/22 23:32:42  pauloscustodio
 # Release 2.2.0 with major fixes:
 #
 # - Object file format changed to version 03, to include address of start

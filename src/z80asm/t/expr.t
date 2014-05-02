@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.10 2014-04-18 17:46:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.11 2014-05-02 20:24:39 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -179,7 +179,7 @@ t_z80asm(
 #------------------------------------------------------------------------------
 unlink_testfiles();
 my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
-		   "options.o model.o hist.o codearea.o scan.o listfile.o ".
+		   "options.o model.o module.o hist.o codearea.o scan.o listfile.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o lib/srcfile.o ".
 		   "lib/except.o ".
 		   "lib/list.o lib/array.o lib/class.o";
@@ -187,10 +187,6 @@ my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
 my $init = <<'END';
 #include "symbol.h"
 
-struct module the_module;
-struct module *CURRENTMODULE = &the_module;
-struct modules the_modules;
-struct modules *modulehdr = &the_modules;
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
@@ -225,7 +221,10 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.10  2014-04-18 17:46:18  pauloscustodio
+# Revision 1.11  2014-05-02 20:24:39  pauloscustodio
+# New class Module to replace struct module and struct modules
+#
+# Revision 1.10  2014/04/18 17:46:18  pauloscustodio
 # - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 #   manipulating.
 # - Factor parsing and evaluating contants.

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.15 2014-04-28 22:16:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.16 2014-05-02 20:24:39 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -968,25 +968,14 @@ t_z80asm_capture(asm_file(), "",
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "errors.o scan.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o";
+my $objs = "errors.o scan.o lib/array.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o symref.o codearea.o expr.o listfile.o lib/srcfile.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END';
 
-#include "symbol.h"
-
-struct module *CURRENTMODULE;
 FILE *errfile;
-size_t get_PC( void ) { return 0; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
-{	
-	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
-}
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
-Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
-char ident[MAXLINE];
-char separators[MAXLINE];
 
 END
 
@@ -1125,7 +1114,10 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.15  2014-04-28 22:16:11  pauloscustodio
+# Revision 1.16  2014-05-02 20:24:39  pauloscustodio
+# New class Module to replace struct module and struct modules
+#
+# Revision 1.15  2014/04/28 22:16:11  pauloscustodio
 # Merge tests in same compilation unit to speed up testing.
 #
 # Revision 1.14  2014/04/25 23:39:14  pauloscustodio

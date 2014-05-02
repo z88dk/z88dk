@@ -18,13 +18,14 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.29 2014-04-27 09:08:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.30 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "listfile.h"
+#include "model.h"
 #include "options.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -98,7 +99,7 @@ Symbol *find_global_symbol( char *name )
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
 Symbol *_define_sym( char *name, long value, byte_t type,
-                     struct module *owner, SymbolHash **psymtab )
+                     Module *owner, SymbolHash **psymtab )
 {
     Symbol *sym;
 
@@ -221,11 +222,13 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value )
 {
     SymbolHash *all_syms = OBJ_NEW( SymbolHash );
-    struct module *cmodule;
+	ModuleListElem *iter;
 
-    for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
+    for ( iter = ModuleList_first( module_list() ) ; 
+		  iter != NULL ; 
+		  iter = ModuleList_next( iter ) )
     {
-        copy_full_sym_names( &all_syms, cmodule->local_symtab, type_mask, type_value );
+        copy_full_sym_names( &all_syms, iter->obj->local_symtab, type_mask, type_value );
     }
 
     copy_full_sym_names( &all_syms, global_symtab, type_mask, type_value );
@@ -495,7 +498,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.29  2014-04-27 09:08:15  pauloscustodio
+* Revision 1.30  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.29  2014/04/27 09:08:15  pauloscustodio
 * comments
 *
 * Revision 1.28  2014/04/22 23:32:42  pauloscustodio

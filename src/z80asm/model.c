@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.5 2014-03-16 19:19:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.6 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.5 2014-03-16 19:19
 /*-----------------------------------------------------------------------------
 *   Global data
 *----------------------------------------------------------------------------*/
-static SrcFile *g_src_input;		/* input handle for reading source lines */
+static ModuleList *g_module_list;	/* list of input modules */
+static Module	  *g_curr_module;	/* current module being handled */
+static SrcFile    *g_src_input;		/* input handle for reading source lines */
 
 /*-----------------------------------------------------------------------------
 *   Call-back called when reading each new line from source
@@ -65,6 +67,9 @@ DEFINE_init()
 {
 	errors_init();						/* setup error handler */
 
+	/* setup module list */
+	g_module_list = OBJ_NEW( ModuleList );
+
 	/* setup input handler */
 	g_src_input = OBJ_NEW( SrcFile );
 	set_new_line_cb( new_line_cb );
@@ -72,6 +77,8 @@ DEFINE_init()
 
 DEFINE_fini()
 {
+	OBJ_DELETE( g_module_list );
+	OBJ_DELETE( g_src_input );
 }
 
 void model_init(void) 
@@ -80,10 +87,61 @@ void model_init(void)
 }
 
 /*-----------------------------------------------------------------------------
-*   Singleton interfaces
+*   list of modules and current module
 *----------------------------------------------------------------------------*/
+ModuleList *module_list( void )
+{
+	init();
+	return g_module_list;
+}
 
-/* interface to SrcFile singleton */
+void delete_module_list( void )
+{
+	init();
+	g_curr_module = NULL;
+	ModuleList_remove_all( g_module_list );
+}
+
+void set_curr_module( Module *module )
+{
+	init();
+	g_curr_module = module;
+}
+
+Module *get_curr_module( void )
+{
+	init();
+	return g_curr_module;
+}
+
+Module *new_curr_module( void )
+{
+	init();
+	g_curr_module = OBJ_NEW( Module );
+	ModuleList_push( &g_module_list, g_curr_module );
+	return g_curr_module;
+}
+
+Module *get_first_module( void )
+{
+	ModuleListElem *iter;
+	init();
+	iter = ModuleList_first( g_module_list );
+	return iter == NULL ? NULL : iter->obj;
+}
+
+Module *get_last_module( void )
+{
+	ModuleListElem *iter;
+	init();
+	iter = ModuleList_last( g_module_list );
+	return iter == NULL ? NULL : iter->obj;
+}
+
+
+/*-----------------------------------------------------------------------------
+*   interface to SrcFile singleton
+*----------------------------------------------------------------------------*/
 void src_open( char *filename, List *dir_list )
 {
 	init();
@@ -129,7 +187,10 @@ BOOL src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.5  2014-03-16 19:19:49  pauloscustodio
+* Revision 1.6  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.5  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
 * and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
 *

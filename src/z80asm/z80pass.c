@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.92 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.93 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -60,7 +60,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 /* global variables */
 extern FILE *objfile;
-extern struct module *CURRENTMODULE;
 
 void Z80pass1( char *filename )
 {
@@ -512,7 +511,7 @@ Z80pass2( void )
 
     fseek( objfile, 8, SEEK_SET ); /* set file pointer to point at ORG */
 
-    if ( modulehdr->first == CURRENTMODULE )
+    if ( CURRENTMODULE == get_first_module() )
     {
         if ( opts.origin >= 0 )
         {
@@ -592,7 +591,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.92  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.93  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.92  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

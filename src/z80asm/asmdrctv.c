@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.90 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.91 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -57,7 +57,6 @@ void UNDEFINE( void );
 
 /* global variables */
 extern uint_t DEFVPC;
-extern struct module *CURRENTMODULE;
 
 
 int
@@ -521,7 +520,7 @@ ORG( void )
 
             if ( constant >= 0 && constant <= 65535 )
             {
-                CURRENTMODULE->origin = constant;
+                CURRENTMODULE->origin = (uint_t) constant;
             }
             else
             {
@@ -785,7 +784,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.90  2014-04-22 23:32:42  pauloscustodio
+ * Revision 1.91  2014-05-02 20:24:38  pauloscustodio
+ * New class Module to replace struct module and struct modules
+ *
+ * Revision 1.90  2014/04/22 23:32:42  pauloscustodio
  * Release 2.2.0 with major fixes:
  *
  * - Object file format changed to version 03, to include address of start

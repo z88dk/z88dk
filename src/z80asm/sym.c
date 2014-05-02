@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.15 2014-04-18 17:46:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.16 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,7 +52,7 @@ void Symbol_fini( Symbol *self )
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner )
+Symbol *Symbol_create( char *name, long value, byte_t type, Module *owner )
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
@@ -88,7 +88,10 @@ char *Symbol_fullname( Symbol *sym )
 
 /*
 * $Log: sym.c,v $
-* Revision 1.15  2014-04-18 17:46:18  pauloscustodio
+* Revision 1.16  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.15  2014/04/18 17:46:18  pauloscustodio
 * - Change struct expr to Expr class, use CLASS_LIST instead of linked list
 *   manipulating.
 * - Factor parsing and evaluating contants.

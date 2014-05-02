@@ -14,16 +14,72 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.4 2014-04-15 20:06:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.5 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "codearea.h"
 #include "module.h"
+
+/*-----------------------------------------------------------------------------
+*   Code section, one assembly instruction
+*----------------------------------------------------------------------------*/
+DEF_CLASS( CodeSection );
+
+void CodeSection_init (CodeSection *self)   
+{ 
+	self->bytes = OBJ_NEW( Str );
+	OBJ_AUTODELETE( self->bytes ) = FALSE;
+}
+
+void CodeSection_copy (CodeSection *self, CodeSection *other)
+{
+	self->bytes = Str_clone( other->bytes );
+}
+
+void CodeSection_fini (CodeSection *self)
+{
+	OBJ_DELETE( self->bytes );
+}
+
+/*-----------------------------------------------------------------------------
+*   Assembly module
+*----------------------------------------------------------------------------*/
+DEF_CLASS( Module );
+
+void Module_init (Module *self)   
+{
+	self->origin		= 0xFFFF;
+	self->startoffset	= get_codesize();
+
+	self->local_symtab	= OBJ_NEW( SymbolHash );
+	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
+
+	self->exprs			= OBJ_NEW( ExprList );
+	OBJ_AUTODELETE( self->exprs ) = FALSE;
+}
+
+void Module_copy (Module *self, Module *other)	
+{ 
+	self->local_symtab = SymbolHash_clone( other->local_symtab );
+	self->exprs = ExprList_clone( other->exprs ); 
+}
+
+void Module_fini (Module *self)
+{ 
+	OBJ_DELETE( self->local_symtab );
+	OBJ_DELETE( self->exprs);
+}
+
+DEF_CLASS_LIST( Module );
 
 /* 
 * $Log: module.c,v $
-* Revision 1.4  2014-04-15 20:06:43  pauloscustodio
+* Revision 1.5  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.4  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.3  2014/01/11 01:29:40  pauloscustodio

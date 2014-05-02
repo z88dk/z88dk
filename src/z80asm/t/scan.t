@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.2 2014-04-19 17:55:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.3 2014-05-02 20:24:39 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -23,10 +23,11 @@ use File::Slurp;
 use Test::Differences; 
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o model.o options.o hist.o sym.o symtab.o symref.o ".
+my $objs = "scan.o errors.o model.o module.o codearea.o listfile.o ".
+		   "options.o hist.o sym.o symtab.o symref.o expr.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o ".
 		   "lib/srcfile.o lib/except.o lib/class.o ".
-		   "lib/list.o";
+		   "lib/list.o lib/array.o";
 		   
 my $init = <<'END';
 #include "legacy.h"
@@ -34,15 +35,8 @@ my $init = <<'END';
 #include "symbol.h"
 #include <assert.h>
 
-struct module the_module;
-struct module *CURRENTMODULE = &the_module;
-struct modules the_modules;
-struct modules *modulehdr = &the_modules;
 char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
-size_t get_PC( void ) { return 0; }
-int list_get_page_nr() { return 1; }
-void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
 
 #define T_GET( exp_token, exp_text ) \
 	token = GetSym(); \
@@ -580,7 +574,10 @@ done_testing;
 
 
 # $Log: scan.t,v $
-# Revision 1.2  2014-04-19 17:55:51  pauloscustodio
+# Revision 1.3  2014-05-02 20:24:39  pauloscustodio
+# New class Module to replace struct module and struct modules
+#
+# Revision 1.2  2014/04/19 17:55:51  pauloscustodio
 # Update for 64-bit architecture
 #
 # Revision 1.1  2014/04/06 22:31:42  pauloscustodio

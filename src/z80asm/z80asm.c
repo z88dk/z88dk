@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.160 2014-04-26 09:25:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.161 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -56,7 +56,6 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
 void ReleaseOwnedFile( struct usedfile *ownedfile );
-void ReleaseModules( void );
 void CloseFiles( void );
 Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
@@ -86,8 +85,6 @@ char *reloctable = NULL, *relocptr = NULL;
 
 uint_t DEFVPC;          /* DEFVARS address counter */
 
-struct modules *modulehdr;
-struct module *CURRENTMODULE;
 struct liblist *libraryhdr;
 
 /* local functions */
@@ -103,6 +100,7 @@ static void do_assemble( char *src_filename, char *obj_filename );
 void assemble_file( char *filename )
 {
     char *src_filename, *obj_filename;
+	Module *module;
 
     /* normal case - assemble a asm source file */
     objfile = NULL;
@@ -113,8 +111,8 @@ void assemble_file( char *filename )
     obj_filename = get_obj_filename( filename );      /* set '.obj' extension */
 
     /* Create module data structures for new file */
-    CURRENTMODULE = NewModule();
-	CURRENTMODULE->filename = strpool_add( src_filename );
+	module = new_curr_module();
+	module->filename = strpool_add( src_filename );
 
     query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
@@ -257,7 +255,7 @@ BOOL load_module_object( char *filename )
     {
         inc_codesize( obj_file->code_size );		/* BUG_0015, BUG_0050 */
 
-        CURRENTMODULE->modname	= obj_file->modname;
+        CURRENTMODULE->modname = obj_file->modname;
         
 		OBJ_DELETE( obj_file );						/* BUG_0049 */
 
@@ -368,44 +366,6 @@ char *GetLibfile( char *filename )
 
 
 /* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-struct module *NewModule( void )
-{
-    struct module *newm;
-
-    if ( modulehdr == NULL )
-    {
-        modulehdr = xnew( struct modules );
-        modulehdr->first = NULL;
-        modulehdr->last = NULL; /* Module header initialised */
-    }
-
-    newm = xnew( struct module );
-
-    newm->nextmodule = NULL;
-    newm->modname  = NULL;
-	newm->filename = NULL;
-	newm->startoffset = get_codesize();
-    newm->origin = 65535;
-    newm->local_symtab = OBJ_NEW( SymbolHash );
-
-    newm->exprs = OBJ_NEW( ExprList );
-
-    if ( modulehdr->first == NULL )
-    {
-        modulehdr->first = newm;
-        modulehdr->last = newm;         /* First module     in list   */
-    }
-    else
-    {
-        modulehdr->last->nextmodule = newm;     /* current/last module points now at new current */
-        modulehdr->last = newm;                 /* pointer to current module updated */
-    }
-
-    return newm;
-}
-
-
-/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 struct libfile *
 NewLibrary( void )
 {
@@ -435,36 +395,6 @@ NewLibrary( void )
     }
 
     return newl;
-}
-
-
-
-void
-ReleaseModules( void )
-{
-    struct module *tmpptr, *curptr;
-
-    if ( modulehdr == NULL )
-    {
-        return;
-    }
-
-    /* if exception happened at first module creation, we may have a header an no modules
-     * move while check to top of loop */
-    curptr = modulehdr->first;
-
-    while ( curptr != NULL )    /* until all modules are released */
-    {
-        OBJ_DELETE( curptr->local_symtab );
-		OBJ_DELETE( curptr->exprs );
-
-        tmpptr = curptr;
-        curptr = curptr->nextmodule;
-        xfree( tmpptr );       /* Release module */
-    }
-
-    xfree( modulehdr );
-    CURRENTMODULE = NULL;
 }
 
 
@@ -503,8 +433,6 @@ int main( int argc, char *argv[] )
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-        CURRENTMODULE = NULL;
-        modulehdr = NULL;               /* initialise to no modules */
         libraryhdr = NULL;              /* initialise to no library files */
 
         /* define OS_ID */
@@ -545,8 +473,7 @@ int main( int argc, char *argv[] )
 
 #ifndef QDOS
 
-        if ( modulehdr != NULL )
-            ReleaseModules();    /* Release module information (symbols, etc.) */
+        delete_module_list();		/* Release module information (symbols, etc.) */
 
         if ( libraryhdr != NULL )
             ReleaseLibraries();    /* Release library information */
@@ -581,7 +508,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.160  2014-04-26 09:25:32  pauloscustodio
+* Revision 1.161  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.160  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
 * When a library is built with -d, and the total size of the loaded
 * modules is more than 64K, z80asm fails with "max. code size reached".

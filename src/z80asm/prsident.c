@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.70 2014-04-22 23:52:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.71 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -73,9 +73,6 @@ void IF( void ), ELSE( void ), ENDIF( void );
 void MODULE( void );
 void LINE( void );
 void PUBLIC( void ); void EXTERN( void ); 
-
-/* global variables */
-extern struct module *CURRENTMODULE;
 
 
 typedef void ( *ptrfunc )( void ); /* ptr to function returning void */
@@ -998,7 +995,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.70  2014-04-22 23:52:55  pauloscustodio
+* Revision 1.71  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.70  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 * Removed append_opcode() and created a new helper append_2bytes().
 *

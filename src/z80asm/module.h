@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.7 2014-04-22 23:34:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.8 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.7 2014-04-22 23:3
 
 #include "class.h"
 #include "classlist.h"
+#include "expr.h"
 #include "strutil.h"
 #include "symtab.h"
 
@@ -30,15 +31,32 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.7 2014-04-22 23:3
 *   Code section, one assembly instruction
 *----------------------------------------------------------------------------*/
 CLASS( CodeSection )
-	char	*source_filename;		/* input file name, kept in strpool */
+	char	*filename;				/* input file name, kept in strpool */
 	int		 line_nr;				/* input line number */
 	Str		*bytes;					/* bytes of this opcode */
 END_CLASS;
 
 
+/*-----------------------------------------------------------------------------
+*   Assembly module
+*----------------------------------------------------------------------------*/
+CLASS( Module )
+	char		*modname;			/* module name, kept in strpool*/
+	char		*filename;			/* source file name, kept in strpool */
+    uint_t		 startoffset;		/* this module's start offset from start of code buffer */
+    uint_t		 origin;			/* ORG address of module, 0xFFFF if not defined */
+    SymbolHash	*local_symtab;		/* module local symbols */
+    ExprList	*exprs;				/* list of module expressions */
+END_CLASS;
+
+CLASS_LIST( Module );
+
 /*
 * $Log: module.h,v $
-* Revision 1.7  2014-04-22 23:34:26  pauloscustodio
+* Revision 1.8  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.7  2014/04/22 23:34:26  pauloscustodio
 * whitespace
 *
 * Revision 1.6  2014/04/15 20:06:43  pauloscustodio

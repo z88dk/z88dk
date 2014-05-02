@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.51 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.52 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -46,8 +46,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.51 2014-04-22 23:
 #define FLAGS_M 7
 
 
-extern struct module *CURRENTMODULE;
-extern struct modules *modulehdr;
 extern FILE *objfile;
 extern uint_t sizeof_relocroutine, sizeof_reloctable;
 
@@ -59,7 +57,10 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.51  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.52  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.51  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

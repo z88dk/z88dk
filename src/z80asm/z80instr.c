@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.69 2014-04-23 22:07:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.70 2014-05-02 20:24:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -49,11 +49,6 @@ void IncDec_8bit_instr( int opcode );
 void ArithLog8_instr( int opcode );
 void JP_instr( int opc0, int opc );
 void Subroutine_addr( int opc0, int opc );
-
-
-/* global variables */
-extern struct module *CURRENTMODULE;
-
 
 void
 PushPop_instr( int opcode )
@@ -1375,7 +1370,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.69  2014-04-23 22:07:57  pauloscustodio
+* Revision 1.70  2014-05-02 20:24:39  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.69  2014/04/23 22:07:57  pauloscustodio
 * warning
 *
 * Revision 1.68  2014/04/22 23:52:55  pauloscustodio

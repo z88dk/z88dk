@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.109 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.110 2014-05-02 20:24:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -64,7 +64,6 @@ extern char Z80objhdr[];
 extern char Z80libhdr[];
 extern byte_t reloc_routine[];
 extern struct liblist *libraryhdr;
-extern struct module *CURRENTMODULE;
 extern char *reloctable, *relocptr;
 
 struct linklist *linkhdr;
@@ -92,7 +91,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
         {
         case 'A':
             symboltype = SYM_ADDR;
-            value += modulehdr->first->origin + CURRENTMODULE->startoffset;       /* Absolute address */
+            value += get_first_module()->origin + CURRENTMODULE->startoffset;       /* Absolute address */
             break;
 
         case 'C':
@@ -139,7 +138,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
         offsetptr	= xfget_uint16( file );
 
         /* assembler PC as absolute address */
-        set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + asmpc );
+        set_PC( get_first_module()->origin + CURRENTMODULE->startoffset + asmpc );
 
 		xfget_count_byte_Str( file, expr_text );	/* get expression */
 		xfget_uint8( file );						/* skip zero byte */
@@ -240,7 +239,9 @@ LinkModules( void )
 {
     char fheader[9];
     uint_t origin;
-    struct module *lastobjmodule;
+    Module *first_obj_module, *last_obj_module;
+	ModuleListElem *iter;
+	BOOL saw_last_obj_module;
     char *obj_filename;
 	FILE *file;
 
@@ -268,16 +269,23 @@ LinkModules( void )
 
     TRY
     {
-        CURRENTMODULE = modulehdr->first;       /* begin with first module */
-        lastobjmodule = modulehdr->last;        /* remember this last module, further modules are libraries */
-
-        /* open error file */
-        open_error_file( get_err_filename( CURRENTMODULE->filename ) );
+		/* remember current first and last modules, i.e. before adding library modules */
+		first_obj_module = get_first_module();
+		last_obj_module  = get_last_module();
 
         set_PC( 0 );
 
-        do                                      /* link machine code & read symbols in all modules */
+		/* link machine code & read symbols in all modules */
+		for ( iter = ModuleList_first( module_list() ), saw_last_obj_module = FALSE ;
+			  iter != NULL && ! saw_last_obj_module ;
+			  iter = ModuleList_next( iter ) )  
         {
+			set_curr_module( iter->obj );
+
+	        /* open error file on first module */
+			if ( CURRENTMODULE == first_obj_module )
+		        open_error_file( get_err_filename( CURRENTMODULE->filename ) );
+
             set_error_null();
             set_error_module( CURRENTMODULE->modname );
 
@@ -307,7 +315,7 @@ LinkModules( void )
 
             origin = xfget_uint16( file );
 
-            if ( modulehdr->first == CURRENTMODULE )            /* origin of first module */
+            if ( CURRENTMODULE == first_obj_module )            /* origin of first module */
             {
                 if ( opts.relocatable )
                 {
@@ -323,7 +331,7 @@ LinkModules( void )
                     {
                         CURRENTMODULE->origin = origin;
 
-                        if ( CURRENTMODULE->origin == 65535U )
+                        if ( CURRENTMODULE->origin == 0xFFFF )
                         {
                             error_org_not_defined();  /* no ORG */
                             xfclose( file );
@@ -342,17 +350,16 @@ LinkModules( void )
 
             LinkModule( obj_filename, 0 );       /* link code & read name definitions */
 
-            CURRENTMODULE = CURRENTMODULE->nextmodule;  /* get next module, if any */
+	        /* parse only object modules, not added library modules */
+			if ( CURRENTMODULE == last_obj_module )
+				saw_last_obj_module = TRUE;
 
-        }
-        while ( CURRENTMODULE != lastobjmodule->nextmodule );
-
-        /* parse only object modules, not added library modules */
+		}
 
         set_error_null();
 
         define_global_def_sym( ASMSIZE_KW, get_codesize() );
-        define_global_def_sym( ASMTAIL_KW, modulehdr->first->origin + get_codesize() );
+        define_global_def_sym( ASMTAIL_KW, first_obj_module->origin + get_codesize() );
 
         if ( opts.verbose )
         {
@@ -621,22 +628,23 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 int
 LinkLibModule( struct libfile *library, long curmodule, char *modname )
 {
-    struct module *tmpmodule;
+    Module *tmpmodule, *lib_module;
     int flag;
 
-    tmpmodule = CURRENTMODULE;  /* remember current module */
+    tmpmodule = get_curr_module();					/* remember current module */
 
-    CURRENTMODULE = NewModule();
-    CURRENTMODULE->modname = strpool_add( modname );  /* get a copy of module name */
+	/* create new module to link library */
+	lib_module = new_curr_module();
+	lib_module->modname = strpool_add( modname );
 
     if ( opts.verbose )
     {
         printf( "Linking library module <%s>\n", modname );
     }
 
-    flag = LinkModule( library->libfilename, curmodule );       /* link   module & read names */
+    flag = LinkModule( library->libfilename, curmodule );       /* link module & read names */
 
-    CURRENTMODULE = tmpmodule;  /* restore previous current module */
+    set_curr_module( tmpmodule );		/* restore previous current module */
     return flag;
 }
 
@@ -658,7 +666,7 @@ ModuleExpr( void )
 
     do
     {
-        CURRENTMODULE = curlink->moduleinfo;
+		set_curr_module( curlink->moduleinfo );
         fptr_base = curlink->modulestart;
 
         set_error_null();
@@ -722,12 +730,12 @@ CreateBinFile( void )
         if ( opts.code_seg && get_codesize() > 16384 )
         {
             /* add '.bn0' extension */
-            filename = get_segbin_filename( modulehdr->first->filename, 0 );
+            filename = get_segbin_filename( get_first_module()->filename, 0 );
         }
         else
         {
             /* add '.bin' extension */
-            filename = get_bin_filename( modulehdr->first->filename );
+            filename = get_bin_filename( get_first_module()->filename );
         }
     }
 
@@ -794,18 +802,20 @@ CreateBinFile( void )
 void
 CreateLib( char *lib_filename )
 {
-    long Codesize;
+	static Str *file_buffer = NULL;
+    uint_t Codesize;
     FILE *lib_file = NULL;
     FILE *obj_file = NULL;
-    char *filebuffer = NULL;
     long fptr;
+	ModuleListElem *iter;
+	Module *last_module;
+
+	INIT_OBJ( Str, &file_buffer );		/* static object to read each file, not reentrant */
 
     if ( opts.verbose )
     {
         puts( "Creating library..." );
     }
-
-    CURRENTMODULE = modulehdr->first;
 
     TRY
     {
@@ -817,9 +827,15 @@ CreateLib( char *lib_filename )
 
         open_error_file( get_err_filename( lib_filename ) );
 
-        do
-        {
-            set_error_null();
+		last_module = get_last_module();
+
+		for ( iter = ModuleList_first( module_list() ) ; 
+			  iter != NULL ; 
+			  iter = ModuleList_next( iter ) )
+		{
+			set_curr_module( iter->obj );
+
+			set_error_null();
             set_error_module( CURRENTMODULE->modname );
 
             /* replace fname with the .obj extension */
@@ -830,13 +846,14 @@ CreateLib( char *lib_filename )
             Codesize = ftell( obj_file );
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
-            filebuffer = xnew_n( char, ( uint_t ) Codesize );
-			/* load object file */
-            xfget_chars( obj_file, filebuffer, Codesize );
+			/* expand file buffer if needed and read object file */
+			if ( Codesize > file_buffer->len )
+				Str_reserve( file_buffer, Codesize - file_buffer->len );
+			xfget_Str( obj_file, file_buffer, Codesize );
             xfclose( obj_file );
             obj_file = NULL;
 
-            if ( memcmp( filebuffer, Z80objhdr, 8U ) != 0 )
+            if ( memcmp( file_buffer->str, Z80objhdr, 8U ) != 0 )
             {
                 error_not_obj_file( CURRENTMODULE->filename );
                 break;
@@ -847,7 +864,7 @@ CreateLib( char *lib_filename )
                 printf( "<%s> module at %04lX.\n", CURRENTMODULE->filename, ftell( lib_file ) );
             }
 
-            if ( CURRENTMODULE->nextmodule == NULL )
+            if ( CURRENTMODULE == last_module )
             {
                 xfput_uint32( lib_file, -1 );    /* this is the last module */
             }
@@ -860,13 +877,8 @@ CreateLib( char *lib_filename )
             xfput_uint32( lib_file, Codesize );    /* size of this module */
 
 			/* write module to library */
-            xfput_chars( lib_file, filebuffer, Codesize ); 
-
-			xfree( filebuffer );
-
-            CURRENTMODULE = CURRENTMODULE->nextmodule;
+            xfput_Str( lib_file, file_buffer ); 
         }
-        while ( CURRENTMODULE != NULL );
     }
     FINALLY
     {
@@ -881,9 +893,6 @@ CreateLib( char *lib_filename )
 
         set_error_null();
         close_error_file();
-
-        if ( filebuffer )
-            xfree( filebuffer );
     }
     ETRY;
 }
@@ -958,7 +967,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.109  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.110  2014-05-02 20:24:38  pauloscustodio
+* New class Module to replace struct module and struct modules
+*
+* Revision 1.109  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start
