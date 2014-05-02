@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.6 2014-04-15 20:06:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.7 2014-05-02 21:13:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -51,6 +51,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.6 2014-04-15 2
 
 
 /* default types */
+ARRAY( byte_t );
 ARRAY( int );
 ARRAY( long );
 
@@ -151,7 +152,10 @@ ARRAY( long );
 
 /*
 * $Log: array.h,v $
-* Revision 1.6  2014-04-15 20:06:44  pauloscustodio
+* Revision 1.7  2014-05-02 21:13:54  pauloscustodio
+* Add byte array to default types
+*
+* Revision 1.6  2014/04/15 20:06:44  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.5  2014/04/12 15:18:05  pauloscustodio

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.7 2014-04-19 15:15:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.8 2014-05-02 21:13:54 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -36,6 +36,7 @@ ARRAY( Point );
 DEF_ARRAY( Point );
 
 PointArray *points;
+byte_tArray *bytes;
 intArray *ints;
 longArray *longs;
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
 	Point *p;
 	long *lp;
 	int *ip;
+	byte_t *bp;
 	long l;
 	int i;
 	
@@ -186,17 +188,17 @@ int main(int argc, char *argv[])
 	PointArray_unreserve(points);
 	assert( p == NULL );
 	
-	/* int array */
-	ints = OBJ_NEW( intArray );
+	/* byte_t array */
+	bytes = OBJ_NEW( byte_tArray );
 	for ( i = 10; i >= 0; i-- ) 
 	{
-		ip = intArray_item(ints, i);
-		*ip = i;
+		bp = byte_tArray_item(bytes, i);
+		*bp = (byte_t) i;
 	}
 	for ( i = 0; i <= 10; i++ )
 	{
-		ip = intArray_item(ints, i);
-		assert( *ip == i );
+		bp = byte_tArray_item(bytes, i);
+		assert( *bp == (byte_t) i );
 	}
 	
 	/* int array */
@@ -247,7 +249,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.7  2014-04-19 15:15:40  pauloscustodio
+# Revision 1.8  2014-05-02 21:13:54  pauloscustodio
+# Add byte array to default types
+#
+# Revision 1.7  2014/04/19 15:15:40  pauloscustodio
 # Update for 64-bit architecture
 #
 # Revision 1.6  2014/04/19 14:57:58  pauloscustodio
