@@ -15,8 +15,7 @@ type = $(lastword $(subst -, ,$*))
 ${jobs}: job-%:
 	cp target/$(target)/clib_cfg.asm .
 	cp target/$(target)/clib_target_cfg.asm .
-	z80asm -ns -nm -Mo -x$(target)_$(type).lib @target/$(target)/library/$(target)_$(type).lst
-	mv $(target)_$(type).lib lib
+	z80asm -ns -nm -Mo -xlib/$(target)_$(type).lib @target/$(target)/library/$(target)_$(type).lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
