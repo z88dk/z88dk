@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.113 2014-05-02 21:54:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.114 2014-05-02 23:35:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -91,7 +91,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
         {
         case 'A':
             symboltype = SYM_ADDR;
-            value += get_first_module()->origin + CURRENTMODULE->startoffset;       /* Absolute address */
+            value += get_first_module()->origin + CURRENTMODULE->start_offset;       /* Absolute address */
             break;
 
         case 'C':
@@ -138,7 +138,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
         offsetptr	= xfget_uint16( file );
 
         /* assembler PC as absolute address */
-        set_PC( get_first_module()->origin + CURRENTMODULE->startoffset + asmpc );
+        set_PC( get_first_module()->origin + CURRENTMODULE->start_offset + asmpc );
 
 		xfget_count_byte_Str( file, expr_text );	/* get expression */
 		xfget_uint8( file );						/* skip zero byte */
@@ -164,7 +164,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
             else
             {
                 constant = Expr_eval( expr );
-                patchptr = CURRENTMODULE->startoffset + offsetptr;        /* index to memory buffer */
+                patchptr = CURRENTMODULE->start_offset + offsetptr;        /* index to memory buffer */
 
                 switch ( type )
                 {
@@ -316,19 +316,19 @@ LinkModules( void )
             {
                 if ( opts.relocatable )
                 {
-                    CURRENTMODULE->origin = 0;    /* ORG 0 on auto relocation */
+                    CURRENTMODULE->origin = 0;					/* ORG 0 on auto relocation */
                 }
                 else
                 {
                     if ( opts.origin >= 0 )
                     {
-                        CURRENTMODULE->origin = opts.origin;    /* use origin from command line    */
+                        CURRENTMODULE->origin = opts.origin;    /* use origin from command line */
                     }
                     else
                     {
                         CURRENTMODULE->origin = origin;
 
-                        if ( CURRENTMODULE->origin == 0xFFFF )
+						if ( CURRENTMODULE->origin == NO_ORIGIN )
                         {
                             error_org_not_defined();  /* no ORG */
                             xfclose( file );
@@ -411,12 +411,12 @@ LinkModule( char *filename, long fptr_base )
         if ( size == 0 )
             size = 0x10000;
 
-        /* read module code at startoffset of the module */
+        /* read module code at start_offset of the module */
         /* BUG_0015: was reading at current position in code area, swaping order of modules */
-        fread_codearea_offset( file, CURRENTMODULE->startoffset, size );
+        fread_codearea_offset( file, CURRENTMODULE->start_offset, size );
 
-        /* BUG_0015 : was no updating codesize */
-        if ( CURRENTMODULE->startoffset == get_codesize() )
+        /* BUG_0015 : was not updating codesize */
+        if ( CURRENTMODULE->start_offset == get_codesize() )
             inc_codesize( size );    /* a new module has been added */
     }
 
@@ -958,7 +958,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.113  2014-05-02 21:54:09  pauloscustodio
+* Revision 1.114  2014-05-02 23:35:19  pauloscustodio
+* Rename startoffset, add constant for NO_ORIGIN
+*
+* Revision 1.113  2014/05/02 21:54:09  pauloscustodio
 * Use byteArray instead of Str to hold object file
 *
 * Revision 1.112  2014/05/02 21:34:58  pauloscustodio

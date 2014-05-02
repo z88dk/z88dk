@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.5 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.6 2014-05-02 23:35:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,8 +50,8 @@ DEF_CLASS( Module );
 
 void Module_init (Module *self)   
 {
-	self->origin		= 0xFFFF;
-	self->startoffset	= get_codesize();
+	self->origin		= NO_ORIGIN;
+	self->start_offset	= get_codesize();
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
 	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
@@ -76,7 +76,10 @@ DEF_CLASS_LIST( Module );
 
 /* 
 * $Log: module.c,v $
-* Revision 1.5  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.6  2014-05-02 23:35:19  pauloscustodio
+* Rename startoffset, add constant for NO_ORIGIN
+*
+* Revision 1.5  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.4  2014/04/15 20:06:43  pauloscustodio
