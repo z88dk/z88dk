@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.143 2014-05-02 20:24:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.144 2014-05-02 23:36:27 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -158,7 +158,7 @@ clean :
 #------------------------------------------------------------------------------
 # test
 #------------------------------------------------------------------------------
-test : $(TARGET)
+test:
 	$(MAKE) legacy prove
 	$(MAKE) new    prove
 
@@ -230,7 +230,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.143  2014-05-02 20:24:38  pauloscustodio
+# Revision 1.144  2014-05-02 23:36:27  pauloscustodio
+# Make test failed to build object after changing legacy
+#
+# Revision 1.143  2014/05/02 20:24:38  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.142  2014/04/19 14:57:58  pauloscustodio
