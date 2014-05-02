@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.14 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.15 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -74,7 +74,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 		struct 
 		{
 			char   *name;			/* name of identifier, stored in strpool */
-			byte_t	sym_type;		/* type of identifier (local, global, rel. address or constant) */
+			byte	sym_type;		/* type of identifier (local, global, rel. address or constant) */
 		} ident;
 
 		/* CONST_EXPR_OP - no data */
@@ -92,10 +92,10 @@ ARRAY( ExprOp );					/* hold list of Expr operations/operands */
 CLASS( Expr )
 	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
 	Str			*text;			/* expression in infix text */
-	byte_t		 expr_type;		/* range type of evaluated expression */
+	byte		 expr_type;		/* range type of evaluated expression */
     BOOL		 is_stored;		/* Flag to indicate that expression has been stored to object file */
-	uint_t		 asmpc;			/* ASMPC value during linking */
-    uint_t		 code_pos;		/* Address to patch expression value */
+	uint		 asmpc;			/* ASMPC value during linking */
+    uint		 code_pos;		/* Address to patch expression value */
 	char		*filename;		/* file and line where expression defined, string in strpool */
     int			 line_nr;		/* source line */
     long		 listpos;		/* position in listing file to patch (in pass 2) */
@@ -134,7 +134,10 @@ extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.14  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.15  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.14  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

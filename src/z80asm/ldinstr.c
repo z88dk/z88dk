@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.37 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.38 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -208,7 +208,7 @@ LD( void )
                         }
 
                         destreg &= 7;
-                        append_byte( ( byte_t )( destreg * 0x08 + 0x06 ) );
+                        append_byte( (byte)( destreg * 0x08 + 0x06 ) );
                         ExprUnsigned8( 1 );
                         return;
                     }
@@ -260,7 +260,7 @@ LD( void )
                     sourcereg &= 7;
                     destreg &= 7;
 
-                    append_byte( ( byte_t )( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
+                    append_byte( (byte)( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
                 }
             }
             else
@@ -299,7 +299,7 @@ LD_HL8bit_indrct( void )
             break;
 
         default:
-            append_byte( ( byte_t )( 0x70 + sourcereg ) );       /* LD  (HL),r  */
+            append_byte( (byte)( 0x70 + sourcereg ) );       /* LD  (HL),r  */
             break;
         }
     }
@@ -317,7 +317,7 @@ void
 LD_index8bit_indrct( int destreg )
 {
     int sourcereg;
-    uint_t opcodeptr;
+    uint opcodeptr;
 
     if ( destreg == 5 )
     {
@@ -360,7 +360,7 @@ LD_index8bit_indrct( int destreg )
             break;
 
         default:
-            patch_byte( &opcodeptr, ( byte_t )( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
+            patch_byte( &opcodeptr, (byte)( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
             break;
         }                       /* end switch */
     }
@@ -382,7 +382,7 @@ LD_r_8bit_indrct( int destreg )
     switch ( sourcereg = IndirectRegisters() )
     {
     case 2:
-        append_byte( ( byte_t )( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
+        append_byte( (byte)( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
         break;
 
     case 5:
@@ -396,7 +396,7 @@ LD_r_8bit_indrct( int destreg )
             append_byte( 0xFD );
         }
 
-        append_byte( ( byte_t )( 0x40 + destreg * 0x08 + 0x06 ) );
+        append_byte( (byte)( 0x40 + destreg * 0x08 + 0x06 ) );
         ExprSigned8( 2 );
         break;
 
@@ -483,7 +483,7 @@ LD_address_indrct( char *exprptr )
         case 1:         /* LD  (nn),dd   => dd: BC,DE,SP  */
         case 3:
             append_byte( 0xED );
-            append_byte( ( byte_t )( 0x43 + sourcereg * 0x10 ) );
+            append_byte( (byte)( 0x43 + sourcereg * 0x10 ) );
             bytepos = 2;
             break;
 
@@ -573,7 +573,7 @@ LD_16bit_reg( void )
 
                 default:
                     append_byte( 0xED );
-                    append_byte( ( byte_t )( 0x4B + destreg * 0x10 ) );
+                    append_byte( (byte)( 0x4B + destreg * 0x10 ) );
                     bytepos = 2;
                     break;
                 }
@@ -607,7 +607,7 @@ LD_16bit_reg( void )
                         break;
 
                     default:
-                        append_byte( ( byte_t )( destreg * 0x10 + 0x01 ) );
+                        append_byte( (byte)( destreg * 0x10 + 0x01 ) );
                         bytepos = 1;
                         break;
                     }
@@ -666,7 +666,10 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.37  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.38  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.37  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.36  2014/04/22 23:52:55  pauloscustodio
@@ -756,7 +759,7 @@ LD_16bit_reg( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.24  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -783,8 +786,8 @@ LD_16bit_reg( void )
 * one file errors.t.
 *
 * Revision 1.19  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 *
 * Revision 1.18  2013/01/20 21:24:28  pauloscustodio

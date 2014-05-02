@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.48 2014-05-02 20:24:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.49 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,7 +62,10 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.48  2014-05-02 20:24:39  pauloscustodio
+* Revision 1.49  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.48  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.47  2014/04/26 08:12:04  pauloscustodio
@@ -160,7 +163,7 @@ struct linkedmod
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.32  2014/02/17 22:48:28  pauloscustodio
 * Symbol types and Expression types need to be in sync
@@ -225,8 +228,8 @@ struct linkedmod
 * Added comments
 *
 * Revision 1.18  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 *
 * Revision 1.17  2013/01/20 13:18:10  pauloscustodio

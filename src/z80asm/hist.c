@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.95 2014-04-26 09:25:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.96 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.95 2014-04-26 09:25
 
 /*
 * $Log: hist.c,v $
-* Revision 1.95  2014-04-26 09:25:32  pauloscustodio
+* Revision 1.96  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.95  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
 * When a library is built with -d, and the total size of the loaded
 * modules is more than 64K, z80asm fails with "max. code size reached".
@@ -172,7 +175,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.95 2014-04-26 09:25
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.71  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
@@ -1409,7 +1412,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, byte_t, uint_t
+	- Unified usage of integer types: int, char, byte, uint
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1728,7 +1731,7 @@ Based on 1.0.31
 		breaks on a 64-bit architecture. Make the functions return the value instead 
 		of being passed the pointer to the return value, so that the compiler
 		takes care of size convertions.
-		Create uint_t and ulong_t, use uint_t instead of size_t.
+		Create uint and ulong, use uint instead of size_t.
 		
 -------------------------------------------------------------------------------
 01.03.2014 [2.1.4] (pauloscustodio)

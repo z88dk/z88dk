@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.111 2014-05-02 21:00:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.112 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -62,19 +62,19 @@ static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modna
 /* global variables */
 extern char Z80objhdr[];
 extern char Z80libhdr[];
-extern byte_t reloc_routine[];
+extern byte reloc_routine[];
 extern struct liblist *libraryhdr;
 extern char *reloctable, *relocptr;
 
 struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
-uint_t totaladdr, curroffset;
+uint totaladdr, curroffset;
 
 void
 ReadNames( char *filename, FILE *file, long nextname, long endnames )
 {
     int scope, symbol_char;
-    byte_t symboltype = 0;
+    byte symboltype = 0;
     long value;
 	DEFINE_STR( name, MAXLINE );
 
@@ -128,7 +128,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
     int type;
     long constant;
     Expr *expr;
-    uint_t asmpc, patchptr, offsetptr;
+    uint asmpc, patchptr, offsetptr;
 	DEFINE_STR( expr_text, MAXLINE );
 
     do
@@ -172,14 +172,14 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, ( byte_t ) constant );
+                    patch_byte( &patchptr, (byte) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, ( byte_t ) constant );  /* opcode is stored, now store signed 8bit value */
+                    patch_byte( &patchptr, (byte) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
@@ -192,11 +192,11 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                         if ( expr->expr_type & SYM_ADDR )
                         {
                             /* Expression contains relocatable address */
-							uint_t distance = offsetptr - curroffset;
+							uint distance = offsetptr - curroffset;
 
                             if ( distance >= 0 && distance <= 255 )
                             {
-                                *relocptr++ = ( byte_t ) distance;
+                                *relocptr++ = (byte) distance;
                                 sizeof_reloctable++;
                             }
                             else
@@ -238,7 +238,7 @@ void
 LinkModules( void )
 {
     char fheader[9];
-    uint_t origin;
+    uint origin;
     Module *first_obj_module, *last_obj_module;
 	BOOL saw_last_obj_module;
     char *obj_filename;
@@ -387,7 +387,7 @@ int
 LinkModule( char *filename, long fptr_base )
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    uint_t size;
+    uint size;
     int flag = 0;
 	FILE *file;
 
@@ -711,7 +711,7 @@ void
 CreateBinFile( void )
 {
     FILE *binaryfile;
-    uint_t codesize, codeblock, offset;
+    uint codesize, codeblock, offset;
     int segment;
     char *filename;
 
@@ -744,10 +744,10 @@ CreateBinFile( void )
 		/* relocate routine */
         xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
 
-        *( reloctable + 0 ) = ( uint_t ) totaladdr % 256U;
-        *( reloctable + 1 ) = ( uint_t ) totaladdr / 256U;  /* total of relocation elements */
-        *( reloctable + 2 ) = ( uint_t ) sizeof_reloctable % 256U;
-        *( reloctable + 3 ) = ( uint_t ) sizeof_reloctable / 256U; /* total size of relocation table elements */
+        *( reloctable + 0 ) = (uint) totaladdr % 256U;
+        *( reloctable + 1 ) = (uint) totaladdr / 256U;  /* total of relocation elements */
+        *( reloctable + 2 ) = (uint) sizeof_reloctable % 256U;
+        *( reloctable + 3 ) = (uint) sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 		/* write relocation table, inclusive 4 byte header */
         xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
@@ -800,7 +800,7 @@ void
 CreateLib( char *lib_filename )
 {
 	static Str *file_buffer = NULL;
-    uint_t Codesize;
+    uint Codesize;
     FILE *lib_file = NULL;
     FILE *obj_file = NULL;
     long fptr;
@@ -959,7 +959,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.111  2014-05-02 21:00:49  pauloscustodio
+* Revision 1.112  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.111  2014/05/02 21:00:49  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
 *
 * Revision 1.110  2014/05/02 20:24:38  pauloscustodio
@@ -1089,7 +1092,7 @@ ReleaseLinkInfo( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.89  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
@@ -1272,8 +1275,8 @@ ReleaseLinkInfo( void )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.47  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 *
 * Revision 1.46  2013/01/20 13:18:10  pauloscustodio

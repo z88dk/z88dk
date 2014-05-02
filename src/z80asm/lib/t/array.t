@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.8 2014-05-02 21:13:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.9 2014-05-02 21:34:58 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -36,7 +36,7 @@ ARRAY( Point );
 DEF_ARRAY( Point );
 
 PointArray *points;
-byte_tArray *bytes;
+byteArray *bytes;
 intArray *ints;
 longArray *longs;
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	Point *p;
 	long *lp;
 	int *ip;
-	byte_t *bp;
+	byte *bp;
 	long l;
 	int i;
 	
@@ -188,17 +188,17 @@ int main(int argc, char *argv[])
 	PointArray_unreserve(points);
 	assert( p == NULL );
 	
-	/* byte_t array */
-	bytes = OBJ_NEW( byte_tArray );
+	/* byte array */
+	bytes = OBJ_NEW( byteArray );
 	for ( i = 10; i >= 0; i-- ) 
 	{
-		bp = byte_tArray_item(bytes, i);
-		*bp = (byte_t) i;
+		bp = byteArray_item(bytes, i);
+		*bp = (byte) i;
 	}
 	for ( i = 0; i <= 10; i++ )
 	{
-		bp = byte_tArray_item(bytes, i);
-		assert( *bp == (byte_t) i );
+		bp = byteArray_item(bytes, i);
+		assert( *bp == (byte) i );
 	}
 	
 	/* int array */
@@ -249,7 +249,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.8  2014-05-02 21:13:54  pauloscustodio
+# Revision 1.9  2014-05-02 21:34:58  pauloscustodio
+# byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+#
+# Revision 1.8  2014/05/02 21:13:54  pauloscustodio
 # Add byte array to default types
 #
 # Revision 1.7  2014/04/19 15:15:40  pauloscustodio

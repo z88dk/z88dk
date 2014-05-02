@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.81 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.82 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -146,7 +146,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
    to retrieve an argument, if any */
 static char *check_option( char *arg, char *opt )
 {
-    uint_t len = strlen( opt );
+    uint len = strlen( opt );
 
     if ( *opt &&				/* ignore empty option strings */
             strncmp( arg, opt, len ) == 0 )
@@ -571,7 +571,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.81  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.82  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.81  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start
@@ -631,7 +634,7 @@ char *get_segbin_filename( char *filename, int segment )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.74  2014/02/09 10:10:25  pauloscustodio
 * Rename internal functions.

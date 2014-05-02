@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.91 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.92 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -56,7 +56,7 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern uint_t DEFVPC;
+extern uint DEFVPC;
 
 
 int
@@ -204,7 +204,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = ( uint_t )offset;
+            DEFVPC = (uint)offset;
             globaldefv = ON;
         }
         else
@@ -250,7 +250,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = ( uint_t )offset;
+            DEFVPC = (uint)offset;
         }
     }
 }
@@ -386,7 +386,7 @@ DEFS()
             {
                 while ( constant-- )
                 {
-                    append_byte( ( byte_t ) val );
+                    append_byte( (byte) val );
                 }
             }
             else
@@ -520,7 +520,7 @@ ORG( void )
 
             if ( constant >= 0 && constant <= 65535 )
             {
-                CURRENTMODULE->origin = (uint_t) constant;
+                CURRENTMODULE->origin = (uint) constant;
             }
             else
             {
@@ -684,7 +684,7 @@ DEFM( void )
         {
 			for ( p = tok_string; *p != '\0'; p++ )
 			{
-                append_byte( ( byte_t ) *p );
+                append_byte( (byte) *p );
                 ++bytepos;
 			}
 
@@ -784,7 +784,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.91  2014-05-02 20:24:38  pauloscustodio
+ * Revision 1.92  2014-05-02 21:34:58  pauloscustodio
+ * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+ *
+ * Revision 1.91  2014/05/02 20:24:38  pauloscustodio
  * New class Module to replace struct module and struct modules
  *
  * Revision 1.90  2014/04/22 23:32:42  pauloscustodio
@@ -921,7 +924,7 @@ DeclModuleName( void )
  * breaks on a 64-bit architecture. Make the functions return the value instead
  * of being passed the pointer to the return value, so that the compiler
  * takes care of size convertions.
- * Create uint_t and ulong_t, use uint_t instead of size_t.
+ * Create uint and ulong, use uint instead of size_t.
  *
  * Revision 1.67  2014/02/08 11:21:08  pauloscustodio
  * Moved srcfile.c to lib/
@@ -1048,8 +1051,8 @@ DeclModuleName( void )
  * New listfile.c with all the listing related code
  *
  * Revision 1.37  2013/01/24 23:03:03  pauloscustodio
- * Replaced (unsigned char) by (byte_t)
- * Replaced (unisigned int) by (uint_t)
+ * Replaced (unsigned char) by (byte)
+ * Replaced (unisigned int) by (uint)
  * Replaced (short) by (int)
  *
  * Revision 1.36  2013/01/20 21:24:28  pauloscustodio

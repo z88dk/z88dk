@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.7 2014-05-02 21:13:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.8 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.7 2014-05-02 2
 *	arr = OBJ_NEW( TArray )		// create object
 *	arr->free_data = elem_free;	// function to free each element
 *	T *TArray_item(n)			// expand array if needed and return address of item
-*	uint_t TArray_size()		// return number of elements
+*	uint TArray_size()			// return number of elements
 *	TArray_set_size(n)			// set number of elements, call free_data on dropped ones
 *	TArray_remove_all()			// free each element and colapse array
 *	TArray_unreserve()			// free all unused space of array
@@ -40,9 +40,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.7 2014-05-02 2
 										/* called by TArray_remove_all() */	\
 	END_CLASS																\
 																			\
-	extern uint_t	T##Array_size(T##Array *self);							\
-	extern void		T##Array_set_size(T##Array *self, uint_t n);			\
-	extern T 	   *T##Array_item(T##Array *self, uint_t n);				\
+	extern uint	T##Array_size(T##Array *self);								\
+	extern void		T##Array_set_size(T##Array *self, uint n);				\
+	extern T 	   *T##Array_item(T##Array *self, uint n);					\
 	extern void		T##Array_remove_all(T##Array *self);					\
 	extern void		T##Array_unreserve(T##Array *self);						\
 	extern T	   *T##Array_push(T##Array *self);							\
@@ -51,7 +51,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.7 2014-05-02 2
 
 
 /* default types */
-ARRAY( byte_t );
+ARRAY( byte );
 ARRAY( int );
 ARRAY( long );
 
@@ -76,14 +76,14 @@ ARRAY( long );
 		OBJ_DELETE(self->items);											\
 	}																		\
 																			\
-	uint_t T##Array_size(T##Array *self)									\
+	uint T##Array_size(T##Array *self)										\
 	{																		\
 		return self->items->len / sizeof(T);								\
 	}																		\
 																			\
-	void T##Array_set_size(T##Array *self, uint_t n)						\
+	void T##Array_set_size(T##Array *self, uint n)							\
 	{																		\
-		uint_t size, i;														\
+		uint size, i;														\
 																			\
 		/* delete old items */												\
 		if ( self->free_data != NULL )										\
@@ -101,9 +101,9 @@ ARRAY( long );
 		self->items->len = n * sizeof(T);									\
 	}																		\
 																			\
-	T *T##Array_item(T##Array *self, uint_t n)								\
+	T *T##Array_item(T##Array *self, uint n)								\
 	{																		\
-		uint_t old_size, new_size, new_bytes;								\
+		uint old_size, new_size, new_bytes;									\
 																			\
 		old_size = T##Array_size(self);										\
 		new_size = MAX( old_size, n + 1 );									\
@@ -133,26 +133,29 @@ ARRAY( long );
 																			\
 	T *T##Array_push(T##Array *self)										\
 	{																		\
-		uint_t size = T##Array_size(self);									\
+		uint size = T##Array_size(self);									\
 		return T##Array_item(self, size);									\
 	}																		\
 																			\
 	T *T##Array_top(T##Array *self)											\
 	{																		\
-		uint_t size = T##Array_size(self);									\
+		uint size = T##Array_size(self);									\
 		return size > 0 ? T##Array_item(self, size - 1) : NULL;				\
 	}																		\
 																			\
 	void T##Array_pop(T##Array *self)										\
 	{																		\
-		uint_t size = T##Array_size(self);									\
+		uint size = T##Array_size(self);									\
 		assert( size > 0 );													\
 		T##Array_set_size(self, size - 1);									\
 	}																		\
 
 /*
 * $Log: array.h,v $
-* Revision 1.7  2014-05-02 21:13:54  pauloscustodio
+* Revision 1.8  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.7  2014/05/02 21:13:54  pauloscustodio
 * Add byte array to default types
 *
 * Revision 1.6  2014/04/15 20:06:44  pauloscustodio
@@ -174,7 +177,7 @@ ARRAY( long );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.1  2014/02/17 22:05:20  pauloscustodio
 * Template array that grows on request. Items may move in memory on reallocation.

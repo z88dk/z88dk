@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.31 2014-05-02 21:00:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.32 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -98,7 +98,7 @@ Symbol *find_global_symbol( char *name )
 /*-----------------------------------------------------------------------------
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
-Symbol *_define_sym( char *name, long value, byte_t type,
+Symbol *_define_sym( char *name, long value, byte type,
                      Module *owner, SymbolHash **psymtab )
 {
     Symbol *sym;
@@ -186,12 +186,12 @@ Symbol *define_local_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a new symbol in the local or global tabs
 *----------------------------------------------------------------------------*/
-Symbol *define_local_sym( char *name, long value, byte_t type )
+Symbol *define_local_sym( char *name, long value, byte type )
 {
     return _define_sym( name, value, type | SYM_LOCAL, CURRENTMODULE, & CURRENTMODULE->local_symtab );
 }
 
-Symbol *define_global_sym( char *name, long value, byte_t type )
+Symbol *define_global_sym( char *name, long value, byte type )
 {
     return _define_sym( name, value, type | SYM_PUBLIC, CURRENTMODULE, &global_symtab );
 }
@@ -200,7 +200,7 @@ Symbol *define_global_sym( char *name, long value, byte_t type )
 *   copy all SYM_ADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
 static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
-                                 byte_t type_mask, byte_t type_value )
+                                 byte type_mask, byte type_value )
 {
     SymbolHashElem *iter;
     Symbol         *sym;
@@ -219,7 +219,7 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 *   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
 *   Selects symbols where (type & type_mask) == type_value
 *----------------------------------------------------------------------------*/
-SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value )
+SymbolHash *get_all_syms( byte type_mask, byte type_value )
 {
     SymbolHash *all_syms = OBJ_NEW( SymbolHash );
 
@@ -270,7 +270,7 @@ void remove_all_global_syms( void )
 *   b) if in the local table but not yet defined, create now (was a reference)
 *   c) else error REDEFINED
 *----------------------------------------------------------------------------*/
-static void define_local_symbol( char *name, long value, byte_t type )
+static void define_local_symbol( char *name, long value, byte type )
 {
     Symbol *sym;
 
@@ -307,7 +307,7 @@ static void define_local_symbol( char *name, long value, byte_t type )
 *   c) if declared global/extern and defined -> error REDEFINED
 *   d) if in global table and not global/extern -> define a new local symbol
 *----------------------------------------------------------------------------*/
-void define_symbol( char *name, long value, byte_t type )
+void define_symbol( char *name, long value, byte type )
 {
     Symbol     *sym;
 
@@ -495,7 +495,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.31  2014-05-02 21:00:50  pauloscustodio
+* Revision 1.32  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.31  2014/05/02 21:00:50  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
 *
 * Revision 1.30  2014/05/02 20:24:39  pauloscustodio

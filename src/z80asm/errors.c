@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.40 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.41 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -200,7 +200,7 @@ static void puts_error_file( char *string )
 static void do_error( enum ErrType err_type, char *message )
 {
     DEFINE_STR( msg, MAXLINE );
-    uint_t len_at, len_prefix;
+    uint len_at, len_prefix;
 
     init();
 
@@ -291,7 +291,10 @@ static void fatal_file_error( char *filename, BOOL writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.40  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.41  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.40  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.39  2014/02/25 22:39:34  pauloscustodio
@@ -304,7 +307,7 @@ static void fatal_file_error( char *filename, BOOL writing )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.37  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,

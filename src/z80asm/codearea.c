@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.29 2014-04-22 23:52:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.30 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -35,12 +35,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.29 2014-04-22 2
 *   global data
 *----------------------------------------------------------------------------*/
 static char *codearea;                  /* machine code block */
-static uint_t codeindex;                /* point to current address of codearea */
-static uint_t codesize;                 /* size of all modules before current,
+static uint codeindex;                /* point to current address of codearea */
+static uint codesize;                 /* size of all modules before current,
                                            i.e. base address of current module
                                            BUG_0015 */
-static uint_t g_PC;		                /* Program Counter */
-static uint_t g_opcode_size;			/* Number of bytes added after last set_PC() or next_PC() */
+static uint g_PC;		                /* Program Counter */
+static uint g_opcode_size;			/* Number of bytes added after last set_PC() or next_PC() */
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
@@ -66,30 +66,30 @@ DEFINE_fini()
 *	next_PC() moves to the next opcode
 *	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
-void set_PC( uint_t n )
+void set_PC( uint n )
 {
 	g_PC = n;
 	g_opcode_size = 0;
 }
 
-uint_t next_PC( void )
+uint next_PC( void )
 {
 	g_PC += g_opcode_size;
 	g_opcode_size = 0;
 	return g_PC;
 }
 
-uint_t get_PC( void )
+uint get_PC( void )
 {
 	return g_PC;
 }
 
-uint_t get_opcode_size( void )
+uint get_opcode_size( void )
 {
 	return g_opcode_size;
 }
 
-static void inc_PC( uint_t n )
+static void inc_PC( uint n )
 {
     g_opcode_size += n;
 }
@@ -105,25 +105,25 @@ void reset_codearea( void )
     memset( codearea, 0, MAXCODESIZE );
 }
 
-uint_t get_codeindex( void ) /* BUG_0015 */
+uint get_codeindex( void ) /* BUG_0015 */
 {
     init();
     return codeindex;
 }
 
-uint_t get_codesize( void ) /* BUG_0015 */
+uint get_codesize( void ) /* BUG_0015 */
 {
     init();
     return codesize;
 }
 
-uint_t inc_codesize( uint_t n ) /* BUG_0015 */
+uint inc_codesize( uint n ) /* BUG_0015 */
 {
     init();
     return codesize += n;
 }
 
-static void check_space( uint_t addr, uint_t n )
+static void check_space( uint addr, uint n )
 {
     if ( addr + n > MAXCODESIZE )
     {
@@ -140,7 +140,7 @@ void fwrite_codearea( FILE *stream )
     xfput_chars( stream, codearea, codeindex );
 }
 
-void fwrite_codearea_chunk( FILE *stream, uint_t addr, uint_t size )
+void fwrite_codearea_chunk( FILE *stream, uint addr, uint size )
 {
     init();
 
@@ -156,7 +156,7 @@ void fwrite_codearea_chunk( FILE *stream, uint_t addr, uint_t size )
 }
 
 /* append data read from file to the current code area */
-void fread_codearea( FILE *stream, uint_t size )
+void fread_codearea( FILE *stream, uint size )
 {
     init();
     check_space( codeindex, size );
@@ -166,7 +166,7 @@ void fread_codearea( FILE *stream, uint_t size )
 }
 
 /* read to codearea at offset - BUG_0015 */
-void fread_codearea_offset( FILE *stream, uint_t offset, uint_t size )
+void fread_codearea_offset( FILE *stream, uint offset, uint size )
 {
     init();
     check_space( offset, size );
@@ -182,28 +182,28 @@ void fread_codearea_offset( FILE *stream, uint_t offset, uint_t size )
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte( uint_t *paddr, byte_t byte )
+void patch_byte( uint *paddr, byte byte1 )
 {
     init();
     check_space( *paddr, 1 );
-    codearea[( *paddr )++] = byte;
+    codearea[( *paddr )++] = byte1;
 }
 
-void append_byte( byte_t byte )
+void append_byte( byte byte1 )
 {
     init();
-    patch_byte( &codeindex, byte );
-    list_append_byte( byte );
+    patch_byte( &codeindex, byte1 );
+    list_append_byte( byte1 );
 	inc_PC( 1 );
 }
 
-void append_2bytes( byte_t byte1, byte_t byte2 )
+void append_2bytes( byte byte1, byte byte2 )
 {
 	append_byte( byte1 );
 	append_byte( byte2 );
 }
 
-void patch_word( uint_t *paddr, int word )
+void patch_word( uint *paddr, int word )
 {
     init();
     check_space( *paddr, 2 );
@@ -221,7 +221,7 @@ void append_word( int word )
 	inc_PC( 2 );
 }
 
-void patch_long( uint_t *paddr, long dword )
+void patch_long( uint *paddr, long dword )
 {
     init();
     check_space( *paddr, 4 );
@@ -243,20 +243,23 @@ void append_long( long dword )
 	inc_PC( 4 );
 }
 
-byte_t get_byte( uint_t *paddr )
+byte get_byte( uint *paddr )
 {
-    byte_t byte;
+    byte byte1;
 
     init();
     assert( *paddr < codeindex );
-    byte = codearea[( *paddr )++];
-    return byte;
+    byte1 = codearea[( *paddr )++];
+    return byte1;
 }
 
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.29  2014-04-22 23:52:55  pauloscustodio
+* Revision 1.30  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.29  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 * Removed append_opcode() and created a new helper append_2bytes().
 *
@@ -308,7 +311,7 @@ byte_t get_byte( uint_t *paddr )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.23  2014/01/20 23:29:17  pauloscustodio
 * Moved file.c to lib/fileutil.c
@@ -365,8 +368,8 @@ byte_t get_byte( uint_t *paddr )
 * Solve memory leak
 *
 * Revision 1.9  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 *
 * Revision 1.8  2013/01/20 21:24:28  pauloscustodio

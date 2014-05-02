@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.56 2014-04-05 23:36:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.57 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -71,9 +71,9 @@ flags[] =
 int
 CheckCondition( void )
 {
-    uint_t  i;
+    uint  i;
     char   *text = tok_name;
-    uint_t  len = strlen( text );
+    uint  len = strlen( text );
 
     for ( i = 0; i < NUM_ELEMS( flags ); i++ )
     {
@@ -318,7 +318,10 @@ IndirectRegisters( void )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.56  2014-04-05 23:36:11  pauloscustodio
+* Revision 1.57  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.56  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
 * Symbols no longer converted to upper-case, but still case-insensitive
 * searched. Warning when a symbol is used with different case than
@@ -402,7 +405,7 @@ IndirectRegisters( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.41  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -448,8 +451,8 @@ IndirectRegisters( void )
 * warnings
 *
 * Revision 1.31  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 *
 * Revision 1.30  2013/01/20 21:24:28  pauloscustodio

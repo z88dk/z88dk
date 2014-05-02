@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.8 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.9 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -43,8 +43,8 @@ END_CLASS;
 CLASS( Module )
 	char		*modname;			/* module name, kept in strpool*/
 	char		*filename;			/* source file name, kept in strpool */
-    uint_t		 startoffset;		/* this module's start offset from start of code buffer */
-    uint_t		 origin;			/* ORG address of module, 0xFFFF if not defined */
+    uint		 startoffset;		/* this module's start offset from start of code buffer */
+    uint		 origin;			/* ORG address of module, 0xFFFF if not defined */
     SymbolHash	*local_symtab;		/* module local symbols */
     ExprList	*exprs;				/* list of module expressions */
 END_CLASS;
@@ -53,7 +53,10 @@ CLASS_LIST( Module );
 
 /*
 * $Log: module.h,v $
-* Revision 1.8  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.9  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.8  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.7  2014/04/22 23:34:26  pauloscustodio

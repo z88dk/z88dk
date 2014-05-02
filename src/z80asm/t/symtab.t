@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.11 2014-05-02 20:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.12 2014-05-02 21:34:58 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -276,7 +276,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 extern SymbolHash *get_static_tab(void);
 
-extern Symbol *_define_sym( char *name, long value, byte_t type, Module *owner, SymbolHash **psymtab );
+extern Symbol *_define_sym( char *name, long value, byte type, Module *owner, SymbolHash **psymtab );
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
@@ -568,7 +568,10 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.11  2014-05-02 20:24:39  pauloscustodio
+# Revision 1.12  2014-05-02 21:34:58  pauloscustodio
+# byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+#
+# Revision 1.11  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.10  2014/04/22 23:32:42  pauloscustodio

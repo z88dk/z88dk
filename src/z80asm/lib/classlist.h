@@ -3,7 +3,7 @@ Lists of objects defined by class.h
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.6 2014-03-05 23:44:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.7 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,7 +37,7 @@ DEF_CLASS_LIST(T);
 																			\
 	/* list class */														\
 	CLASS( T##List )														\
-		uint_t count;							/* number of objects */		\
+		uint count;							/* number of objects */		\
 		TAILQ_HEAD( T##ListHead, T##ListElem ) head; 	/* head of queue */	\
 	END_CLASS;																\
 																			\
@@ -261,7 +261,10 @@ DEF_CLASS_LIST(T);
 
 /*
 * $Log: classlist.h,v $
-* Revision 1.6  2014-03-05 23:44:55  pauloscustodio
+* Revision 1.7  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.6  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
 *
 * Revision 1.5  2014/02/19 23:59:27  pauloscustodio
@@ -271,7 +274,7 @@ DEF_CLASS_LIST(T);
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

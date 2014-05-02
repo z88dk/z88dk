@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.11 2014-04-22 23:32:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.12 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,7 +39,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.11 2014-04-22 23:32
 
 /* init each type of ExprOp */
 static void ExprOp_init_number(     ExprOp *self, long value );
-static void ExprOp_init_name(       ExprOp *self, char *name, byte_t sym_type );
+static void ExprOp_init_name(       ExprOp *self, char *name, byte sym_type );
 static void ExprOp_init_const_expr( ExprOp *self );
 static void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type );
 
@@ -236,7 +236,7 @@ void ExprOp_init_number( ExprOp *self, long value )
 	self->d.value	= value;
 }
 
-void ExprOp_init_name( ExprOp *self, char *name, byte_t sym_type )
+void ExprOp_init_name( ExprOp *self, char *name, byte sym_type )
 {
 	self->op_type 			= NAME_OP;
 	self->d.ident.name		= strpool_add(name);
@@ -408,7 +408,7 @@ static BOOL Expr_parse_ternary_cond( Expr *expr );
 static BOOL Expr_parse_factor( Expr *self )
 {
     Symbol *symptr;
-	uint_t  asmpc;
+	uint  asmpc;
 
     switch ( tok )
     {
@@ -649,7 +649,7 @@ Expr *expr_parse( void )
 *----------------------------------------------------------------------------*/
 long Expr_eval( Expr *self )
 {
-	uint_t i;
+	uint i;
 
 	self->expr_type &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
 
@@ -709,7 +709,10 @@ long expr_parse_eval_if( void )
 
 /*
 * $Log: expr.c,v $
-* Revision 1.11  2014-04-22 23:32:42  pauloscustodio
+* Revision 1.12  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.11  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
 *
 * - Object file format changed to version 03, to include address of start

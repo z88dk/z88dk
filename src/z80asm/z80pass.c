@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.93 2014-05-02 20:24:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.94 2014-05-02 21:34:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -245,7 +245,7 @@ Evallogexpr( void )
 
 
 void
-StoreName( Symbol *node, byte_t scope )
+StoreName( Symbol *node, byte scope )
 {
     switch ( scope )
     {
@@ -341,7 +341,7 @@ Z80pass2( void )
     Expr *expr;
     long constant;
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    uint_t patchptr;
+    uint patchptr;
 
 	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
 	{
@@ -416,7 +416,7 @@ Z80pass2( void )
 
                 if ( constant >= -128 && constant <= 127 )
                 {
-                    patch_byte( &patchptr, ( byte_t ) constant );
+                    patch_byte( &patchptr, (byte) constant );
                     /* opcode is stored, now store relative jump */
                 }
                 else
@@ -429,14 +429,14 @@ Z80pass2( void )
                 if ( constant < -128 || constant > 255 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, ( byte_t ) constant );
+                patch_byte( &patchptr, (byte) constant );
                 break;
 
             case RANGE_8SIGN:
                 if ( constant < -128 || constant > 127 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, ( byte_t ) constant );
+                patch_byte( &patchptr, (byte) constant );
                 break;
 
             case RANGE_16CONST:
@@ -591,7 +591,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.93  2014-05-02 20:24:39  pauloscustodio
+* Revision 1.94  2014-05-02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+*
+* Revision 1.93  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.92  2014/04/22 23:32:42  pauloscustodio
@@ -724,7 +727,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint_t and ulong_t, use uint_t instead of size_t.
+* Create uint and ulong, use uint instead of size_t.
 *
 * Revision 1.70  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
@@ -879,8 +882,8 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * BUG_0026 : Incorrect paging in symbol list
 * 
 * Revision 1.35  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte_t)
-* Replaced (unisigned int) by (uint_t)
+* Replaced (unsigned char) by (byte)
+* Replaced (unisigned int) by (uint)
 * Replaced (short) by (int)
 * 
 * Revision 1.34  2013/01/20 13:18:10  pauloscustodio
