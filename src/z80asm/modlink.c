@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.112 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.113 2014-05-02 21:54:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -799,14 +799,14 @@ CreateBinFile( void )
 void
 CreateLib( char *lib_filename )
 {
-	static Str *file_buffer = NULL;
+	static byteArray *buffer = NULL;
     uint Codesize;
     FILE *lib_file = NULL;
     FILE *obj_file = NULL;
     long fptr;
 	Module *last_module;
 
-	INIT_OBJ( Str, &file_buffer );		/* static object to read each file, not reentrant */
+	INIT_OBJ( byteArray, &buffer );		/* static object to read each file, not reentrant */
 
     if ( opts.verbose )
     {
@@ -839,13 +839,12 @@ CreateLib( char *lib_filename )
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
 			/* expand file buffer if needed and read object file */
-			if ( Codesize > file_buffer->len )
-				Str_reserve( file_buffer, Codesize - file_buffer->len );
-			xfget_Str( obj_file, file_buffer, Codesize );
+			byteArray_item(buffer, Codesize);
+			xfget_chars( obj_file, (char *) byteArray_item(buffer, 0), Codesize );
             xfclose( obj_file );
             obj_file = NULL;
 
-            if ( memcmp( file_buffer->str, Z80objhdr, 8U ) != 0 )
+            if ( memcmp( byteArray_item(buffer, 0), Z80objhdr, 8U ) != 0 )
             {
                 error_not_obj_file( CURRENTMODULE->filename );
                 break;
@@ -869,7 +868,7 @@ CreateLib( char *lib_filename )
             xfput_uint32( lib_file, Codesize );    /* size of this module */
 
 			/* write module to library */
-            xfput_Str( lib_file, file_buffer ); 
+            xfput_chars( lib_file, (char *) byteArray_item(buffer, 0), Codesize ); 
         }
     }
     FINALLY
@@ -959,7 +958,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.112  2014-05-02 21:34:58  pauloscustodio
+* Revision 1.113  2014-05-02 21:54:09  pauloscustodio
+* Use byteArray instead of Str to hold object file
+*
+* Revision 1.112  2014/05/02 21:34:58  pauloscustodio
 * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
 *
 * Revision 1.111  2014/05/02 21:00:49  pauloscustodio
