@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.30 2014-04-27 21:55:55 dom Exp $
+;	$Id: msx_crt0.asm,v 1.31 2014-05-02 08:09:01 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -534,36 +534,99 @@ endloop:
 l_dcal:	jp	(hl)		;Used for call by function pointer
 
 
-;--------
-; Static variables are kept in RAM in high memory
-;--------
-
+XDEF __sgoioblk
+XDEF coords
+XDEF base_graphics
+XDEF pixelbyte
 XDEF _std_seed
+XDEF exitsp
+XDEF exitcount
+XDEF fp_seed
+XDEF extra
+XDEF fa
+XDEF fasign
+XDEF heaplast
+XDEF heapblocks
 XDEF _heap
+XDEF _heap_area
+XDEF brksave
+XDEF snd_tick
+XDEF bit_irqstatus
 XDEF CRT_AVAILABLE_MEMORY
 
-DEFVARS $C000
+XDEF _vfprintf
+XDEF msxbios
+
+; Now, which of the vfprintf routines do we need?
+
+
+_vfprintf:
+IF DEFINED_floatstdio
+	LIB	vfprintf_fp
+	jp	vfprintf_fp
+ELSE
+	IF DEFINED_complexstdio
+		LIB	vfprintf_comp
+		jp	vfprintf_comp
+	ELSE
+		IF DEFINED_ministdio
+			LIB	vfprintf_mini
+			jp	vfprintf_mini
+		ENDIF
+	ENDIF
+ENDIF
+
+
+; Safe BIOS call
+msxbios:
+	ld	iy,($FCC0)	; slot address of BIOS ROM
+	call	001Ch		; CALSLT
+	ei			; make sure interrupts are enabled
+	ret
+
+IF NEED_floatpack
+        INCLUDE         "float.asm"
+ENDIF
+
+IF !DEFINED_sysdefvarsaddr
+      defc sysdefvarsaddr =  $C000   ; Static variables are kept in RAM in high memory
+ENDIF
+
+DEFVARS sysdefvarsaddr
 {
 
-_std_seed	ds.w	1	;Integer seed
-fp_seed		ds.w	3	;Floating point seed, unused ATM
-extra		ds.w	3	;Floating point temp variable
-fa		ds.w	3	;Floating point accumulator
-fasign		ds.b	1	;Floating point temp store
-_heap           ds.l    1       ;process heap pointer
-_heap_area   ds.b    HEAPSIZE  ; initial heap
+__sgoioblk      ds.b    40  ; stdio control block
+
+coords          ds.w	1	; Current graphics xy coordinates
+base_graphics   ds.w	1	; Location of current screen buffer
+pixelbyte       ds.b	1
+_std_seed       ds.w    1	; Integer seed
+exitsp          ds.w    1	; Address of where the atexit() stack is
+exitcount       ds.b    1	; Number of atexit() routines
+
+fp_seed         ds.w	3	; Floating point seed, unused ATM
+extra           ds.w	3	; Floating point temp variable
+fa              ds.w	3	; Floating point accumulator
+fasign          ds.b	1	; Floating point temp store
+
+
+heaplast        ds.w    1	; Address of last block on heap
+heapblocks      ds.w    1	; Number of blocks
+_heap           ds.l    1	      ; process heap pointer
+_heap_area      ds.b    HEAPSIZE  ; initial heap
+
+brksave         ds.b	1   ; Keeping the BREAK status
+;defltdsk        ds.b	1	; Default disc
+
+;IF DEFINED_NEED1bitsound
+snd_tick        ds.b	1	; Sound variable
+bit_irqstatus 	ds.w	1
+;ENDIF
+
 
 CRT_AVAILABLE_MEMORY
 }
 
-
-;--------
-; Now, include the math routines if needed..
-;--------
-
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
 ;===============================================================================
 ENDIF
