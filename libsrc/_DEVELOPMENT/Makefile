@@ -3,6 +3,7 @@ TARGETS = cpm zx
 LIB_TYPES = asm lr_sccz80 sdcc_ix sdcc_iy
 
 jobs := $(foreach target,$(TARGETS),$(foreach type,$(LIB_TYPES),job-$(target)-$(type)))
+cleans := $(foreach target,$(TARGETS),$(foreach type,$(LIB_TYPES),clean-$(target)-$(type)))
 
 .PHONY: all
 all: ${jobs} 
@@ -17,4 +18,12 @@ ${jobs}: job-%:
 	z80asm -ns -nm -Mo -x$(target)_$(type).lib @target/$(target)/library/$(target)_$(type).lst
 	mv $(target)_$(type).lib lib
 
+.PHONY: ${cleans}
+${cleans}: clean-%:
+	$(RM) $(target)_$(type).lib 
 
+
+clean:	${cleans}
+	$(RM) clib_cfg.asm clib_target_cfg.asm
+	find . -name '*.o' | xargs $(RM)
+	find . -name '*.err' | xargs $(RM)
