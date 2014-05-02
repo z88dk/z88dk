@@ -2,7 +2,7 @@
    Chessboard lib demo/test program
    By Stefano Bodrato - 13/08/2001
    
-   $Id: chessboard.c,v 1.2 2001-08-21 15:40:15 stefano Exp $
+   $Id: chessboard.c,v 1.3 2014-05-02 12:35:11 stefano Exp $
    
 */
 
@@ -12,7 +12,7 @@
 #include <chessboard.h>
 #endif
 
-Main()
+main()
 {
 
   int     x;

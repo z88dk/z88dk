@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.31 2014-05-02 08:09:01 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.32 2014-05-02 12:35:11 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -478,6 +478,18 @@ start:
 	ld sp, ($FC4A)
 	ei
 
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
+ENDIF
+ENDIF
+
 ; port fixing; required for ROMs
 
 	in a,($A8)
@@ -528,6 +540,8 @@ ENDIF
 
 cleanup:
 endloop:
+	di
+	halt
 	jr endloop
 
 
@@ -625,6 +639,15 @@ bit_irqstatus 	ds.w	1
 
 
 CRT_AVAILABLE_MEMORY
+}
+
+IF !DEFINED_defvarsaddr
+        defc defvarsaddr = CRT_AVAILABLE_MEMORY+2000
+ENDIF
+
+DEFVARS defvarsaddr
+{
+dummydummy        ds.b    1 
 }
 
 
