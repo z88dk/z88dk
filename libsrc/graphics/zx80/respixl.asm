@@ -1,10 +1,12 @@
 
 	XLIB	respixel
 
+	XREF	coords
+
 	LIB	textpixl
 
 ;
-;	$Id: respixl.asm,v 1.2 2014-04-18 09:30:32 stefano Exp $
+;	$Id: respixl.asm,v 1.3 2014-05-02 14:18:40 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -24,6 +26,8 @@
 				cp	48
 				ret	nc		; y0	out of range
 				
+				ld	(coords),hl
+
 				push	bc
 
 				ld	c,l

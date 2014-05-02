@@ -3,11 +3,11 @@
 	XLIB	respixel
 
 	LIB pixeladdress
-
+	XREF	coords
 	XREF	pix_return
 
 ;
-;	$Id: respixl.asm,v 1.5 2014-04-18 09:30:31 stefano Exp $
+;	$Id: respixl.asm,v 1.6 2014-05-02 14:18:40 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -32,6 +32,8 @@
 				ld	a,l
 				cp	maxy
 				ret	nc			; y0	out of range
+				
+				ld	(coords),hl
 
 				push	bc
 				call	pixeladdress

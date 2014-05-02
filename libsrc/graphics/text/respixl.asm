@@ -7,7 +7,7 @@
 ;	Erases pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
+;	$Id: respixl.asm,v 1.4 2014-05-02 14:18:40 stefano Exp $
 ;
 
 
@@ -16,6 +16,7 @@
 			XLIB	respixel
 
 			LIB	textpixl
+			XREF	coords
 			XREF	base_graphics
 
 
@@ -26,6 +27,8 @@
 			ld	a,l
 			cp	maxy
 			ret	nc		; y0	out of range
+			
+			ld	(coords),hl
 			
 			push	bc
 
