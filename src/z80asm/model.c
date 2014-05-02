@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.6 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.7 2014-05-02 21:00:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,9 +32,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.6 2014-05-02 20:24
 /*-----------------------------------------------------------------------------
 *   Global data
 *----------------------------------------------------------------------------*/
-static ModuleList *g_module_list;	/* list of input modules */
-static Module	  *g_curr_module;	/* current module being handled */
-static SrcFile    *g_src_input;		/* input handle for reading source lines */
+static ModuleList		*g_module_list;			/* list of input modules */
+static ModuleListElem	*g_module_list_iter;	/* iterator to current module */
+static Module			*g_curr_module;			/* current module being handled */
+static SrcFile			*g_src_input;			/* input handle for reading source lines */
 
 /*-----------------------------------------------------------------------------
 *   Call-back called when reading each new line from source
@@ -89,13 +90,22 @@ void model_init(void)
 /*-----------------------------------------------------------------------------
 *   list of modules and current module
 *----------------------------------------------------------------------------*/
-ModuleList *module_list( void )
+void module_list_first( void )
 {
 	init();
-	return g_module_list;
+	g_module_list_iter = ModuleList_first( g_module_list );
+	g_curr_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
 }
 
-void delete_module_list( void )
+BOOL module_list_next( void )
+{
+	init();
+	g_module_list_iter = ModuleList_next( g_module_list_iter );
+	g_curr_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
+	return g_curr_module != NULL;
+}
+
+void delete_modules( void )
 {
 	init();
 	g_curr_module = NULL;
@@ -187,7 +197,10 @@ BOOL src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.6  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.7  2014-05-02 21:00:49  pauloscustodio
+* Hide module list, expose only iterators on CURRENTMODULE
+*
+* Revision 1.6  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.5  2014/03/16 19:19:49  pauloscustodio

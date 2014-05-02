@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.13 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.14 2014-05-02 21:00:49 pauloscustodio Exp $
 */
 
 #pragma once
@@ -76,10 +76,14 @@ extern void model_init(void);
 *   Singleton interfaces
 *----------------------------------------------------------------------------*/
 
-/* list of modules and current module */
-extern ModuleList *module_list( void );
-extern void		   delete_module_list( void );
+/* list of modules iterator, set CURRENTMODULE */
+extern void module_list_first( void );
+extern BOOL module_list_next( void );
 
+/* delete all modules */
+extern void delete_modules( void );
+
+/* current module */
 extern void		   set_curr_module( Module *module );
 extern Module	  *get_curr_module( void );
 extern Module	  *new_curr_module( void );
@@ -100,7 +104,10 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.13  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.14  2014-05-02 21:00:49  pauloscustodio
+* Hide module list, expose only iterators on CURRENTMODULE
+*
+* Revision 1.13  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.12  2014/04/22 23:32:42  pauloscustodio

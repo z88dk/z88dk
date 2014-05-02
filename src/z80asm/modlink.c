@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.110 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.111 2014-05-02 21:00:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -240,7 +240,6 @@ LinkModules( void )
     char fheader[9];
     uint_t origin;
     Module *first_obj_module, *last_obj_module;
-	ModuleListElem *iter;
 	BOOL saw_last_obj_module;
     char *obj_filename;
 	FILE *file;
@@ -276,12 +275,10 @@ LinkModules( void )
         set_PC( 0 );
 
 		/* link machine code & read symbols in all modules */
-		for ( iter = ModuleList_first( module_list() ), saw_last_obj_module = FALSE ;
-			  iter != NULL && ! saw_last_obj_module ;
-			  iter = ModuleList_next( iter ) )  
+		for ( module_list_first(), saw_last_obj_module = FALSE ;
+			  CURRENTMODULE != NULL && ! saw_last_obj_module ;
+			  module_list_next() )  
         {
-			set_curr_module( iter->obj );
-
 	        /* open error file on first module */
 			if ( CURRENTMODULE == first_obj_module )
 		        open_error_file( get_err_filename( CURRENTMODULE->filename ) );
@@ -342,7 +339,7 @@ LinkModules( void )
 
                 if ( opts.verbose )
                 {
-                    printf( "ORG address for code is %04lX\n", CURRENTMODULE->origin );
+                    printf( "ORG address for code is %04X\n", CURRENTMODULE->origin );
                 }
             }
 
@@ -807,7 +804,6 @@ CreateLib( char *lib_filename )
     FILE *lib_file = NULL;
     FILE *obj_file = NULL;
     long fptr;
-	ModuleListElem *iter;
 	Module *last_module;
 
 	INIT_OBJ( Str, &file_buffer );		/* static object to read each file, not reentrant */
@@ -829,12 +825,8 @@ CreateLib( char *lib_filename )
 
 		last_module = get_last_module();
 
-		for ( iter = ModuleList_first( module_list() ) ; 
-			  iter != NULL ; 
-			  iter = ModuleList_next( iter ) )
+		for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
 		{
-			set_curr_module( iter->obj );
-
 			set_error_null();
             set_error_module( CURRENTMODULE->modname );
 
@@ -967,7 +959,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.110  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.111  2014-05-02 21:00:49  pauloscustodio
+* Hide module list, expose only iterators on CURRENTMODULE
+*
+* Revision 1.110  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.109  2014/04/22 23:32:42  pauloscustodio

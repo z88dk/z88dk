@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.30 2014-05-02 20:24:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.31 2014-05-02 21:00:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -222,13 +222,10 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value )
 {
     SymbolHash *all_syms = OBJ_NEW( SymbolHash );
-	ModuleListElem *iter;
 
-    for ( iter = ModuleList_first( module_list() ) ; 
-		  iter != NULL ; 
-		  iter = ModuleList_next( iter ) )
+    for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
     {
-        copy_full_sym_names( &all_syms, iter->obj->local_symtab, type_mask, type_value );
+        copy_full_sym_names( &all_syms, CURRENTMODULE->local_symtab, type_mask, type_value );
     }
 
     copy_full_sym_names( &all_syms, global_symtab, type_mask, type_value );
@@ -498,7 +495,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.30  2014-05-02 20:24:39  pauloscustodio
+* Revision 1.31  2014-05-02 21:00:50  pauloscustodio
+* Hide module list, expose only iterators on CURRENTMODULE
+*
+* Revision 1.30  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.29  2014/04/27 09:08:15  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.161 2014-05-02 20:24:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.162 2014-05-02 21:00:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -55,7 +55,6 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 /* local functions */
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
-void ReleaseOwnedFile( struct usedfile *ownedfile );
 void CloseFiles( void );
 Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
@@ -473,7 +472,7 @@ int main( int argc, char *argv[] )
 
 #ifndef QDOS
 
-        delete_module_list();		/* Release module information (symbols, etc.) */
+        delete_modules();		/* Release module information (symbols, etc.) */
 
         if ( libraryhdr != NULL )
             ReleaseLibraries();    /* Release library information */
@@ -508,7 +507,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.161  2014-05-02 20:24:39  pauloscustodio
+* Revision 1.162  2014-05-02 21:00:50  pauloscustodio
+* Hide module list, expose only iterators on CURRENTMODULE
+*
+* Revision 1.161  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.160  2014/04/26 09:25:32  pauloscustodio
