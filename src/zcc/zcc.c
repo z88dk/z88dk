@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.77 2014-05-01 21:57:49 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.78 2014-05-02 21:23:10 dom Exp $
  */
 
 
@@ -821,9 +821,8 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
 
 void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 {
-    size_t offs = strlen(dest);
-       
-    offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : "");
+    size_t offs;
+    offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : " ");
     
     if (IS_ASM(ASM_Z80ASM)) {
         offs += snprintf(dest + offs, destlen - offs,"%s%s%s",
