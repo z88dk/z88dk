@@ -4,6 +4,7 @@
 ;
 ; 2014 adapted to z88dk by aralbrec
 ; * modified to use 1-bit output for all targets
+; * modified to return to caller between rows
 ; ===============================================================
 ;
 ; void *bit_play_tritone(void *song)
