@@ -3,7 +3,7 @@ INCLUDE "clib_cfg.asm"
 
 XLIB __stdio_verify_valid
 
-LIB error_ebadf_mc, __p_forward_list_locate_item
+LIB __p_forward_list_locate_item
 
 XREF __stdio_file_list_open
 
