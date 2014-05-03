@@ -70,18 +70,29 @@ defc SP1V_UPDATELISTT   = $d1ef        ; address of 2-byte variable holding the 
 ;; INPUT
 ;;;;;;;;
 
+defc __crt_enable_amx_mouse = 1
+
 ;__input_amx_mouse_x  defs 2
 ;__input_amx_mouse_y  defs 2
 ;__input_amx_mouse_dx defs 2
 ;__input_amx_mouse_dy defs 2
 
-;__input_kempston_mouse_x  defs 2
-;__input_kempston_mouse_y  defs 2
 
+defc __crt_enable_kempston_mouse = 1
+
+;__input_kempston_mouse_x      defs 2
+;__input_kempston_mouse_y      defs 2
+;__input_kempston_mouse_rawx   defs 1
+;__input_kempston_mouse_rawy   defs 1
 
 ;;;;;;;;;;;;
 ;; SOUND/BIT
 ;;;;;;;;;;;;
+
+defc __crt_enable_sound_bit = 1
+
+; __sound_bit_state  defs 1
+
 
 ; 1-bit sound constants
 
@@ -92,8 +103,6 @@ defc __sound_bit_toggle_pos   = 4      ; bit position to test state of output
 defc __sound_bit_read_mask    = $17    ; part of state byte to be used in output
 defc __sound_bit_write_mask   = $e8    ; part of state byte to be preserved on write
 
-defc __sound_bit_beep_use_rom = 1      ; spectrum uses ROM routine (di/ei affected) -- TODO asm_bit_beep_raw
-
-; __sound_bit_state  defs 1
+defc __sound_bit_beep_use_rom = 0      ; spectrum uses ROM routine (di/ei affected) -- TODO asm_bit_beep_raw
 
 ENDIF
