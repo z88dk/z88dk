@@ -14,16 +14,18 @@ INCLUDE "clib_cfg.asm"
 XLIB asm_fopen_unlocked
 XDEF asm0_fopen_unlocked
 
-XREF __stdio_file_list_avail, mtx_recursive
-
 LIB error_einval_zc, error_emfile_zc, error_zc
-LIB asm_open, __stdio_parse_permission, asm_mtx_init
-LIB asm_p_forward_list_alt_pop_front, asm_p_forward_list_alt_push_front
+LIB asm_p_forward_list_alt_pop_front, asm_p_forward_list_push_front
+LIB asm_p_forward_list_alt_push_front
+LIB __stdio_parse_permission, asm_open, asm_mtx_init
+
+XREF mtx_recursive
+XREF __stdio_file_list_open, __stdio_file_list_avail
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   LIB __stdio_lock_file_list, __stdio_unlock_file_list
+LIB __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,17 +51,21 @@ asm_fopen_unlocked:
    or l
    jp z, error_einval_zc       ; if filename == NULL
    
+   ; mode string valid ?
+   
    push hl                     ; save filename
    
-   call __stdio_parse_permission   ; parse mode string
-   jp c, error_einval_zc - 1       ; if mode string is invalid
+   call __stdio_parse_permission
+   jp c, error_einval_zc - 1   ; if mode string is invalid
    
    push bc                     ; save mode byte
    
+   ; allocate a FILE structure
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
-   
-   call __stdio_lock_file_list   ; acquire stdio lock
+
+   call __stdio_lock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,43 +76,115 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   push hl                     ; save & FILE.link
    push af                     ; save error status
+   push hl                     ; save & FILE.link
    
-   call __stdio_unlock_file_list  ; release stdio lock
-
+   call __stdio_unlock_file_list
+   
+   pop hl                      ; hl = & FILE.link
    pop af                      ; carry = error
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   pop bc                      ; c = mode bytes
+   pop de                      ; de = filename
+   
+   jp c, error_emfile_zc       ; if no available FILE struct
+   
+   ; target must open file on appropriate device
+   
+   push bc                     ; save mode byte
+   push hl                     ; save & FILE.link
+   
+   ;  c = mode bytes
+   ; de = filename
+   ; stack = mode byte, FILE.link
+   
+   call asm_open               ; pass details to target open()
+   jr c, open_failed           ; if target cannot open file
+
+   pop hl                      ; hl = & FILE.link
+   pop bc                      ; c = mode byte
+   
+   ; initialize the FILE structure
+   
+   push hl                     ; save & FILE.link
+   
+   inc hl
+   inc hl
+   
+   call initialize_file_struct
+   
+   ; place FILE on open list
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   pop de                      ; de = & FILE.link
+   
+   ld hl,__stdio_file_list_open
+   call asm_p_forward_list_push_front
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   push hl                     ; save & FILE.link
+   
+   call __stdio_unlock_file_list
+   
    pop hl                      ; hl = & FILE.link
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   pop bc                      ; c = mode byte
-   pop de                      ; de = filename
-   
-   jp c, error_emfile_zc       ; if FILE is unavailable
-
-   push bc                     ; save mode byte
-   push hl                     ; save & FILE.link
-   
-   ;  c = mode byte
-   ; de = filename
-   ; stack = mode byte, FILE.link
-   
-   call asm_open               ; pass details to target open()
-   jr c, open_failed
-   
-   pop hl                      ; hl = & FILE.link
-   pop bc                      ; c = mode byte
+   ; return FILE *
    
    inc hl
-   inc hl                      ; hl = FILE*
+   inc hl                      ; hl = FILE *
+   
+   ret
+
+open_failed:
+
+   ; stack = mode byte, FILE.link
+
+   ; return allocated FILE
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   pop de                      ; de = & FILE.link
+   
+   ld bc,__stdio_file_list_avail
+   call asm_p_forward_list_alt_push_front
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   jp error_zc - 1
 
 asm0_fopen_unlocked:
+initialize_file_struct:
 
    ;  c = mode byte
-   ; de = driver_function
-   ; hl = uninitialized FILE
+   ; de = driver function
+   ; hl = uninitialized FILE *
    
    push hl                     ; save FILE*
    
@@ -137,28 +215,3 @@ asm0_fopen_unlocked:
 
    pop hl                      ; hl = FILE*
    ret
-
-open_failed:
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-  
-   call __stdio_lock_file_list   ; acquire stdio lock
-   
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   pop de                      ; de = & FILE.link
-   
-   ld bc, __stdio_file_list_avail
-   call asm_p_forward_list_alt_push_front
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-   
-   call __stdio_unlock_file_list  ; release stdio lock
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   jp error_zc - 1
