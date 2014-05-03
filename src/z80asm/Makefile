@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.144 2014-05-02 23:36:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.145 2014-05-03 09:51:51 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -159,8 +159,10 @@ clean :
 # test
 #------------------------------------------------------------------------------
 test:
-	$(MAKE) legacy prove
-	$(MAKE) new    prove
+	$(MAKE) legacy
+	$(MAKE) prove
+	$(MAKE) new
+	$(MAKE) prove
 
 prove: $(TARGET)
 	perl -S prove t/*.t
@@ -230,7 +232,14 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.144  2014-05-02 23:36:27  pauloscustodio
+# Revision 1.145  2014-05-03 09:51:51  pauloscustodio
+# Make test failed to build object after changing legacy.
+# List of out-of-date targets are computed by make only at start. When legacy.h is
+# changed, a new set of target get out-of-date, but make misses them if running in the
+# same session.
+# Need to split make targets in multiple sessions.
+#
+# Revision 1.144  2014/05/02 23:36:27  pauloscustodio
 # Make test failed to build object after changing legacy
 #
 # Revision 1.143  2014/05/02 20:24:38  pauloscustodio
