@@ -12,6 +12,7 @@ FILE STRUCTURE
 
 offset  size  name              purpose
 
+ -2      2    link              pointer for linked list of FILEs
   0      1    JP                z80 jump instruction
   1      2    stdio_next        address of next stdio struct in chain
   3      1    state_flags_0     flags used to hold stream state, described below
@@ -63,12 +64,14 @@ MEMORY STREAM FILE STRUCTURE
 
 offset  size  name              purpose
 
-  0      13   FILE              FILE structure
+ -2       2   link              pointer for linked list of FILEs
+  0      13   FILE              FILE structure not including link
   13      1   memstream_flags   see below
   14      2   char **bufp       where to store buffer address
   16      2   size_t *sizep     where to store buffer length
   18      8   b_vector          byte vector to manage resizeable buffer
   26      2   fp                file pointer index (index in vector for next read/write)
+  28      1   mode              mode byte when memstream created (for freopen() )
 
 * memstream_flags
 
