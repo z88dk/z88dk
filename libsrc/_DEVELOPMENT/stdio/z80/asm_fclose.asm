@@ -39,7 +39,6 @@ asm_fclose:
    ; uses  : all except ix
 
    call __stdio_lock_acquire
-   
    jp nc, asm_fclose_unlocked
    jp error_enolck_mc
 
