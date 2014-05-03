@@ -16,12 +16,24 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 XLIB asm__fmemopen
 XDEF asm0__fmemopen
 
-LIB error_einval_zc, error_zc
+LIB error_einval_zc, error_zc, asm_p_forward_list_push_front
 LIB __stdio_parse_permission, asm_malloc, __stdio_file_init, l_setmem_hl
 LIB __stdio_memstream_driver, asm_realloc, __stdio_file_destroy, asm_free
+
+XREF __stdio_file_list_open
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+LIB __stdio_lock_file_list, __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 asm__fmemopen:
 
@@ -65,14 +77,17 @@ asm__fmemopen:
    
    push bc                     ; save mode byte
    
-   ld hl,28                    ; sizeof(memstream FILE *)
+   ld hl,31                    ; sizeof(memstream FILE *)
    call asm_malloc
    
    jp c, error_zc - 3          ; if malloc failed
 
+   inc hl
+   inc hl                      ; hl = FILE *
+   
 asm0__fmemopen:
 
-   ; hl = FILE * (28 bytes uninitialized)
+   ; hl = FILE * (29 bytes uninitialized)
    ; stack = bufp, sizep, mode byte
 
    ld e,l
@@ -103,6 +118,7 @@ asm0__fmemopen:
    ld (hl),__stdio_memstream_driver / 256
    
    pop de                      ; e = mode byte = IOBX00AC
+   ld (ix+28),e                ; save original mode byte
    
    ld a,e
    and $c0
@@ -265,6 +281,35 @@ vector_no_grow:
    inc hl
    ld (hl),d                   ; fptr = position_index
 
+   ; place FILE on open list
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld e,ixl
+   ld d,ixh
+   
+   dec de
+   dec de                      ; de = & FILE.link
+   
+   ld hl,__stdio_file_list_open
+   call asm_p_forward_list_push_front
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; return FILE
+   
    push ix
    pop hl                      ; hl = FILE *
    
@@ -322,6 +367,9 @@ allocate_fail:
    call __stdio_file_destroy
    
    pop hl
-   call asm_free               ; free(FILE *)
    
+   dec hl
+   dec hl                      ; hl = & FILE.link
+   
+   call asm_free               ; free(FILE *)
    jp error_zc
