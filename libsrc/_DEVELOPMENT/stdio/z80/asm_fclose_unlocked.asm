@@ -13,12 +13,11 @@ INCLUDE "clib_cfg.asm"
 
 XLIB asm_fclose_unlocked
 
-XREF STDIO_MSG_CLOS
-XREF __stdio_file_list_avail, __stdio_file_list_open
-
-LIB l_jpix, asm_free, __stdio_file_destroy
 LIB asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
-LIB error_znc, error_mc, error_ebadf_mc
+LIB error_ebadf_mc, error_znc, __stdio_file_destroy, asm_free, l_jpix
+
+XREF STDIO_MSG_CLOS
+XREF __stdio_file_list_open, __stdio_file_list_avail
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -45,23 +44,13 @@ asm_fclose_unlocked:
    ;            carry set, errno set
    ;
    ; uses  : all except ix
-   
-   ld a,STDIO_MSG_CLOS         ; deliver close message
-   call l_jpix
-   
-   push af                     ; save error status
-   
-   ld a,(ix+3)                 ; examine FILE type
-   and $07
-   
-   jr nz, memstream            ; if FILE type == memstream
-   
-   call __stdio_file_destroy   ; FILE structure is disassociated
+
+   ; attempt to remove FILE from open list
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   call __stdio_lock_file_list   ; acquire stdio lock
+   call __stdio_lock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,38 +62,73 @@ ENDIF
    dec bc                      ; bc = & FILE.link
    
    ld hl,__stdio_file_list_open
-   call asm_p_forward_list_remove  ; remove FILE from open list
-   
-   jr c, file_invalid          ; if FILE is not in open list
-   
-   ld e,c
-   ld d,b                      ; de = & FILE.link
-   
-   ld bc,__stdio_file_list_avail
-   call asm_p_forward_list_alt_push_back  ; add FILE to end of available list
-
-file_invalid:
+   call asm_p_forward_list_remove
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   call __stdio_unlock_file_list  ; release stdio lock
+   push af                     ; save error state
+   
+   call __stdio_unlock_file_list
+
+   pop af
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-   pop af                      ; error status
-   
-   jp nc, error_znc
-   jp error_mc
 
-memstream:
+   jp c, error_ebadf_mc        ; if FILE is not in open list
+   
+   ; close FILE
+   
+   ld a,STDIO_MSG_CLOS
+   call l_jpix                 ; deliver close message
+   
+   ld a,(ix+3)                 ; examine FILE type
+   and $07
+   jr nz, close_memstream      ; if FILE type == memstream
+   
+   ; disassociate FILE
+   
+   call __stdio_file_destroy   ; FILE returns ebadf errors
+   
+   ; append FILE to available list
 
-   pop af                      ; error status
-   jp c, error_mc              ; if this is an invalid FILE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld e,ixl
+   ld d,ixh
+   
+   dec de
+   dec de                      ; de = & FILE.link
+   
+   ld bc,__stdio_file_list_avail
+   call asm_p_forward_list_alt_push_back
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; success
+   
+   jp error_znc
+
+close_memstream:
 
    push ix
    pop hl
+   
+   dec hl
+   dec hl                      ; hl = & FILE.link
    
    call asm_free
    jp error_znc
