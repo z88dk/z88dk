@@ -9,44 +9,43 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
-
 XLIB asm_in_mouse_amx_setpos
+
+XREF __input_amx_mouse_x, __input_amx_mouse_y
 
 asm_in_mouse_amx_setpos:
 
-   ; enter : hl = x
-   ;         de = y
+   ; enter : de = x
+   ;         bc = y
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de
 
 test_x:
 
-   inc h
-   dec h
+   inc d
+   dec d
    jr z, test_y
 
 adjust_x:
 
-   ld hl,$00ff
+   ld de,$ff00
 
 test_y:
 
-   inc d
-   dec d
-   jr nz, adjust_y
+   inc b
+   djnz adjust_y
    
-   ld a,e
+   ld a,c
    cp 192
    jr c, set_xy
    
 adjust_y:
 
-   ld de,191
+   ld bc,191*256
 
 set_xy:
 
-   ld (__input_amx_mouse_x),hl   ; atomic
-   ld (__input_amx_mouse_y),de   ; atomic
+   ld (__input_amx_mouse_x),de   ; atomic
+   ld (__input_amx_mouse_y),bc   ; atomic
 
    ret

@@ -1,6 +1,14 @@
 input/spectrum/z80/asm_in_inkey
 input/spectrum/z80/asm_in_key_pressed
 input/spectrum/z80/asm_in_key_scancode
+input/spectrum/z80/asm_in_mouse_amx
+input/spectrum/z80/asm_in_mouse_amx_init
+input/spectrum/z80/asm_in_mouse_amx_setpos
+input/spectrum/z80/asm_in_mouse_amx_wheel
+input/spectrum/z80/asm_in_mouse_kempston
+input/spectrum/z80/asm_in_mouse_kempston_init
+input/spectrum/z80/asm_in_mouse_kempston_setpos
+input/spectrum/z80/asm_in_mouse_kempston_wheel
 input/spectrum/z80/asm_in_pause
 input/spectrum/z80/asm_in_stick_cursor
 input/spectrum/z80/asm_in_stick_fuller
