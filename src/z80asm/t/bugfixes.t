@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.8 2014-05-04 18:46:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.9 2014-05-04 19:04:55 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -132,6 +132,32 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
+# BUG_0010 : heap corruption when reaching MAXCODESIZE
+# raise HEAP CORRUPTION DETECTED in MSVC
+note "BUG_0010";
+z80asm(
+	asm		=> "defs 65534,0xAA \n ld a, 0xAA",
+	bin		=> "\xAA" x 65534 . "\x3E\xAA",
+);
+z80asm(
+	asm		=> "defs 65535,0xAA \n ld a, 0xAA ;; error: max. code size of 65536 bytes reached",
+);
+z80asm(
+	asm		=> "defs 65533,0xAA \n ld bc, 0xAAAA",
+	bin		=> "\xAA" x 65533 . "\x01\xAA\xAA",
+);
+z80asm(
+	asm		=> "defs 65534,0xAA \n ld bc, 0xAAAA ;; error: max. code size of 65536 bytes reached",
+);
+z80asm(
+	asm		=> "defs 65532,0xAA \n defl 0xAAAAAAAA",
+	bin		=> "\xAA" x 65536,
+);
+z80asm(
+	asm		=> "defs 65533,0xAA \n defl 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached",
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 {
 	my @list;
@@ -167,7 +193,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.8  2014-05-04 18:46:46  pauloscustodio
+# Revision 1.9  2014-05-04 19:04:55  pauloscustodio
+# Move tests of BUG_0010 to bugfixes.t
+#
+# Revision 1.8  2014/05/04 18:46:46  pauloscustodio
 # Move tests of BUG_0008 to bugfixes.t
 #
 # Revision 1.7  2014/05/04 18:05:39  pauloscustodio
