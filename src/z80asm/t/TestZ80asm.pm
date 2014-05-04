@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.1 2014-05-04 16:48:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.2 2014-05-04 17:36:16 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -54,6 +54,7 @@ END {
 #						^;; error|warn:		- expect pass2 error at this module
 # 		options - assemble options; if not defined, "-b -r0" is used
 #		ok => 1 - needed if no binary file is generated (i.e. -x)
+#		error - additional error messages not in asm source files
 #------------------------------------------------------------------------------
 sub z80asm {
 	my(%args) = @_;
@@ -89,7 +90,7 @@ sub z80asm {
 					}
 				}
 				if (/(\s*);;\s+(error|warn):\s+(.*)/) {
-					my $err = ($2 eq 'error' ? "Error" : "Warning ").
+					my $err = ($2 eq 'error' ? "Error" : "Warning").
 							" at file 'test$id.asm' ".
 							($1 eq '' ? "module 'test$id'" : "line $line_nr").
 							": $3\n";
@@ -104,6 +105,10 @@ sub z80asm {
 				}
 			}
 		}
+	}
+	for (split(/\n/, $args{error} || "")) {
+		$err_text .= "$_\n";
+		$num_errors++ if /Error/i;
 	}
 	$err_text .= "$num_errors errors occurred during assembly\n" if $num_errors;
 	
@@ -125,7 +130,7 @@ sub z80asm {
 	# check error file
 	for (sort keys %err_file) {
 		ok -f $_, "$_ exists";
-		eq_or_diff read_file($_), $err_file{$_}, "$_ contents";
+		eq_or_diff scalar(read_file($_)), $err_file{$_}, "$_ contents";
 	}
 	
 	# check object file
@@ -172,10 +177,10 @@ sub unlink_temp {
 	@temp = uniq(@temp);
 	
 	if ( ! $KEEP_FILES ) {
-		ok unlink(@temp) == @temp, "unlink temp files @temp";
+		ok unlink(@temp) == @temp, "unlink temp files";
 	}
 	else {
-		note "kept temp files @temp";
+		note "kept temp files";
 	}
 }
 
@@ -194,7 +199,10 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.1  2014-05-04 16:48:52  pauloscustodio
+# Revision 1.2  2014-05-04 17:36:16  pauloscustodio
+# Move tests of BUG_0004 to bugfixes.t
+#
+# Revision 1.1  2014/05/04 16:48:52  pauloscustodio
 # Move tests of BUG_0001 and BUG_0002 to bugfixes.t, using TestZ80asm.pm
 #
 
