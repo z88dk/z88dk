@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.6 2014-05-04 17:51:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.7 2014-05-04 18:05:39 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -81,6 +81,7 @@ ERR
 # BUG_0004 : 8bit unsigned constants are not checked for out-of-range
 # BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
 # BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+# BUG_0007 : memory leaks
 z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0004
@@ -108,6 +109,9 @@ z80asm(
 		defb (2+[3-1]		;; error: syntax error in expression
 		defb (2+[3-1)]		;; error: syntax error in expression
 
+	;; note: BUG_0007
+		defs not_defined	;; error: symbol not defined
+		
 ASM
 );
 
@@ -147,7 +151,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.6  2014-05-04 17:51:43  pauloscustodio
+# Revision 1.7  2014-05-04 18:05:39  pauloscustodio
+# Fix memory leak
+#
+# Revision 1.6  2014/05/04 17:51:43  pauloscustodio
 # Move tests of BUG_0006 to bugfixes.t
 #
 # Revision 1.5  2014/05/04 17:45:21  pauloscustodio

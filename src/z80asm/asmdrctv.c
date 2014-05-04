@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.92 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.93 2014-05-04 18:05:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -351,12 +351,13 @@ DEFS()
         /* expr. must not be stored in relocatable file */
         if ( expr->expr_type & NOT_EVALUABLE )
         {
+            /* BUG_0007 : memory leaks - was not being released in case of error */
+            OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
             error_not_defined();
         }
         else
         {
             constant = Expr_eval( expr );
-            /* BUG_0007 : memory leaks - was not being released in case of error */
             OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
 
             if ( tok != TK_COMMA )
@@ -784,7 +785,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.92  2014-05-02 21:34:58  pauloscustodio
+ * Revision 1.93  2014-05-04 18:05:39  pauloscustodio
+ * Fix memory leak
+ *
+ * Revision 1.92  2014/05/02 21:34:58  pauloscustodio
  * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
  *
  * Revision 1.91  2014/05/02 20:24:38  pauloscustodio
