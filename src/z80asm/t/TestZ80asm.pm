@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.2 2014-05-04 17:36:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.3 2014-05-04 18:46:46 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -55,6 +55,7 @@ END {
 # 		options - assemble options; if not defined, "-b -r0" is used
 #		ok => 1 - needed if no binary file is generated (i.e. -x)
 #		error - additional error messages not in asm source files
+#		bin - result binary code
 #------------------------------------------------------------------------------
 sub z80asm {
 	my(%args) = @_;
@@ -64,7 +65,7 @@ sub z80asm {
 	# test files
 	my @asm_files;
 	my $bin_file;
-	my $bin = "";
+	my $bin = $args{bin} || "";
 	my $err_text = "";
 	my %err_file;
 	my %obj_file;
@@ -140,6 +141,7 @@ sub z80asm {
 	
 	# check binary
 	if ($bin ne "") {
+		$bin_file ||= "test.bin";
 		my $out_bin = read_binfile($bin_file);
 		if ($out_bin eq $bin) {
 			is $out_bin, $bin, "binary";
@@ -199,7 +201,10 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.2  2014-05-04 17:36:16  pauloscustodio
+# Revision 1.3  2014-05-04 18:46:46  pauloscustodio
+# Move tests of BUG_0008 to bugfixes.t
+#
+# Revision 1.2  2014/05/04 17:36:16  pauloscustodio
 # Move tests of BUG_0004 to bugfixes.t
 #
 # Revision 1.1  2014/05/04 16:48:52  pauloscustodio

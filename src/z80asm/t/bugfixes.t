@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.7 2014-05-04 18:05:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.8 2014-05-04 18:46:46 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -116,6 +116,22 @@ ASM
 );
 
 #------------------------------------------------------------------------------
+# BUG_0008 : code block of 64K is read as zero
+note "BUG_0008";
+z80asm(
+	asm		=> "defs 65536, 0xAA",
+	options	=> " ",
+	ok		=> 1,
+);
+
+# use obj, dont assemble
+z80asm(
+	options	=> "-d -r0 -b test.obj",
+	bin		=> "\xAA" x 65536,
+	ok		=> 1,
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 {
 	my @list;
@@ -151,7 +167,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.7  2014-05-04 18:05:39  pauloscustodio
+# Revision 1.8  2014-05-04 18:46:46  pauloscustodio
+# Move tests of BUG_0008 to bugfixes.t
+#
+# Revision 1.7  2014/05/04 18:05:39  pauloscustodio
 # Fix memory leak
 #
 # Revision 1.6  2014/05/04 17:51:43  pauloscustodio
