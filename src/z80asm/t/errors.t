@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.16 2014-05-02 20:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.17 2014-05-04 17:36:46 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -652,7 +652,6 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 		);
 
 	}
-	
 }
 
 #------------------------------------------------------------------------------
@@ -1114,7 +1113,10 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.16  2014-05-02 20:24:39  pauloscustodio
+# Revision 1.17  2014-05-04 17:36:46  pauloscustodio
+# ws
+#
+# Revision 1.16  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.15  2014/04/28 22:16:11  pauloscustodio
