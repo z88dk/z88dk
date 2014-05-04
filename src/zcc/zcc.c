@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.78 2014-05-02 21:23:10 dom Exp $
+ *      $Id: zcc.c,v 1.79 2014-05-04 19:53:49 dom Exp $
  */
 
 
@@ -102,7 +102,7 @@ static int             preserve = 0;    /* don't destroy zcc_opt */
 static int             createapp = 0;    /* Go the next stage and create the app */
 static int             makelib = 0;
 static int             lateassemble = 0;
-static int             makeapp = 0;
+static int             defer_assembly = 0;
 static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
@@ -300,7 +300,8 @@ static arg_t     myargs[] = {
     {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files"},
     {"make-lib", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Compile as if to make a library"},
     {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run"},
-    {"make-app", AF_BOOL_TRUE, SetBoolean, &makeapp, NULL, "Create binary suitable for generated application"},
+    {"make-app", AF_BOOL_TRUE|AF_DEPRECATED, SetBoolean, &defer_assembly, NULL, "Use defer-assembly"},
+    {"defer-assembly", AF_BOOL_TRUE, SetBoolean, &defer_assembly, NULL, "Defer assembly until link time" },
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, NULL, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, NULL, "Don't use the temporary directory for intermediate files"},
@@ -827,8 +828,8 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
     if (IS_ASM(ASM_Z80ASM)) {
         offs += snprintf(dest + offs, destlen - offs,"%s%s%s",
                         prefix,
-                        z80verbose ? " -v " : "",
-                        !symbolson ? " -ns " : "");
+                        z80verbose ? " -v " : " ",
+                        !symbolson ? " -ns " : " ");
     }
     
     snprintf(dest + offs, destlen - offs,"%s", c_asmopts);
@@ -1057,7 +1058,7 @@ void print_help_text()
     printf("\nOptions:\n\n");
 
     while (cur->help) {
-        printf("-%-15s %s\n", cur->name, cur->help);
+        printf("-%-15s %s%s\n", cur->name,  cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
         cur++;
     }
 
@@ -1130,7 +1131,7 @@ static void configure_misc_options()
     }
 
     /* We only have to do a late assembly hack for z80asm family */
-    if (createapp && makeapp && IS_ASM(ASM_Z80ASM)) {
+    if (createapp && defer_assembly && IS_ASM(ASM_Z80ASM)) {
         lateassemble = YES;
     }
 }
@@ -1248,7 +1249,7 @@ static void configure_compiler()
         if ( makelib ) {
             add_option_to_compiler("-make-lib");
         }
-        if ( makeapp ) {
+        if ( defer_assembly ) {
             add_option_to_compiler("-make-app");
         }
         c_compiler = c_sccz80_exe;
