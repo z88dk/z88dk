@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.163 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.164 2014-05-04 18:05:56 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -332,7 +332,6 @@ char *GetLibfile( char *filename )
 
         if ( filename != NULL )
         {
-            /* BUG_0002 - off by one alloc */
             found_libfilename = strpool_add( filename );
         }
         else
@@ -507,7 +506,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.163  2014-05-02 21:34:58  pauloscustodio
+* Revision 1.164  2014-05-04 18:05:56  pauloscustodio
+* comment
+*
+* Revision 1.163  2014/05/02 21:34:58  pauloscustodio
 * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
 *
 * Revision 1.162  2014/05/02 21:00:50  pauloscustodio
