@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.5 2014-05-04 17:45:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.6 2014-05-04 17:51:43 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -80,6 +80,7 @@ ERR
 #------------------------------------------------------------------------------
 # BUG_0004 : 8bit unsigned constants are not checked for out-of-range
 # BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
+# BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
 z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0004
@@ -100,6 +101,13 @@ z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0005
 		inc (ix   3)		;; error: syntax error
+		
+	;; note: BUG_0006
+		defb (2				;; error: syntax error in expression
+		defb (2+[			;; error: syntax error in expression
+		defb (2+[3-1]		;; error: syntax error in expression
+		defb (2+[3-1)]		;; error: syntax error in expression
+
 ASM
 );
 
@@ -139,7 +147,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.5  2014-05-04 17:45:21  pauloscustodio
+# Revision 1.6  2014-05-04 17:51:43  pauloscustodio
+# Move tests of BUG_0006 to bugfixes.t
+#
+# Revision 1.5  2014/05/04 17:45:21  pauloscustodio
 # Move tests of BUG_0005 to bugfixes.t
 #
 # Revision 1.4  2014/05/04 17:36:16  pauloscustodio

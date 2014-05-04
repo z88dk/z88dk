@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.11 2014-05-02 20:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.12 2014-05-04 17:51:43 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -154,12 +154,6 @@ t_z80asm(
 	bin		=> $bin
 );
 
-# test BUG_0006
-t_z80asm_error("defb (2",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb (2+[",		"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb (2+[3-1]",	"Error at file 'test.asm' line 1: syntax error in expression");
-t_z80asm_error("defb (2+[3-1)]","Error at file 'test.asm' line 1: syntax error in expression");
-
 if ( ! get_legacy() ) {
 	t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error in expression");
 	t_z80asm_error("defb 1?2",		"Error at file 'test.asm' line 1: syntax error in expression");
@@ -221,7 +215,10 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.11  2014-05-02 20:24:39  pauloscustodio
+# Revision 1.12  2014-05-04 17:51:43  pauloscustodio
+# Move tests of BUG_0006 to bugfixes.t
+#
+# Revision 1.11  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.10  2014/04/18 17:46:18  pauloscustodio
