@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.4 2014-05-04 17:36:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.5 2014-05-04 17:45:21 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -79,13 +79,27 @@ ERR
 
 #------------------------------------------------------------------------------
 # BUG_0004 : 8bit unsigned constants are not checked for out-of-range
-note "BUG_0004";
+# BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
 z80asm(
-	asm 	=> <<'ASM',
+	asm => <<'ASM',
+	;; note: BUG_0004
 		ld a, -129			;; 3E 7F 		;; warn: integer '-129' out of range
 		ld a,256			;; 3E 00 		;; warn: integer '256' out of range
 		ld (ix-129),-1		;; DD 36 7F FF	;; warn: integer '-129' out of range
 		ld (ix+128),-1		;; DD 36 80 FF	;; warn: integer '128' out of range
+
+	;; note: BUG_0005
+		inc (ix)			;; DD 34 00
+		inc (ix + 3)		;; DD 34 03
+		inc (ix - 3)		;; DD 34 FD
+		
+ASM
+);
+
+z80asm(
+	asm => <<'ASM',
+	;; note: BUG_0005
+		inc (ix   3)		;; error: syntax error
 ASM
 );
 
@@ -125,7 +139,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.4  2014-05-04 17:36:16  pauloscustodio
+# Revision 1.5  2014-05-04 17:45:21  pauloscustodio
+# Move tests of BUG_0005 to bugfixes.t
+#
+# Revision 1.4  2014/05/04 17:36:16  pauloscustodio
 # Move tests of BUG_0004 to bugfixes.t
 #
 # Revision 1.3  2014/05/04 16:48:52  pauloscustodio
