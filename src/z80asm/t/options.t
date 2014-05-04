@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.38 2014-04-13 20:32:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.39 2014-05-04 16:48:52 pauloscustodio Exp $
 #
 # Test options
 
@@ -905,7 +905,6 @@ for my $options ('-D', '-D=', '--define', '--define=') {
 
 #------------------------------------------------------------------------------
 # -i, --use-lib, -x, --make-lib
-# test BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
 #------------------------------------------------------------------------------
 
 unlink_testfiles();
@@ -1112,7 +1111,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.38  2014-04-13 20:32:10  pauloscustodio
+# Revision 1.39  2014-05-04 16:48:52  pauloscustodio
+# Move tests of BUG_0001 and BUG_0002 to bugfixes.t, using TestZ80asm.pm
+#
+# Revision 1.38  2014/04/13 20:32:10  pauloscustodio
 # PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 #
 # Revision 1.37  2014/04/05 23:36:11  pauloscustodio

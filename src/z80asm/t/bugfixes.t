@@ -13,69 +13,100 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.2 2014-04-26 09:25:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.3 2014-05-04 16:48:52 pauloscustodio Exp $
 #
 # Test bugfixes
 
-use strict;
-use warnings;
-use File::Slurp;
-use File::Basename;
-use File::Copy;
-use Test::Differences; 
-use Test::More;
-require 't/test_utils.pl';
+use Modern::Perl;
+use t::TestZ80asm;
 
 #------------------------------------------------------------------------------
-diag "BUG_0049";
-# Making a library with -d and 512 object files fails - Too many open files
+# BUG_0001: Error in expression during link
+# BUG_0001(a): during correction of BUG_0001, new symbol 
+z80asm(
+	asm => 	<<'ASM',
+			;; note: BUG_0001
+				JP NN			;; C3 06 00
+				JP NN			;; C3 06 00
+			NN:
+
+			;; note: BUG_0001(a)
+				EXTERN value
+				ld a,value - 0	;; 3E 0A
+ASM
+
+	asm1 => <<'ASM1',
+			;; note: BUG_0001(a)
+				PUBLIC value
+				DEFC   value = 10
+ASM1
+);
+
 #------------------------------------------------------------------------------
+# BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
+$ENV{Z80_STDLIB} = "test.lib";
+z80asm(
+	asm => <<'ASM',
+			;; note: BUG_0002
+				PUBLIC one
+			one: 
+				ld a,1
+				ret
+ASM
+	options => "-x",
+	ok		=> 1,
+);
+
+z80asm(
+	asm =>	<<'ASM',
+			;; note: BUG_0002
+				EXTERN one
+				jp one			;; C3 03 00 3E 01 C9
+ASM
+	options => "-i -b -r0",
+);
+delete $ENV{Z80_STDLIB};
+unlink_temp("test.lib");
+
+#------------------------------------------------------------------------------
+# BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 {
-	unlink_testfiles();
-	my @asm_list;
-	my @obj_list;
+	my @list;
+	my %args;
 	for (1..512) {
-		my $asm_file = "test_$_.asm";
-		my $obj_file = "test_$_.obj";
-		push @asm_list, $asm_file;
-		push @obj_list, $obj_file;
-		write_file($asm_file, " public test_$_ \n defc test_$_ = $_\n");
+		my $id = sprintf("%03d", $_);
+		unlink("test$id.asm", "test$id.obj", "test$id.bin");
+		push @list, "test$id";
+		$args{"asm$id"} = "defw $_ ;; ".sprintf("%02X %02X", $_ & 255, $_ >> 8);
 	}
-	write_file(prj_file(), join("\n", @asm_list), "\n");
+	write_file("test.prj", join("\n", @list), "\n");
 	
 	# assemble all first
-	t_z80asm_capture('-ns -nm @'.prj_file(), "", "", 0);
+	z80asm( %args, options => '   -ns -nm -r0 -b @test.prj' );
 	
 	# assemble all with -d, make lib - failed with too many open files
-	t_z80asm_capture('-d -ns -nm -x'.lib_file().' @'.prj_file(), "", "", 0);
-	
-	unlink_testfiles(@asm_list, @obj_list);
+	z80asm( %args, options => '-d -ns -nm -r0 -b @test.prj' );
 }
 
 #------------------------------------------------------------------------------
-diag "BUG_0050";
-# Making a library with more than 64K and -d option fails - max. code size reached
-#------------------------------------------------------------------------------
-{
-	unlink_testfiles();
-	write_file(asm1_file(), " public test1 \ntest1: defs 65000\n");
-	write_file(asm2_file(), " public test2 \ntest2: defs 65000\n");
-	
-	# assemble all first
-	t_z80asm_capture('-ns -nm '.asm1_file().' '.asm2_file(), "", "", 0);
-	
-	# assemble all with -d, make lib - failed with too many open files
-	t_z80asm_capture('-d -ns -nm '.asm1_file().' '.asm2_file(), "", "", 0);
-}
+# BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
+z80asm(
+	asm1 =>	"defs 65000",
+	asm2 =>	"defs 65000",
+	options => "-ns -nm",
+	ok => 1,
+);
+z80asm(
+	options => "-d -ns -nm test1 test2",
+	ok => 1,
+);
 
-
-
-
-unlink_testfiles();
-done_testing();
 
 # $Log: bugfixes.t,v $
-# Revision 1.2  2014-04-26 09:25:32  pauloscustodio
+# Revision 1.3  2014-05-04 16:48:52  pauloscustodio
+# Move tests of BUG_0001 and BUG_0002 to bugfixes.t, using TestZ80asm.pm
+#
+# Revision 1.2  2014/04/26 09:25:32  pauloscustodio
 # BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
 # When a library is built with -d, and the total size of the loaded
 # modules is more than 64K, z80asm fails with "max. code size reached".
