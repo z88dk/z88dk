@@ -1508,6 +1508,9 @@ jr2:
 
 ;------------------------------------------------------------------------------
 ; 
+; Revision 1.5  2014/05/05 21:40:25  pauloscustodio
+; Move tests of BUG_0011 to bugfixes.t
+;
 ; Revision 1.4  2014/04/28 22:07:03  pauloscustodio
 ; Extend tests
 ;
