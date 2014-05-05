@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.12 2014-05-05 21:51:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.13 2014-05-05 22:03:57 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -181,7 +181,28 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
+# BUG_0014: -x./zx_clib should create ./zx_clib.lib but actually creates .lib
+note "BUG_0014";
+for my $lib (      'test',    'test.lib',
+				 './test',  './test.lib',
+				'.\\test', '.\\test.lib' ) {
+    unlink('test.lib');
+    ok ! -f 'test.lib', "test.lib deleted, building $lib";
+	z80asm(
+		asm		=> "PUBLIC main \n main: ret",
+		options	=> "-x".$lib,
+		ok		=> 1,
+	);
+    ok -f 'test.lib', "test.lib exists, built $lib";
+	z80asm(
+		asm		=> "EXTERN main \n jp main ;; C3 03 00 C9",
+		options	=> "-r0 -b -i".$lib,
+	);
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
+note "BUG_0049";
 {
 	my @list;
 	my %args;
@@ -216,7 +237,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.12  2014-05-05 21:51:41  pauloscustodio
+# Revision 1.13  2014-05-05 22:03:57  pauloscustodio
+# Move tests of BUG_0014 to bugfixes.t
+#
+# Revision 1.12  2014/05/05 21:51:41  pauloscustodio
 # Move tests of BUG_0013 to bugfixes.t
 #
 # Revision 1.11  2014/05/05 21:47:35  pauloscustodio
