@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.10 2014-05-05 21:40:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.11 2014-05-05 21:47:35 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -165,6 +165,14 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
+# BUG_0012: binfilename[] array is too short, should be FILENAME_MAX
+note "BUG_0012";
+z80asm(
+	asm		=> "nop ;; 00",
+	options	=> "-r0 -b -o".("./" x 64)."test.bin",
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 {
 	my @list;
@@ -200,7 +208,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.10  2014-05-05 21:40:24  pauloscustodio
+# Revision 1.11  2014-05-05 21:47:35  pauloscustodio
+# Move tests of BUG_0012 to bugfixes.t
+#
+# Revision 1.10  2014/05/05 21:40:24  pauloscustodio
 # Move tests of BUG_0011 to bugfixes.t
 #
 # Revision 1.9  2014/05/04 19:04:55  pauloscustodio
