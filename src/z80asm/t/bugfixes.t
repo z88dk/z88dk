@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.9 2014-05-04 19:04:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.10 2014-05-05 21:40:24 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -82,6 +82,7 @@ ERR
 # BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
 # BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
 # BUG_0007 : memory leaks
+# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
 z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0004
@@ -94,7 +95,13 @@ z80asm(
 		inc (ix)			;; DD 34 00
 		inc (ix + 3)		;; DD 34 03
 		inc (ix - 3)		;; DD 34 FD
-		
+	
+	;; note: BUG_0011
+		defb    bug0011a-ASMPC, bug0011a-ASMPC	;; 06 06
+		defb    bug0011a-ASMPC, bug0011a-ASMPC	;; 04 04
+		defb    bug0011a-ASMPC, bug0011a-ASMPC	;; 02 02
+	bug0011a:
+
 ASM
 );
 
@@ -193,7 +200,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.9  2014-05-04 19:04:55  pauloscustodio
+# Revision 1.10  2014-05-05 21:40:24  pauloscustodio
+# Move tests of BUG_0011 to bugfixes.t
+#
+# Revision 1.9  2014/05/04 19:04:55  pauloscustodio
 # Move tests of BUG_0010 to bugfixes.t
 #
 # Revision 1.8  2014/05/04 18:46:46  pauloscustodio

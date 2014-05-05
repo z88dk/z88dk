@@ -7,7 +7,7 @@
 ; 
 ; Copyright (C) Paulo Custodio, 2011-2014
 ; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.4 2014-04-28 22:07:03 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.5 2014-05-05 21:40:25 pauloscustodio Exp $
 ;
 ;------------------------------------------------------------------------------
 
@@ -37,12 +37,6 @@
 ;------------------------------------------------------------------------------
 ; Regression tests
 ;------------------------------------------------------------------------------
-
-; BUG_0011: ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 6,6
-	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 4,4
-	defb    bug0011a-ASMPC, bug0011a-ASMPC	;;	defb 2,2
-bug0011a:
 
 ; BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
 bug0047a:
@@ -444,7 +438,10 @@ ENDIF
 
 ;------------------------------------------------------------------------------
 ; $Log: z80opcodes_templ.asm,v $
-; Revision 1.4  2014-04-28 22:07:03  pauloscustodio
+; Revision 1.5  2014-05-05 21:40:25  pauloscustodio
+; Move tests of BUG_0011 to bugfixes.t
+;
+; Revision 1.4  2014/04/28 22:07:03  pauloscustodio
 ; Extend tests
 ;
 ; Revision 1.3  2014/04/26 08:34:18  pauloscustodio
