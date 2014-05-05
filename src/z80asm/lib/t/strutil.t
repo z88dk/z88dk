@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.11 2014-04-19 14:57:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.12 2014-05-05 22:07:38 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -193,7 +193,7 @@ int main()
 	/* str_compress_escapes, Str_compress_escapes */
 	{
 		Str *s1 = OBJ_NEW(Str);
-		uint_t len;
+		uint len;
 		int i;
 		
 		Str_set_alias(s1, &alias);
@@ -751,7 +751,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.11  2014-04-19 14:57:37  pauloscustodio
+# Revision 1.12  2014-05-05 22:07:38  pauloscustodio
+# byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+#
+# Revision 1.11  2014/04/19 14:57:37  pauloscustodio
 # BUG_0046: Expressions stored in object file with wrong values in MacOS
 # Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
 # Problem caused by non-portable way of repeating a call to vsnprintf without
