@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.11 2014-05-05 21:47:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.12 2014-05-05 21:51:41 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -173,6 +173,14 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
+# BUG_0013: defm check for MAX_CODESIZE incorrect
+note "BUG_0013";
+z80asm(
+	asm		=> "defs 65535, 'a' \n defm \"a\"",
+	bin		=> "a" x 65536,
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 {
 	my @list;
@@ -208,7 +216,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.11  2014-05-05 21:47:35  pauloscustodio
+# Revision 1.12  2014-05-05 21:51:41  pauloscustodio
+# Move tests of BUG_0013 to bugfixes.t
+#
+# Revision 1.11  2014/05/05 21:47:35  pauloscustodio
 # Move tests of BUG_0012 to bugfixes.t
 #
 # Revision 1.10  2014/05/05 21:40:24  pauloscustodio
