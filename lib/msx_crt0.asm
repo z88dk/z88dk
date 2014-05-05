@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.32 2014-05-02 12:35:11 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.33 2014-05-05 07:26:37 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -464,7 +464,8 @@ ELSE
 ;  Main Code Entrance Point
 ;
 
-	org $4000
+    defc  myzorg  = $4000
+	org   myzorg
 
 ; ROM header
 

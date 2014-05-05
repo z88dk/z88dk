@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.38 2014-05-01 21:46:35 pauloscustodio Exp $
+ *   $Id: appmake.h,v 1.39 2014-05-05 07:26:37 stefano Exp $
  */
 
 
@@ -349,6 +349,9 @@ extern void			zx_pilot(int pilot_len, FILE *fpout);
 extern void			zx_rawbit(FILE *fpout, int period);
 extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
 
+/*  record size for bin2hex and other text encoding formats */
+#define RECSIZE 16
+extern int			bin2hex(FILE *input, FILE *output, int address);
 extern int			hexdigit(char digit);
 
 /* snprintf is _snprintf in _MSC_VER */

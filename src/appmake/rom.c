@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.4 2014-04-30 19:00:01 dom Exp $
+ *      $Id: rom.c,v 1.5 2014-05-05 07:26:37 stefano Exp $
  */
 
 
@@ -12,18 +12,24 @@
 
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
+static char             *crtfile      = NULL;
 static char              help         = 0;
 static int               filler       = 255;
 static int               size         = -1;
+static int               origin       = -1;
+static char              ihex         = 0;
 
 
 /* Options that are available for this module */
 option_t rom_options[] = {
     { 'h', "help",      "Display this help",              OPT_BOOL,  &help},
-    { 'b', "binfile",   "Linked binary file",             OPT_STR|OPT_INPUT,   &binname },
-    { 'o', "output",    "Name of output file",            OPT_STR|OPT_OUTPUT,   &outfile },
+    { 'b', "binfile",   "Linked binary file",             OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
+    { 'o', "output",    "Name of output file",            OPT_STR,   &outfile },
     { 'f', "filler",    "Filler byte (default: 0xFF)",    OPT_INT,   &filler },
     { 's', "blocksize", "ROM size to be reached",         OPT_INT,   &size },
+    {  0 , "org",       "Origin of the binary",           OPT_INT,   &origin },
+    {  0,  "ihex",      "Get also an iHEX version",       OPT_BOOL,  &ihex },
     {  0,  NULL,       NULL,                              OPT_NONE,  NULL }
 };
 
@@ -49,8 +55,15 @@ int rom_exec(char *target)
     if ( size != -1 ) {
         fillsize = size;
     } else {
-        exit_log(1,"ROM block size not specified (use -s)\n");
+        myexit("ROM block size not specified (use -s)\n",1);
     }
+
+	if ( (ihex) && (origin == -1 )) {
+		if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+			fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
+			origin = 0;
+		}
+	}
 
     if ( outfile == NULL )
     {
@@ -113,6 +126,21 @@ int rom_exec(char *target)
 
     if (fpin != NULL) fclose(fpin);
     fclose(fpout);
+
+	if (ihex) {
+	  if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+        fprintf(stderr,"Can't open file for hex conversion  %s\n",filename);
+        myexit(NULL,1);
+      }
+	  suffix_change(filename,".ihx");
+      if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+        fprintf(stderr,"Can't open file for hex conversion  %s\n",filename);
+        myexit(NULL,1);
+      }
+      bin2hex(fpin, fpout, origin); 
+      fclose(fpin);
+      fclose(fpout);
+	}
 
     return 0;
 }

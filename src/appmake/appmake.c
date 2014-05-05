@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.23 2014-05-02 21:24:39 dom Exp $
+ *   $Id: appmake.c,v 1.24 2014-05-05 07:26:37 stefano Exp $
  */
 
 #define MAIN_C
@@ -150,7 +150,8 @@ long parameter_search(char *filen, char *ext,char *target)
     FILE    *fp;
 
     if (filen == NULL) {
-        myexit("CRT file name not specified (not z88dk compiled?)\n",1);
+		fprintf(stderr,"Warning: CRT file name not specified (not z88dk compiled?)\n");
+		return(-1);
     }
     /* Create the filename very quickly */
     strcpy(name,filen);
@@ -544,6 +545,70 @@ int hexdigit(char digit) {
 }
 
 
+/* iHEX format file conversion (+hex and others) */
+
+static int checksum(const unsigned char *data, int size)
+{
+    int sum;
+    
+    sum = 0;    
+    while ( size-- ) {
+        sum += *data++;
+        sum &= 0xff;
+    }
+
+    if (sum > 0) {
+        sum = 0x100 - sum;
+    }
+
+    return(sum);    
+}
+
+int bin2hex(FILE *input, FILE *output, int address)
+{
+    unsigned char outbuf[5 + RECSIZE + 1];
+    unsigned char *inbuf;
+    int byte;
+    int size;   
+    int i;
+
+    inbuf = outbuf + 5;
+    outbuf[0] = ':';
+  
+    do {    
+
+        size = 0;
+        while (size < RECSIZE) {
+            byte = fgetc(input);             
+	    if ( byte == EOF ) {
+		break;
+	    }
+            inbuf[size++] = byte;
+        }
+
+        outbuf[1] = size;
+        if (size > 0) {
+            outbuf[2] = address >> 8;
+            outbuf[3] = address & 0xff;
+            outbuf[4] = 0;
+        } else {
+            outbuf[2] = 0;
+            outbuf[3] = 0;
+            outbuf[4] = 1;
+        }
+        outbuf[5 + size] = checksum(outbuf + 1, size + 4);
+
+        fputc(outbuf[0], output);
+        for (i=1; i<(size+6); i++) {
+            fprintf(output, "%02X", outbuf[i]);
+        }
+
+        fprintf(output, "\n");
+        address += size;        
+    } while (!feof(input) || (size > 0));
+
+    return(0);
+}
 
 static void get_temporary_filename(char *filen)
 {
