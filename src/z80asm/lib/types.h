@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.6 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.7 2014-05-05 21:51:30 dom Exp $
 */
 
 #pragma once
@@ -23,10 +23,12 @@ typedef int BOOL;
 #define	TRUE	(!FALSE)
 #endif
 
-/* Unsigned types */
+/* Unsigned types - defined by /usr/include/i386-linux-gnu/sys/types.h */
+#ifndef __u_char_defined
 typedef unsigned char byte;		/*  8-bit */
 typedef unsigned int  uint;		/* 16 or 32-bit */
 typedef unsigned int  ulong;	/* 32 or 64-bit */
+#endif
 
 /* MIN, MAX, ABS, CLAMP */
 #undef	MIN
@@ -49,7 +51,10 @@ typedef unsigned int  ulong;	/* 32 or 64-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.6  2014-05-02 21:34:58  pauloscustodio
+* Revision 1.7  2014-05-05 21:51:30  dom
+* Horrible workaround.
+*
+* Revision 1.6  2014/05/02 21:34:58  pauloscustodio
 * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
 *
 * Revision 1.5  2014/03/05 23:44:55  pauloscustodio
