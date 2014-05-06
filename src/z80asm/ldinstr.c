@@ -13,13 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.39 2014-05-06 22:17:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.40 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-#include "config.h"
 #include "errors.h"
 #include "options.h"
 #include "scan.h"
@@ -666,7 +665,11 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.39  2014-05-06 22:17:37  pauloscustodio
+* Revision 1.40  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.39  2014/05/06 22:17:37  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.38  2014/05/02 21:34:58  pauloscustodio

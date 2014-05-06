@@ -88,7 +88,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="codearea.h" />
-    <ClInclude Include="config.h" />
     <ClInclude Include="deffile.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />

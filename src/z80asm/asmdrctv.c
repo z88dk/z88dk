@@ -13,13 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.94 2014-05-06 22:17:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.95 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
 
 #include "codearea.h"
-#include "config.h"
 #include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
@@ -785,7 +784,11 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.94  2014-05-06 22:17:37  pauloscustodio
+ * Revision 1.95  2014-05-06 22:52:01  pauloscustodio
+ * Remove OS-dependent defines and dependency on ../config.h.
+ * Remove OS_ID constant from predefined defines in assembly.
+ *
+ * Revision 1.94  2014/05/06 22:17:37  pauloscustodio
  * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
  *
  * Revision 1.93  2014/05/04 18:05:39  pauloscustodio

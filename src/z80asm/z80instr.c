@@ -13,13 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.72 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.73 2014-05-06 22:52:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-#include "config.h"
 #include "errors.h"
 #include "expr.h"
 #include "options.h"
@@ -1370,7 +1369,11 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.72  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.73  2014-05-06 22:52:02  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.72  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.71  2014/05/02 21:34:58  pauloscustodio

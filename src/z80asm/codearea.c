@@ -15,13 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.31 2014-05-06 22:17:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.32 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-#include "config.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "init.h"
@@ -256,7 +255,11 @@ BYTE get_byte( UINT *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.31  2014-05-06 22:17:37  pauloscustodio
+* Revision 1.32  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.31  2014/05/06 22:17:37  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.30  2014/05/02 21:34:58  pauloscustodio

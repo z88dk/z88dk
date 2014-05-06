@@ -13,13 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.95 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.96 2014-05-06 22:52:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-#include "config.h"
 #include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
@@ -591,7 +590,11 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.95  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.96  2014-05-06 22:52:02  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.95  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.94  2014/05/02 21:34:58  pauloscustodio

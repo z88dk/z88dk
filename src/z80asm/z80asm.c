@@ -13,13 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.165 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.166 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-#include "config.h"
 #include "deffile.h"
 #include "errors.h"
 #include "except.h"
@@ -433,9 +432,6 @@ int main( int argc, char *argv[] )
     {
         libraryhdr = NULL;              /* initialise to no library files */
 
-        /* define OS_ID */
-        define_static_def_sym( OS_ID, 1 );
-
         /* parse command line and call-back via assemble_file() */
         parse_argv( argc, argv, assemble_file );
 
@@ -469,8 +465,6 @@ int main( int argc, char *argv[] )
 
         CloseFiles();
 
-#ifndef QDOS
-
         delete_modules();		/* Release module information (symbols, etc.) */
 
         if ( libraryhdr != NULL )
@@ -481,8 +475,6 @@ int main( int argc, char *argv[] )
             if ( reloctable != NULL )
                 xfree( reloctable );
         }
-
-#endif
     }
     ETRY;
 
@@ -506,7 +498,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.165  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.166  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.165  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.164  2014/05/04 18:05:56  pauloscustodio

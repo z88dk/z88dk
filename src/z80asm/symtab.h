@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.18 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.19 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,7 +52,7 @@ extern Symbol *find_global_symbol( char *name );
    create undefined symbol if not found, return symbol */
 extern Symbol *get_used_symbol( char *name );
 
-/* define a static DEF symbol (e.g. from -D command line, OS_ID) */
+/* define a static DEF symbol (e.g. from -D command line) */
 extern Symbol *define_static_def_sym( char *name, long value );
 
 /* define a global DEF symbol (e.g. ASMSIZE, ASMTAIL) */
@@ -104,7 +104,11 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.18  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.19  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.18  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.17  2014/05/02 21:34:58  pauloscustodio

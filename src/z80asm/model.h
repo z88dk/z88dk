@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.14 2014-05-02 21:00:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.15 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,7 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.14 2014-05-02 21:0
 #define SYM_DEFINED		1       	/* 00000001 symbol is defined */
 #define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
 									   a symbol table search */
-#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D, OS_ID
+#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D
 									   not output in sym list */
 
 #define SYM_TYPE		120     	/* 01111000 */
@@ -104,7 +104,11 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.14  2014-05-02 21:00:49  pauloscustodio
+* Revision 1.15  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.14  2014/05/02 21:00:49  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
 *
 * Revision 1.13  2014/05/02 20:24:38  pauloscustodio

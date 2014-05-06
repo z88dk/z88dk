@@ -14,14 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.54 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.55 2014-05-06 22:52:01 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "config.h"
 #include "types.h"
 #include "sym.h"
 #include <stdio.h>
@@ -45,6 +44,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.54 2014-05-06 22:
 #define FLAGS_P 6
 #define FLAGS_M 7
 
+#ifdef MSDOS
+#define MAXCODESIZE 65532       /* MSDOS 64K heap boundary */
+#else
+#define MAXCODESIZE 65536
+#endif
 
 extern FILE *objfile;
 extern UINT sizeof_relocroutine, sizeof_reloctable;
@@ -57,7 +61,11 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.54  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.55  2014-05-06 22:52:01  pauloscustodio
+* Remove OS-dependent defines and dependency on ../config.h.
+* Remove OS_ID constant from predefined defines in assembly.
+*
+* Revision 1.54  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.53  2014/05/02 21:34:58  pauloscustodio
