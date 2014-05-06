@@ -63,7 +63,7 @@ asm_qsort:
    call l_mulu_16_16x16        ; hl = hl * de = (nmemb - 1) * size
    
    pop de                      ; de = lo (base)
-   jp c, error_einval_zc - 1   ; if multiply overflowed
+   jp c, error_erange_zc - 1   ; if multiply overflowed
    
    add hl,de                   ; hl = hi (address of last item)
    pop bc                      ; bc = size
@@ -109,13 +109,13 @@ left_squeeze:
    ; hl = j
    ; bc = size
    ; ix = compare
-   ; stack = hi, lo
+   ; stack = hi, lo=pivot
 
    call l_ltu_de_hl            ; carry set if i < j
    jr nc, right_squeeze
    
    ex (sp),hl                  ; push j
-   push hl                     ; push lo
+   push hl                     ; push lo=pivot
    push bc                     ; push size
    push de                     ; push i
    push ix                     ; push compare
@@ -127,7 +127,7 @@ IF __SDCC | __SDCC_IX | __SDCC_IY
    push de
    push hl
    ex de,hl
-   call l_jpix                 ; compare(de=lo, hl=i)
+   call l_jpix                 ; compare(de=lo=pivot, hl=i)
    ld a,h                      ; get result
    pop hl
    pop de
@@ -139,7 +139,7 @@ ELSE
    push hl
    push de
    ex de,hl
-   call l_jpix                 ; compare(de=lo, hl=i)
+   call l_jpix                 ; compare(de=lo=pivot, hl=i)
    ld a,h                      ; get result
    pop de
    pop hl
@@ -152,10 +152,10 @@ ENDIF
    pop de                      ; de = i
    pop bc                      ; bc = size
    pop hl
-   ex (sp),hl                  ; hl = j, stack = hi, lo
+   ex (sp),hl                  ; hl = j,, stack = hi, lo=pivot
 
    rla
-   jr nc, partition            ; if item[lo] >= item[i] continue
+   jr nc, partition            ; if item[lo=pivot] >= item[i] continue
 
 right_squeeze:
 
@@ -167,13 +167,13 @@ right_loop:
    ; hl = i
    ; bc = size
    ; ix = compare
-   ; stack = hi, lo
+   ; stack = hi, lo=pivot
 
    call l_ltu_de_hl            ; carry set if j < i
    jr c, swap_ij
    
    ex (sp),hl                  ; push i
-   push hl                     ; push lo
+   push hl                     ; push lo=pivot
    push bc                     ; push size
    push de                     ; push j
    push ix                     ; push compare
@@ -184,7 +184,7 @@ IF __SDCC | __SDCC_IX | __SDCC_IY
 
    push hl
    push de
-   call l_jpix                 ; compare(de=j, hl=lo)
+   call l_jpix                 ; compare(de=j, hl=lo=pivot)
    ld a,h                      ; get result
    pop de
    pop hl
@@ -195,7 +195,7 @@ ELSE
 
    push de
    push hl
-   call l_jpix                 ; compare(de=j, hl=lo)
+   call l_jpix                 ; compare(de=j, hl=lo=pivot)
    ld a,h                      ; get result
    pop hl
    pop de
@@ -208,10 +208,10 @@ ENDIF
    pop de                      ; de = j
    pop bc                      ; bc = size
    pop hl
-   ex (sp),hl                  ; hl = i, stack = lo
+   ex (sp),hl                  ; hl = i,, stack = hi, lo=pivot
    
    rla
-   jr c, swap_ij               ; if item[j] < item[lo] stop
+   jr c, swap_ij               ; if item[j] < item[lo=pivot] stop
    
    ex de,hl
    sbc hl,bc                   ; j -= size
@@ -228,7 +228,7 @@ swap_ij:
    ; hl = i
    ; bc = size
    ; ix = compare
-   ; stack = hi, lo
+   ; stack = hi, lo=pivot
 
    call l_ltu_hl_de            ; carry set if i < j
    jr nc, partition_done
@@ -243,7 +243,7 @@ swap_ij:
    pop hl
    sbc hl,bc                   ; j -= size
    
-   jr partition
+   jr left_squeeze
 
 partition_done:
 
@@ -253,15 +253,15 @@ partition_done:
    ; de = j
    ; bc = size
    ; ix = compare
-   ; stack = hi, lo
+   ; stack = hi, lo=pivot
 
    pop hl
-   call l_ltu_hl_de            ; carry set if lo < j
+   call l_ltu_hl_de            ; carry set if lo=pivot < j
    jr nc, left_empty
    
    push bc
    push de
-   call asm0_memswap           ; swap(j, lo, size)
+   call asm0_memswap           ; swap(j, lo=pivot, size)
    pop bc
    pop de
    
@@ -345,7 +345,7 @@ right_smallest:
 
 left_empty:
 
-   ; left side of partition is empty so only right side is left
+   ; left side of partition is empty so only right side remains
    
    ; hl = lo
    ; bc = size
