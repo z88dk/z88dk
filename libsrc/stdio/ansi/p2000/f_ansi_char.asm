@@ -38,4 +38,21 @@
 
 	pop	af
 
+	cp 95
+	jr nz,nounderscore
+	ld a,92
+nounderscore:
+
+	call $60C0
+
+; adjust the cursor position
+	ld	a,4
+	call $60C0
+
+	ld	a,(ansi_ROW)
+	inc a
+	call $60C0
+
+	ld	a,(ansi_COLUMN)
+	inc a
 	jp $60C0

@@ -6,7 +6,7 @@
 ;	Apr 2014 - Stefano Bodrato
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2014-04-17 06:16:05 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2014-05-06 06:23:37 stefano Exp $
 ;
 
 	XLIB  fputc_cons
@@ -20,6 +20,12 @@ fputc_cons:
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl); Now A contains the char to be printed
+	
+	cp 95
+	jr nz,nounderscore
+	ld a,92
+	jr doputc
+nounderscore:
 
 	cp  13
 	jr  nz,doputc
