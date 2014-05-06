@@ -87,7 +87,7 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   pop bc                      ; c = mode bytes
+   pop bc                      ; c = mode byte
    pop de                      ; de = filename
    
    jp c, error_emfile_zc       ; if no available FILE struct
@@ -97,12 +97,15 @@ ENDIF
    push bc                     ; save mode byte
    push hl                     ; save & FILE.link
    
-   ;  c = mode bytes
+   ;  c = mode byte
    ; de = filename
    ; stack = mode byte, FILE.link
    
+   ld b,0
    call asm_open               ; pass details to target open()
    jr c, open_failed           ; if target cannot open file
+
+   ; de = driver function, returned by target open()
 
    pop hl                      ; hl = & FILE.link
    pop bc                      ; c = mode byte
@@ -197,12 +200,14 @@ initialize_file_struct:
    inc hl
    
    ld a,c
+   rrca
+   rrca
    and $c0
    ld (hl),a                   ; state_flags_0
    inc hl
    
-   rlca
-   rlca
+   ld a,c
+   rla
    and $02
    ld (hl),a                   ; state_flags_1
    inc hl

@@ -25,8 +25,8 @@ offset  size  name              purpose
 
 bit   name    purpose
 
- 7    R       if set indicates the stream is open for reading
- 6    W       if set indicates the stream is open for writing
+ 7    W       if set indicates the stream is open for writing
+ 6    R       if set indicates the stream is open for reading
  5    0       reserved
  4    eof     if set the input stream reached eof
  3    err     if set the stream encountered an error
@@ -71,17 +71,19 @@ offset  size  name              purpose
   16      2   size_t *sizep     where to store buffer length
   18      8   b_vector          byte vector to manage resizeable buffer
   26      2   fp                file pointer index (index in vector for next read/write)
-  28      1   mode              mode byte when memstream created (for freopen() )
+  28      1   mode              mode byte when memstream was created (for freopen() )
 
 * memstream_flags
 
 bit   name    purpose
 
  7     F      if set buffer is freed when file is closed
-65     0      reserved
- 4     W      if set buffer info is written on flush
-32     0      reserved
- 1     A      if set writes append
+ 6     0      reserved
+ 5     X      if set buffer info is written on flush
+ 4     0      reserved
+ 3     0      reserved
+ 2     A      if set writes append
+ 1     0      reserved
  0     0      reserved
 
 

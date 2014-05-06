@@ -40,7 +40,7 @@ asm__fmemopen:
    ; enter : hl = char **bufp
    ;         bc = size_t *sizep
    ;         de = char *mode
-   ;          a = mode mask (IOBX11AC, set bit disallows)
+   ;          a = mode mask (0TXC BAWR, set bit disallows)
    ;
    ; exit  : success
    ;
@@ -117,28 +117,30 @@ asm0__fmemopen:
    inc hl
    ld (hl),__stdio_memstream_driver / 256
    
-   pop de                      ; e = mode byte = IOBX00AC
+   pop de                      ; e = mode byte = 0TXC BAWR
    ld (ix+28),e                ; save original mode byte
    
    ld a,e
+   rrca
+   rrca
    and $c0
    inc a
    ld (ix+3),a                 ; set r/w bits, memstream type
    
-   rlca
-   rlca
+   ld a,e
+   rla
    and $02
    ld (ix+4),a                 ; if r mode, indicate last op was read
 
    ; FILE portion is initialized, memstream portion remains
    
    ld a,e
-   and $12
+   and $24
    ld d,a
 
    ; ix = FILE *
-   ;  e = mode byte = IOBX 00AC
-   ;  d = memstream mode = F00G 00A0
+   ;  e = mode byte = 0TXC BAWR
+   ;  d = memstream mode = F0X0 0A00
    ; stack = bufp, sizep
 
    ; must allocate a buffer ?
@@ -173,13 +175,13 @@ asm0__fmemopen:
 rejoin_0:
 
    ; ix = FILE *
-   ;  e = mode byte = IOBX 00AC
-   ;  d = memstream mode = F00G 00A0
+   ;  e = mode byte = 0TXC BAWR
+   ;  d = memstream mode = F0X0 0A00
    ; hl = void *buf
    ; bc = size_t size
 
    ld (ix+13),d                ; store final memstream mode
-   ld a,e                      ; a = mode byte = IOBX00AC
+   ld a,e                      ; a = mode byte = 0TXC BAWR
    
    push hl                     ; save buf
    
@@ -198,19 +200,19 @@ rejoin_0:
 
    push bc
 
-   ;  a = mode byte = IOBX 00AC   
+   ;  a = mode byte = 0TXC BAWR
    ; hl = & vector.size
    ; bc = capacity
    ; de = void *buf
    ; stack = capacity
 
-   and $03
-   jr z, mode_AC_00
+   and $50
+   jr z, mode_TC_00
    
-   rra
-   jr c, mode_AC_X1
+   cp $50
+   jr z, mode_TC_11
    
-   ; mode_AC_10
+mode_TC_01:
 
    push hl                     ; save & vector.size
 
@@ -238,11 +240,11 @@ skip_cpir:
    pop hl
    jr rejoin_1
 
-mode_AC_X1:
+mode_TC_11:
 
    ld bc,0                     ; bc = append_index = 0
 
-mode_AC_00:
+mode_TC_00:
 
    ld de,0                     ; de = position_index = 0
 
@@ -265,7 +267,7 @@ rejoin_1:
    ld (hl),b                   ; vector.capacity = capacity
    inc hl
    
-   bit 4,(ix+13)               ; vector allowed to grow ?
+   bit 5,(ix+13)               ; vector allowed to grow ?
    jr z, vector_no_grow
 
    ld bc,$ffff                 ; max_size = all of memory
@@ -319,12 +321,12 @@ ENDIF
 must_allocate_size_0:
 
    ; ix = FILE *
-   ;  e = mode byte = IOBX 00AC
-   ;  d = memstream mode = F00G 00A0
+   ;  e = mode byte = 0TXC BAWR
+   ;  d = memstream mode = F0X0 0A00
    ; hl = void *buf
    ; bc = size_t size = 0
 
-   bit 4,d
+   bit 5,d
    call z, error_einval_zc
    jr z, allocate_fail         ; if not allowed to grow buffer
    
@@ -343,7 +345,7 @@ must_allocate_buf_0:
    
    jr c, allocate_fail
    
-   bit 4,d
+   bit 5,d
    jr nz, _skip
    
    set 7,d                     ; if not allowed to expand, must free buffer on close
@@ -356,7 +358,7 @@ _skip:
    ld (hl),0                   ; zero terminate
    
    sbc hl,bc
-   jr rejoin_0
+   jp rejoin_0
 
 allocate_fail:
 

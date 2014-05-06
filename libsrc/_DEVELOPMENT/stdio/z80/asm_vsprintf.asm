@@ -46,7 +46,7 @@ asm_vsprintf:
    
    ld hl,0
    push hl
-   ld hl,$4000 + (vsprintf_outchar / 256)
+   ld hl,$8000 + (vsprintf_outchar / 256)
    push hl
    ld hl,195 + ((vsprintf_outchar % 256) * 256)
    push hl

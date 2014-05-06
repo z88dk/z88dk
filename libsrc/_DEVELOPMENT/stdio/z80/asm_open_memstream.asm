@@ -43,7 +43,7 @@ asm_open_memstream:
    
    ex de,hl                    ; hl = char **bufp
 
-   ld a,$0c                    ; disallow unknown mode chars
+   ld a,$80                    ; disallow unknown mode bits
    ld de,mode                  ; create an expanding write only buffer
 
    jp asm__fmemopen

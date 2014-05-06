@@ -44,7 +44,7 @@ asm_fmemopen:
    inc bc
    inc bc                      ; bc = size_t *sizep
    
-   ld a,$1c                    ; mode mask disallows buffer growth
+   ld a,$a0                    ; mode mask disallows buffer growth
    call asm__fmemopen
    
    pop bc

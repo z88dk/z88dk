@@ -95,7 +95,7 @@ output_string:
    
    ld hl,0
    push hl
-   ld hl,$4000 + (vsnprintf_outchar / 256)
+   ld hl,$8000 + (vsnprintf_outchar / 256)
    push hl
    ld hl,195 + ((vsnprintf_outchar % 256) * 256)
    push hl

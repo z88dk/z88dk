@@ -253,7 +253,7 @@ WRIT:
    
    call get_vector             ; hl = vector *
    
-   bit 1,(ix+13)
+   bit 2,(ix+13)
    call z, get_file_pointer    ; if writing, bc = fp_idx_old
    call nz, get_append_pointer ; if appending, bc = vector.size
 
@@ -281,7 +281,7 @@ WRIT:
    ; bc = idx
    ; a = realloc_status = 0 if realloc was performed, -1 if could not write all bytes
    
-   bit 1,(ix+13)
+   bit 2,(ix+13)
    jr nz, _write_no_fp         ; if appending
 
    ; adjust the file pointer
@@ -343,7 +343,7 @@ PUTC:
    
    call get_vector             ; hl = vector *
    
-   bit 1,(ix+13)
+   bit 2,(ix+13)
    call z, get_file_pointer    ; if writing, bc = fp_idx_old
    call nz, get_append_pointer ; if appending, bc = vector.size
 
@@ -407,7 +407,7 @@ _putc_no_realloc:
 
    pop hl                      ; hl = idx
 
-   bit 1,(ix+13)
+   bit 2,(ix+13)
    jr nz, _putc_no_fp          ; if appending
    
    ; file pointer needs to be adjusted
@@ -513,7 +513,7 @@ FLSH:
    ;
    ; exit  : carry reset
 
-   bit 4,(ix+13)               ; write buffer info ?
+   bit 5,(ix+13)               ; write buffer info ?
    jr z, _flush_terminate      ; if not writing buffer info
 
    ld e,ixl

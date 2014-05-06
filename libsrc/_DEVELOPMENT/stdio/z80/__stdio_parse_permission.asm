@@ -12,24 +12,23 @@ __stdio_parse_permission:
    ;
    ;         success, permission string valid
    ;
-   ;            c = flags = IOBX 00AC
+   ;            c = flags = 0TXC BAWR
    ;            carry reset
    ;
    ;         fail, permission string invalid
    ;
    ;            carry set
    ;
-   ; note  : IOBX 00AC
+   ; note  : 0TXC BAWR, O_RDWR = O_RDONLY | O_WRONLY
    ;
-   ;          I =  1  open for reading
-   ;          O =  1  open for writing
-   ;          B =  1  binary mode (may be relevant for a driver)
-   ;          X =  1  exclusive mode (C11 specification)
-   ;          A =  1  append writes
-   ;         AC = 00  file must exist, do not create
-   ;              10  open if exists but create if it does not exist
-   ;              01  create and/or truncate
-   ;              11  create and/or truncate
+   ;          R = $01 = O_RDONLY = open for reading
+   ;          W = $02 = O_WRONLY = open for writing
+   ;          A = $04 = O_APPEND = append writes
+   ;          B = $08 = O_BINARY = binary mode (many drivers ignore this)
+   ;
+   ;          C = $10 = O_CREAT  = create file if it does not exist
+   ;          X = $20 = O_EXCL   = if file already exists return error
+   ;          T = $40 = O_TRUNC  = if file exists reduce it to zero length
    ;
    ; uses  : af, bc, de, hl
 
@@ -72,20 +71,22 @@ found_flag:
 
 check_validity:
 
-   ; c = flags = IOBX 00AC
+   ; c = flags = 1TXC BAWR
    
    ld a,c
-   and $c0                     ; valid set of flags must have I and/or O set
-   ret nz
+   xor $80                     ; complete mode string has bit 7 set
+   ld c,a
+   
+   ret p
    
    scf
    ret
 
 permission_table:
 
-   defb 'r', $80
-   defb 'w', $41
-   defb 'a', $42
-   defb '+', $c0
-   defb 'b', $20
-   defb 'x', $10
+   defb 'r', $81               ; bit 7 set indicates mode string is complete
+   defb 'w', $d2               ; bit 7 set indicates mode string is complete
+   defb 'a', $96               ; bit 7 set indicates mode string is complete
+   defb '+', $03
+   defb 'b', $08
+   defb 'x', $20
