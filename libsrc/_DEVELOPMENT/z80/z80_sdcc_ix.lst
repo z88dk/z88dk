@@ -1,6 +1,6 @@
 z80/c/sdcc_ix/im2_append_generic_callback
 z80/c/sdcc_ix/im2_create_generic_isr
-z80/c/sdcc_ix/im2_create_generic_isr_light
+z80/c/sdcc_ix/im2_create_generic_isr_8080
 z80/c/sdcc_ix/im2_init
 z80/c/sdcc_ix/im2_install_isr
 z80/c/sdcc_ix/im2_prepend_generic_callback

@@ -3,19 +3,19 @@
 ; Apr 2004
 ; ===============================================================
 ;
-; void *im2_create_generic_isr_light(uint8_t num_callback, void *address)
+; void *im2_create_generic_isr_8080(uint8_t num_callback, void *address)
 ;
 ; Create a light generic isr at the address given.  Space is
 ; reserved for num_callback callbacks.
 ;
 ; ===============================================================
 
-XLIB asm_im2_create_generic_isr_light
+XLIB asm_im2_create_generic_isr_8080
 
 LIB __generic_isr_create, __generic_isr_run_callbacks
 LIB asm_z80_push_registers_8080, asm_z80_pop_registers_8080
 
-asm_im2_create_generic_isr_light:
+asm_im2_create_generic_isr_8080:
 
    ; enter :  a = uint8_t num_callback < 127
    ;         de = void *address
@@ -24,16 +24,16 @@ asm_im2_create_generic_isr_light:
    ;
    ; uses  : af, bc, de, hl
 
-   ld hl,generic_isr_light
+   ld hl,generic_isr_8080
    jp __generic_isr_create
    
-generic_isr_light:
+generic_isr_8080:
 
    call asm_z80_push_registers_8080
 
 location:
 
-   ld bc,generic_isr_light_end - location
+   ld bc,generic_isr_8080_end - location
    add hl,bc
    
    call __generic_isr_run_callbacks
@@ -43,4 +43,4 @@ location:
    ei
    reti
 
-generic_isr_light_end:
+generic_isr_8080_end:

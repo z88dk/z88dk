@@ -1,6 +1,6 @@
 z80/z80/asm_im2_append_generic_callback
 z80/z80/asm_im2_create_generic_isr
-z80/z80/asm_im2_create_generic_isr_light
+z80/z80/asm_im2_create_generic_isr_8080
 z80/z80/asm_im2_init
 z80/z80/asm_im2_install_isr
 z80/z80/asm_im2_prepend_generic_callback

@@ -2,8 +2,8 @@ z80/c/lr_sccz80/im2_append_generic_callback
 z80/c/lr_sccz80/im2_append_generic_callback_callee
 z80/c/lr_sccz80/im2_create_generic_isr
 z80/c/lr_sccz80/im2_create_generic_isr_callee
-z80/c/lr_sccz80/im2_create_generic_isr_light
-z80/c/lr_sccz80/im2_create_generic_isr_light_callee
+z80/c/lr_sccz80/im2_create_generic_isr_8080
+z80/c/lr_sccz80/im2_create_generic_isr_8080_callee
 z80/c/lr_sccz80/im2_init
 z80/c/lr_sccz80/im2_install_isr
 z80/c/lr_sccz80/im2_install_isr_callee
