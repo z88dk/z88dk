@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.93 2014-05-04 18:05:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.94 2014-05-06 22:17:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -56,7 +56,7 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern uint DEFVPC;
+extern UINT DEFVPC;
 
 
 int
@@ -204,7 +204,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = (uint)offset;
+            DEFVPC = (UINT)offset;
             globaldefv = ON;
         }
         else
@@ -250,7 +250,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = (uint)offset;
+            DEFVPC = (UINT)offset;
         }
     }
 }
@@ -387,7 +387,7 @@ DEFS()
             {
                 while ( constant-- )
                 {
-                    append_byte( (byte) val );
+                    append_byte( (BYTE) val );
                 }
             }
             else
@@ -521,7 +521,7 @@ ORG( void )
 
             if ( constant >= 0 && constant <= 65535 )
             {
-                CURRENTMODULE->origin = (uint) constant;
+                CURRENTMODULE->origin = (UINT) constant;
             }
             else
             {
@@ -685,7 +685,7 @@ DEFM( void )
         {
 			for ( p = tok_string; *p != '\0'; p++ )
 			{
-                append_byte( (byte) *p );
+                append_byte( (BYTE) *p );
                 ++bytepos;
 			}
 
@@ -785,11 +785,14 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.93  2014-05-04 18:05:39  pauloscustodio
+ * Revision 1.94  2014-05-06 22:17:37  pauloscustodio
+ * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+ *
+ * Revision 1.93  2014/05/04 18:05:39  pauloscustodio
  * Fix memory leak
  *
  * Revision 1.92  2014/05/02 21:34:58  pauloscustodio
- * byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+ * byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
  *
  * Revision 1.91  2014/05/02 20:24:38  pauloscustodio
  * New class Module to replace struct module and struct modules
@@ -928,7 +931,7 @@ DeclModuleName( void )
  * breaks on a 64-bit architecture. Make the functions return the value instead
  * of being passed the pointer to the return value, so that the compiler
  * takes care of size convertions.
- * Create uint and ulong, use uint instead of size_t.
+ * Create UINT and ULONG, use UINT instead of size_t.
  *
  * Revision 1.67  2014/02/08 11:21:08  pauloscustodio
  * Moved srcfile.c to lib/
@@ -1055,8 +1058,8 @@ DeclModuleName( void )
  * New listfile.c with all the listing related code
  *
  * Revision 1.37  2013/01/24 23:03:03  pauloscustodio
- * Replaced (unsigned char) by (byte)
- * Replaced (unisigned int) by (uint)
+ * Replaced (unsigned char) by (BYTE)
+ * Replaced (unisigned int) by (UINT)
  * Replaced (short) by (int)
  *
  * Revision 1.36  2013/01/20 21:24:28  pauloscustodio
@@ -1130,7 +1133,9 @@ DeclModuleName( void )
  *
  * Revision 1.22  2011/08/19 15:53:58  pauloscustodio
  * BUG_0010 : heap corruption when reaching MAXCODESIZE
- * - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+ * - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+ *	 if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+ *	 the heap is corrupted before the exception is raised.
  * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
  *
  * Revision 1.21  2011/08/18 23:27:54  pauloscustodio

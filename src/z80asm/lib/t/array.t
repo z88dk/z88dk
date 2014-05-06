@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.9 2014-05-02 21:34:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.10 2014-05-06 22:17:38 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -36,7 +36,7 @@ ARRAY( Point );
 DEF_ARRAY( Point );
 
 PointArray *points;
-byteArray *bytes;
+BYTEArray *bytes;
 intArray *ints;
 longArray *longs;
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	Point *p;
 	long *lp;
 	int *ip;
-	byte *bp;
+	BYTE *bp;
 	long l;
 	int i;
 	
@@ -189,16 +189,16 @@ int main(int argc, char *argv[])
 	assert( p == NULL );
 	
 	/* byte array */
-	bytes = OBJ_NEW( byteArray );
+	bytes = OBJ_NEW( BYTEArray );
 	for ( i = 10; i >= 0; i-- ) 
 	{
-		bp = byteArray_item(bytes, i);
-		*bp = (byte) i;
+		bp = BYTEArray_item(bytes, i);
+		*bp = (BYTE) i;
 	}
 	for ( i = 0; i <= 10; i++ )
 	{
-		bp = byteArray_item(bytes, i);
-		assert( *bp == (byte) i );
+		bp = BYTEArray_item(bytes, i);
+		assert( *bp == (BYTE) i );
 	}
 	
 	/* int array */
@@ -249,8 +249,11 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.9  2014-05-02 21:34:58  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+# Revision 1.10  2014-05-06 22:17:38  pauloscustodio
+# Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+#
+# Revision 1.9  2014/05/02 21:34:58  pauloscustodio
+# byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 #
 # Revision 1.8  2014/05/02 21:13:54  pauloscustodio
 # Add byte array to default types

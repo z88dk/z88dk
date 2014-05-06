@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.14 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.15 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -33,7 +33,7 @@ struct Module;							/* defined in module.h */
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-	byte			sym_type;			/* type of symbol */
+	BYTE			sym_type;			/* type of symbol */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
 	struct Module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
@@ -50,7 +50,7 @@ END_CLASS;
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create( char *name, long value, byte type, struct Module *owner );
+extern Symbol *Symbol_create( char *name, long value, BYTE type, struct Module *owner );
 
 /* return full symbol name NAME@MODULE stored in strpool */
 extern char *Symbol_fullname( Symbol *sym );
@@ -58,8 +58,11 @@ extern char *Symbol_fullname( Symbol *sym );
 
 /*
 * $Log: sym.h,v $
-* Revision 1.14  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.15  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.14  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.13  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

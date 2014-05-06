@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.71 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.72 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -995,7 +995,10 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.71  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.72  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.71  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.70  2014/04/22 23:52:55  pauloscustodio
@@ -1236,7 +1239,9 @@ DAA( void )
 *
 * Revision 1.25  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.24  2011/07/18 00:48:25  pauloscustodio

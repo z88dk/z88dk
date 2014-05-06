@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.164 2014-05-04 18:05:56 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.165 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -70,19 +70,19 @@ char Z80libhdr[] = "Z80LMF01";
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 #endif
 
-byte reloc_routine[] =
+BYTE reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
     "\xD1\xE3\x2B\x7C\xB5\xE3\xD5\x20\xDD\xF1\xF1\xFD\x36\x00\xC3\xFD"
     "\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
 
-uint sizeof_relocroutine = 73;
-uint sizeof_reloctable   = 0;
+UINT sizeof_relocroutine = 73;
+UINT sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
 
-uint DEFVPC;          /* DEFVARS address counter */
+UINT DEFVPC;          /* DEFVARS address counter */
 
 struct liblist *libraryhdr;
 
@@ -283,7 +283,7 @@ CloseFiles( void )
 /* define name of library file to create, return name in strpool */
 char *CreateLibfile( char *filename )
 {
-    uint len;
+    UINT len;
     char *found_libfilename;
 
     len = strlen( filename );
@@ -506,11 +506,14 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.164  2014-05-04 18:05:56  pauloscustodio
+* Revision 1.165  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.164  2014/05/04 18:05:56  pauloscustodio
 * comment
 *
 * Revision 1.163  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.162  2014/05/02 21:00:50  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -649,7 +652,7 @@ createsym( Symbol *symptr )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.137  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
@@ -958,8 +961,8 @@ createsym( Symbol *symptr )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.66  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.65  2013/01/20 21:24:28  pauloscustodio
@@ -1079,7 +1082,9 @@ createsym( Symbol *symptr )
 *
 * Revision 1.39  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.38  2011/08/19 10:20:32  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.16 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.17 2014-05-06 22:17:38 pauloscustodio Exp $
 
 */
 
@@ -49,7 +49,7 @@ BOOL	source_list_ended;		/* end of source listing, from now on no source lines *
 /* current line being output */
 BOOL	line_started;			/* true if a line was started but not ended */
 long	start_line_pos;			/* ftell() position at start of next list line */
-uint	address;				/* address of start of line */
+UINT	address;				/* address of start of line */
 Str		*bytes;					/* list of bytes output for this line */
 
 char	*source_file;			/* source file, kept in strpool */
@@ -73,10 +73,10 @@ extern void ListFile_close( ListFile *self, BOOL keep_file );
    2.1. append bytes, words, longs
    2.2. collect patch position in list file for expressions
    3. output the full line */
-extern void ListFile_start_line( ListFile *self, uint address,
+extern void ListFile_start_line( ListFile *self, UINT address,
                                  char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
-extern void ListFile_append_byte( ListFile *self, byte byte1 );
+extern void ListFile_append_byte( ListFile *self, BYTE byte1 );
 extern void ListFile_append_word( ListFile *self, int word );
 extern void ListFile_append_long( ListFile *self, long dword );
 extern long ListFile_patch_pos( ListFile *self, int byte_offset );
@@ -105,10 +105,10 @@ extern int ListFile_get_page_nr( ListFile *self );
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
 extern void list_close( BOOL keep_file );
-extern void list_start_line( uint address,
+extern void list_start_line( UINT address,
                              char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
-extern void list_append_byte( byte byte1 );
+extern void list_append_byte( BYTE byte1 );
 extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );
@@ -122,8 +122,11 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.16  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.17  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.16  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.15  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
@@ -138,7 +141,7 @@ extern int  list_get_page_nr( void );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

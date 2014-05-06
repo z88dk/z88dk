@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.77 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.78 2014-05-06 22:17:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -74,7 +74,7 @@ ExprLong( int listoffset )
     Expr *expr;
     long constant;
     int flag = 1;
-    uint exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    UINT exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( expr = expr_parse() ) != NULL )
     {
@@ -136,7 +136,7 @@ ExprAddress( int listoffset )
     Expr *expr;
     long constant;
     int flag = 1;
-    uint exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    UINT exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( expr = expr_parse() ) != NULL )
     {
@@ -197,7 +197,7 @@ ExprUnsigned8( int listoffset )
     Expr *expr;
     long constant;
     int flag = 1;
-    uint exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    UINT exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     if ( ( expr = expr_parse() ) != NULL )
     {
@@ -233,7 +233,7 @@ ExprUnsigned8( int listoffset )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range( constant );
 
-                    append_byte( (byte) constant );
+                    append_byte( (BYTE) constant );
                 }
             }
         }
@@ -259,7 +259,7 @@ ExprSigned8( int listoffset )
     Expr *expr;
     long constant;
     int flag = 1;
-    uint exprptr = get_codeindex();     /* address of expression - BUG_0015 */
+    UINT exprptr = get_codeindex();     /* address of expression - BUG_0015 */
 
     /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
     switch ( tok )
@@ -310,7 +310,7 @@ ExprSigned8( int listoffset )
                     if ( constant < -128 || constant > 127 )
                         warn_int_range( constant );
 
-                    append_byte( (byte) constant );
+                    append_byte( (BYTE) constant );
                 }
             }
         }
@@ -331,8 +331,11 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.77  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.78  2014-05-06 22:17:37  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.77  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.76  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -466,7 +469,7 @@ ExprSigned8( int listoffset )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.53  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
@@ -566,8 +569,8 @@ ExprSigned8( int listoffset )
 * processed.
 *
 * Revision 1.32  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.31  2013/01/20 13:18:10  pauloscustodio
@@ -635,7 +638,9 @@ ExprSigned8( int listoffset )
 *
 * Revision 1.19  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.18  2011/08/18 23:27:54  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.16 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.17 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,7 +52,7 @@ CLASS( ObjFile )
 	long	externsym_ptr;		/* offset if file to External Name Declaration */
 	long	code_ptr;			/* offset if file to Machine Code Block */
 
-	uint	code_size;			/* size of code block */
+	UINT	code_size;			/* size of code block */
 
 END_CLASS;
 
@@ -75,8 +75,11 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.16  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.17  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.16  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.15  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
@@ -123,7 +126,7 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.11  2014/02/17 23:12:38  pauloscustodio
 * ws
@@ -170,7 +173,9 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 * 
 * Revision 1.1  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 * 
 */

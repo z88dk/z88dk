@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.114 2014-05-02 23:35:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.115 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -62,19 +62,19 @@ static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modna
 /* global variables */
 extern char Z80objhdr[];
 extern char Z80libhdr[];
-extern byte reloc_routine[];
+extern BYTE reloc_routine[];
 extern struct liblist *libraryhdr;
 extern char *reloctable, *relocptr;
 
 struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
-uint totaladdr, curroffset;
+UINT totaladdr, curroffset;
 
 void
 ReadNames( char *filename, FILE *file, long nextname, long endnames )
 {
     int scope, symbol_char;
-    byte symboltype = 0;
+    BYTE symboltype = 0;
     long value;
 	DEFINE_STR( name, MAXLINE );
 
@@ -128,7 +128,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
     int type;
     long constant;
     Expr *expr;
-    uint asmpc, patchptr, offsetptr;
+    UINT asmpc, patchptr, offsetptr;
 	DEFINE_STR( expr_text, MAXLINE );
 
     do
@@ -172,14 +172,14 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, (byte) constant );
+                    patch_byte( &patchptr, (BYTE) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, (byte) constant );  /* opcode is stored, now store signed 8bit value */
+                    patch_byte( &patchptr, (BYTE) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
@@ -192,11 +192,11 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                         if ( expr->expr_type & SYM_ADDR )
                         {
                             /* Expression contains relocatable address */
-							uint distance = offsetptr - curroffset;
+							UINT distance = offsetptr - curroffset;
 
                             if ( distance >= 0 && distance <= 255 )
                             {
-                                *relocptr++ = (byte) distance;
+                                *relocptr++ = (BYTE) distance;
                                 sizeof_reloctable++;
                             }
                             else
@@ -238,7 +238,7 @@ void
 LinkModules( void )
 {
     char fheader[9];
-    uint origin;
+    UINT origin;
     Module *first_obj_module, *last_obj_module;
 	BOOL saw_last_obj_module;
     char *obj_filename;
@@ -387,7 +387,7 @@ int
 LinkModule( char *filename, long fptr_base )
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    uint size;
+    UINT size;
     int flag = 0;
 	FILE *file;
 
@@ -711,7 +711,7 @@ void
 CreateBinFile( void )
 {
     FILE *binaryfile;
-    uint codesize, codeblock, offset;
+    UINT codesize, codeblock, offset;
     int segment;
     char *filename;
 
@@ -744,10 +744,10 @@ CreateBinFile( void )
 		/* relocate routine */
         xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
 
-        *( reloctable + 0 ) = (uint) totaladdr % 256U;
-        *( reloctable + 1 ) = (uint) totaladdr / 256U;  /* total of relocation elements */
-        *( reloctable + 2 ) = (uint) sizeof_reloctable % 256U;
-        *( reloctable + 3 ) = (uint) sizeof_reloctable / 256U; /* total size of relocation table elements */
+        *( reloctable + 0 ) = (UINT) totaladdr % 256U;
+        *( reloctable + 1 ) = (UINT) totaladdr / 256U;  /* total of relocation elements */
+        *( reloctable + 2 ) = (UINT) sizeof_reloctable % 256U;
+        *( reloctable + 3 ) = (UINT) sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 		/* write relocation table, inclusive 4 byte header */
         xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
@@ -799,14 +799,14 @@ CreateBinFile( void )
 void
 CreateLib( char *lib_filename )
 {
-	static byteArray *buffer = NULL;
-    uint Codesize;
+	static BYTEArray *buffer = NULL;
+    UINT Codesize;
     FILE *lib_file = NULL;
     FILE *obj_file = NULL;
     long fptr;
 	Module *last_module;
 
-	INIT_OBJ( byteArray, &buffer );		/* static object to read each file, not reentrant */
+	INIT_OBJ( BYTEArray, &buffer );		/* static object to read each file, not reentrant */
 
     if ( opts.verbose )
     {
@@ -839,12 +839,12 @@ CreateLib( char *lib_filename )
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
 			/* expand file buffer if needed and read object file */
-			byteArray_item(buffer, Codesize);
-			xfget_chars( obj_file, (char *) byteArray_item(buffer, 0), Codesize );
+			BYTEArray_item(buffer, Codesize);
+			xfget_chars( obj_file, (char *) BYTEArray_item(buffer, 0), Codesize );
             xfclose( obj_file );
             obj_file = NULL;
 
-            if ( memcmp( byteArray_item(buffer, 0), Z80objhdr, 8U ) != 0 )
+            if ( memcmp( BYTEArray_item(buffer, 0), Z80objhdr, 8U ) != 0 )
             {
                 error_not_obj_file( CURRENTMODULE->filename );
                 break;
@@ -868,7 +868,7 @@ CreateLib( char *lib_filename )
             xfput_uint32( lib_file, Codesize );    /* size of this module */
 
 			/* write module to library */
-            xfput_chars( lib_file, (char *) byteArray_item(buffer, 0), Codesize ); 
+            xfput_chars( lib_file, (char *) BYTEArray_item(buffer, 0), Codesize ); 
         }
     }
     FINALLY
@@ -958,14 +958,17 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.114  2014-05-02 23:35:19  pauloscustodio
+* Revision 1.115  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.114  2014/05/02 23:35:19  pauloscustodio
 * Rename startoffset, add constant for NO_ORIGIN
 *
 * Revision 1.113  2014/05/02 21:54:09  pauloscustodio
-* Use byteArray instead of Str to hold object file
+* Use BYTEArray instead of Str to hold object file
 *
 * Revision 1.112  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.111  2014/05/02 21:00:49  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -1097,7 +1100,7 @@ ReleaseLinkInfo( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.89  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called
@@ -1280,8 +1283,8 @@ ReleaseLinkInfo( void )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.47  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.46  2013/01/20 13:18:10  pauloscustodio
@@ -1380,7 +1383,9 @@ ReleaseLinkInfo( void )
 *
 * Revision 1.27  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.26  2011/08/19 10:20:32  pauloscustodio

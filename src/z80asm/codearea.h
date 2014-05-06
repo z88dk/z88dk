@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.22 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.23 2014-05-06 22:17:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,54 +32,57 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.22 2014-05-02 2
 *	next_PC() moves to the next opcode
 *	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
-extern void   set_PC( uint n );
-extern uint next_PC( void );
-extern uint get_PC( void );
-extern uint get_opcode_size( void );
+extern void   set_PC( UINT n );
+extern UINT next_PC( void );
+extern UINT get_PC( void );
+extern UINT get_opcode_size( void );
 
 /*-----------------------------------------------------------------------------
 *   reset the code area, return current size
 *----------------------------------------------------------------------------*/
 extern void reset_codearea( void );              /* set code area to zeros */
-extern uint get_codeindex( void );            /* return number of bytes appended */
+extern UINT get_codeindex( void );            /* return number of bytes appended */
 
-extern uint get_codesize( void );              /* size of all modules before current,
+extern UINT get_codesize( void );              /* size of all modules before current,
                                                    i.e. base address of current module */
-extern uint inc_codesize( uint n );         /* increment loaded codesize */
+extern UINT inc_codesize( UINT n );         /* increment loaded codesize */
 
 /*-----------------------------------------------------------------------------
 *   write code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea( FILE *stream );
-extern void fwrite_codearea_chunk( FILE *stream, uint addr, uint size );
-extern void fread_codearea( FILE *stream, uint size );        /* append to codearea */
-extern void fread_codearea_offset( FILE *stream, uint offset, uint size );  /* read to codearea at offset */
+extern void fwrite_codearea_chunk( FILE *stream, UINT addr, UINT size );
+extern void fread_codearea( FILE *stream, UINT size );        /* append to codearea */
+extern void fread_codearea_offset( FILE *stream, UINT offset, UINT size );  /* read to codearea at offset */
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_byte( uint *paddr, byte byte1 );		/* one byte */
-extern void append_byte( byte byte1 );
-extern void append_2bytes( byte byte1, byte byte2 );
+extern void  patch_byte( UINT *paddr, BYTE byte1 );		/* one byte */
+extern void append_byte( BYTE byte1 );
+extern void append_2bytes( BYTE byte1, BYTE byte2 );
 
-extern void  patch_word( uint *paddr, int word );			/* 2-byte word */
+extern void  patch_word( UINT *paddr, int word );		/* 2-byte word */
 extern void append_word( int word );
 
-extern void  patch_long( uint *paddr, long dword );		/* 4-byte long */
+extern void  patch_long( UINT *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
 /*-----------------------------------------------------------------------------
 *   get a byte at the given address
 *	the patch address is incremented after fetch
 *----------------------------------------------------------------------------*/
-extern byte get_byte( uint *paddr );
+extern BYTE get_byte( UINT *paddr );
 
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.22  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.23  2014-05-06 22:17:37  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.22  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.21  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
@@ -133,7 +136,7 @@ extern byte get_byte( uint *paddr );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.15  2014/02/11 15:10:10  pauloscustodio
 * ws
@@ -164,8 +167,8 @@ extern byte get_byte( uint *paddr );
 * Solve memory leak
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:24:28  pauloscustodio
@@ -202,7 +205,9 @@ extern byte get_byte( uint *paddr );
 *
 * Revision 1.1  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*   if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*   the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 */

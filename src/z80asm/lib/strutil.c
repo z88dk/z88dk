@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.14 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.15 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -109,7 +109,7 @@ static int char_digit(char c)
    to allow strings with '\0' characters 
    Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo
    code borrowed from GLib */
-uint str_compress_escapes( char *string )
+UINT str_compress_escapes( char *string )
 {
 	char *p, *q, *num;
 	int base = 0, max_digits, digit;
@@ -257,9 +257,9 @@ void Str_compress_escapes( Str *self )
 *   expand if needed to store at least more num_chars plus a zero byte
 *   increment size in blocks of SIZE_MASK
 *----------------------------------------------------------------------------*/
-void Str_reserve( Str *self, uint num_chars )
+void Str_reserve( Str *self, UINT num_chars )
 {
-    uint need_size, new_size;
+    UINT need_size, new_size;
 
     if ( self->alloc_str )
 	{
@@ -295,7 +295,7 @@ void Str_reserve( Str *self, uint num_chars )
 *----------------------------------------------------------------------------*/
 void Str_unreserve( Str *self )
 {
-    uint need_size;
+    UINT need_size;
 
     if ( self->alloc_str )
 	{
@@ -310,15 +310,15 @@ void Str_unreserve( Str *self )
 /*-----------------------------------------------------------------------------
 *   set / append from memory buffer, add always a zero byte after
 *----------------------------------------------------------------------------*/
-void Str_set_bytes( Str *self, char *source, uint size )
+void Str_set_bytes( Str *self, char *source, UINT size )
 {
     Str_clear( self );
     Str_append_bytes( self, source, size );
 }
 
-void Str_append_bytes( Str *self, char *source, uint size )
+void Str_append_bytes( Str *self, char *source, UINT size )
 {
-    uint num_copy;
+    UINT num_copy;
 
     /* expand string if needed and possible */
     Str_reserve( self, size );
@@ -352,13 +352,13 @@ void Str_append( Str *self, char *source )
 /*-----------------------------------------------------------------------------
 *   set / append substring, add always a zero byte after
 *----------------------------------------------------------------------------*/
-void Str_set_n( Str *self, char *source, uint count )
+void Str_set_n( Str *self, char *source, UINT count )
 {
     Str_clear( self );
     Str_append_n( self, source, count );
 }
 
-void Str_append_n( Str *self, char *source, uint count )
+void Str_append_n( Str *self, char *source, UINT count )
 {
     Str_append_bytes( self, source, MIN( count, strlen(source) ) );
 }
@@ -406,7 +406,7 @@ BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr )
     free_space = self->size - self->len;
 
     if ( free_space > 0 )
-        need_space = vsnprintf( self->str + self->len, (uint) free_space,
+        need_space = vsnprintf( self->str + self->len, (UINT) free_space,
                                 format, argptr );
 
     if ( free_space <= 0 ||					/* no free space */
@@ -463,7 +463,7 @@ void Str_append_sprintf( Str *self, char *format, ... )
 /*-----------------------------------------------------------------------------
 *   get N characters from input, return FALSE on EOF
 *----------------------------------------------------------------------------*/
-BOOL Str_getchars( Str *self, FILE *fp, uint num_chars )
+BOOL Str_getchars( Str *self, FILE *fp, UINT num_chars )
 {
     int c = EOF;
 
@@ -512,8 +512,11 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.14  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.15  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.14  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.13  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS
@@ -546,7 +549,7 @@ BOOL Str_getline( Str *self, FILE *fp )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.6  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

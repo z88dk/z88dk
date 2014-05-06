@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.17 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.18 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,13 +62,13 @@ extern Symbol *define_global_def_sym( char *name, long value );
 extern Symbol *define_local_def_sym( char *name, long value );
 
 /* define a new symbol in the local or global tabs */
-extern Symbol *define_local_sym( char *name, long value, byte type );
-extern Symbol *define_global_sym( char *name, long value, byte type );
+extern Symbol *define_local_sym( char *name, long value, BYTE type );
+extern Symbol *define_global_sym( char *name, long value, BYTE type );
 
 /* get the list of symbols that match the given type mask,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
    Selects symbols where (type & type_mask) == type_value */
-extern SymbolHash *get_all_syms( byte type_mask, byte type_value );
+extern SymbolHash *get_all_syms( BYTE type_mask, BYTE type_value );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
@@ -89,7 +89,7 @@ extern SymbolHash *static_symtab;
    b) if declared global/extern and not defined, define now
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
-extern void define_symbol( char *name, long value, byte type );
+extern void define_symbol( char *name, long value, BYTE type );
 
 /* declare a PUBLIC symbol */
 extern void declare_public_symbol( char *name );
@@ -104,8 +104,11 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.17  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.18  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.17  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.16  2014/04/27 09:08:15  pauloscustodio
 * comments

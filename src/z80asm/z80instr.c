@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.71 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.72 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -61,21 +61,21 @@ PushPop_instr( int opcode )
         case REG16_BC:
         case REG16_DE:
         case REG16_HL:
-            append_byte( (byte)( opcode + qq * 0x10 ) );
+            append_byte( (BYTE)( opcode + qq * 0x10 ) );
             break;
 
         case REG16_AF:
-            append_byte( (byte)( opcode + 0x30 ) );
+            append_byte( (BYTE)( opcode + 0x30 ) );
             break;
 
         case REG16_IX:
             append_byte( 0xDD );
-            append_byte( (byte)( opcode + 0x20 ) );
+            append_byte( (BYTE)( opcode + 0x20 ) );
             break;
 
         case REG16_IY:
             append_byte( 0xFD );
-            append_byte( (byte)( opcode + 0x20 ) );
+            append_byte( (BYTE)( opcode + 0x20 ) );
             break;
 
         default:
@@ -98,7 +98,7 @@ RET( void )
     case TK_NAME:
         if ( ( constant = CheckCondition() ) != -1 )
         {
-            append_byte( (byte)( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
+            append_byte( (BYTE)( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
         }
         else
         {
@@ -270,7 +270,7 @@ OUT( void )
 
                         default:
                             append_byte( 0xED );
-                            append_byte( (byte)( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
+                            append_byte( (BYTE)( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
                             break;
                         }
                     else
@@ -365,7 +365,7 @@ IN( void )
             {
             case 1:
                 append_byte( 0xED );
-                append_byte( (byte)( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
+                append_byte( (BYTE)( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
                 break;
 
             case -1:
@@ -445,7 +445,7 @@ RST( void )
             }
             else
             {
-                append_byte( (byte)( 0xC7 + constant ) );
+                append_byte( (BYTE)( 0xC7 + constant ) );
             }
         }
         else
@@ -468,7 +468,7 @@ void CALL_OZ( void )
 	{
         if ( ( constant > 0 ) && ( constant <= 255 ) )
         {
-            append_byte( (byte)constant ); /* 1 byte OZ parameter */
+            append_byte( (BYTE)constant ); /* 1 byte OZ parameter */
         }
         else if ( ( constant > 255 ) && ( constant <= 65535 ) )
         {
@@ -548,7 +548,7 @@ FPP( void )
 	{
         if ( ( constant > 0 ) && ( constant < 255 ) )
         {
-            append_byte( (byte)constant ); /* 1 byte OZ parameter */
+            append_byte( (BYTE)constant ); /* 1 byte OZ parameter */
         }
         else
         {
@@ -585,7 +585,7 @@ Subroutine_addr( int opcode0, int opcode )
 				listoffset = 2;
 				next_PC();
 
-				append_byte( (byte)opcode0 );
+				append_byte( (BYTE)opcode0 );
                 break;
 
             case FLAGS_Z:  /* z */
@@ -593,7 +593,7 @@ Subroutine_addr( int opcode0, int opcode )
 				listoffset = 2;
 				next_PC();
 
-                append_byte( (byte)opcode0 );
+                append_byte( (BYTE)opcode0 );
                 break;
 
             case FLAGS_NC:  /* nc */
@@ -601,7 +601,7 @@ Subroutine_addr( int opcode0, int opcode )
 				listoffset = 2;
 				next_PC();
 
-                append_byte( (byte)opcode0 );
+                append_byte( (BYTE)opcode0 );
                 break;
 
             case FLAGS_C:  /* c */
@@ -609,7 +609,7 @@ Subroutine_addr( int opcode0, int opcode )
 				listoffset = 2;
 				next_PC();
 
-                append_byte( (byte)opcode0 );
+                append_byte( (BYTE)opcode0 );
                 break;
 
             case FLAGS_PO:  /* po */
@@ -667,14 +667,14 @@ Subroutine_addr( int opcode0, int opcode )
         }
         else
         {
-            append_byte( (byte)( opcode + constant * 0x08 ) ); /* get instruction opcode */
+            append_byte( (BYTE)( opcode + constant * 0x08 ) ); /* get instruction opcode */
         }
 
         GetSym();
     }
     else
     {
-        append_byte( (byte)opcode0 );  /* JP nn, CALL nn */
+        append_byte( (BYTE)opcode0 );  /* JP nn, CALL nn */
     }
 
     ExprAddress( listoffset + 1 );
@@ -723,7 +723,7 @@ JP_instr( int opc0, int opc )
 }
 
 
-static void RelativeJump( byte opcode )
+static void RelativeJump( BYTE opcode )
 {
     long constant;
     Expr *expr;
@@ -746,7 +746,7 @@ static void RelativeJump( byte opcode )
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
-                append_byte( (byte)( constant ) );  /* opcode is stored, now store relative jump */
+                append_byte( (BYTE)( constant ) );  /* opcode is stored, now store relative jump */
             }
             else
             {
@@ -761,7 +761,7 @@ void
 JR( void )
 {
     long constant;
-	byte opcode = 0x18;			/* opcode for JR  e */
+	BYTE opcode = 0x18;			/* opcode for JR  e */
     char *startexpr;				/* scan pointer to start of address expression */
 
 	startexpr = ScanGetPos();		/* remember position of possible start of expression */
@@ -775,7 +775,7 @@ JR( void )
         case FLAGS_Z:
         case FLAGS_NC:
         case FLAGS_C:
-            opcode = (byte)( 0x20 + constant * 0x08 );
+            opcode = (BYTE)( 0x20 + constant * 0x08 );
 
             if ( GetSym() == TK_COMMA )
             {
@@ -839,7 +839,7 @@ ADD( void )
 
             if ( reg16 >= 0 && reg16 <= 3 )
             {
-                append_byte( (byte)( 0x09 + 0x10 * reg16 ) ); /* ADD HL,rr */
+                append_byte( (BYTE)( 0x09 + 0x10 * reg16 ) ); /* ADD HL,rr */
             }
             else
             {
@@ -895,7 +895,7 @@ ADD( void )
                 append_byte( 0xFD );
             }
 
-            append_byte( (byte)( 0x09 + 0x10 * reg16 ) );
+            append_byte( (BYTE)( 0x09 + 0x10 * reg16 ) );
         }
         else
         {
@@ -936,7 +936,7 @@ SBC( void )
             if ( reg16 >= 0 && reg16 <= 3 )
             {
                 append_byte( 0xED );
-                append_byte( (byte)( 0x42 + 0x10 * reg16 ) );
+                append_byte( (BYTE)( 0x42 + 0x10 * reg16 ) );
             }
             else
             {
@@ -983,7 +983,7 @@ ADC( void )
             if ( reg16 >= 0 && reg16 <= 3 )
             {
                 append_byte( 0xED );
-                append_byte( (byte)( 0x4A + 0x10 * reg16 ) );
+                append_byte( (BYTE)( 0x4A + 0x10 * reg16 ) );
             }
             else
             {
@@ -1017,7 +1017,7 @@ ArithLog8_instr( int opcode )
         switch ( reg = IndirectRegisters() )
         {
         case 2:
-            append_byte( (byte)( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
+            append_byte( (BYTE)( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
             break;
 
         case 5:                   /* xxx A,(IX+d) */
@@ -1031,7 +1031,7 @@ ArithLog8_instr( int opcode )
                 append_byte( 0xFD );    /* xxx A,(IY+d) */
             }
 
-            append_byte( (byte)( 0x80 + opcode * 0x08 + 0x06 ) );
+            append_byte( (BYTE)( 0x80 + opcode * 0x08 + 0x06 ) );
             ExprSigned8( 2 );
             break;
 
@@ -1048,7 +1048,7 @@ ArithLog8_instr( int opcode )
         {
             /* 8bit register wasn't found, try to evaluate an expression */
         case -1:
-            append_byte( (byte)( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
+            append_byte( (BYTE)( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
             ExprUnsigned8( 1 );
             break;
 
@@ -1084,7 +1084,7 @@ ArithLog8_instr( int opcode )
 
             reg &= 7;
 
-            append_byte( (byte)( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
+            append_byte( (BYTE)( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
             break;
         }
     }
@@ -1118,7 +1118,7 @@ INC( void )
         break;
 
     default:
-        append_byte( (byte)( 0x03 + reg16 * 0x10 ) );
+        append_byte( (BYTE)( 0x03 + reg16 * 0x10 ) );
         break;
     }
 }
@@ -1150,7 +1150,7 @@ DEC( void )
         break;
 
     default:
-        append_byte( (byte)( 0x0B + reg16 * 0x10 ) );
+        append_byte( (BYTE)( 0x0B + reg16 * 0x10 ) );
         break;
     }
 }
@@ -1166,7 +1166,7 @@ IncDec_8bit_instr( int opcode )
         switch ( reg = IndirectRegisters() )
         {
         case 2:
-            append_byte( (byte)( 0x30 + opcode ) ); /* INC/DEC (HL) */
+            append_byte( (BYTE)( 0x30 + opcode ) ); /* INC/DEC (HL) */
             break;
 
         case 5:         /* INC/DEC (IX+d) */
@@ -1180,7 +1180,7 @@ IncDec_8bit_instr( int opcode )
                 append_byte( 0xFD );    /* INC/DEC (IY+d) */
             }
 
-            append_byte( (byte)( 0x30 + opcode ) );
+            append_byte( (BYTE)( 0x30 + opcode ) );
             ExprSigned8( 2 );
             break;
 
@@ -1213,7 +1213,7 @@ IncDec_8bit_instr( int opcode )
             }
 
             append_byte( 0xDD );
-            append_byte( (byte)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
+            append_byte( (BYTE)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
             break;
 
         case 20:
@@ -1225,11 +1225,11 @@ IncDec_8bit_instr( int opcode )
             }
 
             append_byte( 0xFD );
-            append_byte( (byte)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
+            append_byte( (BYTE)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
             break;
 
         default:
-            append_byte( (byte)( reg * 0x08 + opcode ) ); /* INC/DEC  r */
+            append_byte( (BYTE)( reg * 0x08 + opcode ) ); /* INC/DEC  r */
             break;
         }
     }
@@ -1257,7 +1257,7 @@ BitTest_instr( int opcode )
                     {
                     case 2:
                         append_byte( 0xCB );  /* (HL)  */
-                        append_byte( (byte)( opcode + bitnumber * 0x08 + 0x06 ) );
+                        append_byte( (BYTE)( opcode + bitnumber * 0x08 + 0x06 ) );
                         break;
 
                     case 5:
@@ -1273,7 +1273,7 @@ BitTest_instr( int opcode )
 
                         append_byte( 0xCB );
                         ExprSigned8( 2 );
-                        append_byte( (byte)( opcode + bitnumber * 0x08 + 0x06 ) );
+                        append_byte( (BYTE)( opcode + bitnumber * 0x08 + 0x06 ) );
                         break;
 
                     default:
@@ -1297,7 +1297,7 @@ BitTest_instr( int opcode )
 
                     default:
                         append_byte( 0xCB );
-                        append_byte( (byte)( opcode + bitnumber * 0x08 + reg ) );
+                        append_byte( (BYTE)( opcode + bitnumber * 0x08 + reg ) );
                     }
                 }
             }
@@ -1324,7 +1324,7 @@ RotShift_instr( int opcode )
         {
         case 2:
             append_byte( 0xCB );
-            append_byte( (byte)( opcode * 0x08 + 0x06 ) );
+            append_byte( (BYTE)( opcode * 0x08 + 0x06 ) );
             break;
 
         case 5:
@@ -1340,7 +1340,7 @@ RotShift_instr( int opcode )
 
             append_byte( 0xCB );
             ExprSigned8( 2 );
-            append_byte( (byte)( opcode * 0x08 + 0x06 ) );
+            append_byte( (BYTE)( opcode * 0x08 + 0x06 ) );
             break;
 
         default:
@@ -1363,15 +1363,18 @@ RotShift_instr( int opcode )
 
         default:
             append_byte( 0xCB );
-            append_byte( (byte)( opcode * 0x08 + reg ) );
+            append_byte( (BYTE)( opcode * 0x08 + reg ) );
         }
     }
 }
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.71  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.72  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.71  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.70  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -1536,7 +1539,7 @@ RotShift_instr( int opcode )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.40  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -1570,8 +1573,8 @@ RotShift_instr( int opcode )
 * one file errors.t.
 *
 * Revision 1.33  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.32  2013/01/20 12:50:05  pauloscustodio
@@ -1615,7 +1618,9 @@ RotShift_instr( int opcode )
 *
 * Revision 1.24  2011/08/19 15:53:58  pauloscustodio
 * BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
+*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
+*	the heap is corrupted before the exception is raised.
 * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 *
 * Revision 1.23  2011/08/05 20:11:02  pauloscustodio

@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.8 2014-05-06 16:32:23 dom Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.9 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,12 +23,10 @@ typedef int BOOL;
 #define	TRUE	(!FALSE)
 #endif
 
-/* Unsigned types - defined by /usr/include/i386-linux-gnu/sys/types.h */
-typedef unsigned char byte;		/*  8-bit */
-typedef unsigned int  uint;		/* 16 or 32-bit */
-#ifndef __u_char_defined
-typedef unsigned int  ulong;	/* 32 or 64-bit */
-#endif
+/* Unsigned types */
+typedef unsigned char BYTE;		/*  8-bit */
+typedef unsigned int  UINT;		/* 16 or 32-bit */
+typedef unsigned int  ULONG;	/* 32 or 64-bit */
 
 /* MIN, MAX, ABS, CLAMP */
 #undef	MIN
@@ -51,14 +49,17 @@ typedef unsigned int  ulong;	/* 32 or 64-bit */
 
 /*
 * $Log: types.h,v $
-* Revision 1.8  2014-05-06 16:32:23  dom
+* Revision 1.9  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.8  2014/05/06 16:32:23  dom
 * Get the protector in the right place
 *
 * Revision 1.7  2014/05/05 21:51:30  dom
 * Horrible workaround.
 *
 * Revision 1.6  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.5  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
@@ -70,7 +71,7 @@ typedef unsigned int  ulong;	/* 32 or 64-bit */
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -110,8 +111,8 @@ typedef unsigned int  ulong;	/* 32 or 64-bit */
 * Include io.h only in MSVC
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (byte)
-* Replaced (unisigned int) by (uint)
+* Replaced (unsigned char) by (BYTE)
+* Replaced (unisigned int) by (UINT)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:10:32  pauloscustodio

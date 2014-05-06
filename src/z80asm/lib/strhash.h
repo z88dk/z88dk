@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.9 2014-05-02 21:34:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.10 2014-05-06 22:17:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,7 +30,7 @@ typedef struct StrHashElem
 } StrHashElem;
 
 CLASS( StrHash )
-	uint 	count;					/* number of objects */
+	UINT 	count;					/* number of objects */
 	BOOL 	ignore_case;			/* TRUE to ignore case of keys */
 	void  (*free_data)(void *);		/* function to free an element
 									   called by StrHash_remove_all() */
@@ -77,8 +77,11 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /*
 * $Log: strhash.h,v $
-* Revision 1.9  2014-05-02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to byte, uint and ulong
+* Revision 1.10  2014-05-06 22:17:38  pauloscustodio
+* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+*
+* Revision 1.9  2014/05/02 21:34:58  pauloscustodio
+* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
 *
 * Revision 1.8  2014/04/05 14:37:54  pauloscustodio
 * Added ignore_case attribute to allow case-insensitive string hashes
@@ -96,7 +99,7 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint and ulong, use uint instead of size_t.
+* Create UINT and ULONG, use UINT instead of size_t.
 *
 * Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
