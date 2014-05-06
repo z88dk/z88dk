@@ -9,7 +9,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 XLIB asm_flockfile
+XDEF asm0_flockfile
 
 LIB asm_mtx_lock
 
@@ -23,7 +26,20 @@ asm_flockfile:
    ;         carry set if failed to acquire
    ;
    ; uses  : af
-   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_flockfile:
+
    push bc
    push de
    push hl

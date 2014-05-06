@@ -1,9 +1,10 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB __stdio_verify_valid
+XLIB __stdio_verify_valid_lock
 
-LIB __p_forward_list_locate_item, error_ebadf_mc
+LIB __p_forward_list_locate_item, __stdio_lock_acquire
+LIB error_ebadf_mc, error_enolck_mc
 
 XREF __stdio_file_list_open
 
@@ -15,14 +16,14 @@ LIB __stdio_lock_file_list, __stdio_unlock_file_list
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__stdio_verify_valid:
+__stdio_verify_valid_lock:
 
-   ; Verify that FILE is on the open list
+   ; Verify that FILE is on the open list and then lock it
    ;
    ; enter : ix = FILE *
    ;
    ; exit  : ix = FILE *
-   ;         carry set, errno = ebadf if invalid FILE
+   ;         carry set, errno set if error
    ;
    ; uses  : none, except hl=-1 on error
 
@@ -44,13 +45,17 @@ ENDIF
    
    ld a,b
    or c
-   jr z, invalid_file_0
+   jr z, exit_error_ebadf
    
    dec bc
    dec bc                      ; bc = & FILE.link
    
    ld hl,__stdio_file_list_open
    call __p_forward_list_locate_item
+   
+   jr c, exit_error_ebadf
+
+   call __stdio_lock_acquire
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -66,9 +71,9 @@ ENDIF
 
    pop de
    pop bc
-   jr c, invalid_file_1
+   jr c, exit_error_enolck
 
-valid_file:
+exit_success:
 
    pop af
    pop hl
@@ -76,12 +81,15 @@ valid_file:
    or a
    ret
 
-invalid_file_0:
+exit_error_ebadf:
 
    pop de
    pop bc
+   pop af
+
+   jp error_ebadf_mc - 1
    
-invalid_file_1:
+exit_error_enolck:
 
    pop af
-   jp error_ebadf_mc - 1
+   jp error_enolck_mc - 1

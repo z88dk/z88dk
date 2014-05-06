@@ -17,8 +17,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_vfscanf
 
-LIB asm_vfscanf_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+LIB asm1_vfscanf_unlocked, __stdio_lock_release
 
 asm_vfscanf:
 
@@ -52,10 +51,25 @@ asm_vfscanf:
    ;            
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid_lock
+
+   call __stdio_verify_valid_lock
+   ret c
+
+ELSE
+
+   LIB __stdio_lock_acquire, error_enolck_mc
+   
    call __stdio_lock_acquire
    jp c, error_enolck_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   call asm_vfscanf_unlocked
+   call asm1_vfscanf_unlocked
    jp __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

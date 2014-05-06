@@ -10,6 +10,7 @@
 ; ===============================================================
 
 XLIB asm_ferror_unlocked
+XDEF asm1_ferror_unlocked
 
 asm_ferror_unlocked:
 
@@ -29,6 +30,19 @@ asm_ferror_unlocked:
    ;            z flag set
    ;
    ; uses  : af, hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_ferror_unlocked:
 
    ld a,(ix+3)
    and $08                     ; err bit only

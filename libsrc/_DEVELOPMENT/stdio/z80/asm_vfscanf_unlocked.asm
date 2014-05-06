@@ -12,7 +12,7 @@
 INCLUDE "clib_cfg.asm"
 
 XLIB asm_vfscanf_unlocked
-XDEF asm0_vfscanf_unlocked
+XDEF asm0_vfscanf_unlocked, asm1_vfscanf_unlocked
 
 LIB __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
 LIB __stdio_scanf_sm_format_pct, error_einval_zc
@@ -53,6 +53,19 @@ asm_vfscanf_unlocked:
    ;            more errors may be set by underlying driver
    ;            
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_vfscanf_unlocked:
 
    call __stdio_verify_input   ; check that input from stream is ok
    ret c                       ; if input is not possible

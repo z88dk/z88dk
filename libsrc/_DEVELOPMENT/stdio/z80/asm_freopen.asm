@@ -17,8 +17,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_freopen
 
-LIB asm0_freopen_unlocked, __stdio_verify_valid
-LIB __stdio_lock_acquire, error_enolck_zc, error_ebadf_zc
+LIB asm0_freopen_unlocked, __stdio_verify_valid_lock, error_zc
 
 asm_freopen:
 
@@ -40,13 +39,10 @@ asm_freopen:
    ;
    ; uses  : all except ix
 
-   call __stdio_verify_valid
-   jp c, error_ebadf_zc        ; if FILE is not valid
+   call __stdio_verify_valid_lock
 
-   call __stdio_lock_acquire
    jp nc, asm0_freopen_unlocked
-   
-   jp error_enolck_mc
+   jp error_zc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

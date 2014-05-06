@@ -12,7 +12,7 @@
 INCLUDE "clib_cfg.asm"
 
 XLIB asm_vfprintf_unlocked
-XDEF asm0_vfprintf_unlocked
+XDEF asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
 
 LIB __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
 LIB l_utod_hl, l_neg_hl, error_einval_zc
@@ -52,6 +52,19 @@ asm_vfprintf_unlocked:
    ;            more errors may be set by underlying driver
    ;            
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_vfprintf_unlocked:
 
    call __stdio_verify_output  ; check that output on stream is ok
    ret c                       ; if output on stream not possible

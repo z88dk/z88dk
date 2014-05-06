@@ -57,6 +57,17 @@ asm_gets_unlocked:
 
    ld ix,(__stdio_file_stdin)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid, error_zc
+
+   call __stdio_verify_valid
+   jp c, error_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 asm0_gets_unlocked:
 
    ex de,hl                    ; de = char *s

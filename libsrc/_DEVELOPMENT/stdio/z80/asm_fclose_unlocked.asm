@@ -12,6 +12,7 @@
 INCLUDE "clib_cfg.asm"
 
 XLIB asm_fclose_unlocked
+XDEF asm0_fclose_unlocked
 
 LIB asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
 LIB error_ebadf_mc, error_znc, __stdio_file_destroy, asm_free, l_jpix
@@ -52,8 +53,13 @@ IF __CLIB_OPT_MULTITHREAD & $04
 
    call __stdio_lock_file_list
 
+   ; must hang onto this lock until done
+   ; to avoid deadlock problems
+
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fclose_unlocked:
 
    ld c,ixl
    ld b,ixh
@@ -64,22 +70,10 @@ ENDIF
    ld hl,__stdio_file_list_open
    call asm_p_forward_list_remove
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-   push af                     ; save error state
-   
-   call __stdio_unlock_file_list
-
-   pop af
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   jp c, error_ebadf_mc        ; if FILE is not in open list
+   jr c, exit_error_ebadf
    
    ; close FILE
-   
+
    ld a,STDIO_MSG_CLOS
    call l_jpix                 ; deliver close message
    
@@ -92,14 +86,6 @@ ENDIF
    call __stdio_file_destroy   ; FILE returns ebadf errors
    
    ; append FILE to available list
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-   call __stdio_lock_file_list
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ld e,ixl
    ld d,ixh
@@ -124,6 +110,14 @@ ENDIF
 
 close_memstream:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    push ix
    pop hl
    
@@ -132,3 +126,15 @@ close_memstream:
    
    call asm_free
    jp error_znc
+
+exit_error_ebadf:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   jp error_ebadf_mc

@@ -14,7 +14,7 @@ defc _CLIB_CFG_ASM_ = 1
 
 ; Enables multi-threading features of the library.
 
-defc __CLIB_OPT_MULTITHREAD = 0
+defc __CLIB_OPT_MULTITHREAD = $00
 
 ; bit 0 = $01 = enable locking on heaps
 ; bit 1 = $02 = enable recursive locks on FILEs
@@ -190,6 +190,15 @@ defc __CLIB_OPT_NUM2TXT_SELECT = $00
 ; bit 1 = $02 = choose fast octal conversion
 ; bit 2 = $04 = choose fast decimal conversion
 ; bit 3 = $08 = choose fast hex conversion
+
+;;;;;;;;;;;;;;;
+; stdio options
+;;;;;;;;;;;;;;;
+
+defc __CLIB_OPT_STDIO = $00
+
+; bit 0 = $01 = stdio checks the validity of the FILE
+;               prior to every operation.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; printf converter selection

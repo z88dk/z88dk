@@ -19,8 +19,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_fread
 
-LIB asm_fread_unlocked, fread_immediate_error_enolck
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_zc
+LIB asm0_fread_unlocked, __stdio_lock_release
 
 asm_fread:
 
@@ -46,10 +45,25 @@ asm_fread:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid_lock, fread_immediate_error_ebadf
+
+   call __stdio_verify_valid_lock
+   jp c, fread_immediate_error_ebadf
+
+ELSE
+
+   LIB __stdio_lock_acquire, fread_immediate_error_enolck
+   
    call __stdio_lock_acquire
    jp c, fread_immediate_error_enolck
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   call asm_fread_unlocked
+   call asm0_fread_unlocked
    jp __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

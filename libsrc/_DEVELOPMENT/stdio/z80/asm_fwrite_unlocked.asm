@@ -12,7 +12,7 @@
 ; ===============================================================
 
 XLIB asm_fwrite_unlocked
-XDEF fwrite_immediate_error_enolck
+XDEF asm0_fwrite_unlocked
 
 LIB __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked, error_enolck_zc
 
@@ -40,6 +40,22 @@ asm_fwrite_unlocked:
    ;            carry set, errno set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   push hl
+   call __stdio_verify_valid
+   pop hl
+   
+   jr c, fwrite_immediate_error_ebadf
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fwrite_unlocked:
 
    call __stdio_verify_output  ; check that output on stream is ok
    jr c, immediate_error       ; if output on stream not possible
@@ -127,11 +143,25 @@ immediate_success:
    
    ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   XDEF fwrite_immediate_error_ebadf
+   fwrite_immediate_error_ebadf:
+
+ELSE
+
+   XDEF fwrite_immediate_error_enolck
+   LIB error_enolck_zc
+
 fwrite_immediate_error_enolck:
 
    push hl
    call error_enolck_zc
    pop hl
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 immediate_error:
 

@@ -17,8 +17,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_fclose
 
-LIB asm_fclose_unlocked
-LIB __stdio_lock_acquire, error_enolck_mc
+LIB asm0_fclose_unlocked, __stdio_lock_acquire, error_enolck_mc
 
 asm_fclose:
 
@@ -38,9 +37,28 @@ asm_fclose:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   LIB __stdio_lock_file_list, __stdio_unlock_file_list
+   
+   call __stdio_lock_file_list
+   
    call __stdio_lock_acquire
-   jp nc, asm_fclose_unlocked
+   jp nc, asm0_fclose_unlocked
+   
+   call __stdio_unlock_file_list
    jp error_enolck_mc
+
+ELSE
+
+   call __stdio_lock_acquire
+   jp nc, asm0_fclose_unlocked
+   
+   jp error_enolck_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -57,3 +75,4 @@ asm_fclose:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   

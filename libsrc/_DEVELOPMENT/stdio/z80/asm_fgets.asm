@@ -22,8 +22,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_fgets
 
-LIB asm_fgets_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_zc
+LIB asm1_fgets_unlocked, __stdio_lock_release
 
 asm_fgets:
 
@@ -61,10 +60,25 @@ asm_fgets:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid_lock, error_zc
+
+   call __stdio_verify_valid_lock
+   jp c, error_zc
+
+ELSE
+
+   LIB __stdio_lock_acquire, error_enolck_zc
+   
    call __stdio_lock_acquire
    jp c, error_enolck_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   call asm_fgets_unlocked
+   call asm1_fgets_unlocked
    jp __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

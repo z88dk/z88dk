@@ -13,8 +13,9 @@
 ; ===============================================================
 
 XLIB asm_fgetpos_unlocked
+XDEF asm0_fgetpos_unlocked
 
-LIB asm_ftell_unlocked, error_mc, error_znc
+LIB asm0_ftell_unlocked, error_mc, error_znc
 
 asm_fgetpos_unlocked:
 
@@ -35,9 +36,22 @@ asm_fgetpos_unlocked:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+   
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fgetpos_unlocked:
+
    push hl                     ; save void *pos
 
-   call asm_ftell_unlocked     ; dehl = file position
+   call asm0_ftell_unlocked    ; dehl = file position
    jp c, error_mc - 1
    
    ex de,hl                    ; de = LSW

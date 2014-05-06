@@ -10,10 +10,11 @@
 ; ===============================================================
 
 XLIB asm_fsetpos_unlocked
+XDEF asm0_fsetpos_unlocked
 
 XREF STDIO_SEEK_SET
 
-LIB asm_fseek_unlocked
+LIB asm0_fseek_unlocked
 
 asm_fsetpos_unlocked:
 
@@ -34,6 +35,19 @@ asm_fsetpos_unlocked:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fsetpos_unlocked:
+
    ld e,(hl)
    inc hl
    ld d,(hl)
@@ -45,4 +59,4 @@ asm_fsetpos_unlocked:
    ex de,hl                    ; dehl = file position
    
    ld c,STDIO_SEEK_SET
-   jp asm_fseek_unlocked
+   jp asm0_fseek_unlocked

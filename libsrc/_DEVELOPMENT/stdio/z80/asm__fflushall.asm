@@ -2,15 +2,23 @@
 INCLUDE "clib_cfg.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
+IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 XLIB asm__fflushall
 
 XREF __stdio_file_list_open
 
-LIB asm0_fflush, asm_p_forward_list_front
+LIB asm1_fflush_unlocked, asm_p_forward_list_front
+LIB __stdio_lock_acquire, __stdio_lock_release
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
 LIB __stdio_lock_file_list, __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 asm__fflushall:
 
@@ -20,8 +28,14 @@ asm__fflushall:
    ;         carry reset
    ;
    ; uses  : all
+   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
 
-   call __stdio_lock_file_list     ; acquire list lock
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ld hl,__stdio_file_list_open
 
@@ -32,12 +46,28 @@ file_loop:
    push hl
    pop ix
 
-   jp c, __stdio_unlock_file_list  ; if no more open files in list
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
 
-   push hl   
-   call asm0_fflush
-   pop hl
+   jp c, __stdio_unlock_file_list
+
+ELSE
+
+   ccf
+   ret nc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   push hl
    
+   call __stdio_lock_acquire
+   
+   call asm1_fflush_unlocked
+   
+   call __stdio_lock_release
+   
+   pop hl
    jr file_loop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

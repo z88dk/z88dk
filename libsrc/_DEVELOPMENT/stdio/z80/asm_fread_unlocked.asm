@@ -12,9 +12,9 @@
 ; ===============================================================
 
 XLIB asm_fread_unlocked
-XDEF fread_immediate_error_enolck
+XDEF asm0_fread_unlocked
 
-LIB __stdio_verify_input, __stdio_recv_input_raw_read, error_enolck_zc
+LIB __stdio_verify_input, __stdio_recv_input_raw_read
 
 asm_fread_unlocked:
 
@@ -39,6 +39,19 @@ asm_fread_unlocked:
    ;            carry set, errno set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   jr c, fread_immediate_error_ebadf
+   
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fread_unlocked:
 
    call __stdio_verify_input   ; check that input from stream is ok
    jr c, immediate_error       ; if input from stream is not possible
@@ -123,9 +136,23 @@ immediate_success:
    
    ret
 
-fread_immediate_error_enolck:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
 
-   call error_enolck_zc
+   XDEF fread_immediate_error_ebadf
+   fread_immediate_error_ebadf:
+
+ELSE
+
+   XDEF fread_immediate_error_enolck
+   LIB error_enolck_zc
+   
+   fread_immediate_error_enolck:
+   
+      call error_enolck_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 immediate_error:
 
@@ -137,4 +164,3 @@ immediate_error:
    ld b,h
    
    ret
-

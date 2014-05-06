@@ -15,17 +15,7 @@ XLIB asm_perror
 
 XREF __stdio_file_stderr, _errno
 
-LIB asm_strerror, asm_fputs_unlocked, asm_fputc_unlocked
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $02
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-LIB __stdio_lock_acquire, __stdio_lock_release, error_mc
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+LIB asm_strerror, asm0_fputs_unlocked, asm0_fputc_unlocked
 
 asm_perror:
 
@@ -40,12 +30,38 @@ asm_perror:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   call __stdio_lock_acquire   ; so that output is contiguous
-   jp c, error_mc              ; if lock could not be acquired, do not overwrite errno
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   IF __CLIB_OPT_STDIO & $01
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      LIB __stdio_verify_valid_lock
+   
+      call __stdio_verify_valid_lock
+      ret c
+   
+   ELSE
+   
+      LIB __stdio_lock_acquire, error_mc
+      
+      call __stdio_lock_acquire
+      jp c, error_mc
+
+   ENDIF
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ELSE
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   IF __CLIB_OPT_STDIO & $01
+   
+      LIB __stdio_verify_valid
+      
+      call __stdio_verify_valid
+      ret c
+   
+   ENDIF
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -59,10 +75,10 @@ ENDIF
 
    ; output user string
    
-   call asm_fputs_unlocked
+   call asm0_fputs_unlocked
    
    ld hl,separator_s
-   call asm_fputs_unlocked
+   call asm0_fputs_unlocked
 
 errno_string:
    
@@ -70,25 +86,22 @@ errno_string:
    
    ld hl,(_errno)
    call asm_strerror
-   call asm_fputs_unlocked
+   call asm0_fputs_unlocked
    
    ld e,13                     ; '\n'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   call asm_fputc_unlocked
+   LIB __stdio_lock_release
 
+   call asm0_fputc_unlocked
    jp __stdio_lock_release
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   jp asm_fputc_unlocked
+   jp asm0_fputc_unlocked
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

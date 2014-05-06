@@ -10,6 +10,7 @@
 ; ===============================================================
 
 XLIB asm_funlockfile
+XDEF asm0_funlockfile
 
 LIB asm_mtx_unlock
 
@@ -22,6 +23,19 @@ asm_funlockfile:
    ; exit  : ix = FILE *
    ;
    ; uses  : none
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_funlockfile:
 
    push af
    push bc

@@ -2,7 +2,7 @@
 XLIB __stdio_verify_input
 
 LIB error_eacces_mc, error_mc
-LIB asm0_fflush_unlocked
+LIB asm1_fflush_unlocked
 
 __stdio_verify_input:
 
@@ -19,8 +19,8 @@ __stdio_verify_input:
    
    ld a,(ix+3)                 ; a = state_flags_0
    
-   and $98                     ; keep read, error, eof flags
-   cp $80                      ; compare R=1, ERR=0, EOF=0
+   and $58                     ; keep read, error, eof flags
+   cp $40                      ; compare R=1, ERR=0, EOF=0
    
    jr nz, errors
    
@@ -33,7 +33,7 @@ __stdio_verify_input:
    push de
    push hl
    
-   call asm0_fflush_unlocked
+   call asm1_fflush_unlocked
    
    pop hl
    pop de

@@ -10,11 +10,11 @@
 ; ===============================================================
 
 XLIB asm_ftell_unlocked
-XDEF ftell_immediate_error_enolck
+XDEF asm0_ftell_unlocked
 
 XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
 
-LIB l_jpix, error_mc, l_decu_dehl, error_enolck_mc
+LIB l_jpix, error_mc, l_decu_dehl
 
 asm_ftell_unlocked:
 
@@ -33,6 +33,19 @@ asm_ftell_unlocked:
    ;           carry set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   jr c, ftell_immediate_error_ebadf
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_ftell_unlocked:
 
    ld de,0
    ld l,e
@@ -57,9 +70,23 @@ asm_ftell_unlocked:
    ret nz
    jp l_decu_dehl              ; if unget char present adjust position
 
-ftell_immediate_error_enolck:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
 
-   call error_enolck_mc
+   XDEF ftell_immediate_error_ebadf
+   ftell_immediate_error_ebadf:
+
+ELSE
+
+   XDEF ftell_immediate_error_enolck
+   LIB error_enolck_mc
+   
+   ftell_immediate_error_enolck:
+   
+      call error_enolck_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 immediate_error:
 

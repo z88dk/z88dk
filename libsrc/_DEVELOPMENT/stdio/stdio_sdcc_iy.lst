@@ -103,6 +103,7 @@ stdio/z80/__stdio_varg
 stdio/z80/__stdio_verify_input
 stdio/z80/__stdio_verify_output
 stdio/z80/__stdio_verify_valid
+stdio/z80/__stdio_verify_valid_lock
 stdio/z80/drivers/memstream/__stdio_memstream_driver
 stdio/z80/input_helpers/__stdio_input_sm_fgets
 stdio/z80/input_helpers/__stdio_input_sm_getdelim

@@ -1,11 +1,11 @@
 
 XLIB __stdio_lock_release
 
-LIB asm_funlockfile
+LIB asm0_funlockfile
 
 __stdio_lock_release:
 
-   jp asm_funlockfile
+   jp asm0_funlockfile
 
 ;defc __stdio_lock_release = asm_funlockfile
 

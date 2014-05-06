@@ -9,8 +9,9 @@
 ; ===============================================================
 
 XLIB asm_rewind_unlocked
+XDEF asm0_rewind_unlocked
 
-LIB asm_fseek_unlocked
+LIB asm0_fseek_unlocked
 
 XREF STDIO_SEEK_SET
 
@@ -32,6 +33,19 @@ asm_rewind_unlocked:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+   
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_rewind_unlocked:
+
    res 3,(ix+3)                ; clear stream error state
    
    ld hl,0
@@ -39,4 +53,4 @@ asm_rewind_unlocked:
    ld d,h                      ; dehl = 0L
    
    ld c,STDIO_SEEK_SET
-   jp asm_fseek_unlocked       ; rewind stream
+   jp asm0_fseek_unlocked      ; rewind stream

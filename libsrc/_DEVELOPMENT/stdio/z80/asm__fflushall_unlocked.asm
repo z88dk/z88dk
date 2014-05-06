@@ -5,7 +5,7 @@ XLIB asm__fflushall_unlocked
 
 XREF __stdio_file_list_open
 
-LIB asm0_fflush_unlocked, asm_p_forward_list_front
+LIB asm1_fflush_unlocked, asm_p_forward_list_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -49,13 +49,14 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ELSE
 
    ccf
-   ret nc                      ; if no more open files in list
+   ret nc                          ; if no more open files in list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   push hl   
-   call asm0_fflush_unlocked
-   pop hl
+   push hl
    
+   call asm1_fflush_unlocked
+   
+   pop hl
    jr file_loop

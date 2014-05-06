@@ -24,8 +24,7 @@ XLIB asm_gets
 
 XREF __stdio_file_stdin
 
-LIB asm0_gets_unlocked
-LIB __stdio_lock_acquire, error_enolck_zc, __stdio_lock_release
+LIB asm0_gets_unlocked, __stdio_lock_release
 
 asm_gets:
 
@@ -62,9 +61,24 @@ asm_gets:
    ; uses  : all except ix
 
    ld ix,(__stdio_file_stdin)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid_lock, error_zc
+
+   call __stdio_verify_valid_lock
+   jp c, error_zc
+
+ELSE
+
+   LIB __stdio_lock_acquire, error_enolck_zc
    
    call __stdio_lock_acquire
    jp c, error_enolck_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    call asm0_gets_unlocked
    jp __stdio_lock_release

@@ -10,6 +10,7 @@
 ; ===============================================================
 
 XLIB asm_fputc_unlocked
+XDEF asm0_fputc_unlocked
 
 LIB error_mc, __stdio_verify_output, __stdio_send_output_raw_chars_unchecked
 
@@ -31,6 +32,19 @@ asm_fputc_unlocked:
    ;            carry set, errno set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fputc_unlocked:
 
    call __stdio_verify_output  ; check that output on stream is ok
    ret c

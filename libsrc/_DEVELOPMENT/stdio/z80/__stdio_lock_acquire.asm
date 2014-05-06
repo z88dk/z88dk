@@ -1,11 +1,11 @@
 
 XLIB __stdio_lock_acquire
 
-LIB asm_flockfile
+LIB asm0_flockfile
 
 __stdio_lock_acquire:
 
-   jp asm_flockfile
+   jp asm0_flockfile
 
 ;defc __stdio_lock_acquire = asm_flockfile
 

@@ -10,6 +10,7 @@
 ; ===============================================================
 
 XLIB asm_ungetc_unlocked
+XDEF asm0_ungetc_unlocked
 
 LIB __stdio_verify_input, error_mc
 
@@ -32,6 +33,19 @@ asm_ungetc_unlocked:
    ;
    ; uses  : all except ix
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_ungetc_unlocked:
+
    ld a,h
    or a
    jp nz, error_mc             ; if hl > 255
@@ -42,8 +56,8 @@ asm_ungetc_unlocked:
    ld (ix+6),l                 ; store ungetc
    
    ld a,(ix+3)
-   and $88                     ; examine R and ERR flags
-   cp $80                      ; open for reading and ERR = 0 ?
+   and $48                     ; examine R and ERR flags
+   cp $40                      ; open for reading and ERR = 0 ?
    jp nz, error_mc
    
    res 4,(ix+3)                ; clear eof

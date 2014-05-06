@@ -14,7 +14,7 @@ XDEF asm0_putchar_unlocked
 
 XREF __stdio_file_stdout
 
-LIB asm_fputc_unlocked
+LIB asm0_fputc_unlocked
 
 asm_putchar_unlocked:
 
@@ -36,7 +36,18 @@ asm_putchar_unlocked:
 
    ld ix,(__stdio_file_stdout)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 asm0_putchar_unlocked:
    
    ld e,l
-   jp asm_fputc_unlocked
+   jp asm0_fputc_unlocked

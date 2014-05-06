@@ -15,7 +15,7 @@
 ; ===============================================================
 
 XLIB asm_fgets_unlocked
-XDEF asm0_fgets_unlocked
+XDEF asm0_fgets_unlocked, asm1_fgets_unlocked
 
 LIB error_zc, __stdio_recv_input_raw_getc
 LIB __stdio_verify_input, __stdio_input_sm_fgets, __stdio_recv_input_raw_eatc
@@ -55,6 +55,19 @@ asm_fgets_unlocked:
    ;            carry set, errno set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   jp c, error_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_fgets_unlocked:
 
    ld hl,__stdio_input_sm_fgets  ; use the fgets state machine to qualify stream chars
 

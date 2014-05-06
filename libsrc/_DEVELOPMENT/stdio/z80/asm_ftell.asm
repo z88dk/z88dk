@@ -17,8 +17,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 XLIB asm_ftell
 
-LIB asm_ftell_unlocked, ftell_immediate_error_enolck
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+LIB asm0_ftell_unlocked, __stdio_lock_release
 
 asm_ftell:
 
@@ -37,11 +36,25 @@ asm_ftell:
    ;           carry set
    ;
    ; uses  : all except ix
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
 
+   LIB __stdio_verify_valid_lock, ftell_immediate_error_ebadf
+
+   call __stdio_verify_valid_lock
+   jp c, ftell_immediate_error_ebadf
+
+ELSE
+
+   LIB __stdio_lock_acquire, ftell_immediate_error_enolck
+   
    call __stdio_lock_acquire
    jp c, ftell_immediate_error_enolck
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   call asm_ftell_unlocked
+   call asm0_ftell_unlocked
    jp __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -16,7 +16,7 @@ XDEF asm0_freopen_unlocked
 
 LIB __stdio_verify_valid, l_jpix, __stdio_file_destroy
 LIB __stdio_parse_permission, asm_open, asm0_fopen_unlocked
-LIB error_ebadf_zc, error_eacces_zc, error_einval_zc, error_zc
+LIB error_eacces_zc, error_einval_zc, error_zc
 
 XREF STDIO_MSG_CLOS
 
@@ -45,7 +45,7 @@ asm_freopen_unlocked:
    ; * freopen on memstreams
 
    call __stdio_verify_valid
-   jp c, error_ebadf_zc        ; if FILE is not valid
+   jp c, error_zc              ; if FILE is not valid
 
 asm0_freopen_unlocked:
 
@@ -82,13 +82,14 @@ asm0_freopen_unlocked:
    
    push bc                     ; save mode byte
    
+   ld b,0
    call asm_open               ; pass details to target open()
    
    pop bc                      ; c = mode byte
    jp c, error_zc              ; if open failed
    
    ;  c = mode byte
-   ; de = driver_function
+   ; de = driver_function from target open()
    
    push ix
    pop hl

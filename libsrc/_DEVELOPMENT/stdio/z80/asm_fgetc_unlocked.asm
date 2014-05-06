@@ -10,6 +10,7 @@
 ; ===============================================================
 
 XLIB asm_fgetc_unlocked
+XDEF asm0_fgetc_unlocked
 
 LIB __stdio_verify_input, __stdio_recv_input_raw_getc, error_mc
 
@@ -30,6 +31,19 @@ asm_fgetc_unlocked:
    ;            carry set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fgetc_unlocked:
 
    call __stdio_verify_input   ; check that input from stream is ok
    ret c

@@ -15,7 +15,7 @@
 ; ===============================================================
 
 XLIB asm_fflush_unlocked
-XDEF asm0_fflush_unlocked
+XDEF asm0_fflush_unlocked, asm1_fflush_unlocked
 
 XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK, STDIO_MSG_FLSH
 
@@ -45,6 +45,19 @@ asm_fflush_unlocked:
    jp z, asm__fflushall_unlocked
 
 asm0_fflush_unlocked:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+   
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_fflush_unlocked:
 
    bit 3,(ix+3)
    jp nz, error_mc             ; if stream is in an error state

@@ -9,7 +9,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 XLIB asm_clearerr_unlocked
+XDEF asm1_clearerr_unlocked
 
 LIB error_znc
 
@@ -18,10 +21,31 @@ asm_clearerr_unlocked:
    ; enter : ix = FILE *
    ; 
    ; exit  : ix = FILE *
-   ;         hl = 0
-   ;         carry reset
    ;
-   ; uses  : af
+   ;         success
+   ;
+   ;            hl = 0
+   ;            carry reset
+   ;
+   ;         fail if lock could not be acquired
+   ;
+   ;            hl = -1
+   ;            carry set, errno set
+   ;
+   ; uses  : af, hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm1_clearerr_unlocked:
 
    ld a,(ix+3)
    and $e7                     ; clear eof and err bits

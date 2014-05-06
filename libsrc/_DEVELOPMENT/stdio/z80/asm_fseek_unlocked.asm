@@ -19,6 +19,7 @@
 ; ===============================================================
 
 XLIB asm_fseek_unlocked
+XDEF asm0_fseek_unlocked
 
 XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
 
@@ -43,6 +44,19 @@ asm_fseek_unlocked:
    ;           carry set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_fseek_unlocked:
 
    bit 3,(ix+3)
    jp nz, error_mc             ; if stream is in an error state

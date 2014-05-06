@@ -24,6 +24,7 @@
 ; ===============================================================
 
 XLIB asm_getdelim_unlocked
+XDEF asm0_getdelim_unlocked
 
 LIB error_mc, asm_b_vector_resize, l_ltu_bc_hl, __stdio_recv_input_raw_getc
 LIB __stdio_verify_input, __stdio_recv_input_raw_eatc, __stdio_input_sm_getdelim
@@ -51,6 +52,19 @@ asm_getdelim_unlocked:
    ;            carry set
    ;
    ; uses  : all except ix
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid
+
+   call __stdio_verify_valid
+   ret c
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+asm0_getdelim_unlocked:
 
    call __stdio_verify_input   ; check if input from stream is ok
    ret c                       ; if stream not readable

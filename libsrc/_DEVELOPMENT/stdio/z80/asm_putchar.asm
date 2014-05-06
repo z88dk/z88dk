@@ -19,8 +19,7 @@ XLIB asm_putchar
 
 XREF __stdio_file_stdout
 
-LIB asm0_putchar_unlocked
-LIB __stdio_lock_acquire, __stdio_lock_release, error_enolck_mc
+LIB asm0_putchar_unlocked, __stdio_lock_release
 
 asm_putchar:
 
@@ -42,8 +41,23 @@ asm_putchar:
 
    ld ix,(__stdio_file_stdout)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO & $01
+
+   LIB __stdio_verify_valid_lock
+
+   call __stdio_verify_valid_lock
+   ret c
+
+ELSE
+
+   LIB __stdio_lock_acquire, error_enolck_mc
+   
    call __stdio_lock_acquire
    jp c, error_enolck_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    call asm0_putchar_unlocked
    jp __stdio_lock_release
