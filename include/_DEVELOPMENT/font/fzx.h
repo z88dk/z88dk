@@ -329,6 +329,97 @@ extern void __LIB__ _ff_dkud1_UpnUp2(void);
 #endif
 
 
+// FZX FONTS FROM UNIVERSUM'S DESKTOP
+// http://www.worldofspectrum.org/infoseekid.cgi?id=0016682
+
+#if __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_dkud2_Academy;
+extern struct fzx_font *ff_dkud2_Belegost1;
+extern struct fzx_font *ff_dkud2_Belegost2;
+extern struct fzx_font *ff_dkud2_BigBold;
+extern struct fzx_font *ff_dkud2_UltraBold;
+extern struct fzx_font *ff_dkud2_UpcaseBold;
+extern struct fzx_font *ff_dkud2_Cobra;
+extern struct fzx_font *ff_dkud2_Crash;
+extern struct fzx_font *ff_dkud2_doc;
+extern struct fzx_font *ff_dkud2_Eclipse;
+extern struct fzx_font *ff_dkud2_Extra;
+extern struct fzx_font *ff_dkud2_Hijack;
+extern struct fzx_font *ff_dkud2_Italika;
+extern struct fzx_font *ff_dkud2_Just6;
+extern struct fzx_font *ff_dkud2_Locomotion;
+extern struct fzx_font *ff_dkud2_Midnight;
+extern struct fzx_font *ff_dkud2_MoonAlert;
+extern struct fzx_font *ff_dkud2_Nether;
+extern struct fzx_font *ff_dkud2_Neverend;
+extern struct fzx_font *ff_dkud2_Roman;
+extern struct fzx_font *ff_dkud2_Script1;
+extern struct fzx_font *ff_dkud2_Script2;
+extern struct fzx_font *ff_dkud2_Standard;
+extern struct fzx_font *ff_dkud2_Tomahawk;
+extern struct fzx_font *ff_dkud2_Wildvest;
+extern struct fzx_font *ff_dkud2_Winter;
+
+#else
+
+#define ff_dkud2_Academy       ((struct fzx_font *)(_ff_dkud2_Academy))
+#define ff_dkud2_Belegost1     ((struct fzx_font *)(_ff_dkud2_Belegost1))
+#define ff_dkud2_Belegost2     ((struct fzx_font *)(_ff_dkud2_Belegost2))
+#define ff_dkud2_BigBold       ((struct fzx_font *)(_ff_dkud2_BigBold))
+#define ff_dkud2_UltraBold     ((struct fzx_font *)(_ff_dkud2_UltraBold))
+#define ff_dkud2_UpcaseBold    ((struct fzx_font *)(_ff_dkud2_UpcaseBold))
+#define ff_dkud2_Cobra         ((struct fzx_font *)(_ff_dkud2_Cobra))
+#define ff_dkud2_Crash         ((struct fzx_font *)(_ff_dkud2_Crash))
+#define ff_dkud2_doc           ((struct fzx_font *)(_ff_dkud2_doc))
+#define ff_dkud2_Eclipse       ((struct fzx_font *)(_ff_dkud2_Eclipse))
+#define ff_dkud2_Extra         ((struct fzx_font *)(_ff_dkud2_Extra))
+#define ff_dkud2_Hijack        ((struct fzx_font *)(_ff_dkud2_Hijack))
+#define ff_dkud2_Italika       ((struct fzx_font *)(_ff_dkud2_Italika))
+#define ff_dkud2_Just6         ((struct fzx_font *)(_ff_dkud2_Just6))
+#define ff_dkud2_Locomotion    ((struct fzx_font *)(_ff_dkud2_Locomotion))
+#define ff_dkud2_Midnight      ((struct fzx_font *)(_ff_dkud2_Midnight))
+#define ff_dkud2_MoonAlert     ((struct fzx_font *)(_ff_dkud2_MoonAlert))
+#define ff_dkud2_Nether        ((struct fzx_font *)(_ff_dkud2_Nether))
+#define ff_dkud2_Neverend      ((struct fzx_font *)(_ff_dkud2_Neverend))
+#define ff_dkud2_Roman         ((struct fzx_font *)(_ff_dkud2_Roman))
+#define ff_dkud2_Script1       ((struct fzx_font *)(_ff_dkud2_Script1))
+#define ff_dkud2_Script2       ((struct fzx_font *)(_ff_dkud2_Script2))
+#define ff_dkud2_Standard      ((struct fzx_font *)(_ff_dkud2_Standard))
+#define ff_dkud2_Tomahawk      ((struct fzx_font *)(_ff_dkud2_Tomahawk))
+#define ff_dkud2_Wildvest      ((struct fzx_font *)(_ff_dkud2_Wildvest))
+#define ff_dkud2_Winter        ((struct fzx_font *)(_ff_dkud2_Winter))
+
+extern void __LIB__ _ff_dkud2_Academy(void);
+extern void __LIB__ _ff_dkud2_Belegost1(void);
+extern void __LIB__ _ff_dkud2_Belegost2(void);
+extern void __LIB__ _ff_dkud2_BigBold(void);
+extern void __LIB__ _ff_dkud2_UltraBold(void);
+extern void __LIB__ _ff_dkud2_UpcaseBold(void);
+extern void __LIB__ _ff_dkud2_Cobra(void);
+extern void __LIB__ _ff_dkud2_Crash(void);
+extern void __LIB__ _ff_dkud2_doc(void);
+extern void __LIB__ _ff_dkud2_Eclipse(void);
+extern void __LIB__ _ff_dkud2_Extra(void);
+extern void __LIB__ _ff_dkud2_Hijack(void);
+extern void __LIB__ _ff_dkud2_Italika(void);
+extern void __LIB__ _ff_dkud2_Just6(void);
+extern void __LIB__ _ff_dkud2_Locomotion(void);
+extern void __LIB__ _ff_dkud2_Midnight(void);
+extern void __LIB__ _ff_dkud2_MoonAlert(void);
+extern void __LIB__ _ff_dkud2_Nether(void);
+extern void __LIB__ _ff_dkud2_Neverend(void);
+extern void __LIB__ _ff_dkud2_Roman(void);
+extern void __LIB__ _ff_dkud2_Script1(void);
+extern void __LIB__ _ff_dkud2_Script2(void);
+extern void __LIB__ _ff_dkud2_Standard(void);
+extern void __LIB__ _ff_dkud2_Tomahawk(void);
+extern void __LIB__ _ff_dkud2_Wildvest(void);
+extern void __LIB__ _ff_dkud2_Winter(void);
+
+#endif
+
+
 // FZX FONTS BY INDEPENDENT DESIGNERS
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
