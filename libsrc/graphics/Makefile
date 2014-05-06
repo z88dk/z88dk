@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.32 2013-03-08 13:40:20 stefano Exp $
+# $Id: Makefile,v 1.33 2014-05-06 06:01:47 stefano Exp $
 
 
 lx11:
@@ -40,6 +40,7 @@ clean:
 	$(RM) nascom/*.o
 	$(RM) osca/*.o
 	$(RM) oz/*.o
+	$(RM) p2000/*.o
 	$(RM) pc6001/*.o
 	$(RM) sam/*.o
 	$(RM) spectrum/*.o

@@ -29,6 +29,8 @@ main()
 {
 	char x, y, temp;
 
+	clg();
+
 	for(y=0 ; y<7 ; y++)
 	{
 		temp = smile[y+2];

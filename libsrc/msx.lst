@@ -39,7 +39,7 @@ graphics/msx/xorpixl
 graphics/msx/pointxy
 graphics/msx/fill
 graphics/getsprite
-graphics/msx/putsprite
+graphics/putsprite2
 graphics/msx/bksave
 graphics/msx/bkrestore
 graphics/liner

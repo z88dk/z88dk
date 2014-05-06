@@ -2,26 +2,26 @@
 ;       Generic pseudo graphics routines for text-only platforms
 ;	Version for the 2x3 graphics symbols
 ;
-;       Written by Stefano Bodrato 19/12/2006
+;       Written by Stefano Bodrato 05/09/2007
 ;
 ;
-;       Reset pixel at (x,y) coordinate.
+;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.4 2014-05-06 06:01:48 stefano Exp $
+;	$Id: pointxy.asm,v 1.1 2014-05-06 06:01:48 stefano Exp $
 ;
 
 
 			INCLUDE	"graphics/text6/textgfx.inc"
 
-			XLIB	respixel
+			XLIB	pointxy
 
 			LIB	textpixl
 			LIB	div3
-			XREF	coords
+			XREF	COORDS
 			XREF	base_graphics
 
-.respixel
+.pointxy
 			ld	a,h
 			cp	maxx
 			ret	nc
@@ -31,10 +31,14 @@
 
 			dec	a
 			dec	a
-
-			ld	(coords),hl
 			
 			push	bc
+			push	de
+			push	hl			
+			
+			ld	(COORDS),hl
+			
+			;push	bc
 
 			ld	c,a	; y
 			ld	b,h	; x
@@ -45,7 +49,7 @@
 			ld	d,0
 			ld	e,c
 			inc	e
-			adc	hl,de
+			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			
@@ -70,7 +74,7 @@
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero
+.r_zero			ld	d,0
 			ld	e,c
 			add	hl,de
 
@@ -122,17 +126,12 @@
 			jr	z,evenrow
 			add	a,a		; move down the bit
 .evenrow
-			cpl
 			and	c
-
-			ld	hl,textpixl
-			ld	d,0
-			ld	e,a
-			add	hl,de
-			ld	a,(hl)
-
-			pop	hl
-			ld	(hl),a
 			
 			pop	bc
+			
+			pop	hl
+			pop	de
+			pop	bc
+			
 			ret

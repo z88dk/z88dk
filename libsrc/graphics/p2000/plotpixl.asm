@@ -1,27 +1,26 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
+;       Philips P2000 pseudo graphics routines
 ;	Version for the 2x3 graphics symbols
 ;
-;       Written by Stefano Bodrato 19/12/2006
+;       Stefano Bodrato 2014
 ;
 ;
-;       Reset pixel at (x,y) coordinate.
+;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.4 2014-05-06 06:01:48 stefano Exp $
+;	$Id: plotpixl.asm,v 1.1 2014-05-06 06:01:48 stefano Exp $
 ;
 
 
 			INCLUDE	"graphics/text6/textgfx.inc"
 
-			XLIB	respixel
+			XLIB	plotpixel
 
-			LIB	textpixl
 			LIB	div3
 			XREF	coords
 			XREF	base_graphics
 
-.respixel
+.plotpixel
 			ld	a,h
 			cp	maxx
 			ret	nc
@@ -31,7 +30,7 @@
 
 			dec	a
 			dec	a
-
+			
 			ld	(coords),hl
 			
 			push	bc
@@ -45,7 +44,7 @@
 			ld	d,0
 			ld	e,c
 			inc	e
-			adc	hl,de
+			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			
@@ -56,47 +55,29 @@
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-			ld	hl,0BCAh
+			ld    hl,(base_graphics)
+			inc hl
 			ld	b,a		; keep y/3
 			and	a
 			jr	z,r_zero
-		
-			ld	hl,$80a
-			dec	a
-			jr	z,r_zero
-			ld	de,64
+
+			ld	de,80
 .r_loop
 			add	hl,de
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero
+.r_zero     ld	d,0
 			ld	e,c
 			add	hl,de
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld	a,(hl)		; get current symbol from screen
+			sub 32
 			ld	e,a		; ..and its copy
-
-			push	hl		; char address
-			push	bc		; keep y/3
-			ld	hl,textpixl
-			ld	e,0
-			ld	b,64		; whole symbol table size
-.ckmap			cp	(hl)		; compare symbol with the one in map
-			jr	z,chfound
-			inc	hl
-			inc	e
-			djnz	ckmap
-			ld	e,0
-.chfound		ld	a,e
-			pop	bc		; restore y/3 in b
-			pop	hl		; char address
 			
 			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
-			
-			ld	c,a		; keep the symbol
 			
 			ld	a,l
 			inc	a
@@ -122,14 +103,12 @@
 			jr	z,evenrow
 			add	a,a		; move down the bit
 .evenrow
-			cpl
-			and	c
-
-			ld	hl,textpixl
-			ld	d,0
-			ld	e,a
-			add	hl,de
-			ld	a,(hl)
+			and  @11011111	; Character generator gap
+			jr  nz,nobug
+			or   @01000000  ;
+.nobug
+			or	e
+			add 32
 
 			pop	hl
 			ld	(hl),a
