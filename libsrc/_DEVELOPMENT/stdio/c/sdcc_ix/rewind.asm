@@ -7,7 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF rewind:
+XDEF rewind
+
+rewind:
 
    pop af
    pop bc
