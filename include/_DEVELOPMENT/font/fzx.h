@@ -420,6 +420,158 @@ extern void __LIB__ _ff_dkud2_Winter(void);
 #endif
 
 
+// FZX FONTS FROM KLUB UZIVATELU DESKTOPU 3
+// http://www.worldofspectrum.org/infoseekid.cgi?id=0023577
+
+#if __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_dkud3_Azbuka;
+extern struct fzx_font *ff_dkud3_AzbukaBold;
+extern struct fzx_font *ff_dkud3_Belegost3;
+extern struct fzx_font *ff_dkud3_CobraLight;
+extern struct fzx_font *ff_dkud3_CobraTall;
+extern struct fzx_font *ff_dkud3_DeutchBold;
+extern struct fzx_font *ff_dkud3_TrnsDeutch;
+extern struct fzx_font *ff_dkud3_Echo;
+extern struct fzx_font *ff_dkud3_Erotic;
+extern struct fzx_font *ff_dkud3_Lovely;
+extern struct fzx_font *ff_dkud3_NisaSport1;
+extern struct fzx_font *ff_dkud3_NisaSport2;
+extern struct fzx_font *ff_dkud3_Notes;
+extern struct fzx_font *ff_dkud3_Pearl;
+extern struct fzx_font *ff_dkud3_Pipe;
+extern struct fzx_font *ff_dkud3_PipePlus;
+extern struct fzx_font *ff_dkud3_QuaUni;
+extern struct fzx_font *ff_dkud3_Script;
+extern struct fzx_font *ff_dkud3_Small1;
+extern struct fzx_font *ff_dkud3_Small2;
+extern struct fzx_font *ff_dkud3_SteAff;
+extern struct fzx_font *ff_dkud3_Times1;
+extern struct fzx_font *ff_dkud3_Times2;
+extern struct fzx_font *ff_dkud3_Western;
+extern struct fzx_font *ff_dkud3_Windows;
+extern struct fzx_font *ff_dkud3_WingCmdr1;
+extern struct fzx_font *ff_dkud3_WingCmdr2;
+
+#else
+
+#define ff_dkud3_Azbuka        ((struct fzx_font *)(_ff_dkud3_Azbuka))
+#define ff_dkud3_AzbukaBold    ((struct fzx_font *)(_ff_dkud3_AzbukaBold))
+#define ff_dkud3_Belegost3     ((struct fzx_font *)(_ff_dkud3_Belegost3))
+#define ff_dkud3_CobraLight    ((struct fzx_font *)(_ff_dkud3_CobraLight))
+#define ff_dkud3_CobraTall     ((struct fzx_font *)(_ff_dkud3_CobraTall))
+#define ff_dkud3_DeutchBold    ((struct fzx_font *)(_ff_dkud3_DeutchBold))
+#define ff_dkud3_TrnsDeutch    ((struct fzx_font *)(_ff_dkud3_TrnsDeutch))
+#define ff_dkud3_Echo          ((struct fzx_font *)(_ff_dkud3_Echo))
+#define ff_dkud3_Erotic        ((struct fzx_font *)(_ff_dkud3_Erotic))
+#define ff_dkud3_Lovely        ((struct fzx_font *)(_ff_dkud3_Lovely))
+#define ff_dkud3_NisaSport1    ((struct fzx_font *)(_ff_dkud3_NisaSport1))
+#define ff_dkud3_NisaSport2    ((struct fzx_font *)(_ff_dkud3_NisaSport2))
+#define ff_dkud3_Notes         ((struct fzx_font *)(_ff_dkud3_Notes))
+#define ff_dkud3_Pearl         ((struct fzx_font *)(_ff_dkud3_Pearl))
+#define ff_dkud3_Pipe          ((struct fzx_font *)(_ff_dkud3_Pipe))
+#define ff_dkud3_PipePlus      ((struct fzx_font *)(_ff_dkud3_PipePlus))
+#define ff_dkud3_QuaUni        ((struct fzx_font *)(_ff_dkud3_QuaUni))
+#define ff_dkud3_Script        ((struct fzx_font *)(_ff_dkud3_Script))
+#define ff_dkud3_Small1        ((struct fzx_font *)(_ff_dkud3_Small1))
+#define ff_dkud3_Small2        ((struct fzx_font *)(_ff_dkud3_Small2))
+#define ff_dkud3_SteAff        ((struct fzx_font *)(_ff_dkud3_SteAff))
+#define ff_dkud3_Times1        ((struct fzx_font *)(_ff_dkud3_Times1))
+#define ff_dkud3_Times2        ((struct fzx_font *)(_ff_dkud3_Times2))
+#define ff_dkud3_Western       ((struct fzx_font *)(_ff_dkud3_Western))
+#define ff_dkud3_Windows       ((struct fzx_font *)(_ff_dkud3_Windows))
+#define ff_dkud3_WingCmdr1     ((struct fzx_font *)(_ff_dkud3_WingCmdr1))
+#define ff_dkud3_WingCmdr2     ((struct fzx_font *)(_ff_dkud3_WingCmdr2))
+
+extern void __LIB__ _ff_dkud3_Azbuka(void);
+extern void __LIB__ _ff_dkud3_AzbukaBold(void);
+extern void __LIB__ _ff_dkud3_Belegost3(void);
+extern void __LIB__ _ff_dkud3_CobraLight(void);
+extern void __LIB__ _ff_dkud3_CobraTall(void);
+extern void __LIB__ _ff_dkud3_DeutchBold(void);
+extern void __LIB__ _ff_dkud3_TrnsDeutch(void);
+extern void __LIB__ _ff_dkud3_Echo(void);
+extern void __LIB__ _ff_dkud3_Erotic(void);
+extern void __LIB__ _ff_dkud3_Lovely(void);
+extern void __LIB__ _ff_dkud3_NisaSport1(void);
+extern void __LIB__ _ff_dkud3_NisaSport2(void);
+extern void __LIB__ _ff_dkud3_Notes(void);
+extern void __LIB__ _ff_dkud3_Pearl(void);
+extern void __LIB__ _ff_dkud3_Pipe(void);
+extern void __LIB__ _ff_dkud3_PipePlus(void);
+extern void __LIB__ _ff_dkud3_QuaUni(void);
+extern void __LIB__ _ff_dkud3_Script(void);
+extern void __LIB__ _ff_dkud3_Small1(void);
+extern void __LIB__ _ff_dkud3_Small2(void);
+extern void __LIB__ _ff_dkud3_SteAff(void);
+extern void __LIB__ _ff_dkud3_Times1(void);
+extern void __LIB__ _ff_dkud3_Times2(void);
+extern void __LIB__ _ff_dkud3_Western(void);
+extern void __LIB__ _ff_dkud3_Windows(void);
+extern void __LIB__ _ff_dkud3_WingCmdr1(void);
+extern void __LIB__ _ff_dkud3_WingCmdr2(void);
+
+#endif
+
+
+// FZX FONTS FROM DESKTOP FONT EDITOR
+// http://www.worldofspectrum.org/infoseekid.cgi?id=0016682
+
+#if __SDCC | __SDCC_IX | __SDCC_IY
+
+extern struct fzx_font *ff_dkud4_Font01;
+extern struct fzx_font *ff_dkud4_Font02;
+extern struct fzx_font *ff_dkud4_Font03;
+extern struct fzx_font *ff_dkud4_Font04;
+extern struct fzx_font *ff_dkud4_Font05;
+extern struct fzx_font *ff_dkud4_Font06;
+extern struct fzx_font *ff_dkud4_Font07;
+extern struct fzx_font *ff_dkud4_Font08;
+extern struct fzx_font *ff_dkud4_Font09;
+extern struct fzx_font *ff_dkud4_Font10;
+extern struct fzx_font *ff_dkud4_Font11;
+extern struct fzx_font *ff_dkud4_Font12;
+extern struct fzx_font *ff_dkud4_Font13;
+extern struct fzx_font *ff_dkud4_Font14;
+extern struct fzx_font *ff_dkud4_Font15;
+
+#else
+
+#define ff_dkud4_Font01        ((struct fzx_font *)(_ff_dkud4_Font01))
+#define ff_dkud4_Font02        ((struct fzx_font *)(_ff_dkud4_Font02))
+#define ff_dkud4_Font03        ((struct fzx_font *)(_ff_dkud4_Font03))
+#define ff_dkud4_Font04        ((struct fzx_font *)(_ff_dkud4_Font04))
+#define ff_dkud4_Font05        ((struct fzx_font *)(_ff_dkud4_Font05))
+#define ff_dkud4_Font06        ((struct fzx_font *)(_ff_dkud4_Font06))
+#define ff_dkud4_Font07        ((struct fzx_font *)(_ff_dkud4_Font07))
+#define ff_dkud4_Font08        ((struct fzx_font *)(_ff_dkud4_Font08))
+#define ff_dkud4_Font09        ((struct fzx_font *)(_ff_dkud4_Font09))
+#define ff_dkud4_Font10        ((struct fzx_font *)(_ff_dkud4_Font10))
+#define ff_dkud4_Font11        ((struct fzx_font *)(_ff_dkud4_Font11))
+#define ff_dkud4_Font12        ((struct fzx_font *)(_ff_dkud4_Font12))
+#define ff_dkud4_Font13        ((struct fzx_font *)(_ff_dkud4_Font13))
+#define ff_dkud4_Font14        ((struct fzx_font *)(_ff_dkud4_Font14))
+#define ff_dkud4_Font15        ((struct fzx_font *)(_ff_dkud4_Font15))
+
+extern void __LIB__ _ff_dkud4_Font01(void);
+extern void __LIB__ _ff_dkud4_Font02(void);
+extern void __LIB__ _ff_dkud4_Font03(void);
+extern void __LIB__ _ff_dkud4_Font04(void);
+extern void __LIB__ _ff_dkud4_Font05(void);
+extern void __LIB__ _ff_dkud4_Font06(void);
+extern void __LIB__ _ff_dkud4_Font07(void);
+extern void __LIB__ _ff_dkud4_Font08(void);
+extern void __LIB__ _ff_dkud4_Font09(void);
+extern void __LIB__ _ff_dkud4_Font10(void);
+extern void __LIB__ _ff_dkud4_Font11(void);
+extern void __LIB__ _ff_dkud4_Font12(void);
+extern void __LIB__ _ff_dkud4_Font13(void);
+extern void __LIB__ _ff_dkud4_Font14(void);
+extern void __LIB__ _ff_dkud4_Font15(void);
+
+#endif
+
+
 // FZX FONTS BY INDEPENDENT DESIGNERS
 
 #if __SDCC | __SDCC_IX | __SDCC_IY
