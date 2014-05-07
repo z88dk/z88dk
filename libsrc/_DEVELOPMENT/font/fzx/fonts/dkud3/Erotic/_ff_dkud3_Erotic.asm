@@ -1,0 +1,6 @@
+
+XLIB _ff_dkud3_Erotic
+
+_ff_dkud3_Erotic:
+
+BINARY "font/fzx/fonts/dkud3/Erotic/erotic.fzx"
