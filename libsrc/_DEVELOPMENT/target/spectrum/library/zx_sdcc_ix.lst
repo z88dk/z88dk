@@ -15,3 +15,4 @@
 @string/string_sdcc_ix.lst
 @threads/threads_sdcc_ix.lst
 @z80/z80_sdcc_ix.lst
+@temp/sp1/spectrum/sp1_spectrum_sdcc_ix.lst
