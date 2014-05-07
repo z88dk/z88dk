@@ -13,11 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.15 2014-05-07 23:09:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.16 2014-05-07 23:18:16 pauloscustodio Exp $
 #
 # Test bugfixes
 
 use Modern::Perl;
+use File::Path qw(make_path remove_tree);;
 use t::TestZ80asm;
 
 #------------------------------------------------------------------------------
@@ -277,6 +278,17 @@ ASM
 }
 
 #------------------------------------------------------------------------------
+# BUG_0017 : no error message if fails to create binary file chunk (option -c)
+note "BUG_0017";
+make_path('test.bn1');	# make it impossible to create one of the bin files
+z80asm(
+	asm		=> "defs 0x10000",
+	error	=> "Error: cannot write file 'test.bn1'",
+	options	=> "-r0 -b -c",
+);
+remove_tree('test.bn1');
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -313,7 +325,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.15  2014-05-07 23:09:26  pauloscustodio
+# Revision 1.16  2014-05-07 23:18:16  pauloscustodio
+# Move tests of BUG_0017 to bugfixes.t
+#
+# Revision 1.15  2014/05/07 23:09:26  pauloscustodio
 # Move tests of BUG_0016 to bugfixes.t
 #
 # Revision 1.14  2014/05/07 22:41:20  pauloscustodio
