@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.14 2014-05-07 22:41:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.15 2014-05-07 23:09:26 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -256,6 +256,27 @@ ASM2
 );
 
 #------------------------------------------------------------------------------
+# BUG_0016: RCMX000 emulation routines not assembled when LIST is ON (-l)
+note "BUG_0016";
+for my $list ("", "-l") {
+z80asm(
+	asm		=> <<'ASM',
+			cpi				;; ED A1
+ASM
+	options	=> "-i".z80emu()." $list -b -r0",
+);
+z80asm(
+	asm		=> <<'ASM',
+			cpi				;; CD 03 00
+							;; 38 12 BE 23 0B F5 E3 CB 85 CB D5 78
+							;; B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5
+							;; E3 CB C5 18 EC
+ASM
+	options	=> "-i".z80emu()." $list -b -r0 -RCMX000",
+);
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -292,7 +313,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.14  2014-05-07 22:41:20  pauloscustodio
+# Revision 1.15  2014-05-07 23:09:26  pauloscustodio
+# Move tests of BUG_0016 to bugfixes.t
+#
+# Revision 1.14  2014/05/07 22:41:20  pauloscustodio
 # Move tests of BUG_0015 to bugfixes.t
 #
 # Revision 1.13  2014/05/05 22:03:57  pauloscustodio

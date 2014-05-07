@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.3 2014-05-04 18:46:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.4 2014-05-07 23:09:26 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -26,7 +26,7 @@ use Data::HexDump;
 use List::AllUtils 'uniq';
 use Capture::Tiny::Extended 'capture';
 
-our @EXPORT = qw( z80asm read_binfile write_binfile );
+our @EXPORT = qw( z80asm z80emu read_binfile write_binfile );
 
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
@@ -187,6 +187,21 @@ sub unlink_temp {
 }
 
 #------------------------------------------------------------------------------
+# Build and return file name of z80emu library
+#------------------------------------------------------------------------------
+sub z80emu {
+	my $z80emu_dir = '../../libsrc/z80_crt0s/z80_emu';
+	my $z80emu = $z80emu_dir.'/z80mu.lib';
+	if ( ! -f $z80emu ) {
+		z80asm(
+			options	=> '-x'.$z80emu.' -Mo -ns -d '.join(' ', <$z80emu_dir/*.asm>),
+			ok		=> 1,
+		);
+	}
+	return $z80emu;
+}
+
+#------------------------------------------------------------------------------
 sub read_binfile {
 	my($file) = @_;
 	return scalar read_file($file, binmode => ':raw');
@@ -201,7 +216,10 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.3  2014-05-04 18:46:46  pauloscustodio
+# Revision 1.4  2014-05-07 23:09:26  pauloscustodio
+# Move tests of BUG_0016 to bugfixes.t
+#
+# Revision 1.3  2014/05/04 18:46:46  pauloscustodio
 # Move tests of BUG_0008 to bugfixes.t
 #
 # Revision 1.2  2014/05/04 17:36:16  pauloscustodio
