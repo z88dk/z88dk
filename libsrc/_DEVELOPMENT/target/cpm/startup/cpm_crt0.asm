@@ -148,7 +148,7 @@ __FILE_STDIN:
    
    defb 195                    ; jp driver
    defw __bdoskbd_driver
-   defb $80                    ; open for reading
+   defb $40                    ; open for reading
    defb $02                    ; last op was read, to skip auto-flush
    defb 0
    defb 0
@@ -160,7 +160,7 @@ __FILE_STDOUT:
 
    defb 195                    ; jp driver
    defw __bdoscons_driver
-   defb $40                    ; open for writing
+   defb $80                    ; open for writing
    defb 0
    defb 0
    defb 0
@@ -175,7 +175,7 @@ __FILE_STDERR:
 
    defb 195                    ; jp driver
    defw __bdoscons_driver
-   defb $40                    ; open for writing
+   defb $80                    ; open for writing
    defb 0
    defb 0
    defb 0
