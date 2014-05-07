@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.80 2014-05-04 20:15:14 dom Exp $
+ *      $Id: zcc.c,v 1.81 2014-05-07 19:42:24 dom Exp $
  */
 
 
@@ -597,9 +597,7 @@ int main(int argc, char **argv)
     
     configure_assembler();
     configure_compiler();
-    
     configure_misc_options();
-    
     configure_maths_library();
     
     if ( c_nostdlib == 0 ) {
@@ -1134,6 +1132,10 @@ static void configure_misc_options()
     /* We only have to do a late assembly hack for z80asm family */
     if (createapp && defer_assembly && IS_ASM(ASM_Z80ASM)) {
         lateassemble = YES;
+    }
+
+    if ( linkargs == NULL ) {
+        linkargs = strdup("");
     }
 }
 
