@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.13 2014-05-05 22:03:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.14 2014-05-07 22:41:20 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -201,6 +201,61 @@ for my $lib (      'test',    'test.lib',
 }
 
 #------------------------------------------------------------------------------
+# BUG_0015: Relocation issue - dubious addresses come out of linking
+note "BUG_0015";
+z80asm(
+	asm		=> <<'ASM',
+				PUBLIC L1
+
+	    L1:		ld l,1		; 802C  2E 01
+				jp L2		; 802E  C3 31 80
+
+	    L2:		ld l,2		; 8031  2E 02
+				jp L1		; 8033  C3 2C 80
+							; 8036
+ASM
+	options	=> "-xtest.lib",
+	ok		=> 1,
+);
+z80asm(
+	asm1	=> <<'ASM1',
+				PUBLIC A1, A2
+				EXTERN B1, B2, L1
+
+	    A1:		ld a,1		; 8000 ;; 3E 01
+				call B1		; 8002 ;; CD 16 80
+				call L1		; 8005 ;; CD 2C 80
+				jp A2		; 8008 ;; C3 0B 80
+
+	    A2:		ld a,2		; 800B ;; 3E 02
+				call B2		; 800D ;; CD 21 80
+				call L1		; 8010 ;; CD 2C 80
+				jp A1		; 8013 ;; C3 00 80
+							; 8016
+ASM1
+	asm2	=> <<'ASM2',
+				PUBLIC B1, B2
+				EXTERN A1, A2, L1
+
+	    B1:		ld b,1		; 8016 ;; 06 01
+				call A1		; 8018 ;; CD 00 80
+				call L1		; 801B ;; CD 2C 80
+				jp B2		; 801E ;; C3 21 80
+
+	    B2:		ld b,2		; 8021 ;; 06 02
+				call A2		; 8023 ;; CD 0B 80
+				call L1		; 8026 ;; CD 2C 80
+				jp B1		; 8029 ;; C3 16 80
+							; 802C ;; 2E 01
+							; 802E ;; C3 31 80
+							; 8031 ;; 2E 02
+							; 8033 ;; C3 2C 80
+							; 8036
+ASM2
+	options	=> "-itest.lib -b -r8000",
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -231,13 +286,16 @@ z80asm(
 	ok => 1,
 );
 z80asm(
-	options => "-d -ns -nm test1 test2",
+	options => "-d -ns -nm -xtest.lib test1 test2",
 	ok => 1,
 );
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.13  2014-05-05 22:03:57  pauloscustodio
+# Revision 1.14  2014-05-07 22:41:20  pauloscustodio
+# Move tests of BUG_0015 to bugfixes.t
+#
+# Revision 1.13  2014/05/05 22:03:57  pauloscustodio
 # Move tests of BUG_0014 to bugfixes.t
 #
 # Revision 1.12  2014/05/05 21:51:41  pauloscustodio
