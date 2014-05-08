@@ -1,11 +1,11 @@
 
 ; int in_test_key(void)
 
-PUBLIC in_test_key
+PUBLIC _in_test_key
 
 EXTERN asm_in_test_key
 
-in_test_key:
+_in_test_key:
 
    call asm_in_test_key
    
