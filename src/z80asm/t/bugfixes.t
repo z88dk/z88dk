@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.17 2014-05-08 22:09:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.18 2014-05-08 22:30:38 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -312,6 +312,27 @@ note "BUG_0018";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0020: Segmentation fault in ParseIdent for symbol not found with interpret OFF
+note "BUG_0020";
+z80asm(
+	asm		=> <<'ASM',
+		IF C
+		invalid		;; error: unknown identifier
+		ENDIF
+ASM
+	options	=> "-r0 -b -DC",
+);
+z80asm(
+	asm		=> <<'ASM',
+		IF C
+		invalid
+		ENDIF
+		defb 0		;; 00
+ASM
+	options	=> "-r0 -b",
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -348,7 +369,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.17  2014-05-08 22:09:37  pauloscustodio
+# Revision 1.18  2014-05-08 22:30:38  pauloscustodio
+# Move tests of BUG_0020 to bugfixes.t
+#
+# Revision 1.17  2014/05/08 22:09:37  pauloscustodio
 # Move tests of BUG_0018 to bugfixes.t
 #
 # Revision 1.16  2014/05/07 23:18:16  pauloscustodio
