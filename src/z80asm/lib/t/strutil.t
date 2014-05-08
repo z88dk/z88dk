@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.13 2014-05-06 22:17:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.14 2014-05-08 22:37:30 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -751,7 +751,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.13  2014-05-06 22:17:38  pauloscustodio
+# Revision 1.14  2014-05-08 22:37:30  pauloscustodio
+# comment
+#
+# Revision 1.13  2014/05/06 22:17:38  pauloscustodio
 # Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 #
 # Revision 1.12  2014/05/05 22:07:38  pauloscustodio
@@ -831,7 +834,7 @@ sub t_capture {
 # stricompare() instead of Flncmp()
 #
 # Revision 1.5  2012/06/06 22:42:57  pauloscustodio
-# BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
+# BUG_0022 : Different behaviour in string truncation in strutil in Linux and Win32
 #
 # Revision 1.4  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
