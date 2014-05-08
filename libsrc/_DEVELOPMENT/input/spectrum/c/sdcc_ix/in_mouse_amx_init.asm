@@ -1,7 +1,7 @@
 
 ; void in_mouse_amx_init(uint8_t x_vector, uint8_t y_vector)
 
-XDEF _in_mouse_amx_init
+PUBLIC _in_mouse_amx_init
 
 _in_mouse_amx_init:
 

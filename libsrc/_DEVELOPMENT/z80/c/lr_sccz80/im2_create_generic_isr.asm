@@ -1,9 +1,9 @@
 
 ; void *im2_create_generic_isr(uint8_t num_callback, void *address)
 
-XLIB im2_create_generic_isr
+PUBLIC im2_create_generic_isr
 
-LIB asm_im2_create_generic_isr
+EXTERN asm_im2_create_generic_isr
 
 im2_create_generic_isr:
 

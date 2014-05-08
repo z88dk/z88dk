@@ -1,9 +1,9 @@
 
 ; bv_stack_t *bv_stack_init(void *p, size_t capacity, size_t max_size)
 
-XDEF bv_stack_init_callee
+PUBLIC bv_stack_init_callee
 
-LIB b_vector_init_callee
+EXTERN b_vector_init_callee
 
 ;defc bv_stack_init_callee = b_vector_init_callee
 

@@ -1,7 +1,7 @@
 
 ; unsigned int _strtou_(const char *nptr, char **endptr, int base)
 
-XDEF _strtou__callee
+PUBLIC _strtou__callee
 
 _strtou__callee:
 

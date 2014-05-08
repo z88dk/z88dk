@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_align_distance_callee
+PUBLIC obstack_align_distance_callee
 
 obstack_align_distance_callee:
 

@@ -1,7 +1,7 @@
 
 ; void mtx_destroy(mtx_t *m)
 
-XDEF _mtx_destroy
+PUBLIC _mtx_destroy
 
 _mtx_destroy:
 

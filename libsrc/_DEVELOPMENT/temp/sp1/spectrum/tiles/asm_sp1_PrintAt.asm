@@ -2,9 +2,8 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_PrintAt
-
-LIB asm_sp1_GetUpdateStruct
+PUBLIC asm_sp1_PrintAt
+EXTERN asm_sp1_GetUpdateStruct
 
 asm_sp1_PrintAt:
 

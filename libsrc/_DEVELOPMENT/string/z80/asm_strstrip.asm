@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strstrip
+PUBLIC asm_strstrip
 
-LIB asm_isspace
+EXTERN asm_isspace
 
 asm_strstrip:
 

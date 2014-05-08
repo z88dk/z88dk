@@ -1,9 +1,9 @@
 
 ; int vprintf_unlocked(const char *format, void *arg)
 
-XLIB vprintf_unlocked
+PUBLIC vprintf_unlocked
 
-LIB asm_vprintf_unlocked
+EXTERN asm_vprintf_unlocked
 
 vprintf_unlocked:
 

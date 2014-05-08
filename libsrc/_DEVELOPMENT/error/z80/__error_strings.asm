@@ -1,11 +1,11 @@
 
-XLIB __error_strings
-XDEF __error_string_default
+PUBLIC __error_strings
+PUBLIC __error_string_default
 
-XREF __EOK, __EDOM, __EINVAL, __ENOMEM
-XREF __ERANGE, __EACCES, __ENOLCK, __EOVERFLOW
-XREF __ENOTSUP, __EFBIG, __EBADF, __EMFILE
-XREF __EUNKWN
+EXTERN __EOK, __EDOM, __EINVAL, __ENOMEM
+EXTERN __ERANGE, __EACCES, __ENOLCK, __EOVERFLOW
+EXTERN __ENOTSUP, __EFBIG, __EBADF, __EMFILE
+EXTERN __EUNKWN
 
 __error_strings:
 

@@ -1,7 +1,7 @@
 
 ; char *strerror(int errnum)
 
-XDEF _strerror
+PUBLIC _strerror
 
 _strerror:
 

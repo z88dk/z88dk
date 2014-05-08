@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Nether
+PUBLIC _ff_dkud2_Nether
 
 _ff_dkud2_Nether:
 

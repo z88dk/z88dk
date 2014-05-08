@@ -1,9 +1,9 @@
 
 ; void wv_stack_clear(wv_stack_t *s)
 
-XDEF _wv_stack_clear
+PUBLIC _wv_stack_clear
 
-LIB _w_vector_clear
+EXTERN _w_vector_clear
 
 _wv_stack_clear:
 

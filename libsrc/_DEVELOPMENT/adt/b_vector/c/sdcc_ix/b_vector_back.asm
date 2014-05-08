@@ -1,9 +1,9 @@
 
 ; int b_vector_back(b_vector_t *v)
 
-XDEF _b_vector_back
+PUBLIC _b_vector_back
 
-LIB _b_array_back
+EXTERN _b_array_back
 
 _b_vector_back:
 

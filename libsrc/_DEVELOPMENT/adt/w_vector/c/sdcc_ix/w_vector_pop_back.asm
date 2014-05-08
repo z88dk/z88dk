@@ -1,9 +1,9 @@
 
 ; void *w_vector_pop_back(w_vector_t *v)
 
-XDEF _w_vector_pop_back
+PUBLIC _w_vector_pop_back
 
-LIB _w_array_pop_back
+EXTERN _w_array_pop_back
 
 _w_vector_pop_back:
 

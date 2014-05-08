@@ -1,8 +1,8 @@
 
-XLIB __vector_realloc_grow
-XDEF __0_vector_realloc_grow
+PUBLIC __vector_realloc_grow
+PUBLIC __0_vector_realloc_grow
 
-LIB asm_realloc, error_einval_zc, error_zc
+EXTERN asm_realloc, error_einval_zc, error_zc
 
 __vector_realloc_grow:
 

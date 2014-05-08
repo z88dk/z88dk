@@ -1,9 +1,9 @@
 
 ; void *w_vector_back(b_vector_t *v)
 
-XDEF _w_vector_back
+PUBLIC _w_vector_back
 
-LIB _w_array_back
+EXTERN _w_array_back
 
 _w_vector_back:
 

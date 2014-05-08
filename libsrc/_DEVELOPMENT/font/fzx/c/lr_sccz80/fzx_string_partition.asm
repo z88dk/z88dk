@@ -1,9 +1,9 @@
 
 ; char *fzx_string_partition(char *s, uint width)
 
-XLIB fzx_string_partition
+PUBLIC fzx_string_partition
 
-LIB asm_fzx_string_partition
+EXTERN asm_fzx_string_partition
 
 fzx_string_partition:
 

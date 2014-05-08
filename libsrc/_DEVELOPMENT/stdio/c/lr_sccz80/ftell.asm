@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF ftell
+PUBLIC ftell
 
 ftell:
 
@@ -20,9 +20,9 @@ ftell:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF ftell
+PUBLIC ftell
 
-LIB ftell_unlocked
+EXTERN ftell_unlocked
 
 ftell:
 

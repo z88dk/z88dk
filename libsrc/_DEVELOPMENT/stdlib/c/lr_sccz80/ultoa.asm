@@ -1,9 +1,9 @@
 
 ; char *ultoa(unsigned long num, char *buf, int radix)
 
-XLIB ultoa
+PUBLIC ultoa
 
-LIB asm_ultoa
+EXTERN asm_ultoa
 
 ultoa:
 

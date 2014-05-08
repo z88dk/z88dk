@@ -1,7 +1,7 @@
 
 ; int abs(int j)
 
-XDEF abs
+PUBLIC abs
 
 abs:
 

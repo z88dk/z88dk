@@ -15,11 +15,11 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_putchar
+PUBLIC asm_putchar
 
-XREF __stdio_file_stdout
+EXTERN __stdio_file_stdout
 
-LIB asm0_putchar_unlocked, __stdio_lock_release
+EXTERN asm0_putchar_unlocked, __stdio_lock_release
 
 asm_putchar:
 
@@ -44,14 +44,14 @@ asm_putchar:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock
+   EXTERN __stdio_verify_valid_lock
 
    call __stdio_verify_valid_lock
    ret c
 
 ELSE
 
-   LIB __stdio_lock_acquire, error_enolck_mc
+   EXTERN __stdio_lock_acquire, error_enolck_mc
    
    call __stdio_lock_acquire
    jp c, error_enolck_mc
@@ -66,9 +66,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_putchar
+PUBLIC asm_putchar
 
-LIB asm_putchar_unlocked
+EXTERN asm_putchar_unlocked
 
 asm_putchar:
 

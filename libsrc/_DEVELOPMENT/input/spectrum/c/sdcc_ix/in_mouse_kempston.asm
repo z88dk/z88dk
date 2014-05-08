@@ -1,9 +1,9 @@
 
 ; void in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
-XLIB _in_mouse_kempston
+PUBLIC _in_mouse_kempston
 
-LIB asm_in_mouse_kempston
+EXTERN asm_in_mouse_kempston
 
 _in_mouse_kempston:
 

@@ -1,9 +1,9 @@
 
 ; void *b_vector_data(b_vector_t *v)
 
-XDEF _b_vector_data
+PUBLIC _b_vector_data
 
-LIB _b_array_data
+EXTERN _b_array_data
 
 _b_vector_data:
 

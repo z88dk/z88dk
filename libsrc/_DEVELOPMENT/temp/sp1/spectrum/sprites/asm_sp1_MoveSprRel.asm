@@ -2,9 +2,9 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_MoveSprRel
+PUBLIC asm_sp1_MoveSprRel
 
-LIB asm_sp1_MoveSprAbs
+EXTERN asm_sp1_MoveSprAbs
 
 asm_sp1_MoveSprRel:
 

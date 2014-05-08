@@ -1,9 +1,9 @@
 
 ; int wa_stack_push(wa_stack_t *s, void *item)
 
-XDEF _wa_stack_push
+PUBLIC _wa_stack_push
 
-LIB _w_array_append
+EXTERN _w_array_append
 
 _wa_stack_push:
 

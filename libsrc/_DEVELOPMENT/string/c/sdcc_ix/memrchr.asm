@@ -1,7 +1,7 @@
 
 ; void *memrchr(const void *s, int c, size_t n)
 
-XDEF _memrchr
+PUBLIC _memrchr
 
 _memrchr:
 

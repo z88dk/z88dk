@@ -1,9 +1,9 @@
 
 ; int bv_stack_reserve(bv_stack_t *s, size_t n)
 
-XDEF _bv_stack_reserve
+PUBLIC _bv_stack_reserve
 
-LIB _b_vector_reserve
+EXTERN _b_vector_reserve
 
 _bv_stack_reserve:
 

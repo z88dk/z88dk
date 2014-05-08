@@ -1,8 +1,8 @@
 
 ;; fzx output driver ;;;;;;;;;;
 
-LIB asm_fzx_putc, asm_fzx_write
-LIB error_enotsup_zc, error_lznc, error_znc
+EXTERN asm_fzx_putc, asm_fzx_write
+EXTERN error_enotsup_zc, error_lznc, error_znc
 
 __fzx_driver:
 

@@ -1,9 +1,9 @@
 
-XLIB error_ebadf_zc
+PUBLIC error_ebadf_zc
 
-XREF __EBADF
+EXTERN __EBADF
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    pop hl

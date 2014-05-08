@@ -2,7 +2,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_PrintAtInv_callee
+PUBLIC sp1_PrintAtInv_callee
 
 sp1_PrintAtInv_callee:
 

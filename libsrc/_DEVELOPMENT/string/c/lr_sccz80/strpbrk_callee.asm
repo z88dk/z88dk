@@ -1,7 +1,7 @@
 
 ; char *strpbrk(const char *s1, const char *s2)
 
-XDEF strpbrk_callee
+PUBLIC strpbrk_callee
 
 strpbrk_callee:
 

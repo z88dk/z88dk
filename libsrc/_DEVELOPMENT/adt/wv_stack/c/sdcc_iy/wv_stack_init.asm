@@ -1,9 +1,9 @@
 
 ; wv_stack_t *wv_stack_init(void *p, size_t capacity, size_t max_size)
 
-XDEF _wv_stack_init
+PUBLIC _wv_stack_init
 
-LIB _w_vector_init
+EXTERN _w_vector_init
 
 _wv_stack_init:
 

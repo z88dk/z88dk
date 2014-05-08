@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Newbrand
+PUBLIC _ff_ao_Newbrand
 
 _ff_ao_Newbrand:
 

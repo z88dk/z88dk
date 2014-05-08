@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _getdelim
+PUBLIC _getdelim
 
 _getdelim:
 
@@ -29,9 +29,9 @@ _getdelim:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _getdelim
+PUBLIC _getdelim
 
-LIB _getdelim_unlocked
+EXTERN _getdelim_unlocked
 
 _getdelim:
 

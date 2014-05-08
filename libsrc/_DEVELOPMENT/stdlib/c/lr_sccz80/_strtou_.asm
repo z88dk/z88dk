@@ -1,9 +1,9 @@
 
 ; unsigned int _strtou_(const char *nptr, char **endptr, int base)
 
-XLIB _strtou_
+PUBLIC _strtou_
 
-LIB asm__strtou
+EXTERN asm__strtou
 
 _strtou_:
 

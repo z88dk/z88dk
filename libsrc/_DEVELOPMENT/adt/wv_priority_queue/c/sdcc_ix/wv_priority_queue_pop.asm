@@ -1,9 +1,9 @@
 
 ; void *wv_priority_queue_pop(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_pop
+PUBLIC _wv_priority_queue_pop
 
-LIB _wa_priority_queue_pop
+EXTERN _wa_priority_queue_pop
 
 _wv_priority_queue_pop:
 

@@ -1,5 +1,5 @@
 
-XLIB l_dec_bc
+PUBLIC l_dec_bc
 
    dec bc
    dec bc

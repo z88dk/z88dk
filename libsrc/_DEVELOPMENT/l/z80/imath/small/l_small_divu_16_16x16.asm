@@ -2,10 +2,10 @@
 ; 2000 djm
 ; 2014 aralbrec - special case for 8-bit divisor
 
-XLIB l_small_divu_16_16x16
-XDEF l0_small_divu_16_16x16, l1_small_divu_16_16x16
+PUBLIC l_small_divu_16_16x16
+PUBLIC l0_small_divu_16_16x16, l1_small_divu_16_16x16
 
-LIB error_divide_by_zero_mc
+EXTERN error_divide_by_zero_mc
 
 l_small_divu_16_16x16:
 

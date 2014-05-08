@@ -13,7 +13,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_strncpy
+PUBLIC asm_strncpy
 
 asm_strncpy:
 

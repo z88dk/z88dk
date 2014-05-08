@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Hijack
+PUBLIC _ff_dkud2_Hijack
 
 _ff_dkud2_Hijack:
 

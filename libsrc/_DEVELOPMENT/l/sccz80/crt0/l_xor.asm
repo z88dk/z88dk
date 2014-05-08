@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_xor
+                PUBLIC    l_xor
 
 
 ; "xor" HL and DE into HL

@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_utoa
-XDEF asm0_utoa, asm1_utoa
+PUBLIC asm_utoa
+PUBLIC asm0_utoa, asm1_utoa
 
-LIB error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x8, l_num2char
+EXTERN error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x8, l_num2char
 
 INCLUDE "clib_cfg.asm"
 
@@ -139,7 +139,7 @@ IF __CLIB_OPT_NUM2TXT & $04
 
 decimal:
 
-   LIB l_utoa
+   EXTERN l_utoa
    
    call l_utoa
 
@@ -163,7 +163,7 @@ IF __CLIB_OPT_NUM2TXT & $08
 
 hex:
    
-   LIB l_utoh
+   EXTERN l_utoh
    
    call l_utoh
    jr terminate
@@ -175,7 +175,7 @@ IF __CLIB_OPT_NUM2TXT & $02
 
 octal:
 
-   LIB l_utoo
+   EXTERN l_utoo
    
    call l_utoo
    jr terminate
@@ -187,7 +187,7 @@ IF __CLIB_OPT_NUM2TXT & $01
 
 binary:
 
-   LIB l_utob
+   EXTERN l_utob
    
    call l_utob
    jr terminate

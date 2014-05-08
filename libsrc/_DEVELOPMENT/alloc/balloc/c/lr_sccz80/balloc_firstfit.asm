@@ -1,9 +1,9 @@
 
 ; void *balloc_firstfit(unsigned int queue, unsigned char num)
 
-XLIB balloc_firstfit
+PUBLIC balloc_firstfit
 
-LIB asm_balloc_firstfit
+EXTERN asm_balloc_firstfit
 
 balloc_firstfit:
 

@@ -5,8 +5,8 @@
 ;       6/9/98  djm
 ;       13/5/99 djm Added carry conditions...
 
-                XLIB    l_eq
-                LIB     l_cmp
+                PUBLIC    l_eq
+                EXTERN     l_cmp
 
 ;
 ;

@@ -2,7 +2,7 @@
 ; BeepFX sound effect by shiru
 ; http://shiru.untergrund.net
 
-XLIB _bfx_20
+PUBLIC _bfx_20
 
 _bfx_20:
 

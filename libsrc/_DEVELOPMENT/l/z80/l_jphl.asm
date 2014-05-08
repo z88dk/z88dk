@@ -1,5 +1,5 @@
 
-XLIB l_jphl
+PUBLIC l_jphl
 
 l_jphl:
 

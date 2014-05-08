@@ -5,17 +5,17 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm__fflushall
+PUBLIC asm__fflushall
 
-XREF __stdio_file_list_open
+EXTERN __stdio_file_list_open
 
-LIB asm1_fflush_unlocked, asm_p_forward_list_front
-LIB __stdio_lock_acquire, __stdio_lock_release
+EXTERN asm1_fflush_unlocked, asm_p_forward_list_front
+EXTERN __stdio_lock_acquire, __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,9 +74,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm__fflushall
+PUBLIC asm__fflushall
 
-LIB asm__fflushall_unlocked
+EXTERN asm__fflushall_unlocked
 
 asm__fflushall:
 

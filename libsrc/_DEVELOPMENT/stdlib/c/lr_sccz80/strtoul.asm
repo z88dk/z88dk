@@ -1,9 +1,9 @@
 
 ; unsigned long strtoul( const char * restrict nptr, char ** restrict endptr, int base)
 
-XLIB strtoul
+PUBLIC strtoul
 
-LIB asm_strtoul
+EXTERN asm_strtoul
 
 strtoul:
 

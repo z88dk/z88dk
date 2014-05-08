@@ -1,7 +1,7 @@
 
 ; void in_mouse_kempston_setpos_callee(uint16_t x, uint16_t y)
 
-XDEF in_mouse_kempston_setpos_callee
+PUBLIC in_mouse_kempston_setpos_callee
 
 in_mouse_kempston_setpos_callee:
 

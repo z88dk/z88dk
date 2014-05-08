@@ -1,7 +1,7 @@
 
 ; void *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size)
 
-XDEF heap_alloc_aligned_unlocked_callee
+PUBLIC heap_alloc_aligned_unlocked_callee
 
 heap_alloc_aligned_unlocked_callee:
 

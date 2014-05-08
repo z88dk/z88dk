@@ -1,7 +1,7 @@
 
 ; uint16_t in_pause(uint16_t dur_ms)
 
-XDEF in_pause
+PUBLIC in_pause
 
 in_pause:
 

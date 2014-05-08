@@ -9,11 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_mtx_init
+PUBLIC asm_mtx_init
 
-XREF thrd_error
-
-LIB l_setmem_hl
+EXTERN thrd_error, l_setmem_hl
 
 asm_mtx_init:
 

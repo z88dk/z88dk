@@ -1,7 +1,7 @@
 
 ; size_t w_vector_append_n(b_vector_t *v, size_t n, void *item)
 
-XDEF w_vector_append_n_callee
+PUBLIC w_vector_append_n_callee
 
 w_vector_append_n_callee:
 

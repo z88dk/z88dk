@@ -23,9 +23,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_realloc_unlocked
+PUBLIC asm_heap_realloc_unlocked
 
-LIB error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked, l_ltu_bc_hl
+EXTERN error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked, l_ltu_bc_hl
 
 asm_heap_realloc_unlocked:
 

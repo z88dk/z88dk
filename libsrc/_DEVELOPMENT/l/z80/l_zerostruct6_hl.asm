@@ -1,7 +1,7 @@
 
-XLIB l_zerostruct6_hl
+PUBLIC l_zerostruct6_hl
 
-LIB l_setmem_hl
+EXTERN l_setmem_hl
 
 l_zerostruct6_hl:
 

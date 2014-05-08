@@ -1,9 +1,9 @@
 
-XLIB error_emfile_zc
+PUBLIC error_emfile_zc
 
-XREF __EMFILE
+EXTERN __EMFILE
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    

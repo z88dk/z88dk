@@ -1,9 +1,9 @@
 
 ; void ba_stack_destroy(ba_stack_t *s)
 
-XDEF _ba_stack_destroy
+PUBLIC _ba_stack_destroy
 
-LIB _b_array_destroy
+EXTERN _b_array_destroy
 
 _ba_stack_destroy:
 

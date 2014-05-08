@@ -2,7 +2,7 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_Validate
+PUBLIC sp1_Validate
 
 sp1_Validate:
 

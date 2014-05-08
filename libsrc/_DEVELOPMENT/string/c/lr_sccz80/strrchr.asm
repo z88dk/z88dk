@@ -1,9 +1,9 @@
 
 ; char *strrchr(const char *s, int c)
 
-XLIB strrchr
+PUBLIC strrchr
 
-LIB asm_strrchr
+EXTERN asm_strrchr
 
 strrchr:
 

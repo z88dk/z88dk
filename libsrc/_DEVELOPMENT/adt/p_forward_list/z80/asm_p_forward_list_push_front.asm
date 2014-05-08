@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_push_front
+PUBLIC asm_p_forward_list_push_front
 
-LIB asm_p_forward_list_insert_after
+EXTERN asm_p_forward_list_insert_after
 
 asm_p_forward_list_push_front:
 

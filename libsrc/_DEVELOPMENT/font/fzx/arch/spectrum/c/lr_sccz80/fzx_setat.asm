@@ -1,9 +1,9 @@
 
 ; int fzx_setat(uchar y, uchar x)
 
-XLIB fzx_setat
+PUBLIC fzx_setat
 
-LIB asm_fzx_setat
+EXTERN asm_fzx_setat
 
 fzx_setat:
 

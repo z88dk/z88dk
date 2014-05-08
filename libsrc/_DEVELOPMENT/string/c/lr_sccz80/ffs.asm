@@ -1,7 +1,7 @@
 
 ; int ffs(int i)
 
-XDEF ffs
+PUBLIC ffs
 
 ffs:
 

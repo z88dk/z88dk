@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_amx
+PUBLIC asm_in_mouse_amx
 
-XREF __input_amx_mouse_x, __input_amx_mouse_y
+EXTERN __input_amx_mouse_x, __input_amx_mouse_y
 
 asm_in_mouse_amx:
 

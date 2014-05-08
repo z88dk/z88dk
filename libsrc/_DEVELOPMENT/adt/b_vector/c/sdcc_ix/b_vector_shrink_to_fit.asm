@@ -1,7 +1,7 @@
 
 ; int b_vector_shrink_to_fit(b_vector_t *v)
 
-XDEF _b_vector_shrink_to_fit
+PUBLIC _b_vector_shrink_to_fit
 
 _b_vector_shrink_to_fit:
 

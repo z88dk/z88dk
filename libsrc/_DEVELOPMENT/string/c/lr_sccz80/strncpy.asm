@@ -1,9 +1,9 @@
 
 ; char *strncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XLIB strncpy
+PUBLIC strncpy
 
-LIB asm_strncpy
+EXTERN asm_strncpy
 
 strncpy:
 

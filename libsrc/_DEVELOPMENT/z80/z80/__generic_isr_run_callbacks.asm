@@ -1,7 +1,7 @@
 
-XLIB __generic_isr_run_callbacks
+PUBLIC __generic_isr_run_callbacks
 
-LIB l_jphl
+EXTERN l_jphl
 
 __generic_isr_run_callbacks:
 

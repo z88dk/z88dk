@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_room
+PUBLIC asm_obstack_room
 
 asm_obstack_room:
 

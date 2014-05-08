@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_vsprintf
+PUBLIC asm_vsprintf
 
-XREF STDIO_MSG_PUTC
+EXTERN STDIO_MSG_PUTC
 
-LIB asm0_vfprintf_unlocked, asm_memset
+EXTERN asm0_vfprintf_unlocked, asm_memset
 
 asm_vsprintf:
 

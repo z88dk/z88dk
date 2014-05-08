@@ -14,12 +14,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_fflush_unlocked
-XDEF asm0_fflush_unlocked, asm1_fflush_unlocked
+PUBLIC asm_fflush_unlocked
+PUBLIC asm0_fflush_unlocked, asm1_fflush_unlocked
 
-XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK, STDIO_MSG_FLSH
+EXTERN STDIO_SEEK_CUR, STDIO_MSG_SEEK, STDIO_MSG_FLSH
 
-LIB asm__fflushall_unlocked, l_jpix, error_mc, error_znc
+EXTERN asm__fflushall_unlocked, l_jpix, error_mc, error_znc
 
 asm_fflush_unlocked:
 
@@ -49,7 +49,7 @@ asm0_fflush_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
    
    call __stdio_verify_valid
    ret c

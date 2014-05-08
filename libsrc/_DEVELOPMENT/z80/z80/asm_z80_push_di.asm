@@ -12,7 +12,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_z80_push_di
+PUBLIC asm_z80_push_di
 
 asm_z80_push_di:
 

@@ -1,7 +1,7 @@
 
 ; void rewind_unlocked(FILE *stream)
 
-XDEF rewind_unlocked
+PUBLIC rewind_unlocked
 
 rewind_unlocked:
 

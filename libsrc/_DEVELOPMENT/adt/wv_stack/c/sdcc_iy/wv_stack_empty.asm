@@ -1,9 +1,9 @@
 
 ; int wv_stack_empty(wv_stack_t *s)
 
-XDEF _wv_stack_empty
+PUBLIC _wv_stack_empty
 
-LIB _w_vector_empty
+EXTERN _w_vector_empty
 
 _wv_stack_empty:
 

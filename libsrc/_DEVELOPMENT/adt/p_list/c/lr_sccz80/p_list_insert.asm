@@ -1,9 +1,9 @@
 
 ; void *p_list_insert(p_list_t *list, void *list_item, void *item)
 
-XLIB p_list_insert
+PUBLIC p_list_insert
 
-LIB asm_p_list_insert
+EXTERN asm_p_list_insert
 
 p_list_insert:
 

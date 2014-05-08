@@ -1,5 +1,5 @@
 
-XLIB l_small_btou
+PUBLIC l_small_btou
 
 l_small_btou:
 

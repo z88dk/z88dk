@@ -1,7 +1,7 @@
 
-XLIB l_fast_ultoa
+PUBLIC l_fast_ultoa
 
-LIB l_fast_utoa, l0_fast_utoa, l_setmem_de
+EXTERN l_fast_utoa, l0_fast_utoa, l_setmem_de
 
 l_fast_ultoa:
 

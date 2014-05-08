@@ -1,5 +1,5 @@
 
-XLIB asm_isupper
+PUBLIC asm_isupper
 
 asm_isupper:
 

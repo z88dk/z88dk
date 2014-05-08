@@ -1,7 +1,7 @@
 
 ; char *strupr(char *s)
 
-XDEF strupr
+PUBLIC strupr
 
 strupr:
 

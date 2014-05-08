@@ -1,7 +1,7 @@
 
-XLIB l_neg_hl
+PUBLIC l_neg_hl
 
-LIB _l_neg_hl_
+EXTERN _l_neg_hl_
 
 l_neg_hl:
 

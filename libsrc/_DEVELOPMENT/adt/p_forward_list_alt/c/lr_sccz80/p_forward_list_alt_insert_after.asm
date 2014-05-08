@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_alt_insert_after(p_forward_list_alt_t *list, void *list_item, void *item)
 
-XLIB p_forward_list_alt_insert_after
+PUBLIC p_forward_list_alt_insert_after
 
-LIB asm_p_forward_list_alt_insert_after
+EXTERN asm_p_forward_list_alt_insert_after
 
 p_forward_list_alt_insert_after:
 

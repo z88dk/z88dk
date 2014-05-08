@@ -1,7 +1,7 @@
 
-XLIB __rrslong_rrx_s
+PUBLIC __rrslong_rrx_s
 
-LIB l_asr_dehl
+EXTERN l_asr_dehl
 
 __rrslong_rrx_s:
 

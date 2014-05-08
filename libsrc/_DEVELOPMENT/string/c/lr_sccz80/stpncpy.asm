@@ -1,9 +1,9 @@
 
 ; char *stpncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XLIB stpncpy
+PUBLIC stpncpy
 
-LIB asm_stpncpy
+EXTERN asm_stpncpy
 
 stpncpy:
 

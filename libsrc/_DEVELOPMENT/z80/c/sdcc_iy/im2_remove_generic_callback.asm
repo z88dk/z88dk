@@ -1,7 +1,7 @@
 
 ; int im2_remove_generic_callback(uint8_t vector, void *callback)
 
-XDEF _im2_remove_generic_callback
+PUBLIC _im2_remove_generic_callback
 
 _im2_remove_generic_callback:
 

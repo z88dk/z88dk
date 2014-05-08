@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_insert_after
+PUBLIC asm_p_forward_list_insert_after
 
 asm_p_forward_list_insert_after:
 

@@ -1,7 +1,7 @@
 
 ; void *memcpy(void * restrict s1, const void * restrict s2, size_t n)
 
-XDEF memcpy_callee
+PUBLIC memcpy_callee
 
 memcpy_callee:
 

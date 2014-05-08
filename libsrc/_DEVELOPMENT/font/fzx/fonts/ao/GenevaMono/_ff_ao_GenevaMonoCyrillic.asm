@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_GenevaMonoCyrillic
+PUBLIC _ff_ao_GenevaMonoCyrillic
 
 _ff_ao_GenevaMonoCyrillic:
 

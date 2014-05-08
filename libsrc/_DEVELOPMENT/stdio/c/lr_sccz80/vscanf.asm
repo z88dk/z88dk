@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB vscanf
+PUBLIC vscanf
 
-LIB asm_vscanf
+EXTERN asm_vscanf
 
 vscanf:
 
@@ -27,9 +27,9 @@ vscanf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB vscanf
+PUBLIC vscanf
 
-LIB vscanf_unlocked
+EXTERN vscanf_unlocked
 
 vscanf:
 

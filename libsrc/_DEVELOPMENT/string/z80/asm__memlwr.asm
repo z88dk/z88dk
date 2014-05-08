@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__memlwr
+PUBLIC asm__memlwr
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 asm__memlwr:
 

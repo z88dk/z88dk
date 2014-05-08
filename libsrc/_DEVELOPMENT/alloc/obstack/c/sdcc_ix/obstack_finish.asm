@@ -1,7 +1,7 @@
 
 ; void *obstack_finish(struct obstack *ob)
 
-XDEF _obstack_finish
+PUBLIC _obstack_finish
 
 _obstack_finish:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_stricmp
+PUBLIC asm_stricmp
 
-LIB asm_strcasecmp
+EXTERN asm_strcasecmp
 
 asm_stricmp:
 

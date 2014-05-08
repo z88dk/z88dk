@@ -1,7 +1,7 @@
 
 ; void *p_forward_list_insert_after(void *list_item, void *item)
 
-XDEF p_forward_list_insert_after_callee
+PUBLIC p_forward_list_insert_after_callee
 
 p_forward_list_insert_after_callee:
 

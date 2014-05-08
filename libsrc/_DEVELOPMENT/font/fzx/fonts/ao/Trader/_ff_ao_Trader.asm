@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Trader
+PUBLIC _ff_ao_Trader
 
 _ff_ao_Trader:
 

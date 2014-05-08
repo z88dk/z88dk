@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_im2_create_generic_isr_8080
+PUBLIC asm_im2_create_generic_isr_8080
 
-LIB __generic_isr_create, __generic_isr_run_callbacks
-LIB asm_z80_push_registers_8080, asm_z80_pop_registers_8080
+EXTERN __generic_isr_create, __generic_isr_run_callbacks
+EXTERN asm_z80_push_registers_8080, asm_z80_pop_registers_8080
 
 asm_im2_create_generic_isr_8080:
 

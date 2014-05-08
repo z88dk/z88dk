@@ -16,9 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__div
+PUBLIC asm__div
 
-LIB l_divs_16_16x16
+EXTERN l_divs_16_16x16
 
 asm__div:
 

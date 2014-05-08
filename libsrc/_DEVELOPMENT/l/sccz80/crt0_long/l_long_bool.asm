@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_bool
+                PUBLIC    l_long_bool
 
 
 ; HL = !!HL

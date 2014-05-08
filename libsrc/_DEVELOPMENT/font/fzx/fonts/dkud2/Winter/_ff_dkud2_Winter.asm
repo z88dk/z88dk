@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Winter
+PUBLIC _ff_dkud2_Winter
 
 _ff_dkud2_Winter:
 

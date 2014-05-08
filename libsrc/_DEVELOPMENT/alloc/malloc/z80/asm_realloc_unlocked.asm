@@ -25,12 +25,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_realloc_unlocked
-XDEF asm_realloc_unlocked_lib
+PUBLIC asm_realloc_unlocked
+PUBLIC asm_realloc_unlocked_lib
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_realloc_unlocked
+EXTERN asm_heap_realloc_unlocked
 
 asm_realloc_unlocked:
 asm_realloc_unlocked_lib:

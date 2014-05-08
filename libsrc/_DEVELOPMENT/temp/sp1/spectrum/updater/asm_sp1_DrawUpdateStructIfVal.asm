@@ -5,8 +5,9 @@
 
 ; FASTCALL
 
-XLIB asm_sp1_DrawUpdateStructIfVal
-LIB SP1DrawUpdateStruct
+PUBLIC asm_sp1_DrawUpdateStructIfVal
+
+EXTERN SP1DrawUpdateStruct
 
 ; draw the char's graphics to screen but only
 ; if the update struct is currently validated

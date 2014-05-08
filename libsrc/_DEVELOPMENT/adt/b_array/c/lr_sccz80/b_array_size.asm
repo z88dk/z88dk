@@ -1,7 +1,7 @@
 
 ; size_t b_array_size(b_array_t *a)
 
-XDEF b_array_size
+PUBLIC b_array_size
 
 ;defc b_array_size = asm_b_array_size
 

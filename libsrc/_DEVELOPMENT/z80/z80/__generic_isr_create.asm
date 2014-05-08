@@ -1,5 +1,5 @@
 
-XLIB __generic_isr_create
+PUBLIC __generic_isr_create
 
 __generic_isr_create:
 

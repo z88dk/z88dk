@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_strdup
-XDEF asm0_strdup
+PUBLIC asm_strdup
+PUBLIC asm0_strdup
 
-LIB asm_strlen, asm_malloc, error_enomem_zc
+EXTERN asm_strlen, asm_malloc, error_enomem_zc
 
 asm_strdup:
 

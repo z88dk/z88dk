@@ -1,7 +1,7 @@
 
 ; int bv_priority_queue_reserve(bv_priority_queue_t *q, size_t n)
 
-XDEF _bv_priority_queue_reserve
+PUBLIC _bv_priority_queue_reserve
 
 _bv_priority_queue_reserve:
 

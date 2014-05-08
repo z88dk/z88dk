@@ -20,9 +20,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fgets
+PUBLIC asm_fgets
 
-LIB asm1_fgets_unlocked, __stdio_lock_release
+EXTERN asm1_fgets_unlocked, __stdio_lock_release
 
 asm_fgets:
 
@@ -63,14 +63,14 @@ asm_fgets:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock, error_zc
+   EXTERN __stdio_verify_valid_lock, error_zc
 
    call __stdio_verify_valid_lock
    jp c, error_zc
 
 ELSE
 
-   LIB __stdio_lock_acquire, error_enolck_zc
+   EXTERN __stdio_lock_acquire, error_enolck_zc
    
    call __stdio_lock_acquire
    jp c, error_enolck_zc
@@ -85,9 +85,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fgets
+PUBLIC asm_fgets
 
-LIB asm_fgets_unlocked
+EXTERN asm_fgets_unlocked
 
 asm_fgets:
 

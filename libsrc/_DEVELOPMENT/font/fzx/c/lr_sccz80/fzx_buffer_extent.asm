@@ -1,9 +1,9 @@
 
 ; uint fzx_buffer_extent(void *buf, uint len)
 
-XLIB fzx_buffer_extent
+PUBLIC fzx_buffer_extent
 
-LIB asm_fzx_buffer_extent
+EXTERN asm_fzx_buffer_extent
 
 fzx_buffer_extent:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Cobretti
+PUBLIC _ff_dkud1_Cobretti
 
 _ff_dkud1_Cobretti:
 

@@ -1,7 +1,7 @@
 
 ; void im2_init(void *im2_table)
 
-XDEF im2_init
+PUBLIC im2_init
 
 im2_init:
 

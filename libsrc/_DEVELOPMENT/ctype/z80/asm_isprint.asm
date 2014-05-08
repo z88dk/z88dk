@@ -1,5 +1,5 @@
 
-XLIB asm_isprint
+PUBLIC asm_isprint
 
 asm_isprint:
 

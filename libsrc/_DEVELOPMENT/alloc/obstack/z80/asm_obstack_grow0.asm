@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_grow0
+PUBLIC asm_obstack_grow0
 
-LIB asm0_obstack_blank, asm_memcpy, error_enomem_zc
+EXTERN asm0_obstack_blank, asm_memcpy, error_enomem_zc
 
 asm_obstack_grow0:
 

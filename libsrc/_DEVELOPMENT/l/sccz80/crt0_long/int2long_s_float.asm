@@ -2,8 +2,8 @@
 ;
 ;       Convert signed int to long
 
-                XLIB    l_int2long_s_float
-                LIB		float
+                PUBLIC    l_int2long_s_float
+                EXTERN 	float
 
 ; If MSB of h sets de to 255, if not sets de=0
 

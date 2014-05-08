@@ -1,9 +1,9 @@
 
 ; void p_forward_list_alt_push_back(p_forward_list_alt_t *list, void *item)
 
-XLIB p_forward_list_alt_push_back
+PUBLIC p_forward_list_alt_push_back
 
-LIB asm_p_forward_list_alt_push_back
+EXTERN asm_p_forward_list_alt_push_back
 
 p_forward_list_alt_push_back:
 

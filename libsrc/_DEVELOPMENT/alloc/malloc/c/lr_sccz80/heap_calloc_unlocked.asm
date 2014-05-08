@@ -1,9 +1,9 @@
 
 ; void *heap_calloc_unlocked(void *heap, size_t nmemb, size_t size)
 
-XLIB heap_calloc_unlocked
+PUBLIC heap_calloc_unlocked
 
-LIB asm_heap_calloc_unlocked
+EXTERN asm_heap_calloc_unlocked
 
 heap_calloc_unlocked:
 

@@ -1,7 +1,7 @@
 
-XLIB __w_array_write_n
+PUBLIC __w_array_write_n
 
-LIB asm_memcpy
+EXTERN asm_memcpy
 
 __w_array_write_n:
 

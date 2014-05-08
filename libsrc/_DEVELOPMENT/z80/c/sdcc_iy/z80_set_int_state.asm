@@ -1,7 +1,7 @@
 
 ; void z80_set_int_state(uint state)
 
-XDEF _z80_set_int_state
+PUBLIC _z80_set_int_state
 
 _z80_set_int_state:
 

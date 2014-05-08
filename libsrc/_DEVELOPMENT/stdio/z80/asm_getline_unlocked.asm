@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_getline_unlocked
+PUBLIC asm_getline_unlocked
 
-LIB asm_getdelim_unlocked
+EXTERN asm_getdelim_unlocked
 
 asm_getline_unlocked:
 

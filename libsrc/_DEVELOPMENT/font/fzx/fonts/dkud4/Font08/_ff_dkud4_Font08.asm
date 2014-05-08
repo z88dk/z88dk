@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud4_Font08
+PUBLIC _ff_dkud4_Font08
 
 _ff_dkud4_Font08:
 

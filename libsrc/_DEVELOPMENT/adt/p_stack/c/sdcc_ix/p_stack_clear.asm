@@ -1,9 +1,9 @@
 
 ; void p_stack_clear(p_stack_t *s)
 
-XDEF _p_stack_clear
+PUBLIC _p_stack_clear
 
-LIB _p_forward_list_init
+EXTERN _p_forward_list_init
 
 _p_stack_clear:
 

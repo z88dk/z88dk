@@ -5,8 +5,9 @@
 
 ; FASTCALL
 
-XLIB asm_sp1_DrawUpdateStructIfNotRem
-LIB SP1DrawUpdateStruct
+PUBLIC asm_sp1_DrawUpdateStructIfNotRem
+
+EXTERN SP1DrawUpdateStruct
 
 ; Draw the char's graphics to screen if it hasn't
 ; been removed.  Validates char as well.

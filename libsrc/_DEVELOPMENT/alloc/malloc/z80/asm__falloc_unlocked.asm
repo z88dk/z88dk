@@ -12,11 +12,11 @@
 ;
 ; ===============================================================
 
-XLIB asm__falloc_unlocked
+PUBLIC asm__falloc_unlocked
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_alloc_fixed_unlocked
+EXTERN asm_heap_alloc_fixed_unlocked
 
 asm__falloc_unlocked:
 

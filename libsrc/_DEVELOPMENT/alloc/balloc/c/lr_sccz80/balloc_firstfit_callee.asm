@@ -1,7 +1,7 @@
 
 ; void *balloc_firstfit(unsigned int queue, unsigned char num)
 
-XDEF balloc_firstfit_callee
+PUBLIC balloc_firstfit_callee
 
 balloc_firstfit_callee:
 

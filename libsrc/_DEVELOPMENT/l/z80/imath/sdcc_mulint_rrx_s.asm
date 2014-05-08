@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB __mulint_rrx_s
+PUBLIC __mulint_rrx_s
 
 __mulint_rrx_s:
 
@@ -32,7 +32,7 @@ IF __CLIB_OPT_IMATH <= 50
    push hl
    push af
    
-   LIB l_small_mul_16_16x16
+   EXTERN l_small_mul_16_16x16
    jp l_small_mul_16_16x16
 
 ENDIF
@@ -47,7 +47,7 @@ IF __CLIB_OPT_IMATH > 50
    push hl
    push af
    
-   LIB l_fast_mulu_16_16x16
+   EXTERN l_fast_mulu_16_16x16
    jp l_fast_mulu_16_16x16     ; hl = hl * de
 
 ENDIF

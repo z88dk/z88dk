@@ -1,7 +1,7 @@
 
 ; char *strndup(const char *s, size_t n)
 
-XDEF strndup_callee
+PUBLIC strndup_callee
 
 strndup_callee:
 

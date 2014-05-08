@@ -1,7 +1,7 @@
 
 ; _Noreturn void quick_exit(int status)
 
-XDEF quick_exit
+PUBLIC quick_exit
 
 quick_exit:
 

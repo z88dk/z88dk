@@ -17,9 +17,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_resize
+PUBLIC asm_w_vector_resize
 
-LIB asm_b_vector_resize, error_enomem_zc
+EXTERN asm_b_vector_resize, error_enomem_zc
 
 asm_w_vector_resize:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_GenevaMonoRoman
+PUBLIC _ff_ao_GenevaMonoRoman
 
 _ff_ao_GenevaMonoRoman:
 

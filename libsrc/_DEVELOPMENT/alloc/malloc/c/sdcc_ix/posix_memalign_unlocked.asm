@@ -1,7 +1,7 @@
 
 ; int posix_memalign_unlocked(void **memptr, size_t alignment, size_t size)
 
-XDEF _posix_memalign_unlocked
+PUBLIC _posix_memalign_unlocked
 
 _posix_memalign_unlocked:
 

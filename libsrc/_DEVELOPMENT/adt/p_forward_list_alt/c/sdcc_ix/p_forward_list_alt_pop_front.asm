@@ -1,7 +1,7 @@
 
 ; void *p_forward_list_alt_pop_front(p_forward_list_alt_t *list)
 
-XDEF _p_forward_list_alt_pop_front
+PUBLIC _p_forward_list_alt_pop_front
 
 _p_forward_list_alt_pop_front:
 

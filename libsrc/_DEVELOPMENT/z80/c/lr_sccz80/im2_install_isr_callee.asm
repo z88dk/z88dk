@@ -1,7 +1,7 @@
 
 ; void im2_install_isr_callee(uint8_t vector, void *isr)
 
-XDEF im2_install_isr_callee
+PUBLIC im2_install_isr_callee
 
 im2_install_isr_callee:
 

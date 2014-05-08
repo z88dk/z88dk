@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_reserve
+PUBLIC asm_b_vector_reserve
 
-LIB __0_vector_realloc_grow, error_mnc
+EXTERN __0_vector_realloc_grow, error_mnc
 
    inc hl
    inc hl

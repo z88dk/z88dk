@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_object_size
+PUBLIC obstack_object_size
 
 obstack_object_size:
 

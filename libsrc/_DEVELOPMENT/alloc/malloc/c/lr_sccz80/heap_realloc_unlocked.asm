@@ -1,9 +1,9 @@
 
 ; void *heap_realloc_unlocked(void *heap, void *p, size_t size)
 
-XLIB heap_realloc_unlocked
+PUBLIC heap_realloc_unlocked
 
-LIB asm_heap_realloc_unlocked
+EXTERN asm_heap_realloc_unlocked
 
 heap_realloc_unlocked:
 

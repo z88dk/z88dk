@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB sp1_Initialize
+PUBLIC sp1_Initialize
 
-LIB asm_sp1_Initialize
+EXTERN asm_sp1_Initialize
 
 sp1_Initialize:
 

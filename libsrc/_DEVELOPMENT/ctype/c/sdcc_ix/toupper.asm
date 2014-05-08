@@ -1,9 +1,9 @@
 
 ; int toupper(int c)
 
-XLIB _toupper
+PUBLIC _toupper
 
-LIB asm_toupper
+EXTERN asm_toupper
 
 _toupper:
 

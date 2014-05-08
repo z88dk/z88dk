@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_clear
+PUBLIC asm_w_array_clear
 
-LIB l_zeroword_hl
+EXTERN l_zeroword_hl
 
 asm_w_array_clear:
 

@@ -1,9 +1,9 @@
 
 ; int bv_stack_push(bv_stack_t *s, int c)
 
-XDEF _bv_stack_push
+PUBLIC _bv_stack_push
 
-LIB _b_vector_append
+EXTERN _b_vector_append
 
 _bv_stack_push:
 

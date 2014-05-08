@@ -1,9 +1,9 @@
 
 ; void *b_array_insert_block(b_array_t *a, size_t idx, size_t n)
 
-XLIB b_array_insert_block
+PUBLIC b_array_insert_block
 
-LIB asm_b_array_insert_block
+EXTERN asm_b_array_insert_block
 
 b_array_insert_block:
 

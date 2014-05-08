@@ -3,7 +3,7 @@
 ; aralbrec - Nov 2013
 ; ===============================================================
 
-XLIB __fzx_char_metrics
+PUBLIC __fzx_char_metrics
 
 __fzx_char_metrics:
 

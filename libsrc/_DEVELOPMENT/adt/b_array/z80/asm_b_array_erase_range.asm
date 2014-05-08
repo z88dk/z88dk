@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_erase_range
+PUBLIC asm_b_array_erase_range
 
-LIB asm_b_array_erase_block, error_einval_mc
+EXTERN asm_b_array_erase_block, error_einval_mc
 
 asm_b_array_erase_range:
 

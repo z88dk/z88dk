@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_erase_block
-XDEF asm0_b_array_erase_block
+PUBLIC asm_b_array_erase_block
+PUBLIC asm0_b_array_erase_block
 
-LIB error_einval_mc, l_neg_hl, asm_memcpy
+EXTERN error_einval_mc, l_neg_hl, asm_memcpy
 
 asm_b_array_erase_block:
 

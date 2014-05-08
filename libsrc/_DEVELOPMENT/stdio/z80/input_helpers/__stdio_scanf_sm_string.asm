@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_string
-XDEF __stdio_scanf_sm_string_write
+PUBLIC __stdio_scanf_sm_string
+PUBLIC __stdio_scanf_sm_string_write
 
-LIB asm_isspace
+EXTERN asm_isspace
 
 __stdio_scanf_sm_string:
 

@@ -1,9 +1,9 @@
 
 ; int wa_priority_queue_empty(wa_priority_queue_t *q)
 
-XDEF _wa_priority_queue_empty
+PUBLIC _wa_priority_queue_empty
 
-LIB _ba_priority_queue_empty
+EXTERN _ba_priority_queue_empty
 
 _wa_priority_queue_empty:
 

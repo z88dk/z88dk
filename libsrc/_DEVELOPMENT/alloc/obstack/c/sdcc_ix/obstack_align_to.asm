@@ -1,7 +1,7 @@
 
 ; int obstack_align_to(struct obstack *ob, size_t alignment)
 
-XDEF _obstack_align_to
+PUBLIC _obstack_align_to
 
 _obstack_align_to:
 

@@ -4,7 +4,7 @@
 ;
 ;	Quicky to make network progs quicker
 
-                XLIB    l_ghtonsint
+                PUBLIC    l_ghtonsint
 
 
 .l_ghtonsint

@@ -1,9 +1,9 @@
 
 ; void wa_priority_queue_clear(wa_priority_queue_t *q)
 
-XDEF _wa_priority_queue_clear
+PUBLIC _wa_priority_queue_clear
 
-LIB _ba_priority_queue_clear
+EXTERN _ba_priority_queue_clear
 
 _wa_priority_queue_clear:
 

@@ -3,7 +3,7 @@
 ;
 ; Multiply two 16 bit numbers hl=hl*de ((un)signed)
 
-                XLIB     l_mult
+                PUBLIC     l_mult
 
 ;New version 15/11/98  based on Spectrum ROM routine
 

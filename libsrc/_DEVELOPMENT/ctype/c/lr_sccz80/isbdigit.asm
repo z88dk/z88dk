@@ -1,9 +1,9 @@
 
 ; int isbdigit(int c)
 
-XLIB isbdigit
+PUBLIC isbdigit
 
-LIB asm_isbdigit, error_znc
+EXTERN asm_isbdigit, error_znc
 
 isbdigit:
 

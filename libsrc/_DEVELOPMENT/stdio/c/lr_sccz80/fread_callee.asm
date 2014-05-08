@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fread_callee
+PUBLIC fread_callee
 
 fread_callee:
 
@@ -24,9 +24,9 @@ fread_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fread_callee
+PUBLIC fread_callee
 
-LIB fread_unlocked_callee
+EXTERN fread_unlocked_callee
 
 fread_callee:
 

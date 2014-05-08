@@ -1,9 +1,9 @@
 
 ; FILE *fopen(const char *filename, const char *mode);
 
-XLIB fopen
+PUBLIC fopen
 
-LIB asm_fopen
+EXTERN asm_fopen
 
 fopen:
 

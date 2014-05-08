@@ -1,7 +1,7 @@
 
 ; int snprintf(char *s, size_t n, const char *format, ...)
 
-XDEF _snprintf
+PUBLIC _snprintf
 
 _snprintf:
 

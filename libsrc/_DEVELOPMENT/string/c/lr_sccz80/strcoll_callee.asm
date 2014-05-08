@@ -1,7 +1,7 @@
 
 ; int strcoll(const char *s1, const char *s2)
 
-XDEF strcoll_callee
+PUBLIC strcoll_callee
 
 strcoll_callee:
 

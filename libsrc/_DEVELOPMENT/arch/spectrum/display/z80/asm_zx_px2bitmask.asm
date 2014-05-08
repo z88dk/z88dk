@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_px2bitmask
+PUBLIC asm_zx_px2bitmask
 
 asm_zx_px2bitmask:
 

@@ -1,7 +1,7 @@
 
 ; void *b_array_data(b_array_t *a)
 
-XDEF b_array_data
+PUBLIC b_array_data
 
 ;defc b_array_data = asm_b_array_data
 

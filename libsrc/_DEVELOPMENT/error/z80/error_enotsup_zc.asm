@@ -1,9 +1,9 @@
 
-XLIB error_enotsup_zc
+PUBLIC error_enotsup_zc
 
-XREF __ENOTSUP
+EXTERN __ENOTSUP
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    

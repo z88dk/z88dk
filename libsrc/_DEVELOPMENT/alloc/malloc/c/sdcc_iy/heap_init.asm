@@ -1,7 +1,7 @@
 
 ; void *heap_init(void *heap, size_t size)
 
-XDEF _heap_init
+PUBLIC _heap_init
 
 _heap_init:
 

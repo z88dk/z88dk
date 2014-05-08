@@ -1,9 +1,9 @@
 
 ; void *memcpy(void * restrict s1, const void * restrict s2, size_t n)
 
-XLIB memcpy
+PUBLIC memcpy
 
-LIB asm_memcpy
+EXTERN asm_memcpy
 
 memcpy:
 

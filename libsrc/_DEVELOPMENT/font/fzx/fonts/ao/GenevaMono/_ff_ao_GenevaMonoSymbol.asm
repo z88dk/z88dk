@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_GenevaMonoSymbol
+PUBLIC _ff_ao_GenevaMonoSymbol
 
 _ff_ao_GenevaMonoSymbol:
 

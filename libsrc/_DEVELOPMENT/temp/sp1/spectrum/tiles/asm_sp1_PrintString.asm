@@ -2,9 +2,9 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
-XLIB asm_sp1_PrintString
+PUBLIC asm_sp1_PrintString
 
-LIB SP1PrintString, SP1PSPOP, SP1PSPUSH
+EXTERN SP1PrintString, SP1PSPOP, SP1PSPUSH
 
 asm_sp1_PrintString:
    

@@ -1,7 +1,7 @@
 
 ; void *zx_aaddrcdown(void *attraddr)
 
-XDEF zx_aaddrcdown
+PUBLIC zx_aaddrcdown
 
 zx_aaddrcdown:
 

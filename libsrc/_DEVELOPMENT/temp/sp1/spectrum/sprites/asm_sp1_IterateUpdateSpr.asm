@@ -2,9 +2,9 @@
 ; 11.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_IterateUpdateSpr
+PUBLIC asm_sp1_IterateUpdateSpr
 
-LIB l_jpix
+EXTERN l_jpix
 
 asm_sp1_IterateUpdateSpr:
 

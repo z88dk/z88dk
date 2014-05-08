@@ -11,10 +11,10 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_ftrylockfile
-XDEF asm0_ftrylockfile
+PUBLIC asm_ftrylockfile
+PUBLIC asm0_ftrylockfile
 
-LIB __stdio_lock_tryacquire, error_znc, error_mc
+EXTERN __stdio_lock_tryacquire, error_znc, error_mc
 
 asm_ftrylockfile:
 
@@ -37,7 +37,7 @@ asm_ftrylockfile:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

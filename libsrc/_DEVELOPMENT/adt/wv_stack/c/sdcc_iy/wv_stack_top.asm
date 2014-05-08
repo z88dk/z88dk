@@ -1,9 +1,9 @@
 
 ; void *wv_stack_top(wv_stack_t *s)
 
-XDEF _wv_stack_top
+PUBLIC _wv_stack_top
 
-LIB _w_array_back
+EXTERN _w_array_back
 
 _wv_stack_top:
 

@@ -1,7 +1,7 @@
 
 ; int ferror_unlocked(FILE *stream)
 
-XDEF ferror_unlocked
+PUBLIC ferror_unlocked
 
 ferror_unlocked:
 

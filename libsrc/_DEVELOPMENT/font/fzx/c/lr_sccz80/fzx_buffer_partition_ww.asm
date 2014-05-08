@@ -1,9 +1,9 @@
 
 ; void *fzx_buffer_partition_ww(void *buf, uint len, uint width)
 
-XLIB fzx_buffer_partition_ww
+PUBLIC fzx_buffer_partition_ww
 
-LIB asm_fzx_buffer_partition_ww
+EXTERN asm_fzx_buffer_partition_ww
 
 fzx_buffer_partition_ww:
 

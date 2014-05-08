@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_blank_callee
+PUBLIC obstack_blank_callee
 
 obstack_blank_callee:
 

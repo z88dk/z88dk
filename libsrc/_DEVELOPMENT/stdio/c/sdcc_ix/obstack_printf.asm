@@ -1,7 +1,7 @@
 
 ; int obstack_printf(struct obstack *obstack, const char *format, ...)
 
-XDEF _obstack_printf
+PUBLIC _obstack_printf
 
 _obstack_printf:
 

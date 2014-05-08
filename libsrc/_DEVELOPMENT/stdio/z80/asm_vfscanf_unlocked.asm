@@ -11,15 +11,15 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_vfscanf_unlocked
-XDEF asm0_vfscanf_unlocked, asm1_vfscanf_unlocked
+PUBLIC asm_vfscanf_unlocked
+PUBLIC asm0_vfscanf_unlocked, asm1_vfscanf_unlocked
 
-LIB __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
-LIB __stdio_scanf_sm_format_pct, error_einval_zc
+EXTERN __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
+EXTERN __stdio_scanf_sm_format_pct, error_einval_zc
 
 IF __CLIB_OPT_SCANF != 0
 
-LIB __stdio_nextarg_bc, __stdio_length_modifier, error_erange_zc, l_atou
+EXTERN __stdio_nextarg_bc, __stdio_length_modifier, error_erange_zc, l_atou
 
 ENDIF
 
@@ -57,7 +57,7 @@ asm_vfscanf_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c
@@ -349,7 +349,7 @@ spec_unmodified:
 IF __CLIB_OPT_SCANF & $01
 
    cp 'd'
-   LIB __stdio_scanf_d
+   EXTERN __stdio_scanf_d
    jp z, __stdio_scanf_d
 
 ENDIF
@@ -357,7 +357,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $02
    
    cp 'u'
-   LIB __stdio_scanf_u
+   EXTERN __stdio_scanf_u
    jp z, __stdio_scanf_u
 
 ENDIF
@@ -365,7 +365,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $40
    
    cp 'i'
-   LIB __stdio_scanf_i
+   EXTERN __stdio_scanf_i
    jp z, __stdio_scanf_i
 
 ENDIF
@@ -373,7 +373,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $c0
    
    cp 'x'
-   LIB __stdio_scanf_x
+   EXTERN __stdio_scanf_x
    jp z, __stdio_scanf_x
 
 ENDIF
@@ -381,7 +381,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $10
    
    cp 'o'
-   LIB __stdio_scanf_o
+   EXTERN __stdio_scanf_o
    jp z, __stdio_scanf_o
 
 ENDIF
@@ -389,7 +389,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $80
    
    cp 'p'
-   LIB __stdio_scanf_p
+   EXTERN __stdio_scanf_p
    jp z, __stdio_scanf_p
 
 ENDIF
@@ -397,7 +397,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $20
    
    cp 'n'
-   LIB __stdio_scanf_n
+   EXTERN __stdio_scanf_n
    jp z, __stdio_scanf_n
 
 ENDIF
@@ -405,7 +405,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $100
    
    cp 'B'
-   LIB __stdio_scanf_bb
+   EXTERN __stdio_scanf_bb
    jp z, __stdio_scanf_bb
 
 ENDIF
@@ -415,7 +415,7 @@ spec_constant:
 IF __CLIB_OPT_SCANF & $200
 
    cp 's'
-   LIB __stdio_scanf_s
+   EXTERN __stdio_scanf_s
    jp z, __stdio_scanf_s
 
 ENDIF
@@ -423,7 +423,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $400
    
    cp 'c'
-   LIB __stdio_scanf_c
+   EXTERN __stdio_scanf_c
    jp z, __stdio_scanf_c
 
 ENDIF
@@ -431,7 +431,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $800
    
    cp 'I'
-   LIB __stdio_scanf_ii
+   EXTERN __stdio_scanf_ii
    jp z, __stdio_scanf_ii
 
 ENDIF
@@ -465,7 +465,7 @@ __spec_long:
 IF __CLIB_OPT_SCANF & $1000
 
    cp 'd'
-   LIB __stdio_scanf_ld
+   EXTERN __stdio_scanf_ld
    jp z, __stdio_scanf_ld
 
 ENDIF
@@ -473,7 +473,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $2000
    
    cp 'u'
-   LIB __stdio_scanf_lu
+   EXTERN __stdio_scanf_lu
    jp z, __stdio_scanf_lu
 
 ENDIF
@@ -481,7 +481,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $40000
    
    cp 'i'
-   LIB __stdio_scanf_li
+   EXTERN __stdio_scanf_li
    jp z, __stdio_scanf_li
 
 ENDIF
@@ -489,7 +489,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $c000
    
    cp 'x'
-   LIB __stdio_scanf_lx
+   EXTERN __stdio_scanf_lx
    jp z, __stdio_scanf_lx
 
 ENDIF
@@ -497,7 +497,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $10000
    
    cp 'o'
-   LIB __stdio_scanf_lo
+   EXTERN __stdio_scanf_lo
    jp z, __stdio_scanf_lo
 
 ENDIF
@@ -505,7 +505,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $80000
    
    cp 'p'
-   LIB __stdio_scanf_lp
+   EXTERN __stdio_scanf_lp
    jp z, __stdio_scanf_lp
 
 ENDIF
@@ -513,7 +513,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $20000
    
    cp 'n'
-   LIB __stdio_scanf_ln
+   EXTERN __stdio_scanf_ln
    jp z, __stdio_scanf_ln
 
 ENDIF
@@ -521,7 +521,7 @@ ENDIF
 IF __CLIB_OPT_SCANF & $100000
    
    cp 'B'
-   LIB __stdio_scanf_lbb
+   EXTERN __stdio_scanf_lbb
    jp z, __stdio_scanf_lbb
 
 ENDIF
@@ -535,7 +535,7 @@ _scanf_bkt:
    ; special treatment for %[
    ; bc' communicates the format pointer
    
-   LIB __stdio_scanf_bkt
+   EXTERN __stdio_scanf_bkt
    call __stdio_scanf_bkt
 
    ; bc'= char *format   

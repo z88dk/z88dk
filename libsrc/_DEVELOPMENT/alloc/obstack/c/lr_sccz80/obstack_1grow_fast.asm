@@ -1,9 +1,9 @@
 
 ; void *obstack_1grow_fast(struct obstack *ob, char c)
 
-XLIB obstack_1grow_fast
+PUBLIC obstack_1grow_fast
 
-LIB asm_obstack_1grow_fast
+EXTERN asm_obstack_1grow_fast
 
 obstack_1grow_fast:
 

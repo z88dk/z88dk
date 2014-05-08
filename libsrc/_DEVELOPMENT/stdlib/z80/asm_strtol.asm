@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strtol
+PUBLIC asm_strtol
 
-LIB __strtoul__, error_erange_mc, error_erange_zc, error_einval_zc
+EXTERN __strtoul__, error_erange_mc, error_erange_zc, error_einval_zc
 
 asm_strtol:
 

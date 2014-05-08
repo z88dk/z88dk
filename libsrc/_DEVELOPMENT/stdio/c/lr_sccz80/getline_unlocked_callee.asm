@@ -1,7 +1,7 @@
 
 ; size_t getline_unlocked(char **lineptr, size_t *n, FILE *stream)
 
-XDEF getline_unlocked_callee
+PUBLIC getline_unlocked_callee
 
 getline_unlocked_callee:
 

@@ -1,9 +1,9 @@
 
 ; size_t bv_stack_capacity(bv_stack_t *s)
 
-XDEF _bv_stack_capacity
+PUBLIC _bv_stack_capacity
 
-LIB _b_vector_capacity
+EXTERN _b_vector_capacity
 
 _bv_stack_capacity:
 

@@ -1,5 +1,5 @@
 
-XLIB l_jp_table
+PUBLIC l_jp_table
 
 l_jp_table:
 

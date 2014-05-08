@@ -2,7 +2,7 @@
 ;       l_gchar variant to be used sometimes by the peephole optimizer
 ;
 
-XLIB l_gcharspsp
+PUBLIC l_gcharspsp
 .l_gcharspsp
 	add	hl,sp
 	inc hl

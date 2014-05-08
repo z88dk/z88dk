@@ -1,9 +1,9 @@
 
 ; int vasprintf(char **ptr, const char *format, void *arg)
 
-XLIB vasprintf
+PUBLIC vasprintf
 
-LIB asm_vasprintf
+EXTERN asm_vasprintf
 
 vasprintf:
 

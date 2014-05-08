@@ -1,7 +1,7 @@
 
 ; void *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size)
 
-XDEF heap_alloc_fixed_unlocked_callee
+PUBLIC heap_alloc_fixed_unlocked_callee
 
 heap_alloc_fixed_unlocked_callee:
 

@@ -1,9 +1,9 @@
 
 ; size_t w_array_erase_range(w_array_t *a, size_t idx_first, size_t idx_last)
 
-XLIB w_array_erase_range
+PUBLIC w_array_erase_range
 
-LIB asm_w_array_erase_range
+EXTERN asm_w_array_erase_range
 
 w_array_erase_range:
 

@@ -1,7 +1,7 @@
 
 ; int at_quick_exit(void (*func)(void))
 
-XDEF _at_quick_exit
+PUBLIC _at_quick_exit
 
 _at_quick_exit:
 

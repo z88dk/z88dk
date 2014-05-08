@@ -1,7 +1,7 @@
 
 ; int _strtoi_(const char *nptr, char **endptr, int base)
 
-XDEF _strtoi__callee
+PUBLIC _strtoi__callee
 
 _strtoi__callee:
 

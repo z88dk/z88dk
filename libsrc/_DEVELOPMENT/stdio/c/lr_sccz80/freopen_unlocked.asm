@@ -1,9 +1,9 @@
 
 ; FILE *freopen_unlocked(char *filename, char *mode, FILE *stream)
 
-XLIB freopen_unlocked
+PUBLIC freopen_unlocked
 
-LIB asm_freopen_unlocked
+EXTERN asm_freopen_unlocked
 
 freopen_unlocked:
 

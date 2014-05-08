@@ -1,7 +1,7 @@
 
 ; char *_memupr_(void *p, size_t n)
 
-XDEF __memupr_
+PUBLIC __memupr_
 
 __memupr_:
 

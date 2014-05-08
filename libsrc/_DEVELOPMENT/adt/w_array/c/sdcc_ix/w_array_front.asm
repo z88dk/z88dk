@@ -1,7 +1,7 @@
 
 ; void *w_array_front(w_array_t *a)
 
-XDEF _w_array_front
+PUBLIC _w_array_front
 
 _w_array_front:
 

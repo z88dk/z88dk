@@ -1,7 +1,7 @@
 
 ; void p_forward_list_init(void *p)
 
-XDEF _p_forward_list_init
+PUBLIC _p_forward_list_init
 
 _p_forward_list_init:
 

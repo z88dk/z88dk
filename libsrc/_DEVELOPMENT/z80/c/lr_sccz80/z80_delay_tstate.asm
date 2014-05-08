@@ -1,7 +1,7 @@
 
 ; void z80_delay_tstate(uint tstates)
 
-XDEF z80_delay_tstate
+PUBLIC z80_delay_tstate
 
 z80_delay_tstate:
 

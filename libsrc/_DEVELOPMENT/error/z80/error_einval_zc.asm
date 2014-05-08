@@ -1,9 +1,9 @@
 
-XLIB error_einval_zc
+PUBLIC error_einval_zc
 
-XREF __EINVAL
+EXTERN __EINVAL
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    pop hl

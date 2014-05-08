@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_strlen
+PUBLIC asm_strlen
 
 asm_strlen:
 

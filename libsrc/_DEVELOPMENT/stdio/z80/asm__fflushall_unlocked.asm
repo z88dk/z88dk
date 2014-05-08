@@ -1,16 +1,16 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm__fflushall_unlocked
+PUBLIC asm__fflushall_unlocked
 
-XREF __stdio_file_list_open
+EXTERN __stdio_file_list_open
 
-LIB asm1_fflush_unlocked, asm_p_forward_list_front
+EXTERN asm1_fflush_unlocked, asm_p_forward_list_front
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

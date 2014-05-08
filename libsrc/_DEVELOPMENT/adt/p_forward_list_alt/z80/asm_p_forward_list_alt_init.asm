@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_alt_init
+PUBLIC asm_p_forward_list_alt_init
 
-LIB asm_p_forward_list_init
+EXTERN asm_p_forward_list_init
 
 asm_p_forward_list_alt_init:
 

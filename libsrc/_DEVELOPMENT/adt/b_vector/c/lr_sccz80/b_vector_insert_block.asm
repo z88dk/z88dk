@@ -1,9 +1,9 @@
 
 ; void *b_vector_insert_block(b_vector_t *v, size_t idx, size_t n)
 
-XLIB b_vector_insert_block
+PUBLIC b_vector_insert_block
 
-LIB asm_b_vector_insert_block
+EXTERN asm_b_vector_insert_block
 
 b_vector_insert_block:
 

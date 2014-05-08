@@ -2,12 +2,11 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_ClearRect
-XDEF SP1CRSELECT
+PUBLIC asm_sp1_ClearRect
+PUBLIC SP1CRSELECT
 
-LIB asm_sp1_GetUpdateStruct, l_jpix
-
-XREF SP1V_DISPWIDTH
+EXTERN asm_sp1_GetUpdateStruct, l_jpix
+EXTERN SP1V_DISPWIDTH
 
 asm_sp1_ClearRect:
 

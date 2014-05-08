@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_stack_size
+PUBLIC asm_p_stack_size
 
-LIB asm_p_forward_list_size
+EXTERN asm_p_forward_list_size
 
 asm_p_stack_size:
 

@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ffsl
+PUBLIC asm_ffsl
 
-LIB asm0_ffs, asm1_ffs, asm2_ffs
+EXTERN asm0_ffs, asm1_ffs, asm2_ffs
 
 asm_ffsl:
 

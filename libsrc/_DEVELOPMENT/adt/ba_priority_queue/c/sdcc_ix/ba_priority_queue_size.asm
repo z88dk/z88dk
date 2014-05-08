@@ -1,7 +1,7 @@
 
 ; size_t ba_priority_queue_size(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_size
+PUBLIC _ba_priority_queue_size
 
 _ba_priority_queue_size:
 

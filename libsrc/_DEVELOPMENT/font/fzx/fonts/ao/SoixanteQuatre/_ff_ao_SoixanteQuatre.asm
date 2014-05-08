@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_SoixanteQuatre
+PUBLIC _ff_ao_SoixanteQuatre
 
 _ff_ao_SoixanteQuatre:
 

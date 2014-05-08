@@ -1,5 +1,5 @@
 
-XLIB l_fast_lsl_dehl
+PUBLIC l_fast_lsl_dehl
 
 l_fast_lsl_dehl:
 

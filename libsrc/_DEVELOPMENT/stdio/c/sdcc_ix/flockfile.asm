@@ -1,7 +1,7 @@
 
 ; void flockfile(FILE *file)
 
-XDEF _flockfile
+PUBLIC _flockfile
 
 _flockfile:
 

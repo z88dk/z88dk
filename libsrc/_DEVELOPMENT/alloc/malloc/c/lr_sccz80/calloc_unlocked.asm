@@ -1,9 +1,9 @@
 
 ; void *calloc_unlocked(size_t nmemb, size_t size)
 
-XLIB calloc_unlocked
+PUBLIC calloc_unlocked
 
-LIB asm_calloc_unlocked
+EXTERN asm_calloc_unlocked
 
 calloc_unlocked:
 

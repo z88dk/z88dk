@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_vprintf_unlocked
+PUBLIC asm_vprintf_unlocked
 
-XREF __stdio_file_stdout
+EXTERN __stdio_file_stdout
 
-LIB asm_vfprintf_unlocked
+EXTERN asm_vfprintf_unlocked
 
 asm_vprintf_unlocked:
 

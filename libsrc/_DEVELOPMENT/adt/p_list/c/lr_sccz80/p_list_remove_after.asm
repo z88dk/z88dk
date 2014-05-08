@@ -1,9 +1,9 @@
 
 ; void *p_list_remove_after(p_list_t *list, void *list_item)
 
-XLIB p_list_remove_after
+PUBLIC p_list_remove_after
 
-LIB asm_p_list_remove_after
+EXTERN asm_p_list_remove_after
 
 p_list_remove_after:
 

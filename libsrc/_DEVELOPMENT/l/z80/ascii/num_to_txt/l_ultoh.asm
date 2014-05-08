@@ -5,7 +5,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_ultoh
+PUBLIC l_ultoh
 
 l_ultoh:
 
@@ -21,12 +21,12 @@ l_ultoh:
 
 IF __CLIB_OPT_NUM2TXT_SELECT & $08
 
-   LIB l_fast_ultoh
+   EXTERN l_fast_ultoh
    jp l_fast_ultoh
 
 ELSE
 
-   LIB l_small_ultoh
+   EXTERN l_small_ultoh
    jp l_small_ultoh
 
 ENDIF

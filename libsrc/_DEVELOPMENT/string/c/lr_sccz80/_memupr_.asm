@@ -1,9 +1,9 @@
 
 ; char *_memupr_(void *p, size_t n)
 
-XLIB _memupr_
+PUBLIC _memupr_
 
-LIB asm__memupr
+EXTERN asm__memupr
 
 _memupr_:
 

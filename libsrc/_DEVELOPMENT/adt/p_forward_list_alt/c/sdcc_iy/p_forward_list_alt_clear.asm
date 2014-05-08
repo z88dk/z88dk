@@ -1,9 +1,9 @@
 
 ; void p_forward_list_alt_clear(p_forward_list_alt_t *list)
 
-XDEF _p_forward_list_alt_clear
+PUBLIC _p_forward_list_alt_clear
 
-LIB _p_forward_list_alt_init
+EXTERN _p_forward_list_alt_init
 
 _p_forward_list_alt_clear:
 

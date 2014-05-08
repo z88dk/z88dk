@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Hemery
+PUBLIC _ff_ao_Hemery
 
 _ff_ao_Hemery:
 

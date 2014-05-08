@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fseek_callee
+PUBLIC fseek_callee
 
 fseek_callee:
 
@@ -24,9 +24,9 @@ fseek_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fseek_callee
+PUBLIC fseek_callee
 
-LIB fseek_unlocked_callee
+EXTERN fseek_unlocked_callee
 
 fseek_callee:
 

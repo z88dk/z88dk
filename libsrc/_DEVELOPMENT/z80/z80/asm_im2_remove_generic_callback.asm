@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_im2_remove_generic_callback
+PUBLIC asm_im2_remove_generic_callback
 
-LIB __generic_isr_locate_callbacks, error_einval_mc, error_znc
+EXTERN __generic_isr_locate_callbacks, error_einval_mc, error_znc
 
 asm_im2_remove_generic_callback:
 

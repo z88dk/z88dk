@@ -9,8 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_feof_unlocked
-XDEF asm1_feof_unlocked
+PUBLIC asm_feof_unlocked
+PUBLIC asm1_feof_unlocked
 
 asm_feof_unlocked:
 
@@ -33,7 +33,7 @@ asm_feof_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
    
    call __stdio_verify_valid
    ret c

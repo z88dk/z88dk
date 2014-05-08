@@ -1,7 +1,7 @@
 
 ; size_t w_array_insert(w_array_t *a, size_t idx, void *item)
 
-XDEF w_array_insert_callee
+PUBLIC w_array_insert_callee
 
 w_array_insert_callee:
 

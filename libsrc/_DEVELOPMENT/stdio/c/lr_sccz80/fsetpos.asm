@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fsetpos
+PUBLIC fsetpos
 
-LIB asm_fsetpos
+EXTERN asm_fsetpos
 
 fsetpos:
 
@@ -27,9 +27,9 @@ fsetpos:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fsetpos
+PUBLIC fsetpos
 
-LIB fsetpos_unlocked
+EXTERN fsetpos_unlocked
 
 fsetpos:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_info_unlocked
+PUBLIC asm_heap_info_unlocked
 
-LIB l_jpix, l_inc_sp
+EXTERN l_jpix, l_inc_sp
 
 asm_heap_info_unlocked:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_Skyscrap
+PUBLIC _ff_utz_Skyscrap
 
 _ff_utz_Skyscrap:
 

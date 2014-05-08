@@ -1,7 +1,7 @@
 
 ; int fzx_mode(int mode)
 
-XDEF _fzx_mode
+PUBLIC _fzx_mode
 
 _fzx_mode:
 

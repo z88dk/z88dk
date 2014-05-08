@@ -9,11 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_mtx_unlock
+PUBLIC asm_mtx_unlock
 
-XREF __thrd_id, thrd_success, thrd_error
-
-LIB asm_spinlock_acquire, __thread_unblock, error_einval_mc
+EXTERN __thrd_id, thrd_success, thrd_error
+EXTERN asm_spinlock_acquire, __thread_unblock, error_einval_mc
 
 asm_mtx_unlock:
 

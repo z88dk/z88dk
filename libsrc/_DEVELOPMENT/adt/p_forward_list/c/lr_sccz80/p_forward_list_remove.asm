@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_remove(p_forward_list_t *list, void *item)
 
-XLIB p_forward_list_remove
+PUBLIC p_forward_list_remove
 
-LIB asm_p_forward_list_remove
+EXTERN asm_p_forward_list_remove
 
 p_forward_list_remove:
 

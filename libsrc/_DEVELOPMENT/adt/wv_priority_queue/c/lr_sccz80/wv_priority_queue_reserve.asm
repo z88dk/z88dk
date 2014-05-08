@@ -1,9 +1,9 @@
 
 ; int wv_priority_queue_reserve(wv_priority_queue_t *q, size_t n)
 
-XLIB wv_priority_queue_reserve
+PUBLIC wv_priority_queue_reserve
 
-LIB asm_wv_priority_queue_reserve
+EXTERN asm_wv_priority_queue_reserve
 
 wv_priority_queue_reserve:
 

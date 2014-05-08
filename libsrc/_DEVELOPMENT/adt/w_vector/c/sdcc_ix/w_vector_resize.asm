@@ -1,7 +1,7 @@
 
 ; int w_vector_resize(w_vector_t *v, size_t n)
 
-XDEF _w_vector_resize
+PUBLIC _w_vector_resize
 
 _w_vector_resize:
 

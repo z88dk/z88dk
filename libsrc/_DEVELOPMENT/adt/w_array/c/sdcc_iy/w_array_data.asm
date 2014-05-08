@@ -1,9 +1,9 @@
 
 ; void *w_array_data(w_array_t *a)
 
-XDEF _w_array_data
+PUBLIC _w_array_data
 
-LIB _b_array_data
+EXTERN _b_array_data
 
 _w_array_data:
 

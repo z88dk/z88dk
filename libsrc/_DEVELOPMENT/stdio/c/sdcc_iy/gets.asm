@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _gets
+PUBLIC _gets
 
 _gets:
 
@@ -23,9 +23,9 @@ _gets:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _gets
+PUBLIC _gets
 
-LIB _gets_unlocked
+EXTERN _gets_unlocked
 
 _gets:
 

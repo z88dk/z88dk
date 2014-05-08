@@ -1,7 +1,7 @@
 
 ; void *obstack_int_grow(struct obstack *ob, int data)
 
-XDEF _obstack_int_grow
+PUBLIC _obstack_int_grow
 
 _obstack_int_grow:
 

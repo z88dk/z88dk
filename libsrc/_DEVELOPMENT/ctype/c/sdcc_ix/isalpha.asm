@@ -1,9 +1,9 @@
 
 ; int isalpha(int c)
 
-XLIB _isalpha
+PUBLIC _isalpha
 
-LIB asm_isalpha, error_zc
+EXTERN asm_isalpha, error_zc
 
 _isalpha:
 

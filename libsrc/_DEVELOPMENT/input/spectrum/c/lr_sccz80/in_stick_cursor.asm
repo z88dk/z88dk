@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_cursor(void)
 
-XDEF in_stick_cursor
+PUBLIC in_stick_cursor
 
 in_stick_cursor:
 

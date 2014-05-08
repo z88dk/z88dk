@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wv_priority_queue_reserve
+PUBLIC asm_wv_priority_queue_reserve
 
-LIB asm_w_vector_reserve
+EXTERN asm_w_vector_reserve
 
 asm_wv_priority_queue_reserve:
 

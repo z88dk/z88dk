@@ -17,9 +17,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_resize
+PUBLIC asm_b_vector_resize
 
-LIB __array_expand, asm0_b_array_resize, __vector_realloc_grow, error_zc
+EXTERN __array_expand, asm0_b_array_resize, __vector_realloc_grow, error_zc
 
 asm_b_vector_resize:
 

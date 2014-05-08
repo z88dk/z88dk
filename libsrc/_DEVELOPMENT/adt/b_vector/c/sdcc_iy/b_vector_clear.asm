@@ -1,9 +1,9 @@
 
 ; void b_vector_clear(b_vector_t *v)
 
-XDEF _b_vector_clear
+PUBLIC _b_vector_clear
 
-LIB _b_array_clear
+EXTERN _b_array_clear
 
 _b_vector_clear:
 

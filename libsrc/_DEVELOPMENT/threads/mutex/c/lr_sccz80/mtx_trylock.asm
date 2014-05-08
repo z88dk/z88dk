@@ -1,7 +1,7 @@
 
 ; int mtx_trylock(mtx_t *m)
 
-XDEF mtx_trylock
+PUBLIC mtx_trylock
 
 mtx_trylock:
 

@@ -1,9 +1,9 @@
 
 ; int ungetc_unlocked(int c, FILE *stream)
 
-XLIB ungetc_unlocked
+PUBLIC ungetc_unlocked
 
-LIB asm_ungetc_unlocked
+EXTERN asm_ungetc_unlocked
 
 ungetc_unlocked:
 

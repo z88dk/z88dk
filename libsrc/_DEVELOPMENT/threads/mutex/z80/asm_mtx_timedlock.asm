@@ -9,11 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_mtx_timedlock
+PUBLIC asm_mtx_timedlock
 
-XREF __thrd_id, thrd_success, thrd_error
-
-LIB asm_spinlock_acquire, __thread_block_timeout, error_einval_mc
+EXTERN __thrd_id, thrd_success, thrd_error
+EXTERN asm_spinlock_acquire, __thread_block_timeout, error_einval_mc
 
 asm_mtx_timedlock:
 

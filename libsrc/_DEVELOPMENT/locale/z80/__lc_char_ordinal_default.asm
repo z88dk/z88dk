@@ -1,5 +1,5 @@
 
-XLIB __lc_char_ordinal_default
+PUBLIC __lc_char_ordinal_default
 
 __lc_char_ordinal_default:
 

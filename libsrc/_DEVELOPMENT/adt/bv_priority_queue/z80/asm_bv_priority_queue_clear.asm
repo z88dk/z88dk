@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_clear
+PUBLIC asm_bv_priority_queue_clear
 
-LIB l_zeroword_hl
+EXTERN l_zeroword_hl
 
 asm_bv_priority_queue_clear:
 

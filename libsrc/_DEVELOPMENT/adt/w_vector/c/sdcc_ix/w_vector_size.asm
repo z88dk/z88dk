@@ -1,9 +1,9 @@
 
 ; void *w_vector_size(w_vector_t *v)
 
-XDEF _w_vector_size
+PUBLIC _w_vector_size
 
-LIB _w_array_size
+EXTERN _w_array_size
 
 _w_vector_size:
 

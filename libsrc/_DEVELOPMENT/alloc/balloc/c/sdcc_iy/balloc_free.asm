@@ -1,7 +1,7 @@
 
 ; void balloc_free(void *m)
 
-XDEF _balloc_free
+PUBLIC _balloc_free
 
 _balloc_free:
 

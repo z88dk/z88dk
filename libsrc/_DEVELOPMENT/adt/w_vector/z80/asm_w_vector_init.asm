@@ -13,9 +13,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_init
+PUBLIC asm_w_vector_init
 
-LIB asm_b_vector_init, error_enomem_zc
+EXTERN asm_b_vector_init, error_enomem_zc
 
 asm_w_vector_init:
 

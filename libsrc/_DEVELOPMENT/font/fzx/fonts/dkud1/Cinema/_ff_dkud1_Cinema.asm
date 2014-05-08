@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Cinema
+PUBLIC _ff_dkud1_Cinema
 
 _ff_dkud1_Cinema:
 

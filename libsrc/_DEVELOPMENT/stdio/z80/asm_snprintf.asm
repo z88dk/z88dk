@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_snprintf
+PUBLIC asm_snprintf
 
-LIB asm_vsnprintf, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_vsnprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_snprintf:
 

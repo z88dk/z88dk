@@ -1,7 +1,7 @@
 
 ; void *w_vector_max_size(w_vector_t *v)
 
-XDEF _w_vector_max_size
+PUBLIC _w_vector_max_size
 
 _w_vector_max_size:
 

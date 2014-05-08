@@ -1,9 +1,9 @@
 
 ; int getc(FILE *stream)
 
-XDEF getc
+PUBLIC getc
 
-LIB fgetc
+EXTERN fgetc
 
 ;defc getc = fgetc
 

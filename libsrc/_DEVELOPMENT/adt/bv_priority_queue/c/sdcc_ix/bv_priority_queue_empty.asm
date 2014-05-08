@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_empty(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_empty
+PUBLIC _bv_priority_queue_empty
 
-LIB _ba_priority_queue_empty
+EXTERN _ba_priority_queue_empty
 
 _bv_priority_queue_empty:
 

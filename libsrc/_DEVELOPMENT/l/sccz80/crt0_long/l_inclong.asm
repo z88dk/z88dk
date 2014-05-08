@@ -1,7 +1,7 @@
 
-XLIB l_inclong
+PUBLIC l_inclong
 
-LIB l_inc_dehl
+EXTERN l_inc_dehl
 
 l_inclong:
 

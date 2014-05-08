@@ -1,7 +1,7 @@
 
 ; int fsetpos_unlocked(FILE *stream, const fpos_t *pos)
 
-XDEF _fsetpos_unlocked
+PUBLIC _fsetpos_unlocked
 
 _fsetpos_unlocked:
 

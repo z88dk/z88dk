@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_key_scancode
+PUBLIC asm_in_key_scancode
 
-LIB in_key_translation_table, error_einval_zc
+EXTERN in_key_translation_table, error_einval_zc
 
 asm_in_key_scancode:
 

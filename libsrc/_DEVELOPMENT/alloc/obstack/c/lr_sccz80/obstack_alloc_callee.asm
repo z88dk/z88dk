@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_alloc_callee
+PUBLIC obstack_alloc_callee
 
 obstack_alloc_callee:
 

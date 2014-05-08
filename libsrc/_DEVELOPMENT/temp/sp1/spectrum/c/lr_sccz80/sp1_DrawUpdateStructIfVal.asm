@@ -1,7 +1,7 @@
 
 ; sp1_DrawUpdateStructIfVal(struct sp1_update *u)
 
-XDEF sp1_DrawUpdateStructIfVal
+PUBLIC sp1_DrawUpdateStructIfVal
 
 sp1_DrawUpdateStructIfVal:
 

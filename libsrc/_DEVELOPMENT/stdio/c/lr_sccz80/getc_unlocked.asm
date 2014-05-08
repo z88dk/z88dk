@@ -1,9 +1,9 @@
 
 ; int getc_unlocked(FILE *stream)
 
-XDEF getc_unlocked
+PUBLIC getc_unlocked
 
-LIB fgetc_unlocked
+EXTERN fgetc_unlocked
 
 ;defc getc_unlocked = fgetc_unlocked
 

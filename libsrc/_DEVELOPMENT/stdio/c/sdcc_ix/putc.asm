@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _putc
+PUBLIC _putc
 
-LIB _fputc
+EXTERN _fputc
 
 _putc:
 
@@ -21,9 +21,9 @@ _putc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _putc
+PUBLIC _putc
 
-LIB _putc_unlocked
+EXTERN _putc_unlocked
 
 _putc:
 

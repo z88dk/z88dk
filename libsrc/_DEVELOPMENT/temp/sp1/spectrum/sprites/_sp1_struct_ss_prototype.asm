@@ -1,6 +1,7 @@
 
-XLIB _sp1_struct_ss_prototype
-XREF SP1V_ROTTBL, SP1V_DISPWIDTH
+PUBLIC _sp1_struct_ss_prototype
+
+EXTERN SP1V_ROTTBL, SP1V_DISPWIDTH
 
 _sp1_struct_ss_prototype:
 

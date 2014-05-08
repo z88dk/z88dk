@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_back
+PUBLIC asm_b_vector_back
 
-LIB asm_b_array_back
+EXTERN asm_b_array_back
 
 asm_b_vector_back:
 

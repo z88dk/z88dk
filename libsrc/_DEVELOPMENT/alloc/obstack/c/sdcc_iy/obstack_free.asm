@@ -1,7 +1,7 @@
 
 ; void *obstack_free(struct obstack *ob, void *object)
 
-XDEF _obstack_free
+PUBLIC _obstack_free
 
 _obstack_free:
 

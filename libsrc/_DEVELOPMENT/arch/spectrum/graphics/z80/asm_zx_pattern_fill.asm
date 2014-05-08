@@ -78,10 +78,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_pattern_fill
+PUBLIC asm_zx_pattern_fill
 
-LIB error_einval_zc, error_enomem_zc, error_mnc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask
-LIB asm_zx_saddrup, asm_zx_saddrpdown, asm_zx_saddrpup, asm_zx_saddrcleft, asm_zx_saddrcright
+EXTERN error_einval_zc, error_enomem_zc, error_mnc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask
+EXTERN asm_zx_saddrup, asm_zx_saddrpdown, asm_zx_saddrpup, asm_zx_saddrcleft, asm_zx_saddrcright
 
 asm_zx_pattern_fill:
 

@@ -1,6 +1,6 @@
 ; void __CALLEE__ sp1_GetSprClrAddr_callee(struct sp1_ss *s, uchar **sprdest)
 
-XDEF sp1_GetSprClrAddr_callee
+PUBLIC sp1_GetSprClrAddr_callee
 
 sp1_GetSprClrAddr_callee:
 

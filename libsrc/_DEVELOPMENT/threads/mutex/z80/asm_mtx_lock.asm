@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_mtx_lock
+PUBLIC asm_mtx_lock
 
-LIB asm_mtx_timedlock
+EXTERN asm_mtx_timedlock
 
 asm_mtx_lock:
 

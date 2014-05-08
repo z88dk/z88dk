@@ -1,7 +1,7 @@
 
 ; char *strsep(char ** restrict stringp, const char * restrict delim)
 
-XDEF strsep_callee
+PUBLIC strsep_callee
 
 strsep_callee:
 

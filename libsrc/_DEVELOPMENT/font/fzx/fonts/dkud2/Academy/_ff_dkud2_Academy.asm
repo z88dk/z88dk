@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Academy
+PUBLIC _ff_dkud2_Academy
 
 _ff_dkud2_Academy:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_SpecDings
+PUBLIC _ff_ao_SpecDings
 
 _ff_ao_SpecDings:
 

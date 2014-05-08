@@ -2,7 +2,7 @@
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 
-XLIB l_small_mul_32_32x32
+PUBLIC l_small_mul_32_32x32
 
 l_small_mul_32_32x32:
 

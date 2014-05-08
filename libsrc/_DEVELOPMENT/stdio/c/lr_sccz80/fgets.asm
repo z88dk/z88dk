@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fgets
+PUBLIC fgets
 
-LIB asm_fgets
+EXTERN asm_fgets
 
 fgets:
 
@@ -29,9 +29,9 @@ fgets:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fgets
+PUBLIC fgets
 
-LIB fgets_unlocked
+EXTERN fgets_unlocked
 
 fgets:
 

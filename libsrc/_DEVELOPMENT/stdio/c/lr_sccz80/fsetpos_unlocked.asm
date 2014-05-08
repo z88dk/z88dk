@@ -1,9 +1,9 @@
 
 ; int fsetpos_unlocked(FILE *stream, const fpos_t *pos)
 
-XLIB fsetpos_unlocked
+PUBLIC fsetpos_unlocked
 
-LIB asm_fsetpos_unlocked
+EXTERN asm_fsetpos_unlocked
 
 fsetpos_unlocked:
 

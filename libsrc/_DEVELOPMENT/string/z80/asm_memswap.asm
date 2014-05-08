@@ -9,8 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_memswap
-XDEF asm0_memswap
+PUBLIC asm_memswap
+PUBLIC asm0_memswap
 
 asm_memswap:
 

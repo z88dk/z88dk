@@ -2,11 +2,10 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_GetTiles
+PUBLIC asm_sp1_GetTiles
 
-LIB asm_sp1_GetUpdateStruct
-
-XREF SP1V_DISPWIDTH
+EXTERN asm_sp1_GetUpdateStruct
+EXTERN SP1V_DISPWIDTH
 
 asm_sp1_GetTiles:
 

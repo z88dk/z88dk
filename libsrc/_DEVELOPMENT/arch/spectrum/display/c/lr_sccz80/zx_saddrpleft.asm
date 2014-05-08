@@ -1,9 +1,9 @@
 
 ; void *zx_saddrpleft(void *saddr, uchar bitmask)
 
-XLIB zx_saddrpleft
+PUBLIC zx_saddrpleft
 
-LIB asm_zx_saddrpleft
+EXTERN asm_zx_saddrpleft
 
 zx_saddrpleft:
 

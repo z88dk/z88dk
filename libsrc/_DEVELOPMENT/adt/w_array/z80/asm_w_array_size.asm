@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_size
+PUBLIC asm_w_array_size
 
-LIB l_readword_2_hl
+EXTERN l_readword_2_hl
 
 asm_w_array_size:
 

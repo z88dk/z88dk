@@ -1,7 +1,7 @@
 
 ; int spinlock_tryacquire(char *spinlock)
 
-XDEF spinlock_tryacquire
+PUBLIC spinlock_tryacquire
 
 spinlock_tryacquire:
 

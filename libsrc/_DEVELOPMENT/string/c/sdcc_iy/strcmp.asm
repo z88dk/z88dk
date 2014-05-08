@@ -1,7 +1,7 @@
 
 ; int strcmp(const char *s1, const char *s2)
 
-XDEF _strcmp
+PUBLIC _strcmp
 
 _strcmp:
 

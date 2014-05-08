@@ -12,11 +12,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_calloc_unlocked
+PUBLIC asm_calloc_unlocked
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_calloc_unlocked
+EXTERN asm_heap_calloc_unlocked
 
 asm_calloc_unlocked:
 

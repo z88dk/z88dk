@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_back
+PUBLIC asm_w_vector_back
 
-LIB asm_w_array_back
+EXTERN asm_w_array_back
 
 asm_w_vector_back:
 

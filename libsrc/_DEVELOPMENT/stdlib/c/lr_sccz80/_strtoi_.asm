@@ -1,9 +1,9 @@
 
 ; int _strtoi(const char *nptr, char **endptr, int base)
 
-XLIB _strtoi_
+PUBLIC _strtoi_
 
-LIB asm__strtoi
+EXTERN asm__strtoi
 
 _strtoi_:
 

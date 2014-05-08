@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_alloc_aligned
+PUBLIC heap_alloc_aligned
 
-LIB asm_heap_alloc_aligned
+EXTERN asm_heap_alloc_aligned
 
 heap_alloc_aligned:
 
@@ -29,9 +29,9 @@ heap_alloc_aligned:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_alloc_aligned
+PUBLIC heap_alloc_aligned
 
-LIB heap_alloc_aligned_unlocked
+EXTERN heap_alloc_aligned_unlocked
 
 heap_alloc_aligned:
 

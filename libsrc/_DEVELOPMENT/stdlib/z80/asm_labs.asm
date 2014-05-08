@@ -9,8 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_labs
-XDEF _l_neg_dehl_
+PUBLIC asm_labs
+PUBLIC _l_neg_dehl_
 
 asm_labs:
 

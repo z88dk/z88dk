@@ -1,5 +1,5 @@
 
-XLIB l_incu_hl
+PUBLIC l_incu_hl
 
 l_incu_hl:
 

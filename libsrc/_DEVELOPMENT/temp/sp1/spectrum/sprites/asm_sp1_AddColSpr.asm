@@ -3,10 +3,10 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_AddColSpr
+PUBLIC asm_sp1_AddColSpr
 
-LIB _sp1_struct_cs_prototype
-LIB asm_malloc, asm_free
+EXTERN _sp1_struct_cs_prototype
+EXTERN asm_malloc, asm_free
 
 asm_sp1_AddColSpr:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_NisaSport1
+PUBLIC _ff_dkud3_NisaSport1
 
 _ff_dkud3_NisaSport1:
 

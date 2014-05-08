@@ -1,5 +1,5 @@
 
-XLIB l_minu_de_hl
+PUBLIC l_minu_de_hl
 
 l_minu_de_hl:
 

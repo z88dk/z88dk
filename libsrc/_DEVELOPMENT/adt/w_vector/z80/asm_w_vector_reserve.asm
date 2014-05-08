@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_reserve
+PUBLIC asm_w_vector_reserve
 
-LIB asm_b_vector_reserve, error_enomem_zc
+EXTERN asm_b_vector_reserve, error_enomem_zc
 
    inc hl
    inc hl

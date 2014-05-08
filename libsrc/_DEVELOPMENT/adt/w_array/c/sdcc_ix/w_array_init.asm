@@ -1,7 +1,7 @@
 
 ; w_array_t *w_array_init(void *p, void *data, size_t capacity)
 
-XDEF _w_array_init
+PUBLIC _w_array_init
 
 _w_array_init:
 

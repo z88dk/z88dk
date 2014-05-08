@@ -11,14 +11,14 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_freopen_unlocked
-XDEF asm0_freopen_unlocked
+PUBLIC asm_freopen_unlocked
+PUBLIC asm0_freopen_unlocked
 
-LIB __stdio_verify_valid, l_jpix, __stdio_file_destroy
-LIB __stdio_parse_permission, asm_open, asm0_fopen_unlocked
-LIB error_eacces_zc, error_einval_zc, error_zc
+EXTERN __stdio_verify_valid, l_jpix, __stdio_file_destroy
+EXTERN __stdio_parse_permission, asm_open, asm0_fopen_unlocked
+EXTERN error_eacces_zc, error_einval_zc, error_zc
 
-XREF STDIO_MSG_CLOS
+EXTERN STDIO_MSG_CLOS
 
 asm_freopen_unlocked:
 

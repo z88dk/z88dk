@@ -1,7 +1,7 @@
 
 ; int strncasecmp(const char *s1, const char *s2, size_t n)
 
-XDEF strncasecmp_callee, strnicmp_callee
+PUBLIC strncasecmp_callee, strnicmp_callee
 
 strncasecmp_callee:
 strnicmp_callee:

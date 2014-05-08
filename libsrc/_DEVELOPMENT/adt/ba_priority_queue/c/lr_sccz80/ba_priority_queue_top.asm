@@ -1,7 +1,7 @@
 
 ; int ba_priority_queue_top(ba_priority_queue_t *q)
 
-XDEF ba_priority_queue_top
+PUBLIC ba_priority_queue_top
 
 ;defc ba_priority_queue_top = asm_ba_priority_queue_top
 

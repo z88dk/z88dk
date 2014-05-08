@@ -1,9 +1,9 @@
 
 ; size_t wv_stack_max_size(wv_stack_t *s)
 
-XDEF _wv_stack_max_size
+PUBLIC _wv_stack_max_size
 
-LIB _w_vector_max_size
+EXTERN _w_vector_max_size
 
 _wv_stack_max_size:
 

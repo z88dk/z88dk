@@ -1,8 +1,8 @@
 
-XLIB __stdio_recv_input_eat_ws
-XDEF __stdio_recv_input_eat_ws_repeat
+PUBLIC __stdio_recv_input_eat_ws
+PUBLIC __stdio_recv_input_eat_ws_repeat
 
-LIB asm_isspace, __stdio_recv_input_eatc
+EXTERN asm_isspace, __stdio_recv_input_eatc
 
 ; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
 ; DE' IS USED TO TRACK NUMBER OF CHARS READ FROM STREAM

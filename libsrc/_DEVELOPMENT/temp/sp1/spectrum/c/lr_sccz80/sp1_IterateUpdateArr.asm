@@ -1,9 +1,9 @@
 ; void sp1_IterateUpdateArr(struct sp1_update **ua, void *hook)
 ; CALLER linkage for function pointers
 
-XLIB sp1_IterateUpdateArr
+PUBLIC sp1_IterateUpdateArr
 
-LIB asm_sp1_IterateUpdateArr
+EXTERN asm_sp1_IterateUpdateArr
 
 sp1_IterateUpdateArr:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_alloc
+PUBLIC asm_obstack_alloc
 
-LIB asm0_obstack_blank
+EXTERN asm0_obstack_blank
 
 asm_obstack_alloc:
 

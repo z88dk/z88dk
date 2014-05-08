@@ -1,7 +1,7 @@
 
 ; int mtx_init(mtx_t *mtx, int type)
 
-XDEF _mtx_init
+PUBLIC _mtx_init
 
 _mtx_init:
 

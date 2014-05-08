@@ -1,7 +1,7 @@
 
-XLIB l_fast_mulu_32_16x16
+PUBLIC l_fast_mulu_32_16x16
 
-LIB l_fast_mulu_24_16x8, l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
+EXTERN l_fast_mulu_24_16x8, l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
 
 l_fast_mulu_32_16x16:
 

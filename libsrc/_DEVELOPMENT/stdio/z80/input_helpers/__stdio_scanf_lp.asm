@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_lp
+PUBLIC __stdio_scanf_lp
 
-LIB __stdio_scanf_lx
+EXTERN __stdio_scanf_lx
 
 __stdio_scanf_lp:
 

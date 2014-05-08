@@ -1,7 +1,7 @@
 
 ; size_t balloc_blockcount(unsigned int queue)
 
-XDEF _balloc_blockcount
+PUBLIC _balloc_blockcount
 
 _balloc_blockcount:
 

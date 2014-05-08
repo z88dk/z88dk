@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strrev
+PUBLIC asm_strrev
 
-LIB __str_locate_nul
+EXTERN __str_locate_nul
 
 asm_strrev:
 

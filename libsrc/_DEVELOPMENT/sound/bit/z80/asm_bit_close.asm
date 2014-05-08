@@ -1,9 +1,9 @@
 
-XLIB asm_bit_close
+PUBLIC asm_bit_close
 
 INCLUDE "clib_target_cfg.asm"
 
-XREF __sound_bit_state
+EXTERN __sound_bit_state
 
 asm_bit_close:
 

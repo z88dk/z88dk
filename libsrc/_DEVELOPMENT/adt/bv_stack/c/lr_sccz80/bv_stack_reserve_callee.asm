@@ -1,9 +1,9 @@
 
 ; int bv_stack_reserve(bv_stack_t *s, size_t n)
 
-XDEF bv_stack_reserve_callee
+PUBLIC bv_stack_reserve_callee
 
-LIB b_vector_reserve_callee
+EXTERN b_vector_reserve_callee
 
 ;defc bv_stack_reserve_callee = b_vector_reserve_callee
 

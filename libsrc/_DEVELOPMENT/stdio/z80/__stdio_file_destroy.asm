@@ -1,7 +1,7 @@
 
-XLIB __stdio_file_destroy
+PUBLIC __stdio_file_destroy
 
-LIB asm_mtx_destroy, __0_stdio_file_init
+EXTERN asm_mtx_destroy, __0_stdio_file_init
 
 __stdio_file_destroy:
 

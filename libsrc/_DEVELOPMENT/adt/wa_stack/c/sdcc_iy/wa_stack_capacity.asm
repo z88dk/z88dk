@@ -1,9 +1,9 @@
 
 ; size_t wa_stack_capacity(wa_stack_t *s)
 
-XDEF _wa_stack_capacity
+PUBLIC _wa_stack_capacity
 
-LIB _w_array_capacity
+EXTERN _w_array_capacity
 
 _wa_stack_capacity:
 

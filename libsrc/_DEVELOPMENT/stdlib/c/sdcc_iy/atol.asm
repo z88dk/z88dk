@@ -1,7 +1,7 @@
 
 ; long atol(const char *buf)
 
-XDEF _atol
+PUBLIC _atol
 
 _atol:
 

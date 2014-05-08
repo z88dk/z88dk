@@ -1,7 +1,7 @@
 
 ; void *balloc_addmem(unsigned char q, size_t num, size_t size, void *addr)
 
-XDEF balloc_addmem_callee
+PUBLIC balloc_addmem_callee
 
 balloc_addmem_callee:
 

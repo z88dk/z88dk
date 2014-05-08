@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_read_block
+PUBLIC asm_b_array_read_block
 
-LIB __array_at, l_minu_de_hl, asm_memcpy, error_einval_zc
+EXTERN __array_at, l_minu_de_hl, asm_memcpy, error_einval_zc
 
 asm_b_array_read_block:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_destroy
+PUBLIC asm_w_array_destroy
 
-LIB asm_b_array_destroy
+EXTERN asm_b_array_destroy
 
 asm_w_array_destroy:
 

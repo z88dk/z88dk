@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_stick_kempston
+PUBLIC asm_in_stick_kempston
 
 asm_in_stick_kempston:
 

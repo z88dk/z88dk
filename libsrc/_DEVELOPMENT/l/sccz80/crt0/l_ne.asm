@@ -4,9 +4,9 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_ne
+                PUBLIC    l_ne
 
-                LIB     l_cmp
+                EXTERN     l_cmp
 
 ;
 ; DE != HL

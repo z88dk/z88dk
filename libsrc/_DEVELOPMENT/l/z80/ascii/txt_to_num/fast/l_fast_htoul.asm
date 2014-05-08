@@ -1,7 +1,7 @@
 
-XLIB l_fast_htoul
+PUBLIC l_fast_htoul
 
-LIB l_fast_htou, l_char2num
+EXTERN l_fast_htou, l_char2num
 
 l_fast_htoul:
 

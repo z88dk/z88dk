@@ -1,9 +1,9 @@
 
 ; void *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size)
 
-XLIB heap_alloc_fixed_unlocked
+PUBLIC heap_alloc_fixed_unlocked
 
-LIB asm_heap_alloc_fixed_unlocked
+EXTERN asm_heap_alloc_fixed_unlocked
 
 heap_alloc_fixed_unlocked:
 

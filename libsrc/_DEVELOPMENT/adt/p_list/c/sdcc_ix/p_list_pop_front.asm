@@ -1,7 +1,7 @@
 
 ; void *p_list_pop_front(p_list_t *list)
 
-XDEF _p_list_pop_front
+PUBLIC _p_list_pop_front
 
 _p_list_pop_front:
 

@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_grow0_callee
+PUBLIC obstack_grow0_callee
 
 obstack_grow0_callee:
 

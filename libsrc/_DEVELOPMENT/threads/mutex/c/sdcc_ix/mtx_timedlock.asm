@@ -1,7 +1,7 @@
 
 ; int mtx_timedlock(mtx_t *m, struct timespec *ts)
 
-XDEF _mtx_timedlock
+PUBLIC _mtx_timedlock
 
 _mtx_timedlock:
 

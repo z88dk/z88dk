@@ -1,7 +1,7 @@
 
 ; char *strsep(char ** restrict stringp, const char * restrict delim)
 
-XDEF _strsep
+PUBLIC _strsep
 
 _strsep:
 

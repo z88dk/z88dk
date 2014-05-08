@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_com
+                PUBLIC    l_com
 
 
 ; HL = ~HL

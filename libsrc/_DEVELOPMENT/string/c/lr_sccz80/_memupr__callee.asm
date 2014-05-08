@@ -1,7 +1,7 @@
 
 ; char *_memupr_(void *p, size_t n)
 
-XDEF _memupr__callee
+PUBLIC _memupr__callee
 
 _memupr__callee:
 

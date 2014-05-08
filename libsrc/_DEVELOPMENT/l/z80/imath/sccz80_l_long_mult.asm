@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_long_mult
+PUBLIC l_long_mult
 
 l_long_mult:
 
@@ -32,7 +32,7 @@ IF __CLIB_OPT_IMATH <= 50
    pop de
    push af
    
-   LIB l_small_mul_32_32x32
+   EXTERN l_small_mul_32_32x32
    jp l_small_mul_32_32x32
 
 ENDIF
@@ -46,7 +46,7 @@ IF __CLIB_OPT_IMATH > 50
    pop de
    push af
 
-   LIB l_fast_mulu_32_32x32
+   EXTERN l_fast_mulu_32_32x32
    jp l_fast_mulu_32_32x32     ; dehl = product
 
 ENDIF

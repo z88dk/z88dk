@@ -1,9 +1,9 @@
 
 ; int obstack_align_to(struct obstack *ob, size_t alignment)
 
-XLIB obstack_align_to
+PUBLIC obstack_align_to
 
-LIB asm_obstack_align_to
+EXTERN asm_obstack_align_to
 
 obstack_align_to:
 

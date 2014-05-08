@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Crash
+PUBLIC _ff_dkud2_Crash
 
 _ff_dkud2_Crash:
 

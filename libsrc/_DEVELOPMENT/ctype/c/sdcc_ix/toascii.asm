@@ -1,7 +1,7 @@
 
 ; int toascii(int c)
 
-XLIB _toascii
+PUBLIC _toascii
 
 _toascii:
 

@@ -1,5 +1,5 @@
 
-XLIB error_mc
+PUBLIC error_mc
 
    pop hl
    

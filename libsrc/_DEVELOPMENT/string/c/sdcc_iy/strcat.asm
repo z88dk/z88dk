@@ -1,7 +1,7 @@
 
 ; char *strcat(char * restrict s1, const char * restrict s2)
 
-XDEF _strcat
+PUBLIC _strcat
 
 _strcat:
 

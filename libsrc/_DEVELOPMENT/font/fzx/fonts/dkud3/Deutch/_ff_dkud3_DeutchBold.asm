@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_DeutchBold
+PUBLIC _ff_dkud3_DeutchBold
 
 _ff_dkud3_DeutchBold:
 

@@ -1,7 +1,7 @@
 
 ; size_t b_vector_insert(b_vector_t *v, size_t idx, int c)
 
-XDEF b_vector_insert_callee
+PUBLIC b_vector_insert_callee
 
 b_vector_insert_callee:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_clear
+PUBLIC asm_p_forward_list_clear
 
-LIB l_zeroword_hl
+EXTERN l_zeroword_hl
 
 asm_p_forward_list_clear:
 

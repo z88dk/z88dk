@@ -1,9 +1,9 @@
 
 ; size_t strlcat(char * restrict s1, const char * restrict s2, size_t n)
 
-XLIB strlcat
+PUBLIC strlcat
 
-LIB asm_strlcat
+EXTERN asm_strlcat
 
 strlcat:
 

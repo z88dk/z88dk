@@ -1,9 +1,9 @@
 
 ; int bv_stack_empty(bv_stack_t *s)
 
-XDEF _bv_stack_empty
+PUBLIC _bv_stack_empty
 
-LIB _b_vector_empty
+EXTERN _b_vector_empty
 
 _bv_stack_empty:
 

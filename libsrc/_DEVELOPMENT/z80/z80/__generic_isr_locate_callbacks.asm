@@ -1,5 +1,5 @@
 
-XLIB __generic_isr_locate_callbacks
+PUBLIC __generic_isr_locate_callbacks
 
 __generic_isr_locate_callbacks:
 

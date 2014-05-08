@@ -1,7 +1,7 @@
 
 ; int fzx_char_metrics(struct fzx_cmetric *m, uchar c)
 
-XDEF fzx_char_metrics
+PUBLIC fzx_char_metrics
 
 fzx_char_metrics:
 

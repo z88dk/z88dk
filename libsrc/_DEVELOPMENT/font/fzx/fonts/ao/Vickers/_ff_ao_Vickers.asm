@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Vickers
+PUBLIC _ff_ao_Vickers
 
 _ff_ao_Vickers:
 

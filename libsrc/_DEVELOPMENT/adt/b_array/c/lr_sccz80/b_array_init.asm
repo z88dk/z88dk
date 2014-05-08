@@ -1,9 +1,9 @@
 
 ; b_array_t *b_array_init(void *p, void *data, size_t capacity)
 
-XLIB b_array_init
+PUBLIC b_array_init
 
-LIB asm_b_array_init
+EXTERN asm_b_array_init
 
 b_array_init:
 

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _fflush
+PUBLIC _fflush
 
 _fflush:
 
@@ -23,9 +23,9 @@ _fflush:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _fflush
+PUBLIC _fflush
 
-LIB _fflush_unlocked
+EXTERN _fflush_unlocked
 
 _fflush:
 

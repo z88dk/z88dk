@@ -1,7 +1,7 @@
 
 ; uint zx_aaddr2py(void *attraddr)
 
-XDEF _zx_aaddr2py
+PUBLIC _zx_aaddr2py
 
 _zx_aaddr2py:
 

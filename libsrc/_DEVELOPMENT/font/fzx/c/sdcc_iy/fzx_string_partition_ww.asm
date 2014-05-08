@@ -1,7 +1,7 @@
 
 ; char *fzx_string_partition_ww(char *s, uint width)
 
-XDEF _fzx_string_partition_ww
+PUBLIC _fzx_string_partition_ww
 
 _fzx_string_partition_ww:
 

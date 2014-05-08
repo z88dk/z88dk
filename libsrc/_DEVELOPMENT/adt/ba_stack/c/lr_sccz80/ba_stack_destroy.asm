@@ -1,9 +1,9 @@
 
 ; void ba_stack_destroy(ba_stack_t *s)
 
-XDEF ba_stack_destroy
+PUBLIC ba_stack_destroy
 
-LIB b_array_destroy
+EXTERN b_array_destroy
 
 ;defc ba_stack_destroy = b_array_destroy
 

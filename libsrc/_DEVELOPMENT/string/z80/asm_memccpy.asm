@@ -13,9 +13,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_memccpy
+PUBLIC asm_memccpy
 
-LIB error_zc
+EXTERN error_zc
 
 asm_memccpy:
 

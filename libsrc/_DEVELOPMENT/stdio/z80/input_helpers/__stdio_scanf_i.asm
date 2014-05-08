@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_i
+PUBLIC __stdio_scanf_i
 
-LIB __stdio_scanf_sm_i, __stdio_scanf_number_head
-LIB l_inc_sp, asm__strtoi, __stdio_scanf_number_tail_int
+EXTERN __stdio_scanf_sm_i, __stdio_scanf_number_head
+EXTERN l_inc_sp, asm__strtoi, __stdio_scanf_number_tail_int
 
 __stdio_scanf_i:
 

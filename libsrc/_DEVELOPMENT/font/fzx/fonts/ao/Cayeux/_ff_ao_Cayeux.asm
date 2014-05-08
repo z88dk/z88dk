@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Cayeux
+PUBLIC _ff_ao_Cayeux
 
 _ff_ao_Cayeux:
 

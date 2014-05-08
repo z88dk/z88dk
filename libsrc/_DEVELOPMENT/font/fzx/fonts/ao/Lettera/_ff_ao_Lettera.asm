@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Lettera
+PUBLIC _ff_ao_Lettera
 
 _ff_ao_Lettera:
 

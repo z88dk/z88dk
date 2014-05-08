@@ -1,7 +1,7 @@
 
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 
-XDEF _obstack_alloc
+PUBLIC _obstack_alloc
 
 _obstack_alloc:
 

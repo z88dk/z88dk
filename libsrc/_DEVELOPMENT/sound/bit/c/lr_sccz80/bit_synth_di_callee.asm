@@ -1,7 +1,7 @@
 
 ; void bit_synth_di_callee(int dur, int freq_1, int freq_2, int freq_3, int freq_4)
 
-XDEF bit_synth_di_callee
+PUBLIC bit_synth_di_callee
 
 bit_synth_di_callee:
 

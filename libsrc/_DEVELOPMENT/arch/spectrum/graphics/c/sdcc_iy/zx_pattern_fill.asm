@@ -1,7 +1,7 @@
 
 ; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
 
-XDEF _zx_pattern_fill
+PUBLIC _zx_pattern_fill
 
 _zx_pattern_fill:
 

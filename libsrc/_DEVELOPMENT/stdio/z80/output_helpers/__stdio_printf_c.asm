@@ -1,8 +1,8 @@
 
-XLIB __stdio_printf_c
+PUBLIC __stdio_printf_c
 
-LIB __stdio_nextarg_hl
-LIB __stdio_send_output_chars, __stdio_printf_padding_width_hl
+EXTERN __stdio_nextarg_hl
+EXTERN __stdio_send_output_chars, __stdio_printf_padding_width_hl
 
 __stdio_printf_c:
 

@@ -1,7 +1,7 @@
 
-XLIB __stdio_lock_release
+PUBLIC __stdio_lock_release
 
-LIB asm0_funlockfile
+EXTERN asm0_funlockfile
 
 __stdio_lock_release:
 

@@ -1,7 +1,7 @@
 
 ; void b_array_clear(b_array_t *a)
 
-XDEF _b_array_clear
+PUBLIC _b_array_clear
 
 _b_array_clear:
 

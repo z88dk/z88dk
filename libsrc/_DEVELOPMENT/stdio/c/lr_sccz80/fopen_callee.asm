@@ -1,7 +1,7 @@
 
 ; FILE *fopen(const char *filename, const char *mode);
 
-XDEF fopen_callee
+PUBLIC fopen_callee
 
 fopen_callee:
 

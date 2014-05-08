@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_insert_n
+PUBLIC asm_b_array_insert_n
 
-LIB asm_b_array_insert_block, asm_memset, error_mc
+EXTERN asm_b_array_insert_block, asm_memset, error_mc
 
 asm_b_array_insert_n:
 

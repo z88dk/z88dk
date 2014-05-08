@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_getc_unlocked
+PUBLIC asm_getc_unlocked
 
-LIB asm_fgetc_unlocked
+EXTERN asm_fgetc_unlocked
 
 asm_getc_unlocked:
 

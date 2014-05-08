@@ -1,9 +1,9 @@
 
 ; void wa_stack_destroy(wa_stack_t *s)
 
-XDEF _wa_stack_destroy
+PUBLIC _wa_stack_destroy
 
-LIB _w_array_destroy
+EXTERN _w_array_destroy
 
 _wa_stack_destroy:
 

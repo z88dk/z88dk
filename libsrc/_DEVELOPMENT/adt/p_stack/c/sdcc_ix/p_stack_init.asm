@@ -1,9 +1,9 @@
 
 ; void p_stack_init(void *p)
 
-XDEF _p_stack_init
+PUBLIC _p_stack_init
 
-LIB _p_forward_list_init
+EXTERN _p_forward_list_init
 
 _p_stack_init:
 

@@ -1,9 +1,9 @@
 
-XLIB error_eacces_mc
+PUBLIC error_eacces_mc
 
-XREF __EACCES
+EXTERN __EACCES
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    

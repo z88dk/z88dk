@@ -11,16 +11,16 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_vfprintf_unlocked
-XDEF asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
+PUBLIC asm_vfprintf_unlocked
+PUBLIC asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
 
-LIB __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
-LIB l_utod_hl, l_neg_hl, error_einval_zc
+EXTERN __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
+EXTERN l_utod_hl, l_neg_hl, error_einval_zc
 
 
 IF __CLIB_OPT_PRINTF != 0
 
-LIB __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
+EXTERN __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
 
 ENDIF
 
@@ -56,7 +56,7 @@ asm_vfprintf_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c
@@ -620,7 +620,7 @@ IF __CLIB_OPT_PRINTF & $100
 
 _printf_bb:
 
-   LIB __stdio_printf_bb
+   EXTERN __stdio_printf_bb
    
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_bb
@@ -633,7 +633,7 @@ IF __CLIB_OPT_PRINTF & $100000
 
 _printf_lbb:
 
-   LIB __stdio_printf_lbb
+   EXTERN __stdio_printf_lbb
 
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_lbb
@@ -646,7 +646,7 @@ IF __CLIB_OPT_PRINTF & $400
 
 _printf_c:
 
-   LIB __stdio_printf_c
+   EXTERN __stdio_printf_c
 
    ld hl,__stdio_printf_c
    jr printf_invoke_2 - 2
@@ -657,7 +657,7 @@ IF __CLIB_OPT_PRINTF & $41
 
 _printf_d:
 
-   LIB __stdio_printf_d
+   EXTERN __stdio_printf_d
 
    res 4,(ix+5)                ; base indicator off
    ld a,$c0                    ; signed & capitalize
@@ -671,7 +671,7 @@ IF __CLIB_OPT_PRINTF & $41000
 
 _printf_ld:
 
-   LIB __stdio_printf_ld
+   EXTERN __stdio_printf_ld
 
    res 4,(ix+5)                ; base indicator off
    ld a,$c0                    ; signed & capitalize
@@ -685,7 +685,7 @@ IF __CLIB_OPT_PRINTF & $20
 
 _printf_n:
 
-   LIB __stdio_printf_n
+   EXTERN __stdio_printf_n
 
    ld hl,__stdio_printf_n
    jr printf_invoke_2 - 2
@@ -696,7 +696,7 @@ IF __CLIB_OPT_PRINTF & $20000
 
 _printf_ln:
 
-   LIB __stdio_printf_ln
+   EXTERN __stdio_printf_ln
 
    ld hl,__stdio_printf_ln
    jr printf_invoke_4 - 2
@@ -707,7 +707,7 @@ IF __CLIB_OPT_PRINTF & $10
 
 _printf_o:
 
-   LIB __stdio_printf_o
+   EXTERN __stdio_printf_o
 
    set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_o
@@ -720,7 +720,7 @@ IF __CLIB_OPT_PRINTF & $10000
 
 _printf_lo:
 
-   LIB __stdio_printf_lo
+   EXTERN __stdio_printf_lo
 
    set 1,(ix+5)                ; octal base indicator
    ld hl,__stdio_printf_lo
@@ -733,7 +733,7 @@ IF __CLIB_OPT_PRINTF & $80
 
 _printf_p:
 
-   LIB __stdio_printf_p
+   EXTERN __stdio_printf_p
 
    ld hl,__stdio_printf_p
    jr printf_invoke_2 - 2
@@ -744,7 +744,7 @@ IF __CLIB_OPT_PRINTF & $80000
 
 _printf_lp:
 
-   LIB __stdio_printf_lp
+   EXTERN __stdio_printf_lp
 
    ld hl,__stdio_printf_lp
    jr printf_invoke_4 - 2
@@ -754,7 +754,7 @@ IF __CLIB_OPT_PRINTF & $200
 
 _printf_s:
 
-   LIB __stdio_printf_s
+   EXTERN __stdio_printf_s
  
    ld hl,__stdio_printf_s
    jr printf_invoke_2 - 2
@@ -765,7 +765,7 @@ IF __CLIB_OPT_PRINTF & $02
 
 _printf_u:
 
-   LIB __stdio_printf_u
+   EXTERN __stdio_printf_u
 
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_u
@@ -778,7 +778,7 @@ IF __CLIB_OPT_PRINTF & $2000
 
 _printf_lu:
 
-   LIB __stdio_printf_lu
+   EXTERN __stdio_printf_lu
 
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_lu
@@ -791,7 +791,7 @@ IF __CLIB_OPT_PRINTF & $08
 
 _printf_xx:
 
-   LIB __stdio_printf_x
+   EXTERN __stdio_printf_x
 
    ld hl,__stdio_printf_x
    jr printf_invoke_2 - 2
@@ -802,7 +802,7 @@ IF __CLIB_OPT_PRINTF & $8000
 
 _printf_lxx:
 
-   LIB __stdio_printf_lx
+   EXTERN __stdio_printf_lx
       
    ld hl,__stdio_printf_lx
    jr printf_invoke_4 - 2
@@ -813,7 +813,7 @@ IF __CLIB_OPT_PRINTF & $04
 
 _printf_x:
 
-   LIB __stdio_printf_x
+   EXTERN __stdio_printf_x
 
    xor a                       ; no capitalize
    ld hl,__stdio_printf_x
@@ -825,7 +825,7 @@ IF __CLIB_OPT_PRINTF & $4000
 
 _printf_lx:
 
-   LIB __stdio_printf_lx
+   EXTERN __stdio_printf_lx
    
    xor a                       ; no capitalize
    ld hl,__stdio_printf_lx
@@ -837,7 +837,7 @@ IF __CLIB_OPT_PRINTF & $800
 
 _printf_I:
 
-   LIB __stdio_printf_ii
+   EXTERN __stdio_printf_ii
 
    ld hl,__stdio_printf_ii
    jr printf_invoke_4 - 2

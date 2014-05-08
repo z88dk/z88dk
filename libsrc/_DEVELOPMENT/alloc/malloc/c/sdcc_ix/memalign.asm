@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _memalign
+PUBLIC _memalign
 
-LIB _aligned_alloc
+EXTERN _aligned_alloc
 
 _memalign:
 
@@ -21,9 +21,9 @@ _memalign:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _memalign
+PUBLIC _memalign
 
-LIB _memalign_unlocked
+EXTERN _memalign_unlocked
 
 _memalign:
 

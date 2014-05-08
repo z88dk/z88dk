@@ -2,10 +2,10 @@
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 
-XLIB l_small_divu_32_32x32
-XDEF l0_small_divu_32_32x32
+PUBLIC l_small_divu_32_32x32
+PUBLIC l0_small_divu_32_32x32
 
-LIB error_divide_by_zero_mc
+EXTERN error_divide_by_zero_mc
 
 l_small_divu_32_32x32:
 

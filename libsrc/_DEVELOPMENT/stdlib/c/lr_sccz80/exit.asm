@@ -1,7 +1,7 @@
 
 ; _Noreturn void exit(int status)
 
-XDEF exit
+PUBLIC exit
 
 exit:
 

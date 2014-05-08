@@ -1,5 +1,5 @@
 
-XLIB l_fast_lsl_hl
+PUBLIC l_fast_lsl_hl
 
 l_fast_lsl_hl:
 

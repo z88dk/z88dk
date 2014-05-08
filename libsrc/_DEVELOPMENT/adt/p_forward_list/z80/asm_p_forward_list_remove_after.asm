@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_remove_after
+PUBLIC asm_p_forward_list_remove_after
 
-LIB error_einval_zc
+EXTERN error_einval_zc
 
 asm_p_forward_list_remove_after:
 

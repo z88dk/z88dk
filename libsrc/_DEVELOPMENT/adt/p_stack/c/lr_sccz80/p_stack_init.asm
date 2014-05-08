@@ -1,7 +1,7 @@
 
 ; void p_stack_init(void *p)
 
-XDEF p_stack_init
+PUBLIC p_stack_init
 
 ;defc p_stack_init = asm_p_stack_init
 

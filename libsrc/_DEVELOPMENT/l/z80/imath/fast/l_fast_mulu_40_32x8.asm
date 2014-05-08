@@ -1,8 +1,8 @@
 
-XLIB l_fast_mulu_40_32x8
-XDEF l0_fast_mulu_40_32x8
+PUBLIC l_fast_mulu_40_32x8
+PUBLIC l0_fast_mulu_40_32x8
 
-LIB l0_fast_mulu_32_24x8, l_fast_mulu_16_8x8
+EXTERN l0_fast_mulu_32_24x8, l_fast_mulu_16_8x8
 
 l_fast_mulu_40_32x8:
 

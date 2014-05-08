@@ -1,7 +1,7 @@
 
 ; uint16_t in_mouse_amx_wheel(void)
 
-XDEF _in_mouse_amx_wheel
+PUBLIC _in_mouse_amx_wheel
 
 _in_mouse_amx_wheel:
 

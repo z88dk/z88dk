@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_or
+                PUBLIC    l_or
 
 ; "or" HL and DE into HL
 .l_or  

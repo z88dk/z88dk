@@ -1,9 +1,9 @@
 
 ; size_t b_vector_insert(b_vector_t *v, size_t idx, int c)
 
-XLIB b_vector_insert
+PUBLIC b_vector_insert
 
-LIB asm_b_vector_insert
+EXTERN asm_b_vector_insert
 
 b_vector_insert:
 

@@ -1,7 +1,7 @@
 
 ; void *b_vector_init(void *p, size_t capacity, size_t max_size)
 
-XDEF _b_vector_init
+PUBLIC _b_vector_init
 
 _b_vector_init:
 

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _posix_memalign
+PUBLIC _posix_memalign
 
 _posix_memalign:
 
@@ -27,9 +27,9 @@ _posix_memalign:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _posix_memalign
+PUBLIC _posix_memalign
 
-LIB _posix_memalign_unlocked
+EXTERN _posix_memalign_unlocked
 
 _posix_memalign:
 

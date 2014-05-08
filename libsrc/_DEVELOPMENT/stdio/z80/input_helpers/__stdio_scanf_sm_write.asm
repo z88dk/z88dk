@@ -1,5 +1,5 @@
 
-XLIB __stdio_scanf_sm_write
+PUBLIC __stdio_scanf_sm_write
 
 __stdio_scanf_sm_write:
 

@@ -1,7 +1,7 @@
 
 ; void in_wait_key(void)
 
-XDEF _in_wait_key
+PUBLIC _in_wait_key
 
 _in_wait_key:
 

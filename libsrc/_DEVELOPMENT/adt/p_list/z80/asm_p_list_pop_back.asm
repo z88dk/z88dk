@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_list_pop_back
+PUBLIC asm_p_list_pop_back
 
-LIB asm_p_list_remove, error_einval_zc
+EXTERN asm_p_list_remove, error_einval_zc
 
 asm_p_list_pop_back:
 

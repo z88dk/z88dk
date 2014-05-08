@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF heap_alloc_aligned_callee
+PUBLIC heap_alloc_aligned_callee
 
 heap_alloc_aligned_callee:
 
@@ -23,9 +23,9 @@ heap_alloc_aligned_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF heap_alloc_aligned_callee
+PUBLIC heap_alloc_aligned_callee
 
-LIB heap_alloc_aligned_unlocked_callee
+EXTERN heap_alloc_aligned_unlocked_callee
 
 heap_alloc_aligned_callee:
 

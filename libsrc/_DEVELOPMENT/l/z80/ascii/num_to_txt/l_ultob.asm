@@ -5,7 +5,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_ultob
+PUBLIC l_ultob
 
 l_ultob:
 
@@ -21,12 +21,12 @@ l_ultob:
 
 IF __CLIB_OPT_NUM2TXT_SELECT & $01
 
-   LIB l_fast_ultob
+   EXTERN l_fast_ultob
    jp l_fast_ultob
 
 ELSE
 
-   LIB l_small_ultob
+   EXTERN l_small_ultob
    jp l_small_ultob
 
 ENDIF

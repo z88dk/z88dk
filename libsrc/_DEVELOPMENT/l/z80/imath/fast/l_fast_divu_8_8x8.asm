@@ -1,10 +1,10 @@
 
-XLIB l_fast_divu_8_8x8
-XDEF l0_fast_divu_8_8x8
+PUBLIC l_fast_divu_8_8x8
+PUBLIC l0_fast_divu_8_8x8
 
 INCLUDE "clib_cfg.asm"
 
-LIB error_divide_by_zero_mc
+EXTERN error_divide_by_zero_mc
 
 l_fast_divu_8_8x8:
 

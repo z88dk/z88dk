@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_AzbukaBold
+PUBLIC _ff_dkud3_AzbukaBold
 
 _ff_dkud3_AzbukaBold:
 

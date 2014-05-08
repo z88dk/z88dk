@@ -1,9 +1,9 @@
 
 ; int p_stack_empty(p_stack_t *s)
 
-XDEF _p_stack_empty
+PUBLIC _p_stack_empty
 
-LIB _p_forward_list_empty
+EXTERN _p_forward_list_empty
 
 _p_stack_empty:
 

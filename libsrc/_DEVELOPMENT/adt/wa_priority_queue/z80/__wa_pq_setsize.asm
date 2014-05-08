@@ -1,7 +1,7 @@
 
-XLIB __wa_pq_setsize
+PUBLIC __wa_pq_setsize
 
-LIB __ba_pq_setsize, error_zc
+EXTERN __ba_pq_setsize, error_zc
 
 __wa_pq_setsize:
 

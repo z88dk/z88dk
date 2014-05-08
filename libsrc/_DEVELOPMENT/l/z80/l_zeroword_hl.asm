@@ -1,5 +1,5 @@
 
-XLIB l_zeroword_hl
+PUBLIC l_zeroword_hl
 
    inc hl
    inc hl

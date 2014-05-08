@@ -1,9 +1,9 @@
 
 ; size_t b_vector_erase(b_vector_t *v, size_t idx)
 
-XDEF _b_vector_erase
+PUBLIC _b_vector_erase
 
-LIB _b_array_erase
+EXTERN _b_array_erase
 
 _b_vector_erase:
 

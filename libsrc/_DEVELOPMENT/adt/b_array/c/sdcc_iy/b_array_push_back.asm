@@ -1,9 +1,9 @@
 
 ; size_t b_array_push_back(b_array_t *a, int c)
 
-XDEF _b_array_push_back
+PUBLIC _b_array_push_back
 
-LIB _b_array_append
+EXTERN _b_array_append
 
 _b_array_push_back:
 

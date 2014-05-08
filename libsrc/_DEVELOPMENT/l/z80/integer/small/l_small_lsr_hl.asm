@@ -1,5 +1,5 @@
 
-XLIB l_small_lsr_hl
+PUBLIC l_small_lsr_hl
 
 l_small_lsr_hl:
 

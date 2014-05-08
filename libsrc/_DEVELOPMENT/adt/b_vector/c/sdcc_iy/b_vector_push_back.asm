@@ -1,9 +1,9 @@
 
 ; size_t b_vector_push_back(b_vector_t *v, int c)
 
-XDEF _b_vector_push_back
+PUBLIC _b_vector_push_back
 
-LIB _b_vector_append
+EXTERN _b_vector_append
 
 _b_vector_push_back:
 

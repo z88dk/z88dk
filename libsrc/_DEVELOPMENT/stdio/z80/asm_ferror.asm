@@ -15,9 +15,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_ferror
+PUBLIC asm_ferror
 
-LIB asm1_ferror_unlocked, __stdio_lock_release
+EXTERN asm1_ferror_unlocked, __stdio_lock_release
 
 asm_ferror:
 
@@ -41,14 +41,14 @@ asm_ferror:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock
+   EXTERN __stdio_verify_valid_lock
    
    call __stdio_verify_valid_lock
    ret c
 
 ELSE
 
-   LIB __stdio_lock_acquire, error_enolck_mc
+   EXTERN __stdio_lock_acquire, error_enolck_mc
 
    call __stdio_lock_acquire
    jp c, error_enolck_mc
@@ -63,9 +63,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_ferror
+PUBLIC asm_ferror
 
-LIB asm_ferror_unlocked
+EXTERN asm_ferror_unlocked
 
 asm_ferror:
 

@@ -1,9 +1,9 @@
 
 ; int strnicmp(const char *s1, const char *s2, size_t n)
 
-XDEF _strnicmp
+PUBLIC _strnicmp
 
-LIB _strncasecmp
+EXTERN _strncasecmp
 
 _strnicmp:
 

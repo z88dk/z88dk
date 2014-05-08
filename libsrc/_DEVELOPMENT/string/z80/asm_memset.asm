@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_memset
+PUBLIC asm_memset
 
 asm_memset:
 

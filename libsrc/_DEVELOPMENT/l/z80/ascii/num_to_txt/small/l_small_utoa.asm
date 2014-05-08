@@ -1,5 +1,5 @@
 
-XLIB l_small_utoa
+PUBLIC l_small_utoa
 
 l_small_utoa:
 

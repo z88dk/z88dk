@@ -8,12 +8,12 @@
 ; Clear any stream error and execute fseek(stream, 0L, SEEK_SET)
 ; ===============================================================
 
-XLIB asm_rewind_unlocked
-XDEF asm0_rewind_unlocked
+PUBLIC asm_rewind_unlocked
+PUBLIC asm0_rewind_unlocked
 
-LIB asm0_fseek_unlocked
+EXTERN asm0_fseek_unlocked
 
-XREF STDIO_SEEK_SET
+EXTERN STDIO_SEEK_SET
 
 asm_rewind_unlocked:
 
@@ -36,7 +36,7 @@ asm_rewind_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
    
    call __stdio_verify_valid
    ret c

@@ -1,9 +1,9 @@
 
 ; void *w_vector_front(w_vector_t *v)
 
-XDEF _w_vector_front
+PUBLIC _w_vector_front
 
-LIB _w_array_front
+EXTERN _w_array_front
 
 _w_vector_front:
 

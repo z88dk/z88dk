@@ -1,9 +1,9 @@
 
 ; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
-XLIB _fmemopen_
+PUBLIC _fmemopen_
 
-LIB asm__fmemopen
+EXTERN asm__fmemopen
 
 _fmemopen_:
 

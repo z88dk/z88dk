@@ -1,7 +1,7 @@
 
 ; size_t fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XDEF _fwrite_unlocked
+PUBLIC _fwrite_unlocked
 
 _fwrite_unlocked:
 

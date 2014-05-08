@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_key_pressed
+PUBLIC asm_in_key_pressed
 
-LIB error_znc, error_mc
+EXTERN error_znc, error_mc
 
 asm_in_key_pressed:
 

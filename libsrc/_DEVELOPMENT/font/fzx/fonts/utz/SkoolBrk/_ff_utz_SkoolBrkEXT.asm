@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_SkoolBrkEXT
+PUBLIC _ff_utz_SkoolBrkEXT
 
 _ff_utz_SkoolBrkEXT:
 

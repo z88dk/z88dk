@@ -1,7 +1,7 @@
 
 ; int fzx_setat(uchar y, uchar x)
 
-XDEF _fzx_setat
+PUBLIC _fzx_setat
 
 _fzx_setat:
 

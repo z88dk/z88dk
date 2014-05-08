@@ -1,9 +1,9 @@
 
 ; int fzx_char_metrics(struct fzx_cmetric *m, uchar c)
 
-XLIB fzx_char_metrics
+PUBLIC fzx_char_metrics
 
-LIB asm_fzx_char_metrics
+EXTERN asm_fzx_char_metrics
 
 fzx_char_metrics:
 

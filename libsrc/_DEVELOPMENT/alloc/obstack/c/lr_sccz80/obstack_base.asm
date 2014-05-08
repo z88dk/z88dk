@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_base
+PUBLIC obstack_base
 
 obstack_base:
 

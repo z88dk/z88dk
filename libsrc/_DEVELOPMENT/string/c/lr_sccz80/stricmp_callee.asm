@@ -1,9 +1,9 @@
 
 ; int stricmp(const char *s1, const char *s2)
 
-XDEF stricmp_callee
+PUBLIC stricmp_callee
 
-LIB strcasecmp_callee
+EXTERN strcasecmp_callee
 
 ;defc stricmp_callee = strcasecmp_callee
 

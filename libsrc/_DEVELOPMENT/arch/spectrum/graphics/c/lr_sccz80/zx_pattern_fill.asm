@@ -1,9 +1,9 @@
 
 ; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
 
-XLIB zx_pattern_fill
+PUBLIC zx_pattern_fill
 
-LIB asm_zx_pattern_fill
+EXTERN asm_zx_pattern_fill
 
 zx_pattern_fill:
 

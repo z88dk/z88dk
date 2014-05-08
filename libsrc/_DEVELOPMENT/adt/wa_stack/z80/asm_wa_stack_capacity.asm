@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_stack_capacity
+PUBLIC asm_wa_stack_capacity
 
-LIB l_readword_2_hl
+EXTERN l_readword_2_hl
 
 asm_wa_stack_capacity:
 

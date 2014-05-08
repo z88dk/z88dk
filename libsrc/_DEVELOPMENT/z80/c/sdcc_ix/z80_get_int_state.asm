@@ -1,7 +1,7 @@
 
 ; uint z80_get_int_state(void)
 
-XDEF _z80_get_int_state
+PUBLIC _z80_get_int_state
 
 _z80_get_int_state:
 

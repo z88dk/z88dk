@@ -11,9 +11,9 @@
 ; zero width.
 ; ===============================================================
 
-XLIB asm_fzx_string_extent
+PUBLIC asm_fzx_string_extent
 
-LIB __fzx_width_sm, _fzx, error_zc
+EXTERN __fzx_width_sm, _fzx, error_zc
 
 asm_fzx_string_extent:
 

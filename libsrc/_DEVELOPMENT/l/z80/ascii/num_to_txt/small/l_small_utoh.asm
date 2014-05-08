@@ -1,7 +1,7 @@
 
-XLIB l_small_utoh
+PUBLIC l_small_utoh
 
-LIB l_hex_nibble_hi, l_hex_nibble_lo
+EXTERN l_hex_nibble_hi, l_hex_nibble_lo
 
 l_small_utoh:
 

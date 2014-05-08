@@ -1,9 +1,9 @@
 
 ; void bv_stack_destroy(bv_stack_t *s)
 
-XDEF _bv_stack_destroy
+PUBLIC _bv_stack_destroy
 
-LIB _b_vector_destroy
+EXTERN _b_vector_destroy
 
 _bv_stack_destroy:
 

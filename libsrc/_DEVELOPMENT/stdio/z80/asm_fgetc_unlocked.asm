@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_fgetc_unlocked
-XDEF asm0_fgetc_unlocked
+PUBLIC asm_fgetc_unlocked
+PUBLIC asm0_fgetc_unlocked
 
-LIB __stdio_verify_input, __stdio_recv_input_raw_getc, error_mc
+EXTERN __stdio_verify_input, __stdio_recv_input_raw_getc, error_mc
 
 asm_fgetc_unlocked:
 
@@ -35,7 +35,7 @@ asm_fgetc_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

@@ -17,9 +17,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_rand
+PUBLIC asm_rand
 
-XREF __seed
+EXTERN __seed
 
 asm_rand:
 

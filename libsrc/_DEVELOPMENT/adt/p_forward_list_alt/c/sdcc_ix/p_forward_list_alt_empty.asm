@@ -1,9 +1,9 @@
 
 ; int p_forward_list_alt_empty(p_forward_list_alt_t *list)
 
-XDEF _p_forward_list_alt_empty
+PUBLIC _p_forward_list_alt_empty
 
-LIB _p_forward_list_empty
+EXTERN _p_forward_list_empty
 
 _p_forward_list_alt_empty:
 

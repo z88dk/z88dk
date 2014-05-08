@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_sinclair1(void)
 
-XDEF in_stick_sinclair1
+PUBLIC in_stick_sinclair1
 
 in_stick_sinclair1:
 

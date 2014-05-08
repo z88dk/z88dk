@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fsetpos_callee
+PUBLIC fsetpos_callee
 
 fsetpos_callee:
 
@@ -22,9 +22,9 @@ fsetpos_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fsetpos_callee
+PUBLIC fsetpos_callee
 
-LIB fsetpos_unlocked_callee
+EXTERN fsetpos_unlocked_callee
 
 fsetpos_callee:
 

@@ -1,9 +1,9 @@
 
 ; void p_stack_push(p_stack_t *s, void *item)
 
-XDEF _p_stack_push
+PUBLIC _p_stack_push
 
-LIB _p_forward_list_insert_after
+EXTERN _p_forward_list_insert_after
 
 _p_stack_push:
 

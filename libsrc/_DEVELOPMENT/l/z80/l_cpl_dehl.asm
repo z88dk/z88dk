@@ -1,5 +1,5 @@
 
-XLIB l_cpl_dehl
+PUBLIC l_cpl_dehl
 
 l_cpl_dehl:
 

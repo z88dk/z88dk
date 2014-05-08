@@ -1,7 +1,7 @@
 
-XLIB l_neg_dehl
+PUBLIC l_neg_dehl
 
-LIB _l_neg_dehl_
+EXTERN _l_neg_dehl_
 
 l_neg_dehl:
 

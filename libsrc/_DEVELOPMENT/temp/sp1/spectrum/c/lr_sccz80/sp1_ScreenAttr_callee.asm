@@ -2,7 +2,7 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_ScreenAttr_callee
+PUBLIC sp1_ScreenAttr_callee
 
 sp1_ScreenAttr_callee:
 

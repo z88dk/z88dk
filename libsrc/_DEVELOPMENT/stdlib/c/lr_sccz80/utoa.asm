@@ -1,9 +1,9 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
-XLIB utoa
+PUBLIC utoa
 
-LIB asm_utoa
+EXTERN asm_utoa
 
 utoa:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_kemptson_wheel
+PUBLIC asm_in_mouse_kemptson_wheel
 
-XREF __input_kempston_mouse_wheel
+EXTERN __input_kempston_mouse_wheel
 
 asm_in_mouse_kempston_wheel:
 

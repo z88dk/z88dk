@@ -1,7 +1,7 @@
 
 ; int puts_unlocked(const char *s)
 
-XDEF puts_unlocked
+PUBLIC puts_unlocked
 
 puts_unlocked:
 

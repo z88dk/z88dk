@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_1grow_fast
+PUBLIC asm_obstack_1grow_fast
 
 asm_obstack_1grow_fast:
 

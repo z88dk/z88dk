@@ -1,9 +1,9 @@
 ; void sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB sp1_SetPrintPos
+PUBLIC sp1_SetPrintPos
 
-LIB asm_sp1_SetPrintPos
+EXTERN asm_sp1_SetPrintPos
 
 sp1_SetPrintPos:
 

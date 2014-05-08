@@ -1,7 +1,7 @@
 
-XLIB l_long_aslo
+PUBLIC l_long_aslo
 
-LIB l_lsl_dehl
+EXTERN l_lsl_dehl
 
 l_long_aslo:
 

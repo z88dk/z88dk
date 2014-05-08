@@ -1,7 +1,7 @@
 
 ; void *ba_priority_queue_data(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_data
+PUBLIC _ba_priority_queue_data
 
 _ba_priority_queue_data:
 

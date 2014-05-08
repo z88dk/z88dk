@@ -10,12 +10,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_puts_unlocked
-XDEF asm0_puts_unlocked
+PUBLIC asm_puts_unlocked
+PUBLIC asm0_puts_unlocked
 
-XREF __stdio_file_stdout
+EXTERN __stdio_file_stdout
 
-LIB asm0_fputs_unlocked, asm0_fputc_unlocked, l_utod_hl, error_mc
+EXTERN asm0_fputs_unlocked, asm0_fputc_unlocked, l_utod_hl, error_mc
 
 asm_puts_unlocked:
 
@@ -40,7 +40,7 @@ asm_puts_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

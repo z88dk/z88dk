@@ -1,9 +1,9 @@
 
 ; char *strtok(char * restrict s1, const char * restrict s2)
 
-XLIB strtok
+PUBLIC strtok
 
-LIB asm_strtok
+EXTERN asm_strtok
 
 strtok:
 

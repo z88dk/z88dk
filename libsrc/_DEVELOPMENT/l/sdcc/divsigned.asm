@@ -26,13 +26,13 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	XLIB __divsint_rrx_s
+	PUBLIC __divsint_rrx_s
 
-        LIB	__divu16
-	XDEF	__div16
-	XDEF __div8
-	XDEF __divsint_rrx_hds
-	XDEF __get_remainder
+        EXTERN    __divu16
+	PUBLIC   __div16
+	PUBLIC __div8
+	PUBLIC __divsint_rrx_hds
+	PUBLIC __get_remainder
 
 __divsint_rrx_s:
         pop     af

@@ -1,7 +1,7 @@
 
 ; void heap_free_unlocked(void *p)
 
-XDEF heap_free_unlocked
+PUBLIC heap_free_unlocked
 
 heap_free_unlocked:
 

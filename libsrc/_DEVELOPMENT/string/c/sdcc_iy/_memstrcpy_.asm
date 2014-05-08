@@ -1,7 +1,7 @@
 
 ; char *_memstrcpy_(void *p, char *s, size_t n)
 
-XDEF __memstrcpy_
+PUBLIC __memstrcpy_
 
 __memstrcpy_:
 

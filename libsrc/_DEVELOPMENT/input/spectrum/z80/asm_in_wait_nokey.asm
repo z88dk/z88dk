@@ -9,17 +9,15 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_wait_nokey
+PUBLIC asm_in_wait_nokey
+
+EXTERN asm_in_test_key
 
 asm_in_wait_nokey:
 
    ; uses : af
-   
-   xor a
-   in a,($fe)
-   
-   and $1f
-   cp 31
+
+   call asm_in_test_key
    jr nz, asm_in_wait_nokey
    
    ret

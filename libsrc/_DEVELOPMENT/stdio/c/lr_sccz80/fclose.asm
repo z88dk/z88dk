@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fclose
+PUBLIC fclose
 
 fclose:
 
@@ -20,9 +20,9 @@ fclose:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fclose
+PUBLIC fclose
 
-LIB fclose_unlocked
+EXTERN fclose_unlocked
 
 fclose:
 

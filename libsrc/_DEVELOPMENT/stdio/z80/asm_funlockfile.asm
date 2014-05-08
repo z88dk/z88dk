@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_funlockfile
-XDEF asm0_funlockfile
+PUBLIC asm_funlockfile
+PUBLIC asm0_funlockfile
 
-LIB asm_mtx_unlock
+EXTERN asm_mtx_unlock
 
 asm_funlockfile:
 
@@ -27,7 +27,7 @@ asm_funlockfile:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

@@ -1,8 +1,8 @@
 
-XLIB __array_make_room
-XDEF __0_array_make_room
+PUBLIC __array_make_room
+PUBLIC __0_array_make_room
 
-LIB __array_expand, asm_memset
+EXTERN __array_expand, asm_memset
 
 __array_make_room:
 

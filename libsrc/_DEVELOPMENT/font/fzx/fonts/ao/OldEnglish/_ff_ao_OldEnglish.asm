@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_OldEnglish
+PUBLIC _ff_ao_OldEnglish
 
 _ff_ao_OldEnglish:
 

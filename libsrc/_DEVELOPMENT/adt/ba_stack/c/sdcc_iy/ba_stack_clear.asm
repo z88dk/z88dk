@@ -1,9 +1,9 @@
 
 ; void ba_stack_clear(ba_stack_t *s)
 
-XDEF _ba_stack_clear
+PUBLIC _ba_stack_clear
 
-LIB _b_array_clear
+EXTERN _b_array_clear
 
 _ba_stack_clear:
 

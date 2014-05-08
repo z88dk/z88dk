@@ -1,9 +1,9 @@
 
 ; void *obstack_blank(struct obstack *ob, int size)
 
-XLIB obstack_blank
+PUBLIC obstack_blank
 
-LIB asm_obstack_blank
+EXTERN asm_obstack_blank
 
 obstack_blank:
 

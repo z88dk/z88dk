@@ -1,7 +1,7 @@
 
 ; uint zx_saddr2py(void *saddr)
 
-XDEF _zx_saddr2py
+PUBLIC _zx_saddr2py
 
 _zx_saddr2py:
 

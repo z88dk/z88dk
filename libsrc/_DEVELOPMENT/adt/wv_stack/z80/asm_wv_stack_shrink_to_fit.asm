@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wv_stack_shrink_to_fit
+PUBLIC asm_wv_stack_shrink_to_fit
 
-LIB asm_b_vector_shrink_to_fit
+EXTERN asm_b_vector_shrink_to_fit
 
 asm_wv_stack_shrink_to_fit:
 

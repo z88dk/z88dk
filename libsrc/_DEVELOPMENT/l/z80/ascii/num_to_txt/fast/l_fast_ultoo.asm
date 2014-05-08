@@ -1,10 +1,10 @@
 
-XLIB l_fast_ultoo
+PUBLIC l_fast_ultoo
 
-LIB l_fast_utoo, l_setmem_de
-LIB l1_fast_utoo_lz, l1_fast_utoo_nlz
-LIB l2_fast_utoo_lz, l2_fast_utoo_nlz
-LIB l3_fast_utoo_lz, l3_fast_utoo_nlz
+EXTERN l_fast_utoo, l_setmem_de
+EXTERN l1_fast_utoo_lz, l1_fast_utoo_nlz
+EXTERN l2_fast_utoo_lz, l2_fast_utoo_nlz
+EXTERN l3_fast_utoo_lz, l3_fast_utoo_nlz
 
 l_fast_ultoo:
 

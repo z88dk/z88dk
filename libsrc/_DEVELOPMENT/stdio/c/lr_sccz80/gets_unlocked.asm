@@ -1,7 +1,7 @@
 
 ; char *gets_unlocked(char *s)
 
-XDEF gets_unlocked
+PUBLIC gets_unlocked
 
 gets_unlocked:
 

@@ -1,8 +1,8 @@
 
-XLIB l_small_utoo
+PUBLIC l_small_utoo
 
-XDEF l2_small_utoo_lz, l2_small_utoo_nlz
-XDEF l3_small_utoo_lz, l3_small_utoo_nlz
+PUBLIC l2_small_utoo_lz, l2_small_utoo_nlz
+PUBLIC l3_small_utoo_lz, l3_small_utoo_nlz
 
 l_small_utoo:
 

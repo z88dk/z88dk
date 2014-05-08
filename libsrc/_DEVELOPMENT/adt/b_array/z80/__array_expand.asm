@@ -1,8 +1,8 @@
 
-XLIB __array_expand
-XDEF __0_array_expand, __1_array_expand
+PUBLIC __array_expand
+PUBLIC __0_array_expand, __1_array_expand
 
-LIB l_ltu_bc_hl
+EXTERN l_ltu_bc_hl
 
 __array_expand:
 

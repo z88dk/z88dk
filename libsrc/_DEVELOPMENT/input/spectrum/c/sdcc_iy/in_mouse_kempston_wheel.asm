@@ -1,7 +1,7 @@
 
 ; uint16_t in_mouse_kempston_wheel(void)
 
-XDEF _in_mouse_kempston_wheel
+PUBLIC _in_mouse_kempston_wheel
 
 _in_mouse_kempston_wheel:
 

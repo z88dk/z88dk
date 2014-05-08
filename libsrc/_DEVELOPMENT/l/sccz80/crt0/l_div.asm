@@ -4,10 +4,10 @@
 ; Moved from z88_crt0.asm to library function
 ;
 
-XLIB l_div
+PUBLIC l_div
 
-LIB l_div_u
-XREF L_DIVENTRY
+EXTERN l_div_u
+EXTERN L_DIVENTRY
 
 IF !ARCHAIC
 
@@ -102,8 +102,8 @@ IF ARCHAIC
 
 
 ;These are now in libraries!
-                LIB     l_deneg
-                LIB     l_bcneg
+                EXTERN     l_deneg
+                EXTERN     l_bcneg
 
 
 ; HL = DE / HL, DE = DE % HL

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF rewind
+PUBLIC rewind
 
 rewind:
 
@@ -33,9 +33,9 @@ rewind:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF rewind
+PUBLIC rewind
 
-LIB rewind_unlocked
+EXTERN rewind_unlocked
 
 rewind:
 

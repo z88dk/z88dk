@@ -16,9 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_init
+PUBLIC asm_bv_priority_queue_init
 
-LIB asm_b_vector_init
+EXTERN asm_b_vector_init
 
 asm_bv_priority_queue_init:
 

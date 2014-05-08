@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_realloc
+PUBLIC heap_realloc
 
-LIB asm_heap_realloc
+EXTERN asm_heap_realloc
 
 heap_realloc:
 
@@ -29,9 +29,9 @@ heap_realloc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_realloc
+PUBLIC heap_realloc
 
-LIB heap_realloc_unlocked
+EXTERN heap_realloc_unlocked
 
 heap_realloc:
 

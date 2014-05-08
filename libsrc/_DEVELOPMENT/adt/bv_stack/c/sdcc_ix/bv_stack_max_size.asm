@@ -1,9 +1,9 @@
 
 ; size_t bv_stack_max_size(bv_stack_t *s)
 
-XDEF _bv_stack_max_size
+PUBLIC _bv_stack_max_size
 
-LIB _b_vector_max_size
+EXTERN _b_vector_max_size
 
 _bv_stack_max_size:
 

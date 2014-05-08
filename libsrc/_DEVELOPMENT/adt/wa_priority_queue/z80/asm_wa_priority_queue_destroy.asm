@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_destroy
+PUBLIC asm_wa_priority_queue_destroy
 
-LIB l_zerostruct8_hl
+EXTERN l_zerostruct8_hl
 
 asm_wa_priority_queue_destroy:
 

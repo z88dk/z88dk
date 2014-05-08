@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_srand
+PUBLIC asm_srand
 
-XREF __seed
+EXTERN __seed
 
 asm_srand:
 

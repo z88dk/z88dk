@@ -1,7 +1,7 @@
 
 ; void perror(const char *s)
 
-XDEF _perror
+PUBLIC _perror
 
 _perror:
 

@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_append_n
+PUBLIC asm_w_vector_append_n
 
-LIB asm_b_vector_append_block, asm1_w_array_append_n
-LIB error_mc, error_enomem_mc
+EXTERN asm_b_vector_append_block, asm1_w_array_append_n
+EXTERN error_mc, error_enomem_mc
 
 asm_w_vector_append_n:
 

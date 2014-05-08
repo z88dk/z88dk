@@ -1,7 +1,7 @@
 
-XLIB __stdio_lock_tryacquire
+PUBLIC __stdio_lock_tryacquire
 
-LIB asm_mtx_trylock
+EXTERN asm_mtx_trylock
 
 __stdio_lock_tryacquire:
 

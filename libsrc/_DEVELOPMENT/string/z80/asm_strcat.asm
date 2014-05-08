@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strcat
+PUBLIC asm_strcat
 
-LIB __str_locate_nul
+EXTERN __str_locate_nul
 
 asm_strcat:
    

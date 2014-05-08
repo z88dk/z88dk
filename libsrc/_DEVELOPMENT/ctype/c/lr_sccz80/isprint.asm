@@ -1,9 +1,9 @@
 
 ; int isprint(int c)
 
-XLIB isprint
+PUBLIC isprint
 
-LIB asm_isprint, error_zc
+EXTERN asm_isprint, error_zc
 
 isprint:
 

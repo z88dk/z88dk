@@ -2,7 +2,7 @@
 ; wa_priority_queue_t *
 ; wa_priority_queue_init(void *p, void *data, size_t capacity, int (*compar)(const void *, const void *))
 
-XDEF _wa_priority_queue_init
+PUBLIC _wa_priority_queue_init
 
 _wa_priority_queue_init:
 

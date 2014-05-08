@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_printf_unlocked
+PUBLIC asm_printf_unlocked
 
-LIB asm_vprintf_unlocked, __stdio_varg_2
+EXTERN asm_vprintf_unlocked, __stdio_varg_2
 
 asm_printf_unlocked:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_stack_clear
+PUBLIC asm_p_stack_clear
 
-LIB asm_p_forward_list_init
+EXTERN asm_p_forward_list_init
 
 asm_p_stack_clear:
 

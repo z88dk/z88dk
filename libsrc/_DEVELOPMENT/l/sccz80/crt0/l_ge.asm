@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-XLIB    l_ge
+PUBLIC    l_ge
 
 ;
 ; DE >= HL [signed]

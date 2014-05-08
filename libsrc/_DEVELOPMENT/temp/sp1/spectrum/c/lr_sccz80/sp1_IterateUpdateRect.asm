@@ -1,9 +1,9 @@
 ; void sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook)
 ; CALLER linkage for function pointers
 
-XLIB sp1_IterateUpdateRect
+PUBLIC sp1_IterateUpdateRect
 
-LIB asm0_sp1_IterateUpdateRect
+EXTERN asm0_sp1_IterateUpdateRect
 
 sp1_IterateUpdateRect:
 

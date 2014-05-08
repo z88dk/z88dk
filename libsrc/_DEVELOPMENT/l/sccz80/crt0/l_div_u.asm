@@ -5,8 +5,8 @@
 ;
 ; This is the unsigned routine...disregards signs and just does it..
 
-XLIB     l_div_u
-XDEF     L_DIVENTRY
+PUBLIC     l_div_u
+PUBLIC     L_DIVENTRY
                 
 ; The old routine was so cumbersome, so come up with a new one which
 ; will hopefully be a lot quicker and nicer!

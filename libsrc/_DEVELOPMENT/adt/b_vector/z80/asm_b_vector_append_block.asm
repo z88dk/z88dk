@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_append_block
-XDEF asm_b_vector_append_block_extra
+PUBLIC asm_b_vector_append_block
+PUBLIC asm_b_vector_append_block_extra
 
-LIB error_enomem_zc, error_zc
-LIB asm_b_array_append_block, __vector_realloc_grow, l_inc_sp
+EXTERN error_enomem_zc, error_zc
+EXTERN asm_b_array_append_block, __vector_realloc_grow, l_inc_sp
 
 asm_b_vector_append_block:
 

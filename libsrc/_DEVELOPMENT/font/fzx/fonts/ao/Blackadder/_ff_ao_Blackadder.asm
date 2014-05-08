@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Blackadder
+PUBLIC _ff_ao_Blackadder
 
 _ff_ao_Blackadder:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Subtitles
+PUBLIC _ff_dkud1_Subtitles
 
 _ff_dkud1_Subtitles:
 

@@ -1,7 +1,7 @@
 
 ; void *memset(void *s, int c, size_t n)
 
-XDEF _memset
+PUBLIC _memset
 
 _memset:
 

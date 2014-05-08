@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_balloc_alloc
+PUBLIC asm_balloc_alloc
 
-XREF __qtbl
+EXTERN __qtbl
 
-LIB asm_p_forward_list_remove_after, error_enomem_zc
+EXTERN asm_p_forward_list_remove_after, error_enomem_zc
 
 asm_balloc_alloc:
 

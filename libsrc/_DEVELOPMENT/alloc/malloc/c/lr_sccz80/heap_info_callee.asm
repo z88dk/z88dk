@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF heap_info_callee
+PUBLIC heap_info_callee
 
 heap_info_callee:
 
@@ -22,9 +22,9 @@ heap_info_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF heap_info_callee
+PUBLIC heap_info_callee
 
-LIB heap_info_unlocked_callee
+EXTERN heap_info_unlocked_callee
 
 heap_info_callee:
 

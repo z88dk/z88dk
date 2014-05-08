@@ -1,7 +1,7 @@
 
 ; int ungetc_unlocked(int c, FILE *stream)
 
-XDEF ungetc_unlocked_callee
+PUBLIC ungetc_unlocked_callee
 
 ungetc_unlocked_callee:
 

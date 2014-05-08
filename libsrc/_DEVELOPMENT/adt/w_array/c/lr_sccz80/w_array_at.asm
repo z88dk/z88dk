@@ -1,9 +1,9 @@
 
 ; void *w_array_at(w_array_t *a, size_t idx)
 
-XLIB w_array_at
+PUBLIC w_array_at
 
-LIB asm_w_array_at
+EXTERN asm_w_array_at
 
 w_array_at:
 

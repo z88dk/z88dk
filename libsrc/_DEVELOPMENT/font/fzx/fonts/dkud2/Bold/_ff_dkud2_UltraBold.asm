@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_UltraBold
+PUBLIC _ff_dkud2_UltraBold
 
 _ff_dkud2_UltraBold:
 

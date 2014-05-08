@@ -2,7 +2,7 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_MoveSprAbs_callee
+PUBLIC sp1_MoveSprAbs_callee
 
 sp1_MoveSprAbs_callee:
 

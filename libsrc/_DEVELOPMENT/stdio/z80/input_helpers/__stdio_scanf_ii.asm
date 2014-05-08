@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_ii
+PUBLIC __stdio_scanf_ii
 
-LIB __stdio_scanf_sm_i, __stdio_recv_input_eat_ws_repeat, l_inc_sp
-LIB __stdio_scanf_sm_ii, __stdio_recv_input_eatc, error_einval_zc, asm__strtoi
+EXTERN __stdio_scanf_sm_i, __stdio_recv_input_eat_ws_repeat, l_inc_sp
+EXTERN __stdio_scanf_sm_ii, __stdio_recv_input_eatc, error_einval_zc, asm__strtoi
 
 __stdio_scanf_ii:
 

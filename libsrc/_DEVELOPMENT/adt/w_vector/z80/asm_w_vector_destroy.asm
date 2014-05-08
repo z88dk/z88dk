@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_destroy
+PUBLIC asm_w_vector_destroy
 
-LIB asm_b_vector_destroy
+EXTERN asm_b_vector_destroy
 
 asm_w_vector_destroy:
 

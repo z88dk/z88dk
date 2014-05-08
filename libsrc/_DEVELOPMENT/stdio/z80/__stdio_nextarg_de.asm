@@ -1,5 +1,5 @@
 
-XLIB __stdio_nextarg_de
+PUBLIC __stdio_nextarg_de
 
 __stdio_nextarg_de:
 

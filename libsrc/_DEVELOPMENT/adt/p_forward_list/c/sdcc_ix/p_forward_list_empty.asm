@@ -1,7 +1,7 @@
 
 ; int p_forward_list_empty(p_forward_list_t *list)
 
-XDEF _p_forward_list_empty
+PUBLIC _p_forward_list_empty
 
 _p_forward_list_empty:
 

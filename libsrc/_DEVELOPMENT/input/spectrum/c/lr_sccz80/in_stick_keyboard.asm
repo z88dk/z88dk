@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_keyboard(udk_t *u)
 
-XDEF in_stick_keyboard
+PUBLIC in_stick_keyboard
 
 in_stick_keyboard:
 

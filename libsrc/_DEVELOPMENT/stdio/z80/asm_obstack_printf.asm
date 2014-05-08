@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_printf
+PUBLIC asm_obstack_printf
 
-LIB asm_obstack_vprintf, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_obstack_vprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_obstack_printf:
 

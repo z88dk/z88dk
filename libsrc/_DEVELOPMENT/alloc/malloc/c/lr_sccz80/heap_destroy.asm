@@ -1,7 +1,7 @@
 
 ; void *heap_destroy(void *heap)
 
-XDEF heap_destroy
+PUBLIC heap_destroy
 
 ;defc heap_destroy = asm_heap_destroy
 

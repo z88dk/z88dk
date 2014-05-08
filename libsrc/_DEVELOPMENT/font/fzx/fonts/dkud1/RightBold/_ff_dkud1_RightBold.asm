@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_RightBold
+PUBLIC _ff_dkud1_RightBold
 
 _ff_dkud1_RightBold:
 

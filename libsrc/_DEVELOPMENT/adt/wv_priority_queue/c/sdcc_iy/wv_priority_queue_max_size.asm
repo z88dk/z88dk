@@ -1,7 +1,7 @@
 
 ; size_t wv_priority_queue_max_size(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_max_size
+PUBLIC _wv_priority_queue_max_size
 
 _wv_priority_queue_max_size:
 

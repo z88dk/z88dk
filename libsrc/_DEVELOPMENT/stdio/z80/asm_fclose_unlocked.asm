@@ -11,19 +11,19 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_fclose_unlocked
-XDEF asm0_fclose_unlocked
+PUBLIC asm_fclose_unlocked
+PUBLIC asm0_fclose_unlocked
 
-LIB asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
-LIB error_ebadf_mc, error_znc, __stdio_file_destroy, asm_free, l_jpix
+EXTERN asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
+EXTERN error_ebadf_mc, error_znc, __stdio_file_destroy, asm_free, l_jpix
 
-XREF STDIO_MSG_CLOS
-XREF __stdio_file_list_open, __stdio_file_list_avail
+EXTERN STDIO_MSG_CLOS
+EXTERN __stdio_file_list_open, __stdio_file_list_avail
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_pop_back
+PUBLIC asm_w_array_pop_back
 
-LIB __array_info, error_einval_mc
+EXTERN __array_info, error_einval_mc
 
 asm_w_array_pop_back:
 

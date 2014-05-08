@@ -15,11 +15,11 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_getchar
+PUBLIC asm_getchar
 
-XREF __stdio_file_stdin
+EXTERN __stdio_file_stdin
 
-LIB asm_fgetc
+EXTERN asm_fgetc
 
 asm_getchar:
 
@@ -46,9 +46,9 @@ asm_getchar:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_getchar
+PUBLIC asm_getchar
 
-LIB asm_getchar_unlocked
+EXTERN asm_getchar_unlocked
 
 asm_getchar:
 

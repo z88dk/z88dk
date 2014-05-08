@@ -28,11 +28,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_bit_play
+PUBLIC asm_bit_play
 
-LIB asm_isdigit, asm0_bit_beep, asm_z80_delay_ms
-LIB l_mulu_16_16x8, l0_divu_16_16x8, l_mulu_16_8x8
-LIB error_znc, error_einval_zc
+EXTERN asm_isdigit, asm0_bit_beep, asm_z80_delay_ms
+EXTERN l_mulu_16_16x8, l0_divu_16_16x8, l_mulu_16_8x8
+EXTERN error_znc, error_einval_zc
 
 asm_bit_play:
 

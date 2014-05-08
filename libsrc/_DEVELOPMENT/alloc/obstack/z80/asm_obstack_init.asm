@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_init
+PUBLIC asm_obstack_init
 
-LIB error_einval_zc
+EXTERN error_einval_zc
    
 asm_obstack_init:
 

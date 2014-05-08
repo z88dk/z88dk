@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_back
+PUBLIC asm_p_forward_list_back
 
-LIB __p_forward_list_locate_item, error_einval_zc
+EXTERN __p_forward_list_locate_item, error_einval_zc
 
 asm_p_forward_list_back:
 

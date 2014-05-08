@@ -1,7 +1,7 @@
 
 ; int w_array_resize(w_array_t *a, size_t n)
 
-XDEF _w_array_resize
+PUBLIC _w_array_resize
 
 _w_array_resize:
 

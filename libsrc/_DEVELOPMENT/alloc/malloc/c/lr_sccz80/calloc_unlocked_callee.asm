@@ -1,7 +1,7 @@
 
 ; void *calloc_unlocked(size_t nmemb, size_t size)
 
-XDEF calloc_unlocked_callee
+PUBLIC calloc_unlocked_callee
 
 calloc_unlocked_callee:
 

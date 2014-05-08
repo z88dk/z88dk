@@ -1,9 +1,9 @@
 
 ; void *memmove(void *s1, const void *s2, size_t n)
 
-XLIB memmove
+PUBLIC memmove
 
-LIB asm_memmove
+EXTERN asm_memmove
 
 memmove:
 

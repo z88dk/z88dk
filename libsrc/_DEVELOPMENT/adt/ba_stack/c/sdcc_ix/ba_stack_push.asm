@@ -1,9 +1,9 @@
 
 ; int ba_stack_push(ba_stack_t *s, int c)
 
-XDEF _ba_stack_push
+PUBLIC _ba_stack_push
 
-LIB _b_array_append
+EXTERN _b_array_append
 
 _ba_stack_push:
 

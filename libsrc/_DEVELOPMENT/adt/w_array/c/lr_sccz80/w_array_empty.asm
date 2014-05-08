@@ -1,7 +1,7 @@
 
 ; int w_array_empty(b_array_t *a)
 
-XDEF w_array_empty
+PUBLIC w_array_empty
 
 ;defc w_array_empty = asm_w_array_empty
 

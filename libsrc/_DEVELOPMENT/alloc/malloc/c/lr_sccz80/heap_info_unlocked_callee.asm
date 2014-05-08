@@ -1,7 +1,7 @@
 
 ; void heap_info_unlocked(void *heap, void *callback)
 
-XDEF heap_info_unlocked_callee
+PUBLIC heap_info_unlocked_callee
 
 heap_info_unlocked_callee:
 

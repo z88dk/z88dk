@@ -1,14 +1,14 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_fast_muls_8_8x8
+PUBLIC l_fast_muls_8_8x8
 
-LIB l_fast_mulu_16_8x8
+EXTERN l_fast_mulu_16_8x8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $80
 
-   LIB error_mulu_overflow_mc
+   EXTERN error_mulu_overflow_mc
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

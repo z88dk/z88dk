@@ -11,10 +11,10 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_flockfile
-XDEF asm0_flockfile
+PUBLIC asm_flockfile
+PUBLIC asm0_flockfile
 
-LIB asm_mtx_lock
+EXTERN asm_mtx_lock
 
 asm_flockfile:
 
@@ -30,7 +30,7 @@ asm_flockfile:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

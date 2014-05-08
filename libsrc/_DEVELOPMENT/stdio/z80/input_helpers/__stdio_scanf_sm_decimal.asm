@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_decimal
-XDEF __stdio_scanf_sm_decimal_join
+PUBLIC __stdio_scanf_sm_decimal
+PUBLIC __stdio_scanf_sm_decimal_join
 
-LIB asm_isdigit, __stdio_scanf_sm_write
+EXTERN asm_isdigit, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_decimal:
 

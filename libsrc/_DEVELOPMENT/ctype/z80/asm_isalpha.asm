@@ -1,5 +1,5 @@
 
-XLIB asm_isalpha
+PUBLIC asm_isalpha
 
 asm_isalpha:
 

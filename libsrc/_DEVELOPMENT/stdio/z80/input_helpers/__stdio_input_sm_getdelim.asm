@@ -1,7 +1,7 @@
 
-XLIB __stdio_input_sm_getdelim
+PUBLIC __stdio_input_sm_getdelim
 
-LIB asm_b_vector_append_block
+EXTERN asm_b_vector_append_block
 
 __stdio_input_sm_getdelim:
 

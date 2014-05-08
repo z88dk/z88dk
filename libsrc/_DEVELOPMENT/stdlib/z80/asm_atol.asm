@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_atol
+PUBLIC asm_atol
 
-LIB l_eat_ws, l_eat_sign, l_neg_dehl, l_atoul
+EXTERN l_eat_ws, l_eat_sign, l_neg_dehl, l_atoul
 
 asm_atol:
 

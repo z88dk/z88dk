@@ -1,5 +1,5 @@
 
-XLIB l_ltu_bc_hl
+PUBLIC l_ltu_bc_hl
 
 l_ltu_bc_hl:
 

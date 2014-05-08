@@ -11,21 +11,21 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_fopen_unlocked
-XDEF asm0_fopen_unlocked
+PUBLIC asm_fopen_unlocked
+PUBLIC asm0_fopen_unlocked
 
-LIB error_einval_zc, error_emfile_zc, error_zc
-LIB asm_p_forward_list_alt_pop_front, asm_p_forward_list_push_front
-LIB asm_p_forward_list_alt_push_front
-LIB __stdio_parse_permission, asm_open, asm_mtx_init
+EXTERN error_einval_zc, error_emfile_zc, error_zc
+EXTERN asm_p_forward_list_alt_pop_front, asm_p_forward_list_push_front
+EXTERN asm_p_forward_list_alt_push_front
+EXTERN __stdio_parse_permission, asm_open, asm_mtx_init
 
-XREF mtx_recursive
-XREF __stdio_file_list_open, __stdio_file_list_avail
+EXTERN mtx_recursive
+EXTERN __stdio_file_list_open, __stdio_file_list_avail
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

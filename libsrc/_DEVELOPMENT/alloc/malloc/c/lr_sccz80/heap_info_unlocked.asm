@@ -1,9 +1,9 @@
 
 ; void heap_info_unlocked(void *heap, void *callback)
 
-XLIB heap_info_unlocked
+PUBLIC heap_info_unlocked
 
-LIB asm_heap_info_unlocked
+EXTERN asm_heap_info_unlocked
 
 heap_info_unlocked:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_clear
+PUBLIC asm_b_vector_clear
 
-LIB l_zeroword_hl
+EXTERN l_zeroword_hl
 
 asm_b_vector_clear:
 

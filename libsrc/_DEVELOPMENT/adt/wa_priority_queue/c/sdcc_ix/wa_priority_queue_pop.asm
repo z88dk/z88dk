@@ -1,7 +1,7 @@
 
 ; void *wa_priority_queue_pop(wa_priority_queue_t *q)
 
-XDEF _wa_priority_queue_pop
+PUBLIC _wa_priority_queue_pop
 
 _wa_priority_queue_pop:
 

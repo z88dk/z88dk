@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Pearl
+PUBLIC _ff_dkud3_Pearl
 
 _ff_dkud3_Pearl:
 

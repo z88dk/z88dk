@@ -1,7 +1,7 @@
 
-XLIB __stdio_lock_acquire
+PUBLIC __stdio_lock_acquire
 
-LIB asm0_flockfile
+EXTERN asm0_flockfile
 
 __stdio_lock_acquire:
 

@@ -1,7 +1,7 @@
 
 ; size_t obstack_room(struct obstack *ob)
 
-XDEF _obstack_room
+PUBLIC _obstack_room
 
 _obstack_room:
 

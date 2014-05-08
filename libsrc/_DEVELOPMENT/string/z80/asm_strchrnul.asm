@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_strchrnul
+PUBLIC asm_strchrnul
 
 asm_strchrnul:
 

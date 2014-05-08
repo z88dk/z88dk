@@ -1,9 +1,9 @@
 
-XLIB error_efbig_zc
+PUBLIC error_efbig_zc
 
-XREF __EFBIG
+EXTERN __EFBIG
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    

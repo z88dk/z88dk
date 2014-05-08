@@ -15,9 +15,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_getc
+PUBLIC asm_getc
 
-LIB asm_fgetc
+EXTERN asm_fgetc
 
 asm_getc:
 
@@ -45,9 +45,9 @@ asm_getc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_getc
+PUBLIC asm_getc
 
-LIB asm_getc_unlocked
+EXTERN asm_getc_unlocked
 
 asm_getc:
 

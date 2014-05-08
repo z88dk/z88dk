@@ -1,8 +1,8 @@
 
-XLIB __strtoul__
+PUBLIC __strtoul__
 
-LIB l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
-LIB l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
+EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
+EXTERN l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
 
 INCLUDE "clib_cfg.asm"
 
@@ -295,7 +295,7 @@ decimal:
 
    ;  hl = char *
    
-   LIB l_atoul
+   EXTERN l_atoul
    
    ex de,hl
    call l_atoul
@@ -313,7 +313,7 @@ hex:
 
    ;  hl = char *
    
-   LIB l_htoul
+   EXTERN l_htoul
    
    ex de,hl
    call l_htoul
@@ -331,7 +331,7 @@ octal:
 
    ; hl = char *
    
-   LIB l_otoul
+   EXTERN l_otoul
    
    ex de,hl
    call l_otoul
@@ -349,7 +349,7 @@ binary:
 
    ; hl = char *
    
-   LIB l_btoul
+   EXTERN l_btoul
    
    ex de,hl
    call l_btoul

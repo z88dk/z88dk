@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_base
+PUBLIC asm_obstack_base
 
 asm_obstack_base:
 

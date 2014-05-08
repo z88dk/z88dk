@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_finish
+PUBLIC asm_obstack_finish
 
 asm_obstack_finish:
 

@@ -1,7 +1,7 @@
 
 ; int fgetpos_unlocked(FILE *stream, fpos_t *pos)
 
-XDEF _fgetpos_unlocked
+PUBLIC _fgetpos_unlocked
 
 _fgetpos_unlocked:
 

@@ -1,5 +1,5 @@
 
-XLIB l_small_otoul
+PUBLIC l_small_otoul
 
 l_small_otoul:
 

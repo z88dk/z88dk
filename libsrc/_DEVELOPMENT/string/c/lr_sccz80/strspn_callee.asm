@@ -1,7 +1,7 @@
 
 ; size_t strspn(const char *s1, const char *s2)
 
-XDEF strspn_callee
+PUBLIC strspn_callee
 
 strspn_callee:
 

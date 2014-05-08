@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_i
+PUBLIC __stdio_scanf_sm_i
 
-LIB __stdio_scanf_sm_decimal_join, __stdio_scanf_sm_hex_join
-LIB __stdio_scanf_sm_octal_join, __stdio_scanf_sm_write
+EXTERN __stdio_scanf_sm_decimal_join, __stdio_scanf_sm_hex_join
+EXTERN __stdio_scanf_sm_octal_join, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_i:
 

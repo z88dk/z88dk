@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_init
+PUBLIC asm_w_array_init
 
-LIB asm_b_array_init, error_einval_zc
+EXTERN asm_b_array_init, error_einval_zc
 
 asm_w_array_init:
 

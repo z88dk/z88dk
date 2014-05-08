@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fputc
+PUBLIC fputc
 
-LIB asm_fputc
+EXTERN asm_fputc
 
 fputc:
 
@@ -27,9 +27,9 @@ fputc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fputc
+PUBLIC fputc
 
-LIB fputc_unlocked
+EXTERN fputc_unlocked
 
 fputc:
 

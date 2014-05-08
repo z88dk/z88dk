@@ -1,7 +1,7 @@
 
 ; unsigned long strtoul( const char * restrict nptr, char ** restrict endptr, int base)
 
-XDEF _strtoul
+PUBLIC _strtoul
 
 _strtoul:
 

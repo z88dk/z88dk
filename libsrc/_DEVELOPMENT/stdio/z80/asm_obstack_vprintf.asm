@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_vprintf
+PUBLIC asm_obstack_vprintf
 
-LIB asm_vsnprintf, l_utod_hl, asm_obstack_blank, error_mc
+EXTERN asm_vsnprintf, l_utod_hl, asm_obstack_blank, error_mc
 
 asm_obstack_vprintf:
 

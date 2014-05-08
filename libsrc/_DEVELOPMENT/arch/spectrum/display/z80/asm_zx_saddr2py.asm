@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_saddr2py
+PUBLIC asm_zx_saddr2py
 
 asm_zx_saddr2py:
 

@@ -1,9 +1,9 @@
 
 ; int wv_stack_push(wv_stack_t *s, void *item)
 
-XDEF _wv_stack_push
+PUBLIC _wv_stack_push
 
-LIB _w_vector_append
+EXTERN _w_vector_append
 
 _wv_stack_push:
 

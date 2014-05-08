@@ -10,12 +10,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_exit
-XDEF asm0_exit
+PUBLIC asm_exit
+PUBLIC asm0_exit
 
-XREF __exit_stack
+EXTERN __exit_stack
 
-LIB __Exit, l_jphl
+EXTERN __Exit, l_jphl
 
 asm_exit:
 

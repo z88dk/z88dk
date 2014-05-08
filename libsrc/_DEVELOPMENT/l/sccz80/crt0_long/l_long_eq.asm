@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB    l_long_eq
+PUBLIC    l_long_eq
 
 ;
 ; DEHL == secondary

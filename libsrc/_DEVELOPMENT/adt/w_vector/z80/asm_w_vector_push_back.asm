@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_push_back
+PUBLIC asm_w_vector_push_back
 
-LIB asm_w_vector_append
+EXTERN asm_w_vector_append
 
 asm_w_vector_push_back:
 

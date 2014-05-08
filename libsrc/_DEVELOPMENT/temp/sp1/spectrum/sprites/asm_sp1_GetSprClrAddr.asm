@@ -2,9 +2,9 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_GetSprClrAddr
+PUBLIC asm_sp1_GetSprClrAddr
 
-LIB asm_sp1_IterateSprChar
+EXTERN asm_sp1_IterateSprChar
 
 asm_sp1_GetSprClrAddr:
 

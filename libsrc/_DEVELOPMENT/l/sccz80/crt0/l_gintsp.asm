@@ -2,7 +2,7 @@
 ;       l_gint variant to be used sometimes by the peephole optimizer
 ;
 
-XLIB l_gintsp
+PUBLIC l_gintsp
 .l_gintsp
 	add	hl,sp
 	inc hl

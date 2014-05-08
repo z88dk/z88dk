@@ -1,7 +1,7 @@
 
 ; void _div_(div_t *d, int numer, int denom)
 
-XDEF __div_
+PUBLIC __div_
 
 __div_:
 

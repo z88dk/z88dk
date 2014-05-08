@@ -1,7 +1,7 @@
 
 ; char *ultoa(unsigned long num, char *buf, int radix)
 
-XDEF ultoa_callee
+PUBLIC ultoa_callee
 
 ultoa_callee:
 

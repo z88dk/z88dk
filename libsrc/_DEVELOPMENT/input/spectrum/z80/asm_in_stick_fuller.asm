@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_stick_fuller
+PUBLIC asm_in_stick_fuller
 
 asm_in_stick_fuller:
 

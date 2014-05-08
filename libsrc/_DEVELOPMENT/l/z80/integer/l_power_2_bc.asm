@@ -1,7 +1,7 @@
 
-XLIB l_power_2_bc
+PUBLIC l_power_2_bc
 
-LIB l_power_2_c
+EXTERN l_power_2_c
 
 l_power_2_bc:
 

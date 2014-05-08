@@ -1,9 +1,9 @@
 
 ; size_t w_vector_append_n(b_vector_t *v, size_t n, void *item)
 
-XLIB w_vector_append_n
+PUBLIC w_vector_append_n
 
-LIB asm_w_vector_append_n
+EXTERN asm_w_vector_append_n
 
 w_vector_append_n:
 

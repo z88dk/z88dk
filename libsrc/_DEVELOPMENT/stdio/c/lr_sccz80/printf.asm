@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF printf
+PUBLIC printf
 
 printf:
 
@@ -17,9 +17,9 @@ printf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF printf
+PUBLIC printf
 
-LIB printf_unlocked
+EXTERN printf_unlocked
 
 printf:
 

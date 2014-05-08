@@ -1,7 +1,7 @@
 
 ; uint fzx_buffer_extent(void *buf, uint len)
 
-XDEF _fzx_buffer_extent
+PUBLIC _fzx_buffer_extent
 
 _fzx_buffer_extent:
 

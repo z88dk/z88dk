@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Kurziva
+PUBLIC _ff_dkud1_Kurziva
 
 _ff_dkud1_Kurziva:
 

@@ -1,9 +1,9 @@
 
 ; void *obstack_free(struct obstack *ob, void *object)
 
-XLIB obstack_free
+PUBLIC obstack_free
 
-LIB asm_obstack_free
+EXTERN asm_obstack_free
 
 obstack_free:
 

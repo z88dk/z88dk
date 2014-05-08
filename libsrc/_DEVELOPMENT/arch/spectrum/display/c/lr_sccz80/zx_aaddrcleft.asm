@@ -1,7 +1,7 @@
 
 ; void *zx_aaddrcleft(void *attraddr)
 
-XDEF zx_aaddrcleft
+PUBLIC zx_aaddrcleft
 
 zx_aaddrcleft:
 

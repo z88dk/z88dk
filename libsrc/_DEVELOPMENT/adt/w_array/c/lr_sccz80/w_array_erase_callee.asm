@@ -1,7 +1,7 @@
 
 ; size_t w_array_erase(w_array_t *a, size_t idx)
 
-XDEF w_array_erase_callee
+PUBLIC w_array_erase_callee
 
 w_array_erase_callee:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_stack_init
+PUBLIC asm_ba_stack_init
 
-LIB asm_b_array_init
+EXTERN asm_b_array_init
 
 asm_ba_stack_init:
 

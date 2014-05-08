@@ -1,7 +1,7 @@
 
-XLIB l_fast_lsr_dehl
+PUBLIC l_fast_lsr_dehl
 
-LIB l0_fast_lsr_hl
+EXTERN l0_fast_lsr_hl
 
 l_fast_lsr_dehl:
 

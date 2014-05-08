@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strupr
+PUBLIC asm_strupr
 
-LIB asm_toupper
+EXTERN asm_toupper
 
 asm_strupr:
 

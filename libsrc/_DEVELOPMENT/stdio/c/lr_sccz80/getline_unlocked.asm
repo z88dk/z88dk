@@ -1,9 +1,9 @@
 
 ; size_t getline_unlocked(char **lineptr, size_t *n, FILE *stream)
 
-XLIB getline_unlocked
+PUBLIC getline_unlocked
 
-LIB asm_getline_unlocked
+EXTERN asm_getline_unlocked
 
 getline_unlocked:
 

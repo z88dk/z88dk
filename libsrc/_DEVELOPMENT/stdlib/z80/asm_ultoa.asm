@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_ultoa
-XDEF asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
+PUBLIC asm_ultoa
+PUBLIC asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
 
-LIB error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
+EXTERN error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
 
 INCLUDE "clib_cfg.asm"
 
@@ -143,7 +143,7 @@ IF __CLIB_OPT_NUM2TXT & $40
 
 decimal:
 
-   LIB l_ultoa
+   EXTERN l_ultoa
 
    ld c,ixl
    ld b,ixh
@@ -169,7 +169,7 @@ IF __CLIB_OPT_NUM2TXT & $80
 
 hex:
    
-   LIB l_ultoh
+   EXTERN l_ultoh
    
    ld c,ixl
    ld b,ixh
@@ -183,7 +183,7 @@ IF __CLIB_OPT_NUM2TXT & $20
 
 octal:
 
-   LIB l_ultoo
+   EXTERN l_ultoo
 
    ld c,ixl
    ld b,ixh
@@ -197,7 +197,7 @@ IF __CLIB_OPT_NUM2TXT & $10
 
 binary:
 
-   LIB l_ultob
+   EXTERN l_ultob
    
    ld c,ixl
    ld b,ixh

@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_number_head
+PUBLIC __stdio_scanf_number_head
 
-LIB __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc
+EXTERN __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc
 
 __stdio_scanf_number_head:
 

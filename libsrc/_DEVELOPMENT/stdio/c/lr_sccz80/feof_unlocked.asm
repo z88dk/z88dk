@@ -1,7 +1,7 @@
 
 ; int feof_unlocked(FILE *stream)
 
-XDEF feof_unlocked
+PUBLIC feof_unlocked
 
 feof_unlocked:
 

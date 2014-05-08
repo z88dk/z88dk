@@ -1,7 +1,7 @@
 
-XLIB l_small_mul_40_32x8
+PUBLIC l_small_mul_40_32x8
 
-LIB l_small_mul_32_32x32, l0_small_mul_16_16x16
+EXTERN l_small_mul_32_32x32, l0_small_mul_16_16x16
 
 l_small_mul_40_32x8:
 

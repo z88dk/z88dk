@@ -11,9 +11,9 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_click
+PUBLIC asm_bit_click
 
-XREF __sound_bit_state
+EXTERN __sound_bit_state
 
 asm_bit_click:
 

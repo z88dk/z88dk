@@ -1,9 +1,9 @@
 
-XLIB error_einval_mc
+PUBLIC error_einval_mc
 
-XREF __EINVAL
+EXTERN __EINVAL
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    pop hl

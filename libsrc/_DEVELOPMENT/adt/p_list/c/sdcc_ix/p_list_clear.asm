@@ -1,9 +1,9 @@
 
 ; void p_list_clear(p_list_t *list)
 
-XDEF _p_list_clear
+PUBLIC _p_list_clear
 
-LIB _p_list_init
+EXTERN _p_list_init
 
 _p_list_clear:
 

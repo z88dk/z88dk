@@ -13,10 +13,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_itoa
-XDEF asm0_itoa
+PUBLIC asm_itoa
+PUBLIC asm0_itoa
 
-LIB error_zc, l_valid_base, error_einval_zc, asm1_utoa, l_neg_hl
+EXTERN error_zc, l_valid_base, error_einval_zc, asm1_utoa, l_neg_hl
 
 asm_itoa:
 

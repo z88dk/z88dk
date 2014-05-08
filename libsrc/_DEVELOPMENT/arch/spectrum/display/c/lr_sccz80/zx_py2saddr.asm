@@ -1,7 +1,7 @@
 
 ; void *zx_py2saddr(uchar y)
 
-XDEF zx_py2saddr
+PUBLIC zx_py2saddr
 
 zx_py2saddr:
 

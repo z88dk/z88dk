@@ -16,9 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strxfrm
+PUBLIC asm_strxfrm
 
-LIB asm_strlen, error_zc, __lc_char_ordinal
+EXTERN asm_strlen, error_zc, __lc_char_ordinal
 
 asm_strxfrm:
 

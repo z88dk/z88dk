@@ -1,7 +1,7 @@
 
-XLIB error_mulu_overflow_mc
+PUBLIC error_mulu_overflow_mc
 
-LIB error_erange_mc
+EXTERN error_erange_mc
 
 error_mulu_overflow_mc:
 

@@ -1,7 +1,7 @@
 
 ; char *itoa(int num, char *buf, int radix)
 
-XDEF itoa_callee
+PUBLIC itoa_callee
 
 itoa_callee:
 

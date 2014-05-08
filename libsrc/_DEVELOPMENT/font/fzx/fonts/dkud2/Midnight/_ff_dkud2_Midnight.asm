@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Midnight
+PUBLIC _ff_dkud2_Midnight
 
 _ff_dkud2_Midnight:
 

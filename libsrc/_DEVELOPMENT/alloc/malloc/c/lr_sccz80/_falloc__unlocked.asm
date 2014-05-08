@@ -1,9 +1,9 @@
 
 ; void *_falloc__unlocked(void *p, size_t size)
 
-XLIB _falloc__unlocked
+PUBLIC _falloc__unlocked
 
-LIB asm__falloc_unlocked
+EXTERN asm__falloc_unlocked
 
 _falloc__unlocked:
 

@@ -1,9 +1,9 @@
 
 ; int ba_stack_push(ba_stack_t *s, int c)
 
-XLIB ba_stack_push
+PUBLIC ba_stack_push
 
-LIB b_array_append
+EXTERN b_array_append
 
 ;defc ba_stack_push = b_array_append
 

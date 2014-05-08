@@ -1,9 +1,9 @@
 
 ; int vsscanf(const char *s, const char *format, va_list arg)
 
-XLIB vsscanf
+PUBLIC vsscanf
 
-LIB asm_vsscanf
+EXTERN asm_vsscanf
 
 vsscanf:
 

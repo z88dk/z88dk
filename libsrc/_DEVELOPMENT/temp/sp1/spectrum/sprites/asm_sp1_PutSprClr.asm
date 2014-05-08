@@ -2,7 +2,7 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_PutSprClr
+PUBLIC asm_sp1_PutSprClr
 
 asm_sp1_PutSprClr:
 

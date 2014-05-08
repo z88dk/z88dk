@@ -1,7 +1,7 @@
 
-XLIB l_eat_digits
+PUBLIC l_eat_digits
 
-LIB l_char2num
+EXTERN l_char2num
 
 l_eat_digits:
 

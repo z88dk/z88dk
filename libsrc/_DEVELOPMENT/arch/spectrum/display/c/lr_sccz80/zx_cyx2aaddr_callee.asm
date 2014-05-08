@@ -1,7 +1,7 @@
 
 ; void *zx_cyx2aaddr(uchar row, uchar col)
 
-XDEF zx_cyx2aaddr_callee
+PUBLIC zx_cyx2aaddr_callee
 
 zx_cyx2aaddr_callee:
 

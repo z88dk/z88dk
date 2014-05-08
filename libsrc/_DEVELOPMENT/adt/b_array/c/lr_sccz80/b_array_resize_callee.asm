@@ -1,7 +1,7 @@
 
 ; int b_array_resize(b_array_t *a, size_t n)
 
-XDEF b_array_resize_callee
+PUBLIC b_array_resize_callee
 
 b_array_resize_callee:
 

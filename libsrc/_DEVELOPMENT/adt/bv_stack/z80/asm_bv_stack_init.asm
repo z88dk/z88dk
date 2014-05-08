@@ -13,9 +13,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_stack_init
+PUBLIC asm_bv_stack_init
 
-LIB asm_b_vector_init
+EXTERN asm_b_vector_init
 
 asm_bv_stack_init:
 

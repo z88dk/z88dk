@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_free_unlocked
+PUBLIC asm_heap_free_unlocked
 
-LIB l_setmem_hl
+EXTERN l_setmem_hl
 
 asm_heap_free_unlocked:
 

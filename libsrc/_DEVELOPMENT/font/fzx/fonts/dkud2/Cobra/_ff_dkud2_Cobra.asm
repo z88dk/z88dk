@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Cobra
+PUBLIC _ff_dkud2_Cobra
 
 _ff_dkud2_Cobra:
 

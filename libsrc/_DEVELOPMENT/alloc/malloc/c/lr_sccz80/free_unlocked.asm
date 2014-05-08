@@ -1,7 +1,7 @@
 
 ; void free_unlocked(void *p)
 
-XDEF free_unlocked
+PUBLIC free_unlocked
 
 ;defc free_unlocked = asm_free_unlocked
 

@@ -1,7 +1,7 @@
 
 ; size_t b_vector_write_block(void *src, size_t n, b_vector_t *v, size_t idx)
 
-XDEF _b_vector_write_block
+PUBLIC _b_vector_write_block
 
 _b_vector_write_block:
 

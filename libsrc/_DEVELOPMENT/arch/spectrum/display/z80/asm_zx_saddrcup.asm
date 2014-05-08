@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_saddrcup
+PUBLIC asm_zx_saddrcup
 
 asm_zx_saddrcup:
 

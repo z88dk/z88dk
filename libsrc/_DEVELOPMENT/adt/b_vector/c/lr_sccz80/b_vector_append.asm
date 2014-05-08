@@ -1,9 +1,9 @@
 
 ; size_t b_vector_append(b_vector_t *v, int c)
 
-XLIB b_vector_append
+PUBLIC b_vector_append
 
-LIB asm_b_vector_append
+EXTERN asm_b_vector_append
 
 b_vector_append:
 

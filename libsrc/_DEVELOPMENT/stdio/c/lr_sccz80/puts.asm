@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF puts
+PUBLIC puts
 
 puts:
 
@@ -17,9 +17,9 @@ puts:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF puts
+PUBLIC puts
 
-LIB puts_unlocked
+EXTERN puts_unlocked
 
 puts:
 

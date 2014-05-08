@@ -1,7 +1,7 @@
 
-XLIB l_fast_atoul
+PUBLIC l_fast_atoul
 
-LIB l_fast_atou, error_mc
+EXTERN l_fast_atou, error_mc
 
 l_fast_atoul:
 

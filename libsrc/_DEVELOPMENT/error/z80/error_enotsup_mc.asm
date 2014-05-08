@@ -1,9 +1,9 @@
 
-XLIB error_enotsup_mc
+PUBLIC error_enotsup_mc
 
-XREF __ENOTSUP
+EXTERN __ENOTSUP
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    

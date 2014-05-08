@@ -13,11 +13,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_ltoa
-XDEF asm0_ltoa
+PUBLIC asm_ltoa
+PUBLIC asm0_ltoa
 
-LIB asm2_ultoa, asm3_ultoa
-LIB l_valid_base, asm1_ultoa, l_neg_dehl
+EXTERN asm2_ultoa, asm3_ultoa
+EXTERN l_valid_base, asm1_ultoa, l_neg_dehl
 
 asm_ltoa:
 

@@ -1,7 +1,7 @@
 
 ; char *strrstrip(char *s)
 
-XDEF _strrstrip
+PUBLIC _strrstrip
 
 _strrstrip:
 

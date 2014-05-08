@@ -1,8 +1,8 @@
 
-XLIB __rlslong_rrx_s
-XDEF __rlulong_rrx_s
+PUBLIC __rlslong_rrx_s
+PUBLIC __rlulong_rrx_s
 
-LIB l_lsl_dehl
+EXTERN l_lsl_dehl
 
 __rlslong_rrx_s:
 __rlulong_rrx_s:

@@ -1,5 +1,5 @@
 
-XLIB asm_isalnum
+PUBLIC asm_isalnum
 
 asm_isalnum:
 

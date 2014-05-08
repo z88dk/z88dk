@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strspn
+PUBLIC asm_strspn
 
-LIB asm_strchr
+EXTERN asm_strchr
 
 asm_strspn:
 

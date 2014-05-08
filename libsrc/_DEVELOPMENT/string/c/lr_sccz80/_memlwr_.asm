@@ -1,9 +1,9 @@
 
 ; char *_memlwr_(void *p, size_t n)
 
-XLIB _memlwr_
+PUBLIC _memlwr_
 
-LIB asm__memlwr
+EXTERN asm__memlwr
 
 _memlwr_:
 

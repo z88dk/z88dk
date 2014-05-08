@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_info
+PUBLIC heap_info
 
-LIB asm_heap_info
+EXTERN asm_heap_info
 
 heap_info:
 
@@ -27,9 +27,9 @@ heap_info:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB heap_info
+PUBLIC heap_info
 
-LIB heap_info_unlocked
+EXTERN heap_info_unlocked
 
 heap_info:
 

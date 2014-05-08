@@ -1,5 +1,5 @@
 
-XLIB asm_isxdigit
+PUBLIC asm_isxdigit
 
 asm_isxdigit:
 

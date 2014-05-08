@@ -1,5 +1,5 @@
 
-XLIB l_bitset_locate
+PUBLIC l_bitset_locate
 
 l_bitset_locate:
 

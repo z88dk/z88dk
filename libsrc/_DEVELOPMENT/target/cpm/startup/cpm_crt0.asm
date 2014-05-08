@@ -11,10 +11,10 @@ org $100
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB start
-XDEF __Exit
+PUBLIC start
+PUBLIC __Exit
 
-XREF _main
+EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

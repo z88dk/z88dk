@@ -5,7 +5,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_htoul
+PUBLIC l_htoul
 
 l_htoul:
 
@@ -23,12 +23,12 @@ l_htoul:
 
 IF __CLIB_OPT_TXT2NUM_SELECT & $08
 
-   LIB l_fast_htoul
+   EXTERN l_fast_htoul
    jp l_fast_htoul
 
 ELSE
 
-   LIB l_small_htoul
+   EXTERN l_small_htoul
    jp l_small_htoul
 
 ENDIF

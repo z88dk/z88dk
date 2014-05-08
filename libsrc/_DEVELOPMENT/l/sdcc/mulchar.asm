@@ -26,12 +26,12 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	XLIB __muluchar_rrx_s
-	XDEF __mulsuchar_rrx_s
-	XDEF __muluschar_rrx_s
-	XDEF __mulschar_rrx_s
-	XDEF __mulschar_rrx_hds
-	LIB  __mul16
+	PUBLIC __muluchar_rrx_s
+	PUBLIC __mulsuchar_rrx_s
+	PUBLIC __muluschar_rrx_s
+	PUBLIC __mulschar_rrx_s
+	PUBLIC __mulschar_rrx_hds
+	EXTERN  __mul16
 
 ; This multiplication routine is similar to the one
 ; from Rodnay Zaks, "Programming the Z80".

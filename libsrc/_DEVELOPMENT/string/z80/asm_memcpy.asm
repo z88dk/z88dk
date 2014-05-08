@@ -9,8 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_memcpy
-XDEF asm0_memcpy, asm1_memcpy
+PUBLIC asm_memcpy
+PUBLIC asm0_memcpy, asm1_memcpy
 
 asm_memcpy:
 

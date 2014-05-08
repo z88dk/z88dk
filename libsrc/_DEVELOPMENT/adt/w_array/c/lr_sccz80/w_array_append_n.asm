@@ -1,9 +1,9 @@
 
 ; size_t w_array_append_n(w_array_t *a, size_t n, void *item)
 
-XLIB w_array_append_n
+PUBLIC w_array_append_n
 
-LIB asm_w_array_append_n
+EXTERN asm_w_array_append_n
 
 w_array_append_n:
 

@@ -1,7 +1,7 @@
 
 ; void in_mouse_kempston_init(void)
 
-XDEF in_mouse_kempston_init
+PUBLIC in_mouse_kempston_init
 
 in_mouse_kempston_init:
 

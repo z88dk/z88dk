@@ -1,7 +1,7 @@
 
 ; size_t b_array_read_block(void *dst, size_t n, b_array_t *a, size_t idx)
 
-XDEF _b_array_read_block
+PUBLIC _b_array_read_block
 
 _b_array_read_block:
 

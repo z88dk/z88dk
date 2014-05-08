@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Extra
+PUBLIC _ff_dkud2_Extra
 
 _ff_dkud2_Extra:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Transcript
+PUBLIC _ff_dkud1_Transcript
 
 _ff_dkud1_Transcript:
 

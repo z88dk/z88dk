@@ -1,9 +1,9 @@
 
 ; void *p_queue_front(p_queue_t *q)
 
-XDEF _p_queue_front
+PUBLIC _p_queue_front
 
-LIB _p_forward_list_front
+EXTERN _p_forward_list_front
 
 _p_queue_front:
 

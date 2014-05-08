@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Just6
+PUBLIC _ff_dkud2_Just6
 
 _ff_dkud2_Just6:
 

@@ -1,5 +1,5 @@
 
-XLIB asm_isblank
+PUBLIC asm_isblank
 
 asm_isblank:
 

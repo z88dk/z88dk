@@ -1,7 +1,7 @@
 
 ; void bit_synth(int dur, int freq_1, int freq_2, int freq_3, int freq_4)
 
-XDEF _bit_synth
+PUBLIC _bit_synth
 
 _bit_synth:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fopen
+PUBLIC asm_fopen
 
-LIB asm_fopen_unlocked
+EXTERN asm_fopen_unlocked
 
 asm_fopen:
 

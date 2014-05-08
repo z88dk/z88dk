@@ -1,8 +1,8 @@
 
-XLIB l_small_divs_32_32x32
-XDEF l0_small_divs_32_32x32
+PUBLIC l_small_divs_32_32x32
+PUBLIC l0_small_divs_32_32x32
 
-LIB l_neg_dehl, l0_small_divu_32_32x32, error_divide_by_zero_mc
+EXTERN l_neg_dehl, l0_small_divu_32_32x32, error_divide_by_zero_mc
 
 l_small_divs_32_32x32:
 

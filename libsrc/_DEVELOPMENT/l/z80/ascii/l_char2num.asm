@@ -1,7 +1,7 @@
 
-XLIB l_char2num
+PUBLIC l_char2num
 
-LIB asm_isalpha
+EXTERN asm_isalpha
 
 l_char2num:
 

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _malloc
+PUBLIC _malloc
 
 _malloc:
 
@@ -23,9 +23,9 @@ _malloc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _malloc
+PUBLIC _malloc
 
-LIB _malloc_unlocked
+EXTERN _malloc_unlocked
 
 _malloc:
 

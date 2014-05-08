@@ -3,7 +3,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_InvUpdateStruct
+PUBLIC sp1_InvUpdateStruct
 
 sp1_InvUpdateStruct:
 

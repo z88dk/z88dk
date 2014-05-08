@@ -1,7 +1,7 @@
 
 ; void in_wait_nokey(void)
 
-XDEF _in_wait_nokey
+PUBLIC _in_wait_nokey
 
 _in_wait_nokey:
 

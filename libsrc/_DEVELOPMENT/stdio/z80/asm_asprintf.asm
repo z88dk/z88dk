@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_asprintf
+PUBLIC asm_asprintf
 
-LIB asm_vasprintf, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_vasprintf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_asprintf:
 

@@ -1,9 +1,9 @@
 
-XLIB error_erange_zc
+PUBLIC error_erange_zc
 
-XREF __ERANGE
+EXTERN __ERANGE
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    

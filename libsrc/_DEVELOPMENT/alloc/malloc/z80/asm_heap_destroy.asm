@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_destroy
+PUBLIC asm_heap_destroy
 
-LIB asm_mtx_destroy
+EXTERN asm_mtx_destroy
 
 asm_heap_destroy:
 

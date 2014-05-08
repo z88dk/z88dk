@@ -1,5 +1,5 @@
 
-XLIB l_long_add_exx
+PUBLIC l_long_add_exx
 
 l_long_add_exx:
 

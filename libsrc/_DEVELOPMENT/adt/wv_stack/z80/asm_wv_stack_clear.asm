@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wv_stack_clear
+PUBLIC asm_wv_stack_clear
 
-LIB l_zeroword_hl
+EXTERN l_zeroword_hl
 
 asm_wv_stack_clear:
 

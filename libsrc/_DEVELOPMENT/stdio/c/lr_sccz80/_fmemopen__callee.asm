@@ -1,7 +1,7 @@
 
 ; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
-XDEF _fmemopen__callee
+PUBLIC _fmemopen__callee
 
 _fmemopen__callee:
 

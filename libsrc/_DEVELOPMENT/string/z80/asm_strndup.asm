@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strndup
+PUBLIC asm_strndup
 
-LIB asm_strlen, l_minu_bc_hl, asm0_strdup
+EXTERN asm_strlen, l_minu_bc_hl, asm0_strdup
 
 asm_strndup:
 

@@ -1,9 +1,9 @@
 
 ; int p_queue_empty(p_queue_t *q)
 
-XDEF _p_queue_empty
+PUBLIC _p_queue_empty
 
-LIB _p_forward_list_empty
+EXTERN _p_forward_list_empty
 
 _p_queue_empty:
 

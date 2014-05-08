@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Script1
+PUBLIC _ff_dkud2_Script1
 
 _ff_dkud2_Script1:
 

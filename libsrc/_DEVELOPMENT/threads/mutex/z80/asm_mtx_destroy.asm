@@ -12,9 +12,9 @@
 ;;; should we unblock any blocked threads?
 ;;; standard specifically says we don't need to
 
-XLIB asm_mtx_destroy
+PUBLIC asm_mtx_destroy
 
-LIB l_setmem_hl
+EXTERN l_setmem_hl
 
 asm_mtx_destroy:
 

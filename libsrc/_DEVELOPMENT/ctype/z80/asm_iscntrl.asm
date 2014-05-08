@@ -1,5 +1,5 @@
 
-XLIB asm_iscntrl
+PUBLIC asm_iscntrl
 
 asm_iscntrl:
 

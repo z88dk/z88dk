@@ -1,9 +1,9 @@
 
 ; size_t wv_stack_capacity(wv_stack_t *s)
 
-XDEF _wv_stack_capacity
+PUBLIC _wv_stack_capacity
 
-LIB _w_vector_capacity
+EXTERN _w_vector_capacity
 
 _wv_stack_capacity:
 

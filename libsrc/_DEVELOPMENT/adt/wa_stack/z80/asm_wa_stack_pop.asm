@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_stack_pop
+PUBLIC asm_wa_stack_pop
 
-LIB asm_w_array_pop_back
+EXTERN asm_w_array_pop_back
 
 asm_wa_stack_pop:
 

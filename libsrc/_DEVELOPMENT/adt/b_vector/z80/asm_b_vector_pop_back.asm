@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_pop_pack
+PUBLIC asm_b_vector_pop_pack
 
-LIB asm_b_array_pop_back
+EXTERN asm_b_array_pop_back
 
 asm_b_vector_pop_back:
 

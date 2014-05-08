@@ -1,7 +1,7 @@
 
 ; int vasprintf(char **ptr, const char *format, void *arg)
 
-XDEF vasprintf_callee
+PUBLIC vasprintf_callee
 
 vasprintf_callee:
 

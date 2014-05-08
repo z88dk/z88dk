@@ -1,5 +1,5 @@
 
-XLIB l_num2char
+PUBLIC l_num2char
 
 l_num2char:
 

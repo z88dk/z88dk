@@ -1,5 +1,5 @@
 
-XLIB l_power_2_c
+PUBLIC l_power_2_c
 
 l_power_2_c:
 

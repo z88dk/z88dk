@@ -1,5 +1,5 @@
 
-XLIB l_maxu_bc_hl
+PUBLIC l_maxu_bc_hl
 
 l_maxu_bc_hl:
 

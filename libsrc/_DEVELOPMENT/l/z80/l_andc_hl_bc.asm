@@ -1,5 +1,5 @@
 
-XLIB l_andc_hl_bc
+PUBLIC l_andc_hl_bc
 
 l_andc_hl_bc:
 

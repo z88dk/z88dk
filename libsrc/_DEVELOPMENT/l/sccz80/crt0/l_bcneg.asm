@@ -1,7 +1,7 @@
 
-XLIB l_bcneg
+PUBLIC l_bcneg
 
-LIB l_neg_bc
+EXTERN l_neg_bc
 
 l_bcneg:
 

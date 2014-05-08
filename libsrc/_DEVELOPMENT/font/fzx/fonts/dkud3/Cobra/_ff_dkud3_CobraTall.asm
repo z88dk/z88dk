@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_CobraTall
+PUBLIC _ff_dkud3_CobraTall
 
 _ff_dkud3_CobraTall:
 

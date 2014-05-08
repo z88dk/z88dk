@@ -1,9 +1,9 @@
 
 ; int wv_priority_queue_push(wv_priority_queue_t *q, void *item)
 
-XLIB wv_priority_queue_push
+PUBLIC wv_priority_queue_push
 
-LIB asm_wv_priority_queue_push
+EXTERN asm_wv_priority_queue_push
 
 wv_priority_queue_push:
 

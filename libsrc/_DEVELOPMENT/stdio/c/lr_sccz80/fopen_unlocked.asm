@@ -1,9 +1,9 @@
 
 ; FILE *fopen_unlocked(const char *filename, const char *mode)
 
-XLIB fopen_unlocked
+PUBLIC fopen_unlocked
 
-LIB asm_fopen_unlocked
+EXTERN asm_fopen_unlocked
 
 fopen_unlocked:
 

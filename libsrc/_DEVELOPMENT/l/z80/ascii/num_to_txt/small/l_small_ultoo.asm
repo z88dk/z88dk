@@ -1,8 +1,8 @@
 
-XLIB l_small_ultoo
+PUBLIC l_small_ultoo
 
-LIB l2_small_utoo_lz, l2_small_utoo_nlz
-LIB l3_small_utoo_lz, l3_small_utoo_nlz
+EXTERN l2_small_utoo_lz, l2_small_utoo_nlz
+EXTERN l3_small_utoo_lz, l3_small_utoo_nlz
 
 l_small_ultoo:
 

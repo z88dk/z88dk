@@ -11,10 +11,10 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_clearerr_unlocked
-XDEF asm1_clearerr_unlocked
+PUBLIC asm_clearerr_unlocked
+PUBLIC asm1_clearerr_unlocked
 
-LIB error_znc
+EXTERN error_znc
 
 asm_clearerr_unlocked:
 
@@ -37,7 +37,7 @@ asm_clearerr_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

@@ -3,9 +3,9 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_DeleteSpr
+PUBLIC asm_sp1_DeleteSpr
 
-LIB asm_free
+EXTERN asm_free
 
 ; Delete the sprite, freeing any memory that was allocated in its
 ; creation.  Sprite must not be display on screen (move off-screen

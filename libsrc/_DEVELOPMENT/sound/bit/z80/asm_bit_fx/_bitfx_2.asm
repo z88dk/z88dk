@@ -1,7 +1,7 @@
 
-XLIB _bitfx_2
+PUBLIC _bitfx_2
 
-LIB asm_bit_beep_raw
+EXTERN asm_bit_beep_raw
 
 _bitfx_2:
 

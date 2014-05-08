@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strrchr
+PUBLIC asm_strrchr
 
-LIB __str_locate_nul, l_neg_bc, error_zc
+EXTERN __str_locate_nul, l_neg_bc, error_zc
 
 asm_strrchr:
    

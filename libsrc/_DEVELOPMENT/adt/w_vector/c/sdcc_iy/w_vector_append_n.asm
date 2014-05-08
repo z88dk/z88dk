@@ -1,7 +1,7 @@
 
 ; size_t w_vector_append_n(b_vector_t *v, size_t n, void *item)
 
-XDEF _w_vector_append_n
+PUBLIC _w_vector_append_n
 
 _w_vector_append_n:
 

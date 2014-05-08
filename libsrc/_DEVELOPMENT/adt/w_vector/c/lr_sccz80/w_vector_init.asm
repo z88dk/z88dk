@@ -1,9 +1,9 @@
 
 ; w_vector_t *w_vector_init(void *p, size_t capacity, size_t max_size)
 
-XLIB w_vector_init
+PUBLIC w_vector_init
 
-LIB asm_w_vector_init
+EXTERN asm_w_vector_init
 
 w_vector_init:
 

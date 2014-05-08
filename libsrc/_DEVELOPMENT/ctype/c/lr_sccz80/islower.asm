@@ -1,9 +1,9 @@
 
 ; int islower(int c)
 
-XLIB islower
+PUBLIC islower
 
-LIB asm_islower, error_zc
+EXTERN asm_islower, error_zc
 
 islower:
 

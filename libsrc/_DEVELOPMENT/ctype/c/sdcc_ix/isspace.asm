@@ -1,9 +1,9 @@
 
 ; int isspace(int c)
 
-XLIB _isspace
+PUBLIC _isspace
 
-LIB asm_isspace, error_zc
+EXTERN asm_isspace, error_zc
 
 _isspace:
 

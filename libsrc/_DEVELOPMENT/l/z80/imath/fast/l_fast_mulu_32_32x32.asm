@@ -1,19 +1,19 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_fast_mulu_32_32x32
+PUBLIC l_fast_mulu_32_32x32
 
-LIB l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8, l0_fast_mulu_32_24x8
-LIB l_fast_mulu_32_16x16, l_fast_mulu_32_24x16
+EXTERN l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8, l0_fast_mulu_32_24x8
+EXTERN l_fast_mulu_32_16x16, l_fast_mulu_32_24x16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $80
 
-   LIB error_mulu_overflow_mc
+   EXTERN error_mulu_overflow_mc
 
 ELSE
 
-   LIB l_fast_mulu_16_8x8, l_fast_mulu_24_16x8
+   EXTERN l_fast_mulu_16_8x8, l_fast_mulu_24_16x8
    
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

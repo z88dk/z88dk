@@ -1,7 +1,7 @@
 
 ; char *bit_play_di(char *melody)
 
-XDEF bit_play_di
+PUBLIC bit_play_di
 
 bit_play_di:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_destroy
+PUBLIC asm_b_vector_destroy
 
-LIB asm_free, l_zerostruct8_hl
+EXTERN asm_free, l_zerostruct8_hl
 
    inc hl
    inc hl

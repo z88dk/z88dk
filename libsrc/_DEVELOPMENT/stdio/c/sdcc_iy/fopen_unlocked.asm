@@ -1,7 +1,7 @@
 
 ; FILE *fopen_unlocked(const char *filename, const char *mode)
 
-XDEF _fopen_unlocked
+PUBLIC _fopen_unlocked
 
 _fopen_unlocked:
 

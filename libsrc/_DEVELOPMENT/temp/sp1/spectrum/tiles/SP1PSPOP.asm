@@ -2,7 +2,7 @@
 ; 02.2008 aralbrec
 ; sinclair spectrum version
 
-XLIB SP1PSPOP
+PUBLIC SP1PSPOP
 
 ; enter : de  = & string to print (or something else)
 ;         hl  = & struct sp1_pss to read

@@ -1,7 +1,7 @@
 
 ; uint16_t in_key_scancode(int c)
 
-XDEF in_key_scancode
+PUBLIC in_key_scancode
 
 in_key_scancode:
 

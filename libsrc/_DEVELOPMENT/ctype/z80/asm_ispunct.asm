@@ -1,5 +1,5 @@
 
-XLIB asm_ispunct
+PUBLIC asm_ispunct
 
 asm_ispunct:
 

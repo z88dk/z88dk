@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Wildvest
+PUBLIC _ff_dkud2_Wildvest
 
 _ff_dkud2_Wildvest:
 

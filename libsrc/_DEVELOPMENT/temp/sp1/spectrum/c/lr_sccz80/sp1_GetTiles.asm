@@ -1,8 +1,8 @@
 ; void sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest)
 
-XLIB sp1_GetTiles
+PUBLIC sp1_GetTiles
 
-LIB asm_sp1_GetTiles
+EXTERN asm_sp1_GetTiles
 
 sp1_GetTiles:
 

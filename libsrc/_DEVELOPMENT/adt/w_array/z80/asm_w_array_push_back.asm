@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_push_back
+PUBLIC asm_w_array_push_back
 
-LIB asm_w_array_append
+EXTERN asm_w_array_append
 
 asm_w_array_push_back:
 

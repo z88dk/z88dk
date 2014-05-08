@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_finish
+PUBLIC obstack_finish
 
 obstack_finish:
 

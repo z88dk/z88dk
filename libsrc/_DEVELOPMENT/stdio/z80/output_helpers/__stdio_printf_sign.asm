@@ -1,5 +1,5 @@
 
-XLIB __stdio_printf_sign
+PUBLIC __stdio_printf_sign
 
 __stdio_printf_sign:
 

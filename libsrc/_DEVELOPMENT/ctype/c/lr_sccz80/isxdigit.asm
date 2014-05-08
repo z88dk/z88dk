@@ -1,9 +1,9 @@
 
 ; int isxdigit(int c)
 
-XLIB isxdigit
+PUBLIC isxdigit
 
-LIB asm_isxdigit, error_zc
+EXTERN asm_isxdigit, error_zc
 
 isxdigit:
 

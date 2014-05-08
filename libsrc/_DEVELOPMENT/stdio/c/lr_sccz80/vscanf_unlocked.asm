@@ -1,9 +1,9 @@
 
 ; int vscanf_unlocked(const char *format, void *arg)
 
-XLIB vscanf_unlocked
+PUBLIC vscanf_unlocked
 
-LIB asm_vscanf_unlocked
+EXTERN asm_vscanf_unlocked
 
 vscanf_unlocked:
 

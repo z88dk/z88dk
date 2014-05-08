@@ -1,7 +1,7 @@
 
 ; char *strstr(const char *s1, const char *s2)
 
-XDEF _strstr
+PUBLIC _strstr
 
 _strstr:
 

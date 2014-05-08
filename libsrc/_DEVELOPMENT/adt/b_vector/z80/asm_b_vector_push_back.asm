@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_push_back
+PUBLIC asm_b_vector_push_back
 
-LIB asm_b_vector_append
+EXTERN asm_b_vector_append
 
 asm_b_vector_push_back:
 

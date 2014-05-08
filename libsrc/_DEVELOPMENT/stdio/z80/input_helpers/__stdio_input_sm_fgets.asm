@@ -1,5 +1,5 @@
 
-XLIB __stdio_input_sm_fgets
+PUBLIC __stdio_input_sm_fgets
 
 __stdio_input_sm_fgets:
 

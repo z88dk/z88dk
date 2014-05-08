@@ -1,9 +1,9 @@
 
 ; int isodigit(int c)
 
-XLIB isodigit
+PUBLIC isodigit
 
-LIB asm_isodigit, error_zc
+EXTERN asm_isodigit, error_zc
 
 isodigit:
 

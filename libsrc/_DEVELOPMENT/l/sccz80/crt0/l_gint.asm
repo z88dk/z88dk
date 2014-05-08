@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_gint
+                PUBLIC    l_gint
 
 
 .l_gint

@@ -1,9 +1,9 @@
 
 ; int iscntrl(int c)
 
-XLIB iscntrl
+PUBLIC iscntrl
 
-LIB asm_iscntrl, error_znc
+EXTERN asm_iscntrl, error_znc
 
 iscntrl:
 

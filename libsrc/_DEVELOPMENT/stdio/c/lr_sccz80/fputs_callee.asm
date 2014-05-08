@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fputs_callee
+PUBLIC fputs_callee
 
 fputs_callee:
 
@@ -21,9 +21,9 @@ fputs_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fputs_callee
+PUBLIC fputs_callee
 
-LIB fputs_unlocked_callee
+EXTERN fputs_unlocked_callee
 
 fputs_callee:
 

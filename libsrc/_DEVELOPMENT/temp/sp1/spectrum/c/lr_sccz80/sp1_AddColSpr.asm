@@ -1,8 +1,8 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, uchar type, int graphic, uchar plane)
 
-XLIB sp1_AddColSpr
+PUBLIC sp1_AddColSpr
 
-LIB asm_sp1_AddColSpr
+EXTERN asm_sp1_AddColSpr
 
 sp1_AddColSpr:
 

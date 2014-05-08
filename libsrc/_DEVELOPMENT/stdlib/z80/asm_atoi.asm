@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_atoi
+PUBLIC asm_atoi
 
-LIB l_eat_ws, l_eat_sign, l_neg_hl, l_atou
+EXTERN l_eat_ws, l_eat_sign, l_neg_hl, l_atou
 
 asm_atoi:
 

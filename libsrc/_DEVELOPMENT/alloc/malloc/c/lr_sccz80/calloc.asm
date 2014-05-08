@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB calloc
+PUBLIC calloc
 
-LIB asm_calloc
+EXTERN asm_calloc
 
 calloc:
 
@@ -27,9 +27,9 @@ calloc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB calloc
+PUBLIC calloc
 
-LIB calloc_unlocked
+EXTERN calloc_unlocked
 
 calloc:
 

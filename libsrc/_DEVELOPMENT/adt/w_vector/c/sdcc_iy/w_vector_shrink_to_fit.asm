@@ -1,9 +1,9 @@
 
 ; int w_vector_shrink_to_fit(w_vector_t *v)
 
-XDEF _w_vector_shrink_to_fit
+PUBLIC _w_vector_shrink_to_fit
 
-LIB _b_vector_shrink_to_fit
+EXTERN _b_vector_shrink_to_fit
 
 _w_vector_shrink_to_fit:
 

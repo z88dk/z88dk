@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_priority_queue_empty
+PUBLIC asm_ba_priority_queue_empty
 
-LIB l_testword_hl
+EXTERN l_testword_hl
 
 asm_ba_priority_queue_empty:
 

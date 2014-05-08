@@ -1,7 +1,7 @@
 
 ; int ba_priority_queue_pop(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_pop
+PUBLIC _ba_priority_queue_pop
 
 _ba_priority_queue_pop:
 

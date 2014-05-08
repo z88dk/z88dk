@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _ferror
+PUBLIC _ferror
 
 _ferror:
 
@@ -33,9 +33,9 @@ _ferror:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _ferror
+PUBLIC _ferror
 
-LIB _ferror_unlocked
+EXTERN _ferror_unlocked
 
 _ferror:
 

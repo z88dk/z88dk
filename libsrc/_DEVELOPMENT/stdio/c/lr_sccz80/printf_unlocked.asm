@@ -1,7 +1,7 @@
 
 ; int printf_unlocked(const char *format, ...)
 
-XDEF printf_unlocked
+PUBLIC printf_unlocked
 
 printf_unlocked:
 

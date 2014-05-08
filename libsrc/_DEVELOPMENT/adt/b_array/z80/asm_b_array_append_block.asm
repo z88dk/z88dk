@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_append_block
-XDEF asm0_b_array_append_block
+PUBLIC asm_b_array_append_block
+PUBLIC asm0_b_array_append_block
 
-LIB __1_array_expand
+EXTERN __1_array_expand
 
 asm_b_array_append_block:
 

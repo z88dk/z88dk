@@ -1,5 +1,5 @@
 
-XLIB l_setmem_hl
+PUBLIC l_setmem_hl
 
    ; write byte to buffer pointed at by hl
    ; invoke with "call l_setmem_hl - (n*2)" to write n bytes to memory

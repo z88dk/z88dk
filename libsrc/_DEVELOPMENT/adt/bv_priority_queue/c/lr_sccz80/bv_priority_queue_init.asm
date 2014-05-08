@@ -2,9 +2,9 @@
 ; bv_priority_queue_t *
 ; bv_priority_queue_init(void *p, size_t capacity, size_t max_size, int (*compar)(const void *, const void *))
 
-XLIB bv_priority_queue_init
+PUBLIC bv_priority_queue_init
 
-LIB asm_bv_priority_queue_init
+EXTERN asm_bv_priority_queue_init
 
 bv_priority_queue_init:
 

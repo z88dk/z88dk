@@ -1,9 +1,9 @@
 
 ; size_t p_list_size(p_list_t *list)
 
-XDEF _p_list_size
+PUBLIC _p_list_size
 
-LIB _p_forward_list_size
+EXTERN _p_forward_list_size
 
 _p_list_size:
 

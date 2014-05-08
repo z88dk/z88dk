@@ -1,9 +1,9 @@
 
 ; size_t b_array_append(b_array_t *a, int c)
 
-XLIB b_array_append
+PUBLIC b_array_append
 
-LIB asm_b_array_append
+EXTERN asm_b_array_append
 
 b_array_append:
 

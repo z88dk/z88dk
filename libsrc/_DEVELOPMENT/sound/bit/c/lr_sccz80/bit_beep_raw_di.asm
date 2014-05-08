@@ -1,9 +1,9 @@
 
 ; void bit_beep_raw_di(uint_16t num_cycles, uint16_t tone_period_T)
 
-XLIB bit_beep_raw_di
+PUBLIC bit_beep_raw_di
 
-LIB asm_bit_beep_raw_di
+EXTERN asm_bit_beep_raw_di
 
 bit_beep_raw_di:
 

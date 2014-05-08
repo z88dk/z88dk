@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_stick_sinclair2
+PUBLIC asm_in_stick_sinclair2
 
 asm_in_stick_sinclair2:
 

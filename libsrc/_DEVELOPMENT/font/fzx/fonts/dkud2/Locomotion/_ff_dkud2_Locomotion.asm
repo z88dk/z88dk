@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Locomotion
+PUBLIC _ff_dkud2_Locomotion
 
 _ff_dkud2_Locomotion:
 

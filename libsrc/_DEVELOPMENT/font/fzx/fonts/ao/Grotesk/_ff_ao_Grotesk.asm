@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Grotesk
+PUBLIC _ff_ao_Grotesk
 
 _ff_ao_Grotesk:
 

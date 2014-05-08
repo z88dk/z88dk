@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_stack_top
+PUBLIC asm_p_stack_top
 
-LIB asm_p_forward_list_front
+EXTERN asm_p_forward_list_front
 
 asm_p_stack_top:
 

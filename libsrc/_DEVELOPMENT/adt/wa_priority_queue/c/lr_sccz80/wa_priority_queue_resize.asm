@@ -1,9 +1,9 @@
 
 ; int wa_priority_queue_resize(wa_priority_queue_t *q, size_t n)
 
-XLIB wa_priority_queue_resize
+PUBLIC wa_priority_queue_resize
 
-LIB asm_wa_priority_queue_resize
+EXTERN asm_wa_priority_queue_resize
 
 wa_priority_queue_resize:
 

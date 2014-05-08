@@ -1,5 +1,5 @@
 
-XLIB _ff_ind_vga
+PUBLIC _ff_ind_vga
 
 _ff_ind_vga:
 

@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_align_to_callee
+PUBLIC obstack_align_to_callee
 
 obstack_align_to_callee:
 

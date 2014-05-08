@@ -10,12 +10,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_atexit
-XDEF asm0_atexit
+PUBLIC asm_atexit
+PUBLIC asm0_atexit
 
-XREF __exit_stack, __exit_stack_sz
+EXTERN __exit_stack, __exit_stack_sz
 
-LIB error_mc, error_znc
+EXTERN error_mc, error_znc
 
 asm_atexit:
 

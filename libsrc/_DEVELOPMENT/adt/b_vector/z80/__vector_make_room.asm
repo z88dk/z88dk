@@ -1,9 +1,9 @@
 
-XLIB __vector_make_room
-XDEF __vector_make_room_extra
+PUBLIC __vector_make_room
+PUBLIC __vector_make_room_extra
 
-LIB error_einval_zc, error_enomem_zc, error_zc
-LIB __array_make_room, __0_array_make_room, __vector_realloc_grow
+EXTERN error_einval_zc, error_enomem_zc, error_zc
+EXTERN __array_make_room, __0_array_make_room, __vector_realloc_grow
 
 __vector_make_room:
 

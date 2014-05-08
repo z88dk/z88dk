@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_next_free
+PUBLIC obstack_next_free
 
 obstack_next_free:
 

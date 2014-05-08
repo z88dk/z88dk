@@ -1,9 +1,9 @@
 
 ; char *strpbrk(const char *s1, const char *s2)
 
-XLIB strpbrk
+PUBLIC strpbrk
 
-LIB asm_strpbrk
+EXTERN asm_strpbrk
 
 strpbrk:
 

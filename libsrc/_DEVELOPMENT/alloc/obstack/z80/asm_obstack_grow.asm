@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_grow
+PUBLIC asm_obstack_grow
 
-LIB asm0_obstack_blank, asm_memcpy
+EXTERN asm0_obstack_blank, asm_memcpy
 
 asm_obstack_grow:
 

@@ -1,9 +1,9 @@
 
 ; void b_vector_empty(b_vector_t *v)
 
-XDEF _b_vector_empty
+PUBLIC _b_vector_empty
 
-LIB _b_array_empty
+EXTERN _b_array_empty
 
 _b_vector_empty:
 

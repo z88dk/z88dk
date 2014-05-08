@@ -58,7 +58,7 @@ defc __CLIB_OPT_IMATH = 0
 ; The specific integer math library selected above
 ; can be further tailored by choosing options below.
 
-; FAST INTEGER MATH LIBRARY OPTIONS
+; FAST INTEGER MATH EXTERNRARY OPTIONS
 
 defc __CLIB_OPT_IMATH_FAST = $00
 

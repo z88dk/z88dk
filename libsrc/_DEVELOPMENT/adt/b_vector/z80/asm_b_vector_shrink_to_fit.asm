@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_shrink_to_fit
+PUBLIC asm_b_vector_shrink_to_fit
 
-LIB __array_info, asm_realloc, error_mnc, error_zc
+EXTERN __array_info, asm_realloc, error_mnc, error_zc
 
    inc hl
    inc hl

@@ -1,7 +1,7 @@
 
 ; void *zx_saddrcup(void *saddr)
 
-XDEF zx_saddrcup
+PUBLIC zx_saddrcup
 
 zx_saddrcup:
 

@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_alt_front(p_forward_list_alt_t *list)
 
-XDEF _p_forward_list_alt_front
+PUBLIC _p_forward_list_alt_front
 
-LIB _p_forward_list_front
+EXTERN _p_forward_list_front
 
 _p_forward_list_alt_front:
 

@@ -1,7 +1,7 @@
 
 ; int fscanf_unlocked(FILE *stream, const char *format, ...)
 
-XDEF fscanf_unlocked
+PUBLIC fscanf_unlocked
 
 fscanf_unlocked:
 

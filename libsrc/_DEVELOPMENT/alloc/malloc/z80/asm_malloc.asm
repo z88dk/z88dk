@@ -18,12 +18,12 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_malloc
-XDEF asm_malloc_lib
+PUBLIC asm_malloc
+PUBLIC asm_malloc_lib
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_alloc
+EXTERN asm_heap_alloc
 
 asm_malloc:
 asm_malloc_lib:
@@ -56,10 +56,10 @@ asm_malloc_lib:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_malloc
-XDEF asm_malloc_lib
+PUBLIC asm_malloc
+PUBLIC asm_malloc_lib
 
-LIB asm_malloc_unlocked
+EXTERN asm_malloc_unlocked
 
 asm_malloc:
 asm_malloc_lib:

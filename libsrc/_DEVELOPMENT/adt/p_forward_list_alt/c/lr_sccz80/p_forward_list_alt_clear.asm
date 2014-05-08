@@ -1,7 +1,7 @@
 
 ; void p_forward_list_alt_clear(p_forward_list_alt_t *list)
 
-XDEF p_forward_list_alt_clear
+PUBLIC p_forward_list_alt_clear
 
 ;defc p_forward_list_alt_clear = asm_p_forward_list_alt_clear
 

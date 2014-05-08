@@ -1,7 +1,7 @@
 
 ; int wa_priority_queue_push(wa_priority_queue_t *q, void *item)
 
-XDEF _wa_priority_queue_push
+PUBLIC _wa_priority_queue_push
 
 _wa_priority_queue_push:
 

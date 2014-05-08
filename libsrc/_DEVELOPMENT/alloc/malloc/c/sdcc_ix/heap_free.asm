@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _heap_free
+PUBLIC _heap_free
 
 _heap_free:
 
@@ -25,9 +25,9 @@ _heap_free:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _heap_free
+PUBLIC _heap_free
 
-LIB _heap_free_unlocked
+EXTERN _heap_free_unlocked
 
 _heap_free:
 

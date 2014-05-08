@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_kempston(void)
 
-XDEF _in_stick_kempston
+PUBLIC _in_stick_kempston
 
 _in_stick_kempston:
 

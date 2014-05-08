@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_blank_fast_callee
+PUBLIC obstack_blank_fast_callee
 
 obstack_blank_fast_callee:
 

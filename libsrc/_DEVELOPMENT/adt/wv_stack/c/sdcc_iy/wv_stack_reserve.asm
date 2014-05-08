@@ -1,9 +1,9 @@
 
 ; int wv_stack_reserve(wv_stack_t *s, size_t n)
 
-XDEF _wv_stack_reserve
+PUBLIC _wv_stack_reserve
 
-LIB _w_vector_reserve
+EXTERN _w_vector_reserve
 
 _wv_stack_reserve:
 

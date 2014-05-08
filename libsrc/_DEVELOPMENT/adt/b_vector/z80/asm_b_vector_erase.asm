@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_erase
+PUBLIC asm_b_vector_erase
 
-LIB asm_b_array_erase
+EXTERN asm_b_array_erase
 
 asm_b_vector_erase:
 

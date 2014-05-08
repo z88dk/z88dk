@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _fscanf
+PUBLIC _fscanf
 
 _fscanf:
 
@@ -24,9 +24,9 @@ _fscanf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _fscanf
+PUBLIC _fscanf
 
-LIB _fscanf_unlocked
+EXTERN _fscanf_unlocked
 
 _fscanf:
 

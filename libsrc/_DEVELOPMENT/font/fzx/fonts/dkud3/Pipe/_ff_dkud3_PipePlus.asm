@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_PipePlus
+PUBLIC _ff_dkud3_PipePlus
 
 _ff_dkud3_PipePlus:
 

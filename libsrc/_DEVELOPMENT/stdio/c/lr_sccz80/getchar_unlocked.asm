@@ -1,7 +1,7 @@
 
 ; int getchar_unlocked(void)
 
-XDEF getchar_unlocked
+PUBLIC getchar_unlocked
 
 getchar_unlocked:
 

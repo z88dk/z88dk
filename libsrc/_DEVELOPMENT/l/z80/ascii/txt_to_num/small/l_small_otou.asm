@@ -1,5 +1,5 @@
 
-XLIB l_small_otou
+PUBLIC l_small_otou
 
 l_small_otou:
 

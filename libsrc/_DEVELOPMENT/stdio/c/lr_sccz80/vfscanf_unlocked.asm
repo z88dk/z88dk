@@ -1,9 +1,9 @@
 
 ; int vfscanf_unlocked(FILE *stream, const char *format, void *arg)
 
-XLIB vfscanf_unlocked
+PUBLIC vfscanf_unlocked
 
-LIB asm_vfscanf_unlocked
+EXTERN asm_vfscanf_unlocked
 
 vfscanf_unlocked:
 

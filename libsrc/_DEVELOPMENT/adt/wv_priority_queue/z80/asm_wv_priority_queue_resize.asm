@@ -20,9 +20,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wv_priority_queue_resize
+PUBLIC asm_wv_priority_queue_resize
 
-LIB asm_wa_priority_queue_resize
+EXTERN asm_wa_priority_queue_resize
 
 asm_wv_priority_queue_resize:
 

@@ -1,7 +1,7 @@
 
 ; void *p_forward_list_remove(p_forward_list_t *list, void *item)
 
-XDEF _p_forward_list_remove
+PUBLIC _p_forward_list_remove
 
 _p_forward_list_remove:
 

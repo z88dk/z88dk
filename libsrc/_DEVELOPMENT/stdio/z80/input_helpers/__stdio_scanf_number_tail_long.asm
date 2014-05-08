@@ -1,5 +1,5 @@
 
-XLIB __stdio_scanf_number_tail_long
+PUBLIC __stdio_scanf_number_tail_long
 
 __stdio_scanf_number_tail_long:
 

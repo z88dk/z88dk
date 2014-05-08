@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_saddr2px
+PUBLIC asm_zx_saddr2px
 
 asm_zx_saddr2px:
 

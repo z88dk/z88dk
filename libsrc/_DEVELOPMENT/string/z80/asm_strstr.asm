@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strstr
+PUBLIC asm_strstr
 
-LIB error_zc
+EXTERN error_zc
 
 asm_strstr:
 

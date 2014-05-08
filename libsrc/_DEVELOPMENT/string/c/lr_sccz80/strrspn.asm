@@ -1,9 +1,9 @@
 
 ; size_t strrspn(const char *str, const char *cset)
 
-XLIB strrspn
+PUBLIC strrspn
 
-LIB asm_strrspn
+EXTERN asm_strrspn
 
 strrspn:
 

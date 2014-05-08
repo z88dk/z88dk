@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Chloe
+PUBLIC _ff_ao_Chloe
 
 _ff_ao_Chloe:
 

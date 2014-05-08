@@ -1,7 +1,7 @@
 
 ; size_t w_array_capacity(w_array_t *a)
 
-XDEF _w_array_capacity
+PUBLIC _w_array_capacity
 
 _w_array_capacity:
 

@@ -1,7 +1,7 @@
 
 ; int fzx_puts(char *s)
 
-XDEF fzx_puts
+PUBLIC fzx_puts
 
 fzx_puts:
 

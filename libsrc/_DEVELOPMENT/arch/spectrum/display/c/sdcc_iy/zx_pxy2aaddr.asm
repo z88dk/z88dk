@@ -1,7 +1,7 @@
 
 ; void *zx_pxy2aaddr_callee(uchar x, uchar y)
 
-XDEF _zx_pxy2aaddr
+PUBLIC _zx_pxy2aaddr
 
 _zx_pxy2aaddr:
 

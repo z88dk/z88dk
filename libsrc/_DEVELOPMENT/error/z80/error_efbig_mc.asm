@@ -1,9 +1,9 @@
 
-XLIB error_efbig_mc
+PUBLIC error_efbig_mc
 
-XREF __EFBIG
+EXTERN __EFBIG
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    

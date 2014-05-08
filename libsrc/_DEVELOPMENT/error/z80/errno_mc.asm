@@ -1,9 +1,9 @@
 
-XLIB errno_mc
+PUBLIC errno_mc
 
-XREF _errno
+EXTERN _errno
 
-LIB error_mc
+EXTERN error_mc
    
 errno_mc:
 

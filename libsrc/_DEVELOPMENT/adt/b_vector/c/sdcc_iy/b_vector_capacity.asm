@@ -1,9 +1,9 @@
 
 ; size_t b_vector_capacity(b_vector_t *v)
 
-XDEF _b_vector_capacity
+PUBLIC _b_vector_capacity
 
-LIB _b_array_capacity
+EXTERN _b_array_capacity
 
 _b_vector_capacity:
 

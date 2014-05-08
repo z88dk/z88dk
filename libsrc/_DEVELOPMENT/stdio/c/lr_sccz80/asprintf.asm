@@ -1,7 +1,7 @@
  
 ; int asprintf (char **ptr, const char *format, ...)
 
-XDEF asprintf
+PUBLIC asprintf
 
 asprintf:
 

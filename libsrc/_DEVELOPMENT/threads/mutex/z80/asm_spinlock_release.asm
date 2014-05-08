@@ -1,5 +1,5 @@
 
-XLIB asm_spinlock_release
+PUBLIC asm_spinlock_release
 
 asm_spinlock_release:
 

@@ -7,7 +7,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_long_div_u
+PUBLIC l_long_div_u
 
 l_long_div_u:
 
@@ -30,7 +30,7 @@ IF __CLIB_OPT_IMATH <= 50
    
    exx
    
-   LIB l_small_divu_32_32x32
+   EXTERN l_small_divu_32_32x32
    jp l_small_divu_32_32x32
 
 ENDIF
@@ -46,7 +46,7 @@ IF __CLIB_OPT_IMATH > 50
 
    exx
    
-   LIB l_fast_divu_32_32x32
+   EXTERN l_fast_divu_32_32x32
    jp l_fast_divu_32_32x32
 
 ENDIF

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF feof
+PUBLIC feof
 
 feof:
 
@@ -20,9 +20,9 @@ feof:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF feof
+PUBLIC feof
 
-LIB feof_unlocked
+EXTERN feof_unlocked
 
 feof:
 

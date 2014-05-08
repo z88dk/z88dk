@@ -1,7 +1,7 @@
 
 ; int ba_priority_queue_empty(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_empty
+PUBLIC _ba_priority_queue_empty
 
 _ba_priority_queue_empty:
 

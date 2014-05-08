@@ -1,9 +1,9 @@
 
 ; int putc_unlocked(int c, FILE *stream)
 
-XDEF putc_unlocked_callee
+PUBLIC putc_unlocked_callee
 
-LIB fputc_unlocked_callee
+EXTERN fputc_unlocked_callee
 
 ;defc putc_unlocked_callee = fputc_unlocked_callee
 

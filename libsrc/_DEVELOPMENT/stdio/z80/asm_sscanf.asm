@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_sscanf
+PUBLIC asm_sscanf
 
-LIB asm_vsscanf, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_vsscanf, __stdio_varg_2, __stdio_nextarg_de
 
 asm_sscanf:
 

@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_alt_remove
+PUBLIC asm_p_forward_list_alt_remove
 
-LIB error_einval_zc
-LIB __p_forward_list_locate_item, asm_p_forward_list_alt_remove_after
+EXTERN error_einval_zc
+EXTERN __p_forward_list_locate_item, asm_p_forward_list_alt_remove_after
 
 asm_p_forward_list_alt_remove:
 

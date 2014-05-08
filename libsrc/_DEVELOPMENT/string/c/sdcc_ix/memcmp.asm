@@ -1,7 +1,7 @@
 
 ; int memcmp(const void *s1, const void *s2, size_t n)
 
-XDEF _memcmp
+PUBLIC _memcmp
 
 _memcmp:
 

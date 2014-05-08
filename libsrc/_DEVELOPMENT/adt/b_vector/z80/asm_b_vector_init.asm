@@ -13,9 +13,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_init
+PUBLIC asm_b_vector_init
 
-LIB l_setmem_hl, l_ltu_hl_bc, asm_realloc, error_einval_zc, error_zc
+EXTERN l_setmem_hl, l_ltu_hl_bc, asm_realloc, error_einval_zc, error_zc
 
 asm_b_vector_init:
 

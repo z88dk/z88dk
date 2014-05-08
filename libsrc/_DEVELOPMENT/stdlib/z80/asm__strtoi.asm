@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__strtoi
+PUBLIC asm__strtoi
 
-LIB __strtou__, error_erange_mc, error_erange_zc, error_einval_zc
+EXTERN __strtou__, error_erange_mc, error_erange_zc, error_einval_zc
 
 asm__strtoi:
 

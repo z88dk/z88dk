@@ -1,7 +1,7 @@
 
 ; int wa_priority_queue_resize(wa_priority_queue_t *q, size_t n)
 
-XDEF _wa_priority_queue_resize
+PUBLIC _wa_priority_queue_resize
 
 _wa_priority_queue_resize:
 

@@ -1,7 +1,7 @@
 
 ; void *obstack_copy(struct obstack *ob, void *address, size_t size)
 
-XDEF _obstack_copy
+PUBLIC _obstack_copy
 
 _obstack_copy:
 

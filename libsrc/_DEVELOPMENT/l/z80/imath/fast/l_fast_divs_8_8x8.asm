@@ -1,8 +1,8 @@
 
-XLIB l_fast_divs_8_8x8
-XDEF l0_fast_divs_8_8x8
+PUBLIC l_fast_divs_8_8x8
+PUBLIC l0_fast_divs_8_8x8
 
-LIB l0_fast_divu_8_8x8, error_divide_by_zero_mc
+EXTERN l0_fast_divu_8_8x8, error_divide_by_zero_mc
 
 l_fast_divs_8_8x8:
 

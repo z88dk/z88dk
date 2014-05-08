@@ -4,7 +4,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_sp1_GetUpdateStruct
+PUBLIC asm_sp1_GetUpdateStruct
 
 asm_sp1_GetUpdateStruct:
 

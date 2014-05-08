@@ -1,7 +1,7 @@
 
 ; void *balloc_alloc(unsigned int queue)
 
-XDEF _balloc_alloc
+PUBLIC _balloc_alloc
 
 _balloc_alloc:
 

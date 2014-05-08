@@ -17,9 +17,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fwrite
+PUBLIC asm_fwrite
 
-LIB asm0_fwrite_unlocked, __stdio_lock_release
+EXTERN asm0_fwrite_unlocked, __stdio_lock_release
 
 asm_fwrite:
 
@@ -48,7 +48,7 @@ asm_fwrite:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock, fwrite_immediate_error_ebadf
+   EXTERN __stdio_verify_valid_lock, fwrite_immediate_error_ebadf
 
    push hl
    call __stdio_verify_valid_lock
@@ -58,7 +58,7 @@ IF __CLIB_OPT_STDIO & $01
 
 ELSE
 
-   LIB __stdio_lock_acquire, fwrite_immediate_error_enolck
+   EXTERN __stdio_lock_acquire, fwrite_immediate_error_enolck
 
    call __stdio_lock_acquire
    jp c, fwrite_immediate_error_enolck
@@ -73,9 +73,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fwrite
+PUBLIC asm_fwrite
 
-LIB asm_fwrite_unlocked
+EXTERN asm_fwrite_unlocked
 
 asm_fwrite:
 

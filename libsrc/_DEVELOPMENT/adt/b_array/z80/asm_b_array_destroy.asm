@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_destroy
+PUBLIC asm_b_array_destroy
 
-LIB l_zerostruct6_hl
+EXTERN l_zerostruct6_hl
 
 asm_b_array_destroy:
 

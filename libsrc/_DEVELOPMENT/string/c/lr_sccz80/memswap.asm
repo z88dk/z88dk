@@ -1,9 +1,9 @@
 
 ; void *memswap(void *s1, void *s2, size_t n)
 
-XLIB memswap
+PUBLIC memswap
 
-LIB asm_memswap
+EXTERN asm_memswap
 
 memswap:
 

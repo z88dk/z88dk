@@ -1,9 +1,9 @@
 
 ; size_t getdelim_unlocked(char **lineptr, size_t *n, int delimiter, FILE *stream)
 
-XLIB getdelim_unlocked
+PUBLIC getdelim_unlocked
 
-LIB asm_getdelim_unlocked
+EXTERN asm_getdelim_unlocked
 
 getdelim_unlocked:
 

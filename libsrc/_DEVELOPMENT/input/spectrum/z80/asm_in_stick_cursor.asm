@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_stick_cursor
+PUBLIC asm_in_stick_cursor
 
 asm_in_stick_cursor:
 

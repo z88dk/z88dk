@@ -1,7 +1,7 @@
 
 ; size_t b_vector_capacity(b_vector_t *v)
 
-XDEF b_vector_capacity
+PUBLIC b_vector_capacity
 
 ;defc b_vector_capacity = asm_b_vector_capacity
 

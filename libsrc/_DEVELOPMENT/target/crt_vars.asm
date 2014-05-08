@@ -7,7 +7,7 @@
 
 ;;; host jump table
 
-XDEF __ch_system
+PUBLIC __ch_system
 
 IF __ch_system_func
 
@@ -15,7 +15,7 @@ IF __ch_system_func
 
 ELSE
 
-   LIB error_zc
+   EXTERN error_zc
    
    __ch_system:                jp error_zc
 
@@ -30,7 +30,7 @@ ENDIF
 
 IF __heap_sz > 14
 
-   XDEF __heap
+   PUBLIC __heap
    
    IF __heap_loc
    
@@ -47,7 +47,7 @@ ENDIF
 
 IF __qtbl_sz > 0
 
-   XDEF __qtbl
+   PUBLIC __qtbl
    
    IF __qtbl_loc
    
@@ -70,7 +70,7 @@ IF !__exit_stack_sz
 
 ENDIF
 
-XDEF __exit_stack, __exit_stack_sz
+PUBLIC __exit_stack, __exit_stack_sz
 
 __exit_stack:
 
@@ -87,7 +87,7 @@ IF !__quickexit_stack_sz
 
 ENDIF
 
-XDEF __quickexit_stack, __quickexit_stack_sz
+PUBLIC __quickexit_stack, __quickexit_stack_sz
 
 __quickexit_stack:
 
@@ -109,7 +109,7 @@ __sp:          defs 2
 
 ;;;;;;;;;;;; clib
 
-XDEF __thrd_id, _errno
+PUBLIC __thrd_id, _errno
 
 IF __thrd_id_loc
 
@@ -133,7 +133,7 @@ ENDIF
 
 ;;;;;;;;;; locale
 
-XDEF __lc_char_cmp_bc, __lc_char_ordinal
+PUBLIC __lc_char_cmp_bc, __lc_char_ordinal
 
 IF __lc_char_cmp_bc_func
    
@@ -141,7 +141,7 @@ IF __lc_char_cmp_bc_func
 
 ELSE
 
-   LIB __lc_char_cmp_bc_default
+   EXTERN __lc_char_cmp_bc_default
 
    __lc_char_cmp_bc:           jp __lc_char_cmp_bc_default
 
@@ -153,7 +153,7 @@ IF __lc_char_ordinal_func
 
 ELSE
 
-   LIB __lc_char_ordinal_default
+   EXTERN __lc_char_ordinal_default
    
    __lc_char_ordinal:          jp __lc_char_ordinal_default
 
@@ -163,7 +163,7 @@ ENDIF
 
 IF __HAVE_FILE_STDIN
 
-   XDEF __stdio_file_stdin
+   PUBLIC __stdio_file_stdin
    
    __stdio_file_stdin:         defw __FILE_STDIN
 
@@ -171,7 +171,7 @@ ENDIF
 
 IF __HAVE_FILE_STDOUT
 
-   XDEF __stdio_file_stdout
+   PUBLIC __stdio_file_stdout
    
    __stdio_file_stdout:        defw __FILE_STDOUT
 
@@ -179,13 +179,13 @@ ENDIF
 
 IF __HAVE_FILE_STDERR
 
-   XDEF __stdio_file_stderr
+   PUBLIC __stdio_file_stderr
    
    __stdio_file_stderr:        defw __FILE_STDERR
 
 ENDIF
 
-XDEF __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
+PUBLIC __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
 
 __stdio_file_list_lock:        defs 6
 __stdio_file_list_open:        defs 2
@@ -193,7 +193,7 @@ __stdio_file_list_avail:       defs 4
 
 ;;;;;;;;;; stdlib
 
-XDEF __seed
+PUBLIC __seed
 
 IF __seed_loc
 
@@ -207,7 +207,7 @@ ENDIF
 
 ; string
 
-XDEF __strtok_ptr
+PUBLIC __strtok_ptr
 
 IF __strtok_loc
 
@@ -221,5 +221,5 @@ ENDIF
 
 ; =============================
 
-XDEF __sound_bit_state
+PUBLIC __sound_bit_state
 __sound_bit_state:  defb 0

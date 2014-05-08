@@ -1,6 +1,6 @@
 ; void __CALLEE__ sp1_ClearRectInv_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 
-XDEF sp1_ClearRectInv_callee
+PUBLIC sp1_ClearRectInv_callee
 
 sp1_ClearRectInv_callee:
 

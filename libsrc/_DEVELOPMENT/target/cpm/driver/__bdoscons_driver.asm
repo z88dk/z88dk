@@ -1,7 +1,7 @@
 
 ;; bdos output driver ;;;;;;;;;;
 
-LIB error_enotsup_zc, error_lznc, error_znc
+EXTERN error_enotsup_zc, error_lznc, error_znc
 
 __bdoscons_driver:
 

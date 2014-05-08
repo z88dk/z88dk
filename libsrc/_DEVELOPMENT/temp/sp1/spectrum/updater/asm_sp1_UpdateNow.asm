@@ -3,11 +3,10 @@
 ; 01.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_UpdateNow
+PUBLIC asm_sp1_UpdateNow
 
-LIB SP1DrawUpdateStruct
-
-XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT
+EXTERN SP1DrawUpdateStruct
+EXTERN SP1V_UPDATELISTH, SP1V_UPDATELISTT
 
 ; Iterates through the invalidated tiles list, drawing all invalidated tiles on screen.
 ; Validates them and removes them from the list along the way.

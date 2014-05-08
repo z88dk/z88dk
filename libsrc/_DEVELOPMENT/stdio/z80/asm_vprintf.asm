@@ -15,11 +15,11 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_vprintf
+PUBLIC asm_vprintf
 
-XREF __stdio_file_stdout
+EXTERN __stdio_file_stdout
 
-LIB asm_vfprintf
+EXTERN asm_vfprintf
 
 asm_vprintf:
 
@@ -56,9 +56,9 @@ asm_vprintf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_vprintf
+PUBLIC asm_vprintf
 
-LIB asm_vprintf_unlocked
+EXTERN asm_vprintf_unlocked
 
 asm_vprintf:
 

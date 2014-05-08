@@ -15,8 +15,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_z80_pop_ei
-XDEF asm0_z80_pop_ei
+PUBLIC asm_z80_pop_ei
+PUBLIC asm0_z80_pop_ei
 
 asm_z80_pop_ei:
 

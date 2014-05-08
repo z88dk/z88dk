@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_cy2aaddr
+PUBLIC asm_zx_cy2aaddr
 
 asm_zx_cy2aaddr:
 

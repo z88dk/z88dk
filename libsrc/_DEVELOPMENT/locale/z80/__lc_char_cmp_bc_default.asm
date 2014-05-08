@@ -1,7 +1,7 @@
 
-XLIB __lc_char_cmp_bc_default
+PUBLIC __lc_char_cmp_bc_default
 
-LIB __lc_char_ordinal
+EXTERN __lc_char_ordinal
 
 __lc_char_cmp_bc_default:
 

@@ -17,9 +17,9 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_beepfx
+PUBLIC asm_bit_beepfx
 
-LIB asm_z80_delay_tstate, asm_bit_open, asm_bit_close
+EXTERN asm_z80_delay_tstate, asm_bit_open, asm_bit_close
 
 asm_bit_beepfx:
 

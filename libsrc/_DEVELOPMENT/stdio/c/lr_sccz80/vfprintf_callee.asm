@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF vfprintf_callee
+PUBLIC vfprintf_callee
 
 vfprintf_callee:
    
@@ -23,9 +23,9 @@ vfprintf_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF vfprintf_callee
+PUBLIC vfprintf_callee
 
-LIB vfprintf_unlocked_callee
+EXTERN vfprintf_unlocked_callee
 
 vfprintf_callee:
 

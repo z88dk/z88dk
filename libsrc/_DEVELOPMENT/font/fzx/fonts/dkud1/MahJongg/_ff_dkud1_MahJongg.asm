@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_MahJongg
+PUBLIC _ff_dkud1_MahJongg
 
 _ff_dkud1_MahJongg:
 

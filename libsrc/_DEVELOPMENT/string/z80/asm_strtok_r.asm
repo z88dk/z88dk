@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strtok_r
+PUBLIC asm_strtok_r
 
-LIB asm_strspn, asm_strpbrk
+EXTERN asm_strspn, asm_strpbrk
 
 asm_strtok_r:
 

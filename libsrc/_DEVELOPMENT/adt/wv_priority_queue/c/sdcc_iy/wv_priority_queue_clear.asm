@@ -1,9 +1,9 @@
 
 ; void wv_priority_queue_clear(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_clear
+PUBLIC _wv_priority_queue_clear
 
-LIB _wa_priority_queue_clear
+EXTERN _wa_priority_queue_clear
 
 _wv_priority_queue_clear:
 

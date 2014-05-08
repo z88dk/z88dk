@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_CobraLight
+PUBLIC _ff_dkud3_CobraLight
 
 _ff_dkud3_CobraLight:
 

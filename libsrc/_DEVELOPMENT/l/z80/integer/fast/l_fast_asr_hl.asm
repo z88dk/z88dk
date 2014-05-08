@@ -1,6 +1,6 @@
 
-XLIB l_fast_asr_hl
-XDEF l0_fast_asr_hl
+PUBLIC l_fast_asr_hl
+PUBLIC l0_fast_asr_hl
 
 l_fast_asr_hl:
 

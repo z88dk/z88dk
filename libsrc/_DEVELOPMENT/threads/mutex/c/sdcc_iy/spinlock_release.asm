@@ -1,7 +1,7 @@
 
 ; void spinlock_release(char *spinlock)
 
-XDEF _spinlock_release
+PUBLIC _spinlock_release
 
 _spinlock_release:
 

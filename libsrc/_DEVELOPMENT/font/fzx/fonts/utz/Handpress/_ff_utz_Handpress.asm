@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_Handpress
+PUBLIC _ff_utz_Handpress
 
 _ff_utz_Handpress:
 

@@ -1,9 +1,9 @@
 
 ; void p_queue_push(p_queue_t *q, void *item)
 
-XDEF _p_queue_push
+PUBLIC _p_queue_push
 
-LIB _p_forward_list_alt_push_back
+EXTERN _p_forward_list_alt_push_back
 
 _p_queue_push:
 

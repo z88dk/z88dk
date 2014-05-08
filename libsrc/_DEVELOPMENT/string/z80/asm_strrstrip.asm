@@ -14,9 +14,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strrstrip
+PUBLIC asm_strrstrip
 
-LIB asm__strrstrip
+EXTERN asm__strrstrip
 
 asm_strrstrip:
 

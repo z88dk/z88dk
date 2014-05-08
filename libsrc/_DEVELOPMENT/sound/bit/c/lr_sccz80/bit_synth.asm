@@ -1,9 +1,9 @@
 
 ; void bit_synth(int dur, int freq_1, int freq_2, int freq_3, int freq_4)
 
-XLIB bit_synth
+PUBLIC bit_synth
 
-LIB asm_bit_synth
+EXTERN asm_bit_synth
 
 bit_synth:
 

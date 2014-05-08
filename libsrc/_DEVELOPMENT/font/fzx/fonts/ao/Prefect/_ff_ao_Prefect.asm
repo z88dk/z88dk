@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Prefect
+PUBLIC _ff_ao_Prefect
 
 _ff_ao_Prefect:
 

@@ -1,7 +1,7 @@
 
 ; void *memswap(void *s1, void *s2, size_t n)
 
-XDEF memswap_callee
+PUBLIC memswap_callee
 
 memswap_callee:
 

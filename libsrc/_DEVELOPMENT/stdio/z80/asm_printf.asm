@@ -15,9 +15,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_printf
+PUBLIC asm_printf
 
-LIB asm_vprintf, __stdio_varg_2
+EXTERN asm_vprintf, __stdio_varg_2
 
 asm_printf:
 
@@ -59,9 +59,9 @@ asm_printf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_printf
+PUBLIC asm_printf
 
-LIB asm_printf_unlocked
+EXTERN asm_printf_unlocked
 
 asm_printf:
 

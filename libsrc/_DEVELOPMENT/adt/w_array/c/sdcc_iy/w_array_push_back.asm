@@ -1,9 +1,9 @@
 
 ; size_t w_array_push_back(w_array_t *a, void *item)
 
-XDEF _w_array_push_back
+PUBLIC _w_array_push_back
 
-LIB _w_array_append
+EXTERN _w_array_append
 
 _w_array_push_back:
 

@@ -1,7 +1,7 @@
 
 ; void wv_priority_queue_destroy(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_destroy
+PUBLIC _wv_priority_queue_destroy
 
 _wv_priority_queue_destroy:
 

@@ -1,7 +1,7 @@
 
 ; size_t b_vector_append(b_vector_t *v, int c)
 
-XDEF b_vector_append_callee
+PUBLIC b_vector_append_callee
 
 b_vector_append_callee:
 

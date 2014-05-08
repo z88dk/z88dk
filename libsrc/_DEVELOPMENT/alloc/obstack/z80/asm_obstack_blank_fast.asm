@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_blank_fast
+PUBLIC asm_obstack_blank_fast
 
 asm_obstack_blank_fast:
 

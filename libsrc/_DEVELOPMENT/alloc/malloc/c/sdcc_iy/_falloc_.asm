@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF __falloc_
+PUBLIC __falloc_
 
 __falloc_:
 
@@ -25,9 +25,9 @@ __falloc_:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF __falloc_
+PUBLIC __falloc_
 
-LIB __falloc__unlocked
+EXTERN __falloc__unlocked
 
 __falloc_:
 

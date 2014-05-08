@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_system
+PUBLIC asm_system
 
-LIB l_inc_sp, __ch_system
+EXTERN l_inc_sp, __ch_system
 
 asm_system:
 

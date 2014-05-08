@@ -1,7 +1,7 @@
 
-XLIB l_long_com
+PUBLIC l_long_com
 
-LIB l_cpl_dehl
+EXTERN l_cpl_dehl
 
 l_long_com:
 

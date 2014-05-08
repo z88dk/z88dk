@@ -26,10 +26,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_qsort
+PUBLIC asm_qsort
 
-LIB l_mulu_16_16x16, asm0_memswap, l_jpix, error_einval_zc, error_erange_zc
-LIB l_ltu_de_hl, l_ltu_hl_de, l_ltu_bc_hl
+EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix, error_einval_zc, error_erange_zc
+EXTERN l_ltu_de_hl, l_ltu_hl_de, l_ltu_bc_hl
 
 asm_qsort:
 

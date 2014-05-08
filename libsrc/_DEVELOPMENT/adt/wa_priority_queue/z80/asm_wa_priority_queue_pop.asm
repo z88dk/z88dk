@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_pop
+PUBLIC asm_wa_priority_queue_pop
 
-LIB __array_info, __w_heap_swap, __w_heap_sift_down, error_einval_mc
+EXTERN __array_info, __w_heap_swap, __w_heap_sift_down, error_einval_mc
 
 asm_wa_priority_queue_pop:
 

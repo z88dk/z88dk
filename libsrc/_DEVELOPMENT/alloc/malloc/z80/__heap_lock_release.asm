@@ -1,8 +1,8 @@
 
-XLIB __heap_lock_release
-XDEF __heap_lock_release_0
+PUBLIC __heap_lock_release
+PUBLIC __heap_lock_release_0
 
-LIB asm_mtx_unlock
+EXTERN asm_mtx_unlock
 
 __heap_lock_release:
 

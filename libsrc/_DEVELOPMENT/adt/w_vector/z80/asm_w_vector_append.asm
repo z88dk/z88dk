@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_append
+PUBLIC asm_w_vector_append
 
-LIB asm_b_vector_append_block, asm1_w_array_append, error_mc
+EXTERN asm_b_vector_append_block, asm1_w_array_append, error_mc
 
 asm_w_vector_append:
 

@@ -1,16 +1,16 @@
 
-XLIB __stdio_send_output
-XDEF __stdio_send_output_buffer, __stdio_send_output_chars
+PUBLIC __stdio_send_output
+PUBLIC __stdio_send_output_buffer, __stdio_send_output_chars
 
-XDEF __stdio_printf_padding_width
-XDEF __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
+PUBLIC __stdio_printf_padding_width
+PUBLIC __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
 
-XDEF __stdio_printf_padding_precision
-XDEF __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
+PUBLIC __stdio_printf_padding_precision
+PUBLIC __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
-XREF STDIO_MSG_PUTC, STDIO_MSG_WRIT
+EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT
 
-LIB l_jpix, l_addu_hl_bc
+EXTERN l_jpix, l_addu_hl_bc
 
 ; ALL VFPRINTF OUTPUT PASSES THROUGH THESE FUNCTIONS
 ; HL' IS USED TO TRACK TOTAL NUMBER OF CHARS OUTPUT ON STREAM

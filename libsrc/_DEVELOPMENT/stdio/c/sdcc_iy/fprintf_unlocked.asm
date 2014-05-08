@@ -1,7 +1,7 @@
 
 ; int fprintf_unlocked(FILE *stream, const char *format, ...)
 
-XDEF _fprintf_unlocked
+PUBLIC _fprintf_unlocked
 
 _fprintf_unlocked:
 

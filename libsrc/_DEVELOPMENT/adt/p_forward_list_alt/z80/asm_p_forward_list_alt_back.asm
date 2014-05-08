@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_alt_back
+PUBLIC asm_p_forward_list_alt_back
 
-LIB l_readword_hl, error_einval_zc
+EXTERN l_readword_hl, error_einval_zc
 
 asm_p_forward_list_alt_back:
 

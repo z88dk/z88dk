@@ -1,9 +1,9 @@
 
 ; void *memalign_unlocked(size_t alignment, size_t size)
 
-XDEF _memalign_unlocked
+PUBLIC _memalign_unlocked
 
-LIB _aligned_alloc_unlocked
+EXTERN _aligned_alloc_unlocked
 
 _memalign_unlocked:
 

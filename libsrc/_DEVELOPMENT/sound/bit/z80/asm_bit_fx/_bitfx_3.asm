@@ -1,5 +1,5 @@
 
-XLIB _bitfx_3
+PUBLIC _bitfx_3
 
 INCLUDE "clib_target_cfg.asm"
 

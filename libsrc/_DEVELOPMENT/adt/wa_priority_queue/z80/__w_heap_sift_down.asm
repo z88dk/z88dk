@@ -1,7 +1,7 @@
 
-XLIB __w_heap_sift_down
+PUBLIC __w_heap_sift_down
 
-LIB l_jpix, __w_heap_swap, l_ltu_de_hl, error_znc
+EXTERN l_jpix, __w_heap_swap, l_ltu_de_hl, error_znc
 
 __w_heap_sift_down:
 

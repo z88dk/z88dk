@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_align_distance
+PUBLIC asm_obstack_align_distance
 
-LIB l_power_2_bc, error_einval_mc, error_znc, l_andc_hlbc
+EXTERN l_power_2_bc, error_einval_mc, error_znc, l_andc_hlbc
 
 asm_obstack_align_distance:
 

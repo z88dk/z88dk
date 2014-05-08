@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_GridDrop1
+PUBLIC _ff_utz_GridDrop1
 
 _ff_utz_GridDrop1:
 

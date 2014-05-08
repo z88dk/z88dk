@@ -1,5 +1,5 @@
 
-XLIB l_fast_mulu_16_8x8
+PUBLIC l_fast_mulu_16_8x8
 
 INCLUDE "clib_cfg.asm"
 

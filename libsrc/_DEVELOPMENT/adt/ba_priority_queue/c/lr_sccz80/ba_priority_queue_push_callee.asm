@@ -1,7 +1,7 @@
 
 ; int ba_priority_queue_push(ba_priority_queue_t *q, int c)
 
-XDEF ba_priority_queue_push_callee
+PUBLIC ba_priority_queue_push_callee
 
 ba_priority_queue_push_callee:
 

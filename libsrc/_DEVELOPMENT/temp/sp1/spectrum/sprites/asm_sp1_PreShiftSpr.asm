@@ -2,7 +2,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_PreShiftSpr
+PUBLIC asm_sp1_PreShiftSpr
 
 asm_sp1_PreShiftSpr:
 

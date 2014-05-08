@@ -1,9 +1,9 @@
 
 ; void p_queue_init(void *p)
 
-XDEF _p_queue_init
+PUBLIC _p_queue_init
 
-LIB _p_forward_list_alt_init
+EXTERN _p_forward_list_alt_init
 
 _p_queue_init:
 

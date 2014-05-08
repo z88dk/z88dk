@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wv_stack_push
+PUBLIC asm_wv_stack_push
 
-LIB asm_w_vector_append
+EXTERN asm_w_vector_append
 
 asm_wv_stack_push:
 

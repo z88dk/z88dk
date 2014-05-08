@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fscanf_unlocked
+PUBLIC asm_fscanf_unlocked
 
-LIB asm_vfscanf_unlocked, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_vfscanf_unlocked, __stdio_varg_2, __stdio_nextarg_de
 
 asm_fscanf_unlocked:
 

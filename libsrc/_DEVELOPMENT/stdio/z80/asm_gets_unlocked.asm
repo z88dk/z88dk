@@ -14,12 +14,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_gets_unlocked
-XDEF asm0_gets_unlocked
+PUBLIC asm_gets_unlocked
+PUBLIC asm0_gets_unlocked
 
-XREF __stdio_file_stdin
+EXTERN __stdio_file_stdin
 
-LIB asm0_fgets_unlocked, __stdio_input_sm_gets
+EXTERN asm0_fgets_unlocked, __stdio_input_sm_gets
 
 asm_gets_unlocked:
 
@@ -60,7 +60,7 @@ asm_gets_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid, error_zc
+   EXTERN __stdio_verify_valid, error_zc
 
    call __stdio_verify_valid
    jp c, error_zc

@@ -1,9 +1,9 @@
 
 ; int wv_priority_queue_resize(wv_priority_queue_t *q, size_t n)
 
-XDEF _wv_priority_queue_resize
+PUBLIC _wv_priority_queue_resize
 
-LIB _wa_priority_queue_resize
+EXTERN _wa_priority_queue_resize
 
 _wv_priority_queue_resize:
 

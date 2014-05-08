@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_copy
+PUBLIC asm_obstack_copy
 
-LIB asm_obstack_alloc, asm_memcpy
+EXTERN asm_obstack_alloc, asm_memcpy
 
 asm_obstack_copy:
 

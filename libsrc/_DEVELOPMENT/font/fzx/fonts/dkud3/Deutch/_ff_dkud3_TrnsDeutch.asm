@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_TrnsDeutch
+PUBLIC _ff_dkud3_TrnsDeutch
 
 _ff_dkud3_TrnsDeutch:
 

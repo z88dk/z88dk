@@ -1,7 +1,7 @@
 
 ; sp1_DrawUpdateStructIfNotRem(struct sp1_update *u)
 
-XDEF sp1_DrawUpdateStructIfNotRem
+PUBLIC sp1_DrawUpdateStructIfNotRem
 
 sp1_DrawUpdateStructIfNotRem:
 

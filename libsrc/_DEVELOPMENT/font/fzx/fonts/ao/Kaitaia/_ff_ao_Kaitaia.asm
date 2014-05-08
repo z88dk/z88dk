@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Kaitaia
+PUBLIC _ff_ao_Kaitaia
 
 _ff_ao_Kaitaia:
 

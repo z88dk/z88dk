@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_saddrpright
+PUBLIC asm_zx_saddrpright
 
 asm_zx_saddrpright:
 

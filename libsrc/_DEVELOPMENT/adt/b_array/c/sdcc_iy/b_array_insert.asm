@@ -1,7 +1,7 @@
 
 ; size_t b_array_insert(b_array_t *a, size_t idx, int c)
 
-XDEF _b_array_insert
+PUBLIC _b_array_insert
 
 _b_array_insert:
 

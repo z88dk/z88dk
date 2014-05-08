@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm__memstrcpy
+PUBLIC asm__memstrcpy
 
 asm__memstrcpy:
 

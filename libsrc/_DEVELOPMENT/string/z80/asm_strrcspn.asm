@@ -27,9 +27,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strrcspn
+PUBLIC asm_strrcspn
 
-LIB __str_locate_nul, l_neg_bc, asm_strchr, error_zc
+EXTERN __str_locate_nul, l_neg_bc, asm_strchr, error_zc
 
 asm_strrcspn:
 

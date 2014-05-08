@@ -1,7 +1,7 @@
 
 ; size_t strlcpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF _strlcpy
+PUBLIC _strlcpy
 
 _strlcpy:
 

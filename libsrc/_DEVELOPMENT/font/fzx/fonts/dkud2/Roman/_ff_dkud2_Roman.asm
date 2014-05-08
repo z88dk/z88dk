@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Roman
+PUBLIC _ff_dkud2_Roman
 
 _ff_dkud2_Roman:
 

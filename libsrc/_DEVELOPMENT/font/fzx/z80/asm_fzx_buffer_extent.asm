@@ -17,9 +17,9 @@
 ; to work simply.
 ; ===============================================================
 
-XLIB asm_fzx_buffer_extent
+PUBLIC asm_fzx_buffer_extent
 
-LIB __fzx_width_sm, _fzx, error_zc
+EXTERN __fzx_width_sm, _fzx, error_zc
 
 asm_fzx_buffer_extent:
 

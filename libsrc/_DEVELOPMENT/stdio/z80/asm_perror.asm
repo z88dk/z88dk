@@ -11,11 +11,11 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm_perror
+PUBLIC asm_perror
 
-XREF __stdio_file_stderr, _errno
+EXTERN __stdio_file_stderr, _errno
 
-LIB asm_strerror, asm0_fputs_unlocked, asm0_fputc_unlocked
+EXTERN asm_strerror, asm0_fputs_unlocked, asm0_fputc_unlocked
 
 asm_perror:
 
@@ -34,14 +34,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    IF __CLIB_OPT_STDIO & $01
 
-      LIB __stdio_verify_valid_lock
+      EXTERN __stdio_verify_valid_lock
    
       call __stdio_verify_valid_lock
       ret c
    
    ELSE
    
-      LIB __stdio_lock_acquire, error_mc
+      EXTERN __stdio_lock_acquire, error_mc
       
       call __stdio_lock_acquire
       jp c, error_mc
@@ -54,7 +54,7 @@ ELSE
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    IF __CLIB_OPT_STDIO & $01
    
-      LIB __stdio_verify_valid
+      EXTERN __stdio_verify_valid
       
       call __stdio_verify_valid
       ret c
@@ -93,7 +93,7 @@ errno_string:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 
-   LIB __stdio_lock_release
+   EXTERN __stdio_lock_release
 
    call asm0_fputc_unlocked
    jp __stdio_lock_release

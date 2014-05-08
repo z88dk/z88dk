@@ -1,9 +1,9 @@
 
 ; size_t ba_stack_capacity(ba_stack_t *s)
 
-XDEF _ba_stack_capacity
+PUBLIC _ba_stack_capacity
 
-LIB _b_array_capacity
+EXTERN _b_array_capacity
 
 _ba_stack_capacity:
 

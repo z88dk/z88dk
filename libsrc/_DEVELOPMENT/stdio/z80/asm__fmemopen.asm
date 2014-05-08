@@ -18,19 +18,19 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB asm__fmemopen
-XDEF asm0__fmemopen
+PUBLIC asm__fmemopen
+PUBLIC asm0__fmemopen
 
-LIB error_einval_zc, error_zc, asm_p_forward_list_push_front
-LIB __stdio_parse_permission, asm_malloc, __stdio_file_init, l_setmem_hl
-LIB __stdio_memstream_driver, asm_realloc, __stdio_file_destroy, asm_free
+EXTERN error_einval_zc, error_zc, asm_p_forward_list_push_front
+EXTERN __stdio_parse_permission, asm_malloc, __stdio_file_init, l_setmem_hl
+EXTERN __stdio_memstream_driver, asm_realloc, __stdio_file_destroy, asm_free
 
-XREF __stdio_file_list_open
+EXTERN __stdio_file_list_open
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

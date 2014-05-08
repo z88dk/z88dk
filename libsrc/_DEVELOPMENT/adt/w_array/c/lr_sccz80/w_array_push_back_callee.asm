@@ -1,9 +1,9 @@
 
 ; size_t w_array_push_back(w_array_t *a, void *item)
 
-XDEF w_array_push_back_callee
+PUBLIC w_array_push_back_callee
 
-LIB w_array_append_callee
+EXTERN w_array_append_callee
 
 ;defc w_array_push_back_callee = w_array_append_callee
 

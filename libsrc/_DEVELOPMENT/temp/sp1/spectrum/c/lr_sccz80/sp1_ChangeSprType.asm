@@ -1,8 +1,8 @@
 ; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 
-XLIB sp1_ChangeSprType
+PUBLIC sp1_ChangeSprType
 
-LIB asm_sp1_ChangeSprType
+EXTERN asm_sp1_ChangeSprType
 
 sp1_ChangeSprType:
 

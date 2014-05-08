@@ -1,7 +1,7 @@
 
 ; int ftrylockfile (FILE *stream)
 
-XDEF _ftrylockfile
+PUBLIC _ftrylockfile
 
 _ftrylockfile:
 

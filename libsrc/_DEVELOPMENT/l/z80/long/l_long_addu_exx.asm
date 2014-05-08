@@ -1,5 +1,5 @@
 
-XLIB l_long_addu_exx
+PUBLIC l_long_addu_exx
 
 l_long_addu_exx:
 

@@ -1,7 +1,7 @@
 
 ; char *strrev(char *s)
 
-XDEF strrev
+PUBLIC strrev
 
 strrev:
 

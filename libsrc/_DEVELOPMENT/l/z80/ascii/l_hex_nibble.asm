@@ -1,6 +1,6 @@
 
-XLIB l_hex_nibble
-XDEF l_hex_nibble_hi, l_hex_nibble_lo
+PUBLIC l_hex_nibble
+PUBLIC l_hex_nibble_hi, l_hex_nibble_lo
 
 l_hex_nibble_hi:
 

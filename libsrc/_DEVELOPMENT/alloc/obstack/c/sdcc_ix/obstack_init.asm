@@ -1,7 +1,7 @@
 
 ; void *obstack_init(struct obstack *ob, size_t size)
 
-XDEF _obstack_init
+PUBLIC _obstack_init
 
 _obstack_init:
 

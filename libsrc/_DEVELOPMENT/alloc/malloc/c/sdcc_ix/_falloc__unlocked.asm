@@ -1,7 +1,7 @@
 
 ; void *_falloc__unlocked(void *p, size_t size)
 
-XDEF __falloc__unlocked
+PUBLIC __falloc__unlocked
 
 __falloc__unlocked:
 

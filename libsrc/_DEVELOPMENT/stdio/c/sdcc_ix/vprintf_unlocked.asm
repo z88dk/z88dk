@@ -1,7 +1,7 @@
 
 ; int vprintf_unlocked(const char *format, void *arg)
 
-XDEF _vprintf_unlocked
+PUBLIC _vprintf_unlocked
 
 _vprintf_unlocked:
 

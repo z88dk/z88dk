@@ -1,5 +1,5 @@
 
-XLIB l_fast_atou
+PUBLIC l_fast_atou
 
 l_fast_atou:
 

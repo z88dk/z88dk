@@ -1,9 +1,9 @@
 
 ; int obstack_vprintf(struct obstack *obstack, const char *format, void *arg)
 
-XLIB obstack_vprintf
+PUBLIC obstack_vprintf
 
-LIB asm_obstack_vprintf
+EXTERN asm_obstack_vprintf
 
 obstack_vprintf:
 

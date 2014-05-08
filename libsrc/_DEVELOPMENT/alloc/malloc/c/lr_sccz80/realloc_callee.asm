@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF realloc_callee
+PUBLIC realloc_callee
 
 realloc_callee:
 
@@ -21,9 +21,9 @@ realloc_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF realloc_callee
+PUBLIC realloc_callee
 
-LIB realloc_unlocked_callee
+EXTERN realloc_unlocked_callee
 
 realloc_callee:
 

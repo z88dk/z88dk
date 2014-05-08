@@ -1,9 +1,9 @@
 
 ; void *p_queue_back(p_queue_t *q)
 
-XDEF _p_queue_back
+PUBLIC _p_queue_back
 
-LIB _p_forward_list_alt_back
+EXTERN _p_forward_list_alt_back
 
 _p_queue_back:
 

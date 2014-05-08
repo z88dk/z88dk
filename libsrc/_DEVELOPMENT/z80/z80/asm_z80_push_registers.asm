@@ -1,5 +1,5 @@
 
-XLIB asm_z80_push_registers
+PUBLIC asm_z80_push_registers
 
 asm_z80_push_registers:
 

@@ -1,9 +1,9 @@
 
-XLIB __vector_make_room_best_effort
-XDEF __vector_make_room_best_effort_extra
+PUBLIC __vector_make_room_best_effort
+PUBLIC __vector_make_room_best_effort_extra
 
-LIB error_enomem_zc
-LIB __vector_make_room_extra, __array_make_room_best_effort, l_inc_sp
+EXTERN error_enomem_zc
+EXTERN __vector_make_room_extra, __array_make_room_best_effort, l_inc_sp
 
 __vector_make_room_best_effort:
 

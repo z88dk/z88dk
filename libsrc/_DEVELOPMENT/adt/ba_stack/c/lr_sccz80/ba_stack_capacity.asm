@@ -1,7 +1,7 @@
 
 ; size_t ba_stack_capacity(ba_stack_t *s)
 
-XDEF ba_stack_capacity
+PUBLIC ba_stack_capacity
 
 ;defc ba_stack_capacity = asm_ba_stack_capacity
 

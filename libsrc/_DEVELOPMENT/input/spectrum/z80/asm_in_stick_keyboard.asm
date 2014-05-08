@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_stick_keyboard
+PUBLIC asm_in_stick_keyboard
 
 asm_in_stick_keyboard:
 

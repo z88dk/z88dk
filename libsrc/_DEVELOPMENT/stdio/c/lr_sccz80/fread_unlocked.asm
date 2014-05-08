@@ -1,9 +1,9 @@
 
 ; size_t fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XLIB fread_unlocked
+PUBLIC fread_unlocked
 
-LIB asm_fread_unlocked
+EXTERN asm_fread_unlocked
 
 fread_unlocked:
 

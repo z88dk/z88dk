@@ -5,7 +5,7 @@
 ;
 ;       djm 26/2/2000
 
-XLIB    l_long_dec
+PUBLIC    l_long_dec
 
 .l_long_dec
 

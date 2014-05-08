@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_insert
+PUBLIC asm_b_vector_insert
 
-LIB asm_b_vector_insert_block, error_mc
+EXTERN asm_b_vector_insert_block, error_mc
 
 asm_b_vector_insert:
 

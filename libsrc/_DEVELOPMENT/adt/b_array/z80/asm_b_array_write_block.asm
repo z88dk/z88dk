@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_write_block
-XDEF asm1_b_array_write_block
+PUBLIC asm_b_array_write_block
+PUBLIC asm1_b_array_write_block
 
-LIB __array_make_room_best_effort, error_enomem_zc
+EXTERN __array_make_room_best_effort, error_enomem_zc
 
 asm_b_array_write_block:
 

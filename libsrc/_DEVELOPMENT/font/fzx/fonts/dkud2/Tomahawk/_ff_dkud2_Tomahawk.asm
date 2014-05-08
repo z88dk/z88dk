@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Tomahawk
+PUBLIC _ff_dkud2_Tomahawk
 
 _ff_dkud2_Tomahawk:
 

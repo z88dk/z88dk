@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_memmove
+PUBLIC asm_memmove
 
-LIB asm0_memcpy, asm1_memcpy
+EXTERN asm0_memcpy, asm1_memcpy
 
 asm_memmove:
 

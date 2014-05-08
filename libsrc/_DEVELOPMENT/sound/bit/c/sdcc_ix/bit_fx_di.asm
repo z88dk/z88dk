@@ -1,7 +1,7 @@
 
 ; void bit_fx_di(void *effect)
 
-XDEF _bit_fx_di
+PUBLIC _bit_fx_di
 
 _bit_fx_di:
 

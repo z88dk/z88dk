@@ -1,9 +1,9 @@
 
 ; void bv_priority_queue_clear(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_clear
+PUBLIC _bv_priority_queue_clear
 
-LIB _ba_priority_queue_clear
+EXTERN _ba_priority_queue_clear
 
 _bv_priority_queue_clear:
 

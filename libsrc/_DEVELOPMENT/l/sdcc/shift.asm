@@ -25,10 +25,10 @@
 ;  not however invalidate any other reasons why the executable file
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
-	XLIB __rrulong_rrx_s
-	XDEF __rrslong_rrx_s
-	XDEF __rlslong_rrx_s
-	XDEF __rlulong_rrx_s
+	PUBLIC __rrulong_rrx_s
+	PUBLIC __rrslong_rrx_s
+	PUBLIC __rlslong_rrx_s
+	PUBLIC __rlulong_rrx_s
 
 __rrulong_rrx_s:
         ld      hl,#2+4

@@ -1,7 +1,7 @@
 
-XLIB __heap_place_block
+PUBLIC __heap_place_block
 
-LIB l_ltu_de_hl
+EXTERN l_ltu_de_hl
 
 __heap_place_block:
 

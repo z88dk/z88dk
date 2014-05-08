@@ -1,7 +1,7 @@
 
 ; void srand(unsigned int seed)
 
-XDEF srand
+PUBLIC srand
 
 srand:
 

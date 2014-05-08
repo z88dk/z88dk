@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_SteAff
+PUBLIC _ff_dkud3_SteAff
 
 _ff_dkud3_SteAff:
 

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_stpcpy
+PUBLIC asm_stpcpy
 
 asm_stpcpy:
 

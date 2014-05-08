@@ -12,10 +12,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_fgetpos_unlocked
-XDEF asm0_fgetpos_unlocked
+PUBLIC asm_fgetpos_unlocked
+PUBLIC asm0_fgetpos_unlocked
 
-LIB asm0_ftell_unlocked, error_mc, error_znc
+EXTERN asm0_ftell_unlocked, error_mc, error_znc
 
 asm_fgetpos_unlocked:
 
@@ -39,7 +39,7 @@ asm_fgetpos_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
    
    call __stdio_verify_valid
    ret c

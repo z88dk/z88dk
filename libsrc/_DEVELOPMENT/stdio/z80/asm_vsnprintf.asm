@@ -15,11 +15,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_vsnprintf
+PUBLIC asm_vsnprintf
 
-XREF STDIO_MSG_PUTC
+EXTERN STDIO_MSG_PUTC
 
-LIB asm0_vfprintf_unlocked, asm_memset, l_minu_bc_hl, l_neg_hl
+EXTERN asm0_vfprintf_unlocked, asm_memset, l_minu_bc_hl, l_neg_hl
 
 asm_vsnprintf:
 

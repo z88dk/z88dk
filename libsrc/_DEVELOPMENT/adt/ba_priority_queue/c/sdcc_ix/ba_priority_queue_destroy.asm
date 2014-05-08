@@ -1,7 +1,7 @@
 
 ; void ba_priority_queue_destroy(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_destroy
+PUBLIC _ba_priority_queue_destroy
 
 _ba_priority_queue_destroy:
 

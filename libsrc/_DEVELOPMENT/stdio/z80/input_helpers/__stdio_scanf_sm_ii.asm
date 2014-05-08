@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_sm_ii
+PUBLIC __stdio_scanf_sm_ii
 
-LIB __stdio_scanf_sm_i, __stdio_scanf_sm_write
+EXTERN __stdio_scanf_sm_i, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_ii:
 

@@ -1,7 +1,7 @@
 
-XLIB l_deneg
+PUBLIC l_deneg
 
-LIB l_neg_de
+EXTERN l_neg_de
 
 l_deneg:
 

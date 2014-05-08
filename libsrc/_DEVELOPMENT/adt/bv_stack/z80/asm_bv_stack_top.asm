@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_stack_top
+PUBLIC asm_bv_stack_top
 
-LIB asm_b_array_back
+EXTERN asm_b_array_back
 
 asm_bv_stack_top:
 

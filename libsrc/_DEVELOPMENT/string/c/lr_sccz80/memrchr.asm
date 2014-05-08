@@ -1,9 +1,9 @@
 
 ; void *memrchr(const void *s, int c, size_t n)
 
-XLIB memrchr
+PUBLIC memrchr
 
-LIB asm_memrchr
+EXTERN asm_memrchr
 
 memrchr:
 

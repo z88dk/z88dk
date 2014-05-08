@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strcasecmp
+PUBLIC asm_strcasecmp
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 asm_strcasecmp:
 

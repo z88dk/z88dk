@@ -1,9 +1,9 @@
 
 ; void *wa_stack_pop(wa_stack_t *s)
 
-XDEF _wa_stack_pop
+PUBLIC _wa_stack_pop
 
-LIB _w_array_pop_back
+EXTERN _w_array_pop_back
 
 _wa_stack_pop:
 

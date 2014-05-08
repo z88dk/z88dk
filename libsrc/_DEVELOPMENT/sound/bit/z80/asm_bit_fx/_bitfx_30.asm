@@ -1,9 +1,9 @@
 
-XLIB _bitfx_30
+PUBLIC _bitfx_30
 
 INCLUDE "clib_target_cfg.asm"
 
-LIB asm_bit_beep_raw
+EXTERN asm_bit_beep_raw
 
 _bitfx_30:
 

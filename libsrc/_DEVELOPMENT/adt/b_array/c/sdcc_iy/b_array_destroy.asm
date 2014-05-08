@@ -1,7 +1,7 @@
 
 ; void b_array_destroy(b_array_t *a)
 
-XDEF _b_array_destroy
+PUBLIC _b_array_destroy
 
 _b_array_destroy:
 

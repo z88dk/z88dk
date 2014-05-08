@@ -27,11 +27,11 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_play_tritone
+PUBLIC asm_bit_play_tritone
 
-LIB asm_bit_open, asm_bit_close
+EXTERN asm_bit_open, asm_bit_close
 
-XREF __sound_bit_state
+EXTERN __sound_bit_state
 
 asm_bit_play_tritone:
 

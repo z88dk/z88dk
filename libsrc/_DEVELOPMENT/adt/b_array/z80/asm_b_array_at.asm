@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_at
+PUBLIC asm_b_array_at
 
-LIB __array_at, error_einval_mc
+EXTERN __array_at, error_einval_mc
 
 asm_b_array_at:
 

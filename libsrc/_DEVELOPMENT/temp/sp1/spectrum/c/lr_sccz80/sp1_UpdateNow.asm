@@ -3,7 +3,7 @@
 ; 01.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_UpdateNow
+PUBLIC sp1_UpdateNow
 
 sp1_UpdateNow:
 

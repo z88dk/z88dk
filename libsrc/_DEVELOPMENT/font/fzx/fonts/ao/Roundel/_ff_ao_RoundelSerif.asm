@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_RoundelSerif
+PUBLIC _ff_ao_RoundelSerif
 
 _ff_ao_RoundelSerif:
 

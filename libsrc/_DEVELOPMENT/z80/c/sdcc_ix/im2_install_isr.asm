@@ -1,7 +1,7 @@
 
 ; void im2_install_isr(uint8_t vector, void *isr)
 
-XDEF _im2_install_isr
+PUBLIC _im2_install_isr
 
 _im2_install_isr:
 

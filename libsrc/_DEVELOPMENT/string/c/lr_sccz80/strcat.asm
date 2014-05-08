@@ -1,9 +1,9 @@
 
 ; char *strcat(char * restrict s1, const char * restrict s2)
 
-XLIB strcat
+PUBLIC strcat
 
-LIB asm_strcat
+EXTERN asm_strcat
 
 strcat:
 

@@ -1,9 +1,9 @@
 
 ; void *obstack_copy(struct obstack *ob, void *address, size_t size)
 
-XLIB obstack_copy
+PUBLIC obstack_copy
 
-LIB asm_obstack_copy
+EXTERN asm_obstack_copy
 
 obstack_copy:
 

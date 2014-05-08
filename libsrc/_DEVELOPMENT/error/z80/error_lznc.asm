@@ -1,7 +1,7 @@
 
-XLIB error_lznc
+PUBLIC error_lznc
 
-LIB error_znc
+EXTERN error_znc
 
    pop hl
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Jangeborg
+PUBLIC _ff_ao_Jangeborg
 
 _ff_ao_Jangeborg:
 

@@ -1,7 +1,7 @@
 
 ; size_t strnlen(const char *s, size_t maxlen)
 
-XDEF strnlen_callee
+PUBLIC strnlen_callee
 
 strnlen_callee:
 

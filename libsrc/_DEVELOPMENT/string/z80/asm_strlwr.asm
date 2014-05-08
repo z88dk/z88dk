@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strlwr
+PUBLIC asm_strlwr
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 asm_strlwr:
 

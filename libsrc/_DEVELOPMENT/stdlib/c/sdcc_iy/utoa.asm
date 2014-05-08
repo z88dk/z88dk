@@ -1,7 +1,7 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
-XDEF _utoa
+PUBLIC _utoa
 
 _utoa:
 

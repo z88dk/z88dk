@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_im2_install_isr
+PUBLIC asm_im2_install_isr
 
 asm_im2_install_isr:
 

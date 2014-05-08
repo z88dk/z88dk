@@ -1,9 +1,9 @@
 
 ; int fzx_write(void *buf, uint len)
 
-XLIB fzx_write
+PUBLIC fzx_write
 
-LIB asm_fzx_write
+EXTERN asm_fzx_write
 
 fzx_write:
 

@@ -1,7 +1,7 @@
 
-XLIB __stdio_printf_ln
+PUBLIC __stdio_printf_ln
 
-LIB __stdio_nextarg_hl
+EXTERN __stdio_nextarg_hl
 
 __stdio_printf_ln:
 

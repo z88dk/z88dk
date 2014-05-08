@@ -1,9 +1,9 @@
 
 ; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
 
-XLIB strtol
+PUBLIC strtol
 
-LIB asm_strtol
+EXTERN asm_strtol
 
 strtol:
 

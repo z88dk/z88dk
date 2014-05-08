@@ -1,9 +1,9 @@
 
 ; void *heap_destroy(void *heap)
 
-XDEF _heap_destroy
+PUBLIC _heap_destroy
 
-LIB _mtx_destroy
+EXTERN _mtx_destroy
 
 _heap_destroy:
 

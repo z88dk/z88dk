@@ -18,9 +18,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_call_once
+PUBLIC asm_call_once
 
-LIB asm_spinlock_tryacquire, __thread_context_switch, l_jphl
+EXTERN asm_spinlock_tryacquire, __thread_context_switch, l_jphl
 
 asm_call_once:
 

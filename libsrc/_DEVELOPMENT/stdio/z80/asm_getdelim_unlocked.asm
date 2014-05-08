@@ -23,11 +23,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_getdelim_unlocked
-XDEF asm0_getdelim_unlocked
+PUBLIC asm_getdelim_unlocked
+PUBLIC asm0_getdelim_unlocked
 
-LIB error_mc, asm_b_vector_resize, l_ltu_bc_hl, __stdio_recv_input_raw_getc
-LIB __stdio_verify_input, __stdio_recv_input_raw_eatc, __stdio_input_sm_getdelim
+EXTERN error_mc, asm_b_vector_resize, l_ltu_bc_hl, __stdio_recv_input_raw_getc
+EXTERN __stdio_verify_input, __stdio_recv_input_raw_eatc, __stdio_input_sm_getdelim
 
 asm_getdelim_unlocked:
 
@@ -56,7 +56,7 @@ asm_getdelim_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

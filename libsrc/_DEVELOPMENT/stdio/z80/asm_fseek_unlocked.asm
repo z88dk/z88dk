@@ -18,12 +18,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_fseek_unlocked
-XDEF asm0_fseek_unlocked
+PUBLIC asm_fseek_unlocked
+PUBLIC asm0_fseek_unlocked
 
-XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
+EXTERN STDIO_SEEK_CUR, STDIO_MSG_SEEK
 
-LIB l_decs_dehl, error_mc, error_znc, error_einval_mc, l_jpix
+EXTERN l_decs_dehl, error_mc, error_znc, error_einval_mc, l_jpix
 
 asm_fseek_unlocked:
 
@@ -48,7 +48,7 @@ asm_fseek_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

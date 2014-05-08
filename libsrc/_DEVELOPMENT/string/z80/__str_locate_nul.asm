@@ -1,5 +1,5 @@
 
-XLIB __str_locate_nul
+PUBLIC __str_locate_nul
 
 __str_locate_nul:
 

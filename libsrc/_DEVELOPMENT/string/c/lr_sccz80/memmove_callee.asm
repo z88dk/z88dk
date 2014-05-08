@@ -1,7 +1,7 @@
 
 ; void *memmove(void *s1, const void *s2, size_t n)
 
-XDEF memmove_callee
+PUBLIC memmove_callee
 
 memmove_callee:
 

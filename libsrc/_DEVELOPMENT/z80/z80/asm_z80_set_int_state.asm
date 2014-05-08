@@ -11,7 +11,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_z80_set_int_state
+PUBLIC asm_z80_set_int_state
 
 asm_z80_set_int_state:
 

@@ -1,9 +1,9 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
-XLIB fgets_unlocked
+PUBLIC fgets_unlocked
 
-LIB asm_fgets_unlocked
+EXTERN asm_fgets_unlocked
 
 fgets_unlocked:
 

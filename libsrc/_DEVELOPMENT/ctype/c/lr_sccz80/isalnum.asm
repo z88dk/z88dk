@@ -1,9 +1,9 @@
 
 ; int isalnum(int c)
 
-XLIB isalnum
+PUBLIC isalnum
 
-LIB asm_isalnum, error_zc
+EXTERN asm_isalnum, error_zc
 
 isalnum:
 

@@ -1,5 +1,5 @@
 
-XLIB l_fast_btou
+PUBLIC l_fast_btou
 
 l_fast_btou:
 

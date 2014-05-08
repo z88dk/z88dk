@@ -3,9 +3,9 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_InvUpdateStruct
+PUBLIC asm_sp1_InvUpdateStruct
 
-XREF SP1V_UPDATELISTT
+EXTERN SP1V_UPDATELISTT
 
 ; FASTCALL
 

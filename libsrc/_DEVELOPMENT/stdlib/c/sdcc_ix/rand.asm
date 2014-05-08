@@ -1,7 +1,7 @@
 
 ; int rand(void)
 
-XDEF _rand
+PUBLIC _rand
 
 _rand:
 

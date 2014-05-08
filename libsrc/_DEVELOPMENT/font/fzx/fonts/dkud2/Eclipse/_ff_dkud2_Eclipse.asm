@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Eclipse
+PUBLIC _ff_dkud2_Eclipse
 
 _ff_dkud2_Eclipse:
 

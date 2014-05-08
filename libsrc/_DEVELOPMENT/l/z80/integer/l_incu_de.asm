@@ -1,5 +1,5 @@
 
-XLIB l_incu_de
+PUBLIC l_incu_de
 
 l_incu_de:
 

@@ -6,7 +6,7 @@
 ;
 ;       13/5/99 djm, inverted carry conditions
 
-XLIB    l_uge
+PUBLIC    l_uge
 
 ;
 ; DE >= HL [unsigned]

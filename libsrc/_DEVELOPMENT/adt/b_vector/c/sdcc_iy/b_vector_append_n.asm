@@ -1,7 +1,7 @@
 
 ; size_t b_vector_append_n(b_vector_t *v, size_t n, int c)
 
-XDEF _b_vector_append_n
+PUBLIC _b_vector_append_n
 
 _b_vector_append_n:
 

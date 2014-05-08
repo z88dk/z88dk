@@ -1,7 +1,7 @@
 
 ; void bit_beep_raw_di(uint_16t num_cycles, uint16_t tone_period_T)
 
-XDEF _bit_beep_raw_di
+PUBLIC _bit_beep_raw_di
 
 _bit_beep_raw_di:
 

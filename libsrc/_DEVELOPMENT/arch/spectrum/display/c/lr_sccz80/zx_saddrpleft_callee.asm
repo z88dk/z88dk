@@ -1,7 +1,7 @@
 
 ; void *zx_saddrpleft(void *saddr, uchar bitmask)
 
-XDEF zx_saddrpleft_callee
+PUBLIC zx_saddrpleft_callee
 
 zx_saddrpleft_callee:
 

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_next_free
+PUBLIC asm_obstack_next_free
 
 asm_obstack_next_free:
 

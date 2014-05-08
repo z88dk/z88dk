@@ -17,10 +17,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_resize
-XDEF asm0_b_array_resize
+PUBLIC asm_b_array_resize
+PUBLIC asm0_b_array_resize
 
-LIB __array_expand, asm_memset, error_enomem_zc
+EXTERN __array_expand, asm_memset, error_enomem_zc
 
 asm_b_array_resize:
 

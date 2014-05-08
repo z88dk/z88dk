@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bit_fx_di
+PUBLIC asm_bit_fx_di
 
-LIB asm_bit_fx, asm_z80_push_di, asm0_z80_pop_ei
+EXTERN asm_bit_fx, asm_z80_push_di, asm0_z80_pop_ei
 
 asm_bit_fx_di:
 

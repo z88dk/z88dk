@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Western
+PUBLIC _ff_dkud3_Western
 
 _ff_dkud3_Western:
 

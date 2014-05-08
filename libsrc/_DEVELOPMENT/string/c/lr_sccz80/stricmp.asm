@@ -1,9 +1,9 @@
 
 ; int stricmp(const char *s1, const char *s2)
 
-XLIB stricmp
+PUBLIC stricmp
 
-LIB strcasecmp
+EXTERN strcasecmp
 
 ;defc stricmp = strcasecmp
 

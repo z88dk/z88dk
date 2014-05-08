@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_quick_exit
+PUBLIC asm_quick_exit
 
-XREF __quickexit_stack
+EXTERN __quickexit_stack
 
-LIB asm0_exit
+EXTERN asm0_exit
 
 asm_quick_exit:
 

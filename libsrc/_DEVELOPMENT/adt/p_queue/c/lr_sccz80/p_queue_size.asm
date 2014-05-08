@@ -1,7 +1,7 @@
 
 ; size_t p_queue_size(p_queue_t *q)
 
-XDEF p_queue_size
+PUBLIC p_queue_size
 
 ;defc p_queue_size = asm_p_queue_size
 

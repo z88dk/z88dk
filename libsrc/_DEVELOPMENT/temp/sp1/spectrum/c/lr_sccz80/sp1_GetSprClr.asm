@@ -1,8 +1,8 @@
 ; void sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n)
 
-XLIB sp1_GetSprClr
+PUBLIC sp1_GetSprClr
 
-LIB asm_sp1_GetSprClr
+EXTERN asm_sp1_GetSprClr
 
 sp1_GetSprClr:
 

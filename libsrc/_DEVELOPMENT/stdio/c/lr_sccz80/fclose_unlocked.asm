@@ -1,7 +1,7 @@
 
 ; int fclose_unlocked(FILE *stream)
 
-XDEF fclose_unlocked
+PUBLIC fclose_unlocked
 
 fclose_unlocked:
 

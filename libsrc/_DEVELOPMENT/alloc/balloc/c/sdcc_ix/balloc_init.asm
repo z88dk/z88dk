@@ -1,7 +1,7 @@
 
 ; void balloc_init(unsigned char num)
 
-XDEF _balloc_init
+PUBLIC _balloc_init
 
 _balloc_init:
 

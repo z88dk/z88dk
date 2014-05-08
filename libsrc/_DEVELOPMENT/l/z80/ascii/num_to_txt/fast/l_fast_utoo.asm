@@ -1,11 +1,11 @@
 
-XLIB l_fast_utoo
+PUBLIC l_fast_utoo
 
-XDEF l1_fast_utoo_lz, l1_fast_utoo_nlz
-XDEF l2_fast_utoo_lz, l2_fast_utoo_nlz
-XDEF l3_fast_utoo_lz, l3_fast_utoo_nlz
+PUBLIC l1_fast_utoo_lz, l1_fast_utoo_nlz
+PUBLIC l2_fast_utoo_lz, l2_fast_utoo_nlz
+PUBLIC l3_fast_utoo_lz, l3_fast_utoo_nlz
 
-LIB l_setmem_de
+EXTERN l_setmem_de
 
 l_fast_utoo:
 

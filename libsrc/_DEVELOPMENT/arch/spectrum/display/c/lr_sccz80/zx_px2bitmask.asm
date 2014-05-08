@@ -1,7 +1,7 @@
 
 ; uint zx_px2bitmask(uchar x)
 
-XDEF zx_px2bitmask
+PUBLIC zx_px2bitmask
 
 zx_px2bitmask:
 

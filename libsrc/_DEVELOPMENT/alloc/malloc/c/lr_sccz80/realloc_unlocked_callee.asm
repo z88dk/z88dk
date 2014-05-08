@@ -1,7 +1,7 @@
 
 ; void *realloc_unlocked(void *p, size_t size)
 
-XDEF realloc_unlocked_callee
+PUBLIC realloc_unlocked_callee
 
 realloc_unlocked_callee:
 

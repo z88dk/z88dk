@@ -1,9 +1,9 @@
 
 ; size_t strnlen(const char *s, size_t maxlen)
 
-XLIB strnlen
+PUBLIC strnlen
 
-LIB asm_strnlen
+EXTERN asm_strnlen
 
 strnlen:
 

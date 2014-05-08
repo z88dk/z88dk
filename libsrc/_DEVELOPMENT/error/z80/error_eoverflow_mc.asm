@@ -1,9 +1,9 @@
 
-XLIB error_eoverflow_mc
+PUBLIC error_eoverflow_mc
 
-XREF __EOVERFLOW
+EXTERN __EOVERFLOW
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    

@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_sxt
+                PUBLIC    l_sxt
 
 .l_sxt    ld l,a
           rlca

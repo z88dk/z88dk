@@ -1,7 +1,7 @@
 
-XLIB l_declong
+PUBLIC l_declong
 
-LIB l_dec_dehl
+EXTERN l_dec_dehl
 
 l_declong:
 

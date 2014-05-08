@@ -1,9 +1,9 @@
 
 ; char *strstr(const char *s1, const char *s2)
 
-XLIB strstr
+PUBLIC strstr
 
-LIB asm_strstr
+EXTERN asm_strstr
 
 strstr:
 

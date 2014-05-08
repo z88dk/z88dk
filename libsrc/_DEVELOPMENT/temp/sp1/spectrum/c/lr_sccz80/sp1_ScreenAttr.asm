@@ -1,9 +1,9 @@
 ; uchar sp1_ScreenAttr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB sp1_ScreenAttr
+PUBLIC sp1_ScreenAttr
 
-LIB asm_sp1_ScreenAttr
+EXTERN asm_sp1_ScreenAttr
 
 sp1_ScreenAttr:
 

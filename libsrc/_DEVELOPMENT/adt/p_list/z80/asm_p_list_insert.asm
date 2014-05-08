@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_list_insert
+PUBLIC asm_p_list_insert
 
-LIB asm_p_list_insert_after, asm_p_list_push_front
+EXTERN asm_p_list_insert_after, asm_p_list_push_front
 
 asm_p_list_insert:
 

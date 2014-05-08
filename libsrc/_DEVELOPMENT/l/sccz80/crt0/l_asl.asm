@@ -1,7 +1,7 @@
 
-XLIB l_asl
+PUBLIC l_asl
 
-LIB l_lsl_hl
+EXTERN l_lsl_hl
 
 l_asl:
 

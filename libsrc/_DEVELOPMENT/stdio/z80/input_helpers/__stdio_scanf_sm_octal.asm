@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_octal
-XDEF __stdio_scanf_sm_octal_join
+PUBLIC __stdio_scanf_sm_octal
+PUBLIC __stdio_scanf_sm_octal_join
 
-LIB asm_isodigit, __stdio_scanf_sm_write
+EXTERN asm_isodigit, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_octal:
 

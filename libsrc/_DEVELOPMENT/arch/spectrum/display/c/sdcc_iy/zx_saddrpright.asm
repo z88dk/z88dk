@@ -1,7 +1,7 @@
 
 ; void *zx_saddrpright(void *saddr, uint bitmask)
 
-XDEF _zx_saddrpright
+PUBLIC _zx_saddrpright
 
 _zx_saddrpright:
 

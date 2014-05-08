@@ -1,9 +1,9 @@
 
 ; size_t bv_priority_queue_capacity(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_capacity
+PUBLIC _bv_priority_queue_capacity
 
-LIB _ba_priority_queue_capacity
+EXTERN _ba_priority_queue_capacity
 
 _bv_priority_queue_capacity:
 

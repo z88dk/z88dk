@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_object_size
+PUBLIC asm_obstack_object_size
 
 asm_obstack_object_size:
 

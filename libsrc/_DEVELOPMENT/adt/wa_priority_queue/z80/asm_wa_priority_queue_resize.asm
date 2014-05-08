@@ -20,9 +20,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_resize
+PUBLIC asm_wa_priority_queue_resize
 
-LIB __wa_pq_setsize, __w_heap_sift_down, error_einval_mc, error_znc, error_zc
+EXTERN __wa_pq_setsize, __w_heap_sift_down, error_einval_mc, error_znc, error_zc
 
 asm_wa_priority_queue_resize:
 

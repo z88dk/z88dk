@@ -1,8 +1,8 @@
 
-XLIB __stdio_verify_output
+PUBLIC __stdio_verify_output
 
-LIB error_eacces_mc, error_mc
-LIB asm1_fflush_unlocked
+EXTERN error_eacces_mc, error_mc
+EXTERN asm1_fflush_unlocked
 
 __stdio_verify_output:
 

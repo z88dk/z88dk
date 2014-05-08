@@ -1,9 +1,9 @@
 
 ; int b_vector_front(b_vector_t *v)
 
-XDEF _b_vector_front
+PUBLIC _b_vector_front
 
-LIB _b_array_front
+EXTERN _b_array_front
 
 _b_vector_front:
 

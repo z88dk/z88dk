@@ -1,9 +1,9 @@
 
 ; int tolower(int c)
 
-XLIB _tolower
+PUBLIC _tolower
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 _tolower:
 

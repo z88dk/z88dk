@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_pint
+                PUBLIC    l_pint
 
 ; store int from HL into (DE)
 .l_pint   

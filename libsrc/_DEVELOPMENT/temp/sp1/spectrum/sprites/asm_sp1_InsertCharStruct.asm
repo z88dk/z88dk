@@ -3,9 +3,9 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_InsertCharStruct
+PUBLIC asm_sp1_InsertCharStruct
 
-LIB __sp1_add_spr_char
+EXTERN __sp1_add_spr_char
 
 asm_sp1_InsertCharStruct:
 

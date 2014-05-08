@@ -1,10 +1,10 @@
 
 ; void *b_array_append_block(b_array_t *a, size_t n)
 
-XDEF b_array_append_block_callee
-XDEF b_array_append_block_entry
+PUBLIC b_array_append_block_callee
+PUBLIC b_array_append_block_entry
 
-LIB error_enomem_zc
+EXTERN error_enomem_zc
 
 b_array_append_block_callee:
 

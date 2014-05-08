@@ -1,7 +1,7 @@
 
 ; void p_list_init(void *p)
 
-XDEF p_list_init
+PUBLIC p_list_init
 
 p_list_init:
 

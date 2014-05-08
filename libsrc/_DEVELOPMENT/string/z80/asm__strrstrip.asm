@@ -14,9 +14,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__strrstrip
+PUBLIC asm__strrstrip
 
-LIB asm_strlen, asm_isspace
+EXTERN asm_strlen, asm_isspace
 
 asm__strrstrip:
 

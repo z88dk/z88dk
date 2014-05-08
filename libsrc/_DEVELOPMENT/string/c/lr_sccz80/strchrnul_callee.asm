@@ -1,7 +1,7 @@
 
 ; char *strchrnul(const char *s, int c)
 
-XDEF strchrnul_callee
+PUBLIC strchrnul_callee
 
 strchrnul_callee:
 

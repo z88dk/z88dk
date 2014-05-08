@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_alt_remove_after
+PUBLIC asm_p_forward_list_alt_remove_after
 
-LIB asm_p_forward_list_remove_after, l_dec_bc
+EXTERN asm_p_forward_list_remove_after, l_dec_bc
 
 asm_p_forward_list_alt_remove_after:
 

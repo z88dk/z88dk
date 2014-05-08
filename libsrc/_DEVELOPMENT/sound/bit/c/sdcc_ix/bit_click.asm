@@ -1,7 +1,7 @@
 
 ; void bit_click(void)
 
-XDEF _bit_click
+PUBLIC _bit_click
 
 _bit_click:
 

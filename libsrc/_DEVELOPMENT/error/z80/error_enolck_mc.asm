@@ -1,9 +1,9 @@
 
-XLIB error_enolck_mc
+PUBLIC error_enolck_mc
 
-XREF __ENOLCK
+EXTERN __ENOLCK
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    

@@ -1,9 +1,9 @@
 
 ; size_t w_vector_insert_n(w_vector_t *v, size_t idx, size_t n, void *item)
 
-XLIB w_vector_insert_n
+PUBLIC w_vector_insert_n
 
-LIB asm_w_vector_insert_n
+EXTERN asm_w_vector_insert_n
 
 w_vector_insert_n:
 

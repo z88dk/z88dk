@@ -1,6 +1,6 @@
 ; struct sp1_update __CALLEE__ *sp1_GetUpdateStruct_callee(uchar row, uchar col)
 
-XDEF sp1_GetUpdateStruct_callee
+PUBLIC sp1_GetUpdateStruct_callee
 
 sp1_GetUpdateStruct_callee:
 

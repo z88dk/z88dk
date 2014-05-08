@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_queue_pop
+PUBLIC asm_p_queue_pop
 
-LIB asm_p_forward_list_alt_pop_front
+EXTERN asm_p_forward_list_alt_pop_front
 
 asm_p_queue_pop:
 

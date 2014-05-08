@@ -1,9 +1,9 @@
 
 ; void *heap_init(void *heap, size_t size)
 
-XLIB heap_init
+PUBLIC heap_init
 
-LIB asm_heap_init
+EXTERN asm_heap_init
 
 heap_init:
 

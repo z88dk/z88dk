@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_KickDrop
+PUBLIC _ff_utz_KickDrop
 
 _ff_utz_KickDrop:
 

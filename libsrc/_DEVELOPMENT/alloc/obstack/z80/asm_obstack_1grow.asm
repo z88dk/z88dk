@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_1grow
+PUBLIC asm_obstack_1grow
 
-LIB asm_obstack_room, error_enomem_zc
+EXTERN asm_obstack_room, error_enomem_zc
 
 asm_obstack_1grow:
 

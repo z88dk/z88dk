@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_z80_delay_tstate
+PUBLIC asm_z80_delay_tstate
 
 asm_z80_delay_tstate:
 

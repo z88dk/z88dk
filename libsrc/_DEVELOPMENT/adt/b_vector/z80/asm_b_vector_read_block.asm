@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_read_block
+PUBLIC asm_b_vector_read_block
 
-LIB asm_b_array_read_block
+EXTERN asm_b_array_read_block
 
 asm_b_vector_read_block:
 

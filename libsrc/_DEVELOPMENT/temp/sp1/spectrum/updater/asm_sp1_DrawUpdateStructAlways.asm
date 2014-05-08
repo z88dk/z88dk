@@ -5,9 +5,9 @@
 
 ; FASTCALL
 
-XLIB asm_sp1_DrawUpdateStructAlways
+PUBLIC asm_sp1_DrawUpdateStructAlways
 
-LIB SP1DrawUpdateStruct
+EXTERN SP1DrawUpdateStruct
 
 ; Draws the update struct no matter what, including
 ; structs removed from the engine.  Validates char

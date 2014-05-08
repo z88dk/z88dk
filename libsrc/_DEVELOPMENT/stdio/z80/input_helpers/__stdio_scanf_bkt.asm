@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_bkt
+PUBLIC __stdio_scanf_bkt
 
-LIB asm_memset, l_bitset_locate, l_inc_sp, __stdio_scanf_sm_bkt
-LIB __stdio_recv_input_eatc, error_einval_zc, __stdio_scanf_s_tail
+EXTERN asm_memset, l_bitset_locate, l_inc_sp, __stdio_scanf_sm_bkt
+EXTERN __stdio_recv_input_eatc, error_einval_zc, __stdio_scanf_s_tail
 
 __stdio_scanf_bkt:
 

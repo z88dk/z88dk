@@ -1,5 +1,5 @@
 
-XLIB __stdio_scanf_ln
+PUBLIC __stdio_scanf_ln
 
 __stdio_scanf_ln:
 

@@ -1,7 +1,7 @@
 
 ; void bit_beep_raw_callee(uint16_t num_cycles, uint16_t tone_period_T)
 
-XDEF bit_beep_raw_callee
+PUBLIC bit_beep_raw_callee
 
 bit_beep_raw_callee:
 

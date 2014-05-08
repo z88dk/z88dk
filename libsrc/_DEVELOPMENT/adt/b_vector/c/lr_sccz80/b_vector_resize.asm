@@ -1,9 +1,9 @@
 
 ; int b_vector_resize(b_vector_t *v, size_t n)
 
-XLIB b_vector_resize
+PUBLIC b_vector_resize
 
-LIB asm_b_vector_resize
+EXTERN asm_b_vector_resize
 
 b_vector_resize:
 

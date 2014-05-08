@@ -1,7 +1,7 @@
 
 ; void ba_priority_queue_clear(ba_priority_queue_t *q)
 
-XDEF _ba_priority_queue_clear
+PUBLIC _ba_priority_queue_clear
 
 _ba_priority_queue_clear:
 

@@ -1,7 +1,7 @@
 
-XLIB __b_heap_sift_up
+PUBLIC __b_heap_sift_up
 
-LIB l_jpix, error_znc
+EXTERN l_jpix, error_znc
 
 __b_heap_sift_up:
 

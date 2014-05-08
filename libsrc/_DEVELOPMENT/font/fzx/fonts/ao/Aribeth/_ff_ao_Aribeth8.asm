@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Aribeth8
+PUBLIC _ff_ao_Aribeth8
 
 _ff_ao_Aribeth8:
 

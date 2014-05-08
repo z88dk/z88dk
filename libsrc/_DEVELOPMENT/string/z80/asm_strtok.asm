@@ -23,11 +23,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_strtok
+PUBLIC asm_strtok
 
-XREF __strtok_ptr
+EXTERN __strtok_ptr
 
-LIB asm_strtok_r
+EXTERN asm_strtok_r
 
 asm_strtok:
 

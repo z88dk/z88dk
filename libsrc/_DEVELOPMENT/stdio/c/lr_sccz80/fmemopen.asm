@@ -1,9 +1,9 @@
 
 ; FILE *fmemopen(void *buf, size_t size, const char *mode)
 
-XLIB fmemopen
+PUBLIC fmemopen
 
-LIB asm_fmemopen
+EXTERN asm_fmemopen
 
 fmemopen:
 

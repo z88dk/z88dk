@@ -10,8 +10,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_memcmp
-XDEF asm0_memcmp
+PUBLIC asm_memcmp
+PUBLIC asm0_memcmp
 
 asm_memcmp:
 

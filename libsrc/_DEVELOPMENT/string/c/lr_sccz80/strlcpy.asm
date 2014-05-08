@@ -1,9 +1,9 @@
 
 ; size_t strlcpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XLIB strlcpy
+PUBLIC strlcpy
 
-LIB asm_strlcpy
+EXTERN asm_strlcpy
 
 strlcpy:
 

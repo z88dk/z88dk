@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Dutch
+PUBLIC _ff_ao_Dutch
 
 _ff_ao_Dutch:
 

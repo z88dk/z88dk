@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB getline
+PUBLIC getline
 
-LIB asm_getline
+EXTERN asm_getline
 
 getline:
 
@@ -29,9 +29,9 @@ getline:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB getline
+PUBLIC getline
 
-LIB getline_unlocked
+EXTERN getline_unlocked
 
 getline:
 

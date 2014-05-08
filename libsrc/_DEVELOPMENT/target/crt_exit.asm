@@ -14,7 +14,7 @@
 
 IF __exit_stack_sz > 0
    
-   LIB asm_exit
+   EXTERN asm_exit
    jp asm_exit                 ; exit function jumps to _Exit
    
 ENDIF

@@ -1,7 +1,7 @@
 
 ; void b_vector_destroy(b_vector_t *v)
 
-XDEF _b_vector_destroy
+PUBLIC _b_vector_destroy
 
 _b_vector_destroy:
 

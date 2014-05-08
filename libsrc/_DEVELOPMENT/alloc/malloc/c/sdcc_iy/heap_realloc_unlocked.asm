@@ -1,7 +1,7 @@
 
 ; void *heap_realloc_unlocked(void *heap, void *p, size_t size)
 
-XDEF _heap_realloc_unlocked
+PUBLIC _heap_realloc_unlocked
 
 _heap_realloc_unlocked:
 

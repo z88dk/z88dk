@@ -1,6 +1,6 @@
 
-XLIB l_fast_utoa
-XDEF l0_fast_utoa
+PUBLIC l_fast_utoa
+PUBLIC l0_fast_utoa
 
 l_fast_utoa:
 

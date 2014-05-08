@@ -1,5 +1,5 @@
 
-XLIB l_long_addu_stack
+PUBLIC l_long_addu_stack
 
 l_long_addu_stack:
 

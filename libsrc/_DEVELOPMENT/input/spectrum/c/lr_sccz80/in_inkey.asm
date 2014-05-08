@@ -1,7 +1,7 @@
 
 ; int in_inkey(void)
 
-XDEF in_inkey
+PUBLIC in_inkey
 
 in_inkey:
 

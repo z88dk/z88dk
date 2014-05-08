@@ -1,7 +1,7 @@
 
 ; void bv_priority_queue_destroy(bv_priority_queue_t *q)
 
-XDEF bv_priority_queue_destroy
+PUBLIC bv_priority_queue_destroy
 
 ;defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy
 

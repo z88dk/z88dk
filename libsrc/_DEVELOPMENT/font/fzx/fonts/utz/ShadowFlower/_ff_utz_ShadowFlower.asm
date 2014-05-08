@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_ShadowFlower
+PUBLIC _ff_utz_ShadowFlower
 
 _ff_utz_ShadowFlower:
 

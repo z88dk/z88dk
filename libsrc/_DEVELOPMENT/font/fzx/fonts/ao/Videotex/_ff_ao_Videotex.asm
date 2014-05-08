@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Videotex
+PUBLIC _ff_ao_Videotex
 
 _ff_ao_Videotex:
 

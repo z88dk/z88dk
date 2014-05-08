@@ -1,6 +1,6 @@
 ; void __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf)
 
-XDEF sp1_ChangeSprType_callee
+PUBLIC sp1_ChangeSprType_callee
 
 sp1_ChangeSprType_callee:
 

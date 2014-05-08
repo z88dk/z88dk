@@ -1,7 +1,7 @@
 
 ; uint zx_saddr2px(void *saddr)
 
-XDEF _zx_saddr2px
+PUBLIC _zx_saddr2px
 
 _zx_saddr2px:
 

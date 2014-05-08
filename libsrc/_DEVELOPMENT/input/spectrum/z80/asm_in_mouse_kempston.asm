@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_kempston
+PUBLIC asm_in_mouse_kempston
 
-XREF __input_kempston_mouse_x, __input_kempston_mouse_y
-XREF __input_kempston_mouse_rawx, __input_kempston_mouse_rawy
+EXTERN __input_kempston_mouse_x, __input_kempston_mouse_y
+EXTERN __input_kempston_mouse_rawx, __input_kempston_mouse_rawy
 
 asm_in_mouse_kempston:
 

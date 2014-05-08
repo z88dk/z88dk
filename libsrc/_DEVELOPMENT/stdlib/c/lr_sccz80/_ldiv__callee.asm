@@ -1,7 +1,7 @@
 
 ; void _ldiv_(ldiv_t *ld, long numer, long denom)
 
-XDEF _ldiv__callee
+PUBLIC _ldiv__callee
 
 _ldiv__callee:
 

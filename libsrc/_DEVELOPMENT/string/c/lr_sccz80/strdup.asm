@@ -1,7 +1,7 @@
 
 ; char *strdup(const char * s)
 
-XDEF strdup
+PUBLIC strdup
 
 strdup:
 

@@ -1,7 +1,7 @@
 
 ; char *ltoa(unsigned long num, char *buf, int radix)
 
-XDEF ltoa_callee
+PUBLIC ltoa_callee
 
 ltoa_callee:
 

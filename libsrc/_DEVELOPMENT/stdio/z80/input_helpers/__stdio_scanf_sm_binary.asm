@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_sm_binary
+PUBLIC __stdio_scanf_sm_binary
 
-LIB asm_isbdigit, __stdio_scanf_sm_write
+EXTERN asm_isbdigit, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_binary:
 

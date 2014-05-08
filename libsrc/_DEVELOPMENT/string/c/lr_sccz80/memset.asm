@@ -1,9 +1,9 @@
 
 ; void *memset(void *s, int c, size_t n)
 
-XLIB memset
+PUBLIC memset
 
-LIB asm_memset
+EXTERN asm_memset
 
 memset:
 

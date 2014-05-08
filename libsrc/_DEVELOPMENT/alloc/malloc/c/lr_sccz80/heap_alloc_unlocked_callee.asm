@@ -1,7 +1,7 @@
 
 ; void *heap_alloc_unlocked(void *heap, size_t size)
 
-XDEF heap_alloc_unlocked_callee
+PUBLIC heap_alloc_unlocked_callee
 
 heap_alloc_unlocked_callee:
 

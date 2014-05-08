@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_room
+PUBLIC obstack_room
 
 obstack_room:
 

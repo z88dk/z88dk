@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_init
+PUBLIC asm_b_array_init
 
-LIB l_setmem_hl
+EXTERN l_setmem_hl
 
 asm_b_array_init:
 

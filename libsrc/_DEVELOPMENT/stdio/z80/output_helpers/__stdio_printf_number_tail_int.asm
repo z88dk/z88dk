@@ -1,9 +1,9 @@
 
-XLIB __stdio_printf_number_tail_int
-XDEF __stdio_printf_number_tail_uint
+PUBLIC __stdio_printf_number_tail_int
+PUBLIC __stdio_printf_number_tail_uint
 
-LIB __stdio_nextarg_hl, asm1_utoa, l_neg_hl
-LIB __stdio_printf_number_tail, __stdio_printf_number_tail_zero
+EXTERN __stdio_nextarg_hl, asm1_utoa, l_neg_hl
+EXTERN __stdio_printf_number_tail, __stdio_printf_number_tail_zero
 
 
 __stdio_printf_number_tail_int:

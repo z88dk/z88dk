@@ -1,6 +1,6 @@
 ; uint __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane)
 
-XDEF sp1_AddColSpr_callee
+PUBLIC sp1_AddColSpr_callee
 
 sp1_AddColSpr_callee:
 

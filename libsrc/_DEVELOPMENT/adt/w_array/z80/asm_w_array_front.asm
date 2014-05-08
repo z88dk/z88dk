@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_front
+PUBLIC asm_w_array_front
 
-LIB __array_info, error_einval_mc
+EXTERN __array_info, error_einval_mc
 
    inc hl
    inc hl

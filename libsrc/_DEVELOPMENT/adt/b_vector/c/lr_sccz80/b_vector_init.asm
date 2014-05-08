@@ -1,9 +1,9 @@
 
 ; void *b_vector_init(void *p, size_t capacity, size_t max_size)
 
-XLIB b_vector_init
+PUBLIC b_vector_init
 
-LIB asm_b_vector_init
+EXTERN asm_b_vector_init
 
 b_vector_init:
 

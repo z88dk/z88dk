@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Notes
+PUBLIC _ff_dkud3_Notes
 
 _ff_dkud3_Notes:
 

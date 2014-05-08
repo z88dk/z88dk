@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fmemopen
+PUBLIC asm_fmemopen
 
-LIB asm__fmemopen
+EXTERN asm__fmemopen
 
 asm_fmemopen:
 

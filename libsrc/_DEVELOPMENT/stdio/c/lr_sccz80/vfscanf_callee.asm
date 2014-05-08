@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF vfscanf_callee
+PUBLIC vfscanf_callee
 
 vfscanf_callee:
 
@@ -23,9 +23,9 @@ vfscanf_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF vfscanf_callee
+PUBLIC vfscanf_callee
 
-LIB vfscanf_unlocked_callee
+EXTERN vfscanf_unlocked_callee
 
 vfscanf_callee:
 

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_aaddr2px
+PUBLIC asm_zx_aaddr2px
 
 asm_zx_aaddr2px:
 

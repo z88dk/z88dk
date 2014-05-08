@@ -1,9 +1,9 @@
 
 ; int fseek_unlocked(FILE *stream, long offset, int whence)
 
-XLIB fseek_unlocked
+PUBLIC fseek_unlocked
 
-LIB asm_fseek_unlocked
+EXTERN asm_fseek_unlocked
 
 fseek_unlocked:
 

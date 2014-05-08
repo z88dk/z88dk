@@ -1,9 +1,9 @@
 
 ; void w_array_destroy(w_array_t *a)
 
-XDEF _w_array_destroy
+PUBLIC _w_array_destroy
 
-LIB _b_array_destroy
+EXTERN _b_array_destroy
 
 _w_array_destroy:
 

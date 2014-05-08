@@ -1,9 +1,9 @@
 
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 
-XLIB obstack_alloc
+PUBLIC obstack_alloc
 
-LIB asm_obstack_alloc
+EXTERN asm_obstack_alloc
 
 obstack_alloc:
 

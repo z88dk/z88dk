@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_capacity
+PUBLIC asm_w_vector_capacity
 
-LIB l_readword_2_hl
+EXTERN l_readword_2_hl
 
 asm_w_vector_capacity:
 

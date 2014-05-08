@@ -1,9 +1,9 @@
 
 ; size_t w_array_erase(w_array_t *a, size_t idx)
 
-XLIB w_array_erase
+PUBLIC w_array_erase
 
-LIB asm_w_array_erase
+EXTERN asm_w_array_erase
 
 w_array_erase:
 

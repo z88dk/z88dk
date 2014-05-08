@@ -1,7 +1,7 @@
 
 ; void im2_prepend_generic_callback_callee(uint8_t vector, void *callback)
 
-XDEF im2_prepend_generic_callback_callee
+PUBLIC im2_prepend_generic_callback_callee
 
 im2_prepend_generic_callback_callee:
 

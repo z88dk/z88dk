@@ -15,11 +15,11 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_vscanf
+PUBLIC asm_vscanf
 
-XREF __stdio_file_stdin
+EXTERN __stdio_file_stdin
 
-LIB asm_vfscanf
+EXTERN asm_vfscanf
 
 asm_vscanf:
 
@@ -59,9 +59,9 @@ asm_vscanf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_vscanf
+PUBLIC asm_vscanf
 
-LIB asm_vscanf_unlocked
+EXTERN asm_vscanf_unlocked
 
 asm_vscanf:
 

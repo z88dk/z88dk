@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_hex
-XDEF __stdio_scanf_sm_hex_join
+PUBLIC __stdio_scanf_sm_hex
+PUBLIC __stdio_scanf_sm_hex_join
 
-LIB asm_isxdigit, __stdio_scanf_sm_write
+EXTERN asm_isxdigit, __stdio_scanf_sm_write
 
 __stdio_scanf_sm_hex:
 

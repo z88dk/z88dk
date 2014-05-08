@@ -1,7 +1,7 @@
 
 ; void spinlock_acquire(char *spinlock)
 
-XDEF _spinlock_acquire
+PUBLIC _spinlock_acquire
 
 _spinlock_acquire:
 

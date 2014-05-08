@@ -1,7 +1,7 @@
 
-XLIB l_setmem
+PUBLIC l_setmem
 
-LIB l_setmem_hl
+EXTERN l_setmem_hl
 
 l_setmem:
 

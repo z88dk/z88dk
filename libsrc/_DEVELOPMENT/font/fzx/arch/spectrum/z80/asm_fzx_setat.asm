@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_setat
+PUBLIC asm_fzx_setat
 
-LIB _fzx
+EXTERN _fzx
 
 DEFC MARGIN = 2
 DEFC P_COL = 4

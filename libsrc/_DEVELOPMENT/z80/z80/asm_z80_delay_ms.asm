@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_z80_delay_ms
-
 INCLUDE "clib_target_cfg.asm"
 
-LIB asm_z80_delay_tstate
+PUBLIC asm_z80_delay_ms
+
+EXTERN asm_z80_delay_tstate
 
 asm_z80_delay_ms:
 

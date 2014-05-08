@@ -1,7 +1,7 @@
 
 ; void call_once_callee(once_flag *flag, void (*func)(void))
 
-XDEF call_once_callee
+PUBLIC call_once_callee
 
 call_once_callee:
 

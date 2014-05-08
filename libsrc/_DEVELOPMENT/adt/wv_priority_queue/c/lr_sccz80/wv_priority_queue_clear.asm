@@ -1,7 +1,7 @@
 
 ; void wv_priority_queue_clear(wv_priority_queue_t *q)
 
-XDEF wv_priority_queue_clear
+PUBLIC wv_priority_queue_clear
 
 ;defc wv_priority_queue_clear = asm_wv_priority_queue_clear
 

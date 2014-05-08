@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Soxz
+PUBLIC _ff_ao_Soxz
 
 _ff_ao_Soxz:
 

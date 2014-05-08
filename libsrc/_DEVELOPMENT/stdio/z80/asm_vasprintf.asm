@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_vasprintf
+PUBLIC asm_vasprintf
 
-LIB asm_vsnprintf, error_einval_mc, l_utod_hl, asm_malloc, error_mc
+EXTERN asm_vsnprintf, error_einval_mc, l_utod_hl, asm_malloc, error_mc
 
 asm_vasprintf:
 

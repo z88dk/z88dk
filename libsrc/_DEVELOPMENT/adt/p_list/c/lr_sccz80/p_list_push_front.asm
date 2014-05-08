@@ -1,9 +1,9 @@
 
 ; void *p_list_push_front(p_list_t *list, void *item)
 
-XLIB p_list_push_front
+PUBLIC p_list_push_front
 
-LIB asm_p_list_push_front
+EXTERN asm_p_list_push_front
 
 p_list_push_front:
 

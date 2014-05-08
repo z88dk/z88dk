@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_inkey
+PUBLIC asm_in_inkey
 
-LIB in_key_translation_table, error_znc, error_zc
+EXTERN in_key_translation_table, error_znc, error_zc
 
 asm_in_inkey:
 

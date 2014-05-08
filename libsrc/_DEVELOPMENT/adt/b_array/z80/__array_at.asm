@@ -1,7 +1,7 @@
 
-XLIB __array_at
+PUBLIC __array_at
 
-LIB l_ltu_bc_hl
+EXTERN l_ltu_bc_hl
 
 __array_at:
 

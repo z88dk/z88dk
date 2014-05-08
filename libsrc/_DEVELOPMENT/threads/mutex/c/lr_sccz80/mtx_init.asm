@@ -1,9 +1,9 @@
 
 ; int mtx_init(mtx_t *mtx, int type)
 
-XLIB mtx_init
+PUBLIC mtx_init
 
-LIB asm_mtx_init
+EXTERN asm_mtx_init
 
 mtx_init:
 

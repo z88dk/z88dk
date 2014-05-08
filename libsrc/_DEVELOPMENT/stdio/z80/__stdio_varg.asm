@@ -1,7 +1,7 @@
 
-XLIB __stdio_varg_2
+PUBLIC __stdio_varg_2
 
-LIB __stdio_nextarg_de
+EXTERN __stdio_nextarg_de
 
 ; __stdio_varg_n
 ;

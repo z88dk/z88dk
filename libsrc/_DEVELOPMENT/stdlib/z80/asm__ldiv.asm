@@ -16,9 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__ldiv
+PUBLIC asm__ldiv
 
-LIB l_divs_32_32x32
+EXTERN l_divs_32_32x32
 
 asm__ldiv:
 

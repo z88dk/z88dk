@@ -20,10 +20,10 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fflush
-XDEF asm0_fflush, asm1_fflush
+PUBLIC asm_fflush
+PUBLIC asm0_fflush, asm1_fflush
 
-LIB asm1_fflush_unlocked, asm__fflushall, __stdio_lock_release
+EXTERN asm1_fflush_unlocked, asm__fflushall, __stdio_lock_release
 
 asm_fflush:
 
@@ -54,14 +54,14 @@ asm0_fflush:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock
+   EXTERN __stdio_verify_valid_lock
 
    call __stdio_verify_valid_lock
    ret c
 
 ELSE
 
-   LIB __stdio_lock_acquire, error_enolck_mc
+   EXTERN __stdio_lock_acquire, error_enolck_mc
 
    call __stdio_lock_acquire
    jp c, error_enolck_mc
@@ -76,9 +76,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fflush
+PUBLIC asm_fflush
 
-LIB asm_fflush_unlocked
+EXTERN asm_fflush_unlocked
 
 asm_fflush:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_alt_pop_front
+PUBLIC asm_p_forward_list_alt_pop_front
 
-LIB asm_p_forward_list_alt_remove_after
+EXTERN asm_p_forward_list_alt_remove_after
 
 asm_p_forward_list_alt_pop_front:
 

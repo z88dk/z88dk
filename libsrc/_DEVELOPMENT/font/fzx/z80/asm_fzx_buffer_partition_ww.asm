@@ -15,9 +15,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_buffer_partition_ww
+PUBLIC asm_fzx_buffer_partition_ww
 
-LIB __fzx_glyph_width, _fzx
+EXTERN __fzx_glyph_width, _fzx
 
 asm_fzx_buffer_partition_ww:
 

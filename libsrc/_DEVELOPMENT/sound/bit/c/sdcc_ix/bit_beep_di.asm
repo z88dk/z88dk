@@ -1,7 +1,7 @@
 
 ; void bit_beep_di(uint16_t duration_ms, uint16_t frequency_hz)
 
-XDEF _bit_beep_di
+PUBLIC _bit_beep_di
 
 _bit_beep_di:
 

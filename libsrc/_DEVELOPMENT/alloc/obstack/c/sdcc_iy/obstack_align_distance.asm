@@ -1,7 +1,7 @@
 
 ; size_t obstack_align_distance(struct obstack *ob, size_t alignment)
 
-XDEF _obstack_align_distance
+PUBLIC _obstack_align_distance
 
 _obstack_align_distance:
 

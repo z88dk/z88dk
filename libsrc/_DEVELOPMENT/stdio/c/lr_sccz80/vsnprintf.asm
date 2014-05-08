@@ -1,9 +1,9 @@
 
 ; int vsnprintf(char *s, size_t n, const char *format, void *arg)
 
-XLIB vsnprintf
+PUBLIC vsnprintf
 
-LIB asm_vsnprintf
+EXTERN asm_vsnprintf
 
 vsnprintf:
 

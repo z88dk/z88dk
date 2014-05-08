@@ -1,7 +1,7 @@
 
-XLIB l_asr
+PUBLIC l_asr
 
-LIB l_asr_hl
+EXTERN l_asr_hl
 
 l_asr:
 

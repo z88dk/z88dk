@@ -1,7 +1,7 @@
 
 ; int atoi(const char *buf)
 
-XDEF atoi
+PUBLIC atoi
 
 atoi:
 

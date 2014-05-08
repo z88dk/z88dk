@@ -12,10 +12,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_strncat
-XDEF asm0_strncat
+PUBLIC asm_strncat
+PUBLIC asm0_strncat
 
-LIB __str_locate_nul
+EXTERN __str_locate_nul
 
 asm_strncat:
 

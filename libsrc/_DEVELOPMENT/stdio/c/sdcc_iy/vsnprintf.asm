@@ -1,7 +1,7 @@
 
 ; int vsnprintf(char *s, size_t n, const char *format, void *arg)
 
-XDEF _vsnprintf
+PUBLIC _vsnprintf
 
 _vsnprintf:
 

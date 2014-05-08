@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_copy_callee
+PUBLIC obstack_copy_callee
 
 obstack_copy_callee:
 

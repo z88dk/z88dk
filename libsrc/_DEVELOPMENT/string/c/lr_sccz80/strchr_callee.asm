@@ -1,7 +1,7 @@
 
 ; char *strchr(const char *s, int c)
 
-XDEF strchr_callee
+PUBLIC strchr_callee
 
 strchr_callee:
 

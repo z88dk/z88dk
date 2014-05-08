@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_OpenDyslexic
+PUBLIC _ff_ao_OpenDyslexic
 
 _ff_ao_OpenDyslexic:
 

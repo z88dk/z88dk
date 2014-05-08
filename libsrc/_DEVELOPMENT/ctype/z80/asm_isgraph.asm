@@ -1,5 +1,5 @@
 
-XLIB asm_isgraph
+PUBLIC asm_isgraph
 
 asm_isgraph:
 

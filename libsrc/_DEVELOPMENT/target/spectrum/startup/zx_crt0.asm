@@ -15,10 +15,10 @@ org myzorg
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB start
-XDEF __Exit
+PUBLIC start
+PUBLIC __Exit
 
-XREF _main
+EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -60,7 +60,7 @@ start:
       
    ; initialize fzx state
    
-   LIB _ff_ao_SoixanteQuatre
+   EXTERN _ff_ao_SoixanteQuatre
    ld hl,_ff_ao_SoixanteQuatre
    ld (_fzx),hl                ; initial font
    
@@ -139,13 +139,13 @@ __FILE_STDERR:
 
 ; fzx state
 
-XDEF _fzx
+PUBLIC _fzx
 
 _fzx:   defs 6
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF cls
+PUBLIC cls
 
 cls:
 
@@ -161,7 +161,7 @@ cls:
    ld hl,$5800
    ld bc,768
    
-   LIB asm_memset
+   EXTERN asm_memset
    call asm_memset
 
    ; pixels

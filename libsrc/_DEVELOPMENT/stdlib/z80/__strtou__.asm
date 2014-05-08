@@ -1,8 +1,8 @@
 
-XLIB __strtou__
+PUBLIC __strtou__
 
-LIB l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix
-LIB l_char2num, l_mulu_24_16x8, l_eat_digits
+EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_neg_hl, l_eat_base_prefix
+EXTERN l_char2num, l_mulu_24_16x8, l_eat_digits
 
 INCLUDE "clib_cfg.asm"
 
@@ -273,7 +273,7 @@ decimal:
 
    ; de = char *
 
-   LIB l_atou
+   EXTERN l_atou
    
    call l_atou
    jr c, unsigned_overflow
@@ -290,7 +290,7 @@ hex:
 
    ; de = char *
    
-   LIB l_htou
+   EXTERN l_htou
    
    call l_htou
    jr c, unsigned_overflow
@@ -307,7 +307,7 @@ octal:
 
    ; de = char *
    
-   LIB l_otou
+   EXTERN l_otou
    
    call l_otou
    jr c, unsigned_overflow
@@ -324,7 +324,7 @@ binary:
 
    ; de = char *
    
-   LIB l_btou
+   EXTERN l_btou
    
    call l_btou
    jr c, unsigned_overflow

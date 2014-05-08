@@ -1,7 +1,7 @@
 
 ; char *strncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF strncpy_callee
+PUBLIC strncpy_callee
 
 strncpy_callee:
 

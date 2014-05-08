@@ -1,5 +1,5 @@
 
-XLIB l_utod_hl
+PUBLIC l_utod_hl
 
 l_utod_hl:
 

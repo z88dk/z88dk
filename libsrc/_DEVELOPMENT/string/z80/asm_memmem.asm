@@ -15,9 +15,9 @@
 ; 
 ; ===============================================================
 
-XLIB asm_memmem
+PUBLIC asm_memmem
 
-LIB error_zc
+EXTERN error_zc
 
 asm_memmem:
 

@@ -1,7 +1,7 @@
 
-XLIB l_long_add
+PUBLIC l_long_add
 
-LIB l_long_add_stack
+EXTERN l_long_add_stack
 
 l_long_add:
 

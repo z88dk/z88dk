@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_list_init
+PUBLIC asm_p_list_init
 
-LIB asm_p_forward_list_init, l_setmem_hl
+EXTERN asm_p_forward_list_init, l_setmem_hl
 
 asm_p_list_init:
 

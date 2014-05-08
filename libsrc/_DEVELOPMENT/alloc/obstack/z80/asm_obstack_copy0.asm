@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_copy0
+PUBLIC asm_obstack_copy0
 
-LIB asm_obstack_copy, error_enomem_zc
+EXTERN asm_obstack_copy, error_enomem_zc
 
 asm_obstack_copy0:
 

@@ -1,7 +1,7 @@
 
 ; void *zx_saddrcdown(void *saddr)
 
-XDEF _zx_saddrcdown
+PUBLIC _zx_saddrcdown
 
 _zx_saddrcdown:
 

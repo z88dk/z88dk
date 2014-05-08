@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Sabon
+PUBLIC _ff_ao_Sabon
 
 _ff_ao_Sabon:
 

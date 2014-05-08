@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Belegost1
+PUBLIC _ff_dkud2_Belegost1
 
 _ff_dkud2_Belegost1:
 

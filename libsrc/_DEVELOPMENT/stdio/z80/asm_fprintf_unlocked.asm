@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fprintf_unlocked
+PUBLIC asm_fprintf_unlocked
 
-LIB asm_vfprintf_unlocked, __stdio_varg_2, __stdio_nextarg_de
+EXTERN asm_vfprintf_unlocked, __stdio_varg_2, __stdio_nextarg_de
 
 asm_fprintf_unlocked:
 

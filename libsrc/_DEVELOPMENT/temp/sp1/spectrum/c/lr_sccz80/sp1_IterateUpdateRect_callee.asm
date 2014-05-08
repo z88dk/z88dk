@@ -2,7 +2,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_IterateUpdateRect_callee, asm0_sp1_IterateUpdateRect
+PUBLIC sp1_IterateUpdateRect_callee, asm0_sp1_IterateUpdateRect
 
 sp1_IterateUpdateRect_callee:
 

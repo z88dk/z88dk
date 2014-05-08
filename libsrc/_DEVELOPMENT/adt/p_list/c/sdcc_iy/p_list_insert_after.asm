@@ -1,7 +1,7 @@
 
 ; void *p_list_insert_after(p_list_t *list, void *list_item, void *item)
 
-XDEF _p_list_insert_after
+PUBLIC _p_list_insert_after
 
 _p_list_insert_after:
 

@@ -1,7 +1,7 @@
 
 ; void *wv_priority_queue_data(wv_priority_queue_t *q)
 
-XDEF wv_priority_queue_data
+PUBLIC wv_priority_queue_data
 
 ;defc wv_priority_queue_data = asm_wv_priority_queue_data
 

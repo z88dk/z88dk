@@ -1,9 +1,9 @@
 
 ; int memcmp(const void *s1, const void *s2, size_t n)
 
-XLIB memcmp
+PUBLIC memcmp
 
-LIB asm_memcmp
+EXTERN asm_memcmp
 
 memcmp:
 

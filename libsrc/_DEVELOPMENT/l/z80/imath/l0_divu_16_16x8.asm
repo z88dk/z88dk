@@ -10,20 +10,20 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l0_divu_16_16x8
+PUBLIC l0_divu_16_16x8
 
 l0_divu_16_16x8:
 
 IF __CLIB_OPT_IMATH <= 50
 
-   LIB l1_small_divu_16_16x16
+   EXTERN l1_small_divu_16_16x16
    jp l1_small_divu_16_16x16
 
 ENDIF
 
 IF __CLIB_OPT_IMATH > 50
 
-   LIB l0_fast_divu_16_16x8
+   EXTERN l0_fast_divu_16_16x8
    jp l0_fast_divu_16_16x8
 
 ENDIF

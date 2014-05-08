@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB freopen
+PUBLIC freopen
 
-LIB asm_freopen
+EXTERN asm_freopen
 
 freopen:
 
@@ -29,9 +29,9 @@ freopen:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB freopen
+PUBLIC freopen
 
-LIB freopen_unlocked
+EXTERN freopen_unlocked
 
 freopen:
 

@@ -1,7 +1,7 @@
 
 ; char *strndup(const char *s, size_t n)
 
-XDEF _strndup
+PUBLIC _strndup
 
 _strndup:
 

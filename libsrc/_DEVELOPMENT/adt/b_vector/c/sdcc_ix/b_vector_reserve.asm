@@ -1,7 +1,7 @@
 
 ; int b_vector_reserve(b_vector_t *v, size_t n)
 
-XDEF _b_vector_reserve
+PUBLIC _b_vector_reserve
 
 _b_vector_reserve:
 

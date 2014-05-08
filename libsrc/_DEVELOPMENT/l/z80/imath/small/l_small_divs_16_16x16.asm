@@ -1,9 +1,9 @@
 
-XLIB l_small_divs_16_16x16
-XDEF l0_small_divs_16_16x16
+PUBLIC l_small_divs_16_16x16
+PUBLIC l0_small_divs_16_16x16
 
-LIB l_neg_hl, l_neg_de
-LIB l0_small_divu_16_16x16, error_divide_by_zero_mc
+EXTERN l_neg_hl, l_neg_de
+EXTERN l0_small_divu_16_16x16, error_divide_by_zero_mc
 
 l_small_divs_16_16x16:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_ind_DutchLatin1
+PUBLIC _ff_ind_DutchLatin1
 
 _ff_ind_DutchLatin1:
 

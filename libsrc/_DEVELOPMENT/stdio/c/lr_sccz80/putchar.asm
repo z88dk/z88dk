@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF putchar
+PUBLIC putchar
 
 putchar:
 
@@ -17,9 +17,9 @@ putchar:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF putchar
+PUBLIC putchar
 
-LIB putchar_unlocked
+EXTERN putchar_unlocked
 
 putchar:
 

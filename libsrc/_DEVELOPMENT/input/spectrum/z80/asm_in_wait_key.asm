@@ -9,17 +9,15 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_wait_key
+PUBLIC asm_in_wait_key
+
+EXTERN asm_in_test_key
 
 asm_in_wait_key:
 
    ; uses : af
-   
-   xor a
-   in a,($fe)
-   
-   and 31
-   cp 31
+
+   call asm_in_test_key
    jr z, asm_in_wait_key
    
    ret

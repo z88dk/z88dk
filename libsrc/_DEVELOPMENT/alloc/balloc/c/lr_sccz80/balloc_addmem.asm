@@ -1,9 +1,9 @@
 
 ; void *balloc_addmem(unsigned char q, size_t num, size_t size, void *addr)
 
-XLIB balloc_addmem
+PUBLIC balloc_addmem
 
-LIB asm_balloc_addmem
+EXTERN asm_balloc_addmem
 
 balloc_addmem:
 

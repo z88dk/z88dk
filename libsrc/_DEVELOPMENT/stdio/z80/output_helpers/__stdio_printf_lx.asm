@@ -1,7 +1,7 @@
 
-XLIB __stdio_printf_lx
+PUBLIC __stdio_printf_lx
 
-LIB __stdio_printf_number_tail_ulong
+EXTERN __stdio_printf_number_tail_ulong
 
 __stdio_printf_lx:
 

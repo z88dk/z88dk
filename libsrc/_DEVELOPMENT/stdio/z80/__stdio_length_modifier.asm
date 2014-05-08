@@ -1,5 +1,5 @@
 
-XLIB __stdio_length_modifier
+PUBLIC __stdio_length_modifier
 
 __stdio_length_modifier:
 

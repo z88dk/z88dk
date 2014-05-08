@@ -1,10 +1,10 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
-XLIB strcasecmp
-XDEF stricmp
+PUBLIC strcasecmp
+PUBLIC stricmp
 
-LIB asm_strcasecmp
+EXTERN asm_strcasecmp
 
 strcasecmp:
 stricmp:

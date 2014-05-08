@@ -1,9 +1,9 @@
 
-XLIB __stdio_printf_number_tail_long
-XDEF __stdio_printf_number_tail_ulong
+PUBLIC __stdio_printf_number_tail_long
+PUBLIC __stdio_printf_number_tail_ulong
 
-LIB __stdio_nextarg_de, __stdio_nextarg_hl, asm1_ultoa, l_neg_dehl
-LIB __stdio_printf_number_tail, __stdio_printf_number_tail_zero
+EXTERN __stdio_nextarg_de, __stdio_nextarg_hl, asm1_ultoa, l_neg_dehl
+EXTERN __stdio_printf_number_tail, __stdio_printf_number_tail_zero
 
 
 __stdio_printf_number_tail_long:

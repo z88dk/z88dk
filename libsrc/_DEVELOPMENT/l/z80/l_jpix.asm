@@ -1,5 +1,5 @@
 
-XLIB l_jpix
+PUBLIC l_jpix
 
 l_jpix:
 

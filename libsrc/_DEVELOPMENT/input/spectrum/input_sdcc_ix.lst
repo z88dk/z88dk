@@ -18,8 +18,10 @@ input/spectrum/c/sdcc_ix/in_stick_kempston
 input/spectrum/c/sdcc_ix/in_stick_keyboard
 input/spectrum/c/sdcc_ix/in_stick_sinclair1
 input/spectrum/c/sdcc_ix/in_stick_sinclair2
+input/spectrum/c/sdcc_ix/in_test_key
 input/spectrum/c/sdcc_ix/in_wait_key
 input/spectrum/c/sdcc_ix/in_wait_nokey
 input/spectrum/z80/in_key_translation_table
 input/spectrum/z80/asm_in_mouse_amx
 input/spectrum/z80/asm_in_mouse_kempston
+input/spectrum/z80/asm_in_test_key

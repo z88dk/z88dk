@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_RoundelSans
+PUBLIC _ff_ao_RoundelSans
 
 _ff_ao_RoundelSans:
 

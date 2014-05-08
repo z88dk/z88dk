@@ -1,9 +1,9 @@
 
 ; char *strchrnul(const char *s, int c)
 
-XLIB strchrnul
+PUBLIC strchrnul
 
-LIB asm_strchrnul
+EXTERN asm_strchrnul
 
 strchrnul:
 

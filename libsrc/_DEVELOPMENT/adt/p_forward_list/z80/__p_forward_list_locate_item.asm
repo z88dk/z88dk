@@ -1,5 +1,5 @@
 
-XLIB __p_forward_list_locate_item
+PUBLIC __p_forward_list_locate_item
 
 __p_forward_list_locate_item:
 

@@ -17,10 +17,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_alloc_aligned_unlocked
+PUBLIC asm_heap_alloc_aligned_unlocked
 
-LIB __heap_place_block, __heap_allocate_block, l_andc_hl_bc
-LIB l_power_2_bc, asm_heap_alloc_unlocked, error_enomem_zc, error_einval_zc
+EXTERN __heap_place_block, __heap_allocate_block, l_andc_hl_bc
+EXTERN l_power_2_bc, asm_heap_alloc_unlocked, error_enomem_zc, error_einval_zc
 
 asm_heap_alloc_aligned_unlocked:
 

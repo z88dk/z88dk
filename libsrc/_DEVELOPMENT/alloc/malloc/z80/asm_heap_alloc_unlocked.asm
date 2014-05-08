@@ -12,9 +12,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_alloc_unlocked
+PUBLIC asm_heap_alloc_unlocked
 
-LIB __heap_allocate_block, error_enomem_zc
+EXTERN __heap_allocate_block, error_enomem_zc
 
 asm_heap_alloc_unlocked:
 

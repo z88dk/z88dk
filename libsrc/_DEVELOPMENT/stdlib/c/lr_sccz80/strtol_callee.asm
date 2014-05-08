@@ -1,7 +1,7 @@
 
 ; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
 
-XDEF strtol_callee
+PUBLIC strtol_callee
 
 strtol_callee:
 

@@ -1,5 +1,5 @@
 
-XLIB asm_toascii
+PUBLIC asm_toascii
 
 asm_toascii:
 

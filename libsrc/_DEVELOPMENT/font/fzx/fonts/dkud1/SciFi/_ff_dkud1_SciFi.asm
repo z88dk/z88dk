@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_SciFi
+PUBLIC _ff_dkud1_SciFi
 
 _ff_dkud1_SciFi:
 

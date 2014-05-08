@@ -1,7 +1,7 @@
 
 ; int bv_priority_queue_push(bv_priority_queue_t *q, int c)
 
-XDEF bv_priority_queue_push
+PUBLIC bv_priority_queue_push
 
 bv_priority_queue_push:
 

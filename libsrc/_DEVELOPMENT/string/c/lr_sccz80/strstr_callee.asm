@@ -1,7 +1,7 @@
 
 ; char *strstr(const char *s1, const char *s2)
 
-XDEF strstr_callee
+PUBLIC strstr_callee
 
 strstr_callee:
 

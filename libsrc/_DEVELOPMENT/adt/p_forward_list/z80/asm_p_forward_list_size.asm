@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_size
+PUBLIC asm_p_forward_list_size
 
 asm_p_forward_list_size:
 

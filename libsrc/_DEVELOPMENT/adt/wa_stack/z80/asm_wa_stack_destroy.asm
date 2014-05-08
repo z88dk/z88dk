@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_stack_destroy
+PUBLIC asm_wa_stack_destroy
 
-LIB l_zerostruct6_hl
+EXTERN l_zerostruct6_hl
 
 asm_wa_stack_destroy:
 

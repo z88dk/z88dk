@@ -15,9 +15,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_free
+PUBLIC asm_obstack_free
 
-LIB error_einval_zc
+EXTERN error_einval_zc
 
 asm_obstack_free:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Neverend
+PUBLIC _ff_dkud2_Neverend
 
 _ff_dkud2_Neverend:
 

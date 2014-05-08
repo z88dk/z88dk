@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strncasecmp
+PUBLIC asm_strncasecmp
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 asm_strncasecmp:
 

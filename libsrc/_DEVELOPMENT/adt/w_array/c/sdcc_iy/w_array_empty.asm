@@ -1,9 +1,9 @@
 
 ; int w_array_empty(b_array_t *a)
 
-XDEF _w_array_empty
+PUBLIC _w_array_empty
 
-LIB _b_array_empty
+EXTERN _b_array_empty
 
 _w_array_empty:
 

@@ -1,7 +1,7 @@
 
 ; size_t strlcat(char * restrict s1, const char * restrict s2, size_t n)
 
-XDEF strlcat_callee
+PUBLIC strlcat_callee
 
 strlcat_callee:
 

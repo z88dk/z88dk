@@ -1,7 +1,7 @@
 
 ; void *obstack_blank_fast(struct obstack *ob, int size)
 
-XDEF _obstack_blank_fast
+PUBLIC _obstack_blank_fast
 
 _obstack_blank_fast:
 

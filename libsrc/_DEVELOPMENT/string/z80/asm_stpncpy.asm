@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_stpncpy
+PUBLIC asm_stpncpy
 
 asm_stpncpy:
 

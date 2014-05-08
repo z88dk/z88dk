@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_data
+PUBLIC asm_b_vector_data
 
-LIB l_readword_hl
+EXTERN l_readword_hl
 
 asm_b_vector_data:
 

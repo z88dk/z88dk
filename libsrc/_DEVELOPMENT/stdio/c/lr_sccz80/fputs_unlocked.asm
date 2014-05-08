@@ -1,9 +1,9 @@
 
 ; int fputs_unlocked(const char *s, FILE *stream)
 
-XLIB fputs_unlocked
+PUBLIC fputs_unlocked
 
-LIB asm_fputs_unlocked
+EXTERN asm_fputs_unlocked
 
 fputs_unlocked:
 

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_saddrcdown
+PUBLIC asm_zx_saddrcdown
 
 asm_zx_saddrcdown:
 

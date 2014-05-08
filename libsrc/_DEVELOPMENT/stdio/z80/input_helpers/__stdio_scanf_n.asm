@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_n
+PUBLIC __stdio_scanf_n
 
-LIB l_utod_de
+EXTERN l_utod_de
 
 __stdio_scanf_n:
 

@@ -12,10 +12,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_free_unlocked
-XDEF asm_free_unocked_lib
+PUBLIC asm_free_unlocked
+PUBLIC asm_free_unocked_lib
 
-LIB asm_heap_free_unlocked
+EXTERN asm_heap_free_unlocked
 
 asm_free_unlocked:
 asm_free_unlocked_lib:

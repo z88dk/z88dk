@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_priority_queue_pop
+PUBLIC asm_ba_priority_queue_pop
 
-LIB __array_info, __b_heap_sift_down, error_einval_mc
+EXTERN __array_info, __b_heap_sift_down, error_einval_mc
 
 asm_ba_priority_queue_pop:
 

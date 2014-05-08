@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_memrchr
-XDEF asm0_memrchr
+PUBLIC asm_memrchr
+PUBLIC asm0_memrchr
 
-LIB error_zc
+EXTERN error_zc
 
 asm_memrchr:
 

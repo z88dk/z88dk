@@ -1,7 +1,7 @@
 
 ; void *obstack_1grow_fast(struct obstack *ob, char c)
 
-XDEF _obstack_1grow_fast
+PUBLIC _obstack_1grow_fast
 
 _obstack_1grow_fast:
 

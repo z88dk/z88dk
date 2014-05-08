@@ -1,9 +1,9 @@
 
 ; int b_array_resize(b_array_t *a, size_t n)
 
-XLIB b_array_resize
+PUBLIC b_array_resize
 
-LIB asm_b_array_resize
+EXTERN asm_b_array_resize
 
 b_array_resize:
 

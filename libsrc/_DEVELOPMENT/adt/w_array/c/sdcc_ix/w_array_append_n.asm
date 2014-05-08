@@ -1,7 +1,7 @@
 
 ; size_t w_array_append_n(w_array_t *a, size_t n, void *item)
 
-XDEF _w_array_append_n
+PUBLIC _w_array_append_n
 
 _w_array_append_n:
 

@@ -10,10 +10,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_append_n
-XDEF asm1_w_array_append_n
+PUBLIC asm_w_array_append_n
+PUBLIC asm1_w_array_append_n
 
-LIB asm_b_array_append_block, __w_array_write_n, error_enomem_mc
+EXTERN asm_b_array_append_block, __w_array_write_n, error_enomem_mc
 
 asm_w_array_append_n:
 

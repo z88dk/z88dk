@@ -1,7 +1,7 @@
 
 ; int fzx_putc(uchar c)
 
-XDEF _fzx_putc
+PUBLIC _fzx_putc
 
 _fzx_putc:
 

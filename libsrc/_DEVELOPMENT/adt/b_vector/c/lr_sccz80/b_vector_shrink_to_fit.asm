@@ -1,7 +1,7 @@
 
 ; int b_vector_shrink_to_fit(b_vector_t *v)
 
-XDEF b_vector_shrink_to_fit
+PUBLIC b_vector_shrink_to_fit
 
 ;defc b_vector_shrink_to_fit = asm_b_vector_shrink_to_fit
 

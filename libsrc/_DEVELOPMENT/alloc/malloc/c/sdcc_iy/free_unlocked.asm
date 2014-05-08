@@ -1,9 +1,9 @@
 
 ; void free_unlocked(void *p)
 
-XDEF _free_unlocked
+PUBLIC _free_unlocked
 
-LIB _heap_free_unlocked
+EXTERN _heap_free_unlocked
 
 _free_unlocked:
 

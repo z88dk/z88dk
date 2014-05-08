@@ -1,9 +1,9 @@
 
 ; int wa_priority_queue_push(wa_priority_queue_t *q, void *item)
 
-XLIB wa_priority_queue_push
+PUBLIC wa_priority_queue_push
 
-LIB asm_wa_priority_queue_push
+EXTERN asm_wa_priority_queue_push
 
 wa_priority_queue_push:
 

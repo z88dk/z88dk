@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_balloc_firstfit
+PUBLIC asm_balloc_firstfit
 
-XREF __qtbl
+EXTERN __qtbl
 
-LIB error_enomem_zc
+EXTERN error_enomem_zc
 
 asm_balloc_firstfit:
 

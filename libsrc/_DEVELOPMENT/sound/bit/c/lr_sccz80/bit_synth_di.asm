@@ -1,9 +1,9 @@
 
 ; void bit_synth_di(int dur, int freq_1, int freq_2, int freq_3, int freq_4)
 
-XLIB bit_synth_di
+PUBLIC bit_synth_di
 
-LIB asm_bit_synth_di
+EXTERN asm_bit_synth_di
 
 bit_synth_di:
 

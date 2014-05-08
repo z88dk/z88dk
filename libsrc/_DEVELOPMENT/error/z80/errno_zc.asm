@@ -1,9 +1,9 @@
 
-XLIB errno_zc
+PUBLIC errno_zc
 
-XREF _errno
+EXTERN _errno
 
-LIB error_zc
+EXTERN error_zc
 
 errno_zc:
 

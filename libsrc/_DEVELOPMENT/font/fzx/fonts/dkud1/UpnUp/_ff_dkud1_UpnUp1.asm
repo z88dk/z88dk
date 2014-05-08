@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_UpnUp1
+PUBLIC _ff_dkud1_UpnUp1
 
 _ff_dkud1_UpnUp1:
 

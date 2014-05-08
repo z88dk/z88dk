@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_shrink_to_fit
+PUBLIC asm_bv_priority_queue_shrink_to_fit
 
-LIB asm_b_vector_shrink_to_fit
+EXTERN asm_b_vector_shrink_to_fit
 
 asm_bv_priority_queue_shrink_to_fit:
 

@@ -1,7 +1,7 @@
 
 ; void *heap_calloc_unlocked(void *heap, size_t nmemb, size_t size)
 
-XDEF _heap_calloc_unlocked
+PUBLIC _heap_calloc_unlocked
 
 _heap_calloc_unlocked:
 

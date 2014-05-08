@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Phones2
+PUBLIC _ff_dkud1_Phones2
 
 _ff_dkud1_Phones2:
 

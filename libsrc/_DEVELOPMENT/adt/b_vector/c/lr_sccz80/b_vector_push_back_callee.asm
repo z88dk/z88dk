@@ -1,9 +1,9 @@
 
 ; size_t b_vector_push_back(b_vector_t *v, int c)
 
-XDEF b_vector_push_back_callee
+PUBLIC b_vector_push_back_callee
 
-LIB b_vector_append_callee
+EXTERN b_vector_append_callee
 
 ;defc b_vector_push_back_callee = b_vector_append_callee
 

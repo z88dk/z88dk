@@ -2,7 +2,7 @@
 ; bv_priority_queue_t *
 ; bv_priority_queue_init(void *p, size_t capacity, size_t max_size, int (*compar)(const void *, const void *))
 
-XDEF bv_priority_queue_init_callee
+PUBLIC bv_priority_queue_init_callee
 
 bv_priority_queue_init_callee:
 

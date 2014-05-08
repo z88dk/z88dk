@@ -12,9 +12,9 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_beep_raw
+PUBLIC asm_bit_beep_raw
 
-LIB asm_bit_open, asm_bit_close
+EXTERN asm_bit_open, asm_bit_close
 
 asm_bit_beep_raw:
 

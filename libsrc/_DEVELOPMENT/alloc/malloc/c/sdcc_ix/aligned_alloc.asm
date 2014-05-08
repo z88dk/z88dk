@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _aligned_alloc
+PUBLIC _aligned_alloc
 
 _aligned_alloc:
 
@@ -25,9 +25,9 @@ _aligned_alloc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _aligned_alloc
+PUBLIC _aligned_alloc
 
-LIB _aligned_alloc_unlocked
+EXTERN _aligned_alloc_unlocked
 
 _aligned_alloc:
 

@@ -1,9 +1,9 @@
 
 ; int isascii(int c)
 
-XLIB isascii
+PUBLIC isascii
 
-LIB error_znc
+EXTERN error_znc
 
 isascii:
 

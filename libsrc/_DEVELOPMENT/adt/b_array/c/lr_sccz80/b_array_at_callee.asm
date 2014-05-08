@@ -1,7 +1,7 @@
 
 ; int b_array_at(b_array_t *a, size_t idx)
 
-XDEF b_array_at_callee
+PUBLIC b_array_at_callee
 
 b_array_at_callee:
 

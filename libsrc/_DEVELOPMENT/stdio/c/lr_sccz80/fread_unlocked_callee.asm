@@ -1,7 +1,7 @@
 
 ; size_t fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XDEF fread_unlocked_callee
+PUBLIC fread_unlocked_callee
 
 fread_unlocked_callee:
 

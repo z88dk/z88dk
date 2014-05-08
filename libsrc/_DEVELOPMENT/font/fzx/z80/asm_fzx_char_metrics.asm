@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_char_metrics
+PUBLIC asm_fzx_char_metrics
 
-LIB __fzx_char_metrics, error_zc, _fzx
+EXTERN __fzx_char_metrics, error_zc, _fzx
 
 asm_fzx_char_metrics:
 

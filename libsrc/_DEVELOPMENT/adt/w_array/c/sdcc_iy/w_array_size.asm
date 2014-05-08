@@ -1,7 +1,7 @@
 
 ; size_t w_array_size(w_array_t *a)
 
-XDEF _w_array_size
+PUBLIC _w_array_size
 
 _w_array_size:
 

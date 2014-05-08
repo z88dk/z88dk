@@ -9,12 +9,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_ftell_unlocked
-XDEF asm0_ftell_unlocked
+PUBLIC asm_ftell_unlocked
+PUBLIC asm0_ftell_unlocked
 
-XREF STDIO_SEEK_CUR, STDIO_MSG_SEEK
+EXTERN STDIO_SEEK_CUR, STDIO_MSG_SEEK
 
-LIB l_jpix, error_mc, l_decu_dehl
+EXTERN l_jpix, error_mc, l_decu_dehl
 
 asm_ftell_unlocked:
 
@@ -37,7 +37,7 @@ asm_ftell_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    jr c, ftell_immediate_error_ebadf
@@ -73,13 +73,13 @@ asm0_ftell_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   XDEF ftell_immediate_error_ebadf
+   PUBLIC ftell_immediate_error_ebadf
    ftell_immediate_error_ebadf:
 
 ELSE
 
-   XDEF ftell_immediate_error_enolck
-   LIB error_enolck_mc
+   PUBLIC ftell_immediate_error_enolck
+   EXTERN error_enolck_mc
    
    ftell_immediate_error_enolck:
    

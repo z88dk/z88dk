@@ -1,7 +1,7 @@
 
 ; size_t bv_priority_queue_max_size(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_max_size
+PUBLIC _bv_priority_queue_max_size
 
 _bv_priority_queue_max_size:
 

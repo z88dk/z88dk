@@ -1,9 +1,9 @@
 
 ; int isdigit(int c)
 
-XLIB _isdigit
+PUBLIC _isdigit
 
-LIB asm_isdigit, error_zc
+EXTERN asm_isdigit, error_zc
 
 _isdigit:
 

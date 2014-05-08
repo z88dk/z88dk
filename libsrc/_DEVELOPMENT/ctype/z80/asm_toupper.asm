@@ -1,5 +1,5 @@
 
-XLIB asm_toupper
+PUBLIC asm_toupper
 
 asm_toupper:
 

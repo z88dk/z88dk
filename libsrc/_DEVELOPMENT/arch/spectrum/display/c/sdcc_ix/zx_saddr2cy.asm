@@ -1,7 +1,7 @@
 
 ; uint zx_saddr2cy(void *saddr)
 
-XDEF _zx_saddr2cy
+PUBLIC _zx_saddr2cy
 
 _zx_saddr2cy:
 

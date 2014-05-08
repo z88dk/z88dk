@@ -1,9 +1,9 @@
 
 ; size_t wv_priority_queue_size(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_size
+PUBLIC _wv_priority_queue_size
 
-LIB _wa_priority_queue_size
+EXTERN _wa_priority_queue_size
 
 _wv_priority_queue_size:
 

@@ -14,9 +14,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_heap_calloc_unlocked
+PUBLIC asm_heap_calloc_unlocked
 
-LIB l_mulu_16_16x16, asm_heap_alloc_unlocked, asm_memset, error_enomem_zc
+EXTERN l_mulu_16_16x16, asm_heap_alloc_unlocked, asm_memset, error_enomem_zc
 
 asm_heap_calloc_unlocked:
 

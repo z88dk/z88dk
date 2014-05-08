@@ -1,7 +1,7 @@
 
 ; char *strlwr(char *s)
 
-XDEF strlwr
+PUBLIC strlwr
 
 strlwr:
 

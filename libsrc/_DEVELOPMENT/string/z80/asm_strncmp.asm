@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_strncmp
+PUBLIC asm_strncmp
 
 asm_strncmp:
 

@@ -1,9 +1,9 @@
 
 ; void p_forward_list_push_front(p_forward_list_t *list, void *item)
 
-XDEF _p_forward_list_push_front
+PUBLIC _p_forward_list_push_front
 
-LIB _p_forward_list_insert_after
+EXTERN _p_forward_list_insert_after
 
 _p_forward_list_push_front:
 

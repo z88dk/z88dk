@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_zx_border
+PUBLIC asm_zx_border
 
-XREF __sound_bit_state
+EXTERN __sound_bit_state
 
 asm_zx_border:
 

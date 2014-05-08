@@ -2,8 +2,8 @@
 ; 2000 djm
 ; 2014 aralbrec - special case for 8-bit multiplicands
 
-XLIB l_small_mul_16_16x16
-XDEF l0_small_mul_16_16x16
+PUBLIC l_small_mul_16_16x16
+PUBLIC l0_small_mul_16_16x16
 
 l_small_mul_16_16x16:
 

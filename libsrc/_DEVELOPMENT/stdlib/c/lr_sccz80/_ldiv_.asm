@@ -1,9 +1,9 @@
 
 ; void _ldiv_(ldiv_t *ld, long numer, long denom)
 
-XLIB _ldiv_
+PUBLIC _ldiv_
 
-LIB asm__ldiv
+EXTERN asm__ldiv
 
 _ldiv_:
 

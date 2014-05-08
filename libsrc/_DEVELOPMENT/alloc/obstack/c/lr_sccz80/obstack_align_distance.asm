@@ -1,9 +1,9 @@
 
 ; size_t obstack_align_distance(struct obstack *ob, size_t alignment)
 
-XLIB obstack_align_distance
+PUBLIC obstack_align_distance
 
-LIB asm_obstack_align_distance
+EXTERN asm_obstack_align_distance
 
 obstack_align_distance:
 

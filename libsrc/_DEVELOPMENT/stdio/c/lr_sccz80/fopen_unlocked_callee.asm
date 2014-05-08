@@ -1,7 +1,7 @@
 
 ; FILE *fopen_unlocked(const char *filename, const char *mode)
 
-XDEF fopen_unlocked_callee
+PUBLIC fopen_unlocked_callee
 
 fopen_unlocked_callee:
 

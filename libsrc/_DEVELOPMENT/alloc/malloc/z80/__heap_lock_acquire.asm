@@ -1,7 +1,7 @@
 
-XLIB __heap_lock_acquire
+PUBLIC __heap_lock_acquire
 
-LIB asm_mtx_lock
+EXTERN asm_mtx_lock
 
 __heap_lock_acquire:
 

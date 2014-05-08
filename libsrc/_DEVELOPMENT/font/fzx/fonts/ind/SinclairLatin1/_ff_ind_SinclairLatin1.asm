@@ -1,5 +1,5 @@
 
-XLIB _ff_ind_SinclairLatin1
+PUBLIC _ff_ind_SinclairLatin1
 
 _ff_ind_SinclairLatin1:
 

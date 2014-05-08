@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_putc_unlocked
+PUBLIC asm_putc_unlocked
 
-LIB asm_fputc_unlocked
+EXTERN asm_fputc_unlocked
 
 asm_putc_unlocked:
 

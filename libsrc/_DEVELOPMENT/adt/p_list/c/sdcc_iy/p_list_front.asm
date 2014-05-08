@@ -1,9 +1,9 @@
 
 ; void *p_list_front(p_list_t *list)
 
-XDEF _p_list_front
+PUBLIC _p_list_front
 
-LIB _p_forward_list_front
+EXTERN _p_forward_list_front
 
 _p_list_front:
 

@@ -1,5 +1,5 @@
 
-XLIB __w_heap_swap
+PUBLIC __w_heap_swap
 
 __w_heap_swap:
 

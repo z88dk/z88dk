@@ -9,12 +9,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_kempston_init
-XDEF asm_in_mouse_kempston_reset
+PUBLIC asm_in_mouse_kempston_init
+PUBLIC asm_in_mouse_kempston_reset
 
-LIB asm_in_mouse_kempston
+EXTERN asm_in_mouse_kempston
 
-XREF __input_kempston_mouse_x, __input_kempston_mouse_y
+EXTERN __input_kempston_mouse_x, __input_kempston_mouse_y
 
 asm_in_mouse_kempston_init:
 asm_in_mouse_kempston_reset:

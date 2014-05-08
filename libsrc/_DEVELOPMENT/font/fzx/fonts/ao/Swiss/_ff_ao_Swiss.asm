@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Swiss
+PUBLIC _ff_ao_Swiss
 
 _ff_ao_Swiss:
 

@@ -1,7 +1,7 @@
 
 ; sp1_DrawUpdateStructAlways(struct sp1_update *u)
 
-XDEF sp1_DrawUpdateStructAlways
+PUBLIC sp1_DrawUpdateStructAlways
 
 sp1_DrawUpdateStructAlways:
 

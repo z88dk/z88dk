@@ -9,12 +9,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_vsscanf
+PUBLIC asm_vsscanf
 
-XREF STDIO_MSG_READ, STDIO_MSG_SEEK
+EXTERN STDIO_MSG_READ, STDIO_MSG_SEEK
 
-LIB asm_strnlen, asm__memstrcpy, l_jphl, error_mnc
-LIB asm0_vfscanf_unlocked, error_einval_zc, error_mc
+EXTERN asm_strnlen, asm__memstrcpy, l_jphl, error_mnc
+EXTERN asm0_vfscanf_unlocked, error_einval_zc, error_mc
 
 
 error_s_null:

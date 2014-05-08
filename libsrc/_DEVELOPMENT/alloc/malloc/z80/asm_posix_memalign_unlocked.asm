@@ -17,12 +17,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_posix_memalign_unlocked
-XDEF asm0_posix_memalign_unlocked
+PUBLIC asm_posix_memalign_unlocked
+PUBLIC asm0_posix_memalign_unlocked
 
-XREF __heap, _errno
+EXTERN __heap, _errno
 
-LIB asm_heap_alloc_aligned_unlocked, error_znc
+EXTERN asm_heap_alloc_aligned_unlocked, error_znc
 
 asm_posix_memalign_unlocked:
 

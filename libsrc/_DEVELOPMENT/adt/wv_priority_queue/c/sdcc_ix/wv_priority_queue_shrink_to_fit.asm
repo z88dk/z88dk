@@ -1,7 +1,7 @@
 
 ; int wv_priority_queue_shrink_to_fit(wv_priority_queue_t *q)
 
-XDEF _wv_priority_queue_shrink_to_fit
+PUBLIC _wv_priority_queue_shrink_to_fit
 
 _wv_priority_queue_shrink_to_fit:
 

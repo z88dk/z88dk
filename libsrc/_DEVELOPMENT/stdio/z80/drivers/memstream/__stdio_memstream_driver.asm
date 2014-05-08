@@ -3,15 +3,15 @@
 ; Feb 2014
 ; ===============================================================
 
-XLIB __stdio_memstream_driver
+PUBLIC __stdio_memstream_driver
 
-XREF STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_EATC, STDIO_MSG_READ
-XREF STDIO_MSG_GETC, STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_CLOS
+EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_EATC, STDIO_MSG_READ
+EXTERN STDIO_MSG_GETC, STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_CLOS
 
-LIB asm_memset, asm_free, __stdio_file_destroy, l_long_add_exx
-LIB __array_at, __vector_make_room_best_effort_extra
-LIB l_minu_bc_hl, l_jphl, asm_b_vector_read_block, asm_b_vector_write_block_extra
-LIB error_enotsup_zc, error_efbig_zc, error_erange_zc, error_mc, error_znc
+EXTERN asm_memset, asm_free, __stdio_file_destroy, l_long_add_exx
+EXTERN __array_at, __vector_make_room_best_effort_extra
+EXTERN l_minu_bc_hl, l_jphl, asm_b_vector_read_block, asm_b_vector_write_block_extra
+EXTERN error_enotsup_zc, error_efbig_zc, error_erange_zc, error_mc, error_znc
 
 __stdio_memstream_driver:
 

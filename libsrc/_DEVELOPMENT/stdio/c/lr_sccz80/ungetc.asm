@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB ungetc
+PUBLIC ungetc
 
-LIB asm_ungetc
+EXTERN asm_ungetc
 
 ungetc:
 
@@ -27,9 +27,9 @@ ungetc:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB ungetc
+PUBLIC ungetc
 
-LIB ungetc_unlocked
+EXTERN ungetc_unlocked
 
 ungetc:
 

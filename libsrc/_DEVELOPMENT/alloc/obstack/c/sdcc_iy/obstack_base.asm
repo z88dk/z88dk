@@ -1,7 +1,7 @@
 
 ; void *obstack_base(struct obstack *ob)
 
-XDEF _obstack_base
+PUBLIC _obstack_base
 
 _obstack_base:
 

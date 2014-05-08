@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_lbb
+PUBLIC __stdio_scanf_lbb
 
-LIB __stdio_scanf_sm_binary, __stdio_scanf_number_head
-LIB l_inc_sp, asm_strtoul, __stdio_scanf_number_tail_long
+EXTERN __stdio_scanf_sm_binary, __stdio_scanf_number_head
+EXTERN l_inc_sp, asm_strtoul, __stdio_scanf_number_tail_long
 
 __stdio_scanf_lbb:
 

@@ -11,10 +11,10 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_beep
-XDEF asm0_bit_beep
+PUBLIC asm_bit_beep
+PUBLIC asm0_bit_beep
 
-LIB asm_bit_beep_raw, l_mulu_32_16x16, l0_divu_32_32x16
+EXTERN asm_bit_beep_raw, l_mulu_32_16x16, l0_divu_32_32x16
 
 asm_bit_beep:
 

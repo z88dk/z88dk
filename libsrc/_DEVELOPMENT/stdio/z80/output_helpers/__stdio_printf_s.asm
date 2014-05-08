@@ -1,8 +1,8 @@
 
-XLIB __stdio_printf_s
+PUBLIC __stdio_printf_s
 
-LIB __stdio_nextarg_hl, asm_strnlen
-LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_width_bc
+EXTERN __stdio_nextarg_hl, asm_strnlen
+EXTERN __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_width_bc
 
 __stdio_printf_s:
 

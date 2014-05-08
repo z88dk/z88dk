@@ -1,7 +1,7 @@
 
 ; int putchar_unlocked(int c)
 
-XDEF _putchar_unlocked
+PUBLIC _putchar_unlocked
 
 _putchar_unlocked:
 

@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB    l_long_lneg
+PUBLIC    l_long_lneg
 
 ; deHL = !deHL
 ; set carry if result true and return val in dehl

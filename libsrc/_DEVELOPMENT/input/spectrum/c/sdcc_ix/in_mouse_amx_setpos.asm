@@ -1,7 +1,7 @@
 
 ; void in_mouse_amx_setpos(uint16_t x, uint16_t y)
 
-XDEF _in_mouse_amx_setpos
+PUBLIC _in_mouse_amx_setpos
 
 _in_mouse_amx_setpos:
 

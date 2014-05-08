@@ -1,7 +1,7 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
-XDEF fgets_unlocked_callee
+PUBLIC fgets_unlocked_callee
 
 fgets_unlocked_callee:
 

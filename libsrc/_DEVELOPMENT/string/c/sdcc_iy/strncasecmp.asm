@@ -1,7 +1,7 @@
 
 ; int strncasecmp(const char *s1, const char *s2, size_t n)
 
-XDEF _strncasecmp
+PUBLIC _strncasecmp
 
 _strncasecmp:
 

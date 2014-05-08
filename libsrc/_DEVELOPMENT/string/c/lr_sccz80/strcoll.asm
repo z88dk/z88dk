@@ -1,9 +1,9 @@
 
 ; int strcoll(const char *s1, const char *s2)
 
-XLIB strcoll
+PUBLIC strcoll
 
-LIB asm_strcoll
+EXTERN asm_strcoll
 
 strcoll:
 

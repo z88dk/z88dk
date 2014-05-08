@@ -1,5 +1,5 @@
 
-XLIB asm_spinlock_tryacquire
+PUBLIC asm_spinlock_tryacquire
 
 asm_spinlock_tryacquire:
 

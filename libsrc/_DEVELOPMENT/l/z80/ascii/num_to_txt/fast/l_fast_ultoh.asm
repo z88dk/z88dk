@@ -1,7 +1,7 @@
 
-XLIB l_fast_ultoh
+PUBLIC l_fast_ultoh
 
-LIB l_fast_utoh
+EXTERN l_fast_utoh
 
 l_fast_ultoh:
 

@@ -8,7 +8,7 @@
 ; Attribute address corresponding to pixel coordinate x = 0, y.
 ; ===============================================================
 
-XLIB asm_zx_py2aaddr
+PUBLIC asm_zx_py2aaddr
 
 asm_zx_py2aaddr:
 

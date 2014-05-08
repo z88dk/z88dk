@@ -1,7 +1,7 @@
 
-XLIB l_eat_ws
+PUBLIC l_eat_ws
 
-LIB asm_isspace
+EXTERN asm_isspace
 
 l_eat_ws:
 

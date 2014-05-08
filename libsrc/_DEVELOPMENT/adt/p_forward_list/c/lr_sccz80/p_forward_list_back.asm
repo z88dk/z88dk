@@ -1,7 +1,7 @@
 
 ; void *p_forward_list_back(p_forward_list_t *list)
 
-XDEF p_forward_list_back
+PUBLIC p_forward_list_back
 
 p_forward_list_back:
 

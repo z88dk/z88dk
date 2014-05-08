@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_pop_front(p_forward_list_t *list)
 
-XDEF _p_forward_list_pop_front
+PUBLIC _p_forward_list_pop_front
 
-LIB _p_forward_list_remove_after
+EXTERN _p_forward_list_remove_after
 
 _p_forward_list_pop_front:
 

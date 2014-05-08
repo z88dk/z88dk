@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_im2_prepend_generic_callback
+PUBLIC asm_im2_prepend_generic_callback
 
-LIB __generic_isr_locate_callbacks
+EXTERN __generic_isr_locate_callbacks
 
 asm_im2_prepend_generic_callback:
 

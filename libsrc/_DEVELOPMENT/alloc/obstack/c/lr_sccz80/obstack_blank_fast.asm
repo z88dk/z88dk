@@ -1,9 +1,9 @@
 
 ; void *obstack_blank_fast(struct obstack *ob, int size)
 
-XLIB obstack_blank_fast
+PUBLIC obstack_blank_fast
 
-LIB asm_obstack_blank_fast
+EXTERN asm_obstack_blank_fast
 
 obstack_blank_fast:
 

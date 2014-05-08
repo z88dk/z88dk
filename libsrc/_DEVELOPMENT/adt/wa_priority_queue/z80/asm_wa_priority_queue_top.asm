@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_top
+PUBLIC asm_wa_priority_queue_top
 
-LIB asm_w_array_front
+EXTERN asm_w_array_front
 
 asm_wa_priority_queue_top:
 

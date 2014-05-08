@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_fuller(void)
 
-XDEF in_stick_fuller
+PUBLIC in_stick_fuller
 
 in_stick_fuller:
 

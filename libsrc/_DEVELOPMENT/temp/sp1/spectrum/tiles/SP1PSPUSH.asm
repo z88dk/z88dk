@@ -2,7 +2,7 @@
 ; 02.2008 aralbrec
 ; sinclair spectrum version
 
-XLIB SP1PSPUSH
+PUBLIC SP1PSPUSH
 
 ; enter : hl = & struct sp1_pss to write to
 ;          e = flags

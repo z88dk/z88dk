@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_pop
+PUBLIC asm_bv_priority_queue_pop
 
-LIB asm_ba_priority_queue_pop
+EXTERN asm_ba_priority_queue_pop
 
 asm_bv_priority_queue_pop:
 

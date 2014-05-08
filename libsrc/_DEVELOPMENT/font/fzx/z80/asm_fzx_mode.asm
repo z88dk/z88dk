@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_mode
+PUBLIC asm_fzx_mode
 
-XDEF fzx_mode_or, fzx_mode_xor, fzx_mode_reset
-XREF __fzx_inst_0, __fzx_inst_1, fzx_inst_2
+PUBLIC fzx_mode_or, fzx_mode_xor, fzx_mode_reset
+EXTERN __fzx_inst_0, __fzx_inst_1, fzx_inst_2
 
 asm_fzx_mode:
 

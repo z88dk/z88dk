@@ -1,7 +1,7 @@
 
 ; void *b_vector_append_block(b_vector_t *v, size_t n)
 
-XDEF b_vector_append_block_callee
+PUBLIC b_vector_append_block_callee
 
 b_vector_append_block_callee:
 

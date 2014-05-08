@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Sinclair
+PUBLIC _ff_dkud1_Sinclair
 
 _ff_dkud1_Sinclair:
 

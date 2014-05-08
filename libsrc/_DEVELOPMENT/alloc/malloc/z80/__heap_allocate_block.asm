@@ -1,5 +1,5 @@
 
-XLIB __heap_allocate_block
+PUBLIC __heap_allocate_block
 
 __heap_allocate_block:
 

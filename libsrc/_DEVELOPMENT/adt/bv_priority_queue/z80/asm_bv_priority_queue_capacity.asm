@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_capacity
+PUBLIC asm_bv_priority_queue_capacity
 
-LIB l_readword_hl
+EXTERN l_readword_hl
 
 asm_bv_priority_queue_capacity:
 

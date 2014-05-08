@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_resize(bv_priority_queue_t *q, size_t n)
 
-XDEF bv_priority_queue_resize_callee
+PUBLIC bv_priority_queue_resize_callee
 
-LIB ba_priority_queue_resize_callee
+EXTERN ba_priority_queue_resize_callee
 
 ;defc bv_priority_queue_resize_callee = ba_priority_queue_resize_callee
 

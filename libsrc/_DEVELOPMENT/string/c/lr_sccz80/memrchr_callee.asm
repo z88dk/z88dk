@@ -1,7 +1,7 @@
 
 ; void *memrchr(const void *s, int c, size_t n)
 
-XDEF memrchr_callee
+PUBLIC memrchr_callee
 
 memrchr_callee:
 

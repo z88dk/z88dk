@@ -1,7 +1,7 @@
 
 ; int b_array_back(b_array_t *a)
 
-XDEF _b_array_back
+PUBLIC _b_array_back
 
 _b_array_back:
 

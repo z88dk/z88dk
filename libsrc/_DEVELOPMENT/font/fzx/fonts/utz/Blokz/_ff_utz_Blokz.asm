@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_Blokz
+PUBLIC _ff_utz_Blokz
 
 _ff_utz_Blokz:
 

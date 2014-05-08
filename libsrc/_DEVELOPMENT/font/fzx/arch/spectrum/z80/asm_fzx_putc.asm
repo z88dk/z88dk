@@ -22,12 +22,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_putc
+PUBLIC asm_fzx_putc
 
-LIB _fzx, error_zc, error_onc
-LIB asm_zx_pxy2saddr, asm_zx_saddrpdown
+EXTERN _fzx, error_zc, error_onc
+EXTERN asm_zx_pxy2saddr, asm_zx_saddrpdown
 
-XDEF __fzx_inst_0, __fzx_inst_1, __fzx_inst_2
+PUBLIC __fzx_inst_0, __fzx_inst_1, __fzx_inst_2
 
 DEFC FONT = 0
 DEFC MARGIN = 2

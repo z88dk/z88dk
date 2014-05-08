@@ -1,9 +1,9 @@
 
 ; void *zx_cyx2saddr(uchar row, uchar col)
 
-XLIB zx_cyx2saddr
+PUBLIC zx_cyx2saddr
 
-LIB asm_zx_cyx2saddr
+EXTERN asm_zx_cyx2saddr
 
 zx_cyx2saddr:
 

@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strnlen
+PUBLIC asm_strnlen
 
-LIB error_znc
+EXTERN error_znc
 
 asm_strnlen:
 

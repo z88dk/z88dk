@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_1stGrade
+PUBLIC _ff_utz_1stGrade
 
 _ff_utz_1stGrade:
 

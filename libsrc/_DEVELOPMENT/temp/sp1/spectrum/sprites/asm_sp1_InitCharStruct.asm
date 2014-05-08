@@ -2,11 +2,10 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB asm_sp1_InitCharStruct
+PUBLIC asm_sp1_InitCharStruct
 
-LIB _sp1_struct_cs_prototype
-
-XREF SP1V_ROTTBL
+EXTERN _sp1_struct_cs_prototype
+EXTERN SP1V_ROTTBL
 
 asm_sp1_InitCharStruct:
 

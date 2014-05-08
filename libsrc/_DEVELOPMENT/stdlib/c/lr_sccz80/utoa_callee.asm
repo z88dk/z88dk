@@ -1,7 +1,7 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
-XDEF utoa_callee
+PUBLIC utoa_callee
 
 utoa_callee:
 

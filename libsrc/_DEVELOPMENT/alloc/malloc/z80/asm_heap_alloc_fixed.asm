@@ -21,10 +21,10 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_heap_alloc_fixed
+PUBLIC asm_heap_alloc_fixed
 
-LIB asm_heap_alloc_fixed_unlocked
-LIB __heap_lock_acquire, __heap_lock_release_0, error_enolck_zc
+EXTERN asm_heap_alloc_fixed_unlocked
+EXTERN __heap_lock_acquire, __heap_lock_release_0, error_enolck_zc
 
 asm_heap_alloc_fixed:
 
@@ -63,9 +63,9 @@ asm_heap_alloc_fixed:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_heap_alloc_fixed
+PUBLIC asm_heap_alloc_fixed
 
-LIB asm_heap_alloc_fixed_unlocked
+EXTERN asm_heap_alloc_fixed_unlocked
 
 asm_heap_alloc_fixed:
 

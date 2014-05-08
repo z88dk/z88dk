@@ -1,7 +1,7 @@
 
 ; void z80_delay_ms(uint ms)
 
-XDEF _z80_delay_ms
+PUBLIC _z80_delay_ms
 
 _z80_delay_ms:
 

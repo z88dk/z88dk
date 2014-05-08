@@ -1,7 +1,7 @@
 
-XLIB __ba_pq_setsize
+PUBLIC __ba_pq_setsize
 
-LIB l_ltu_bc_hl, error_zc
+EXTERN l_ltu_bc_hl, error_zc
 
 __ba_pq_setsize:
 

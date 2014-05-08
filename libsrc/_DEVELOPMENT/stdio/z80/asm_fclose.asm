@@ -15,9 +15,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fclose
+PUBLIC asm_fclose
 
-LIB asm0_fclose_unlocked, __stdio_lock_acquire, error_enolck_mc
+EXTERN asm0_fclose_unlocked, __stdio_lock_acquire, error_enolck_mc
 
 asm_fclose:
 
@@ -40,7 +40,7 @@ asm_fclose:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   LIB __stdio_lock_file_list, __stdio_unlock_file_list
+   EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
    
    call __stdio_lock_file_list
    
@@ -64,9 +64,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fclose
+PUBLIC asm_fclose
 
-LIB asm_fclose_unlocked
+EXTERN asm_fclose_unlocked
 
 asm_fclose:
 

@@ -1,7 +1,7 @@
 
 ; int vsprintf(char *s, const char *format, void *arg)
 
-XDEF vsprintf_callee
+PUBLIC vsprintf_callee
 
 vsprintf_callee:
 

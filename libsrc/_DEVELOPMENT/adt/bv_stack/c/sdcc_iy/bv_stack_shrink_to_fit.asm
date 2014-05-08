@@ -1,9 +1,9 @@
 
 ; int bv_stack_shrink_to_fit(bv_stack_t *s)
 
-XDEF _bv_stack_shrink_to_fit
+PUBLIC _bv_stack_shrink_to_fit
 
-LIB _b_vector_shrink_to_fit
+EXTERN _b_vector_shrink_to_fit
 
 _bv_stack_shrink_to_fit:
 

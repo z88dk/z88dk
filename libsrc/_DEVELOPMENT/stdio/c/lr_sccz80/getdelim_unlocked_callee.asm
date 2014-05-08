@@ -1,7 +1,7 @@
 
 ; size_t getdelim_unlocked(char **lineptr, size_t *n, int delimiter, FILE *stream)
 
-XDEF getdelim_unlocked_callee
+PUBLIC getdelim_unlocked_callee
 
 getdelim_unlocked_callee:
 

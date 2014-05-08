@@ -1,7 +1,7 @@
 
 ; void clearerr_unlocked(FILE *stream)
 
-XDEF _clearerr_unlocked
+PUBLIC _clearerr_unlocked
 
 _clearerr_unlocked:
 

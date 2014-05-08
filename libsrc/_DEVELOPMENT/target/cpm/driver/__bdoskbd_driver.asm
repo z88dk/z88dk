@@ -1,8 +1,8 @@
 
 ;; simple keyboard driver ;;;;;
 
-LIB l_jphl, asm_fzx_putc
-LIB error_enotsup_zc, error_znc, error_lznc
+EXTERN l_jphl, asm_fzx_putc
+EXTERN error_enotsup_zc, error_znc, error_lznc
 
 __bdoskbd_driver:
 

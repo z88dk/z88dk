@@ -16,7 +16,7 @@
 ; aralbrec  advice taken!
 
 
-XLIB	l_long_mult
+PUBLIC l_long_mult
 
 ; dehl = arg1
 ; stack = arg2, ret

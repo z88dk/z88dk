@@ -1,9 +1,9 @@
 
 ; void in_mouse_kempston_reset(void)
 
-XLIB _in_mouse_kempston_reset
+PUBLIC _in_mouse_kempston_reset
 
-LIB asm_in_mouse_kempston_reset
+EXTERN asm_in_mouse_kempston_reset
 
 _in_mouse_kempston_reset:
 

@@ -1,7 +1,7 @@
 
 ; char *fzx_string_partition(char *s, uint width)
 
-XDEF fzx_string_partition_callee
+PUBLIC fzx_string_partition_callee
 
 fzx_string_partition_callee:
 

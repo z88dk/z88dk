@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_free_callee
+PUBLIC obstack_free_callee
 
 obstack_free_callee:
 

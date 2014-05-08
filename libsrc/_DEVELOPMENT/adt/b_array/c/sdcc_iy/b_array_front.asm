@@ -1,7 +1,7 @@
 
 ; int b_array_front(b_array_t *a)
 
-XDEF _b_array_front
+PUBLIC _b_array_front
 
 _b_array_front:
 

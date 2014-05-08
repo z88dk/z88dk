@@ -1,7 +1,7 @@
 
 ; FILE *freopen_unlocked(char *filename, char *mode, FILE *stream)
 
-XDEF _freopen_unlocked
+PUBLIC _freopen_unlocked
 
 _freopen_unlocked:
 

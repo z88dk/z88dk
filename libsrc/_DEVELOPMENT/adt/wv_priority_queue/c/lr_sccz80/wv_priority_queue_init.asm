@@ -2,9 +2,9 @@
 ; wv_priority_queue_t *
 ; wv_priority_queue_init(void *p, size_t capacity, size_t max_size, int (*compar)(const void *, const void *))
 
-XLIB wv_priority_queue_init
+PUBLIC wv_priority_queue_init
 
-LIB asm_wv_priority_queue_init
+EXTERN asm_wv_priority_queue_init
 
 wv_priority_queue_init:
 

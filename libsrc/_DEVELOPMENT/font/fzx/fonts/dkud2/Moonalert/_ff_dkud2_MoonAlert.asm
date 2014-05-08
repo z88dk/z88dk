@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_MoonAlert
+PUBLIC _ff_dkud2_MoonAlert
 
 _ff_dkud2_MoonAlert:
 

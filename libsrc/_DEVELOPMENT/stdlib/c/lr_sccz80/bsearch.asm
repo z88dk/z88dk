@@ -3,9 +3,9 @@
 ;               size_t nmemb, size_t size,
 ;               int (*compar)(const void *, const void *))
 
-XLIB bsearch
+PUBLIC bsearch
 
-LIB asm_bsearch
+EXTERN asm_bsearch
 
 bsearch:
 

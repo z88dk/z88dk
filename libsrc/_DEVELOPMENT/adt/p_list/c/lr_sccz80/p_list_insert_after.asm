@@ -1,9 +1,9 @@
 
 ; void *p_list_insert_after(p_list_t *list, void *list_item, void *item)
 
-XLIB p_list_insert_after
+PUBLIC p_list_insert_after
 
-LIB asm_p_list_insert_after
+EXTERN asm_p_list_insert_after
 
 p_list_insert_after:
 

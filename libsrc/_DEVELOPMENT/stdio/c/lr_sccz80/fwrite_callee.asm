@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fwrite_callee
+PUBLIC fwrite_callee
 
 fwrite_callee:
 
@@ -23,9 +23,9 @@ fwrite_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF fwrite_callee
+PUBLIC fwrite_callee
 
-LIB fwrite_unlocked_callee
+EXTERN fwrite_unlocked_callee
 
 fwrite_callee:
 

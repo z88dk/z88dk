@@ -1,7 +1,7 @@
 
-XLIB l_eat_base_prefix
+PUBLIC l_eat_base_prefix
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 l_eat_base_prefix:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud4_Font11
+PUBLIC _ff_dkud4_Font11
 
 _ff_dkud4_Font11:
 

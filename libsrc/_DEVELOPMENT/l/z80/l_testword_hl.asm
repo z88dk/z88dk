@@ -1,5 +1,5 @@
 
-XLIB l_testword_hl
+PUBLIC l_testword_hl
 
    inc hl
    inc hl

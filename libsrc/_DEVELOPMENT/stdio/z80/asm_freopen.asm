@@ -15,9 +15,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_freopen
+PUBLIC asm_freopen
 
-LIB asm0_freopen_unlocked, __stdio_verify_valid_lock, error_zc
+EXTERN asm0_freopen_unlocked, __stdio_verify_valid_lock, error_zc
 
 asm_freopen:
 
@@ -48,9 +48,9 @@ asm_freopen:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_freopen
+PUBLIC asm_freopen
 
-LIB asm_freopen_unlocked
+EXTERN asm_freopen_unlocked
 
 asm_freopen:
 

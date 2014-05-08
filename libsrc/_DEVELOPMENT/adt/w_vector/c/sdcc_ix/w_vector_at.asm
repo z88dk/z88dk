@@ -1,9 +1,9 @@
 
 ; void *w_vector_at(b_vector_t *v, size_t idx)
 
-XDEF _w_vector_at
+PUBLIC _w_vector_at
 
-LIB _w_array_at
+EXTERN _w_array_at
 
 _w_vector_at:
 

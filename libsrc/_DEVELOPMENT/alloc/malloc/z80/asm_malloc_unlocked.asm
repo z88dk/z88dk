@@ -12,12 +12,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_malloc_unlocked
-XDEF asm_malloc_unlocked_lib
+PUBLIC asm_malloc_unlocked
+PUBLIC asm_malloc_unlocked_lib
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_alloc_unlocked
+EXTERN asm_heap_alloc_unlocked
 
 asm_malloc_unlocked:
 asm_malloc_unlocked_lib:

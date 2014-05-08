@@ -1,9 +1,9 @@
 
 ; int fputc_unlocked(int c, FILE *stream)
 
-XLIB fputc_unlocked
+PUBLIC fputc_unlocked
 
-LIB asm_fputc_unlocked
+EXTERN asm_fputc_unlocked
 
 fputc_unlocked:
 

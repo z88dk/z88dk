@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Overline
+PUBLIC _ff_dkud1_Overline
 
 _ff_dkud1_Overline:
 

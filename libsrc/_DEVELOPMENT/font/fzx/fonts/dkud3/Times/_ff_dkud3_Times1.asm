@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Times1
+PUBLIC _ff_dkud3_Times1
 
 _ff_dkud3_Times1:
 

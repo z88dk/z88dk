@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm__memupr
+PUBLIC asm__memupr
 
-LIB asm_toupper
+EXTERN asm_toupper
 
 asm__memupr:
 

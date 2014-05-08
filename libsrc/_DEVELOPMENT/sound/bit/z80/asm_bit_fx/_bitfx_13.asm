@@ -1,9 +1,9 @@
 
-XLIB _bitfx_13
+PUBLIC _bitfx_13
 
 INCLUDE "clib_target_cfg.asm"
 
-LIB asm_bit_open
+EXTERN asm_bit_open
 
 _bitfx_13:
 

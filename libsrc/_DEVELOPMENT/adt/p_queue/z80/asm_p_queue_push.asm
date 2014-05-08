@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_queue_push
+PUBLIC asm_p_queue_push
 
-LIB asm_p_forward_list_alt_push_back
+EXTERN asm_p_forward_list_alt_push_back
 
 asm_p_queue_push:
 

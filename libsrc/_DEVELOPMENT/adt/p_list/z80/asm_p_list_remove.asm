@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_list_remove
+PUBLIC asm_p_list_remove
 
 asm_p_list_remove:
 

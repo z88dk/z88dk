@@ -9,8 +9,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_abs
-XDEF _l_neg_hl_
+PUBLIC asm_abs
+PUBLIC _l_neg_hl_
 
 asm_abs:
 

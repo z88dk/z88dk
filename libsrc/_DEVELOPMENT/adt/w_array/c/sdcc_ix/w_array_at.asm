@@ -1,7 +1,7 @@
 
 ; void *w_array_at(w_array_t *a, size_t idx)
 
-XDEF _w_array_at
+PUBLIC _w_array_at
 
 _w_array_at:
 

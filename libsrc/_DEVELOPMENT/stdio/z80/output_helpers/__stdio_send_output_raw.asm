@@ -1,11 +1,11 @@
 
-XLIB __stdio_send_output_raw
-XDEF __stdio_send_output_raw_chars, __stdio_send_output_raw_chars_unchecked
-XDEF __stdio_send_output_raw_buffer, __stdio_send_output_raw_buffer_unchecked
+PUBLIC __stdio_send_output_raw
+PUBLIC __stdio_send_output_raw_chars, __stdio_send_output_raw_chars_unchecked
+PUBLIC __stdio_send_output_raw_buffer, __stdio_send_output_raw_buffer_unchecked
 
-XREF STDIO_MSG_PUTC, STDIO_MSG_WRIT
+EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT
 
-LIB l_jpix
+EXTERN l_jpix
 
 ; ALL HIGH LEVEL STDIO OUTPUT EXCEPT VFPRINTF PASSES THROUGH THESE FUNCTIONS
 ; A COMMON PATH ENSURES STREAM STATE IS UPDATED PROPERLY

@@ -1,7 +1,7 @@
 
-XLIB l_small_htoul
+PUBLIC l_small_htoul
 
-LIB l_char2num
+EXTERN l_char2num
 
 l_small_htoul:
 

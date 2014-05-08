@@ -2,7 +2,7 @@
 ;       The new case statement..maybe things will work now!
 ;       13/10/98
 
-        XLIB    l_long_case
+        PUBLIC    l_long_case
 
 
 ;Case statement for longs

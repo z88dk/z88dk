@@ -1,7 +1,7 @@
 
 ; void *w_array_at(w_array_t *a, size_t idx)
 
-XDEF w_array_at_callee
+PUBLIC w_array_at_callee
 
 w_array_at_callee:
 

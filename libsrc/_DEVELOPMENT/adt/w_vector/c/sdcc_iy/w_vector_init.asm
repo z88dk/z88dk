@@ -1,7 +1,7 @@
 
 ; w_vector_t *w_vector_init(void *p, size_t capacity, size_t max_size)
 
-XDEF _w_vector_init
+PUBLIC _w_vector_init
 
 _w_vector_init:
 

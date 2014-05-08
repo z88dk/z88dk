@@ -1,7 +1,7 @@
 
 ; char *_strrstrip_(const char *s)
 
-XDEF __strrstrip_
+PUBLIC __strrstrip_
 
 __strrstrip_:
 

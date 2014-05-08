@@ -1,7 +1,7 @@
 
 ; size_t b_array_erase_range(b_array_t *a, size_t idx_first, size_t idx_last)
 
-XDEF _b_array_erase_range
+PUBLIC _b_array_erase_range
 
 _b_array_erase_range:
 

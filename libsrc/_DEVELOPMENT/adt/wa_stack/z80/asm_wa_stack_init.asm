@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_stack_init
+PUBLIC asm_wa_stack_init
 
-LIB asm_w_array_init
+EXTERN asm_w_array_init
 
 asm_wa_stack_init:
 

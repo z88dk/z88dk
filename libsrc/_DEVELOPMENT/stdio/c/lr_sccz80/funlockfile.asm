@@ -1,7 +1,7 @@
 
 ; void funlockfile(FILE *file)
 
-XDEF funlockfile
+PUBLIC funlockfile
 
 funlockfile:
 

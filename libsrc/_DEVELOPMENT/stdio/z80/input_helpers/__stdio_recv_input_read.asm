@@ -1,9 +1,9 @@
 
-XLIB __stdio_recv_input_read
+PUBLIC __stdio_recv_input_read
 
-XREF STDIO_MSG_READ
+EXTERN STDIO_MSG_READ
 
-LIB l_addu_hl_bc, l_incu_de, l_jpix
+EXTERN l_addu_hl_bc, l_incu_de, l_jpix
 
 ; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
 ; DE' IS USED TO TRACK NUMBER OF CHARS READ FROM STREAM

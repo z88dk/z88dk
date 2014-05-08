@@ -1,5 +1,5 @@
 
-XLIB asm_isspace
+PUBLIC asm_isspace
 
 asm_isspace:
 

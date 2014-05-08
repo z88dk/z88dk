@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_Phraktur
+PUBLIC _ff_utz_Phraktur
 
 _ff_utz_Phraktur:
 

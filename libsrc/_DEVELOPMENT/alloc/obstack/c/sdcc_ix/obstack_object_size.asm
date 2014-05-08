@@ -1,7 +1,7 @@
 
 ; size_t obstack_object_size(struct obstack *ob)
 
-XDEF _obstack_object_size
+PUBLIC _obstack_object_size
 
 _obstack_object_size:
 

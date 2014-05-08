@@ -1,16 +1,16 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB __stdio_verify_valid
+PUBLIC __stdio_verify_valid
 
-LIB __p_forward_list_locate_item, error_ebadf_mc
+EXTERN __p_forward_list_locate_item, error_ebadf_mc
 
-XREF __stdio_file_list_open
+EXTERN __stdio_file_list_open
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-LIB __stdio_lock_file_list, __stdio_unlock_file_list
+EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

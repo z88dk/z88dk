@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_TinyTexanXS
+PUBLIC _ff_utz_TinyTexanXS
 
 _ff_utz_TinyTexanXS:
 

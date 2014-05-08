@@ -1,7 +1,7 @@
 
 ; void *aligned_alloc_unlocked(size_t alignment, size_t size)
 
-XDEF _aligned_alloc_unlocked
+PUBLIC _aligned_alloc_unlocked
 
 _aligned_alloc_unlocked:
 

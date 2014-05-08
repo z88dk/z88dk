@@ -1,9 +1,9 @@
 
 ; size_t ba_stack_size(ba_stack_t *s)
 
-XDEF _ba_stack_size
+PUBLIC _ba_stack_size
 
-LIB _b_array_size
+EXTERN _b_array_size
 
 _ba_stack_size:
 

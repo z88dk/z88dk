@@ -1,7 +1,7 @@
 
 ; int ffsl(long i)
 
-XDEF _ffsl
+PUBLIC _ffsl
 
 _ffsl:
 

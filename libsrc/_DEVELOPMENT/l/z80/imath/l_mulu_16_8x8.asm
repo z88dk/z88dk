@@ -9,13 +9,13 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB l_mulu_16_8x8
+PUBLIC l_mulu_16_8x8
 
 l_mulu_16_8x8:
 
 IF __CLIB_OPT_IMATH <= 50
 
-   LIB l0_small_mul_16_16x16
+   EXTERN l0_small_mul_16_16x16
    
    ld h,0
    ld d,h
@@ -25,7 +25,7 @@ ENDIF
 
 IF __CLIB_OPT_IMATH > 50
 
-   LIB l_fast_mulu_16_8x8
+   EXTERN l_fast_mulu_16_8x8
    jp l_fast_mulu_16_8x8
 
 ENDIF

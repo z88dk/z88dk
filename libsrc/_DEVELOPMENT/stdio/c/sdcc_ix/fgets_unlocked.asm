@@ -1,7 +1,7 @@
 
 ; char *fgets(char *s, int n, FILE *stream)
 
-XDEF _fgets_unlocked
+PUBLIC _fgets_unlocked
 
 _fgets_unlocked:
 

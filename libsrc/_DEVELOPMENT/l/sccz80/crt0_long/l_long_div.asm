@@ -10,10 +10,10 @@
 ;
 ;       Replaced use of ix with bcbc'
 
-XLIB    l_long_div
+PUBLIC    l_long_div
 
-LIB     l_long_div_u, l_long_neg
-XREF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
+EXTERN     l_long_div_u, l_long_neg
+EXTERN    L_LONG_DIVIDE0, L_LONG_DIVENTRY
 
 ; 32 bit division
 ; enter:

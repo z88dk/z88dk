@@ -1,7 +1,7 @@
 
-XLIB __stdio_printf_d
+PUBLIC __stdio_printf_d
 
-LIB __stdio_printf_number_tail_int
+EXTERN __stdio_printf_number_tail_int
 
 __stdio_printf_d:
 

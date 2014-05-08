@@ -1,7 +1,7 @@
 
 ; int strncmp(const char *s1, const char *s2, size_t n)
 
-XDEF strncmp_callee
+PUBLIC strncmp_callee
 
 strncmp_callee:
 

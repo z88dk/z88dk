@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_align_to
+PUBLIC asm_obstack_align_to
 
-LIB asm_obstack_align_distance, asm0_obstack_blank
-LIB error_einval_zc, error_enomem_zc, error_zc
+EXTERN asm_obstack_align_distance, asm0_obstack_blank
+EXTERN error_einval_zc, error_enomem_zc, error_zc
 
 asm_obstack_align_to:
 

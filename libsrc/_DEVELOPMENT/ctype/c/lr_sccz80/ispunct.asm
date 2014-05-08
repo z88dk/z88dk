@@ -1,9 +1,9 @@
 
 ; int ispunct(int c)
 
-XLIB ispunct
+PUBLIC ispunct
 
-LIB asm_ispunct, error_zc
+EXTERN asm_ispunct, error_zc
 
 ispunct:
 

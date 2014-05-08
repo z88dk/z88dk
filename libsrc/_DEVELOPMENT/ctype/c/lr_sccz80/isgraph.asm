@@ -1,9 +1,9 @@
 
 ; int isgraph(int c)
 
-XLIB isgraph
+PUBLIC isgraph
 
-LIB asm_isgraph, error_zc
+EXTERN asm_isgraph, error_zc
 
 isgraph:
 

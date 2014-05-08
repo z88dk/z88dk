@@ -1,10 +1,10 @@
 
 ; int strncasecmp(const char *s1, const char *s2, size_t n)
 
-XLIB strncasecmp
-XDEF strnicmp
+PUBLIC strncasecmp
+PUBLIC strnicmp
 
-LIB asm_strncasecmp
+EXTERN asm_strncasecmp
 
 strncasecmp:
 strnicmp:

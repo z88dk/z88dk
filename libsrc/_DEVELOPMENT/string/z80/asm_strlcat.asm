@@ -14,7 +14,7 @@
 ;
 ; ===============================================================
 
-XLIB asm_strlcat
+PUBLIC asm_strlcat
 
 asm_strlcat:
 

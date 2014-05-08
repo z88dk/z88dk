@@ -1,7 +1,7 @@
 
 ; unsigned long ftell_unlocked(FILE *stream)
 
-XDEF ftell_unlocked
+PUBLIC ftell_unlocked
 
 ftell_unlocked:
 

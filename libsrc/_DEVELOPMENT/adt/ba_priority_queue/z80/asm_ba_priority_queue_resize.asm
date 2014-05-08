@@ -20,9 +20,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_priority_queue_resize
+PUBLIC asm_ba_priority_queue_resize
 
-LIB __ba_pq_setsize, __b_heap_sift_down, error_einval_mc, error_znc, error_zc
+EXTERN __ba_pq_setsize, __b_heap_sift_down, error_einval_mc, error_znc, error_zc
 
 asm_ba_priority_queue_resize:
 

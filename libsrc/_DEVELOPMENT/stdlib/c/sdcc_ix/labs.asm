@@ -1,7 +1,7 @@
 
 ; long labs(long j)
 
-XDEF _labs
+PUBLIC _labs
 
 _labs:
 

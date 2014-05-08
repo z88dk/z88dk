@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fseek
+PUBLIC fseek
 
-LIB asm_fseek
+EXTERN asm_fseek
 
 fseek:
 
@@ -31,9 +31,9 @@ fseek:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB fseek
+PUBLIC fseek
 
-LIB fseek_unlocked
+EXTERN fseek_unlocked
 
 fseek:
 

@@ -3,7 +3,7 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XDEF sp1_InsertCharStruct_callee
+PUBLIC sp1_InsertCharStruct_callee
 
 sp1_InsertCharStruct_callee:
 

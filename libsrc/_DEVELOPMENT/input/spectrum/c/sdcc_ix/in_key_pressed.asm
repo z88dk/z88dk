@@ -1,7 +1,7 @@
 
 ; int in_key_pressed(uint16_t scancode)
 
-XDEF _in_key_pressed
+PUBLIC _in_key_pressed
 
 _in_key_pressed:
 

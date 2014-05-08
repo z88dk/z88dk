@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_QuaUni
+PUBLIC _ff_dkud3_QuaUni
 
 _ff_dkud3_QuaUni:
 

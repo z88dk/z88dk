@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_array_empty
+PUBLIC asm_w_array_empty
 
-LIB l_testword_hl
+EXTERN l_testword_hl
 
 asm_w_array_empty:
 

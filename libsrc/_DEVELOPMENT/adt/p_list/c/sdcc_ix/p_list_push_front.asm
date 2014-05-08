@@ -1,7 +1,7 @@
 
 ; void *p_list_push_front(p_list_t *list, void *item)
 
-XDEF _p_list_push_front
+PUBLIC _p_list_push_front
 
 _p_list_push_front:
 

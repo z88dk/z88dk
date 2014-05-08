@@ -1,9 +1,9 @@
 
 ; void *realloc_unlocked(void *p, size_t size)
 
-XLIB realloc_unlocked
+PUBLIC realloc_unlocked
 
-LIB asm_realloc_unlocked
+EXTERN asm_realloc_unlocked
 
 realloc_unlocked:
 

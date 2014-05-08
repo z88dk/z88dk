@@ -1,9 +1,9 @@
 
 ; size_t strxfrm(char * restrict s1, const char * restrict s2, size_t n)
 
-XLIB strxfrm
+PUBLIC strxfrm
 
-LIB asm_strxfrm
+EXTERN asm_strxfrm
 
 strxfrm:
 

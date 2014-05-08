@@ -16,9 +16,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_memalign_unlocked
+PUBLIC asm_memalign_unlocked
 
-LIB asm_aligned_alloc_unlocked
+EXTERN asm_aligned_alloc_unlocked
 
 asm_memalign_unlocked:
 

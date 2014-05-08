@@ -1,9 +1,9 @@
 
 ; void *zx_pxy2saddr(uchar x, uchar y)
 
-XLIB zx_pxy2saddr
+PUBLIC zx_pxy2saddr
 
-LIB asm_zx_pxy2saddr
+EXTERN asm_zx_pxy2saddr
 
 zx_pxy2saddr:
 

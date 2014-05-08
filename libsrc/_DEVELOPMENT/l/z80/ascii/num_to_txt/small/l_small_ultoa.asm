@@ -1,5 +1,5 @@
 
-XLIB l_small_ultoa
+PUBLIC l_small_ultoa
 
 l_small_ultoa:
 

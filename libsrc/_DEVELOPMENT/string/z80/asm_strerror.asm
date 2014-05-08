@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strerror
+PUBLIC asm_strerror
 
-LIB __error_strings, __error_string_default, __str_locate_nul
+EXTERN __error_strings, __error_string_default, __str_locate_nul
 
 asm_strerror:
 

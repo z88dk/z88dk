@@ -1,5 +1,5 @@
 
-XLIB __stdio_parse_permission
+PUBLIC __stdio_parse_permission
 
 __stdio_parse_permission:
 

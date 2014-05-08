@@ -1,7 +1,7 @@
 
 ; void *fzx_buffer_partition(void *buf, uint len, uint width)
 
-XDEF fzx_buffer_partition_callee
+PUBLIC fzx_buffer_partition_callee
 
 fzx_buffer_partition_callee:
 

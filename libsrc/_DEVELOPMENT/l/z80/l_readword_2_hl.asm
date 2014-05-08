@@ -1,5 +1,5 @@
 
-XLIB l_readword_2_hl
+PUBLIC l_readword_2_hl
 
    inc hl
    inc hl

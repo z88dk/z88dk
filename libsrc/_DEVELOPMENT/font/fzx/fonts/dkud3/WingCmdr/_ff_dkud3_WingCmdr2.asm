@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_WingCmdr2
+PUBLIC _ff_dkud3_WingCmdr2
 
 _ff_dkud3_WingCmdr2:
 

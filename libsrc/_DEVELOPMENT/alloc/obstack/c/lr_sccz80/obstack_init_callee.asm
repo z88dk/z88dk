@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_init_callee
+PUBLIC obstack_init_callee
 
 obstack_init_callee:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_push_back
+PUBLIC asm_p_forward_list_push_back
 
-LIB __p_forward_list_locate_item, asm_p_forward_list_insert_after
+EXTERN __p_forward_list_locate_item, asm_p_forward_list_insert_after
 
 asm_p_forward_list_push_back:
 

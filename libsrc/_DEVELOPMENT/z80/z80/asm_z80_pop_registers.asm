@@ -1,5 +1,5 @@
 
-XLIB asm_z80_pop_registers
+PUBLIC asm_z80_pop_registers
 
 asm_z80_pop_registers:
 

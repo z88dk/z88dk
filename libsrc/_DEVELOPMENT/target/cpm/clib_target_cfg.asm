@@ -51,19 +51,19 @@ defc SP1V_UPDATELISTT   = $d1ef        ; address of 2-byte variable holding the 
 
 ; With these default settings the memory map is:
 ;
-; ADDRESS (HEX)   LIBRARY  DESCRIPTION
+; ADDRESS (HEX)   EXTERNRARY  DESCRIPTION
 ;
-; f200 - ffff     SP1.LIB  horizontal rotation tables
-; f000 - f1ff     SP1.LIB  tile array
-; d200 - efff     SP1.LIB  update array for full size screen 32x24
-; d1ff - d1ff     SP1.LIB  attribute buffer
-; d1f7 - d1fe     SP1.LIB  pixel buffer
-; d1ed - d1f6     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
-;  * d1ef - d1f0  SP1.LIB  update list tail pointer (inside dummy struct sp1_update)
+; f200 - ffff     SP1.EXTERN  horizontal rotation tables
+; f000 - f1ff     SP1.EXTERN  tile array
+; d200 - efff     SP1.EXTERN  update array for full size screen 32x24
+; d1ff - d1ff     SP1.EXTERN  attribute buffer
+; d1f7 - d1fe     SP1.EXTERN  pixel buffer
+; d1ed - d1f6     SP1.EXTERN  update list head - a dummy struct sp1_update acting as first in invalidated list
+;  * d1ef - d1f0  SP1.EXTERN  update list tail pointer (inside dummy struct sp1_update)
 ; d1d4 - d1ec     --free-  25 bytes free
 ; d1d1 - d1d3     -------  JP to im2 service routine (im2 table filled with 0xd1 bytes)
 ; d101 - d1d0     --free-  208 bytes
-; d000 - d100     IM2.LIB  im 2 vector table (257 bytes)
+; d000 - d100     IM2.EXTERN  im 2 vector table (257 bytes)
 ; ce00 - cfff     -------  z80 stack (512 bytes) set SP=d000
 
 ;;;;;;;;;;;;

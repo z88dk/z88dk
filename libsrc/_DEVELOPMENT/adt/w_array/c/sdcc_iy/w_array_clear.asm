@@ -1,9 +1,9 @@
 
 ; void w_array_clear(w_array_t *a)
 
-XDEF _w_array_clear
+PUBLIC _w_array_clear
 
-LIB _b_array_clear
+EXTERN _b_array_clear
 
 _w_array_clear:
 

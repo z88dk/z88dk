@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_bit_fx
+PUBLIC asm_bit_fx
 
 INCLUDE "clib_target_cfg.asm"
 
-LIB l_jphl, asm_bit_open, asm_bit_close
+EXTERN l_jphl, asm_bit_open, asm_bit_close
 
 asm_bit_fx:
 

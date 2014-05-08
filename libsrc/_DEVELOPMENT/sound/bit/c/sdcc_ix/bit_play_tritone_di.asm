@@ -1,7 +1,7 @@
 
 ; void *bit_play_tritone_di(void *song)
 
-XDEF _bit_play_tritone_di
+PUBLIC _bit_play_tritone_di
 
 _bit_play_tritone_di:
 

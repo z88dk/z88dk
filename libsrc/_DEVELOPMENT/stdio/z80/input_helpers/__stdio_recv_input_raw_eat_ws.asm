@@ -1,8 +1,8 @@
 
-XLIB __stdio_recv_input_raw_eat_ws
-XDEF __stdio_recv_input_raw_eat_ws_repeat
+PUBLIC __stdio_recv_input_raw_eat_ws
+PUBLIC __stdio_recv_input_raw_eat_ws_repeat
 
-LIB asm_isspace, __stdio_recv_input_raw_eatc
+EXTERN asm_isspace, __stdio_recv_input_raw_eatc
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
 ; EXCEPT FOR VFSCANF.  THIS ENSURES STREAM STATE IS CORRECTLY MAINTAINED

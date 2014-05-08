@@ -1,9 +1,9 @@
 
 ; char *strndup(const char *s, size_t n)
 
-XLIB strndup
+PUBLIC strndup
 
-LIB asm_strndup
+EXTERN asm_strndup
 
 strndup:
 

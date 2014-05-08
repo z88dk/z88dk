@@ -1,7 +1,7 @@
 
 ; int bv_stack_pop(bv_stack_t *s)
 
-XDEF bv_stack_pop
+PUBLIC bv_stack_pop
 
 ;defc bv_stack_pop = asm_bv_stack_pop
 

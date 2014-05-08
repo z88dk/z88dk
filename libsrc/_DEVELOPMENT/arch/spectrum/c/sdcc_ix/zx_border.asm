@@ -1,7 +1,7 @@
 
 ; void zx_border(uchar colour)
 
-XDEF _zx_border
+PUBLIC _zx_border
 
 _zx_border:
 

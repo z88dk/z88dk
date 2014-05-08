@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strcoll
+PUBLIC asm_strcoll
 
-LIB __lc_char_cmp_bc
+EXTERN __lc_char_cmp_bc
 
 asm_strcoll:
 

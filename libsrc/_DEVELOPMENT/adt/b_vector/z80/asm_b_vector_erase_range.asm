@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_erase_range
+PUBLIC asm_b_vector_erase_range
 
-LIB asm_b_array_erase_range
+EXTERN asm_b_array_erase_range
 
 asm_b_vector_erase_range:
 

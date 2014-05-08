@@ -31,12 +31,12 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_realloc
-XDEF asm_realloc_lib
+PUBLIC asm_realloc
+PUBLIC asm_realloc_lib
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_realloc
+EXTERN asm_heap_realloc
 
 asm_realloc:
 asm_realloc_lib:
@@ -70,10 +70,10 @@ asm_realloc_lib:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_realloc
-XDEF asm_realloc_lib
+PUBLIC asm_realloc
+PUBLIC asm_realloc_lib
 
-LIB asm_realloc_unlocked
+EXTERN asm_realloc_unlocked
 
 asm_realloc:
 asm_realloc_lib:

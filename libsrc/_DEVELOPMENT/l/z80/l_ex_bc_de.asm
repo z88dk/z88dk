@@ -1,5 +1,5 @@
 
-XLIB l_ex_bc_de
+PUBLIC l_ex_bc_de
 
 l_ex_bc_de:
 

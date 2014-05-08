@@ -1,7 +1,7 @@
 
 ; int ba_priority_queue_resize(ba_priority_queue_t *q, size_t n)
 
-XDEF _ba_priority_queue_resize
+PUBLIC _ba_priority_queue_resize
 
 _ba_priority_queue_resize:
 

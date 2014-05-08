@@ -1,7 +1,7 @@
 
 ; char *strchr(const char *s, int c)
 
-XDEF _strchr
+PUBLIC _strchr
 
 _strchr:
 

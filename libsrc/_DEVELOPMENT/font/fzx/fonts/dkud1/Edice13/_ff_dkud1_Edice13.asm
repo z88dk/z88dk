@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_Edice13
+PUBLIC _ff_dkud1_Edice13
 
 _ff_dkud1_Edice13:
 

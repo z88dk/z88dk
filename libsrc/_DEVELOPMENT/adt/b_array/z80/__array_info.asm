@@ -1,5 +1,5 @@
 
-XLIB __array_info
+PUBLIC __array_info
 
 __array_info:
 

@@ -14,9 +14,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_init
+PUBLIC asm_wa_priority_queue_init
 
-LIB asm_ba_priority_queue_init, error_einval_zc
+EXTERN asm_ba_priority_queue_init, error_einval_zc
 
 asm_wa_priority_queue_init:
 

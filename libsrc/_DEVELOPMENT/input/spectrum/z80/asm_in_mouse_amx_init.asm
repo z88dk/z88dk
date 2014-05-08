@@ -28,13 +28,13 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_amx_init
-XDEF asm_in_mouse_amx_reset
+PUBLIC asm_in_mouse_amx_init
+PUBLIC asm_in_mouse_amx_reset
 
-LIB asm_im2_install_isr
+EXTERN asm_im2_install_isr
 
-XREF __input_amx_mouse_x, __input_amx_mouse_y
-XREF __input_amx_mouse_dx, __input_amx_mouse_dy
+EXTERN __input_amx_mouse_x, __input_amx_mouse_y
+EXTERN __input_amx_mouse_dx, __input_amx_mouse_dy
 
 asm_in_mouse_amx_init:
 

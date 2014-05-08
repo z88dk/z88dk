@@ -1,7 +1,7 @@
 
 ; FILE *open_memstream(char **bufp, size_t *sizep)
 
-XDEF _open_memstream
+PUBLIC _open_memstream
 
 _open_memstream:
 

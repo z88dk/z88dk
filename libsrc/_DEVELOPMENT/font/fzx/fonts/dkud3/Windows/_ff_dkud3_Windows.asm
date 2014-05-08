@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Windows
+PUBLIC _ff_dkud3_Windows
 
 _ff_dkud3_Windows:
 

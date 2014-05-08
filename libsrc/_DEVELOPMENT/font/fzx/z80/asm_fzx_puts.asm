@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_fzx_puts
+PUBLIC asm_fzx_puts
 
-LIB asm_fzx_putc
+EXTERN asm_fzx_putc
 
 asm_fzx_puts:
 

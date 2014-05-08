@@ -1,5 +1,5 @@
 
-XLIB l_neg_bc
+PUBLIC l_neg_bc
 
 l_neg_bc:
 

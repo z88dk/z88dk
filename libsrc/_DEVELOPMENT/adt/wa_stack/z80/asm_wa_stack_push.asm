@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_stack_push
+PUBLIC asm_wa_stack_push
 
-LIB asm_w_array_append
+EXTERN asm_w_array_append
 
 asm_wa_stack_push:
 

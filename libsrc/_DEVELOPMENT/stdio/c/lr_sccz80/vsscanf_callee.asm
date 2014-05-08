@@ -1,7 +1,7 @@
 
 ; int vsscanf(const char *s, const char *format, va_list arg)
 
-XDEF vsscanf_callee
+PUBLIC vsscanf_callee
 
 vsscanf_callee:
 

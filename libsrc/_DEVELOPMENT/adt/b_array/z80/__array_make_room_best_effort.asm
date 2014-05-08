@@ -1,8 +1,8 @@
 
-XLIB __array_make_room_best_effort
-XDEF __0_array_make_room_best_effort
+PUBLIC __array_make_room_best_effort
+PUBLIC __0_array_make_room_best_effort
 
-LIB __array_make_room, __0_array_make_room
+EXTERN __array_make_room, __0_array_make_room
 
 __array_make_room_best_effort:
 

@@ -1,5 +1,5 @@
 
-XLIB l_inc_hl
+PUBLIC l_inc_hl
 
    inc hl
    inc hl

@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF ferror
+PUBLIC ferror
 
 ferror:
 
@@ -20,9 +20,9 @@ ferror:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF ferror
+PUBLIC ferror
 
-LIB ferror_unlocked
+EXTERN ferror_unlocked
 
 ferror:
 

@@ -1,7 +1,7 @@
 
 ; size_t p_forward_list_size(p_forward_list_t *list)
 
-XDEF p_forward_list_size
+PUBLIC p_forward_list_size
 
 p_forward_list_size:
 

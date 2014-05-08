@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_UpcaseBold
+PUBLIC _ff_dkud2_UpcaseBold
 
 _ff_dkud2_UpcaseBold:
 

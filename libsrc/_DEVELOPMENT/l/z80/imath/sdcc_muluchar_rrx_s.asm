@@ -7,7 +7,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB __muluchar_rrx_s
+PUBLIC __muluchar_rrx_s
 
 __muluchar_rrx_s:
 
@@ -30,7 +30,7 @@ IF __CLIB_OPT_IMATH <= 50
    ld h,a
    ld d,a
    
-   LIB l0_small_mul_16_16x16
+   EXTERN l0_small_mul_16_16x16
    jp l0_small_mul_16_16x16
 
 ENDIF
@@ -44,7 +44,7 @@ IF __CLIB_OPT_IMATH > 50
    dec hl
    ld l,(hl)
 
-   LIB l_fast_mulu_8_8x8
+   EXTERN l_fast_mulu_8_8x8
    jp l_fast_mulu_8_8x8        ; hl = l * e
    
 ENDIF

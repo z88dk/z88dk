@@ -14,11 +14,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_fgets_unlocked
-XDEF asm0_fgets_unlocked, asm1_fgets_unlocked
+PUBLIC asm_fgets_unlocked
+PUBLIC asm0_fgets_unlocked, asm1_fgets_unlocked
 
-LIB error_zc, __stdio_recv_input_raw_getc
-LIB __stdio_verify_input, __stdio_input_sm_fgets, __stdio_recv_input_raw_eatc
+EXTERN error_zc, __stdio_recv_input_raw_getc
+EXTERN __stdio_verify_input, __stdio_input_sm_fgets, __stdio_recv_input_raw_eatc
 
 asm_fgets_unlocked:
 
@@ -59,7 +59,7 @@ asm_fgets_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    jp c, error_zc

@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Hiroshi
+PUBLIC _ff_ao_Hiroshi
 
 _ff_ao_Hiroshi:
 

@@ -1,7 +1,7 @@
 
-XLIB l_fast_btoul
+PUBLIC l_fast_btoul
 
-LIB l_fast_btou
+EXTERN l_fast_btou
 
 l_fast_btoul:
 

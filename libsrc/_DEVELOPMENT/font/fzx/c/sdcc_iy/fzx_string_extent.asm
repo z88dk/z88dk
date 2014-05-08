@@ -1,7 +1,7 @@
 
 ; uint fzx_string_extent(char *s)
 
-XDEF _fzx_string_extent
+PUBLIC _fzx_string_extent
 
 _fzx_string_extent:
 

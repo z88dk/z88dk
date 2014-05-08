@@ -22,9 +22,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_memalign
+PUBLIC asm_memalign
 
-LIB asm_aligned_alloc
+EXTERN asm_aligned_alloc
 
 asm_memalign:
 
@@ -64,9 +64,9 @@ asm_memalign:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_memalign
+PUBLIC asm_memalign
 
-LIB asm_memalign_unlocked
+EXTERN asm_memalign_unlocked
 
 asm_memalign:
 

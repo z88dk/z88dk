@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_wa_priority_queue_size
+PUBLIC asm_wa_priority_queue_size
 
-LIB l_readword_2_hl
+EXTERN l_readword_2_hl
 
 asm_wa_priority_queue_size:
 

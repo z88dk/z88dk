@@ -1,5 +1,5 @@
 
-XLIB error_zc
+PUBLIC error_zc
 
    pop hl
    pop hl

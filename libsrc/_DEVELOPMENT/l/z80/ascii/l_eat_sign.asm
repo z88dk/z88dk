@@ -1,5 +1,5 @@
 
-XLIB l_eat_sign
+PUBLIC l_eat_sign
 
 l_eat_sign:
 

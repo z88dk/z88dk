@@ -1,7 +1,7 @@
 
 ; int vfscanf_unlocked(FILE *stream, const char *format, void *arg)
 
-XDEF _vfscanf_unlocked
+PUBLIC _vfscanf_unlocked
 
 _vfscanf_unlocked:
 

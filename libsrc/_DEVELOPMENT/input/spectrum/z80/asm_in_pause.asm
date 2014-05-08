@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_pause
+PUBLIC asm_in_pause
 
 INCLUDE "clib_target_cfg.asm"
 
-LIB asm_in_wait_key, asm_z80_delay_tstate
+EXTERN asm_in_wait_key, asm_in_test_key, asm_z80_delay_tstate
 
 asm_in_pause:
 
@@ -42,7 +42,7 @@ pause_loop:
 
    ; wait for one millisecond then sample the keyboard
    
-   ld hl,+(__clock_freq / 1000) - 72
+   ld hl,+(__clock_freq / 1000) - 72 - 27
    call asm_z80_delay_tstate
    
    dec de
@@ -50,12 +50,8 @@ pause_loop:
    ld a,d
    or e
    jr z, exit                  ; if time is up
-   
-   xor a
-   in a,($fe)
-   
-   and 31
-   cp 31
+
+   call asm_in_test_key
    jr z, pause_loop
    
    ; key is pressed

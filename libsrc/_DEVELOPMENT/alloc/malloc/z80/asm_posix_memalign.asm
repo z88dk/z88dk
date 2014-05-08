@@ -23,11 +23,11 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_posix_memalign
+PUBLIC asm_posix_memalign
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_alloc_aligned, asm0_posix_memalign_unlocked
+EXTERN asm_heap_alloc_aligned, asm0_posix_memalign_unlocked
 
 asm_posix_memalign:
 
@@ -62,9 +62,9 @@ asm_posix_memalign:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_posix_memalign
+PUBLIC asm_posix_memalign
 
-LIB asm_posix_memalign_unlocked
+EXTERN asm_posix_memalign_unlocked
 
 asm_posix_memalign:
 

@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_push(bv_priority_queue_t *q, int c)
 
-XLIB bv_priority_queue_push
+PUBLIC bv_priority_queue_push
 
-LIB asm_bv_priority_queue_push
+EXTERN asm_bv_priority_queue_push
 
 bv_priority_queue_push:
 

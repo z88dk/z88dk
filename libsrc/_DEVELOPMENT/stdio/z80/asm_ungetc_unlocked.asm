@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_ungetc_unlocked
-XDEF asm0_ungetc_unlocked
+PUBLIC asm_ungetc_unlocked
+PUBLIC asm0_ungetc_unlocked
 
-LIB __stdio_verify_input, error_mc
+EXTERN __stdio_verify_input, error_mc
 
 asm_ungetc_unlocked:
 
@@ -36,7 +36,7 @@ asm_ungetc_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

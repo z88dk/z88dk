@@ -1,9 +1,9 @@
 
 ; void w_vector_destroy(w_vector_t *v)
 
-XDEF _w_vector_destroy
+PUBLIC _w_vector_destroy
 
-LIB _b_vector_destroy
+EXTERN _b_vector_destroy
 
 _w_vector_destroy:
 

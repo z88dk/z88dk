@@ -1,9 +1,9 @@
 
 ; size_t fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-XLIB fwrite_unlocked
+PUBLIC fwrite_unlocked
 
-LIB asm_fwrite_unlocked
+EXTERN asm_fwrite_unlocked
 
 fwrite_unlocked:
 

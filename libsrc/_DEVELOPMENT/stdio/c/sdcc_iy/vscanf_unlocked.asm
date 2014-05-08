@@ -1,7 +1,7 @@
 
 ; int vscanf_unlocked(const char *format, void *arg)
 
-XDEF _vscanf_unlocked
+PUBLIC _vscanf_unlocked
 
 _vscanf_unlocked:
 

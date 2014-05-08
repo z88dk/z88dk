@@ -1,7 +1,7 @@
 
 ; int fputc_unlocked(int c, FILE *stream)
 
-XDEF _fputc_unlocked
+PUBLIC _fputc_unlocked
 
 _fputc_unlocked:
 

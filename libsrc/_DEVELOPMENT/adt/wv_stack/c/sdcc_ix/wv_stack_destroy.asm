@@ -1,9 +1,9 @@
 
 ; void wv_stack_destroy(wv_stack_t *s)
 
-XDEF _wv_stack_destroy
+PUBLIC _wv_stack_destroy
 
-LIB _w_vector_destroy
+EXTERN _w_vector_destroy
 
 _wv_stack_destroy:
 

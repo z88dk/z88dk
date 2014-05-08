@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_in_mouse_amx_wheel
+PUBLIC asm_in_mouse_amx_wheel
 
-LIB error_enotsup_mc
+EXTERN error_enotsup_mc
 
 asm_in_mouse_amx_wheel:
 

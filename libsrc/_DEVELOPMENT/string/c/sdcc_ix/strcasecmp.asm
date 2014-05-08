@@ -1,7 +1,7 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
-XDEF _strcasecmp
+PUBLIC _strcasecmp
 
 _strcasecmp:
 

@@ -1,7 +1,7 @@
 
 ; void *p_list_remove(p_list_t *list, void *item)
 
-XDEF _p_list_remove
+PUBLIC _p_list_remove
 
 _p_list_remove:
 

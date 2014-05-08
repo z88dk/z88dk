@@ -1,7 +1,7 @@
 
 ; size_t b_vector_insert_n(b_vector_t *v, size_t idx, size_t n, int c)
 
-XDEF b_vector_insert_n_callee
+PUBLIC b_vector_insert_n_callee
 
 b_vector_insert_n_callee:
 

@@ -9,10 +9,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_priority_queue_push
-XDEF asm1_ba_priority_queue_push
+PUBLIC asm_ba_priority_queue_push
+PUBLIC asm1_ba_priority_queue_push
 
-LIB asm_b_array_append_block, __b_heap_sift_up, error_enomem_mc
+EXTERN asm_b_array_append_block, __b_heap_sift_up, error_enomem_mc
 
 asm_ba_priority_queue_push:
 

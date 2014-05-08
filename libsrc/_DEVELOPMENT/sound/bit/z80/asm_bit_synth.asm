@@ -18,9 +18,9 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-XLIB asm_bit_synth
+PUBLIC asm_bit_synth
 
-LIB asm_bit_open, asm_bit_close
+EXTERN asm_bit_open, asm_bit_close
 
 asm_bit_synth:
 

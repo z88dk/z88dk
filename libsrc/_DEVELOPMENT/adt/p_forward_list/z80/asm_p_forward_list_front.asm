@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_forward_list_front
+PUBLIC asm_p_forward_list_front
 
-LIB error_einval_zc
+EXTERN error_einval_zc
 
    inc hl
    inc hl

@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_ult
+                PUBLIC    l_ult
 
 ;
 ; DE < HL [unsigned]

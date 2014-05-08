@@ -1,7 +1,7 @@
 
 ; void bit_beepfx(void *effect)
 
-XDEF _bit_beepfx
+PUBLIC _bit_beepfx
 
 _bit_beepfx:
 

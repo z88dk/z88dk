@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud1_JmenoRuze
+PUBLIC _ff_dkud1_JmenoRuze
 
 _ff_dkud1_JmenoRuze:
 

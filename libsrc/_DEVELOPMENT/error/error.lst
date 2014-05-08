@@ -3,6 +3,7 @@ error/z80/errno_zc
 error/z80/error_divide_by_zero_mc
 error/z80/error_divide_by_zero_zc
 error/z80/error_eacces_mc
+error/z80/error_ebadf_mc
 error/z80/error_ebadf_zc
 error/z80/error_edom_mc
 error/z80/error_edom_zc

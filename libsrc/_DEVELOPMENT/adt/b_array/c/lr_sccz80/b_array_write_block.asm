@@ -1,9 +1,9 @@
 
 ; size_t b_array_write_block(void *src, size_t n, b_array_t *a, size_t idx)
 
-XLIB b_array_write_block
+PUBLIC b_array_write_block
 
-LIB asm_b_array_write_block
+EXTERN asm_b_array_write_block
 
 b_array_write_block:
 

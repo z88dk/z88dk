@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Erotic
+PUBLIC _ff_dkud3_Erotic
 
 _ff_dkud3_Erotic:
 

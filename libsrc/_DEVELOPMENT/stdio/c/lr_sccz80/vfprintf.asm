@@ -7,9 +7,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB vfprintf
+PUBLIC vfprintf
 
-LIB asm_vfprintf
+EXTERN asm_vfprintf
 
 vfprintf:
    
@@ -29,9 +29,9 @@ vfprintf:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB vfprintf
+PUBLIC vfprintf
 
-LIB vfprintf_unlocked
+EXTERN vfprintf_unlocked
 
 vfprintf:
 

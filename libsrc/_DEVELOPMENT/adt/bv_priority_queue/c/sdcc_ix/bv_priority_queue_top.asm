@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_top(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_top
+PUBLIC _bv_priority_queue_top
 
-LIB _ba_priority_queue_top
+EXTERN _ba_priority_queue_top
 
 _bv_priority_queue_top:
 

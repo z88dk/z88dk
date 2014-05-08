@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_queue_init
+PUBLIC asm_p_queue_init
 
-LIB asm_p_forward_list_alt_init
+EXTERN asm_p_forward_list_alt_init
 
 asm_p_queue_init:
 

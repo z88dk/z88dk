@@ -1,9 +1,9 @@
 
 ; void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
 
-XLIB qsort
+PUBLIC qsort
 
-LIB asm_qsort
+EXTERN asm_qsort
 
 qsort:
 

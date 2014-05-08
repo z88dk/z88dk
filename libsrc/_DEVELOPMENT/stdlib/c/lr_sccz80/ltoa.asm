@@ -1,9 +1,9 @@
 
 ; char *ltoa(unsigned long num, char *buf, int radix)
 
-XLIB ltoa
+PUBLIC ltoa
 
-LIB asm_ltoa
+EXTERN asm_ltoa
 
 ltoa:
 

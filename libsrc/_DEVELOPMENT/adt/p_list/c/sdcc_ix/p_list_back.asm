@@ -1,7 +1,7 @@
 
 ; void *p_list_back(p_list_t *list)
 
-XDEF _p_list_back
+PUBLIC _p_list_back
 
 _p_list_back:
 

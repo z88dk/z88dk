@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_SkoolBrkCD
+PUBLIC _ff_utz_SkoolBrkCD
 
 _ff_utz_SkoolBrkCD:
 

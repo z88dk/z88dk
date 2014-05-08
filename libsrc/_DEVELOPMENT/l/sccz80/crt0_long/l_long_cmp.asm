@@ -26,7 +26,7 @@
 ;                nc=number is positive
 
 
-                XLIB    l_long_cmp
+                PUBLIC    l_long_cmp
 
 
 .l_long_cmp

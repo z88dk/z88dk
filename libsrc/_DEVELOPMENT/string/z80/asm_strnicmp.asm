@@ -11,9 +11,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strnicmp
+PUBLIC asm_strnicmp
 
-LIB asm_strncasecmp
+EXTERN asm_strncasecmp
 
 asm_strnicmp:
 

@@ -1,7 +1,7 @@
 
-XLIB asm_spinlock_acquire
+PUBLIC asm_spinlock_acquire
 
-LIB __thread_context_switch
+EXTERN __thread_context_switch
 
 asm_spinlock_acquire:
 

@@ -2,7 +2,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
-XDEF sp1_SetPrintPos_callee
+PUBLIC sp1_SetPrintPos_callee
 
 sp1_SetPrintPos_callee:
 

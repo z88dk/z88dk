@@ -1,9 +1,9 @@
 
-XLIB error_enomem_mc
+PUBLIC error_enomem_mc
 
-XREF __ENOMEM
+EXTERN __ENOMEM
 
-LIB errno_mc
+EXTERN errno_mc
 
    pop hl
    pop hl

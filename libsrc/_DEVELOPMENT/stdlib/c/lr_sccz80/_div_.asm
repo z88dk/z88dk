@@ -1,9 +1,9 @@
 
 ; void _div_(div_t *d, int numer, int denom)
 
-XLIB _div_
+PUBLIC _div_
 
-LIB asm__div
+EXTERN asm__div
 
 _div_:
 

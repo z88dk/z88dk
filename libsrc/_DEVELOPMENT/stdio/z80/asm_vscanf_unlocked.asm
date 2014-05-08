@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_vscanf_unlocked
+PUBLIC asm_vscanf_unlocked
 
-XREF __stdio_file_stdin
+EXTERN __stdio_file_stdin
 
-LIB asm_vfscanf_unlocked
+EXTERN asm_vfscanf_unlocked
 
 asm_vscanf_unlocked:
 

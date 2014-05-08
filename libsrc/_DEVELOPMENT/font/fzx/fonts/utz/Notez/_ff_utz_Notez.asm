@@ -1,5 +1,5 @@
 
-XLIB _ff_utz_Notez
+PUBLIC _ff_utz_Notez
 
 _ff_utz_Notez:
 

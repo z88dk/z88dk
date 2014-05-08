@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Echo
+PUBLIC _ff_dkud3_Echo
 
 _ff_dkud3_Echo:
 

@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Klausjahn
+PUBLIC _ff_ao_Klausjahn
 
 _ff_ao_Klausjahn:
 

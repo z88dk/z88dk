@@ -1,7 +1,7 @@
 
-XLIB error_divide_by_zero_mc
+PUBLIC error_divide_by_zero_mc
 
-LIB error_edom_mc
+EXTERN error_edom_mc
 
 error_divide_by_zero_mc:
 

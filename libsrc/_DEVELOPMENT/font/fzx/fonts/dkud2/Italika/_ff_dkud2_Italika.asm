@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud2_Italika
+PUBLIC _ff_dkud2_Italika
 
 _ff_dkud2_Italika:
 

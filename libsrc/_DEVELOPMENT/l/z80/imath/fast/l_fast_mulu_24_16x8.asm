@@ -1,6 +1,6 @@
 
-XLIB l_fast_mulu_24_16x8
-XDEF l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
+PUBLIC l_fast_mulu_24_16x8
+PUBLIC l0_fast_mulu_24_16x8, l1_fast_mulu_24_16x8
 
 INCLUDE "clib_cfg.asm"
 

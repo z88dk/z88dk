@@ -1,7 +1,7 @@
 
 ; char *strtok(char * restrict s1, const char * restrict s2)
 
-XDEF strtok_callee
+PUBLIC strtok_callee
 
 strtok_callee:
 

@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_p_list_clear
+PUBLIC asm_p_list_clear
 
-LIB asm_p_list_init
+EXTERN asm_p_list_init
 
 asm_p_list_clear:
 

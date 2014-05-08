@@ -14,9 +14,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_ba_priority_queue_init
+PUBLIC asm_ba_priority_queue_init
 
-LIB asm_b_array_init
+EXTERN asm_b_array_init
 
 asm_ba_priority_queue_init:
 

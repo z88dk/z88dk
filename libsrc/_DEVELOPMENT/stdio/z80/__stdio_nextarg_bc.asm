@@ -1,5 +1,5 @@
 
-XLIB __stdio_nextarg_bc
+PUBLIC __stdio_nextarg_bc
 
 __stdio_nextarg_bc:
 

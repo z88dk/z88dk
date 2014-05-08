@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Sinclair
+PUBLIC _ff_ao_Sinclair
 
 _ff_ao_Sinclair:
 

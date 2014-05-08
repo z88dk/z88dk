@@ -1,5 +1,5 @@
 
-XLIB l_utod_de
+PUBLIC l_utod_de
 
 l_utod_de:
 

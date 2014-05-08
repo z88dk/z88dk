@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-XDEF obstack_int_grow_fast_callee
+PUBLIC obstack_int_grow_fast_callee
 
 obstack_int_grow_fast_callee:
 

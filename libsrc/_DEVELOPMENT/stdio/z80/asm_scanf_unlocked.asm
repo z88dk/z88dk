@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_scanf_unlocked
+PUBLIC asm_scanf_unlocked
 
-LIB asm_vscanf_unlocked, __stdio_varg_2
+EXTERN asm_vscanf_unlocked, __stdio_varg_2
 
 asm_scanf_unlocked:
 

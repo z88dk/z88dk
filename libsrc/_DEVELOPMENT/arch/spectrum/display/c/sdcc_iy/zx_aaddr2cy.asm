@@ -1,7 +1,7 @@
 
 ; uint zx_aaddr2cy(void *attraddr)
 
-XDEF _zx_aaddr2cy
+PUBLIC _zx_aaddr2cy
 
 _zx_aaddr2cy:
 

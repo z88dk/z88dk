@@ -1,7 +1,7 @@
 
 ; int system(const char *string)
 
-XDEF _system
+PUBLIC _system
 
 _system:
 

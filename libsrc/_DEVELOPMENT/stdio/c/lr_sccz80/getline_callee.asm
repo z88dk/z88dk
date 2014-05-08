@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF getline_callee
+PUBLIC getline_callee
 
 getline_callee:
 
@@ -22,9 +22,9 @@ getline_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF getline_callee
+PUBLIC getline_callee
 
-LIB getline_unlocked_callee
+EXTERN getline_unlocked_callee
 
 getline_callee:
 

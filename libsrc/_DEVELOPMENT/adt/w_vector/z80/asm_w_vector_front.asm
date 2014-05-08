@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_front
+PUBLIC asm_w_vector_front
 
-LIB asm_w_array_front
+EXTERN asm_w_array_front
 
 asm_w_vector_front:
 

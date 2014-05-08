@@ -1,7 +1,7 @@
 
 ; int sprintf(char *s, const char *format, ...)
 
-XDEF sprintf
+PUBLIC sprintf
 
 sprintf:
 

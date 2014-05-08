@@ -3,9 +3,9 @@
 ; aralbrec - Nov 2013
 ; ===============================================================
 
-XLIB __fzx_width_sm
+PUBLIC __fzx_width_sm
 
-LIB __fzx_glyph_width
+EXTERN __fzx_glyph_width
 
 __fzx_width_sm:
 

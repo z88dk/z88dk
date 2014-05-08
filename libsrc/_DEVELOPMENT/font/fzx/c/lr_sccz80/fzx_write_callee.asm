@@ -1,7 +1,7 @@
 
 ; int fzx_write(void *buf, uint len)
 
-XDEF fzx_write_callee
+PUBLIC fzx_write_callee
 
 fzx_write_callee:
 

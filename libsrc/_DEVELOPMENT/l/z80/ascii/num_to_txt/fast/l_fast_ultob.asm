@@ -1,7 +1,7 @@
 
-XLIB l_fast_ultob
+PUBLIC l_fast_ultob
 
-LIB l_fast_utob, l_setmem_de
+EXTERN l_fast_utob, l_setmem_de
    
 l_fast_ultob:
 

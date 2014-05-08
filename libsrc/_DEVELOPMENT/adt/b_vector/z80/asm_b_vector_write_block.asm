@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_vector_write_block
-XDEF asm_b_vector_write_block_extra
+PUBLIC asm_b_vector_write_block
+PUBLIC asm_b_vector_write_block_extra
 
-LIB __vector_make_room_best_effort_extra, asm1_b_array_write_block
+EXTERN __vector_make_room_best_effort_extra, asm1_b_array_write_block
 
 asm_b_vector_write_block:
 

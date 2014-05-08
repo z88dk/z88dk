@@ -1,5 +1,5 @@
 
-XLIB _ff_ao_Programmer
+PUBLIC _ff_ao_Programmer
 
 _ff_ao_Programmer:
 

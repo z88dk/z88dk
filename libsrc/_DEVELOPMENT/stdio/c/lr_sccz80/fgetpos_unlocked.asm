@@ -1,9 +1,9 @@
 
 ; int fgetpos_unlocked(FILE *stream, fpos_t *pos)
 
-XLIB fgetpos_unlocked
+PUBLIC fgetpos_unlocked
 
-LIB asm_fgetpos_unlocked
+EXTERN asm_fgetpos_unlocked
 
 fgetpos_unlocked:
 

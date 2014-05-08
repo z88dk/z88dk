@@ -1,5 +1,5 @@
 
-XLIB _ff_dkud3_Lovely
+PUBLIC _ff_dkud3_Lovely
 
 _ff_dkud3_Lovely:
 

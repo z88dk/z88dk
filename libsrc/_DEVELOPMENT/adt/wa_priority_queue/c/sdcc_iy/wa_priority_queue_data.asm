@@ -1,9 +1,9 @@
 
 ; void *wa_priority_queue_data(wa_priority_queue_t *q)
 
-XDEF _wa_priority_queue_data
+PUBLIC _wa_priority_queue_data
 
-LIB _ba_priority_queue_data
+EXTERN _ba_priority_queue_data
 
 _wa_priority_queue_data:
 

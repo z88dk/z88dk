@@ -7,7 +7,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-XLIB __divschar_rrx_s
+PUBLIC __divschar_rrx_s
 
 __divschar_rrx_s:
 
@@ -37,7 +37,7 @@ IF __CLIB_OPT_IMATH <= 50
    sbc a,a
    ld h,a
    
-   LIB l_small_divs_16_16x16
+   EXTERN l_small_divs_16_16x16
    jp l_small_divs_16_16x16
 
 ENDIF
@@ -51,7 +51,7 @@ IF __CLIB_OPT_IMATH > 50
    dec hl
    ld l,(hl)
 
-   LIB l_fast_divs_8_8x8
+   EXTERN l_fast_divs_8_8x8
    call l_fast_divs_8_8x8      ; l = l / e, e = l % e
    
    ; not sure if we really need a 16-bit result

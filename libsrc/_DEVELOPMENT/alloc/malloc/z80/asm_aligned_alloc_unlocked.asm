@@ -16,11 +16,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_aligned_alloc_unlocked
+PUBLIC asm_aligned_alloc_unlocked
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_alloc_aligned_unlocked
+EXTERN asm_heap_alloc_aligned_unlocked
 
 asm_aligned_alloc_unlocked:
 

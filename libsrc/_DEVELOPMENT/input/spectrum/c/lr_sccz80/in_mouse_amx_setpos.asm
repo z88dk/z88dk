@@ -1,9 +1,9 @@
 
 ; void in_mouse_amx_setpos(uint16_t x, uint16_t y)
 
-XLIB in_mouse_amx_setpos
+PUBLIC in_mouse_amx_setpos
 
-LIB asm_in_mouse_amx_setpos
+EXTERN asm_in_mouse_amx_setpos
 
 in_mouse_amx_setpos:
 

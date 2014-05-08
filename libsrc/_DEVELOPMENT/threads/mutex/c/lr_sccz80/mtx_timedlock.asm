@@ -1,9 +1,9 @@
 
 ; int mtx_timedlock(mtx_t *m, struct timespec *ts)
 
-XLIB mtx_timedlock
+PUBLIC mtx_timedlock
 
-LIB asm_mtx_timedlock
+EXTERN asm_mtx_timedlock
 
 mtx_timedlock:
 

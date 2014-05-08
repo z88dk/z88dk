@@ -1,7 +1,7 @@
 
 ; int atexit(void (*func)(void))
 
-XDEF _atexit
+PUBLIC _atexit
 
 _atexit:
 

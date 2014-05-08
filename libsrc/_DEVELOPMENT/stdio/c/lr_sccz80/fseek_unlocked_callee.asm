@@ -1,7 +1,7 @@
 
 ; int fseek_unlocked(FILE *stream, long offset, int whence)
 
-XDEF fseek_unlocked_callee
+PUBLIC fseek_unlocked_callee
 
 fseek_unlocked_callee:
 

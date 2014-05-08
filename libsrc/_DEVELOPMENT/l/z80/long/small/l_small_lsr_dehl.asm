@@ -1,5 +1,5 @@
 
-XLIB l_small_lsr_dehl
+PUBLIC l_small_lsr_dehl
 
 l_small_lsr_dehl:
 

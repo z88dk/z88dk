@@ -1,9 +1,9 @@
 
 ; int bv_stack_top(bv_stack_t *s)
 
-XDEF _bv_stack_top
+PUBLIC _bv_stack_top
 
-LIB _b_array_back
+EXTERN _b_array_back
 
 _bv_stack_top:
 

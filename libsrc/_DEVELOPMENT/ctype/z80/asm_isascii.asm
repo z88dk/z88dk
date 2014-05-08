@@ -1,5 +1,5 @@
 
-XLIB asm_isascii
+PUBLIC asm_isascii
 
 asm_isascii:
 

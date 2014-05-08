@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_b_array_insert_block
-XDEF asm0_b_array_insert_block, asm1_b_array_insert_block
+PUBLIC asm_b_array_insert_block
+PUBLIC asm0_b_array_insert_block, asm1_b_array_insert_block
 
-LIB error_einval_zc, error_enomem_zc
-LIB asm0_b_array_append_block, asm_memmove
+EXTERN error_einval_zc, error_enomem_zc
+EXTERN asm0_b_array_append_block, asm_memmove
 
 asm_b_array_insert_block:
 

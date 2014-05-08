@@ -9,12 +9,12 @@
 ;
 ; ===============================================================
 
-XLIB asm_fsetpos_unlocked
-XDEF asm0_fsetpos_unlocked
+PUBLIC asm_fsetpos_unlocked
+PUBLIC asm0_fsetpos_unlocked
 
-XREF STDIO_SEEK_SET
+EXTERN STDIO_SEEK_SET
 
-LIB asm0_fseek_unlocked
+EXTERN asm0_fseek_unlocked
 
 asm_fsetpos_unlocked:
 
@@ -38,7 +38,7 @@ asm_fsetpos_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    call __stdio_verify_valid
    ret c

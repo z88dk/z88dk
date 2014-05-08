@@ -1,9 +1,9 @@
 
 ; void wa_stack_clear(wa_stack_t *s)
 
-XDEF _wa_stack_clear
+PUBLIC _wa_stack_clear
 
-LIB _w_array_clear
+EXTERN _w_array_clear
 
 _wa_stack_clear:
 

@@ -1,9 +1,9 @@
 
 ; int isupper(int c)
 
-XLIB _isupper
+PUBLIC _isupper
 
-LIB asm_isupper, error_zc
+EXTERN asm_isupper, error_zc
 
 _isupper:
 

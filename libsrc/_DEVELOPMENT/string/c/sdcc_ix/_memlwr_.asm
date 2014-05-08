@@ -1,7 +1,7 @@
 
 ; char *_memlwr_(void *p, size_t n)
 
-XDEF __memlwr_
+PUBLIC __memlwr_
 
 __memlwr_:
 

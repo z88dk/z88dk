@@ -17,9 +17,9 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fread
+PUBLIC asm_fread
 
-LIB asm0_fread_unlocked, __stdio_lock_release
+EXTERN asm0_fread_unlocked, __stdio_lock_release
 
 asm_fread:
 
@@ -48,14 +48,14 @@ asm_fread:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid_lock, fread_immediate_error_ebadf
+   EXTERN __stdio_verify_valid_lock, fread_immediate_error_ebadf
 
    call __stdio_verify_valid_lock
    jp c, fread_immediate_error_ebadf
 
 ELSE
 
-   LIB __stdio_lock_acquire, fread_immediate_error_enolck
+   EXTERN __stdio_lock_acquire, fread_immediate_error_enolck
    
    call __stdio_lock_acquire
    jp c, fread_immediate_error_enolck
@@ -70,9 +70,9 @@ ENDIF
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_fread
+PUBLIC asm_fread
 
-LIB asm_fread_unlocked
+EXTERN asm_fread_unlocked
 
 asm_fread:
 

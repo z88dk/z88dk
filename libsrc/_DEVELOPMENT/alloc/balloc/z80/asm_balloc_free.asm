@@ -10,11 +10,11 @@
 ;
 ; ===============================================================
 
-XLIB asm_balloc_free
+PUBLIC asm_balloc_free
 
-XREF __qtbl
+EXTERN __qtbl
 
-LIB asm_p_forward_list_insert_after
+EXTERN asm_p_forward_list_insert_after
 
 asm_balloc_free:
 

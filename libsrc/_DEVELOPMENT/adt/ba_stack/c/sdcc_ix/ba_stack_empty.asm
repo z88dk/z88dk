@@ -1,9 +1,9 @@
 
 ; int ba_stack_empty(ba_stack_t *s)
 
-XDEF _ba_stack_empty
+PUBLIC _ba_stack_empty
 
-LIB _b_array_empty
+EXTERN _b_array_empty
 
 _ba_stack_empty:
 

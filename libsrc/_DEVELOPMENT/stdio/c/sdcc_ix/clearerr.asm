@@ -7,7 +7,7 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _clearerr
+PUBLIC _clearerr
 
 _clearerr:
 
@@ -33,9 +33,9 @@ _clearerr:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XDEF _clearerr
+PUBLIC _clearerr
 
-LIB _clearerr_unlocked
+EXTERN _clearerr_unlocked
 
 _clearerr:
 

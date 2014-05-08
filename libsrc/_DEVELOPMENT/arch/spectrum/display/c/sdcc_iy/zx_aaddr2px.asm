@@ -1,7 +1,7 @@
 
 ; uint zx_aaddr2px(void *attraddr)
 
-XDEF _zx_aaddr2px
+PUBLIC _zx_aaddr2px
 
 _zx_aaddr2px:
 

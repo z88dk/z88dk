@@ -1,9 +1,9 @@
 
 ; int putc_unlocked(int c, FILE *stream)
 
-XDEF _putc_unlocked
+PUBLIC _putc_unlocked
 
-LIB _fputc_unlocked
+EXTERN _fputc_unlocked
 
 _putc_unlocked:
 

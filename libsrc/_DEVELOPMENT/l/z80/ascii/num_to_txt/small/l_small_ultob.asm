@@ -1,7 +1,7 @@
 
-XLIB l_small_ultob
+PUBLIC l_small_ultob
 
-LIB l_small_utob
+EXTERN l_small_utob
    
 l_small_ultob:
 

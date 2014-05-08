@@ -1,9 +1,9 @@
 
 ; void bit_beep(uint16_t duration_ms, uint16_t frequency_hz)
 
-XLIB bit_beep
+PUBLIC bit_beep
 
-LIB asm_bit_beep
+EXTERN asm_bit_beep
 
 bit_beep:
 

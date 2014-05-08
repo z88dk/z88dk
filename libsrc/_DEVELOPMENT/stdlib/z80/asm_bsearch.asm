@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_bsearch
-XDEF asm0_bsearch
+PUBLIC asm_bsearch
+PUBLIC asm0_bsearch
 
-LIB error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
+EXTERN error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
 
 asm_bsearch:
 

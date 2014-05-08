@@ -1,9 +1,9 @@
 
 ; char *strsep(char ** restrict stringp, const char * restrict delim)
 
-XLIB strsep
+PUBLIC strsep
 
-LIB asm_strsep
+EXTERN asm_strsep
 
 strsep:
 

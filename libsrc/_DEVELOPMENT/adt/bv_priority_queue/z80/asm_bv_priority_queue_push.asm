@@ -9,9 +9,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_bv_priority_queue_push
+PUBLIC asm_bv_priority_queue_push
 
-LIB asm_b_vector_append_block, asm1_ba_priority_queue_push, error_mc
+EXTERN asm_b_vector_append_block, asm1_ba_priority_queue_push, error_mc
 
 asm_bv_priority_queue_push:
 

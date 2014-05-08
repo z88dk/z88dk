@@ -1,9 +1,9 @@
 
 ; int ba_priority_queue_resize(ba_priority_queue_t *q, size_t n)
 
-XLIB ba_priority_queue_resize
+PUBLIC ba_priority_queue_resize
 
-LIB asm_ba_priority_queue_resize
+EXTERN asm_ba_priority_queue_resize
 
 ba_priority_queue_resize:
 

@@ -1,5 +1,5 @@
 
-XLIB l_small_utob
+PUBLIC l_small_utob
 
 l_small_utob:
 

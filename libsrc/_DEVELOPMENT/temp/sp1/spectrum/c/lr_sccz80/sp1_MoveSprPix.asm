@@ -1,9 +1,9 @@
 ; void sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y)
 ; CALLER linkage for function pointers
 
-XLIB sp1_MoveSprPix
+PUBLIC sp1_MoveSprPix
 
-LIB asm_sp1_MoveSprPix
+EXTERN asm_sp1_MoveSprPix
 
 sp1_MoveSprPix:
 

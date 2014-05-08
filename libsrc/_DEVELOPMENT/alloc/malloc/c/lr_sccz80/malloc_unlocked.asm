@@ -1,7 +1,7 @@
 
 ; void *malloc_unlocked(size_t size)
 
-XDEF malloc_unlocked
+PUBLIC malloc_unlocked
 
 malloc_unlocked:
 

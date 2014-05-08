@@ -1,7 +1,7 @@
 
 ; void *im2_create_generic_isr_callee(uint8_t num_callback, void *address)
 
-XDEF im2_create_generic_isr_callee
+PUBLIC im2_create_generic_isr_callee
 
 im2_create_generic_isr_callee:
 

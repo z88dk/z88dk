@@ -1,8 +1,8 @@
 
-XLIB __stdio_scanf_sm_format
-XDEF __stdio_scanf_sm_format_pct
+PUBLIC __stdio_scanf_sm_format
+PUBLIC __stdio_scanf_sm_format_pct
 
-LIB asm_isspace, asm_strstrip
+EXTERN asm_isspace, asm_strstrip
 
 __stdio_scanf_sm_format:
 

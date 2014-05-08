@@ -1,9 +1,9 @@
 
 ; int isblank(int c)
 
-XLIB _isblank
+PUBLIC _isblank
 
-LIB asm_isblank, error_znc
+EXTERN asm_isblank, error_znc
 
 _isblank:
 

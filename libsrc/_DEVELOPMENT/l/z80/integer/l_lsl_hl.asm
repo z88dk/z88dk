@@ -1,5 +1,5 @@
 
-XLIB l_lsl_hl
+PUBLIC l_lsl_hl
 
 INCLUDE "clib_cfg.asm"
 
@@ -16,12 +16,12 @@ l_lsl_hl:
 
    IF __CLIB_OPT_IMATH_SELECT & $04
    
-      LIB l_fast_lsl_hl
+      EXTERN l_fast_lsl_hl
       jp l_fast_lsl_hl
    
    ELSE
    
-      LIB l_small_lsl_hl
+      EXTERN l_small_lsl_hl
       jp l_small_lsl_hl
    
    ENDIF

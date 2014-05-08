@@ -1,9 +1,9 @@
 
 ; void *bv_priority_queue_data(bv_priority_queue_t *q)
 
-XDEF _bv_priority_queue_data
+PUBLIC _bv_priority_queue_data
 
-LIB _ba_priority_queue_data
+EXTERN _ba_priority_queue_data
 
 _bv_priority_queue_data:
 

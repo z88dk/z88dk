@@ -1,7 +1,7 @@
 
 ; int mtx_lock(mtx_t *m)
 
-XDEF _mtx_lock
+PUBLIC _mtx_lock
 
 _mtx_lock:
 

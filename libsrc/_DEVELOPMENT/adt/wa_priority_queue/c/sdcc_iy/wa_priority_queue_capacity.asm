@@ -1,7 +1,7 @@
 
 ; size_t wa_priority_queue_capacity(wa_priority_queue_t *q)
 
-XDEF _wa_priority_queue_capacity
+PUBLIC _wa_priority_queue_capacity
 
 _wa_priority_queue_capacity:
 

@@ -11,8 +11,8 @@
 ;
 ; ===============================================================
 
-XLIB asm_ffs
-XDEF asm0_ffs, asm1_ffs, asm2_ffs
+PUBLIC asm_ffs
+PUBLIC asm0_ffs, asm1_ffs, asm2_ffs
 
 asm_ffs:
 

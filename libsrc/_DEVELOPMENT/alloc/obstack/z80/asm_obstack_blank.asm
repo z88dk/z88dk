@@ -15,10 +15,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_obstack_blank
-XDEF asm0_obstack_blank
+PUBLIC asm_obstack_blank
+PUBLIC asm0_obstack_blank
 
-LIB asm_obstack_room, error_enomem_zc
+EXTERN asm_obstack_room, error_enomem_zc
 
 asm_obstack_blank:
 

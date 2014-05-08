@@ -1,7 +1,7 @@
 
 ; int sscanf(const char *s, const char *format, ...)
 
-XDEF sscanf
+PUBLIC sscanf
 
 sscanf:
 

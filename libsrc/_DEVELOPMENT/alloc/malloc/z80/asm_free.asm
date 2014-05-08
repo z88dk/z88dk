@@ -18,12 +18,12 @@ INCLUDE "clib_cfg.asm"
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_free
-XDEF asm_free_lib
+PUBLIC asm_free
+PUBLIC asm_free_lib
 
-XREF __heap
+EXTERN __heap
 
-LIB asm_heap_free
+EXTERN asm_heap_free
 
 asm_free:
 asm_free_lib:
@@ -50,10 +50,10 @@ asm_free_lib:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-XLIB asm_free
-XDEF asm_free_lib
+PUBLIC asm_free
+PUBLIC asm_free_lib
 
-LIB asm_free_unlocked
+EXTERN asm_free_unlocked
 
 asm_free:
 asm_free_lib:

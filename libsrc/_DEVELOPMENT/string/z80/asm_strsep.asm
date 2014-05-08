@@ -19,9 +19,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_strsep
+PUBLIC asm_strsep
 
-LIB asm_strpbrk
+EXTERN asm_strpbrk
 
 asm_strsep:
 

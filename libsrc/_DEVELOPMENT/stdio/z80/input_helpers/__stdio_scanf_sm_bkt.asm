@@ -1,7 +1,7 @@
 
-XLIB __stdio_scanf_sm_bkt
+PUBLIC __stdio_scanf_sm_bkt
 
-LIB l_bitset_locate, __stdio_scanf_sm_string_write
+EXTERN l_bitset_locate, __stdio_scanf_sm_string_write
 
 __stdio_scanf_sm_bkt:
 

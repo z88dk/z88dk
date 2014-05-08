@@ -1,7 +1,7 @@
 
 ; int fgetc_unlocked(FILE *stream)
 
-XDEF fgetc_unlocked
+PUBLIC fgetc_unlocked
 
 fgetc_unlocked:
 

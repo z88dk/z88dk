@@ -1,7 +1,7 @@
 
 ; int scanf_unlocked(const char *format, ...)
 
-XDEF _scanf_unlocked
+PUBLIC _scanf_unlocked
 
 _scanf_unlocked:
 

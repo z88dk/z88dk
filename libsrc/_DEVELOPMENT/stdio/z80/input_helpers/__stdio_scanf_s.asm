@@ -1,9 +1,9 @@
 
-XLIB __stdio_scanf_s
-XDEF __stdio_scanf_s_tail
+PUBLIC __stdio_scanf_s
+PUBLIC __stdio_scanf_s_tail
 
-LIB l_incu_hl
-LIB __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc, __stdio_scanf_sm_string
+EXTERN l_incu_hl
+EXTERN __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc, __stdio_scanf_sm_string
 
 __stdio_scanf_s:
 

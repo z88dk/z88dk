@@ -1,7 +1,7 @@
 
 ; int b_array_empty(b_array_t *a)
 
-XDEF _b_array_empty
+PUBLIC _b_array_empty
 
 _b_array_empty:
 

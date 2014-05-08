@@ -4,7 +4,7 @@
 ;       NB. This routine will only work if long < +/-32767ish (obvious)
 
 
-XLIB l_long2int_s
+PUBLIC l_long2int_s
 
 ;This routine picks up the sign in d (MSB) sticks into the MSB of h
 ;Perhaps this routine could be inlined? Certainly short enough!

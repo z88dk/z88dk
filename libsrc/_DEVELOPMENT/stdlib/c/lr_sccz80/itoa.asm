@@ -1,9 +1,9 @@
 
 ; char *itoa(int num, char *buf, int radix)
 
-XLIB itoa
+PUBLIC itoa
 
-LIB asm_itoa
+EXTERN asm_itoa
 
 itoa:
 

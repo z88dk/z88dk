@@ -1,5 +1,5 @@
 
-XLIB asm_tolower
+PUBLIC asm_tolower
 
 asm_tolower:
 

@@ -1,7 +1,7 @@
 
 ; void *w_array_pop_back(w_array_t *a)
 
-XDEF w_array_pop_back
+PUBLIC w_array_pop_back
 
 w_array_pop_back:
 

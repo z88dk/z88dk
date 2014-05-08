@@ -4,11 +4,10 @@
 
 ; *** PLEASE HELP ME I'VE BEEN MADE UGLY BY BUGFIXES
 
-XLIB asm_sp1_MoveSprAbs
+PUBLIC asm_sp1_MoveSprAbs
 
-LIB asm_sp1_GetUpdateStruct, __sp1_add_spr_char, __sp1_remove_spr_char
-
-XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
+EXTERN asm_sp1_GetUpdateStruct, __sp1_add_spr_char, __sp1_remove_spr_char
+EXTERN SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 asm_sp1_MoveSprAbs:
 

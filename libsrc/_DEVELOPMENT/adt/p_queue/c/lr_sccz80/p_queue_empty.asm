@@ -1,7 +1,7 @@
 
 ; int p_queue_empty(p_queue_t *q)
 
-XDEF p_queue_empty
+PUBLIC p_queue_empty
 
 ;defc p_queue_empty = asm_p_queue_empty
 

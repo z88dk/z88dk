@@ -1,7 +1,7 @@
 
 ; void *zx_cy2aaddr(uchar row)
 
-XDEF zx_cy2aaddr
+PUBLIC zx_cy2aaddr
 
 zx_cy2aaddr:
 

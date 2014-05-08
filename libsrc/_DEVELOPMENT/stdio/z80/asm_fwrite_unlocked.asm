@@ -11,10 +11,10 @@
 ;
 ; ===============================================================
 
-XLIB asm_fwrite_unlocked
-XDEF asm0_fwrite_unlocked
+PUBLIC asm_fwrite_unlocked
+PUBLIC asm0_fwrite_unlocked
 
-LIB __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked, error_enolck_zc
+EXTERN __stdio_verify_output, __stdio_send_output_raw_buffer_unchecked, error_enolck_zc
 
 asm_fwrite_unlocked:
 
@@ -44,7 +44,7 @@ asm_fwrite_unlocked:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   LIB __stdio_verify_valid
+   EXTERN __stdio_verify_valid
 
    push hl
    call __stdio_verify_valid
@@ -146,13 +146,13 @@ immediate_success:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
-   XDEF fwrite_immediate_error_ebadf
+   PUBLIC fwrite_immediate_error_ebadf
    fwrite_immediate_error_ebadf:
 
 ELSE
 
-   XDEF fwrite_immediate_error_enolck
-   LIB error_enolck_zc
+   PUBLIC fwrite_immediate_error_enolck
+   EXTERN error_enolck_zc
 
 fwrite_immediate_error_enolck:
 

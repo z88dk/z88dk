@@ -8,7 +8,7 @@ IF __heap_sz > 14
    ld hl,(__heap)
    ld bc,__heap_sz      
 
-   LIB asm_heap_init
+   EXTERN asm_heap_init
    call asm_heap_init
    
 ENDIF
@@ -19,14 +19,14 @@ IF __qtbl_sz > 0
       
    ld l,__qtbl_sz
 
-   LIB asm_balloc_init
+   EXTERN asm_balloc_init
    call asm_balloc_init
    
 ENDIF
 
 ; initialize stdio FILE queues
 
-LIB asm_mtx_init, l_zeroword_hl
+EXTERN asm_mtx_init, l_zeroword_hl
 
 ld c,mtx_plain
 ld hl,__stdio_file_list_lock
@@ -43,7 +43,7 @@ ld (__stdio_file_list_avail+2),hl
    
 IF __HAVE_FILE_STDIN | __HAVE_FILE_STDOUT | __HAVE_FILE_STDERR
    
-   LIB asm_p_forward_list_push_front
+   EXTERN asm_p_forward_list_push_front
    
 ENDIF
    

@@ -1,9 +1,9 @@
 
 ; int wa_stack_empty(wa_stack_t *s)
 
-XDEF _wa_stack_empty
+PUBLIC _wa_stack_empty
 
-LIB _w_array_empty
+EXTERN _w_array_empty
 
 _wa_stack_empty:
 

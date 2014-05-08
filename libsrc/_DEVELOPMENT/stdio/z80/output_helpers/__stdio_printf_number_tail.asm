@@ -1,10 +1,10 @@
 
-XLIB __stdio_printf_number_tail
-XDEF __stdio_printf_number_tail_zero
+PUBLIC __stdio_printf_number_tail
+PUBLIC __stdio_printf_number_tail_zero
 
-LIB __stdio_printf_sign, asm__memlwr, l_maxu_bc_hl, l_addu_hl_de
-LIB __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_precision_bc
-LIB __stdio_printf_padding_precision_hl, __stdio_printf_padding_width_bc
+EXTERN __stdio_printf_sign, asm__memlwr, l_maxu_bc_hl, l_addu_hl_de
+EXTERN __stdio_send_output_buffer, __stdio_printf_padding_width_hl, __stdio_printf_padding_precision_bc
+EXTERN __stdio_printf_padding_precision_hl, __stdio_printf_padding_width_bc
 
 __stdio_printf_number_tail_zero:
 

@@ -1,9 +1,9 @@
 
 ; int strcmp(const char *s1, const char *s2)
 
-XLIB strcmp
+PUBLIC strcmp
 
-LIB asm_strcmp
+EXTERN asm_strcmp
 
 strcmp:
 

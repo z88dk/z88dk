@@ -1,7 +1,7 @@
 
 ; int fflush_unlocked(FILE *stream)
 
-XDEF _fflush_unlocked
+PUBLIC _fflush_unlocked
 
 _fflush_unlocked:
 

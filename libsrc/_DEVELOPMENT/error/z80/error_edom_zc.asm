@@ -1,9 +1,9 @@
 
-XLIB error_edom_zc
+PUBLIC error_edom_zc
 
-XREF __EDOM
+EXTERN __EDOM
 
-LIB errno_zc
+EXTERN errno_zc
 
    pop hl
    

@@ -1,5 +1,5 @@
 
-XLIB l_valid_base
+PUBLIC l_valid_base
 
 l_valid_base:
 

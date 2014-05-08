@@ -1,9 +1,9 @@
 
-XLIB __stdio_recv_input_raw_eatc
+PUBLIC __stdio_recv_input_raw_eatc
 
-XREF STDIO_MSG_EATC
+EXTERN STDIO_MSG_EATC
 
-LIB l_incu_bc, l_jpix, l_jphl
+EXTERN l_incu_bc, l_jpix, l_jphl
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
 ; EXCEPT FOR VFSCANF.  THIS ENSURES STREAM STATE IS CORRECTLY MAINTAINED

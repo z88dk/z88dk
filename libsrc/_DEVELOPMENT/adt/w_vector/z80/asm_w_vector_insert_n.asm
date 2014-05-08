@@ -10,9 +10,9 @@
 ;
 ; ===============================================================
 
-XLIB asm_w_vector_insert_n
+PUBLIC asm_w_vector_insert_n
 
-LIB asm_b_vector_insert_block, asm1_w_array_insert_n, error_einval_mc
+EXTERN asm_b_vector_insert_block, asm1_w_array_insert_n, error_einval_mc
 
 asm_w_vector_insert_n:
 
