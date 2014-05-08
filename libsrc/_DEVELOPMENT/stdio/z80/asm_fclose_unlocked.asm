@@ -70,7 +70,17 @@ asm0_fclose_unlocked:
    ld hl,__stdio_file_list_open
    call asm_p_forward_list_remove
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
    jr c, exit_error_ebadf
+
+ELSE
+
+   jp c, error_ebadf_mc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; close FILE
 
@@ -127,14 +137,13 @@ ENDIF
    call asm_free
    jp error_znc
 
-exit_error_ebadf:
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
+exit_error_ebadf:
+
    call __stdio_unlock_file_list
+   jp error_ebadf_mc
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   jp error_ebadf_mc
