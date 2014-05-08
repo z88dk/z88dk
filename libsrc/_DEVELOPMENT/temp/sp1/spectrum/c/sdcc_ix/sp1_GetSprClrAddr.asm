@@ -1,6 +1,6 @@
 ; void sp1_GetSprClrAddr(struct sp1_ss *s, uchar **sprdest)
 
-XDEF _sp1_GetSprClrAddr
+PUBLIC _sp1_GetSprClrAddr
 
 _sp1_GetSprClrAddr:
 

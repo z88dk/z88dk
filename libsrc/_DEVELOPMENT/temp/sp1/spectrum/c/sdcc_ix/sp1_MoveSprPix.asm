@@ -1,6 +1,6 @@
 ; void sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y)
 
-XDEF _sp1_MoveSprPix
+PUBLIC _sp1_MoveSprPix
 
 _sp1_MoveSprPix:
 

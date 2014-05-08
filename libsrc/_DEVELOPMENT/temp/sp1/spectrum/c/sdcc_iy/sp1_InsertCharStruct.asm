@@ -1,6 +1,6 @@
 ; void sp1_InsertCharStruct(struct sp1_update *u, struct sp1_cs *cs)
 
-XDEF _sp1_InsertCharStruct
+PUBLIC _sp1_InsertCharStruct
 
 _sp1_InsertCharStruct:
 

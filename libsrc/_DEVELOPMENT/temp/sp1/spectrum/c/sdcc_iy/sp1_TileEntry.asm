@@ -1,6 +1,6 @@
 ; void *sp1_TileEntry(uchar c, void *def)
 
-XDEF _sp1_TileEntry
+PUBLIC _sp1_TileEntry
 
 _sp1_TileEntry:
 

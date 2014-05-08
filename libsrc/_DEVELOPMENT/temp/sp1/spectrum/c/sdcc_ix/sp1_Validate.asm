@@ -1,6 +1,6 @@
 ; void sp1_Validate(struct sp1_Rect *r)
 
-XDEF _sp1_Validate
+PUBLIC _sp1_Validate
 
 _sp1_Validate:
 

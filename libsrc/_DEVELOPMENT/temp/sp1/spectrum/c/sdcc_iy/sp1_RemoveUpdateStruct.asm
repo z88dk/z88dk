@@ -1,7 +1,7 @@
 
 ; sp1_RemoveUpdateStruct
 
-XDEF _sp1_RemoveUpdateStruct
+PUBLIC _sp1_RemoveUpdateStruct
 
 _sp1_RemoveUpdateStruct:
 

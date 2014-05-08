@@ -1,7 +1,7 @@
 
 ; void  sp1_RemoveCharStruct(struct sp1_cs *cs)
 
-XDEF _sp1_RemoveCharStruct
+PUBLIC _sp1_RemoveCharStruct
 
 _sp1_RemoveCharStruct:
 

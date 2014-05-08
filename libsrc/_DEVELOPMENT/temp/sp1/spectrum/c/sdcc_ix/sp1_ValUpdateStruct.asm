@@ -1,7 +1,7 @@
 
 ; sp1_ValUpdateStruct
 
-XDEF _sp1_ValUpdateStruct
+PUBLIC _sp1_ValUpdateStruct
 
 _sp1_ValUpdateStruct:
 

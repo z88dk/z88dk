@@ -1,6 +1,6 @@
 ; uchar sp1_ScreenAttr(uchar row, uchar col)
 
-XDEF _sp1_ScreenAttr
+PUBLIC _sp1_ScreenAttr
 
 _sp1_ScreenAttr:
 

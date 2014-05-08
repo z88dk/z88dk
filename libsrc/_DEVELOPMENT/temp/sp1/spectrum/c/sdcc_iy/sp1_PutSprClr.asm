@@ -1,6 +1,6 @@
 ; void sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n)
 
-XDEF _sp1_PutSprClr
+PUBLIC _sp1_PutSprClr
 
 _sp1_PutSprClr:
 

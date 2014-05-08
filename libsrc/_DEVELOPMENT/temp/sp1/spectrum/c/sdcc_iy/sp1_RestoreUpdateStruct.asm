@@ -1,7 +1,7 @@
 
 ; sp1_RestoreUpdateStruct
 
-XDEF _sp1_RestoreUpdateStruct
+PUBLIC _sp1_RestoreUpdateStruct
 
 _sp1_RestoreUpdateStruct:
 

@@ -1,6 +1,6 @@
 ; uint sp1_ScreenStr(uchar row, uchar col)
 
-XDEF _sp1_ScreenStr
+PUBLIC _sp1_ScreenStr
 
 _sp1_ScreenStr:
 

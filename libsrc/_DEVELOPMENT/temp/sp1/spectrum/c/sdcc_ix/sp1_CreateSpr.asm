@@ -1,6 +1,6 @@
 ; struct sp1_ss *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane)
 
-XDEF _sp1_CreateSpr
+PUBLIC _sp1_CreateSpr
 
 _sp1_CreateSpr:
 

@@ -1,6 +1,6 @@
 ; void __FASTCALL__ sp1_Invalidate(struct sp1_Rect *r)
 
-XDEF _sp1_Invalidate
+PUBLIC _sp1_Invalidate
 
 _sp1_Invalidate:
 

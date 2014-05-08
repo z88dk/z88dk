@@ -1,6 +1,6 @@
 ; void sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col)
 
-XDEF _sp1_SetPrintPos
+PUBLIC _sp1_SetPrintPos
 
 _sp1_SetPrintPos:
 

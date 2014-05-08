@@ -1,6 +1,6 @@
 ; void *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 
-XDEF _sp1_PreShiftSpr
+PUBLIC _sp1_PreShiftSpr
 
 _sp1_PreShiftSpr:
 

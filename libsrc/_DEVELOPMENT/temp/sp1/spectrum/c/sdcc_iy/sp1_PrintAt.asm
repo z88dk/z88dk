@@ -1,6 +1,6 @@
 ; void sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile)
 
-XDEF _sp1_PrintAt
+PUBLIC _sp1_PrintAt
 
 _sp1_PrintAt:
 

@@ -1,6 +1,6 @@
 ; void sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 
-XDEF _sp1_ClearRectInv
+PUBLIC _sp1_ClearRectInv
 
 _sp1_ClearRectInv:
 

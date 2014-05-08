@@ -1,6 +1,6 @@
 ; struct sp1_update *sp1_GetUpdateStruct(uchar row, uchar col)
 
-XDEF _sp1_GetUpdateStruct
+PUBLIC _sp1_GetUpdateStruct
 
 _sp1_GetUpdateStruct:
 

@@ -1,6 +1,6 @@
 ; void sp1_IterateUpdateArr(struct sp1_update **ua, void *hook)
 
-XDEF _sp1_IterateUpdateArr
+PUBLIC _sp1_IterateUpdateArr
 
 _sp1_IterateUpdateArr:
 

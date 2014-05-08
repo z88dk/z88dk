@@ -1,7 +1,7 @@
 
 ; sp1_InvUpdateStruct
 
-XDEF _sp1_InvUpdateStruct
+PUBLIC _sp1_InvUpdateStruct
 
 _sp1_InvUpdateStruct:
 

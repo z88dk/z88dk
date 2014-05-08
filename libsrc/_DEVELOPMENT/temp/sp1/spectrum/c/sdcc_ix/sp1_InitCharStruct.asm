@@ -1,6 +1,6 @@
 ; void sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane)
 
-XDEF _sp1_InitCharStruct
+PUBLIC _sp1_InitCharStruct
 
 _sp1_InitCharStruct:
 

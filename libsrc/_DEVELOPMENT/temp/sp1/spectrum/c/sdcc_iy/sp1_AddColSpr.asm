@@ -1,6 +1,6 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane)
 
-XDEF _sp1_AddColSpr
+PUBLIC _sp1_AddColSpr
 
 _sp1_AddColSpr:
 

@@ -1,6 +1,6 @@
 ; void sp1_IterateSprChar(struct sp1_ss *s, void *hook1)
 
-XDEF _sp1_IterateSprChar
+PUBLIC _sp1_IterateSprChar
 
 _sp1_IterateSprChar:
 

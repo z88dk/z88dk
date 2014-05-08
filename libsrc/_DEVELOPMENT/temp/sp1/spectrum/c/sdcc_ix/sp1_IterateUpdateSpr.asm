@@ -1,6 +1,6 @@
 ; void sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2)
 
-XDEF _sp1_IterateUpdateSpr
+PUBLIC _sp1_IterateUpdateSpr
 
 _sp1_IterateUpdateSpr:
 

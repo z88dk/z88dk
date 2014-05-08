@@ -1,6 +1,6 @@
 ; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 
-XDEF _sp1_ChangeSprType
+PUBLIC _sp1_ChangeSprType
 
 _sp1_ChangeSprType:
 

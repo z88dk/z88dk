@@ -1,6 +1,6 @@
 ; void sp1_PrintString(struct sp1_pss *ps, uchar *s)
 
-XDEF _sp1_PrintString
+PUBLIC _sp1_PrintString
 
 _sp1_PrintString:
 

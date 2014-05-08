@@ -1,6 +1,6 @@
 ; void sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook)
 
-XDEF _sp1_IterateUpdateRect
+PUBLIC _sp1_IterateUpdateRect
 
 _sp1_IterateUpdateRect:
 

@@ -1,6 +1,6 @@
 ; void sp1_Initialize(uchar iflag, uchar colour, uchar tile)
 
-XDEF _sp1_Initialize
+PUBLIC _sp1_Initialize
 
 _sp1_Initialize:
 

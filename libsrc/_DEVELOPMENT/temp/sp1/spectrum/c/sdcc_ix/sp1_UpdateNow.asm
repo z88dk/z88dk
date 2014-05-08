@@ -1,7 +1,7 @@
 
 ; sp1_UpdateNow
 
-XDEF _sp1_UpdateNow
+PUBLIC _sp1_UpdateNow
 
 _sp1_UpdateNow:
 

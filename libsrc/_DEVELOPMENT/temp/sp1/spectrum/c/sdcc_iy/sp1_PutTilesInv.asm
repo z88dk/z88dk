@@ -1,6 +1,6 @@
 ; void sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src)
 
-XDEF _sp1_PutTilesInv
+PUBLIC _sp1_PutTilesInv
 
 _sp1_PutTilesInv:
 

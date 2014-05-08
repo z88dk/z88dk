@@ -1,6 +1,6 @@
 ; void sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest)
 
-XDEF _sp1_GetTiles
+PUBLIC _sp1_GetTiles
 
 _sp1_GetTiles:
 
