@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.16 2014-05-07 23:18:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.17 2014-05-08 22:09:37 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -289,6 +289,29 @@ z80asm(
 remove_tree('test.bn1');
 
 #------------------------------------------------------------------------------
+# BUG_0018: stack overflow in '@' includes - wrong range check
+note "BUG_0018";
+{
+	my $levels = 64;
+	
+	write_file("test.prj", "\@test0.prj");
+	my $bin = "";
+	for (0 .. $levels) {
+		write_file("test$_.prj", 
+				   "test$_.asm\n",
+				   "\@test".($_+1).".prj\n");
+		write_file("test$_.asm", "defb $_");
+		$bin .= chr($_);
+	}
+	write_file("test".($levels+1).".prj", "");
+
+	z80asm(
+		options	=> "-r0 -b -ns -nm -otest.bin \@test.prj",
+		bin		=> $bin,
+	);
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -325,7 +348,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.16  2014-05-07 23:18:16  pauloscustodio
+# Revision 1.17  2014-05-08 22:09:37  pauloscustodio
+# Move tests of BUG_0018 to bugfixes.t
+#
+# Revision 1.16  2014/05/07 23:18:16  pauloscustodio
 # Move tests of BUG_0017 to bugfixes.t
 #
 # Revision 1.15  2014/05/07 23:09:26  pauloscustodio
