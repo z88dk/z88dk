@@ -4,7 +4,7 @@ PUBLIC __stdio_scanf_c
 EXTERN STDIO_SEEK_CUR
 
 EXTERN __stdio_recv_input_read
-EXTERN l_addu_hl_bc, asm_fseek_unlocked
+EXTERN l_addu_hl_bc, asm0_fseek_unlocked
 
 __stdio_scanf_c:
 
@@ -65,7 +65,7 @@ assignment_suppressed:
 
    exx
    
-   call asm_fseek_unlocked
+   call asm0_fseek_unlocked
    
    pop de                      ; de = items assigned
    pop hl                      ; hl = chars read from stream
