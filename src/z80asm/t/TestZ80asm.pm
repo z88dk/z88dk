@@ -15,14 +15,14 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.4 2014-05-07 23:09:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.5 2014-05-08 21:57:35 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
 use Test::More;
 use Test::Differences; 
+use Test::HexDifferences;
 use File::Slurp;
-use Data::HexDump;
 use List::AllUtils 'uniq';
 use Capture::Tiny::Extended 'capture';
 
@@ -143,12 +143,7 @@ sub z80asm {
 	if ($bin ne "") {
 		$bin_file ||= "test.bin";
 		my $out_bin = read_binfile($bin_file);
-		if ($out_bin eq $bin) {
-			is $out_bin, $bin, "binary";
-		}
-		else {
-			eq_or_diff HexDump($out_bin), HexDump($bin), "binary";
-		}
+		eq_or_dump_diff $out_bin, $bin, "binary";
 	}
 }
 
@@ -216,7 +211,10 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.4  2014-05-07 23:09:26  pauloscustodio
+# Revision 1.5  2014-05-08 21:57:35  pauloscustodio
+# Test::HexDifferences to show differences in hex code
+#
+# Revision 1.4  2014/05/07 23:09:26  pauloscustodio
 # Move tests of BUG_0016 to bugfixes.t
 #
 # Revision 1.3  2014/05/04 18:46:46  pauloscustodio
