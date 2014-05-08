@@ -21,6 +21,7 @@ extern int                            in_key_pressed(uint16_t scancode);
 extern uint16_t                       in_key_scancode(int c);
 
 extern uint16_t                       in_pause(uint16_t dur_ms);
+extern int                            in_test_key(void);
 extern void                           in_wait_key(void);
 extern void                           in_wait_nokey(void);
 
@@ -33,6 +34,7 @@ extern int       __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode);
 extern uint16_t  __LIB__ __FASTCALL__ in_key_scancode(int c);
 
 extern uint16_t  __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
+extern int       __LIB__              in_test_key(void);
 extern void      __LIB__              in_wait_key(void);
 extern void      __LIB__              in_wait_nokey(void);
 
