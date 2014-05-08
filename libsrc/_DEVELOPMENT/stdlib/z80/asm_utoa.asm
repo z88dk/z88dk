@@ -61,7 +61,7 @@ IF __CLIB_OPT_NUM2TXT & $08
 
 ENDIF
 
-IF IF __CLIB_OPT_NUM2TXT & $02
+IF __CLIB_OPT_NUM2TXT & $02
 
    cp 8
    jr z, octal
