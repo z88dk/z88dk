@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.18 2014-05-08 22:30:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.19 2014-05-08 22:52:23 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -333,6 +333,33 @@ ASM
 );
 
 #------------------------------------------------------------------------------
+# BUG_0023: Error file with warning is removed in link phase
+note "BUG_0023";
+z80asm(
+	asm		=> "ld a,-129 ;; 3E 7F ;; warn: integer '-129' out of range",
+);
+eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
+Warning at file 'test.asm' line 1: integer '-129' out of range
+ERROR
+
+z80asm(
+	asm  	=> <<'ASM',
+			EXTERN value
+			ld a,value 		;; 3E 7F 
+			ld b,256		;; 06 00 ;; warn: integer '256' out of range
+;; warn: integer '-129' out of range in expression 'value'
+ASM
+	asm1	=> <<'ASM1',
+			PUBLIC value
+			defc value = -129
+ASM1
+);
+eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
+Warning at file 'test.asm' line 3: integer '256' out of range
+Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'
+ERROR
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -369,7 +396,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.18  2014-05-08 22:30:38  pauloscustodio
+# Revision 1.19  2014-05-08 22:52:23  pauloscustodio
+# Move tests of BUG_0023 to bugfixes.t
+#
+# Revision 1.18  2014/05/08 22:30:38  pauloscustodio
 # Move tests of BUG_0020 to bugfixes.t
 #
 # Revision 1.17  2014/05/08 22:09:37  pauloscustodio
