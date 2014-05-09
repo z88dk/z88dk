@@ -28,8 +28,8 @@
 
 PUBLIC asm_qsort
 
-EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix, error_einval_zc, error_erange_zc
-EXTERN l_ltu_de_hl, l_ltu_hl_de, l_ltu_bc_hl
+EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
+EXTERN error_einval_zc, error_erange_zc
 
 asm_qsort:
 
@@ -77,33 +77,50 @@ asm_qsort:
 while_lohi:
 
    ; partition to sort is interval [lo, hi]
-   ; first element (at lo) is taken as pivot to avoid multiplication
    
    ; hl = hi
    ; de = lo
    ; bc = size
    ; ix = compare
    ; stack = 0, (hi,lo)*
+   ; carry reset
    
-   call l_ltu_de_hl            ; carry set if lo < hi
-   jp nc, interval_done
+   scf
+   sbc hl,de
+   jr nc, partition            ; if hi > lo
+
+interval_done:
+
+   ; retrieve next partition from stack
    
-   push hl                     ; save hi
-   push de                     ; save lo
+   ; bc = size
+   ; ix = compare
+   ; stack = 0, (hi,lo)*
+   
+   pop de
+   
+   ld a,d                      ; zero is end marker
+   or e
+   ret z
+
+   pop hl
+   jr while_lohi
 
 partition:
+
+   add hl,de
+   inc hl
+
+   ; first element (at lo) is taken as pivot to avoid multiplication
+   
+   push hl                     ; save hi
+   push de                     ; save lo=pivot
+
+left_squeeze_0:
 
    ex de,hl
    add hl,bc
    ex de,hl
-
-   ; rearrange items so that all items less than the pivot are on
-   ; the left and those greater than the pivot are on the right
-   
-   ; portion of partition still being investigated is [i,j]
-   ; all items before i are <= pivot and all items after j are >= pivot
-
-left_squeeze:
 
    ; de = i
    ; hl = j
@@ -111,9 +128,27 @@ left_squeeze:
    ; ix = compare
    ; stack = hi, lo=pivot
 
-   call l_ltu_de_hl            ; carry set if i < j
-   jr nc, right_squeeze
+   ; rearrange items so that all items less than the pivot are on
+   ; the left and those greater than the pivot are on the right
    
+   ; portion of partition still being investigated is [i,j]
+   ; all items before i are <= pivot and all items after j are >= pivot
+
+left_squeeze_1:
+
+   ; de = i
+   ; hl = j
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, lo=pivot
+   ; carry reset
+   
+   sbc hl,de
+   add hl,de
+   jr c, partition_done_left   ; if i > j
+
+   ; i <= j
+
    ex (sp),hl                  ; push j
    push hl                     ; push lo=pivot
    push bc                     ; push size
@@ -155,22 +190,31 @@ ENDIF
    ex (sp),hl                  ; hl = j,, stack = hi, lo=pivot
 
    rla
-   jr nc, partition            ; if item[lo=pivot] >= item[i] continue
+   jr nc, left_squeeze_0       ; if item[lo=pivot] >= item[i] continue
 
-right_squeeze:
-
+   or a
    ex de,hl
    
-right_loop:
+right_squeeze:
+
+   ; de = j
+   ; hl = i
+   ; bc = size
+   ; ix = compare
+   ; carry reset
+   ; stack = hi, lo=pivot
+
+   sbc hl,de
+   jr z, partition_done_right  ; if i == j
+   add hl,de
+
+   ; i < j
 
    ; de = j
    ; hl = i
    ; bc = size
    ; ix = compare
    ; stack = hi, lo=pivot
-
-   call l_ltu_de_hl            ; carry set if j < i
-   jr c, swap_ij
    
    ex (sp),hl                  ; push i
    push hl                     ; push lo=pivot
@@ -216,22 +260,21 @@ ENDIF
    ex de,hl
    sbc hl,bc                   ; j -= size
    ex de,hl
-   
-   jr right_loop
+
+   jr right_squeeze
 
 swap_ij:
 
-   ; if we haven't visited all items in the partition then
-   ; i and j point to items that belong in the other half
+   ; item[j] < item[pivot]
+   ; item[i] > item[pivot]
+
+   ; need to swap and then continue squeeze
 
    ; de = j
    ; hl = i
    ; bc = size
    ; ix = compare
    ; stack = hi, lo=pivot
-
-   call l_ltu_hl_de            ; carry set if i < j
-   jr nc, partition_done
 
    push de
    push bc
@@ -243,34 +286,75 @@ swap_ij:
    pop hl
    sbc hl,bc                   ; j -= size
    
-   jr left_squeeze
+   jr left_squeeze_1
 
-partition_done:
+partition_done_right:
 
-   ; move pivot item to final position
-   ; create two new partitions to sort on left and right side of pivot
+   ex de,hl
    
-   ; de = j
+   ; hl = i
+   ; bc = size
+   ; ix = compare
+   ; carry reset
+   ; stack = hi, lo=pivot
+
+   ; i == j
+   ; item[i] > item[pivot]
+
+   ; move pivot item into index (i-1)
+   
+   sbc hl,bc                   ; hl = "j" = i-1
+
+partition_done_left:
+
+   ; hl = j
    ; bc = size
    ; ix = compare
    ; stack = hi, lo=pivot
 
-   pop hl
-   call l_ltu_hl_de            ; carry set if lo=pivot < j
-   jr nc, left_empty
+   ; i > j
+   ; item[j] <= item[pivot]
+
+   ; move pivot item into index j
+
+partition_done:
+
+   ; move pivot item to final position in index j
+   ; create two new partitions to sort on left and right side of pivot
+   
+   ; hl = j = final position
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, lo=pivot
+
+   or a
+   pop de                      ; de = lo=pivot
+   
+   sbc hl,de
+   jr z, left_partition_empty  ; if lo=pivot == j
+   add hl,de
+
+   ; swap pivot into final position
+   
+   ; hl = j
+   ; de = lo=pivot
+   ; bc = size
+   ; stack = hi
    
    push bc
    push de
+
    call asm0_memswap           ; swap(j, lo=pivot, size)
-   pop bc
+
    pop de
-   
-   ex de,hl
+   ld c,l
+   ld b,h
+   pop hl
    ex (sp),hl
    push hl
-   
+
    ; hl = hi
-   ; bc = j
+   ; bc = j=pivot
    ; de = lo
    ; ix = compare
    ; stack = size, hi
@@ -282,9 +366,10 @@ partition_done:
    add hl,de
    rr h
    rr l                        ; hl = (hi+lo)/2
-   
-   call l_ltu_bc_hl            ; carry set if j < (hi+lo)/2
-   
+
+   or a
+   sbc hl,bc                   ; carry set if (hi+lo) < j=pivot
+
    pop hl
    ex (sp),hl
    push de
@@ -295,13 +380,19 @@ partition_done:
    ld b,h
    ld l,e
    ld h,d
-   
-   jr nc, right_smallest
+
+   ; hl = j=pivot
+   ; de = j=pivot
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, lo
+
+   jr c, right_smallest        ; if pivot > middle
 
 left_smallest:
    
-   ; hl = j
-   ; de = j
+   ; hl = j=pivot
+   ; de = j=pivot
    ; bc = size
    ; ix = compare
    ; stack = hi, lo
@@ -315,14 +406,14 @@ left_smallest:
    ; hl = j - size (new hi)
    ; de = lo (new lo)
    ; bc = size
-   ; stack = hi, j+size (hi, lo)
+   ; stack = (hi, j+size) = stacked right side (hi, lo)
    
    jp while_lohi               ; do left side
 
 right_smallest:
 
-   ; hl = j
-   ; de = j
+   ; hl = j=pivot
+   ; de = j=pivot
    ; bc = size
    ; ix = compare
    ; stack = hi, lo
@@ -339,15 +430,17 @@ right_smallest:
    ; de = j + size (new lo)
    ; bc = size
    ; ix = compare
-   ; stack = j - size, lo (hi, lo)
+   ; stack = (j - size, lo) = stack left side (hi, lo)
 
    jp while_lohi               ; do right side
 
-left_empty:
+left_partition_empty:
 
    ; left side of partition is empty so only right side remains
    
-   ; hl = lo
+   ex de,hl
+   
+   ; hl = lo=pivot
    ; bc = size
    ; ix = compare
    ; stack = hi
@@ -356,21 +449,4 @@ left_empty:
    add hl,bc
    ex de,hl
    
-   jp while_lohi
-
-interval_done:
-
-   ; retrieve next partition from stack
-   
-   ; bc = size
-   ; ix = compare
-   ; stack = 0, (hi,lo)*
-   
-   pop de
-   
-   ld a,d                      ; zero is end marker
-   or e
-   ret z
-
-   pop hl
    jp while_lohi
