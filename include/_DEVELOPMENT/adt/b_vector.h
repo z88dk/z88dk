@@ -41,7 +41,7 @@ extern size_t      b_vector_insert_n(b_vector_t *v, size_t idx, size_t n, int c)
 extern size_t      b_vector_max_size(b_vector_t *v);
 extern int         b_vector_pop_back(b_vector_t *v);
 extern size_t      b_vector_push_back(b_vector_t *v, int c);
-extern size_t      b_vector_read_block(void *dst, size_t n, b_vector *v, size_t idx);
+extern size_t      b_vector_read_block(void *dst, size_t n, b_vector_t *v, size_t idx);
 extern int         b_vector_reserve(b_vector_t *v, size_t n);
 extern int         b_vector_resize(b_vector_t *v, size_t n);
 extern int         b_vector_shrink_to_fit(b_vector_t *);
@@ -73,7 +73,7 @@ extern size_t     __LIB__               b_vector_insert_n(b_vector_t *v, size_t 
 extern size_t     __LIB__ __FASTCALL__  b_vector_max_size(b_vector_t *v);
 extern int        __LIB__ __FASTCALL__  b_vector_pop_back(b_vector_t *v);
 extern size_t     __LIB__               b_vector_push_back(b_vector_t *v, int c);
-extern size_t     __LIB__               b_vector_read_block(void *dst, size_t n, b_vector *v, size_t idx);
+extern size_t     __LIB__               b_vector_read_block(void *dst, size_t n, b_vector_t *v, size_t idx);
 extern int        __LIB__               b_vector_reserve(b_vector_t *v, size_t n);
 extern int        __LIB__               b_vector_resize(b_vector_t *v, size_t n);
 extern int        __LIB__ __FASTCALL__  b_vector_shrink_to_fit(b_vector_t *);
@@ -94,7 +94,7 @@ extern size_t     __LIB__ __CALLEE__    b_vector_insert_callee(b_vector_t *v, si
 extern void       __LIB__ __CALLEE__   *b_vector_insert_block_callee(b_vector_t *v, size_t idx, size_t n);
 extern size_t     __LIB__ __CALLEE__    b_vector_insert_n_callee(b_vector_t *v, size_t idx, size_t n, int c);
 extern size_t     __LIB__ __CALLEE__    b_vector_push_back_callee(b_vector_t *v, int c);
-extern size_t     __LIB__ __CALLEE__    b_vector_read_block_callee(void *dst, size_t n, b_vector *v, size_t idx);
+extern size_t     __LIB__ __CALLEE__    b_vector_read_block_callee(void *dst, size_t n, b_vector_t *v, size_t idx);
 extern int        __LIB__ __CALLEE__    b_vector_reserve_callee(b_vector_t *v, size_t n);
 extern int        __LIB__ __CALLEE__    b_vector_resize_callee(b_vector_t *v, size_t n);
 extern size_t     __LIB__ __CALLEE__    b_vector_write_block_callee(void *src, size_t n, b_vector_t *v, size_t idx);

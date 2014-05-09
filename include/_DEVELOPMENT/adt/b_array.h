@@ -6,7 +6,7 @@
 
 // DATA STRUCTURES
 
-typdef struct b_array_s
+typedef struct b_array_s
 {
 
    void       *data;
