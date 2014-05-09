@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.20 2014-05-09 23:13:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.21 2014-05-09 23:20:57 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -365,6 +365,19 @@ Warning at file 'test.asm' module 'test': integer '-129' out of range in express
 ERROR
 
 #------------------------------------------------------------------------------
+# BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
+for ('jr', 'djnz')
+{
+	z80asm(
+		asm		=> "$_ ASMPC+2-129 ;; error: integer '-129' out of range",
+	);
+
+	z80asm(
+		asm		=> "$_ ASMPC+2+128 ;; error: integer '128' out of range",
+	);
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -401,7 +414,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.20  2014-05-09 23:13:20  pauloscustodio
+# Revision 1.21  2014-05-09 23:20:57  pauloscustodio
+# Move tests of BUG_0025 to bugfixes.t
+#
+# Revision 1.20  2014/05/09 23:13:20  pauloscustodio
 # Move tests of BUG_0024 to bugfixes.t
 #
 # Revision 1.19  2014/05/08 22:52:23  pauloscustodio
