@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.19 2014-05-08 22:52:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.20 2014-05-09 23:13:20 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -84,6 +84,7 @@ ERR
 # BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
 # BUG_0007 : memory leaks
 # BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+# BUG_0024 : (ix+128) should show warning message
 z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0004
@@ -102,6 +103,10 @@ z80asm(
 		defb    bug0011a-ASMPC, bug0011a-ASMPC	;; 04 04
 		defb    bug0011a-ASMPC, bug0011a-ASMPC	;; 02 02
 	bug0011a:
+	
+	;; note: BUG_0024
+		inc (ix + 255)		;; DD 34 FF		;; warn: integer '255' out of range
+		
 
 ASM
 );
@@ -396,7 +401,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.19  2014-05-08 22:52:23  pauloscustodio
+# Revision 1.20  2014-05-09 23:13:20  pauloscustodio
+# Move tests of BUG_0024 to bugfixes.t
+#
+# Revision 1.19  2014/05/08 22:52:23  pauloscustodio
 # Move tests of BUG_0023 to bugfixes.t
 #
 # Revision 1.18  2014/05/08 22:30:38  pauloscustodio
