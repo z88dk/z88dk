@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.5 2014-05-08 21:57:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.6 2014-05-09 23:12:35 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -143,7 +143,13 @@ sub z80asm {
 	if ($bin ne "") {
 		$bin_file ||= "test.bin";
 		my $out_bin = read_binfile($bin_file);
-		eq_or_dump_diff $out_bin, $bin, "binary";
+		if ($out_bin eq $bin) {
+			is $out_bin, $bin, "binary";
+		}
+		else {
+			# slow - always generates hex dump even if equal
+			eq_or_dump_diff $out_bin, $bin, "binary";
+		}
 	}
 }
 
@@ -211,7 +217,11 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.5  2014-05-08 21:57:35  pauloscustodio
+# Revision 1.6  2014-05-09 23:12:35  pauloscustodio
+# eq_or_dump_diff is slow - always generates hex dump even if equal;
+# call only if different binary
+#
+# Revision 1.5  2014/05/08 21:57:35  pauloscustodio
 # Test::HexDifferences to show differences in hex code
 #
 # Revision 1.4  2014/05/07 23:09:26  pauloscustodio
