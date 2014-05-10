@@ -118,6 +118,7 @@ partition:
 
    ; compute the address of the middle element k in the interval [i,j]
    ; k = (i+j)/2 - ((j-i)/2)%size
+   ;   = i + (j-i)/2 - ((j-i)/2)%size (Einar Saukas)
 
    push hl                     ; save j
    push de                     ; save i
@@ -132,21 +133,17 @@ partition:
    ld e,c
    ld d,b                      ; de = size
    
+   push hl                     ; save (j-i)/2
+   
    call l0_divu_16_16x16       ; de = hl % de = [(j-i)/2] % size
 
-   pop hl                      ; hl = i
-   pop bc                      ; bc = j
+   pop hl                      ; hl = (j-i)/2
+   sbc hl,de
    
-   add hl,bc
-   rr h
-   rr l                        ; hl = (i+j)/2
-   
-   or a
-   sbc hl,de                   ; hl = k
-   
-   ld e,c
-   ld d,b                      ; de = j
+   pop de                      ; de = i
+   add hl,de                   ; hl = k = i + (j-i)/2 - ((j-i)/2)%size
 
+   pop de                      ; de = j
    pop bc                      ; bc = size
    
    ; find the median element among i,j,k
@@ -187,7 +184,6 @@ order_ki_j:
    
    rla
    jr nc, order_i_k_j
-
    jr order_k_i_j
 
 order_j_k:
@@ -392,7 +388,7 @@ swap_ij:
    
    add hl,bc                   ; i += size
    ex de,hl                    ; de = i
-   pop hl
+   pop hl                      ; hl = j
    sbc hl,bc                   ; j -= size
    
    jr left_squeeze_1
