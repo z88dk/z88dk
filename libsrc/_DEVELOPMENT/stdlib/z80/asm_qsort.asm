@@ -29,7 +29,7 @@
 PUBLIC asm_qsort
 
 EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
-EXTERN error_einval_zc, error_erange_zc
+EXTERN l0_divu_16_16x16, error_einval_zc, error_erange_zc
 
 asm_qsort:
 
@@ -111,7 +111,163 @@ partition:
    add hl,de
    inc hl
 
-   ; first element (at lo) is taken as pivot to avoid multiplication
+   ; de = i
+   ; hl = j
+   ; bc = size
+   ; carry reset
+
+   ; compute the address of the middle element k in the interval [i,j]
+   ; k = (i+j)/2 - ((j-i)/2)%size
+
+   push hl                     ; save j
+   push de                     ; save i
+   push bc                     ; save size
+   push hl                     ; save j
+   push de                     ; save i
+
+   sbc hl,de
+   srl h
+   rr l                        ; hl = (j-i)/2
+   
+   ld e,c
+   ld d,b                      ; de = size
+   
+   call l0_divu_16_16x16       ; de = hl % de = [(j-i)/2] % size
+
+   pop hl                      ; hl = i
+   pop bc                      ; bc = j
+   
+   add hl,bc
+   rr h
+   rr l                        ; hl = (i+j)/2
+   
+   or a
+   sbc hl,de                   ; hl = k
+   
+   ld e,c
+   ld d,b                      ; de = j
+
+   pop bc                      ; bc = size
+   
+   ; find the median element among i,j,k
+
+   ; de = j
+   ; hl = k
+   ; bc = size
+   ; stack = j, i
+
+   call compare_de_hl          ; compare(de=j, hl=k)
+   ex (sp),hl
+
+   rla
+   jr c, order_j_k
+
+order_k_j:
+
+   ; de = j
+   ; hl = i
+   ; bc = size
+   ; stack = j, k
+
+   call compare_de_hl          ; compare(de=j, hl=i)
+   
+   rla
+   jr c, order_k_j_i
+
+order_ki_j:
+
+   pop de
+   
+   ; de = k
+   ; hl = i
+   ; bc = size
+   ; stack = j
+   
+   call compare_de_hl          ; compare(de=k, hl=i)
+   
+   rla
+   jr nc, order_i_k_j
+
+   jr order_k_i_j
+
+order_j_k:
+   
+   ; de = j
+   ; hl = i
+   ; bc = size
+   ; stack = j, k
+   
+   call compare_de_hl          ; compare(de=j, hl=i)
+   
+   rla
+   jr c, order_j_ik
+
+order_i_j_k:
+order_k_j_i:
+
+   pop af                      ; junk k
+   
+   ; hl = i
+   ; de = j
+   ; bc = size
+   ; stack = j
+   
+   jr pivot_selected
+
+order_j_ik:
+
+   ex de,hl
+   pop hl
+   
+   ; de = i
+   ; hl = k
+   ; bc = size
+   ; stack = j
+   
+   call compare_de_hl          ; compare(de=i, hl=k)
+   ex de,hl
+   
+   rla
+   jr c, order_j_i_k
+
+order_j_k_i:
+order_i_k_j:
+
+   ; hl = i
+   ; de = k
+   ; bc = size
+   ; stack = j
+   
+pivot_selected:
+
+   ; move pivot to start of partition
+   
+   ; hl = i
+   ; de = pivot
+   ; bc = size
+   ; stack = j
+
+   push bc
+   call asm0_memswap           ; swap(i, pivot, size)
+   pop bc
+
+order_j_i_k:
+order_k_i_j:
+
+   ; median element is already at front of partition
+
+   ; hl = i
+   ; bc = size
+   ; stack = j
+
+   pop de
+   ex de,hl
+   
+   ; de = i=pivot
+   ; hl = j
+   ; bc = size
+
+   ; first element (at lo) is the pivot
    
    push hl                     ; save hi
    push de                     ; save lo=pivot
@@ -119,7 +275,7 @@ partition:
 left_squeeze_0:
 
    ex de,hl
-   add hl,bc
+   add hl,bc                   ; i += size
    ex de,hl
 
    ; de = i
@@ -150,44 +306,24 @@ left_squeeze_1:
    ; i <= j
 
    ex (sp),hl                  ; push j
-   push hl                     ; push lo=pivot
-   push bc                     ; push size
-   push de                     ; push i
-   push ix                     ; push compare
-
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push de
-   push hl
    ex de,hl
-   call l_jpix                 ; compare(de=lo=pivot, hl=i)
-   ld a,h                      ; get result
-   pop hl
-   pop de
-
-;******************************
-ELSE
-;******************************
-
-   push hl
-   push de
-   ex de,hl
-   call l_jpix                 ; compare(de=lo=pivot, hl=i)
-   ld a,h                      ; get result
-   pop de
-   pop hl
-
-;******************************
-ENDIF
-;******************************
    
-   pop ix                      ; ix = compare
-   pop de                      ; de = i
-   pop bc                      ; bc = size
-   pop hl
-   ex (sp),hl                  ; hl = j,, stack = hi, lo=pivot
+   ; de = lo=pivot
+   ; hl = i
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, j
+   
+   call compare_de_hl          ; compare(de=lo=pivot, hl=i)
+   
+   ex de,hl
+   ex (sp),hl
+
+   ; de = i
+   ; hl = j
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, lo=pivot
 
    rla
    jr nc, left_squeeze_0       ; if item[lo=pivot] >= item[i] continue
@@ -209,51 +345,24 @@ right_squeeze:
    add hl,de
 
    ; i < j
+   
+   ex (sp),hl
+   
+   ; de = j
+   ; hl = lo=pivot
+   ; bc = size
+   ; ix = compare
+   ; stack = hi, i
+   
+   call compare_de_hl          ; compare(de=j, hl=lo=pivot)
+   ex (sp),hl
 
    ; de = j
    ; hl = i
    ; bc = size
    ; ix = compare
    ; stack = hi, lo=pivot
-   
-   ex (sp),hl                  ; push i
-   push hl                     ; push lo=pivot
-   push bc                     ; push size
-   push de                     ; push j
-   push ix                     ; push compare
 
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push hl
-   push de
-   call l_jpix                 ; compare(de=j, hl=lo=pivot)
-   ld a,h                      ; get result
-   pop de
-   pop hl
-
-;******************************
-ELSE
-;******************************
-
-   push de
-   push hl
-   call l_jpix                 ; compare(de=j, hl=lo=pivot)
-   ld a,h                      ; get result
-   pop hl
-   pop de
-
-;******************************
-ENDIF
-;******************************
-
-   pop ix                      ; ix = compare
-   pop de                      ; de = j
-   pop bc                      ; bc = size
-   pop hl
-   ex (sp),hl                  ; hl = i,, stack = hi, lo=pivot
-   
    rla
    jr c, swap_ij               ; if item[j] < item[lo=pivot] stop
    
@@ -450,3 +559,51 @@ left_partition_empty:
    ex de,hl
    
    jp while_lohi
+
+compare_de_hl:
+
+  ; enter : ix = compare
+  ;         de = left operand
+  ;         hl = right operand
+  ;
+  ; exit  :  a = result
+  ;
+  ; uses  : af
+
+   push hl
+   push bc
+   push de
+   push ix
+
+;******************************
+IF __SDCC | __SDCC_IX | __SDCC_IY
+;******************************
+
+   push hl
+   push de
+   call l_jpix                 ; compare(de, hl)
+   ld a,h                      ; get result
+   pop de
+   pop hl
+
+;******************************
+ELSE
+;******************************
+
+   push de
+   push hl
+   call l_jpix                 ; compare(de, hl)
+   ld a,h                      ; get result
+   pop hl
+   pop de
+
+;******************************
+ENDIF
+;******************************
+   
+   pop ix
+   pop de
+   pop bc
+   pop hl
+
+   ret
