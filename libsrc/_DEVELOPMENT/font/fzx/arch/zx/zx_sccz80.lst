@@ -1,0 +1,4 @@
+font/fzx/arch/zx/c/sccz80/fzx_mode
+font/fzx/arch/zx/c/sccz80/fzx_putc
+font/fzx/arch/zx/c/sccz80/fzx_setat
+font/fzx/arch/zx/c/sccz80/fzx_setat_callee

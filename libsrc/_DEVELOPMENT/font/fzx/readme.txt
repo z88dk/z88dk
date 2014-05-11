@@ -1,12 +1,3 @@
 
-These functions will be changing to accommodate windowed terminals.
-
-
-======
-
-
-Each target must implement:
-
-asm_fzx_putc
-
-These functions can be found in the arch subdirectory
+Code in the arch subdirectory must also be included
+separately in the target's list of library files.
