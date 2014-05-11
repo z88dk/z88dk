@@ -1,0 +1,17 @@
+@adt/b_array/b_array_sccz80.lst
+@adt/b_vector/b_vector_sccz80.lst
+@adt/ba_priority_queue/ba_priority_queue_sccz80.lst
+@adt/ba_stack/ba_stack_sccz80.lst
+@adt/bv_priority_queue/bv_priority_queue_sccz80.lst
+@adt/bv_stack/bv_stack_sccz80.lst
+@adt/p_forward_list/p_forward_list_sccz80.lst
+@adt/p_forward_list_alt/p_forward_list_alt_sccz80.lst
+@adt/p_list/p_list_sccz80.lst
+@adt/p_queue/p_queue_sccz80.lst
+@adt/p_stack/p_stack_sccz80.lst
+@adt/w_array/w_array_sccz80.lst
+@adt/w_vector/w_vector_sccz80.lst
+@adt/wa_priority_queue/wa_priority_queue_sccz80.lst
+@adt/wa_stack/wa_stack_sccz80.lst
+@adt/wv_priority_queue/wv_priority_queue_sccz80.lst
+@adt/wv_stack/wv_stack_sccz80.lst

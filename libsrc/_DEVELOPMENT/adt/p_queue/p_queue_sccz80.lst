@@ -1,0 +1,9 @@
+adt/p_queue/c/sccz80/p_queue_back
+adt/p_queue/c/sccz80/p_queue_clear
+adt/p_queue/c/sccz80/p_queue_empty
+adt/p_queue/c/sccz80/p_queue_front
+adt/p_queue/c/sccz80/p_queue_init
+adt/p_queue/c/sccz80/p_queue_pop
+adt/p_queue/c/sccz80/p_queue_push
+adt/p_queue/c/sccz80/p_queue_push_callee
+adt/p_queue/c/sccz80/p_queue_size

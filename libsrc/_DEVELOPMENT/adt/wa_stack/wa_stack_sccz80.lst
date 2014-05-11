@@ -1,0 +1,11 @@
+adt/wa_stack/c/sccz80/wa_stack_capacity
+adt/wa_stack/c/sccz80/wa_stack_clear
+adt/wa_stack/c/sccz80/wa_stack_destroy
+adt/wa_stack/c/sccz80/wa_stack_empty
+adt/wa_stack/c/sccz80/wa_stack_init
+adt/wa_stack/c/sccz80/wa_stack_init_callee
+adt/wa_stack/c/sccz80/wa_stack_pop
+adt/wa_stack/c/sccz80/wa_stack_push
+adt/wa_stack/c/sccz80/wa_stack_push_callee
+adt/wa_stack/c/sccz80/wa_stack_size
+adt/wa_stack/c/sccz80/wa_stack_top

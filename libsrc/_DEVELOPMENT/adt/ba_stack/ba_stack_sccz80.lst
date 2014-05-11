@@ -1,0 +1,11 @@
+adt/ba_stack/c/sccz80/ba_stack_capacity
+adt/ba_stack/c/sccz80/ba_stack_clear
+adt/ba_stack/c/sccz80/ba_stack_destroy
+adt/ba_stack/c/sccz80/ba_stack_empty
+adt/ba_stack/c/sccz80/ba_stack_init
+adt/ba_stack/c/sccz80/ba_stack_init_callee
+adt/ba_stack/c/sccz80/ba_stack_pop
+adt/ba_stack/c/sccz80/ba_stack_push
+adt/ba_stack/c/sccz80/ba_stack_push_callee
+adt/ba_stack/c/sccz80/ba_stack_size
+adt/ba_stack/c/sccz80/ba_stack_top
