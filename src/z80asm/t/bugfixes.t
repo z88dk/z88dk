@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.25 2014-05-11 17:17:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.26 2014-05-11 17:21:37 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -450,6 +450,19 @@ note "BUG_0029";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0030 : List bytes patching overwrites header
+note "BUG_0030";
+{
+	my $list = t::Listfile->new();
+	my $num = (t::Listfile->max_line() - 5) / 2;		# max number of operands
+	$list->push_asm(";") for (1..60);
+	$list->push_asm("defb ".join(",", ('P') x $num), (0x12) x $num);
+	$list->push_asm("defc P = 0x12");
+
+	$list->test();
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -486,7 +499,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.25  2014-05-11 17:17:25  pauloscustodio
+# Revision 1.26  2014-05-11 17:21:37  pauloscustodio
+# Move tests of BUG_0030 to bugfixes.t
+#
+# Revision 1.25  2014/05/11 17:17:25  pauloscustodio
 # Move tests of BUG_0029 to bugfixes.t
 #
 # Revision 1.24  2014/05/11 17:10:08  pauloscustodio
