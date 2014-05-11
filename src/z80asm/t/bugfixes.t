@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.24 2014-05-11 17:10:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.25 2014-05-11 17:17:25 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -426,6 +426,30 @@ note "BUG_0028";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+note "BUG_0029";
+{
+	my @items = ( 0  ..  25) x 10;
+	my @vars  = ('A' .. 'Z') x 10;
+
+	my $list = t::Listfile->new();
+	for ([defb => "C"], [defw => "v"], [defl => "V"]) {
+		my($opcode, $pack) = @$_;
+		
+		for (0 .. $#items) {
+			my $asm = "$opcode ".join(",", @vars[0 .. $_]);
+			last if length($asm) > t::Listfile->max_line();
+			
+			$list->push_asm($asm, unpack("C*", pack("$pack*", @items[0 .. $_])));
+		}
+	}
+	for (0 .. 25) {		
+		$list->push_asm("defc ".chr(ord('A')+$_)." = $_");
+	}
+	$list->test();	
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -462,7 +486,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.24  2014-05-11 17:10:08  pauloscustodio
+# Revision 1.25  2014-05-11 17:17:25  pauloscustodio
+# Move tests of BUG_0029 to bugfixes.t
+#
+# Revision 1.24  2014/05/11 17:10:08  pauloscustodio
 # Move tests of BUG_0028 to bugfixes.t
 #
 # Revision 1.23  2014/05/11 16:45:38  pauloscustodio
