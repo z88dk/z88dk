@@ -1,0 +1,8 @@
+alloc/balloc/c/sccz80/balloc_addmem
+alloc/balloc/c/sccz80/balloc_addmem_callee
+alloc/balloc/c/sccz80/balloc_alloc
+alloc/balloc/c/sccz80/balloc_blockcount
+alloc/balloc/c/sccz80/balloc_firstfit
+alloc/balloc/c/sccz80/balloc_firstfit_callee
+alloc/balloc/c/sccz80/balloc_free
+alloc/balloc/c/sccz80/balloc_init

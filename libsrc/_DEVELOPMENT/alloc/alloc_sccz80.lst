@@ -1,0 +1,3 @@
+@alloc/balloc/balloc_sccz80.lst
+@alloc/malloc/malloc_sccz80.lst
+@alloc/obstack/obstack_sccz80.lst
