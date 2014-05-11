@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.22 2014-05-11 16:35:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.23 2014-05-11 16:45:38 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -392,6 +392,22 @@ note "BUG_0026";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0027 : Incorrect tabulation in symbol list
+note "BUG_0027";
+{
+	my $list = t::Listfile->new();
+	for (1..255) {
+		my $label = substr("X_".sprintf("%03d", $_).('_X' x $_), 0, $_);
+				
+		my $asm = "$label: defb $_";
+		last if length($asm) >= t::Listfile->max_line();
+		
+		$list->push_asm($asm, $_);
+	}		
+	$list->test();	
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -428,7 +444,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.22  2014-05-11 16:35:42  pauloscustodio
+# Revision 1.23  2014-05-11 16:45:38  pauloscustodio
+# Move tests of BUG_0027 to bugfixes.t
+#
+# Revision 1.22  2014/05/11 16:35:42  pauloscustodio
 # Move tests of BUG_0026 to bugfixes.t
 #
 # Revision 1.21  2014/05/09 23:20:57  pauloscustodio
