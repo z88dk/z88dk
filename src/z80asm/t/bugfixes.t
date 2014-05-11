@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.23 2014-05-11 16:45:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.24 2014-05-11 17:10:08 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -408,6 +408,24 @@ note "BUG_0027";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0028 : Not aligned page list in symbol list with more that 18 references
+note "BUG_0028";
+{
+	my $list = t::Listfile->new();
+	
+	# very long reference list, one defined before reference, other defined after reference
+	$list->push_asm("LBL1:");
+	for (0 .. 255) {
+		$list->push_asm("defw LBL1", 0, 0);
+		$list->push_asm("defw LBL2", 0, 4);
+
+		$list->push_asm(";") for (1..61-2);	# force new page
+	}		
+	$list->push_asm("LBL2:");
+	$list->test();	
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -444,7 +462,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.23  2014-05-11 16:45:38  pauloscustodio
+# Revision 1.24  2014-05-11 17:10:08  pauloscustodio
+# Move tests of BUG_0028 to bugfixes.t
+#
+# Revision 1.23  2014/05/11 16:45:38  pauloscustodio
 # Move tests of BUG_0027 to bugfixes.t
 #
 # Revision 1.22  2014/05/11 16:35:42  pauloscustodio
