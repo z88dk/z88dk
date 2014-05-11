@@ -1,7 +1,7 @@
-@adt/adt_lr_sccz80.lst
-@alloc/alloc_lr_sccz80.lst
-@arch/spectrum/spectrum_lr_sccz80.lst
-@ctype/ctype_lr_sccz80.lst
+@adt/adt_sccz80.lst
+@alloc/alloc_sccz80.lst
+@arch/zx/zx_sccz80.lst
+@ctype/ctype_sccz80.lst
 @error/error.lst
 @font/fzx/fzx_lr_sccz80.lst
 @font/fzx/arch/spectrum/spectrum_lr_sccz80.lst

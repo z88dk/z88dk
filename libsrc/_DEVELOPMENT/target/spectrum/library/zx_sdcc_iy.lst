@@ -1,6 +1,6 @@
 @adt/adt_sdcc_iy.lst
 @alloc/alloc_sdcc_iy.lst
-@arch/spectrum/spectrum_sdcc_iy.lst
+@arch/zx/zx_sdcc_iy.lst
 @ctype/ctype_sdcc_iy.lst
 @error/error.lst
 @font/fzx/fzx_sdcc_iy.lst
