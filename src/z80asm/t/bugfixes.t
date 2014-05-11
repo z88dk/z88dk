@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.26 2014-05-11 17:21:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.27 2014-05-11 17:25:37 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -458,7 +458,17 @@ note "BUG_0030";
 	$list->push_asm(";") for (1..60);
 	$list->push_asm("defb ".join(",", ('P') x $num), (0x12) x $num);
 	$list->push_asm("defc P = 0x12");
+	$list->test();
+}
 
+#------------------------------------------------------------------------------
+# BUG_0031 : List file garbled with input lines with 255 chars
+note "BUG_0031";
+{
+	my $list = t::Listfile->new();
+	my $num = int((255-5)/2);
+	$list->push_asm("defb ".join(",", ('P') x $num), (0x12) x $num) for (1..4);
+	$list->push_asm("defc P = 0x12");
 	$list->test();
 }
 
@@ -499,7 +509,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.26  2014-05-11 17:21:37  pauloscustodio
+# Revision 1.27  2014-05-11 17:25:37  pauloscustodio
+# Move tests of BUG_0031 to bugfixes.t
+#
+# Revision 1.26  2014/05/11 17:21:37  pauloscustodio
 # Move tests of BUG_0030 to bugfixes.t
 #
 # Revision 1.25  2014/05/11 17:17:25  pauloscustodio
