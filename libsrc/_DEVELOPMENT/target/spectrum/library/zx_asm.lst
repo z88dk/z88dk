@@ -4,8 +4,8 @@
 @ctype/ctype_asm.lst
 @error/error.lst
 @font/fzx/fzx_asm.lst
-@font/fzx/arch/spectrum/spectrum_asm.lst
-@input/spectrum/input_asm.lst
+@font/fzx/arch/zx/zx_asm.lst
+@input/zx/input_asm.lst
 @l/l.lst
 @locale/locale.lst
 @sound/sound_asm.lst

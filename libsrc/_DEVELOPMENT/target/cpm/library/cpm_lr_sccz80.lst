@@ -5,8 +5,8 @@
 @l/l.lst
 @l/sccz80.lst
 @locale/locale.lst
-@stdio/stdio_lr_sccz80.lst
-@stdlib/stdlib_lr_sccz80.lst
-@string/string_lr_sccz80.lst
+@stdio/stdio_sccz80.lst
+@stdlib/stdlib_sccz80.lst
+@string/string_sccz80.lst
 @threads/threads_lr_sccz80.lst
 @z80/z80_lr_sccz80.lst
