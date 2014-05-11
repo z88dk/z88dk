@@ -13,13 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.21 2014-05-09 23:20:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.22 2014-05-11 16:35:42 pauloscustodio Exp $
 #
 # Test bugfixes
 
 use Modern::Perl;
 use File::Path qw(make_path remove_tree);;
 use t::TestZ80asm;
+use t::Listfile;
 
 #------------------------------------------------------------------------------
 # BUG_0001: Error in expression during link
@@ -378,6 +379,19 @@ for ('jr', 'djnz')
 }
 
 #------------------------------------------------------------------------------
+# BUG_0026 : Incorrect paging in symbol list
+note "BUG_0026";
+{
+	my $list = t::Listfile->new();
+	for (0 .. 255) {
+		$list->push_asm("PUBLIC GLOBAL$_");
+		$list->push_asm("GLOBAL$_: defb $_", $_);
+		$list->push_asm("LOCAL$_: defb $_", $_);
+	}
+	$list->test();	
+}
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -414,7 +428,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.21  2014-05-09 23:20:57  pauloscustodio
+# Revision 1.22  2014-05-11 16:35:42  pauloscustodio
+# Move tests of BUG_0026 to bugfixes.t
+#
+# Revision 1.21  2014/05/09 23:20:57  pauloscustodio
 # Move tests of BUG_0025 to bugfixes.t
 #
 # Revision 1.20  2014/05/09 23:13:20  pauloscustodio

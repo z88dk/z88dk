@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.62 2014-04-26 08:12:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.63 2014-05-11 16:35:42 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -692,7 +692,7 @@ my $PAGE_SIZE = 61;
 my $LINE_SIZE = 122;
 my $MAX_LINE = 255-2;
 my $COLUMN_WIDTH = 32;
-my $LINENR; my @LINENR;
+my $LINENR; my @LINENR_STACK;
 my $PAGENR;
 my $PAGE_LINENR;
 my $ADDR = 0;
@@ -734,7 +734,7 @@ sub list_push_asm {
 	
 	# handle asm, interpreet labels
 	if ($asm) {				
-		push @LIST_ASM, $asm unless @LINENR;		# not if inside include
+		push @LIST_ASM, $asm unless @LINENR_STACK;		# not if inside include
 		
 		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
 			unshift @{$LABEL_PAGE{$1}}, $PAGENR;
@@ -810,14 +810,14 @@ sub list_push_asm {
 sub list_push_include {
 	my($file) = @_;
 	list_push_asm("include \"$file\"");
-	push @LINENR, $LINENR;
+	push @LINENR_STACK, $LINENR;
 	$LINENR = 1;
 }
 
 sub list_pop_include {
 	list_push_asm();
-	@LINENR or die;
-	$LINENR = pop(@LINENR);
+	@LINENR_STACK or die;
+	$LINENR = pop(@LINENR_STACK);
 }
 	
 #------------------------------------------------------------------------------
@@ -1014,9 +1014,11 @@ sub get_gcc_options {
 
 1;
 
-__END__
 # $Log: test_utils.pl,v $
-# Revision 1.62  2014-04-26 08:12:04  pauloscustodio
+# Revision 1.63  2014-05-11 16:35:42  pauloscustodio
+# Move tests of BUG_0026 to bugfixes.t
+#
+# Revision 1.62  2014/04/26 08:12:04  pauloscustodio
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 # Error caused by z80asm not closing the intermediate object files, when
 # assembling with -d.
