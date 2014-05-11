@@ -15,7 +15,7 @@
 #
 # Test generation of listfiles by z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.1 2014-05-11 16:35:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.2 2014-05-11 17:11:04 pauloscustodio Exp $
 
 package t::Listfile;
 
@@ -99,16 +99,17 @@ sub push_asm {
 			unless @{$self->LINENR_STACK};			# not if inside include
 		
 		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
-			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_PAGE->{$1} ||= [];
+			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_ADDR->{$1} = $self->ADDR;
 		}
 		elsif ($asm =~ /^\s*defc\s+($LABEL_RE)\s*=\s*(.*)/) {		# define constant
-			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_PAGE->{$1} ||= [];
+			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_ADDR->{$1} = 0+eval($2);
 		}
 		elsif ($asm =~ /(?i:xdef|xlib|public)\s+($LABEL_RE)/) {	# global label
+			$self->LABEL_PAGE->{$1} ||= [];
 			push @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_GLOBAL->{$1}++;
 		}
@@ -119,8 +120,10 @@ sub push_asm {
 			$new_list_on = 1;
 		}
 		else {
-			push @{$->LABEL_PAGE->{$1}}, $self->PAGENR 
-				while $asm =~ /($LABEL_RE)/g;	# use label
+			while ($asm =~ /($LABEL_RE)/g) {	# use label
+				$self->LABEL_PAGE->{$1} ||= [];
+				push @{$self->LABEL_PAGE->{$1}}, $self->PAGENR 
+			}
 		}
 	}
 	
@@ -377,6 +380,9 @@ sub test {
 1;
 
 # $Log: Listfile.pm,v $
-# Revision 1.1  2014-05-11 16:35:42  pauloscustodio
+# Revision 1.2  2014-05-11 17:11:04  pauloscustodio
+# Need to create list references before pushing
+#
+# Revision 1.1  2014/05/11 16:35:42  pauloscustodio
 # Move tests of BUG_0026 to bugfixes.t
 #
