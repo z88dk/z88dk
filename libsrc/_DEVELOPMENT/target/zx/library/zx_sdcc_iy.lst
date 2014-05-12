@@ -13,6 +13,6 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@temp/sp1/zx/sp1_zx_sdcc_iy.lst
 @threads/threads_sdcc_iy.lst
 @z80/z80_sdcc_iy.lst
-@temp/sp1/spectrum/sp1_spectrum_sdcc_iy.lst
