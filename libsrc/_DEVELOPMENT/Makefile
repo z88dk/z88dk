@@ -1,6 +1,6 @@
 
 TARGETS = cpm zx
-LIB_TYPES = asm lr_sccz80 sdcc_ix sdcc_iy
+LIB_TYPES = asm sccz80 sdcc_ix sdcc_iy
 
 jobs := $(foreach target,$(TARGETS),$(foreach type,$(LIB_TYPES),job-$(target)-$(type)))
 cleans := $(foreach target,$(TARGETS),$(foreach type,$(LIB_TYPES),clean-$(target)-$(type)))
