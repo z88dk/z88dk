@@ -13,7 +13,7 @@ struct obstack
    void       *end;
 };
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

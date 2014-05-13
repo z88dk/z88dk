@@ -15,7 +15,7 @@ typedef struct wa_stack_s
 
 } wa_stack_t;
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

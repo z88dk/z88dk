@@ -17,7 +17,7 @@ typedef struct bv_priority_queue_s
 
 } bv_priority_queue_t;
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

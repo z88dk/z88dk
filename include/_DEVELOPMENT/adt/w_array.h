@@ -15,7 +15,7 @@ typedef struct w_array_s
 
 } w_array_t;
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

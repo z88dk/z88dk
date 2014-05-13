@@ -107,7 +107,7 @@
 #define BEEPFX_YEAH               bfx_56
 #define BEEPFX_AWW                bfx_57
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

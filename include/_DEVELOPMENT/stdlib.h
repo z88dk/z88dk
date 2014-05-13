@@ -25,7 +25,7 @@ typedef struct ldiv_s
 
 #define RAND_MAX 32767
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

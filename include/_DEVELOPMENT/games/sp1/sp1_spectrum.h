@@ -124,7 +124,7 @@ struct sp1_pss {                      // "print string struct" - 11 bytes - A st
 };
 
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

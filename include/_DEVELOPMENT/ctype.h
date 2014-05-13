@@ -2,7 +2,7 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

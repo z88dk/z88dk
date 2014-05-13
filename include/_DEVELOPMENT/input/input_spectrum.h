@@ -8,7 +8,7 @@
 // joysticks
 ////////////
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // sdcc
 
@@ -34,7 +34,7 @@ extern uint16_t  __LIB__  in_stick_sinclair2(void);
 // mouse
 ////////
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // sdcc
 

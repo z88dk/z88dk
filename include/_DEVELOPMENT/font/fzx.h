@@ -56,7 +56,7 @@ extern struct fzx_state fzx;
 #define FZX_MODE_XOR   0xae00
 #define FZX_MODE_RESET 0xa62f
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 
@@ -117,7 +117,7 @@ extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 
 // FZX FONTS BY ANDREW OWEN
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_ao_Aribeth14;
 extern struct fzx_font *ff_ao_Aribeth6;
@@ -256,7 +256,7 @@ extern void __LIB__ _ff_ao_Zaibatsu(void);
 // FZX FONTS FROM KLUB UZIVATELU DESKTOPU
 // http://www.worldofspectrum.org/infoseekid.cgi?id=0023578
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_dkud1_Beerland2;
 extern struct fzx_font *ff_dkud1_Cinema;
@@ -332,7 +332,7 @@ extern void __LIB__ _ff_dkud1_UpnUp2(void);
 // FZX FONTS FROM UNIVERSUM'S DESKTOP
 // http://www.worldofspectrum.org/infoseekid.cgi?id=0016682
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_dkud2_Academy;
 extern struct fzx_font *ff_dkud2_Belegost1;
@@ -423,7 +423,7 @@ extern void __LIB__ _ff_dkud2_Winter(void);
 // FZX FONTS FROM KLUB UZIVATELU DESKTOPU 3
 // http://www.worldofspectrum.org/infoseekid.cgi?id=0023577
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_dkud3_Azbuka;
 extern struct fzx_font *ff_dkud3_AzbukaBold;
@@ -517,7 +517,7 @@ extern void __LIB__ _ff_dkud3_WingCmdr2(void);
 // FZX FONTS FROM DESKTOP FONT EDITOR
 // http://www.worldofspectrum.org/infoseekid.cgi?id=0016682
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_dkud4_Font01;
 extern struct fzx_font *ff_dkud4_Font02;
@@ -574,7 +574,7 @@ extern void __LIB__ _ff_dkud4_Font15(void);
 
 // FZX FONTS BY INDEPENDENT DESIGNERS
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_ind_vga;
 extern struct fzx_font *ff_ind_DutchLatin1;
@@ -595,7 +595,7 @@ extern void __LIB__ _ff_ind_SinclairLatin1(void);
 
 // FZX FONTS BY UTZ
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 extern struct fzx_font *ff_utz_1stGrade;
 extern struct fzx_font *ff_utz_Blokz;

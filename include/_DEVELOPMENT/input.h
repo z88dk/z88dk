@@ -12,7 +12,7 @@
 // keyboard
 ///////////
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // sdcc
 
@@ -68,7 +68,7 @@ typedef struct udk_s
 #define IN_STICK_LEFT    0x04
 #define IN_STICK_RIGHT   0x08
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // sdcc
 
@@ -133,7 +133,7 @@ extern udm_t input_stick_mouse_state;
 
 /******************************
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // sdcc
 

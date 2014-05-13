@@ -21,7 +21,7 @@ typedef struct mtx_s
 typedef uint16_t       once_flag;
 #define ONCE_FLAG_INIT 0x00fe
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

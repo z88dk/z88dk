@@ -8,7 +8,7 @@
 
 typedef void* p_forward_list_t;
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

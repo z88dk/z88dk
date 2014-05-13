@@ -25,7 +25,7 @@
 #define BRIGHT                      0x40
 #define FLASH                       0x80
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

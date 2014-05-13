@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 

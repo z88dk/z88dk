@@ -13,7 +13,7 @@ typedef struct p_queue_s
 
 } p_queue_t;
 
-#if __SDCC | __SDCC_IX | __SDCC_IY
+#ifdef __SDCC
 
 // SDCC
 
