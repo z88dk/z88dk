@@ -8,35 +8,30 @@ l_power_2_c:
    ; enter : c = unsigned char
    ;
    ; exit  : a = power of 2 >= c
-   ;         carry set if 2^8 is the result
+   ;         carry set and a==0 if 2^8 is the result
    ; 
-   ; uses  : af, b
-   
-   ld a,128
+   ; uses  : af, bc
+
+   ld a,$80
+   ld b,8
 
 loop:
 
-   ld b,a
-   and c
-   ld a,b
-   
-   jr nz, set_bit
+   sla c
+   jr c, set_bit
    
    rra
-   jp nc, loop
-
-was_zero:
-
+   djnz loop
+   
    xor a
    inc a
    ret
 
 set_bit:
 
-   cp c
+   ccf
    ret z
-   
+
    add a,a
    ret
-
    
