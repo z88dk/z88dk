@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: msxbasic.def,v 1.2 2007-12-19 10:00:27 stefano Exp $
+; $Id: msxbasic.def,v 1.3 2014-05-13 06:10:23 stefano Exp $
 ;
 
 
@@ -99,8 +99,8 @@ defc STREND = $F6C6
 defc SLOTID = $F91F	;1 Character set SlotID 
 defc CHFONT = $F920	;2 Character set address 
 defc ACPAGE = $FAF6
-defc EXBRSA = $FAF8	;1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
-defc DRVINF = $FB21	;1 Nr. of drives connected to disk interface 1 
+defc EXBRSA  = $FAF8	;1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
+defc DRVINF  = $FB21	;1 Nr. of drives connected to disk interface 1 
 defc DRVINF1 = $FB21	;1 Nr. of drives connected to disk interface 1 
 defc DISKIF1 = $FB22	;1 Slot address of disk interface 1 
 defc DRVINF2 = $FB23	;1 Nr. of drives connected to disk interface 2 
@@ -109,14 +109,73 @@ defc DRVINF3 = $FB25	;1 Nr. of drives connected to disk interface 3
 defc DISKIF3 = $FB26	;1 Slot address of disk interface 3 
 defc DRVINF4 = $FB27	;1 Nr. of drives connected to disk interface 4 
 defc DISKIF4 = $FB28	;1 Slot address of disk interface 4 
-defc BASROM = $FBB1
 
+defc PRSCNT = $FB35 ; Used by PLAY command in BASIC
+defc SAVSP  = $FB36 ;  "
+defc VOICEN = $FB38 ;  "
+defc SAVVOL = $FB39 ;  "
+defc MCLLEN = $FB3B ;  "
+defc MCLPTR = $FB3C ;  "
+defc QUEUEN = $FB3E
+defc MUSICF = $FB3F
+defc PLYCNT = $FB40
+defc VCBA   = $FB41
+defc VCBB   = $FB66
+defc VCBC   = $FB8B
+defc ENSTOP = $FBB0 ; <>0 if warm start enabled (CTRL+SHIFT+GRPH+KANA/CODE for warm start)
+defc BASROM = $FBB1 ; <>0 if basic is in rom (CTRL+STOP disabled)
+
+defc LINTTB = $FBB2  ; line terminator table (<>0 if line terminates)
+defc FSTPOS = $FBCA  ; first position for inlin
+defc CODSAV = $FBCC  ; code save area for cursor
+defc FNKSWI = $FBCD  ; indicate which func key is displayed
+defc FNKFLG = $FBCE  ; fkey which have subroutine
+defc ONGSBF = $FBD8  ; global event flag
+defc CLIKFL = $FBD9
+defc OLDKEY = $FBDA  ; (key map)
+defc NEWKEY = $FBE5  ; (key map)
+defc KEYBUF = $FBF0  ;  key code buffer
+defc BUFEND = $FC18  ;  end of key buffer
+defc LINWRK = $FC18  ;  ^
+defc PATWRK = $FC40  ;  Pattern Buffer
+defc BOTTOM = $FC48
 defc SYSMEM = $FC4A	;start address of system memory
+defc HIMEM  = $FC4A ;^
+defc TRPTBL = $FC4C
+defc RTYCNT = $FC9A
 
-defc SCRMOD = $FCAF
-defc BRDATR = $FCB2
+defc INTFLG = $FC9B ; This flag is set if STOP (=4) or CTRL + STOP (=3) is pressed
+defc PADY   = $FC9C ; Y-coordinate of a connected Graphics Tablet (PAD)
+defc PADX   = $FC9D ; X-coordinate of a connected Graphics Tablet (PAD)
+
+defc JIFFY  = $FC9E ; Counter for the BASIC "time" function, each interrupt of the VDP  it is increased by 1. 
+defc INTVAL = $FCA0 ; length of the interval when the ON INTERVAL routine was established.
+defc INTCNT = $FCA2 ; ON INTERVAL counter (counts backwards)
+defc LOWLIM = $FCA4 ; Used by the Cassette system (minimal length of startbit)
+defc WINWID = $FCA5 ; Used by the Cassette system (store the difference between a low-and high-cycle)
+defc GRPHED = $FCA6 ; flag for graph. char
+defc ESCCNT = $FCA7 ; escape sequence counter FCA8 INSFLG  insert mode flag
+defc CSRSW  = $FCA9 ; cursor display switch
+defc CSTYLE = $FCAA ; cursor style i.e. Used if INS Key is used ( 00# = Full Cursor / FF# = Halve Cursor ) 
+defc CAPST  = $FCAB ; capital status ( 00# = Off / FF# = On )
+defc KANAST = $FCAC ; russian key status (Dead Keys) 1=DK, 2=SHIFT+DK, 3=CODE+DK, 4=SHIFT+CODE+DK
+defc KANAMD = $FCAD
+defc FLBMEM = $FCAE ; 0 if loading basic programm
+
+defc SCRMOD = $FCAF ; screen mode
+defc OLDSCR = $FCB0 ; old screen mode
+defc CASPRV = $FCB1
+defc BRDATR = $FCB2 ; border color for paint
+defc GXPOS  = $FCB3 ; X-position
+defc GYPOS  = $FCB5 ; Y-position
 defc GRPACX = $FCB7
 defc GRPACY = $FCB9
+defc DRWFLG = $FCBB ; DrawFlag: Bit 7 = Draw Line (,N), Bit 6 = Move Cursor (,B)
+defc DRWSCL = $FCBC ; DrawScaling
+defc DRWANG = $FCBD ; DrawAngle (0..3): 1=90 degrees rotation .. 3=270 degrees, etc..
+
+defc RUNBNF = $FCBE ; Run Binary File After loading ( Bload"File.Bin",R ) 0 = Don't Run / 1 = Run
+defc SAVENT = $FCBF ; start address for BSAVE / BLOAD operations
 
 ; FCC1H  --  slot-address of main-ROM
 defc EXPTBL = $FCC1	;1 Slot 0: #80 = expanded, 0 = not expanded. Also slot address of the main BIOS-ROM. 
@@ -130,6 +189,10 @@ defc SLT1 = $FCC6	;1 Mirror of slot 1...
 defc SLT2 = $FCC7	;1 Mirror of slot 2...
 defc SLT3 = $FCC8	;1 Mirror of slot 3...
 
+defc SLTATR = $FCC9 ; Slotatributes found starting: Bit 7 = Basic prog, Bit 6 = Dev Ext, Bit 5 = Stmt Ext
+defc SLTWRK = $FD09 ; (free word = FD09H + 32*basic slot + 8*expansion slot + 2*page)
+defc PROCNM = $FD89 ; name of expanded statement
+defc DEVICE = $FD99 ; device ID for cartrige 0-3
 
 
 ; BASIC locations

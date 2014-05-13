@@ -13,9 +13,10 @@
  *	Changes to standard source:
  *	 - casts removed in structures
  *	 - Few defines to make life easier
- *   - tape save
+ *   - tape or disk save     (-DTAPE, -DDISK)
  *   - lowercase text taken from the oz700 port in the 'ozdev' web site
- *   - opt graphics scenes
+ *   - opt graphics scenes   (-DPIC)
+ *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
  *
@@ -149,7 +150,9 @@ int		CUR_RM;
 
 char	strTokenBuf[4];		/* workspace of $04 bytes to hold a token*/
 
+#ifdef COMPUTE_SCORE
 int nScore;
+#endif
 
 #ifdef SPECTRUM
 #define MAX_COL 50
@@ -459,7 +462,7 @@ typedef struct
 	int		nCode;
 } TOKEN;
 
-#define MAX_TOK 110
+#define MAX_TOK 111
 
 TOKEN taToken[MAX_TOK] =
 {
@@ -474,6 +477,7 @@ TOKEN taToken[MAX_TOK] =
 	{ "WEST", TOK_WEST },
 	{ "W   ", TOK_WEST },
 	{ "GET ", TOK_GET },
+	{ "TAKE", TOK_GET },
 	{ "PICK", TOK_GET },
 	{ "DROP", TOK_DROP },
 	{ "PUT ", TOK_DROP },
@@ -2586,7 +2590,9 @@ void SH_QUIT()
 		PrintStr("Start tape, then press a key\n");
 		i_GetCh();
 		tape_save_block(GVARS, sizeof(GVARS), 1);
+#ifdef COMPUTE_SCORE
 		tape_save_block(&nScore, sizeof(nScore), 2);
+#endif
 		tape_save_block(naItemLoc, sizeof(naItemLoc), 3);
 		tape_save_block(&CUR_RM, sizeof(CUR_RM), 4);
 #endif
@@ -2599,7 +2605,9 @@ void SH_QUIT()
 		/* save */
 		fpsave=fopen("adv_a.sav","wb");
 		fwrite(GVARS, sizeof(GVARS),1, fpsave);
+#ifdef COMPUTE_SCORE
 		fwrite(&nScore, sizeof(nScore),1, fpsave);
+#endif
 		fwrite(naItemLoc, sizeof(naItemLoc),1, fpsave);
 		fwrite(&CUR_RM, sizeof(CUR_RM),1, fpsave);
 		fclose(fpsave);
@@ -2689,25 +2697,27 @@ void SH_FAIL()
 
 void SH_ADSC()
 {
+#ifdef COMPUTE_SCORE
 	nScore += PARAM1;
+#endif
 }
-
 
 void SH_SCOR()
 {
+#ifdef COMPUTE_SCORE
 	char szScore[32];
 	
 	PrintStr("You have a score of ");
 	
-#ifdef SMALL_C
-	printn(nScore,16,stdout);
-#else
-	sprintf(szScore, "%04x", nScore);		/* hex! (really) */
+#ifndef printn
+	sprintf(szScore, "%04x", nScore);		// hex! (really)
 	PrintStr(szScore);
+#else
+	printn(nScore,16,stdout);
 #endif
 	PrintCR();
+#endif
 }	
-
 
 /* addresses of various system function handlers */
 
@@ -2976,8 +2986,10 @@ int main()
 		for (n = 0; n <= 0x1e; ++n)
 			GVARS[n] = 0;
 
+#ifdef COMPUTE_SCORE
 		nScore = 0;
-
+#endif
+		
 		PrintInstr();
 
 		/* copy data from naItemStart to naItemLoc at start of game */
@@ -2992,7 +3004,9 @@ int main()
 		{
 			/* restore */
 			tape_load_block(GVARS, sizeof(GVARS), 1);
+#ifdef COMPUTE_SCORE
 			tape_load_block(&nScore, sizeof(nScore), 2);
+#endif
 			tape_load_block(naItemLoc, sizeof(naItemLoc), 3);
 			tape_load_block(&CUR_RM, sizeof(CUR_RM), 4);
 		}
@@ -3005,7 +3019,9 @@ int main()
 		/* restore */
 			fpsave=fopen("adv_a.sav","rb");
 			fread(GVARS, sizeof(GVARS),1, fpsave);
+#ifdef COMPUTE_SCORE
 			fread(&nScore, sizeof(nScore),1, fpsave);
+#endif
 			fread(naItemLoc, sizeof(naItemLoc),1, fpsave);
 			fread(&CUR_RM, sizeof(CUR_RM),1, fpsave);
 			fclose(fpsave);
