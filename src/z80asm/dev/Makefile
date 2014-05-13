@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.10 2014-04-27 09:06:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.11 2014-05-13 23:42:48 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -39,21 +39,13 @@ scan_rules.h : scan_rules.rl scan_def.h legacy.h
 	$(ASTYLE) scan_rules.h
 	$(RM) scan_rules.*.tmp
 	
-all:
-	$(MAKE)
-
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation
 #------------------------------------------------------------------------------
-BUILD_OPCODES	= dev/build_z80opcodes.pl
-OPCODES_DAT		= t/data/z80opcodes_templ.asm
-OPCODES_OUT		= t/data/z80opcodes
+all: t/opcodes.t
 
-all : $(OPCODES_OUT).asm $(OPCODES_OUT).bin $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin 
-
-$(OPCODES_OUT).asm $(OPCODES_OUT).bin $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin : $(OPCODES_DAT) $(BUILD_OPCODES)
-	perl $(BUILD_OPCODES)          $(OPCODES_DAT) $(OPCODES_OUT).asm        $(OPCODES_OUT).bin
-	perl $(BUILD_OPCODES) -DRABBIT $(OPCODES_DAT) $(OPCODES_OUT)_rabbit.asm $(OPCODES_OUT)_rabbit.bin
+t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm
+	perl dev/build_opcodes.pl
 
 #------------------------------------------------------------------------------
 # formatting style
@@ -85,11 +77,19 @@ astyle:
 #------------------------------------------------------------------------------
 #parse.c parse.h : parse.y
 #	bison parse.y
-	
+
+all:
+	$(MAKE)
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.10  2014-04-27 09:06:25  pauloscustodio
+# Revision 1.11  2014-05-13 23:42:48  pauloscustodio
+# Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+# Remove opcode errors and warnings from t/errors.t.
+# Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+# Remove t/data/z80opcodes*, too complex to maintain.
+#
+# Revision 1.10  2014/04/27 09:06:25  pauloscustodio
 # Cleanup temporary files
 #
 # Revision 1.9  2014/04/25 23:52:17  pauloscustodio

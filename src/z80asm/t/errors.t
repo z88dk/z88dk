@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.17 2014-05-04 17:36:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.18 2014-05-13 23:42:49 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -126,120 +126,6 @@ t_z80asm_capture("-r0 -b -c ".asm_file(),
 remove_tree( bin_file() );
 
 #------------------------------------------------------------------------------
-# Errors
-check_errors("", <<'ASM');
-	ldx						; unknown identifier
-	ld						; syntax error
-	ld a,1+					; syntax error in expression
-
-	defm ";					; unclosed quoted string
-	defm "hello				; unclosed quoted string
-
-	defb '					; invalid single quoted character
-	defb 'x					; invalid single quoted character
-	defb ''					; invalid single quoted character
-	defb 'he'				; invalid single quoted character
-
-	call_oz		0      		; integer '0' out of range
-	call_oz		65536		; integer '65536' out of range
-	
-	call_pkg	-1    		; integer '-1' out of range
-	call_pkg	65536 		; integer '65536' out of range
-	
-	fpp			0    		; integer '0' out of range
-	fpp			255	 		; integer '255' out of range
-	fpp			256	 		; integer '256' out of range
-	
-	invoke		-1    		; integer '-1' out of range
-	invoke		65536 		; integer '65536' out of range
-	
-; RST out of range
-	rst	undefined		   	; symbol not defined
-	rst -1					; integer '-1' out of range
-	rst 1					; integer '1' out of range
-	rst 7					; integer '7' out of range
-	rst 9					; integer '9' out of range
-	rst 15					; integer '15' out of range
-	rst 17					; integer '17' out of range
-	rst 23					; integer '23' out of range
-	rst 25					; integer '25' out of range
-	rst 31					; integer '31' out of range
-	rst 33					; integer '33' out of range
-	rst 39					; integer '39' out of range
-	rst 41					; integer '41' out of range
-	rst 47					; integer '47' out of range
-	rst 49					; integer '49' out of range
-	rst 55					; integer '55' out of range
-	rst 57					; integer '57' out of range
-	
-; bit out of range
-	bit -1,a				; integer '-1' out of range
-	bit  8,a				; integer '8' out of range
-	bit undefined,a			; symbol not defined
-	res -1,a				; integer '-1' out of range
-	res  8,a				; integer '8' out of range
-	res undefined,a			; symbol not defined
-	set -1,a				; integer '-1' out of range
-	set  8,a				; integer '8' out of range
-	set undefined,a			; symbol not defined
-
-; im out of range
-	im 	-1					; integer '-1' out of range
-	im 	3					; integer '3' out of range
-	im 	undefined			; symbol not defined
-
-; jump relative out of range
-	djnz ASMPC-0x7F			; integer '-129' out of range
-	djnz ASMPC+0x82			; integer '128' out of range
-	jr ASMPC-0x7F			; integer '-129' out of range
-	jr ASMPC+0x82			; integer '128' out of range
-	jr nz,ASMPC-0x7F		; integer '-129' out of range
-	jr nz,ASMPC+0x82		; integer '128' out of range
-	jr  z,ASMPC-0x7F		; integer '-129' out of range
-	jr  z,ASMPC+0x82		; integer '128' out of range
-	jr nc,ASMPC-0x7F		; integer '-129' out of range
-	jr nc,ASMPC+0x82		; integer '128' out of range
-	jr  c,ASMPC-0x7F		; integer '-129' out of range
-	jr  c,ASMPC+0x82		; integer '128' out of range
-
-ASM
-
-#------------------------------------------------------------------------------
-# Errors on RABBIT
-check_errors("-RCMX000", <<'ASM');
-	daa						; illegal identifier
-	inc ixl					; illegal identifier
-	inc ixh					; illegal identifier
-	inc iyl					; illegal identifier
-	inc iyh					; illegal identifier
-	ld (bc),b				; illegal identifier
-	di 						; illegal identifier
-	ei	 					; illegal identifier
-	halt					; illegal identifier
-	im	0					; illegal identifier
-	im	1   				; illegal identifier
-	im	2   				; illegal identifier
-	retn					; illegal identifier
-	rst	0x00				; illegal identifier
-	rst	0x08				; illegal identifier
-	rst	0x30				; illegal identifier
-	in a,(N)				; illegal identifier
-	in a,(c)				; illegal identifier
-	in d,(c)				; illegal identifier
-	ini						; illegal identifier
-	inir					; illegal identifier
-	ind						; illegal identifier
-	indr					; illegal identifier
-	out (N),a				; illegal identifier
-	out (c),a				; illegal identifier
-	out (c),d				; illegal identifier
-	outi					; illegal identifier
-	otir					; illegal identifier
-	outd					; illegal identifier
-	otdr					; illegal identifier
-ASM
-
-#------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", EXPR => [ [C => 0, 0, "*+VAL"] ] ));
@@ -249,42 +135,6 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 				 "Error at file 'test.asm' module 'test': error in expression '*+VAL'\n".
 				 "2 errors occurred during assembly\n",
 				 1);
-
-#------------------------------------------------------------------------------
-# Warnings
-check_warnings("", <<'ASM');
-
-; Byte
-	ld a, -129			; 3E 7F			; integer '-129' out of range
-	ld a,-128			; 3E 80			;
-	ld a,0				; 3E 00			;
-	ld a,255			; 3E FF			;
-	ld a,256			; 3E 00			; integer '256' out of range
-
-; SignedByte
-	ld (ix-129),-1		; DD 36 7F FF	; integer '-129' out of range
-	ld (ix-128),-1		; DD 36 80 FF	;
-	ld (ix),-1			; DD 36 00 FF	;
-	ld (ix+127),-1		; DD 36 7F FF	;
-	ld (ix+128),-1		; DD 36 80 FF	; integer '128' out of range
-
-; Word
-	ld bc,-32769		; 01 FF 7F		; integer '-32769' out of range
-	ld bc,-32768		; 01 00 80		; 
-	ld bc, 65535		; 01 FF FF		; 
-	ld bc, 65536		; 01 00 00		; integer '65536' out of range
-
-; 32-bit arithmetic, long range is not tested on a 32bit long
-	defl 0xFFFFFFFF+1	; 00 00 00 00	; 
-
-; call out of range
-	call -32769			; CD FF 7F		; integer '-32769' out of range
-	call -32768			; CD 00 80		; 
-	call -1				; CD FF FF		; 
-	call 65535			; CD FF FF		; 
-	call 65536			; CD FF FF		; integer '65536' out of range
-
-ASM
 
 #------------------------------------------------------------------------------
 # warn_option_deprecated
@@ -450,63 +300,6 @@ t_binary(read_binfile(bin_file()), pack("C*",
 		0x01, 0x00, 0x00,
 		0x01, 0x00, 0x00,
 ));
-
-#------------------------------------------------------------------------------
-# assemble, check errors
-#------------------------------------------------------------------------------
-sub check_errors {	
-	my($options, $code) = @_;
-	
-	my $line = 0;
-	my $asm = "";
-	my $errors = "";
-	my $num_errors;
-	
-	for (split(/\n/, $code)) {
-		$line++;
-		$asm .= "$_\n";
-		diag($1) if /;\s+((BUG_|CH_)\d+)/;
-		
-		my($error_text) = /\s+;\s*(.*)/ or next;
-		$errors .= "Error at file '".asm_file()."' line ".$line.": ".$error_text."\n";
-		$num_errors++;
-	}
-	$errors .= $num_errors." errors occurred during assembly\n";
-	
-	write_file(asm_file(), $asm);
-	t_z80asm_capture($options." ".asm_file(), "", $errors, 1 );
-}
-
-#------------------------------------------------------------------------------
-# assemble, check warnings
-#------------------------------------------------------------------------------
-sub check_warnings {	
-	my($options, $code, $add_options, $link_warnings) = @_;
-	
-	my $line = 0;
-	my $asm = "";
-	my $bin = "";
-	my $warnings = "";
-	
-	for (split(/\n/, $code)) {
-		$line++;
-		$asm .= "$_\n";
-		diag($1) if /;\s+((BUG_|CH_)\d+)/;
-		
-		my($hex, $warning_text) = /\s+;([0-9A-F \t]+);\s*((.+)?)/i or next;
-		for (split(' ', $hex)) {
-			$bin .= chr(hex($_));
-		}
-		if ($warning_text) {
-			$warnings .= "Warning at file '".asm_file()."' line ".
-						 $line.": ".$warning_text."\n";
-		}
-	}
-	
-	write_file(asm_file(), $asm);
-	t_z80asm_capture($options." ".asm_file()." ".($add_options || ""), "", 
-					 $warnings.($link_warnings || ""), 0 );
-}
 
 # defvar out of range
 t_z80asm(
@@ -1113,7 +906,13 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.17  2014-05-04 17:36:46  pauloscustodio
+# Revision 1.18  2014-05-13 23:42:49  pauloscustodio
+# Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+# Remove opcode errors and warnings from t/errors.t.
+# Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+# Remove t/data/z80opcodes*, too complex to maintain.
+#
+# Revision 1.17  2014/05/04 17:36:46  pauloscustodio
 # ws
 #
 # Revision 1.16  2014/05/02 20:24:39  pauloscustodio

@@ -1,120 +1,86 @@
 ;------------------------------------------------------------------------------
-; Z80 reference opcodes parsed by build_z80opcodes.pl
-; 		z80asm-code ;; z80pack-code ;; code ;; code
-; The code is assembled by z80pack and transformed into code and binary form:
-;		z80asm-code ;; addr hh hh hh hh
-; This is file used to test the assembly of z80asm
-; 
-; Copyright (C) Paulo Custodio, 2011-2014
-; 
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80opcodes_templ.asm,v 1.5 2014-05-05 21:40:25 pauloscustodio Exp $
+;     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
+;   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
+;                ZZZZZ      888           888  0000         0000
+;              ZZZZZ        88888888888888888  0000         0000
+;            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
+;          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
+;        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
+;      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
+;    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
+;  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 ;
+; Input data for tests, to be parsed by build_opcodes.pl
+;
+; Copyright (C) Paulo Custodio, 2011-2014
+;
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.1 2014-05-13 23:42:48 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
+
+	extern ZERO							;;ZERO    equ 0
 
 	defc IND =	05h						;;IND	equ	05h 
 	defc M   =	10h						;;M		equ	10h 
 	defc N   =	20h						;;N		equ	20h 
 	defc NN  =  30h						;;NN	equ 30h 
 	defc DIS =	40h						;;DIS	equ	40h 
-	
+
 ;------------------------------------------------------------------------------
 ; Value ranges
+; z80pack is less permissive than z80asm in out of range
 ;------------------------------------------------------------------------------
 
-										; z80pack does not allow negative indexes
-	ld	a,(ix-128)						;; 	defb 0DDh ;; ld a,(hl) ;; defb -128
-	ld	a,(iy-128)						;; 	defb 0FDh ;; ld a,(hl) ;; defb -128
-	ld	a,(ix)							;; 	defb 0DDh ;; ld a,(hl) ;; defb 0
-	ld	a,(iy)							;; 	defb 0FDh ;; ld a,(hl) ;; defb 0
+	ldx									;; error: unknown identifier
+	ld									;; error: syntax error
+	ld a,1+								;; error: syntax error in expression
+
+; Byte
+	ld a,{-128 -1 0 1 127 255}
+	ld a,{-129 256}						;; defb 03Eh, {1}	;; warn: integer '{1}' out of range
+
+; SignedByte
+	ld	a,({ix iy}{-129 +128})			;; defb {1@} ;; ld a,(hl) ;; defb {2}	;; warn: integer '{2-+}' out of range
+	ld	a,({ix iy}-128)					;; defb {1@} ;; ld a,(hl) ;; defb 080h
+	ld	a,({ix iy})						;; defb {1@} ;; ld a,(hl) ;; defb 0
 	ld	a,({ix iy}+{0 127})
 
-	ld	a,{-128 0 255}
-	ld 	bc,{-32768 -1 0 65535}
-	jp	{-32768 -1 0 65535}
+; Word
+	ld bc,{-32768 -1 0 1 32767 65535}
+	ld bc,{-32769 65536}				;; warn: integer '{1}' out of range
+
+; 32-bit arithmetic, long range is not tested on a 32bit long
+	defl 0xFFFFFFFF						;; defw 0FFFFh, 0FFFFh
+	defl 0xFFFFFFFF+1					;; defw 0, 0
+
+; call out of range
+	call {-32768 -1 0 1 65535}
+	call {-32769 65536}					;; warn: integer '{1}' out of range
 
 ;------------------------------------------------------------------------------
-; Regression tests
+; Strings
 ;------------------------------------------------------------------------------
 
-; BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-bug0047a:
-	defw	ASMPC,ASMPC,ASMPC			;;	defw bug0047a,bug0047a,bug0047a
-bug0047b:	
-	jp		ASMPC						;;	jp bug0047b
+	defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
+	defw 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
+	defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ"	;; defm 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-;------------------------------------------------------------------------------
-; IF ELSE ENDIF
-;------------------------------------------------------------------------------
-	if	1								;;
-	  defb 1							;;	defb 1
-	  if 1								;;
-		defb 2							;;	defb 2
-	  else								;;
-	    defb 3							;;
-	  endif								;;
-	else								;;
-	  defb 4							;;
-	  if 1								;;
-	    defb 5							;;
-      else								;;
-	    defb 6							;;
-	  endif								;;
-	endif								;;
+	defm "								;; error: unclosed quoted string
+	defm "hello							;; error: unclosed quoted string
 
-	if 0								;;
-	  defb 7							;;
-	endif								;;
-	
-	if 1								;;
-	  defb 8							;; 	defb 8
-	endif								;;
-	
-	if 0								;;
-	  defb 9							;;
-	else								;;
-	  defb 10							;;	defb 10
-	endif								;;
-	
-	if undefined						;;
-	  defb 11							;;
-	else								;;
-	  defb 12							;;	defb 12
-	endif								;;
+	defb '								;; error: invalid single quoted character
+	defb 'x								;; error: invalid single quoted character
+	defb ''								;; error: invalid single quoted character
+	defb 'he'							;; error: invalid single quoted character
 
-	if undefined | 1					;;
-	  defb 13							;;	defb 13
-	else								;;
-	  defb 14							;;
-	endif								;;
-
-;------------------------------------------------------------------------------
-; Z88DK specific opcodes
-;------------------------------------------------------------------------------
-	call_oz	1							;; 	rst 20h ;; defb 1
-	call_oz	255							;; 	rst 20h ;; defb 255
-	call_oz	256							;; 	rst 20h ;; defw 256
-	call_oz	65535						;; 	rst 20h ;; defw 65535
-
-	call_pkg 0							;; 	rst 08h ;; defw 0
-	call_pkg 1							;; 	rst 08h ;; defw 1
-	call_pkg 65535						;; 	rst 08h ;; defw 65535
-	
-	fpp 1								;; 	rst 18h ;; defb 1
-	fpp 254								;; 	rst 18h ;; defb 254
-
-	invoke 0							;;	call 0
-	invoke 1							;;	call 1
-	invoke 65535						;;	call 65535
-	
 ;------------------------------------------------------------------------------
 ; 8 bit load group
 ;------------------------------------------------------------------------------
 
 	ld	{b c d e h l a},{b c d e h l a}
 	ld	{b c d e h l a},N
-
+	
 IF !RABBIT
 	ld	{b c d e ixh ixl a},{ixh ixl}	;;	defb 0DDh ;; ld	{1-ix},{2-ix}
 	ld	{ixh ixl},{b c d e ixh ixl a}	;;	defb 0DDh ;; ld	{1-ix},{2-ix}
@@ -123,43 +89,39 @@ IF !RABBIT
 	ld	{b c d e iyh iyl a},{iyh iyl}	;;	defb 0FDh ;; ld	{1-iy},{2-iy}
 	ld	{iyh iyl},{b c d e iyh iyl a}	;;	defb 0FDh ;; ld	{1-iy},{2-iy}
 	ld	{iyh iyl},N						;;	defb 0FDh ;; ld {1-iy},N
+ELSE
+	ld	{b c d e ixh ixl a},{ixh ixl}	;; error: illegal identifier
+	ld	{ixh ixl},{b c d e ixh ixl a}	;; error: illegal identifier
+	ld	{ixh ixl},N						;; error: illegal identifier
+	
+	ld	{b c d e iyh iyl a},{iyh iyl}	;; error: illegal identifier
+	ld	{iyh iyl},{b c d e iyh iyl a}	;; error: illegal identifier
+	ld	{iyh iyl},N						;; error: illegal identifier
 ENDIF
 
 	ld	{b c d e h l a},(hl)
 ;	ldi	{b c d e h l a},(hl)			;; 	ld	{1},(hl) ;; inc hl
 ;	ldd	{b c d e h l a},(hl)			;; 	ld	{1},(hl) ;; dec hl
 
-	ld	{b c d e h l a},(ix+DIS)
-;	ldi	{b c d e h l a},(ix+DIS)		;;	ld	{1},(ix+DIS) ;; inc ix
-;	ldd	{b c d e h l a},(ix+DIS)		;;	ld	{1},(ix+DIS) ;; dec ix
-
-	ld	{b c d e h l a},(iy+DIS)
-;	ldi	{b c d e h l a},(iy+DIS)		;;	ld	{1},(iy+DIS) ;; inc iy
-;	ldd	{b c d e h l a},(iy+DIS)		;;	ld	{1},(iy+DIS) ;; dec iy
+	ld	{b c d e h l a},({ix iy}+DIS)
+;	ldi	{b c d e h l a},({ix iy}+DIS)	;;	ld	{1},({2}+DIS) ;; inc {2}
+;	ldd	{b c d e h l a},({ix iy}+DIS)	;;	ld	{1},({2}+DIS) ;; dec {2}
 
 	ld	(hl),{b c d e h l a}
 ;	ldi	(hl),{b c d e h l a}			;; 	ld	(hl),{1} ;; inc hl
 ;	ldd	(hl),{b c d e h l a}			;; 	ld	(hl),{1} ;; dec hl
 
-	ld	(ix+DIS),{b c d e h l a}
-;	ldi	(ix+DIS),{b c d e h l a}		;;	ld	(ix+DIS),{1} ;; inc ix
-;	ldd	(ix+DIS),{b c d e h l a}		;;	ld	(ix+DIS),{1} ;; dec ix
-
-	ld	(iy+DIS),{b c d e h l a}
-;	ldi	(iy+DIS),{b c d e h l a}		;;	ld	(iy+DIS),{1} ;; inc iy
-;	ldd	(iy+DIS),{b c d e h l a}		;;	ld	(iy+DIS),{1} ;; dec iy
+	ld	({ix iy}+DIS),{b c d e h l a}
+;	ldi	({ix iy}+DIS),{b c d e h l a}	;;	ld	({1}+DIS),{2} ;; inc {1}
+;	ldd	({ix iy}+DIS),{b c d e h l a}	;;	ld	({1}+DIS),{2} ;; dec {1}
 
 	ld	(hl),N
 ;	ldi	(hl),N							;;	ld	(hl),N ;; inc hl
 ;	ldd	(hl),N							;;	ld	(hl),N ;; dec hl
 
-	ld	(ix+DIS),N
-;	ldi	(ix+DIS),N						;;	ld	(ix+DIS),N ;; inc ix
-;	ldd	(ix+DIS),N						;;	ld	(ix+DIS),N ;; dec ix
-
-	ld	(iy+DIS),N
-;	ldi	(iy+DIS),N						;;	ld	(iy+DIS),N ;; inc iy
-;	ldd	(iy+DIS),N						;;	ld	(iy+DIS),N ;; dec iy
+	ld	({ix iy}+DIS),N
+;	ldi	({ix iy}+DIS),N					;;	ld	({1}+DIS),N ;; inc {1}
+;	ldd	({ix iy}+DIS),N					;;	ld	({1}+DIS),N ;; dec {1}
 
 	ld	a,({bc de})
 ;	ldi	a,({bc de})						;;	ld	a,({1}) ;; inc {1}
@@ -171,6 +133,8 @@ ENDIF
 
 	ld	a,(NN)
 	ld	(NN),a
+
+	ld ({bc de}),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: illegal identifier
 
 IF !RABBIT
 	ld	a,{i r}
@@ -230,7 +194,6 @@ ENDIF
 ;	ld iy,iy						=} 0xFD 0x6D 0xFD 0x64
 ;	ld iy,ix						=} 0xDD 0xE5 0xFD 0xE1
 
-
 ;------------------------------------------------------------------------------
 ; Exchange, block transfer, search group
 ;------------------------------------------------------------------------------
@@ -277,10 +240,17 @@ ENDIF
 	{inc dec}             {b c d e h l a (hl) (ix+DIS) (iy+DIS)}
 	
 IF !RABBIT
-	{add adc sbc} a,{ixh ixl}				;;	defb 0DDh ;; {1} a,{2-ix}
-	{add adc sbc} a,{iyh iyl}				;;	defb 0FDh ;; {1} a,{2-iy}
-	{sub and xor or cp inc dec} {ixh ixl}	;;	defb 0DDh ;; {1} {2-ix}
-	{sub and xor or cp inc dec} {iyh iyl}	;;	defb 0FDh ;; {1} {2-iy}
+	{add adc sbc} a,{ix iy}{h l}		;;	defb {2@} ;; {1} a,{3}
+	{add adc sbc}   {ix iy}{h l}		;;	defb {2@} ;; {1} a,{3}
+	{sub and xor or cp}   {ix iy}{h l}	;;	defb {2@} ;; {1}   {3}
+	{sub and xor or cp} a,{ix iy}{h l}	;;	defb {2@} ;; {1}   {3}
+	{inc dec}             {ix iy}{h l}	;;	defb {2@} ;; {1}   {3}
+ELSE
+	{add adc sbc} a,{ix iy}{h l}		;; error: illegal identifier
+	{add adc sbc}   {ix iy}{h l}		;; error: illegal identifier
+	{sub and xor or cp}   {ix iy}{h l}	;; error: illegal identifier
+	{sub and xor or cp} a,{ix iy}{h l}	;; error: illegal identifier
+	{inc dec}             {ix iy}{h l}	;; error: illegal identifier
 ENDIF
 
 ;------------------------------------------------------------------------------
@@ -343,9 +313,16 @@ IF !RABBIT
 	di 		
 	ei	 	
 	halt	
+	
 	im	0 	
 	im	1 	
 	im	2 	
+	
+	im 	{-1 3}							;; error: integer '{1}' out of range
+	im 	undefined						;; error: symbol not defined
+ELSE
+	{daa di ei halt}					;; error: illegal identifier
+	im {0 1 2} 							;; error: illegal identifier
 ENDIF
 
 ;------------------------------------------------------------------------------
@@ -353,6 +330,10 @@ ENDIF
 ;------------------------------------------------------------------------------
 
 	{bit res set} {0 1 2 3 4 5 6 7},{b c d e h l a (hl) (ix+DIS) (iy+DIS)}
+	
+	{bit res set} {-1 8},a				;; error: integer '{2}' out of range
+	{bit res set} undefined,a			;; error: symbol not defined
+	
 ;	{res set}     {0 1 2 3 4 5 6 7},(ix+DIS),{b c d e h l  a}	=} 0xDD 0xCB DIS {<0:6}+{<1:3}+{<3}
 ;	{res set}     {0 1 2 3 4 5 6 7},(iy+DIS),{b c d e h l  a}	=} 0xFD 0xCB DIS {<0:6}+{<1:3}+{<3}
 
@@ -378,9 +359,18 @@ jr1:
 	djnz jr1
 	jr {nz z nc c},jr1
 		
-	defs 127-26, 0FFh					;;	defs 127-26
+	defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+	defb 26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
+	defb 51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75
+	defb 76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101
+	
 jr2:
-	defs 122, 0FFh						;; 	defs 122
+	defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+	defb 26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
+	defb 51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75
+	defb 76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100
+	defb 101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122
+	
 	jr	 jr2
 	jr	 jr2
 										; max backward jump - z80pack does not accept -128
@@ -388,7 +378,19 @@ jr2:
 	
 
 ;	jr {po pe p m},NN
-
+	
+	djnz ASMPC-0x7F						;; error: integer '-129' out of range
+	djnz ASMPC+0x82						;; error: integer '128' out of range
+	jr ASMPC-0x7F						;; error: integer '-129' out of range
+	jr ASMPC+0x82						;; error: integer '128' out of range
+	jr nz,ASMPC-0x7F					;; error: integer '-129' out of range
+	jr nz,ASMPC+0x82					;; error: integer '128' out of range
+	jr  z,ASMPC-0x7F					;; error: integer '-129' out of range
+	jr  z,ASMPC+0x82					;; error: integer '128' out of range
+	jr nc,ASMPC-0x7F					;; error: integer '-129' out of range
+	jr nc,ASMPC+0x82					;; error: integer '128' out of range
+	jr  c,ASMPC-0x7F					;; error: integer '-129' out of range
+	jr  c,ASMPC+0x82					;; error: integer '128' out of range
 
 ;------------------------------------------------------------------------------
 ; Call and Return Group
@@ -403,20 +405,28 @@ jr2:
 
 IF !RABBIT
 	call {nz z nc c po pe p m},NN
+	
 	retn
+	
 	rst {00h 08h 10h 18h 20h 28h 30h 38h}
 ELSE
 	call {nz z nc c},NN					;;	jr {1!},$+5 ;; call NN
 	call {po pe p m},NN					;;	jp {1!},$+6 ;; call NN
+	
+	retn								;; error: illegal identifier
+	
 	rst {        10h 18h 20h 28h     38h}
+	rst {00h 08h                 30h    } ;; error: illegal identifier
 ENDIF
 
+	rst	undefined		   								;; error: symbol not defined
+	rst {-1 1 7 9 15 17 23 25 31 33 39 41 47 49 55 57}	;; error: integer '{1}' out of range
 
-IF !RABBIT
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
 
+IF !RABBIT
 	in a,(N)
 	in {b c d e h l a},(c)
 ;	in f,(c)
@@ -434,23 +444,83 @@ IF !RABBIT
 	otir
 	outd
 	otdr
+ELSE
+	in a,(N)							;; error: illegal identifier
+	in {b c d e h l a},(c)				;; error: illegal identifier
+	{ini inir ind indr}					;; error: illegal identifier
+	out (N),a							;; error: illegal identifier
+	out (c),{b c d e h l a}				;; error: illegal identifier
+	{outi otir outd otdr}				;; error: illegal identifier
 ENDIF
 
 ;------------------------------------------------------------------------------
-; $Log: z80opcodes_templ.asm,v $
-; Revision 1.5  2014-05-05 21:40:25  pauloscustodio
-; Move tests of BUG_0011 to bugfixes.t
+; IF ELSE ENDIF
+;------------------------------------------------------------------------------
+	if	1								;;
+	  defb 1							;;	defb 1
+	  if 1								;;
+		defb 2							;;	defb 2
+	  else								;;
+	    defb 3							;;
+	  endif								;;
+	else								;;
+	  defb 4							;;
+	  if 1								;;
+	    defb 5							;;
+      else								;;
+	    defb 6							;;
+	  endif								;;
+	endif								;;
+
+	if 0								;;
+	  defb 7							;;
+	endif								;;
+	
+	if 1								;;
+	  defb 8							;; 	defb 8
+	endif								;;
+	
+	if 0								;;
+	  defb 9							;;
+	else								;;
+	  defb 10							;;	defb 10
+	endif								;;
+	
+	if undefined						;;
+	  defb 11							;;
+	else								;;
+	  defb 12							;;	defb 12
+	endif								;;
+
+	if undefined | 1					;;
+	  defb 13							;;	defb 13
+	else								;;
+	  defb 14							;;
+	endif								;;
+
+;------------------------------------------------------------------------------
+; Z88DK specific opcodes
+;------------------------------------------------------------------------------
+	call_oz	{1 255}						;; 	rst 20h ;; defb {1}
+	call_oz	{256 65535}					;; 	rst 20h ;; defw {1}
+	call_oz	{0 65536}					;; error: integer '{1}' out of range
+
+	call_pkg {0 1 65535}				;; 	rst 08h ;; defw {1}
+	call_pkg {-1 65536} 				;; error: integer '{1}' out of range
+	
+	fpp {1 254}							;; 	rst 18h ;; defb {1}
+	fpp {0 255 256}				 		;; error: integer '{1}' out of range
+
+	invoke {0 1 65535}					;;	call {1}
+	invoke {-1 65536}			 		;; error: integer '{1}' out of range
+	
+;------------------------------------------------------------------------------
+; $Log: build_opcodes.asm,v $
+; Revision 1.1  2014-05-13 23:42:48  pauloscustodio
+; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+; Remove opcode errors and warnings from t/errors.t.
+; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+; Remove t/data/z80opcodes*, too complex to maintain.
 ;
-; Revision 1.4  2014/04/28 22:07:03  pauloscustodio
-; Extend tests
 ;
-; Revision 1.3  2014/04/26 08:34:18  pauloscustodio
-; No RCS keywords in generated files
-;
-; Revision 1.2  2014/04/26 08:14:01  pauloscustodio
-; ws
-;
-; Revision 1.1  2014/04/25 23:52:17  pauloscustodio
-; Rename input file for z80opcodes generation
-;
-;
+;------------------------------------------------------------------------------

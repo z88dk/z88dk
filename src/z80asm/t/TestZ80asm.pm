@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.6 2014-05-09 23:12:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.7 2014-05-13 23:42:49 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -141,14 +141,15 @@ sub z80asm {
 	
 	# check binary
 	if ($bin ne "") {
+		my $bin_test_name = "binary (".length($bin)." bytes)";
 		$bin_file ||= "test.bin";
 		my $out_bin = read_binfile($bin_file);
 		if ($out_bin eq $bin) {
-			is $out_bin, $bin, "binary";
+			is $out_bin, $bin, $bin_test_name;
 		}
 		else {
 			# slow - always generates hex dump even if equal
-			eq_or_dump_diff $out_bin, $bin, "binary";
+			eq_or_dump_diff $out_bin, $bin, $bin_test_name;
 		}
 	}
 }
@@ -191,14 +192,19 @@ sub unlink_temp {
 # Build and return file name of z80emu library
 #------------------------------------------------------------------------------
 sub z80emu {
+	our $done_z80emu;	# only once per session
 	my $z80emu_dir = '../../libsrc/z80_crt0s/z80_emu';
 	my $z80emu = $z80emu_dir.'/z80mu.lib';
-	if ( ! -f $z80emu ) {
+# need to check if legacy changed and compile with -d
+#	if ( ! -f $z80emu ) {
+	if ( ! $done_z80emu ) {
 		z80asm(
-			options	=> '-x'.$z80emu.' -Mo -ns -d '.join(' ', <$z80emu_dir/*.asm>),
+			options	=> '-x'.$z80emu.' -Mo -ns '.join(' ', <$z80emu_dir/*.asm>),
 			ok		=> 1,
 		);
+		$done_z80emu++;
 	}
+#	}
 	return $z80emu;
 }
 
@@ -217,7 +223,13 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.6  2014-05-09 23:12:35  pauloscustodio
+# Revision 1.7  2014-05-13 23:42:49  pauloscustodio
+# Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+# Remove opcode errors and warnings from t/errors.t.
+# Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+# Remove t/data/z80opcodes*, too complex to maintain.
+#
+# Revision 1.6  2014/05/09 23:12:35  pauloscustodio
 # eq_or_dump_diff is slow - always generates hex dump even if equal;
 # call only if different binary
 #
