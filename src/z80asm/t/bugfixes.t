@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.27 2014-05-11 17:25:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.28 2014-05-13 23:45:36 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -107,8 +107,7 @@ z80asm(
 	
 	;; note: BUG_0024
 		inc (ix + 255)		;; DD 34 FF		;; warn: integer '255' out of range
-		
-
+	
 ASM
 );
 
@@ -473,6 +472,19 @@ note "BUG_0031";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0047 : Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+note "BUG_0047";
+z80asm(
+	asm		=> <<'ASM',
+			bug0047a:
+				defw	ASMPC,ASMPC,ASMPC	;; 00 01 00 01 00 01
+			bug0047b:	
+				jp		ASMPC				;; C3 06 01
+ASM
+	options	=> "-r100 -b",
+);
+
+#------------------------------------------------------------------------------
 # BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 note "BUG_0049";
 {
@@ -509,7 +521,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.27  2014-05-11 17:25:37  pauloscustodio
+# Revision 1.28  2014-05-13 23:45:36  pauloscustodio
+# Move tests of BUG_0047 to bugfixes.t
+#
+# Revision 1.27  2014/05/11 17:25:37  pauloscustodio
 # Move tests of BUG_0031 to bugfixes.t
 #
 # Revision 1.26  2014/05/11 17:21:37  pauloscustodio
