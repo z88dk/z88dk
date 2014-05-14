@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.31 2014-05-14 22:10:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.32 2014-05-14 22:17:03 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -514,6 +514,7 @@ note "BUG_0033";
 
 #------------------------------------------------------------------------------
 # BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+note "BUG_0034";
 unlink("test.lib");
 z80asm(
 	asm		=> <<'ASM',
@@ -522,6 +523,18 @@ ASM
 	options	=> "-xtest.lib",
 );
 ok ! -f "test.lib", "test.lib does not exist";
+
+#------------------------------------------------------------------------------
+# BUG_0035 : Symbol not defined in forward references
+note "BUG_0035";
+z80asm(
+	asm		=> <<'ASM',
+			call loop			;; CD 06 00
+			call loop 			;; CD 06 00
+		loop:
+			ret					;; C9
+ASM
+);
 
 #------------------------------------------------------------------------------
 # BUG_0047 : Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
@@ -573,7 +586,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.31  2014-05-14 22:10:26  pauloscustodio
+# Revision 1.32  2014-05-14 22:17:03  pauloscustodio
+# Move tests of BUG_0035 to bugfixes.t
+#
+# Revision 1.31  2014/05/14 22:10:26  pauloscustodio
 # Move tests of BUG_0034 to bugfixes.t
 #
 # Revision 1.30  2014/05/14 22:04:15  pauloscustodio
