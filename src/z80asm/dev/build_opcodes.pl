@@ -15,7 +15,7 @@
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.1 2014-05-13 23:42:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.2 2014-05-14 21:30:28 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -457,9 +457,9 @@ sub format_iter {
 				
 				# indent
 				my $this_indent = $indent;
-				if (/^if\b/) {			$indent += 2; }
-				elsif (/^else\b/) {		$this_indent -= 2; }
-				elsif (/^endif\b/) {	$indent -= 2; $this_indent = $indent; }
+				if (/^if\b|^\{/) {			$indent += 2; }
+				elsif (/^else\b/) {			$this_indent -= 2; }
+				elsif (/^endif\b|^\}/) {	$indent -= 2; $this_indent = $indent; }
 				else {}				
 				
 				my $line = sprintf("%-*s ", $this_indent-1, $label || "");
@@ -500,7 +500,10 @@ sub format_iter {
 	
 
 # $Log: build_opcodes.pl,v $
-# Revision 1.1  2014-05-13 23:42:49  pauloscustodio
+# Revision 1.2  2014-05-14 21:30:28  pauloscustodio
+# Indent {} blocks
+#
+# Revision 1.1  2014/05/13 23:42:49  pauloscustodio
 # Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 # Remove opcode errors and warnings from t/errors.t.
 # Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
