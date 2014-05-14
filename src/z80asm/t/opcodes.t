@@ -1804,6 +1804,9 @@ jr2:
         invoke 65535                    ;; CD FF FF
 
 ;------------------------------------------------------------------------------
+; Revision 1.2  2014/05/14 21:29:46  pauloscustodio
+; Move tests of BUG_0032 to bugfixes.t
+;
 ; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
 ; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 ; Remove opcode errors and warnings from t/errors.t.
@@ -3525,6 +3528,9 @@ jr2:
         invoke 65535                    ;; CD FF FF
 
 ;------------------------------------------------------------------------------
+; Revision 1.2  2014/05/14 21:29:46  pauloscustodio
+; Move tests of BUG_0032 to bugfixes.t
+;
 ; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
 ; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 ; Remove opcode errors and warnings from t/errors.t.
