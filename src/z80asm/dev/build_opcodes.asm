@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.2 2014-05-14 21:29:46 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.3 2014-05-14 21:32:14 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -551,16 +551,3 @@ ENDIF
 	invoke {0 1 65535}					;;	call {1}
 	invoke {-1 65536}			 		;; error: integer '{1}' out of range
 	
-;------------------------------------------------------------------------------
-; $Log: build_opcodes.asm,v $
-; Revision 1.2  2014-05-14 21:29:46  pauloscustodio
-; Move tests of BUG_0032 to bugfixes.t
-;
-; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
-; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
-; Remove opcode errors and warnings from t/errors.t.
-; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
-; Remove t/data/z80opcodes*, too complex to maintain.
-;
-;
-;------------------------------------------------------------------------------

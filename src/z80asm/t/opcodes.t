@@ -1802,19 +1802,6 @@ jr2:
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
         invoke 65535                    ;; CD FF FF
-
-;------------------------------------------------------------------------------
-; Revision 1.2  2014/05/14 21:29:46  pauloscustodio
-; Move tests of BUG_0032 to bugfixes.t
-;
-; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
-; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
-; Remove opcode errors and warnings from t/errors.t.
-; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
-; Remove t/data/z80opcodes*, too complex to maintain.
-;
-;
-;------------------------------------------------------------------------------
 END_ASM
 );
 
@@ -3526,20 +3513,7 @@ jr2:
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
         invoke 65535                    ;; CD FF FF
-
-;------------------------------------------------------------------------------
-; Revision 1.2  2014/05/14 21:29:46  pauloscustodio
-; Move tests of BUG_0032 to bugfixes.t
-;
-; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
-; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
-; Remove opcode errors and warnings from t/errors.t.
-; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
-; Remove t/data/z80opcodes*, too complex to maintain.
-;
-;
-;------------------------------------------------------------------------------
-                                        ;;  38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD EE 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 37 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 62 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 84 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                                        ;; 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD EE 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 37 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 62 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 84 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
