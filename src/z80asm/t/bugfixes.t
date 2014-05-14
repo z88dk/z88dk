@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.29 2014-05-14 21:29:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.30 2014-05-14 22:04:15 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -480,6 +480,39 @@ note "BUG_0031";
 }
 
 #------------------------------------------------------------------------------
+# BUG_0033 : -d option fails if .asm does not exist
+note "BUG_0033";
+{
+	# compile
+	my $compile = "zcc +zx -O3 -vn -make-lib -Wn43 test.c";
+	unlink("test.asm", "test.o");
+	
+	write_file("test.c", "int test() { return 1; }\n");
+	ok ! system($compile), $compile;
+	ok -f "test.o", "test.o exists";
+
+	z80asm(
+		options	=> "-d -Mo -xtest.lib test.asm",
+		ok		=> 1,
+	);
+	ok -f "test.lib", "test.lib exists";
+
+	unlink("zcc_opt.def");
+	
+	# only assembly
+	z80asm(
+		asm		=> "ld a,3",
+		options	=> " ",
+		ok		=> 1,
+	);
+	ok unlink("test.asm"), "unlink test.asm";
+	z80asm(
+		options	=> "-d -r0 -b test.asm",
+		bin		=> "\x3E\x03",
+	);
+}
+
+#------------------------------------------------------------------------------
 # BUG_0047 : Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
 note "BUG_0047";
 z80asm(
@@ -529,7 +562,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.29  2014-05-14 21:29:47  pauloscustodio
+# Revision 1.30  2014-05-14 22:04:15  pauloscustodio
+# Move tests of BUG_0033 to bugfixes.t
+#
+# Revision 1.29  2014/05/14 21:29:47  pauloscustodio
 # Move tests of BUG_0032 to bugfixes.t
 #
 # Revision 1.28  2014/05/13 23:45:36  pauloscustodio
