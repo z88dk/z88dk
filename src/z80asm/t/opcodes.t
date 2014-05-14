@@ -1747,6 +1747,44 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+        defgroup
+        {
+          f0, f1,
+          f2, f3,
+          f10  = 10,
+          f11,
+          f20  = 20, f21
+        }
+        defb f0,f1,f2,f3,f10,f11,f20,f21
+                                        ;; 00 01 02 03 0A 0B 14 15
+
+        if   1
+          defgroup
+          {
+            ff   = 1
+          }
+        else
+          defgroup
+          {
+            ff   = 2
+          }
+        endif
+        if   0
+          defgroup
+          {
+            fg   = 1
+          }
+        else
+          defgroup
+          {
+            fg   = 2
+          }
+        endif
+        defb ff, fg                     ;; 01 02
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
@@ -1766,6 +1804,12 @@ jr2:
         invoke 65535                    ;; CD FF FF
 
 ;------------------------------------------------------------------------------
+; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
+; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+; Remove opcode errors and warnings from t/errors.t.
+; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+; Remove t/data/z80opcodes*, too complex to maintain.
+;
 ;
 ;------------------------------------------------------------------------------
 END_ASM
@@ -2319,10 +2363,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD 08 09
-        cpir                            ;; CD 25 09
-        cpd                             ;; CD BF 08
-        cpdr                            ;; CD DC 08
+        cpi                             ;; CD 12 09
+        cpir                            ;; CD 2F 09
+        cpd                             ;; CD C9 08
+        cpdr                            ;; CD E6 08
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2751,8 +2795,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 51 09
-        rrd                             ;; CD 73 09
+        rld                             ;; CD 5B 09
+        rrd                             ;; CD 7D 09
 
 ;	# rotate 16 bits
 ;
@@ -3424,6 +3468,44 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+        defgroup
+        {
+          f0, f1,
+          f2, f3,
+          f10  = 10,
+          f11,
+          f20  = 20, f21
+        }
+        defb f0,f1,f2,f3,f10,f11,f20,f21
+                                        ;; 00 01 02 03 0A 0B 14 15
+
+        if   1
+          defgroup
+          {
+            ff   = 1
+          }
+        else
+          defgroup
+          {
+            ff   = 2
+          }
+        endif
+        if   0
+          defgroup
+          {
+            fg   = 1
+          }
+        else
+          defgroup
+          {
+            fg   = 2
+          }
+        endif
+        defb ff, fg                     ;; 01 02
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
@@ -3443,9 +3525,15 @@ jr2:
         invoke 65535                    ;; CD FF FF
 
 ;------------------------------------------------------------------------------
+; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
+; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
+; Remove opcode errors and warnings from t/errors.t.
+; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
+; Remove t/data/z80opcodes*, too complex to maintain.
+;
 ;
 ;------------------------------------------------------------------------------
-                                        ;;  38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD E4 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 2D 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 58 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 7A 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                                        ;;  38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD EE 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 37 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 62 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 84 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3697,3 +3785,4 @@ z80asm(
         invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
+

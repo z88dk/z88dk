@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.1 2014-05-13 23:42:48 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.2 2014-05-14 21:29:46 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -499,6 +499,43 @@ ENDIF
 	endif								;;
 
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+	defgroup 							;;	
+	{ 									;;
+		f0, f1,  						;;	
+		f2, f3,  						;;	
+		f10 = 10,  						;;	
+		f11,  							;;	
+		f20 = 20, f21					;;	
+	} 									;;	
+	defb f0,f1,f2,f3,f10,f11,f20,f21	;; defb 0,1,2,3,10,11,20,21
+
+	if 1								;;	
+		defgroup 						;;	
+		{ 								;;	
+			ff = 1						;;	
+		}								;;	
+	else								;;	
+		defgroup 						;;	
+		{								;;	
+			ff = 2						;;	
+		}								;;	
+	endif								;;	
+	if 0								;;	
+		defgroup 						;;	
+		{ 								;;	
+			fg = 1						;;	
+		}								;;	
+	else								;;	
+		defgroup 						;;	
+		{								;;	
+			fg = 2						;;	
+		}								;;	
+	endif								;;		
+	defb ff, fg							;; defb 1, 2
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
 	call_oz	{1 255}						;; 	rst 20h ;; defb {1}
@@ -516,7 +553,10 @@ ENDIF
 	
 ;------------------------------------------------------------------------------
 ; $Log: build_opcodes.asm,v $
-; Revision 1.1  2014-05-13 23:42:48  pauloscustodio
+; Revision 1.2  2014-05-14 21:29:46  pauloscustodio
+; Move tests of BUG_0032 to bugfixes.t
+;
+; Revision 1.1  2014/05/13 23:42:48  pauloscustodio
 ; Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 ; Remove opcode errors and warnings from t/errors.t.
 ; Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.28 2014-05-13 23:45:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.29 2014-05-14 21:29:47 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -86,6 +86,7 @@ ERR
 # BUG_0007 : memory leaks
 # BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
 # BUG_0024 : (ix+128) should show warning message
+# BUG_0032 : DEFGROUP ignores name after assignment
 z80asm(
 	asm => <<'ASM',
 	;; note: BUG_0004
@@ -107,6 +108,13 @@ z80asm(
 	
 	;; note: BUG_0024
 		inc (ix + 255)		;; DD 34 FF		;; warn: integer '255' out of range
+	
+	;; note: BUG_0032
+		defgroup
+		{
+			f10 = 10, f11
+		}
+		defb f10, f11		;; 0A 0B
 	
 ASM
 );
@@ -521,7 +529,10 @@ z80asm(
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.28  2014-05-13 23:45:36  pauloscustodio
+# Revision 1.29  2014-05-14 21:29:47  pauloscustodio
+# Move tests of BUG_0032 to bugfixes.t
+#
+# Revision 1.28  2014/05/13 23:45:36  pauloscustodio
 # Move tests of BUG_0047 to bugfixes.t
 #
 # Revision 1.27  2014/05/11 17:25:37  pauloscustodio
