@@ -35,7 +35,7 @@ asm__vioctl__unlocked:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, ix
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -54,19 +54,20 @@ asm0__vioctl__unlocked:
    dec d
    jp nz, error_einval_mc      ; if command not understood
    
-   ld a,(ix+13)                ; driver flags
-   xor e
-   and $07                     ; compare command driver type
-   jp nz, error_enotsup_mc     ; if driver types do not match
+   ld a,(ix+13)
+   push af                     ; save current driver flags
    
-   ; kind of parameter
+   xor e                       ; compare command driver type
+   and $07
+   jp nz, error_enotsup_mc - 1 ; if driver types do not match
    
-   ld a,e
+   ld a,e                      ; check for load flags command
    or $07
-   inc a
+   inc a                       ; z flag set if load
 
    ld a,(bc)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __SDCC | __SDCC_IX | __SDCC_IY
 
    inc bc
@@ -76,56 +77,68 @@ ELSE
    dec bc
 
 ENDIF
-   
-   ld d,a
-   jr z, load_parameter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-boolean_parameter:
+   ld d,a
+   jr z, load_flags
+
+boolean_flag:
 
    ld a,(bc)
    or d
-   jr z, have_boolean
+   jr z, boolean_false
    
-   ld a,$f8
+boolean_true:
 
-have_boolean:
+   ld a,$f8                    ; all flag bits set
+
+boolean_false:
 
    and e
-   ld d,a
+   ld d,a                      ; d = bit state for affected flag bits
    
    ld a,e
    cpl
    and $f8
    or $07
-   and (ix+13)
+   and (ix+13)                 ; zero affected flag bits
    
-   or d
-   ld (ix+13),a
-   
-   ret
+   jr exit
 
-load_parameter:
+load_flags:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __SDCC | __SDCC_IX | __SDCC_IY
 
-   ld a,(bc)
+   ld a,(bc)                   ; MSB of integer parameter
+   
    or a
-   jp nz, error_einval_mc      ; if load parameter larger than byte
-   ld a,d
+   jp nz, error_einval_mc - 1  ; if load parameter larger than byte
+   
+   ld a,d                      ; LSB of integer parameter
 
 ELSE
 
    or a
-   ld a,(bc)
-   jp nz, error_einval_mc
+   jp nz, error_einval_mc - 1  ; if load parameter larger than byte
+   
+   ld a,(bc)                   ; LSB of integer parameter
    
 ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    and $f8
    ld d,a
    ld a,e
    and $07
-   or d
-   ld (ix+13),a
+
+exit:
+
+   or d                        ; or in new flag bits
+   ld (ix+13),a                ; set new flag state
+   
+   pop hl
+   ld l,h
+   ld h,0                      ; hl = old flags
    
    ret
