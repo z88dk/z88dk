@@ -4,6 +4,7 @@
 ;; origin ;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "zcc_opt.def"
+INCLUDE "clib_cfg.asm"
 
 IF !myzorg
 
@@ -107,6 +108,9 @@ __FILE_STDIN:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb $81                    ; driver flags = echo on
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
 
    defw 0
    
@@ -119,6 +123,9 @@ __FILE_STDOUT:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb 0                      ; driver flags
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
 
    defw 0
    
@@ -134,6 +141,8 @@ __FILE_STDERR:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb 0                      ; driver flags
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

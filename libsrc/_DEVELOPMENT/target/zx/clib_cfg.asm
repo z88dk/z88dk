@@ -200,6 +200,17 @@ defc __CLIB_OPT_STDIO = $00
 ; bit 0 = $01 = stdio checks the validity of the FILE
 ;               prior to every operation.
 
+defc __CLIB_OPT_STDIO_FILE_EXTRA = 2
+
+; Number of additional bytes to append to FILE structures.
+; Until posix file descriptors are added, this is a
+; temporary measure to allow drivers to associate additional
+; state with an open file.  Keep in mind *all* FILE
+; structures come with this additional memory so if your
+; driver requires a lot of extra memory to store file
+; state, consider storing a pointer to the state in the
+; FILE struct.
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; printf converter selection
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -208,7 +219,7 @@ defc __CLIB_OPT_STDIO = $00
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
-defc __CLIB_OPT_PRINTF = $ffffffff
+defc __CLIB_OPT_PRINTF = $47647
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
@@ -246,7 +257,7 @@ defc __CLIB_OPT_PRINTF = $ffffffff
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for printf.
 
-defc __CLIB_OPT_SCANF = $ffffffff
+defc __CLIB_OPT_SCANF = $1f61f
 
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u

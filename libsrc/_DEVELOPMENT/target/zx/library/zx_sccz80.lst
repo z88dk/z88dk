@@ -13,6 +13,7 @@
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
+@sys/sys_sccz80.lst
 @temp/sp1/zx/sp1_zx_sccz80.lst
 @threads/threads_sccz80.lst
 @z80/z80_sccz80.lst

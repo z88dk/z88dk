@@ -13,6 +13,7 @@
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
+@sys/sys_sdcc_ix.lst
 @temp/sp1/zx/sp1_zx_sdcc_ix.lst
 @threads/threads_sdcc_ix.lst
 @z80/z80_sdcc_ix.lst

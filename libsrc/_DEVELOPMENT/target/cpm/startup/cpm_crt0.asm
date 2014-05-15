@@ -6,6 +6,7 @@
 ;; origin ;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "zcc_opt.def"
+INCLUDE "clib_cfg.asm"
 
 org $100
 
@@ -142,6 +143,10 @@ INCLUDE "../crt_stubs.asm"     ; crt stubs for unimplemented lib functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __null_string:
+
+   defb 0
+
+
    defw 0
    
 __FILE_STDIN:
@@ -153,6 +158,9 @@ __FILE_STDIN:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb $81                    ; driver flags = echo on
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
 
    defw 0
    
@@ -165,6 +173,9 @@ __FILE_STDOUT:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb 0                      ; driver flags
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
 
    defw 0
    
@@ -180,6 +191,9 @@ __FILE_STDERR:
    defb 0
    defb 0
    defs 6                      ; mutex
+   defb 0                      ; driver flags
+   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

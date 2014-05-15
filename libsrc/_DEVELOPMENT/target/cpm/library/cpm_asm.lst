@@ -7,5 +7,6 @@
 @stdio/stdio_asm.lst
 @stdlib/stdlib_asm.lst
 @string/string_asm.lst
+@sys/sys_asm.lst
 @threads/threads_asm.lst
 @z80/z80_asm.lst

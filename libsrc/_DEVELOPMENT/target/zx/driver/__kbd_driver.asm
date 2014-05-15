@@ -35,12 +35,11 @@ __kbd_getc:
    ; return hl = char
    
    call __kbd_getchar
-   
+
    push hl
-   
    call __kbd_echo
-   
    pop hl
+   
    ld h,0
    
    or a
@@ -231,6 +230,19 @@ __kbd_getchar:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __kbd_echo:
+
+   cp 13
+   jr z, unfiltered
+   
+   bit 7,(ix+13)
+   ret z                       ; if echo is off
+   
+   bit 6,(ix+13)
+   jr z, unfiltered            ; if not password mode
+   
+   ld a,'*'
+   
+unfiltered:
 
    push ix
 

@@ -1,0 +1,4 @@
+sys/ioctl/c/sdcc_ix/_ioctl_
+sys/ioctl/c/sdcc_ix/_ioctl__unlocked
+sys/ioctl/c/sdcc_ix/_vioctl_
+sys/ioctl/c/sdcc_ix/_vioctl__unlocked

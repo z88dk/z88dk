@@ -53,6 +53,15 @@ defc STDIO_SEEK_SET = 0
 defc STDIO_SEEK_CUR = 1
 defc STDIO_SEEK_END = 2
 
+;;;;;;;;;;;;
+;; sys/ioctl
+;;;;;;;;;;;;
+
+PUBLIC IOCTL_TERMINAL_ECHO, IOCTL_TERMINAL_PASSWORD, IOCTL_TERMINAL_RESET
+
+defc IOCTL_TERMINAL_ECHO = $81
+defc IOCTL_TERMINAL_PASSWORD = $41
+defc IOCTL_TERMINAL_FLAGS = $f9
 
 ;;;;;;;;;;
 ;; threads
