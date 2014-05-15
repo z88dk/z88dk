@@ -34,7 +34,7 @@ asm__ioctl__unlocked:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, ix
 
    call __stdio_varg_2
    

@@ -38,7 +38,7 @@ asm__vioctl_:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, ix
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
