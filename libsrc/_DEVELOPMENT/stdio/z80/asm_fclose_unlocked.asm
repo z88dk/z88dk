@@ -94,6 +94,12 @@ ENDIF
    ; disassociate FILE
    
    call __stdio_file_destroy   ; FILE returns ebadf errors
+
+;;; temporary driver state
+
+ld (ix+13),0
+
+;;;
    
    ; append FILE to available list
 

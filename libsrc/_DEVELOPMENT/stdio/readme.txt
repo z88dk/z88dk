@@ -20,6 +20,8 @@ offset  size  name              purpose
   5      1    conversion_flags  flags used by printf converters, described below
   6      1    ungetc            unget char
   7      6    mtx_t file_lock   recursive mutex used for locking file
+ 13      1    dflags_0 (temp)   driver flags, described below
+ 14      ?    (temporary state) __CLIB_OPT_STDIO_FILE_EXTRA free bytes for driver
 
 * state_flags_0
 
@@ -57,6 +59,21 @@ bit   name    purpose
  1    base    if set indicates octal conversion
  0    P       if set indicates precision was defined 
 
+* dflags_0
+
+Flag bits associated with the driver.  This is temporary state information
+that will be moved to the driver when posix file descriptors are added.
+
+if bits 2..0 = 000, this byte is unused
+
+if bits 2..0 = 001, the driver is an input terminal
+
+   bit   name      purpose
+
+    7    echo      if set, echo is on
+    6    password  if set, echo asterisks only
+   543     0       reserved
+   210   type      001 = input terminal
 
 
 MEMORY STREAM FILE STRUCTURE

@@ -96,8 +96,21 @@ ENDIF
    
    push bc                     ; save mode byte
    push hl                     ; save & FILE.link
-   
-   ;  c = mode byte
+
+;;; temporary driver state
+
+inc hl
+inc hl
+
+push hl
+pop ix
+
+ld (ix+13),0
+
+;;;
+
+   ; ix = FILE *
+   ; bc = mode byte
    ; de = filename
    ; stack = mode byte, FILE.link
    

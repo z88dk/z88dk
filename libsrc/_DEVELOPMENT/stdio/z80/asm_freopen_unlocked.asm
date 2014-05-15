@@ -68,6 +68,12 @@ asm0_freopen_unlocked:
    pop de                      ; de = mode
    jp nz, error_eacces_zc - 1  ; freopen on memstream not currenty supported
 
+;;; temporary driver state
+
+ld (ix+13),0
+
+;;;
+
    call __stdio_parse_permission
    
    pop de                      ; de = filename
@@ -77,6 +83,7 @@ asm0_freopen_unlocked:
    or e
    jp z, error_eacces_zc       ; changing mode not yet supported
 
+   ; ix = FILE *
    ;  c = mode byte
    ; de = filename
    
