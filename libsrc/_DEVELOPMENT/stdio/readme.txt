@@ -20,8 +20,10 @@ offset  size  name              purpose
   5      1    conversion_flags  flags used by printf converters, described below
   6      1    ungetc            unget char
   7      6    mtx_t file_lock   recursive mutex used for locking file
- 13      1    dflags_0 (temp)   driver flags, described below
- 14      ?    (temporary state) __CLIB_OPT_STDIO_FILE_EXTRA free bytes for driver
+ 13      ?    (temporary state) __CLIB_OPT_STDIO_FILE_EXTRA free bytes for driver
+
+note:  if __CLIB_OPT_STDIO_FILE_EXTRA > 0, the first byte at offset 13
+       is always driver flags "dflags_0" (see below)
 
 * state_flags_0
 

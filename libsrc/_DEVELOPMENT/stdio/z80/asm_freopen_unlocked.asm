@@ -68,11 +68,13 @@ asm0_freopen_unlocked:
    pop de                      ; de = mode
    jp nz, error_eacces_zc - 1  ; freopen on memstream not currenty supported
 
-;;; temporary driver state
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+   ld (ix+13),0                ; clear driver flags
 
-ld (ix+13),0
-
-;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    call __stdio_parse_permission
    

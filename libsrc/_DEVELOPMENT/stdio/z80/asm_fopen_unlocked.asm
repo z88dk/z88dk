@@ -45,7 +45,7 @@ asm_fopen_unlocked:
    ;            hl = 0
    ;            carry set, errno set
    ;
-   ; uses  : all except ix
+   ; uses  : all
 
    ld a,h
    or l
@@ -97,20 +97,23 @@ ENDIF
    push bc                     ; save mode byte
    push hl                     ; save & FILE.link
 
-;;; temporary driver state
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-inc hl
-inc hl
-
-push hl
-pop ix
-
-ld (ix+13),0
-
-;;;
-
+   inc hl
+   inc hl
+   
+   push hl
+   pop ix
+   
+   ld (ix+13),0                ; clear driver flags
+   
    ; ix = FILE *
-   ; bc = mode byte
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ;  c = mode byte
    ; de = filename
    ; stack = mode byte, FILE.link
    

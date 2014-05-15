@@ -29,7 +29,7 @@
 PUBLIC asm_qsort
 
 EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
-EXTERN l0_divu_16_16x16, error_einval_zc, error_erange_zc
+EXTERN l0_divu_16_16x16, error_einval_zc, error_erange_zc, error_znc
 
 asm_qsort:
 
@@ -69,7 +69,106 @@ asm_qsort:
    pop bc                      ; bc = size
    
    jp c, error_erange_zc       ; if address out of range
+
+   push de
+   push hl
    
+   call quicksort              ; apply quicksort until partitions are small
+   
+   pop hl
+   pop de
+
+insertion_sort:                ; sort the small partitions with insertion sort
+
+   ; de = array_lo
+   ; hl = array_hi
+   ; bc = size
+   ; ix = compare
+
+   add hl,bc
+   push hl                     ; save array_hi + 1
+   
+   ld l,e
+   ld h,d
+   
+   add hl,bc
+   ex de,hl                    ; hl = array_lo, de = array_lo + 1
+
+array_loop:
+
+   ; de = i
+   ; hl = array_lo
+   ; bc = size
+   ; ix = compare
+   ; stack = array_hi + 1
+   
+   ex (sp),hl                  ; hl = array_hi + 1
+
+   ld a,l
+   cp e
+   jr nz, begin_loop           ; if i != array_hi + 1
+   
+   ld a,h
+   cp d
+   jp z, error_znc - 1         ; finished if i == array_hi + 1
+
+begin_loop:
+
+   ex (sp),hl                  ; hl = array_lo
+   
+   push de
+   push hl   
+
+insert_loop:
+
+   ; de = j
+   ; bc = size
+   ; ix = compare
+   ; stack = array_hi + 1, i, array_lo
+
+   ld l,e
+   ld h,d
+   
+   or a
+   sbc hl,bc                   ; hl = j-1
+
+   call compare_de_hl
+   
+   rla
+   jr nc, insert_exit          ; if array[j] >= array[j-1]
+
+   push bc
+   call asm0_memswap           ; swap(j, j-1, size)
+   pop bc
+   
+   ld e,l
+   ld d,h                      ; de = j-1
+   
+   pop hl                      ; hl = array_lo
+   push hl
+
+   or a
+   sbc hl,de
+   
+   jr nz, insert_loop          ; if more elements in array
+
+insert_exit:
+
+   ; bc = size
+   ; ix = compare
+   ; stack = array_hi + 1, i, array_lo
+
+   pop de                      ; de = array_lo
+   pop hl                      ; hl = i
+   
+   add hl,bc
+   ex de,hl
+   
+   jr array_loop
+
+
+quicksort:
+
    push hl
    ld hl,0                     ; mark end of stack with 0
    ex (sp),hl
@@ -83,7 +182,6 @@ while_lohi:
    ; bc = size
    ; ix = compare
    ; stack = 0, (hi,lo)*
-   ; carry reset
    
    scf
    sbc hl,de
@@ -106,6 +204,17 @@ interval_done:
    pop hl
    jr while_lohi
 
+partition_small:
+
+   pop bc
+   pop bc
+   pop bc
+   pop bc                      ; bc = size
+   pop af
+   pop af
+   
+   jr interval_done
+
 partition:
 
    add hl,de
@@ -115,6 +224,58 @@ partition:
    ; hl = j
    ; bc = size
    ; carry reset
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF 0
+   ; select a random pivot
+   ;
+   ; k = rand() % (j-i)
+   ; k = k - k % size + i
+   
+   push hl                     ; save j
+   push de                     ; save i
+   push bc                     ; save size
+   push bc                     ; save size
+   
+   sbc hl,de
+   
+   ld c,l
+   ld b,h                      ; bc = (j-i)
+   
+   EXTERN asm_rand
+   call asm_rand               ; hl = rand()
+   
+   ld e,c
+   ld d,b                      ; de = (j-i)
+   
+   call l0_divu_16_16x16
+   
+   ex de,hl                    ; hl = k = rand() % (j-i)
+   pop de                      ; de = size
+   
+   push hl                     ; save k
+   
+   call l0_divu_16_16x16       ; de = k % size
+   
+   pop hl                      ; hl = k
+   sbc hl,de                   ; hl = k - k % size
+   
+   pop bc                      ; bc = size
+   pop de                      ; de = i
+   
+   add hl,de                   ; hl = k - k % size + i
+   ex de,hl
+   
+   ; de = k
+   ; hl = i
+   ; bc = size
+   ; stack = j
+   
+   jr pivot_selected
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
    ; compute the address of the middle element k in the interval [i,j]
    ; k = (i+j)/2 - ((j-i)/2)%size
@@ -137,6 +298,16 @@ partition:
    
    call l0_divu_16_16x16       ; de = hl % de = [(j-i)/2] % size
 
+inc h
+dec h
+jr nz, partition_size_large
+
+ld a,l
+cp 5
+jr c, partition_small          ; if partition size < 8 elements
+
+partition_size_large:
+
    pop hl                      ; hl = (j-i)/2
    sbc hl,de
    
@@ -148,6 +319,16 @@ partition:
    
    ; find the median element among i,j,k
 
+IF 1
+
+   ex de,hl
+   pop hl
+   jr pivot_selected
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;
+IF 0
    ; de = j
    ; hl = k
    ; bc = size
@@ -233,7 +414,10 @@ order_i_k_j:
    ; de = k
    ; bc = size
    ; stack = j
-   
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;
+
 pivot_selected:
 
    ; move pivot to start of partition
@@ -505,7 +689,7 @@ left_smallest:
    add hl,bc                   ; hl = j + size
    ex (sp),hl
    ex de,hl
-   
+;;or a   
    sbc hl,bc                   ; hl = j - size
    
    ; hl = j - size (new hi)
@@ -523,6 +707,7 @@ right_smallest:
    ; ix = compare
    ; stack = hi, lo
 
+;;or a
    add hl,bc
    ex de,hl                    ; de = j + size
    sbc hl,bc                   ; hl = j - size

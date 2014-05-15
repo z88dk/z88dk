@@ -28,6 +28,6 @@ asm_fopen:
    ;            hl = 0
    ;            carry set, errno set
    ;
-   ; uses  : all except ix
+   ; uses  : all
 
    jp asm_fopen_unlocked

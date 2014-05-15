@@ -108,8 +108,14 @@ __FILE_STDIN:
    defb 0
    defb 0
    defs 6                      ; mutex
-   defb $81                    ; driver flags = echo on
-   defs __CLIB_OPT_STDIO_FILE_EXTRA
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+      defb $81                 ; driver flags = echo on
+   ENDIF
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+   ENDIF
 
 
    defw 0
@@ -123,8 +129,14 @@ __FILE_STDOUT:
    defb 0
    defb 0
    defs 6                      ; mutex
-   defb 0                      ; driver flags
-   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+      defb 0                   ; driver flags n/a
+   ENDIF
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+   ENDIF
 
 
    defw 0
@@ -141,8 +153,14 @@ __FILE_STDERR:
    defb 0
    defb 0
    defs 6                      ; mutex
-   defb 0                      ; driver flags
-   defs __CLIB_OPT_STDIO_FILE_EXTRA
+
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+      defb 0                   ; driver flags n/a
+   ENDIF
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

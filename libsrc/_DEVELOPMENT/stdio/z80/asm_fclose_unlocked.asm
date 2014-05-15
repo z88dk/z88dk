@@ -95,11 +95,13 @@ ENDIF
    
    call __stdio_file_destroy   ; FILE returns ebadf errors
 
-;;; temporary driver state
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-ld (ix+13),0
+   ld (ix+13),0                ; clear driver flags
 
-;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; append FILE to available list
 
