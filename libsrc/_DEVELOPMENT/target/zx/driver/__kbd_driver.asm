@@ -230,12 +230,12 @@ __kbd_getchar:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __kbd_echo:
-
-   cp 13
-   jr z, unfiltered
    
    bit 7,(ix+13)
    ret z                       ; if echo is off
+   
+   cp 13
+   jr z, unfiltered
    
    bit 6,(ix+13)
    jr z, unfiltered            ; if not password mode
