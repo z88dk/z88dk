@@ -26,6 +26,15 @@
 ;
 ; ===============================================================
 
+
+;********* not finished
+; exploring: insertion sort on partitions < N items
+;  median of 3 pivot selection
+; middle pivot selection
+; addressing equal items case
+
+
+
 PUBLIC asm_qsort
 
 EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
