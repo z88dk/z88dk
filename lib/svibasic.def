@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.4 2009-05-27 10:41:07 stefano Exp $
+; $Id: svibasic.def,v 1.5 2014-05-16 13:41:50 stefano Exp $
 ;
 
 
@@ -12,6 +12,8 @@ lstoff
 defc VDP_RP  = $373A	; address of vdp READ port
 defc VDP_WP  = $3732	; address of vdp WRITE port
 ;;;; defc MSX_VER = $????    ; MSX version (0 = MSX1, 1 = MSX2)
+
+; SUBROUTINES FOR READ/WRITE CALLS OF THE INTER-SLOT
 ;; defc RDPRIM = $????	;5 Routine that reads from a primary slot 
 ;; defc WRPRIM = $????	;7 Routine that writes to a primary slot 
 ;; defc CLPRIM = $????	;14 Routine that calls a routine in a primary slot 
@@ -31,6 +33,8 @@ defc USR9 = $F534	;2 Address to call with Basic USR9
 defc LINLEN = $F543	;1 Width for the current text mode 
 ;; defc CRTCNT = $????	;1 Number of lines on screen 
 ;; defc CLMLST = $????	;1 Column space. It’s uncertain what this address actually stores 
+
+; WORK FOR INITIALIZATION
 ;; defc TXTNAM = $????	;2 BASE(0) - SCREEN 0 name table 
 ;; defc TXTCOL = $????	;2 BASE(1) - SCREEN 0 color table 
 ;; defc TXTCGP = $0800	;2 BASE(2) - SCREEN 0 character pattern table 
@@ -55,6 +59,8 @@ defc CLIKSW = $FA02	;press click status (CLICK)
 defc CSRY = $FA03	;1 Current row-position of the cursor 
 defc CSRX = $FA04	;1 Current column-position of the cursor 
 defc CNSDFG = $FA06	;function keys status
+
+; AREA TO SAVE VDP REGISTERS
 defc RG0SAV = $FE3C	;1 Content of VDP(0) register (R#0) 
 defc RG1SAV = $FE3D	;1 Content of VDP(1) register (R#1) 
 defc RG2SAV = $FE3E	;1 Content of VDP(2) register (R#2) 
@@ -71,10 +77,14 @@ defc BDRCLR = $FA0C	;1 Border color (BORCLR)
 defc MAXUPD = $FA0D	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc MINUPD = $FA10	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc ATRBYT = $FA13	;1 Attribute byte (for graphical routines it’s used to read the color) 
+
+;WORK AREA FOR PLAY STATEMENT
 defc QUEUES = $FA17	;2 Address of the queue table 
 defc FRCNEW = $FD4B	;1 CLOAD flag
+
+; WORK AREA FOR KEY INPUT
 defc SCNCNT = $FE78	;1 Key scan timing
-defc REPCNT = $FA19	;1 This is the key repeat delay counter
+defc REPCNT = $FA19	;1 This is the key repeat delay counterprin
 defc PUTPNT = $FA1A	;2 Address in the keyboard buffer where a character will be written 
 defc GETPNT = $FA1C	;2 Address in the keyboard buffer where the next character is read 
 ;; defc CS120 = $????	;5 Cassette I/O parameters to use for 1200 baud 
@@ -84,7 +94,9 @@ defc GETPNT = $FA1C	;2 Address in the keyboard buffer where the next character i
 ;; defc HEADER = $????	;1 Delay of tape header (sync.) block 
 ;; defc ASPCT1 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
 ;; defc ASPCT2 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
-defc ENDPRG = $F7DB	;5 Pointer for the RESUME NEXT command (SAVTXT)
+;; defc ENDPRG = $????	;5 Pointer for the RESUME NEXT command
+
+; USED BY BASIC INTERNALLY
 defc ERRFLG = $F53F	;1 Basic Error code 
 ;; defc LPTPOS = $????	;1 Position of the printer head
 ;; defc PRTFLG = $????	;1 Printer output flag is read by OUTDO
@@ -94,30 +106,257 @@ defc VLZADR = $F54C	;2 Address of data that is temporarilly replaced by ‘O’ when
 defc VLZDAT = $F8E8	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F54B	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
 defc KBUF   = $F54F
-defc STREND = $F7F2
-;; defc SLOTID = $????	;1 Character set SlotID 
-;; defc CHFONT = $????	;2 Character set address 
-;; defc ACPAGE = $????
-;; defc EXBRSA = $????	;1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
-;; defc DRVINF = $????	;1 Nr. of drives connected to disk interface 1 
-;; defc DRVINF1 = $????	;1 Nr. of drives connected to disk interface 1 
-;; defc DISKIF1 = $????	;1 Slot address of disk interface 1 
-;; defc DRVINF2 = $????	;1 Nr. of drives connected to disk interface 2 
-;; defc DISKIF2 = $????	;1 Slot address of disk interface 2 
-;; defc DRVINF3 = $????	;1 Nr. of drives connected to disk interface 3 
-;; defc DISKIF3 = $????	;1 Slot address of disk interface 3 
-;; defc DRVINF4 = $????	;1 Nr. of drives connected to disk interface 4 
-;; defc DISKIF4 = $????	;1 Slot address of disk interface 4 
 
-defc BASROM = $0000
-;; defc SYSMEM = $????	;start address of system memory
+defc BUFMIN = $F68D  ; used in INPUT st.
+defc BUF    = $F68E  ; Buffer to store characters typed( in ASCII code)
+defc ENDBUF = $F790  ; Prevent overflow of BUF
+defc TTYPOS = $F791  ; Virtual cursor location internally retained by BASIC
+defc DIMFLG = $F792  ; ARRAY FLAG
+defc VALTYP = $F793  ; Type indicator
+;; defc OPRTYP = $????  ; Store operator number in the extended momentarily before operator application
+;; defc DORES  = $????  ; Indicates whether stored word can be crunched
+;; defc DONUM  = $????  ; Flag for crunch
+;; defc CONTXT = $????  ; Text address used by CNRGET
+defc CONSAV = $F798  ; Store token of constant after calling CHRGET
+;; defc CONTYP = $????  ; Type of stored constant
+;; defc CONLO  = $????  ; Value of stored constant
+defc MEMSIZ = $F7A2  ; Highest location in memory used by BASIC
+defc STKTOP = $F546  ; Top location to be used for the stack
+defc TXTTAB = $F54A  ; Starting address of BASIC text area
+defc TEMPPT = $F7A4  ; Starting address of unused area of temporary descriptor
+defc TEMPST = $F7A6  ; Temporary descriptors
+defc DSCTMP = $F7C4  ; String descriptor wich is the result of string fun.
+defc FRETOP = $F7C7  ; Starting address of unused area of string area
+defc TEMP3  = $F7C9  ; Used for garbage collection or by USR function
+defc TEMP8  = $F7CB  ; Used for garbage collection
+defc ENDFOR = $F7CD  ; Next address of FOR st.
+;; defc DATLIN = $????  ; Line number of DATA st.read by READ st.
+defc SUBFLG = $F7D1  ; Flag for array for USR fun.
+defc USFLG  = $F7D2
+;; defc FLGINP = $????  ; Flag for INPUT or READ
+defc TEMP   = $F7D3  ; Location for temporary reservation for st.code
+defc PTRFLG = $F7D5  ; =0 if no line number converted to pointers
+defc AUTFLG = $F7D6  ; AUTO mode flag
+defc AUTLIN = $F7D7  ; Current line number for auto
+defc AUTINC = $F7D9  ; (AUTOP) Increment for auto
+defc SAVTXT = $F7DB  ; Text pointer for resume
+defc SAVSTK = $F7DD  ; Save stack when error occurs
+;; defc ERRLIN = $????  ; Line where last error
+defc DOT    = $F7E1  ; Current line for edit & list
+;; defc ERRTXT = $????  ; Text pointer for use by RESUME
+defc ONELIN = $F7E5  ; LINE to go when error
+defc ONEFLG = $F7E7  ; =1 if executing an error trap routine
+defc TEMP2  = $F7E8
+defc OLDLIN = $F7EA  ; old line number set up ^C ...
+defc OLDTXT = $F7EC  ; Points st. to be executed next
+defc VARTAB = $F7EE  ; Pointer to start of variable space
+defc ARYTAB = $F7F0  Pointer to begging of array table
+defc STREND = $F7F2
+defc DATPTR = $F7F4  ; DATA pointer
+defc DEFTBL = $F7F6  ; Default valtype for each letter
+
+; USER FUNCTION PARAMETERS
+defc PRMSTK = $F810  ; Previous definition block on stack
+defc PRMLEN = $F812  ; Number of bytes of objective table
+defc PARM1  = $F814  ; Objective prameter definition table
+defc PRMPRV = $F878  ; Pointer to previous parameter block
+defc PRMLN2 = $F87A  ; Size of parameter block
+;; defc PARM2  = $????  ; For parameter storage
+defc PRMFLG = $F8E0  ; Flag to indicate whether PARM1 was searching
+defc ARYTA2 = $F7F0  ; End point of search
+defc NOFUNS = $F8E3  ; 0 if no function active
+defc TEMP9  = $F8E4  ; Location of temporary storage for garbage collection
+defc FUNACT = $F8E6  ; Count of active functions
+defc SWPTMP = $F8E9  ; Value of first  variable in SWAP st.
+defc TRCFLG = $FA08  ; 0 MEANS NO TRACE
+
+; MATH-PACK
+defc FBUFFR = $F8F2  ; Buffer for fout
+defc DECTMP = $F91D  ; Used to transform decimal integer to floating point number
+defc DECTM2 = $F91F  ; Used at division routine execution
+defc DECCNT = $F921  ; Used at division routine execution
+defc DAC    = $F923  ; DECIMAL ACCUMULATOR
+defc FACCU  = $F923  ; alias for DECIMAL ACCUMULATOR
+defc FACLOW = $F925  ; DECIMAL ACCUMULATOR + 2
+;; defc HOLD8  = $????  ; Registers for decimal multiplication (?)
+;; defc HOLDB  = $F933  ; Registers for decimal multiplication (?)
+defc HOLD2  = $F963
+defc HOLD   = $F968
+defc ARG    = $F974  ; Area to set the value to be calculate with DAC
+defc RNDX   = $F984  ; Last random number
+
+; DATA AREA USED BY BASIC INTERPRETER
+defc MAXFIL = $F98D  ; (MAXFILES) High legal file number
+defc FILTAB = $F98E  ; Starting address of of file data area
+defc NULBUF = $F992  ; Points to file 0 buffer ( used in SAVE & LOAD st.)
+defc PTRFIL = $F997  ; Points to file data of currently accessing file
+;; defc RUNFLG = $????  ; Non-zero for run after load
+defc FILNAM = $99E  ; Name for FILES, NAME & others
+defc FILNM2 = $F9A7  ; Second name for NAME
+defc NLONLY = $F9B2  ; <>0 when loading program
+defc SAVEND = $F9B4  ; End address for BSAVE
+defc FNKSTR = $FA1E  ; FUNCTION KEY AREA
+;; defc CGPNT  = $????  ; Address to store charecter font in ROM
+defc CGTABL = $4198
+;; defc SLOTID = $????	 ; 1 Character set SlotID 
+;; defc CHFONT = $????	 ; 2 Character set address 
+;; defc NAMBAS = $????  ; Base address of current pattern name table
+;; defc CGPBAS = $????  ; Base address of current pattern generator table
+;; defc PATBAS = $????  ; Base address of current sprite generator table
+;; defc ATRBAS = $????  ; Base address of current sprite attribute table
+defc CLOC   = $FAC0		; (CHKROM/CLOC)
+defc CMASK  = $FAC2
+defc MINDEL = $FAE9
+defc MAXDEL = $FAEB
+
+; DATA AREA FOR CIRCLE STATEMENT
+defc ASPECT = $FAC3  ; Aspect ratio of the circle; set by <ratio> of CIRCLE
+defc CENCNT = $FAC5  ; End count
+defc CLINEF = $FAC7  ; Flag to draw line to centre
+defc CNPNTS = $FAC8  ; Point to be plottted
+defc CPLOTF = $FACA  ; (CPLDTF) Plot polarity flag
+defc CPCNT  = $FACB  ; (CPCND)1/8 of number of points in circle
+defc CPCNT8 = $FACD  ; (CPCNT)
+;; defc CRCSUM = $????  (CRCSU)
+defc CSTCNT = $FAD1  (CSTCN)
+defc CSCLXY = $FAD3  ; Scale of X & Y
+defc CSAVEA = $FAD4  ; reservation area of ADVGRP
+defc CSAVEM = $FAD6  ; reservation area of ADVGRP
+defc CXOFF  = $FAD7  ; X offset from center
+defc CYOFF  = $FAD9  ; Y offset from center
+
+; DATA AREA FOR PAINT STATEMENT
+defc LOHMSK = $FADB
+defc LOHDIR = $FADC
+defc LOHADR = $FADD
+defc LOHCNT = $FADF
+defc SKPCNT = $FAE1  ; Skip count
+defc MOVCNT = $FAE3  ; Movement count
+defc PDIREC = $FAE5  ; (POIREC) Direction of the paint
+defc LFPROG = $FAE5
+defc RTPROG = $FAE7
+
+defc MCLTAB = $FAEF
+defc MCLFLG = $FAF1
+
+defc QUETAB = $FAF2
+defc QUEBAK = $FB0A
+defc VOICAQ = $FB0E
+defc VOICBQ = $FB8E
+defc VOICCQ = $FC0E
+
+; FOR MSX 2 ONLY ?
+;; defc DPPAGE  = $????    ;  Display page number
+
+;; defc ACPAGE  = $????
+;; defc AVCSAV  = $????    ;  Reserves AV control port
+;; defc EXBRSA  = $????    ;  1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
+
+;; defc CHRCNT  = $????    ;  Character counter in the buffer used in Roman-Kana translation
+;; defc ROMA    = $????    ;  Area to store character (Japan version only)
+;; defc MODE    = $????    ;  mode svitch for VRAM size
+;; defc NORUSE  = $????    ;  unused
+;; defc XSAVE   = $????    ;  [10000000 XXXXXXXX]
+;; defc YSAVE   = $????    ;  [*0000000 YYYYYYYY] *-light pen interrupt request
+;; defc LOGOPR  = $????    ;  Logical operation code
+
+; Data area used by RS-232C or disk drive
+;; defc RSTMP   = $????
+;; defc TOCNT   = $????
+;; defc RSFCB   = $????
+;; defc RSIQLN  = $????
+;; defc MEXBIH  = $????
+;; defc OLDSTT  = $????
+;; defc OLDINT  = $????
+;; defc DEVNUM  = $????
+defc DATCNT  = $FE4D
+;; defc ERRORS  = $????
+;; defc FLAGS   = $????
+;; defc ESTBLS  = $????
+;; defc COMMSK  = $????
+;; defc LSTCOM  = $????
+;; defc LSTMOD  = $????
+
+; Data area used by MSX-DOS
+;; defc DRVINF  = $FB21	;1 Nr. of drives connected to disk interface 1 
+;; defc DRVINF1 = $FB21	;1 Nr. of drives connected to disk interface 1 
+;; defc DISKIF1 = $FB22	;1 Slot address of disk interface 1 
+;; defc DRVINF2 = $FB23	;1 Nr. of drives connected to disk interface 2 
+;; defc DISKIF2 = $FB24	;1 Slot address of disk interface 2 
+;; defc DRVINF3 = $FB25	;1 Nr. of drives connected to disk interface 3 
+;; defc DISKIF3 = $FB26	;1 Slot address of disk interface 3 
+;; defc DRVINF4 = $FB27	;1 Nr. of drives connected to disk interface 4 
+;; defc DISKIF4 = $FB28	;1 Slot address of disk interface 4 
+
+defc PRSCNT = $FCCE ; Used by PLAY command in BASIC
+defc SAVSP  = $FCCF ;  "
+defc VOICEN = $FCD1 ;  "
+defc SAVVOL = $FCD2 ;  "
+defc MCLLEN = $FCD4 ;  "
+defc MCLPTR = $FCD5 ;  "
+defc QUEUEN = $FCD7
+defc MUSICF = $FCD8
+defc PLYCNT = $FCD9
+defc VCBA   = $FCDA ; (VCBA/METREX)
+defc VCBB   = $FCFF
+defc VCBC   = $FD24   ; (VCCC)
+;; defc ENSTOP = $???? ; <>0 if warm start enabled (CTRL+SHIFT+GRPH+KANA/CODE for warm start)
+defc BASROM = $0000 ; <>0 if basic is in rom (CTRL+STOP disabled)
+
+defc LINTTB = $FD4D  ; line terminator table (<>0 if line terminates)
+defc FSTPOS = $FD65  ; first position for inlin
+defc CODSAV = $FD67  ; code save area for cursor
+defc FNKSWI = $FD68  ; indicate which func key is displayed
+defc FNKFLG = $FD69  ; fkey which have subroutine
+defc ONGSBF = $FD73  ; global event flag
+defc CLIKFL = $FD74
+defc OLDKEY = $FD75  ; (OLDKEYS) (key map)
+defc NEWKEY = $FD80  ; (ACTKEYS) (key map)
+defc KEYBUF = $FD8B  ;  key code buffer
+defc BUFEND = $FDB3  ;  end of key buffer
+defc LINWRK = $FDB4  ;  ^
+defc PATWRK = $FDDC  ;  Pattern Buffer
+defc BOTTOM = $FDE4
+defc SYSMEM = $FDE6	;start address of system memory
+defc HIMEM  = $FDE6 ;^
+defc TRPTBL = $FDEB
+defc RTYCNT = $FB2A
+
+defc INTFLG = $FE2B ; This flag is set if STOP (=4) or CTRL + STOP (=3) is pressed
+defc PADY   = $FE2C ; Y-coordinate of a connected Graphics Tablet (PAD)
+defc PADX   = $FE2D ; X-coordinate of a connected Graphics Tablet (PAD)
+
+defc JIFFY  = $FE2E ; (TIMEVAR) Counter for the BASIC "time" function, each interrupt of the VDP  it is increased by 1. 
+defc INTVAL = $FE30 ; length of the interval when the ON INTERVAL routine was established.
+defc INTCNT = $FE32 ; ON INTERVAL counter (counts backwards)
+;; defc LOWLIM = $???? ; Used by the Cassette system (minimal length of startbit)
+;; defc WINWID = $???? ; Used by the Cassette system (store the difference between a low-and high-cycle)
+;; defc GRPHED = $???? ; flag for graph. char
+defc ESCCNT = $FE34 ; escape sequence counter
+defc INSFLG = $FE36 ; insert mode flag
+defc CSRSW  = $FA05 ; cursor display switch
+defc CSTYLE = $FE37 ; cursor style i.e. Used if INS Key is used ( 00# = Full Cursor / FF# = Halve Cursor ) 
+defc CAPST  = $FE38 ; capital status ( 00# = Off / FF# = On )
+;; defc KANAST = $???? ; russian key status (Dead Keys) 1=DK, 2=SHIFT+DK, 3=CODE+DK, 4=SHIFT+CODE+DK
+;; defc KANAMD = $????
+defc FLBMEM = $FE39 ; 0 if loading basic programm
 
 defc SCRMOD = $FE3A
+;; defc OLDSCR = $???? ; old screen mode
+;; defc CASPRV = $????
 defc BRDATR = $FE41
+defc GXPOS  = $FE42 ; X-position
+defc GYPOS  = $FE44 ; Y-position
 defc GRPACX = $FE46
 defc GRPACY = $FE48
+defc DRWFLG = $FE4A ; DrawFlag: Bit 7 = Draw Line (,N), Bit 6 = Move Cursor (,B)
+defc DRWSCL = $FE4B ; DrawScaling
+defc DRWANG = $FE4C ; DrawAngle (0..3): 1=90 degrees rotation .. 3=270 degrees, etc..
 
-; FCC1H  --  slot-address of main-ROM
+defc RUNBNF = $FE57 ; Run Binary File After loading ( Bload"File.Bin",R ) 0 = Don't Run / 1 = Run
+defc SAVENT = $FE58 ; start address for BSAVE / BLOAD operations
+
+; ????  --  slot-address of main-ROM
 ;; defc EXPTBL = $????	;1 Slot 0: #80 = expanded, 0 = not expanded. Also slot address of the main BIOS-ROM. 
 ;; defc EXP0 = $????	;1 Expansion Slot 0
 ;; defc EXP1 = $????	;1 Expansion Slot 1
@@ -129,22 +368,28 @@ defc GRPACY = $FE48
 ;; defc SLT2 = $????	;1 Mirror of slot 2...
 ;; defc SLT3 = $????	;1 Mirror of slot 3...
 
+;; defc SLTATR = $???? ; Slotatributes found starting: Bit 7 = Basic prog, Bit 6 = Dev Ext, Bit 5 = Stmt Ext
+;; defc SLTWRK = $???? ; (free word = FD09H + 32*basic slot + 8*expansion slot + 2*page)
+;; defc PROCNM = $???? ; name of expanded statement
+;; defc DEVICE = $???? ; device ID for cartrige 0-3
 
 
+; -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ; BASIC locations
+; -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 ;; defc WARM_BT = $????	; address of "warm boot" BASIC interpreter
 
-;; defc DOTLINE = $????
-;; defc DOBOXF  = $????
-;; defc BOXLIN  = $????
-;; defc DO_CIRC = $????
+defc DOTLINE = $243C	; LINE (BC,DE)-(GXPOS,GYPOS)
+defc DOBOXF  = $2401
+defc BOXLIN  = $2452
+defc DO_CIRC = $265A
 
-;; defc PSET    = $????	; (X = (BC), Y = (DE))
-;; defc DOPSET  = $????
+;; defc PSET    = $2338
+defc DO_PSET = $2338	; (X = (BC), Y = (DE))
 
 ;; defc N_PAINT = $????	; (color = (A), X = (BC), Y = (DE)) -
-;; defc O_PAINT = $????	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT
+defc O_PAINT = $2524	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT
 
 
 lston

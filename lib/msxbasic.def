@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: msxbasic.def,v 1.3 2014-05-13 06:10:23 stefano Exp $
+; $Id: msxbasic.def,v 1.4 2014-05-16 13:41:50 stefano Exp $
 ;
 
 
@@ -13,6 +13,7 @@ defc VDP_RP  = $0006	; address of vdp READ port
 defc VDP_WP  = $0007	; address of vdp WRITE port
 defc MSX_VER = $002D    ; MSX version (0 = MSX1, 1 = MSX2)
 
+; SUBROUTINES FOR READ/WRITE CALLS OF THE INTER-SLOT
 defc RDPRIM = $F380	;5 Routine that reads from a primary slot 
 defc WRPRIM = $F385	;7 Routine that writes to a primary slot 
 defc CLPRIM = $F38C	;14 Routine that calls a routine in a primary slot 
@@ -32,6 +33,8 @@ defc LINL32 = $F3AF	;1 Width for SCREEN 1 (default 29)
 defc LINLEN = $F3B0	;1 Width for the current text mode 
 defc CRTCNT = $F3B1	;1 Number of lines on screen 
 defc CLMLST = $F3B2	;1 Column space. It’s uncertain what this address actually stores 
+
+; WORK FOR INITIALIZATION
 defc TXTNAM = $F3B3	;2 BASE(0) - SCREEN 0 name table 
 defc TXTCOL = $F3B5	;2 BASE(1) - SCREEN 0 color table 
 defc TXTCGP = $F3B7	;2 BASE(2) - SCREEN 0 character pattern table 
@@ -56,6 +59,8 @@ defc CLIKSW = $F3DB	;press click status
 defc CSRY = $F3DC	;1 Current row-position of the cursor 
 defc CSRX = $F3DD	;1 Current column-position of the cursor 
 defc CNSDFG = $F3DE	;function keys status
+
+; AREA TO SAVE VDP REGISTERS
 defc RG0SAV = $F3DF	;1 Content of VDP(0) register (R#0) 
 defc RG1SAV = $F3E0	;1 Content of VDP(1) register (R#1) 
 defc RG2SAV = $F3E1	;1 Content of VDP(2) register (R#2) 
@@ -72,8 +77,12 @@ defc BDRCLR = $F3EB	;1 Border color
 defc MAXUPD = $F3EC	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc MINUPD = $F3EF	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc ATRBYT = $F3F2	;1 Attribute byte (for graphical routines it’s used to read the color) 
+
+; WORK AREA FOR PLAY STATEMENT
 defc QUEUES = $F3F3	;2 Address of the queue table 
 defc FRCNEW = $F3F5	;1 CLOAD flag
+
+; WORK AREA FOR KEY INPUT
 defc SCNCNT = $F3F6	;1 Key scan timing
 defc REPCNT = $F3F7	;1 This is the key repeat delay counter
 defc PUTPNT = $F3F8	;2 Address in the keyboard buffer where a character will be written 
@@ -86,6 +95,8 @@ defc HEADER = $F40A	;1 Delay of tape header (sync.) block
 defc ASPCT1 = $F40B	;2 Horizontal / Vertical aspect for CIRCLE command 
 defc ASPCT2 = $F40D	;2 Horizontal / Vertical aspect for CIRCLE command 
 defc ENDPRG = $F40F	;5 Pointer for the RESUME NEXT command 
+
+; USED BY BASIC INTERNALLY
 defc ERRFLG = $F414	;1 Basic Error code 
 defc LPTPOS = $F415	;1 Position of the printer head
 defc PRTFLG = $F416	;1 Printer output flag is read by OUTDO
@@ -95,11 +106,178 @@ defc VLZADR = $F419	;2 Address of data that is temporarilly replaced by ‘O’ when
 defc VLZDAT = $F41B	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F41C	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
 defc KBUF   = $F41F
+
+defc BUFMIN = $F55D  ; used in INPUT st.
+defc BUF    = $F55E  ; Buffer to store characters typed( in ASCII code)
+defc ENDBUF = $F660  ; Prevent overflow of BUF
+defc TTYPOS = $F661  ; Virtual cursor location internally retained by BASIC
+defc DIMFLG = $F662  ; ARRAY FLAG
+defc VALTYP = $F663  ; Type indicator
+defc OPRTYP = $F664  ; Store operator number in the extended momentarily before operator application
+defc DORES  = $F664  ; Indicates whether stored word can be crunched
+defc DONUM  = $F665  ; Flag for crunch
+defc CONTXT = $F666  ; Text address used by CNRGET
+defc CONSAV = $F668  ; Store token of constant after calling CHRGET
+defc CONTYP = $F669  ; Type of stored constant
+defc CONLO  = $F66A  ; Value of stored constant
+defc MEMSIZ = $F672  ; Highest location in memory used by BASIC
+defc STKTOP = $F674  ; Top location to be used for the stack
+defc TXTTAB = $F676  ; Starting address of BASIC text area
+defc TEMPPT = $F678  ; Starting address of unused area of temporary descriptor
+defc TEMPST = $F67A  ; Temporary descriptors
+defc DSCTMP = $F698  ; String descriptor wich is the result of string fun.
+defc FRETOP = $F69B  ; Starting address of unused area of string area
+defc TEMP3  = $F69D  ; Used for garbage collection or by USR function
+defc TEMP8  = $F69F  ; Used for garbage collection
+defc ENDFOR = $F6A1  ; Next address of FOR st.
+defc DATLIN = $F6A3  ; Line number of DATA st.read by READ st.
+defc SUBFLG = $F6A5  ; Flag for array for USR fun.
+defc USFLG  = $F6A6
+defc FLGINP = $F6A6  ; Flag for INPUT or READ
+defc TEMP   = $F6A7  ; Location for temporary reservation for st.code
+defc PTRFLG = $F6A9  ; =0 if no line number converted to pointers
+defc AUTFLG = $F6AA  ; AUTO mode flag
+defc AUTLIN = $F6AB  ; Current line number for auto
+defc AUTINC = $F6AD  ; Increment for auto
+defc SAVTXT = $F6AF  ; Text pointer for resume
+defc SAVSTK = $F6B1  ; Save stack when error occurs
+defc ERRLIN = $F6B3  ; Line where last error
+defc DOT    = $F6B5  ; Current line for edit & list
+defc ERRTXT = $F6B7  ; Text pointer for use by RESUME
+defc ONELIN = $F6B9  ; LINE to go when error
+defc ONEFLG = $F6BB  ; =1 if executing an error trap routine
+defc TEMP2  = $F6BC
+defc OLDLIN = $F6BE  ; old line number set up ^C ...
+defc OLDTXT = $F6C0  ; Points st. to be executed next
+defc VARTAB = $F6C2  ; Pointer to start of variable space
+defc ARYTAB = $F6C4  ; Pointer to begging of array table
 defc STREND = $F6C6
-defc SLOTID = $F91F	;1 Character set SlotID 
-defc CHFONT = $F920	;2 Character set address 
-defc ACPAGE = $FAF6
-defc EXBRSA  = $FAF8	;1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
+defc DATPTR = $F6C8  ; DATA pointer
+defc DEFTBL = $F6CA  ; Default valtype for each letter
+
+; USER FUNCTION PARAMETERS
+defc PRMSTK = $F6E4  ; Previous definition block on stack
+defc PRMLEN = $F6E6  ; Number of bytes of objective table
+defc PARM1  = $F6E8  ; Objective prameter definition table
+defc PRMPRV = $F74C  ; Pointer to previous parameter block
+defc PRMLN2 = $F74E  ; Size of parameter block
+defc PARM2  = $F750  ; For parameter storage
+defc PRMFLG = $F7B4  ; Flag to indicate whether PARM1 was searching
+defc ARYTA2 = $F7B5  ; End point of search
+defc NOFUNS = $F7B7  ; 0 if no function active
+defc TEMP9  = $F7B8  ; Location of temporary storage for garbage collection
+defc FUNACT = $F7BA  ; Count of active functions
+defc SWPTMP = $F7BC  ; Value of first  variable in SWAP st.
+defc TRCFLG = $F7C4  ; 0 MEANS NO TRACE
+
+; MATH-PACK
+defc FBUFFR = $F7C5  ; Buffer for fout
+defc DECTMP = $F7F0  ; Used to transform decimal integer to floating point number
+defc DECTM2 = $F7F2  ; Used at division routine execution
+defc DECCNT = $F7F4  ; Used at division routine execution
+defc DAC    = $F7F6  ; DECIMAL ACCUMULATOR
+defc FACCU  = $F7F6  ; alias for DECIMAL ACCUMULATOR
+defc FACLOW = $F7F8  ; DECIMAL ACCUMULATOR + 2
+;; defc HOLD8  = $F806  ; Registers for decimal multiplication (?)
+;; defc HOLDB  = $????  ; Registers for decimal multiplication (?)
+defc HOLD2  = $F836
+defc HOLD   = $F83E
+defc ARG    = $F847  ; Area to set the value to be calculate with DAC
+defc RNDX   = $F857  ; Last random number
+
+; DATA AREA USED BY BASIC INTERPRETER
+defc MAXFIL = $F85F  ; High legal file number
+defc FILTAB = $F860  ; Starting address of of file data area
+defc NULBUF = $F862  ; Points to file 0 buffer ( used in SAVE & LOAD st.)
+defc PTRFIL = $F864  ; Points to file data of currently accessing file
+defc RUNFLG = $F866  ; Non-zero for run after load
+defc FILNAM = $F866  ; Name for FILES, NAME & others
+defc FILNM2 = $F871  ; Second name for NAME
+defc NLONLY = $F87C  ; <>0 when loading program
+defc SAVEND = $F87D  ; End address for BSAVE
+defc FNKSTR = $F87F  ; FUNCTION KEY AREA
+defc CGPNT  = $F91F  ; Address to store charecter font in ROM
+;; defc CGTABL = $0004  ; Found in CBIOS..  does it exist on the regular BIOS too ?
+defc SLOTID = $F91F	 ; 1 Character set SlotID 
+defc CHFONT = $F920	 ; 2 Character set address 
+defc NAMBAS = $F922  ; Base address of current pattern name table
+defc CGPBAS = $F924  ; Base address of current pattern generator table
+defc PATBAS = $F926  ; Base address of current sprite generator table
+defc ATRBAS = $F928  ; Base address of current sprite attribute table
+defc CLOC   = $F92A  ; (CHKROM/CLOC)
+defc CMASK  = $F92C
+defc MINDEL = $F92D
+defc MAXDEL = $F92F
+
+; DATA AREA FOR CIRCLE STATEMENT
+defc ASPECT = $F931  ; Aspect ratio of the circle; set by <ratio> of CIRCLE
+defc CENCNT = $F933  ; End count
+defc CLINEF = $F935  ; Flag to draw line to centre
+defc CNPNTS = $F936  ; Point to be plottted
+defc CPLOTF = $F938  ; Plot polarity flag
+defc CPCNT  = $F939  ; 1/8 of number of points in circle
+defc CPCNT8 = $F93B
+defc CRCSUM = $F93D
+defc CSTCNT = $F93F
+defc CSCLXY = $F941  ; Scale of X & Y
+defc CSAVEA = $F942  ; reservation area of ADVGRP
+defc CSAVEM = $F944  ; reservation area of ADVGRP
+defc CXOFF  = $F945  ; X offset from center
+defc CYOFF  = $F947  ; Y offset from center
+
+; DATA AREA FOR PAINT STATEMENT
+defc LOHMSK = $F949
+defc LOHDIR = $F94A
+defc LOHADR = $F94B
+defc LOHCNT = $F94D
+defc SKPCNT = $F94F  ; Skip count
+defc MOVCNT = $F951  ; Movement count
+defc PDIREC = $F953  ; Direction of the paint
+defc LFPROG = $F954
+defc RTPROG = $F955
+
+defc MCLTAB = $F956
+defc MCLFLG = $F958
+
+defc QUETAB = $F959
+defc QUEBAK = $F971
+defc VOICAQ = $F975
+defc VOICBQ = $F9F5
+defc VOICCQ = $FA75
+
+; FOR MSX 2 ONLY ?
+defc DPPAGE  = $FAF5    ;  Display page number
+
+defc ACPAGE  = $FAF6
+defc AVCSAV  = $FAF7    ;  Reserves AV control port
+defc EXBRSA  = $FAF8	;  1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
+
+defc CHRCNT  = $FAF9    ;  Character counter in the buffer used in Roman-Kana translation
+defc ROMA    = $FAFA    ;  Area to store character (Japan version only)
+defc MODE    = $FAFC    ;  mode svitch for VRAM size
+defc NORUSE  = $FAFD    ;  unused
+defc XSAVE   = $FAFE    ;  [10000000 XXXXXXXX]
+defc YSAVE   = $FB00    ;  [*0000000 YYYYYYYY] *-light pen interrupt request
+defc LOGOPR  = $FB02    ;  Logical operation code
+
+; Data area used by RS-232C or disk drive
+defc RSTMP   = $FB03
+defc TOCNT   = $FB03
+defc RSFCB   = $FB04
+defc RSIQLN  = $FB06
+defc MEXBIH  = $FB07
+defc OLDSTT  = $FB0C
+defc OLDINT  = $FB12
+defc DEVNUM  = $FB17
+defc DATCNT  = $FB18
+defc ERRORS  = $FB1B
+defc FLAGS   = $FB1C
+defc ESTBLS  = $FB1D
+defc COMMSK  = $FB1E
+defc LSTCOM  = $FB1F
+defc LSTMOD  = $FB20
+
+; Data area used by MSX-DOS
 defc DRVINF  = $FB21	;1 Nr. of drives connected to disk interface 1 
 defc DRVINF1 = $FB21	;1 Nr. of drives connected to disk interface 1 
 defc DISKIF1 = $FB22	;1 Slot address of disk interface 1 
@@ -148,13 +326,14 @@ defc INTFLG = $FC9B ; This flag is set if STOP (=4) or CTRL + STOP (=3) is press
 defc PADY   = $FC9C ; Y-coordinate of a connected Graphics Tablet (PAD)
 defc PADX   = $FC9D ; X-coordinate of a connected Graphics Tablet (PAD)
 
-defc JIFFY  = $FC9E ; Counter for the BASIC "time" function, each interrupt of the VDP  it is increased by 1. 
+defc JIFFY  = $FC9E ; (TIMEVAR) Counter for the BASIC "time" function, each interrupt of the VDP  it is increased by 1. 
 defc INTVAL = $FCA0 ; length of the interval when the ON INTERVAL routine was established.
 defc INTCNT = $FCA2 ; ON INTERVAL counter (counts backwards)
 defc LOWLIM = $FCA4 ; Used by the Cassette system (minimal length of startbit)
 defc WINWID = $FCA5 ; Used by the Cassette system (store the difference between a low-and high-cycle)
 defc GRPHED = $FCA6 ; flag for graph. char
-defc ESCCNT = $FCA7 ; escape sequence counter FCA8 INSFLG  insert mode flag
+defc ESCCNT = $FCA7 ; escape sequence counter
+defc INSFLG = $FCA8 ; insert mode flag
 defc CSRSW  = $FCA9 ; cursor display switch
 defc CSTYLE = $FCAA ; cursor style i.e. Used if INS Key is used ( 00# = Full Cursor / FF# = Halve Cursor ) 
 defc CAPST  = $FCAB ; capital status ( 00# = Off / FF# = On )
@@ -195,20 +374,22 @@ defc PROCNM = $FD89 ; name of expanded statement
 defc DEVICE = $FD99 ; device ID for cartrige 0-3
 
 
+; -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ; BASIC locations
+; -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 defc WARM_BT = $409B	; address of "warm boot" BASIC interpreter
 
-defc DOTLINE = $58FC
+defc DOTLINE = $58FC	; LINE (BC,DE)-(GXPOS,GYPOS)
 defc DOBOXF  = $58C1
 defc BOXLIN  = $5912
-defc DO_CIRC = $5B19
+defc DO_CIRC = $5B19	;
 
-defc PSET    = $57F5	; (X = (BC), Y = (DE))
-defc DOPSET  = $57F5
+;; defc PSET    = $57F5
+defc DOPSET  = $57F5    ; (X = (BC), Y = (DE))
 
 defc N_PAINT = $266E	; (color = (A), X = (BC), Y = (DE)) -
-defc O_PAINT = $59E3	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT
+defc O_PAINT = $59E3	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT (BC,DE)
 
 
 lston
