@@ -10,7 +10,7 @@ l_small_mul_40_32x8:
    ; enter : dehl = 32-bit multiplicand
    ;            a = 8-bit multiplicand
    ;
-   ; exit  : dehl = 32-bit product
+   ; exit  : adehl = 40-bit product
    ;         carry reset
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
