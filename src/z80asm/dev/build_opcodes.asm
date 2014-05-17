@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.3 2014-05-14 21:32:14 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.4 2014-05-17 10:54:34 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -550,4 +550,3 @@ ENDIF
 
 	invoke {0 1 65535}					;;	call {1}
 	invoke {-1 65536}			 		;; error: integer '{1}' out of range
-	
