@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.117 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.118 2014-05-17 23:08:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -237,7 +237,7 @@ void
 LinkModules( void )
 {
     char fheader[9];
-    long origin;
+    int32_t origin;
     Module *first_obj_module, *last_obj_module;
 	BOOL saw_last_obj_module;
     char *obj_filename;
@@ -310,6 +310,8 @@ LinkModules( void )
             }
 
             origin = xfget_uint16( file );
+			if ( origin == 0xFFFF )
+				origin = -1;
 
             if ( CURRENTMODULE == first_obj_module )            /* origin of first module */
             {
@@ -327,7 +329,7 @@ LinkModules( void )
                     {
                         CURRENTMODULE->origin = origin;
 
-						if ( CURRENTMODULE->origin == NO_ORIGIN )
+						if ( CURRENTMODULE->origin == -1 )
                         {
                             error_org_not_defined();  /* no ORG */
                             xfclose( file );
@@ -957,7 +959,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.117  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.118  2014-05-17 23:08:03  pauloscustodio
+* Change origin to int32_t, use -1 to signal as not defined
+*
+* Revision 1.117  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.116  2014/05/06 22:52:01  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.37 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.38 2014-05-17 23:08:03 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ OPT_VAR( BOOL,		code_seg,	FALSE	)
 OPT_VAR( BOOL,		relocatable, FALSE	)
 OPT_VAR( BOOL,		library,	FALSE	)	/* true if linking with libs */
 
-OPT_VAR( long, 		origin,		-1	)		/* -1 == not defined */
+OPT_VAR( int32_t,	origin,		-1	)		/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	asm_ext,	( FILEEXT_ASM ) + 1 )	/* skip "." */
@@ -188,7 +188,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.37  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.38  2014-05-17 23:08:03  pauloscustodio
+* Change origin to int32_t, use -1 to signal as not defined
+*
+* Revision 1.37  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.36  2014/05/17 10:57:45  pauloscustodio

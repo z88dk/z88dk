@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.85 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.86 2014-05-17 23:08:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -440,12 +440,12 @@ static void option_make_updated_bin( void )
 
 static void option_origin( char *origin_hex )
 {
-    long origin = strtol( origin_hex, NULL, 16 );
+    int32_t origin = strtol( origin_hex, NULL, 16 );
 
     if ( origin < 0 || origin > 0xFFFF )
         error_int_range( origin );
 
-    opts.origin = ( int ) origin;
+    opts.origin = (int32_t) origin;
 }
 
 static void option_define( char *symbol )
@@ -569,7 +569,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.85  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.86  2014-05-17 23:08:03  pauloscustodio
+* Change origin to int32_t, use -1 to signal as not defined
+*
+* Revision 1.85  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.84  2014/05/17 10:57:45  pauloscustodio

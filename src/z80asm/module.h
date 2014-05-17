@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.12 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.13 2014-05-17 23:08:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -44,18 +44,19 @@ CLASS( Module )
 	char		*modname;			/* module name, kept in strpool*/
 	char		*filename;			/* source file name, kept in strpool */
     uint32_t	 start_offset;		/* this module's start offset from start of code buffer */
-    uint32_t	 origin;			/* ORG address of module, NO_ORIGIN (=0xFFFF) if not defuined */
+    int32_t		 origin;			/* ORG address of module, -1 if not defined */
 	SymbolHash	*local_symtab;		/* module local symbols */
     ExprList	*exprs;				/* list of module expressions */
 END_CLASS;
-
-#define NO_ORIGIN 0xFFFF
 
 CLASS_LIST( Module );
 
 /*
 * $Log: module.h,v $
-* Revision 1.12  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.13  2014-05-17 23:08:03  pauloscustodio
+* Change origin to int32_t, use -1 to signal as not defined
+*
+* Revision 1.12  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.11  2014/05/06 22:17:38  pauloscustodio

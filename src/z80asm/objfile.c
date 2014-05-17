@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.25 2014-05-17 22:42:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.26 2014-05-17 23:08:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -103,7 +103,6 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 {
 	OFile *self;
     DEFINE_STR( buffer, MAXLINE );
-	uint16_t origin_read;
 
 	/* check file version */
     fseek( file, start_ptr, SEEK_SET );
@@ -118,8 +117,9 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 	self->writing		= FALSE;
 
     /* read object file header */
-    origin_read			= xfget_uint16( file );
-	self->origin		= (origin_read == 0xFFFF) ? -1 : origin_read;
+    self->origin = xfget_uint16( file );
+	if ( self->origin == 0xFFFF)
+		self->origin = -1;
 
     self->modname_ptr	= xfget_int32( file );
     self->expr_ptr		= xfget_int32( file );
@@ -230,7 +230,10 @@ BOOL objmodule_loaded( Module *module, char *filename )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.25  2014-05-17 22:42:25  pauloscustodio
+* Revision 1.26  2014-05-17 23:08:03  pauloscustodio
+* Change origin to int32_t, use -1 to signal as not defined
+*
+* Revision 1.25  2014/05/17 22:42:25  pauloscustodio
 * Move load_module_object() that loads object file size when assembling
 * with -d option to objfile.c. Change objfile API.
 *
