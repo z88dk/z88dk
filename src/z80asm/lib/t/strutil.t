@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.14 2014-05-08 22:37:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.15 2014-05-17 14:27:13 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -193,7 +193,7 @@ int main()
 	/* str_compress_escapes, Str_compress_escapes */
 	{
 		Str *s1 = OBJ_NEW(Str);
-		UINT len;
+		size_t len;
 		int i;
 		
 		Str_set_alias(s1, &alias);
@@ -751,14 +751,17 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.14  2014-05-08 22:37:30  pauloscustodio
+# Revision 1.15  2014-05-17 14:27:13  pauloscustodio
+# Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+#
+# Revision 1.14  2014/05/08 22:37:30  pauloscustodio
 # comment
 #
 # Revision 1.13  2014/05/06 22:17:38  pauloscustodio
-# Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+# Made types uint8_t, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 #
 # Revision 1.12  2014/05/05 22:07:38  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+# byte_t, uint_t and ulong_t renamed to uint8_t, UINT and ULONG
 #
 # Revision 1.11  2014/04/19 14:57:37  pauloscustodio
 # BUG_0046: Expressions stored in object file with wrong values in MacOS

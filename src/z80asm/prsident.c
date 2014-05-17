@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.73 2014-05-06 22:52:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.74 2014-05-17 14:27:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -994,12 +994,15 @@ DAA( void )
 
 /*
 * $Log: prsident.c,v $
-* Revision 1.73  2014-05-06 22:52:01  pauloscustodio
+* Revision 1.74  2014-05-17 14:27:12  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.73  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.72  2014/05/06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.71  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

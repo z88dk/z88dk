@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.59 2014-05-06 22:52:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.60 2014-05-17 14:27:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -70,9 +70,9 @@ flags[] =
 int
 CheckCondition( void )
 {
-    UINT  i;
+    size_t  i;
     char   *text = tok_name;
-    UINT  len = strlen( text );
+    size_t  len = strlen( text );
 
     for ( i = 0; i < NUM_ELEMS( flags ); i++ )
     {
@@ -317,15 +317,18 @@ IndirectRegisters( void )
 
 /*
 * $Log: prsline.c,v $
-* Revision 1.59  2014-05-06 22:52:01  pauloscustodio
+* Revision 1.60  2014-05-17 14:27:12  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.59  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.58  2014/05/06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.57  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.56  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols
@@ -411,7 +414,7 @@ IndirectRegisters( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.41  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -457,8 +460,8 @@ IndirectRegisters( void )
 * warnings
 *
 * Revision 1.31  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (BYTE)
-* Replaced (unisigned int) by (UINT)
+* Replaced (unsigned char) by (uint8_t)
+* Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *
 * Revision 1.30  2013/01/20 21:24:28  pauloscustodio

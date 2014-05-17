@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.50 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.51 2014-05-17 14:27:13 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,11 +62,14 @@ struct linkedmod
 
 /*
 * $Log: symbol.h,v $
-* Revision 1.50  2014-05-06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Revision 1.51  2014-05-17 14:27:13  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.50  2014/05/06 22:17:38  pauloscustodio
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.49  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.48  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -166,7 +169,7 @@ struct linkedmod
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.32  2014/02/17 22:48:28  pauloscustodio
 * Symbol types and Expression types need to be in sync
@@ -231,8 +234,8 @@ struct linkedmod
 * Added comments
 *
 * Revision 1.18  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (BYTE)
-* Replaced (unisigned int) by (UINT)
+* Replaced (unsigned char) by (uint8_t)
+* Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *
 * Revision 1.17  2013/01/20 13:18:10  pauloscustodio

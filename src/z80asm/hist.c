@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.98 2014-05-17 10:57:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.99 2014-05-17 14:27:12 pauloscustodio Exp $
 */
 
 /*
@@ -24,15 +24,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.98 2014-05-17 10:57
 
 /*
 * $Log: hist.c,v $
-* Revision 1.98  2014-05-17 10:57:45  pauloscustodio
+* Revision 1.99  2014-05-17 14:27:12  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.98  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,
 * linker and librarian.
 *
 * Revision 1.97  2014/05/06 22:17:37  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.96  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.95  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
@@ -182,7 +185,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.98 2014-05-17 10:57
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.71  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
@@ -1419,7 +1422,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, BYTE, UINT
+	- Unified usage of integer types: int, char, uint8_t, uint32_t
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1738,7 +1741,7 @@ Based on 1.0.31
 		breaks on a 64-bit architecture. Make the functions return the value instead 
 		of being passed the pointer to the return value, so that the compiler
 		takes care of size convertions.
-		Create UINT and ULONG, use UINT instead of size_t.
+		Create uint32_t, use uint32_t instead of size_t.
 		
 -------------------------------------------------------------------------------
 01.03.2014 [2.1.4] (pauloscustodio)

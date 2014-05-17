@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.167 2014-05-17 10:57:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.168 2014-05-17 14:27:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -69,19 +69,19 @@ char Z80libhdr[] = "Z80LMF01";
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 #endif
 
-BYTE reloc_routine[] =
+uint8_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
     "\xD1\xE3\x2B\x7C\xB5\xE3\xD5\x20\xDD\xF1\xF1\xFD\x36\x00\xC3\xFD"
     "\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
 
-UINT sizeof_relocroutine = 73;
-UINT sizeof_reloctable   = 0;
+size_t sizeof_relocroutine = 73;
+size_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
 
-UINT DEFVPC;          /* DEFVARS address counter */
+uint32_t DEFVPC;          /* DEFVARS address counter */
 
 struct liblist *libraryhdr;
 
@@ -101,9 +101,8 @@ void assemble_file( char *filename )
 	Module *module;
 
     /* normal case - assemble a asm source file */
-    objfile = NULL;
     opts.cur_list = opts.list;		/* initial LSTON status */
-    reset_codearea();           /* Pointer (PC) to store z80 instruction */
+    reset_codearea();				/* Pointer (PC) to store z80 instruction */
 
     src_filename = get_asm_filename( filename );      /* set '.asm' extension */
     obj_filename = get_obj_filename( filename );      /* set '.obj' extension */
@@ -282,7 +281,7 @@ CloseFiles( void )
 /* define name of library file to create, return name in strpool */
 char *CreateLibfile( char *filename )
 {
-    UINT len;
+    size_t len;
     char *found_libfilename;
 
     len = strlen( filename );
@@ -502,7 +501,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.167  2014-05-17 10:57:45  pauloscustodio
+* Revision 1.168  2014-05-17 14:27:13  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.167  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,
 * linker and librarian.
 *
@@ -511,13 +513,13 @@ createsym( Symbol *symptr )
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.165  2014/05/06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.164  2014/05/04 18:05:56  pauloscustodio
 * comment
 *
 * Revision 1.163  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.162  2014/05/02 21:00:50  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -656,7 +658,7 @@ createsym( Symbol *symptr )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.137  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
@@ -965,8 +967,8 @@ createsym( Symbol *symptr )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.66  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (BYTE)
-* Replaced (unisigned int) by (UINT)
+* Replaced (unsigned char) by (uint8_t)
+* Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *
 * Revision 1.65  2013/01/20 21:24:28  pauloscustodio

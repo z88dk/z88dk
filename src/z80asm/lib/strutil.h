@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.16 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.17 2014-05-17 14:27:13 pauloscustodio Exp $
 */
 
 #pragma once
@@ -35,7 +35,7 @@ extern char *strip( char *string );
 /* convert C-escape sequences - modify in place, return final length 
    to allow strings with '\0' characters 
    Accepts \b, \f, \n, \r, \t, \v, \xhh, \? \ooo */
-extern UINT str_compress_escapes( char *string );
+extern size_t str_compress_escapes( char *string );
 
 /*-----------------------------------------------------------------------------
 *   String class - dual use
@@ -60,8 +60,8 @@ CLASS( Str )
 	char   **palias;	/* points to a char* alias variable that is always kept pointing
 						   to self->str; useful to export a char* that always points
 						   at the buffer */
-	UINT	 size;		/* allocated size */
-	UINT	 len;		/* sring length (excluding zero terminator) */
+	size_t	 size;		/* allocated size */
+	size_t	 len;		/* sring length (excluding zero terminator) */
 	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
 						   FALSE if str is in user supplied buffer and cannot grow */
 END_CLASS;
@@ -85,7 +85,7 @@ extern void Str_sync_len( Str *self );
 extern void Str_set_alias( Str *self, char **palias );
 
 /* expand if needed to store at least more num_chars plus a zero byte */
-extern void Str_reserve( Str *self, UINT num_chars );
+extern void Str_reserve( Str *self, size_t num_chars );
 
 /* delete extra unused space */
 extern void Str_unreserve( Str *self );
@@ -95,12 +95,12 @@ extern void Str_set( Str *self, char *source );
 extern void Str_append( Str *self, char *source );
 
 /* set / append substring */
-extern void Str_set_n( Str *self, char *source, UINT count );
-extern void Str_append_n( Str *self, char *source, UINT count );
+extern void Str_set_n( Str *self, char *source, size_t count );
+extern void Str_append_n( Str *self, char *source, size_t count );
 
 /* set / append bytes */
-extern void Str_set_bytes( Str *self, char *source, UINT size );
-extern void Str_append_bytes( Str *self, char *source, UINT size );
+extern void Str_set_bytes( Str *self, char *source, size_t size );
+extern void Str_append_bytes( Str *self, char *source, size_t size );
 
 /* set / append char */
 extern void Str_set_char( Str *self, char ch );
@@ -127,7 +127,7 @@ extern void Str_strip( Str *self );
 extern void Str_compress_escapes( Str *self );
 
 /* get N characters from input, return FALSE on EOF */
-extern BOOL Str_getchars( Str *self, FILE *fp, UINT num_chars );
+extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
 
 /* get one line from input, convert end-of-line sequences,
    return string including one LF character
@@ -137,11 +137,14 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.16  2014-05-06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Revision 1.17  2014-05-17 14:27:13  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.16  2014/05/06 22:17:38  pauloscustodio
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.14  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS
@@ -171,7 +174,7 @@ extern BOOL Str_getline( Str *self, FILE *fp );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.8  2014/01/21 21:31:52  pauloscustodio
 * ws

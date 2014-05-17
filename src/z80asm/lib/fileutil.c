@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.16 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.17 2014-05-17 14:27:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -319,13 +319,13 @@ void xfclose_remove( FILE *file )
 /*-----------------------------------------------------------------------------
 *   Buffers
 *----------------------------------------------------------------------------*/
-void xfwrite( void *buffer, UINT size, UINT count, FILE *file )
+void xfwrite( void *buffer, size_t size, size_t count, FILE *file )
 {
     if ( fwrite( buffer, size, count, file ) != count )
         fatal_ferr_write( file );
 }
 
-void xfread( void *buffer, UINT size, UINT count, FILE *file )
+void xfread( void *buffer, size_t size, size_t count, FILE *file )
 {
     if ( fread( buffer, size, count, file ) != count )
         fatal_ferr_read( file );
@@ -334,12 +334,12 @@ void xfread( void *buffer, UINT size, UINT count, FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write strings of characters
 *----------------------------------------------------------------------------*/
-void xfput_chars( FILE *file, char *buffer, UINT len )
+void xfput_chars( FILE *file, char *buffer, size_t len )
 {
     xfwrite( buffer, sizeof(char), len, file );
 }
 
-void xfget_chars( FILE *file, char *buffer, UINT len )
+void xfget_chars( FILE *file, char *buffer, size_t len )
 {
     xfread( buffer, sizeof(char), len, file );
 }
@@ -357,7 +357,7 @@ void xfput_Str( FILE *file, Str *str )
     xfput_chars( file, str->str, str->len );
 }
 
-void xfget_Str( FILE *file, Str *str, UINT len )
+void xfget_Str( FILE *file, Str *str, size_t len )
 {
     if ( len + 1 > str->size )
         fatal_ferr_read( file ); 			/* too long */
@@ -371,7 +371,7 @@ void xfget_Str( FILE *file, Str *str, UINT len )
 /*-----------------------------------------------------------------------------
 *   read/write counted string - string with size byte at start
 *----------------------------------------------------------------------------*/
-static void _xfput_count_byte_str( FILE *file, char *str, UINT len )
+static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
 {
     if ( len > 0xFF )
         fatal_ferr_write( file );			/* too long */
@@ -392,7 +392,7 @@ void xfput_count_byte_Str( FILE *file, Str *str )
 
 void xfget_count_byte_Str( FILE *file, Str *str )
 {
-	UINT len;
+	size_t len;
 	
 	len = xfget_uint8( file );				/* byte count */
     xfget_Str(   file, str, len );			/* characters */
@@ -401,7 +401,7 @@ void xfget_count_byte_Str( FILE *file, Str *str )
 /*-----------------------------------------------------------------------------
 *   read/write counted string - string with size word at start
 *----------------------------------------------------------------------------*/
-static void _xfput_count_word_str( FILE *file, char *str, UINT len )
+static void _xfput_count_word_str( FILE *file, char *str, size_t len )
 {
     if ( len > 0xFFFF )
         fatal_ferr_write( file );			/* too long */
@@ -422,7 +422,7 @@ void xfput_count_word_Str( FILE *file, Str *str )
 
 void xfget_count_word_Str( FILE *file, Str *str )
 {
-	UINT len;
+	size_t len;
 	
 	len = xfget_uint16( file );				/* byte count */
     xfget_Str(    file, str, len );			/* characters */
@@ -431,63 +431,63 @@ void xfget_count_word_Str( FILE *file, Str *str )
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 8 bit
 *----------------------------------------------------------------------------*/
-void xfput_int8( FILE *file, int value )
+void xfput_int8( FILE *file, int8_t value )
 {
-	xfput_uint8( file, (UINT) value );
+	xfput_uint8( file, (uint8_t) value );
 }
 
-void xfput_uint8( FILE *file, UINT value )
+void xfput_uint8( FILE *file, uint8_t value )
 {
     if ( fputc( value, file ) < 0 )
         fatal_ferr_write( file );
 }
 
-int xfget_int8(  FILE *file )
+int8_t xfget_int8(  FILE *file )
 {
-	UINT value = xfget_uint8( file );
+	uint8_t value = xfget_uint8( file );
     if ( value & 0x80 )
         value |= ~ 0xFF;				/* sign-extend above bit 7 */
-	return (int) value;
+	return (int8_t) value;
 }
 
-UINT xfget_uint8( FILE *file )
+uint8_t xfget_uint8( FILE *file )
 {
 	int value;
 	if ( (value = getc( file )) < 0 )
         fatal_ferr_read( file );
-	return (UINT) value;
+	return (uint8_t) value;
 }
 
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 16 bit
 *----------------------------------------------------------------------------*/
-void xfput_int16( FILE *file, int value )
+void xfput_int16( FILE *file, int16_t value )
 {
-	xfput_uint16( file, (UINT) value );
+	xfput_uint16( file, (uint16_t) value );
 }
 
-void xfput_uint16( FILE *file, UINT value )
+void xfput_uint16( FILE *file, uint16_t value )
 {
-    char buffer[2];
+    uint8_t buffer[2];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
-    xfput_chars( file, buffer, sizeof(buffer) );
+    xfput_chars( file, (char *) buffer, sizeof(buffer) );
 }
 
-int xfget_int16( FILE *file )
+int16_t xfget_int16( FILE *file )
 {
-	int value = (int) xfget_uint16( file );
+	int16_t value = (int16_t) xfget_uint16( file );
     if ( value & 0x8000 )
         value |= ~ 0xFFFF;			/* sign-extend above bit 15 */
 	return value;
 }
 
-UINT xfget_uint16( FILE *file )
+uint16_t xfget_uint16( FILE *file )
 {
-    char buffer[2];
+    uint8_t buffer[2];
 
-    xfget_chars( file, buffer, sizeof(buffer) );
+    xfget_chars( file, (char *) buffer, sizeof(buffer) );
 	return
         ( ( buffer[0] << 0 ) & 0x00FF ) |
         ( ( buffer[1] << 8 ) & 0xFF00 );
@@ -496,35 +496,35 @@ UINT xfget_uint16( FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 32 bit
 *----------------------------------------------------------------------------*/
-void xfput_int32( FILE *file, long value )
+void xfput_int32( FILE *file, int32_t value )
 {
-	xfput_uint32( file, (ULONG) value );
+	xfput_uint32( file, (uint32_t) value );
 }
 
-void xfput_uint32( FILE *file, ULONG value )
+void xfput_uint32( FILE *file, uint32_t value )
 {
-    char buffer[4];
+    uint8_t buffer[4];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
 	buffer[2] = value & 0xFF; value >>= 8;
 	buffer[3] = value & 0xFF; value >>= 8;
-    xfput_chars( file, buffer, sizeof(buffer) );
+    xfput_chars( file, (char *) buffer, sizeof(buffer) );
 }
 
-long xfget_int32( FILE *file )
+int32_t xfget_int32( FILE *file )
 {
-	long value = (long) xfget_uint32( file );
+	int32_t value = (int32_t) xfget_uint32( file );
     if ( value & 0x80000000L )
         value |= ~ 0xFFFFFFFFL;	/* sign-extend above bit 31; solve BUG_0021 */
 	return value;
 }
 
-ULONG xfget_uint32( FILE *file )
+uint32_t xfget_uint32( FILE *file )
 {
-    char buffer[4];
+    uint8_t buffer[4];
 
-    xfget_chars( file, buffer, sizeof(buffer) );
+    xfget_chars( file, (char *) buffer, sizeof(buffer) );
 	return
         ( ( buffer[0] << 0 ) & 0x000000FF ) |
         ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
@@ -662,11 +662,14 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.16  2014-05-06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Revision 1.17  2014-05-17 14:27:13  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.16  2014/05/06 22:17:38  pauloscustodio
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.14  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
@@ -682,7 +685,7 @@ char *search_file( char *filename, List *dir_list )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.11  2014/02/02 23:00:54  pauloscustodio
 * New xfclose_remove() to remove file after closing.

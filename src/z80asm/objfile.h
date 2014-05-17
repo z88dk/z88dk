@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.17 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.18 2014-05-17 14:27:12 pauloscustodio Exp $
 */
 
 #pragma once
@@ -29,30 +29,38 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.17 2014-05-06 22
 #define OBJ_VERSION	"03"
 
 /*-----------------------------------------------------------------------------
+*   Object files
+*----------------------------------------------------------------------------*/
+
+/* test if object file with given filename exists and is the correct version
+   return object code size if yes, -1 if not */
+extern long obj_file_code_size( char *filename );
+
+/*-----------------------------------------------------------------------------
 *   Object file handle
 *----------------------------------------------------------------------------*/
 CLASS( ObjFile )
-	FILE   *file;				/* file handle, if file open */
-	long	start_ptr;			/* offset in file to start of object file
+	FILE	*file;				/* file handle, if file open */
+	long	 start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
 
-	char   *filename;			/* object file name, in strpool */
-	char   *modname;			/* module name, in strpool */
+	char	*filename;			/* object file name, in strpool */
+	char	*modname;			/* module name, in strpool */
 
-	BOOL	in_library;			/* true if this file is part of a library */
-	BOOL	writing;			/* TRUE if writing a new object file,
+	BOOL	 in_library;		/* true if this file is part of a library */
+	BOOL	 writing;			/* TRUE if writing a new object file,
 								   FALSE if reading */
 
-	int		org_addr;			/* defined ORG address, -1 if not defined */
+	long	 org_addr;			/* defined ORG address, -1 if not defined */
 
 	/* all file pointers are -1 if not defined */
-	long	modname_ptr;		/* offset in file to Module Name */
-	long	expr_ptr;			/* offset if file to Expression Declaration */
-	long	symbols_ptr;		/* offset if file to Name Definition */
-	long	externsym_ptr;		/* offset if file to External Name Declaration */
-	long	code_ptr;			/* offset if file to Machine Code Block */
+	long	 modname_ptr;		/* offset in file to Module Name */
+	long	 expr_ptr;			/* offset if file to Expression Declaration */
+	long	 symbols_ptr;		/* offset if file to Name Definition */
+	long	 externsym_ptr;		/* offset if file to External Name Declaration */
+	long	 code_ptr;			/* offset if file to Machine Code Block */
 
-	UINT	code_size;			/* size of code block */
+	uint32_t code_size;			/* size of code block */
 
 END_CLASS;
 
@@ -75,11 +83,14 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.17  2014-05-06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Revision 1.18  2014-05-17 14:27:12  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.17  2014/05/06 22:17:38  pauloscustodio
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.15  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
@@ -126,7 +137,7 @@ extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.11  2014/02/17 23:12:38  pauloscustodio
 * ws

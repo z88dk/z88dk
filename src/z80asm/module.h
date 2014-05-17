@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.11 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.12 2014-05-17 14:27:12 pauloscustodio Exp $
 */
 
 #pragma once
@@ -43,8 +43,8 @@ END_CLASS;
 CLASS( Module )
 	char		*modname;			/* module name, kept in strpool*/
 	char		*filename;			/* source file name, kept in strpool */
-    UINT		 start_offset;		/* this module's start offset from start of code buffer */
-    UINT		 origin;			/* ORG address of module, NO_ORIGIN (=0xFFFF) if not defuined */
+    uint32_t	 start_offset;		/* this module's start offset from start of code buffer */
+    uint32_t	 origin;			/* ORG address of module, NO_ORIGIN (=0xFFFF) if not defuined */
 	SymbolHash	*local_symtab;		/* module local symbols */
     ExprList	*exprs;				/* list of module expressions */
 END_CLASS;
@@ -55,14 +55,17 @@ CLASS_LIST( Module );
 
 /*
 * $Log: module.h,v $
-* Revision 1.11  2014-05-06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Revision 1.12  2014-05-17 14:27:12  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.11  2014/05/06 22:17:38  pauloscustodio
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.10  2014/05/02 23:35:19  pauloscustodio
 * Rename startoffset, add constant for NO_ORIGIN
 *
 * Revision 1.9  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.8  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

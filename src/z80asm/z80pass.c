@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.96 2014-05-06 22:52:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.97 2014-05-17 14:27:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -244,7 +244,7 @@ Evallogexpr( void )
 
 
 void
-StoreName( Symbol *node, BYTE scope )
+StoreName( Symbol *node, uint8_t scope )
 {
     switch ( scope )
     {
@@ -340,7 +340,7 @@ Z80pass2( void )
     Expr *expr;
     long constant;
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    UINT patchptr;
+    uint32_t patchptr;
 
 	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
 	{
@@ -415,7 +415,7 @@ Z80pass2( void )
 
                 if ( constant >= -128 && constant <= 127 )
                 {
-                    patch_byte( &patchptr, (BYTE) constant );
+                    patch_byte( &patchptr, (uint8_t) constant );
                     /* opcode is stored, now store relative jump */
                 }
                 else
@@ -428,14 +428,14 @@ Z80pass2( void )
                 if ( constant < -128 || constant > 255 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, (BYTE) constant );
+                patch_byte( &patchptr, (uint8_t) constant );
                 break;
 
             case RANGE_8SIGN:
                 if ( constant < -128 || constant > 127 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, (BYTE) constant );
+                patch_byte( &patchptr, (uint8_t) constant );
                 break;
 
             case RANGE_16CONST:
@@ -497,7 +497,7 @@ Z80pass2( void )
     else
     {
         fptr_modcode = ftell( objfile );
-        xfput_uint16( objfile, constant );  /* two bytes of module code size */
+        xfput_uint16( objfile, constant & 0xFFFF );  /* two bytes of module code size */
         fwrite_codearea( objfile );
     }
 
@@ -590,15 +590,18 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.96  2014-05-06 22:52:02  pauloscustodio
+* Revision 1.97  2014-05-17 14:27:13  pauloscustodio
+* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+*
+* Revision 1.96  2014/05/06 22:52:02  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.95  2014/05/06 22:17:38  pauloscustodio
-* Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.94  2014/05/02 21:34:58  pauloscustodio
-* byte_t, uint_t and ulong_t renamed to BYTE, UINT and ULONG
+* byte_t and uint_t renamed to uint8_t, uint32_t
 *
 * Revision 1.93  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -733,7 +736,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UINT and ULONG, use UINT instead of size_t.
+* Create uint32_t, use uint32_t instead of size_t.
 *
 * Revision 1.70  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
@@ -888,8 +891,8 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * BUG_0026 : Incorrect paging in symbol list
 * 
 * Revision 1.35  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (BYTE)
-* Replaced (unisigned int) by (UINT)
+* Replaced (unsigned char) by (uint8_t)
+* Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 * 
 * Revision 1.34  2013/01/20 13:18:10  pauloscustodio
