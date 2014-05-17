@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.83 2014-05-06 22:17:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.84 2014-05-17 10:57:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -68,7 +68,7 @@ static void option_use_lib( char *library );
 static void option_cpu_RCM2000( void );
 
 static void process_options( int *parg, int argc, char *argv[] );
-static void process_files( int arg, int argc, char *argv[], void (*process_arg_cb)(char *filename) );
+static void process_files( int arg, int argc, char *argv[] );
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -118,7 +118,7 @@ DEFINE_fini()
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) )
+void parse_argv( int argc, char *argv[] )
 {
     int arg;
 
@@ -136,7 +136,7 @@ void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) 
         display_options();				/* display status messages of select assembler options */
 
     if ( ! get_num_errors() )
-        process_files( arg, argc, argv, process_arg_cb );	/* process each source file */
+        process_files( arg, argc, argv );	/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -261,8 +261,7 @@ static void process_options( int *parg, int argc, char *argv[] )
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
-static void process_file( char *filename, 
-						void (*process_arg_cb)(char *filename) )
+static void process_file( char *filename )
 {
 	char *line;
 
@@ -286,27 +285,26 @@ static void process_file( char *filename,
 		{
 			src_open( filename, NULL );
 			while ( (line = src_getline()) != NULL )
-				process_file( line, process_arg_cb );
+				process_file( line );
 		}
 		src_pop();
 		break;
 
     default:
-        process_arg_cb( filename );
+        List_push( &opts.files, strpool_add(filename) );
     }
 }
 
 /*-----------------------------------------------------------------------------
 *   process all files
 *----------------------------------------------------------------------------*/
-static void process_files( int arg, int argc, char *argv[], 
-						 void (*process_arg_cb)(char *filename) )
+static void process_files( int arg, int argc, char *argv[] )
 {
     int i;
 
     /* Assemble file list */
     for ( i = arg; i < argc; i++ )
-        process_file( argv[i], process_arg_cb );
+        process_file( argv[i] );
 }
 
 /*-----------------------------------------------------------------------------
@@ -571,7 +569,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.83  2014-05-06 22:17:38  pauloscustodio
+* Revision 1.84  2014-05-17 10:57:45  pauloscustodio
+* Parse argv generates list of files that can be iterated by assembler,
+* linker and librarian.
+*
+* Revision 1.83  2014/05/06 22:17:38  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.82  2014/05/02 21:34:58  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.97 2014-05-06 22:17:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.98 2014-05-17 10:57:45 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.97 2014-05-06 22:17
 
 /*
 * $Log: hist.c,v $
-* Revision 1.97  2014-05-06 22:17:37  pauloscustodio
+* Revision 1.98  2014-05-17 10:57:45  pauloscustodio
+* Parse argv generates list of files that can be iterated by assembler,
+* linker and librarian.
+*
+* Revision 1.97  2014/05/06 22:17:37  pauloscustodio
 * Made types BYTE, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.96  2014/05/02 21:34:58  pauloscustodio
@@ -1881,6 +1885,10 @@ xx.xx.2014 [2.2.1] (pauloscustodio)
 		When a library is built with -d, and the total size of the loaded 
 		modules is more than 64K, z80asm fails with "max. code size reached".
 
+	- Cleanup test files
+	- Parse argv generates list of files that can be iterated by assembler,
+	  linker and librarian.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1906,7 +1914,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.1b"
+#define VERSION     "2.2.1c"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

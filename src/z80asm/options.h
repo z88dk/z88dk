@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.43 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.44 2014-05-17 10:57:45 pauloscustodio Exp $
 */
 
 #pragma once
@@ -53,7 +53,7 @@ extern Opts opts;
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-extern void parse_argv( int argc, char *argv[], void (*process_arg_cb)(char *filename) );
+extern void parse_argv( int argc, char *argv[] );
 
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
@@ -74,7 +74,11 @@ extern char *get_map_filename( char *filename );
 
 /*
 * $Log: options.h,v $
-* Revision 1.43  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.44  2014-05-17 10:57:45  pauloscustodio
+* Parse argv generates list of files that can be iterated by assembler,
+* linker and librarian.
+*
+* Revision 1.43  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.42  2014/02/08 18:30:49  pauloscustodio

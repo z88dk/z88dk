@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.166 2014-05-06 22:52:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.167 2014-05-17 10:57:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -425,6 +425,8 @@ ReleaseLibraries( void )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
+	ListElem *iter;
+
 	model_init();						/* init global data */
 
     /* start try..catch with finally to cleanup any allocated memory */
@@ -433,7 +435,9 @@ int main( int argc, char *argv[] )
         libraryhdr = NULL;              /* initialise to no library files */
 
         /* parse command line and call-back via assemble_file() */
-        parse_argv( argc, argv, assemble_file );
+		parse_argv(argc, argv);
+		for ( iter = List_first( opts.files ); iter != NULL; iter = List_next( iter ) )
+			assemble_file( iter->data );
 
         /* Link */
         CloseFiles();
@@ -498,7 +502,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.166  2014-05-06 22:52:01  pauloscustodio
+* Revision 1.167  2014-05-17 10:57:45  pauloscustodio
+* Parse argv generates list of files that can be iterated by assembler,
+* linker and librarian.
+*
+* Revision 1.166  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.35 2014-04-15 20:06:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.36 2014-05-17 10:57:45 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -51,6 +51,8 @@ OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
 
 OPT_VAR( List *,	inc_path,	NULL )		/* path for include files */
 OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
+
+OPT_VAR( List *,	files,		NULL )		/* list of input files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
@@ -186,7 +188,11 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.35  2014-04-15 20:06:43  pauloscustodio
+* Revision 1.36  2014-05-17 10:57:45  pauloscustodio
+* Parse argv generates list of files that can be iterated by assembler,
+* linker and librarian.
+*
+* Revision 1.35  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.34  2014/04/13 20:32:06  pauloscustodio
