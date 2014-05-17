@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.18 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.19 2014-05-17 22:42:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,6 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.18 2014-05-17 14
 #include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
+#include "module.h"
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,61 +30,69 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.18 2014-05-17 14
 #define OBJ_VERSION	"03"
 
 /*-----------------------------------------------------------------------------
-*   Object files
+*   Object file class
 *----------------------------------------------------------------------------*/
-
-/* test if object file with given filename exists and is the correct version
-   return object code size if yes, -1 if not */
-extern long obj_file_code_size( char *filename );
-
-/*-----------------------------------------------------------------------------
-*   Object file handle
-*----------------------------------------------------------------------------*/
-CLASS( ObjFile )
-	FILE	*file;				/* file handle, if file open */
-	long	 start_ptr;			/* offset in file to start of object file
+CLASS( OFile )
+	FILE	*file;				/* file handle */
+	size_t	 start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
+
+	BOOL	 writing;			/* TRUE if writing a new object file,
+								   FALSE if reading */
 
 	char	*filename;			/* object file name, in strpool */
 	char	*modname;			/* module name, in strpool */
 
-	BOOL	 in_library;		/* true if this file is part of a library */
-	BOOL	 writing;			/* TRUE if writing a new object file,
-								   FALSE if reading */
-
-	long	 org_addr;			/* defined ORG address, -1 if not defined */
+	int32_t	 origin;			/* ORG address, -1 if not defined */
 
 	/* all file pointers are -1 if not defined */
-	long	 modname_ptr;		/* offset in file to Module Name */
-	long	 expr_ptr;			/* offset if file to Expression Declaration */
-	long	 symbols_ptr;		/* offset if file to Name Definition */
-	long	 externsym_ptr;		/* offset if file to External Name Declaration */
-	long	 code_ptr;			/* offset if file to Machine Code Block */
+	int32_t	 modname_ptr;		/* offset in file to Module Name */
+	int32_t	 expr_ptr;			/* offset if file to Expression Declaration */
+	int32_t	 symbols_ptr;		/* offset if file to Name Definition */
+	int32_t	 externsym_ptr;		/* offset if file to External Name Declaration */
+	int32_t	 code_ptr;			/* offset if file to Machine Code Block */
 
 	uint32_t code_size;			/* size of code block */
-
-END_CLASS;
+END_CLASS;	
 
 /*-----------------------------------------------------------------------------
-*   API
+*   OFile API
 *----------------------------------------------------------------------------*/
 
-/* open object file for reading, return new object that needs to be deleted
-   by OBJ_DELETE() by caller;
-   return NULL and raise error on invalid file or file not found;
-   In test_mode does not raise errors - used when deciding if an existent
-   object file can be reused or needs to be assembled again */
-extern ObjFile *ObjFile_open_read( char *filename, BOOL test_mode );
+/* test if a object file exists and is the correct version, return object if yes
+   return NULL if not. 
+   Object needs to be deleted by caller by OBJ_DELETE()
+   Opens and closes the object file */
+extern OFile *OFile_test_file( char *filename );
 
-/* read an object file from an open library file, return new object that
-   needs to be deleted by OBJ_DELETE() by caller;
-   return NULL and raise error on invalid file */
-extern ObjFile *ObjFile_read( char *filename, FILE *libfile );
+/* read object file header from within an open library file.
+   Return NULL if invalid object file or not the correct version.
+   Object needs to be deleted by caller by OBJ_DELETE()
+   Keeps the library file open */
+extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
 
+/* open object file for reading, read header.
+   Return NULL if invalid object file or not the correct version.
+   Object needs to be deleted by caller by OBJ_DELETE()
+   Keeps the object file open */
+extern OFile *OFile_open_read( char *filename );
+
+
+/*-----------------------------------------------------------------------------
+*   Module interface to object files
+*----------------------------------------------------------------------------*/
+
+/* Updates current module name and size, if given object file is valid
+   load module name and size, when assembling with -d and up-to-date */
+extern BOOL objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.18  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.19  2014-05-17 22:42:25  pauloscustodio
+* Move load_module_object() that loads object file size when assembling
+* with -d option to objfile.c. Change objfile API.
+*
+* Revision 1.18  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.17  2014/05/06 22:17:38  pauloscustodio

@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.12 2014-05-02 20:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.13 2014-05-17 22:42:25 pauloscustodio Exp $
 #
 
 use strict;
@@ -219,6 +219,7 @@ my $objs = "objfile.o lib/class.o lib/array.o errors.o lib/strutil.o lib/strhash
 my $init = <<'END';
 
 #include "symbol.h"
+#include <assert.h>
 
 FILE *errfile;
 char *CreateLibfile( char *filename ) {return NULL;}
@@ -231,7 +232,7 @@ t_compile_module($init, <<'END', $objs);
 
 #define SEL3(i,a,b,c)	((i)<=0?(a):(i)<=1?(b):(c))
 
-	ObjFile *obj;
+	OFile *obj;
 	FILE	*file;
 	int 	code_size;
 	
@@ -241,52 +242,49 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("File not found, test mode");	
 	remove("test.obj");
-	TRY_OK( obj = ObjFile_open_read("test.obj", TRUE) );
+	TRY_OK( obj = OFile_test_file("test.obj") ); 
 	ASSERT( obj == NULL );
 
 	TITLE("File not found, read mode");	
 	remove("test.obj");
-	obj = NULL;
-	TRY_NOK( obj = ObjFile_open_read("test.obj", FALSE) );
+	TRY_NOK( obj = OFile_open_read("test.obj") );
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	
 	TRY_OK( file = xfopen("test.obj", "wb") );
 	TRY_OK( xfclose(file) );
-	TRY_OK( obj = ObjFile_open_read("test.obj", TRUE) );
+	TRY_OK( obj = OFile_test_file("test.obj") );
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid short file, read mode");	
 	TRY_OK( file = xfopen("test.obj", "wb") );
 	TRY_OK( xfclose(file) );
-	obj = NULL;
-	TRY_OK( obj = ObjFile_open_read("test.obj", FALSE) );
+	TRY_OK( obj = OFile_open_read("test.obj") );
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, test mode");	
 	TRY_OK( file = xfopen("test.obj", "wb") );
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	TRY_OK( xfclose(file) );
-	TRY_OK( obj = ObjFile_open_read("test.obj", TRUE) );
+	TRY_OK( obj = OFile_test_file("test.obj") );
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, read mode");	
 	TRY_OK( file = xfopen("test.obj", "wb") );
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	TRY_OK( xfclose(file) );
-	obj = NULL;
-	TRY_OK( obj = ObjFile_open_read("test.obj", FALSE) );
+	TRY_OK( obj = OFile_open_read("test.obj") );
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, read mode");
-	TRY_OK( obj = ObjFile_open_read("test1.obj", FALSE) );
+	TRY_OK( obj = OFile_open_read("test1.obj") );
 	ASSERT( obj != NULL );
+	ASSERT( obj->file != NULL );
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->in_library == FALSE );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -297,14 +295,14 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, test mode");
-	TRY_OK( obj = ObjFile_open_read("test1.obj", TRUE) );
+	TRY_OK( obj = OFile_test_file("test1.obj") );
 	ASSERT( obj != NULL );
+	ASSERT( obj->file == NULL );
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->in_library == FALSE );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -317,15 +315,14 @@ t_compile_module($init, <<'END', $objs);
 	TITLE("test1 Library file");
 	TRY_OK( file = xfopen("test1.lib", "rb") );
 	ASSERT( file != NULL );
-	fseek( file, 16, SEEK_SET );
-	TRY_OK( obj = ObjFile_read("test1.lib", file) );	
+	TRY_OK( obj = OFile_read_header(file, 16) );	
 	ASSERT( obj != NULL );
+	ASSERT( obj->file == file );
 	ASSERT( obj->start_ptr == 16 );
-	ASSERT( strcmp(obj->filename, "test1.lib") == 0 );
+	ASSERT( obj->filename == NULL );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->in_library == TRUE );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -386,7 +383,11 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.12  2014-05-02 20:24:39  pauloscustodio
+# Revision 1.13  2014-05-17 22:42:25  pauloscustodio
+# Move load_module_object() that loads object file size when assembling
+# with -d option to objfile.c. Change objfile API.
+#
+# Revision 1.12  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.11  2014/04/22 23:32:42  pauloscustodio

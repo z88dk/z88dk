@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.168 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.169 2014-05-17 22:42:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -86,7 +86,6 @@ uint32_t DEFVPC;          /* DEFVARS address counter */
 struct liblist *libraryhdr;
 
 /* local functions */
-static BOOL load_module_object( char *filename );
 static void query_assemble( char *src_filename, char *obj_filename );
 static void do_assemble( char *src_filename, char *obj_filename );
 
@@ -136,7 +135,7 @@ static void query_assemble( char *src_filename, char *obj_filename )
               : TRUE										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
-            load_module_object( obj_filename )			/* object file valid and size loaded */
+            objmodule_loaded( CURRENTMODULE, obj_filename )			/* object file valid and size loaded */
        )
     {
         /* OK - object file is up-to-date */
@@ -237,33 +236,6 @@ static void do_assemble( char *src_filename, char *obj_filename )
     }
     ETRY;
 }
-
-/*-----------------------------------------------------------------------------
-*	Updates current module name and size, if given object file is valid
-*	If not returns FALSE
-*----------------------------------------------------------------------------*/
-BOOL load_module_object( char *filename )
-{
-    ObjFile *obj_file;
-
-    obj_file = ObjFile_open_read( filename, TRUE );	/* test-mode => no errors */
-
-    if ( obj_file != NULL )
-    {
-        inc_codesize( obj_file->code_size );		/* BUG_0015, BUG_0050 */
-
-        CURRENTMODULE->modname = obj_file->modname;
-        
-		OBJ_DELETE( obj_file );						/* BUG_0049 */
-
-        return TRUE;
-    }
-    else
-        return FALSE;
-}
-
-
-
 
 void
 CloseFiles( void )
@@ -501,7 +473,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.168  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.169  2014-05-17 22:42:25  pauloscustodio
+* Move load_module_object() that loads object file size when assembling
+* with -d option to objfile.c. Change objfile API.
+*
+* Revision 1.168  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.167  2014/05/17 10:57:45  pauloscustodio

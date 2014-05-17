@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.146 2014-05-06 22:52:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.147 2014-05-17 22:42:25 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -231,7 +231,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.146  2014-05-06 22:52:01  pauloscustodio
+# Revision 1.147  2014-05-17 22:42:25  pauloscustodio
+# Move load_module_object() that loads object file size when assembling
+# with -d option to objfile.c. Change objfile API.
+#
+# Revision 1.146  2014/05/06 22:52:01  pauloscustodio
 # Remove OS-dependent defines and dependency on ../config.h.
 # Remove OS_ID constant from predefined defines in assembly.
 #
@@ -895,9 +899,11 @@ module.o: lib/xmalloc.h codearea.h lib/types.h module.h lib/class.h
 module.o: lib/queue.h lib/classlist.h expr.h lib/array.h lib/strutil.h scan.h
 module.o: scan_def.h legacy.h symtab.h lib/classhash.h lib/strhash.h
 module.o: lib/uthash.h lib/die.h sym.h symref.h
-objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h errors.h
-objfile.o: errors_def.h lib/fileutil.h lib/list.h lib/strutil.h objfile.h
-objfile.o: lib/strpool.h legacy.h
+objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
+objfile.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/strutil.h
+objfile.o: objfile.h module.h lib/classlist.h expr.h lib/array.h scan.h
+objfile.o: scan_def.h legacy.h symtab.h lib/classhash.h lib/strhash.h
+objfile.o: lib/uthash.h lib/die.h sym.h symref.h lib/strpool.h
 options.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 options.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h hist.h
 options.o: lib/init.h lib/die.h model.h module.h lib/classlist.h expr.h
@@ -937,9 +943,9 @@ z80asm.o: lib/xmalloc.h codearea.h lib/types.h deffile.h errors.h
 z80asm.o: errors_def.h lib/except.h lib/die.h expr.h lib/array.h lib/class.h
 z80asm.o: lib/queue.h lib/strutil.h lib/classlist.h scan.h scan_def.h
 z80asm.o: legacy.h lib/fileutil.h lib/list.h hist.h listfile.h symref.h
-z80asm.o: mapfile.h objfile.h options.h options_def.h lib/strpool.h symbol.h
-z80asm.o: model.h module.h symtab.h lib/classhash.h lib/strhash.h
-z80asm.o: lib/uthash.h sym.h z80asm.h
+z80asm.o: mapfile.h objfile.h module.h symtab.h lib/classhash.h lib/strhash.h
+z80asm.o: lib/uthash.h sym.h options.h options_def.h lib/strpool.h symbol.h
+z80asm.o: model.h z80asm.h
 z80instr.o: lib/xmalloc.h codearea.h lib/types.h errors.h errors_def.h expr.h
 z80instr.o: lib/array.h lib/class.h lib/queue.h lib/strutil.h lib/classlist.h
 z80instr.o: scan.h scan_def.h legacy.h options.h lib/list.h options_def.h

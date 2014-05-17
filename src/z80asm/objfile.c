@@ -14,12 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.24 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.25 2014-05-17 22:42:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
+#include "codearea.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "objfile.h"
@@ -27,6 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.24 2014-05-17 14
 #include "strutil.h"
 #include "legacy.h"
 
+#include <assert.h>
 #include <sys/stat.h>
 
 /*-----------------------------------------------------------------------------
@@ -42,51 +44,6 @@ char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 
 char objhdrprefix[] = "oomodnexprnamelibnmodc";
 
-//typedef struct ObjHeader
-//{
-
-/*-----------------------------------------------------------------------------
-*   Check if file exists and is correct version, return code size
-*----------------------------------------------------------------------------*/
-
-
-/*-----------------------------------------------------------------------------
-*   Object file handle
-*----------------------------------------------------------------------------*/
-DEF_CLASS( ObjFile );
-
-void ObjFile_init( ObjFile *self )
-{
-    self->org_addr = -1;
-    self->modname_ptr = self->expr_ptr = self->symbols_ptr = self->externsym_ptr
-                                         = self->code_ptr = -1;
-    self->code_size = 0;
-}
-
-void ObjFile_copy( ObjFile *self, ObjFile *other ) { }
-
-void ObjFile_fini( ObjFile *self )
-{
-    if ( self->file != NULL && ! self->in_library )
-        xfclose( self->file );
-
-    if ( self->writing && ! self->in_library &&
-            self->file != NULL && self->filename != NULL )
-        remove( self->filename );
-}
-
-/*-----------------------------------------------------------------------------
-*   Check that file exists and at least as long as the obj header
-*----------------------------------------------------------------------------*/
-static BOOL objfile_exists( char *filename )
-{
-    struct stat filestat;
-    return ( stat( filename, &filestat ) == 0 &&
-             ( filestat.st_mode & S_IFREG ) &&
-             ( filestat.st_mode & S_IREAD ) &&
-             filestat.st_size > ( long )Z80objhdr_size );
-}
-
 /*-----------------------------------------------------------------------------
 *   Check the object file header
 *----------------------------------------------------------------------------*/
@@ -94,8 +51,8 @@ static BOOL test_header( FILE *file )
 {
     char buffer[Z80objhdr_size];
 
-    if ( fread( buffer, sizeof( char ), Z80objhdr_size, file ) == Z80objhdr_size &&
-            memcmp( buffer, Z80objhdr, Z80objhdr_size ) == 0
+    if ( fread(  buffer, sizeof(char), Z80objhdr_size, file ) == Z80objhdr_size &&
+         memcmp( buffer, Z80objhdr,    Z80objhdr_size ) == 0
        )
         return TRUE;
     else
@@ -103,111 +60,181 @@ static BOOL test_header( FILE *file )
 }
 
 /*-----------------------------------------------------------------------------
-*   Read the given object file and return the ObjFile object
-*	If libfile is NULL, file is opened
-*	Raises errors on failure if not in test_mode
+*   Object file class
 *----------------------------------------------------------------------------*/
-ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
+DEF_CLASS( OFile );
+
+void OFile_init( OFile *self )
 {
+	self->origin = 
+	self->modname_ptr = 
+	self->expr_ptr = 
+	self->symbols_ptr =
+	self->externsym_ptr = 
+	self->code_ptr = -1;
+}
+
+void OFile_copy( OFile *self, OFile *other ) { assert(0); }
+
+void OFile_fini( OFile *self )
+{
+	/* if not from library, close file */
+    if ( self->file		 != NULL && 
+		 self->start_ptr != 0
+	   )
+        xfclose( self->file );
+
+	/* if writing but not closed, delete partialy created file */
+    if ( self->writing && 
+		 self->start_ptr != 0 &&
+         self->file      != NULL && 
+		 self->filename  != NULL
+	   )
+        remove( self->filename );
+}
+
+/*-----------------------------------------------------------------------------
+*	read object file header from within an open library file.
+*   Return NULL if invalid object file or not the correct version.
+*   Object needs to be deleted by caller by OBJ_DELETE()
+*   Keeps the library file open
+*----------------------------------------------------------------------------*/
+OFile *OFile_read_header( FILE *file, size_t start_ptr )
+{
+	OFile *self;
     DEFINE_STR( buffer, MAXLINE );
-    ObjFile *self;
-    FILE    *file;
-    long	 start_ptr;
-	long	 org_addr;
-    BOOL	 in_library = libfile == NULL ? FALSE : TRUE;
+	uint16_t origin_read;
 
-    /* open file if needed */
-    if ( in_library )
-        file = libfile;
-    else
-    {
-        /* checking at compile phase? */
-        if ( test_mode && ! objfile_exists( filename ) )
-            return NULL;
+	/* check file version */
+    fseek( file, start_ptr, SEEK_SET );
+	if ( ! test_header( file ) )
+		return NULL;
 
-        /* open file - no error in test_mode, as we bailed out just above */
-        file = xfopen( filename, "rb" );
-    }
+	/* create OFile object */
+	self = OBJ_NEW( OFile );
 
-    /* check header, bail out if wrong */
-    start_ptr = ftell( file );
-
-    if ( ! test_header( file ) )
-    {
-        if ( ! test_mode )
-            error_not_obj_file( filename );	/* error except test_mode */
-
-        if ( ! in_library )
-            xfclose( file );							/* close except in library */
-
-        return NULL;
-    }
-
-    /* create ObjFile and fill-in header */
-    self = OBJ_NEW( ObjFile );
-
-    self->file			= file;
-    self->start_ptr		= start_ptr;
-    self->filename		= strpool_add( filename );
-    self->in_library	= in_library;
-    self->writing		= FALSE;
+	self->file			= file;
+	self->start_ptr		= start_ptr;
+	self->writing		= FALSE;
 
     /* read object file header */
-    org_addr			= xfget_uint16( self->file );
-	self->org_addr		= (org_addr == 0xFFFF) ? -1 : org_addr;
+    origin_read			= xfget_uint16( file );
+	self->origin		= (origin_read == 0xFFFF) ? -1 : origin_read;
 
-    self->modname_ptr	= xfget_int32( self->file );
-    self->expr_ptr		= xfget_int32( self->file );
-    self->symbols_ptr	= xfget_int32( self->file );
-    self->externsym_ptr	= xfget_int32( self->file );
-    self->code_ptr		= xfget_int32( self->file );
+    self->modname_ptr	= xfget_int32( file );
+    self->expr_ptr		= xfget_int32( file );
+    self->symbols_ptr	= xfget_int32( file );
+    self->externsym_ptr	= xfget_int32( file );
+    self->code_ptr		= xfget_int32( file );
 
     /* read module name */
-    fseek( self->file, self->start_ptr + self->modname_ptr, SEEK_SET );
-    xfget_count_byte_Str( self->file, buffer );
-    self->modname = strpool_add( buffer->str );
+    fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
+    xfget_count_byte_Str( file, buffer );
+    self->modname		= strpool_add( buffer->str );
 
     /* read code size */
     if ( self->code_ptr < 0 )
         self->code_size = 0;
     else
     {
-        fseek( self->file, self->start_ptr + self->code_ptr, SEEK_SET );
-        self->code_size = xfget_uint16( self->file );
+        fseek( file, self->start_ptr + self->code_ptr, SEEK_SET );
+        self->code_size = xfget_uint16( file );
 
         if ( self->code_size == 0 )		/* BUG_0008 */
             self->code_size = 0x10000;
     }
 
-    return self;
+	return self;
 }
 
 /*-----------------------------------------------------------------------------
-*   open object file for reading, return new object that needs to be deleted
-*   by OBJ_DELETE() by caller;
-*   return NULL and raise error on invalid file or file not found;
-*   In test_mode does not raise errors - used when deciding if an existent
-*   object file can be reused or needs to be assembled again.
+*	open object file for reading, read header.
+*   Return NULL if invalid object file or not the correct version.
+*   Object needs to be deleted by caller by OBJ_DELETE()
+*   Keeps the object file open
 *----------------------------------------------------------------------------*/
-ObjFile *ObjFile_open_read( char *filename, BOOL test_mode )
+static OFile *_OFile_open_read( char *filename, BOOL test_mode )
 {
-    return _ObjFile_read( filename, NULL, test_mode );
+	OFile *self;
+	FILE *file;
+
+	/* file exists? */
+	file = test_mode ? 
+			fopen(  filename, "rb" ) :	/* no exceptions if testing */
+			xfopen( filename, "rb" );
+	if ( file == NULL )
+		return NULL;
+
+	/* read header */
+	self = OFile_read_header( file, 0 );
+	if ( self == NULL )
+	{
+		xfclose( file );
+		
+		if ( ! test_mode )
+			error_not_obj_file( filename );
+
+		return NULL;
+	}
+	self->filename = strpool_add( filename );
+
+	/* return object */
+	return self;
+}
+
+OFile *OFile_open_read( char *filename )
+{
+	return _OFile_open_read( filename, FALSE );
 }
 
 /*-----------------------------------------------------------------------------
-*   read an object file from an open library file, return new object that
-*	needs to be deleted by OBJ_DELETE() by caller;
-*   return NULL and raise error on invalid file;
+*	test if a object file exists and is the correct version, return object if yes
+*   return NULL if not. 
+*   Object needs to be deleted by caller by OBJ_DELETE()
+*   Opens and closes the object file
 *----------------------------------------------------------------------------*/
-ObjFile *ObjFile_read( char *filename, FILE *libfile )
+OFile *OFile_test_file( char *filename )
 {
-    return _ObjFile_read( filename, libfile, FALSE );
+	OFile *self = _OFile_open_read( filename, TRUE );
+
+	/* close the file */
+	if ( self != NULL && self->file != NULL )
+	{
+		xfclose( self->file );
+		self->file = NULL;
+	}
+
+	return self;
 }
+
+/*-----------------------------------------------------------------------------
+*	Updates current module name and size, if given object file is valid
+*	Load module name and size, when assembling with -d and up-to-date
+*----------------------------------------------------------------------------*/
+BOOL objmodule_loaded( Module *module, char *filename )
+{
+	OFile *ofile = OFile_test_file( filename );
+    if ( ofile != NULL )
+    {
+        inc_codesize( ofile->code_size );		/* BUG_0015, BUG_0050 */
+        module->modname = ofile->modname;        
+		OBJ_DELETE( ofile );					/* BUG_0049 */
+
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
 
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.24  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.25  2014-05-17 22:42:25  pauloscustodio
+* Move load_module_object() that loads object file size when assembling
+* with -d option to objfile.c. Change objfile API.
+*
+* Revision 1.24  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.23  2014/05/06 22:17:38  pauloscustodio

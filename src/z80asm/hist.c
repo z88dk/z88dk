@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.99 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.100 2014-05-17 22:42:25 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.99 2014-05-17 14:27
 
 /*
 * $Log: hist.c,v $
-* Revision 1.99  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.100  2014-05-17 22:42:25  pauloscustodio
+* Move load_module_object() that loads object file size when assembling
+* with -d option to objfile.c. Change objfile API.
+*
+* Revision 1.99  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.98  2014/05/17 10:57:45  pauloscustodio
@@ -1891,6 +1895,8 @@ xx.xx.2014 [2.2.1] (pauloscustodio)
 	- Cleanup test files
 	- Parse argv generates list of files that can be iterated by assembler,
 	  linker and librarian.
+	- Move load_module_object() that loads object file size when assembling
+	  with -d option to objfile.c. 
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1917,7 +1923,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.1c"
+#define VERSION     "2.2.1d"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
