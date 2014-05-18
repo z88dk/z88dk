@@ -14,13 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.7 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.8 2014-05-18 16:05:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "module.h"
+#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   Code section, one assembly instruction
@@ -44,39 +45,90 @@ void CodeSection_fini (CodeSection *self)
 }
 
 /*-----------------------------------------------------------------------------
+*   Named Section of code, introduced by "SECTION" keyword
+*----------------------------------------------------------------------------*/
+DEF_CLASS( Section );
+DEF_CLASS_HASH( Section, TRUE );
+
+void Section_init (Section *self)   
+{
+	self->section_name	= strpool_add("");		/* default: empty section */
+
+	self->exprs			= OBJ_NEW( ExprList );
+	OBJ_AUTODELETE( self->exprs ) = FALSE;
+
+	self->bytes			= OBJ_NEW( uint8_tArray );
+	OBJ_AUTODELETE( self->bytes ) = FALSE;
+}
+
+void Section_copy (Section *self, Section *other)	
+{ 
+	self->exprs = ExprList_clone( other->exprs ); 
+	self->bytes = uint8_tArray_clone( other->bytes );
+}
+
+void Section_fini (Section *self)
+{
+	OBJ_DELETE( self->exprs);
+	OBJ_DELETE( self->bytes );
+}
+
+/*-----------------------------------------------------------------------------
 *   Assembly module
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Module );
+DEF_CLASS_LIST( Module );
 
 void Module_init (Module *self)   
 {
-	self->origin		= -1;
 	self->start_offset	= get_codesize();
+	self->origin		= -1;
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
 	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
 
-	self->exprs			= OBJ_NEW( ExprList );
-	OBJ_AUTODELETE( self->exprs ) = FALSE;
+	self->sections		= OBJ_NEW( SectionHash );
+	OBJ_AUTODELETE( self->sections ) = FALSE;
+
+	Module_set_section( self, "");			/* define default section */
 }
 
 void Module_copy (Module *self, Module *other)	
 { 
 	self->local_symtab = SymbolHash_clone( other->local_symtab );
-	self->exprs = ExprList_clone( other->exprs ); 
+	self->sections = SectionHash_clone( other->sections );
+
+	/* set the same default section */
+	Module_set_section( self, other->curr_section->section_name );	
 }
 
 void Module_fini (Module *self)
 { 
 	OBJ_DELETE( self->local_symtab );
-	OBJ_DELETE( self->exprs);
+	OBJ_DELETE( self->sections );
 }
 
-DEF_CLASS_LIST( Module );
+/*-----------------------------------------------------------------------------
+*   define the current section, create a new one if not defined
+*----------------------------------------------------------------------------*/
+void Module_set_section( Module *self, char *section_name )
+{
+	self->curr_section = SectionHash_get( self->sections, section_name );
+	if ( self->curr_section == NULL )
+	{
+		self->curr_section = OBJ_NEW( Section );
+		self->curr_section->section_name = strpool_add( section_name );
+		SectionHash_set( & self->sections, section_name, self->curr_section );
+	}
+}
 
 /* 
 * $Log: module.c,v $
-* Revision 1.7  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.8  2014-05-18 16:05:28  pauloscustodio
+* Add sections to the Module structure, define default section "".
+* Move module expressions to the Section structure.
+*
+* Revision 1.7  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.6  2014/05/02 23:35:19  pauloscustodio

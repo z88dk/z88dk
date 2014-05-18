@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.97 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.98 2014-05-18 16:05:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -342,7 +342,7 @@ Z80pass2( void )
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     uint32_t patchptr;
 
-	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
+	while ( (expr = ExprList_shift( CURRENTSECTION->exprs )) != NULL )
 	{
         /* set error location */
         set_error_file( expr->filename );
@@ -466,7 +466,7 @@ Z80pass2( void )
         set_error_line( 0 );
     }
 
-    OBJ_DELETE( CURRENTMODULE->exprs );   /* Release header of expressions list */
+    OBJ_DELETE( CURRENTSECTION->exprs );   /* Release header of expressions list */
 
     if ( ! get_num_errors() && opts.symtable )
     {
@@ -553,7 +553,7 @@ Pass2info( Expr *expr,       /* pointer to header of postfix expression linked l
     expr->expr_type = constrange;
     expr->listpos = list_patch_pos( byteoffset );	    /* now calculated as absolute file pointer */
 
-	ExprList_push( & CURRENTMODULE->exprs, expr );
+	ExprList_push( & CURRENTSECTION->exprs, expr );
 }
 
 
@@ -590,7 +590,11 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.97  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.98  2014-05-18 16:05:28  pauloscustodio
+* Add sections to the Module structure, define default section "".
+* Move module expressions to the Section structure.
+*
+* Revision 1.97  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.96  2014/05/06 22:52:02  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.13 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.14 2014-05-18 16:05:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.13 2014-05-17 23:
 
 #include "class.h"
 #include "classlist.h"
+#include "classhash.h"
 #include "expr.h"
 #include "strutil.h"
 #include "symtab.h"
@@ -38,6 +39,18 @@ CLASS( CodeSection )
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
+*   Named Section of code, introduced by "SECTION" keyword
+*----------------------------------------------------------------------------*/
+CLASS( Section )
+	char		 *section_name;		/* name of section, kept in strpool */
+	uint32_t	  addr;				/* start address of this section */
+    ExprList	 *exprs;			/* list of section expressions */
+	uint8_tArray *bytes;			/* binary code of section */
+END_CLASS;
+
+CLASS_HASH( Section );
+
+/*-----------------------------------------------------------------------------
 *   Assembly module
 *----------------------------------------------------------------------------*/
 CLASS( Module )
@@ -46,14 +59,28 @@ CLASS( Module )
     uint32_t	 start_offset;		/* this module's start offset from start of code buffer */
     int32_t		 origin;			/* ORG address of module, -1 if not defined */
 	SymbolHash	*local_symtab;		/* module local symbols */
-    ExprList	*exprs;				/* list of module expressions */
+	SectionHash *sections;			/* list of sections defined in the code,
+									   indexed also by section name */
+	Section		*curr_section;		/* point to current section */
 END_CLASS;
 
 CLASS_LIST( Module );
 
+/*-----------------------------------------------------------------------------
+*   Module API
+*----------------------------------------------------------------------------*/
+
+/* define the current section, create a new one if not defined */
+extern void Module_set_section( Module *self, char *section_name );
+
+
 /*
 * $Log: module.h,v $
-* Revision 1.13  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.14  2014-05-18 16:05:28  pauloscustodio
+* Add sections to the Module structure, define default section "".
+* Move module expressions to the Section structure.
+*
+* Revision 1.13  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.12  2014/05/17 14:27:12  pauloscustodio

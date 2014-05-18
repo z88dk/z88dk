@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.15 2014-05-06 22:52:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.16 2014-05-18 16:05:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -91,6 +91,7 @@ extern Module	  *get_first_module( void );
 extern Module	  *get_last_module( void );
 
 #define CURRENTMODULE	(get_curr_module())
+#define CURRENTSECTION	(get_curr_module()->curr_section)
 
 /* interface to SrcFile singleton */
 extern void  src_open( char *filename, List *dir_list );
@@ -104,7 +105,11 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.15  2014-05-06 22:52:01  pauloscustodio
+* Revision 1.16  2014-05-18 16:05:28  pauloscustodio
+* Add sections to the Module structure, define default section "".
+* Move module expressions to the Section structure.
+*
+* Revision 1.15  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
