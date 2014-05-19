@@ -14,13 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.20 2014-05-19 00:21:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.21 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "array.h"
 #include "class.h"
 #include "module.h"
 #include "types.h"
@@ -77,6 +78,11 @@ extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
    Keeps the object file open */
 extern OFile *OFile_open_read( char *filename );
 
+/* return static uint8_tArray with binary contents of the given object file,
+   return NULL if input file is not an object, wrong version, or does not exist
+   NOTE: not reentrant, reuses array on each call */
+extern uint8_tArray *read_obj_file_data( char *filename );
+
 /*-----------------------------------------------------------------------------
 *   Module interface to object files
 *----------------------------------------------------------------------------*/
@@ -87,7 +93,11 @@ extern BOOL objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.20  2014-05-19 00:21:10  pauloscustodio
+* Revision 1.21  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.20  2014/05/19 00:21:10  pauloscustodio
 * logic error in test for library
 *
 * Revision 1.19  2014/05/17 22:42:25  pauloscustodio

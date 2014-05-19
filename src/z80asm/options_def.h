@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.38 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.39 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PAT
 OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
 
 OPT( OptCallOptArg, option_make_lib, "-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
-OPT( OptCallOptArg, option_use_lib,	"-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
+OPT( OptCallOptArg, option_use_lib,	 "-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
 
 
 OPT_TITLE(	"Output Options:" )
@@ -188,7 +188,11 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.38  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.39  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.38  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.37  2014/05/17 14:27:12  pauloscustodio

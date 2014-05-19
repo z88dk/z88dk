@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.170 2014-05-19 00:19:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.171 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -244,35 +244,6 @@ CloseFiles( void )
 }
 
 
-/* define name of library file to create, return name in strpool */
-char *CreateLibfile( char *filename )
-{
-    size_t len;
-    char *found_libfilename;
-
-    len = strlen( filename );
-
-    if ( len )
-    {
-        found_libfilename = get_lib_filename( filename );     /* add '.lib' extension */
-    }
-    else
-    {
-        if ( ( filename = getenv( "Z80_STDLIB" ) ) != NULL )
-        {
-            found_libfilename = strpool_add( filename );
-        }
-        else
-        {
-            error_env_not_defined( "Z80_STDLIB" );
-            return NULL;
-        }
-    }
-
-    return found_libfilename;
-}
-
-
 /* search library file name, return found name in strpool */
 char *GetLibfile( char *filename )
 {
@@ -467,7 +438,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.170  2014-05-19 00:19:33  pauloscustodio
+* Revision 1.171  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.170  2014/05/19 00:19:33  pauloscustodio
 * Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
 * is deleted in case of error.
 *

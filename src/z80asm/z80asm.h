@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.56 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.57 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -53,7 +53,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.56 2014-05-17 14:
 extern FILE *objfile;
 extern uint32_t sizeof_relocroutine, sizeof_reloctable;
 
-extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
@@ -61,7 +60,11 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.56  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.57  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.56  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.55  2014/05/06 22:52:01  pauloscustodio

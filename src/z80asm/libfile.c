@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.1 2014-05-19 00:19:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.2 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "array.h"
+#include "errors.h"
 #include "fileutil.h"
 #include "legacy.h"
 #include "libfile.h"
@@ -33,35 +33,21 @@ char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 #endif
 
 /*-----------------------------------------------------------------------------
-*	return static uint8_tArray with binary contents of given file
-*	return NULL if input file is not an object, or does not exist
-*	NOTE: not reentrant, reuses array on each call
+*	define a library file name from the command line
+*	if empty, use Z80_STDLIB environment variable
+*	add .lib extension
 *----------------------------------------------------------------------------*/
-static uint8_tArray *read_obj_file_data( char *filename )
+static char *search_libfile( char *filename )
 {
-	static uint8_tArray *buffer = NULL;
-	size_t	 size;
-	OFile	*ofile;
-
-	/* static object to read each file, not reentrant */
-	INIT_OBJ( uint8_tArray, &buffer );
-
-	/* open object file, check header */
-	ofile = OFile_open_read( filename );
-	if ( ofile == NULL )
-		return NULL;					/* error */
-
-    fseek( ofile->file, 0, SEEK_END );	/* file pointer to end of file */
-    size = ftell( ofile->file );
-    fseek( ofile->file, 0, SEEK_SET );	/* file pointer to start of file */
-
-	/* set array size, read file */
-	uint8_tArray_set_size( buffer, size );
-	xfget_chars( ofile->file, (char *) uint8_tArray_item( buffer, 0 ), size );
-    
-	OBJ_DELETE( ofile );
-
-	return buffer;
+	if ( filename != NULL && *filename != '\0' )	/* not empty */
+		return get_lib_filename( filename );		/* add '.lib' extension */
+	else if ( (filename = getenv("Z80_STDLIB")) != NULL )
+		return filename;							/* return env var-as-is*/
+	else
+	{
+        error_env_not_defined("Z80_STDLIB");
+        return NULL;
+	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -74,6 +60,10 @@ void make_library( char *lib_filename, List *src_files )
 	char	*obj_filename;
 	size_t	 fptr, obj_size;
 	ListElem *iter, *last;
+
+	lib_filename = search_libfile(lib_filename);
+	if ( lib_filename == NULL )
+		return;					/* ERROR */
 
     if ( opts.verbose )
         printf("Creating library '%s'...\n", lib_filename );
@@ -121,7 +111,11 @@ void make_library( char *lib_filename, List *src_files )
 
 /*
 * $Log: libfile.c,v $
-* Revision 1.1  2014-05-19 00:19:33  pauloscustodio
+* Revision 1.2  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.1  2014/05/19 00:19:33  pauloscustodio
 * Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
 * is deleted in case of error.
 *

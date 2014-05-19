@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.27 2014-05-19 00:21:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.28 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -208,6 +208,38 @@ OFile *OFile_test_file( char *filename )
 }
 
 /*-----------------------------------------------------------------------------
+*	return static uint8_tArray with binary contents of given file
+*	return NULL if input file is not an object, or does not exist
+*	NOTE: not reentrant, reuses array on each call
+*----------------------------------------------------------------------------*/
+uint8_tArray *read_obj_file_data( char *filename )
+{
+	static uint8_tArray *buffer = NULL;
+	size_t	 size;
+	OFile	*ofile;
+
+	/* static object to read each file, not reentrant */
+	INIT_OBJ( uint8_tArray, &buffer );
+
+	/* open object file, check header */
+	ofile = OFile_open_read( filename );
+	if ( ofile == NULL )
+		return NULL;					/* error */
+
+    fseek( ofile->file, 0, SEEK_END );	/* file pointer to end of file */
+    size = ftell( ofile->file );
+    fseek( ofile->file, 0, SEEK_SET );	/* file pointer to start of file */
+
+	/* set array size, read file */
+	uint8_tArray_set_size( buffer, size );
+	xfget_chars( ofile->file, (char *) uint8_tArray_item( buffer, 0 ), size );
+    
+	OBJ_DELETE( ofile );
+
+	return buffer;
+}
+
+/*-----------------------------------------------------------------------------
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
@@ -230,7 +262,11 @@ BOOL objmodule_loaded( Module *module, char *filename )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.27  2014-05-19 00:21:10  pauloscustodio
+* Revision 1.28  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.27  2014/05/19 00:21:10  pauloscustodio
 * logic error in test for library
 *
 * Revision 1.26  2014/05/17 23:08:03  pauloscustodio

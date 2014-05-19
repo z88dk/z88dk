@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.86 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.87 2014-05-19 22:15:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -473,7 +473,7 @@ static void option_define( char *symbol )
 
 static void option_make_lib( char *library )
 {
-    opts.lib_file = CreateLibfile( library );
+    opts.lib_file = library;		/* may be empty string */
 }
 
 static void option_use_lib( char *library )
@@ -569,7 +569,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.86  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.87  2014-05-19 22:15:54  pauloscustodio
+* Move read_obj_file_data() to objfile.c
+* Move CreateLibfile() to libfile.c, rename to search_libfile()
+*
+* Revision 1.86  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.85  2014/05/17 14:27:12  pauloscustodio
