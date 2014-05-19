@@ -3,7 +3,7 @@
 
    ; BSS SEGMENT
 
-   IF (__crt_segment_bss_end - __crt_segment_bss_begin) > 0
+   ;;IF (__crt_segment_bss_end - __crt_segment_bss_begin) > 0
 
      EXTERN asm_memset
      
@@ -13,11 +13,13 @@
    
      call asm_memset
    
-   ENDIF
+   ;;ENDIF
    
    ; DATA SEGMENT
    
-   IF (__crt_cfg_segment_data & $01) & ((__crt_segment_data_end - __crt_segment_data_begin) > 0)
+   ;;IF (__crt_cfg_segment_data & $01) & ((__crt_segment_data_end - __crt_segment_data_begin) > 0)
+
+   IF (__crt_cfg_segment_data & $01)
    
       EXTERN asm_memcpy
       
