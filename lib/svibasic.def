@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.5 2014-05-16 13:41:50 stefano Exp $
+; $Id: svibasic.def,v 1.6 2014-05-19 07:13:09 stefano Exp $
 ;
 
 
@@ -378,7 +378,7 @@ defc SAVENT = $FE58 ; start address for BSAVE / BLOAD operations
 ; BASIC locations
 ; -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-;; defc WARM_BT = $????	; address of "warm boot" BASIC interpreter
+defc WARM_BT = $092B	; address of "warm boot" BASIC interpreter
 
 defc DOTLINE = $243C	; LINE (BC,DE)-(GXPOS,GYPOS)
 defc DOBOXF  = $2401

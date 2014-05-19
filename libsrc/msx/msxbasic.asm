@@ -5,13 +5,13 @@
 ;	Internal function, call a ROM BASIC subroutine
 ;
 ;
-;	$Id: msxbasic.asm,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msxbasic.asm,v 1.2 2014-05-19 07:13:09 stefano Exp $
 ;
 
 	XLIB	msxbasic
 	LIB	msxrompage
 
-	defc CALBAS = $0159
+	INCLUDE "msxbios.def"
 
 msxbasic:
          exx

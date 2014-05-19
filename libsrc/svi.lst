@@ -12,6 +12,7 @@ graphics/msx/plotpixl
 graphics/msx/respixl
 graphics/msx/xorpixl
 graphics/msx/pointxy
+graphics/msx/fill
 graphics/getsprite
 graphics/msx/putsprite
 graphics/msx/bksave

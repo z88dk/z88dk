@@ -1,9 +1,10 @@
 ;
 ;	MSX basic graphics routines
 ;	by Stefano Bodrato, December 2007
+;   19/5/2014 - extended to Spectravideo SVI
 ;
 ;
-;	$Id: fill.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: fill.asm,v 1.3 2014-05-19 07:13:09 stefano Exp $
 ;
 
 ;Usage: fill(struct *pixel)
@@ -14,8 +15,14 @@
 	INCLUDE	"graphics/grafix.inc"
 
 	LIB	msxextrom
-	LIB	msxbasic
+
+IF FORmsx
         INCLUDE "msxbasic.def"
+		LIB	msxbasic
+ELSE
+        INCLUDE "svibasic.def"
+		LIB	msxbios
+ENDIF
 
 	LIB	msx_breakoff
 	LIB	msx_breakon
@@ -50,8 +57,8 @@
 	pop	de			; set y
 	pop	bc			; set x
 
+IF FORmsx
 	call	msx_breakoff
-
 	ld	a,(SCRMOD)
 	cp	4+1
 	jr	c,pnt_old
@@ -59,8 +66,18 @@
 	call	msxextrom
 	jr	pnt_done
 pnt_old:
+ELSE
+	xor a
+	ld (INTFLG),a
+ENDIF
+
 	ld	ix,O_PAINT
+
+IF FORmsx
 	call	msxbasic
 pnt_done:
-
 	jp	msx_breakon
+ELSE
+	jp	msxbios
+ENDIF
+
