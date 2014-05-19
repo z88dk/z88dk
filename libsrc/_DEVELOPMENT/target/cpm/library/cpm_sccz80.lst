@@ -9,5 +9,6 @@
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
 @sys/sys_sccz80.lst
+@target/cpm/driver/driver_asm.lst
 @threads/threads_sccz80.lst
 @z80/z80_sccz80.lst
