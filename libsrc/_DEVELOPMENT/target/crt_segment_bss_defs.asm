@@ -4,19 +4,19 @@
 
 ; data that is zeroed at startup
 
-PUBLIC __exit_stack, __exit_stack_size
-PUBLIC __quickexit_stack, __quickexit_stack_size
-PUBLIC _errno, __strtok_ptr
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; errno
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PUBLIC _errno
 
 _errno:                        defs 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; string
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PUBLIC __strtok_ptr
 
 _strtok_ptr:                   defs 2
 
@@ -38,6 +38,8 @@ ENDIF
 
 ; exit stack
 
+PUBLIC __exit_stack, __exit_stack_size
+
 __exit_stack:
 
 IF __exit_stack_size > 0
@@ -48,6 +50,8 @@ IF __exit_stack_size > 0
 ENDIF
 
 ; quick_exit stack
+
+PUBLIC __quickexit_stack, __quickexit_stack_size
 
 __quickexit_stack:
 

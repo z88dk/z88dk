@@ -4,8 +4,6 @@
 
 ; data that is zeroed at startup
 
-PUBLIC __exit_stack, __exit_stack_size
-PUBLIC __quickexit_stack, __quickexit_stack_size
 PUBLIC _errno, __strtok_ptr
 
 defvars -1
@@ -38,6 +36,8 @@ IF __crt_cfg_qtbl_size > 0
 
 ENDIF
 
+PUBLIC __exit_stack, __exit_stack_size
+
 defvars -1
 {
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,6 +58,8 @@ IF __exit_stack_size > 0
    }
 
 ENDIF
+
+PUBLIC __quickexit_stack, __quickexit_stack_size
 
 defvars -1
 {

@@ -4,28 +4,13 @@
 
 ; data that is initialized to non-zero values at startup
 
-IF __crt_cfg_qtbl_size > 0 
-
-   PUBLIC __qtbl
-
-ENDIF
-
-IF __crt_cfg_heap_size > 14
-   
-   PUBLIC __heap
-   
-ENDIF
-
-PUBLIC __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
-PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
-
-PUBLIC _seed, __thrd_id, __sound_bit_state
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; alloc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __crt_cfg_qtbl_size > 0
+
+   PUBLIC __qtbl
 
    defvars -1
    {
@@ -38,6 +23,8 @@ ENDIF
 
 IF __crt_cfg_heap_size > 14
 
+   PUBLIC __heap
+   
    defvars -1
    {   
       ; malloc's heap
@@ -47,14 +34,12 @@ IF __crt_cfg_heap_size > 14
 
 ENDIF
 
-defvars -1
-{
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; sound
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PUBLIC __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
+PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
+PUBLIC _seed, __thrd_id
 
-   __sound_bit_state           ds.b 1
-   
+defvars -1
+{   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; stdio
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
