@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.26 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.27 2014-05-19 00:21:10 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -80,13 +80,13 @@ void OFile_fini( OFile *self )
 {
 	/* if not from library, close file */
     if ( self->file		 != NULL && 
-		 self->start_ptr != 0
+		 self->start_ptr == 0
 	   )
         xfclose( self->file );
 
 	/* if writing but not closed, delete partialy created file */
     if ( self->writing && 
-		 self->start_ptr != 0 &&
+		 self->start_ptr == 0 &&
          self->file      != NULL && 
 		 self->filename  != NULL
 	   )
@@ -230,7 +230,10 @@ BOOL objmodule_loaded( Module *module, char *filename )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.26  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.27  2014-05-19 00:21:10  pauloscustodio
+* logic error in test for library
+*
+* Revision 1.26  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.25  2014/05/17 22:42:25  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.19 2014-05-17 22:42:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.20 2014-05-19 00:21:10 pauloscustodio Exp $
 */
 
 #pragma once
@@ -77,7 +77,6 @@ extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
    Keeps the object file open */
 extern OFile *OFile_open_read( char *filename );
 
-
 /*-----------------------------------------------------------------------------
 *   Module interface to object files
 *----------------------------------------------------------------------------*/
@@ -88,7 +87,10 @@ extern BOOL objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.19  2014-05-17 22:42:25  pauloscustodio
+* Revision 1.20  2014-05-19 00:21:10  pauloscustodio
+* logic error in test for library
+*
+* Revision 1.19  2014/05/17 22:42:25  pauloscustodio
 * Move load_module_object() that loads object file size when assembling
 * with -d option to objfile.c. Change objfile API.
 *
