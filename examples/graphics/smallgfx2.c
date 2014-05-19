@@ -6,6 +6,7 @@
 main()
 {
 int x,a;
+	clg();
 	
 	for (x=1;x<95;x++)
 		{

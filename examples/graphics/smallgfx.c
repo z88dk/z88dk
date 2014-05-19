@@ -4,6 +4,7 @@
 
 main()
 {
+	clg();
 	draw(0,0,95,63);
 
 /* Draw a diamond - weak, but it demonstrates relative drawing! */
