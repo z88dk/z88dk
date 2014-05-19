@@ -7,13 +7,14 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.5 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.6 2014-05-19 00:11:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 #include "class.h"
 #include "die.h"
 #include "init.h"
+#include "strpool.h"
 #include "types.h"
 
 /*-----------------------------------------------------------------------------
@@ -47,7 +48,9 @@ static Object *next_autodelete( ObjectList *headp )
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
+	/* make sure xmalloc and strpool are removed last */
     xmalloc_init();
+	strpool_init();
 
 #ifdef CLASS_DEBUG
     warn( "class: init\n" );
@@ -120,7 +123,10 @@ void _deregister_obj( Object *obj )
 
 /*
 * $Log: class.c,v $
-* Revision 1.5  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.6  2014-05-19 00:11:25  pauloscustodio
+* Make sure strpool is deleted after class, because objects defined with class may use strpool
+*
+* Revision 1.5  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

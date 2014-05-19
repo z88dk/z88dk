@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.6 2014-04-19 17:44:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.7 2014-05-19 00:11:25 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c xmalloc.c die.c";
+my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c strpool.c xmalloc.c die.c";
 
 write_file("test.c", <<'END');
 #include "class.h"
@@ -251,7 +251,10 @@ sub t_capture {
 }
 
 # $Log: class.t,v $
-# Revision 1.6  2014-04-19 17:44:01  pauloscustodio
+# Revision 1.7  2014-05-19 00:11:25  pauloscustodio
+# Make sure strpool is deleted after class, because objects defined with class may use strpool
+#
+# Revision 1.6  2014/04/19 17:44:01  pauloscustodio
 # Fix test scripts to run in UNIX
 #
 # Revision 1.5  2014/01/11 01:29:41  pauloscustodio

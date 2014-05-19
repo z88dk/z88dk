@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.11 2014-05-17 14:27:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.12 2014-05-19 00:11:25 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c array.c strutil.c class.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c die.c";
 
 write_file("test.c", <<'END');
 #include "xmalloc.h"
@@ -249,7 +249,10 @@ sub t_capture {
 }
 
 # $Log: array.t,v $
-# Revision 1.11  2014-05-17 14:27:13  pauloscustodio
+# Revision 1.12  2014-05-19 00:11:25  pauloscustodio
+# Make sure strpool is deleted after class, because objects defined with class may use strpool
+#
+# Revision 1.11  2014/05/17 14:27:13  pauloscustodio
 # Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 #
 # Revision 1.10  2014/05/06 22:17:38  pauloscustodio

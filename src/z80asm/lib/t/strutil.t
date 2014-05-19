@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.15 2014-05-17 14:27:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.16 2014-05-19 00:11:25 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strutil.c class.c die.c xmalloc.c";
+my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c die.c xmalloc.c";
 
 write_file("test.1.asm", {binmode => ':raw'}, "");
 write_file("test.2.asm", {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -751,7 +751,10 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.15  2014-05-17 14:27:13  pauloscustodio
+# Revision 1.16  2014-05-19 00:11:25  pauloscustodio
+# Make sure strpool is deleted after class, because objects defined with class may use strpool
+#
+# Revision 1.15  2014/05/17 14:27:13  pauloscustodio
 # Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 #
 # Revision 1.14  2014/05/08 22:37:30  pauloscustodio
