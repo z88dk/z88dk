@@ -121,7 +121,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC __crt_code_start, _crt_code_end
-PUBLIC __Exit, _crt_cls, _crt_scroll
+PUBLIC __Exit, _crt_cls, _crt_scroll, _crt_scroll_
 
 PUBLIC __crt_segment_bss_begin,  __crt_segment_bss_end
 PUBLIC __crt_segment_data_begin, __crt_segment_data_end
@@ -152,7 +152,6 @@ __crt_code_start:
 
    ; console initialization
    
-   ld hl,56                    ; ink black, paper white
    call _crt_cls
       
    ; call user program
@@ -191,9 +190,11 @@ _crt_cls:
    
    ; attributes
    
-   ld e,l
+   ld a,(_crt_attr)
+   
    ld hl,$5800
    ld bc,768
+   ld e,a
    
    call asm_memset
    
@@ -214,7 +215,165 @@ _crt_cls:
 
 _crt_scroll:
 
-   ; TODO scroll up hl pixels
+   pop af
+   pop hl
+   
+   push hl
+   push af
+
+_crt_scroll_:
+
+   ; scroll upward hl char rows
+   
+   ; uses : af, bc, de, hl, de', bc', hl'
+
+   ld a,h
+   or a
+   jr nz, _crt_cls             ; if hl > 255
+   
+   inc l
+   dec l
+   ret z                       ; if hl == 0
+   
+   ld a,23
+   sub l
+   jr c, _crt_cls              ; if hl >= 24
+   inc a
+   
+   ; l = number of rows to scroll upward
+   ; a = loop count
+
+   ld c,a                      ; c = loop count
+   push hl                     ; save scroll amount
+   
+   EXTERN asm_zx_cy2saddr
+   
+   call asm_zx_cy2saddr        ; hl = screen address corresponding to first scroll row L
+   ld de,$4000                 ; destination screen address of first scroll row
+   
+   exx
+   
+   pop hl
+   push hl                     ; hl = scroll amount
+   
+   EXTERN asm_zx_cy2aaddr
+   
+   call asm_zx_cy2aaddr        ; hl = attribute address corresponding to first scroll row L
+   ld de,$5800                 ; destination attribute address of first scroll row
+
+   exx
+
+   ; scroll
+
+   call __scroll
+
+   ; adjust fzx state
+   
+   pop bc                      ; c = scroll amount
+   
+   xor a
+   ld (_fzx+4),a               ; x coordinate = 0
+   
+   ld a,c
+   add a,a
+   add a,a
+   add a,a
+   ld b,a
+   
+   ld a,(_fzx+5)
+   sub b
+   ld (_fzx+5),a               ; y coordinate -= 8*L
+
+   ; clear invalid region
+
+   ex de,hl
+   exx
+   ex de,hl
+   exx
+
+__clear_region:
+
+   ; clear row of attributes
+   
+   exx
+   
+   ld a,(_crt_attr)
+   ld e,a
+      
+   ld bc,32
+   
+   EXTERN asm_memset
+   call asm_memset
+   
+   ex de,hl
+   
+   exx
+   
+   ; clear row of pixels
+   
+   ld b,8
+
+__clear_pixel:
+
+   push bc
+   
+   ld e,0
+   ld bc,32
+
+   EXTERN asm_memset
+   call asm_memset
+   
+   EXTERN asm_zx_saddrpdown
+   call asm_zx_saddrpdown
+      
+   pop bc
+   djnz __clear_pixel
+   
+   dec c
+   jr nz, __clear_region
+
+   ret
+
+__scroll:
+
+   ; copy row of attributes upward
+   
+   exx
+   
+   ld bc,32
+   ldir
+   
+   exx
+   
+   ; copy row of pixels upward
+   
+   ld b,8
+      
+__scroll_pixel:
+
+   push bc
+
+   ld bc,32
+   
+   push de
+   push hl
+   
+   ldir
+   
+   pop de
+   pop hl
+   
+   EXTERN asm_zx_saddrpdown
+   
+   call asm_zx_saddrpdown
+   ex de,hl
+   call asm_zx_saddrpdown
+   
+   pop bc
+   djnz __scroll_pixel
+   
+   dec c
+   jr nz, __scroll
 
    ret
 

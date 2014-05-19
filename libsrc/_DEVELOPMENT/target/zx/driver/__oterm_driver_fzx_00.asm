@@ -5,8 +5,8 @@
 
 PUBLIC __oterm_driver_fzx_00, __oterm_echo
 
-EXTERN asm_fzx_putc, asm_fzx_write, _crt_cls
-EXTERN error_enotsup_zc, error_lznc, error_znc
+EXTERN asm_fzx_putc, asm_fzx_write, _crt_scroll_
+EXTERN error_enotsup_zc, error_lznc, error_znc, _fzx
 
 EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_SEEK
 EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS
@@ -40,8 +40,7 @@ __fzx_putc:
    ;
    ; return HL = number of bytes successfully output
    ; carry reset
-    
-   push ix
+
    push hl                     ; output length
     
    exx
@@ -52,23 +51,7 @@ __fzx_putc_loop:
    push de
    
    ld a,e
-   call asm_fzx_putc
-   
-   jr nc, __fzx_putc_cont
-   
-   ; screen full
-
-   ld hl,56
-   call _crt_cls               ; also resets fzx state
-   
-   pop de
-   pop bc
-   
-   push bc
-   push de
-   
-   ld a,e
-   call asm_fzx_putc           ; try again
+   call __oterm_echo
 
 __fzx_putc_cont:
 
@@ -82,7 +65,6 @@ __fzx_putc_cont:
    jr nz, __fzx_putc_loop
 
    pop hl                      ; say we output everything
-   pop ix
 
    ret
 
@@ -102,7 +84,9 @@ __fzx_writ:
    
    exx
    ex de,hl                    ; de = buffer
-   
+
+__writ_loop:
+
    call asm_fzx_write
    jr nc, __fzx_writ_exit
    
@@ -114,13 +98,12 @@ __fzx_writ:
    push bc
    push de
    
-   ld hl,56
-   call _crt_cls               ; also resets fzx state
+   call __oterm_scroll
    
    pop de
    pop bc
 
-   call asm_fzx_write          ; finish writing
+   jr __writ_loop              ; finish writing
    
 __fzx_writ_exit:
 
@@ -137,10 +120,71 @@ __oterm_echo:
    ; a = output char
    ; preserve ix
    
+   ld e,a
+   
    push ix
+   push de
+
    call asm_fzx_putc
+   jr nc, __echo_done
+
+   ; screen full
+   
+   call __oterm_scroll
+   
+   pop de
+   push de
+   
+   ld a,e
+   call asm_fzx_putc
+
+__echo_done:
+
+   pop de
    pop ix
    
+   ret
+
+
+__oterm_scroll:
+
+   exx
+   
+   push bc
+   push de
+   push hl
+   
+   ld hl,(_fzx)                ; hl = struct fzx_font *
+   ld l,(hl)                   ; l = font height in pixels
+   
+   ld a,(_fzx+5)               ; a = current y coordinate
+   
+   add a,l
+   sub 192
+   jr c, __no_scroll
+
+   inc a
+   ld hl,1
+
+__amount_loop:
+
+   sub 8
+   jr c, __scroll
+   
+   inc l
+   jr __amount_loop
+
+__scroll:
+
+   call _crt_scroll_
+
+__no_scroll:
+
+   pop hl
+   pop de
+   pop bc
+   
+   exx
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
