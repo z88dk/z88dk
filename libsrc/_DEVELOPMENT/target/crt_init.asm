@@ -48,20 +48,24 @@
    
          ; available stdio FILE structures
 
-         EXTERN asm_p_forward_list_push_front
+         EXTERN asm_p_forward_list_alt_push_front
 
          ld de,__file_block
          ld b,__crt_cfg_fopen_max - 3
 
       __file_init_loop:
       
-         ld hl,__stdio_file_list_avail
-         call asm_p_forward_list_push_front
+         push bc
+         
+         ld bc,__stdio_file_list_avail
+         call asm_p_forward_list_alt_push_front
          
          ld de,__CLIB_OPT_STDIO_FILE_EXTRA + 15
          add hl,de
          
          ex de,hl
+         
+         pop bc
          djnz __file_init_loop
    
    ENDIF
