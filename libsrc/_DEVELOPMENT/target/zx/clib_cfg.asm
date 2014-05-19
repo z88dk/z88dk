@@ -2,6 +2,11 @@
 IF !_CLIB_CFG_ASM_
 defc _CLIB_CFG_ASM_ = 1
 
+; *********************************
+; IF YOU MAKE CHANGES TO THIS FILE
+; YOU MUST RECOMPILE THE ZX LIBRARY
+; *********************************
+
 ;;;;;;;;;;;;;;;;;;;;
 ; CLIB CONFIGURATION
 ;;;;;;;;;;;;;;;;;;;;

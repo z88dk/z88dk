@@ -2,6 +2,11 @@
 IF !_CLIB_TARGET_CFG_ASM_
 defc _CLIB_TARGET_CFG_ASM_ = 1
 
+; *********************************
+; IF YOU MAKE CHANGES TO THIS FILE
+; YOU MUST RECOMPILE THE ZX LIBRARY
+; *********************************
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Target CLIB Configuration
 ; ZX Spectrum
@@ -70,6 +75,9 @@ defc SP1V_UPDATELISTT   = $d1ef        ; address of 2-byte variable holding the 
 ;; INPUT
 ;;;;;;;;
 
+; crt variables
+; defined in target segments
+
 ;__input_amx_mouse_x  defs 2
 ;__input_amx_mouse_y  defs 2
 ;__input_amx_mouse_dx defs 2
@@ -83,6 +91,9 @@ defc SP1V_UPDATELISTT   = $d1ef        ; address of 2-byte variable holding the 
 ;;;;;;;;;;;;
 ;; SOUND/BIT
 ;;;;;;;;;;;;
+
+; crt variables
+; defined in target segments
 
 ; __sound_bit_state  defs 1
 
