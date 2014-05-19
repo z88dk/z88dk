@@ -13,8 +13,7 @@
 PUBLIC asm_atexit
 PUBLIC asm0_atexit
 
-EXTERN __exit_stack, __exit_stack_sz
-
+EXTERN __exit_stack, __exit_stack_size
 EXTERN error_mc, error_znc
 
 asm_atexit:
@@ -29,7 +28,7 @@ asm_atexit:
    ex de,hl                    ; de = func
    
    ld hl,__exit_stack
-   ld a,__exit_stack_sz
+   ld a,__exit_stack_size
 
 asm0_atexit:
 

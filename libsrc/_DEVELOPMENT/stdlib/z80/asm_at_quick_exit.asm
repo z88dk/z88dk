@@ -12,8 +12,7 @@
 
 PUBLIC asm_at_quick_exit
 
-EXTERN __quickexit_stack, __quickexit_stack_sz
-
+EXTERN __quickexit_stack, __quickexit_stack_size
 EXTERN asm0_atexit
 
 asm_at_quick_exit:
@@ -28,6 +27,6 @@ asm_at_quick_exit:
    ex de,hl                    ; de = func
    
    ld hl,__quickexit_stack
-   ld a,__quickexit_stack_sz
+   ld a,__quickexit_stack_size
 
    jp asm0_atexit
