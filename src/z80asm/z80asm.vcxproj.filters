@@ -141,6 +141,9 @@
     <ClInclude Include="scan_rules.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -247,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="lib\array.c">
       <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="libfile.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.169 2014-05-17 22:42:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.170 2014-05-19 00:19:33 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.169 2014-05-17 22
 #include "fileutil.h"
 #include "hist.h"
 #include "legacy.h"
+#include "libfile.h"
 #include "listfile.h"
 #include "mapfile.h"
 #include "objfile.h"
@@ -44,7 +45,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.169 2014-05-17 22
 
 /* external functions */
 void Z80pass2( void );
-void CreateLib( char *lib_filename );
 void LinkModules( void );
 void DeclModuleName( void );
 void CreateBinFile( void );
@@ -62,12 +62,6 @@ FILE *objfile;
 
 extern char Z80objhdr[];
 extern char objhdrprefix[];
-
-#ifdef __LEGACY_Z80ASM_SYNTAX
-char Z80libhdr[] = "Z80LMF01";
-#else
-char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
-#endif
 
 uint8_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
@@ -415,7 +409,7 @@ int main( int argc, char *argv[] )
 
         /* Create library */
         if ( opts.lib_file && ! get_num_errors() )
-            CreateLib( opts.lib_file );
+            make_library( opts.lib_file, opts.files );
 
         if ( ! get_num_errors() && opts.make_bin )
             LinkModules();
@@ -473,7 +467,11 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.169  2014-05-17 22:42:25  pauloscustodio
+* Revision 1.170  2014-05-19 00:19:33  pauloscustodio
+* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
+* is deleted in case of error.
+*
+* Revision 1.169  2014/05/17 22:42:25  pauloscustodio
 * Move load_module_object() that loads object file size when assembling
 * with -d option to objfile.c. Change objfile API.
 *

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.43 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.44 2014-05-19 00:19:33 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -61,6 +61,8 @@ static ErrorFile error_file;		/* currently open error file */
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
+	strpool_init();					/* make sure strpool is removed last */
+
     /* init Errors */
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
@@ -291,7 +293,11 @@ static void fatal_file_error( char *filename, BOOL writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.43  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.44  2014-05-19 00:19:33  pauloscustodio
+* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
+* is deleted in case of error.
+*
+* Revision 1.43  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.42  2014/05/06 22:17:37  pauloscustodio

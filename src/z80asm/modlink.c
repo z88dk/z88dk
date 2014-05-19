@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.118 2014-05-17 23:08:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.119 2014-05-19 00:19:33 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -48,7 +48,6 @@ int LinkLibModule( struct libfile *library, long curmodule, char *modname );
 int SearchLibfile( struct libfile *curlib, char *modname );
 char *ReadName( FILE *file );
 void redefinedmsg( void );
-void CreateLib( char *lib_filename );
 void SearchLibraries( char *modname );
 void LinkModules( void );
 void ModuleExpr( void );
@@ -60,7 +59,6 @@ static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modna
 
 /* global variables */
 extern char Z80objhdr[];
-extern char Z80libhdr[];
 extern uint8_t reloc_routine[];
 extern struct liblist *libraryhdr;
 extern char *reloctable, *relocptr;
@@ -797,100 +795,6 @@ CreateBinFile( void )
 
 
 
-void
-CreateLib( char *lib_filename )
-{
-	static uint8_tArray *buffer = NULL;
-    size_t Codesize;
-    FILE *lib_file = NULL;
-    FILE *obj_file = NULL;
-    long fptr;
-	Module *last_module;
-
-	INIT_OBJ( uint8_tArray, &buffer );		/* static object to read each file, not reentrant */
-
-    if ( opts.verbose )
-    {
-        puts( "Creating library..." );
-    }
-
-    TRY
-    {
-        /* create library as BINARY file */
-        lib_file = xfopen( lib_filename, "w+b" );          /* CH_0012 */
-
-		/* write library header */
-		xfput_strz( lib_file, Z80libhdr );
-
-        open_error_file( get_err_filename( lib_filename ) );
-
-		last_module = get_last_module();
-
-		for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
-		{
-			set_error_null();
-            set_error_module( CURRENTMODULE->modname );
-
-            /* replace fname with the .obj extension */
-            CURRENTMODULE->filename = get_obj_filename( CURRENTMODULE->filename );
-
-            obj_file = xfopen( CURRENTMODULE->filename, "rb" );           /* CH_0012 */
-            fseek( obj_file, 0L, SEEK_END );  /* file pointer to end of file */
-            Codesize = ftell( obj_file );
-            fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
-
-			/* expand file buffer if needed and read object file */
-			uint8_tArray_item(buffer, Codesize);
-			xfget_chars( obj_file, (char *) uint8_tArray_item(buffer, 0), Codesize );
-            xfclose( obj_file );
-            obj_file = NULL;
-
-            if ( memcmp( uint8_tArray_item(buffer, 0), Z80objhdr, 8U ) != 0 )
-            {
-                error_not_obj_file( CURRENTMODULE->filename );
-                break;
-            }
-
-            if ( opts.verbose )
-            {
-                printf( "<%s> module at %04lX.\n", CURRENTMODULE->filename, ftell( lib_file ) );
-            }
-
-            if ( CURRENTMODULE == last_module )
-            {
-                xfput_uint32( lib_file, -1 );    /* this is the last module */
-            }
-            else
-            {
-                fptr = ftell( lib_file ) + 4 + 4;
-                xfput_uint32( lib_file, fptr + Codesize ); /* file pointer to next module */
-            }
-
-            xfput_uint32( lib_file, Codesize );    /* size of this module */
-
-			/* write module to library */
-            xfput_chars( lib_file, (char *) uint8_tArray_item(buffer, 0), Codesize ); 
-        }
-    }
-    FINALLY
-    {
-        if ( obj_file )
-            xfclose( obj_file );
-
-        if ( lib_file )
-            xfclose( lib_file );
-
-        if ( get_num_errors() )
-            remove( lib_filename );
-
-        set_error_null();
-        close_error_file();
-    }
-    ETRY;
-}
-
-
-
 int
 LinkTracedModule( char *filename, long baseptr )
 {
@@ -959,7 +863,11 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.118  2014-05-17 23:08:03  pauloscustodio
+* Revision 1.119  2014-05-19 00:19:33  pauloscustodio
+* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
+* is deleted in case of error.
+*
+* Revision 1.118  2014/05/17 23:08:03  pauloscustodio
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.117  2014/05/17 14:27:12  pauloscustodio
