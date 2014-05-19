@@ -1,7 +1,7 @@
 
 ; target data segment externally supplied
 
-PUBLIC __sound_bit_state
+PUBLIC __sound_bit_state, _crt_attr
 
 defvars -1
 {
@@ -10,4 +10,10 @@ defvars -1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    __sound_bit_state           ds.b 1
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; crt attribute
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   _crt_attr                   ds.b 1
 }

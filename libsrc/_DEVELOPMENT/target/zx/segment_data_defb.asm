@@ -9,3 +9,10 @@ PUBLIC __sound_bit_state
 
 __sound_bit_state:             defb 7
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; crt attribute
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PUBLIC _crt_attr
+
+_crt_attr:                     defb 56
