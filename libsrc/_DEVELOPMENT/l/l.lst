@@ -117,6 +117,7 @@ l/z80/imath/small/l_small_divu_32_32x32
 l/z80/imath/small/l_small_mul_16_16x16
 l/z80/imath/small/l_small_mul_32_32x32
 l/z80/imath/small/l_small_mul_40_32x8
+l/z80/imath/small/l_small_mul_64_32x32
 l/z80/integer/l_addu_hl_bc
 l/z80/integer/l_addu_hl_de
 l/z80/integer/l_asr_hl
