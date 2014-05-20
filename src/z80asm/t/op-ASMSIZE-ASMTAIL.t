@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.5 2014-04-13 20:32:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.6 2014-05-20 22:18:27 pauloscustodio Exp $
 # $Log: op-ASMSIZE-ASMTAIL.t,v $
-# Revision 1.5  2014-04-13 20:32:10  pauloscustodio
+# Revision 1.6  2014-05-20 22:18:27  pauloscustodio
+# Add ASMHEAD symbol at the end of link with address of start of linked code.
+#
+# Revision 1.5  2014/04/13 20:32:10  pauloscustodio
 # PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 #
 # Revision 1.4  2014/01/11 01:29:46  pauloscustodio
@@ -42,16 +45,16 @@ my @testfiles = qw( testa.asm testa.lst testa.sym testa.obj testa.map testa.bin
 				);
 
 my $asm = "
-	EXTERN ASMSIZE, ASMTAIL
+	EXTERN ASMHEAD, ASMTAIL, ASMSIZE
 	
-	DEFB 0,1,2,3
-	DEFW ASMSIZE
+	DEFW ASMHEAD
 	DEFW ASMTAIL
+	DEFW ASMSIZE
 ";
 
 #------------------------------------------------------------------------------
-t_z80asm_ok(0, $asm, "\x00\x01\x02\x03\x08\x00\x08\x00", "-r0000 -b");
-t_z80asm_ok(0, $asm, "\x00\x01\x02\x03\x08\x00\x08\xF0", "-rF000 -b");
+t_z80asm_ok(0, $asm, "\x00\x00\x06\x00\x06\x00", "-r0000 -b");
+t_z80asm_ok(0, $asm, "\x00\xF0\x06\xF0\x06\x00", "-rF000 -b");
 
 #------------------------------------------------------------------------------
 unlink_testfiles(@testfiles);
@@ -60,13 +63,13 @@ write_file('testa.asm', $asm);
 write_file('testb.asm', $asm);
 t_z80asm_capture("-b -r0000 testa.asm testb.asm", "", "", 0);
 t_binary(read_binfile('testa.bin'), 
-		"\x00\x01\x02\x03\x10\x00\x10\x00".
-		"\x00\x01\x02\x03\x10\x00\x10\x00");
+		"\x00\x00\x0C\x00\x0C\x00".
+		"\x00\x00\x0C\x00\x0C\x00");
 
 t_z80asm_capture("-b -rF000 testa.asm testb.asm", "", "", 0);
 t_binary(read_binfile('testa.bin'), 
-		"\x00\x01\x02\x03\x10\x00\x10\xF0".
-		"\x00\x01\x02\x03\x10\x00\x10\xF0");
+		"\x00\xF0\x0C\xF0\x0C\x00".
+		"\x00\xF0\x0C\xF0\x0C\x00");
 
 unlink_testfiles(@testfiles);
 done_testing();
