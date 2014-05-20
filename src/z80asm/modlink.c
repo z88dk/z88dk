@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.119 2014-05-19 00:19:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.120 2014-05-20 21:58:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -355,6 +355,7 @@ LinkModules( void )
         set_error_null();
 
         define_global_def_sym( ASMSIZE_KW, get_codesize() );
+        define_global_def_sym( ASMHEAD_KW, first_obj_module->origin );
         define_global_def_sym( ASMTAIL_KW, first_obj_module->origin + get_codesize() );
 
         if ( opts.verbose )
@@ -863,7 +864,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.119  2014-05-19 00:19:33  pauloscustodio
+* Revision 1.120  2014-05-20 21:58:31  pauloscustodio
+* Add ASMHEAD symbol at the end of link with address of start of linked code.
+*
+* Revision 1.119  2014/05/19 00:19:33  pauloscustodio
 * Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
 * is deleted in case of error.
 *

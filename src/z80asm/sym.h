@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.16 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.17 2014-05-20 21:58:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -41,8 +41,9 @@ END_CLASS;
 /*-----------------------------------------------------------------------------
 *   Special symbols
 *----------------------------------------------------------------------------*/
-#define ASMSIZE_KW	"ASMSIZE"
+#define ASMHEAD_KW	"ASMHEAD"
 #define ASMTAIL_KW	"ASMTAIL"
+#define ASMSIZE_KW	"ASMSIZE"
 
 /*-----------------------------------------------------------------------------
 *   Symbol API
@@ -58,7 +59,10 @@ extern char *Symbol_fullname( Symbol *sym );
 
 /*
 * $Log: sym.h,v $
-* Revision 1.16  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.17  2014-05-20 21:58:31  pauloscustodio
+* Add ASMHEAD symbol at the end of link with address of start of linked code.
+*
+* Revision 1.16  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.15  2014/05/06 22:17:38  pauloscustodio
