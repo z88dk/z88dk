@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.13 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.14 2014-05-20 22:26:29 pauloscustodio Exp $
 
 */
 
@@ -52,7 +52,7 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
             fprintf( file, "= $%04lX ; ", sym->value );
         }
 
-        fprintf( file, "Module %s\n", sym->owner->modname );
+        fprintf( file, "Module %s\n", sym->owner ? sym->owner->modname : "" );
     }
 }
 
@@ -60,6 +60,11 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
 *   write full defition file to FILE.def, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
+static BOOL cond_global_addr_symbols(Symbol *sym) 
+{ 
+	return (sym->sym_type & SYM_ADDR) && ! (sym->sym_type & SYM_LOCAL); 
+}
+
 void write_def_file( void )
 {
     char *filename;
@@ -77,8 +82,8 @@ void write_def_file( void )
         puts( "Creating global definition file..." );
     }
 
-    def_symtab = get_all_syms( SYM_ADDR | SYM_LOCAL | SYM_PUBLIC | SYM_DEFINE,
-                               SYM_ADDR | 0         | SYM_PUBLIC | 0 );
+	/* all global addresses */
+    def_symtab = select_symbols( cond_global_addr_symbols );
 
     /* Write symbols by address */
     SymbolHash_sort( def_symtab, SymbolHash_by_value );
@@ -92,7 +97,13 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.13  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.14  2014-05-20 22:26:29  pauloscustodio
+* BUG_0051: DEFC and DEFVARS constants do not appear in map file
+* Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+* written to the map file.
+* Logic to select symbols for map and def files was wrong.
+*
+* Revision 1.13  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.12  2014/04/18 17:46:18  pauloscustodio

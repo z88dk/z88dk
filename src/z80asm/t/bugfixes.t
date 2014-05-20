@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.32 2014-05-14 22:17:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.33 2014-05-20 22:26:29 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -584,9 +584,63 @@ z80asm(
 	ok => 1,
 );
 
+#------------------------------------------------------------------------------
+# BUG_0051: DEFC and DEFVARS constants do not appear in map file
+note "BUG_0051";
+{
+	z80asm(
+		asm		=> <<'ASM',
+			public minus_d_var, defc_var, defvars_var, public_label
+			defc defc_var = 2
+			defvars 3 { 
+			defvars_var ds.b 1
+			}
+		public_label: 
+			defb minus_d_var	;; 01
+			defb defc_var		;; 02
+			defb defvars_var	;; 03
+			defb public_label	;; 04
+			defb local_label 	;; 09
+		local_label:
+ASM
+		options	=> "-r4 -b -m -g -Dminus_d_var"
+	);
+
+	eq_or_diff scalar(read_file("test.def")), <<'END', "test.def";
+DEFC public_label                    = $0004 ; Module test
+END
+
+	eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
+ASMHEAD                         = 0004, G: 
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0009, G: 
+defc_var                        = 0002, G: test
+defvars_var                     = 0003, G: test
+local_label                     = 0009, L: test
+minus_d_var                     = 0001, G: test
+public_label                    = 0004, G: test
+
+
+minus_d_var                     = 0001, G: test
+defc_var                        = 0002, G: test
+defvars_var                     = 0003, G: test
+ASMHEAD                         = 0004, G: 
+public_label                    = 0004, G: test
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0009, G: 
+local_label                     = 0009, L: test
+END
+}
+
 
 # $Log: bugfixes.t,v $
-# Revision 1.32  2014-05-14 22:17:03  pauloscustodio
+# Revision 1.33  2014-05-20 22:26:29  pauloscustodio
+# BUG_0051: DEFC and DEFVARS constants do not appear in map file
+# Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+# written to the map file.
+# Logic to select symbols for map and def files was wrong.
+#
+# Revision 1.32  2014/05/14 22:17:03  pauloscustodio
 # Move tests of BUG_0035 to bugfixes.t
 #
 # Revision 1.31  2014/05/14 22:10:26  pauloscustodio

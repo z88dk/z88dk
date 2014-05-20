@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.18 2014-05-02 20:24:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.19 2014-05-20 22:26:29 pauloscustodio Exp $
 */
 
 
@@ -59,7 +59,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
         else
             fputc( 'G', file );
 
-        fprintf( file, ": %s\n", sym->owner->modname );
+        fprintf( file, ": %s\n", sym->owner ? sym->owner->modname : "" );
     }
 }
 
@@ -67,6 +67,8 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 *   write full mapfile to FILE.map, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
+static BOOL cond_all_symbols(Symbol *sym) { return TRUE; }
+
 void write_map_file( void )
 {
     char *filename;
@@ -84,9 +86,8 @@ void write_map_file( void )
         puts( "Creating map..." );
     }
 
-    /* BUG_0036 - need to create coposed symbol names NAME@MODULE, so that local symbols
-       in different modules are shown */
-    map_symtab = get_all_syms( SYM_ADDR, SYM_ADDR );
+    /* BUG_0036, BUG_0051 */
+    map_symtab = select_symbols( cond_all_symbols );
 
     if ( SymbolHash_empty( map_symtab ) )
     {
@@ -113,7 +114,13 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.18  2014-05-02 20:24:38  pauloscustodio
+* Revision 1.19  2014-05-20 22:26:29  pauloscustodio
+* BUG_0051: DEFC and DEFVARS constants do not appear in map file
+* Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+* written to the map file.
+* Logic to select symbols for map and def files was wrong.
+*
+* Revision 1.18  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
 *
 * Revision 1.17  2014/04/18 17:46:18  pauloscustodio

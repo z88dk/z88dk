@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.39 2014-05-04 16:48:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.40 2014-05-20 22:26:29 pauloscustodio Exp $
 #
 # Test options
 
@@ -399,7 +399,14 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-None.
+ASMHEAD                         = 0000, G: 
+ASMSIZE                         = 000B, G: 
+ASMTAIL                         = 000B, G: 
+
+
+ASMHEAD                         = 0000, G: 
+ASMSIZE                         = 000B, G: 
+ASMTAIL                         = 000B, G: 
 END
 }
 
@@ -413,20 +420,28 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+ASMHEAD                         = 0000, G: 
+ASMSIZE                         = 000B, G: 
+ASMTAIL                         = 000B, G: 
 func                            = 0006, G: test2
 loop                            = 0002, L: test
 loop                            = 0008, L: test2
 main                            = 0000, G: test
 x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
 x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
+zero                            = 0000, L: test
 
 
+ASMHEAD                         = 0000, G: 
 main                            = 0000, G: test
+zero                            = 0000, L: test
 loop                            = 0002, L: test
 x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
 x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
 func                            = 0006, G: test2
 loop                            = 0008, L: test2
+ASMSIZE                         = 000B, G: 
+ASMTAIL                         = 000B, G: 
 END
 }
 
@@ -792,12 +807,18 @@ loop:	djnz loop
 ";
 $bin = "\x06\x0A\x10\xFE\xC9";
 my $map = <<'END';
+ASMHEAD                         = 0000, G: 
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0005, G: 
 loop                            = 0002, L: test
 main                            = 0000, G: test
 
 
+ASMHEAD                         = 0000, G: 
 main                            = 0000, G: test
 loop                            = 0002, L: test
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0005, G: 
 END
 
 
@@ -1111,7 +1132,13 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.39  2014-05-04 16:48:52  pauloscustodio
+# Revision 1.40  2014-05-20 22:26:29  pauloscustodio
+# BUG_0051: DEFC and DEFVARS constants do not appear in map file
+# Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+# written to the map file.
+# Logic to select symbols for map and def files was wrong.
+#
+# Revision 1.39  2014/05/04 16:48:52  pauloscustodio
 # Move tests of BUG_0001 and BUG_0002 to bugfixes.t, using TestZ80asm.pm
 #
 # Revision 1.38  2014/04/13 20:32:10  pauloscustodio

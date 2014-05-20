@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.20 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.21 2014-05-20 22:26:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,10 +65,9 @@ extern Symbol *define_local_def_sym( char *name, long value );
 extern Symbol *define_local_sym( char *name, long value, uint8_t type );
 extern Symbol *define_global_sym( char *name, long value, uint8_t type );
 
-/* get the list of symbols that match the given type mask,
-   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
-   Selects symbols where (type & type_mask) == type_value */
-extern SymbolHash *get_all_syms( uint8_t type_mask, uint8_t type_value );
+/* get the symbols for which the passed function returns TRUE,
+   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
+extern SymbolHash *select_symbols( BOOL (*cond)(Symbol *sym) );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
@@ -104,7 +103,13 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.20  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.21  2014-05-20 22:26:29  pauloscustodio
+* BUG_0051: DEFC and DEFVARS constants do not appear in map file
+* Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+* written to the map file.
+* Logic to select symbols for map and def files was wrong.
+*
+* Revision 1.20  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.19  2014/05/06 22:52:01  pauloscustodio

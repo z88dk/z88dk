@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.35 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.36 2014-05-20 22:26:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -199,8 +199,8 @@ Symbol *define_global_sym( char *name, long value, uint8_t type )
 /*-----------------------------------------------------------------------------
 *   copy all SYM_ADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
-static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
-                                 uint8_t type_mask, uint8_t type_value )
+static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source, 
+								 BOOL (*cond)(Symbol *sym) )
 {
     SymbolHashElem *iter;
     Symbol         *sym;
@@ -209,26 +209,24 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->sym_type & type_mask ) == ( type_value & type_mask ) )
-            SymbolHash_set( ptarget, Symbol_fullname( sym ), Symbol_clone( sym ) );
+		if ( cond( sym ) )
+			SymbolHash_set( ptarget, Symbol_fullname( sym ), Symbol_clone( sym ) );
     }
 }
 
 /*-----------------------------------------------------------------------------
-*   get the list of symbols that match the given type mask,
+*   get the symbols for which the passed function returns TRUE,
 *   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
-*   Selects symbols where (type & type_mask) == type_value
 *----------------------------------------------------------------------------*/
-SymbolHash *get_all_syms( uint8_t type_mask, uint8_t type_value )
+SymbolHash *select_symbols( BOOL (*cond)(Symbol *sym) )
 {
     SymbolHash *all_syms = OBJ_NEW( SymbolHash );
 
-    for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
-    {
-        copy_full_sym_names( &all_syms, CURRENTMODULE->local_symtab, type_mask, type_value );
-    }
-
-    copy_full_sym_names( &all_syms, global_symtab, type_mask, type_value );
+	for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
+	{
+		copy_full_sym_names( &all_syms, CURRENTMODULE->local_symtab, cond );
+	}
+    copy_full_sym_names( &all_syms, global_symtab, cond );
 
     return all_syms;
 }
@@ -495,7 +493,13 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.35  2014-05-17 14:27:13  pauloscustodio
+* Revision 1.36  2014-05-20 22:26:29  pauloscustodio
+* BUG_0051: DEFC and DEFVARS constants do not appear in map file
+* Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+* written to the map file.
+* Logic to select symbols for map and def files was wrong.
+*
+* Revision 1.35  2014/05/17 14:27:13  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.34  2014/05/06 22:52:01  pauloscustodio

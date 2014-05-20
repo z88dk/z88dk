@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.100 2014-05-17 22:42:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.101 2014-05-20 22:26:29 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.100 2014-05-17 22:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.100  2014-05-17 22:42:25  pauloscustodio
+* Revision 1.101  2014-05-20 22:26:29  pauloscustodio
+* BUG_0051: DEFC and DEFVARS constants do not appear in map file
+* Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+* written to the map file.
+* Logic to select symbols for map and def files was wrong.
+*
+* Revision 1.100  2014/05/17 22:42:25  pauloscustodio
 * Move load_module_object() that loads object file size when assembling
 * with -d option to objfile.c. Change objfile API.
 *
@@ -1892,11 +1898,17 @@ xx.xx.2014 [2.2.1] (pauloscustodio)
 		When a library is built with -d, and the total size of the loaded 
 		modules is more than 64K, z80asm fails with "max. code size reached".
 
+	BUG_0051: DEFC and DEFVARS constants do not appear in map file
+		Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
+		written to the map file.
+		Logic to select symbols for map and def files was wrong.
+
 	- Cleanup test files
 	- Parse argv generates list of files that can be iterated by assembler,
 	  linker and librarian.
 	- Move load_module_object() that loads object file size when assembling
 	  with -d option to objfile.c. 
+	- Add ASMHEAD symbol at the end of link with address of start of linked code.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
