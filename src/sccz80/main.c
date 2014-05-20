@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.23 2013-09-11 18:07:49 dom Exp $
+ *      $Id: main.c,v 1.24 2014-05-20 19:53:32 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -773,7 +773,7 @@ void dumplits(
             while ( j-- ) {
                 if (size==0) {
                     lit=getint(queue+k,1);
-                    if (lit >= 32 && lit <= 126  && lit != '"' ) outbyte(lit);
+                    if (lit >= 32 && lit <= 126  && lit != '"' && lit != '\\' ) outbyte(lit);
                     else {
                         outstr("\"\n");
                         defbyte();
