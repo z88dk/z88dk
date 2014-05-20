@@ -15,7 +15,7 @@
 #
 # Test generation of listfiles by z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.2 2014-05-11 17:11:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.3 2014-05-20 22:27:47 pauloscustodio Exp $
 
 package t::Listfile;
 
@@ -296,7 +296,7 @@ sub format_sym_line {
 		push @ret, $line;
 		$line = '';
 	}
-	$line .= sprintf("%-*s= %08X", 
+	$line .= sprintf("%-*s= %04X", 
 					 $COLUMN_WIDTH - length($line), '', 
 					 $self->LABEL_ADDR->{$label});
 	
@@ -380,7 +380,10 @@ sub test {
 1;
 
 # $Log: Listfile.pm,v $
-# Revision 1.2  2014-05-11 17:11:04  pauloscustodio
+# Revision 1.3  2014-05-20 22:27:47  pauloscustodio
+# Show symbol values with 4 digits instead of 8
+#
+# Revision 1.2  2014/05/11 17:11:04  pauloscustodio
 # Need to create list references before pushing
 #
 # Revision 1.1  2014/05/11 16:35:42  pauloscustodio

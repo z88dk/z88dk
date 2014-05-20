@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.63 2014-05-11 16:35:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.64 2014-05-20 22:27:47 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -895,7 +895,7 @@ sub format_sym_line {
 		push @ret, $line;
 		$line = '';
 	}
-	$line .= sprintf("%-*s= %08X", $COLUMN_WIDTH - length($line), '', $LABEL_ADDR{$label});
+	$line .= sprintf("%-*s= %04X", $COLUMN_WIDTH - length($line), '', $LABEL_ADDR{$label});
 	
 	if ($show_pages) {
 		$line .= " :";
@@ -1015,7 +1015,10 @@ sub get_gcc_options {
 1;
 
 # $Log: test_utils.pl,v $
-# Revision 1.63  2014-05-11 16:35:42  pauloscustodio
+# Revision 1.64  2014-05-20 22:27:47  pauloscustodio
+# Show symbol values with 4 digits instead of 8
+#
+# Revision 1.63  2014/05/11 16:35:42  pauloscustodio
 # Move tests of BUG_0026 to bugfixes.t
 #
 # Revision 1.62  2014/04/26 08:12:04  pauloscustodio

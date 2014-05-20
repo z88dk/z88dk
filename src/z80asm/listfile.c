@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.21 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.22 2014-05-20 22:27:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -530,7 +530,7 @@ void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
             ListFile_fprintf( self, "%s\n", symbol_name );
         }
 
-        ListFile_fprintf( self, "%-*s= %08lX", COLUMN_WIDTH, symbol_output, symbol_value );
+        ListFile_fprintf( self, "%-*s= %04lX", COLUMN_WIDTH, symbol_output, symbol_value );
 
         /* BUG_0028 */
         for ( iter = SymbolRefList_first( references ), first = TRUE, count_page_ref = 0 ;
@@ -580,7 +580,10 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.21  2014-05-17 14:27:12  pauloscustodio
+* Revision 1.22  2014-05-20 22:27:47  pauloscustodio
+* Show symbol values with 4 digits instead of 8
+*
+* Revision 1.21  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
 *
 * Revision 1.20  2014/05/06 22:17:37  pauloscustodio
