@@ -37,15 +37,23 @@ __bdoskbd_driver_00:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __bdoskbd_getc:
-
 	call    __bdoskbd_getchar
         push    af
+        bit     7,(ix+13)		; echo turned off
+        jr      z,__getc_noecho
+        cp      13
+        jr      z,__getc_echoit
+        bit     6,(ix+13)		; password echo mode
+        jr      z,__getc_echoit
+        ld      a,'*'
+__getc_echoit:
         ld      e,a
         ld      c,2
         call    5
+__getc_noecho:
         pop     af
-	ld		l,a
-	ld		h,0
+	ld	l,a
+	ld	h,0
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -197,7 +205,7 @@ __bdoskbd_getchar:
 __bdoskbd_getchar_loop:
 	ld		c,6
 	ld		e,255
-	call	5
+	call	        5
 	and		a
 	jr		z,__bdoskbd_getchar_loop
 	
@@ -205,6 +213,5 @@ __bdoskbd_getchar_loop:
 	pop		de
 	pop		bc
 	ret
-
 
 
