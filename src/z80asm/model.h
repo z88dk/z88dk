@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.16 2014-05-18 16:05:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.17 2014-05-21 20:56:08 pauloscustodio Exp $
 */
 
 #pragma once
@@ -68,6 +68,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.16 2014-05-18 16:0
 #define NOT_EVALUABLE	128     	/* 10000000 Expression is not evaluable */
 
 /*-----------------------------------------------------------------------------
+*   Special symbols
+*----------------------------------------------------------------------------*/
+#define ASMHEAD_KW	"ASMHEAD"
+#define ASMTAIL_KW	"ASMTAIL"
+#define ASMSIZE_KW	"ASMSIZE"
+
+/*-----------------------------------------------------------------------------
 *   Initialize data structures
 *----------------------------------------------------------------------------*/
 extern void model_init(void);
@@ -105,7 +112,10 @@ extern BOOL  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.16  2014-05-18 16:05:28  pauloscustodio
+* Revision 1.17  2014-05-21 20:56:08  pauloscustodio
+* Move special symbols to model.h
+*
+* Revision 1.16  2014/05/18 16:05:28  pauloscustodio
 * Add sections to the Module structure, define default section "".
 * Move module expressions to the Section structure.
 *

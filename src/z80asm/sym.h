@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.17 2014-05-20 21:58:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.18 2014-05-21 20:56:08 pauloscustodio Exp $
 */
 
 #pragma once
@@ -39,13 +39,6 @@ CLASS( Symbol )
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
-*   Special symbols
-*----------------------------------------------------------------------------*/
-#define ASMHEAD_KW	"ASMHEAD"
-#define ASMTAIL_KW	"ASMTAIL"
-#define ASMSIZE_KW	"ASMSIZE"
-
-/*-----------------------------------------------------------------------------
 *   Symbol API
 *----------------------------------------------------------------------------*/
 
@@ -59,7 +52,10 @@ extern char *Symbol_fullname( Symbol *sym );
 
 /*
 * $Log: sym.h,v $
-* Revision 1.17  2014-05-20 21:58:31  pauloscustodio
+* Revision 1.18  2014-05-21 20:56:08  pauloscustodio
+* Move special symbols to model.h
+*
+* Revision 1.17  2014/05/20 21:58:31  pauloscustodio
 * Add ASMHEAD symbol at the end of link with address of start of linked code.
 *
 * Revision 1.16  2014/05/17 14:27:13  pauloscustodio
