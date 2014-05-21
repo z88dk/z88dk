@@ -44,7 +44,9 @@ __bdos_putc:
    push hl                     ; output length
     
    exx
-   
+ __bdos_putc_loop: 
+   push de
+   push bc 
    ld   a,e
    exx
    cp   12      ; FF (CLS) ?
@@ -62,6 +64,12 @@ __bdos_putc_nocrlf:
    ld   d,0
    ld   c,2
    call 5
+   pop  bc
+   pop  de
+   dec  bc
+   ld   a,b
+   or   c
+   jr   nz,__bdos_putc_loop
    pop  hl                      ; say we output everything
    pop  ix
    and  a
