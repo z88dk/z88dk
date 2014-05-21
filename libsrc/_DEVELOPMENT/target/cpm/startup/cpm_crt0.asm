@@ -332,10 +332,10 @@ IF __crt_cfg_segment_data & $01
 
    __CRT_FILE_STDOUT_s:
 
-      EXTERN __cons_output_fzx_00
+      EXTERN __bdoscons_driver_00
 
       defb 195                    ; jp driver
-      defw __cons_output_fzx_00
+      defw __bdoscons_driver_00
       defb $80                    ; open for writing
       defb 0
       defb 0
