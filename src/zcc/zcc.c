@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.81 2014-05-07 19:42:24 dom Exp $
+ *      $Id: zcc.c,v 1.82 2014-05-21 21:17:09 dom Exp $
  */
 
 
@@ -1239,9 +1239,6 @@ static void configure_compiler()
             parse_cmdline_arg("-Ca-sdcc");
         }
         c_compiler = c_sdcc_exe;
-        snprintf(buf, sizeof(buf),"%s -E", c_sdcc_exe);
-        c_cpp_exe = strdup(buf);
-        c_stylecpp = outspecified_flag;
         compiler_style = filter_outspecified_flag;
     } else {
         preprocarg = " -DSCCZ80 -DSMALL_C";
