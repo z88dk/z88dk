@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.57 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.58 2014-05-21 19:39:09 dom Exp $
 */
 
 #pragma once
@@ -51,7 +51,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.57 2014-05-19 22:
 #endif
 
 extern FILE *objfile;
-extern uint32_t sizeof_relocroutine, sizeof_reloctable;
+extern size_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *GetLibfile( char *filename );
 
@@ -60,7 +60,10 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.57  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.58  2014-05-21 19:39:09  dom
+* size_t != u_int_32
+*
+* Revision 1.57  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
