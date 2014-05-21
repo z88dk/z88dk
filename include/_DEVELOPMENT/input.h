@@ -86,6 +86,16 @@ extern uint16_t  __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
 // mouse
 ////////
 
+// masks for return values from mouse functions
+
+#define IN_MOUSE_BUTTON_LEFT    0x01
+#define IN_MOUSE_BUTTON_RIGHT   0x02
+#define IN_MOUSE_BUTTON_MIDDLE  0x04
+
+#define IN_MOUSE_BUTTON_1       0x01
+#define IN_MOUSE_BUTTON_2       0x02
+#define IN_MOUSE_BUTTON_3       0x04
+
 /******************************
 
 stick mouse is not widely used yet and there may be a better
@@ -119,19 +129,6 @@ typedef struct udm_s
 
 extern udm_t input_stick_mouse_state;
 
-******************************/
-
-// masks for return values from mouse functions
-
-#define IN_MOUSE_BUTTON_LEFT    0x01
-#define IN_MOUSE_BUTTON_RIGHT   0x02
-#define IN_MOUSE_BUTTON_MIDDLE  0x04
-
-#define IN_MOUSE_BUTTON_1       0x01
-#define IN_MOUSE_BUTTON_2       0x02
-#define IN_MOUSE_BUTTON_3       0x04
-
-/******************************
 
 #ifdef __SDCC
 
