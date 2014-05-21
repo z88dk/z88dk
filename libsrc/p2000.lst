@@ -14,6 +14,8 @@ graphics/p2000/plotpixl
 graphics/p2000/respixl
 graphics/p2000/xorpixl
 graphics/p2000/pointxy
+graphics/fill
+graphics/dfill2
 graphics/putsprite2
 graphics/liner
 graphics/stencil_render

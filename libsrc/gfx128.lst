@@ -9,6 +9,8 @@ graphics/text/plotpixl
 graphics/text/respixl
 graphics/text/xorpixl
 graphics/pointxy
+graphics/fill
+graphics/dfill2
 graphics/putsprite2
 graphics/liner
 graphics/stencil_render

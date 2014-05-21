@@ -22,6 +22,8 @@ graphics/zx81/xorpixl
 graphics/putsprite3
 graphics/point
 graphics/zx81/pointxy
+graphics/fill
+graphics/dfill2
 graphics/multipoint
 graphics/rbitmask
 graphics/rscroll

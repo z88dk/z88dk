@@ -23,6 +23,8 @@ graphics/plotpixl_smc
 graphics/respixl_smc
 graphics/xorpixl_smc
 graphics/pointxy
+graphics/fill
+graphics/dfill2
 graphics/putsprite_smc
 graphics/liner
 graphics/stencil_render

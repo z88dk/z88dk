@@ -9,16 +9,18 @@
 ;	Since some platform (expecially the TI83) has very little stack space,
 ;	we undersize it; this will cause a crash if a big area is filled.
 ;
-;	- THIS SMC VERSION DOESN'T MAKE USE OF ALTERNATE REGISTERS -
+;	GENERIC VERSION
+;   IT DOESN'T MAKE USE OF ALTERNATE REGISTERS
+;   IT IS BASED ON "pointxy" and "plotpixel"
 ;
-;	$Id: dfill2.asm,v 1.1 2007-09-24 08:07:24 stefano Exp $
+;	$Id: dfill2.asm,v 1.2 2014-05-21 19:34:14 stefano Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
         XLIB    do_fill
-        LIB	pixeladdress
-	LIB	plotpixel
+        LIB   pointxy
+        LIB   plotpixel
 
 .spsave	defw 0
 
@@ -41,15 +43,19 @@
         ld      hl,-maxy*3	; create buffer 2 on stack
         add     hl,sp
         ld      sp,hl
+        
 .loop	push	ix
 	push	hl
         call	cfill
 	pop	ix
 	pop	hl
 
-.asave	ld	a,0
-	and	a
+;.asave	ld	a,0
+	;and	a
 	
+	push de
+	pop af
+
 	;;ex	af,af	; Restore the Z flag
 	;;push	af
 	;;ex	af,af
@@ -64,8 +70,12 @@
 .cfill	
 	;sub	a,a	; Reset the Z flag
 	;ex	af,af	; and save it
+
 	xor	a
-	ld	(asave+1),a
+	push af
+	pop de
+
+	;ld	(asave+1),a
 
 .next	ld	a,(ix+0)
 	cp	255		; stopper ?
@@ -125,35 +135,35 @@
 	push	hl
 	ld	l,b
 	ld	h,c
-	call	pixeladdress	; bc must be saved by pixeladdress !
+	
+	;call	pixeladdress	; bc must be saved by pixeladdress !
+	push de
+	call pointxy
+	pop de
 	pop	hl
-	xor	7
-
-	ld	b,a
-	inc	b
-	push	bc
-	ld	a,(de)
-.shift	rlca
-	djnz	shift
-	and	1
-	pop	bc
 
 	jr	z,dontret
-	pop	de
+	pop	af
 	ret
 .dontret
 
-	inc	a
-.doset	rrca
-	djnz	doset
-
-	ld	b,a
-	ld	a,(de)
 	or	b	; Z flag set...
+;	or 1
+;	and a
+
+	;ld	(asave+1),a
+	push af
+	;pop de
 	
-	ld	(asave+1),a
+;	ld	(de),a
+
+	push	hl
+	ld	l,b
+	ld	h,c
+	call plotpixel
+	pop     hl
 	
-	ld	(de),a
+	pop de
 
 	pop	bc
 	ld	(hl),b

@@ -43,4 +43,6 @@ graphics/text6/xorpixl
 graphics/text6/div3
 graphics/text6/swapgfxbk
 graphics/text6/pointxy
+graphics/fill
+graphics/dfill2
 graphics/stencil_render

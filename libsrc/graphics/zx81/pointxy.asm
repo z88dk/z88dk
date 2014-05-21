@@ -1,10 +1,10 @@
 
 	XLIB	pointxy
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: pointxy.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2014-05-21 19:34:14 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -24,9 +24,11 @@
 				cp	48
 				ret	nc		; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 				
-				push	bc
+			push	bc
+			push	de
+			push	hl			
 
 				ld	c,l
 				ld	b,h
@@ -56,7 +58,8 @@
 				jr	c,islow		; recode graph symbol to binary -> 0..F
 				ld	a,143
 				sub	(hl)
-.islow				ex	(sp),hl		; save char address <=> restore x,y
+
+.islow			ex	(sp),hl		; save char address <=> restore x,y
 
 				cp	16		; Just to be sure:
 				jr	c,issym		; if it isn't a symbol...
@@ -76,8 +79,9 @@
 				add	a,a
 				add	a,a		; move down the bit
 .evenrow
-
 				and	b
 				
-				pop	bc
+			pop	hl
+			pop	de
+			pop	bc
 				ret

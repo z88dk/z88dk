@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.33 2014-05-06 06:01:48 stefano Exp $
+;	$Id: grafix.inc,v 1.34 2014-05-21 19:34:14 stefano Exp $
 ;
 
 
@@ -93,8 +93,8 @@ ENDIF
 
 IF FORjupiter
 	DEFINE gotgfx
-	defc maxx	= 96 ; emulated (64 real dots)
-	defc maxy	= 64 ; emulated (48 real dots)
+	defc maxx	= 64
+	defc maxy	= 48
 ENDIF
 
 IF FORzx

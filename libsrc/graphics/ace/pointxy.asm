@@ -1,21 +1,23 @@
 
-	XLIB	plotpixel
-
+	XLIB	pointxy
 	XREF	coords
 
+	LIB	pixeladdress
+
+
 ;
-;	$Id: plotpixl.asm,v 1.10 2014-05-21 19:34:14 stefano Exp $
+;	$Id: pointxy.asm,v 1.1 2014-05-21 19:34:14 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
-; Plot pixel at (x,y) coordinate.
+; Check if pixel at	(x,y) coordinate is	set or not.
 ;
-; ZX 81 version.  
+; Jupiter ACE version.  
 ; 64x48 dots.
 ;
 ;
-.plotpixel
+.pointxy			
 				ld	a,h
 				cp	64
 				ret	nc
@@ -26,23 +28,25 @@
 				
 				ld	(coords),hl
 				
-				push	bc
+			push	bc
+			push	de
+			push	hl			
 
 				ld	c,l
 				ld	b,h
 
-				push	bc
+				;push	bc
 				
 				srl	b
 				srl	c
-				ld	hl,(16396)
-				inc	hl
+				ld	hl,$2400
+;				inc	hl
 				ld	a,c
 				ld	c,b	; !!
-				ld	de,33	; 32+1. Every text line ends with an HALT
 				and	a
 				jr	z,r_zero
 				ld	b,a
+				ld	de,32
 .r_loop
 				add	hl,de
 				djnz	r_loop
@@ -51,23 +55,26 @@
 				add	hl,de
 				
 				ld	a,(hl)		; get current symbol
-				
+
 				cp	8
 				jr	c,islow		; recode graph symbol to binary -> 0..F
+				cp	128
+				jr	c,ischar
 				ld	a,143
+				;ld	a,128+10
 				sub	(hl)
-.islow				ex	(sp),hl		; save char address <=> restore x,y
-
-				cp	16		; Just to be sure:
-				jr	c,issym		; if it isn't a symbol...
+				;xor	a;;;;
+				jr	islow
+.ischar
 				xor	a		; .. force to blank sym
-.issym
-				ld	b,a
+.islow
+				ex	(sp),hl		; save char address <=> restore x,y
 
+				ld	b,a
 				ld	a,1		; the bit we want to draw
 				
 				bit	0,h
-				jr	z,iseven
+				jr	nz,iseven
 				add	a,a		; move right the bit
 
 .iseven
@@ -76,18 +83,9 @@
 				add	a,a
 				add	a,a		; move down the bit
 .evenrow
-				or	b
-
-				cp	8		; Now back from binary to
-				jr	c,hisym		; graph symbols.
-
-				ld	b,a
-				ld	a,15
-				sub	b
-				add	a,128
-.hisym
-				pop	hl
-				ld	(hl),a
+				and	b
 				
-				pop	bc
+			pop	hl
+			pop	de
+			pop	bc
 				ret

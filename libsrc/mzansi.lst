@@ -22,6 +22,8 @@ graphics/mz/plotpixl
 graphics/mz/respixl
 graphics/mz/xorpixl
 graphics/mz/pointxy
+graphics/fill
+graphics/dfill2
 graphics/putsprite2
 graphics/liner
 graphics/stencil_render

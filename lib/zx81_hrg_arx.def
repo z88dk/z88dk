@@ -4,14 +4,14 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.10 2013-10-23 08:40:59 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.11 2014-05-21 19:34:14 stefano Exp $
 ;
 ; - - - - - - -
 
 XDEF	hrg_on
 XDEF	hrg_off
 XDEF	HRG_LineStart
-XDEF	HRG_Handler
+XDEF	HRG_handler
 XDEF	zx_blank
 XDEF	zx_noblank
 XDEF	zx_fast

@@ -1,11 +1,10 @@
 
 	XLIB	plotpixel
 
-	LIB pixeladdress
 	XREF	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
+;	$Id: plotpixl.asm,v 1.5 2014-05-21 19:34:14 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -13,39 +12,24 @@
 ; Plot pixel at (x,y) coordinate.
 ;
 ; Jupiter ACE version.  
-; Emulated 96x64 resolution (TI82/TI83) with 64x48 dots.
-;
-; (x=x*2/3;  y=y*3/4)
+; 64x48 dots.
 ;
 ;
 .plotpixel			
 				ld	a,h
-				cp	96
+				cp	64
 				ret	nc
 				ld	a,l
 				;cp	maxy
-				cp	64
+				cp	48
 				ret	nc		; y0	out of range
 				
 				ld	(coords),hl
 				
 				push	bc
 
-				add	a,l	; y=y*3/4
-				add	a,l
-				srl	a
-				srl	a
-				ld	c,a
-
-				ld	b,0	; x=x*2/3
-				;sll	h
-				sla	h
-				ld	a,h
-.subtract
-				inc	b
-				sub	3
-				jr	nc,subtract
-				dec	b
+				ld	c,l
+				ld	b,h
 
 				push	bc
 				
@@ -67,8 +51,7 @@
 				add	hl,de
 				
 				ld	a,(hl)		; get current symbol
-;				dec	a
-;				dec	a
+
 				cp	8
 				jr	c,islow		; recode graph symbol to binary -> 0..F
 				cp	128
@@ -98,8 +81,6 @@
 .evenrow
 				or	b
 
-;				inc	a
-;				inc	a
 				cp	8		; Now back from binary to
 				jr	c,losym		; graph symbols.
 
@@ -107,13 +88,7 @@
 				ld	a,15
 				sub	b
 				add	a,128
-
-;				ld	b,a
-;				ld	a,128+10
-;				sub	b
-
 .losym
-
 				pop	hl
 				ld	(hl),a
 				

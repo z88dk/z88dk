@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.8 2013-10-21 14:23:44 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.9 2014-05-21 19:34:14 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -358,15 +358,15 @@ mc_irq:
 		di
 		push hl
 		push af
-		ld	hl,(frames)
+		ld	hl,(FRAMES)
 		inc	hl
-		ld	(frames),hl
+		ld	(FRAMES),hl
 		ld	a,h
 		or	l
 		jr	nz,irq_hndl
-		ld	hl,(frames+2)
+		ld	hl,(FRAMES+2)
 		inc	hl
-		ld	(frames+2),hl
+		ld	(FRAMES+2),hl
 irq_hndl:
 		ld	hl,0
 		;jp	$7f

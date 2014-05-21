@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.24 2013-10-21 14:23:44 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.25 2014-05-21 19:34:14 stefano Exp $
 ;
 
 
@@ -118,7 +118,7 @@
         ENDIF
 
 
-	IF ((myzorg = $5000) ~ (!DEFINED_osca_bank))
+	IF ((myzorg = $5000) || (!DEFINED_osca_bank))
                 org		myzorg
 	ELSE
 				; optional Program Location File Header
@@ -186,7 +186,7 @@ ELSE
 .v_srand_loop
 		ld	hl,FLOSvarsaddr
 		add	(hl)
-		ld	(frames),a
+		ld	(FRAMES),a
 		inc hl
 		djnz v_srand_loop
 ENDIF
@@ -416,16 +416,16 @@ my_timer_irq_code:
 ;        bit 4,a
 ;        jr nz,timer_irq_count_done
 
-        ld hl,(frames)
+        ld hl,(FRAMES)
         inc hl
-        ld (frames),hl
+        ld (FRAMES),hl
         ;;ld	(palette),hl		; testing purposes
         ld a,h
         or l
         jr nz,timer_irq_count_done
-        ld hl,(frames+2)
+        ld hl,(FRAMES+2)
         inc hl
-        ld (frames+2),hl
+        ld (FRAMES+2),hl
 
 timer_irq_count_done:
         ld  a,@00000100
@@ -440,11 +440,11 @@ ENDIF
 original_irq_vector:
 	defw 0
 
-frames_pre:
+;frames_pre:
+;
+;	defb 0
 
-	defb 0
-
-frames:
+FRAMES:
 
 	defw 0
 	defw 0

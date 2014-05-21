@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.4 2013-10-21 14:23:44 stefano Exp $
+;       $Id: mtx_crt0.asm,v 1.5 2014-05-21 19:34:14 stefano Exp $
 ;
 
 
@@ -84,9 +84,12 @@
 
 start:
 
+        ld      (start1+1),sp   ; Save entry stack
+
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+
         ld      (exitsp),sp
 
 

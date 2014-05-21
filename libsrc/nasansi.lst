@@ -24,6 +24,8 @@ graphics/nascom/plotpixl
 graphics/nascom/respixl
 graphics/nascom/xorpixl
 graphics/nascom/pointxy
+graphics/fill
+graphics/dfill2
 graphics/putsprite2
 graphics/liner
 graphics/stencil_render
