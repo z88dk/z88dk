@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.21 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.22 2014-05-21 20:57:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -57,7 +57,7 @@ CLASS( OFile )
 END_CLASS;	
 
 /*-----------------------------------------------------------------------------
-*   OFile API
+*   OFile API - reading
 *----------------------------------------------------------------------------*/
 
 /* test if a object file exists and is the correct version, return object if yes
@@ -69,7 +69,7 @@ extern OFile *OFile_test_file( char *filename );
 /* read object file header from within an open library file.
    Return NULL if invalid object file or not the correct version.
    Object needs to be deleted by caller by OBJ_DELETE()
-   Keeps the library file open */
+   Keeps the object file open */
 extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
 
 /* open object file for reading, read header.
@@ -77,11 +77,17 @@ extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
    Object needs to be deleted by caller by OBJ_DELETE()
    Keeps the object file open */
 extern OFile *OFile_open_read( char *filename );
+extern void   OFile_close( OFile *self );
 
 /* return static uint8_tArray with binary contents of the given object file,
    return NULL if input file is not an object, wrong version, or does not exist
    NOTE: not reentrant, reuses array on each call */
 extern uint8_tArray *read_obj_file_data( char *filename );
+
+/*-----------------------------------------------------------------------------
+*   OFile API - write module to object file
+*----------------------------------------------------------------------------*/
+extern void write_obj_file( char *filename, Module *module );
 
 /*-----------------------------------------------------------------------------
 *   Module interface to object files
@@ -93,7 +99,10 @@ extern BOOL objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.21  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.22  2014-05-21 20:57:27  pauloscustodio
+* Embryo of write module
+*
+* Revision 1.21  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *

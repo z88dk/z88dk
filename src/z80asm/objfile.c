@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.28 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.29 2014-05-21 20:57:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -188,6 +188,18 @@ OFile *OFile_open_read( char *filename )
 }
 
 /*-----------------------------------------------------------------------------
+*	close object file
+*----------------------------------------------------------------------------*/
+void OFile_close( OFile *self )
+{
+	if ( self != NULL && self->file != NULL )
+	{
+		xfclose( self->file );
+		self->file = NULL;
+	}
+}
+
+/*-----------------------------------------------------------------------------
 *	test if a object file exists and is the correct version, return object if yes
 *   return NULL if not. 
 *   Object needs to be deleted by caller by OBJ_DELETE()
@@ -240,6 +252,15 @@ uint8_tArray *read_obj_file_data( char *filename )
 }
 
 /*-----------------------------------------------------------------------------
+*   OFile API - write module to object file
+*----------------------------------------------------------------------------*/
+void write_obj_file( char *filename, Module *module )
+{
+	/* TODO */
+}
+
+
+/*-----------------------------------------------------------------------------
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
@@ -262,7 +283,10 @@ BOOL objmodule_loaded( Module *module, char *filename )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.28  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.29  2014-05-21 20:57:27  pauloscustodio
+* Embryo of write module
+*
+* Revision 1.28  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
