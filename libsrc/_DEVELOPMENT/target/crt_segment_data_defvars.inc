@@ -35,7 +35,6 @@ IF __crt_cfg_heap_size > 14
 ENDIF
 
 PUBLIC __stdio_file_list_lock, __stdio_file_list_open, __stdio_file_list_avail
-PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
 PUBLIC _seed, __thrd_id
 
 defvars -1
@@ -47,11 +46,43 @@ defvars -1
    __stdio_file_list_lock      ds.b 6
    __stdio_file_list_open      ds.w 1
    __stdio_file_list_avail     ds.w 2
-   
-   __stdio_file_stdin          ds.w 1
-   __stdio_file_stdout         ds.w 1
-   __stdio_file_stderr         ds.w 1
+}
 
+IF __crt_cfg_file_enable & $01
+
+   PUBLIC __stdio_file_stdin
+
+   defvars -1
+   {
+      __stdio_file_stdin       ds.w 1
+   }
+
+ENDIF
+
+IF __crt_cfg_file_enable & $02
+
+   PUBLIC __stdio_file_stdout
+
+   defvars -1
+   {
+      __stdio_file_stdout      ds.w 1
+   }
+
+ENDIF
+
+IF __crt_cfg_file_enable & $04
+
+   PUBLIC __stdio_file_stderr
+
+   defvars -1
+   {
+      __stdio_file_stderr      ds.w 1
+   }
+
+ENDIF
+
+defvars -1
+{
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; stdlib
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

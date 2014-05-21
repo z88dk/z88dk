@@ -18,7 +18,7 @@ _errno:                        defs 2
 
 PUBLIC __strtok_ptr
 
-_strtok_ptr:                   defs 2
+__strtok_ptr:                  defs 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; alloc
@@ -78,7 +78,7 @@ ENDIF
 ; stdio
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_cfg_fopen_max > 3
+IF (__crt_cfg_file_enable & $80) & (__crt_cfg_fopen_max > 3)
 
    __file_block:               defs (__CLIB_OPT_STDIO_FILE_EXTRA + 15) * (__crt_cfg_fopen_max - 3)
 

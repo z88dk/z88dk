@@ -10,12 +10,12 @@ PUBLIC __sound_bit_state
 __sound_bit_state:             defb 7
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; crt attribute
+; console attribute
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC _crt_attr
+PUBLIC _cons_attr_p
 
-_crt_attr:                     defb 56
+_cons_attr_p:                  defb 56
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input

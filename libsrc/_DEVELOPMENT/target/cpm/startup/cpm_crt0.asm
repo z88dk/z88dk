@@ -80,19 +80,40 @@ IF __crt_segment_data_address > 0
    
    defvars __crt_segment_data_begin
    {
-      ; -- insert local crt data segment here -----------------
-
+   ; -- insert local crt data segment here --------------------
+   }
+   
+   IF __crt_cfg_file_enable & $01
+   
+   defvars -1
+   {
                           ds.w 1
       __CRT_FILE_STDIN    ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+   }
+   
+   ENDIF
+   
+   IF __crt_cfg_file_enable & $02
 
+   defvars -1
+   {   
                           ds.w 1
       __CRT_FILE_STDOUT   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
-
+   }
+   
+   ENDIF
+   
+   IF __crt_cfg_file_enable & $04
+   
+   defvars -1
+   {
                           ds.w 1
       __CRT_FILE_STDERR   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
-
-      ; -------------------------------------------------------
    }
+   
+   ENDIF
+
+   ; ----------------------------------------------------------
    
    INCLUDE "../crt_segment_data_defvars.inc"
    INCLUDE "segment_data_defvars.inc"
@@ -108,16 +129,15 @@ ENDIF
 ;; startup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC __crt_code_start, _crt_code_end, __Exit
+PUBLIC __crt_code_begin, __crt_code_end, __Exit
 
-PUBLIC __crt_segment_bss_begin,  __crt_segment_bss_end
-PUBLIC __crt_segment_data_begin, __crt_segment_data_end
-PUBLIC __crt_segment_data_source_begin, __crt_segment_data_source_end
-PUBLIC __crt_segment_bss_len, __crt_segment_data_len, __crt_segment_data_source_len
+PUBLIC __crt_segment_bss_begin,  __crt_segment_bss_end, __crt_segment_bss_len
+PUBLIC __crt_segment_data_begin, __crt_segment_data_end, __crt_segment_data_len
+PUBLIC __crt_segment_data_source_begin, __crt_segment_data_source_end, __crt_segment_data_source_len
 
 EXTERN _main
 
-__crt_code_start:
+__crt_code_begin:
 
 IF !DEFINED_noprotectmsdos
 
@@ -145,7 +165,7 @@ ENDIF
 
    ld       (__sp),sp
 
-    ; Command line arguments - push points to argv[n] onto the stack
+   ; Command line arguments - push points to argv[n] onto the stack
 
 	ld	    hl,0	;NULL pointer at end, just in case
 	push	hl
@@ -252,85 +272,119 @@ IF __crt_cfg_segment_data & $01
 
    ; -- insert local crt data segment here --------------------
 
-      defw __CRT_FILE_STDOUT - 2
+   IF __crt_cfg_file_enable & $01
+   
+      IF __crt_cfg_file_enable & $02
+      
+         defw __CRT_FILE_STDOUT - 2
+         
+      ENDIF
+      
+      IF (__crt_cfg_file_enable & $06) = 4
+      
+         defw __CRT_FILE_STDERR - 2
+         
+      ENDIF
+      
+      IF (__crt_cfg_file_enable & $06) = 0
+      
+         defw 0
+         
+      ENDIF
 
    __CRT_FILE_STDIN_s:
 
       EXTERN __bdoskbd_driver_00
 
-      defb 195                 ; jp driver
+      defb 195                    ; jp driver
       defw __bdoskbd_driver_00
-      defb $40                 ; open for reading
-      defb $02                 ; last op was read, to skip auto-flush
+      defb $40                    ; open for reading
+      defb $02                    ; last operation was a read
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb $81              ; driver flags = echo on
-         
+
+         defb $81                 ; driver flags = echo on
+
       ENDIF
-   
+                       
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
+
          defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
+
       ENDIF
 
+   ENDIF
 
-      defw __CRT_FILE_STDERR - 2
+   IF __crt_cfg_file_enable & $02
+   
+      IF __crt_cfg_file_enable & $04
+      
+         defw __CRT_FILE_STDERR - 2
+      
+      ELSE
+      
+         defw 0
+      
+      ENDIF
 
    __CRT_FILE_STDOUT_s:
-   
-      EXTERN __bdoscons_driver_00
 
-      defb 195                 ; jp driver
-      defw __bdoscons_driver_00
-      defb $80                 ; open for writing
+      EXTERN __cons_output_fzx_00
+
+      defb 195                    ; jp driver
+      defw __cons_output_fzx_00
+      defb $80                    ; open for writing
       defb 0
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb 0                ; driver flags n/a
-         
+
+         defb 0                   ; driver flags n/a
+
       ENDIF
-   
+
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
+
          defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
+
       ENDIF
-      
-      
+
+   ENDIF
+
+   IF __crt_cfg_file_enable & $04
+   
       defw 0
 
    __CRT_FILE_STDERR_s:
 
       EXTERN __bdoscons_driver_00
 
-      defb 195                 ; jp driver
+      defb 195                      ; jp driver
       defw __bdoscons_driver_00
-      defb $80                 ; open for writing
+      defb $80                      ; open for writing
       defb 0
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0       ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb 0                ; driver flags n/a
-         
+
+         defb 0                     ; driver flags n/a
+
+      ENDIF
+
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+
       ENDIF
    
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
-      ENDIF
+   ENDIF
 
    ; ----------------------------------------------------------
    
@@ -353,85 +407,119 @@ __crt_segment_data_begin:
 
    ; -- insert local crt data segment here --------------------
 
-      defw __CRT_FILE_STDOUT - 2
+   IF __crt_cfg_file_enable & $01
+   
+      IF __crt_cfg_file_enable & $02
+      
+         defw __CRT_FILE_STDOUT - 2
+         
+      ENDIF
+      
+      IF (__crt_cfg_file_enable & $06) = 4
+      
+         defw __CRT_FILE_STDERR - 2
+         
+      ENDIF
+      
+      IF (__crt_cfg_file_enable & $06) = 0
+      
+         defw 0
+         
+      ENDIF
 
    __CRT_FILE_STDIN:
 
       EXTERN __bdoskbd_driver_00
 
-      defb 195                 ; jp driver
+      defb 195                    ; jp driver
       defw __bdoskbd_driver_00
-      defb $40                 ; open for reading
-      defb $02                 ; last op was read, to skip auto-flush
+      defb $40                    ; open for reading
+      defb $02                    ; last operation was a read
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb $81              ; driver flags = echo on
-         
+
+         defb $81                 ; driver flags = echo on
+
       ENDIF
-   
+                       
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
+
          defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
+
       ENDIF
 
+   ENDIF
 
-      defw __CRT_FILE_STDERR - 2
+   IF __crt_cfg_file_enable & $02
+   
+      IF __crt_cfg_file_enable & $04
+      
+         defw __CRT_FILE_STDERR - 2
+      
+      ELSE
+      
+         defw 0
+      
+      ENDIF
 
    __CRT_FILE_STDOUT:
-   
+
       EXTERN __bdoscons_driver_00
 
-      defb 195                 ; jp driver
+      defb 195                    ; jp driver
       defw __bdoscons_driver_00
-      defb $80                 ; open for writing
+      defb $80                    ; open for writing
       defb 0
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb 0                ; driver flags n/a
-         
+
+         defb 0                   ; driver flags n/a
+
       ENDIF
-   
+
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
+
          defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
+
       ENDIF
-      
-      
+
+   ENDIF
+
+   IF __crt_cfg_file_enable & $04
+   
       defw 0
 
    __CRT_FILE_STDERR:
 
       EXTERN __bdoscons_driver_00
 
-      defb 195                 ; jp driver
+      defb 195                      ; jp driver
       defw __bdoscons_driver_00
-      defb $80                 ; open for writing
+      defb $80                      ; open for writing
       defb 0
       defb 0
       defb 0
-      defb 0, 2, 0, $fe, 0, 0  ; recursive mutex
+      defb 0, 2, 0, $fe, 0, 0       ; recursive mutex
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-      
-         defb 0                ; driver flags n/a
-         
+
+         defb 0                     ; driver flags n/a
+
+      ENDIF
+
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+
       ENDIF
    
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-      
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-         
-      ENDIF
+   ENDIF
 
    ; ----------------------------------------------------------
    

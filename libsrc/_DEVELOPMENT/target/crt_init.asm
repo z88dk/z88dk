@@ -46,7 +46,7 @@
 
    ENDIF
 
-   IF __crt_cfg_fopen_max > 3
+   IF (__crt_cfg_file_enable & $80) & (__crt_cfg_fopen_max > 3)
    
          ; available stdio FILE structures
 

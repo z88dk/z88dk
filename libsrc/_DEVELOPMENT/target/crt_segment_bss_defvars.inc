@@ -93,7 +93,7 @@ IF __crt_cfg_heap_size > 14
 
 ENDIF
 
-IF __crt_cfg_fopen_max > 3
+IF (__crt_cfg_file_enable & $80) & (__crt_cfg_fopen_max > 3)
 
    defvars -1
    {

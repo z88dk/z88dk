@@ -1,6 +1,8 @@
 
 ; == crt cleanup ==============================================
 
+IF __crt_cfg_file_enable & $80
+
    push hl                       ; save exit status
 
    ; stop multi-threading
@@ -36,5 +38,7 @@ __close_loop:
 __close_done:
 
    pop hl                        ; restore exit status
+
+ENDIF
 
 ; =============================================================
