@@ -3,9 +3,12 @@
 ;; simple keyboard driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC __iterm_driver_kbd_00
+PUBLIC __cons_input_kbd_A_00
 
-EXTERN l_jphl, __oterm_echo
+; keyboard driver reads LASTK for key input
+; ROM independent, other than reliant on something updating LASTK
+
+EXTERN __cons_output_echo, l_jphl
 EXTERN error_enotsup_zc, error_znc, error_lznc
 
 EXTERN STDIO_SEEK_CUR
@@ -14,7 +17,7 @@ EXTERN STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_CLOS
 
 defc LASTK = 23560
 
-__iterm_driver_kbd_00:
+__cons_input_kbd_A_00:
 
    cp STDIO_MSG_GETC
    jr z, __kbd_getc
@@ -40,16 +43,18 @@ __iterm_driver_kbd_00:
 
 __kbd_getc:
 
-   ; return hl = char
+   ; read a single char from the stream
+   ;
+   ; return: HL = char
+   ; carry set on error or eof: if HL=0 stream error, HL=-1 on eof
    
-   call __kbd_getchar
+   call __kbd_getchar          ; read one char
 
    push hl
-   call __kbd_echo
+   call __kbd_echo             ; local echo function
    pop hl
    
    ld h,0
-   
    or a
    ret
 
@@ -57,10 +62,13 @@ __kbd_getc:
 
 __kbd_eatc:
 
+   ; read chars from the stream until one is disqualified
+   ; disqualified char should be 'ungot'
+   ;
    ; HL'= int (*qualify)(char c)
    ; BC'= optional
    ; DE'= optional
-   ; HL = max_length = number of stream chars to consume
+   ; HL = max_length = max number of stream chars to consume
    ; 
    ; return: BC = number of bytes consumed from stream
    ;         HL = next unconsumed (unmatching) char or EOF
@@ -93,7 +101,7 @@ __kbd_eatc_loop:
    push de
    
    ld a,l
-   call __kbd_echo
+   call __kbd_echo             ; local echo function
    
    pop de
    pop bc
@@ -110,7 +118,7 @@ __kbd_eatc_exit:
    ld h,a                      ; hl = next consumed char
    
    ld a,l
-   ld (LASTK),a                ; shove unconsumed char back into LASTK, may not last
+   ld (LASTK),a                ; shove unconsumed char back into LASTK
 
    ld c,e
    ld b,d                      ; bc = num chars consumed
@@ -129,7 +137,7 @@ __kbd_read:
    ;        DE'= void *buffer_ptr = address of byte following last written
    ;        carry set on error with HL=0 for stream error, -1 for eof
 
-   ; we never have stream errors or eof
+   ; we never have stream errors or eof from a keyboard
    
    exx
    
@@ -148,7 +156,7 @@ __kbd_read_loop:
    push bc
    push de
    
-   call __kbd_echo
+   call __kbd_echo             ; local echo function
    
    pop de
    pop bc
@@ -198,11 +206,10 @@ __kbd_seek_loop:
    jp z, error_lznc            ; if num chars == 0
 
    dec de
-
    call __kbd_getchar
    
    push de
-   call __kbd_echo
+   call __kbd_echo             ; local echo function
    pop de
    
    jr __kbd_seek_loop
@@ -243,12 +250,12 @@ __kbd_echo:
    ret z                       ; if echo is off
    
    cp 13
-   jp z, __oterm_echo
+   jp z, __cons_output_echo
    
    bit 6,(ix+13)
-   jp z, __oterm_echo          ; if not password mode
+   jp z, __cons_output_echo    ; if not password mode
    
    ld a,'*'
-   jp __oterm_echo
+   jp __cons_output_echo
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

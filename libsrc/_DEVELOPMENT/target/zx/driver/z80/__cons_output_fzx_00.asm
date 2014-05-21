@@ -3,15 +3,18 @@
 ;; fzx output driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC __oterm_driver_fzx_00, __oterm_echo
+PUBLIC __cons_output_fzx_00, __cons_output_echo, __cons_output_scroll
 
-EXTERN asm_fzx_putc, asm_fzx_write, _crt_scroll_
+; fzx used to generate console output
+; ROM independent
+
+EXTERN asm_fzx_putc, asm_fzx_write, asm_cons_scroll_00
 EXTERN error_enotsup_zc, error_lznc, error_znc, _fzx
 
 EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_SEEK
 EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS
 
-__oterm_driver_fzx_00:
+__cons_output_fzx_00:
 
    cp STDIO_MSG_PUTC
    jr z, __fzx_putc
@@ -51,9 +54,7 @@ __fzx_putc_loop:
    push de
    
    ld a,e
-   call __oterm_echo
-
-__fzx_putc_cont:
+   call __cons_output_echo
 
    pop de
    pop bc
@@ -65,7 +66,6 @@ __fzx_putc_cont:
    jr nz, __fzx_putc_loop
 
    pop hl                      ; say we output everything
-
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -88,9 +88,14 @@ __fzx_writ:
 __writ_loop:
 
    call asm_fzx_write
-   jr nc, __fzx_writ_exit
-   
-   ; screen full
+   jr c, __writ_screen_full
+
+   pop hl                      ; say we output everything
+   pop ix
+
+   ret
+
+__writ_screen_full:
    
    ; bc = num remaining chars
    ; de = void *buffer_ptr
@@ -98,55 +103,51 @@ __writ_loop:
    push bc
    push de
    
-   call __oterm_scroll
+   call __cons_output_scroll
    
    pop de
    pop bc
 
    jr __writ_loop              ; finish writing
-   
-__fzx_writ_exit:
-
-   pop hl                      ; say we output everything
-   pop ix
-   
-   or a
-   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__oterm_echo:
+__cons_output_echo:
 
-   ; a = output char
-   ; preserve ix
+   ; enter :  a = output char
+   ; 
+   ; uses  : all except ix, bc', de', hl'
    
    ld e,a
-   
    push ix
-   push de
 
-   call asm_fzx_putc
-   jr nc, __echo_done
+__echo_loop:
 
-   ; screen full
-   
-   call __oterm_scroll
-   
-   pop de
    push de
    
-   ld a,e
    call asm_fzx_putc
-
-__echo_done:
+   jr c, __echo_screen_full
 
    pop de
    pop ix
    
    ret
 
+__echo_screen_full:
 
-__oterm_scroll:
+   call __cons_output_scroll
+   
+   pop de
+   jr __echo_loop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__cons_output_scroll:
+
+   ; scroll upward by a number of character rows such that
+   ; another line of fzx text can be written
+   ;
+   ; uses : all except ix, bc', de', hl'
 
    exx
    
@@ -161,7 +162,7 @@ __oterm_scroll:
    
    add a,l
    sub 192
-   jr c, __no_scroll
+   jr c, __scroll_done
 
    inc a
    ld hl,1
@@ -176,9 +177,24 @@ __amount_loop:
 
 __scroll:
 
-   call _crt_scroll_
+   ; adjust fzx state
+   
+   xor a
+   ld (_fzx+4),a               ; x coordinate = 0
+   
+   ld a,l
+   add a,a
+   add a,a
+   add a,a
+   ld e,a
+   
+   ld a,(_fzx+5)
+   sub e
+   ld (_fzx+5),a               ; y coordinate -= L * 8
 
-__no_scroll:
+   call asm_cons_scroll_00
+
+__scroll_done:
 
    pop hl
    pop de
