@@ -1,6 +1,7 @@
 @adt/adt_sccz80.lst
 @alloc/alloc_sccz80.lst
 @arch/zx/zx_sccz80.lst
+@compress/compress_sccz80.lst
 @ctype/ctype_sccz80.lst
 @error/error.lst
 @font/fzx/fzx_sccz80.lst

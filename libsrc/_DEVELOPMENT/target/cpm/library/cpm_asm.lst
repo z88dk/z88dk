@@ -1,5 +1,6 @@
 @adt/adt_asm.lst
 @alloc/alloc_asm.lst
+@compress/compress_asm.lst
 @ctype/ctype_asm.lst
 @error/error.lst
 @l/l.lst

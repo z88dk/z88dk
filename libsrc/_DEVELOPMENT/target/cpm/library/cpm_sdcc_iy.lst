@@ -1,5 +1,6 @@
 @adt/adt_sdcc_iy.lst
 @alloc/alloc_sdcc_iy.lst
+@compress/compress_sdcc_iy.lst
 @ctype/ctype_sdcc_iy.lst
 @error/error.lst
 @l/l.lst
