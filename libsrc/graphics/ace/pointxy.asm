@@ -2,11 +2,9 @@
 	XLIB	pointxy
 	XREF	coords
 
-	LIB	pixeladdress
-
 
 ;
-;	$Id: pointxy.asm,v 1.1 2014-05-21 19:34:14 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2014-05-22 14:55:51 stefano Exp $
 ;
 
 ; ******************************************************************

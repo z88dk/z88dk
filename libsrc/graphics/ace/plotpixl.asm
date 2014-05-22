@@ -4,7 +4,7 @@
 	XREF	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.5 2014-05-21 19:34:14 stefano Exp $
+;	$Id: plotpixl.asm,v 1.6 2014-05-22 14:55:51 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -15,7 +15,7 @@
 ; 64x48 dots.
 ;
 ;
-.plotpixel			
+.plotpixel
 				ld	a,h
 				cp	64
 				ret	nc

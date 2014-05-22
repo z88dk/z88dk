@@ -1,63 +1,48 @@
 
 	XLIB	xorpixel
 
-	XREF	COORDS
+	XREF	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.4 2002-04-22 14:45:50 stefano Exp $
+;	$Id: xorpixl.asm,v 1.5 2014-05-22 14:55:51 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
-; Inverts pixel at (x,y) coordinate.
+; Invert pixel at (x,y) coordinate.
 ;
-; ZX 81 version.  
-; Emulated 96x64 resolution (TI82/TI83) with 64x48 dots.
-;
-; (x=x*2/3;  y=y*3/4)
+; Jupiter ACE version.  
+; 64x48 dots.
 ;
 ;
-.xorpixel			
+.xorpixel
 				ld	a,h
-				cp	96
+				cp	64
 				ret	nc
 				ld	a,l
 				;cp	maxy
-				cp	64
+				cp	48
 				ret	nc		; y0	out of range
 				
-				ld	(COORDS),hl
+				ld	(coords),hl
 				
 				push	bc
 
-				add	a,l	; y=y*3/4
-				add	a,l
-				srl	a
-				srl	a
-				ld	c,a
+				ld	c,l
+				ld	b,h
 
-				ld	b,0	; x=x*2/3
-				;sll	h
-				sla	h
-				ld	a,h
-.subtract
-				inc	b
-				sub	3
-				jr	nc,subtract
-				dec	b
-				
 				push	bc
 				
 				srl	b
 				srl	c
-				ld	hl,(16396)
-				inc	hl
+				ld	hl,$2400
+;				inc	hl
 				ld	a,c
 				ld	c,b	; !!
-				ld	de,33	; 32+1. Every text line ends with an HALT
 				and	a
 				jr	z,r_zero
 				ld	b,a
+				ld	de,32
 .r_loop
 				add	hl,de
 				djnz	r_loop
@@ -66,23 +51,26 @@
 				add	hl,de
 				
 				ld	a,(hl)		; get current symbol
-				
+
 				cp	8
 				jr	c,islow		; recode graph symbol to binary -> 0..F
+				cp	128
+				jr	c,ischar
 				ld	a,143
+				;ld	a,128+10
 				sub	(hl)
-.islow				ex	(sp),hl		; save char address <=> restore x,y
-
-				cp	16		; Just to be sure:
-				jr	c,issym		; if it isn't a symbol...
+				;xor	a;;;;
+				jr	islow
+.ischar
 				xor	a		; .. force to blank sym
-.issym
-				ld	b,a
+.islow
+				ex	(sp),hl		; save char address <=> restore x,y
 
+				ld	b,a
 				ld	a,1		; the bit we want to draw
 				
 				bit	0,h
-				jr	z,iseven
+				jr	nz,iseven
 				add	a,a		; move right the bit
 
 .iseven
@@ -94,12 +82,13 @@
 				xor	b
 
 				cp	8		; Now back from binary to
-				jr	c,hisym		; graph symbols.
+				jr	c,losym		; graph symbols.
+
 				ld	b,a
 				ld	a,15
 				sub	b
 				add	a,128
-.hisym
+.losym
 				pop	hl
 				ld	(hl),a
 				
