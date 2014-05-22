@@ -19,7 +19,7 @@ asm_z80_get_int_state:
    ;
    ; uses  : af, hl
 
-   IF __z80_nmos = 1
+   IF __z80_cpu_info & $01
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
       ; see http://www.z80.info/zip/ZilogProductSpecsDatabook129-143.pdf

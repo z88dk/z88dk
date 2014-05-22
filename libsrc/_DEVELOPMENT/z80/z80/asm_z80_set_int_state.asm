@@ -19,7 +19,7 @@ asm_z80_set_int_state:
    ;
    ; uses  : f
 
-   IF __z80_nmos = 1
+   IF __z80_cpu_info & $01
    
       bit 0,l                  ; check carry flag
    

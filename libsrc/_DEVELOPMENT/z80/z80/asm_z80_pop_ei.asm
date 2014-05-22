@@ -40,7 +40,7 @@ asm0_z80_pop_ei:
 
    pop af                      ; af = ei_di_status
    
-   IF __z80_nmos = 1
+   IF __z80_cpu_info & $01
    
       jr nc, di_state
    
