@@ -9,7 +9,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.3 2014-05-22 15:17:35 stefano Exp $
+;	$Id: pointxy.asm,v 1.4 2014-05-22 20:14:02 stefano Exp $
 ;
 
 
@@ -84,6 +84,8 @@
 			
 			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
 			
+
+
 			ld	a,l
 			inc	a
 			inc	a
@@ -112,11 +114,12 @@
 			jr  nz,nobug
 			or   @01000000  ;
 .nobug
-			cpl
+;			cpl
 ;			and  @11011111	; Character generator bug
 			and	e
+			
 
-;			pop	bc
+			pop	bc
 			
 			pop	hl
 			pop	de
