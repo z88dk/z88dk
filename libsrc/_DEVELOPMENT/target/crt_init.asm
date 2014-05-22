@@ -3,8 +3,6 @@
 
    ; BSS SEGMENT
 
-   ;;IF (__crt_segment_bss_end - __crt_segment_bss_begin) > 0
-
      EXTERN asm_memset
      
      ld hl,__crt_segment_bss_begin
@@ -13,13 +11,11 @@
    
      call asm_memset
    
-   ;;ENDIF
-   
    ; DATA SEGMENT
    
-   ;;IF (__crt_cfg_segment_data & $01) & ((__crt_segment_data_end - __crt_segment_data_begin) > 0)
-
-   IF (__crt_cfg_segment_data & $01)
+   IF (__crt_cfg_segment_data & $03) = 1
+   
+      ; data source is uncompressed
    
       EXTERN asm_memcpy
       
@@ -28,6 +24,19 @@
       ld bc,__crt_segment_data_end - __crt_segment_data_begin
       
       call asm_memcpy
+   
+   ENDIF
+   
+   IF (__crt_cfg_segment_data & $03) = 3
+   
+      ; data source is compressed
+      
+      EXTERN asm_dzx7_standard
+      
+      ld hl,__crt_segment_data_source_begin
+      ld de,__crt_segment_data_begin
+      
+      call asm_dzx7_standard
    
    ENDIF
    

@@ -217,9 +217,9 @@ INCLUDE "../crt_stub.asm"
 
 __crt_segment_data_source_begin:
 
-IF __crt_cfg_segment_data & $01
+IF (__crt_cfg_segment_data & $03) = 1
 
-   ; crt initializes data segment
+   ; crt initializes data segment from uncompressed stored copy
 
    ; -- insert local crt data segment here --------------------
 
@@ -348,6 +348,14 @@ IF __crt_cfg_segment_data & $01
    
    INCLUDE "../crt_segment_data_s_defb.asm"
    INCLUDE "segment_data_s_defb.asm"
+
+ENDIF
+
+IF (__crt_cfg_segment_data & $03) = 3
+
+   ; crt initializes data segment from compressed stored copy
+   
+   BINARY "segment_data_s.bin.zx7"
 
 ENDIF
 
