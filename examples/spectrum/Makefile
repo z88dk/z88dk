@@ -1,6 +1,6 @@
 
 
-all: dstar ansitest gfx save ccoswave c3d cmandel csprite zxbasic zxcurrah
+all: dstar gfx save ccoswave c3d cmandel csprite zxbasic zxcurrah
 
 
 save:
@@ -11,9 +11,6 @@ gfx:
 
 dstar:
 	zcc +zx -vn dstar.c -o dstar.bin -create-app -lndos
-
-ansitest:
-	zcc +zxansi -vn ansitest.c -o ansitest.bin -create-app -lndos
 
 ccoswave:
 	zcc +zx -vn ccoswave.c -lndos -lm -create-app -occoswave.bin
