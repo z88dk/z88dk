@@ -1,14 +1,15 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
+;       Philips P2000 pseudo graphics routines
 ;	Version for the 2x3 graphics symbols
 ;
-;       Written by Stefano Bodrato 05/09/2007
+;
+;       Written by Stefano Bodrato 2014
 ;
 ;
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.2 2014-05-22 15:02:06 stefano Exp $
+;	$Id: pointxy.asm,v 1.3 2014-05-22 15:17:35 stefano Exp $
 ;
 
 
@@ -16,7 +17,6 @@
 
 			XLIB	pointxy
 
-			LIB	textpixl
 			LIB	div3
 			XREF	coords
 			XREF	base_graphics
@@ -60,47 +60,29 @@
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-			ld	hl,0BCAh
+			ld    hl,(base_graphics)
+			inc hl
 			ld	b,a		; keep y/3
 			and	a
 			jr	z,r_zero
-		
-			ld	hl,$80a
-			dec	a
-			jr	z,r_zero
-			ld	de,64
+
+			ld	de,80
 .r_loop
 			add	hl,de
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero			ld	d,0
+.r_zero     ld	d,0
 			ld	e,c
 			add	hl,de
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld	a,(hl)		; get current symbol from screen
+			sub 32
 			ld	e,a		; ..and its copy
-
-			push	hl		; char address
-			push	bc		; keep y/3
-			ld	hl,textpixl
-			ld	e,0
-			ld	b,64		; whole symbol table size
-.ckmap			cp	(hl)		; compare symbol with the one in map
-			jr	z,chfound
-			inc	hl
-			inc	e
-			djnz	ckmap
-			ld	e,0
-.chfound		ld	a,e
-			pop	bc		; restore y/3 in b
-			pop	hl		; char address
 			
 			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
-			
-			ld	c,a		; keep the symbol
 			
 			ld	a,l
 			inc	a
@@ -126,9 +108,15 @@
 			jr	z,evenrow
 			add	a,a		; move down the bit
 .evenrow
-			and	c
-			
-			pop	bc
+			and  @11011111	; Character generator gap
+			jr  nz,nobug
+			or   @01000000  ;
+.nobug
+			cpl
+;			and  @11011111	; Character generator bug
+			and	e
+
+;			pop	bc
 			
 			pop	hl
 			pop	de
