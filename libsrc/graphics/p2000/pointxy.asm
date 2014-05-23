@@ -9,7 +9,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.4 2014-05-22 20:14:02 stefano Exp $
+;	$Id: pointxy.asm,v 1.5 2014-05-23 10:37:17 stefano Exp $
 ;
 
 
@@ -82,7 +82,7 @@
 			sub 32
 			ld	e,a		; ..and its copy
 			
-			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
+			pop	hl		;  restore x,y  (y=h, x=l)
 			
 
 
@@ -119,8 +119,6 @@
 			and	e
 			
 
-			pop	bc
-			
 			pop	hl
 			pop	de
 			pop	bc

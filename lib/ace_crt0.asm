@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.12 2013-10-21 14:23:43 stefano Exp $
+;	$Id: ace_crt0.asm,v 1.13 2014-05-23 10:37:17 stefano Exp $
 ;
 
 
@@ -48,11 +48,11 @@
         XDEF    __sgoioblk
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+       	XDEF	heapblocks
 
 ; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+       	XDEF	base_graphics
+       	XDEF	coords
 
 ; Now, getting to the real stuff now!
 
@@ -61,20 +61,39 @@
 ;--------
 
         IF      !myzorg
+            IF (startup=2)                 ; ROM ?
+                defc    myzorg  = 0
+            ELSE
                 defc    myzorg  = $4000
-        ENDIF   
-                org     myzorg
+            ENDIF
+        ENDIF
 
 
         org     myzorg
 
 start:
+IF (startup=2)
+		;  ROM mode BOOT
+		di
+		ld		hl,$3c00	; RAM starts at $4000
+		ld		a,$fc
+ace_ramtest:
+		inc		h			; step to a higher RAM block
+		ld		(hl),a		; probe it
+		cp		(hl)
+		jr		z,ace_ramtest
+		and		h
+		ld		h,a			; use $fc to mask to the lower 1k boundary
+		ld		sp,hl
+ELSE
+		;  set stack if in RAM mode
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+ENDIF
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -83,6 +102,50 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
+
+IF (startup=2)
+		ld    hl,$2c00		; character set RAM
+		; init the first 256 bytes with gfx blocks
+gfx_bloop:
+		ld    a,l
+		and   $bf
+		rrca
+		rrca
+		rrca
+		jr    nc,nobit2
+		rrca
+		rrca
+
+nobit2: rrca
+		ld   b,a
+		sbc  a,a		; 0 or $FF
+		rr   b
+		ld   b,a
+		sbc  a,a
+		xor  b
+		and  $f0
+		xor  b
+		ld   (hl),a
+		inc  l
+		jr   nz,gfx_bloop
+
+		; a bit of cleanup (we should load a font, here!)
+		xor  a
+blankloop:
+		ld   (hl),a
+		inc  hl
+		cp   l
+		jr nz,blankloop
+		
+		ld   h,$24
+		ld   (base_graphics),hl
+
+		LIB  cleargraphics
+		call cleargraphics
+
+ENDIF
+
+
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -110,24 +173,18 @@ ENDIF
 	pop	bc
 start1:
         ld      sp,0
+IF (startup=2)
+		di
+		halt
+ELSE
 	jp (iy)		; To the Jupiter ACE FORTH system
+ENDIF
 
 l_dcal:
         jp      (hl)
 
-; Now, define some values for stdin, stdout, stderr
-
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
 
 ; Now, which of the vfprintf routines do we need?
-
-
 _vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -143,6 +200,67 @@ ELSE
 		ENDIF
 	ENDIF
 ENDIF
+
+;---------------------------------------------------------------------------
+IF (startup=2) | (startup=3) ; ROM or moved system variables
+;---------------------------------------------------------------------------
+
+        XDEF    romsvc		; service space for ROM
+
+IF !DEFINED_HAVESEED
+      XDEF    _std_seed         ; Integer rand() seed
+ENDIF
+
+
+IF !DEFINED_sysdefvarsaddr
+      defc sysdefvarsaddr = $2800-80   ; Close to the end of "PAD", the Forth interpreter workspace
+ENDIF
+
+IF NEED_floatpack
+      INCLUDE   "float.asm"
+ENDIF
+
+IF DEFINED_ANSIstdio
+      INCLUDE   "stdio_fp.asm"
+ENDIF
+
+DEFVARS sysdefvarsaddr
+{
+__sgoioblk      ds.b    40      ; stdio control block
+coords          ds.w    1       ; Graphics xy coordinates
+base_graphics   ds.w    1       ; Address of graphics map
+IF !DEFINED_HAVESEED
+  _std_seed     ds.w    1       ; Integer seed
+ENDIF
+exitsp          ds.w    1       ; atexit() stack
+exitcount       ds.b    1       ; Number of atexit() routines
+fp_seed         ds.w    3       ; Floating point seed (not used ATM)
+extra           ds.w    3       ; Floating point spare register
+fa              ds.w    3       ; Floating point accumulator
+fasign          ds.b    1       ; Floating point variable
+snd_tick        ds.b    1       ; Sound
+bit_irqstatus   ds.w    1       ; used to save the current IRQ status
+heaplast        ds.w    1       ; Address of last block on heap
+heapblocks      ds.w    1       ; Number of blocks
+romsvc          ds.b	1	; Pointer to the end of the sysdefvars
+				; used by the ROM version of some library
+}
+
+
+IF !DEFINED_defvarsaddr
+        defc defvarsaddr = 24576
+ENDIF
+
+DEFVARS defvarsaddr
+{
+dummydummy        ds.b    1 
+}
+
+
+;---------------------------------------------------------------------------
+ELSE
+;---------------------------------------------------------------------------
+
 
 
 ;Seed for integer rand() routines
@@ -183,8 +301,16 @@ snd_tick:       defb	0	; Sound variable
 bit_irqstatus:	defw	0
 ENDIF
 
-         defm  "Small C+ J.ACE"
-	 defb  0
+
+; Now, define some values for stdin, stdout, stderr
+
+__sgoioblk:
+IF DEFINED_ANSIstdio
+	INCLUDE	"stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
+ENDIF
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -211,3 +337,9 @@ fasign:         defb    0
 
 ENDIF
 
+;---------------------------------------------------------------------------
+ENDIF
+;---------------------------------------------------------------------------
+
+	defm  "Small C+ J.ACE"
+	defb  0
