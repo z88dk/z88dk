@@ -6,18 +6,18 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.6 2002-04-17 21:30:26 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.7 2014-05-25 19:48:04 stefano Exp $
 ;
 
 		XLIB	fgetc_cons
 		LIB	getk_decode
-		XREF	TIei
-		XREF	TIdi
+		XREF	tiei
+		XREF	tidi
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 .fgetc_cons
-		call	TIei
+		call	tiei
 
 .kloop
 		halt	; Power saving (?? maybe. Surely true on ti86)
@@ -38,5 +38,5 @@ ENDIF
 		and	a
 		jr	z,kloop
 
-		call	TIdi
+		call	tidi
 		jp	getk_decode

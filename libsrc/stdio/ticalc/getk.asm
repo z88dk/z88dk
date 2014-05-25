@@ -6,23 +6,23 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: getk.asm,v 1.5 2002-04-17 21:30:26 dom Exp $
+;	$Id: getk.asm,v 1.6 2014-05-25 19:48:04 stefano Exp $
 ;
 
 		XLIB	getk
 		LIB	getk_decode
-		XREF	TIdi
-		XREF	TIei
+		XREF	tidi
+		XREF	tiei
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 .getk
-		call	TIei
+		call	tiei
 IF FORti83p
 		rst	$28
 		defw	getkey
 ELSE
 		call	getkey
 ENDIF
-		call	TIdi
+		call	tidi
 		jp	getk_decode
