@@ -9,7 +9,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.5 2014-05-23 10:37:17 stefano Exp $
+;	$Id: pointxy.asm,v 1.6 2014-05-25 21:14:33 stefano Exp $
 ;
 
 
