@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.21 2014-05-20 22:26:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.22 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,12 +62,12 @@ extern Symbol *define_global_def_sym( char *name, long value );
 extern Symbol *define_local_def_sym( char *name, long value );
 
 /* define a new symbol in the local or global tabs */
-extern Symbol *define_local_sym( char *name, long value, uint8_t type );
-extern Symbol *define_global_sym( char *name, long value, uint8_t type );
+extern Symbol *define_local_sym( char *name, long value, Byte type );
+extern Symbol *define_global_sym( char *name, long value, Byte type );
 
 /* get the symbols for which the passed function returns TRUE,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
-extern SymbolHash *select_symbols( BOOL (*cond)(Symbol *sym) );
+extern SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
@@ -88,7 +88,7 @@ extern SymbolHash *static_symtab;
    b) if declared global/extern and not defined, define now
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
-extern void define_symbol( char *name, long value, uint8_t type );
+extern void define_symbol( char *name, long value, Byte type );
 
 /* declare a PUBLIC symbol */
 extern void declare_public_symbol( char *name );
@@ -103,24 +103,27 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.21  2014-05-20 22:26:29  pauloscustodio
+* Revision 1.22  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.21  2014/05/20 22:26:29  pauloscustodio
 * BUG_0051: DEFC and DEFVARS constants do not appear in map file
 * Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 * written to the map file.
 * Logic to select symbols for map and def files was wrong.
 *
 * Revision 1.20  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.19  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.18  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.17  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.16  2014/04/27 09:08:15  pauloscustodio
 * comments

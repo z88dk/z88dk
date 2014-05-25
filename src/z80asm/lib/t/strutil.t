@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.16 2014-05-19 00:11:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.17 2014-05-25 01:02:30 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -31,12 +31,12 @@ write_file("test.c", <<'END');
 #define ERROR die("Test failed at line %d\n", __LINE__)
 #define FOPEN(file)		fp = fopen((file), "rb"); if (fp == NULL) ERROR;
 #define GETLINE(s,exp_text,exp_ret) \
-						{ BOOL ret = Str_getline((s), fp); \
+						{ Bool ret = Str_getline((s), fp); \
 						  if (ret != exp_ret) ERROR; \
 						  if (strcmp((s)->str, exp_text)) ERROR; \
 						}
 #define GETCHARS(s,num,exp_text,exp_ret) \
-						{ BOOL ret = Str_getchars((s), fp, (num)); \
+						{ Bool ret = Str_getchars((s), fp, (num)); \
 						  if (ret != exp_ret) ERROR; \
 						  if (strcmp((s)->str, exp_text)) ERROR; \
 						}
@@ -51,7 +51,7 @@ write_file("test.c", <<'END');
 						FCLOSE();
 
 char *alias;
-void _check_str(Str *str, size_t size, size_t len, char *text, BOOL alloc_str,
+void _check_str(Str *str, size_t size, size_t len, char *text, Bool alloc_str,
 				char *file, int lineno)
 {
 	if (str == NULL) 
@@ -77,10 +77,10 @@ void _check_str(Str *str, size_t size, size_t len, char *text, BOOL alloc_str,
 #define check_str(str,size,len,text,alloc_str)	\
        _check_str(str,size,len,text,alloc_str,__FILE__,__LINE__)
 
-BOOL call_vsprintf (Str *str, char *format, ...)
+Bool call_vsprintf (Str *str, char *format, ...)
 {
 	va_list argptr;
-	BOOL ret;
+	Bool ret;
 	
 	va_start(argptr, format);
 	ret = Str_vsprintf(str, format, argptr);
@@ -89,10 +89,10 @@ BOOL call_vsprintf (Str *str, char *format, ...)
 	return ret;
 }
 
-BOOL call_append_vsprintf (Str *str, char *format, ...)
+Bool call_append_vsprintf (Str *str, char *format, ...)
 {
 	va_list argptr;
-	BOOL ret;
+	Bool ret;
 	
 	va_start(argptr, format);
 	ret = Str_append_vsprintf(str, format, argptr);
@@ -751,20 +751,23 @@ sub t_capture {
 
 
 # $Log: strutil.t,v $
-# Revision 1.16  2014-05-19 00:11:25  pauloscustodio
+# Revision 1.17  2014-05-25 01:02:30  pauloscustodio
+# Byte, Int, UInt added
+#
+# Revision 1.16  2014/05/19 00:11:25  pauloscustodio
 # Make sure strpool is deleted after class, because objects defined with class may use strpool
 #
 # Revision 1.15  2014/05/17 14:27:13  pauloscustodio
-# Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+# Use C99 integer types int8_t, Byte, int16_t, uint16_t, int32_t, uint32_t
 #
 # Revision 1.14  2014/05/08 22:37:30  pauloscustodio
 # comment
 #
 # Revision 1.13  2014/05/06 22:17:38  pauloscustodio
-# Made types uint8_t, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+# Made types Byte, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 #
 # Revision 1.12  2014/05/05 22:07:38  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to uint8_t, UINT and ULONG
+# byte_t, uint_t and ulong_t renamed to Byte, UINT and ULONG
 #
 # Revision 1.11  2014/04/19 14:57:37  pauloscustodio
 # BUG_0046: Expressions stored in object file with wrong values in MacOS

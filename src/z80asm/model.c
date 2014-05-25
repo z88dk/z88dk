@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.7 2014-05-02 21:00:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.8 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -97,7 +97,7 @@ void module_list_first( void )
 	g_curr_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
 }
 
-BOOL module_list_next( void )
+Bool module_list_next( void )
 {
 	init();
 	g_module_list_iter = ModuleList_next( g_module_list_iter );
@@ -188,7 +188,7 @@ void src_push( void )
 	SrcFile_push( g_src_input );
 }
 
-BOOL src_pop( void )
+Bool src_pop( void )
 {
 	init();
 	return SrcFile_pop( g_src_input );
@@ -197,7 +197,10 @@ BOOL src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.7  2014-05-02 21:00:49  pauloscustodio
+* Revision 1.8  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.7  2014/05/02 21:00:49  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
 *
 * Revision 1.6  2014/05/02 20:24:38  pauloscustodio

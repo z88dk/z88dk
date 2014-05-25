@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.4 2014-04-22 23:32:42 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.5 2014-05-25 01:02:29 pauloscustodio Exp $ 
 */
 
 #define TOKEN(name, string)				 \
@@ -186,7 +186,7 @@ main := |*
 
 %% write data nofinal;
 
-static void set_scan_buf( char *text, BOOL _at_bol )
+static void set_scan_buf( char *text, Bool _at_bol )
 {
 	Str_set( input_buf, text );		/* sets p = input_buf->str */
 	

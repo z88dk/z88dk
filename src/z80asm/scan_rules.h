@@ -18,7 +18,7 @@ static const int asm_en_main = 7;
 
 
 
-static void set_scan_buf( char *text, BOOL _at_bol )
+static void set_scan_buf( char *text, Bool _at_bol )
 {
     Str_set( input_buf, text );
 

@@ -3,7 +3,7 @@ Macros to help define init() and fini() functions per module
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.4 2014-04-15 20:06:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.5 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,7 +37,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.4 2014-04-15 20
 		static void __init(void);				\
 		static void init(void)					\
 		{										\
-			static BOOL initialized = FALSE;	\
+			static Bool initialized = FALSE;	\
 			if ( ! initialized )				\
 			{									\
 				initialized = TRUE;				\
@@ -54,7 +54,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.4 2014-04-15 20
 
 /*
 * $Log: init.h,v $
-* Revision 1.4  2014-04-15 20:06:44  pauloscustodio
+* Revision 1.5  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.4  2014/04/15 20:06:44  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.3  2014/01/11 01:29:40  pauloscustodio

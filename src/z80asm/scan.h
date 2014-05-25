@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.33 2014-04-06 23:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.34 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -43,7 +43,7 @@ extern char   *tok_string;	/* contains double-quoted string without quotes
 extern long    tok_number;	/* contains number to return with TK_NUMBER */
 extern void  (*tok_parser)(void);	/* parser for this keyword as opcode */
 
-extern BOOL EOL;			/* scanner EOL state */
+extern Bool EOL;			/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
 *	Scan API
@@ -61,11 +61,14 @@ extern void SetTemporaryLine( char *line );
 
 /* skip line past the newline, set EOL */
 extern void  Skipline( void );
-extern BOOL EOL;
+extern Bool EOL;
 
 /*
 * $Log: scan.h,v $
-* Revision 1.33  2014-04-06 23:29:26  pauloscustodio
+* Revision 1.34  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.33  2014/04/06 23:29:26  pauloscustodio
 * Removed lookup functions in token.c, no longer needed with the ragel based scanner.
 * Moved the token definitions from token_def.h to scan_def.h.
 *

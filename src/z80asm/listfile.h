@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.18 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.19 2014-05-25 01:02:29 pauloscustodio Exp $
 
 */
 
@@ -44,10 +44,10 @@ CLASS( ListFile )
 	int			 page_nr;				/* current page number */
 	int			 line_nr;				/* current line number in page */
 
-	BOOL		 source_list_ended;		/* end of source listing, from now on no source lines */
+	Bool		 source_list_ended;		/* end of source listing, from now on no source lines */
 
 	/* current line being output */
-	BOOL		 line_started;			/* true if a line was started but not ended */
+	Bool		 line_started;			/* true if a line was started but not ended */
 	long		 start_line_pos;		/* ftell() position at start of next list line */
 	uint32_t	 address;				/* address of start of line */
 	Str			*bytes;					/* list of bytes output for this line */
@@ -66,7 +66,7 @@ END_CLASS;
 extern void ListFile_open( ListFile *self, char *list_file );
 
 /* close the list file, and remove the file if the passed flag is FALSE */
-extern void ListFile_close( ListFile *self, BOOL keep_file );
+extern void ListFile_close( ListFile *self, Bool keep_file );
 
 /* output a list line in three steps:
    1. start a new list, provide address, file name, line number and input assembly line
@@ -76,7 +76,7 @@ extern void ListFile_close( ListFile *self, BOOL keep_file );
 extern void ListFile_start_line( ListFile *self, uint32_t address,
                                  char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
-extern void ListFile_append_byte( ListFile *self, uint8_t byte1 );
+extern void ListFile_append_byte( ListFile *self, Byte byte1 );
 extern void ListFile_append_word( ListFile *self, int word );
 extern void ListFile_append_long( ListFile *self, long dword );
 extern long ListFile_patch_pos( ListFile *self, int byte_offset );
@@ -104,11 +104,11 @@ extern int ListFile_get_page_nr( ListFile *self );
 *	See description for corresponding method above
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
-extern void list_close( BOOL keep_file );
+extern void list_close( Bool keep_file );
 extern void list_start_line( uint32_t address,
                              char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
-extern void list_append_byte( uint8_t byte1 );
+extern void list_append_byte( Byte byte1 );
 extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );
@@ -122,14 +122,17 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.18  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.19  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.18  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.17  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.15  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file

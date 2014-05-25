@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.87 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.88 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -179,7 +179,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     error_illegal_option( argv[i] );
                 else
-                    *( ( BOOL * )( opts_lu[j].arg ) ) = FALSE;
+                    *( ( Bool * )( opts_lu[j].arg ) ) = FALSE;
 
                 break;
 
@@ -187,7 +187,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     error_illegal_option( argv[i] );
                 else
-                    *( ( BOOL * )( opts_lu[j].arg ) ) = TRUE;
+                    *( ( Bool * )( opts_lu[j].arg ) ) = TRUE;
 
                 break;
 
@@ -312,12 +312,12 @@ static void process_files( int arg, int argc, char *argv[] )
 *----------------------------------------------------------------------------*/
 #define OPT_TITLE(text)		puts(""); puts(text);
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
-							show_option(type, (BOOL *)arg, \
+							show_option(type, (Bool *)arg, \
 										short_opt, long_opt, help_text, help_arg);
 
 #define ALIGN_HELP	24
 
-static void show_option( enum OptType type, BOOL *pflag,
+static void show_option( enum OptType type, Bool *pflag,
                          char *short_opt, char *long_opt, char *help_text, char *help_arg )
 {
     DEFINE_STR( msg, MAXLINE );
@@ -569,7 +569,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.87  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.88  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.87  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
@@ -577,17 +580,17 @@ char *get_segbin_filename( char *filename, int segment )
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.85  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.84  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,
 * linker and librarian.
 *
 * Revision 1.83  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.82  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.81  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:

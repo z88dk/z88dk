@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.39 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.40 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -24,22 +24,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.39 2014-05-1
 #define OPT_VAR(type, name, default)
 #endif
 
-OPT_VAR( BOOL,		verbose,	FALSE	)
-OPT_VAR( BOOL,		symtable,	TRUE	)
-OPT_VAR( BOOL,		list,		FALSE	)	/* -l flag */
-OPT_VAR( BOOL,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
-OPT_VAR( BOOL,		map,		TRUE	)
-OPT_VAR( BOOL,		sdcc,		FALSE	)
-OPT_VAR( BOOL,		ti83plus,	FALSE	)
-OPT_VAR( BOOL,		swap_ix_iy,	FALSE	)
-OPT_VAR( BOOL,		force_xlib,	FALSE	)
-OPT_VAR( BOOL,		line_mode,	FALSE	)
-OPT_VAR( BOOL,		globaldef,	FALSE	)
-OPT_VAR( BOOL,		make_bin,	FALSE	)
-OPT_VAR( BOOL,		date_stamp,	FALSE	)
-OPT_VAR( BOOL,		code_seg,	FALSE	)
-OPT_VAR( BOOL,		relocatable, FALSE	)
-OPT_VAR( BOOL,		library,	FALSE	)	/* true if linking with libs */
+OPT_VAR( Bool,		verbose,	FALSE	)
+OPT_VAR( Bool,		symtable,	TRUE	)
+OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
+OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
+OPT_VAR( Bool,		map,		TRUE	)
+OPT_VAR( Bool,		sdcc,		FALSE	)
+OPT_VAR( Bool,		ti83plus,	FALSE	)
+OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
+OPT_VAR( Bool,		force_xlib,	FALSE	)
+OPT_VAR( Bool,		line_mode,	FALSE	)
+OPT_VAR( Bool,		globaldef,	FALSE	)
+OPT_VAR( Bool,		make_bin,	FALSE	)
+OPT_VAR( Bool,		date_stamp,	FALSE	)
+OPT_VAR( Bool,		code_seg,	FALSE	)
+OPT_VAR( Bool,		relocatable, FALSE	)
+OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
 OPT_VAR( int32_t,	origin,		-1	)		/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
@@ -188,7 +188,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.39  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.40  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.39  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
@@ -196,7 +199,7 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.37  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.36  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,

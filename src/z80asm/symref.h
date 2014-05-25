@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.6 2014-04-12 11:57:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.7 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,12 +37,15 @@ CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with
 								   definition reference at head of list */
 
 /* add a symbol reference, create the list if NULL */
-extern void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined );
+extern void add_symbol_ref( SymbolRefList *list, int page_nr, Bool defined );
 
 
 /*
 * $Log: symref.h,v $
-* Revision 1.6  2014-04-12 11:57:02  pauloscustodio
+* Revision 1.7  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.6  2014/04/12 11:57:02  pauloscustodio
 * whitespace
 *
 * Revision 1.5  2014/01/11 01:29:40  pauloscustodio

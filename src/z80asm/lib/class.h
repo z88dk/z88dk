@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.7 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.8 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -76,7 +76,7 @@ struct Object;
             void (*delete_ptr)(struct Object *);                       		\
             /* destructor function */       \
             char *name;                     /* class name */                \
-            BOOL autodelete;                /* false to skip cleanup */     \
+            Bool autodelete;                /* false to skip cleanup */     \
             LIST_ENTRY(T) entries;          /* D-Linked list of objs */     \
         } _class;                                                           \
         /* next come the user supplied fields */
@@ -154,7 +154,10 @@ extern void _deregister_obj( struct Object *obj );
 
 /*
 * $Log: class.h,v $
-* Revision 1.7  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.8  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.7  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -200,7 +203,7 @@ extern void _deregister_obj( struct Object *obj );
 * New CLASS_LIST() to create lists of objects defined with CLASS()
 *
 * Revision 1.4  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.3  2013/01/19 00:04:53  pauloscustodio

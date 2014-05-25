@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.49 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.50 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,7 +45,7 @@ long		 tok_number		= 0;
 
 void       (*tok_parser)(void) = NULL;
 
-BOOL EOL;								/* scanner EOL state */
+Bool EOL;								/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
@@ -53,7 +53,7 @@ BOOL EOL;								/* scanner EOL state */
 static Str  *input_buf	= NULL;			/* current input buffer */
 static List *input_stack;				/* stack of previous contexts */
 
-static BOOL	 at_bol;					/* true if at beginning of line */
+static Bool	 at_bol;					/* true if at beginning of line */
 
 static int	 cs, act;					/* Ragel state variables */
 static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
@@ -109,7 +109,7 @@ static long scan_num ( char *text, int length, int base )
 	int digit = 0;
 	char c;
 	int i;
-	BOOL range_err;
+	Bool range_err;
 	
 	value = 0;
 	range_err = FALSE;
@@ -169,7 +169,7 @@ static void set_tok_name( void )
 *	end with p pointing at the end quote, copy characters to tok_string
 *	handling C escape sequences. Return false if string not terminated.
 *----------------------------------------------------------------------------*/
-static BOOL get_tok_string( void )
+static Bool get_tok_string( void )
 {
 	char quote;
 
@@ -240,7 +240,7 @@ void Skipline( void )
 /*-----------------------------------------------------------------------------
 *   Fill scan buffer if needed, return FALSE on end of file
 *----------------------------------------------------------------------------*/
-static BOOL fill_buffer( void )
+static Bool fill_buffer( void )
 {
 	char *line;
 
@@ -337,14 +337,17 @@ void SetTemporaryLine( char *line )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.49  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.50  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.49  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.48  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.47  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.46  2014/04/05 23:36:11  pauloscustodio
 * CH_0024: Case-preserving, case-insensitive symbols

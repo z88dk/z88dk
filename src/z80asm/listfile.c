@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.22 2014-05-20 22:27:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.23 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -220,7 +220,7 @@ void list_open( char *list_file )
 /*-----------------------------------------------------------------------------
 *	close the list file
 *----------------------------------------------------------------------------*/
-void ListFile_close( ListFile *self, BOOL keep_file )
+void ListFile_close( ListFile *self, Bool keep_file )
 {
     if ( self->file != NULL )
     {
@@ -237,7 +237,7 @@ void ListFile_close( ListFile *self, BOOL keep_file )
     self->file = NULL;
 }
 
-void list_close( BOOL keep_file )
+void list_close( Bool keep_file )
 {
     if ( the_list != NULL )
     {
@@ -290,7 +290,7 @@ void list_start_line( uint32_t address,
 *----------------------------------------------------------------------------*/
 void ListFile_append( ListFile *self, long value, int num_bytes )
 {
-    uint8_t byte1;
+    Byte byte1;
 
     if ( self->file != NULL && ! self->source_list_ended )
     {
@@ -303,7 +303,7 @@ void ListFile_append( ListFile *self, long value, int num_bytes )
     }
 }
 
-void ListFile_append_byte( ListFile *self, uint8_t byte1 )
+void ListFile_append_byte( ListFile *self, Byte byte1 )
 {
     ListFile_append( self, byte1, 1 );
 }
@@ -326,7 +326,7 @@ void list_append( long value, int num_bytes )
     }
 }
 
-void list_append_byte( uint8_t byte1 )
+void list_append_byte( Byte byte1 )
 {
     list_append( byte1, 1 );
 }
@@ -396,13 +396,13 @@ long list_patch_pos( int byte_offset )
 void ListFile_end_line( ListFile *self )
 {
     int len, i;
-    uint8_t *byteptr;
+    Byte *byteptr;
 
     if ( self->file != NULL && self->line_started && ! self->source_list_ended )
     {
         /* get length of hex dump and pointer to data bytes (BUG_0015) */
         len     = self->bytes->len;
-        byteptr = (uint8_t *) self->bytes->str;
+        byteptr = (Byte *) self->bytes->str;
 
         /* output line number and address */
         ListFile_fprintf( self, "%-5d %04X  ", self->source_line_nr, self->address );
@@ -515,7 +515,7 @@ void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
     char *symbol_output;
     int count_page_ref;
     SymbolRefListElem *iter;
-    BOOL first;
+    Bool first;
 
     if ( self->file != NULL )
     {
@@ -580,17 +580,20 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.22  2014-05-20 22:27:47  pauloscustodio
+* Revision 1.23  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.22  2014/05/20 22:27:47  pauloscustodio
 * Show symbol values with 4 digits instead of 8
 *
 * Revision 1.21  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.20  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.19  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.18  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS

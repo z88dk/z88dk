@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.16 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.17 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -389,13 +389,13 @@ void Str_append_char( Str *self, char ch )
 /*-----------------------------------------------------------------------------
 *   set / append with printf-like parameters
 *----------------------------------------------------------------------------*/
-BOOL Str_vsprintf( Str *self, char *format, va_list argptr )
+Bool Str_vsprintf( Str *self, char *format, va_list argptr )
 {
     Str_clear( self );
     return Str_append_vsprintf( self, format, argptr );
 }
 
-BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr )
+Bool Str_append_vsprintf( Str *self, char *format, va_list argptr )
 {
     int     free_space;      /* may be negative */
     int     need_space;
@@ -437,7 +437,7 @@ BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr )
 void Str_sprintf( Str *self, char *format, ... )
 {
     va_list argptr;
-	BOOL ok;
+	Bool ok;
 
 	do								/* BUG_0046 */
 	{
@@ -450,7 +450,7 @@ void Str_sprintf( Str *self, char *format, ... )
 void Str_append_sprintf( Str *self, char *format, ... )
 {
     va_list argptr;
-	BOOL ok;
+	Bool ok;
 
 	do								/* BUG_0046 */
 	{
@@ -463,7 +463,7 @@ void Str_append_sprintf( Str *self, char *format, ... )
 /*-----------------------------------------------------------------------------
 *   get N characters from input, return FALSE on EOF
 *----------------------------------------------------------------------------*/
-BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars )
+Bool Str_getchars( Str *self, FILE *fp, size_t num_chars )
 {
     int c = EOF;
 
@@ -480,7 +480,7 @@ BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars )
 *   return string including one LF character
 *   return FALSE on end of input
 *----------------------------------------------------------------------------*/
-BOOL Str_getline( Str *self, FILE *fp )
+Bool Str_getline( Str *self, FILE *fp )
 {
     int c1, c2;
 
@@ -512,14 +512,17 @@ BOOL Str_getline( Str *self, FILE *fp )
 
 /*
 * $Log: strutil.c,v $
-* Revision 1.16  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.17  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.16  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.15  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.14  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.13  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS

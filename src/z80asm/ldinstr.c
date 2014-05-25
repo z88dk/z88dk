@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.41 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.42 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -207,7 +207,7 @@ LD( void )
                         }
 
                         destreg &= 7;
-                        append_byte( (uint8_t)( destreg * 0x08 + 0x06 ) );
+                        append_byte( (Byte)( destreg * 0x08 + 0x06 ) );
                         ExprUnsigned8( 1 );
                         return;
                     }
@@ -259,7 +259,7 @@ LD( void )
                     sourcereg &= 7;
                     destreg &= 7;
 
-                    append_byte( (uint8_t)( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
+                    append_byte( (Byte)( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
                 }
             }
             else
@@ -298,7 +298,7 @@ LD_HL8bit_indrct( void )
             break;
 
         default:
-            append_byte( (uint8_t)( 0x70 + sourcereg ) );       /* LD  (HL),r  */
+            append_byte( (Byte)( 0x70 + sourcereg ) );       /* LD  (HL),r  */
             break;
         }
     }
@@ -359,7 +359,7 @@ LD_index8bit_indrct( int destreg )
             break;
 
         default:
-            patch_byte( &opcodeptr, (uint8_t)( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
+            patch_byte( &opcodeptr, (Byte)( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
             break;
         }                       /* end switch */
     }
@@ -381,7 +381,7 @@ LD_r_8bit_indrct( int destreg )
     switch ( sourcereg = IndirectRegisters() )
     {
     case 2:
-        append_byte( (uint8_t)( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
+        append_byte( (Byte)( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
         break;
 
     case 5:
@@ -395,7 +395,7 @@ LD_r_8bit_indrct( int destreg )
             append_byte( 0xFD );
         }
 
-        append_byte( (uint8_t)( 0x40 + destreg * 0x08 + 0x06 ) );
+        append_byte( (Byte)( 0x40 + destreg * 0x08 + 0x06 ) );
         ExprSigned8( 2 );
         break;
 
@@ -482,7 +482,7 @@ LD_address_indrct( char *exprptr )
         case 1:         /* LD  (nn),dd   => dd: BC,DE,SP  */
         case 3:
             append_byte( 0xED );
-            append_byte( (uint8_t)( 0x43 + sourcereg * 0x10 ) );
+            append_byte( (Byte)( 0x43 + sourcereg * 0x10 ) );
             bytepos = 2;
             break;
 
@@ -572,7 +572,7 @@ LD_16bit_reg( void )
 
                 default:
                     append_byte( 0xED );
-                    append_byte( (uint8_t)( 0x4B + destreg * 0x10 ) );
+                    append_byte( (Byte)( 0x4B + destreg * 0x10 ) );
                     bytepos = 2;
                     break;
                 }
@@ -606,7 +606,7 @@ LD_16bit_reg( void )
                         break;
 
                     default:
-                        append_byte( (uint8_t)( destreg * 0x10 + 0x01 ) );
+                        append_byte( (Byte)( destreg * 0x10 + 0x01 ) );
                         bytepos = 1;
                         break;
                     }
@@ -665,18 +665,21 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.41  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.42  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.41  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.40  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.39  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.38  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.37  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -795,7 +798,7 @@ LD_16bit_reg( void )
 * one file errors.t.
 *
 * Revision 1.19  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

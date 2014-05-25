@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.19 2014-05-20 22:26:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.20 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 
@@ -67,7 +67,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 *   write full mapfile to FILE.map, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
-static BOOL cond_all_symbols(Symbol *sym) { return TRUE; }
+static Bool cond_all_symbols(Symbol *sym) { return TRUE; }
 
 void write_map_file( void )
 {
@@ -114,7 +114,10 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.19  2014-05-20 22:26:29  pauloscustodio
+* Revision 1.20  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.19  2014/05/20 22:26:29  pauloscustodio
 * BUG_0051: DEFC and DEFVARS constants do not appear in map file
 * Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 * written to the map file.

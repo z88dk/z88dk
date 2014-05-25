@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.14 2014-05-20 22:26:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.15 2014-05-25 01:02:29 pauloscustodio Exp $
 
 */
 
@@ -60,7 +60,7 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
 *   write full defition file to FILE.def, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
-static BOOL cond_global_addr_symbols(Symbol *sym) 
+static Bool cond_global_addr_symbols(Symbol *sym) 
 { 
 	return (sym->sym_type & SYM_ADDR) && ! (sym->sym_type & SYM_LOCAL); 
 }
@@ -97,7 +97,10 @@ void write_def_file( void )
 
 /*
 * $Log: deffile.c,v $
-* Revision 1.14  2014-05-20 22:26:29  pauloscustodio
+* Revision 1.15  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.14  2014/05/20 22:26:29  pauloscustodio
 * BUG_0051: DEFC and DEFVARS constants do not appear in map file
 * Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 * written to the map file.

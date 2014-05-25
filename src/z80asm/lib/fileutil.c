@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.17 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.18 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -18,7 +18,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.17 2014-05-
 #include <stdarg.h>
 #include <sys/stat.h>
 
-static void fatal_ferr_filename( char *filename, BOOL is_writing );
+static void fatal_ferr_filename( char *filename, Bool is_writing );
 
 /*-----------------------------------------------------------------------------
 *	List to keep temporary file names that need to be deleted atexit
@@ -59,9 +59,9 @@ CLASS( OpenFile )
     FILE    *file; 					/* file pointer returned by fopen */
     char    *filename;				/* file name kept in strpool.h */
 	char 	*atomic_tempname;		/* tempname used in atomic mode */
-	BOOL	 is_open;				/* TRUE if fopen succeeded */
-	BOOL	 is_writing;			/* TRUE if writing, FALSE if reading */
-	BOOL	 is_atomic;				/* TRUE if writing a temp file to be
+	Bool	 is_open;				/* TRUE if fopen succeeded */
+	Bool	 is_writing;			/* TRUE if writing, FALSE if reading */
+	Bool	 is_atomic;				/* TRUE if writing a temp file to be
 									   renamed to filename at xfclose() */
 END_CLASS;
 
@@ -155,7 +155,7 @@ void OpenFile_fini( OpenFile *self )
 }
 
 /* open a file, add to hash table */
-static FILE *OpenFile_open( char *filename, char *mode, BOOL is_atomic )
+static FILE *OpenFile_open( char *filename, char *mode, Bool is_atomic )
 {
 	OpenFile   *self;
 	char 	   *temp_name;
@@ -186,7 +186,7 @@ static FILE *OpenFile_open( char *filename, char *mode, BOOL is_atomic )
 	if ( self->file == NULL )
 	{
 		/* error, remove object */
-		BOOL is_writing = self->is_writing;
+		Bool is_writing = self->is_writing;
 		OBJ_DELETE( self );
 		fatal_ferr_filename( filename, is_writing );
 	}
@@ -205,7 +205,7 @@ static void OpenFile_close( FILE *file )
 {
     OpenFile *self;
 	char     *filename;
-	BOOL	  is_writing;
+	Bool	  is_writing;
 	int 	  fclose_ret 	= 0;
 	int 	  rename_ret 	= 0;
 
@@ -259,7 +259,7 @@ ferr_callback_t set_ferr_callback( ferr_callback_t func )
 }
 
 /* call fatal error for a file */
-static void fatal_ferr_filename( char *filename, BOOL is_writing )
+static void fatal_ferr_filename( char *filename, Bool is_writing )
 {
 	/* call call-back, if any */
 	if (ferr_callback != NULL)
@@ -433,10 +433,10 @@ void xfget_count_word_Str( FILE *file, Str *str )
 *----------------------------------------------------------------------------*/
 void xfput_int8( FILE *file, int8_t value )
 {
-	xfput_uint8( file, (uint8_t) value );
+	xfput_uint8( file, (Byte) value );
 }
 
-void xfput_uint8( FILE *file, uint8_t value )
+void xfput_uint8( FILE *file, Byte value )
 {
     if ( fputc( value, file ) < 0 )
         fatal_ferr_write( file );
@@ -444,18 +444,18 @@ void xfput_uint8( FILE *file, uint8_t value )
 
 int8_t xfget_int8(  FILE *file )
 {
-	uint8_t value = xfget_uint8( file );
+	Byte value = xfget_uint8( file );
     if ( value & 0x80 )
         value |= ~ 0xFF;				/* sign-extend above bit 7 */
 	return (int8_t) value;
 }
 
-uint8_t xfget_uint8( FILE *file )
+Byte xfget_uint8( FILE *file )
 {
 	int value;
 	if ( (value = getc( file )) < 0 )
         fatal_ferr_read( file );
-	return (uint8_t) value;
+	return (Byte) value;
 }
 
 /*-----------------------------------------------------------------------------
@@ -468,7 +468,7 @@ void xfput_int16( FILE *file, int16_t value )
 
 void xfput_uint16( FILE *file, uint16_t value )
 {
-    uint8_t buffer[2];
+    Byte buffer[2];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
@@ -485,7 +485,7 @@ int16_t xfget_int16( FILE *file )
 
 uint16_t xfget_uint16( FILE *file )
 {
-    uint8_t buffer[2];
+    Byte buffer[2];
 
     xfget_chars( file, (char *) buffer, sizeof(buffer) );
 	return
@@ -503,7 +503,7 @@ void xfput_int32( FILE *file, int32_t value )
 
 void xfput_uint32( FILE *file, uint32_t value )
 {
-    uint8_t buffer[4];
+    Byte buffer[4];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
@@ -522,7 +522,7 @@ int32_t xfget_int32( FILE *file )
 
 uint32_t xfget_uint32( FILE *file )
 {
-    uint8_t buffer[4];
+    Byte buffer[4];
 
     xfget_chars( file, (char *) buffer, sizeof(buffer) );
 	return
@@ -662,14 +662,17 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.17  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.18  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.17  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.16  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.14  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042

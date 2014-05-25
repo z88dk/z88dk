@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.6 2014-05-19 00:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.7 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -123,7 +123,10 @@ void _deregister_obj( Object *obj )
 
 /*
 * $Log: class.c,v $
-* Revision 1.6  2014-05-19 00:11:25  pauloscustodio
+* Revision 1.7  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.6  2014/05/19 00:11:25  pauloscustodio
 * Make sure strpool is deleted after class, because objects defined with class may use strpool
 *
 * Revision 1.5  2014/01/11 01:29:40  pauloscustodio
@@ -148,7 +151,7 @@ void _deregister_obj( Object *obj )
 * introduce memory leak report on exit and memory fence check.
 *
 * Revision 1.2  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.1  2012/05/24 17:01:45  pauloscustodio

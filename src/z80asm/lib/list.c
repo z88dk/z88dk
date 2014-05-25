@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.4 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.5 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -198,7 +198,7 @@ void List_remove_all( List *self )
 }
 
 /* check if list is empty */
-BOOL List_empty( List *self )
+Bool List_empty( List *self )
 {
     return List_first( self ) == NULL ? TRUE : FALSE;
 }
@@ -206,7 +206,10 @@ BOOL List_empty( List *self )
 
 /*
 * $Log: list.c,v $
-* Revision 1.4  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.5  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

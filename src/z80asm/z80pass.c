@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.98 2014-05-18 16:05:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.99 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -244,7 +244,7 @@ Evallogexpr( void )
 
 
 void
-StoreName( Symbol *node, uint8_t scope )
+StoreName( Symbol *node, Byte scope )
 {
     switch ( scope )
     {
@@ -415,7 +415,7 @@ Z80pass2( void )
 
                 if ( constant >= -128 && constant <= 127 )
                 {
-                    patch_byte( &patchptr, (uint8_t) constant );
+                    patch_byte( &patchptr, (Byte) constant );
                     /* opcode is stored, now store relative jump */
                 }
                 else
@@ -428,14 +428,14 @@ Z80pass2( void )
                 if ( constant < -128 || constant > 255 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, (uint8_t) constant );
+                patch_byte( &patchptr, (Byte) constant );
                 break;
 
             case RANGE_8SIGN:
                 if ( constant < -128 || constant > 127 )
                     warn_int_range( constant );
 
-                patch_byte( &patchptr, (uint8_t) constant );
+                patch_byte( &patchptr, (Byte) constant );
                 break;
 
             case RANGE_16CONST:
@@ -590,22 +590,25 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.98  2014-05-18 16:05:28  pauloscustodio
+* Revision 1.99  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.98  2014/05/18 16:05:28  pauloscustodio
 * Add sections to the Module structure, define default section "".
 * Move module expressions to the Section structure.
 *
 * Revision 1.97  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.96  2014/05/06 22:52:02  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.95  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.94  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.93  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -895,7 +898,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 * BUG_0026 : Incorrect paging in symbol list
 * 
 * Revision 1.35  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 * 

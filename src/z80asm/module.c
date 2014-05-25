@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.8 2014-05-18 16:05:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.9 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -57,14 +57,14 @@ void Section_init (Section *self)
 	self->exprs			= OBJ_NEW( ExprList );
 	OBJ_AUTODELETE( self->exprs ) = FALSE;
 
-	self->bytes			= OBJ_NEW( uint8_tArray );
+	self->bytes			= OBJ_NEW( ByteArray );
 	OBJ_AUTODELETE( self->bytes ) = FALSE;
 }
 
 void Section_copy (Section *self, Section *other)	
 { 
 	self->exprs = ExprList_clone( other->exprs ); 
-	self->bytes = uint8_tArray_clone( other->bytes );
+	self->bytes = ByteArray_clone( other->bytes );
 }
 
 void Section_fini (Section *self)
@@ -124,7 +124,10 @@ void Module_set_section( Module *self, char *section_name )
 
 /* 
 * $Log: module.c,v $
-* Revision 1.8  2014-05-18 16:05:28  pauloscustodio
+* Revision 1.9  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.8  2014/05/18 16:05:28  pauloscustodio
 * Add sections to the Module structure, define default section "".
 * Move module expressions to the Section structure.
 *

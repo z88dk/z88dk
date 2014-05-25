@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.14 2014-04-19 17:42:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.15 2014-05-25 01:02:30 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -140,12 +140,12 @@ write_file("test.c", <<'END');
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
-void error(char *filename, BOOL writing)
+void error(char *filename, Bool writing)
 {
 	die("captured error %s %d\n", filename, writing );
 }
 
-void null_error(char *filename, BOOL writing)
+void null_error(char *filename, Bool writing)
 {
 	warn("captured error %s %d\n", filename, writing );
 }
@@ -634,7 +634,10 @@ sub t_capture {
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
 
 # $Log: fileutil.t,v $
-# Revision 1.14  2014-04-19 17:42:43  pauloscustodio
+# Revision 1.15  2014-05-25 01:02:30  pauloscustodio
+# Byte, Int, UInt added
+#
+# Revision 1.14  2014/04/19 17:42:43  pauloscustodio
 # Update for 64-bit architecture
 #
 # Revision 1.13  2014/04/19 14:57:58  pauloscustodio

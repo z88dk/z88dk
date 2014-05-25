@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.33 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.34 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -182,14 +182,14 @@ void fread_codearea_offset( FILE *stream, uint32_t offset, uint32_t size )
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte( uint32_t *paddr, uint8_t byte1 )
+void patch_byte( uint32_t *paddr, Byte byte1 )
 {
     init();
     check_space( *paddr, 1 );
     codearea[( *paddr )++] = byte1;
 }
 
-void append_byte( uint8_t byte1 )
+void append_byte( Byte byte1 )
 {
     init();
     patch_byte( &codeindex, byte1 );
@@ -197,7 +197,7 @@ void append_byte( uint8_t byte1 )
 	inc_PC( 1 );
 }
 
-void append_2bytes( uint8_t byte1, uint8_t byte2 )
+void append_2bytes( Byte byte1, Byte byte2 )
 {
 	append_byte( byte1 );
 	append_byte( byte2 );
@@ -243,9 +243,9 @@ void append_long( long dword )
 	inc_PC( 4 );
 }
 
-uint8_t get_byte( uint32_t *paddr )
+Byte get_byte( uint32_t *paddr )
 {
-    uint8_t byte1;
+    Byte byte1;
 
     init();
     assert( *paddr < codeindex );
@@ -256,18 +256,21 @@ uint8_t get_byte( uint32_t *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.33  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.34  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.33  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.32  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.31  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.30  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.29  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
@@ -378,7 +381,7 @@ uint8_t get_byte( uint32_t *paddr )
 * Solve memory leak
 *
 * Revision 1.9  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.8 2014-04-15 20:06:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.9 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -357,7 +357,10 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
 /*
 * $Log: xmalloc.c,v $
-* Revision 1.8  2014-04-15 20:06:44  pauloscustodio
+* Revision 1.9  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.8  2014/04/15 20:06:44  pauloscustodio
 * Solve warning: no newline at end of file
 *
 * Revision 1.7  2014/02/11 15:20:20  pauloscustodio
@@ -398,7 +401,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 * Output memory leaks on exit
 *
 * Revision 1.7  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.6  2012/05/24 17:09:27  pauloscustodio

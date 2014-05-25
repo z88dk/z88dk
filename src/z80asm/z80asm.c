@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.171 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.172 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -63,7 +63,7 @@ FILE *objfile;
 extern char Z80objhdr[];
 extern char objhdrprefix[];
 
-uint8_t reloc_routine[] =
+Byte reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
@@ -438,7 +438,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.171  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.172  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.171  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
@@ -451,7 +454,7 @@ createsym( Symbol *symptr )
 * with -d option to objfile.c. Change objfile API.
 *
 * Revision 1.168  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.167  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,
@@ -462,13 +465,13 @@ createsym( Symbol *symptr )
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.165  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.164  2014/05/04 18:05:56  pauloscustodio
 * comment
 *
 * Revision 1.163  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.162  2014/05/02 21:00:50  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -916,7 +919,7 @@ createsym( Symbol *symptr )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.66  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

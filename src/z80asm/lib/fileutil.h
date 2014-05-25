@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.15 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.16 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,7 +34,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.15 2014-05-
 *	Fatal error if number of chars read/writen not same as requested
 *   Use fwrite/fread instead for checking.
 *----------------------------------------------------------------------------*/
-typedef void (*ferr_callback_t)(char *filename, BOOL writing);
+typedef void (*ferr_callback_t)(char *filename, Bool writing);
 
 /* set call-back for input/output error; return old call-back */
 extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
@@ -72,9 +72,9 @@ extern void xfget_count_word_Str(  FILE *file, Str  *str );
 
 /* read/write numbers */
 extern void    xfput_int8(  FILE *file, int8_t  value );
-extern void    xfput_uint8( FILE *file, uint8_t value );
+extern void    xfput_uint8( FILE *file, Byte value );
 extern int8_t  xfget_int8(  FILE *file );
-extern uint8_t xfget_uint8( FILE *file );
+extern Byte xfget_uint8( FILE *file );
 
 extern void     xfput_int16(  FILE *file, int16_t  value );
 extern void     xfput_uint16( FILE *file, uint16_t value );
@@ -109,14 +109,17 @@ extern char *temp_filename( char *filename );
 
 /*
 * $Log: fileutil.h,v $
-* Revision 1.15  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.16  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.15  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.14  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.13  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.12  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042

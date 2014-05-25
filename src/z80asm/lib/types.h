@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.10 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.11 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -13,8 +13,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.10 2014-05-17 
 #include <stdio.h>		/* FILENAME_MAX */
 #include <stdint.h>
 
-/* BOOL type and constants */
-typedef int BOOL;
+/* Integer types */
+typedef uint8_t  Byte;
+typedef uint32_t UInt;
+typedef int32_t  Int;
+
+/* Bool type and constants */
+typedef int Bool;
 
 #ifndef	FALSE
 #define	FALSE	(0)
@@ -45,11 +50,14 @@ typedef int BOOL;
 
 /*
 * $Log: types.h,v $
-* Revision 1.10  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.11  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.10  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.9  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.8  2014/05/06 16:32:23  dom
 * Get the protector in the right place
@@ -58,7 +66,7 @@ typedef int BOOL;
 * Horrible workaround.
 *
 * Revision 1.6  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.5  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
@@ -110,12 +118,12 @@ typedef int BOOL;
 * Include io.h only in MSVC
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.5  2012/06/14 15:03:13  pauloscustodio

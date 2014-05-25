@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.8 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.9 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -34,7 +34,7 @@ void SymbolRef_copy( SymbolRef *self, SymbolRef *other ) { }
 void SymbolRef_fini( SymbolRef *self ) { }
 
 /* check if reference is repeated and should not be inserted */
-static BOOL ref_repeated( SymbolRefList *list, int page_nr )
+static Bool ref_repeated( SymbolRefList *list, int page_nr )
 {
     if ( SymbolRefList_empty( list ) )
         return FALSE;					/* list is empty */
@@ -50,7 +50,7 @@ static BOOL ref_repeated( SymbolRefList *list, int page_nr )
 
 
 /* add a symbol reference, create the list if NULL */
-void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
+void add_symbol_ref( SymbolRefList *list, int page_nr, Bool defined )
 {
     SymbolRef *obj;
 
@@ -86,7 +86,10 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 
 /*
 * $Log: symref.c,v $
-* Revision 1.8  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.9  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.8  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

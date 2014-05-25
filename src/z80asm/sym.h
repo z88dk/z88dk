@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.18 2014-05-21 20:56:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.19 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -33,7 +33,7 @@ struct Module;							/* defined in module.h */
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-	uint8_t			sym_type;			/* type of symbol */
+	Byte			sym_type;			/* type of symbol */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
 	struct Module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
@@ -44,7 +44,7 @@ END_CLASS;
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create( char *name, long value, uint8_t type, struct Module *owner );
+extern Symbol *Symbol_create( char *name, long value, Byte type, struct Module *owner );
 
 /* return full symbol name NAME@MODULE stored in strpool */
 extern char *Symbol_fullname( Symbol *sym );
@@ -52,20 +52,23 @@ extern char *Symbol_fullname( Symbol *sym );
 
 /*
 * $Log: sym.h,v $
-* Revision 1.18  2014-05-21 20:56:08  pauloscustodio
+* Revision 1.19  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.18  2014/05/21 20:56:08  pauloscustodio
 * Move special symbols to model.h
 *
 * Revision 1.17  2014/05/20 21:58:31  pauloscustodio
 * Add ASMHEAD symbol at the end of link with address of start of linked code.
 *
 * Revision 1.16  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.15  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.14  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.13  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

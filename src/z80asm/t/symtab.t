@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.14 2014-05-17 14:27:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.15 2014-05-25 01:02:30 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -276,7 +276,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 extern SymbolHash *get_static_tab(void);
 
-extern Symbol *_define_sym( char *name, long value, uint8_t type, Module *owner, SymbolHash **psymtab );
+extern Symbol *_define_sym( char *name, long value, Byte type, Module *owner, SymbolHash **psymtab );
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
@@ -568,14 +568,17 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.14  2014-05-17 14:27:13  pauloscustodio
-# Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+# Revision 1.15  2014-05-25 01:02:30  pauloscustodio
+# Byte, Int, UInt added
+#
+# Revision 1.14  2014/05/17 14:27:13  pauloscustodio
+# Use C99 integer types int8_t, Byte, int16_t, uint16_t, int32_t, uint32_t
 #
 # Revision 1.13  2014/05/06 22:17:38  pauloscustodio
-# Made types uint8_t, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+# Made types Byte, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 #
 # Revision 1.12  2014/05/02 21:34:58  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to uint8_t, UINT and ULONG
+# byte_t, uint_t and ulong_t renamed to Byte, UINT and ULONG
 #
 # Revision 1.11  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules

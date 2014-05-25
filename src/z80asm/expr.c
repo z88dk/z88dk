@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.14 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.15 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,7 +39,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.14 2014-05-17 14:27
 
 /* init each type of ExprOp */
 static void ExprOp_init_number(     ExprOp *self, long value );
-static void ExprOp_init_name(       ExprOp *self, char *name, uint8_t sym_type );
+static void ExprOp_init_name(       ExprOp *self, char *name, Byte sym_type );
 static void ExprOp_init_const_expr( ExprOp *self );
 static void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type );
 
@@ -236,7 +236,7 @@ void ExprOp_init_number( ExprOp *self, long value )
 	self->d.value	= value;
 }
 
-void ExprOp_init_name( ExprOp *self, char *name, uint8_t sym_type )
+void ExprOp_init_name( ExprOp *self, char *name, Byte sym_type )
 {
 	self->op_type 			= NAME_OP;
 	self->d.ident.name		= strpool_add(name);
@@ -378,10 +378,10 @@ void Expr_fini (Expr *self)
 /*-----------------------------------------------------------------------------
 *	Expression parser
 *----------------------------------------------------------------------------*/
-static BOOL Expr_parse_ternary_cond( Expr *expr );
+static Bool Expr_parse_ternary_cond( Expr *expr );
 
 #define DEFINE_PARSER( name, prev_name, condition )			\
-	static BOOL name( Expr *self )							\
+	static Bool name( Expr *self )							\
 	{														\
 		tokid_t op = TK_NIL;								\
 															\
@@ -405,7 +405,7 @@ static BOOL Expr_parse_ternary_cond( Expr *expr );
 	}
 
 /* parse value */
-static BOOL Expr_parse_factor( Expr *self )
+static Bool Expr_parse_factor( Expr *self )
 {
     Symbol  *symptr;
 	uint32_t asmpc;
@@ -463,7 +463,7 @@ static BOOL Expr_parse_factor( Expr *self )
 }
 
 /* parse unary operators */
-static BOOL Expr_parse_unary( Expr *self )
+static Bool Expr_parse_unary( Expr *self )
 {
     tokid_t open_paren;
 
@@ -528,7 +528,7 @@ static BOOL Expr_parse_unary( Expr *self )
 }
 
 /* parse A ** B */
-static BOOL Expr_parse_power( Expr *self )
+static Bool Expr_parse_power( Expr *self )
 {
     if ( ! Expr_parse_unary( self ) )
         return FALSE;
@@ -582,7 +582,7 @@ DEFINE_PARSER( Expr_parse_logical_or, Expr_parse_logical_and,
 			   tok == TK_LOG_OR )
 
 /* parse cond ? true : false */
-static BOOL Expr_parse_ternary_cond( Expr *self )
+static Bool Expr_parse_ternary_cond( Expr *self )
 {
 	if ( ! Expr_parse_logical_or(self) )		/* get cond or expression */
 		return FALSE;
@@ -615,7 +615,7 @@ static BOOL Expr_parse_ternary_cond( Expr *self )
 Expr *expr_parse( void )
 {
 	Expr *self = OBJ_NEW( Expr );
-    BOOL is_const_expr = FALSE;
+    Bool is_const_expr = FALSE;
 
     if ( tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
@@ -666,10 +666,10 @@ long Expr_eval( Expr *self )
 /*-----------------------------------------------------------------------------
 *	parse and eval an expression, return FALSE on NOT_EVALUABLE
 *----------------------------------------------------------------------------*/
-static BOOL _expr_parse_eval( long *presult, BOOL not_defined_error )
+static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
 {
 	Expr *expr;
-	BOOL  failed;
+	Bool  failed;
 
 	*presult = 0;
 
@@ -694,7 +694,7 @@ static BOOL _expr_parse_eval( long *presult, BOOL not_defined_error )
 	return TRUE;
 }
 
-BOOL expr_parse_eval( long *presult )
+Bool expr_parse_eval( long *presult )
 {
 	return _expr_parse_eval( presult, TRUE );
 }
@@ -709,14 +709,17 @@ long expr_parse_eval_if( void )
 
 /*
 * $Log: expr.c,v $
-* Revision 1.14  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.15  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.14  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.13  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.12  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.11  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:

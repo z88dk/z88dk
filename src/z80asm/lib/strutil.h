@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.17 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.18 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,7 +62,7 @@ CLASS( Str )
 						   at the buffer */
 	size_t	 size;		/* allocated size */
 	size_t	 len;		/* sring length (excluding zero terminator) */
-	BOOL	 alloc_str;	/* TRUE if str is in the heap and can grow
+	Bool	 alloc_str;	/* TRUE if str is in the heap and can grow
 						   FALSE if str is in user supplied buffer and cannot grow */
 END_CLASS;
 
@@ -118,8 +118,8 @@ extern void Str_append_sprintf( Str *self, char *format, ... );
    returns FALSE; the user has to call va_end, va_start and retry.
    If the string does not fit and cannot be expanded, it is truncated and the function
    returns TRUE. */ 
-extern BOOL Str_vsprintf( Str *self, char *format, va_list argptr );
-extern BOOL Str_append_vsprintf( Str *self, char *format, va_list argptr );
+extern Bool Str_vsprintf( Str *self, char *format, va_list argptr );
+extern Bool Str_append_vsprintf( Str *self, char *format, va_list argptr );
 
 /* chomp, strip, compress_escapes */
 extern void Str_chomp( Str *self );
@@ -127,24 +127,27 @@ extern void Str_strip( Str *self );
 extern void Str_compress_escapes( Str *self );
 
 /* get N characters from input, return FALSE on EOF */
-extern BOOL Str_getchars( Str *self, FILE *fp, size_t num_chars );
+extern Bool Str_getchars( Str *self, FILE *fp, size_t num_chars );
 
 /* get one line from input, convert end-of-line sequences,
    return string including one LF character
    return FALSE on end of input */
-extern BOOL Str_getline( Str *self, FILE *fp );
+extern Bool Str_getline( Str *self, FILE *fp );
 
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.17  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.18  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.17  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.16  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.14  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS

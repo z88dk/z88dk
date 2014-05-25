@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.14 2014-05-18 16:05:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.15 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,7 +45,7 @@ CLASS( Section )
 	char		 *section_name;		/* name of section, kept in strpool */
 	uint32_t	  addr;				/* start address of this section */
     ExprList	 *exprs;			/* list of section expressions */
-	uint8_tArray *bytes;			/* binary code of section */
+	ByteArray *bytes;			/* binary code of section */
 END_CLASS;
 
 CLASS_HASH( Section );
@@ -76,7 +76,10 @@ extern void Module_set_section( Module *self, char *section_name );
 
 /*
 * $Log: module.h,v $
-* Revision 1.14  2014-05-18 16:05:28  pauloscustodio
+* Revision 1.15  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.14  2014/05/18 16:05:28  pauloscustodio
 * Add sections to the Module structure, define default section "".
 * Move module expressions to the Section structure.
 *
@@ -84,16 +87,16 @@ extern void Module_set_section( Module *self, char *section_name );
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.12  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.11  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.10  2014/05/02 23:35:19  pauloscustodio
 * Rename startoffset, add constant for NO_ORIGIN
 *
 * Revision 1.9  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.8  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

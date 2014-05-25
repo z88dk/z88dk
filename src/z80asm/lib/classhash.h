@@ -6,7 +6,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.10 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.11 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.10 2014-05
 CLASS_HASH(T);			// T is declared by CLASS(T); defines THash
 
 // define the hash class
-DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
+DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 										// keys
 
 *----------------------------------------------------------------------------*/
@@ -53,7 +53,7 @@ DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
 	extern T *T##Hash_get( T##Hash *self, char *key );						\
 																			\
 	/* Check if a key exists in the hash */									\
-	extern BOOL T##Hash_exists( T##Hash *self, char *key );					\
+	extern Bool T##Hash_exists( T##Hash *self, char *key );					\
 																			\
 	/* Remove element from hash if found */									\
 	extern void T##Hash_remove( T##Hash *self, char *key );					\
@@ -74,7 +74,7 @@ DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
 	extern T##HashElem *T##Hash_next( T##HashElem *iter );					\
 																			\
 	/* check if hash is empty */											\
-	extern BOOL T##Hash_empty( T##Hash *self );								\
+	extern Bool T##Hash_empty( T##Hash *self );								\
 																			\
 	/* sort the items in the hash */										\
 	extern void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare );\
@@ -179,7 +179,7 @@ DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
 	}																		\
 																			\
 	/* check if element exists */											\
-	BOOL T##Hash_exists( T##Hash *self, char *key )							\
+	Bool T##Hash_exists( T##Hash *self, char *key )							\
 	{																		\
 		return self == NULL ? FALSE : StrHash_exists( self->hash, key );	\
 	}																		\
@@ -206,7 +206,7 @@ DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
 	}																		\
 																			\
 	/* check if hash is empty */											\
-	BOOL T##Hash_empty( T##Hash *self )										\
+	Bool T##Hash_empty( T##Hash *self )										\
 	{																		\
 		return T##Hash_first(self) == NULL ? TRUE : FALSE;					\
 	}																		\
@@ -223,14 +223,17 @@ DEF_CLASS_HASH(T, BOOL ignore_case);	// ignore_case = TRUE for case-insensitive
 
 /*
 * $Log: classhash.h,v $
-* Revision 1.10  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.11  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.10  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.9  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.8  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.7  2014/04/05 22:02:06  pauloscustodio
 * Added ignore_case attribute to allow case-insensitive class hashes

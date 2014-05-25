@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.101 2014-05-20 22:26:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.102 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.101 2014-05-20 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.101  2014-05-20 22:26:29  pauloscustodio
+* Revision 1.102  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.101  2014/05/20 22:26:29  pauloscustodio
 * BUG_0051: DEFC and DEFVARS constants do not appear in map file
 * Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 * written to the map file.
@@ -35,17 +38,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.101 2014-05-20 22:2
 * with -d option to objfile.c. Change objfile API.
 *
 * Revision 1.99  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.98  2014/05/17 10:57:45  pauloscustodio
 * Parse argv generates list of files that can be iterated by assembler,
 * linker and librarian.
 *
 * Revision 1.97  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.96  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.95  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
@@ -1432,7 +1435,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, uint8_t, uint32_t
+	- Unified usage of integer types: int, char, Byte, uint32_t
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 

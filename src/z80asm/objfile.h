@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.22 2014-05-21 20:57:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.23 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -38,7 +38,7 @@ CLASS( OFile )
 	size_t	 start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
 
-	BOOL	 writing;			/* TRUE if writing a new object file,
+	Bool	 writing;			/* TRUE if writing a new object file,
 								   FALSE if reading */
 
 	char	*filename;			/* object file name, in strpool */
@@ -79,10 +79,10 @@ extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
 extern OFile *OFile_open_read( char *filename );
 extern void   OFile_close( OFile *self );
 
-/* return static uint8_tArray with binary contents of the given object file,
+/* return static ByteArray with binary contents of the given object file,
    return NULL if input file is not an object, wrong version, or does not exist
    NOTE: not reentrant, reuses array on each call */
-extern uint8_tArray *read_obj_file_data( char *filename );
+extern ByteArray *read_obj_file_data( char *filename );
 
 /*-----------------------------------------------------------------------------
 *   OFile API - write module to object file
@@ -95,11 +95,14 @@ extern void write_obj_file( char *filename, Module *module );
 
 /* Updates current module name and size, if given object file is valid
    load module name and size, when assembling with -d and up-to-date */
-extern BOOL objmodule_loaded( Module *module, char *filename );
+extern Bool objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.22  2014-05-21 20:57:27  pauloscustodio
+* Revision 1.23  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.22  2014/05/21 20:57:27  pauloscustodio
 * Embryo of write module
 *
 * Revision 1.21  2014/05/19 22:15:54  pauloscustodio
@@ -114,13 +117,13 @@ extern BOOL objmodule_loaded( Module *module, char *filename );
 * with -d option to objfile.c. Change objfile API.
 *
 * Revision 1.18  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.17  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.15  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:

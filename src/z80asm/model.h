@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.17 2014-05-21 20:56:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.18 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -85,7 +85,7 @@ extern void model_init(void);
 
 /* list of modules iterator, set CURRENTMODULE */
 extern void module_list_first( void );
-extern BOOL module_list_next( void );
+extern Bool module_list_next( void );
 
 /* delete all modules */
 extern void delete_modules( void );
@@ -108,11 +108,14 @@ extern char *src_filename( void );
 extern int   src_line_nr( void );	
 
 extern void  src_push( void );
-extern BOOL  src_pop( void );
+extern Bool  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.17  2014-05-21 20:56:08  pauloscustodio
+* Revision 1.18  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.17  2014/05/21 20:56:08  pauloscustodio
 * Move special symbols to model.h
 *
 * Revision 1.16  2014/05/18 16:05:28  pauloscustodio

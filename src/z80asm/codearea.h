@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.24 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.25 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -59,9 +59,9 @@ extern void fread_codearea_offset( FILE *stream, uint32_t offset, uint32_t size 
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_byte( uint32_t *paddr, uint8_t byte1 );		/* one byte */
-extern void append_byte( uint8_t byte1 );
-extern void append_2bytes( uint8_t byte1, uint8_t byte2 );
+extern void  patch_byte( uint32_t *paddr, Byte byte1 );		/* one byte */
+extern void append_byte( Byte byte1 );
+extern void append_2bytes( Byte byte1, Byte byte2 );
 
 extern void  patch_word( uint32_t *paddr, int word );		/* 2-byte word */
 extern void append_word( int word );
@@ -73,19 +73,22 @@ extern void append_long( long dword );
 *   get a byte at the given address
 *	the patch address is incremented after fetch
 *----------------------------------------------------------------------------*/
-extern uint8_t get_byte( uint32_t *paddr );
+extern Byte get_byte( uint32_t *paddr );
 
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.24  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.25  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.24  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.23  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.22  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.21  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
@@ -170,7 +173,7 @@ extern uint8_t get_byte( uint32_t *paddr );
 * Solve memory leak
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

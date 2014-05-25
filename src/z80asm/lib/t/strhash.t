@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.6 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.7 2014-05-25 01:02:30 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -382,7 +382,10 @@ sub t_capture {
 
 
 # $Log: strhash.t,v $
-# Revision 1.6  2014-04-19 14:57:58  pauloscustodio
+# Revision 1.7  2014-05-25 01:02:30  pauloscustodio
+# Byte, Int, UInt added
+#
+# Revision 1.6  2014/04/19 14:57:58  pauloscustodio
 # Fix test scripts to run in UNIX
 #
 # Revision 1.5  2014/04/05 14:37:54  pauloscustodio
@@ -445,7 +448,7 @@ sub t_capture {
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.7  2013/02/02 00:07:35  pauloscustodio
-# StrHash_next() returns value instead of BOOL
+# StrHash_next() returns value instead of Bool
 #
 # Revision 1.6  2013/01/22 22:24:49  pauloscustodio
 # Removed StrHash_set_delptr() - not intuitive and error prone

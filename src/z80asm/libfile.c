@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.2 2014-05-19 22:15:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.3 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -55,7 +55,7 @@ static char *search_libfile( char *filename )
 *----------------------------------------------------------------------------*/
 void make_library( char *lib_filename, List *src_files )
 {
-	uint8_tArray *obj_file_data;
+	ByteArray *obj_file_data;
 	FILE	*lib_file;
 	char	*obj_filename;
 	size_t	 fptr, obj_size;
@@ -91,7 +91,7 @@ void make_library( char *lib_filename, List *src_files )
             printf( "'%s' module at %08X.\n", obj_filename, fptr );
 
 		/* write file pointer of next file, or -1 if last */
-		obj_size = uint8_tArray_size( obj_file_data );
+		obj_size = ByteArray_size( obj_file_data );
         if ( iter == last )
             xfput_uint32( lib_file, -1 );    
         else
@@ -101,7 +101,7 @@ void make_library( char *lib_filename, List *src_files )
         xfput_uint32( lib_file, obj_size );
 
 		/* write module */
-        xfput_chars( lib_file, (char *) uint8_tArray_item( obj_file_data, 0 ), obj_size ); 
+        xfput_chars( lib_file, (char *) ByteArray_item( obj_file_data, 0 ), obj_size ); 
 	}
 
 	/* close and write lib file */
@@ -111,7 +111,10 @@ void make_library( char *lib_filename, List *src_files )
 
 /*
 * $Log: libfile.c,v $
-* Revision 1.2  2014-05-19 22:15:54  pauloscustodio
+* Revision 1.3  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.2  2014/05/19 22:15:54  pauloscustodio
 * Move read_obj_file_data() to objfile.c
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *

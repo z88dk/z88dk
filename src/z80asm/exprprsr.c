@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.80 2014-05-17 14:27:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.81 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -232,7 +232,7 @@ ExprUnsigned8( int listoffset )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range( constant );
 
-                    append_byte( (uint8_t) constant );
+                    append_byte( (Byte) constant );
                 }
             }
         }
@@ -309,7 +309,7 @@ ExprSigned8( int listoffset )
                     if ( constant < -128 || constant > 127 )
                         warn_int_range( constant );
 
-                    append_byte( (uint8_t) constant );
+                    append_byte( (Byte) constant );
                 }
             }
         }
@@ -330,18 +330,21 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.80  2014-05-17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.81  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.80  2014/05/17 14:27:12  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.79  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.78  2014/05/06 22:17:37  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.77  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.76  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -575,7 +578,7 @@ ExprSigned8( int listoffset )
 * processed.
 *
 * Revision 1.32  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

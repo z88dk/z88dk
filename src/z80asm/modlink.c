@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.120 2014-05-20 21:58:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.121 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,7 +59,7 @@ static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modna
 
 /* global variables */
 extern char Z80objhdr[];
-extern uint8_t reloc_routine[];
+extern Byte reloc_routine[];
 extern struct liblist *libraryhdr;
 extern char *reloctable, *relocptr;
 
@@ -71,7 +71,7 @@ void
 ReadNames( char *filename, FILE *file, long nextname, long endnames )
 {
     int scope, symbol_char;
-    uint8_t symboltype = 0;
+    Byte symboltype = 0;
     long value;
 	DEFINE_STR( name, MAXLINE );
 
@@ -169,14 +169,14 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, (uint8_t) constant );
+                    patch_byte( &patchptr, (Byte) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
                         warn_int_range_expr( constant, expr_text->str );
 
-                    patch_byte( &patchptr, (uint8_t) constant );  /* opcode is stored, now store signed 8bit value */
+                    patch_byte( &patchptr, (Byte) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
@@ -193,7 +193,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 
                             if ( distance >= 0 && distance <= 255 )
                             {
-                                *relocptr++ = (uint8_t) distance;
+                                *relocptr++ = (Byte) distance;
                                 sizeof_reloctable++;
                             }
                             else
@@ -237,7 +237,7 @@ LinkModules( void )
     char fheader[9];
     int32_t origin;
     Module *first_obj_module, *last_obj_module;
-	BOOL saw_last_obj_module;
+	Bool saw_last_obj_module;
     char *obj_filename;
 	FILE *file;
 
@@ -864,7 +864,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.120  2014-05-20 21:58:31  pauloscustodio
+* Revision 1.121  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.120  2014/05/20 21:58:31  pauloscustodio
 * Add ASMHEAD symbol at the end of link with address of start of linked code.
 *
 * Revision 1.119  2014/05/19 00:19:33  pauloscustodio
@@ -875,23 +878,23 @@ ReleaseLinkInfo( void )
 * Change origin to int32_t, use -1 to signal as not defined
 *
 * Revision 1.117  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.116  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.115  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.114  2014/05/02 23:35:19  pauloscustodio
 * Rename startoffset, add constant for NO_ORIGIN
 *
 * Revision 1.113  2014/05/02 21:54:09  pauloscustodio
-* Use uint8_tArray instead of Str to hold object file
+* Use ByteArray instead of Str to hold object file
 *
 * Revision 1.112  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.111  2014/05/02 21:00:49  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -1206,7 +1209,7 @@ ReleaseLinkInfo( void )
 * CH_0017 : Align with spaces, deprecate -t option
 *
 * Revision 1.47  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (uint8_t)
+* Replaced (unsigned char) by (Byte)
 * Replaced (unisigned int) by (uint32_t)
 * Replaced (short) by (int)
 *

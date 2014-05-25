@@ -24,7 +24,7 @@
  *
  * Copyright (C) Paulo Custodio, 2011-2014
  *
- * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.c,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+ * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.c,v 1.4 2014-05-25 01:02:30 pauloscustodio Exp $
  */
 
 #include "xmalloc.h"   /* before any other include */
@@ -40,7 +40,10 @@ int     except_current_count;
 
 /*
 * $Log: except.c,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.4  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *
@@ -67,7 +70,7 @@ int     except_current_count;
 * include xmalloc.h before any other include
 *
 * Revision 1.10  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.9  2012/05/26 18:33:25  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.58 2014-05-21 19:39:09 dom Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.59 2014-05-25 01:02:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -60,7 +60,10 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.58  2014-05-21 19:39:09  dom
+* Revision 1.59  2014-05-25 01:02:29  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.58  2014/05/21 19:39:09  dom
 * size_t != u_int_32
 *
 * Revision 1.57  2014/05/19 22:15:54  pauloscustodio
@@ -68,17 +71,17 @@ extern void Z80pass1( char *filename );
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
 * Revision 1.56  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Use C99 integer types
 *
 * Revision 1.55  2014/05/06 22:52:01  pauloscustodio
 * Remove OS-dependent defines and dependency on ../config.h.
 * Remove OS_ID constant from predefined defines in assembly.
 *
 * Revision 1.54  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.53  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.52  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules

@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.10 2014-05-17 14:27:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.11 2014-05-25 01:02:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -171,7 +171,7 @@ void *StrHash_get( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Check if a key exists in the hash
 *----------------------------------------------------------------------------*/
-BOOL StrHash_exists( StrHash *self, char *key )
+Bool StrHash_exists( StrHash *self, char *key )
 {
     StrHashElem *elem;
 
@@ -212,7 +212,7 @@ StrHashElem *StrHash_next( StrHashElem *iter )
 /*-----------------------------------------------------------------------------
 *	check if hash is empty
 *----------------------------------------------------------------------------*/
-BOOL StrHash_empty( StrHash *self )
+Bool StrHash_empty( StrHash *self )
 {
     return StrHash_first( self ) == NULL ? TRUE : FALSE;
 }
@@ -231,14 +231,17 @@ void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 
 /*
 * $Log: strhash.c,v $
-* Revision 1.10  2014-05-17 14:27:13  pauloscustodio
-* Use C99 integer types int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t
+* Revision 1.11  2014-05-25 01:02:30  pauloscustodio
+* Byte, Int, UInt added
+*
+* Revision 1.10  2014/05/17 14:27:13  pauloscustodio
+* Use C99 integer types
 *
 * Revision 1.9  2014/05/06 22:17:38  pauloscustodio
-* Made types uint8_t, uint32_t all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
+* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.8  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to uint8_t, uint32_t
+* byte_t and uint_t renamed to Byte, uint32_t
 *
 * Revision 1.7  2014/04/05 14:37:54  pauloscustodio
 * Added ignore_case attribute to allow case-insensitive string hashes
@@ -297,7 +300,7 @@ void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 * Uniform the APIs of classhash, classlist, strhash, strlist
 *
 * Revision 1.7  2013/02/02 00:07:35  pauloscustodio
-* StrHash_next() returns value instead of BOOL
+* StrHash_next() returns value instead of Bool
 *
 * Revision 1.6  2013/01/22 22:24:49  pauloscustodio
 * Removed StrHash_set_delptr() - not intuitive and error prone
@@ -311,7 +314,7 @@ void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 * Added StrHash_head() to get head of list - usefull in a delete-all loop.
 *
 * Revision 1.4  2013/01/20 21:10:32  pauloscustodio
-* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+* Rename bool to Bool, to be consistent with TRUE and FALSE and
 * distinguish from C++ bool, true, false
 *
 * Revision 1.3  2013/01/19 23:52:40  pauloscustodio
