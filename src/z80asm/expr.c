@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.15 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.16 2014-05-25 12:55:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -356,8 +356,11 @@ void Expr_init (Expr *self)
 
     self->expr_type = 0;
     self->is_stored = FALSE;
+
+	self->section	= CURRENTSECTION;
     self->asmpc		= get_PC();			/* BUG_0048 */
     self->code_pos	= get_codeindex();	/* BUG_0015 */
+
 	self->filename	= src_filename();
 	self->line_nr	= src_line_nr();
 	self->listpos	= 0;
@@ -709,7 +712,10 @@ long expr_parse_eval_if( void )
 
 /*
 * $Log: expr.c,v $
-* Revision 1.15  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.16  2014-05-25 12:55:03  pauloscustodio
+* Link expressions to the section they refer to.
+*
+* Revision 1.15  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.14  2014/05/17 14:27:12  pauloscustodio

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.15 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.16 2014-05-25 12:55:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,22 +30,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.15 2014-05-25 01:
 #include "types.h"
 
 /*-----------------------------------------------------------------------------
-*   Code section, one assembly instruction
-*----------------------------------------------------------------------------*/
-CLASS( CodeSection )
-	char	*filename;				/* input file name, kept in strpool */
-	int		 line_nr;				/* input line number */
-	Str		*bytes;					/* bytes of this opcode */
-END_CLASS;
-
-/*-----------------------------------------------------------------------------
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 CLASS( Section )
-	char		 *section_name;		/* name of section, kept in strpool */
-	uint32_t	  addr;				/* start address of this section */
-    ExprList	 *exprs;			/* list of section expressions */
-	ByteArray *bytes;			/* binary code of section */
+	char		*section_name;		/* name of section, kept in strpool */
+	uint32_t	 addr;				/* start address of this section */
+	ByteArray	*bytes;				/* binary code of section */
 END_CLASS;
 
 CLASS_HASH( Section );
@@ -58,6 +48,7 @@ CLASS( Module )
 	char		*filename;			/* source file name, kept in strpool */
     uint32_t	 start_offset;		/* this module's start offset from start of code buffer */
     int32_t		 origin;			/* ORG address of module, -1 if not defined */
+    ExprList	 *exprs;			/* list of section expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
 	SectionHash *sections;			/* list of sections defined in the code,
 									   indexed also by section name */
@@ -76,7 +67,10 @@ extern void Module_set_section( Module *self, char *section_name );
 
 /*
 * $Log: module.h,v $
-* Revision 1.15  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.16  2014-05-25 12:55:03  pauloscustodio
+* Link expressions to the section they refer to.
+*
+* Revision 1.15  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.14  2014/05/18 16:05:28  pauloscustodio

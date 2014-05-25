@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.102 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.103 2014-05-25 12:55:03 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.102 2014-05-25 01:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.102  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.103  2014-05-25 12:55:03  pauloscustodio
+* Link expressions to the section they refer to.
+*
+* Revision 1.102  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.101  2014/05/20 22:26:29  pauloscustodio
@@ -1891,7 +1894,7 @@ Based on 1.0.31
 	  Removed append_opcode() and created a new helper append_2bytes().
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.2.1] (pauloscustodio)
+25.05.2014 [2.2.1] (pauloscustodio)
 -------------------------------------------------------------------------------
 	BUG_0049: Making a library with -d and 512 object files fails - Too many open files
 		Error caused by z80asm not closing the intermediate object files, when
@@ -1912,6 +1915,7 @@ xx.xx.2014 [2.2.1] (pauloscustodio)
 	- Move load_module_object() that loads object file size when assembling
 	  with -d option to objfile.c. 
 	- Add ASMHEAD symbol at the end of link with address of start of linked code.
+	- Link expressions to the section they refer to.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1938,7 +1942,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.1d"
+#define VERSION     "2.2.1"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.9 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.10 2014-05-25 12:55:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,27 +22,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.9 2014-05-25 01:0
 #include "codearea.h"
 #include "module.h"
 #include "strpool.h"
-
-/*-----------------------------------------------------------------------------
-*   Code section, one assembly instruction
-*----------------------------------------------------------------------------*/
-DEF_CLASS( CodeSection );
-
-void CodeSection_init (CodeSection *self)   
-{ 
-	self->bytes = OBJ_NEW( Str );
-	OBJ_AUTODELETE( self->bytes ) = FALSE;
-}
-
-void CodeSection_copy (CodeSection *self, CodeSection *other)
-{
-	self->bytes = Str_clone( other->bytes );
-}
-
-void CodeSection_fini (CodeSection *self)
-{
-	OBJ_DELETE( self->bytes );
-}
 
 /*-----------------------------------------------------------------------------
 *   Named Section of code, introduced by "SECTION" keyword
@@ -54,22 +33,17 @@ void Section_init (Section *self)
 {
 	self->section_name	= strpool_add("");		/* default: empty section */
 
-	self->exprs			= OBJ_NEW( ExprList );
-	OBJ_AUTODELETE( self->exprs ) = FALSE;
-
 	self->bytes			= OBJ_NEW( ByteArray );
 	OBJ_AUTODELETE( self->bytes ) = FALSE;
 }
 
 void Section_copy (Section *self, Section *other)	
 { 
-	self->exprs = ExprList_clone( other->exprs ); 
 	self->bytes = ByteArray_clone( other->bytes );
 }
 
 void Section_fini (Section *self)
 {
-	OBJ_DELETE( self->exprs);
 	OBJ_DELETE( self->bytes );
 }
 
@@ -87,6 +61,9 @@ void Module_init (Module *self)
 	self->local_symtab	= OBJ_NEW( SymbolHash );
 	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
 
+	self->exprs			= OBJ_NEW( ExprList );
+	OBJ_AUTODELETE( self->exprs ) = FALSE;
+
 	self->sections		= OBJ_NEW( SectionHash );
 	OBJ_AUTODELETE( self->sections ) = FALSE;
 
@@ -95,6 +72,7 @@ void Module_init (Module *self)
 
 void Module_copy (Module *self, Module *other)	
 { 
+	self->exprs = ExprList_clone( other->exprs ); 
 	self->local_symtab = SymbolHash_clone( other->local_symtab );
 	self->sections = SectionHash_clone( other->sections );
 
@@ -104,6 +82,7 @@ void Module_copy (Module *self, Module *other)
 
 void Module_fini (Module *self)
 { 
+	OBJ_DELETE( self->exprs);
 	OBJ_DELETE( self->local_symtab );
 	OBJ_DELETE( self->sections );
 }
@@ -124,7 +103,10 @@ void Module_set_section( Module *self, char *section_name )
 
 /* 
 * $Log: module.c,v $
-* Revision 1.9  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.10  2014-05-25 12:55:03  pauloscustodio
+* Link expressions to the section they refer to.
+*
+* Revision 1.9  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.8  2014/05/18 16:05:28  pauloscustodio

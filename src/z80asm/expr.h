@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.18 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.19 2014-05-25 12:55:03 pauloscustodio Exp $
 */
 
 #pragma once
@@ -27,6 +27,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.18 2014-05-25 01:02
 #include "classlist.h"
 #include "scan.h"
 #include "strutil.h"
+
+struct Section;
 
 /*-----------------------------------------------------------------------------
 *	Types of operations and associativity
@@ -94,8 +96,11 @@ CLASS( Expr )
 	Str			*text;			/* expression in infix text */
 	Byte		 expr_type;		/* range type of evaluated expression */
     Bool		 is_stored;		/* Flag to indicate that expression has been stored to object file */
+
+	struct Section *section;	/* section where expression is patched (weak ref) */
 	uint32_t	 asmpc;			/* ASMPC value during linking */
     uint32_t	 code_pos;		/* Address to patch expression value */
+
 	char		*filename;		/* file and line where expression defined, string in strpool */
     int			 line_nr;		/* source line */
     long		 listpos;		/* position in listing file to patch (in pass 2) */
@@ -134,7 +139,10 @@ extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.18  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.19  2014-05-25 12:55:03  pauloscustodio
+* Link expressions to the section they refer to.
+*
+* Revision 1.18  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.17  2014/05/17 14:27:12  pauloscustodio
