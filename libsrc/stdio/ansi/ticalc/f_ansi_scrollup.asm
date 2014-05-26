@@ -5,15 +5,15 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.5 2002-04-17 21:30:26 dom Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.6 2014-05-26 07:43:13 stefano Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 	XLIB	ansi_SCROLLUP
 	XREF	base_graphics
-	XREF	TIdi
-	XREF	TIei
+	XREF	tidi
+	XREF	tiei
 	LIB	ansi_del_line
 	LIB	fgetc_cons
 
@@ -22,7 +22,7 @@
 ; These are called before scrolling: we wait for any keypress.
 ; We don't use getkey when possible.
 
-	call	TIei
+	call	tiei
 	
 IF FORti82
 .kloop
@@ -82,7 +82,7 @@ IF FORti86
 	jr	z,kloop
 ENDIF
 
-	call	TIdi
+	call	tidi
 
   	ld	hl,8*row_bytes
   	ld	de,(base_graphics)

@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.4 2014-05-26 06:15:06 stefano Exp $
+;       $Id: sorcerer_crt0.asm,v 1.5 2014-05-26 07:43:13 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -39,20 +39,18 @@
 	XDEF    __sgoioblk	;std* control block
 
 ;-----------------------
-; GFX engine
-;-----------------------
-
-	XDEF    base_graphics   ;Graphical variables
-	XDEF    coords          ;Current xy position
-
-;-----------------------
 ; Target specific labels
 ;-----------------------
 
 	XDEF	snd_tick	; for sound code, if any
 	XDEF	bit_irqstatus	; current irq status when DI is necessary
-	XDEF	pixelbyte	; VDP gfx driver, byte temp storage
-	XDEF	coords
+
+;-----------------------
+; GFX engine
+;-----------------------
+
+	XDEF    base_graphics   ;Graphical variables
+	XDEF    coords          ;Current xy position
 
 
 ;--------
@@ -178,10 +176,8 @@ ENDIF
 ;-----------------------------------------------------
 ; Unneccessary file signature + target specific stuff
 ;-----------------------------------------------------
-         	defm  	"Small C+ CP/M"
+         	defm  	"Small C+ Sorcerer"
 end:		defb	0		; null file name
-pixelbyte:	defb	0		; temp byte storage for VDP driver
-coords:		defw    0       ; Current graphics xy coordinates
 
 ;----------------------------------------------
 ; Floating point support routines and variables
