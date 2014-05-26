@@ -1,14 +1,15 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
-;	Version for the 2x3 graphics symbols
+;       Sorcerer Exidy pseudo graphics routines
+;	Version for the 2x3 graphics symbols (UDG redefined)
 ;
-;       Written by Stefano Bodrato 05/09/2007
+;
+;       Written by Stefano Bodrato 2014
 ;
 ;
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.4 2014-05-26 06:15:06 stefano Exp $
+;	$Id: pointxy.asm,v 1.1 2014-05-26 06:15:06 stefano Exp $
 ;
 
 
@@ -16,7 +17,6 @@
 
 			XLIB	pointxy
 
-			LIB	textpixl
 			LIB	div3
 			XREF	coords
 			XREF	base_graphics
@@ -28,7 +28,9 @@
 			ld	a,l
 			cp	maxy
 			ret	nc		; y0	out of range
-			inc	a
+
+			dec	a
+			dec	a
 			
 			push	bc
 			push	de
@@ -36,6 +38,8 @@
 			
 			ld	(coords),hl
 			
+			;push	bc
+
 			ld	c,a	; y
 			ld	b,h	; x
 			
@@ -44,56 +48,44 @@
 			ld	hl,div3
 			ld	d,0
 			ld	e,c
-			adc	hl,de
+			inc	e
+			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			
 			srl	b	; x/2
 			
-			ld	hl,(base_graphics)
 			ld	a,c
 			ld	c,b	; !!
-			
-			and	a
-			
-			ld	de,maxx/2
-			sbc	hl,de
 
-			jr	z,r_zero
-			ld	b,a
-			
-.r_loop			
-			add	hl,de
-			djnz	r_loop
+;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-.r_zero						; hl = char address
+			ld    hl,(base_graphics)
+			inc hl
 			ld	b,a		; keep y/3
+			and	a
+			jr	z,r_zero
 
+			ld	de,80
+.r_loop
+			add	hl,de
+			dec	a
+			jr	nz,r_loop
+		
+.r_zero     ld	d,0
 			ld	e,c
 			add	hl,de
 
-			ld	a,(hl)		; get current symbol from screen
-			ld	e,a		; ..and its copy
+;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-			push	hl		; char address
-			push	bc		; keep y/3
-			ld	hl,textpixl
-			ld	e,0
-			ld	b,64		; whole symbol table size
-.ckmap			cp	(hl)		; compare symbol with the one in map
-			jr	z,chfound
-			inc	hl
-			inc	e
-			djnz	ckmap
-			ld	e,0
-.chfound		ld	a,e
-			pop	bc		; restore y/3 in b
-			pop	hl		; char address
+			ld	a,(hl)		; get current symbol from screen
+			sub 32
+			ld	e,a		; ..and its copy
 			
-			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
+			pop	hl		;  restore x,y  (y=h, x=l)
 			
-			ld	c,a		; keep the symbol
-			
+
+
 			ld	a,l
 			inc	a
 			inc	a
@@ -118,13 +110,15 @@
 			jr	z,evenrow
 			add	a,a		; move down the bit
 .evenrow
+			and  @11011111	; Character generator gap
+			jr  nz,nobug
+			or   @01000000  ;
+.nobug
+;			cpl
+;			and  @11011111	; Character generator bug
+			and	e
 			
-			
-			and	c
-			
-			
-			pop	bc
-			
+
 			pop	hl
 			pop	de
 			pop	bc

@@ -9,11 +9,11 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.6 2014-05-25 21:14:33 stefano Exp $
+;	$Id: pointxy.asm,v 1.7 2014-05-26 06:15:06 stefano Exp $
 ;
 
 
-			INCLUDE	"graphics/text6/textgfx.inc"
+			INCLUDE	"graphics/grafix.inc"
 
 			XLIB	pointxy
 

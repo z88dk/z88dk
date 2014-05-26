@@ -8,6 +8,7 @@ graphics/draw
 graphics/draw_profile
 graphics/drawb
 graphics/drawr
+graphics/drawto
 graphics/getmaxx
 graphics/getmaxy
 graphics/lbitmask
@@ -32,6 +33,7 @@ graphics/uncircle
 graphics/undraw
 graphics/undrawb
 graphics/undrawr
+graphics/undrawto
 graphics/unplot
 graphics/drawbox
 graphics/setxy

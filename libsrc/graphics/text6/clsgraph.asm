@@ -8,11 +8,11 @@
 ;       Clears graph screen.
 ;
 ;
-;	$Id: clsgraph.asm,v 1.1 2006-12-23 21:33:10 stefano Exp $
+;	$Id: clsgraph.asm,v 1.2 2014-05-26 06:15:06 stefano Exp $
 ;
 
 
-			INCLUDE	"graphics/text6/textgfx.inc"
+			INCLUDE	"graphics/grafix.inc"
 
 			XLIB	cleargraphics
 			XREF	base_graphics

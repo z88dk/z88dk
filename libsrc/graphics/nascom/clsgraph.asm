@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - June 2003
 ;
 ;
-;       $Id: clsgraph.asm,v 1.2 2014-05-23 10:37:17 stefano Exp $
+;       $Id: clsgraph.asm,v 1.3 2014-05-26 06:15:06 stefano Exp $
 ;
 
 

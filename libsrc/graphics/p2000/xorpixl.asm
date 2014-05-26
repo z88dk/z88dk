@@ -8,11 +8,11 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.1 2014-05-06 06:01:48 stefano Exp $
+;	$Id: xorpixl.asm,v 1.2 2014-05-26 06:15:06 stefano Exp $
 ;
 
 
-			INCLUDE	"graphics/text6/textgfx.inc"
+			INCLUDE	"graphics/grafix.inc"
 
 			XLIB	xorpixel
 

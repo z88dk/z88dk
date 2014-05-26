@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.3 2013-10-21 14:23:44 stefano Exp $
+;       $Id: sorcerer_crt0.asm,v 1.4 2014-05-26 06:15:06 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -37,6 +37,13 @@
 	XDEF    heapblocks      ;
 
 	XDEF    __sgoioblk	;std* control block
+
+;-----------------------
+; GFX engine
+;-----------------------
+
+	XDEF    base_graphics   ;Graphical variables
+	XDEF    coords          ;Current xy position
 
 ;-----------------------
 ; Target specific labels
@@ -143,6 +150,9 @@ exitsp:		defw	0	;Address of atexit() stack
 exitcount:	defb	0	;Number of atexit() routinens
 heaplast:	defw	0	;Pointer to last free heap block
 heapblocks:	defw	0	;Number of heap blocks available
+
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    $F080   ; Address of the Graphics map
 
 IF DEFINED_USING_amalloc
 XREF ASMTAIL
