@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.9 2014-05-21 19:34:14 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.10 2014-05-26 08:19:40 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -57,7 +57,7 @@
         
         XDEF	ansi_cls
         XDEF	ansi_del_line
-        XDEF	ansi_scrollup
+        XDEF	ansi_SCROLLUP
 
         XDEF	FRAMES
 
@@ -440,7 +440,7 @@ IF !DEFINED_nogfx
 	ret
 
 ;-----------  GFX support for ANSI VT emulation  -------------
-.ansi_scrollup
+.ansi_SCROLLUP
 	ld	a,$9e
 	out	($80),a
 
