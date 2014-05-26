@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.9 2013-10-21 14:23:44 stefano Exp $
+;       $Id: pps_crt0.asm,v 1.10 2014-05-26 10:10:02 stefano Exp $
 ;
 
 
@@ -317,5 +317,18 @@ extra:          defs    6		;FP register
 fa:             defs    6		;FP Accumulator
 fasign:         defb    0		;FP register
 
+ENDIF
+
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+redir_fopen_flag:
+				defb 'w'
+				defb 0
+redir_fopen_flagr:
+				defb 'r'
+				defb 0
+ENDIF
+ENDIF
 ENDIF
 
