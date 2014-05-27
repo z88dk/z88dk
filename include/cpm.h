@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.10 2013-06-11 09:17:15 stefano Exp $
+ *    $Id: cpm.h,v 1.11 2014-05-27 14:20:49 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -99,6 +99,8 @@ extern struct fcb  _fcb[MAXFILE];
 
 /* The CPM bdos call */
 extern int __LIB__ bdos(int func,int arg);
+extern int __LIB__ bios(int func,int arg,int arg2);
+#define bios(a,b) bios(a,b,0)
 
 /* Get a free FCB */
 

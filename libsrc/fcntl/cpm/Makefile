@@ -1,12 +1,13 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.12 2013-06-06 08:58:32 stefano Exp $
+# $Id: Makefile,v 1.13 2014-05-27 14:20:49 stefano Exp $
 
 include ../../Make.config
 
 CFILES = \
 	_putoffset.c \
+	bios.c \
 	bdos.c \
 	close.c \
 	creat.c \

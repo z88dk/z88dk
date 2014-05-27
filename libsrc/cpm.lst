@@ -2,6 +2,7 @@ stdio/cpm/fgetc_cons
 stdio/cpm/getk
 stdio/cpm/fputc_cons
 stdio/puts_cons
+fcntl/cpm/bios
 fcntl/cpm/bdos
 fcntl/cpm/close
 fcntl/cpm/creat
