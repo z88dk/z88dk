@@ -136,7 +136,8 @@ __cons_input_terminal_L1:
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN IOCTL_ITERM_LINE
+   EXTERN IOCTL_ITERM_LINE, IOCTL_ITERM_SETF
+   EXTERN error_enotsup_zc
 
 __ictl:
 
@@ -161,7 +162,7 @@ __ictl:
    and $20
    jr z, __flsh
    
-   jp error_enostup_zc
+   jp error_enotsup_zc
 
 __ictl_line:
    
