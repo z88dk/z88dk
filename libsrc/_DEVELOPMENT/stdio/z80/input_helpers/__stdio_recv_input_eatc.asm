@@ -110,7 +110,17 @@ _no_ungetc_ec:
    pop af
    pop hl                      ; hl = total num items assigned
    
-   ret nc                      ; if no error
+   jr c, error_occurred
+   
+   bit 0,(ix+3)
+   ret nz                      ; if this file is a memstream
+   
+   ld (ix+6),a                 ; write unconsumed char to ungetc spot
+   set 0,(ix+4)                ; indicate ungetc is present
+   
+   ret
+
+error_occurred:
 
    ; stream error or eof ?
 
