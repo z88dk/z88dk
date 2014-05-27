@@ -1,1 +1,3 @@
 arch/zx/misc/z80/asm_zx_border
+arch/zx/misc/z80/asm_zx_cls
+arch/zx/misc/z80/asm_zx_scroll

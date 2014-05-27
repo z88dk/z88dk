@@ -10,6 +10,7 @@
 ; ===============================================================
 
 PUBLIC asm_zx_saddrpdown
+PUBLIC asm0_zx_saddrpdown
 
 asm_zx_saddrpdown:
 
@@ -21,7 +22,9 @@ asm_zx_saddrpdown:
    ; uses  : af, hl
 
    inc h
-   
+
+asm0_zx_saddrpdown:
+
    ld a,h
    and $07
    ret nz

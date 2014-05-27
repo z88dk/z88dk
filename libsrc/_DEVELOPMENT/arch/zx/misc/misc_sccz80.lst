@@ -1,1 +1,4 @@
 arch/zx/misc/c/sccz80/zx_border
+arch/zx/misc/c/sccz80/zx_cls
+arch/zx/misc/c/sccz80/zx_scroll
+arch/zx/misc/c/sccz80/zx_scroll_callee

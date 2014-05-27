@@ -1,1 +1,3 @@
 arch/zx/misc/c/sdcc_ix/zx_border
+arch/zx/misc/c/sdcc_ix/zx_cls
+arch/zx/misc/c/sdcc_ix/zx_scroll
