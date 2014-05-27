@@ -296,10 +296,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDIN_s:
 
-      EXTERN __bdoskbd_driver_00
+      EXTERN __cons_input_kbd_bdos_L1
 
       defb 195                    ; jp driver
-      defw __bdoskbd_driver_00
+      defw __cons_input_kbd_bdos_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -342,10 +342,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDOUT_s:
 
-      EXTERN __bdoscons_driver_00
+      EXTERN __cons_output_bdos_L1
 
       defb 195                    ; jp driver
-      defw __bdoscons_driver_00
+      defw __cons_output_bdos_L1
       defb $80                    ; open for writing
       defb 0
       defb 0
@@ -373,10 +373,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDERR_s:
 
-      EXTERN __bdoscons_driver_00
+      EXTERN __cons_output_bdos_L1
 
       defb 195                      ; jp driver
-      defw __bdoscons_driver_00
+      defw __cons_output_bdos_L1
       defb $80                      ; open for writing
       defb 0
       defb 0
@@ -448,10 +448,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDIN:
 
-      EXTERN __bdoskbd_driver_00
+      EXTERN __cons_input_kbd_bdos_L1
 
       defb 195                    ; jp driver
-      defw __bdoskbd_driver_00
+      defw __cons_input_kbd_bdos_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -494,10 +494,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDOUT:
 
-      EXTERN __bdoscons_driver_00
+      EXTERN __cons_output_bdos_L1
 
       defb 195                    ; jp driver
-      defw __bdoscons_driver_00
+      defw __cons_output_bdos_L1
       defb $80                    ; open for writing
       defb 0
       defb 0
@@ -525,10 +525,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDERR:
 
-      EXTERN __bdoscons_driver_00
+      EXTERN __cons_output_bdos_L1
 
       defb 195                      ; jp driver
-      defw __bdoscons_driver_00
+      defw __cons_output_bdos_L1
       defb $80                      ; open for writing
       defb 0
       defb 0
