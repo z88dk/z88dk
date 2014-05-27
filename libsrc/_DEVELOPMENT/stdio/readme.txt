@@ -36,6 +36,10 @@ bit   name    purpose
  3    err     if set the stream encountered an error
 210   type    stdio structure type (000 = FILE, 001 = FILE_MEMSTREAM)
 
+note: If type has the LSB set, stdio will not write the unconsumed char
+      to ungetc in the FILE struct.  This is to allow memstreams and 
+      vsscanf to handle ungetc locally, which simplifies that code.
+
 * state_flags_1
 
 bit   name    purpose
@@ -66,7 +70,7 @@ bit   name    purpose
 Flag bits associated with the driver.  This is temporary state information
 that will be moved to the driver when posix file descriptors are added.
 
-if bits 2..0 = 000, this byte is unused
+if bits 2..0 = 000, the driver has no flags managed by stdio
 
 if bits 2..0 = 001, the driver is an input terminal
 
@@ -74,8 +78,19 @@ if bits 2..0 = 001, the driver is an input terminal
 
     7    echo      if set, echo is on
     6    password  if set, echo asterisks only
-   543     0       reserved
+    5    line      if set, input is gathered a line at a time
+    4    cook      if set, input may be processed by the driver
+    3    caps lock if set, indicates processed chars should be capitalized
    210   type      001 = input terminal
+
+if bits 2..0 = 010, the driver is an output terminal
+
+   bit   name      purpose
+   
+    4    cook      if set, output may be processed by the driver
+   210   type      010 = output terminal
+
+bits 2..0 = 100 reserved to prevent conflict with memstreams
 
 
 MEMORY STREAM FILE STRUCTURE
@@ -235,6 +250,28 @@ carry set on error (file position out of range)
 
 note: stdio stages with buffers must flush first when
 this message is received.
+
+****************
+* STDIO_MSG_ICTL
+****************
+
+IOCTL message delivery to driver
+
+input:
+
+   A = STDIO_MSG_ICTL
+  BC = first parameter
+  DE = ioctl command
+  HL = void *arg, C argument list (must mind L->R or R->L param order!)
+
+condition:
+
+  do not alter EXX registers
+
+output:
+
+  carry reset if ok, HL = return value != -1
+  carry set if fail
 
 ****************
 * STDIO_MSG_FLSH
