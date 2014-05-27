@@ -24,7 +24,7 @@ asm__vioctl_:
 
    ; enter : ix = FILE *
    ;         de = command
-   ;         bc = void *stack_param = arg
+   ;         hl = void *stack_param = arg
    ;
    ; exit  : ix = FILE *
    ;

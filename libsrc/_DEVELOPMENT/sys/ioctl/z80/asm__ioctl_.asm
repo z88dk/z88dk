@@ -46,10 +46,6 @@ asm__ioctl_:
    ld ixh,d                    ; ix = FILE *
    
    call __stdio_nextarg_de     ; de = command
-   
-   ld c,l
-   ld b,h                      ; bc = void *arg
-
    jp asm__vioctl_
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -15,13 +15,14 @@ INCLUDE "clib_cfg.asm"
 PUBLIC asm__vioctl__unlocked
 PUBLIC asm0__vioctl__unlocked
 
-EXTERN error_einval_mc, error_enotsup_mc
+EXTERN l_jpix, STDIO_MSG_ICTL, __stdio_nextarg_bc
+EXTERN error_einval_mc, error_enotsup_mc, error_mc
 
 asm__vioctl__unlocked:
 
    ; enter : ix = FILE *
    ;         de = command
-   ;         bc = void *stack_param = arg
+   ;         hl = void *stack_param = arg
    ;
    ; exit  : ix = FILE *
    ;
@@ -35,7 +36,7 @@ asm__vioctl__unlocked:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : af, bc, de, hl, ix
+   ; uses  : af, bc, de, hl
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -50,95 +51,80 @@ ENDIF
 
 asm0__vioctl__unlocked:
 
-   inc d
-   dec d
-   jp nz, error_einval_mc      ; if command not understood
+   call __stdio_nextarg_bc     ; bc = first parameter
+
+   ld a,e
+   and $07
+   jr z, forward_ioctl_1       ; if command type is not handled by stdio
+   
+   ; stdio handles so check for driver type match
    
    ld a,(ix+13)
-   push af                     ; save current driver flags
+   push af                     ; save driver flags state
    
-   xor e                       ; compare command driver type
+   xor e
    and $07
    jp nz, error_enotsup_mc - 1 ; if driver types do not match
    
-   ld a,e                      ; check for load flags command
-   or $07
-   inc a                       ; z flag set if load
-
-   ld a,(bc)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __SDCC | __SDCC_IX | __SDCC_IY
-
-   inc bc
-
-ELSE
-
-   dec bc
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ld d,a
-   jr z, load_flags
-
-boolean_flag:
-
-   ld a,(bc)
-   or d
-   jr z, boolean_false
+   inc d
+   dec d
+   jr nz, forward_ioctl_0      ; not a driver flags command
    
-boolean_true:
+   ; forward ioctl to driver
+   
+   push bc
+   push de
+   
+   call forward_ioctl_1        ; forward to driver
+   
+   pop de
+   pop bc
+   
+   ; alter driver flags
+   
+   ld a,e
+   or $07
+   inc a
+   jr z, load_flags            ; if load flags command
+   
+   ld a,b
+   or c                        ; z flag set to true/false value of bc
+   
+   ld c,0                      ; false
+   jr z, load_flags
+   
+   dec c                       ; true
 
-   ld a,$f8                    ; all flag bits set
+load_flags:
 
-boolean_false:
-
+   ld a,c
    and e
-   ld d,a                      ; d = bit state for affected flag bits
+   ld c,a                      ; c = true/false state of affected bits
    
    ld a,e
    cpl
    and $f8
    or $07
-   and (ix+13)                 ; zero affected flag bits
+   and (ix+13)                 ; clear flags bits that will be affected
    
-   jr exit
-
-load_flags:
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __SDCC | __SDCC_IX | __SDCC_IY
-
-   ld a,(bc)                   ; MSB of integer parameter
+   or c                        ; set state of affected bits
+   ld (ix+13),a                ; write updated driver state flags
    
-   or a
-   jp nz, error_einval_mc - 1  ; if load parameter larger than byte
+   pop hl                      ; h = old driver state flags
    
-   ld a,d                      ; LSB of integer parameter
-
-ELSE
-
-   or a
-   jp nz, error_einval_mc - 1  ; if load parameter larger than byte
-   
-   ld a,(bc)                   ; LSB of integer parameter
-   
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   and $f8
-   ld d,a
-   ld a,e
-   and $07
-
-exit:
-
-   or d                        ; or in new flag bits
-   ld (ix+13),a                ; set new flag state
-   
-   pop hl
    ld l,h
-   ld h,0                      ; hl = old flags
+   ld h,0
    
    ret
+
+forward_ioctl_0:
+
+   pop af
+
+forward_ioctl_1:
+
+   ld a,STDIO_MSG_ICTL
+   call l_jpix
+
+   ret nc   
+   jp error_mc                 ; indicate error
