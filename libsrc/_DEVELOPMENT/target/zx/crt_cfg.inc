@@ -53,6 +53,15 @@ defc __crt_cfg_fopen_max = 8
 ; are disabled) then there will be no available FILE structs.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; input terminal driver
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+defc __crt_cfg_edit_buflen = 255
+
+; size of the edit buffer when the input terminal is in line
+; mode.  setting to zero will disable line mode.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; exit stack size options
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

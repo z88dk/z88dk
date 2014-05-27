@@ -50,12 +50,13 @@ IF __crt_segment_bss_address > 0
    ; bss segment is external
    
    defc __crt_segment_bss_begin = __crt_segment_bss_address
-   
+      
    defvars __crt_segment_bss_begin
    {
       ; -- insert local crt bss segment here ------------------
       
-      __sp                     ds.w 1
+      __sp                             ds.w 1
+      __stdin_edit_buf                 ds.b __crt_cfg_edit_buflen
       
       ; -------------------------------------------------------
    }
@@ -89,15 +90,16 @@ IF __crt_segment_data_address > 0
    {
    ; -- insert local crt data segment here --------------------
 
-      _fzx                ds.b 6
+      _fzx                            ds.b 6
    }
    
    IF __crt_cfg_file_enable & $01
    
    defvars -1
    {
-                          ds.w 1
-      __CRT_FILE_STDIN    ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDIN                ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+      __stdin_terminal_state_L1       ds.b 7
    }
    
    ENDIF
@@ -106,8 +108,9 @@ IF __crt_segment_data_address > 0
 
    defvars -1
    {   
-                          ds.w 1
-      __CRT_FILE_STDOUT   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDOUT               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+      __stdout_terminal_state_L1      ds.b 4
    }
    
    ENDIF
@@ -116,8 +119,8 @@ IF __crt_segment_data_address > 0
    
    defvars -1
    {
-                          ds.w 1
-      __CRT_FILE_STDERR   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDERR               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
    }
    
    ENDIF
@@ -144,7 +147,7 @@ PUBLIC __crt_segment_bss_begin,  __crt_segment_bss_end, __crt_segment_bss_len
 PUBLIC __crt_segment_data_begin, __crt_segment_data_end, __crt_segment_data_len
 PUBLIC __crt_segment_data_source_begin, __crt_segment_data_source_end, __crt_segment_data_source_len
 
-EXTERN _main, asm_cons_cls_00
+EXTERN _main, asm_zx_cls
 
 __crt_code_begin:
 
@@ -170,7 +173,9 @@ __crt_code_begin:
    
    ld a,(__sound_bit_state)
    out ($fe),a
-   call asm_cons_cls_00
+   
+   ld hl,(_cons_attr_p)
+   call asm_zx_cls
       
    ; call user program
    
@@ -252,10 +257,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDIN_s:
 
-      EXTERN __cons_input_kbd_A_00
+      EXTERN __cons_input_kbd_lastk_L1
 
       defb 195                    ; jp driver
-      defw __cons_input_kbd_A_00
+      defw __cons_input_kbd_lastk_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -264,15 +269,23 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb $81                 ; driver flags = echo on
+         defb $b1                 ; driver flags = echo | line | cook
 
       ENDIF
                        
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
 
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+
+      __stdin_terminal_state_L1_s:
+      
+         defw __CRT_FILE_STDOUT
+         defw __stdin_edit_buf
+         defw __stdin_edit_buf
+         defb __crt_cfg_edit_buflen
 
    ENDIF
 
@@ -290,10 +303,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDOUT_s:
 
-      EXTERN __cons_output_fzx_00
+      EXTERN __cons_output_fzx_L1
 
       defb 195                    ; jp driver
-      defw __cons_output_fzx_00
+      defw __cons_output_fzx_L1
       defb $80                    ; open for writing
       defb 0
       defb 0
@@ -302,15 +315,21 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                   ; driver flags n/a
+         defb $12                 ; driver flags = cook
 
       ENDIF
 
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
 
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+         defw __stdout_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+
+      __stdout_terminal_state_L1_s:
+      
+         defw __stdin_terminal_state_L1
+         defw 0
 
    ENDIF
 
@@ -320,10 +339,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDERR_s:
 
-      EXTERN __cons_output_fzx_00
+      EXTERN __cons_output_fzx_L1
 
       defb 195                      ; jp driver
-      defw __cons_output_fzx_00
+      defw __cons_output_fzx_L1
       defb $80                      ; open for writing
       defb 0
       defb 0
@@ -332,7 +351,7 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                     ; driver flags n/a
+         defb $12                   ; driver flags = cook
 
       ENDIF
 
@@ -404,10 +423,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDIN:
 
-      EXTERN __cons_input_kbd_A_00
+      EXTERN __cons_input_kbd_lastk_L1
 
       defb 195                    ; jp driver
-      defw __cons_input_kbd_A_00
+      defw __cons_input_kbd_lastk_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -416,15 +435,23 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb $81                 ; driver flags = echo on
+         defb $b1                 ; driver flags = echo | line | cook
 
       ENDIF
                        
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
+      
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+      
+      __stdin_terminal_state_L1:
+      
+         defw __CRT_FILE_STDOUT
+         defw __stdin_edit_buf
+         defw __stdin_edit_buf
+         defb __crt_cfg_edit_buflen
 
    ENDIF
 
@@ -442,10 +469,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDOUT:
 
-      EXTERN __cons_output_fzx_00
+      EXTERN __cons_output_fzx_L1
 
       defb 195                    ; jp driver
-      defw __cons_output_fzx_00
+      defw __cons_output_fzx_L1
       defb $80                    ; open for writing
       defb 0
       defb 0
@@ -454,15 +481,21 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                   ; driver flags n/a
+         defb $12                 ; driver flags = cook
 
       ENDIF
 
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
 
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+         defw __stdout_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+      
+      __stdout_terminal_state_L1:
+      
+         defw __stdin_terminal_state_L1
+         defw 0
 
    ENDIF
 
@@ -472,10 +505,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDERR:
 
-      EXTERN __cons_output_fzx_00
+      EXTERN __cons_output_fzx_L1
 
       defb 195                      ; jp driver
-      defw __cons_output_fzx_00
+      defw __cons_output_fzx_L1
       defb $80                      ; open for writing
       defb 0
       defb 0
@@ -484,7 +517,7 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                     ; driver flags n/a
+         defb $12                   ; driver flags = cook
 
       ENDIF
 
@@ -515,11 +548,14 @@ IF __crt_segment_bss_address = 0
 
    ; bss segment is attached to the binary
 
+   PUBLIC __cons_input_edit_buf, __crt_cfg_edit_buflen
+
 __crt_segment_bss_begin:
 
    ; -- insert local crt bss segment here ---------------------
    
-   __sp:                       defs 2
+   __sp:                              defs 2
+   __stdin_edit_buf:                  defs __crt_cfg_edit_buflen
    
    ; ----------------------------------------------------------
 

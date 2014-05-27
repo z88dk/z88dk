@@ -10,6 +10,7 @@
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
 @sys/sys_sdcc_iy.lst
+@target/crt/driver_asm.lst
 @target/cpm/driver/driver_asm.lst
 @threads/threads_sdcc_iy.lst
 @z80/z80_sdcc_iy.lst

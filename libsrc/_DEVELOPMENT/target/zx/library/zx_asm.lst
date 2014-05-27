@@ -14,6 +14,7 @@
 @stdlib/stdlib_asm.lst
 @string/string_asm.lst
 @sys/sys_asm.lst
+@target/crt/driver_asm.lst
 @target/zx/driver/driver_asm.lst
 @temp/sp1/zx/sp1_zx_asm.lst
 @threads/threads_asm.lst

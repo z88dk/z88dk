@@ -49,8 +49,9 @@ IF __crt_segment_bss_address > 0
    {
       ; -- insert local crt bss segment here ------------------
       
-      __sp                     ds.w 1
-      __null_string            ds.b 1
+      __sp                            ds.w 1
+      __null_string                   ds.b 1
+      __stdin_edit_buf                ds.b __crt_cfg_edit_buflen
       
       ; -------------------------------------------------------
    }
@@ -87,8 +88,9 @@ IF __crt_segment_data_address > 0
    
    defvars -1
    {
-                          ds.w 1
-      __CRT_FILE_STDIN    ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDIN                ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+      __stdin_terminal_state_L1       ds.b 7
    }
    
    ENDIF
@@ -97,8 +99,8 @@ IF __crt_segment_data_address > 0
 
    defvars -1
    {   
-                          ds.w 1
-      __CRT_FILE_STDOUT   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDOUT               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
    }
    
    ENDIF
@@ -107,8 +109,8 @@ IF __crt_segment_data_address > 0
    
    defvars -1
    {
-                          ds.w 1
-      __CRT_FILE_STDERR   ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+                                      ds.w 1
+      __CRT_FILE_STDERR               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
    }
    
    ENDIF
@@ -306,15 +308,23 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb $81                 ; driver flags = echo on
+         defb $b1                 ; driver flags = echo | line | cook
 
       ENDIF
                        
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
+      
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+
+      __stdin_terminal_state_L1_s:
+      
+         defw __CRT_FILE_STDOUT
+         defw __stdin_edit_buf
+         defw __stdin_edit_buf
+         defb __crt_cfg_edit_buflen
 
    ENDIF
 
@@ -344,13 +354,14 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                   ; driver flags n/a
+         defb $12                 ; driver flags = cook
 
       ENDIF
 
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
 
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
 
@@ -374,7 +385,7 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                     ; driver flags n/a
+         defb $12                   ; driver flags = cook
 
       ENDIF
 
@@ -449,15 +460,23 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb $81                 ; driver flags = echo on
+         defb $b1                 ; driver flags = echo | line | cook
 
       ENDIF
                        
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
+      
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
+      
+      __stdin_terminal_state_L1:
+      
+         defw __CRT_FILE_STDOUT
+         defw __stdin_edit_buf
+         defw __stdin_edit_buf
+         defb __crt_cfg_edit_buflen
 
    ENDIF
 
@@ -487,13 +506,14 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                   ; driver flags n/a
+         defb $12                 ; driver flags = cook
 
       ENDIF
 
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
+      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
 
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
+         defw __stdin_terminal_state_L1
+         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
 
       ENDIF
 
@@ -517,7 +537,7 @@ __crt_segment_data_begin:
 
       IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
 
-         defb 0                     ; driver flags n/a
+         defb $12                   ; driver flags = cook
 
       ENDIF
 
@@ -554,6 +574,7 @@ __crt_segment_bss_begin:
    
    __sp:                       defs 2
    __null_string:              defs 1
+   __stdin_edit_buf:           defs __crt_cfg_edit_buflen
    
    ; ----------------------------------------------------------
 
