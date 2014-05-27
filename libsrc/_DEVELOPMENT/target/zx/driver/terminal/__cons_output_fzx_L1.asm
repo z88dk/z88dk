@@ -392,8 +392,8 @@ __scroll:
 
    ; adjust fzx state
    
-   xor a
-   ld (_fzx+4),a               ; x coordinate = 0
+;   xor a
+;   ld (_fzx+4),a               ; x coordinate = 0
    
    ld a,e
    add a,a
@@ -403,6 +403,12 @@ __scroll:
    
    ld a,(_fzx+5)
    sub l
+   
+   jr nc, __scroll_new_y
+   xor a
+
+__scroll_new_y:
+
    ld (_fzx+5),a               ; y coordinate -= E * 8
 
    ld hl,(_cons_attr_p)
