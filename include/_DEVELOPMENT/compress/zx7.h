@@ -40,7 +40,7 @@
    The mangling only makes sense on the zx spectrum target
    as the re-ordering is a function of the storage format on
    that machine.  The routines are kept available for all targets
-   only to allow all targets to decompress this sort of data.
+   to allow all targets to decompress this sort of data.
    
    * dzx7_smart_rcs()
    
