@@ -2,6 +2,8 @@
 #ifndef _ARCH_SPECTRUM_H
 #define _ARCH_SPECTRUM_H
 
+#include <stddef.h>
+
 // COMMON CONSTANTS
 
 #define INK_BLACK                   0x00
@@ -29,7 +31,11 @@
 
 // SDCC
 
-extern void    zx_border(int colour);
+// misc
+
+extern void    zx_border(uint8_t colour);
+extern void    zx_cls(uint8_t attr);
+extern void    zx_scroll(uint8_t rows, uint8_t attr);
 
 // display
 
@@ -102,7 +108,11 @@ extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
 
 // SCCZ80
 
+// misc
+
 extern void   __LIB__ __FASTCALL__  zx_border(int colour);
+extern void   __LIB__ __FASTCALL__  zx_cls(uint8_t attr);
+extern void   __LIB__               zx_scroll(uint8_t rows, uint8_t attr);
 
 // display
 
@@ -145,6 +155,10 @@ extern int    __LIB__               zx_pattern_fill(int x, int y, void *pattern,
 
 // SCCZ80 CALLEE LINKAGE
 
+// misc
+
+extern void   __LIB__ __CALLEE__    zx_scroll_callee(uint8_t rows, uint8_t attr);
+
 // display
 
 extern void   __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(int row, int col);
@@ -159,6 +173,8 @@ extern void   __LIB__ __CALLEE__   *zx_saddrpright_callee(void *saddr, int bitma
 extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(int x, int y, void *pattern, int depth);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
+
+#define zx_scroll(a,b)              zx_scroll_callee(a,b)
 
 #define zx_cyx2aaddr(a,b)           zx_cyx2aaddr_callee(a,b)
 #define zx_cyx2saddr(a,b)           zx_cyx2saddr_callee(a,b)
