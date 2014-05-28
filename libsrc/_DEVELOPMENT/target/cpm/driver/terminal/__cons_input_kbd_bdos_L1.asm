@@ -30,7 +30,7 @@ PUBLIC __cons_input_kbd_bdos_L1
    EXTERN __cons_input_terminal_L1
    EXTERN STDIO_MSG_ITERM_GETCHAR
 
-__cons_input_kbd_lastk_L1:
+__cons_input_kbd_bdos_L1:
 
    cp STDIO_MSG_ITERM_GETCHAR
    jp nz, __cons_input_terminal_L1   ; forward message to driver

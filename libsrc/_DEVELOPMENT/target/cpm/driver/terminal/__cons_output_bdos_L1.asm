@@ -21,7 +21,7 @@ PUBLIC __cons_output_bdos_L1
    EXTERN __cons_output_terminal_L1
    EXTERN STDIO_MSG_OTERM_L1, STDIO_MSG_OTERM_PUTCHAR
 
-__cons_output_fzx_L1:
+__cons_output_bdos_L1:
    
    cp STDIO_MSG_OTERM_L1
    jr z, __oterm_L1
@@ -53,7 +53,7 @@ __putchar_console:
    bit 4,(ix+13)
    jr z, __bdos_outchar        ; if cook disabled
 
-__putchar_cook
+__putchar_cook:
 
    ; cook is enabled
    ; interpret special codes
