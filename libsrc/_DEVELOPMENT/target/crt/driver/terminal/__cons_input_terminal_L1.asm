@@ -397,8 +397,15 @@ __cons_input_getc:
    bit 5,(ix+13)
    jr nz, __cons_input_getc_line  ; if in line mode
 
-   ; fall through
-   
+__cons_input_getc_loop:
+
+   call __cons_input_getc_raw
+   ret nc
+
+   jr __cons_input_getc_loop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    EXTERN STDIO_MSG_ITERM_GETCHAR
    EXTERN l_jpix
    
@@ -407,7 +414,8 @@ __cons_input_getc_raw:
    ; read a char from the device
 
    ; exit : a = hl = char
-   ;        carry reset always succeeds
+   ;        carry set if char consumed locally
+   ;        always succeeds
    ;
    ; uses : af, hl
 
@@ -415,10 +423,9 @@ __cons_input_getc_raw:
    call l_jpix                 ; get char from driver
 
    bit 4,(ix+13)
-   call nz, __cons_input_cook  ; process char
-   
-   ret nc                      ; if char was not consumed
-   jr __cons_input_getc_raw
+   jp nz, __cons_input_cook    ; process char
+
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -481,7 +488,7 @@ __no_edit_buffer:
 
    pop ix
    
-   call __cons_input_getc_raw
+   call __cons_input_getc_loop
    
    push af
    push hl
@@ -534,7 +541,7 @@ __read_line_loop:
    
    push bc
    push de
-   
+
    ld a,(ix+13)
    and $18
    cp $18                      ; check if caps lock and cook enabled
@@ -548,7 +555,7 @@ __cursor_set:
    ld (de),a
    call __cons_input_echo_cursor
    
-   call __cons_input_getc_raw  ; read char
+   call __cons_input_getc_raw ; read char
    
    pop de
    push de
@@ -557,10 +564,11 @@ __cursor_set:
    ld a,(de)
    call __cons_input_backspace_cursor
    
-   pop af
-   
+   pop af   
    pop de
    pop bc
+
+   jr c, __read_line_loop      ; if char was consumed by console
 
    ;;;;;;;;;;;;;;;;
 
