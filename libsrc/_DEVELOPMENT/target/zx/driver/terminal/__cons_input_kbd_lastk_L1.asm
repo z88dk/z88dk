@@ -31,12 +31,12 @@ defc LASTK = 23560
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN __cons_input_terminal_L1
-   EXTERN STDIO_MSG_FLSH, STDIO_MSG_ITERM_L1
+   EXTERN STDIO_MSG_FLSH, STDIO_MSG_ITERM_GETCHAR
 
 __cons_input_kbd_lastk_L1:
 
-   cp STDIO_MSG_ITERM_L1
-   jr z, __iterm_L1
+   cp STDIO_MSG_ITERM_GETCHAR
+   jr z, __getchar
    
    cp STDIO_MSG_FLSH
    jp nz, __cons_input_terminal_L1   ; forward message to driver
@@ -53,7 +53,7 @@ __flsh:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__iterm_L1:
+__getchar:
 
    ; return a = hl = char read from device
    ;        carry reset
@@ -63,7 +63,7 @@ __iterm_L1:
    ld a,(LASTK)
    
    or a
-   jr z, __iterm_L1            ; if no keypress
+   jr z, __getchar             ; if no keypress
    
    ld l,a
    
