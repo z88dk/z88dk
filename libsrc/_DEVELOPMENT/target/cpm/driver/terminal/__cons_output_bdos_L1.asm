@@ -19,20 +19,84 @@ PUBLIC __cons_output_bdos_L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN __cons_output_terminal_L1
-   EXTERN STDIO_MSG_OTERM_L1
+   EXTERN STDIO_MSG_OTERM_L1, STDIO_MSG_OTERM_PUTCHAR
 
 __cons_output_fzx_L1:
    
    cp STDIO_MSG_OTERM_L1
+   
+   cp STDIO_MSG_OTERM_PUTCHAR
    jp nz, __cons_output_terminal_L1   ; forward unhandled messages
 
    ; fall through
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+__putchar:
+
+   ; these chars are delivered from stdio, not the input console
+   ; this is where tty interpretation should be applied
+
+   ; C = char to output
+   ;
+   ; return carry set on error
+   ; can modify af, bc, de, hl
+
+   ld a,c
+
+   cp 13
+   jr z, __putchar_crlf
+
+   bit 4,(ix+13)
+   jr z, __bdos_outchar        ; if cook disabled
+
+__putchar_cook
+
+   ; cook is enabled
+   ; interpret special codes
+   
+   cp 12
+   jr z, __putchar_cls
+
+__bdos_outchar:
+
+   ld e,a
+   ld d,0
+   ld c,2
+   call 5
+   
+   or a
+   ret
+
+__putchar_crlf:
+
+   ld de,10
+   ld c,2
+   call 5
+   
+   ld a,13
+   jr __bdos_outchar
+
+
+__putchar_cls:
+
+   ; this is the ANSI CLS call
+
+   ld a,27
+   call __bdos_outchar
+   
+   ld a,'['
+   call __bdos_outchar
+   
+   ld a,'J'
+   jp __bdos_outchar
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 __oterm_L1:
 
    ; STDIO_MSG_OTERM_L1
+   ; b = message number
    ; can modify af, bc, de, hl, ix
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -48,61 +112,19 @@ __oterm_01:
 
    ; uses  : all except ix, bc', de', hl'
 
-   push ix
-   call __bdos_putc
-   pop ix
-   ret
-
-__bdos_putc:
+   ; the input console is generating this output
+   ; prevent control characters from being output to driver
 
    ld a,c
-
+   
    cp 13
-   jr z, __bdos_putc_crlf
-
-   bit 4,(ix+13)
-   jr z, __bdos_outchar
-
-__bdos_putc_cook:
-
-   ; cook is enabled
-   ; interpret special codes
+   jr z, __putchar
    
-   cp 12
-   jr z, __bdos_putc_cls
-
-__bdos_outchar:
-
-   ld e,a
-   ld d,0
-   ld c,2
-   call 5
+   cp 32
+   jr nc, __putchar
    
-   or a
-   ret
-
-__bdos_putc_crlf:
-
-   ld de,10
-   ld c,2
-   call 5
-   
-   ld a,13
-   jr __bdos_outchar
-
-
-__bdos_putc_cls:
-
-   ; this is the ANSI CLS call
-
-   ld a,27
-   call __bdos_outchar
-   
-   ld a,'['
-   call __bdos_outchar
-   
-   ld a,'J'
-   jp __bdos_outchar
+   ld c,'?'
+   jr __putchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -135,22 +157,12 @@ __oterm_03:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 __oterm_04:
-
-   djnz __oterm_unknown
 
    ;   b = 4 input console is starting read line
    ;        de = address of edit buffer
-
-
-
-
-
-
-
-
-__oterm_unknown:
+   
+   ; don't need this information
 
    or a
    ret

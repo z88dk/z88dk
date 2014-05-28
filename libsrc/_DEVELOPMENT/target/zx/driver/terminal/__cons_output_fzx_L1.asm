@@ -27,9 +27,13 @@ PUBLIC __cons_output_fzx_L1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN __cons_output_terminal_L1
-   EXTERN STDIO_MSG_WRIT, STDIO_MSG_OTERM_L1
+   EXTERN STDIO_MSG_WRIT, STDIO_MSG_ICTL
+   EXTERN STDIO_MSG_OTERM_L1, STDIO_MSG_OTERM_PUTCHAR
 
 __cons_output_fzx_L1:
+   
+   cp STDIO_MSG_OTERM_PUTCHAR
+   jr z, __putchar
    
    cp STDIO_MSG_WRIT
    jr z, __writ
@@ -37,7 +41,80 @@ __cons_output_fzx_L1:
    cp STDIO_MSG_OTERM_L1
    jr z, __oterm_L1
    
-   jp __cons_output_terminal_L1
+   cp STDIO_MSG_ICTL
+   jp nz, __cons_output_terminal_L1
+
+   ; fall through
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   EXTERN __cons_output_terminal_L1
+   EXTERN _fzx, IOCTL_OTERM_FONT
+
+__ictl:
+
+   ; BC = first parameter
+   ; DE = command
+   ; HL = void *arg, mind R->L or L->R param order!
+   
+   ; IOCTL_OTERM_FONT understood here
+   
+   push hl
+   
+   ld hl,IOCTL_OTERM_FONT
+   sbc hl,de
+   
+   pop hl
+   jp nz, __cons_output_terminal_L1
+   
+   ; change fzx font
+   
+   ld hl,(_fzx)
+   ld (_fzx),bc
+   
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   EXTERN asm_fzx_putc
+
+__putchar:
+
+   ; these chars are delivered from stdio, not the input console
+   ; this is where tty interpretation should be applied
+
+   ; C = char to output
+   ;
+   ; return carry set on error
+   ; can modify af, bc, de, hl
+
+   ex af,af'
+   push af
+   push ix
+
+   ld a,c
+   
+__echo_loop:
+
+   push af
+      
+   call asm_fzx_putc
+   jr c, __echo_screen_full
+
+   pop af
+   pop ix
+   pop af
+   ex af,af'
+   
+   or a
+   ret
+
+__echo_screen_full:
+
+   call __cons_output_scroll
+   
+   pop af
+   jr __echo_loop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -45,6 +122,9 @@ __cons_output_fzx_L1:
 
 __writ:
 
+   ; these chars are delivered from stdio, not the input console
+   ; this is where tty interpretation should be applied
+   
    ; BC' = length > 0
    ; HL' = void *buffer = byte source
    ; HL  = length > 0
@@ -88,11 +168,10 @@ __writ_screen_full:
 __oterm_L1:
 
    ; STDIO_MSG_OTERM_L1
+   ; b = message number
    ; can modify af, bc, de, hl, ix
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   EXTERN asm_fzx_putc
 
 __oterm_01:
 
@@ -105,35 +184,19 @@ __oterm_01:
 
    ; uses  : all except ix, bc', de', hl'
 
-__cons_output_putc:
-
-   ex af,af'
-   push af
-   push ix
+   ; the input console is generating this output
+   ; prevent control characters from being output to driver
 
    ld a,c
    
-__echo_loop:
-
-   push af
-      
-   call asm_fzx_putc
-   jr c, __echo_screen_full
-
-   pop af
-   pop ix
-   pop af
-   ex af,af'
+   cp 13
+   jr z, __putchar
    
-   or a
-   ret
-
-__echo_screen_full:
-
-   call __cons_output_scroll
+   cp 32
+   jr nc, __putchar
    
-   pop af
-   jr __echo_loop
+   ld c,'?'
+   jr __putchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -239,11 +302,11 @@ __password_char:
    
    inc l
    dec l
-   jr z, __no_wrap
 
-   ld hl,(_fzx+2)              ; l = left margin
-   
-   ld h,b
+   ld hl,(_fzx+2)
+   ld h,b                      ; hl = left margin
+
+   jr z, __no_wrap             ; if char fit exactly in last line
    add hl,bc
 
 __no_wrap:
@@ -256,7 +319,7 @@ __no_wrap:
 __virtual_print_done:
 
    ; ix = struct fzx_font *
-   ; hl = x coord of erase_char (0..256)
+   ; hl = x coord of erase_char
    ; stack = FILE*, erase_char
    
    ld de,(_fzx+4)              ; e = current x coord, d = current y coord
@@ -272,6 +335,9 @@ __virtual_print_done:
    ld a,d
    sub (ix+0)                  ; subtract font height
    ld d,a
+   
+   jr nc, __erase_char
+   ld d,0
 
 __erase_char:
 
@@ -319,7 +385,7 @@ __oterm_03:
    ;        de = address of char to erase in edit buffer
 
    scf
-   jr __oterm_02_bs
+   jp __oterm_02_bs
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -391,9 +457,6 @@ __amount_loop:
 __scroll:
 
    ; adjust fzx state
-   
-;   xor a
-;   ld (_fzx+4),a               ; x coordinate = 0
    
    ld a,e
    add a,a
