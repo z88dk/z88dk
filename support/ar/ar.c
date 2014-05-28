@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.15 2014-05-28 23:36:39 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.16 2014-05-28 23:40:11 pauloscustodio Exp $
  */
 
 
@@ -440,11 +440,15 @@ int main(int argc, char *argv[])
 		}
 		fclose( fp );
 	}
+	return 0;
 }
 
 /*
  * $Log: ar.c,v $
- * Revision 1.15  2014-05-28 23:36:39  pauloscustodio
+ * Revision 1.16  2014-05-28 23:40:11  pauloscustodio
+ * Return 0 from main on success.
+ *
+ * Revision 1.15  2014/05/28 23:36:39  pauloscustodio
  * Added -c option to dump object code bytes
  * Accepts all object file versions 1 to 4, see src/z80asm/doc for the format description.
  *
