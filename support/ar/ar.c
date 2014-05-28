@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.14 2014-05-01 11:33:32 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.15 2014-05-28 23:36:39 pauloscustodio Exp $
  */
 
 
@@ -16,284 +16,439 @@
 #include <ctype.h>
 #include <getopt.h>
 #include <assert.h>
+#include <stdarg.h>
 
-static FILE *open_library(char *filename);
+#define END_MARKER 0xFFFFFFFF
+#define MAX_FP     0x7FFFFFFF
+#define END(a, b)  ((a) != END_MARKER ? (a) : (b))
 
-static unsigned long read_intel32(FILE *fp, unsigned long *offs);
-static unsigned int  read_intel16(FILE *fp, unsigned long *offs);
-static void          read_name(FILE *fp, unsigned long *offs, FILE *out, int add_tabs);
+#define MIN_VERSION 1
+#define MAX_VERSION 4
 
-static void object_dump(FILE *fp, char *filename, unsigned long start, char flags);
+enum file_type { is_none, is_library, is_object };
 
-enum { showlocal = 1, showexpr = 2 };
+int opt_showlocal, opt_showexpr, opt_dump_code;	/* options */
+char file_signature[9];		/* set with last read signature */
+int  file_version;			/* set with last file version, -1 if invalid */
+char *last_name = NULL;		/* keep last name returned by xfread_name */
 
-static void usage(char *name)
+/*-----------------------------------------------------------------------------
+*   die()
+*----------------------------------------------------------------------------*/
+void die( char *msg, ... )
 {
-	fprintf(stderr,"Usage %s [-h][-l][-e] library\n",name);
-	fprintf(stderr,"Display the contents of a z80asm library file\n");
-	fprintf(stderr,"\n-l\tShow local symbols\n");
-	fprintf(stderr,"-e\tShow expression patches\n");
-	fprintf(stderr,"-h\tDisplay this help\n");
-	exit(1);
+    va_list argptr;
+    
+	va_start( argptr, msg ); /* init variable args */
+	vfprintf( stderr, msg, argptr );
+	va_end( argptr );
+
+    exit( 1 );
 }
+
+/*-----------------------------------------------------------------------------
+*	File IO with fatal errors
+*----------------------------------------------------------------------------*/
+FILE *xfopen( char *filename, char *mode )
+{
+	FILE *fp = fopen( filename, mode );
+	if ( fp == NULL )
+		die("File %s: cannot open\n", filename );
+	return fp;
+}
+
+void xfread( FILE *file, char *filename, char *buffer, size_t len )
+{
+	if ( fread( buffer, sizeof(char), len, file ) != len )
+        die("File %s: error reading %d bytes\n", filename, len );
+}
+
+long xfread_value( FILE *fp, char *filename, size_t len )
+{
+	long value = 0;
+	size_t i;
+	int c;
+
+	for ( i = 0; i < len; i++ )
+	{
+		c = fgetc( fp );
+		if ( c < 0 )
+			die("File %s: error reading %d bytes\n", filename, len );
+		value |= (c & 0xFF) << (8 * i);
+	}
+
+	return value;
+}
+
+int xfread_byte( FILE *fp, char *filename )
+{
+	return xfread_value( fp, filename, 1 ) & 0xFF;
+}
+
+int xfread_word( FILE *fp, char *filename )
+{
+	return xfread_value( fp, filename, 2 ) & 0xFFFF;
+}
+
+long xfread_long( FILE *fp, char *filename )
+{
+	return xfread_value( fp, filename, 4 );
+}
+
+void free_last_name ( void ) 
+{ 
+	free( last_name ); 
+}
+
+/* NOTE: not reentrant */
+char *xfread_name( FILE *fp, char *filename, size_t len_bytes )
+{
+	static size_t alloc_size = 0;
+	size_t len;
+
+	/* get length */
+	len = xfread_value( fp, filename, len_bytes ) & 0xFFFF;
+
+	/* first time */
+	if ( alloc_size == 0 ) 
+		atexit( free_last_name );
+
+	/* reallocate string if needed */
+	if ( alloc_size < len + 1 )
+	{
+		alloc_size = len + 1;
+		last_name = realloc( last_name, alloc_size );
+	}
+
+	/* read bytes */
+	xfread( fp, filename, last_name, len );
+	last_name[len] = '\0';
+
+	return last_name;
+}
+
+char *xfread_string( FILE *fp, char *filename )
+{
+	return xfread_name( fp, filename, 1 );
+}
+
+char *xfread_lstring( FILE *fp, char *filename )
+{
+	return xfread_name( fp, filename, 2 );
+}
+
+/*-----------------------------------------------------------------------------
+*	Usage
+*----------------------------------------------------------------------------*/
+void usage(char *name)
+{
+	die("Usage %s [-h][-l][-e] library\n"
+		"Display the contents of a z80asm library file\n"
+		"\n"
+		"-l\tShow local symbols\n"
+		"-e\tShow expression patches\n"
+		"-c\tShow code dump\n"
+		"-h\tDisplay this help\n",
+		name );
+}
+
+/*-----------------------------------------------------------------------------
+*	Read file signature
+*----------------------------------------------------------------------------*/
+enum file_type read_signature( FILE *fp, char *filename )
+{
+	enum file_type type = is_none;
+
+	file_version = -1;
+	memset( file_signature, 0, sizeof(file_signature) );
+
+	/* read signature */
+	xfread( fp, filename, file_signature, 8 );
+	if ( strncmp( file_signature, "Z80RMF", 6 ) == 0 )
+		type = is_object;
+	else if ( strncmp( file_signature, "Z80LMF", 6 ) == 0 )
+		type = is_library;
+	else
+		die("File %s: not object nor library file\n", filename );
 	
+	/* read version */
+	if ( sscanf( file_signature + 6, "%d", &file_version ) < 1 )
+		die("File %s: not object nor library file\n", filename );
+
+	if ( file_version < MIN_VERSION || file_version > MAX_VERSION )
+		die("File %s: not object or library file version %d not supported\n", filename, file_version );
+
+	printf("\nFile %s at $%04X: %s\n", filename, ftell( fp ) - 8, file_signature );
+
+	return type;
+}
+
+/*-----------------------------------------------------------------------------
+*	Dump object file
+*----------------------------------------------------------------------------*/
+void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
+{
+	int scope, type;
+	long value;
+	char *name;
+
+	printf("  Names:\n");
+	fseek( fp, fp_start, SEEK_SET );
+	while ( ftell( fp ) < fp_end )
+	{
+		scope = xfread_byte( fp, filename );
+		type  = xfread_byte( fp, filename );
+		value = xfread_long( fp, filename );
+		name  = xfread_string( fp, filename );
+
+		if ( opt_showlocal || scope != 'L' )
+			printf("    %c %c $%04X %s\n", scope, type, value, name );
+	}
+}
+
+void dump_extern( FILE *fp, char *filename, long fp_start, long fp_end )
+{
+	char *name;
+
+	printf("  External names:\n");
+	fseek( fp, fp_start, SEEK_SET );
+	while ( ftell( fp ) < fp_end )
+	{
+		name = xfread_string( fp, filename );
+		printf("    U         %s\n", name );
+	}
+}
+
+void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
+{
+	int type, asmpc, patch_ptr, end_marker;
+	char *source_file, *last_source_file;
+	char *expression;
+	long line_number;
+
+	last_source_file = strdup("");
+
+	if ( file_version >= 4 )		/* signal end by zero type */
+		fp_end = MAX_FP;
+
+	printf("  Expressions:\n");
+	fseek( fp, fp_start, SEEK_SET );
+	while ( ftell( fp ) < fp_end )
+	{
+		type = xfread_byte( fp, filename );
+		if ( type == 0 )
+			break;
+
+		printf("    E %c%c", type, type == 'L' ? 'l' : type == 'C' ? 'w' : 'b' );
+		if ( file_version >= 4 )
+		{
+			source_file = xfread_lstring( fp, filename );
+			if ( *source_file )
+			{
+				free( last_source_file );
+				last_source_file = strdup( source_file );
+			}
+
+			line_number = xfread_long( fp, filename );
+			printf(" (%s:%ld)", last_source_file, line_number );
+		}
+
+		if ( file_version >= 3 )
+		{
+			asmpc = xfread_word( fp, filename );
+			printf(" $%04X", asmpc);
+		}
+
+		patch_ptr = xfread_word( fp, filename );
+		printf(" $%04X", patch_ptr);
+
+		if ( file_version >= 4 )
+			expression = xfread_lstring( fp, filename );
+		else
+			expression = xfread_string( fp, filename );
+		printf(": %s\n", expression );
+
+		if ( file_version < 4 )
+		{
+			end_marker = xfread_byte( fp, filename );
+			if ( end_marker != 0 )
+				die("File %s: missing expression end marker\n", filename );
+		}
+	}
+
+	free( last_source_file );
+}
+
+void dump_code( FILE *fp, char *filename, long fp_start, int size )
+{
+	int addr = 0, byte;
+
+	while ( size-- > 0 )
+	{
+		if ( (addr % 16) == 0 )
+		{
+			if ( addr != 0 )
+				printf("\n");
+			printf("    C $%04X:", addr);
+		}
+
+		byte = xfread_byte( fp, filename );
+		printf(" %02X", byte );
+
+		addr++;
+	}
+
+	if ( addr != 0 )
+		printf("\n");
+}
 
 
+void dump_object( FILE *fp, char *filename )
+{
+	long obj_start = ftell(fp) - 8;		/* before signature */
+	int org, code_size;
+	long fp_modname, fp_expr, fp_names, fp_extern, fp_code;
+
+	org			= xfread_word( fp, filename );
+	fp_modname	= xfread_long( fp, filename );
+	fp_expr		= xfread_long( fp, filename );
+	fp_names	= xfread_long( fp, filename );
+	fp_extern	= xfread_long( fp, filename );
+	fp_code		= xfread_long( fp, filename );
+
+	/* module name */
+	fseek( fp, obj_start + fp_modname, SEEK_SET );
+	printf("  Name: %s\n", xfread_string( fp, filename ) );
+	
+	/* org */
+	if ( org != 0xFFFF )
+		printf("  Org:  $%04X\n", org );
+
+	/* names */
+	if ( fp_names != END_MARKER ) 
+		dump_names( fp, filename, 
+					obj_start + fp_names, 
+					obj_start + END( fp_extern, fp_modname ) );
+
+	/* extern */
+	if ( fp_extern != END_MARKER ) 
+		dump_extern( fp, filename, 
+					 obj_start + fp_extern, 
+					 obj_start + fp_modname );
+
+	/* expressions */
+	if ( fp_expr != END_MARKER && opt_showexpr ) 
+		dump_expr( fp, filename, 
+				   obj_start + fp_expr, 
+				   obj_start + END( fp_names, END( fp_extern, fp_modname ) ) );
+
+	/* code */
+	if ( fp_code != END_MARKER ) 
+	{
+		fseek( fp, obj_start + fp_code, SEEK_SET );
+		code_size = xfread_word( fp, filename );
+		if (code_size == 0)
+			code_size = 0x1000;
+	}
+	else 
+	{
+		code_size = 0;
+	}
+	printf("  Code: %d bytes\n", code_size );
+	if ( code_size != 0 && opt_dump_code )
+		dump_code( fp, filename, obj_start + fp_code, code_size );
+
+}
+
+/*-----------------------------------------------------------------------------
+*	Dump library file
+*----------------------------------------------------------------------------*/
+void dump_library( FILE *fp, char *filename )
+{
+	long lib_start = ftell(fp) - 8;		/* before signature */
+	long next_ptr = lib_start + 8;
+	long obj_start, obj_len;
+	enum file_type type;
+
+	do
+	{
+		fseek( fp, next_ptr, SEEK_SET );	/* next block */
+		obj_start = next_ptr + 8;
+
+		next_ptr = xfread_long( fp, filename );
+		obj_len = xfread_long( fp, filename );
+
+		type = read_signature( fp, filename );
+		if ( type != is_object )
+			die("File %s: contains non-object file\n", filename );
+
+		if ( obj_len == 0 )
+			printf("  Deleted...\n");
+
+		dump_object( fp, filename );
+
+	} while ( next_ptr != END_MARKER );
+}
+
+/*-----------------------------------------------------------------------------
+*	Main
+*----------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
-	char	*file;
-	unsigned long next,len,start;
-	FILE  *fp;
-	char	flags = 0;
+	char	*filename;
+	FILE	*fp;
+	int		flags = 0;
 	int 	opt;
 
-	while ((opt = getopt(argc,argv,"hle")) != -1 ) {
-		switch (opt ) {
+	while ((opt = getopt(argc,argv,"hlec")) != -1 ) 
+	{
+		switch (opt ) 
+		{
 		case 'l':
-			flags |= showlocal;
+			opt_showlocal = 1;
 			break;
 		case 'e':
-			flags |= showexpr;
+			opt_showexpr = 1;
+			break;
+		case 'c':
+			opt_dump_code = 1;
 			break;
 		default:
 			usage(argv[0]);
 		}
 	}
 
-	if ( optind == argc ) {
+	if ( optind == argc ) 
 		usage(argv[0]);
-	}
 
-	while ( optind < argc ) {
-		file = argv[optind++];
-		if ( ( fp = open_library(file) ) == NULL ) {
-			if ( ( fp = fopen(file,"rb")  ) != NULL ) { 	   
-				object_dump(fp,file,0,flags);
-			} else {
-				fprintf(stderr,"File %s: cannot open\n",file);
-			}
+	while ( optind < argc ) 
+	{
+		filename = argv[optind++];
+		fp = xfopen( filename, "rb" );
+		switch ( read_signature( fp, filename ) )
+		{
+		case is_library:
+			dump_library( fp, filename );
+			break;
+
+		case is_object:
+			dump_object( fp, filename );
+			break;
+
+		default:
+			assert(0);
 		}
-		else {
-			next = 8;
-
-			do {
-				start = next + 8;
-				fseek(fp,next,SEEK_SET);
-				next = read_intel32(fp,NULL);
-				len  = read_intel32(fp,NULL);
-				if ( len == 0xFFFFFFFF ) 
-					break;
-				if ( len == 0x0 )
-					printf("Deleted...");
-				object_dump(fp,file,start,flags);
-			} while ( next != 0xFFFFFFFF );
-
-			fclose(fp);
-		}
-		printf("\n");
-	}
-}
-
-static char *patch_type(int type)
-{
-	switch ( type ) {
-	case 'U':
-		return " 8u";
-	case 'S':
-		return " 8s";
-	case 'C':
-		return "16s";
-	case 'L':
-		return "32s";
-		break;
-	}
-	return "???";
-}
-
-void object_dump(FILE *fp, char *filename, unsigned long start, char flags)
-{
-	char	 buf[9];
-	unsigned long modname,expr,symbols,externsym,code,red;
-	unsigned int  org;
-	char		  c;
-	int 		  len;
-	int			  version = 0;
-
-	fread(buf,8,1,fp); buf[8] = '\0';
-
-	if ( strcmp(buf,"Z80RMF01") != 0 &&
-	     strcmp(buf,"Z80RMF02") != 0 &&
-	     strcmp(buf,"Z80RMF03") != 0 ) {
-		fprintf(stderr,"File %s: not object file\n",filename);
-		return;
-	}
-	sscanf( buf + 6, "%d", &version ); 
-
-	org 	  = read_intel16(fp,&red);
-	modname   = read_intel32(fp,&red);
-	expr	  = read_intel32(fp,&red);
-	symbols	  = read_intel32(fp,&red);
-	externsym = read_intel32(fp,&red);
-	code	  = read_intel32(fp,&red);
-
-	fseek(fp,start+modname,SEEK_SET);
-	puts("");
-	read_name(fp,&red,stdout, 0);
-
-	if ( code != 0xFFFFFFFF ) {
-		fseek(fp,start+code,SEEK_SET);
-		len = read_intel16(fp,&red);
-		if (len == 0)
-			len = 0x1000;
-	}
-	else {
-		len = 0;
-	}
-
-	printf("\n     %s: %s @ %08X (%d bytes)\n\n",buf,filename,start,len);
-
-
-	/* Now print any dependencies under that */
-	if ( symbols != 0xFFFFFFFF ) {
-		char   scope,type;
-		unsigned long value;
-		unsigned long end;
-
-		if ( externsym == 0xFFFFFFFF ) {
-			end = modname;
-		} else {
-			end = externsym;
-		}
-		
-		fseek(fp,start+symbols,SEEK_SET);
-		red = 0;
-		while ( symbols + red < end ) {
-			scope = fgetc(fp); red++;
-			type = fgetc(fp); red++;
-			value = read_intel32(fp,&red);
-			if ( ( ( flags & showlocal) || scope != 'L' ) ) {
-				printf("  %c%c ",scope, type == 'C' ? 'C' : ' ' );
-				read_name(fp,&red,stdout, 1);
-				printf("\t+%04X\n",value);
-			}
-			else {
-				read_name(fp,&red,NULL, 0);
-			}
-		}
-		puts("");
-	}
-		
-	if ( externsym != 0xFFFFFFFF ) {
-		fseek(fp,start+externsym,SEEK_SET);
-		red = 0;
-		while ( red < (modname - externsym) ) {
-			printf("  U  ");
-			read_name(fp,&red,stdout, 0);
-			printf("\n");
-		}
-		puts("");
-	}
-
-	if ( expr != 0xFFFFFFFF && (flags & showexpr ) ) {
-		char type;
-		int  asmpc, patch;
-		unsigned long end;
-		fseek(fp,start+expr,SEEK_SET);
-		red = 0;
-		end = symbols   != 0xFFFFFFFF ? symbols   :
-			  externsym != 0xFFFFFFFF ? externsym :
-			  modname;
-		while ( red < ( end - expr) ) {
-			type = fgetc(fp); red++;
-			if ( version >= 3 )
-				asmpc = read_intel16(fp,&red);
-			patch = read_intel16(fp,&red);
-			printf("  E  ");
-			read_name(fp,&red,stdout, 1);
-			printf("\t%c(%s) @ %04X",type,patch_type(type),patch);
-			if ( version >= 3 )
-				printf(", PC %04X",asmpc);
-			puts("");
-			c = fgetc(fp); red++;
-			assert(c == 0);
-		}
-		puts("");
-	}
-}
-
-FILE *open_library(char *filename)
-{
-	char	buf[9];
-	FILE   *fp;
-
-	if ( ( fp = fopen(filename,"rb") ) == NULL ) {
-		return NULL;
-	}
-
-	fread(buf,8,1,fp); buf[8] = '\0';
-
-	if ( strcmp(buf,"Z80LMF01") == 0 ||
-	     strcmp(buf,"Z80LMF02") == 0 ||
-	     strcmp(buf,"Z80LMF03") == 0 ) {
-		printf("%s: %s\n",buf,filename);
-		return fp;
-	}
-
-	fclose(fp);
-
-	return NULL;
-}
-	
-static unsigned long read_intel32(FILE *fp, unsigned long *offs)
-{
-	unsigned char	  buf[4];
-	int 	 i;
-
-	i = fread(buf,1,4,fp);
-
-	if ( offs )
-		*offs += 4;
-
-	return ( buf[3] << 24  | buf[2] << 16 | buf[1] << 8 | buf[0] );
-}
-
-
-static unsigned int  read_intel16(FILE *fp, unsigned long *offs)
-{
-	unsigned char	  buf[2];
-
-	fread(buf,1,2,fp);
-
-	if ( offs )
-		*offs += 2;
-
-	return ( buf[1] << 8 | buf[0] );
-}
-
-static void read_name(FILE *fp, unsigned long *offs, FILE *out, int add_tabs)
-{
-	static int max_len = 32;
-	int len, i, c;
-
-	len = fgetc(fp); (*offs)++;
-	if ( max_len < len )
-		max_len = len;
-	for ( i = 0; i < len; i++ ) {
-		c = fgetc(fp);
-		if (out != NULL)
-			fputc(c,out);
-		(*offs)++;
-	}
-	if (add_tabs) {
-		for ( i = len; i < max_len; i++ ) {
-			fputc(i % 5 ? ' ' : '.', out);
-		}
+		fclose( fp );
 	}
 }
 
 /*
  * $Log: ar.c,v $
- * Revision 1.14  2014-05-01 11:33:32  pauloscustodio
+ * Revision 1.15  2014-05-28 23:36:39  pauloscustodio
+ * Added -c option to dump object code bytes
+ * Accepts all object file versions 1 to 4, see src/z80asm/doc for the format description.
+ *
+ * Revision 1.14  2014/05/01 11:33:32  pauloscustodio
  * Output formatting
  *
  * Revision 1.13  2014/04/22 23:04:56  pauloscustodio
