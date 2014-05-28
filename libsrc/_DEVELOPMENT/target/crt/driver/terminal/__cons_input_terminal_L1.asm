@@ -66,7 +66,7 @@
 
 ; messages to input terminal
 ;
-; STDIO_MSG_ITERM_L1
+; STDIO_MSG_ITERM_GETCHAR
 ; can modify af, hl
 ;
 ;   return a = hl = char read from device, carry reset
@@ -194,6 +194,10 @@ __flsh:
    ld (hl),e
    inc hl
    ld (hl),d                   ; edit buffer ptr = start of edit buffer
+
+   ld a,d
+   or e
+   ret z                       ; if there is no edit buffer
 
    xor a
    ld (de),a
@@ -395,7 +399,7 @@ __cons_input_getc:
 
    ; fall through
    
-   EXTERN STDIO_MSG_ITERM_L1
+   EXTERN STDIO_MSG_ITERM_GETCHAR
    EXTERN l_jpix
    
 __cons_input_getc_raw:
@@ -407,7 +411,7 @@ __cons_input_getc_raw:
    ;
    ; uses : af, hl
 
-   ld a,STDIO_MSG_ITERM_L1
+   ld a,STDIO_MSG_ITERM_GETCHAR
    call l_jpix                 ; get char from driver
 
    bit 4,(ix+13)
@@ -504,7 +508,7 @@ __read_line:
    ex (sp),ix
    push de
    
-   ld b,4                      ; select read line begin
+   ld b,4                      ; inform output terminal a read line is starting
    call __cons_output_tie
 
    pop de
@@ -526,7 +530,39 @@ __read_line_loop:
    ; ix = FILE *
    ; stack = terminate state *
    
-   call __cons_input_getc_raw
+   ; cursor & getchar
+   
+   push bc
+   push de
+   
+   ld a,(ix+13)
+   and $18
+   cp $18                      ; check if caps lock and cook enabled
+   
+   ld a,'_'
+   jr nz, __cursor_set         ; if caps lock disabled
+   ld a,'-'
+
+__cursor_set:
+   
+   ld (de),a
+   call __cons_input_echo_cursor
+   
+   call __cons_input_getc_raw  ; read char
+   
+   pop de
+   push de
+   push af
+   
+   ld a,(de)
+   call __cons_input_backspace_cursor
+   
+   pop af
+   
+   pop de
+   pop bc
+
+   ;;;;;;;;;;;;;;;;
 
    ; check for backspace
 
@@ -538,17 +574,10 @@ __read_line_loop:
    
    ; consume the char
    
+   ld (de),a
+   
    cp 13
    jr z, __line_end
-   
-   cp 32
-   jr nc, __not_control
-   
-   ld a,'?'
-
-__not_control:
-
-   ld (de),a
    
    inc c
    dec c
@@ -594,7 +623,6 @@ __backspace:
 
 __line_end:
 
-   ld (de),a
    call __cons_input_echo
    
    xor a
@@ -641,12 +669,6 @@ __cons_input_cook:
    
    ld l,a
    
-   cp 32
-   ret nc
-   
-   ld a,'?'
-   ld l,a
-   
    or a
    ret
 
@@ -667,11 +689,13 @@ __cons_input_echo:
    ;
    ; uses  : af, bc, de, hl
 
+   call __echo_process_char
+
+__cons_input_echo_cursor:
+
    bit 7,(ix+13)
    ret z                       ; if echo is off
-   
-   call __echo_process_char
-   
+
    ld b,1                      ; select __cons_output_putc
    jr __cons_output_tie
 
@@ -679,6 +703,8 @@ __echo_process_char:
 
    cp 13
    ret z
+   
+   or a
    
    bit 6,(ix+13)
    ret z                       ; if not password mode
@@ -697,10 +723,12 @@ __cons_input_backspace:
    ;
    ; uses  : af, bc, de, hl
 
+   call __echo_process_char
+
+__cons_input_backspace_cursor:
+
    bit 7,(ix+13)
    ret z                       ; if echo is off
-   
-   call __echo_process_char
    
    ld b,2                      ; select __cons_output_backspace
    jr nc, __cons_output_tie
