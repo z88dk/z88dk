@@ -13,6 +13,7 @@
 
 #define IOCTL_OTERM_COOK 0x0012
 #define IOCTL_OTERM_SETF 0x00fa
+#define IOCTL_OTERM_FONT 0x0102
 
 #ifdef __SDCC
 
