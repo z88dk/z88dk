@@ -553,15 +553,17 @@ __read_line_loop:
 __cursor_set:
    
    ld (de),a
-   call __cons_input_echo_cursor
    
+   call __cons_input_echo_cursor
    call __cons_input_getc_raw ; read char
    
    pop de
    push de
    push af
    
+   or a
    ld a,(de)
+
    call __cons_input_backspace_cursor
    
    pop af   
