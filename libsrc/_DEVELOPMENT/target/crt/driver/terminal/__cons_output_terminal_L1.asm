@@ -81,6 +81,12 @@
 ;
 ;   b = 4 input console is starting read line
 ;        de = address of edit buffer
+;
+; STDIO_MSG_OTERM_PUTCHAR
+; c = char to output
+; return carry set on error
+; can modify af, bc, de, hl
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -91,9 +97,12 @@ PUBLIC __cons_output_terminal_L1
    EXTERN error_enotsup_zc, error_lznc, error_znc
 
    EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_SEEK
-   EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS
+   EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, STDIO_MSG_OTERM_PUTCHAR
 
 __cons_output_terminal_L1:
+
+   cp STDIO_MSG_OTERM_PUTCHAR
+   jr z, __putchar
 
    cp STDIO_MSG_PUTC
    jr z, __putc
@@ -114,8 +123,19 @@ __cons_output_terminal_L1:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN l_jpix
    EXTERN STDIO_MSG_OTERM_L1
+
+__putchar:
+
+   ld b,1
+   
+   ld a,STDIO_MSG_OTERM_L1
+   jp (ix)
+   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   EXTERN l_jpix
+   EXTERN STDIO_MSG_OTERM_PUTCHAR
 
 __putc:
 
@@ -134,11 +154,10 @@ __putc_loop:
    ld a,e
    exx
    
-   ld b,1                      ; choose __cons_output_putc
    ld c,a                      ; c = char to output
    
-   ld a,STDIO_MSG_OTERM_L1
-   call l_jpix                 ; __cons_output_putc
+   ld a,STDIO_MSG_OTERM_PUTCHAR
+   call l_jpix
    
    exx
    ret c                       ; if putc error
@@ -153,6 +172,9 @@ __putc_loop:
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   EXTERN STDIO_MSG_OTERM_PUTCHAR
+   EXTERN l_jpix
 
 __writ:
 
@@ -171,12 +193,11 @@ __writ_loop:
    ld a,(hl)
    exx
    
-   ld b,1                      ; choose __cons_output_putc
-   ld c,a                      ; c = char to output
+   ld c,a
    
-   ld a,STDIO_MSG_OTERM_L1
-   call l_jpix                 ; __cons_output_putc
-   
+   ld a,STDIO_MSG_OTERM_PUTCHAR
+   call l_jpix
+
    exx
    jr c, __writ_end
 
