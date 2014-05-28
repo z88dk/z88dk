@@ -24,7 +24,7 @@ in_key_translation_table:
    defb 255,'Z','X','C','V'      ; CAPS SHIFT, Z, X, C, V
    defb 'A','S','D','F','G'      ; A, S, D, F, G
    defb 'Q','W','E','R','T'      ; Q, W, E, R, T
-   defb 7,0,128,129,8            ; 1, 2, 3, 4, 5
+   defb 7,6,128,129,8            ; 1, 2, 3, 4, 5
    defb 12,8,9,11,10             ; 0, 9, 8, 7, 6
    defb 'P','O','I','U','Y'      ; P, O, I, U, Y
    defb 13,'L','K','J','H'       ; ENTER, L, K, J, H
