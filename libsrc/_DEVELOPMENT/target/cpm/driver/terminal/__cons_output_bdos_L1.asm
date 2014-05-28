@@ -24,6 +24,7 @@ PUBLIC __cons_output_bdos_L1
 __cons_output_fzx_L1:
    
    cp STDIO_MSG_OTERM_L1
+   jr z, __oterm_L1
    
    cp STDIO_MSG_OTERM_PUTCHAR
    jp nz, __cons_output_terminal_L1   ; forward unhandled messages
@@ -46,6 +47,8 @@ __putchar:
 
    cp 13
    jr z, __putchar_crlf
+
+__putchar_console:
 
    bit 4,(ix+13)
    jr z, __bdos_outchar        ; if cook disabled
@@ -70,9 +73,8 @@ __bdos_outchar:
 
 __putchar_crlf:
 
-   ld de,10
-   ld c,2
-   call 5
+   ld a,10
+   call __bdos_outchar
    
    ld a,13
    jr __bdos_outchar
@@ -89,7 +91,7 @@ __putchar_cls:
    call __bdos_outchar
    
    ld a,'J'
-   jp __bdos_outchar
+   jr __bdos_outchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -118,13 +120,13 @@ __oterm_01:
    ld a,c
    
    cp 13
-   jr z, __putchar
+   jr z, __putchar_crlf
    
    cp 32
-   jr nc, __putchar
+   jr nc, __putchar_console
    
-   ld c,'?'
-   jr __putchar
+   ld a,'?'
+   jr __putchar_console
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
