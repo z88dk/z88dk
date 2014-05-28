@@ -99,7 +99,7 @@ IF __crt_segment_data_address > 0
    {
                                       ds.w 1
       __CRT_FILE_STDIN                ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
-      __stdin_terminal_state_L1       ds.b 7
+      __stdin_terminal_state_L1       ds.b 14
    }
    
    ENDIF
@@ -257,10 +257,10 @@ IF (__crt_cfg_segment_data & $03) = 1
 
    __CRT_FILE_STDIN_s:
 
-      EXTERN __cons_input_kbd_lastk_L1
+      EXTERN __cons_input_kbd_inkey_L1
 
       defb 195                    ; jp driver
-      defw __cons_input_kbd_lastk_L1
+      defw __cons_input_kbd_inkey_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -286,6 +286,11 @@ IF (__crt_cfg_segment_data & $03) = 1
          defw __stdin_edit_buf
          defw __stdin_edit_buf
          defb __crt_cfg_edit_buflen
+         defb 1
+         defb 0
+         defb 0
+         defw 500
+         defw 15
 
    ENDIF
 
@@ -423,10 +428,10 @@ __crt_segment_data_begin:
 
    __CRT_FILE_STDIN:
 
-      EXTERN __cons_input_kbd_lastk_L1
+      EXTERN __cons_input_kbd_inkey_L1
 
       defb 195                    ; jp driver
-      defw __cons_input_kbd_lastk_L1
+      defw __cons_input_kbd_inkey_L1
       defb $40                    ; open for reading
       defb $02                    ; last operation was a read
       defb 0
@@ -452,6 +457,11 @@ __crt_segment_data_begin:
          defw __stdin_edit_buf
          defw __stdin_edit_buf
          defb __crt_cfg_edit_buflen
+         defb 1
+         defb 0
+         defb 0
+         defw 500
+         defw 15
 
    ENDIF
 
