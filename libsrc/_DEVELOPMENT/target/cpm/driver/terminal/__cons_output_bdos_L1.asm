@@ -132,41 +132,16 @@ __oterm_01:
 
 __oterm_02:
 
-   djnz __oterm_03
+   ld a,b
+   cp 3
+   ret nc
 
    ;   b = 2 __cons_output_backspace
+   ;     = 3 __cons_output_backspace_pwd
    ;         c = char to erase
    ;        de = address of char to erase in edit buffer
-   ;        carry set if password mode (set locally)
-
-__oterm_02_bs:
 
    ld a,8
    jr __bdos_outchar
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__oterm_03:
-
-   djnz __oterm_04
-
-   ;   b = 3 __cons_output_backspace_pwd
-   ;         c = password char
-   ;        de = address of char to erase in edit buffer
-
-   scf
-   jr __oterm_02_bs
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__oterm_04:
-
-   ;   b = 4 input console is starting read line
-   ;        de = address of edit buffer
-   
-   ; don't need this information
-
-   or a
-   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
