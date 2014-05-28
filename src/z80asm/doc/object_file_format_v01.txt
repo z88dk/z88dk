@@ -66,7 +66,7 @@ The format of the object file is as follows:
 	format:
 
 	* *type* (char) : defines the resulting evaluation type range:
-	
+
 		'U' : 8-bit integer (0 to 255)  
 		'S' : 8-bit signed integer (-128 to 127)  
 		'C' : 16-bit integer (-32768 to 65535)  
@@ -95,6 +95,10 @@ The format of the object file is as follows:
 		'A' relocatable address,   
 		'C' a constant.
 
+	* *value* (long) : contains the absolute value for a constant, or the
+	relative address to the start of the code block for a relocatable
+	address.
+	
 	* *name* (string) : contains the name.
 
 

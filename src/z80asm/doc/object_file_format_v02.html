@@ -52,7 +52,7 @@ characters of the string.</p></li>
 <tr>
 	<td align="center">0</td>
 	<td align="center">char[8]</td>
-	<td align="left">'Z80RMF01' (file signature and version)</td>
+	<td align="left">'Z80RMF02' (file signature and version)</td>
 </tr>
 <tr>
 	<td align="center">8</td>
@@ -160,6 +160,9 @@ up to the next existing section. Each name has the following format:</p>
 
 <p>'A' relocatable address, <br />
 'C' a constant.</p></li>
+<li><p><em>value</em> (long) : contains the absolute value for a constant, or the
+relative address to the start of the code block for a relocatable
+address.</p></li>
 <li><p><em>name</em> (string) : contains the name.</p></li>
 </ul></li>
 <li><p><em>External Names</em> : contains a set of external names referred 

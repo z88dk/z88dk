@@ -1,7 +1,10 @@
-<h1 id="z80asmfileformatsv01">z80asm File formats (v01)</h1>
+<h1 id="z80asmfileformatsv04">z80asm File formats (v04)</h1>
 
-<p>This document describes the object and libary formats used by <em>z80asm</em> 
-up to version <em>1.2.10</em>.</p>
+<p>This document describes the object and libary formats used by <em>z80asm</em>
+from version <em>2.3.0</em> onwards. </p>
+
+<p>The version changed to <em>04</em> to include the source file location of 
+expressions in order to give meaningful link-time error messages.</p>
 
 <p>The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -27,6 +30,8 @@ section starts; the value is <em>0xFFFFFFFF</em> (-1) if the section
 does not exist;</p></li>
 <li><p><em>string</em>: one byte containing the string length followed by the 
 characters of the string.</p></li>
+<li><p><em>lstring</em>: one word containing the string length followed by the 
+characters of the string.</p></li>
 </ul>
 
 <h2 id="objectfileformat">Object file format</h2>
@@ -48,7 +53,7 @@ characters of the string.</p></li>
 <tr>
 	<td align="center">0</td>
 	<td align="center">char[8]</td>
-	<td align="left">'Z80RMF01' (file signature and version)</td>
+	<td align="left">'Z80RMF04' (file signature and version)</td>
 </tr>
 <tr>
 	<td align="center">8</td>
@@ -126,22 +131,30 @@ characters of the string.</p></li>
 <ul>
 <li><p><em>ORG Address</em> : contains the ORG address for the linked machine code 
 or <em>0xFFFF</em> for no ORG address defined. </p></li>
-<li><p><em>Expressions</em> : contains a set of expressions up to the 
-start of the next existing section. Each expression has the following
-format:</p>
+<li><p><em>Expressions</em> : contains a set of expressions up to 
+an end marker (<em>type</em> = 0). 
+Each expression has the following format:</p>
 
 <ul>
 <li><p><em>type</em> (char) : defines the resulting evaluation type range:</p>
 
-<p>'U' : 8-bit integer (0 to 255) <br />
+<p>0   : end marker <br />
+'U' : 8-bit integer (0 to 255) <br />
 'S' : 8-bit signed integer (-128 to 127) <br />
 'C' : 16-bit integer (-32768 to 65535) <br />
 'L' : 32-bit signed integer  </p></li>
+<li><p><em>sourcefile</em> (lstring) : source file name where expression was defined,
+to be used in error messages. May be an empty string, signalling that
+the previous <em>sourcefile</em> of the previous expression should be used.</p></li>
+<li><p><em>line_number</em> (long) : line number in source file where 
+expression was defined, to be used in error messages.</p></li>
+<li><p><em>ASMPC</em> (word) : defines the relative module code address of the 
+start of the assembly instruction to be used as <em>ASMPC</em> during
+expression evaluation.</p></li>
 <li><p><em>patchptr</em> (word) : defines the relative module code patch pointer to 
 store the result of evaluating the expression.</p></li>
-<li><p><em>expression</em> (string) : contains the expression text as parsed from the 
-source file, in the original (legacy) expression syntax.</p></li>
-<li><p><em>0</em> (byte) : is a zero byte end marker, not part of the expression length.</p></li>
+<li><p><em>expression</em> (lstring) : contains the expression text as parsed from the 
+source file, in the standard C-like expression syntax.</p></li>
 </ul></li>
 <li><p><em>Module Names</em> : contains a set of names defined in this module 
 up to the next existing section. Each name has the following format:</p>
@@ -150,8 +163,7 @@ up to the next existing section. Each name has the following format:</p>
 <li><p><em>scope</em> (char) : defines the scope of the name:</p>
 
 <p>'L' is local, <br />
-'G' is global, <br />
-'X' global library</p></li>
+'G' is global,  </p></li>
 <li><p>*type (char) : defines whether it is a: </p>
 
 <p>'A' relocatable address, <br />
