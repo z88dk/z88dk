@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.7 2014-05-27 20:01:08 stefano Exp $
+ * $Id: bdscio.h,v 1.8 2014-05-28 12:12:34 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
@@ -95,8 +95,7 @@
 #define isalpnum(a) isalnum(a)
 #define toupper(a) strupr(a)
 
-#define biosh(a,b) bios(a,b)
-#define biosh(a,b,c) bios(a,b,0)
+#define biosh(a,b) bios(a,b,0)
 
 
 /*******   Some console (video) terminal characteristics:   *******/

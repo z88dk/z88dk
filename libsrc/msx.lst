@@ -2,6 +2,7 @@ stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
 stdio/puts_cons
+fcntl/cpm/bios
 fcntl/cpm/bdos
 fcntl/cpm/close
 fcntl/cpm/creat
