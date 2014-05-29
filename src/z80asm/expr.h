@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.19 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.20 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -137,9 +137,18 @@ extern void Calc_compute_unary(   long (*calc)(long a) );
 extern void Calc_compute_binary(  long (*calc)(long a, long b) );
 extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
+
+extern void StoreExpr( Expr *expr, char range );
+extern void StoreExprEnd( void );
+
 /*
 * $Log: expr.h,v $
-* Revision 1.19  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.20  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.19  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.18  2014/05/25 01:02:29  pauloscustodio

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.15 2014-05-25 01:02:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.16 2014-05-29 00:19:37 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -219,7 +219,7 @@ t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
 Warning at file 'test.asm' line 2: symbol 'Loc' used as 'LOC'
 Warning at file 'test.asm' line 4: symbol 'Var' used as 'VAR'
 Warning at file 'test1.asm' line 2: symbol 'var' used as 'VAR'
-Warning at file 'test1.asm' module 'test1': symbol 'Var' used as 'VAR'
+Warning at file 'test1.asm' line 2: symbol 'Var' used as 'VAR'
 ERR
 t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02");
 
@@ -568,7 +568,12 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.15  2014-05-25 01:02:30  pauloscustodio
+# Revision 1.16  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.15  2014/05/25 01:02:30  pauloscustodio
 # Byte, Int, UInt added
 #
 # Revision 1.14  2014/05/17 14:27:13  pauloscustodio

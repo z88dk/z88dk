@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.103 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.104 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.103 2014-05-25 12:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.103  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.104  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.103  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.102  2014/05/25 01:02:29  pauloscustodio
@@ -1918,6 +1923,13 @@ Based on 1.0.31
 	- Link expressions to the section they refer to.
 
 -------------------------------------------------------------------------------
+29.05.2014 [2.3.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	CH_0025: Link-time expression evaluation errors show source filename and line number
+		Object file format changed to version 04, to include the source file 
+		location of expressions in order to give meaningful link-time error messages.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -1942,7 +1954,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.2.1"
+#define VERSION     "2.3.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

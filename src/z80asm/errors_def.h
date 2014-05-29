@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.29 2014-04-13 11:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.30 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -47,13 +47,11 @@ ERR( ErrWarn,	warn_deprecated( char *old_stmt, char *new_stmt ),
 /* assembly errors */
 ERR( ErrError,	error_syntax( void ),					"syntax error" )
 ERR( ErrError,	error_syntax_expr( void ),				"syntax error in expression" )
-ERR( ErrError,	error_expr( char *expr ),				"error in expression '%s'" _C_ expr )
 ERR( ErrError,	error_invalid_squoted_string( void ),	"invalid single quoted character" )
 ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
 ERR( ErrError,	error_divide_by_zero( void ),			"division by zero" )
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
-ERR( ErrError,	error_not_defined_expr( char *expr ),	"symbol not defined in expression '%s'" _C_ expr )
 
 ERR( ErrError,	error_unknown_ident( void ),		    "unknown identifier" )
 ERR( ErrError,	error_illegal_ident( void ),			"illegal identifier" )
@@ -79,15 +77,18 @@ ERR( ErrError,	error_not_lib_file( char *filename ),	"file '%s' not a library fi
 /* range error or warning */
 ERR( ErrWarn,	warn_int_range( long value ),			"integer '%ld' out of range" _C_ value )
 ERR( ErrError,	error_int_range( long value ),			"integer '%ld' out of range" _C_ value )
-ERR( ErrWarn,	warn_int_range_expr( long value, char *expr ),
-														"integer '%ld' out of range in expression '%s'" _C_ value _C_ expr )
 
 #undef _C_
 
 
 /*
 * $Log: errors_def.h,v $
-* Revision 1.29  2014-04-13 11:54:01  pauloscustodio
+* Revision 1.30  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.29  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 * Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
 * Remove 'X' scope for symbols in object files used before for XLIB -

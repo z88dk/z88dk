@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.59 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.60 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.59 2014-05-25 01:
 
 #include "types.h"
 #include "sym.h"
+#include "strutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -51,6 +52,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.59 2014-05-25 01:
 #endif
 
 extern FILE *objfile;
+extern Str  *objfile_last_sourcefile;	/* keep last source file referred to in object */
+
 extern size_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *GetLibfile( char *filename );
@@ -60,7 +63,12 @@ extern void Z80pass1( char *filename );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.59  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.60  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.59  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.58  2014/05/21 19:39:09  dom

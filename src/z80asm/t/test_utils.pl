@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.64 2014-05-20 22:27:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.65 2014-05-29 00:19:37 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -368,7 +368,7 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF03";
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF04";
 	$obj .= pack("v", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
@@ -382,9 +382,12 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$obj, $expr_addr);
 		for (@{$args{EXPR}}) {
-			my($type, $asmptr, $ptr, $string) = @$_;
-			$obj .= $type . pack("vv", $asmptr, $ptr) . pack_string($string) ."\0";
+			@$_ == 6 or die;
+			my($type, $filename, $line_nr, $asmptr, $ptr, $string) = @$_;
+			$obj .= $type . pack_lstring($filename) . pack("V", $line_nr) .
+			        pack("vv", $asmptr, $ptr) . pack_lstring($string);
 		}
+		$obj .= "\0";
 	}
 
 	# store symbols
@@ -434,6 +437,12 @@ sub pack_string {
 }
 
 #------------------------------------------------------------------------------
+sub pack_lstring {
+	my($string) = @_;
+	return pack("v", length($string)).$string;
+}
+
+#------------------------------------------------------------------------------
 sub read_binfile {
 	my($file) = @_;
 	ok -f $file, "$file exists";
@@ -450,7 +459,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF03";
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF04";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?
@@ -1015,7 +1024,12 @@ sub get_gcc_options {
 1;
 
 # $Log: test_utils.pl,v $
-# Revision 1.64  2014-05-20 22:27:47  pauloscustodio
+# Revision 1.65  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.64  2014/05/20 22:27:47  pauloscustodio
 # Show symbol values with 4 digits instead of 8
 #
 # Revision 1.63  2014/05/11 16:35:42  pauloscustodio

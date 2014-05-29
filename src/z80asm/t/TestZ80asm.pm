@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.7 2014-05-13 23:42:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.8 2014-05-29 00:19:37 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -90,16 +90,16 @@ sub z80asm {
 						$bin .= chr(hex($_));
 					}
 				}
-				if (/(\s*);;\s+(error|warn):\s+(.*)/) {
-					my $err = ($2 eq 'error' ? "Error" : "Warning").
+				if (/\s*;;\s+(error|warn)(\s(\d+))?:\s+(.*)/) {
+					my $err = ($1 eq 'error' ? "Error" : "Warning").
 							" at file 'test$id.asm' ".
-							($1 eq '' ? "module 'test$id'" : "line $line_nr").
-							": $3\n";
-					$num_errors++ if $2 eq 'error';
+							($3 ? "line $3" : "line $line_nr").
+							": $4\n";
+					$num_errors++ if $1 eq 'error';
 					$err_text .= $err;
 					$err_file{"test$id.err"} ||= "";
 					$err_file{"test$id.err"} .= $err;		
-					delete $obj_file{"test$id.obj"} if $2 eq 'error';
+					delete $obj_file{"test$id.obj"} if $1 eq 'error';
 				}
 				if (/;;\s+note:\s+(.*)/) {
 					note($1);
@@ -223,7 +223,12 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.7  2014-05-13 23:42:49  pauloscustodio
+# Revision 1.8  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.7  2014/05/13 23:42:49  pauloscustodio
 # Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 # Remove opcode errors and warnings from t/errors.t.
 # Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.

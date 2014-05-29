@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.33 2014-05-20 22:26:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.34 2014-05-29 00:19:37 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -358,9 +358,9 @@ ERROR
 z80asm(
 	asm  	=> <<'ASM',
 			EXTERN value
-			ld a,value 		;; 3E 7F 
+			ld a,value 		;; 3E 7F
 			ld b,256		;; 06 00 ;; warn: integer '256' out of range
-;; warn: integer '-129' out of range in expression 'value'
+									 ;; warn 2: integer '-129' out of range
 ASM
 	asm1	=> <<'ASM1',
 			PUBLIC value
@@ -369,7 +369,7 @@ ASM1
 );
 eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
 Warning at file 'test.asm' line 3: integer '256' out of range
-Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'value'
+Warning at file 'test.asm' line 2: integer '-129' out of range
 ERROR
 
 #------------------------------------------------------------------------------
@@ -634,7 +634,12 @@ END
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.33  2014-05-20 22:26:29  pauloscustodio
+# Revision 1.34  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.33  2014/05/20 22:26:29  pauloscustodio
 # BUG_0051: DEFC and DEFVARS constants do not appear in map file
 # Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 # written to the map file.

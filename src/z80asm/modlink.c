@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.121 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.122 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,7 +53,7 @@ void LinkModules( void );
 void ModuleExpr( void );
 void CreateBinFile( void );
 void ReadNames( char *filename, FILE *file, long nextname, long endnames );
-void ReadExpr( FILE *file, long nextexpr, long endexpr );
+void ReadExpr( FILE *file );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
@@ -120,32 +120,46 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 
 
 void
-ReadExpr( FILE *file, long nextexpr, long endexpr )
+ReadExpr( FILE *file )
 {
-    int type;
+	static Str *expr_text;
+	static Str *source_filename;
+	int line_nr;
+	int type;
     long constant;
     Expr *expr;
     uint32_t asmpc, patchptr, offsetptr;
-	DEFINE_STR( expr_text, MAXLINE );
 
-    do
-    {
-        type		= xfget_int8(   file );
+	INIT_OBJ( Str, &expr_text );
+	INIT_OBJ( Str, &source_filename );
+
+	while (1) 
+	{
+        type = xfget_int8(   file );
+		if ( type == 0 )
+			break;			/* end marker */
+
+		/* source file and line number */
+		xfget_count_word_Str( file, source_filename );
+		if ( source_filename->len > 0 )
+			set_error_file( source_filename->str );
+		
+		line_nr = xfget_int32( file );
+		if ( line_nr > 0 )
+			set_error_line( line_nr );
+
+		/* patch location */
 		asmpc		= xfget_uint16( file );
         offsetptr	= xfget_uint16( file );
 
         /* assembler PC as absolute address */
         set_PC( get_first_module()->origin + CURRENTMODULE->start_offset + asmpc );
 
-		xfget_count_byte_Str( file, expr_text );	/* get expression */
-		xfget_uint8( file );						/* skip zero byte */
-
-        nextexpr += 1 + 2 + 2 + 1 + expr_text->len + 1;
+		xfget_count_word_Str( file, expr_text );	/* get expression */
 
 		/* read expression followed by newline */
 		Str_append_char( expr_text, '\n');
 		SetTemporaryLine( expr_text->str );			/* read expression */
-		Str_chomp( expr_text );						/* remove newline for error messages below */
 
         EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -156,7 +170,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
             /* parse numerical expression */
             if ( expr->expr_type & NOT_EVALUABLE )
             {
-                error_not_defined_expr( expr_text->str );
+                error_not_defined();
             }
             else
             {
@@ -167,21 +181,21 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
                 {
                 case 'U':
                     if ( constant < -128 || constant > 255 )
-                        warn_int_range_expr( constant, expr_text->str );
+                        warn_int_range( constant );
 
                     patch_byte( &patchptr, (Byte) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
-                        warn_int_range_expr( constant, expr_text->str );
+                        warn_int_range( constant );
 
                     patch_byte( &patchptr, (Byte) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
                     if ( constant < -32768 || constant > 65535 )
-                        warn_int_range_expr( constant, expr_text->str );
+                        warn_int_range( constant );
 
                     patch_word( &patchptr, constant );
 
@@ -212,7 +226,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 
                 case 'L':
                     if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range_expr( constant, expr_text->str );
+                        warn_int_range( constant );
 
                     patch_long( &patchptr, constant );
                     break;
@@ -221,12 +235,7 @@ ReadExpr( FILE *file, long nextexpr, long endexpr )
 
             OBJ_DELETE( expr );
         }
-        else
-        {
-            error_expr( expr_text->str );
-        }
     }
-    while ( nextexpr < endexpr );
 }
 
 
@@ -295,7 +304,7 @@ LinkModules( void )
 
             /* open relocatable file for reading */
             file = xfopen( obj_filename, "rb" );           /* CH_0012 */
-			/* read first 6 chars from file into array */
+			/* read first 8 chars from file into array */
             xfget_chars( file, fheader, 8 );
             fheader[8] = '\0';
 
@@ -667,8 +676,8 @@ ModuleExpr( void )
         fptr_base = curlink->modulestart;
 
         set_error_null();
-        set_error_module( CURRENTMODULE->modname );
-        set_error_file(   CURRENTMODULE->filename );
+        //set_error_module( CURRENTMODULE->modname );
+        //set_error_file(   CURRENTMODULE->filename );
 
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
@@ -680,20 +689,8 @@ ModuleExpr( void )
 
         if ( fptr_exprdecl != -1 )
         {
-            fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
-
-            if ( fptr_namedecl != -1 )
-            {
-                ReadExpr( file, fptr_exprdecl, fptr_namedecl );	/* Evaluate until beginning of name declarations */
-            }
-            else if ( fptr_libnmdecl != -1 )
-            {
-                ReadExpr( file, fptr_exprdecl, fptr_libnmdecl );	/* Evaluate until beginning of library reference declarations */
-            }
-            else
-            {
-                ReadExpr( file, fptr_exprdecl, fptr_modname );    /* Evaluate until beginning of module name */
-            }
+        	fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
+			ReadExpr( file );
         }
 
         xfclose( file );
@@ -864,7 +861,12 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.121  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.122  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.121  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.120  2014/05/20 21:58:31  pauloscustodio

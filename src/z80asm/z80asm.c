@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.172 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.173 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,6 +59,7 @@ Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
 
 FILE *objfile;
+Str  *objfile_last_sourcefile;	/* keep last source file referred to in object */
 
 extern char Z80objhdr[];
 extern char objhdrprefix[];
@@ -163,7 +164,10 @@ static void do_assemble( char *src_filename, char *obj_filename )
         {}													/* no list file */
 
         /* Create relocatable object file */
-        objfile = xfopen( obj_filename, "w+b" );           /* CH_0012 */
+        objfile = xfopen( obj_filename, "w+b" );			/* CH_0012 */
+		INIT_OBJ( Str, &objfile_last_sourcefile );
+		Str_clear( objfile_last_sourcefile );				/* expression location */
+
         xfput_strz( objfile, Z80objhdr );
 		xfput_strz( objfile, objhdrprefix );
 
@@ -184,7 +188,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 			CURRENTMODULE->modname = path_remove_ext(path_basename(src_filename));
 
         set_error_null();
-        set_error_module( CURRENTMODULE->modname );
+        //set_error_module( CURRENTMODULE->modname );
 
         if ( start_errors == get_num_errors() )
         {
@@ -438,7 +442,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.172  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.173  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.172  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.171  2014/05/19 22:15:54  pauloscustodio

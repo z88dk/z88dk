@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.18 2014-05-13 23:42:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.19 2014-05-29 00:19:37 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -128,12 +128,11 @@ remove_tree( bin_file() );
 #------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", EXPR => [ [C => 0, 0, "*+VAL"] ] ));
+write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", EXPR => [ ["C", "test.asm",1, 0, 0, "*+VAL"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
-				 "Error at file 'test.asm' module 'test': syntax error in expression\n".
-				 "Error at file 'test.asm' module 'test': error in expression '*+VAL'\n".
-				 "2 errors occurred during assembly\n",
+				 "Error at file 'test.asm' line 1: syntax error in expression\n".
+				 "1 errors occurred during assembly\n",
 				 1);
 
 #------------------------------------------------------------------------------
@@ -242,24 +241,24 @@ write_file(asm1_file(), <<'ASM1');
 ASM1
 
 t_z80asm_capture("-r0 -b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
-Warning at file 'test.asm' module 'test' line 4: integer '-129' out of range
-Warning at file 'test.asm' module 'test' line 19: integer '256' out of range
-Warning at file 'test.asm' module 'test' line 24: integer '-129' out of range
-Warning at file 'test.asm' module 'test' line 39: integer '128' out of range
-Warning at file 'test.asm' module 'test' line 44: integer '-32769' out of range
-Warning at file 'test.asm' module 'test' line 59: integer '65536' out of range
-Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G_129'
-Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G0-129'
-Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'G256'
-Warning at file 'test.asm' module 'test': integer '256' out of range in expression 'G0+256'
-Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G_129'
-Warning at file 'test.asm' module 'test': integer '-129' out of range in expression 'G0-129'
-Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'G128'
-Warning at file 'test.asm' module 'test': integer '128' out of range in expression 'G0+128'
-Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'G_32769'
-Warning at file 'test.asm' module 'test': integer '-32769' out of range in expression 'G0-32769'
-Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'G65536'
-Warning at file 'test.asm' module 'test': integer '65536' out of range in expression 'G0+65536'
+Warning at file 'test.asm' line 4: integer '-129' out of range
+Warning at file 'test.asm' line 19: integer '256' out of range
+Warning at file 'test.asm' line 24: integer '-129' out of range
+Warning at file 'test.asm' line 39: integer '128' out of range
+Warning at file 'test.asm' line 44: integer '-32769' out of range
+Warning at file 'test.asm' line 59: integer '65536' out of range
+Warning at file 'test.asm' line 5: integer '-129' out of range
+Warning at file 'test.asm' line 6: integer '-129' out of range
+Warning at file 'test.asm' line 20: integer '256' out of range
+Warning at file 'test.asm' line 21: integer '256' out of range
+Warning at file 'test.asm' line 25: integer '-129' out of range
+Warning at file 'test.asm' line 26: integer '-129' out of range
+Warning at file 'test.asm' line 40: integer '128' out of range
+Warning at file 'test.asm' line 41: integer '128' out of range
+Warning at file 'test.asm' line 45: integer '-32769' out of range
+Warning at file 'test.asm' line 46: integer '-32769' out of range
+Warning at file 'test.asm' line 60: integer '65536' out of range
+Warning at file 'test.asm' line 61: integer '65536' out of range
 ERR
 
 t_binary(read_binfile(bin_file()), pack("C*",
@@ -406,7 +405,7 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 
 	t_z80asm(
 		asm		=> "$jump label : defc label = ASMPC-129",
-		err		=> "Error at file 'test.asm' module 'test' line 1: integer '-129' out of range",
+		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
 	);
 
 	t_z80asm(
@@ -416,7 +415,7 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 
 	t_z80asm(
 		asm		=> "$jump label : defc label = ASMPC+128",
-		err		=> "Error at file 'test.asm' module 'test' line 1: integer '128' out of range",
+		err		=> "Error at file 'test.asm' line 1: integer '128' out of range",
 	);
 
 	for my $org (0, 0x8000, 0xFFFE) {
@@ -460,7 +459,7 @@ t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: syntax error i
 #------------------------------------------------------------------------------
 # error_not_defined
 unlink_testfiles();
-t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' module 'test' line 1: symbol not defined");
+t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' line 1: symbol not defined");
 
 #------------------------------------------------------------------------------
 # error_not_defined_expr
@@ -471,7 +470,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
+		"Error at file 'test.asm' line 2: symbol not defined\n".
 		"1 errors occurred during assembly\n", 
 		1);
 
@@ -646,7 +645,7 @@ unlink_testfiles();
 t_z80asm_error("
 	EXTERN loop
 	jr loop
-", "Error at file 'test.asm' module 'test' line 3: relative jump address must be local");
+", "Error at file 'test.asm' line 3: relative jump address must be local");
 
 
 #------------------------------------------------------------------------------
@@ -906,7 +905,12 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.18  2014-05-13 23:42:49  pauloscustodio
+# Revision 1.19  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.18  2014/05/13 23:42:49  pauloscustodio
 # Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 # Remove opcode errors and warnings from t/errors.t.
 # Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.

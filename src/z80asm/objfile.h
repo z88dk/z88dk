@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.23 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.24 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,7 +28,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.23 2014-05-25 01
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"03"
+#define OBJ_VERSION	"04"
+
+#define EXPR_DECL_FSEEK	30
 
 /*-----------------------------------------------------------------------------
 *   Object file class
@@ -99,7 +101,12 @@ extern Bool objmodule_loaded( Module *module, char *filename );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.23  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.24  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.23  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.22  2014/05/21 20:57:27  pauloscustodio

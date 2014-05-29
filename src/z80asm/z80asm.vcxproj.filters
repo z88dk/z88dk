@@ -149,9 +149,6 @@
     <ClCompile Include="asmdrctv.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="exprprsr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hist.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="libfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exprprsr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

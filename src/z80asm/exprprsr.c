@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.81 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.82 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -43,7 +43,6 @@ void Pass2info( Expr *expr, char constrange, long lfileptr );
 
 /* local functions */
 void list_PfixExpr( Expr *pfixlist );
-void StoreExpr( Expr *expr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
@@ -55,14 +54,36 @@ int ExprAddress( int listoffset );
 void
 StoreExpr( Expr *expr, char range )
 {
-    xfput_uint8(			objfile, range );				/* range of expression */
-    xfput_uint16(			objfile, expr->asmpc );			/* ASMPC */
-    xfput_uint16(			objfile, expr->code_pos );		/* patchptr */
-	xfput_count_byte_strz(	objfile, expr->text->str );		/* expression */
-    xfput_uint8(			objfile, 0 );					/* nul-terminate expression */
+	xfput_uint8( objfile, range );				/* range of expression */
+
+	/* store file name if different from last, folowed by source line number */
+	if ( expr->filename != NULL &&
+		 strcmp( objfile_last_sourcefile->str, expr->filename ) != 0 )
+	{
+		xfput_count_word_strz( objfile, expr->filename );
+		Str_set( objfile_last_sourcefile, expr->filename );
+	}
+	else
+		xfput_count_word_strz( objfile, "" );
+
+	xfput_int32(	objfile, expr->line_nr );		/* source line number */
+	
+    xfput_uint16(	objfile, expr->asmpc );			/* ASMPC */
+    xfput_uint16(	objfile, expr->code_pos );		/* patchptr */
+
+	xfput_count_word_strz(
+					objfile, expr->text->str );		/* expression */
 
     expr->is_stored = TRUE;
 }
+
+void StoreExprEnd( void )
+{
+	/* write terminator only if any expression written */
+	if ( ftell( objfile ) != EXPR_DECL_FSEEK )
+		xfput_uint8( objfile, 0 );		
+}
+
 
 
 
@@ -330,7 +351,12 @@ ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.81  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.82  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.81  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.80  2014/05/17 14:27:12  pauloscustodio

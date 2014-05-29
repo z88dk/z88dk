@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.100 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.101 2014-05-29 00:19:37 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.100 2014-05-25 1
 /* external functions */
 void LinkModules( void );
 void ParseIdent( enum flag interpret );
-void StoreExpr( Expr *expr, char range );
 
 /* local functions */
 void ifstatement( enum flag interpret );
@@ -56,9 +55,6 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Setfile( struct sourcefile *curfile, struct sourcefile *newfile, char *fname );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
-
-/* global variables */
-extern FILE *objfile;
 
 void Z80pass1( char *filename )
 {
@@ -345,6 +341,7 @@ Z80pass2( void )
 	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
 	{
         /* set error location */
+		set_error_null();
         set_error_file( expr->filename );
         set_error_line( expr->line_nr );
 
@@ -458,15 +455,15 @@ Z80pass2( void )
         {
             list_patch_data( expr->listpos, constant, RANGE_SIZE( expr->expr_type ) );
         }
-
-		OBJ_DELETE( expr );
-
-        /* clean error location */
-        set_error_file( NULL );
-        set_error_line( 0 );
     }
 
-    OBJ_DELETE( CURRENTMODULE->exprs );   /* Release header of expressions list */
+	StoreExprEnd();							/* write expression terminator */
+
+    /* clean error location */
+    set_error_null();
+    set_error_module( CURRENTMODULE->modname );
+
+    OBJ_DELETE( CURRENTMODULE->exprs );		/* Release expressions */
 
     if ( ! get_num_errors() && opts.symtable )
     {
@@ -520,7 +517,7 @@ Z80pass2( void )
 
     xfput_uint16( objfile, CURRENTMODULE->origin );		/* two bytes of origin */
 
-    fptr_exprdecl = 30;           /* expressions always begins at file position 24 */
+    fptr_exprdecl = EXPR_DECL_FSEEK;           /* expressions always begins at file position 24 */
 
     if ( fptr_namedecl == fptr_exprdecl )
     {
@@ -590,7 +587,12 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.100  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.101  2014-05-29 00:19:37  pauloscustodio
+* CH_0025: Link-time expression evaluation errors show source filename and line number
+* Object file format changed to version 04, to include the source file
+* location of expressions in order to give meaningful link-time error messages.
+*
+* Revision 1.100  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.99  2014/05/25 01:02:30  pauloscustodio

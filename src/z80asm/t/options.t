@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.40 2014-05-20 22:26:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.41 2014-05-29 00:19:37 pauloscustodio Exp $
 #
 # Test options
 
@@ -310,7 +310,7 @@ ERR
 #------------------------------------------------------------------------------
 unlink_testfiles();
 t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"Error at file 'test.asm' module 'test' line 2: symbol not defined");
+		"Error at file 'test.asm' line 2: symbol not defined");
 for my $options ('-sdcc', '--sdcc') {
 	t_z80asm(
 		options	=> $options,
@@ -777,7 +777,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' module 'test': symbol not defined in expression 'main'\n".
+		"Error at file 'test.asm' line 2: symbol not defined\n".
 		"1 errors occurred during assembly\n", 
 		1);
 
@@ -909,7 +909,7 @@ unlink_testfiles($lib);
 $asm = "ld a,_value23";		# BUG_0045
 
 # no -D
-t_z80asm_error($asm, "Error at file 'test.asm' module 'test' line 1: symbol not defined");
+t_z80asm_error($asm, "Error at file 'test.asm' line 1: symbol not defined");
 
 # invalid -D
 for my $options ('-D23', '-Da*') {
@@ -1132,7 +1132,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.40  2014-05-20 22:26:29  pauloscustodio
+# Revision 1.41  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.40  2014/05/20 22:26:29  pauloscustodio
 # BUG_0051: DEFC and DEFVARS constants do not appear in map file
 # Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
 # written to the map file.

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.150 2014-05-19 22:15:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.151 2014-05-29 00:19:37 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -135,6 +135,7 @@ $(TARGET): $(OBJS)
 # developer generated source files, and test libs
 #------------------------------------------------------------------------------
 developer :
+	$(MAKE) -C doc
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
 	$(MAKE) all
@@ -232,7 +233,12 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.150  2014-05-19 22:15:54  pauloscustodio
+# Revision 1.151  2014-05-29 00:19:37  pauloscustodio
+# CH_0025: Link-time expression evaluation errors show source filename and line number
+# Object file format changed to version 04, to include the source file
+# location of expressions in order to give meaningful link-time error messages.
+#
+# Revision 1.150  2014/05/19 22:15:54  pauloscustodio
 # Move read_obj_file_data() to objfile.c
 # Move CreateLibfile() to libfile.c, rename to search_libfile()
 #
