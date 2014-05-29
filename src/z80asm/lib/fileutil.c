@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.18 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.19 2014-05-29 00:21:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -359,6 +359,11 @@ void xfput_Str( FILE *file, Str *str )
 
 void xfget_Str( FILE *file, Str *str, size_t len )
 {
+	/* reserve space */
+	Str_clear( str );
+	Str_reserve( str, len );
+
+	/* may fail if static string */
     if ( len + 1 > str->size )
         fatal_ferr_read( file ); 			/* too long */
 
@@ -662,7 +667,10 @@ char *search_file( char *filename, List *dir_list )
 
 /*
 * $Log: fileutil.c,v $
-* Revision 1.18  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.19  2014-05-29 00:21:14  pauloscustodio
+* Expand string in xfget_Str if needed.
+*
+* Revision 1.18  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.17  2014/05/17 14:27:13  pauloscustodio
