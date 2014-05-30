@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
+;	$Id: bas_crt0.asm,v 1.11 2014-05-30 07:04:11 stefano Exp $
 
 
 ;-----------
@@ -103,14 +103,14 @@ processcmd:			;processcmd is called after os_tin
 ;-----------
 errhand:
         ret     z   		;Fatal error
-        cp      rc_esc
+        cp      RC_Esc
         jr     z,errescpressed
         ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
         scf
 l_dcal:	jp	(hl)		;Used for function pointer calls also
 
 errescpressed:
-        call_oz(os_esc)		;Acknowledge escape pressed
+        call_oz(Os_Esc)		;Acknowledge escape pressed
         jr      cleanup		;Exit the program
 
 
