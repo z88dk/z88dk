@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.17 2013-08-30 01:22:25 pauloscustodio Exp $
+;       $Id: rex_crt0.asm,v 1.18 2014-05-31 12:58:18 stefano Exp $
 ;
 
 	MODULE rex_crt0
@@ -15,6 +15,10 @@
 
 	XREF	_main		;main() is always external to crt0
 
+IF (startup=2)                 ; Library ?
+	XREF	_LibMain
+ENDIF
+	
 	XDEF	_std_seed	;integer rand() seed
 	XDEF	exitsp		;atexit() variables
 	XDEF	exitcount
@@ -34,9 +38,22 @@
 ;--------
 ; Main code starts here
 ;--------
+
         org    $8000
 
+		
 	jp	start		;addin signature jump
+
+	
+	
+IF (startup=2)                 ; Library ?
+
+signature:
+	defm	"XXX"
+lib:
+	ld	hl,farret
+	push	hl
+	jp	_LibMain
 start:
 ; Make room for the atexit() stack
 	ld	hl,65535-64	;Initialise sp
@@ -61,6 +78,40 @@ cleanup:
 endloop:
 	jr	endloop
 l_dcal:	jp	(hl)		;Used for call by function pointer
+farret:				;Used for farcall logic
+	pop	bc
+	ld	a,c
+	jp	$26ea
+
+ELSE
+
+start:
+; Make room for the atexit() stack
+	ld	hl,65535-64	;Initialise sp
+	ld	sp,hl
+	ld	hl,$f033	;Clear static memory
+	ld	de,$f034
+	ld	bc,$ffff-$f033
+	ld	(hl),0
+	ldir
+        ld      (exitsp),sp	;Store atexit() stack
+        xor     a
+        ld      (exitcount),a	;Setup number of atexit() routines
+
+        ld      hl,$8080	;Initialise fp seed
+        ld      (fp_seed),hl
+; Entry to the user code
+        call    _main		;Call the users code
+cleanup:
+	ld	de,$42	;DS_ADDIN_TERMINATE
+	ld	($c000),de
+	rst	$10		;Exit the addin
+endloop:
+	jr	endloop
+l_dcal:	jp	(hl)		;Used for call by function pointer
+
+ENDIF
+
 
 ;--------
 ; Static variables are kept in RAM in high memory
