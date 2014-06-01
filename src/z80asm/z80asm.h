@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.60 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.61 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -60,10 +60,16 @@ extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
 extern void Z80pass1( char *filename );
+extern Bool Pass2info( int range, long lfileptr );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.60  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.61  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.60  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

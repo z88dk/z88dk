@@ -15,7 +15,7 @@
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.2 2014-05-14 21:30:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.3 2014-06-01 22:16:50 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -54,10 +54,6 @@ my $asm1 = <<'END_ASM';
 END_ASM
 
 my $INPUT = read_file(dirname($0).'/'.basename($0, '.pl').'.asm');
-
-#;	ld	a,(ix-129)						;; error: integer '-129' out of range
-#;	ld	a,(iy-129)						;; error: integer '-129' out of range
-#;	ld	a,({ix iy}+{128 255})			;; error: integer '{2}' out of range
 
 #------------------------------------------------------------------------------
 # Main
@@ -245,7 +241,7 @@ sub filter_error_iter {
 	return Iterator::Simple::Lookahead->new( sub {
 		while (1) {
 			my $line = $in->next or return;
-			if ($line =~ /;;\s+error: /) {
+			if ($line =~ /;;\s+error\s*\d*: /) {
 				return $line if $error;
 			}
 			else {
@@ -323,7 +319,7 @@ sub build_pack_code {
 		my $line = $asm_code[$i];
 		push @pack_code, ";;LINE $i\n";
 		
-		$line =~ s/;;\s+warn:.*//;		# remove warnings
+		$line =~ s/;;\s+warn.*//;		# remove warnings
 		
 		if ($line !~ /^;/ && $line =~ /;;(.*)/) {
 			for (split(/;;/, $1)) {
@@ -397,7 +393,7 @@ sub merge_asm_hex {
 		}
 		else {
 			my $warn;
-			if (/\s*;;\s+(warn: .*)/) {
+			if (/\s*;;\s+(warn\s*\d*: .*)/) {
 				$warn = $1;
 				$_ = $`;
 			}
@@ -436,8 +432,8 @@ sub format_iter {
 			else {
 				# extract warning / error
 				my $warn;
-				/(;;\s*(warn|error):\s+(.*))$/ and $warn = $1;
-				s/\s*(;;\s*(warn|error):\s+(.*))$//;
+				/(;;\s*(warn|error)\s*\d*:\s+(.*))$/ and $warn = $1;
+				s/\s*(;;\s*(warn|error)\s*\d*:\s+(.*))$//;
 				
 				# extract comment
 				my $comment;
@@ -500,7 +496,12 @@ sub format_iter {
 	
 
 # $Log: build_opcodes.pl,v $
-# Revision 1.2  2014-05-14 21:30:28  pauloscustodio
+# Revision 1.3  2014-06-01 22:16:50  pauloscustodio
+# Write expressions to object file only in pass 2, to remove dupplicate code
+# and allow simplification of object file writing code. All expression
+# error messages are now output only during pass 2.
+#
+# Revision 1.2  2014/05/14 21:30:28  pauloscustodio
 # Indent {} blocks
 #
 # Revision 1.1  2014/05/13 23:42:49  pauloscustodio

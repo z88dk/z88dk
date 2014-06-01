@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.97 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.98 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -37,12 +37,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.97 2014-0
 #include <string.h>
 
 /* external functions */
-int ExprSigned8( int listoffset );
-int ExprUnsigned8( int listoffset );
-int ExprAddress( int listoffset );
-int ExprLong( int listoffset );
 int DEFSP( void );
-void Pass2info( Expr *expr, char constrange, long lfileptr );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
@@ -784,7 +779,12 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.97  2014-05-25 01:02:29  pauloscustodio
+ * Revision 1.98  2014-06-01 22:16:50  pauloscustodio
+ * Write expressions to object file only in pass 2, to remove dupplicate code
+ * and allow simplification of object file writing code. All expression
+ * error messages are now output only during pass 2.
+ *
+ * Revision 1.97  2014/05/25 01:02:29  pauloscustodio
  * Byte, Int, UInt added
  *
  * Revision 1.96  2014/05/17 14:27:12  pauloscustodio

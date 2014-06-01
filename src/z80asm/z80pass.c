@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.101 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.102 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,6 @@ void ParseIdent( enum flag interpret );
 /* local functions */
 void ifstatement( enum flag interpret );
 void parseline( enum flag interpret );
-void Pass2info( Expr *expression, char constrange, long lfileptr );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
 long Evallogexpr( void );
@@ -337,6 +336,7 @@ Z80pass2( void )
     long constant;
     long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     uint32_t patchptr;
+	Bool do_patch;
 
 	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
 	{
@@ -345,63 +345,35 @@ Z80pass2( void )
         set_error_file( expr->filename );
         set_error_line( expr->line_nr );
 
-		set_PC( expr->asmpc );		/* BUG_0048 */
+		/* Define code location; BUG_0048 */
+		set_PC( expr->asmpc );		
 
+		/* try to evaluate expression to detect missing symbols */
 		constant = Expr_eval( expr );
 
-        if ( ! expr->is_stored )
-        {
-            if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
-            {
-                /*
-                    * Expression contains symbol declared as external or defined as a relocatable
-                    * address,
-                    */
-                /* store expression in relocatable file */
-                switch ( expr->expr_type & RANGE )
-                {
-	            case RANGE_JROFFSET:
-					break;					/* JR must be local */
+		/* check if expression is stored in object file or computed and patched */
+		do_patch = TRUE;
 
-                case RANGE_32SIGN:
-                    StoreExpr( expr, 'L' );
-                    break;
+		if ( ( expr->expr_type & RANGE ) == RANGE_JROFFSET )
+		{
+			if ( expr->expr_type & EXPR_EXTERN )
+			{
+				error_jr_not_local();	/* JR must be local */
+				do_patch = FALSE;
+			}
+		}
+		else if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
+		{
+            StoreExpr( expr );            /* store expression in relocatable file */
+			do_patch = FALSE;
+		}
+		else if ( ( expr->expr_type & NOT_EVALUABLE ) )
+		{
+			error_not_defined();
+			do_patch = FALSE;
+		}
 
-                case RANGE_16CONST:
-                    StoreExpr( expr, 'C' );
-                    break;
-
-                case RANGE_8UNSIGN:
-                    StoreExpr( expr, 'U' );
-                    break;
-
-                case RANGE_8SIGN:
-                    StoreExpr( expr, 'S' );
-                    break;
-                }
-            }
-        }
-
-        if ( ( expr->expr_type & NOT_EVALUABLE ) && ( ! expr->is_stored ) )
-        {
-            if ( ( expr->expr_type & RANGE ) == RANGE_JROFFSET )
-            {
-                if ( expr->expr_type & EXPR_EXTERN )
-                {
-                    /* JR, DJNZ used an external label - */
-                    error_jr_not_local();
-                }
-                else
-                {
-                    error_not_defined();
-                }
-            }
-            else
-            {
-                error_not_defined();
-            }
-        }
-        else
+        if ( do_patch )
         {
             patchptr = expr->code_pos;            /* index in memory buffer */
 
@@ -448,13 +420,14 @@ Z80pass2( void )
 
                 patch_long( &patchptr, constant );
                 break;
+
+			default:
+				assert(0);
             }
         }
 
-        if ( opts.list )
-        {
-            list_patch_data( expr->listpos, constant, RANGE_SIZE( expr->expr_type ) );
-        }
+		if ( opts.list )
+			list_patch_data( expr->listpos, constant, RANGE_SIZE( expr->expr_type ) );
     }
 
 	StoreExprEnd();							/* write expression terminator */
@@ -542,15 +515,29 @@ Z80pass2( void )
 }
 
 
-void
-Pass2info( Expr *expr,       /* pointer to header of postfix expression linked list */
-           char constrange,				/* allowed size of value to be parsed */
+Bool
+Pass2info( int range,					/* allowed size of value to be parsed */
            long byteoffset )			/* position in listing file to patch */
 {
-    expr->expr_type = constrange;
-    expr->listpos = list_patch_pos( byteoffset );	    /* now calculated as absolute file pointer */
+    Expr *expr = expr_parse();
+	int i;
 
-	ExprList_push( & CURRENTMODULE->exprs, expr );
+	if ( expr != NULL )
+	{
+		expr->expr_type |= (range & RANGE);
+		if ( opts.cur_list )
+			expr->listpos = list_patch_pos( byteoffset );	/* now calculated as absolute file pointer */
+		else
+			expr->listpos = -1;
+
+		ExprList_push( & CURRENTMODULE->exprs, expr );
+	}
+
+	/* reserve space */
+	for ( i = 0; i < RANGE_SIZE( range ); i++ )
+		append_byte( 0 );
+
+	return expr == NULL ? FALSE : TRUE;
 }
 
 
@@ -587,7 +574,12 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.101  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.102  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.101  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

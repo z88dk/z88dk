@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.4 2014-05-17 10:54:34 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.5 2014-06-01 22:16:50 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -38,17 +38,17 @@
 
 ; Byte
 	ld a,{-128 -1 0 1 127 255}
-	ld a,{-129 256}						;; defb 03Eh, {1}	;; warn: integer '{1}' out of range
+	ld a,{-129 256}						;; defb 03Eh, {1}	;; warn 2: integer '{1}' out of range
 
 ; SignedByte
-	ld	a,({ix iy}{-129 +128})			;; defb {1@} ;; ld a,(hl) ;; defb {2}	;; warn: integer '{2-+}' out of range
+	ld	a,({ix iy}{-129 +128})			;; defb {1@} ;; ld a,(hl) ;; defb {2}	;; warn 2: integer '{2-+}' out of range
 	ld	a,({ix iy}-128)					;; defb {1@} ;; ld a,(hl) ;; defb 080h
 	ld	a,({ix iy})						;; defb {1@} ;; ld a,(hl) ;; defb 0
 	ld	a,({ix iy}+{0 127})
 
 ; Word
 	ld bc,{-32768 -1 0 1 32767 65535}
-	ld bc,{-32769 65536}				;; warn: integer '{1}' out of range
+	ld bc,{-32769 65536}				;; warn 2: integer '{1}' out of range
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
 	defl 0xFFFFFFFF						;; defw 0FFFFh, 0FFFFh
@@ -56,7 +56,7 @@
 
 ; call out of range
 	call {-32768 -1 0 1 65535}
-	call {-32769 65536}					;; warn: integer '{1}' out of range
+	call {-32769 65536}					;; warn 2: integer '{1}' out of range
 
 ;------------------------------------------------------------------------------
 ; Strings
@@ -379,18 +379,18 @@ jr2:
 
 ;	jr {po pe p m},NN
 	
-	djnz ASMPC-0x7F						;; error: integer '-129' out of range
-	djnz ASMPC+0x82						;; error: integer '128' out of range
-	jr ASMPC-0x7F						;; error: integer '-129' out of range
-	jr ASMPC+0x82						;; error: integer '128' out of range
-	jr nz,ASMPC-0x7F					;; error: integer '-129' out of range
-	jr nz,ASMPC+0x82					;; error: integer '128' out of range
-	jr  z,ASMPC-0x7F					;; error: integer '-129' out of range
-	jr  z,ASMPC+0x82					;; error: integer '128' out of range
-	jr nc,ASMPC-0x7F					;; error: integer '-129' out of range
-	jr nc,ASMPC+0x82					;; error: integer '128' out of range
-	jr  c,ASMPC-0x7F					;; error: integer '-129' out of range
-	jr  c,ASMPC+0x82					;; error: integer '128' out of range
+	djnz ASMPC-0x7F						;; error 2: integer '-129' out of range
+	djnz ASMPC+0x82						;; error 2: integer '128' out of range
+	jr ASMPC-0x7F						;; error 2: integer '-129' out of range
+	jr ASMPC+0x82						;; error 2: integer '128' out of range
+	jr nz,ASMPC-0x7F					;; error 2: integer '-129' out of range
+	jr nz,ASMPC+0x82					;; error 2: integer '128' out of range
+	jr  z,ASMPC-0x7F					;; error 2: integer '-129' out of range
+	jr  z,ASMPC+0x82					;; error 2: integer '128' out of range
+	jr nc,ASMPC-0x7F					;; error 2: integer '-129' out of range
+	jr nc,ASMPC+0x82					;; error 2: integer '128' out of range
+	jr  c,ASMPC-0x7F					;; error 2: integer '-129' out of range
+	jr  c,ASMPC+0x82					;; error 2: integer '128' out of range
 
 ;------------------------------------------------------------------------------
 ; Call and Return Group
@@ -538,9 +538,9 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-	call_oz	{1 255}						;; 	rst 20h ;; defb {1}
-	call_oz	{256 65535}					;; 	rst 20h ;; defw {1}
-	call_oz	{0 65536}					;; error: integer '{1}' out of range
+	{call_oz oz} {1 255}				;; 	rst 20h ;; defb {2}
+	{call_oz oz} {256 65535}			;; 	rst 20h ;; defw {2}
+	{call_oz oz} {0 65536}				;; error: integer '{2}' out of range
 
 	call_pkg {0 1 65535}				;; 	rst 08h ;; defw {1}
 	call_pkg {-1 65536} 				;; error: integer '{1}' out of range

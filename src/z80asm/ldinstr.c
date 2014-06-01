@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.42 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.43 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,9 +27,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.42 2014-05
 #include <stdio.h>
 
 /* external functions */
-int ExprUnsigned8( int listoffset );
-int ExprSigned8( int listoffset );
-int ExprAddress( int listoffset );
 int CheckRegister16( void );
 int CheckRegister8( void );
 int IndirectRegisters( void );
@@ -665,7 +662,12 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.42  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.43  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.42  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.41  2014/05/17 14:27:12  pauloscustodio

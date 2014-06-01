@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.8 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.9 2014-06-01 22:16:50 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -67,6 +67,7 @@ sub z80asm {
 	my $bin_file;
 	my $bin = $args{bin} || "";
 	my $err_text = "";
+	my @err_text;	# error text for each pass
 	my %err_file;
 	my %obj_file;
 	my $num_errors;
@@ -90,21 +91,32 @@ sub z80asm {
 						$bin .= chr(hex($_));
 					}
 				}
-				if (/\s*;;\s+(error|warn)(\s(\d+))?:\s+(.*)/) {
-					my $err = ($1 eq 'error' ? "Error" : "Warning").
-							" at file 'test$id.asm' ".
-							($3 ? "line $3" : "line $line_nr").
-							": $4\n";
-					$num_errors++ if $1 eq 'error';
-					$err_text .= $err;
-					$err_file{"test$id.err"} ||= "";
-					$err_file{"test$id.err"} .= $err;		
-					delete $obj_file{"test$id.obj"} if $1 eq 'error';
+				if (my($type, $dummy, $pass, $message) = 
+					/;;\s+(error|warn)(\s*(\d+))?:\s+(.*)/) {
+					$pass ||= 0;
+					my $err = ($type eq 'error' ? "Error" : "Warning").
+							" at file 'test$id.asm' line $line_nr: $message\n";
+					$num_errors++ if $type eq 'error';
+					$err_text[$pass] ||= "";
+					$err_text[$pass] .= $err;
+					delete $obj_file{"test$id.obj"} if $type eq 'error';
 				}
 				if (/;;\s+note:\s+(.*)/) {
 					note($1);
 				}
 			}
+			
+			# sort error messages
+			my $text = "";
+			for (@err_text) {
+				defined $_ and $text .= $_;
+			}
+			$err_text .= $text;
+			if ($text) {
+				$err_file{"test$id.err"} ||= "";
+				$err_file{"test$id.err"} .= $text;		
+			}
+			@err_text = ();
 		}
 	}
 	for (split(/\n/, $args{error} || "")) {
@@ -223,7 +235,12 @@ sub write_binfile {
 1;
 
 # $Log: TestZ80asm.pm,v $
-# Revision 1.8  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.9  2014-06-01 22:16:50  pauloscustodio
+# Write expressions to object file only in pass 2, to remove dupplicate code
+# and allow simplification of object file writing code. All expression
+# error messages are now output only during pass 2.
+#
+# Revision 1.8  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.16 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.17 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -355,7 +355,6 @@ void Expr_init (Expr *self)
 	OBJ_AUTODELETE( self->text ) = FALSE;
 
     self->expr_type = 0;
-    self->is_stored = FALSE;
 
 	self->section	= CURRENTSECTION;
     self->asmpc		= get_PC();			/* BUG_0048 */
@@ -363,7 +362,7 @@ void Expr_init (Expr *self)
 
 	self->filename	= src_filename();
 	self->line_nr	= src_line_nr();
-	self->listpos	= 0;
+	self->listpos	= -1;
 }
 
 void Expr_copy (Expr *self, Expr *other)
@@ -712,7 +711,12 @@ long expr_parse_eval_if( void )
 
 /*
 * $Log: expr.c,v $
-* Revision 1.16  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.17  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.16  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.15  2014/05/25 01:02:29  pauloscustodio

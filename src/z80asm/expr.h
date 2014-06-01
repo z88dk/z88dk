@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.20 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.21 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -95,7 +95,6 @@ CLASS( Expr )
 	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
 	Str			*text;			/* expression in infix text */
 	Byte		 expr_type;		/* range type of evaluated expression */
-    Bool		 is_stored;		/* Flag to indicate that expression has been stored to object file */
 
 	struct Section *section;	/* section where expression is patched (weak ref) */
 	uint32_t	 asmpc;			/* ASMPC value during linking */
@@ -103,7 +102,7 @@ CLASS( Expr )
 
 	char		*filename;		/* file and line where expression defined, string in strpool */
     int			 line_nr;		/* source line */
-    long		 listpos;		/* position in listing file to patch (in pass 2) */
+    long		 listpos;		/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
 
 CLASS_LIST( Expr );				/* list of expressions */
@@ -138,12 +137,21 @@ extern void Calc_compute_binary(  long (*calc)(long a, long b) );
 extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
 
-extern void StoreExpr( Expr *expr, char range );
+extern void StoreExpr( Expr *expr );
 extern void StoreExprEnd( void );
+extern Bool ExprSigned8( int listoffset );
+extern Bool ExprUnsigned8( int listoffset );
+extern Bool ExprAddress( int listoffset );
+extern Bool ExprLong( int listoffset );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.20  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.21  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.20  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

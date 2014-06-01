@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.82 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.83 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -38,22 +38,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.82 2014-0
 #include <stdlib.h>
 #include <string.h>
 
-/* external functions */
-void Pass2info( Expr *expr, char constrange, long lfileptr );
-
-/* local functions */
-void list_PfixExpr( Expr *pfixlist );
-int ExprSigned8( int listoffset );
-int ExprUnsigned8( int listoffset );
-int ExprAddress( int listoffset );
-
-
-
-
-
-void
-StoreExpr( Expr *expr, char range )
+/* store expression in relocatable file */
+void StoreExpr( Expr *expr )
 {
+	char range;
+
+    switch ( expr->expr_type & RANGE )
+    {
+    case RANGE_32SIGN:	range = 'L'; break;
+    case RANGE_16CONST:	range = 'C'; break;
+    case RANGE_8UNSIGN:	range = 'U'; break;
+    case RANGE_8SIGN:	range = 'S'; break;
+	case RANGE_JROFFSET:
+	default:
+		assert(0);
+    }
+
 	xfput_uint8( objfile, range );				/* range of expression */
 
 	/* store file name if different from last, folowed by source line number */
@@ -73,8 +73,6 @@ StoreExpr( Expr *expr, char range )
 
 	xfput_count_word_strz(
 					objfile, expr->text->str );		/* expression */
-
-    expr->is_stored = TRUE;
 }
 
 void StoreExprEnd( void )
@@ -84,274 +82,49 @@ void StoreExprEnd( void )
 		xfput_uint8( objfile, 0 );		
 }
 
-
-
-
-int
-ExprLong( int listoffset )
+Bool ExprLong( int listoffset )
 {
-
-    Expr *expr;
-    long constant;
-    int flag = 1;
-    uint32_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* parse numerical expression */
-        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
-            /* expression contains external reference or address label, must be recalculated during linking */
-        {
-            StoreExpr( expr, 'L' );
-        }
-
-        if ( expr->expr_type & EXPR_EXTERN )
-        {
-            OBJ_DELETE( expr );
-        }
-        else
-        {
-            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
-                                                                           * label */
-            {
-                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
-            }
-            else
-            {
-                if ( expr->expr_type & NOT_EVALUABLE )
-                {
-                    Pass2info( expr, RANGE_32SIGN, listoffset );
-                }
-                else
-                {
-                    constant = Expr_eval( expr );
-                    OBJ_DELETE( expr );
-
-                    if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range( constant );
-
-                    append_long( constant );
-                }
-            }
-        }
-    }
-    else
-    {
-        flag = 0;
-    }
-
-    if ( get_codeindex() == exprptr )     /* BUG_0015 */
-    {
-        append_long( 0 );    /* reserve space if not yet reserved */
-    }
-
-    return flag;
+	return Pass2info( RANGE_32SIGN, listoffset );
 }
 
-
-
-int
-ExprAddress( int listoffset )
+Bool ExprAddress( int listoffset )
 {
-    Expr *expr;
-    long constant;
-    int flag = 1;
-    uint32_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* parse numerical expression */
-        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
-            /* expression contains external reference or address label, must be recalculated during linking */
-        {
-            StoreExpr( expr, 'C' );
-        }
-
-        if ( expr->expr_type & EXPR_EXTERN )
-        {
-            OBJ_DELETE( expr );
-        }
-        else
-        {
-            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
-                                                                           * label */
-            {
-                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
-            }
-            else
-            {
-                if ( expr->expr_type & NOT_EVALUABLE )
-                {
-                    Pass2info( expr, RANGE_16CONST, listoffset );
-                }
-                else
-                {
-                    constant = Expr_eval( expr );
-                    OBJ_DELETE( expr );
-
-                    if ( constant < -32768 || constant > 65535 )
-                        warn_int_range( constant );
-
-                    append_word( constant );
-                }
-            }
-        }
-    }
-    else
-    {
-        flag = 0;
-    }
-
-    if ( get_codeindex() == exprptr )     /* BUG_0015 */
-    {
-        append_word( 0 );    /* reserve space if not yet reserved */
-    }
-
-    return flag;
+	return Pass2info( RANGE_16CONST, listoffset );
 }
 
-
-int
-ExprUnsigned8( int listoffset )
+Bool ExprUnsigned8( int listoffset )
 {
-    Expr *expr;
-    long constant;
-    int flag = 1;
-    uint32_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* parse numerical expression */
-        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
-            /* expression contains external reference or address label, must be recalculated during linking */
-        {
-            StoreExpr( expr, 'U' );
-        }
-
-        if ( expr->expr_type & EXPR_EXTERN )
-        {
-            OBJ_DELETE( expr );
-        }
-        else
-        {
-            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list )     /* expression contains address
-                                                                           * label */
-            {
-                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
-            }
-            else
-            {
-                if ( expr->expr_type & NOT_EVALUABLE )
-                {
-                    Pass2info( expr, RANGE_8UNSIGN, listoffset );
-                }
-                else
-                {
-                    constant = Expr_eval( expr );
-                    OBJ_DELETE( expr );
-
-                    if ( constant < -128 || constant > 255 )
-                        warn_int_range( constant );
-
-                    append_byte( (Byte) constant );
-                }
-            }
-        }
-    }
-    else
-    {
-        flag = 0;
-    }
-
-    if ( get_codeindex() == exprptr )     /* BUG_0015 */
-    {
-        append_byte( 0 );    /* reserve space if not yet reserved */
-    }
-
-    return flag;
+	return Pass2info( RANGE_8UNSIGN, listoffset );
 }
 
-
-
-int
-ExprSigned8( int listoffset )
+Bool ExprSigned8( int listoffset )
 {
-    Expr *expr;
-    long constant;
-    int flag = 1;
-    uint32_t exprptr = get_codeindex();     /* address of expression - BUG_0015 */
-
     /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
     switch ( tok )
     {
     case TK_RPAREN:
         append_byte( 0 );   /* offset zero */
-        return 1;           /* OK, zero already stored */
+        return TRUE;		/* OK, zero already stored */
 
     case TK_PLUS:
     case TK_MINUS:          /* + or - expected */
-        break;              /* continue into parsing expression */
+        return Pass2info( RANGE_8SIGN, listoffset );
 
     default:                /* Syntax error, e.g. (ix 4) */
         error_syntax();
-        return 0;           /* FAIL */
+        return FALSE;		/* FAIL */
     }
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* parse numerical expression */
-        if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
-            /* expression contains external reference or address label, must be recalculated during linking */
-        {
-            StoreExpr( expr, 'S' );
-        }
-
-        if ( expr->expr_type & EXPR_EXTERN )
-        {
-            OBJ_DELETE( expr );
-        }
-        else
-        {
-            if ( ( expr->expr_type & EXPR_ADDR ) && ! opts.cur_list ) /* expression contains address label */
-            {
-                OBJ_DELETE( expr );    /* no listing - evaluate during linking... */
-            }
-            else
-            {
-                if ( expr->expr_type & NOT_EVALUABLE )
-                {
-                    Pass2info( expr, RANGE_8SIGN, listoffset );
-                }
-                else
-                {
-                    constant = Expr_eval( expr );
-                    OBJ_DELETE( expr );
-
-                    if ( constant < -128 || constant > 127 )
-                        warn_int_range( constant );
-
-                    append_byte( (Byte) constant );
-                }
-            }
-        }
-    }
-    else
-    {
-        flag = 0;
-    }
-
-    if ( get_codeindex() == exprptr )     /* BUG_0015 */
-    {
-        append_byte( 0 );    /* reserve space if not yet reserved */
-    }
-
-    return flag;
 }
 
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.82  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.83  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.82  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

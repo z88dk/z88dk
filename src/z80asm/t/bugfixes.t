@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.34 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.35 2014-06-01 22:16:50 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -358,9 +358,8 @@ ERROR
 z80asm(
 	asm  	=> <<'ASM',
 			EXTERN value
-			ld a,value 		;; 3E 7F
-			ld b,256		;; 06 00 ;; warn: integer '256' out of range
-									 ;; warn 2: integer '-129' out of range
+			ld a,value		;; 3E 7F ;; warn 3: integer '-129' out of range
+			ld b,256		;; 06 00 ;; warn 2: integer '256' out of range
 ASM
 	asm1	=> <<'ASM1',
 			PUBLIC value
@@ -634,7 +633,12 @@ END
 
 
 # $Log: bugfixes.t,v $
-# Revision 1.34  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.35  2014-06-01 22:16:50  pauloscustodio
+# Write expressions to object file only in pass 2, to remove dupplicate code
+# and allow simplification of object file writing code. All expression
+# error messages are now output only during pass 2.
+#
+# Revision 1.34  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

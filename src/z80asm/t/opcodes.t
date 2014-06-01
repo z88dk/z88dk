@@ -53,19 +53,19 @@ END_ASM
         ld   a,1                        ;; 3E 01
         ld   a,127                      ;; 3E 7F
         ld   a,255                      ;; 3E FF
-        ld   a,-129                     ;; warn: integer '-129' out of range
+        ld   a,-129                     ;; warn 2: integer '-129' out of range
                                         ;; 3E 7F
-        ld   a,256                      ;; warn: integer '256' out of range
+        ld   a,256                      ;; warn 2: integer '256' out of range
                                         ;; 3E 00
 
 ; SignedByte
-        ld   a,(ix-129)                 ;; warn: integer '-129' out of range
+        ld   a,(ix-129)                 ;; warn 2: integer '-129' out of range
                                         ;; DD 7E 7F
-        ld   a,(iy-129)                 ;; warn: integer '-129' out of range
+        ld   a,(iy-129)                 ;; warn 2: integer '-129' out of range
                                         ;; FD 7E 7F
-        ld   a,(ix+128)                 ;; warn: integer '128' out of range
+        ld   a,(ix+128)                 ;; warn 2: integer '128' out of range
                                         ;; DD 7E 80
-        ld   a,(iy+128)                 ;; warn: integer '128' out of range
+        ld   a,(iy+128)                 ;; warn 2: integer '128' out of range
                                         ;; FD 7E 80
         ld   a,(ix-128)                 ;; DD 7E 80
         ld   a,(iy-128)                 ;; FD 7E 80
@@ -83,9 +83,9 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn: integer '-32769' out of range
+        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
                                         ;; 01 FF 7F
-        ld   bc,65536                   ;; warn: integer '65536' out of range
+        ld   bc,65536                   ;; warn 2: integer '65536' out of range
                                         ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
@@ -98,9 +98,9 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn: integer '-32769' out of range
+        call -32769                     ;; warn 2: integer '-32769' out of range
                                         ;; CD FF 7F
-        call 65536                      ;; warn: integer '65536' out of range
+        call 65536                      ;; warn 2: integer '65536' out of range
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
@@ -1788,9 +1788,13 @@ jr2:
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
+        oz   1                          ;; E7 01
         call_oz 255                     ;; E7 FF
+        oz   255                        ;; E7 FF
         call_oz 256                     ;; E7 00 01
+        oz   256                        ;; E7 00 01
         call_oz 65535                   ;; E7 FF FF
+        oz   65535                      ;; E7 FF FF
 
         call_pkg 0                      ;; CF 00 00
         call_pkg 1                      ;; CF 01 00
@@ -1849,18 +1853,18 @@ z80asm(
         bit  undefined,a                ;; error: symbol not defined
         res  undefined,a                ;; error: symbol not defined
         set  undefined,a                ;; error: symbol not defined
-        djnz ASMPC-0x7F                 ;; error: integer '-129' out of range
-        djnz ASMPC+0x82                 ;; error: integer '128' out of range
-        jr   ASMPC-0x7F                 ;; error: integer '-129' out of range
-        jr   ASMPC+0x82                 ;; error: integer '128' out of range
-        jr   nz,ASMPC-0x7F              ;; error: integer '-129' out of range
-        jr   nz,ASMPC+0x82              ;; error: integer '128' out of range
-        jr   z,ASMPC-0x7F               ;; error: integer '-129' out of range
-        jr   z,ASMPC+0x82               ;; error: integer '128' out of range
-        jr   nc,ASMPC-0x7F              ;; error: integer '-129' out of range
-        jr   nc,ASMPC+0x82              ;; error: integer '128' out of range
-        jr   c,ASMPC-0x7F               ;; error: integer '-129' out of range
-        jr   c,ASMPC+0x82               ;; error: integer '128' out of range
+        djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
+        djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
+        jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
+        jr   ASMPC+0x82                 ;; error 2: integer '128' out of range
+        jr   nz,ASMPC-0x7F              ;; error 2: integer '-129' out of range
+        jr   nz,ASMPC+0x82              ;; error 2: integer '128' out of range
+        jr   z,ASMPC-0x7F               ;; error 2: integer '-129' out of range
+        jr   z,ASMPC+0x82               ;; error 2: integer '128' out of range
+        jr   nc,ASMPC-0x7F              ;; error 2: integer '-129' out of range
+        jr   nc,ASMPC+0x82              ;; error 2: integer '128' out of range
+        jr   c,ASMPC-0x7F               ;; error 2: integer '-129' out of range
+        jr   c,ASMPC+0x82               ;; error 2: integer '128' out of range
         rst  undefined                  ;; error: symbol not defined
         rst  -1                         ;; error: integer '-1' out of range
         rst  1                          ;; error: integer '1' out of range
@@ -1879,7 +1883,9 @@ z80asm(
         rst  55                         ;; error: integer '55' out of range
         rst  57                         ;; error: integer '57' out of range
         call_oz 0                       ;; error: integer '0' out of range
+        oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
+        oz   65536                      ;; error: integer '65536' out of range
         call_pkg -1                     ;; error: integer '-1' out of range
         call_pkg 65536                  ;; error: integer '65536' out of range
         fpp  0                          ;; error: integer '0' out of range
@@ -1938,19 +1944,19 @@ END_ASM
         ld   a,1                        ;; 3E 01
         ld   a,127                      ;; 3E 7F
         ld   a,255                      ;; 3E FF
-        ld   a,-129                     ;; warn: integer '-129' out of range
+        ld   a,-129                     ;; warn 2: integer '-129' out of range
                                         ;; 3E 7F
-        ld   a,256                      ;; warn: integer '256' out of range
+        ld   a,256                      ;; warn 2: integer '256' out of range
                                         ;; 3E 00
 
 ; SignedByte
-        ld   a,(ix-129)                 ;; warn: integer '-129' out of range
+        ld   a,(ix-129)                 ;; warn 2: integer '-129' out of range
                                         ;; DD 7E 7F
-        ld   a,(iy-129)                 ;; warn: integer '-129' out of range
+        ld   a,(iy-129)                 ;; warn 2: integer '-129' out of range
                                         ;; FD 7E 7F
-        ld   a,(ix+128)                 ;; warn: integer '128' out of range
+        ld   a,(ix+128)                 ;; warn 2: integer '128' out of range
                                         ;; DD 7E 80
-        ld   a,(iy+128)                 ;; warn: integer '128' out of range
+        ld   a,(iy+128)                 ;; warn 2: integer '128' out of range
                                         ;; FD 7E 80
         ld   a,(ix-128)                 ;; DD 7E 80
         ld   a,(iy-128)                 ;; FD 7E 80
@@ -1968,9 +1974,9 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn: integer '-32769' out of range
+        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
                                         ;; 01 FF 7F
-        ld   bc,65536                   ;; warn: integer '65536' out of range
+        ld   bc,65536                   ;; warn 2: integer '65536' out of range
                                         ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
@@ -1983,9 +1989,9 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn: integer '-32769' out of range
+        call -32769                     ;; warn 2: integer '-32769' out of range
                                         ;; CD FF 7F
-        call 65536                      ;; warn: integer '65536' out of range
+        call 65536                      ;; warn 2: integer '65536' out of range
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
@@ -2353,10 +2359,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD 12 09
-        cpir                            ;; CD 2F 09
-        cpd                             ;; CD C9 08
-        cpdr                            ;; CD E6 08
+        cpi                             ;; CD 1C 09
+        cpir                            ;; CD 39 09
+        cpd                             ;; CD D3 08
+        cpdr                            ;; CD F0 08
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2785,8 +2791,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 5B 09
-        rrd                             ;; CD 7D 09
+        rld                             ;; CD 65 09
+        rrd                             ;; CD 87 09
 
 ;	# rotate 16 bits
 ;
@@ -3499,9 +3505,13 @@ jr2:
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
+        oz   1                          ;; E7 01
         call_oz 255                     ;; E7 FF
+        oz   255                        ;; E7 FF
         call_oz 256                     ;; E7 00 01
+        oz   256                        ;; E7 00 01
         call_oz 65535                   ;; E7 FF FF
+        oz   65535                      ;; E7 FF FF
 
         call_pkg 0                      ;; CF 00 00
         call_pkg 1                      ;; CF 01 00
@@ -3512,7 +3522,7 @@ jr2:
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD EE 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 37 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 62 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 84 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD F8 08 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 41 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 6C 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 8E 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3696,18 +3706,18 @@ z80asm(
         bit  undefined,a                ;; error: symbol not defined
         res  undefined,a                ;; error: symbol not defined
         set  undefined,a                ;; error: symbol not defined
-        djnz ASMPC-0x7F                 ;; error: integer '-129' out of range
-        djnz ASMPC+0x82                 ;; error: integer '128' out of range
-        jr   ASMPC-0x7F                 ;; error: integer '-129' out of range
-        jr   ASMPC+0x82                 ;; error: integer '128' out of range
-        jr   nz,ASMPC-0x7F              ;; error: integer '-129' out of range
-        jr   nz,ASMPC+0x82              ;; error: integer '128' out of range
-        jr   z,ASMPC-0x7F               ;; error: integer '-129' out of range
-        jr   z,ASMPC+0x82               ;; error: integer '128' out of range
-        jr   nc,ASMPC-0x7F              ;; error: integer '-129' out of range
-        jr   nc,ASMPC+0x82              ;; error: integer '128' out of range
-        jr   c,ASMPC-0x7F               ;; error: integer '-129' out of range
-        jr   c,ASMPC+0x82               ;; error: integer '128' out of range
+        djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
+        djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
+        jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
+        jr   ASMPC+0x82                 ;; error 2: integer '128' out of range
+        jr   nz,ASMPC-0x7F              ;; error 2: integer '-129' out of range
+        jr   nz,ASMPC+0x82              ;; error 2: integer '128' out of range
+        jr   z,ASMPC-0x7F               ;; error 2: integer '-129' out of range
+        jr   z,ASMPC+0x82               ;; error 2: integer '128' out of range
+        jr   nc,ASMPC-0x7F              ;; error 2: integer '-129' out of range
+        jr   nc,ASMPC+0x82              ;; error 2: integer '128' out of range
+        jr   c,ASMPC-0x7F               ;; error 2: integer '-129' out of range
+        jr   c,ASMPC+0x82               ;; error 2: integer '128' out of range
         retn                            ;; error: illegal identifier
         rst  00h                        ;; error: illegal identifier
         rst  08h                        ;; error: illegal identifier
@@ -3754,7 +3764,9 @@ z80asm(
         outd                            ;; error: illegal identifier
         otdr                            ;; error: illegal identifier
         call_oz 0                       ;; error: integer '0' out of range
+        oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
+        oz   65536                      ;; error: integer '65536' out of range
         call_pkg -1                     ;; error: integer '-1' out of range
         call_pkg 65536                  ;; error: integer '65536' out of range
         fpp  0                          ;; error: integer '0' out of range

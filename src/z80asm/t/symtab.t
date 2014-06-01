@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.16 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.17 2014-06-01 22:16:50 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -218,6 +218,7 @@ write_file(asm1_file(), "EXTERN var \n ld a, VAR");
 t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
 Warning at file 'test.asm' line 2: symbol 'Loc' used as 'LOC'
 Warning at file 'test.asm' line 4: symbol 'Var' used as 'VAR'
+Warning at file 'test1.asm' line 2: symbol 'var' used as 'VAR'
 Warning at file 'test1.asm' line 2: symbol 'var' used as 'VAR'
 Warning at file 'test1.asm' line 2: symbol 'Var' used as 'VAR'
 ERR
@@ -568,7 +569,12 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.16  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.17  2014-06-01 22:16:50  pauloscustodio
+# Write expressions to object file only in pass 2, to remove dupplicate code
+# and allow simplification of object file writing code. All expression
+# error messages are now output only during pass 2.
+#
+# Revision 1.16  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

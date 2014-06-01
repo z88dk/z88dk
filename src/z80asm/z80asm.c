@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.173 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.174 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -190,13 +190,10 @@ static void do_assemble( char *src_filename, char *obj_filename )
         set_error_null();
         //set_error_module( CURRENTMODULE->modname );
 
-        if ( start_errors == get_num_errors() )
-        {
-            if ( opts.verbose )
-                puts( "Pass2..." );
+        if ( opts.verbose )
+            puts( "Pass2..." );
 
-            Z80pass2();
-        }
+        Z80pass2();
     }
     FINALLY
     {
@@ -442,7 +439,12 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.173  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.174  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.173  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

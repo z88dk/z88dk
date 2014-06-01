@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.75 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.76 2014-06-01 22:16:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,14 +30,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.75 2014-0
 #include <string.h>
 
 /* external functions */
-void Pass2info( Expr *expr, char constrange, long lfileptr );
-int ExprSigned8( int listpatchoffset );
 int CheckRegister8( void );
 int IndirectRegisters( void );
 int CheckCondition( void );
 int CheckRegister16( void );
-int ExprUnsigned8( int listoffset );
-int ExprAddress( int listoffset );
 void ExtAccumulator( int opcode );
 
 /* local functions */
@@ -724,36 +720,8 @@ JP_instr( int opc0, int opc )
 
 static void RelativeJump( Byte opcode )
 {
-    long constant;
-    Expr *expr;
-
 	append_byte( opcode );
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* get numerical expression */
-        if ( expr->expr_type & NOT_EVALUABLE )
-        {
-            Pass2info( expr, RANGE_JROFFSET, 1 );
-            append_byte( 0 );		/* update code pointer */
-        }
-        else
-        {
-            constant = Expr_eval( expr );
-            constant -= get_PC() + 2;
-            OBJ_DELETE( expr );        /* remove linked list - expression evaluated. */
-
-            if ( ( constant >= -128 ) && ( constant <= 127 ) )
-            {
-                append_byte( (Byte)( constant ) );  /* opcode is stored, now store relative jump */
-            }
-            else
-            {
-                append_byte( 0 );								/* BUG_0025 - store dummy offset */
-                error_int_range( constant );
-            }
-        }
-    }
+	Pass2info( RANGE_JROFFSET, 1 );
 }
 
 void
@@ -1369,7 +1337,12 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.75  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.76  2014-06-01 22:16:50  pauloscustodio
+* Write expressions to object file only in pass 2, to remove dupplicate code
+* and allow simplification of object file writing code. All expression
+* error messages are now output only during pass 2.
+*
+* Revision 1.75  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.74  2014/05/17 14:27:13  pauloscustodio
