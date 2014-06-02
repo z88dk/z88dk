@@ -399,7 +399,7 @@ __FILE_STDIN_s:
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
-   defw __FILE_STDIN
+   defw __FILE_STDIN - 2
    
 __FILE_STDOUT_s:
 
@@ -447,7 +447,7 @@ __FILE_STDOUT_s:
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
-   defw __FILE_STDOUT
+   defw __FILE_STDOUT - 2
    
 __FILE_STDERR_s:
 
@@ -506,9 +506,11 @@ __FILE_STDERR_s:
  
    ENDIF
    
-   __stdio_file_list_open_s:          defw __FILE_STDERR
+   __stdio_file_list_open_s:          defw __FILE_STDERR - 2
    __stdio_file_list_avail_s:         defw 0, __stdio_file_list_avail
-      
+   
+   EXTERN __stdio_badfile
+   
    __stdio_file_stdin_s:              defw __FILE_STDIN
    __stdio_file_stdout_s:             defw __FILE_STDOUT
    __stdio_file_stderr_s:             defw __FILE_STDERR
@@ -604,7 +606,7 @@ __FILE_STDIN:
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
-   defw __FILE_STDIN
+   defw __FILE_STDIN - 2
    
 __FILE_STDOUT:
 
@@ -652,7 +654,7 @@ __FILE_STDOUT:
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
-   defw __FILE_STDOUT
+   defw __FILE_STDOUT - 2
    
 __FILE_STDERR:
 
@@ -716,9 +718,11 @@ __FILE_STDERR:
    PUBLIC __stdio_file_list_open, __stdio_file_list_avail
    PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
    
-   __stdio_file_list_open:            defw __FILE_STDERR
+   __stdio_file_list_open:            __FILE_STDERR - 2
    __stdio_file_list_avail:           defw 0, __stdio_file_list_avail
-      
+   
+   EXTERN __stdio_badfile
+   
    __stdio_file_stdin:                defw __FILE_STDIN
    __stdio_file_stdout:               defw __FILE_STDOUT
    __stdio_file_stderr:               defw __FILE_STDERR

@@ -56,7 +56,7 @@ define(`M4_FILE_DF_OTERM_C', 0x0012)       # cook, output_terminal
 
 define(`M4_CREATE_FILE_DATA_S_DEFB',dnl
 dnl
-defw M4_OPEN_FILE_PTR
+defw `ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)'
    
 __FILE_$1_s:
 
@@ -83,7 +83,7 @@ __FILE_$1_s:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw $5
-      defw ifdef($6,$6,$3_$2_file_state)
+      defw `ifdef($6,$6,$3_$2_file_state)'
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
@@ -95,7 +95,7 @@ __FILE_$1_s:
 
 define(`M4_CREATE_FILE_DATA_DEFB',dnl
 dnl
-defw M4_OPEN_FILE_PTR
+defw `ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)'
    
 __FILE_$1:
 
@@ -122,7 +122,7 @@ __FILE_$1:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw $5
-      defw ifdef($6,$6,$3_$2_file_state)
+      defw `ifdef($6,$6,$3_$2_file_state)'
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
