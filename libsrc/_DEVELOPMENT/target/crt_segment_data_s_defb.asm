@@ -1,88 +1,38 @@
 
-;==============================================================
-;= crt segment data stored copy ===============================
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; alloc
+;; crt segment data stored copy ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; balloc's queue table
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; alloc
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_cfg_qtbl_size > 0
+   ; balloc's queue table
 
-   __qtbl_s:                   defw __qtbl_address
+   IF __crt_cfg_qtbl_size > 0
 
-ENDIF
+      __qtbl_s:                   defw __qtbl_address
 
-; malloc's heap
+   ENDIF
 
-IF __crt_cfg_heap_size > 14
+   ; malloc's heap
 
-   __heap_s:                   defw __heap_address
+   IF __crt_cfg_heap_size > 14
 
-ENDIF
+      __heap_s:                   defw __heap_address
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; stdio
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ENDIF
 
-__stdio_file_list_lock_s:      defb 0, 1, 0, $fe, 0, 0
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; stdlib
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__stdio_file_list_open_s:      IF __crt_cfg_file_enable & $01
+   __seed_s:                      defw 1, 1
 
-                                  defw __CRT_FILE_STDIN - 2
-                               
-                               ENDIF
-                               
-                               IF (__crt_cfg_file_enable & $03) = 2
-                               
-                                  defw __CRT_FILE_STDOUT - 2
-                               
-                               ENDIF
-                               
-                               IF (__crt_cfg_file_enable & $07) = 4
-                               
-                                  defw __CRT_FILE_STDERR - 2
-                               
-                               ENDIF
-                               
-                               IF (__crt_cfg_file_enable & $07) = 0
-                               
-                                  defw 0
-                               
-                               ENDIF
-                               
-__stdio_file_list_avail_s:     defw 0
-                               defw __stdio_file_list_avail
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; threads
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_cfg_file_enable & $01
-
-   __stdio_file_stdin_s:       defw __CRT_FILE_STDIN
-
-ENDIF
-
-IF __crt_cfg_file_enable & $02
-
-   __stdio_file_stdout_s:      defw __CRT_FILE_STDOUT
-
-ENDIF
-
-IF __crt_cfg_file_enable & $04
-
-   __stdio_file_stderr_s:      defw __CRT_FILE_STDERR
-
-ENDIF
+   __thrd_id_s:                   defb 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; stdlib
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__seed_s:                      defw 1, 1
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; threads
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__thrd_id_s:                   defb 1
-
-;==============================================================

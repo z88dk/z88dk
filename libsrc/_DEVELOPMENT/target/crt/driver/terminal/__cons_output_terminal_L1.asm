@@ -52,8 +52,8 @@
 ;
 ; offset  size   desription
 ;
-;   13     1     driver flags
-;  14,15   2     terminal state * (0 if untied)
+;  13,14   2     driver flags
+;  15,16   2     terminal state * (0 if untied)
 
 ; terminal state
 ;

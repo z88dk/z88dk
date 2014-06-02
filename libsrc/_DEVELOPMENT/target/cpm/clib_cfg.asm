@@ -2,20 +2,23 @@
 IF !_CLIB_CFG_ASM_
 defc _CLIB_CFG_ASM_ = 1
 
-; **********************************
-; IF YOU MAKE CHANGES TO THIS FILE
-; YOU MUST RECOMPILE THE CPM LIBRARY
-; **********************************
+; *********************************************************************
+; IF YOU MAKE CHANGES TO THIS FILE YOU MUST RECOMPILE THE CPM LIBRARIES
+; *********************************************************************
 
-;;;;;;;;;;;;;;;;;;;;
-; CLIB CONFIGURATION
-;;;;;;;;;;;;;;;;;;;;
+defc CRT_EOL = 13                  ; end of text line sentinel
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Set these flags prior to making libraries
 
-;;;;;;;;;;;;;;;;;
-; multi-threading
-;;;;;;;;;;;;;;;;;
+
+; -------------------------------------------------------------
+; -- multi-threading ------------------------------------------
+; -------------------------------------------------------------
 
 ; Enables multi-threading features of the library.
 
@@ -25,8 +28,9 @@ defc __CLIB_OPT_MULTITHREAD = $00
 ; bit 1 = $02 = enable recursive locks on FILEs
 ; bit 2 = $04 = enable stdio lock on lists of FILEs
 
-; Setting to zero will reduce code size and slightly speed
-; up execution.
+; Set to zero if you are making traditional single-threaded
+; programs.  Setting to zero will reduce code size and
+; slightly speed up execution.
 ;
 ; When multi-threading is enabled, the program can still
 ; bypass locking by calling the _unlocked versions of functions
@@ -43,9 +47,9 @@ defc __CLIB_OPT_MULTITHREAD = $00
 ; flockfile() appropriately.
 
 
-;;;;;;;;;;;;;;;;;;;;;;
-; integer math options
-;;;;;;;;;;;;;;;;;;;;;;
+; -------------------------------------------------------------
+; -- integer math options -------------------------------------
+; -------------------------------------------------------------
 
 ; This option affects how multiplications and divisions
 ; of integers and longs are performed by the compiler
@@ -97,9 +101,10 @@ defc __CLIB_OPT_IMATH_SELECT = $00
 ; bit 1 = $02 = choose fast logical shift right operator
 ; bit 2 = $04 = choose fast shift left operator
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; text to number conversion
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; -------------------------------------------------------------
+; -- text to number conversion --------------------------------
+; -------------------------------------------------------------
 
 ; Specialized functions are available for fast conversion
 ; of binary, octal, decimal and hex numbers.
@@ -149,9 +154,10 @@ defc __CLIB_OPT_TXT2NUM_SELECT = $00
 ; bit 2 = $04 = choose fast decimal conversion
 ; bit 3 = $08 = choose fast hex conversion
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; number to text conversion
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; -------------------------------------------------------------
+; -- number to text conversion --------------------------------
+; -------------------------------------------------------------
 
 ; Specialized functions are available for fast conversion
 ; of binary, octal, decimal and hex numbers.
@@ -196,16 +202,17 @@ defc __CLIB_OPT_NUM2TXT_SELECT = $00
 ; bit 2 = $04 = choose fast decimal conversion
 ; bit 3 = $08 = choose fast hex conversion
 
-;;;;;;;;;;;;;;;
-; stdio options
-;;;;;;;;;;;;;;;
+
+; -------------------------------------------------------------
+; -- stdio options --------------------------------------------
+; -------------------------------------------------------------
 
 defc __CLIB_OPT_STDIO = $00
 
 ; bit 0 = $01 = stdio checks the validity of the FILE
 ;               prior to every operation.
 
-defc __CLIB_OPT_STDIO_FILE_EXTRA = 3
+defc __CLIB_OPT_STDIO_FILE_EXTRA = 4
 
 ; Number of additional bytes to append to FILE structures.
 ; Until posix file descriptors are added, this is a
@@ -214,13 +221,18 @@ defc __CLIB_OPT_STDIO_FILE_EXTRA = 3
 ; structures come with this additional memory so if your
 ; driver requires a lot of extra memory to store file
 ; state, consider storing a pointer to the state in the
-; FILE struct.  The first byte added is always reserved
+; FILE struct.  The first two bytes added are always reserved
 ; for driver flags so if you want N bytes reserved, set
-; the request to N+1 bytes.
+; the request to N+2 bytes.
+;
+; Note: The current implementation requires at least
+; four bytes -- two for driver flags and two for driver state
+; pointer.  The latter two bytes are owned by the driver.
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; printf converter selection
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; -------------------------------------------------------------
+; -- printf converter selection -------------------------------
+; -------------------------------------------------------------
 
 ; You can select which printf converters are included in
 ; the library.  Omitting unused ones can reduce code size.
@@ -256,9 +268,9 @@ defc __CLIB_OPT_PRINTF = $ffffffff
 ; format text to the stream.
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; scanf converter selection
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; -------------------------------------------------------------
+; -- scanf converter selection --------------------------------
+; -------------------------------------------------------------
 
 ; You can select which scanf converters are included in
 ; the library.  Omitting unused ones can reduce code size.

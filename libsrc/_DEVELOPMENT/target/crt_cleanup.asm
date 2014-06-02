@@ -1,44 +1,45 @@
 
-; == crt cleanup ==============================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt cleanup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_cfg_file_enable & $80
+   IF __crt_cfg_fopen_max < 128
 
-   push hl                       ; save exit status
+      push hl                       ; save exit status
 
-   ; stop multi-threading
+      ; stop multi-threading
 
-   ; close open files
-   ; what about files that are locked?
+      ; close open files
+      ; what about files that are locked?
 
-   EXTERN asm_p_forward_list_front, l_jpix
+      EXTERN asm_p_forward_list_front, l_jpix
 
-   ld hl,__stdio_file_list_open
+      ld hl,__stdio_file_list_open
 
-__close_loop:
+   __close_loop:
 
-   call asm_p_forward_list_front
+      call asm_p_forward_list_front
+      jr c, __close_done
 
-   push hl
-   pop ix
+      push hl
+      pop ix
 
-   jr c, __close_done
+      ld a,(ix+3)
+      and $07
+      jr nz, __close_loop           ; do not bother with memstreams
 
-   ld a,(ix+3)
-   and $07
-   jr nz, __close_loop           ; do not bother with memstreams
-
-   push hl
+      push hl
    
-   ld a,STDIO_MSG_CLOS
-   call l_jpix
+      ld a,STDIO_MSG_CLOS
+      call l_jpix
    
-   pop hl
-   jr __close_loop
+      pop hl
+      jr __close_loop
 
-__close_done:
+   __close_done:
 
-   pop hl                        ; restore exit status
+      pop hl                        ; restore exit status
 
-ENDIF
+   ENDIF
 
-; =============================================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

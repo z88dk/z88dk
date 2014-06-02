@@ -52,8 +52,8 @@
 ;
 ; offset  size   desription
 ;
-;   13     1     driver flags
-;  14,15   2     terminal state *
+;  13,14   2     driver flags
+;  15,16   2     terminal state *
 
 ; terminal state
 ;
@@ -136,7 +136,6 @@ __cons_input_terminal_L1:
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN IOCTL_ITERM_LINE, IOCTL_ITERM_SETF
    EXTERN error_enotsup_zc
 
 __ictl:
@@ -147,28 +146,20 @@ __ictl:
    ;
    ; exit carry set if ioctl not understood
 
-   ; IOCTL_ITERM_LINE and IOCTL_ITERM_SETF are the only ioctl commands understood here
    ; if line mode is being disabled we need to reset the edit buffer
+
+   bit 7,d
+   jp z, error_enotsup_zc      ; if command does not affect driver flags
    
    ld a,e
-   
-   cp IOCTL_ITERM_LINE & $ff
-   jr z, __ictl_line
-   
-   cp IOCTL_ITERM_SETF & $ff
-   jp nz, error_enotsup_zc
+   and $07
+   dec a
+   jp nz, error_enotsup_zc     ; if command is not specific to ITERMs
    
    ld a,c
+   and e
    and $20
-   jr z, __flsh
-   
-   jp error_enotsup_zc
-
-__ictl_line:
-   
-   ld a,b
-   or c
-   ret nz                      ; if line mode is being enabled
+   jp nz, error_enotsup_zc     ; if line mode is not being disabled
    
    ; fall through
 
@@ -180,8 +171,8 @@ __flsh:
 
    ; clear the edit buffer
    
-   ld l,(ix+14)
-   ld h,(ix+15)                ; hl = terminal state *
+   ld l,(ix+15)
+   ld h,(ix+16)                ; hl = terminal state *
    
    inc hl
    inc hl
@@ -443,8 +434,8 @@ __cons_input_getc_line:
    push de
    push ix
    
-   ld e,(ix+14)
-   ld d,(ix+15)
+   ld e,(ix+15)
+   ld d,(ix+16)
    
    ld ixl,e
    ld ixh,d                    ; ix = terminal state *
@@ -536,7 +527,15 @@ __read_line_loop:
    ; de = current position in buffer
    ; ix = FILE *
    ; stack = terminate state *
-   
+
+   bit 1,(ix+14)
+   jr nz, __read_line_cursor   ; if cursor is enabled
+
+   call __cons_input_getc_loop
+   jr __read_line_char
+
+__read_line_cursor:
+
    ; cursor & getchar
    
    push bc
@@ -570,9 +569,9 @@ __cursor_set:
    pop de
    pop bc
 
-   jr c, __read_line_loop      ; if char was consumed by console
+   jr c, __read_line_cursor    ; if char was consumed by console
 
-   ;;;;;;;;;;;;;;;;
+__read_line_char:
 
    ; check for backspace
 
@@ -766,8 +765,8 @@ __cons_output_tie:
    push ix
    push de
 
-   ld l,(ix+14)
-   ld h,(ix+15)                ; hl = terminal state *
+   ld l,(ix+15)
+   ld h,(ix+16)                ; hl = terminal state *
 
    ld e,(hl)
    inc hl

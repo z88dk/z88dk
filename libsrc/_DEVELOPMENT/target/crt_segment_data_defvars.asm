@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; crt segment data defb ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt segment data defvars - external ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -12,18 +12,24 @@
    IF __crt_cfg_qtbl_size > 0
 
       PUBLIC __qtbl
-   
-      __qtbl:                     defw __qtbl_address
+
+      defvars -1
+      {
+         __qtbl                   ds.w 1
+      }
 
    ENDIF
 
    ; malloc's heap
-
+   
    IF __crt_cfg_heap_size > 14
 
       PUBLIC __heap
    
-      __heap:                     defw __heap_address
+      defvars -1
+      {   
+         __heap                   ds.w 1
+      }
 
    ENDIF
 
@@ -33,14 +39,20 @@
 
    PUBLIC __seed
 
-   __seed:                        defw 1, 1
-
+   defvars -1
+   {
+      __seed                      ds.w 2
+   }
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; threads
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+   
    PUBLIC __thrd_id
-
-   __thrd_id:                     defb 1
+   
+   defvars -1
+   {
+      __thrd_id                   ds.b 1
+   }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,5 +1,9 @@
 
-; == crt initialization =======================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt initialization ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF (__crt_cfg_segment_data & $01) = 1
 
    ; BSS SEGMENT
 
@@ -10,6 +14,8 @@
      ld e,0
    
      call asm_memset
+   
+   ENDIF
    
    ; DATA SEGMENT
    
@@ -55,9 +61,9 @@
 
    ENDIF
 
-   IF (__crt_cfg_file_enable & $80) & (__crt_cfg_fopen_max > 3)
+   IF (__crt_cfg_fopen_max < 128) & (__crt_cfg_fopen_max > 3)
    
-         ; available stdio FILE structures
+         ; link available stdio FILE structures
 
          EXTERN asm_p_forward_list_alt_push_front
 
@@ -81,4 +87,4 @@
    
    ENDIF
 
-; =============================================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

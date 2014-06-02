@@ -1,12 +1,29 @@
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; zx spectrum crt
-;
-; #pragma output STACKPTR=address - crt sets stack pointer
-;
-; * stdin  = rom isr keyboard
-; * stdout = fzx
-; * stderr = fzx
+;;                    zx spectrum crt1                       ;;
+;;      generated from target/zx/startup/zx_crt1.m4          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  * Creates global fzx state in variable "_fzx"
+;;    This is required by the fzx output driver.
+;;
+;;  * Creates global "_cons_attr_p" byte to hold a background
+;;    colour.  This is required by the fzx output driver.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; #pragma output STACKPTR=nnnnn
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; stdin    : cons_input_kbd_inkey_L1
+;; stdout   : cons_output_fzx_L1
+;; stderr   : cons_output_fzx_L1
+;;
+;; fzx font : ff_ao_SoixanteQuatre
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,42 +44,70 @@ org myzorg
 ;; global symbols ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-INCLUDE "../crt_symbol.inc"
+INCLUDE "../crt_symbol.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; crt configuration ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 INCLUDE "clib_cfg.asm"
+INCLUDE "crt_cfg.asm"
+INCLUDE "../crt_cfg_default.asm"
 
-INCLUDE "crt_cfg.inc"
-INCLUDE "../crt_cfg_default.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; bss segment - external segment declarations only ;;;;;;;;;;;
+;; BSS SEGMENT - EXTERNAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; No memory is occupied
-; Declarations only if the segment is external
 
 IF __crt_segment_bss_address > 0
-
-   ; bss segment is external
    
    defc __crt_segment_bss_begin = __crt_segment_bss_address
-      
+
    defvars __crt_segment_bss_begin
    {
-      ; -- insert local crt bss segment here ------------------
-      
-      __sp                             ds.w 1
-      __stdin_edit_buf                 ds.b __crt_cfg_edit_buflen
-      
-      ; -------------------------------------------------------
    }
    
+   
+   ; ----------------------------------------------------------
+   ; -- insert local crt bss segment here ---------------------
+   ; ----------------------------------------------------------
+   
+   defvars -1
+   {
+      __sp                            ds.w 1
+   }
+
+   ; ----------------------------------------------------------
+   ; -- stdin bss segment -------------------------------------
+   ; ----------------------------------------------------------
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_input_kbd_inkey_L1, instance = STDIN
+
+   defvars -1
+   {
+      STDIN_cons_input_kbd_inkey_L1_edit_buffer    ds.b __crt_cfg_edit_buflen
+   }
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+   ; ----------------------------------------------------------
+   ; -- stdout bss segment ------------------------------------
+   ; ----------------------------------------------------------
+   
+   
+
+   ; ----------------------------------------------------------
+   ; -- stderr bss segment ------------------------------------
+   ; ----------------------------------------------------------
+
+   
+
+
+
    INCLUDE "../crt_segment_bss_defvars.inc"
-   INCLUDE "segment_bss_defvars.inc"
+   INCLUDE "target_segment_bss_defvars.inc"
    
    defvars -1
    {
@@ -72,64 +117,126 @@ IF __crt_segment_bss_address > 0
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; data segment - external segment declarations only ;;;;;;;;;;
+;; DATA SEGMENT - EXTERNAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; No memory is occupied
-; Declarations only if the segment is external
-
 IF __crt_segment_data_address > 0
-
-   ; data segment is external
    
    defc __crt_segment_data_begin = __crt_segment_data_address
    
-   PUBLIC _fzx
-   
    defvars __crt_segment_data_begin
    {
-   ; -- insert local crt data segment here --------------------
+   }
 
+   
+   ; ----------------------------------------------------------
+   ; -- insert local crt data segment here --------------------
+   ; ----------------------------------------------------------
+   
+   PUBLIC _fzx
+   
+   defvars -1
+   {
       _fzx                            ds.b 6
    }
    
-   IF __crt_cfg_file_enable & $01
-   
-   defvars -1
-   {
-                                      ds.w 1
-      __CRT_FILE_STDIN                ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
-      __stdin_terminal_state_L1       ds.b 14
-   }
-   
-   ENDIF
-   
-   IF __crt_cfg_file_enable & $02
+
+   ; ----------------------------------------------------------
+   ; -- stdin data segment ------------------------------------
+   ; ----------------------------------------------------------
 
    defvars -1
-   {   
+   {
                                       ds.w 1
-      __CRT_FILE_STDOUT               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
-      __stdout_terminal_state_L1      ds.b 4
+      __FILE_STDIN                       ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
    }
-   
-   ENDIF
-   
-   IF __crt_cfg_file_enable & $04
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_input_kbd_inkey_L1, instance = STDIN
+
+   defvars -1
+   {
+      STDIN_cons_input_kbd_inkey_L1_file_state	ds.b 14
+   }
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+   ; ----------------------------------------------------------
+   ; -- stdout data segment -----------------------------------
+   ; ----------------------------------------------------------
    
    defvars -1
    {
                                       ds.w 1
-      __CRT_FILE_STDERR               ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+      __FILE_STDOUT                       ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
    }
-   
-   ENDIF
-   
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
+
+   defvars -1
+   {
+      STDOUT_cons_output_fzx_L1_file_state	ds.b 4
+   }
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
    ; ----------------------------------------------------------
+   ; -- stderr data segment -----------------------------------
+   ; ----------------------------------------------------------
+
+   defvars -1
+   {
+                                      ds.w 1
+      __FILE_STDERR                       ds.b __CLIB_OPT_STDIO_FILE_EXTRA + 13
+   }
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDERR
+
+   defvars -1
+   {
+      STDERR_cons_output_fzx_L1_file_state	ds.b 4
+   }
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   
+
    
    INCLUDE "../crt_segment_data_defvars.inc"
-   INCLUDE "segment_data_defvars.inc"
+   INCLUDE "target_segment_data_defvars.inc"
    
+   ; ----------------------------------------------------------
+   ; -- stdio -------------------------------------------------
+   ; ----------------------------------------------------------
+   
+   IF __CLIB_OPT_MULTITHREAD & $01
+   
+      PUBLIC __stdio_file_list_lock
+   
+      defvars -1
+      {
+         __stdio_file_list_lock       ds.b 6
+      }
+      
+   ENDIF
+   
+   PUBLIC __stdio_file_list_open, __stdio_file_list_avail
+   PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
+   
+   defvars -1
+   {
+      __stdio_file_list_open          ds.w 1
+      __stdio_file_list_avail         ds.w 2
+      
+      __stdio_file_stdin              ds.w 1
+      __stdio_file_stdout             ds.w 1
+      __stdio_file_stderr             ds.w 1
+   }
+
    defvars -1
    {
       __crt_segment_data_end
@@ -137,15 +244,12 @@ IF __crt_segment_data_address > 0
 
 ENDIF
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; startup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC __crt_code_begin, __crt_code_end, __Exit
-
-PUBLIC __crt_segment_bss_begin,  __crt_segment_bss_end, __crt_segment_bss_len
-PUBLIC __crt_segment_data_begin, __crt_segment_data_end, __crt_segment_data_len
-PUBLIC __crt_segment_data_source_begin, __crt_segment_data_source_end, __crt_segment_data_source_len
 
 EXTERN _main, asm_zx_cls
 
@@ -172,7 +276,7 @@ __crt_code_begin:
    ; console initialization
    
    ld a,(__sound_bit_state)
-   out ($fe),a
+   out (254),a
    
    ld hl,(_cons_attr_p)
    call asm_zx_cls
@@ -214,19 +318,20 @@ __Exit:
 
 INCLUDE "../crt_stub.asm"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; data segment stored copy ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+__crt_code_end:
 
-; stored copy of data segment
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DATA SEGMENT - STORED COPY ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __crt_segment_data_source_begin:
 
-IF (__crt_cfg_segment_data & $03) = 1
+IF (__crt_cfg_segment_data & 3) = 1
 
-   ; crt initializes data segment from uncompressed stored copy
-
+   
+   ; ----------------------------------------------------------
    ; -- insert local crt data segment here --------------------
+   ; ----------------------------------------------------------
 
    _fzx_s:
 
@@ -234,150 +339,183 @@ IF (__crt_cfg_segment_data & $03) = 1
 
       defw _ff_ao_SoixanteQuatre
       defb 0, 0, 0, 0
+      
+   ; ----------------------------------------------------------
+   ; -- stdin data segment ------------------------------------
+   ; ----------------------------------------------------------
 
-   IF __crt_cfg_file_enable & $01
+   defw 0
    
-      IF __crt_cfg_file_enable & $02
-      
-         defw __CRT_FILE_STDOUT - 2
-         
-      ENDIF
-      
-      IF (__crt_cfg_file_enable & $06) = 4
-      
-         defw __CRT_FILE_STDERR - 2
-         
-      ENDIF
-      
-      IF (__crt_cfg_file_enable & $06) = 0
-      
-         defw 0
-         
-      ENDIF
+__FILE_STDIN_s:
 
-   __CRT_FILE_STDIN_s:
-
-      EXTERN __cons_input_kbd_inkey_L1
-
-      defb 195                    ; jp driver
-      defw __cons_input_kbd_inkey_L1
-      defb $40                    ; open for reading
-      defb $02                    ; last operation was a read
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $b1                 ; driver flags = echo | line | cook
-
-      ENDIF
-                       
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
-
-         defw __stdin_terminal_state_L1
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
-
-      ENDIF
-
-      __stdin_terminal_state_L1_s:
-      
-         defw __CRT_FILE_STDOUT
-         defw __stdin_edit_buf
-         defw __stdin_edit_buf
-         defb __crt_cfg_edit_buflen
-         defb 1
-         defb 0
-         defb 0
-         defw 500
-         defw 15
-
-   ENDIF
-
-   IF __crt_cfg_file_enable & $02
+   EXTERN cons_input_kbd_inkey_L1
    
-      IF __crt_cfg_file_enable & $04
-      
-         defw __CRT_FILE_STDERR - 2
-      
-      ELSE
-      
-         defw 0
-      
-      ENDIF
-
-   __CRT_FILE_STDOUT_s:
-
-      EXTERN __cons_output_fzx_L1
-
-      defb 195                    ; jp driver
-      defw __cons_output_fzx_L1
-      defb $80                    ; open for writing
-      defb 0
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $12                 ; driver flags = cook
-
-      ENDIF
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
-
-         defw __stdout_terminal_state_L1
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
-
-      ENDIF
-
-      __stdout_terminal_state_L1_s:
-      
-         defw __stdin_terminal_state_L1
-         defw 0
-
-   ENDIF
-
-   IF __crt_cfg_file_enable & $04
+   defb 195		; JP instruction
+   defw cons_input_kbd_inkey_L1		; address of driver message dispatcher
+   defb 0x40		; state_flags_0 = mode byte
    
-      defw 0
-
-   __CRT_FILE_STDERR_s:
-
-      EXTERN __cons_output_fzx_L1
-
-      defb 195                      ; jp driver
-      defw __cons_output_fzx_L1
-      defb $80                      ; open for writing
-      defb 0
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0       ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $12                   ; driver flags = cook
-
-      ENDIF
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-
-      ENDIF
+   IF 0x40 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
    
    ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x03b1
+      defw STDIN_cons_input_kbd_inkey_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_input_kbd_inkey_L1, instance = STDIN
+   
+   STDIN_cons_input_kbd_inkey_L1_file_state_s:
+   
+      defw __FILE_STDOUT
+      defw STDIN_cons_input_kbd_inkey_L1_edit_buffer
+      defw STDIN_cons_input_kbd_inkey_L1_edit_buffer
+      defb __crt_cfg_edit_buflen
+      defb 1
+      defb 0
+      defb 0
+      defw 500
+      defw 15
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
 
    ; ----------------------------------------------------------
+   ; -- stdout data segment -----------------------------------
+   ; ----------------------------------------------------------
    
+   defw __FILE_STDIN
+   
+__FILE_STDOUT_s:
+
+   EXTERN cons_output_fzx_L1
+   
+   defb 195		; JP instruction
+   defw cons_output_fzx_L1		; address of driver message dispatcher
+   defb 0x80		; state_flags_0 = mode byte
+   
+   IF 0x80 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
+   
+   ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x0012
+      defw STDOUT_cons_output_fzx_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
+   
+   STDOUT_cons_output_fzx_L1_file_state_s:
+   
+      defw STDIN_cons_input_kbd_inkey_L1_file_state
+      defw 0
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+   
+   ; ----------------------------------------------------------
+   ; -- stderr data segment -----------------------------------
+   ; ----------------------------------------------------------
+
+   defw __FILE_STDOUT
+   
+__FILE_STDERR_s:
+
+   EXTERN cons_output_fzx_L1
+   
+   defb 195		; JP instruction
+   defw cons_output_fzx_L1		; address of driver message dispatcher
+   defb 0x80		; state_flags_0 = mode byte
+   
+   IF 0x80 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
+   
+   ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x0012
+      defw STDERR_cons_output_fzx_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDERR
+   
+   STDERR_cons_output_fzx_L1_file_state_s:
+   
+      defw 0
+      defw 0
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+   
+
+
    INCLUDE "../crt_segment_data_s_defb.asm"
-   INCLUDE "segment_data_s_defb.asm"
+   INCLUDE "target_segment_data_s_defb.asm"
+
+   ; ----------------------------------------------------------
+   ; -- stdio -------------------------------------------------
+   ; ----------------------------------------------------------
+   
+   IF __CLIB_OPT_MULTITHREAD & $01
+   
+      __stdio_file_list_lock_s:       defb 0, 1, 0, 254, 0, 0
+ 
+   ENDIF
+   
+   __stdio_file_list_open_s:          defw __FILE_STDERR
+   __stdio_file_list_avail_s:         defw 0, __stdio_file_list_avail
+      
+   __stdio_file_stdin_s:              defw __FILE_STDIN
+   __stdio_file_stdout_s:             defw __FILE_STDOUT
+   __stdio_file_stderr_s:             defw __FILE_STDERR
 
 ENDIF
 
-IF (__crt_cfg_segment_data & $03) = 3
-
-   ; crt initializes data segment from compressed stored copy
+IF (__crt_cfg_segment_data & 3) = 3
    
    BINARY "segment_data_s.bin.zx7"
 
@@ -386,17 +524,18 @@ ENDIF
 __crt_segment_data_source_end:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; data segment - internal ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DATA SEGMENT - ATTACHED ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __crt_segment_data_address = 0
-
-   ; data segment is attached to binary
    
 __crt_segment_data_begin:
 
+   
+   ; ----------------------------------------------------------
    ; -- insert local crt data segment here --------------------
-
+   ; ----------------------------------------------------------
+   
    PUBLIC _fzx
 
    _fzx:
@@ -405,172 +544,233 @@ __crt_segment_data_begin:
 
       defw _ff_ao_SoixanteQuatre
       defb 0, 0, 0, 0
+      
+   ; ----------------------------------------------------------
+   ; -- stdin data segment ------------------------------------
+   ; ----------------------------------------------------------
 
-   IF __crt_cfg_file_enable & $01
+   defw 0
    
-      IF __crt_cfg_file_enable & $02
-      
-         defw __CRT_FILE_STDOUT - 2
-         
-      ENDIF
-      
-      IF (__crt_cfg_file_enable & $06) = 4
-      
-         defw __CRT_FILE_STDERR - 2
-         
-      ENDIF
-      
-      IF (__crt_cfg_file_enable & $06) = 0
-      
-         defw 0
-         
-      ENDIF
+__FILE_STDIN:
 
-   __CRT_FILE_STDIN:
-
-      EXTERN __cons_input_kbd_inkey_L1
-
-      defb 195                    ; jp driver
-      defw __cons_input_kbd_inkey_L1
-      defb $40                    ; open for reading
-      defb $02                    ; last operation was a read
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $b1                 ; driver flags = echo | line | cook
-
-      ENDIF
-                       
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
-      
-         defw __stdin_terminal_state_L1
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
-
-      ENDIF
-      
-      __stdin_terminal_state_L1:
-      
-         defw __CRT_FILE_STDOUT
-         defw __stdin_edit_buf
-         defw __stdin_edit_buf
-         defb __crt_cfg_edit_buflen
-         defb 1
-         defb 0
-         defb 0
-         defw 500
-         defw 15
-
-   ENDIF
-
-   IF __crt_cfg_file_enable & $02
+   EXTERN cons_input_kbd_inkey_L1
    
-      IF __crt_cfg_file_enable & $04
-      
-         defw __CRT_FILE_STDERR - 2
-      
-      ELSE
-      
-         defw 0
-      
-      ENDIF
-
-   __CRT_FILE_STDOUT:
-
-      EXTERN __cons_output_fzx_L1
-
-      defb 195                    ; jp driver
-      defw __cons_output_fzx_L1
-      defb $80                    ; open for writing
-      defb 0
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0     ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $12                 ; driver flags = cook
-
-      ENDIF
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 2
-
-         defw __stdout_terminal_state_L1
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 2
-
-      ENDIF
-      
-      __stdout_terminal_state_L1:
-      
-         defw __stdin_terminal_state_L1
-         defw 0
-
-   ENDIF
-
-   IF __crt_cfg_file_enable & $04
+   defb 195		; JP instruction
+   defw cons_input_kbd_inkey_L1		; address of driver message dispatcher
+   defb 0x40		; state_flags_0 = mode byte
    
-      defw 0
-
-   __CRT_FILE_STDERR:
-
-      EXTERN __cons_output_fzx_L1
-
-      defb 195                      ; jp driver
-      defw __cons_output_fzx_L1
-      defb $80                      ; open for writing
-      defb 0
-      defb 0
-      defb 0
-      defb 0, 2, 0, $fe, 0, 0       ; recursive mutex
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
-
-         defb $12                   ; driver flags = cook
-
-      ENDIF
-
-      IF __CLIB_OPT_STDIO_FILE_EXTRA > 1
-
-         defs __CLIB_OPT_STDIO_FILE_EXTRA - 1
-
-      ENDIF
+   IF 0x40 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
    
    ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x03b1
+      defw STDIN_cons_input_kbd_inkey_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_input_kbd_inkey_L1, instance = STDIN
+   
+   STDIN_cons_input_kbd_inkey_L1_file_state:
+   
+      defw __FILE_STDOUT
+      defw STDIN_cons_input_kbd_inkey_L1_edit_buffer
+      defw STDIN_cons_input_kbd_inkey_L1_edit_buffer
+      defb __crt_cfg_edit_buflen
+      defb 1
+      defb 0
+      defb 0
+      defw 500
+      defw 15
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
 
    ; ----------------------------------------------------------
+   ; -- stdout data segment -----------------------------------
+   ; ----------------------------------------------------------
    
+   defw __FILE_STDIN
+   
+__FILE_STDOUT:
+
+   EXTERN cons_output_fzx_L1
+   
+   defb 195		; JP instruction
+   defw cons_output_fzx_L1		; address of driver message dispatcher
+   defb 0x80		; state_flags_0 = mode byte
+   
+   IF 0x80 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
+   
+   ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x0012
+      defw STDOUT_cons_output_fzx_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
+   
+   STDOUT_cons_output_fzx_L1_file_state:
+   
+      defw STDIN_cons_input_kbd_inkey_L1_file_state
+      defw 0
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+
+   ; ----------------------------------------------------------
+   ; -- stderr data segment -----------------------------------
+   ; ----------------------------------------------------------
+
+   defw __FILE_STDOUT
+   
+__FILE_STDERR:
+
+   EXTERN cons_output_fzx_L1
+   
+   defb 195		; JP instruction
+   defw cons_output_fzx_L1		; address of driver message dispatcher
+   defb 0x80		; state_flags_0 = mode byte
+   
+   IF 0x80 & 0x40
+   
+      defb 0x02         ; state_flags_1 = make last operation a read
+   
+   ELSE
+   
+      defb 0            ; state_flags_1 = make last operation a write
+   
+   ENDIF
+   
+   defb 0		; printf conversion flags
+   defb 0		; ungetc
+   defb 0, 2, 0, 254, 0, 0	; recursive mutex
+   
+   IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   
+      defw 0x0012
+      defw STDERR_cons_output_fzx_L1_file_state
+      
+      defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_output_fzx_L1, instance = STDERR
+   
+   STDERR_cons_output_fzx_L1_file_state:
+   
+      defw 0
+      defw 0
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+   
+
+
    INCLUDE "../crt_segment_data_defb.asm"
-   INCLUDE "segment_data_defb.asm"
+   INCLUDE "target_segment_data_defb.asm"
+
+   ; ----------------------------------------------------------
+   ; -- stdio -------------------------------------------------
+   ; ----------------------------------------------------------
+   
+   IF __CLIB_OPT_MULTITHREAD & $01
+   
+      PUBLIC __stdio_file_list_lock
+   
+      __stdio_file_list_lock:         defb 0, 1, 0, 254, 0, 0
+ 
+   ENDIF
+
+   PUBLIC __stdio_file_list_open, __stdio_file_list_avail
+   PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
+   
+   __stdio_file_list_open:            defw __FILE_STDERR
+   __stdio_file_list_avail:           defw 0, __stdio_file_list_avail
+      
+   __stdio_file_stdin:                defw __FILE_STDIN
+   __stdio_file_stdout:               defw __FILE_STDOUT
+   __stdio_file_stderr:               defw __FILE_STDERR
 
 __crt_segment_data_end:
 
 ENDIF
 
-__crt_code_end:
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; bss segment - internal ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BSS SEGMENT - ATTACHED ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __crt_segment_bss_address = 0
 
-   ; bss segment is attached to the binary
-
-   PUBLIC __cons_input_edit_buf, __crt_cfg_edit_buflen
-
 __crt_segment_bss_begin:
 
-   ; -- insert local crt bss segment here ---------------------
-   
-   __sp:                              defs 2
-   __stdin_edit_buf:                  defs __crt_cfg_edit_buflen
    
    ; ----------------------------------------------------------
+   ; -- insert local crt bss segment here ---------------------
+   ; ----------------------------------------------------------
 
+   __sp:                              defs 2
+   
+
+   ; ----------------------------------------------------------
+   ; -- stdin bss segment -------------------------------------
+   ; ----------------------------------------------------------
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; driver = cons_input_kbd_inkey_L1, instance = STDIN
+
+   STDIN_cons_input_kbd_inkey_L1_edit_buffer:      defs __crt_cfg_edit_buflen
+   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+   ; ----------------------------------------------------------
+   ; -- stdout bss segment ------------------------------------
+   ; ----------------------------------------------------------
+   
+   
+
+   ; ----------------------------------------------------------
+   ; -- stderr bss segment ------------------------------------
+   ; ----------------------------------------------------------
+
+   
+   
+
+   
    INCLUDE "../crt_segment_bss_defs.asm"
-   INCLUDE "segment_bss_defs.asm"
+   INCLUDE "target_segment_bss_defs.asm"
 
 __crt_segment_bss_end:
 
@@ -578,6 +778,11 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+PUBLIC __crt_segment_bss_len, __crt_segment_bss_end, __crt_segment_bss_begin
+PUBLIC __crt_segment_data_len, __crt_segment_data_end, __crt_segment_data_begin
+PUBLIC __crt_segment_data_source_len, __crt_segment_data_source_end, __crt_segment_data_source_begin
+
 defc __crt_segment_bss_len = __crt_segment_bss_end - __crt_segment_bss_begin
 defc __crt_segment_data_len = __crt_segment_data_end - __crt_segment_data_begin
 defc __crt_segment_data_source_len = __crt_segment_data_source_end - __crt_segment_data_source_begin
+

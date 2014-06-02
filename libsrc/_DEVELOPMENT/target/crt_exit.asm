@@ -1,17 +1,19 @@
 
-; == crt_exit =================================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt_exit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; ISO/IEC 9899:201x
-; 5.1.2.2.3 Program termination
+   ; ISO/IEC 9899:201x
+   ; 5.1.2.2.3 Program termination
+   ;
+   ; Only the exit stack runs on termination of main()
 
-; Only the exit stack runs on termination of main()
-
-IF __exit_stack_size > 0
+   IF __exit_stack_size > 0
    
-   EXTERN asm_exit
+      EXTERN asm_exit
    
-   jp asm_exit                 ; exit function jumps to __Exit
+      jp asm_exit                 ; exit function jumps to __Exit
    
-ENDIF
+   ENDIF
 
-; =============================================================
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
