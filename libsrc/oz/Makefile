@@ -1,7 +1,7 @@
 #
 # Makefile for OZ-7xx specific libraries
 #
-# $Id: Makefile,v 1.13 2009-04-10 12:47:42 stefano Exp $
+# $Id: Makefile,v 1.14 2014-06-02 09:59:20 stefano Exp $
 
 include ../Make.config
 
@@ -9,7 +9,7 @@ all:
 	$(RM) emu/ozgfx/*.o*
 	cd oztime ; $(MAKE) ; cd ..
 	cd ozinput ; $(MAKE) ; cd ..
-	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/ozextra -DFORoz -DOZDK @oz700.lst
+	$(LIBLINKER) -nb -DFORoz -DOZDK @oz700.lst
 
 clean:
 	$(RM) *.o* zcc_opt.def ozextra.lib
