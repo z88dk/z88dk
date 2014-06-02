@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 PUBLIC asm_getline_unlocked
 
 EXTERN asm_getdelim_unlocked
@@ -36,5 +38,5 @@ asm_getline_unlocked:
    ;
    ; uses  : all except ix
 
-   ld bc,13                    ; '\n'
+   ld bc,CRT_EOL               ; '\n'
    jp asm_getdelim_unlocked

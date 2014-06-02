@@ -88,7 +88,7 @@ errno_string:
    call asm_strerror
    call asm0_fputs_unlocked
    
-   ld e,13                     ; '\n'
+   ld e,CRT_EOL                ; '\n'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02

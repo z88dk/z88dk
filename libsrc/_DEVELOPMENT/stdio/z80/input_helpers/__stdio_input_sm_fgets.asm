@@ -1,4 +1,6 @@
 
+INCLUDE "clib_cfg.asm"
+
 PUBLIC __stdio_input_sm_fgets
 
 __stdio_input_sm_fgets:
@@ -40,7 +42,7 @@ space:
    ld (de),a                   ; write char to buffer
    inc de
    
-   cp 13                       ; '\n'
+   cp CRT_EOL                  ; '\n'
    jr z, delim_met
    
    or a                        ; indicate accepted

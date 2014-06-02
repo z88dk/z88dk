@@ -1,4 +1,6 @@
 
+INCLUDE "clib_cfg.asm"
+
 PUBLIC __stdio_input_sm_gets
 
 __stdio_input_sm_gets:
@@ -18,7 +20,7 @@ __stdio_input_sm_gets:
    ; return: de = void *s_ptr (address past last byte written)
    ;          l = 1 if caller should remove \n
    
-   cp 13                       ; '\n'
+   cp CRT_EOL                  ; '\n'
    jr z, delim_met
    
    ld (de),a                   ; write char to buffer

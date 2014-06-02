@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 PUBLIC asm_puts_unlocked
 PUBLIC asm0_puts_unlocked
 
@@ -55,7 +57,7 @@ asm0_puts_unlocked:
    
    push hl                     ; save strlen(s)
    
-   ld e,13                     ; '\n'
+   ld e,CRT_EOL                ; '\n'
    call asm0_fputc_unlocked    ; output '\n'
    
    pop hl                      ; hl = strlen(s)
