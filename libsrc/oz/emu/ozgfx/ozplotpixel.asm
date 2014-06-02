@@ -3,7 +3,7 @@
 ;	by Stefano Bodrato - Oct. 2003
 ;
 ; ------
-; $Id: ozplotpixel.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozplotpixel.asm,v 1.2 2014-06-02 16:32:18 stefano Exp $
 ;
 
 	XLIB	ozplotpixel
@@ -14,7 +14,7 @@
 	XREF	COORDS
 
 
-	INCLUDE	"../graphics/grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 
 ozplotpixel:
