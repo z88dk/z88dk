@@ -718,7 +718,7 @@ __FILE_STDERR:
    PUBLIC __stdio_file_list_open, __stdio_file_list_avail
    PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
    
-   __stdio_file_list_open:            __FILE_STDERR - 2
+   __stdio_file_list_open:            defw __FILE_STDERR - 2
    __stdio_file_list_avail:           defw 0, __stdio_file_list_avail
    
    EXTERN __stdio_badfile
