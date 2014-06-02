@@ -75,9 +75,9 @@ define(`M4_cons_input_kbd_inkey_L1_PUT_SEGMENT_DATA_DEFB',dnl
       defb $3
       defb 1
       defb 0
-      defb ifdef($5,$5,0)
-      defw ifdef($6,$6,500)
-      defw ifdef($7,$7,15)
+      defb `ifdef($5,$5,0)'
+      defw `ifdef($6,$6,500)'
+      defw `ifdef($7,$7,15)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )
@@ -98,9 +98,9 @@ define(`M4_cons_input_kbd_inkey_L1_PUT_SEGMENT_DATA_S_DEFB',dnl
       defb $3
       defb 1
       defb 0
-      defb ifdef($5,$5,0)
-      defw ifdef($6,$6,500)
-      defw ifdef($7,$7,15)
+      defb `ifdef($5,$5,0)'
+      defw `ifdef($6,$6,500)'
+      defw `ifdef($7,$7,15)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )

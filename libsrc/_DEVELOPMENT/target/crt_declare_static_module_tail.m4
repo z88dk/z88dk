@@ -186,8 +186,8 @@ IF __crt_segment_bss_address > 0
    
    undivert(4)
 
-   INCLUDE "../crt_segment_bss_defvars.inc"
-   INCLUDE "target_segment_bss_defvars.inc"
+   INCLUDE "../crt_segment_bss_defvars.asm"
+   INCLUDE "target_segment_bss_defvars.asm"
    
    defvars -1
    {
@@ -215,8 +215,8 @@ IF __crt_segment_data_address > 0
 
    undivert(6)
    
-   INCLUDE "../crt_segment_data_defvars.inc"
-   INCLUDE "target_segment_data_defvars.inc"
+   INCLUDE "../crt_segment_data_defvars.asm"
+   INCLUDE "target_segment_data_defvars.asm"
    
    ; ----------------------------------------------------------
    ; -- stdio -------------------------------------------------
