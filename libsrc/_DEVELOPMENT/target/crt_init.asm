@@ -3,7 +3,7 @@
 ;; crt initialization ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ;IF (__crt_cfg_segment_data & $01) = 1
+   IF ((__crt_cfg_segment_data & $01) = 1) | (__crt_segment_bss_address > 0)
 
    ; BSS SEGMENT
 
@@ -15,7 +15,7 @@
    
      call asm_memset
    
-   ;ENDIF
+   ENDIF
    
    ; DATA SEGMENT
    
