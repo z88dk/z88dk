@@ -72,6 +72,7 @@ asm0_freopen_unlocked:
 IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
    ld (ix+13),0                ; clear driver flags
+   ld (ix+14),0
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -107,6 +107,7 @@ IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    pop ix
    
    ld (ix+13),0                ; clear driver flags
+   ld (ix+14),0
    
    ; ix = FILE *
 

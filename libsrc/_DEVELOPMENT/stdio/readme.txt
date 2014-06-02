@@ -22,8 +22,10 @@ offset  size  name              purpose
   7      6    mtx_t file_lock   recursive mutex used for locking file
  13      ?    (temporary state) __CLIB_OPT_STDIO_FILE_EXTRA free bytes for driver
 
-note:  if __CLIB_OPT_STDIO_FILE_EXTRA > 0, the first byte at offset 13
-       is always driver flags "dflags_0" (see below)
+note:  __CLIB_OPT_STDIO_FILE_EXTRA must be >= 4 currently; the first two
+       bytes at offset 13,14 are driver flags "dflags" (see below).  The
+       next two bytes are normally a pointer to a driver state structure
+       but the specific use is determined by the driver.
 
 * state_flags_0
 
@@ -65,7 +67,7 @@ bit   name    purpose
  1    base    if set indicates octal conversion
  0    P       if set indicates precision was defined 
 
-* dflags_0
+* dflags
 
 Flag bits associated with the driver.  This is temporary state information
 that will be moved to the driver when posix file descriptors are added.
@@ -74,6 +76,7 @@ if bits 2..0 = 000, the driver has no flags managed by stdio
 
 if bits 2..0 = 001, the driver is an input terminal
 
+   BYTE AT OFFSET 13
    bit   name      purpose
 
     7    echo      if set, echo is on
@@ -83,8 +86,17 @@ if bits 2..0 = 001, the driver is an input terminal
     3    caps lock if set, indicates processed chars should be capitalized
    210   type      001 = input terminal
 
+   BYTE AT OFFSET 14
+
+   bit   name      purpose
+
+    76   reserved  reserved for driver use
+    1    cursor    if set, terminal generates a cursor while in line mode
+    0    crlf      if set, terminal performs crlf conversions
+
 if bits 2..0 = 010, the driver is an output terminal
 
+   BYTE AT OFFSET 13
    bit   name      purpose
    
     4    cook      if set, output may be processed by the driver

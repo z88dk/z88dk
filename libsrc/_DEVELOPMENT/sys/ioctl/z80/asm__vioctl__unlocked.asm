@@ -15,13 +15,20 @@ INCLUDE "clib_cfg.asm"
 PUBLIC asm__vioctl__unlocked
 PUBLIC asm0__vioctl__unlocked
 
-EXTERN l_jpix, STDIO_MSG_ICTL, __stdio_nextarg_bc
+EXTERN STDIO_MSG_ICTL
+EXTERN l_jpix, __stdio_nextarg_bc
 EXTERN error_einval_mc, error_enotsup_mc, error_mc
 
 asm__vioctl__unlocked:
 
    ; enter : ix = FILE *
    ;         de = command
+   ;            = xxxx xxxx xxxx x000 = forward to driver
+   ;            = xxxx xxxx xxxx xDDD = if DDD does not match driver type, error
+   ;            = 00xx xxxx xxxx xDDD = forward to driver
+   ;            = 01xx xxxx xxxx xDDD = get flags (one bits in 13..3)
+   ;            = 10xx xxxx xxxx xDDD = set flags (one bits in 13..3) using parameter
+   ;            = 11xx xxxx xxxx xDDD = boolean flags (one bits in 13..3) using true/false parameter
    ;         hl = void *stack_param = arg
    ;
    ; exit  : ix = FILE *
@@ -55,73 +62,101 @@ asm0__vioctl__unlocked:
 
    ld a,e
    and $07
-   jr z, forward_ioctl_1       ; if command type is not handled by stdio
+   jr z, forward_ioctl         ; if command type is not handled by stdio
    
    ; stdio handles so check for driver type match
-   
+      
    ld a,(ix+13)
-   push af                     ; save driver flags state
-   
    xor e
    and $07
-   jp nz, error_enotsup_mc - 1 ; if driver types do not match
+   jp nz, error_enotsup_mc     ; if driver types do not match
    
-   inc d
-   dec d
-   jr nz, forward_ioctl_0      ; not a driver flags command
+   ld a,d
+   rlca
+   rlca
+   and $03                     ; a = 00 fwd, 01 getf, 10 setf, 11 bool
+   jr z, forward_ioctl         ; if flag type is forward
+
+   ; bc = parameter
+   ; de = command
+   ; hl = void *arg
+
+   dec a
+   jr z, __getf
+
+   dec a
+   jr z, __setf
+
+__bool:
+
+   ld a,b
+   or c
+   jr z, __setf
    
-   ; forward ioctl to driver
-   
+   ld bc,$ffff
+
+__setf:
+
+   ; bc = parameter
+   ; de = command
+   ; hl = void *arg
+
    push bc
    push de
    
-   call forward_ioctl_1        ; forward to driver
+   call forward_ioctl          ; forward to driver
    
    pop de
    pop bc
+
+   ld l,(ix+13)
+   ld h,(ix+14)                ; hl = driver flags
    
-   ; alter driver flags
+   ld a,d
+   and $3f
+   ld d,a                      ; will not affect bits 15..14
    
    ld a,e
-   or $07
-   inc a
-   jr z, load_flags            ; if load flags command
-   
-   ld a,b
-   or c                        ; z flag set to true/false value of bc
-   
-   ld c,0                      ; false
-   jr z, load_flags
-   
-   dec c                       ; true
+   and $f8
+   ld e,a                      ; will not affect bits 2..0   
 
-load_flags:
-
-   ld a,c
-   and e
-   ld c,a                      ; c = true/false state of affected bits
+   and c
+   ld c,a
+   ld a,d
+   and b
+   ld b,a                      ; bc = bc & de = final value of affected bits
    
    ld a,e
    cpl
-   and $f8
-   or $07
-   and (ix+13)                 ; clear flags bits that will be affected
+   and l
+   or c
+   ld (ix+13),a
    
-   or c                        ; set state of affected bits
-   ld (ix+13),a                ; write updated driver state flags
-   
-   pop hl                      ; h = old driver state flags
-   
-   ld l,h
-   ld h,0
+   ld a,d
+   cpl
+   and h
+   or b
+   ld (ix+14),a                ; write new value of driver flags
    
    ret
 
-forward_ioctl_0:
+__getf:
 
-   pop af
+   ; de = command
 
-forward_ioctl_1:
+   ld a,e
+   and $f8
+   and (ix+13)
+   ld l,a
+   
+   ld a,d
+   and $3f
+   and (ix+14)
+   ld h,a
+   
+   ret
+
+forward_ioctl:
 
    ld a,STDIO_MSG_ICTL
    call l_jpix
