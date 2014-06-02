@@ -1,4 +1,5 @@
 l/z80/l_andc_hl_bc
+l/z80/l_andc_hl_de
 l/z80/l_bitset_locate
 l/z80/l_cpl_dehl
 l/z80/l_dec_bc
