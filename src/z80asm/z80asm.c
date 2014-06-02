@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.174 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.175 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,15 +54,10 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 /* local functions */
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
-void CloseFiles( void );
 Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
 
-FILE *objfile;
-Str  *objfile_last_sourcefile;	/* keep last source file referred to in object */
-
 extern char Z80objhdr[];
-extern char objhdrprefix[];
 
 Byte reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
@@ -81,8 +76,8 @@ uint32_t DEFVPC;          /* DEFVARS address counter */
 struct liblist *libraryhdr;
 
 /* local functions */
-static void query_assemble( char *src_filename, char *obj_filename );
-static void do_assemble( char *src_filename, char *obj_filename );
+static void query_assemble( char *src_filename );
+static void do_assemble( char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
@@ -91,7 +86,7 @@ static void do_assemble( char *src_filename, char *obj_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename, *obj_filename;
+    char *src_filename;
 	Module *module;
 
     /* normal case - assemble a asm source file */
@@ -99,13 +94,12 @@ void assemble_file( char *filename )
     reset_codearea();				/* Pointer (PC) to store z80 instruction */
 
     src_filename = get_asm_filename( filename );      /* set '.asm' extension */
-    obj_filename = get_obj_filename( filename );      /* set '.obj' extension */
 
     /* Create module data structures for new file */
 	module = new_curr_module();
 	module->filename = strpool_add( src_filename );
 
-    query_assemble( src_filename, obj_filename );
+    query_assemble( src_filename );
     set_error_null();           /* no more module in error messages */
 	opts.cur_list = FALSE;
 }
@@ -114,10 +108,11 @@ void assemble_file( char *filename )
 *	Assemble file or load object module size if datestamp option was given
 *	and object file is up-to-date
 *----------------------------------------------------------------------------*/
-static void query_assemble( char *src_filename, char *obj_filename )
+static void query_assemble( char *src_filename )
 {
     struct stat src_stat, obj_stat;
     int src_stat_result, obj_stat_result;
+	char *obj_filename = get_obj_filename( src_filename );
 
     /* get time stamp of files, error if source not found */
     src_stat_result = stat( src_filename, &src_stat );	/* BUG_0033 */
@@ -130,7 +125,7 @@ static void query_assemble( char *src_filename, char *obj_filename )
               : TRUE										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
-            objmodule_loaded( CURRENTMODULE, obj_filename )			/* object file valid and size loaded */
+            objmodule_loaded( src_filename, CURRENTMODULE )	/* object file valid and size loaded */
        )
     {
         /* OK - object file is up-to-date */
@@ -138,14 +133,14 @@ static void query_assemble( char *src_filename, char *obj_filename )
     else
     {
         /* Assemble source file */
-        do_assemble( src_filename, obj_filename );
+        do_assemble( src_filename );
     }
 }
 
 /*-----------------------------------------------------------------------------
 *	Assemble one file
 *----------------------------------------------------------------------------*/
-static void do_assemble( char *src_filename, char *obj_filename )
+static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
 
@@ -153,7 +148,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
     TRY
     {
         /* Create error file */
-        open_error_file( get_err_filename( src_filename ) );
+        open_error_file( src_filename );
 
 		/* create list file or symtable */
         if ( opts.list )
@@ -162,14 +157,6 @@ static void do_assemble( char *src_filename, char *obj_filename )
             list_open( get_sym_filename( src_filename ) );	/* set '.sym' extension */
         else
         {}													/* no list file */
-
-        /* Create relocatable object file */
-        objfile = xfopen( obj_filename, "w+b" );			/* CH_0012 */
-		INIT_OBJ( Str, &objfile_last_sourcefile );
-		Str_clear( objfile_last_sourcefile );				/* expression location */
-
-        xfput_strz( objfile, Z80objhdr );
-		xfput_strz( objfile, objhdrprefix );
 
         /* initialize local symtab with copy of static one (-D defines) */
         copy_static_syms();
@@ -207,17 +194,9 @@ static void do_assemble( char *src_filename, char *obj_filename )
         /* remove list file if more errors now than before */
         list_close( start_errors == get_num_errors() );
 
-        if ( objfile != NULL )
-        {
-            xfclose( objfile );
-            objfile = NULL;
-        }
-
+        /* remove incomplete object file */
         if ( start_errors != get_num_errors() )
-        {
-            /* remove incomplete object file */
-            remove( obj_filename );
-        }
+            remove( get_obj_filename( src_filename ) );
 
         close_error_file();
 
@@ -225,23 +204,9 @@ static void do_assemble( char *src_filename, char *obj_filename )
         remove_all_global_syms();
 
         if ( opts.verbose )
-        {
             putchar( '\n' );    /* separate module texts */
-        }
     }
     ETRY;
-}
-
-void
-CloseFiles( void )
-{
-    if ( objfile != NULL )
-    {
-        xfclose( objfile );
-        objfile = NULL;
-    }
-
-    close_error_file();
 }
 
 
@@ -376,11 +341,8 @@ int main( int argc, char *argv[] )
 		for ( iter = List_first( opts.files ); iter != NULL; iter = List_next( iter ) )
 			assemble_file( iter->data );
 
-        /* Link */
-        CloseFiles();
-
         /* Create library */
-        if ( opts.lib_file && ! get_num_errors() )
+        if ( ! get_num_errors() && opts.lib_file )
             make_library( opts.lib_file, opts.files );
 
         if ( ! get_num_errors() && opts.make_bin )
@@ -403,8 +365,7 @@ int main( int argc, char *argv[] )
     FINALLY
     {
         set_error_null();
-
-        CloseFiles();
+        close_error_file();
 
         delete_modules();		/* Release module information (symbols, etc.) */
 
@@ -439,7 +400,13 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.174  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.175  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.174  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.

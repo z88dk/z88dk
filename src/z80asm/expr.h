@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.21 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.22 2014-06-02 22:29:13 pauloscustodio Exp $
 */
 
 #pragma once
@@ -136,9 +136,6 @@ extern void Calc_compute_unary(   long (*calc)(long a) );
 extern void Calc_compute_binary(  long (*calc)(long a, long b) );
 extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
 
-
-extern void StoreExpr( Expr *expr );
-extern void StoreExprEnd( void );
 extern Bool ExprSigned8( int listoffset );
 extern Bool ExprUnsigned8( int listoffset );
 extern Bool ExprAddress( int listoffset );
@@ -146,7 +143,13 @@ extern Bool ExprLong( int listoffset );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.21  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.22  2014-06-02 22:29:13  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.21  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.

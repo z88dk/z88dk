@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.45 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.46 2014-06-02 22:29:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.45 2014-05-25 01:
 #include "errors.h"
 #include "except.h"
 #include "fileutil.h"
+#include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -139,9 +140,10 @@ int get_num_errors( void )
 *	File is created on first call and appended on second, to allow assemble
 *	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
-void open_error_file( char *filename )
+void open_error_file( char *src_filename )
 {
     char *mode;
+	char *filename = get_err_filename( src_filename );
 
     init();
 
@@ -293,7 +295,13 @@ static void fatal_file_error( char *filename, Bool writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.45  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.46  2014-06-02 22:29:13  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.45  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.44  2014/05/19 00:19:33  pauloscustodio

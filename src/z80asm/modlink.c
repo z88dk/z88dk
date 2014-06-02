@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.122 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.123 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -287,7 +287,7 @@ LinkModules( void )
         {
 	        /* open error file on first module */
 			if ( CURRENTMODULE == first_obj_module )
-		        open_error_file( get_err_filename( CURRENTMODULE->filename ) );
+		        open_error_file( CURRENTMODULE->filename );
 
             set_error_null();
             set_error_module( CURRENTMODULE->modname );
@@ -368,14 +368,10 @@ LinkModules( void )
         define_global_def_sym( ASMTAIL_KW, first_obj_module->origin + get_codesize() );
 
         if ( opts.verbose )
-        {
             printf( "Code size of linked modules is %d bytes\n", ( int )get_codesize() );
-        }
 
         if ( ! get_num_errors() )
-        {
             ModuleExpr();               /*  Evaluate expressions in  all modules */
-        }
 
     }
     FINALLY
@@ -861,7 +857,13 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.122  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.123  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.122  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.

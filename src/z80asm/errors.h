@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.26 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.27 2014-06-02 22:29:13 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,7 +52,7 @@ extern int  get_num_errors( void );
 *	File is created on first call and appended on second, to allow assemble
 *	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
-extern void open_error_file( char *filename );
+extern void open_error_file( char *src_filename );
 extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*-----------------------------------------------------------------------------
@@ -65,7 +65,13 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*
 * $Log: errors.h,v $
-* Revision 1.26  2014-02-25 22:39:34  pauloscustodio
+* Revision 1.27  2014-06-02 22:29:13  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.26  2014/02/25 22:39:34  pauloscustodio
 * ws
 *
 * Revision 1.25  2014/01/15 00:01:40  pauloscustodio

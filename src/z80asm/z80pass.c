@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.102 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.103 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -239,107 +239,19 @@ Evallogexpr( void )
 
 
 void
-StoreName( Symbol *node, Byte scope )
-{
-    switch ( scope )
-    {
-    case SYM_LOCAL:
-        xfput_uint8(objfile, 'L');
-        break;
-
-    case SYM_PUBLIC:
-        xfput_uint8(objfile, 'G');
-        break;
-    }
-
-    if ( node->sym_type & SYM_ADDR )   /* then write type of symbol */
-    {
-        xfput_uint8(objfile, 'A');    /* either a relocatable address */
-    }
-    else
-    {
-        xfput_uint8(objfile, 'C');    /* or a constant */
-    }
-
-    xfput_uint32(objfile, node->value);
-	xfput_count_byte_strz(objfile, node->name );
-}
-
-
-void
-StoreGlobalNames( SymbolHash *symtab )
-{
-    SymbolHashElem *iter;
-    Symbol         *sym;
-
-    SymbolHash_sort( symtab, SymbolHash_by_name );
-
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
-
-        if ( ( sym->sym_type & SYM_PUBLIC ) && ( sym->sym_type & SYM_TOUCHED ) )
-        {
-            StoreName( sym, SYM_PUBLIC );
-        }
-    }
-}
-
-
-void
-StoreLocalNames( SymbolHash *symtab )
-{
-    SymbolHashElem *iter;
-    Symbol         *sym;
-
-    SymbolHash_sort( symtab, SymbolHash_by_name );
-
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
-
-        if ( ( sym->sym_type & SYM_LOCAL ) && ( sym->sym_type & SYM_TOUCHED ) )
-        {
-            StoreName( sym, SYM_LOCAL );
-        }
-    }
-}
-
-
-/* BUG_0039: library not pulled in if XLIB symbol not referenced in expression
-   Store both LIB and XREF symbols */
-void
-StoreExternReferences( SymbolHash *symtab )
-{
-    SymbolHashElem *iter;
-    Symbol         *sym;
-
-    SymbolHash_sort( symtab, SymbolHash_by_name );
-
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
-
-        if ( ( sym->sym_type & SYM_EXTERN ) && ( sym->sym_type & SYM_TOUCHED ) )
-			xfput_count_byte_strz( objfile, sym->name );
-    }
-}
-
-
-
-
-
-void
 Z80pass2( void )
 {
+	ExprListElem *iter;
     Expr *expr;
-    long constant;
-    long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
+    long value;
     uint32_t patchptr;
-	Bool do_patch;
+	Bool do_patch, do_store;
 
-	while ( (expr = ExprList_shift( CURRENTMODULE->exprs )) != NULL )
+	iter = ExprList_first( CURRENTMODULE->exprs );
+	while ( iter != NULL )
 	{
+		expr = iter->obj;
+
         /* set error location */
 		set_error_null();
         set_error_file( expr->filename );
@@ -349,10 +261,11 @@ Z80pass2( void )
 		set_PC( expr->asmpc );		
 
 		/* try to evaluate expression to detect missing symbols */
-		constant = Expr_eval( expr );
+		value = Expr_eval( expr );
 
 		/* check if expression is stored in object file or computed and patched */
 		do_patch = TRUE;
+		do_store = FALSE;
 
 		if ( ( expr->expr_type & RANGE ) == RANGE_JROFFSET )
 		{
@@ -364,8 +277,8 @@ Z80pass2( void )
 		}
 		else if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
 		{
-            StoreExpr( expr );            /* store expression in relocatable file */
 			do_patch = FALSE;
+			do_store = TRUE;            /* store expression in relocatable file */
 		}
 		else if ( ( expr->expr_type & NOT_EVALUABLE ) )
 		{
@@ -380,45 +293,45 @@ Z80pass2( void )
             switch ( expr->expr_type & RANGE )
             {
             case RANGE_JROFFSET:
-                constant -= get_PC() + 2;		/* get module PC at JR instruction */
+                value -= get_PC() + 2;		/* get module PC at JR instruction */
 
-                if ( constant >= -128 && constant <= 127 )
+                if ( value >= -128 && value <= 127 )
                 {
-                    patch_byte( &patchptr, (Byte) constant );
+                    patch_byte( &patchptr, (Byte) value );
                     /* opcode is stored, now store relative jump */
                 }
                 else
                 {
-                    error_int_range( constant );
+                    error_int_range( value );
                 }
                 break;
 
             case RANGE_8UNSIGN:
-                if ( constant < -128 || constant > 255 )
-                    warn_int_range( constant );
+                if ( value < -128 || value > 255 )
+                    warn_int_range( value );
 
-                patch_byte( &patchptr, (Byte) constant );
+                patch_byte( &patchptr, (Byte) value );
                 break;
 
             case RANGE_8SIGN:
-                if ( constant < -128 || constant > 127 )
-                    warn_int_range( constant );
+                if ( value < -128 || value > 127 )
+                    warn_int_range( value );
 
-                patch_byte( &patchptr, (Byte) constant );
+                patch_byte( &patchptr, (Byte) value );
                 break;
 
             case RANGE_16CONST:
-                if ( constant < -32768 || constant > 65535 )
-                    warn_int_range( constant );
+                if ( value < -32768 || value > 65535 )
+                    warn_int_range( value );
 
-                patch_word( &patchptr, ( int ) constant );
+                patch_word( &patchptr, ( int ) value );
                 break;
 
             case RANGE_32SIGN:
-                if ( constant < LONG_MIN || constant > LONG_MAX )
-                    warn_int_range( constant );
+                if ( value < LONG_MIN || value > LONG_MAX )
+                    warn_int_range( value );
 
-                patch_long( &patchptr, constant );
+                patch_long( &patchptr, value );
                 break;
 
 			default:
@@ -427,91 +340,36 @@ Z80pass2( void )
         }
 
 		if ( opts.list )
-			list_patch_data( expr->listpos, constant, RANGE_SIZE( expr->expr_type ) );
+			list_patch_data( expr->listpos, value, RANGE_SIZE( expr->expr_type ) );
+			
+		/* continue loop - delete expression unless needs to be stored in object file */
+		if ( do_store )
+			iter = ExprList_next( iter );
+		else
+		{
+			/* extract current expression (same as expr), advance iterator */
+			expr = ExprList_remove( CURRENTMODULE->exprs, &iter );
+			OBJ_DELETE( expr );		
+		}
     }
-
-	StoreExprEnd();							/* write expression terminator */
 
     /* clean error location */
     set_error_null();
-    set_error_module( CURRENTMODULE->modname );
+    //set_error_module( CURRENTMODULE->modname );
 
-    OBJ_DELETE( CURRENTMODULE->exprs );		/* Release expressions */
+	/* define origin from command line on first module */
+    if ( CURRENTMODULE == get_first_module() && opts.origin >= 0 )
+        CURRENTMODULE->origin = opts.origin;
+
+	/* create object file */
+	if ( ! get_num_errors() )
+		write_obj_file( CURRENTMODULE->filename, CURRENTMODULE );
 
     if ( ! get_num_errors() && opts.symtable )
     {
         WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_symtab );
         WriteSymbolTable( "Global Module Symbols:", global_symtab );
     }
-
-    fptr_namedecl = ftell( objfile );
-
-    /* Store Local Name declarations to relocatable file */
-    StoreLocalNames( CURRENTMODULE->local_symtab );
-
-    /* Store Global name declarations to relocatable file */
-    StoreGlobalNames( global_symtab );
-
-    fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
-
-    /* Store library reference name declarations to relocatable file */
-    StoreExternReferences( global_symtab );
-
-    fptr_modname = ftell( objfile );
-	xfput_count_byte_strz( objfile, CURRENTMODULE->modname );		/* write module name */
-
-    if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
-    {
-        fptr_modcode = -1;    /* no code generated!  */
-    }
-    else
-    {
-        fptr_modcode = ftell( objfile );
-        xfput_uint16( objfile, constant & 0xFFFF );  /* two bytes of module code size */
-        fwrite_codearea( objfile );
-    }
-
-    inc_codesize( constant );             /* BUG_0015 */
-
-    if ( opts.verbose )
-    {
-        printf( "Size of module is %ld bytes\n", constant );
-    }
-
-    fseek( objfile, 8, SEEK_SET ); /* set file pointer to point at ORG */
-
-    if ( CURRENTMODULE == get_first_module() )
-    {
-        if ( opts.origin >= 0 )
-        {
-            CURRENTMODULE->origin = opts.origin;		/* use origin from command line */
-        }
-    }
-
-    xfput_uint16( objfile, CURRENTMODULE->origin );		/* two bytes of origin */
-
-    fptr_exprdecl = EXPR_DECL_FSEEK;           /* expressions always begins at file position 24 */
-
-    if ( fptr_namedecl == fptr_exprdecl )
-    {
-        fptr_exprdecl = -1;    /* no expressions */
-    }
-
-    if ( fptr_libnmdecl == fptr_namedecl )
-    {
-        fptr_namedecl = -1;    /* no name declarations */
-    }
-
-    if ( fptr_modname == fptr_libnmdecl )
-    {
-        fptr_libnmdecl = -1;    /* no library reference declarations */
-    }
-
-    xfput_uint32( objfile, fptr_modname );		/* write fptr. to module name */
-    xfput_uint32( objfile, fptr_exprdecl );		/* write fptr. to name declarations */
-    xfput_uint32( objfile, fptr_namedecl );		/* write fptr. to name declarations */
-    xfput_uint32( objfile, fptr_libnmdecl );	/* write fptr. to library name declarations */
-    xfput_uint32( objfile, fptr_modcode );		/* write fptr. to module code */
 }
 
 
@@ -574,7 +432,13 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.102  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.103  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.102  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.

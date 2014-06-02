@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.105 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.106 2014-06-02 22:29:13 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.105 2014-06-01 22:1
 
 /*
 * $Log: hist.c,v $
-* Revision 1.105  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.106  2014-06-02 22:29:13  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.105  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.
@@ -1941,6 +1947,11 @@ xx.xx.2014 [2.3.1] (pauloscustodio)
 	  and allow simplification of object file writing code. All expression
 	  error messages are now output only during pass 2.
 
+	- Write object file in one go at the end of pass 2, instead of writing
+	  parts during pass 1 assembly. This allows the object file format to be
+	  changed more easily, to allow sections in a near future.
+	  Remove global variable objfile and CloseFiles().
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1966,7 +1977,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1a"
+#define VERSION     "2.3.1b"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

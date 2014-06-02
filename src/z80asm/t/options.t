@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.41 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.42 2014-06-02 22:29:14 pauloscustodio Exp $
 #
 # Test options
 
@@ -171,7 +171,7 @@ Assembling 'test.asm'...
 Pass1...
 Reading 'test.asm'...
 Pass2...
-Size of module is 3 bytes
+Size of module 'test' is 3 bytes
 
 linking module(s)...
 Pass1...
@@ -1132,7 +1132,13 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.41  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.42  2014-06-02 22:29:14  pauloscustodio
+# Write object file in one go at the end of pass 2, instead of writing
+# parts during pass 1 assembly. This allows the object file format to be
+# changed more easily, to allow sections in a near future.
+# Remove global variable objfile and CloseFiles().
+#
+# Revision 1.41  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.30 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.31 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.30 2014-05-25 01
 #include "codearea.h"
 #include "errors.h"
 #include "fileutil.h"
+#include "options.h"
+#include "model.h"
 #include "objfile.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -42,7 +44,206 @@ char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 
 #define Z80objhdr_size (sizeof(Z80objhdr)-1)
 
-char objhdrprefix[] = "oomodnexprnamelibnmodc";
+/*-----------------------------------------------------------------------------
+*   Write module to object file
+*----------------------------------------------------------------------------*/
+static long write_expr( FILE *fp, Module *module )
+{
+	static Str *last_sourcefile = NULL;		/* keep last source file referred to in object */
+	ExprListElem *iter;
+    Expr *expr;
+	char range;
+	long expr_ptr;
+
+	INIT_OBJ( Str, &last_sourcefile );
+
+	if ( ExprList_empty( module->exprs ) )	/* no expressions */
+		return -1;
+
+	expr_ptr = ftell( fp );
+	for ( iter = ExprList_first( module->exprs ); iter != NULL; iter = ExprList_next( iter ) )
+	{
+		expr = iter->obj;
+
+		/* store range */
+		switch ( expr->expr_type & RANGE )
+		{
+		case RANGE_32SIGN:	range = 'L'; break;
+		case RANGE_16CONST:	range = 'C'; break;
+		case RANGE_8UNSIGN:	range = 'U'; break;
+		case RANGE_8SIGN:	range = 'S'; break;
+		case RANGE_JROFFSET:
+		default:
+			assert(0);
+		}
+		xfput_uint8( fp, range );				/* range of expression */
+
+		/* store file name if different from last, folowed by source line number */
+		if ( expr->filename != NULL &&
+			 strcmp( last_sourcefile->str, expr->filename ) != 0 )
+		{
+			xfput_count_word_strz( fp, expr->filename );
+			Str_set( last_sourcefile, expr->filename );
+		}
+		else
+			xfput_count_word_strz( fp, "" );
+
+		xfput_int32(  fp, expr->line_nr );				/* source line number */
+		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
+		xfput_uint16( fp, expr->code_pos );				/* patchptr */
+		xfput_count_word_strz( fp, expr->text->str );	/* expression */
+	}
+
+	xfput_uint8( fp, 0 );								/* terminator */
+
+	return expr_ptr;
+}
+
+static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
+{
+    SymbolHashElem *iter;
+    Symbol         *sym;
+	int written = 0;
+	char scope, type;
+
+    SymbolHash_sort( symtab, SymbolHash_by_name );
+
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+		/* scope */
+		scope = ( sym->sym_type & SYM_PUBLIC ) ? 'G' :
+			    ( sym->sym_type & SYM_LOCAL  ) ? 'L' : 0;
+
+		/* type */
+		type = ( sym->sym_type & SYM_ADDR ) ? 'A' : 'C';
+
+        if ( scope != 0 && ( sym->sym_type & SYM_TOUCHED ) )
+        {
+			xfput_uint8( fp, scope );
+			xfput_uint8( fp, type );
+			xfput_uint32(fp, sym->value );
+			xfput_count_byte_strz( fp, sym->name );
+
+			written++;
+        }
+    }
+	return written;
+}
+
+static long write_symbols( FILE *fp, Module *module )
+{
+	long symbols_ptr;
+	int written = 0;
+
+	symbols_ptr = ftell( fp );
+
+	written += write_symbols_symtab( fp, module->local_symtab );
+	written += write_symbols_symtab( fp, global_symtab );
+
+	if ( written )
+		return symbols_ptr;
+	else
+		return -1;
+}
+
+static long write_externsym( FILE *fp, Module *module )
+{
+    SymbolHashElem *iter;
+    Symbol         *sym;
+	long externsym_ptr;
+	int written = 0;
+
+	externsym_ptr = ftell( fp );
+
+    SymbolHash_sort( global_symtab, SymbolHash_by_name );
+
+    for ( iter = SymbolHash_first( global_symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = ( Symbol * )iter->value;
+
+        if ( ( sym->sym_type & SYM_EXTERN ) && 
+			 ( sym->sym_type & SYM_TOUCHED ) )
+		{
+			xfput_count_byte_strz( fp, sym->name );
+			written++;
+		}
+    }
+
+	if ( written )
+		return externsym_ptr;
+	else
+		return -1;
+}
+
+static long write_modname( FILE *fp, Module *module )
+{
+	long modname_ptr = ftell( fp );
+	xfput_count_byte_strz( fp, module->modname );		/* write module name */
+	return modname_ptr;
+}
+
+static long write_code( FILE *fp, Module *module )
+{
+	long code_ptr, code_size;
+	
+	code_size = get_codeindex();
+	if ( code_size == 0 )
+		return -1;
+
+	code_ptr = ftell( fp );
+    xfput_uint16( fp, code_size & 0xFFFF );				/* two bytes of module code size */
+    fwrite_codearea( fp );
+
+    if ( opts.verbose )
+        printf( "Size of module '%s' is %ld bytes\n", module->modname, code_size );
+
+    inc_codesize( code_size);							/* BUG_0015 */
+
+	return code_ptr;
+}
+
+void write_obj_file( char *source_filename, Module *module )
+{
+	char *obj_filename;
+	FILE *fp;
+	long header_ptr, modname_ptr, expr_ptr, symbols_ptr, externsym_ptr, code_ptr;
+	int i;
+
+	/* open file */
+	obj_filename = get_obj_filename( source_filename );
+	fp = xfopen_atomic( obj_filename, "w+b" );
+
+	/* write header */
+    xfput_strz( fp, Z80objhdr );
+	xfput_uint16( fp, module->origin );		/* two bytes of origin */
+
+	/* write placeholders for 5 pointers pointers */
+	header_ptr = ftell( fp );
+	for ( i = 0; i < 5; i++ )
+	    xfput_uint32( fp, -1 );
+
+	/* write sections, return pointers */
+	expr_ptr		= write_expr(		fp, module );
+	symbols_ptr		= write_symbols(	fp, module );
+	externsym_ptr	= write_externsym(	fp, module );
+	modname_ptr		= write_modname(	fp, module );
+	code_ptr		= write_code(		fp, module );
+
+	/* write pointers to areas */
+	fseek( fp, header_ptr, SEEK_SET );
+    xfput_uint32( fp, modname_ptr );
+    xfput_uint32( fp, expr_ptr );
+    xfput_uint32( fp, symbols_ptr );
+    xfput_uint32( fp, externsym_ptr );
+    xfput_uint32( fp, code_ptr );
+
+	/* close temp file and rename to object file */
+	xfclose( fp );
+}
+
+
 
 /*-----------------------------------------------------------------------------
 *   Check the object file header
@@ -252,21 +453,12 @@ ByteArray *read_obj_file_data( char *filename )
 }
 
 /*-----------------------------------------------------------------------------
-*   OFile API - write module to object file
-*----------------------------------------------------------------------------*/
-void write_obj_file( char *filename, Module *module )
-{
-	/* TODO */
-}
-
-
-/*-----------------------------------------------------------------------------
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-Bool objmodule_loaded( Module *module, char *filename )
+Bool objmodule_loaded( char *src_filename, Module *module )
 {
-	OFile *ofile = OFile_test_file( filename );
+	OFile *ofile = OFile_test_file( get_obj_filename( src_filename ) );
     if ( ofile != NULL )
     {
         inc_codesize( ofile->code_size );		/* BUG_0015, BUG_0050 */
@@ -283,7 +475,13 @@ Bool objmodule_loaded( Module *module, char *filename )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.30  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.31  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.30  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.29  2014/05/21 20:57:27  pauloscustodio

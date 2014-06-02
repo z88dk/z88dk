@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.83 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.84 2014-06-02 22:29:13 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,50 +37,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.83 2014-0
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* store expression in relocatable file */
-void StoreExpr( Expr *expr )
-{
-	char range;
-
-    switch ( expr->expr_type & RANGE )
-    {
-    case RANGE_32SIGN:	range = 'L'; break;
-    case RANGE_16CONST:	range = 'C'; break;
-    case RANGE_8UNSIGN:	range = 'U'; break;
-    case RANGE_8SIGN:	range = 'S'; break;
-	case RANGE_JROFFSET:
-	default:
-		assert(0);
-    }
-
-	xfput_uint8( objfile, range );				/* range of expression */
-
-	/* store file name if different from last, folowed by source line number */
-	if ( expr->filename != NULL &&
-		 strcmp( objfile_last_sourcefile->str, expr->filename ) != 0 )
-	{
-		xfput_count_word_strz( objfile, expr->filename );
-		Str_set( objfile_last_sourcefile, expr->filename );
-	}
-	else
-		xfput_count_word_strz( objfile, "" );
-
-	xfput_int32(	objfile, expr->line_nr );		/* source line number */
-	
-    xfput_uint16(	objfile, expr->asmpc );			/* ASMPC */
-    xfput_uint16(	objfile, expr->code_pos );		/* patchptr */
-
-	xfput_count_word_strz(
-					objfile, expr->text->str );		/* expression */
-}
-
-void StoreExprEnd( void )
-{
-	/* write terminator only if any expression written */
-	if ( ftell( objfile ) != EXPR_DECL_FSEEK )
-		xfput_uint8( objfile, 0 );		
-}
 
 Bool ExprLong( int listoffset )
 {
@@ -119,7 +75,13 @@ Bool ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.83  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.84  2014-06-02 22:29:13  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.83  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.

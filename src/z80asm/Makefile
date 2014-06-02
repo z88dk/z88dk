@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.151 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.152 2014-06-02 22:29:12 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -233,7 +233,13 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.151  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.152  2014-06-02 22:29:12  pauloscustodio
+# Write object file in one go at the end of pass 2, instead of writing
+# parts during pass 1 assembly. This allows the object file format to be
+# changed more easily, to allow sections in a near future.
+# Remove global variable objfile and CloseFiles().
+#
+# Revision 1.151  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.
@@ -871,8 +877,8 @@ deffile.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h symtab.h
 deffile.o: sym.h objfile.h z80asm.h
 errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/die.h
 errors.o: lib/types.h lib/fileutil.h lib/list.h lib/class.h lib/queue.h
-errors.o: lib/strutil.h lib/srcfile.h lib/strpool.h lib/strhash.h
-errors.o: lib/uthash.h lib/init.h
+errors.o: lib/strutil.h options.h options_def.h lib/srcfile.h lib/strpool.h
+errors.o: lib/strhash.h lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h codearea.h expr.h lib/classlist.h scan.h scan_def.h
 expr.o: legacy.h errors.h errors_def.h lib/init.h lib/die.h model.h
@@ -923,9 +929,10 @@ module.o: lib/uthash.h lib/die.h expr.h lib/array.h lib/strutil.h scan.h
 module.o: scan_def.h legacy.h symtab.h sym.h symref.h lib/strpool.h
 objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 objfile.o: errors.h errors_def.h lib/fileutil.h lib/list.h lib/strutil.h
-objfile.o: objfile.h lib/array.h module.h lib/classlist.h lib/classhash.h
-objfile.o: lib/strhash.h lib/uthash.h lib/die.h expr.h scan.h scan_def.h
-objfile.o: legacy.h symtab.h sym.h symref.h lib/strpool.h
+objfile.o: options.h options_def.h model.h module.h lib/classlist.h
+objfile.o: lib/classhash.h lib/strhash.h lib/uthash.h lib/die.h expr.h
+objfile.o: lib/array.h scan.h scan_def.h legacy.h symtab.h sym.h symref.h
+objfile.o: objfile.h lib/strpool.h
 options.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 options.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h hist.h
 options.o: lib/init.h lib/die.h model.h module.h lib/classlist.h

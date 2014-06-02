@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.61 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.62 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -51,9 +51,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.61 2014-06-01 22:
 #define MAXCODESIZE 65536
 #endif
 
-extern FILE *objfile;
-extern Str  *objfile_last_sourcefile;	/* keep last source file referred to in object */
-
 extern size_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *GetLibfile( char *filename );
@@ -64,7 +61,13 @@ extern Bool Pass2info( int range, long lfileptr );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.61  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.62  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.61  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.

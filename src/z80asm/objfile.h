@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.24 2014-05-29 00:19:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.25 2014-06-02 22:29:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -29,6 +29,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.24 2014-05-29 00
 #include <stdlib.h>
 
 #define OBJ_VERSION	"04"
+
+/*-----------------------------------------------------------------------------
+*   Write module to object file - object file name is computed
+*----------------------------------------------------------------------------*/
+extern void write_obj_file( char *src_filename, Module *module );
+
+
+
 
 #define EXPR_DECL_FSEEK	30
 
@@ -87,21 +95,22 @@ extern void   OFile_close( OFile *self );
 extern ByteArray *read_obj_file_data( char *filename );
 
 /*-----------------------------------------------------------------------------
-*   OFile API - write module to object file
-*----------------------------------------------------------------------------*/
-extern void write_obj_file( char *filename, Module *module );
-
-/*-----------------------------------------------------------------------------
 *   Module interface to object files
 *----------------------------------------------------------------------------*/
 
-/* Updates current module name and size, if given object file is valid
+/* Updates current module name and size, if object file of given source is valid
    load module name and size, when assembling with -d and up-to-date */
-extern Bool objmodule_loaded( Module *module, char *filename );
+extern Bool objmodule_loaded( char *src_filename, Module *module );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.24  2014-05-29 00:19:37  pauloscustodio
+* Revision 1.25  2014-06-02 22:29:14  pauloscustodio
+* Write object file in one go at the end of pass 2, instead of writing
+* parts during pass 1 assembly. This allows the object file format to be
+* changed more easily, to allow sections in a near future.
+* Remove global variable objfile and CloseFiles().
+*
+* Revision 1.24  2014/05/29 00:19:37  pauloscustodio
 * CH_0025: Link-time expression evaluation errors show source filename and line number
 * Object file format changed to version 04, to include the source file
 * location of expressions in order to give meaningful link-time error messages.
