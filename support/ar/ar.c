@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.16 2014-05-28 23:40:11 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.17 2014-06-03 22:48:01 pauloscustodio Exp $
  */
 
 
@@ -348,7 +348,7 @@ void dump_object( FILE *fp, char *filename )
 		fseek( fp, obj_start + fp_code, SEEK_SET );
 		code_size = xfread_word( fp, filename );
 		if (code_size == 0)
-			code_size = 0x1000;
+			code_size = 0x10000;
 	}
 	else 
 	{
@@ -445,7 +445,10 @@ int main(int argc, char *argv[])
 
 /*
  * $Log: ar.c,v $
- * Revision 1.16  2014-05-28 23:40:11  pauloscustodio
+ * Revision 1.17  2014-06-03 22:48:01  pauloscustodio
+ * Wrong size of code dumped when code size is 64K
+ *
+ * Revision 1.16  2014/05/28 23:40:11  pauloscustodio
  * Return 0 from main on success.
  *
  * Revision 1.15  2014/05/28 23:36:39  pauloscustodio
