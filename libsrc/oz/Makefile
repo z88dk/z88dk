@@ -1,7 +1,7 @@
 #
 # Makefile for OZ-7xx specific libraries
 #
-# $Id: Makefile,v 1.15 2014-06-02 16:32:18 stefano Exp $
+# $Id: Makefile,v 1.16 2014-06-03 10:29:43 stefano Exp $
 
 include ../Make.config
 
@@ -11,7 +11,7 @@ all:
 	cd ozinput ; $(MAKE) ; cd ..
 
 clean:
-	$(RM) *.o* zcc_opt.def ozextra.lib
+	$(RM) *.o* zcc_opt.def
 	$(RM) emu/ozgfx/*.o*
 	$(RM) ozinput/*.o* ozinput/zcc_opt.def
 	$(RM) ozinterrupt/*.o* ozinterrupt/zcc_opt.def
