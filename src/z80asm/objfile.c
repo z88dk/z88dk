@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.31 2014-06-02 22:29:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.32 2014-06-03 22:53:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -106,8 +106,6 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 	int written = 0;
 	char scope, type;
 
-    SymbolHash_sort( symtab, SymbolHash_by_name );
-
     for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
     {
         sym = ( Symbol * )iter->value;
@@ -156,8 +154,6 @@ static long write_externsym( FILE *fp, Module *module )
 	int written = 0;
 
 	externsym_ptr = ftell( fp );
-
-    SymbolHash_sort( global_symtab, SymbolHash_by_name );
 
     for ( iter = SymbolHash_first( global_symtab ); iter; iter = SymbolHash_next( iter ) )
     {
@@ -475,7 +471,11 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.31  2014-06-02 22:29:14  pauloscustodio
+* Revision 1.32  2014-06-03 22:53:14  pauloscustodio
+* Do not sort symbols before writing to object file. Not needed and
+* wastes time.
+*
+* Revision 1.31  2014/06/02 22:29:14  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.

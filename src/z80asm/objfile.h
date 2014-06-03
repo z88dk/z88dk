@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.25 2014-06-02 22:29:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.26 2014-06-03 22:53:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,11 +34,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.25 2014-06-02 22
 *   Write module to object file - object file name is computed
 *----------------------------------------------------------------------------*/
 extern void write_obj_file( char *src_filename, Module *module );
-
-
-
-
-#define EXPR_DECL_FSEEK	30
 
 /*-----------------------------------------------------------------------------
 *   Object file class
@@ -104,7 +99,11 @@ extern Bool objmodule_loaded( char *src_filename, Module *module );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.25  2014-06-02 22:29:14  pauloscustodio
+* Revision 1.26  2014-06-03 22:53:14  pauloscustodio
+* Do not sort symbols before writing to object file. Not needed and
+* wastes time.
+*
+* Revision 1.25  2014/06/02 22:29:14  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.

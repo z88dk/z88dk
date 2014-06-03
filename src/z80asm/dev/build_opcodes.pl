@@ -15,7 +15,7 @@
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.3 2014-06-01 22:16:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.4 2014-06-03 22:53:13 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -30,10 +30,10 @@ $KEEP_FILES	 = grep {/-keep/} @ARGV;
 my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
 my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
 my @Z80EMU = qw(
-		rcmx_cpd
-		rcmx_cpdr
 		rcmx_cpi
 		rcmx_cpir
+		rcmx_cpd
+		rcmx_cpdr
 		rcmx_rld
 		rcmx_rrd
 );
@@ -496,7 +496,11 @@ sub format_iter {
 	
 
 # $Log: build_opcodes.pl,v $
-# Revision 1.3  2014-06-01 22:16:50  pauloscustodio
+# Revision 1.4  2014-06-03 22:53:13  pauloscustodio
+# Do not sort symbols before writing to object file. Not needed and
+# wastes time.
+#
+# Revision 1.3  2014/06/01 22:16:50  pauloscustodio
 # Write expressions to object file only in pass 2, to remove dupplicate code
 # and allow simplification of object file writing code. All expression
 # error messages are now output only during pass 2.

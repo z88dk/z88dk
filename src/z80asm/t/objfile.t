@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.14 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.15 2014-06-03 22:53:14 pauloscustodio Exp $
 #
 
 use strict;
@@ -4250,8 +4250,10 @@ write_file(asm_file(), "
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
-		       SYMBOLS => [["L", "C", 3, "value16"],
-				   ["L", "C", 3, "value8"]],
+		       SYMBOLS => [
+					["L", "C", 3, "value8"],
+					["L", "C", 3, "value16"],
+				],
 		       CODE => "\x3E\x0C".
 			       "\xDD\x46\x0C".
 			       "\x11\x0C\x00".
@@ -4261,8 +4263,8 @@ t_z80nm(obj_file(), <<'END');
 File test.obj at $0000: Z80RMF04
   Name: test
   Names:
-    L C $0003 value16
     L C $0003 value8
+    L C $0003 value16
   Code: 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
 END
@@ -4280,8 +4282,10 @@ write_file(asm_file(), "
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
-		       SYMBOLS => [["L", "C", 3, "value16"],
-				   ["L", "C", 3, "value8"]],
+		       SYMBOLS => [
+					["L", "C", 3, "value8"],
+					["L", "C", 3, "value16"],
+				],
 		       CODE => "\x3E\x0C".
 			       "\xDD\x46\x0C".
 			       "\x11\x0C\x00".
@@ -4291,8 +4295,8 @@ t_z80nm(obj_file(), <<'END');
 File test.obj at $0000: Z80RMF04
   Name: test
   Names:
-    L C $0003 value16
     L C $0003 value8
+    L C $0003 value16
   Code: 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
 END
@@ -4370,7 +4374,7 @@ t_binary($obj, objfile(NAME => 'test',
 				["C", "",8,         4, 5, "extlib"]],
 		       SYMBOLS => [["L", "A", 0, "local"],
 				   ["G", "A", 1, "global"]],
-		       LIBS => ["extlib","extobj"],
+		       LIBS => ["extobj","extlib"],
 		       CODE => "\x00".
 		               "\xCD\x00\x00".
 		               "\xCD\x00\x00"));
@@ -4382,8 +4386,8 @@ File test.obj at $0000: Z80RMF04
     L A $0000 local
     G A $0001 global
   External names:
-    U         extlib
     U         extobj
+    U         extlib
   Expressions:
     E Cw (test.asm:7) $0001 $0002: extobj
     E Cw (test.asm:8) $0004 $0005: extlib
@@ -4424,7 +4428,6 @@ File test.lib at $004A: Z80RMF04
   Code: 1 bytes
     C $0000: C9
 END
-
 
 # link modules
 unlink_testfiles();
@@ -4628,7 +4631,11 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.14  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.15  2014-06-03 22:53:14  pauloscustodio
+# Do not sort symbols before writing to object file. Not needed and
+# wastes time.
+#
+# Revision 1.14  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

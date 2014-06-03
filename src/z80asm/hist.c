@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.106 2014-06-02 22:29:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.107 2014-06-03 22:53:14 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.106 2014-06-02 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.106  2014-06-02 22:29:13  pauloscustodio
+* Revision 1.107  2014-06-03 22:53:14  pauloscustodio
+* Do not sort symbols before writing to object file. Not needed and
+* wastes time.
+*
+* Revision 1.106  2014/06/02 22:29:13  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.
@@ -1951,6 +1955,9 @@ xx.xx.2014 [2.3.1] (pauloscustodio)
 	  parts during pass 1 assembly. This allows the object file format to be
 	  changed more easily, to allow sections in a near future.
 	  Remove global variable objfile and CloseFiles().
+	  
+	- Do not sort symbols before writing to object file. Not needed and 
+	  wastes time.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1977,7 +1984,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1b"
+#define VERSION     "2.3.1c"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
