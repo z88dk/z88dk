@@ -25,16 +25,16 @@
  *	13/3/2000	djm   - Imported to z88dk (smaller than vbcc one)
  *	
  * --------
- * $Id: gmtime.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
+ * $Id: gmtime.c,v 1.3 2014-06-03 19:49:03 dom Exp $
  */
 
 
 #include <time.h>
 
-#define SECS_PER_MINUTE ((time_t)60)
-#define SECS_PER_HOUR	((time_t)(60 * SECS_PER_MINUTE))
-#define SECS_PER_DAY	((time_t)(24 * SECS_PER_HOUR))
-#define SECS_PER_YEAR	((time_t)(365 * SECS_PER_DAY))
+#define SECS_PER_MINUTE ((time_t)60L)
+#define SECS_PER_HOUR	((time_t)(60L * SECS_PER_MINUTE))
+#define SECS_PER_DAY	((time_t)(24L * SECS_PER_HOUR))
+#define SECS_PER_YEAR	((time_t)(365L * SECS_PER_DAY))
 #define SECS_PER_LEAP	((time_t)(SECS_PER_YEAR+SECS_PER_DAY))
 
 static int is_leap( int year )
@@ -71,7 +71,6 @@ struct tm *gmtime (time_t *tp)
 	tm2.tm_year = 70;
 	tm2.tm_wday = ( t / SECS_PER_DAY + 4 ) % 7;	/* 01.01.70 was Thu */
 	tm2.tm_isdst = -1;
-
 
 	/*
 	 *	This loop handles dates in 1970 and later
@@ -126,24 +125,27 @@ struct tm *gmtime (time_t *tp)
 
 main()
 {
-	struct tm2 *tm2
+	struct tm *tm2;
 	time_t		readtime;
 
 	while (1) {
 		printf ("Enter a raw time value: \n");
-		scanf ("%d\n",&readtime);
+		//scanf ("%d\n",&readtime);
+	readtime = 1401824856UL;
 
+	printf("Readtime %ld\n",readtime);
 		tm2= gmtime(&readtime);
 
-		printf ("tm2sec=%d\n",tm2>tm2sec);
-		printf ("tm2min=%d\n",tm2>tm2min);
-		printf ("tm2hour=%d\n",tm2>tm2hour);
-		printf ("tm2mday=%d\n",tm2>tm2mday);
-		printf ("tm2mon=%d\n",tm2>tm2mon);
-		printf ("tm2year=%d\n",tm2>tm2year);
-		printf ("tm2wday=%d\n",tm2>tm2wday);
-		printf ("tm2yday=%d\n",tm2>tm2yday);
-		printf ("tm2isdst=%d\n",tm2>tm2isdst);
+		printf ("tm2sec=%d\n",tm2->tm_sec);
+		printf ("tm2min=%d\n",tm2->tm_min);
+		printf ("tm2hour=%d\n",tm2->tm_hour);
+		printf ("tm2mday=%d\n",tm2->tm_mday);
+		printf ("tm2mon=%d\n",tm2->tm_mon);
+		printf ("tm2year=%d\n",tm2->tm_year);
+		printf ("tm2wday=%d\n",tm2->tm_wday);
+		printf ("tm2yday=%d\n",tm2->tm_yday);
+		printf ("tm2isdst=%d\n",tm2->tm_isdst);
+	break;
 	}
 }
 
