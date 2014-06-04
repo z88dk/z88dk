@@ -87,6 +87,7 @@ stdio/z80/asm_vsscanf
 stdio/z80/asm__fflushall
 stdio/z80/asm__fflushall_unlocked
 stdio/z80/asm__fmemopen
+stdio/z80/__stdio_badfile
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier

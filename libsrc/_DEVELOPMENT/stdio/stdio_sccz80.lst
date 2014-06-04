@@ -131,6 +131,7 @@ stdio/c/sccz80/_fmemopen_
 stdio/c/sccz80/_fmemopen__callee
 stdio/z80/asm__fflushall
 stdio/z80/asm__fflushall_unlocked
+stdio/z80/__stdio_badfile
 stdio/z80/__stdio_file_destroy
 stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier
