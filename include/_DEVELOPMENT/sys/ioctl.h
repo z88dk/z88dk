@@ -17,6 +17,8 @@
 #define IOCTL_ITERM_GETF 0x7ff9
 #define IOCTL_ITERM_GTFM 0x4001
 
+#define IOCTL_ITERM_TIE  0x0001
+
 #define IOCTL_OTERM_COOK 0xc012
 
 #define IOCTL_OTERM_SETF 0xbffa
