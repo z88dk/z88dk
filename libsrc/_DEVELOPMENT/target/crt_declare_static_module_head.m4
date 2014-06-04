@@ -51,12 +51,17 @@ define(`M4_FILE_MODE_RW', 0xc0)
 define(`M4_FILE_DF_ITERM_SRELC', 0x03b1)   # cursor, crlf, echo, line, cook, input_terminal
 define(`M4_FILE_DF_OTERM_C', 0x0012)       # cook, output_terminal
 
+define(`M4_ASSIGN', `define(`$1',`$2')')   # redefine first argument as second argument
+
+define(`M4_OPEN_FILE_PTR_DEFB', 0)         # last FILE* instantiated in segment_data_defb
+define(`M4_OPEN_FILE_PTR_S_DEFB', 0)       # last FILE* instantiated in segment_data_s_defb
+
 #####################################
 # CREATE A FILE - DATA SEGMENT STORED
 
 define(`M4_CREATE_FILE_DATA_S_DEFB',dnl
 dnl
-defw `ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)'
+defw `ifelse(M4_OPEN_FILE_PTR_S_DEFB,0,0,M4_OPEN_FILE_PTR_S_DEFB - 2)'
    
 __FILE_$1_s:
 
@@ -88,14 +93,14 @@ __FILE_$1_s:
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
-)
+   `M4_ASSIGN(`M4_OPEN_FILE_PTR_S_DEFB',`__FILE_$1')')
 
 #######################################
 # CREATE A FILE - DATA SEGMENT ATTACHED
 
 define(`M4_CREATE_FILE_DATA_DEFB',dnl
 dnl
-defw `ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)'
+defw `ifelse(M4_OPEN_FILE_PTR_DEFB,0,0,M4_OPEN_FILE_PTR_DEFB - 2)'
    
 __FILE_$1:
 
@@ -127,7 +132,7 @@ __FILE_$1:
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
-)
+   `M4_ASSIGN(`M4_OPEN_FILE_PTR_DEFB',`__FILE_$1')')
 
 #######################################
 # CREATE A FILE - DATA SEGMENT EXTERNAL
