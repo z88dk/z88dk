@@ -22,54 +22,54 @@ dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl;; data segment stored copy ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl
-divert(7)define(`M4_OPEN_FILE_PTR', 0)dnl
+divert(7)
    ; ----------------------------------------------------------
    ; -- stdin data segment ------------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDIN_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDIN, M4_STDIN_DRIVER, STDIN, M4_FILE_MODE_R, M4_FILE_DF_ITERM_SRELC)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)') define(`M4_OPEN_FILE_PTR', __FILE_STDIN)')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
 
    ; ----------------------------------------------------------
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
    ifelse(M4_STDOUT_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDOUT, M4_STDOUT_DRIVER, STDOUT, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)') define(`M4_OPEN_FILE_PTR', __FILE_STDOUT)')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
    
    ; ----------------------------------------------------------
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDERR_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDERR, M4_STDERR_DRIVER, STDERR, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C, 0)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDERR_DRIVER, STDERR, 0) define(`M4_OPEN_FILE_PTR', __FILE_STDERR)')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDERR_DRIVER, STDERR, 0)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl;; data segment - attached to binary ;;;;;;;;;;;;;;;;;;;;;;;
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl
-divert(8)define(`M4_OPEN_FILE_PTR', 0)dnl
+divert(8)
    ; ----------------------------------------------------------
    ; -- stdin data segment ------------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDIN_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDIN, M4_STDIN_DRIVER, STDIN, M4_FILE_MODE_R, M4_FILE_DF_ITERM_SRELC)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)') define(`M4_OPEN_FILE_PTR', __FILE_STDIN)')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
 
    ; ----------------------------------------------------------
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
    ifelse(M4_STDOUT_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDOUT, M4_STDOUT_DRIVER, STDOUT, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)') define(`M4_OPEN_FILE_PTR', __FILE_STDOUT)')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
 
    ; ----------------------------------------------------------
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDERR_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDERR, M4_STDERR_DRIVER, STDERR, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C, 0)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDERR_DRIVER, STDERR, 0) define(`M4_OPEN_FILE_PTR', __FILE_STDERR)')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDERR_DRIVER, STDERR, 0)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -287,7 +287,7 @@ IF (__crt_cfg_segment_data & 3) = 1
  
    ENDIF
    
-   __stdio_file_list_open_s:          defw ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)
+   __stdio_file_list_open_s:          defw ifelse(M4_OPEN_FILE_PTR_S_DEFB,0,0,M4_OPEN_FILE_PTR_S_DEFB - 2)
    __stdio_file_list_avail_s:         defw 0, __stdio_file_list_avail
    
    EXTERN __stdio_badfile
@@ -339,7 +339,7 @@ __crt_segment_data_begin:
    PUBLIC __stdio_file_list_open, __stdio_file_list_avail
    PUBLIC __stdio_file_stdin, __stdio_file_stdout, __stdio_file_stderr
    
-   __stdio_file_list_open:            defw ifelse(M4_OPEN_FILE_PTR,0,0,M4_OPEN_FILE_PTR - 2)
+   __stdio_file_list_open:            defw ifelse(M4_OPEN_FILE_PTR_DEFB,0,0,M4_OPEN_FILE_PTR_DEFB - 2)
    __stdio_file_list_avail:           defw 0, __stdio_file_list_avail
    
    EXTERN __stdio_badfile
