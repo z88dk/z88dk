@@ -14,7 +14,7 @@
 #endif
 
 typedef unsigned long fpos_t;
-typedef struct { unsigned char file[13];} FILE;
+typedef struct { unsigned char file[17];} FILE;
 
 extern FILE *_stdio_file_stdin;
 extern FILE *_stdio_file_stdout;
