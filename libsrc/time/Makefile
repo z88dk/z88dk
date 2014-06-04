@@ -1,9 +1,11 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.21 2013-11-11 17:23:53 stefano Exp $
+# $Id: Makefile,v 1.22 2014-06-04 20:34:56 stefano Exp $
 
 include ../Make.config
+
+lcpm: cpm_time
 
 lz88: time z88_time
 
@@ -37,6 +39,9 @@ newbrain_time:
 enterprise_time:
 	cd enterprise ; $(MAKE) ; cd ..
 
+cpm_time:
+	cd cpm ; $(MAKE) ; cd ..
+
 x1_time:
 	cd x1 ; $(MAKE) ; cd ..
 
@@ -44,6 +49,7 @@ clean:
 	$(RM) *.o* *.i *.sym *.map zcc_opt.def
 	$(RM) zx81/*.o*
 	$(RM) ace/*.o*
+	$(RM) cpm/*.o*
 	$(RM) enterprise/*.o*
 	$(RM) newbrain/*.o*
 	$(RM) osca/*.o*

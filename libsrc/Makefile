@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.204 2014-05-26 06:15:06 stefano Exp $
+# $Id: Makefile,v 1.205 2014-06-04 20:34:56 stefano Exp $
 
 
 include Make.config
@@ -843,6 +843,7 @@ cpm_clib.lib:
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) lcpm ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lcpm ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
