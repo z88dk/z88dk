@@ -127,6 +127,7 @@ l/z80/integer/l_incu_de
 l/z80/integer/l_incu_hl
 l/z80/integer/l_lsl_hl
 l/z80/integer/l_lsr_hl
+l/z80/integer/l_ltu_bc_de
 l/z80/integer/l_ltu_bc_hl
 l/z80/integer/l_ltu_de_hl
 l/z80/integer/l_ltu_hl_bc
