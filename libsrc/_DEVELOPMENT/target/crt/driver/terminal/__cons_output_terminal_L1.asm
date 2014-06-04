@@ -8,7 +8,7 @@
 ;
 ; The features of the level 1 console include:
 ;
-; * Terminal driver byte flags implemented
+; * Terminal driver flags implemented
 ;
 ;   - echo on/off
 ;
@@ -45,6 +45,17 @@
 ;
 ;   - caps lock on/off
 ;
+;   - cursor on/off
+;
+;     To disable the cursor in line mode.
+;
+; * Other console messages understood
+;
+;   - IOCTL_ITERM_TIE (input side only)
+;
+;     To disassociate or associate an input console
+;     with an output console.
+;
 ; A level 1 output console must be paired with a level 1
 ; input console so that exchanged messages are understood.
 
@@ -53,13 +64,13 @@
 ; offset  size   desription
 ;
 ;  13,14   2     driver flags
-;  15,16   2     terminal state * (0 if untied)
+;  15,16   2     terminal state *
 
 ; terminal state
 ;
 ; offset   description
 ;
-;   0,1    input terminal state * (structure in input console)
+;   0,1    input terminal state * (structure in input console) = 0 if untied
 
 ; messages to the output terminal
 ;
@@ -117,9 +128,17 @@ __cons_output_terminal_L1:
    jp z, error_znc             ; do nothing, report no error
    
    cp STDIO_MSG_CLOS
-   jp z, error_znc             ; do nothing, report no error
+   jp nz, error_enotsup_zc     ; hl = 0 puts stream in error state except for IOCTL
+
+   ; fall through
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__clos:
+
+   ; detach from the input console
    
-   jp error_enotsup_zc         ; hl = 0 puts stream in error state except for IOCTL
+   jp error_znc                ; do nothing, report no error
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

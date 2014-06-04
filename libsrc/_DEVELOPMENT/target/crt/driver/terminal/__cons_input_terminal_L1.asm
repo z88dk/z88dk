@@ -8,7 +8,7 @@
 ;
 ; The features of the level 1 console include:
 ;
-; * Terminal driver byte flags implemented
+; * Terminal driver flags implemented
 ;
 ;   - echo on/off
 ;
@@ -44,6 +44,10 @@
 ;     is active.
 ;
 ;   - caps lock on/off
+;
+;   - cursor on/off
+;
+;     To disable the cursor in line mode.
 ;
 ; A level 1 input console must be paired with a level 1
 ; output console so that exchanged messages are understood.
@@ -136,7 +140,8 @@ __cons_input_terminal_L1:
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN error_enotsup_zc
+   EXTERN IOCTL_ITERM_TIE
+   EXTERN l_ltu_bc_de, error_enotsup_zc
 
 __ictl:
 
@@ -146,11 +151,17 @@ __ictl:
    ;
    ; exit carry set if ioctl not understood
 
+;;   ld hl,IOCTL_ITERM_TIE
+;;   sbc hl,de
+;;   jr nz, __ictl_flags         ; if not IOCTL_ITERM_TIE
+
+__ict_flags:
+
    ; if line mode is being disabled we need to reset the edit buffer
 
    bit 7,d
-   jp z, error_enotsup_zc      ; if command does not affect driver flags
-   
+   jp z, error_enotsup_zc      ; if command does not affect terminal flags
+
    ld a,e
    and $07
    dec a
@@ -790,7 +801,19 @@ IF __CLIB_OPT_MULTITHREAD & $02
    EXTERN __stdio_lock_acquire
 
    call __stdio_lock_acquire
-   jr c, __output_fail
+   jr c, __output_invalid
+
+   ; have a lock but the attached output file may
+   ; have changed while waiting for it
+   
+   ld a,(hl)
+   cp ixh
+   jr nz, __output_fail
+   
+   dec hl
+   ld a,(hl)
+   cp ixl
+   jr nz, __output_fail
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
@@ -805,9 +828,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
    EXTERN __stdio_lock_release
 
-   call __stdio_lock_release
-
 __output_fail:
+
+   call __stdio_lock_release
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
