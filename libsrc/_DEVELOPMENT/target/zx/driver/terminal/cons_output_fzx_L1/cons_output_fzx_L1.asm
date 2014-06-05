@@ -69,7 +69,7 @@ __ictl:
    
    ; change fzx font
    
-   ld hl,(_fzx)
+   ld hl,(_fzx)                ; hl = old font
    ld (_fzx),bc
    
    ret
