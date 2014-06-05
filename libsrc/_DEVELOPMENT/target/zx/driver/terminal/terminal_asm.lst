@@ -1,3 +1,4 @@
 target/zx/driver/terminal/cons_input_kbd_inkey_L1/cons_input_kbd_inkey_L1
 target/zx/driver/terminal/cons_input_kbd_lastk_L1/cons_input_kbd_lastk_L1
+target/zx/driver/terminal/cons_output_char_L1/cons_output_char_L1
 target/zx/driver/terminal/cons_output_fzx_L1/cons_output_fzx_L1

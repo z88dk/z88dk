@@ -13,12 +13,13 @@ include(`../../crt_declare_static_module_head.m4')
 ## select drivers for the standard streams, set to zero to omit
 
 define(`M4_STDIN_DRIVER', cons_input_kbd_inkey_L1)
-define(`M4_STDOUT_DRIVER', cons_output_fzx_L1)
-define(`M4_STDERR_DRIVER', cons_output_fzx_L1)
+define(`M4_STDOUT_DRIVER', cons_output_char_L1)
+define(`M4_STDERR_DRIVER', cons_output_char_L1)
 
-## select default font for fzx driver
+## select default fonts
 
-define(`M4_FZX_FONT', ff_ao_SoixanteQuatre)
+define(`M4_CHAR_FONT', 15360)                  # char driver
+define(`M4_FZX_FONT', ff_ao_SoixanteQuatre)    # fzx driver
 
 ## include macros for all supported drivers on zx target
 ## only drivers that do not acquire host resources can be
@@ -26,6 +27,7 @@ define(`M4_FZX_FONT', ff_ao_SoixanteQuatre)
 
 include(`../driver/terminal/cons_input_kbd_inkey_L1/cons_input_kbd_inkey_L1.m4')
 include(`../driver/terminal/cons_input_kbd_lastk_L1/cons_input_kbd_lastk_L1.m4')
+include(`../driver/terminal/cons_output_char_L1/cons_output_char_L1.m4')
 include(`../driver/terminal/cons_output_fzx_L1/cons_output_fzx_L1.m4')
 
 ##                                                           ##
@@ -60,11 +62,12 @@ divert(2)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; stdin    : M4_STDIN_DRIVER
-;; stdout   : M4_STDOUT_DRIVER
-;; stderr   : M4_STDERR_DRIVER
+;; stdin     : M4_STDIN_DRIVER
+;; stdout    : M4_STDOUT_DRIVER
+;; stderr    : M4_STDERR_DRIVER
 ;;
-;; fzx font : M4_FZX_FONT
+;; fzx font  : M4_FZX_FONT
+;; char font : M4_CHAR_FONT
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -181,12 +184,12 @@ divert(7)
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
 
-   _fzx_s:
-
-      EXTERN _`'M4_FZX_FONT
-
-      defw _`'M4_FZX_FONT
-      defb 0, 0, 0, 0
+;   _fzx_s:
+;
+;      EXTERN _`'M4_FZX_FONT
+;
+;      defw _`'M4_FZX_FONT
+;      defb 0, 0, 0, 0
       
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -198,14 +201,14 @@ divert(8)
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
    
-   PUBLIC _fzx
-
-   _fzx:
-
-      EXTERN _`'M4_FZX_FONT
-
-      defw _`'M4_FZX_FONT
-      defb 0, 0, 0, 0
+;   PUBLIC _fzx
+;
+;   _fzx:
+;
+;      EXTERN _`'M4_FZX_FONT
+;
+;      defw _`'M4_FZX_FONT
+;      defb 0, 0, 0, 0
       
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -217,12 +220,12 @@ divert(6)
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
    
-   PUBLIC _fzx
-   
-   defvars -1
-   {
-      _fzx                            ds.b 6
-   }
+;   PUBLIC _fzx
+;  
+;   defvars -1
+;   {
+;      _fzx                            ds.b 6
+;   }
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
