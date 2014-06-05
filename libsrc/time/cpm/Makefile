@@ -1,12 +1,12 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.1 2014-06-04 20:37:27 stefano Exp $
+# $Id: Makefile,v 1.2 2014-06-05 20:01:01 stefano Exp $
 
 
 include ../../Make.config
 
-all: clock.o
+all: time.o clock.o
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c

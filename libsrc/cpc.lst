@@ -44,6 +44,7 @@ graphics/cpc/swapgfxbk
 graphics/clsgraph
 graphics/stencil_render
 games/cpc/joystick
+cpc/firmware
 cpc/bios_msg
 cpc/cpc_fdc
 cpc/cpc_model
@@ -51,7 +52,6 @@ cpc/cpc_rsx
 cpc/cpc_rsx_str
 cpc/cpc_rsx_strcpy
 cpc/cpc_rsx_strcpy_callee
-cpc/firmware
 cpc/fdc_address
 psg/cpc/set_psg
 psg/cpc/set_psg_callee

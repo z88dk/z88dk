@@ -3,6 +3,7 @@ stdio/cpm/getk
 stdio/cpm/fputc_cons
 stdio/puts_cons
 time/cpm/clock
+time/cpm/time
 fcntl/cpm/bios
 fcntl/cpm/bdos
 fcntl/cpm/close
