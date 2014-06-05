@@ -134,9 +134,11 @@ __cons_input_terminal_L1:
    jp z, error_znc             ; do nothing, report no error
    
    cp STDIO_MSG_ICTL
-   jp nz, error_enotsup_zc     ; hl = 0 puts stream in error state except for ICTL
+   jr z, __ictl
 
-   ; fall through
+__enotsup_zc:
+
+   jp error_enotsup_zc         ; hl = 0 puts stream in error state except for ICTL
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -160,17 +162,20 @@ __ict_flags:
    ; if line mode is being disabled we need to reset the edit buffer
 
    bit 7,d
-   jp z, error_enotsup_zc      ; if command does not affect terminal flags
+   jr z, __enotsup_zc          ; if command does not affect terminal flags
 
    ld a,e
    and $07
    dec a
-   jp nz, error_enotsup_zc     ; if command is not specific to ITERMs
+   jr nz, __enotsup_zc         ; if command is not specific to ITERMs
    
-   ld a,c
-   and e
+   ld a,e
    and $20
-   jp nz, error_enotsup_zc     ; if line mode is not being disabled
+   jr z, __enotsup_zc          ; if line mode flag unaffected
+   
+   and c
+   and $20
+   jr nz, __enotsup_zc         ; if line mode is not being disabled
    
    ; fall through
 
@@ -643,12 +648,14 @@ __backspace:
 
 __line_end:
 
-   call __cons_input_echo
+   ld c,a
    
    xor a
-   
    inc de
    ld (de),a
+   
+   ld a,c
+   call __cons_input_echo
    
    ex (sp),ix                  ; ix = terminal state *
    
