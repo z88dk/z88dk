@@ -4,6 +4,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;--------------------------------------------------------------
+;-- font/fzx --------------------------------------------------
+;--------------------------------------------------------------
+
+IF __enable_fzx
+
+   PUBLIC _fzx
+
+   _fzx:
+
+      EXTERN _ff_ao_SoixanteQuatre
+
+      defw _ff_ao_SoixanteQuatre
+      defb 0, 0, 0, 0
+
+ENDIF
+
+;--------------------------------------------------------------
 ;-- sound -----------------------------------------------------
 ;--------------------------------------------------------------
 
@@ -25,10 +42,13 @@ _cons_attr_p:                  defb 56
 ;-- input -----------------------------------------------------
 ;--------------------------------------------------------------
 
-PUBLIC __input_amx_mouse_dx, __input_amx_mouse_dy
+IF __enable_amx_mouse
 
-; amx mouse moves one pixel per interrupt
+   PUBLIC __input_amx_mouse_dx, __input_amx_mouse_dy
 
-__input_amx_mouse_dx:          defw $0100
-__input_amx_mouse_dy:          defw $0100
+   ; amx mouse moves one pixel per interrupt
 
+   __input_amx_mouse_dx:          defw $0100
+   __input_amx_mouse_dy:          defw $0100
+
+ENDIF
