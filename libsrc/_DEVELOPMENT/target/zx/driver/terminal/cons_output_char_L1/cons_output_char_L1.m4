@@ -6,6 +6,10 @@
 # $2 = instance name
 # $3 = ds* of tied input console (0=none)
 #
+# Parameters
+#
+# $4 = character set address (15360 default)
+#
 # Labels to the driver's local data will have the form:
 #
 # $2_cons_output_char_L1_LABELNAME
@@ -50,7 +54,7 @@ define(`M4_cons_output_char_L1_PUT_SEGMENT_DATA_DEFB',dnl
    
       defw $3
       defb `0, 0'
-      defw M4_CHAR_FONT
+      defw `ifelse($4,0,15360,$4)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )
@@ -67,7 +71,7 @@ define(`M4_cons_output_char_L1_PUT_SEGMENT_DATA_S_DEFB',dnl
    
       defw $3
       defb `0, 0'
-      defw M4_CHAR_FONT
+      defw `ifelse($4,0,15360,$4)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )

@@ -34,7 +34,8 @@ PUBLIC cons_output_char_L1
 cons_output_char_L1:
 
    ; handling PUTC and WRIT messages here would speed things up
-
+   ; but also make things bigger and more complicated for tty emulation
+   
    cp STDIO_MSG_OTERM_PUTCHAR
    jr z, __putchar
 
