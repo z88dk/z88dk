@@ -7,6 +7,10 @@
 # $3 = attach ds* ? (always attaches, used as buffer size)
 # $4 = FILE* for output console
 #
+# Parameters
+#
+# $5 = lastk address (23560 default)
+#
 # Labels to the driver's local data will have the form:
 #
 # $2_cons_input_kbd_lastk_L1_LABELNAME
@@ -50,7 +54,7 @@ define(`M4_cons_input_kbd_lastk_L1_PUT_SEGMENT_DATA_DEFVARS',dnl
 
    defvars -1
    {
-      $2_cons_input_kbd_lastk_L1_file_state	ds.b 7
+      $2_cons_input_kbd_lastk_L1_file_state	ds.b 9
    }
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,6 +74,7 @@ define(`M4_cons_input_kbd_lastk_L1_PUT_SEGMENT_DATA_DEFB',dnl
       defw $2_cons_input_kbd_lastk_L1_edit_buffer
       defw $2_cons_input_kbd_lastk_L1_edit_buffer
       defb $3
+      defw `ifelse($5,0,23560,$5)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )
@@ -88,6 +93,7 @@ define(`M4_cons_input_kbd_lastk_L1_PUT_SEGMENT_DATA_S_DEFB',dnl
       defw $2_cons_input_kbd_lastk_L1_edit_buffer
       defw $2_cons_input_kbd_lastk_L1_edit_buffer
       defb $3
+      defw `ifelse($5,0,23560,$5)'
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )
