@@ -17,7 +17,7 @@
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
  *
  * --------
- * $Id: time.c,v 1.1 2014-06-05 20:01:01 stefano Exp $
+ * $Id: time.c,v 1.2 2014-06-06 05:39:48 stefano Exp $
  */
 
 
@@ -28,10 +28,17 @@ time_t time(time_t *store)
 {
 #asm
         pop     de
-        pop     ix
-        push    ix
+        pop     hl
+        push    hl
         push    de
         
+        ld      a,h
+        or      l
+        jr      nz,haveparm
+        ld      hl,jdate    ; use jdate as a foo parameter location
+haveparm:
+        push    hl
+
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
         call    5           ; get date/time
@@ -91,7 +98,9 @@ nompmii:
         ld      de,1		; load 86400 to dehl, 3600 seconds x 24 hours
         
         call    l_long_mult
+        call    l_long_add
         
+        pop     ix
         ld      (ix+0),l
         ld      (ix+1),h
         ld      (ix+2),e
