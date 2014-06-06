@@ -26,21 +26,20 @@ PUBLIC cons_output_fzx_L1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN __cons_output_terminal_L1
-   EXTERN STDIO_MSG_WRIT, STDIO_MSG_ICTL
-   EXTERN STDIO_MSG_OTERM_L1, STDIO_MSG_OTERM_PUTCHAR
+   EXTERN __cons_output_terminal_L1, STDIO_MSG_ICTL
+   EXTERN STDIO_MSG_OTERM_PUTCHAR, STDIO_MSG_OTERM_L1
 
 cons_output_fzx_L1:
+
+   ; handling PUTC and WRIT messages here would speed things up
+   ; but also make things bigger and more complicated for tty emulation
    
    cp STDIO_MSG_OTERM_PUTCHAR
    jr z, __putchar
    
-   cp STDIO_MSG_WRIT
-   jr z, __writ
-   
    cp STDIO_MSG_OTERM_L1
-   jr z, __oterm_L1
-   
+   jr z, __oterm_01_t
+
    cp STDIO_MSG_ICTL
    jp nz, __cons_output_terminal_L1
 
@@ -88,6 +87,28 @@ __putchar:
    ; return carry set on error
    ; can modify af, bc, de, hl
 
+   ld a,c
+   
+   bit 4,(ix+13)
+   jr z, __putchar_raw         ; if cook disabled
+
+__putchar_cook:
+
+   ; interpret special codes here
+
+__putchar_raw:
+
+   ; a = c = char
+   
+   cp 13
+   jr z, __putchar_ok
+   
+   cp 32
+   jr nc, __putchar_ok         ; if ascii code >= 32
+   ld c,'?'
+
+__putchar_ok:
+
    ex af,af'
    push af
    push ix
@@ -118,53 +139,6 @@ __echo_screen_full:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   EXTERN asm_fzx_write
-
-__writ:
-
-   ; these chars are delivered from stdio, not the input console
-   ; this is where tty interpretation should be applied
-   
-   ; BC' = length > 0
-   ; HL' = void *buffer = byte source
-   ; HL  = length > 0
-   ; 
-   ; return HL = number of bytes successfully output
-   ; carry reset
-
-   push ix
-   push hl                     ; save output length
-   
-   exx
-   ex de,hl                    ; de = buffer
-
-__writ_loop:
-
-   call asm_fzx_write
-   jr c, __writ_screen_full
-
-   pop hl                      ; say we output everything
-   pop ix
-
-   ret
-
-__writ_screen_full:
-   
-   ; bc = num remaining chars
-   ; de = void *buffer_ptr
-
-   push bc
-   push de
-   
-   call __cons_output_scroll
-   
-   pop de
-   pop bc
-
-   jr __writ_loop              ; finish writing
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 __oterm_L1:
 
    ; STDIO_MSG_OTERM_L1
@@ -173,9 +147,11 @@ __oterm_L1:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__oterm_01:
+__oterm_01_t:
 
-   djnz __oterm_02
+   djnz __oterm_02_t
+
+__oterm_01:
 
    ;   b = 1 __cons_output_putc
    ;         c = char to output
@@ -188,24 +164,18 @@ __oterm_01:
    ; prevent control characters from being output to driver
 
    ld a,c
-   
-   cp 13
-   jr z, __putchar
-   
-   cp 32
-   jr nc, __putchar
-   
-   ld c,'?'
-   jr __putchar
+   jr __putchar_raw
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN fzx_mode_xor, _fzx
    EXTERN __fzx_glyph_width, asm_fzx_mode, asm_fzx_putc
 
-__oterm_02:
+__oterm_02_t:
 
-   djnz __oterm_03
+   djnz __oterm_03_t
+
+__oterm_02:
 
    ;   b = 2 __cons_output_backspace
    ;         c = char to erase
@@ -219,8 +189,6 @@ __oterm_02:
    ; erase is - this makes it easier to do password mode
    ; and will fit in with a level 2 console which allows
    ; text insertion
-
-__oterm_02_bs:
 
    push ix                     ; save FILE *
    
@@ -359,8 +327,8 @@ __erase_char:
    
    push hl                     ; save old fzx mode
    call asm_fzx_putc
+
    pop hl                      ; restore old fzx mode
-   
    call asm_fzx_mode
    
    pop de
@@ -376,24 +344,29 @@ __erase_char:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__oterm_03:
+__oterm_03_t:
 
-   djnz __oterm_04
+   djnz __oterm_04_t
+
+__oterm_03:
 
    ;   b = 3 __cons_output_backspace_pwd
    ;         c = password char
    ;        de = address of char to erase in edit buffer
 
    scf
-   jp __oterm_02_bs
+   jp __oterm_02
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN _fzx
 
-__oterm_04:
+__oterm_04_t:
 
-   djnz __oterm_unknown
+   dec b
+   ret nz                      ; message unknown
+
+__oterm_04:
 
    ;   b = 4 input console is starting read line
    ;        de = address of edit buffer
@@ -411,15 +384,13 @@ __oterm_04:
    inc hl
    ld (hl),b                   ; ts->x = current fzx coord
 
-__oterm_unknown:
-
    or a
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    EXTERN _cons_attr_p, _fzx
-   EXTERN asm_zx_scroll
+   EXTERN asm0_zx_scroll
 
 __cons_output_scroll:
 
@@ -427,12 +398,6 @@ __cons_output_scroll:
    ; another line of fzx text can be written
    ;
    ; uses : all except ix, af', bc', de', hl'
-
-   exx
-   
-   push bc
-   push de
-   push hl
    
    ld hl,(_fzx)                ; hl = struct fzx_font *
    ld l,(hl)                   ; l = font height in pixels
@@ -441,7 +406,7 @@ __cons_output_scroll:
    
    add a,l
    sub 192
-   jr c, __scroll_done
+   ret c                       ; no scroll necessary
 
    inc a
    ld de,1
@@ -466,24 +431,9 @@ __scroll:
    
    ld a,(_fzx+5)
    sub l
-   
-   jr nc, __scroll_new_y
-   xor a
-
-__scroll_new_y:
-
    ld (_fzx+5),a               ; y coordinate -= E * 8
 
    ld hl,(_cons_attr_p)
-   call asm_zx_scroll
-
-__scroll_done:
-
-   pop hl
-   pop de
-   pop bc
-   
-   exx
-   ret
+   jp asm0_zx_scroll
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

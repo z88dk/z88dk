@@ -6,6 +6,8 @@
 # $2 = instance name
 # $3 = ds* of tied input console (0=none)
 #
+# No Parameters
+#
 # Labels to the driver's local data will have the form:
 #
 # $2_cons_output_fzx_L1_LABELNAME
