@@ -6,24 +6,13 @@
 ;;      generated from target/zx/startup/zx_crt1.m4          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  * Creates global fzx state in variable "_fzx"
-;;    This is required by the fzx output driver.
-;;
-;;  * Creates global "_cons_attr_p" byte to hold a background
-;;    colour.  This is required by the fzx output driver.
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
 ;; #pragma output STACKPTR=nnnnn
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; stdin     : cons_input_kbd_inkey_L1
-;; stdout    : cons_output_char_L1
-;; stderr    : cons_output_char_L1
-;;
-;; fzx font  : ff_ao_SoixanteQuatre
-;; char font : 15360
+;; stdin     : cons_input_kbd_inkey_L1(0,0,0,0,0,0)
+;; stdout    : cons_output_fzx_L1(0,0,0,0,0,0)
+;; stderr    : cons_output_fzx_L1(0,0,0,0,0,0)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -53,6 +42,7 @@ INCLUDE "../crt_symbol.asm"
 
 INCLUDE "clib_cfg.asm"
 INCLUDE "crt_cfg.asm"
+INCLUDE "crt_target_cfg.asm"
 INCLUDE "../crt_cfg_default.asm"
 
 
@@ -134,13 +124,6 @@ IF __crt_segment_data_address > 0
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
    
-;   PUBLIC _fzx
-;  
-;   defvars -1
-;   {
-;      _fzx                            ds.b 6
-;   }
-   
 
    ; ----------------------------------------------------------
    ; -- stdin data segment ------------------------------------
@@ -174,11 +157,11 @@ IF __crt_segment_data_address > 0
    }
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDOUT
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
 
    defvars -1
    {
-      STDOUT_cons_output_char_L1_file_state	ds.b 6
+      STDOUT_cons_output_fzx_L1_file_state	ds.b 4
    }
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -195,11 +178,11 @@ IF __crt_segment_data_address > 0
    }
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDERR
+   ;; driver = cons_output_fzx_L1, instance = STDERR
 
    defvars -1
    {
-      STDERR_cons_output_char_L1_file_state	ds.b 6
+      STDERR_cons_output_fzx_L1_file_state	ds.b 4
    }
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -268,9 +251,17 @@ __crt_code_begin:
 
    ld (__sp),sp                ; exit() can occur at any value of sp
    
-   IF STACKPTR                 ; pragma to locate stack
+   IF REGISTER_SP
    
-      ld sp,STACKPTR
+      ld sp,REGISTER_SP        ; pragma to locate stack
+   
+   ELSE
+   
+      IF STACKPTR
+      
+         ld sp,STACKPTR        ; pragma to locate stack
+      
+      ENDIF
    
    ENDIF
 
@@ -334,13 +325,6 @@ IF (__crt_cfg_segment_data & 3) = 1
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
 
-;   _fzx_s:
-;
-;      EXTERN _ff_ao_SoixanteQuatre
-;
-;      defw _ff_ao_SoixanteQuatre
-;      defb 0, 0, 0, 0
-      
 
    ; ----------------------------------------------------------
    ; -- stdin data segment ------------------------------------
@@ -405,10 +389,10 @@ __FILE_STDIN_s:
    
 __FILE_STDOUT_s:
 
-   EXTERN cons_output_char_L1
+   EXTERN cons_output_fzx_L1
    
    defb 195		; JP instruction
-   defw cons_output_char_L1		; address of driver message dispatcher
+   defw cons_output_fzx_L1		; address of driver message dispatcher
    defb 0x80		; state_flags_0 = mode byte
    
    IF 0x80 & 0x40
@@ -428,20 +412,19 @@ __FILE_STDOUT_s:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw 0x0012
-      defw STDOUT_cons_output_char_L1_file_state
+      defw STDOUT_cons_output_fzx_L1_file_state
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDOUT
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
    
-   STDOUT_cons_output_char_L1_file_state_s:
+   STDOUT_cons_output_fzx_L1_file_state_s:
    
       defw STDIN_cons_input_kbd_inkey_L1_file_state
-      defb 0, 0
-      defw 15360
+      defw 0
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -454,10 +437,10 @@ __FILE_STDOUT_s:
    
 __FILE_STDERR_s:
 
-   EXTERN cons_output_char_L1
+   EXTERN cons_output_fzx_L1
    
    defb 195		; JP instruction
-   defw cons_output_char_L1		; address of driver message dispatcher
+   defw cons_output_fzx_L1		; address of driver message dispatcher
    defb 0x80		; state_flags_0 = mode byte
    
    IF 0x80 & 0x40
@@ -477,20 +460,19 @@ __FILE_STDERR_s:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw 0x0012
-      defw STDERR_cons_output_char_L1_file_state
+      defw STDERR_cons_output_fzx_L1_file_state
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDERR
+   ;; driver = cons_output_fzx_L1, instance = STDERR
    
-   STDERR_cons_output_char_L1_file_state_s:
+   STDERR_cons_output_fzx_L1_file_state_s:
    
       defw 0
-      defb 0, 0
-      defw 15360
+      defw 0
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -541,16 +523,7 @@ __crt_segment_data_begin:
    ; ----------------------------------------------------------
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
-   
-;   PUBLIC _fzx
-;
-;   _fzx:
-;
-;      EXTERN _ff_ao_SoixanteQuatre
-;
-;      defw _ff_ao_SoixanteQuatre
-;      defb 0, 0, 0, 0
-      
+
 
    ; ----------------------------------------------------------
    ; -- stdin data segment ------------------------------------
@@ -615,10 +588,10 @@ __FILE_STDIN:
    
 __FILE_STDOUT:
 
-   EXTERN cons_output_char_L1
+   EXTERN cons_output_fzx_L1
    
    defb 195		; JP instruction
-   defw cons_output_char_L1		; address of driver message dispatcher
+   defw cons_output_fzx_L1		; address of driver message dispatcher
    defb 0x80		; state_flags_0 = mode byte
    
    IF 0x80 & 0x40
@@ -638,20 +611,19 @@ __FILE_STDOUT:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw 0x0012
-      defw STDOUT_cons_output_char_L1_file_state
+      defw STDOUT_cons_output_fzx_L1_file_state
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDOUT
+   ;; driver = cons_output_fzx_L1, instance = STDOUT
    
-   STDOUT_cons_output_char_L1_file_state:
+   STDOUT_cons_output_fzx_L1_file_state:
    
       defw STDIN_cons_input_kbd_inkey_L1_file_state
-      defb 0, 0
-      defw 15360
+      defw 0
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -664,10 +636,10 @@ __FILE_STDOUT:
    
 __FILE_STDERR:
 
-   EXTERN cons_output_char_L1
+   EXTERN cons_output_fzx_L1
    
    defb 195		; JP instruction
-   defw cons_output_char_L1		; address of driver message dispatcher
+   defw cons_output_fzx_L1		; address of driver message dispatcher
    defb 0x80		; state_flags_0 = mode byte
    
    IF 0x80 & 0x40
@@ -687,20 +659,19 @@ __FILE_STDERR:
    IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
    
       defw 0x0012
-      defw STDERR_cons_output_char_L1_file_state
+      defw STDERR_cons_output_fzx_L1_file_state
       
       defs __CLIB_OPT_STDIO_FILE_EXTRA - 4
    
    ENDIF
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; driver = cons_output_char_L1, instance = STDERR
+   ;; driver = cons_output_fzx_L1, instance = STDERR
    
-   STDERR_cons_output_char_L1_file_state:
+   STDERR_cons_output_fzx_L1_file_state:
    
       defw 0
-      defb 0, 0
-      defw 15360
+      defw 0
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -10,6 +10,7 @@
 # $1 = driver name
 # $2 = instance name
 # $3 = attach ds* ? (0=no, see driver for specific meaning)
+#      tied closely to console instantiation
 # more parameters forwarded to driver
 #
 # Labels to the driver's local data will have the form:

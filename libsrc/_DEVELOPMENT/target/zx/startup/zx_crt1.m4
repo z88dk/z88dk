@@ -13,13 +13,14 @@ include(`../../crt_declare_static_module_head.m4')
 ## select drivers for the standard streams, set to zero to omit
 
 define(`M4_STDIN_DRIVER', cons_input_kbd_inkey_L1)
-define(`M4_STDOUT_DRIVER', cons_output_char_L1)
-define(`M4_STDERR_DRIVER', cons_output_char_L1)
+define(`M4_STDOUT_DRIVER', cons_output_fzx_L1)
+define(`M4_STDERR_DRIVER', cons_output_fzx_L1)
 
-## select default fonts
+## parameters passed to drivers when instantiated
 
-define(`M4_CHAR_FONT', 15360)                  # char driver
-define(`M4_FZX_FONT', ff_ao_SoixanteQuatre)    # fzx driver
+define(`M4_STDIN_PARAMS', `0,0,0,0,0,0')
+define(`M4_STDOUT_PARAMS', `0,0,0,0,0,0')
+define(`M4_STDERR_PARAMS', `0,0,0,0,0,0')
 
 ## include macros for all supported drivers on zx target
 ## only drivers that do not acquire host resources can be
@@ -50,24 +51,13 @@ divert(2)
 ;;      generated from target/zx/startup/zx_crt1.m4          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  * Creates global fzx state in variable "_fzx"
-;;    This is required by the fzx output driver.
-;;
-;;  * Creates global "_cons_attr_p" byte to hold a background
-;;    colour.  This is required by the fzx output driver.
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
 ;; #pragma output STACKPTR=nnnnn
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; stdin     : M4_STDIN_DRIVER
-;; stdout    : M4_STDOUT_DRIVER
-;; stderr    : M4_STDERR_DRIVER
-;;
-;; fzx font  : M4_FZX_FONT
-;; char font : M4_CHAR_FONT
+;; stdin     : M4_STDIN_DRIVER`('M4_STDIN_PARAMS`)'
+;; stdout    : M4_STDOUT_DRIVER`('M4_STDOUT_PARAMS`)'
+;; stderr    : M4_STDERR_DRIVER`('M4_STDERR_PARAMS`)'
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -97,6 +87,7 @@ INCLUDE "../crt_symbol.asm"
 
 INCLUDE "clib_cfg.asm"
 INCLUDE "crt_cfg.asm"
+INCLUDE "crt_target_cfg.asm"
 INCLUDE "../crt_cfg_default.asm"
 
 divert(3)
@@ -122,9 +113,17 @@ __crt_code_begin:
 
    ld (__sp),sp                ; exit() can occur at any value of sp
    
-   IF STACKPTR                 ; pragma to locate stack
+   IF REGISTER_SP
    
-      ld sp,STACKPTR
+      ld sp,REGISTER_SP        ; pragma to locate stack
+   
+   ELSE
+   
+      IF STACKPTR
+      
+         ld sp,STACKPTR        ; pragma to locate stack
+      
+      ENDIF
    
    ENDIF
 
@@ -184,13 +183,6 @@ divert(7)
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
 
-;   _fzx_s:
-;
-;      EXTERN _`'M4_FZX_FONT
-;
-;      defw _`'M4_FZX_FONT
-;      defb 0, 0, 0, 0
-      
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl;; data segment - attached to binary ;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,16 +192,7 @@ divert(8)
    ; ----------------------------------------------------------
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
-   
-;   PUBLIC _fzx
-;
-;   _fzx:
-;
-;      EXTERN _`'M4_FZX_FONT
-;
-;      defw _`'M4_FZX_FONT
-;      defb 0, 0, 0, 0
-      
+
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dnl;; data segment - external ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -219,13 +202,6 @@ divert(6)
    ; ----------------------------------------------------------
    ; -- insert local crt data segment here --------------------
    ; ----------------------------------------------------------
-   
-;   PUBLIC _fzx
-;  
-;   defvars -1
-;   {
-;      _fzx                            ds.b 6
-;   }
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

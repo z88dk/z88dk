@@ -28,21 +28,21 @@ divert(7)
    ; ----------------------------------------------------------
 
    ifelse(M4_STDIN_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDIN, M4_STDIN_DRIVER, STDIN, M4_FILE_MODE_R, M4_FILE_DF_ITERM_SRELC)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)', M4_STDIN_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
    ifelse(M4_STDOUT_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDOUT, M4_STDOUT_DRIVER, STDOUT, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)', M4_STDOUT_PARAMS)')
    
    ; ----------------------------------------------------------
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDERR_DRIVER,0,,`M4_CREATE_FILE_DATA_S_DEFB(STDERR, M4_STDERR_DRIVER, STDERR, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C, 0)
-   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDERR_DRIVER, STDERR, 0)')
+   M4_PUT_SEGMENT_DATA_S_DEFB(M4_STDERR_DRIVER, STDERR, 0, M4_STDERR_PARAMS)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,21 +55,21 @@ divert(8)
    ; ----------------------------------------------------------
 
    ifelse(M4_STDIN_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDIN, M4_STDIN_DRIVER, STDIN, M4_FILE_MODE_R, M4_FILE_DF_ITERM_SRELC)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)', M4_STDIN_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
    ifelse(M4_STDOUT_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDOUT, M4_STDOUT_DRIVER, STDOUT, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)', M4_STDOUT_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDERR_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFB(STDERR, M4_STDERR_DRIVER, STDERR, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C, 0)
-   M4_PUT_SEGMENT_DATA_DEFB(M4_STDERR_DRIVER, STDERR, 0)')
+   M4_PUT_SEGMENT_DATA_DEFB(M4_STDERR_DRIVER, STDERR, 0, M4_STDERR_PARAMS)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,21 +82,21 @@ divert(6)
    ; ----------------------------------------------------------
 
    ifelse(M4_STDIN_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFVARS(STDIN, M4_STDIN_DRIVER, STDIN, M4_FILE_MODE_R, M4_FILE_DF_ITERM_SRELC)
-   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
+   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)', M4_STDIN_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stdout data segment -----------------------------------
    ; ----------------------------------------------------------
    
    ifelse(M4_STDOUT_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFVARS(STDOUT, M4_STDOUT_DRIVER, STDOUT, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C)
-   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
+   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)', M4_STDOUT_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stderr data segment -----------------------------------
    ; ----------------------------------------------------------
 
    ifelse(M4_STDERR_DRIVER,0,,`M4_CREATE_FILE_DATA_DEFVARS(STDERR, M4_STDERR_DRIVER, STDERR, M4_FILE_MODE_W, M4_FILE_DF_OTERM_C, 0)
-   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDERR_DRIVER, STDERR, 0)')
+   M4_PUT_SEGMENT_DATA_DEFVARS(M4_STDERR_DRIVER, STDERR, 0, M4_STDERR_PARAMS)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,19 +108,19 @@ divert(5)
    ; -- stdin bss segment -------------------------------------
    ; ----------------------------------------------------------
 
-   ifelse(M4_STDIN_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
+   ifelse(M4_STDIN_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)', M4_STDIN_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stdout bss segment ------------------------------------
    ; ----------------------------------------------------------
    
-   ifelse(M4_STDOUT_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
+   ifelse(M4_STDOUT_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)', M4_STDOUT_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stderr bss segment ------------------------------------
    ; ----------------------------------------------------------
 
-   ifelse(M4_STDERR_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDERR_DRIVER, STDERR, 0)')
+   ifelse(M4_STDERR_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFS(M4_STDERR_DRIVER, STDERR, 0, M4_STDERR_PARAMS)')
    
 dnl
 dnl;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -132,19 +132,19 @@ divert(4)
    ; -- stdin bss segment -------------------------------------
    ; ----------------------------------------------------------
 
-   ifelse(M4_STDIN_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)')')
+   ifelse(M4_STDIN_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDIN_DRIVER, STDIN, __crt_cfg_edit_buflen, `ifelse(M4_STDOUT_DRIVER,0,0,__FILE_STDOUT)', M4_STDIN_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stdout bss segment ------------------------------------
    ; ----------------------------------------------------------
    
-   ifelse(M4_STDOUT_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)')')
+   ifelse(M4_STDOUT_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDOUT_DRIVER, STDOUT, `ifelse(M4_STDIN_DRIVER,0,0,STDIN_`'M4_STDIN_DRIVER`'_file_state)', M4_STDOUT_PARAMS)')
 
    ; ----------------------------------------------------------
    ; -- stderr bss segment ------------------------------------
    ; ----------------------------------------------------------
 
-   ifelse(M4_STDERR_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDERR_DRIVER, STDERR, 0)')
+   ifelse(M4_STDERR_DRIVER,0,,`M4_PUT_SEGMENT_BSS_DEFVARS(M4_STDERR_DRIVER, STDERR, 0, M4_STDERR_PARAMS)')
 
 divert(-1)
 
