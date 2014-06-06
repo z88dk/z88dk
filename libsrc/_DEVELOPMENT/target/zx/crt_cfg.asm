@@ -64,9 +64,9 @@ ENDIF
 ;-- file options ----------------------------------------------
 ;--------------------------------------------------------------
 
-IF CRT_FOPEN_MAX
+IF CLIB_FOPEN_MAX
 
-   defc __crt_cfg_fopen_max = CRT_FOPEN_MAX
+   defc __crt_cfg_fopen_max = CLIB_FOPEN_MAX
 
 ELSE
 

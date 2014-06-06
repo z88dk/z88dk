@@ -13,11 +13,12 @@ in the target's subdirectory.
 nn   =  8-bit number
 nnnn = 16-bit number
 
+#pragma output CRT_ORG = nnnn
 #pragma output CRT_BSS_SEGMENT_ADDRESS = nnnn
 #pragma output CRT_DATA_SEGMENT_ADDRESS = nnnn
 #pragma output CRT_DATA_SEGMENT_INIT = nn
 
-#pragma output CRT_FOPEN_MAX = nn
+#pragma output CLIB_FOPEN_MAX = nn
 #pragma output CLIB_EXIT_STACK_SIZE = nn
 #pragma output CLIB_QUICKEXIT_STACK_SIZE = nn
 

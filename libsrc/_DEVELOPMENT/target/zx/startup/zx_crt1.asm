@@ -24,7 +24,15 @@ INCLUDE "zcc_opt.def"
 
 IF !myzorg
 
-   defc myzorg = 32768
+   IF CRT_ORG
+   
+      defc myzorg = CRT_ORG
+   
+   ELSE
+   
+      defc myzorg = 32768
+   
+   ENDIF
 
 ENDIF
 
