@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.152 2014-06-02 22:29:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.153 2014-06-07 00:22:41 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -149,12 +149,9 @@ install:
 #------------------------------------------------------------------------------
 # clean
 #------------------------------------------------------------------------------
-clean :
+clean::
 	$(RM) *.o $(LOCAL_LIB)/*.o *.exe $(LOCAL_LIB)/*.exe *~ $(LOCAL_LIB)/*~ *.tmp
 	$(RM) *.bak $(LOCAL_LIB)/*.bak *.orig $(LOCAL_LIB)/*.orig core $(LOCAL_LIB)/core
-	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
-	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
-	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 	$(RM) -rf Debug Release x1 x2 x3
 
 #------------------------------------------------------------------------------
@@ -177,6 +174,11 @@ testzcc : $(TARGET)
 	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
 	eightyone microman.tap
 	eightyone mandel.tap
+
+clean::
+	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
+	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
+	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 
 #------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
@@ -233,7 +235,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.152  2014-06-02 22:29:12  pauloscustodio
+# Revision 1.153  2014-06-07 00:22:41  pauloscustodio
+# Split clean targets
+#
+# Revision 1.152  2014/06/02 22:29:12  pauloscustodio
 # Write object file in one go at the end of pass 2, instead of writing
 # parts during pass 1 assembly. This allows the object file format to be
 # changed more easily, to allow sections in a near future.
