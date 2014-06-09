@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.17 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.18 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -53,7 +53,7 @@ CLASS( Module )
 	SymbolHash	*local_symtab;		/* module local symbols */
 	SectionHash *sections;			/* list of sections defined in the code,
 									   indexed also by section name */
-	Section		*curr_section;		/* point to current section */
+	Section		*cur_section;		/* point to current section */
 END_CLASS;
 
 CLASS_LIST( Module );
@@ -68,7 +68,10 @@ extern void Module_set_section( Module *self, char *section_name );
 
 /*
 * $Log: module.h,v $
-* Revision 1.17  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.18  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.17  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.16  2014/05/25 12:55:03  pauloscustodio

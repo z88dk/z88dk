@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.11 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.12 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -80,7 +80,7 @@ void Module_copy (Module *self, Module *other)
 	self->sections = SectionHash_clone( other->sections );
 
 	/* set the same default section */
-	Module_set_section( self, other->curr_section->section_name );	
+	Module_set_section( self, other->cur_section->section_name );	
 }
 
 void Module_fini (Module *self)
@@ -95,18 +95,21 @@ void Module_fini (Module *self)
 *----------------------------------------------------------------------------*/
 void Module_set_section( Module *self, char *section_name )
 {
-	self->curr_section = SectionHash_get( self->sections, section_name );
-	if ( self->curr_section == NULL )
+	self->cur_section = SectionHash_get( self->sections, section_name );
+	if ( self->cur_section == NULL )
 	{
-		self->curr_section = OBJ_NEW( Section );
-		self->curr_section->section_name = strpool_add( section_name );
-		SectionHash_set( & self->sections, section_name, self->curr_section );
+		self->cur_section = OBJ_NEW( Section );
+		self->cur_section->section_name = strpool_add( section_name );
+		SectionHash_set( & self->sections, section_name, self->cur_section );
 	}
 }
 
 /* 
 * $Log: module.c,v $
-* Revision 1.11  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.12  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.11  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.10  2014/05/25 12:55:03  pauloscustodio

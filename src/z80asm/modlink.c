@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.124 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.125 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -633,10 +633,10 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     Module *tmpmodule, *lib_module;
     int flag;
 
-    tmpmodule = get_curr_module();					/* remember current module */
+    tmpmodule = get_cur_module();					/* remember current module */
 
 	/* create new module to link library */
-	lib_module = new_curr_module();
+	lib_module = new_cur_module();
 	lib_module->modname = strpool_add( modname );
 
     if ( opts.verbose )
@@ -646,7 +646,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
 
     flag = LinkModule( library->libfilename, curmodule );       /* link module & read names */
 
-    set_curr_module( tmpmodule );		/* restore previous current module */
+    set_cur_module( tmpmodule );		/* restore previous current module */
     return flag;
 }
 
@@ -668,7 +668,7 @@ ModuleExpr( void )
 
     do
     {
-		set_curr_module( curlink->moduleinfo );
+		set_cur_module( curlink->moduleinfo );
         fptr_base = curlink->modulestart;
 
         set_error_null();
@@ -857,7 +857,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.124  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.125  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.124  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.123  2014/06/02 22:29:14  pauloscustodio

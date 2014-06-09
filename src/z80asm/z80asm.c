@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.176 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.177 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -96,7 +96,7 @@ void assemble_file( char *filename )
     src_filename = get_asm_filename( filename );      /* set '.asm' extension */
 
     /* Create module data structures for new file */
-	module = new_curr_module();
+	module = new_cur_module();
 	module->filename = strpool_add( src_filename );
 
     query_assemble( src_filename );
@@ -400,7 +400,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.176  2014-06-09 13:15:27  pauloscustodio
+* Revision 1.177  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.176  2014/06/09 13:15:27  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.175  2014/06/02 22:29:14  pauloscustodio

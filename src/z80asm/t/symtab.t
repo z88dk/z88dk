@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.17 2014-06-01 22:16:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.18 2014-06-09 13:30:28 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -354,7 +354,7 @@ t_compile_module($init, <<'END', $objs);
 	opts.list     = TRUE;
 	
 	TITLE("Create current module");	
-	new_curr_module();
+	new_cur_module();
 
 	TITLE("Create symbol");	
 	sym = Symbol_create(S("Var1"), 123, 0, NULL);
@@ -569,7 +569,10 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.17  2014-06-01 22:16:50  pauloscustodio
+# Revision 1.18  2014-06-09 13:30:28  pauloscustodio
+# Rename current module abrev
+#
+# Revision 1.17  2014/06/01 22:16:50  pauloscustodio
 # Write expressions to object file only in pass 2, to remove dupplicate code
 # and allow simplification of object file writing code. All expression
 # error messages are now output only during pass 2.

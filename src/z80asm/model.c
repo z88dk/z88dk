@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.8 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.9 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -34,7 +34,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.8 2014-05-25 01:02
 *----------------------------------------------------------------------------*/
 static ModuleList		*g_module_list;			/* list of input modules */
 static ModuleListElem	*g_module_list_iter;	/* iterator to current module */
-static Module			*g_curr_module;			/* current module being handled */
+static Module			*g_cur_module;			/* current module being handled */
 static SrcFile			*g_src_input;			/* input handle for reading source lines */
 
 /*-----------------------------------------------------------------------------
@@ -94,42 +94,42 @@ void module_list_first( void )
 {
 	init();
 	g_module_list_iter = ModuleList_first( g_module_list );
-	g_curr_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
+	g_cur_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
 }
 
 Bool module_list_next( void )
 {
 	init();
 	g_module_list_iter = ModuleList_next( g_module_list_iter );
-	g_curr_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
-	return g_curr_module != NULL;
+	g_cur_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
+	return g_cur_module != NULL;
 }
 
 void delete_modules( void )
 {
 	init();
-	g_curr_module = NULL;
+	g_cur_module = NULL;
 	ModuleList_remove_all( g_module_list );
 }
 
-void set_curr_module( Module *module )
+void set_cur_module( Module *module )
 {
 	init();
-	g_curr_module = module;
+	g_cur_module = module;
 }
 
-Module *get_curr_module( void )
+Module *get_cur_module( void )
 {
 	init();
-	return g_curr_module;
+	return g_cur_module;
 }
 
-Module *new_curr_module( void )
+Module *new_cur_module( void )
 {
 	init();
-	g_curr_module = OBJ_NEW( Module );
-	ModuleList_push( &g_module_list, g_curr_module );
-	return g_curr_module;
+	g_cur_module = OBJ_NEW( Module );
+	ModuleList_push( &g_module_list, g_cur_module );
+	return g_cur_module;
 }
 
 Module *get_first_module( void )
@@ -197,7 +197,10 @@ Bool src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.8  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.9  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.8  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.7  2014/05/02 21:00:49  pauloscustodio

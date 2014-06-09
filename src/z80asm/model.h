@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.18 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.19 2014-06-09 13:30:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -91,14 +91,14 @@ extern Bool module_list_next( void );
 extern void delete_modules( void );
 
 /* current module */
-extern void		   set_curr_module( Module *module );
-extern Module	  *get_curr_module( void );
-extern Module	  *new_curr_module( void );
+extern void		   set_cur_module( Module *module );
+extern Module	  *get_cur_module( void );
+extern Module	  *new_cur_module( void );
 extern Module	  *get_first_module( void );
 extern Module	  *get_last_module( void );
 
-#define CURRENTMODULE	(get_curr_module())
-#define CURRENTSECTION	(get_curr_module()->curr_section)
+#define CURRENTMODULE	(get_cur_module())
+#define CURRENTSECTION	(get_cur_module()->cur_section)
 
 /* interface to SrcFile singleton */
 extern void  src_open( char *filename, List *dir_list );
@@ -112,7 +112,10 @@ extern Bool  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.18  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.19  2014-06-09 13:30:28  pauloscustodio
+* Rename current module abrev
+*
+* Revision 1.18  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.17  2014/05/21 20:56:08  pauloscustodio
