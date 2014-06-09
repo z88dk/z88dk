@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.10 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.11 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -342,7 +342,10 @@ Bool SrcFile_pop( SrcFile *self )
 
 /*
 * $Log: srcfile.c,v $
-* Revision 1.10  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.11  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.10  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.9  2014/05/17 14:27:13  pauloscustodio
@@ -352,7 +355,7 @@ Bool SrcFile_pop( SrcFile *self )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.7  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.6  2014/03/16 19:19:49  pauloscustodio
 * Integrate use of srcfile in scanner, removing global variable z80asmfile
@@ -371,7 +374,7 @@ Bool SrcFile_pop( SrcFile *self )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.2  2014/02/08 18:21:18  pauloscustodio
 * new line callback needs text read to pass on to listfile.c.

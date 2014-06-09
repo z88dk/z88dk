@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.107 2014-06-03 22:53:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.108 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.107 2014-06-03 22:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.107  2014-06-03 22:53:14  pauloscustodio
+* Revision 1.108  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.107  2014/06/03 22:53:14  pauloscustodio
 * Do not sort symbols before writing to object file. Not needed and
 * wastes time.
 *
@@ -71,7 +74,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.107 2014-06-03 22:5
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.96  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.95  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
@@ -221,7 +224,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.107 2014-06-03 22:5
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.71  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
@@ -1458,7 +1461,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, Byte, uint32_t
+	- Unified usage of integer types: int, char, Byte, UInt
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1777,7 +1780,7 @@ Based on 1.0.31
 		breaks on a 64-bit architecture. Make the functions return the value instead 
 		of being passed the pointer to the return value, so that the compiler
 		takes care of size convertions.
-		Create uint32_t, use uint32_t instead of size_t.
+		Create UInt, use UInt instead of size_t.
 		
 -------------------------------------------------------------------------------
 01.03.2014 [2.1.4] (pauloscustodio)
@@ -1984,7 +1987,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1c"
+#define VERSION     "2.3.1d"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

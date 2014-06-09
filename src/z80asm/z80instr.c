@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.76 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.77 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -1337,7 +1337,10 @@ RotShift_instr( int opcode )
 
 /*
 * $Log: z80instr.c,v $
-* Revision 1.76  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.77  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.76  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.
@@ -1356,7 +1359,7 @@ RotShift_instr( int opcode )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.71  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.70  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -1521,7 +1524,7 @@ RotShift_instr( int opcode )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.40  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -1556,7 +1559,7 @@ RotShift_instr( int opcode )
 *
 * Revision 1.33  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (uint32_t)
+* Replaced (unisigned int) by (UInt)
 * Replaced (short) by (int)
 *
 * Revision 1.32  2013/01/20 12:50:05  pauloscustodio

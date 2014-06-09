@@ -3,7 +3,7 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.11 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.12 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,7 +50,10 @@ typedef int Bool;
 
 /*
 * $Log: types.h,v $
-* Revision 1.11  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.12  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.11  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.10  2014/05/17 14:27:13  pauloscustodio
@@ -66,7 +69,7 @@ typedef int Bool;
 * Horrible workaround.
 *
 * Revision 1.6  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.5  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
@@ -78,7 +81,7 @@ typedef int Bool;
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
@@ -119,7 +122,7 @@ typedef int Bool;
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (uint32_t)
+* Replaced (unisigned int) by (UInt)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:10:32  pauloscustodio

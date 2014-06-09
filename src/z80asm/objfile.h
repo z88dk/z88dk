@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.26 2014-06-03 22:53:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.27 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -49,16 +49,16 @@ CLASS( OFile )
 	char	*filename;			/* object file name, in strpool */
 	char	*modname;			/* module name, in strpool */
 
-	int32_t	 origin;			/* ORG address, -1 if not defined */
+	Int		 origin;			/* ORG address, -1 if not defined */
 
 	/* all file pointers are -1 if not defined */
-	int32_t	 modname_ptr;		/* offset in file to Module Name */
-	int32_t	 expr_ptr;			/* offset if file to Expression Declaration */
-	int32_t	 symbols_ptr;		/* offset if file to Name Definition */
-	int32_t	 externsym_ptr;		/* offset if file to External Name Declaration */
-	int32_t	 code_ptr;			/* offset if file to Machine Code Block */
+	long	 modname_ptr;		/* offset in file to Module Name */
+	long	 expr_ptr;			/* offset if file to Expression Declaration */
+	long	 symbols_ptr;		/* offset if file to Name Definition */
+	long	 externsym_ptr;		/* offset if file to External Name Declaration */
+	long	 code_ptr;			/* offset if file to Machine Code Block */
 
-	uint32_t code_size;			/* size of code block */
+	UInt	 code_size;			/* size of code block */
 END_CLASS;	
 
 /*-----------------------------------------------------------------------------
@@ -99,7 +99,10 @@ extern Bool objmodule_loaded( char *src_filename, Module *module );
 
 /*
 * $Log: objfile.h,v $
-* Revision 1.26  2014-06-03 22:53:14  pauloscustodio
+* Revision 1.27  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.26  2014/06/03 22:53:14  pauloscustodio
 * Do not sort symbols before writing to object file. Not needed and
 * wastes time.
 *
@@ -138,7 +141,7 @@ extern Bool objmodule_loaded( char *src_filename, Module *module );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.15  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
@@ -185,7 +188,7 @@ extern Bool objmodule_loaded( char *src_filename, Module *module );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.11  2014/02/17 23:12:38  pauloscustodio
 * ws

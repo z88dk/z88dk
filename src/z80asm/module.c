@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.10 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.11 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,9 +31,12 @@ DEF_CLASS_HASH( Section, TRUE );
 
 void Section_init (Section *self)   
 {
-	self->section_name	= strpool_add("");		/* default: empty section */
+	self->section_name = "";		/* default: empty section */
 
-	self->bytes			= OBJ_NEW( ByteArray );
+	self->addr	= 0;
+	self->asmpc	= 0;
+
+	self->bytes	= OBJ_NEW( ByteArray );
 	OBJ_AUTODELETE( self->bytes ) = FALSE;
 }
 
@@ -55,8 +58,8 @@ DEF_CLASS_LIST( Module );
 
 void Module_init (Module *self)   
 {
-	self->start_offset	= get_codesize();
-	self->origin		= -1;
+	self->addr		= get_codesize();
+	self->origin	= -1;
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
 	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
@@ -103,7 +106,10 @@ void Module_set_section( Module *self, char *section_name )
 
 /* 
 * $Log: module.c,v $
-* Revision 1.10  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.11  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.10  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.9  2014/05/25 01:02:29  pauloscustodio
@@ -114,7 +120,7 @@ void Module_set_section( Module *self, char *section_name )
 * Move module expressions to the Section structure.
 *
 * Revision 1.7  2014/05/17 23:08:03  pauloscustodio
-* Change origin to int32_t, use -1 to signal as not defined
+* Change origin to Int, use -1 to signal as not defined
 *
 * Revision 1.6  2014/05/02 23:35:19  pauloscustodio
 * Rename startoffset, add constant for NO_ORIGIN

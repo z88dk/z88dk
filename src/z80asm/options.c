@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.88 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.89 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -440,12 +440,12 @@ static void option_make_updated_bin( void )
 
 static void option_origin( char *origin_hex )
 {
-    int32_t origin = strtol( origin_hex, NULL, 16 );
+    Int origin = strtol( origin_hex, NULL, 16 );
 
     if ( origin < 0 || origin > 0xFFFF )
         error_int_range( origin );
 
-    opts.origin = (int32_t) origin;
+    opts.origin = origin;
 }
 
 static void option_define( char *symbol )
@@ -569,7 +569,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /*
 * $Log: options.c,v $
-* Revision 1.88  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.89  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.88  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.87  2014/05/19 22:15:54  pauloscustodio
@@ -577,7 +580,7 @@ char *get_segbin_filename( char *filename, int segment )
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
 * Revision 1.86  2014/05/17 23:08:03  pauloscustodio
-* Change origin to int32_t, use -1 to signal as not defined
+* Change origin to Int, use -1 to signal as not defined
 *
 * Revision 1.85  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types
@@ -590,7 +593,7 @@ char *get_segbin_filename( char *filename, int segment )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.82  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.81  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
@@ -652,7 +655,7 @@ char *get_segbin_filename( char *filename, int segment )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.74  2014/02/09 10:10:25  pauloscustodio
 * Rename internal functions.

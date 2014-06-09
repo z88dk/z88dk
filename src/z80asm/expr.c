@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.17 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.18 2014-06-09 13:15:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -410,7 +410,7 @@ static Bool Expr_parse_ternary_cond( Expr *expr );
 static Bool Expr_parse_factor( Expr *self )
 {
     Symbol  *symptr;
-	uint32_t asmpc;
+	UInt	 asmpc;
 
     switch ( tok )
     {
@@ -711,7 +711,10 @@ long expr_parse_eval_if( void )
 
 /*
 * $Log: expr.c,v $
-* Revision 1.17  2014-06-01 22:16:50  pauloscustodio
+* Revision 1.18  2014-06-09 13:15:25  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.17  2014/06/01 22:16:50  pauloscustodio
 * Write expressions to object file only in pass 2, to remove dupplicate code
 * and allow simplification of object file writing code. All expression
 * error messages are now output only during pass 2.
@@ -729,7 +732,7 @@ long expr_parse_eval_if( void )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.12  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.11  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:

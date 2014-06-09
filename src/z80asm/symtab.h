@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.22 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.23 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -103,7 +103,10 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 
 /*
 * $Log: symtab.h,v $
-* Revision 1.22  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.23  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.22  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.21  2014/05/20 22:26:29  pauloscustodio
@@ -123,7 +126,7 @@ extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.17  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.16  2014/04/27 09:08:15  pauloscustodio
 * comments

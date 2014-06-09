@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.25 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.26 2014-06-09 13:15:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,53 +32,56 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.25 2014-05-25 0
 *	next_PC() moves to the next opcode
 *	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
-extern void     set_PC( uint32_t n );
-extern uint32_t next_PC( void );
-extern uint32_t get_PC( void );
-extern uint32_t get_opcode_size( void );
+extern void set_PC( UInt n );
+extern UInt next_PC( void );
+extern UInt get_PC( void );
+extern UInt get_opcode_size( void );
 
 /*-----------------------------------------------------------------------------
 *   reset the code area, return current size
 *----------------------------------------------------------------------------*/
-extern void     reset_codearea( void );			/* set code area to zeros */
-extern uint32_t get_codeindex( void );			/* return number of bytes appended */
+extern void reset_codearea( void );			/* set code area to zeros */
+extern UInt get_codeindex( void );			/* return number of bytes appended */
 
-extern uint32_t get_codesize( void );			/* size of all modules before current,
-                                                   i.e. base address of current module */
-extern uint32_t inc_codesize( uint32_t n );		/* increment loaded codesize */
+extern UInt get_codesize( void );			/* size of all modules before current,
+                                               i.e. base address of current module */
+extern UInt inc_codesize( UInt n );			/* increment loaded codesize */
 
 /*-----------------------------------------------------------------------------
 *   write code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea( FILE *stream );
-extern void fwrite_codearea_chunk( FILE *stream, uint32_t addr, uint32_t size );
-extern void fread_codearea( FILE *stream, uint32_t size );		/* append to codearea */
-extern void fread_codearea_offset( FILE *stream, uint32_t offset, uint32_t size );  /* read to codearea at offset */
+extern void fwrite_codearea_chunk( FILE *stream, UInt addr, UInt size );
+extern void fread_codearea( FILE *stream, UInt size );		/* append to codearea */
+extern void fread_codearea_offset( FILE *stream, UInt offset, UInt size );  /* read to codearea at offset */
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_byte( uint32_t *paddr, Byte byte1 );		/* one byte */
+extern void  patch_byte( UInt *paddr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
 
-extern void  patch_word( uint32_t *paddr, int word );		/* 2-byte word */
+extern void  patch_word( UInt *paddr, int word );		/* 2-byte word */
 extern void append_word( int word );
 
-extern void  patch_long( uint32_t *paddr, long dword );		/* 4-byte long */
+extern void  patch_long( UInt *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
 /*-----------------------------------------------------------------------------
 *   get a byte at the given address
 *	the patch address is incremented after fetch
 *----------------------------------------------------------------------------*/
-extern Byte get_byte( uint32_t *paddr );
+extern Byte get_byte( UInt *paddr );
 
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.25  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.26  2014-06-09 13:15:25  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.25  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.24  2014/05/17 14:27:12  pauloscustodio
@@ -88,7 +91,7 @@ extern Byte get_byte( uint32_t *paddr );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.22  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.21  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
@@ -142,7 +145,7 @@ extern Byte get_byte( uint32_t *paddr );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.15  2014/02/11 15:10:10  pauloscustodio
 * ws
@@ -174,7 +177,7 @@ extern Byte get_byte( uint32_t *paddr );
 *
 * Revision 1.7  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (uint32_t)
+* Replaced (unisigned int) by (UInt)
 * Replaced (short) by (int)
 *
 * Revision 1.6  2013/01/20 21:24:28  pauloscustodio

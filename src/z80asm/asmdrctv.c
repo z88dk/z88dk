@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.98 2014-06-01 22:16:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.99 2014-06-09 13:15:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -50,7 +50,7 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern uint32_t DEFVPC;
+extern UInt DEFVPC;
 
 
 int
@@ -198,7 +198,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = (uint32_t)offset;
+            DEFVPC = (UInt)offset;
             globaldefv = ON;
         }
         else
@@ -244,7 +244,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = (uint32_t)offset;
+            DEFVPC = (UInt)offset;
         }
     }
 }
@@ -779,7 +779,10 @@ DeclModuleName( void )
 
 /*
  * $Log: asmdrctv.c,v $
- * Revision 1.98  2014-06-01 22:16:50  pauloscustodio
+ * Revision 1.99  2014-06-09 13:15:25  pauloscustodio
+ * Int and UInt types
+ *
+ * Revision 1.98  2014/06/01 22:16:50  pauloscustodio
  * Write expressions to object file only in pass 2, to remove dupplicate code
  * and allow simplification of object file writing code. All expression
  * error messages are now output only during pass 2.
@@ -801,7 +804,7 @@ DeclModuleName( void )
  * Fix memory leak
  *
  * Revision 1.92  2014/05/02 21:34:58  pauloscustodio
- * byte_t and uint_t renamed to Byte, uint32_t
+ * byte_t and uint_t renamed to Byte, UInt
  *
  * Revision 1.91  2014/05/02 20:24:38  pauloscustodio
  * New class Module to replace struct module and struct modules
@@ -940,7 +943,7 @@ DeclModuleName( void )
  * breaks on a 64-bit architecture. Make the functions return the value instead
  * of being passed the pointer to the return value, so that the compiler
  * takes care of size convertions.
- * Create uint32_t, use uint32_t instead of size_t.
+ * Create UInt, use UInt instead of size_t.
  *
  * Revision 1.67  2014/02/08 11:21:08  pauloscustodio
  * Moved srcfile.c to lib/
@@ -1068,7 +1071,7 @@ DeclModuleName( void )
  *
  * Revision 1.37  2013/01/24 23:03:03  pauloscustodio
  * Replaced (unsigned char) by (Byte)
- * Replaced (unisigned int) by (uint32_t)
+ * Replaced (unisigned int) by (UInt)
  * Replaced (short) by (int)
  *
  * Revision 1.36  2013/01/20 21:24:28  pauloscustodio

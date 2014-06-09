@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.16 2014-05-25 12:55:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.17 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,7 +34,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.16 2014-05-25 12:
 *----------------------------------------------------------------------------*/
 CLASS( Section )
 	char		*section_name;		/* name of section, kept in strpool */
-	uint32_t	 addr;				/* start address of this section */
+	UInt		 addr;				/* start address of this section */
+	UInt		 asmpc;				/* address of current opcode */
 	ByteArray	*bytes;				/* binary code of section */
 END_CLASS;
 
@@ -44,11 +45,11 @@ CLASS_HASH( Section );
 *   Assembly module
 *----------------------------------------------------------------------------*/
 CLASS( Module )
-	char		*modname;			/* module name, kept in strpool*/
+	char		*modname;			/* module name, kept in strpool */
 	char		*filename;			/* source file name, kept in strpool */
-    uint32_t	 start_offset;		/* this module's start offset from start of code buffer */
-    int32_t		 origin;			/* ORG address of module, -1 if not defined */
-    ExprList	 *exprs;			/* list of section expressions */
+    UInt		 addr;				/* this module's start offset from start of code buffer */
+    Int			 origin;			/* ORG address of module, -1 if not defined */
+    ExprList	 *exprs;			/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
 	SectionHash *sections;			/* list of sections defined in the code,
 									   indexed also by section name */
@@ -67,7 +68,10 @@ extern void Module_set_section( Module *self, char *section_name );
 
 /*
 * $Log: module.h,v $
-* Revision 1.16  2014-05-25 12:55:03  pauloscustodio
+* Revision 1.17  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.16  2014/05/25 12:55:03  pauloscustodio
 * Link expressions to the section they refer to.
 *
 * Revision 1.15  2014/05/25 01:02:29  pauloscustodio
@@ -78,7 +82,7 @@ extern void Module_set_section( Module *self, char *section_name );
 * Move module expressions to the Section structure.
 *
 * Revision 1.13  2014/05/17 23:08:03  pauloscustodio
-* Change origin to int32_t, use -1 to signal as not defined
+* Change origin to Int, use -1 to signal as not defined
 *
 * Revision 1.12  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types
@@ -90,7 +94,7 @@ extern void Module_set_section( Module *self, char *section_name );
 * Rename startoffset, add constant for NO_ORIGIN
 *
 * Revision 1.9  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.8  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

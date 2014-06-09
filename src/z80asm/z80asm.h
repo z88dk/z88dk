@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.62 2014-06-02 22:29:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.63 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -61,7 +61,10 @@ extern Bool Pass2info( int range, long lfileptr );
 
 /*
 * $Log: z80asm.h,v $
-* Revision 1.62  2014-06-02 22:29:14  pauloscustodio
+* Revision 1.63  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.62  2014/06/02 22:29:14  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.
@@ -98,7 +101,7 @@ extern Bool Pass2info( int range, long lfileptr );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.53  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.52  2014/05/02 20:24:39  pauloscustodio
 * New class Module to replace struct module and struct modules
@@ -190,7 +193,7 @@ extern Bool Pass2info( int range, long lfileptr );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.40  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

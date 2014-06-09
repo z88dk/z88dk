@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.34 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.35 2014-06-09 13:15:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,14 +33,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.34 2014-05-25 0
 /*-----------------------------------------------------------------------------
 *   global data
 *----------------------------------------------------------------------------*/
-static char		*codearea;			/* machine code block */
-static uint32_t  codeindex;			/* point to current address of codearea */
-static uint32_t  codesize;			/* size of all modules before current,
-									   i.e. base address of current module
-									   BUG_0015 */
-static uint32_t  g_PC;				/* Program Counter */
-static uint32_t  g_opcode_size;		/* Number of bytes added after last 
-									   set_PC() or next_PC() */
+static char	*codearea;			/* machine code block */
+static UInt  codeindex;			/* point to current address of codearea */
+static UInt  codesize;			/* size of all modules before current,
+								   i.e. base address of current module
+								   BUG_0015 */
+static UInt  g_PC;				/* Program Counter */
+static UInt  g_opcode_size;		/* Number of bytes added after last 
+								   set_PC() or next_PC() */
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
@@ -66,30 +66,30 @@ DEFINE_fini()
 *	next_PC() moves to the next opcode
 *	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
-void set_PC( uint32_t n )
+void set_PC( UInt n )
 {
 	g_PC = n;
 	g_opcode_size = 0;
 }
 
-uint32_t next_PC( void )
+UInt next_PC( void )
 {
 	g_PC += g_opcode_size;
 	g_opcode_size = 0;
 	return g_PC;
 }
 
-uint32_t get_PC( void )
+UInt get_PC( void )
 {
 	return g_PC;
 }
 
-uint32_t get_opcode_size( void )
+UInt get_opcode_size( void )
 {
 	return g_opcode_size;
 }
 
-static void inc_PC( uint32_t n )
+static void inc_PC( UInt n )
 {
     g_opcode_size += n;
 }
@@ -105,25 +105,25 @@ void reset_codearea( void )
     memset( codearea, 0, MAXCODESIZE );
 }
 
-uint32_t get_codeindex( void ) /* BUG_0015 */
+UInt get_codeindex( void ) /* BUG_0015 */
 {
     init();
     return codeindex;
 }
 
-uint32_t get_codesize( void ) /* BUG_0015 */
+UInt get_codesize( void ) /* BUG_0015 */
 {
     init();
     return codesize;
 }
 
-uint32_t inc_codesize( uint32_t n ) /* BUG_0015 */
+UInt inc_codesize( UInt n ) /* BUG_0015 */
 {
     init();
     return codesize += n;
 }
 
-static void check_space( uint32_t addr, uint32_t n )
+static void check_space( UInt addr, UInt n )
 {
     if ( addr + n > MAXCODESIZE )
     {
@@ -140,7 +140,7 @@ void fwrite_codearea( FILE *stream )
     xfput_chars( stream, codearea, codeindex );
 }
 
-void fwrite_codearea_chunk( FILE *stream, uint32_t addr, uint32_t size )
+void fwrite_codearea_chunk( FILE *stream, UInt addr, UInt size )
 {
     init();
 
@@ -156,7 +156,7 @@ void fwrite_codearea_chunk( FILE *stream, uint32_t addr, uint32_t size )
 }
 
 /* append data read from file to the current code area */
-void fread_codearea( FILE *stream, uint32_t size )
+void fread_codearea( FILE *stream, UInt size )
 {
     init();
     check_space( codeindex, size );
@@ -166,7 +166,7 @@ void fread_codearea( FILE *stream, uint32_t size )
 }
 
 /* read to codearea at offset - BUG_0015 */
-void fread_codearea_offset( FILE *stream, uint32_t offset, uint32_t size )
+void fread_codearea_offset( FILE *stream, UInt offset, UInt size )
 {
     init();
     check_space( offset, size );
@@ -182,7 +182,7 @@ void fread_codearea_offset( FILE *stream, uint32_t offset, uint32_t size )
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte( uint32_t *paddr, Byte byte1 )
+void patch_byte( UInt *paddr, Byte byte1 )
 {
     init();
     check_space( *paddr, 1 );
@@ -203,7 +203,7 @@ void append_2bytes( Byte byte1, Byte byte2 )
 	append_byte( byte2 );
 }
 
-void patch_word( uint32_t *paddr, int word )
+void patch_word( UInt *paddr, int word )
 {
     init();
     check_space( *paddr, 2 );
@@ -221,7 +221,7 @@ void append_word( int word )
 	inc_PC( 2 );
 }
 
-void patch_long( uint32_t *paddr, long dword )
+void patch_long( UInt *paddr, long dword )
 {
     init();
     check_space( *paddr, 4 );
@@ -243,7 +243,7 @@ void append_long( long dword )
 	inc_PC( 4 );
 }
 
-Byte get_byte( uint32_t *paddr )
+Byte get_byte( UInt *paddr )
 {
     Byte byte1;
 
@@ -256,7 +256,10 @@ Byte get_byte( uint32_t *paddr )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.34  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.35  2014-06-09 13:15:25  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.34  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.33  2014/05/17 14:27:12  pauloscustodio
@@ -270,7 +273,7 @@ Byte get_byte( uint32_t *paddr )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.30  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.29  2014/04/22 23:52:55  pauloscustodio
 * As inc_PC() is no longer needed, append_opcode() no longer makes sense.
@@ -324,7 +327,7 @@ Byte get_byte( uint32_t *paddr )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.23  2014/01/20 23:29:17  pauloscustodio
 * Moved file.c to lib/fileutil.c
@@ -382,7 +385,7 @@ Byte get_byte( uint32_t *paddr )
 *
 * Revision 1.9  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (uint32_t)
+* Replaced (unisigned int) by (UInt)
 * Replaced (short) by (int)
 *
 * Revision 1.8  2013/01/20 21:24:28  pauloscustodio

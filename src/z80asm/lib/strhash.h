@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.12 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.h,v 1.13 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -77,7 +77,10 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 /*
 * $Log: strhash.h,v $
-* Revision 1.12  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.13  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.12  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.11  2014/05/17 14:27:13  pauloscustodio
@@ -87,7 +90,7 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.9  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.8  2014/04/05 14:37:54  pauloscustodio
 * Added ignore_case attribute to allow case-insensitive string hashes
@@ -105,7 +108,7 @@ extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.4  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

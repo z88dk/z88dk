@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.23 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.24 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -248,7 +248,7 @@ void list_close( Bool keep_file )
 /*-----------------------------------------------------------------------------
 *	start output of list line
 *----------------------------------------------------------------------------*/
-void ListFile_start_line( ListFile *self, uint32_t address,
+void ListFile_start_line( ListFile *self, UInt address,
                           char *source_file, int source_line_nr, char *line )
 {
     if ( self->file != NULL && ! self->source_list_ended )
@@ -275,7 +275,7 @@ void ListFile_start_line( ListFile *self, uint32_t address,
     }
 }
 
-void list_start_line( uint32_t address,
+void list_start_line( UInt address,
                       char *source_file, int source_line_nr, char *line )
 {
     if ( the_list != NULL )
@@ -580,7 +580,10 @@ int list_get_page_nr( void )
 
 /*
 * $Log: listfile.c,v $
-* Revision 1.23  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.24  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.23  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.22  2014/05/20 22:27:47  pauloscustodio
@@ -593,7 +596,7 @@ int list_get_page_nr( void )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.19  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.18  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS
@@ -612,7 +615,7 @@ int list_get_page_nr( void )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.15  2014/02/03 21:50:03  pauloscustodio
 * ws

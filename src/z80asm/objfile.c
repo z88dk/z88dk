@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.32 2014-06-03 22:53:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.33 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,7 +31,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.32 2014-06-03 22
 #include "legacy.h"
 
 #include <assert.h>
-#include <sys/stat.h>
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -263,7 +262,7 @@ DEF_CLASS( OFile );
 
 void OFile_init( OFile *self )
 {
-	self->origin = 
+	self->origin = -1;
 	self->modname_ptr = 
 	self->expr_ptr = 
 	self->symbols_ptr =
@@ -471,7 +470,10 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.32  2014-06-03 22:53:14  pauloscustodio
+* Revision 1.33  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.32  2014/06/03 22:53:14  pauloscustodio
 * Do not sort symbols before writing to object file. Not needed and
 * wastes time.
 *
@@ -495,7 +497,7 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 * logic error in test for library
 *
 * Revision 1.26  2014/05/17 23:08:03  pauloscustodio
-* Change origin to int32_t, use -1 to signal as not defined
+* Change origin to Int, use -1 to signal as not defined
 *
 * Revision 1.25  2014/05/17 22:42:25  pauloscustodio
 * Move load_module_object() that loads object file size when assembling
@@ -508,7 +510,7 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.22  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.21  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:
@@ -555,7 +557,7 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.17  2014/01/23 22:30:55  pauloscustodio
 * Use xfclose() instead of fclose() to detect file write errors during buffer flush called

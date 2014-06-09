@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.40 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.41 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ OPT_VAR( Bool,		code_seg,	FALSE	)
 OPT_VAR( Bool,		relocatable, FALSE	)
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
-OPT_VAR( int32_t,	origin,		-1	)		/* -1 == not defined */
+OPT_VAR( Int,		origin,		-1	)		/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	asm_ext,	( FILEEXT_ASM ) + 1 )	/* skip "." */
@@ -188,7 +188,10 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.40  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.41  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.40  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.39  2014/05/19 22:15:54  pauloscustodio
@@ -196,7 +199,7 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 * Move CreateLibfile() to libfile.c, rename to search_libfile()
 *
 * Revision 1.38  2014/05/17 23:08:03  pauloscustodio
-* Change origin to int32_t, use -1 to signal as not defined
+* Change origin to Int, use -1 to signal as not defined
 *
 * Revision 1.37  2014/05/17 14:27:12  pauloscustodio
 * Use C99 integer types

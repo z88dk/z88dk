@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.20 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.21 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -88,7 +88,10 @@ char *Symbol_fullname( Symbol *sym )
 
 /*
 * $Log: sym.c,v $
-* Revision 1.20  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.21  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.20  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.19  2014/05/17 14:27:13  pauloscustodio
@@ -98,7 +101,7 @@ char *Symbol_fullname( Symbol *sym )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.17  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.16  2014/05/02 20:24:38  pauloscustodio
 * New class Module to replace struct module and struct modules

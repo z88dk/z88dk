@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.19 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.20 2014-06-09 13:15:26 pauloscustodio Exp $
 
 */
 
@@ -49,7 +49,7 @@ CLASS( ListFile )
 	/* current line being output */
 	Bool		 line_started;			/* true if a line was started but not ended */
 	long		 start_line_pos;		/* ftell() position at start of next list line */
-	uint32_t	 address;				/* address of start of line */
+	UInt	 address;				/* address of start of line */
 	Str			*bytes;					/* list of bytes output for this line */
 
 	char		*source_file;			/* source file, kept in strpool */
@@ -73,7 +73,7 @@ extern void ListFile_close( ListFile *self, Bool keep_file );
    2.1. append bytes, words, longs
    2.2. collect patch position in list file for expressions
    3. output the full line */
-extern void ListFile_start_line( ListFile *self, uint32_t address,
+extern void ListFile_start_line( ListFile *self, UInt address,
                                  char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
 extern void ListFile_append_byte( ListFile *self, Byte byte1 );
@@ -105,7 +105,7 @@ extern int ListFile_get_page_nr( ListFile *self );
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
 extern void list_close( Bool keep_file );
-extern void list_start_line( uint32_t address,
+extern void list_start_line( UInt address,
                              char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
 extern void list_append_byte( Byte byte1 );
@@ -122,7 +122,10 @@ extern int  list_get_page_nr( void );
 
 /*
 * $Log: listfile.h,v $
-* Revision 1.19  2014-05-25 01:02:29  pauloscustodio
+* Revision 1.20  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.19  2014/05/25 01:02:29  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.18  2014/05/17 14:27:12  pauloscustodio
@@ -132,7 +135,7 @@ extern int  list_get_page_nr( void );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.15  2014/04/15 20:06:43  pauloscustodio
 * Solve warning: no newline at end of file
@@ -147,7 +150,7 @@ extern int  list_get_page_nr( void );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.12  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.

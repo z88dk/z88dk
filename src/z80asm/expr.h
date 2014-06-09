@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.22 2014-06-02 22:29:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.23 2014-06-09 13:15:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -97,8 +97,8 @@ CLASS( Expr )
 	Byte		 expr_type;		/* range type of evaluated expression */
 
 	struct Section *section;	/* section where expression is patched (weak ref) */
-	uint32_t	 asmpc;			/* ASMPC value during linking */
-    uint32_t	 code_pos;		/* Address to patch expression value */
+	UInt		 asmpc;			/* ASMPC value during linking */
+    UInt		 code_pos;		/* Address to patch expression value */
 
 	char		*filename;		/* file and line where expression defined, string in strpool */
     int			 line_nr;		/* source line */
@@ -143,7 +143,10 @@ extern Bool ExprLong( int listoffset );
 
 /*
 * $Log: expr.h,v $
-* Revision 1.22  2014-06-02 22:29:13  pauloscustodio
+* Revision 1.23  2014-06-09 13:15:26  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.22  2014/06/02 22:29:13  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.
@@ -172,7 +175,7 @@ extern Bool ExprLong( int listoffset );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.14  2014/04/22 23:32:42  pauloscustodio
 * Release 2.2.0 with major fixes:

@@ -3,7 +3,7 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.18 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.h,v 1.19 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #pragma once
@@ -137,7 +137,10 @@ extern Bool Str_getline( Str *self, FILE *fp );
 
 /*
 * $Log: strutil.h,v $
-* Revision 1.18  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.19  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.18  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.17  2014/05/17 14:27:13  pauloscustodio
@@ -147,7 +150,7 @@ extern Bool Str_getline( Str *self, FILE *fp );
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.14  2014/04/19 14:57:37  pauloscustodio
 * BUG_0046: Expressions stored in object file with wrong values in MacOS
@@ -177,7 +180,7 @@ extern Bool Str_getline( Str *self, FILE *fp );
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.8  2014/01/21 21:31:52  pauloscustodio
 * ws

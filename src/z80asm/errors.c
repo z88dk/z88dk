@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.46 2014-06-02 22:29:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.47 2014-06-09 13:15:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -295,7 +295,10 @@ static void fatal_file_error( char *filename, Bool writing )
 
 /*
 * $Log: errors.c,v $
-* Revision 1.46  2014-06-02 22:29:13  pauloscustodio
+* Revision 1.47  2014-06-09 13:15:25  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.46  2014/06/02 22:29:13  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.
@@ -315,7 +318,7 @@ static void fatal_file_error( char *filename, Bool writing )
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.41  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.40  2014/03/05 23:44:55  pauloscustodio
 * Renamed 64-bit portability to BUG_0042
@@ -330,7 +333,7 @@ static void fatal_file_error( char *filename, Bool writing )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.37  2014/02/08 18:30:49  pauloscustodio
 * lib/srcfile.c to read source files and handle recursive includes,

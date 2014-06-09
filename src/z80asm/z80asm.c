@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.175 2014-06-02 22:29:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.176 2014-06-09 13:15:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -71,7 +71,7 @@ size_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
 
-uint32_t DEFVPC;          /* DEFVARS address counter */
+UInt DEFVPC;          /* DEFVARS address counter */
 
 struct liblist *libraryhdr;
 
@@ -400,7 +400,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.175  2014-06-02 22:29:14  pauloscustodio
+* Revision 1.176  2014-06-09 13:15:27  pauloscustodio
+* Int and UInt types
+*
+* Revision 1.175  2014/06/02 22:29:14  pauloscustodio
 * Write object file in one go at the end of pass 2, instead of writing
 * parts during pass 1 assembly. This allows the object file format to be
 * changed more easily, to allow sections in a near future.
@@ -449,7 +452,7 @@ createsym( Symbol *symptr )
 * comment
 *
 * Revision 1.163  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, uint32_t
+* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.162  2014/05/02 21:00:50  pauloscustodio
 * Hide module list, expose only iterators on CURRENTMODULE
@@ -588,7 +591,7 @@ createsym( Symbol *symptr )
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create uint32_t, use uint32_t instead of size_t.
+* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.137  2014/02/11 15:27:19  pauloscustodio
 * Removed Bison parser files (which where a very incomplete work in progress).
@@ -898,7 +901,7 @@ createsym( Symbol *symptr )
 *
 * Revision 1.66  2013/01/24 23:03:03  pauloscustodio
 * Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (uint32_t)
+* Replaced (unisigned int) by (UInt)
 * Replaced (short) by (int)
 *
 * Revision 1.65  2013/01/20 21:24:28  pauloscustodio
