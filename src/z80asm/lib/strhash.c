@@ -6,7 +6,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.12 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.13 2014-06-10 19:07:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -64,17 +64,13 @@ void StrHash_remove_all( StrHash *self )
 /*-----------------------------------------------------------------------------
 *	Upper-case a key if hash has ignore_case on, return address of key
 *	keeps input unmodified.
-*	NOTE: not reentrant
 *----------------------------------------------------------------------------*/
 static char *StrHash_norm_key( StrHash *self, char *key )
 {
-	static Str *KEY;			/* static object to keep upper case key */
+	DEFINE_STR( KEY, MAXLINE );
 	
 	if ( self->ignore_case )
 	{
-		INIT_OBJ( Str, &KEY );	/* init before first use, will be reclaimed 
-								   by class.c */
-								   
 		Str_set( KEY, key );
 		return strtoupper( KEY->str );
 	}
@@ -231,7 +227,10 @@ void StrHash_sort( StrHash *self, StrHash_compare_func compare )
 
 /*
 * $Log: strhash.c,v $
-* Revision 1.12  2014-06-09 13:15:27  pauloscustodio
+* Revision 1.13  2014-06-10 19:07:50  pauloscustodio
+* Make StrHash_norm_key reentrant
+*
+* Revision 1.12  2014/06/09 13:15:27  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.11  2014/05/25 01:02:30  pauloscustodio
