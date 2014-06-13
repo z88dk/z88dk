@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.18 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.19 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,22 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.18 2014-06-09 13:
 #include "class.h"
 #include "classlist.h"
 #include "classhash.h"
+#include "codearea.h"
 #include "expr.h"
 #include "strutil.h"
 #include "symtab.h"
 #include "types.h"
-
-/*-----------------------------------------------------------------------------
-*   Named Section of code, introduced by "SECTION" keyword
-*----------------------------------------------------------------------------*/
-CLASS( Section )
-	char		*section_name;		/* name of section, kept in strpool */
-	UInt		 addr;				/* start address of this section */
-	UInt		 asmpc;				/* address of current opcode */
-	ByteArray	*bytes;				/* binary code of section */
-END_CLASS;
-
-CLASS_HASH( Section );
 
 /*-----------------------------------------------------------------------------
 *   Assembly module
@@ -51,24 +40,16 @@ CLASS( Module )
     Int			 origin;			/* ORG address of module, -1 if not defined */
     ExprList	 *exprs;			/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
-	SectionHash *sections;			/* list of sections defined in the code,
-									   indexed also by section name */
-	Section		*cur_section;		/* point to current section */
 END_CLASS;
 
 CLASS_LIST( Module );
 
-/*-----------------------------------------------------------------------------
-*   Module API
-*----------------------------------------------------------------------------*/
-
-/* define the current section, create a new one if not defined */
-extern void Module_set_section( Module *self, char *section_name );
-
-
 /*
 * $Log: module.h,v $
-* Revision 1.18  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.19  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.18  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.17  2014/06/09 13:15:26  pauloscustodio

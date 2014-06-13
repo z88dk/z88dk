@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.177 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.178 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,6 +29,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.177 2014-06-09 13
 #include "libfile.h"
 #include "listfile.h"
 #include "mapfile.h"
+#include "modlink.h"
 #include "objfile.h"
 #include "options.h"
 #include "scan.h"
@@ -45,7 +46,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.177 2014-06-09 13
 
 /* external functions */
 void Z80pass2( void );
-void LinkModules( void );
 void DeclModuleName( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
@@ -321,7 +321,6 @@ ReleaseLibraries( void )
 }
 
 
-
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
@@ -346,7 +345,7 @@ int main( int argc, char *argv[] )
             make_library( opts.lib_file, opts.files );
 
         if ( ! get_num_errors() && opts.make_bin )
-            LinkModules();
+            link_modules();
 
         if ( ! get_num_errors() && opts.make_bin )
         {
@@ -400,7 +399,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.177  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.178  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.177  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.176  2014/06/09 13:15:27  pauloscustodio

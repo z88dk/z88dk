@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.125 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.126 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -24,6 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.125 2014-06-09 1
 #include "expr.h"
 #include "fileutil.h"
 #include "listfile.h"
+#include "modlink.h"
 #include "options.h"
 #include "scan.h"
 #include "strpool.h"
@@ -49,7 +50,6 @@ int SearchLibfile( struct libfile *curlib, char *modname );
 char *ReadName( FILE *file );
 void redefinedmsg( void );
 void SearchLibraries( char *modname );
-void LinkModules( void );
 void ModuleExpr( void );
 void CreateBinFile( void );
 void ReadNames( char *filename, FILE *file, long nextname, long endnames );
@@ -240,8 +240,7 @@ ReadExpr( FILE *file )
 
 
 
-void
-LinkModules( void )
+void link_modules( void )
 {
     char fheader[9];
     Int origin;
@@ -857,7 +856,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.125  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.126  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.125  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.124  2014/06/09 13:15:26  pauloscustodio
@@ -1342,7 +1344,7 @@ ReleaseLinkInfo( void )
 * Upgrade to Exceptions4c 2.8.9 to solve memory leak.
 *
 * Revision 1.22  2011/08/14 19:42:07  pauloscustodio
-* - LinkModules(), ModuleExpr(), CreateBinFile(), CreateLib(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN
+* - link_modules(), ModuleExpr(), CreateBinFile(), CreateLib(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN
 *
 * Revision 1.21  2011/08/05 19:56:37  pauloscustodio
 * CH_0004 : Exception mechanism to handle fatal errors

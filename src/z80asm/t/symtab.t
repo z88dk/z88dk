@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.18 2014-06-09 13:30:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.19 2014-06-13 16:00:46 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -257,16 +257,17 @@ t_binary(read_binfile(bin_file()), "\x01\x02\x03");
 # White box tests
 #------------------------------------------------------------------------------
 
-my $objs = "sym.o symtab.o symref.o lib/array.o lib/class.o lib/strhash.o errors.o lib/strutil.o lib/list.o lib/fileutil.o options.o model.o lib/srcfile.o hist.o scan.o module.o expr.o";
+my $objs = "sym.o symtab.o symref.o codearea.o errors.o options.o model.o ".
+		   "hist.o scan.o module.o expr.o ".
+		   "lib/array.o lib/class.o lib/strhash.o lib/strutil.o lib/list.o ".
+		   "lib/fileutil.o lib/srcfile.o";
 
 my $init = <<'END';
-size_t get_PC( void ) { return 0; }
-size_t get_codesize( void ) { return 0; }
-size_t get_codeindex( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
 {	
 	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
 }
+void list_append( long value, int num_bytes ) {}
 
 int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
@@ -569,7 +570,10 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.18  2014-06-09 13:30:28  pauloscustodio
+# Revision 1.19  2014-06-13 16:00:46  pauloscustodio
+# Extended codearea.c to support different sections of code.
+#
+# Revision 1.18  2014/06/09 13:30:28  pauloscustodio
 # Rename current module abrev
 #
 # Revision 1.17  2014/06/01 22:16:50  pauloscustodio

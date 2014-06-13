@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.12 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.13 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,33 +22,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.12 2014-06-09 13:
 #include "codearea.h"
 #include "module.h"
 #include "strpool.h"
-
-/*-----------------------------------------------------------------------------
-*   Named Section of code, introduced by "SECTION" keyword
-*----------------------------------------------------------------------------*/
-DEF_CLASS( Section );
-DEF_CLASS_HASH( Section, TRUE );
-
-void Section_init (Section *self)   
-{
-	self->section_name = "";		/* default: empty section */
-
-	self->addr	= 0;
-	self->asmpc	= 0;
-
-	self->bytes	= OBJ_NEW( ByteArray );
-	OBJ_AUTODELETE( self->bytes ) = FALSE;
-}
-
-void Section_copy (Section *self, Section *other)	
-{ 
-	self->bytes = ByteArray_clone( other->bytes );
-}
-
-void Section_fini (Section *self)
-{
-	OBJ_DELETE( self->bytes );
-}
 
 /*-----------------------------------------------------------------------------
 *   Assembly module
@@ -66,47 +39,26 @@ void Module_init (Module *self)
 
 	self->exprs			= OBJ_NEW( ExprList );
 	OBJ_AUTODELETE( self->exprs ) = FALSE;
-
-	self->sections		= OBJ_NEW( SectionHash );
-	OBJ_AUTODELETE( self->sections ) = FALSE;
-
-	Module_set_section( self, "");			/* define default section */
 }
 
 void Module_copy (Module *self, Module *other)	
 { 
 	self->exprs = ExprList_clone( other->exprs ); 
 	self->local_symtab = SymbolHash_clone( other->local_symtab );
-	self->sections = SectionHash_clone( other->sections );
-
-	/* set the same default section */
-	Module_set_section( self, other->cur_section->section_name );	
 }
 
 void Module_fini (Module *self)
 { 
 	OBJ_DELETE( self->exprs);
 	OBJ_DELETE( self->local_symtab );
-	OBJ_DELETE( self->sections );
-}
-
-/*-----------------------------------------------------------------------------
-*   define the current section, create a new one if not defined
-*----------------------------------------------------------------------------*/
-void Module_set_section( Module *self, char *section_name )
-{
-	self->cur_section = SectionHash_get( self->sections, section_name );
-	if ( self->cur_section == NULL )
-	{
-		self->cur_section = OBJ_NEW( Section );
-		self->cur_section->section_name = strpool_add( section_name );
-		SectionHash_set( & self->sections, section_name, self->cur_section );
-	}
 }
 
 /* 
 * $Log: module.c,v $
-* Revision 1.12  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.13  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.12  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.11  2014/06/09 13:15:26  pauloscustodio

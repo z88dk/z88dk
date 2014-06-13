@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.33 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.34 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -183,7 +183,7 @@ static long write_code( FILE *fp, Module *module )
 {
 	long code_ptr, code_size;
 	
-	code_size = get_codeindex();
+	code_size = get_section_size( CURRENTSECTION );
 	if ( code_size == 0 )
 		return -1;
 
@@ -470,7 +470,10 @@ Bool objmodule_loaded( char *src_filename, Module *module )
 
 /*
 * $Log: objfile.c,v $
-* Revision 1.33  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.34  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.33  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.32  2014/06/03 22:53:14  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.108 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.109 2014-06-13 16:00:45 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.108 2014-06-09 13:1
 
 /*
 * $Log: hist.c,v $
-* Revision 1.108  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.109  2014-06-13 16:00:45  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.108  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.107  2014/06/03 22:53:14  pauloscustodio
@@ -737,7 +740,7 @@ object files in worst case situations.
 03.05.94, V0.37:
 Bug fixes in exprprsr_c, z80pass_c and modlink_c: All expression evaluation did a type casting of the
 evaluated expression before the legal range were examined. This caused illegal ranges to be allowed in expressions.
-13.05.94  Bug fixed in LinkModules(): Z80header were null-terminated beyond local array. This made created peculiar
+13.05.94  Bug fixed in link_modules(): Z80header were null-terminated beyond local array. This made created peculiar
 crashes occasionally on the QL version. MSDOS-version now running perfectly. Releasing of module & global data
 structures are now only released by Z80asm running on platforms other than the QL - the allocated data is released
 automatically when the job is killed.
@@ -1120,7 +1123,7 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
     CH_0004(a) : Exception mechanism to handle fatal errors
         - New exception FatalErrorException to raise on fatal assembly errors
-        - ReportError(), LinkModules(), ModuleExpr(), CreateBinFile(),
+        - ReportError(), link_modules(), ModuleExpr(), CreateBinFile(),
           CreateLib(), INCLUDE(), BINARY(): throw the new exception
           FatalErrorException for fatal errors ERR_FILE_OPEN and ERR_MAX_CODESIZE
         - AssembleSourceFile(): added try-catch to delete incomplete files
@@ -1962,6 +1965,8 @@ xx.xx.2014 [2.3.1] (pauloscustodio)
 	- Do not sort symbols before writing to object file. Not needed and 
 	  wastes time.
 
+	- Extended codearea.c to support different sections of code.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1987,7 +1992,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1d"
+#define VERSION     "2.3.1e"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

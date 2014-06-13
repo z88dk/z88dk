@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.19 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.20 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #pragma once
@@ -98,7 +98,6 @@ extern Module	  *get_first_module( void );
 extern Module	  *get_last_module( void );
 
 #define CURRENTMODULE	(get_cur_module())
-#define CURRENTSECTION	(get_cur_module()->cur_section)
 
 /* interface to SrcFile singleton */
 extern void  src_open( char *filename, List *dir_list );
@@ -112,7 +111,10 @@ extern Bool  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.19  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.20  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.19  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.18  2014/05/25 01:02:29  pauloscustodio

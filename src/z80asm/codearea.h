@@ -15,33 +15,92 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.26 2014-06-09 13:15:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.27 2014-06-13 16:00:45 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
+#include "array.h"
 #include "types.h"
+#include "class.h"
+#include "classhash.h"
 
 #include <stdio.h>
+
+/*-----------------------------------------------------------------------------
+*   Handle Sections
+*	Each section has a name (default = ""), a start address, an ASMPC, 
+*	and a contiguous block of memory where opcodes are added.
+*	Each module allocates a set of 0..N section blocks, each with it's 
+*	start address in each section. Modules are identified with unique 
+*	sequence IDs, and these IDs can be used to find out start of module
+*	data in each section.
+*	The alloc_addresses() call defines the start addresses of each section
+*	by concatenating them together.
+*	The reset_codearea() clears all section data.
+*----------------------------------------------------------------------------*/
+
+extern void reset_codearea( void );			/* init to default section "" */
+
+/*-----------------------------------------------------------------------------
+*   Named Section of code, introduced by "SECTION" keyword
+*----------------------------------------------------------------------------*/
+CLASS( Section )
+	char		*name;			/* name of section, kept in strpool */
+	UInt		 addr;			/* start address of this section,
+								   computed by sections_alloc_addr() */
+	UInt		 asmpc;			/* address of current opcode */
+	UInt		 opcode_size;	/* Number of bytes added after last 
+								   set_PC() or next_PC() */
+	ByteArray	*bytes;			/* binary code of section, used to compute 
+								   current size */
+	UIntArray	*module_start;	/* at module_addr[ID] is the start offset from
+								   addr of module ID */
+END_CLASS;
+
+CLASS_HASH( Section );
+
+/* allocate a new module, setup module_start[] of all sections, return new unique ID */
+extern int section_new_module( void );
+
+/* return start offset for given section and module ID */
+extern UInt section_module_start( Section *section, int module_id );
+
+/* allocate the addr of each of the sections, concatenating the sections in
+   consecutive addresses. Start at the given org, or at 0 if negative */
+extern void sections_alloc_addr( Int origin );
+
+/* get section by name, creates a new section if new name */
+extern Section *get_section( char *name );
+
+/* iterate through sections */
+extern Section *sections_first( SectionHashElem **piter );
+extern Section *sections_next(  SectionHashElem **piter );
+
+/* get/set current and default section */
+extern Section *get_default_section( void );
+extern Section *get_cur_section( void );
+extern void     set_cur_section( Section *section );
+
+#define CURRENTSECTION	(get_cur_section())
+
+/* return number of bytes appended to current section */
+extern UInt get_section_size( Section *section );
 
 /*-----------------------------------------------------------------------------
 *   Handle ASMPC
 *	set_PC() defines the instruction start address
 *	every byte added increments an offset but keeps ASMPC with start of opcode
 *	next_PC() moves to the next opcode
-*	get_opcode_size() returns current offset
 *----------------------------------------------------------------------------*/
 extern void set_PC( UInt n );
 extern UInt next_PC( void );
 extern UInt get_PC( void );
-extern UInt get_opcode_size( void );
 
 /*-----------------------------------------------------------------------------
 *   reset the code area, return current size
 *----------------------------------------------------------------------------*/
-extern void reset_codearea( void );			/* set code area to zeros */
-extern UInt get_codeindex( void );			/* return number of bytes appended */
 
 extern UInt get_codesize( void );			/* size of all modules before current,
                                                i.e. base address of current module */
@@ -50,15 +109,18 @@ extern UInt inc_codesize( UInt n );			/* increment loaded codesize */
 /*-----------------------------------------------------------------------------
 *   write code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea( FILE *stream );
-extern void fwrite_codearea_chunk( FILE *stream, UInt addr, UInt size );
-extern void fread_codearea( FILE *stream, UInt size );		/* append to codearea */
-extern void fread_codearea_offset( FILE *stream, UInt offset, UInt size );  /* read to codearea at offset */
+extern void fwrite_codearea( FILE *file );
+extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt size );
+extern void fread_codearea( FILE *file, UInt size );		/* append to codearea */
+extern void fread_codearea_offset( FILE *file, UInt offset, UInt size );  /* read to codearea at offset */
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is incremented after store
 *----------------------------------------------------------------------------*/
+extern void  patch_value( UInt *paddr, UInt value, int num_bytes );
+extern void append_value(              UInt value, int num_bytes );
+
 extern void  patch_byte( UInt *paddr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
@@ -69,16 +131,13 @@ extern void append_word( int word );
 extern void  patch_long( UInt *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
-/*-----------------------------------------------------------------------------
-*   get a byte at the given address
-*	the patch address is incremented after fetch
-*----------------------------------------------------------------------------*/
-extern Byte get_byte( UInt *paddr );
-
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.26  2014-06-09 13:15:25  pauloscustodio
+* Revision 1.27  2014-06-13 16:00:45  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.26  2014/06/09 13:15:25  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.25  2014/05/25 01:02:29  pauloscustodio

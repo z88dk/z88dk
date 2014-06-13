@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.104 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.105 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -40,7 +40,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.104 2014-06-09 1
 #include <time.h>
 
 /* external functions */
-void LinkModules( void );
 void ParseIdent( enum flag interpret );
 
 /* local functions */
@@ -432,7 +431,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.104  2014-06-09 13:15:27  pauloscustodio
+* Revision 1.105  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.104  2014/06/09 13:15:27  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.103  2014/06/02 22:29:14  pauloscustodio

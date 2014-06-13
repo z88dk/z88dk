@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.44 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.45 2014-06-13 16:00:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -324,7 +324,7 @@ LD_index8bit_indrct( int destreg )
         append_byte( 0xFD );
     }
 
-    opcodeptr = get_codeindex();  /* pointer to instruction opcode - BUG_0015 */
+    opcodeptr = get_section_size( CURRENTSECTION );  /* pointer to instruction opcode - BUG_0015 */
     append_byte( 0x36 );          /* preset 2. opcode to LD (IX|IY+d),n  */
 
 
@@ -662,7 +662,10 @@ LD_16bit_reg( void )
 
 /*
 * $Log: ldinstr.c,v $
-* Revision 1.44  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.45  2014-06-13 16:00:46  pauloscustodio
+* Extended codearea.c to support different sections of code.
+*
+* Revision 1.44  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.43  2014/06/01 22:16:50  pauloscustodio
