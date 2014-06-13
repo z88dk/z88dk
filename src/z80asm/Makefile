@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.154 2014-06-13 15:51:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.155 2014-06-13 19:14:04 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -214,7 +214,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.154  2014-06-13 15:51:58  pauloscustodio
+# Revision 1.155  2014-06-13 19:14:04  pauloscustodio
+# Move module list to module.c
+#
+# Revision 1.154  2014/06/13 15:51:58  pauloscustodio
 # Added test_codearea.c using GLib's unit testing framework.
 #
 # Revision 1.153  2014/06/07 00:22:41  pauloscustodio
@@ -917,8 +920,8 @@ modlink.o: lib/strpool.h sym.h symbol.h model.h module.h symtab.h objfile.h
 modlink.o: z80asm.h
 module.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 module.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-module.o: lib/uthash.h lib/die.h module.h lib/classlist.h expr.h scan.h
-module.o: scan_def.h legacy.h symtab.h sym.h symref.h lib/strpool.h
+module.o: lib/uthash.h lib/die.h lib/init.h module.h lib/classlist.h expr.h
+module.o: scan.h scan_def.h legacy.h symtab.h sym.h symref.h lib/strpool.h
 objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 objfile.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h
 objfile.o: lib/uthash.h lib/die.h errors.h errors_def.h lib/fileutil.h

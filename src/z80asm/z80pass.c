@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.105 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.106 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -357,7 +357,7 @@ Z80pass2( void )
     //set_error_module( CURRENTMODULE->modname );
 
 	/* define origin from command line on first module */
-    if ( CURRENTMODULE == get_first_module() && opts.origin >= 0 )
+    if ( CURRENTMODULE == get_first_module( NULL ) && opts.origin >= 0 )
         CURRENTMODULE->origin = opts.origin;
 
 	/* create object file */
@@ -431,7 +431,10 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 
 /*
 * $Log: z80pass.c,v $
-* Revision 1.105  2014-06-13 16:00:46  pauloscustodio
+* Revision 1.106  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.105  2014/06/13 16:00:46  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.104  2014/06/09 13:15:27  pauloscustodio

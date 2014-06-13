@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.38 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.39 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -220,11 +220,14 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 *----------------------------------------------------------------------------*/
 SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) )
 {
+    Module *module;
+	ModuleListElem *iter;
     SymbolHash *all_syms = OBJ_NEW( SymbolHash );
 
-	for ( module_list_first() ; CURRENTMODULE ; module_list_next() )
+	for ( module = get_first_module( &iter ) ; module != NULL ; 
+		  module = get_next_module( &iter ) )
 	{
-		copy_full_sym_names( &all_syms, CURRENTMODULE->local_symtab, cond );
+		copy_full_sym_names( &all_syms, module->local_symtab, cond );
 	}
     copy_full_sym_names( &all_syms, global_symtab, cond );
 
@@ -493,7 +496,10 @@ int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 
 /*
 * $Log: symtab.c,v $
-* Revision 1.38  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.39  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.38  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.37  2014/05/25 01:02:29  pauloscustodio

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.126 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.127 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -88,7 +88,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
         {
         case 'A':
             symboltype = SYM_ADDR;
-            value += get_first_module()->origin + CURRENTMODULE->addr;       /* Absolute address */
+            value += get_first_module( NULL )->origin + CURRENTMODULE->addr;       /* Absolute address */
             break;
 
         case 'C':
@@ -153,7 +153,7 @@ ReadExpr( FILE *file )
         offsetptr	= xfget_uint16( file );
 
         /* assembler PC as absolute address */
-        set_PC( get_first_module()->origin + CURRENTMODULE->addr + asmpc );
+        set_PC( get_first_module( NULL )->origin + CURRENTMODULE->addr + asmpc );
 
 		xfget_count_word_Str( file, expr_text );	/* get expression */
 
@@ -244,7 +244,8 @@ void link_modules( void )
 {
     char fheader[9];
     Int origin;
-    Module *first_obj_module, *last_obj_module;
+    Module *module, *first_obj_module, *last_obj_module;
+	ModuleListElem *iter;
 	Bool saw_last_obj_module;
     char *obj_filename;
 	FILE *file;
@@ -273,17 +274,19 @@ void link_modules( void )
 
     TRY
     {
-		/* remember current first and last modules, i.e. before adding library modules */
-		first_obj_module = get_first_module();
-		last_obj_module  = get_last_module();
-
         set_PC( 0 );
 
+		/* remember current first and last modules, i.e. before adding library modules */
+		first_obj_module = get_first_module( &iter );
+		last_obj_module  = get_last_module( NULL );
+
 		/* link machine code & read symbols in all modules */
-		for ( module_list_first(), saw_last_obj_module = FALSE ;
-			  CURRENTMODULE != NULL && ! saw_last_obj_module ;
-			  module_list_next() )  
+		for ( module = first_obj_module, saw_last_obj_module = FALSE ;
+			  module != NULL && ! saw_last_obj_module ;
+			  module = get_next_module( &iter ) )  
         {
+			set_cur_module( module );
+
 	        /* open error file on first module */
 			if ( CURRENTMODULE == first_obj_module )
 		        open_error_file( CURRENTMODULE->filename );
@@ -635,7 +638,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     tmpmodule = get_cur_module();					/* remember current module */
 
 	/* create new module to link library */
-	lib_module = new_cur_module();
+	lib_module = set_cur_module( new_module() );
 	lib_module->modname = strpool_add( modname );
 
     if ( opts.verbose )
@@ -719,12 +722,12 @@ CreateBinFile( void )
         if ( opts.code_seg && get_codesize() > 16384 )
         {
             /* add '.bn0' extension */
-            filename = get_segbin_filename( get_first_module()->filename, 0 );
+            filename = get_segbin_filename( get_first_module( NULL )->filename, 0 );
         }
         else
         {
             /* add '.bin' extension */
-            filename = get_bin_filename( get_first_module()->filename );
+            filename = get_bin_filename( get_first_module( NULL )->filename );
         }
     }
 
@@ -856,7 +859,10 @@ ReleaseLinkInfo( void )
 
 /*
 * $Log: modlink.c,v $
-* Revision 1.126  2014-06-13 16:00:46  pauloscustodio
+* Revision 1.127  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.126  2014/06/13 16:00:46  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.125  2014/06/09 13:30:28  pauloscustodio

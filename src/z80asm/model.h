@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.20 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.21 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #pragma once
@@ -83,22 +83,6 @@ extern void model_init(void);
 *   Singleton interfaces
 *----------------------------------------------------------------------------*/
 
-/* list of modules iterator, set CURRENTMODULE */
-extern void module_list_first( void );
-extern Bool module_list_next( void );
-
-/* delete all modules */
-extern void delete_modules( void );
-
-/* current module */
-extern void		   set_cur_module( Module *module );
-extern Module	  *get_cur_module( void );
-extern Module	  *new_cur_module( void );
-extern Module	  *get_first_module( void );
-extern Module	  *get_last_module( void );
-
-#define CURRENTMODULE	(get_cur_module())
-
 /* interface to SrcFile singleton */
 extern void  src_open( char *filename, List *dir_list );
 extern char *src_getline( void );
@@ -111,7 +95,10 @@ extern Bool  src_pop( void );
 
 /*
 * $Log: model.h,v $
-* Revision 1.20  2014-06-13 16:00:46  pauloscustodio
+* Revision 1.21  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.20  2014/06/13 16:00:46  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.19  2014/06/09 13:30:28  pauloscustodio

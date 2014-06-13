@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.178 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.179 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -96,7 +96,7 @@ void assemble_file( char *filename )
     src_filename = get_asm_filename( filename );      /* set '.asm' extension */
 
     /* Create module data structures for new file */
-	module = new_cur_module();
+	module = set_cur_module( new_module() );
 	module->filename = strpool_add( src_filename );
 
     query_assemble( src_filename );
@@ -399,7 +399,10 @@ createsym( Symbol *symptr )
 
 /*
 * $Log: z80asm.c,v $
-* Revision 1.178  2014-06-13 16:00:46  pauloscustodio
+* Revision 1.179  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.178  2014/06/13 16:00:46  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.177  2014/06/09 13:30:28  pauloscustodio

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.9 2014-06-09 13:30:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.10 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,9 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.9 2014-06-09 13:30
 /*-----------------------------------------------------------------------------
 *   Global data
 *----------------------------------------------------------------------------*/
-static ModuleList		*g_module_list;			/* list of input modules */
-static ModuleListElem	*g_module_list_iter;	/* iterator to current module */
-static Module			*g_cur_module;			/* current module being handled */
 static SrcFile			*g_src_input;			/* input handle for reading source lines */
 
 /*-----------------------------------------------------------------------------
@@ -68,9 +65,6 @@ DEFINE_init()
 {
 	errors_init();						/* setup error handler */
 
-	/* setup module list */
-	g_module_list = OBJ_NEW( ModuleList );
-
 	/* setup input handler */
 	g_src_input = OBJ_NEW( SrcFile );
 	set_new_line_cb( new_line_cb );
@@ -78,7 +72,6 @@ DEFINE_init()
 
 DEFINE_fini()
 {
-	OBJ_DELETE( g_module_list );
 	OBJ_DELETE( g_src_input );
 }
 
@@ -86,68 +79,6 @@ void model_init(void)
 { 
 	init(); 
 }
-
-/*-----------------------------------------------------------------------------
-*   list of modules and current module
-*----------------------------------------------------------------------------*/
-void module_list_first( void )
-{
-	init();
-	g_module_list_iter = ModuleList_first( g_module_list );
-	g_cur_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
-}
-
-Bool module_list_next( void )
-{
-	init();
-	g_module_list_iter = ModuleList_next( g_module_list_iter );
-	g_cur_module = g_module_list_iter ? g_module_list_iter->obj : NULL;
-	return g_cur_module != NULL;
-}
-
-void delete_modules( void )
-{
-	init();
-	g_cur_module = NULL;
-	ModuleList_remove_all( g_module_list );
-}
-
-void set_cur_module( Module *module )
-{
-	init();
-	g_cur_module = module;
-}
-
-Module *get_cur_module( void )
-{
-	init();
-	return g_cur_module;
-}
-
-Module *new_cur_module( void )
-{
-	init();
-	g_cur_module = OBJ_NEW( Module );
-	ModuleList_push( &g_module_list, g_cur_module );
-	return g_cur_module;
-}
-
-Module *get_first_module( void )
-{
-	ModuleListElem *iter;
-	init();
-	iter = ModuleList_first( g_module_list );
-	return iter == NULL ? NULL : iter->obj;
-}
-
-Module *get_last_module( void )
-{
-	ModuleListElem *iter;
-	init();
-	iter = ModuleList_last( g_module_list );
-	return iter == NULL ? NULL : iter->obj;
-}
-
 
 /*-----------------------------------------------------------------------------
 *   interface to SrcFile singleton
@@ -197,7 +128,10 @@ Bool src_pop( void )
 
 /*
 * $Log: model.c,v $
-* Revision 1.9  2014-06-09 13:30:28  pauloscustodio
+* Revision 1.10  2014-06-13 19:14:04  pauloscustodio
+* Move module list to module.c
+*
+* Revision 1.9  2014/06/09 13:30:28  pauloscustodio
 * Rename current module abrev
 *
 * Revision 1.8  2014/05/25 01:02:29  pauloscustodio

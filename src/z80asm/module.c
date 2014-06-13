@@ -14,14 +14,35 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.13 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.14 2014-06-13 19:14:04 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
+#include "init.h"
 #include "module.h"
 #include "strpool.h"
+
+/*-----------------------------------------------------------------------------
+*   Global data
+*----------------------------------------------------------------------------*/
+static ModuleList		*g_module_list;			/* list of input modules */
+static Module			*g_cur_module;			/* current module being handled */
+
+/*-----------------------------------------------------------------------------
+*   Initialize data structures
+*----------------------------------------------------------------------------*/
+DEFINE_init()
+{
+	/* setup module list */
+	g_module_list = OBJ_NEW( ModuleList );
+}
+
+DEFINE_fini()
+{
+	OBJ_DELETE( g_module_list );
+}
 
 /*-----------------------------------------------------------------------------
 *   Assembly module
@@ -53,48 +74,72 @@ void Module_fini (Module *self)
 	OBJ_DELETE( self->local_symtab );
 }
 
-/* 
-* $Log: module.c,v $
-* Revision 1.13  2014-06-13 16:00:46  pauloscustodio
-* Extended codearea.c to support different sections of code.
-*
-* Revision 1.12  2014/06/09 13:30:28  pauloscustodio
-* Rename current module abrev
-*
-* Revision 1.11  2014/06/09 13:15:26  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.10  2014/05/25 12:55:03  pauloscustodio
-* Link expressions to the section they refer to.
-*
-* Revision 1.9  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.8  2014/05/18 16:05:28  pauloscustodio
-* Add sections to the Module structure, define default section "".
-* Move module expressions to the Section structure.
-*
-* Revision 1.7  2014/05/17 23:08:03  pauloscustodio
-* Change origin to Int, use -1 to signal as not defined
-*
-* Revision 1.6  2014/05/02 23:35:19  pauloscustodio
-* Rename startoffset, add constant for NO_ORIGIN
-*
-* Revision 1.5  2014/05/02 20:24:38  pauloscustodio
-* New class Module to replace struct module and struct modules
-*
-* Revision 1.4  2014/04/15 20:06:43  pauloscustodio
-* Solve warning: no newline at end of file
-*
-* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.2  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-* 
-* Revision 1.1  2013/06/08 22:57:13  pauloscustodio
-* Embryo of Module structure
-* 
-*/
+/*-----------------------------------------------------------------------------
+*   new and delete modules
+*----------------------------------------------------------------------------*/
+Module *new_module( void )
+{
+	Module *module;
+
+	init();
+	module = OBJ_NEW( Module );
+	ModuleList_push( &g_module_list, module );
+	return module;
+}
+
+void delete_modules( void )
+{
+	init();
+	g_cur_module = NULL;
+	ModuleList_remove_all( g_module_list );
+}
+
+/*-----------------------------------------------------------------------------
+*   current module
+*----------------------------------------------------------------------------*/
+Module *set_cur_module( Module *module )
+{
+	init();
+	return (g_cur_module = module);		/* result result of assignment */
+}
+
+Module *get_cur_module( void )
+{
+	init();
+	return g_cur_module;
+}
+
+/*-----------------------------------------------------------------------------
+*   list of modules iterator
+*	pointer to iterator may be NULL if no need to iterate
+*----------------------------------------------------------------------------*/
+Module *get_first_module( ModuleListElem **piter )
+{
+	ModuleListElem *iter;
+
+	init();
+	if ( piter == NULL )
+		piter = &iter;		/* user does not need to iterate */
+
+	*piter = ModuleList_first( g_module_list );
+	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+}
+
+Module *get_last_module( ModuleListElem **piter )
+{
+	ModuleListElem *iter;
+
+	init();
+	if ( piter == NULL )
+		piter = &iter;		/* user does not need to iterate */
+
+	*piter = ModuleList_last( g_module_list );
+	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+}
+
+Module *get_next_module( ModuleListElem **piter )
+{
+	init();
+	*piter = ModuleList_next( *piter );
+	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+}
