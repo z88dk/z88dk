@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.1 2014-06-13 15:51:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.2 2014-06-13 19:18:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -246,11 +246,3 @@ int main( int argc, char *argv[] )
 
 	return g_test_run();
 }
-
-/*
-* $Log: test_codearea.c,v $
-* Revision 1.1  2014-06-13 15:51:59  pauloscustodio
-* Added test_codearea.c using GLib's unit testing framework.
-*
-*
-*/
