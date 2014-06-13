@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.3 2014-05-02 20:24:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.4 2014-06-13 19:16:48 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -35,7 +35,6 @@ my $init = <<'END';
 #include "symbol.h"
 #include <assert.h>
 
-char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_GET( exp_token, exp_text ) \
@@ -574,7 +573,10 @@ done_testing;
 
 
 # $Log: scan.t,v $
-# Revision 1.3  2014-05-02 20:24:39  pauloscustodio
+# Revision 1.4  2014-06-13 19:16:48  pauloscustodio
+# Remove CreateLibfile() - no longer used
+#
+# Revision 1.3  2014/05/02 20:24:39  pauloscustodio
 # New class Module to replace struct module and struct modules
 #
 # Revision 1.2  2014/04/19 17:55:51  pauloscustodio

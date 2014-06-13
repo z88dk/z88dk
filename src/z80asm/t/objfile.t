@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.15 2014-06-03 22:53:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.16 2014-06-13 19:16:48 pauloscustodio Exp $
 #
 
 use strict;
@@ -4470,7 +4470,6 @@ my $init = <<'END';
 #include <assert.h>
 
 FILE *errfile;
-char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
 END
@@ -4631,7 +4630,10 @@ unlink_testfiles();
 done_testing();
 
 # $Log: objfile.t,v $
-# Revision 1.15  2014-06-03 22:53:14  pauloscustodio
+# Revision 1.16  2014-06-13 19:16:48  pauloscustodio
+# Remove CreateLibfile() - no longer used
+#
+# Revision 1.15  2014/06/03 22:53:14  pauloscustodio
 # Do not sort symbols before writing to object file. Not needed and
 # wastes time.
 #

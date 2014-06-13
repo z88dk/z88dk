@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.19 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.20 2014-06-13 19:16:48 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -765,7 +765,6 @@ my $objs = "errors.o scan.o lib/array.o lib/class.o lib/strutil.o lib/strhash.o 
 my $init = <<'END';
 
 FILE *errfile;
-char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
 END
@@ -905,7 +904,10 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.19  2014-05-29 00:19:37  pauloscustodio
+# Revision 1.20  2014-06-13 19:16:48  pauloscustodio
+# Remove CreateLibfile() - no longer used
+#
+# Revision 1.19  2014/05/29 00:19:37  pauloscustodio
 # CH_0025: Link-time expression evaluation errors show source filename and line number
 # Object file format changed to version 04, to include the source file
 # location of expressions in order to give meaningful link-time error messages.

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.19 2014-06-13 16:00:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.20 2014-06-13 19:16:48 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -273,7 +273,6 @@ int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
 
 
-char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
 extern SymbolHash *get_static_tab(void);
@@ -355,7 +354,7 @@ t_compile_module($init, <<'END', $objs);
 	opts.list     = TRUE;
 	
 	TITLE("Create current module");	
-	new_cur_module();
+	set_cur_module( new_module() );
 
 	TITLE("Create symbol");	
 	sym = Symbol_create(S("Var1"), 123, 0, NULL);
@@ -570,7 +569,10 @@ unlink_testfiles();
 done_testing;
 
 # $Log: symtab.t,v $
-# Revision 1.19  2014-06-13 16:00:46  pauloscustodio
+# Revision 1.20  2014-06-13 19:16:48  pauloscustodio
+# Remove CreateLibfile() - no longer used
+#
+# Revision 1.19  2014/06/13 16:00:46  pauloscustodio
 # Extended codearea.c to support different sections of code.
 #
 # Revision 1.18  2014/06/09 13:30:28  pauloscustodio

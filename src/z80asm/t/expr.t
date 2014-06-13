@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.12 2014-05-04 17:51:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.13 2014-06-13 19:16:48 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -181,7 +181,6 @@ my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
 my $init = <<'END';
 #include "symbol.h"
 
-char *CreateLibfile( char *filename ) {return NULL;}
 char *GetLibfile( char *filename ) {return NULL;}
 
 long add3(long a, long b, long c) { return 3+a+b+c; }
@@ -215,7 +214,10 @@ done_testing();
 
 
 # $Log: expr.t,v $
-# Revision 1.12  2014-05-04 17:51:43  pauloscustodio
+# Revision 1.13  2014-06-13 19:16:48  pauloscustodio
+# Remove CreateLibfile() - no longer used
+#
+# Revision 1.12  2014/05/04 17:51:43  pauloscustodio
 # Move tests of BUG_0006 to bugfixes.t
 #
 # Revision 1.11  2014/05/02 20:24:39  pauloscustodio
