@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.c,v 1.8 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.c,v 1.9 2014-06-13 15:57:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -12,12 +12,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.c,v 1.8 2014-06-09 1
 #include "array.h"
 
 DEF_ARRAY( Byte );
+DEF_ARRAY( UInt );
 DEF_ARRAY( int );
 DEF_ARRAY( long );
 
 /*
 * $Log: array.c,v $
-* Revision 1.8  2014-06-09 13:15:27  pauloscustodio
+* Revision 1.9  2014-06-13 15:57:06  pauloscustodio
+* Added UIntArray
+*
+* Revision 1.8  2014/06/09 13:15:27  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.7  2014/05/25 01:02:30  pauloscustodio
