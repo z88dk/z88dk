@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.36 2014-06-13 16:00:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.37 2014-06-13 17:53:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -58,7 +58,7 @@ DEFINE_fini()
 }
 
 /*-----------------------------------------------------------------------------
-*   init the code area, return current size
+*   init the code area
 *----------------------------------------------------------------------------*/
 void reset_codearea( void )
 {
@@ -232,7 +232,13 @@ Section *get_default_section( void )
 	return g_default_section;
 }
 
-/* return number of bytes appended to current section */
+/* return number of bytes and base address of current section code */
+Byte *get_section_code( Section *section )
+{
+    init();
+    return ByteArray_item( section->bytes, 0 );
+}
+
 UInt get_section_size( Section *section )
 {
     init();
@@ -301,53 +307,51 @@ static void check_space( UInt addr, UInt n )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( FILE *file )
 {
-	UInt codeindex;
-    
 	init();
-	codeindex = get_section_size( g_cur_section );
-    xfput_chars( file, (char *) ByteArray_item( g_cur_section->bytes, 0 ), codeindex );
+    xfput_chars( file, (char *) get_section_code( g_cur_section ), 
+						        get_section_size( g_cur_section ) );
 }
 
-void fwrite_codearea_chunk( FILE *file, UInt addr, UInt size )
+void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size )
 {
-	UInt codeindex;
+	UInt code_size;
 
 	init();
-	codeindex = get_section_size( g_cur_section );
-    if ( addr < codeindex )
+	code_size = get_section_size( g_cur_section );
+    if ( addr < code_size )
     {
-        if ( addr + size > codeindex )
-            size = codeindex - addr;
+        if ( addr + write_size > code_size )
+            write_size = code_size - addr;
 
-        xfput_chars( file, (char *) ByteArray_item( g_cur_section->bytes, addr ), size );
+        xfput_chars( file, (char *) ByteArray_item( g_cur_section->bytes, addr ), write_size );
     }
 }
 
 /* append data read from file to the current code area */
-void fread_codearea( FILE *file, UInt size )
+void fread_codearea( FILE *file, UInt read_size )
 {
-	UInt codeindex;
+	UInt code_size;
 
 	init();
-	codeindex = get_section_size( g_cur_section );
-	if ( size > 0 )
+	code_size = get_section_size( g_cur_section );
+	if ( read_size > 0 )
 	{
-		check_space( codeindex, size );
-		ByteArray_item( g_cur_section->bytes, codeindex + size - 1 );		/* reserve space */
-		xfget_chars( file, (char *) ByteArray_item( g_cur_section->bytes, codeindex ), size );
-		inc_PC( size );
+		check_space( code_size, read_size );
+		ByteArray_item( g_cur_section->bytes, code_size + read_size - 1 );		/* reserve space */
+		xfget_chars( file, (char *) ByteArray_item( g_cur_section->bytes, code_size ), read_size );
+		inc_PC( read_size );
 	}
 }
 
 /* read to codearea at offset - BUG_0015 */
-void fread_codearea_offset( FILE *file, UInt offset, UInt size )
+void fread_codearea_offset( FILE *file, UInt offset, UInt read_size )
 {
 	init();
-	if ( size > 0 )
+	if ( read_size > 0 )
 	{
-		check_space( offset, size );
-		ByteArray_item( g_cur_section->bytes, offset + size - 1 );		/* reserve space */
-		xfget_chars( file, (char *) ByteArray_item( g_cur_section->bytes, offset ), size );
+		check_space( offset, read_size );
+		ByteArray_item( g_cur_section->bytes, offset + read_size - 1 );		/* reserve space */
+		xfget_chars( file, (char *) ByteArray_item( g_cur_section->bytes, offset ), read_size );
 	}
 }
 
@@ -399,7 +403,11 @@ void append_2bytes( Byte byte1, Byte byte2 )
 
 /*
 * $Log: codearea.c,v $
-* Revision 1.36  2014-06-13 16:00:45  pauloscustodio
+* Revision 1.37  2014-06-13 17:53:29  pauloscustodio
+* Added interface to get the section bytes.
+* Renamed codeindex to code_size.
+*
+* Revision 1.36  2014/06/13 16:00:45  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.35  2014/06/09 13:15:25  pauloscustodio

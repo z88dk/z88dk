@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.27 2014-06-13 16:00:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.28 2014-06-13 17:53:29 pauloscustodio Exp $
 */
 
 #pragma once
@@ -85,8 +85,9 @@ extern void     set_cur_section( Section *section );
 
 #define CURRENTSECTION	(get_cur_section())
 
-/* return number of bytes appended to current section */
-extern UInt get_section_size( Section *section );
+/* return number of bytes and base address of current section code */
+extern Byte *get_section_code( Section *section );
+extern UInt  get_section_size( Section *section );
 
 /*-----------------------------------------------------------------------------
 *   Handle ASMPC
@@ -110,9 +111,9 @@ extern UInt inc_codesize( UInt n );			/* increment loaded codesize */
 *   write code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea( FILE *file );
-extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt size );
-extern void fread_codearea( FILE *file, UInt size );		/* append to codearea */
-extern void fread_codearea_offset( FILE *file, UInt offset, UInt size );  /* read to codearea at offset */
+extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size );
+extern void fread_codearea( FILE *file, UInt read_size );		/* append to codearea */
+extern void fread_codearea_offset( FILE *file, UInt offset, UInt read_size );  /* read to codearea at offset */
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
@@ -134,7 +135,11 @@ extern void append_long( long dword );
 
 /*
 * $Log: codearea.h,v $
-* Revision 1.27  2014-06-13 16:00:45  pauloscustodio
+* Revision 1.28  2014-06-13 17:53:29  pauloscustodio
+* Added interface to get the section bytes.
+* Renamed codeindex to code_size.
+*
+* Revision 1.27  2014/06/13 16:00:45  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.26  2014/06/09 13:15:25  pauloscustodio
