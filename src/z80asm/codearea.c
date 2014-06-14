@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.38 2014-06-13 19:18:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.39 2014-06-14 11:59:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,6 +37,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.38 2014-06-13 1
 static SectionHash 	*g_sections;
 static Section 		*g_cur_section;
 static Section 		*g_default_section;
+static Section 		*g_last_section;
 
 static UInt  codesize;			/* size of all modules before current,
 								   i.e. base address of current module
@@ -54,7 +55,7 @@ DEFINE_init()
 DEFINE_fini()
 {
 	OBJ_DELETE( g_sections );
-	g_cur_section = g_default_section = NULL;
+	g_cur_section = g_default_section = g_last_section = NULL;
 }
 
 /*-----------------------------------------------------------------------------
@@ -111,8 +112,8 @@ int section_new_module( void )
 	module_id = UIntArray_size( g_default_section->module_start );
 
 	/* expand all sections this new ID */
-	for ( section = sections_first( &iter ) ; section != NULL ; 
-		  section = sections_next(  &iter ) )
+	for ( section = get_first_section( &iter ) ; section != NULL ; 
+		  section = get_next_section( &iter ) )
 	{
 		(void) section_module_start( section, module_id );
 	}
@@ -165,8 +166,8 @@ void sections_alloc_addr( Int origin )
 	addr = origin >= 0 ? origin : 0;	/* start address */
 
 	/* allocate addr in sequence */
-	for ( section = sections_first( &iter ) ; section != NULL ; 
-		  section = sections_next(  &iter ) )
+	for ( section = get_first_section( &iter ) ; section != NULL ; 
+		  section = get_next_section( &iter ) )
 	{
 		section->addr = addr;
 		addr += section_module_start( section, end_id );
@@ -186,6 +187,7 @@ Section *get_section( char *name )
 		section = OBJ_NEW( Section );
 		section->name = strpool_add( name );
 		SectionHash_set( & g_sections, name, section );
+		g_last_section = section;
 
 		/* define start address of all existing modules = 0, except for default section */
 		if ( g_default_section != NULL && *name != '\0' )
@@ -199,14 +201,25 @@ Section *get_section( char *name )
 }
 
 /* iterate through sections */
-Section *sections_first( SectionHashElem **piter )
+Section *get_first_section( SectionHashElem **piter )
 {
+	SectionHashElem *iter;
+
 	init();
+	if ( piter == NULL )
+		piter = &iter;		/* user does not need to iterate */
+
 	*piter = SectionHash_first( g_sections );
 	return (*piter == NULL) ? NULL : (Section *) (*piter)->value;
 }
 
-Section *sections_next(  SectionHashElem **piter )
+Section *get_last_section( void )
+{
+	init();
+	return g_last_section;
+}
+
+Section *get_next_section(  SectionHashElem **piter )
 {
 	init();
 	*piter = SectionHash_next( *piter );

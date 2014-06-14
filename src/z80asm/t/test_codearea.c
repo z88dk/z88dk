@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.2 2014-06-13 19:18:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.3 2014-06-14 11:59:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -68,11 +68,13 @@ static void test_reset_codearea( void )
 	test_bytes(-1);
 	test_module_start(-1);
 	
-	section = sections_first( &iter ); 
+	section = get_first_section( &iter ); 
 	g_assert( iter ); 
 	g_assert( section );
 	g_assert( section == get_cur_section() );
 	g_assert( section == get_default_section() );
+	g_assert( section == get_first_section(NULL) );
+	g_assert( section == get_last_section() );
 	g_assert_cmpstr(  section->name, ==, "" );
 	g_assert_cmpuint( section->addr, ==, 0 );
 	g_assert_cmpuint( section->asmpc, ==, 0 );
@@ -81,7 +83,7 @@ static void test_reset_codearea( void )
 	test_bytes(-1);
 	test_module_start(-1);
 	
-	section = sections_next( &iter ); 
+	section = get_next_section( &iter ); 
 	g_assert( ! iter ); 
 	g_assert( ! section );
 }
@@ -98,6 +100,8 @@ static void test_sections( void )
 	/* "" section */
 	section_blank = get_default_section();
 	g_assert( section_blank == get_cur_section() );
+	g_assert( section_blank == get_first_section(NULL) );
+	g_assert( section_blank == get_last_section() );
 	
 	/* module 0 - only bytes in "" */
 	module_id = section_new_module();
@@ -191,17 +195,19 @@ static void test_sections( void )
 	g_assert_cmpstr( section_code->name, ==, "code" );
 	g_assert( get_cur_section() == get_default_section() );
 	g_assert( get_cur_section() == section_blank );
+	g_assert( section_blank == get_first_section(NULL) );
+	g_assert( section_code  == get_last_section() );
 
 	set_cur_section( get_section("code") );
 	g_assert( get_cur_section() == section_code );
 	
-	section = sections_first( &iter ); 
+	section = get_first_section( &iter ); 
 	g_assert( iter ); 
 	g_assert( section == section_blank );
-	section = sections_next( &iter ); 
+	section = get_next_section( &iter ); 
 	g_assert( iter ); 
 	g_assert( section == section_code );
-	section = sections_next( &iter ); 
+	section = get_next_section( &iter ); 
 	g_assert( ! iter ); 
 	g_assert( ! section );
 

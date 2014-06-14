@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.29 2014-06-13 19:18:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.30 2014-06-14 11:59:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -74,9 +74,10 @@ extern void sections_alloc_addr( Int origin );
 /* get section by name, creates a new section if new name */
 extern Section *get_section( char *name );
 
-/* iterate through sections */
-extern Section *sections_first( SectionHashElem **piter );
-extern Section *sections_next(  SectionHashElem **piter );
+/* list of sections iterator, pointer to iterator may be NULL if no need to iterate */
+extern Section *get_first_section( SectionHashElem **piter );
+extern Section *get_last_section( void );
+extern Section *get_next_section( SectionHashElem **piter );
 
 /* get/set current and default section */
 extern Section *get_default_section( void );
