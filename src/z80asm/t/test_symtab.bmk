@@ -1,0 +1,80 @@
+Create current module
+Create symbol
+Symbol Var1 (Var1) = 123, type = 0x00 [], ref = [1 ], owner = NULL
+Symbol Var1 (Var1) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+Symbol Var1 (Var1@MODULE) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+Delete symbol
+Global symtab
+Symtab "global": EMPTY
+Symtab "static": EMPTY
+check case insensitive - CH_0024
+Symtab "tab1": 
+  Symbol Var1 (Var1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol Var3 (Var3) = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
+Warning: symbol 'Var1' used as 'VAR1'
+Warning: symbol 'Var1' used as 'var1'
+Warning: symbol 'Var2' used as 'VAR2'
+Warning: symbol 'Var2' used as 'var2'
+Warning: symbol 'Var3' used as 'VAR3'
+Warning: symbol 'Var3' used as 'var3'
+Symtab "tab1": 
+  Symbol Var1 (Var1) = 1, type = 0x03 [DEFINED TOUCHED ], ref = [1 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x03 [DEFINED TOUCHED ], ref = [2 ], owner = NULL
+  Symbol Var3 (Var3) = -3, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
+Concat symbol tables
+Symtab "tab1": 
+  Symbol Var1 (Var1) = 1, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol Var3 (Var3) = -3, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
+Symtab "tab2": 
+  Symbol Var3 (Var3) = 3, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol Var4 (Var4) = 4, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol Var5 (Var5) = 5, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+Symtab "merged_tab": 
+  Symbol Var1 (Var1) = 1, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol Var2 (Var2) = 2, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol Var3 (Var3) = 3, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol Var4 (Var4) = 4, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol Var5 (Var5) = 5, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+Sort
+Symtab "tab": 
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [11 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [12 ], owner = NULL
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [13 ], owner = NULL
+Symtab "tab by name": 
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [13 ], owner = NULL
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [12 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [11 ], owner = NULL
+Symtab "tab by value": 
+  Symbol One (One) = 1, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol Two (Two) = 2, type = 0x01 [DEFINED ], ref = [11 ], owner = NULL
+  Symbol Three (Three) = 3, type = 0x01 [DEFINED ], ref = [12 ], owner = NULL
+  Symbol Four (Four) = 4, type = 0x01 [DEFINED ], ref = [13 ], owner = NULL
+Use local symbol before definition
+Symbol NN (NN@MODULE) = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [23 19 21 ], owner = CURRENTMODULE
+Symtab "global tab": 
+  Symbol PC (PC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [16 ], owner = NULL
+Symtab "static tab": 
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [14 ], owner = NULL
+Symtab "local tab": 
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [14 ], owner = NULL
+  Symbol NN (NN@MODULE) = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [23 19 21 ], owner = CURRENTMODULE
+Delete Local
+Symtab "global tab": 
+  Symbol PC (PC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [16 ], owner = NULL
+Symtab "static tab": 
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [14 ], owner = NULL
+Symtab "local tab": EMPTY
+Delete Static
+Symtab "global tab": 
+  Symbol PC (PC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [16 ], owner = NULL
+Symtab "static tab": EMPTY
+Symtab "local tab": EMPTY
+Delete Global
+Symtab "global tab": EMPTY
+Symtab "static tab": EMPTY
+Symtab "local tab": EMPTY
+End

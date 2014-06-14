@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.155 2014-06-13 19:14:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.156 2014-06-14 11:54:29 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -130,8 +130,9 @@ $(TEST_SRCS:.c=.o) : t/libtestlib.a
 
 .o.out :
 	$(CC) -static $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
-	$(<:.o=$(EXESUFFIX))
-	echo > $@
+	$(<:.o=$(EXESUFFIX)) 2> $@~
+	diff $(<:.o=.bmk) $@~
+	mv -f $@~ $@
 
 clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out $(TEST_SRCS:.c=$(EXESUFFIX))
@@ -142,7 +143,11 @@ test:
 	$(MAKE) new
 	$(MAKE) prove
 
-prove: $(TARGET) t/libtestlib.a $(TEST_SRCS:.c=.o) $(TEST_SRCS:.c=.out)
+prove: prove_c prove_perl
+
+prove_c: t/libtestlib.a $(TEST_SRCS:.c=.o) $(TEST_SRCS:.c=.out)
+
+prove_perl: $(TARGET)
 	perl -S prove t/*.t
 
 testmsvc : $(MSVC_TARGET)
@@ -214,7 +219,10 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.155  2014-06-13 19:14:04  pauloscustodio
+# Revision 1.156  2014-06-14 11:54:29  pauloscustodio
+# Added test_symtab.c using GLib's unit testing framework.
+#
+# Revision 1.155  2014/06/13 19:14:04  pauloscustodio
 # Move module list to module.c
 #
 # Revision 1.154  2014/06/13 15:51:58  pauloscustodio
