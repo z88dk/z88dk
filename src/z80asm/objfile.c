@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.34 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.35 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,7 @@ char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 /*-----------------------------------------------------------------------------
 *   Write module to object file
 *----------------------------------------------------------------------------*/
-static long write_expr( FILE *fp, Module *module )
+static long write_expr( FILE *fp )
 {
 	static Str *last_sourcefile = NULL;		/* keep last source file referred to in object */
 	ExprListElem *iter;
@@ -56,11 +56,11 @@ static long write_expr( FILE *fp, Module *module )
 
 	INIT_OBJ( Str, &last_sourcefile );
 
-	if ( ExprList_empty( module->exprs ) )	/* no expressions */
+	if ( ExprList_empty( CURRENTMODULE->exprs ) )	/* no expressions */
 		return -1;
 
 	expr_ptr = ftell( fp );
-	for ( iter = ExprList_first( module->exprs ); iter != NULL; iter = ExprList_next( iter ) )
+	for ( iter = ExprList_first( CURRENTMODULE->exprs ); iter != NULL; iter = ExprList_next( iter ) )
 	{
 		expr = iter->obj;
 
@@ -129,14 +129,14 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 	return written;
 }
 
-static long write_symbols( FILE *fp, Module *module )
+static long write_symbols( FILE *fp )
 {
 	long symbols_ptr;
 	int written = 0;
 
 	symbols_ptr = ftell( fp );
 
-	written += write_symbols_symtab( fp, module->local_symtab );
+	written += write_symbols_symtab( fp, CURRENTMODULE->local_symtab );
 	written += write_symbols_symtab( fp, global_symtab );
 
 	if ( written )
@@ -145,7 +145,7 @@ static long write_symbols( FILE *fp, Module *module )
 		return -1;
 }
 
-static long write_externsym( FILE *fp, Module *module )
+static long write_externsym( FILE *fp )
 {
     SymbolHashElem *iter;
     Symbol         *sym;
@@ -172,34 +172,43 @@ static long write_externsym( FILE *fp, Module *module )
 		return -1;
 }
 
-static long write_modname( FILE *fp, Module *module )
+static long write_modname( FILE *fp )
 {
 	long modname_ptr = ftell( fp );
-	xfput_count_byte_strz( fp, module->modname );		/* write module name */
+	xfput_count_byte_strz( fp, CURRENTMODULE->modname );		/* write module name */
 	return modname_ptr;
 }
 
-static long write_code( FILE *fp, Module *module )
+static long write_code( FILE *fp )
 {
-	long code_ptr, code_size;
+	long code_ptr, end_code_ptr;
+	UInt code_size;
 	
-	code_size = get_section_size( CURRENTSECTION );
-	if ( code_size == 0 )
-		return -1;
-
 	code_ptr = ftell( fp );
-    xfput_uint16( fp, code_size & 0xFFFF );				/* two bytes of module code size */
-    fwrite_codearea( fp );
+
+	/* advance past size and try to write code to get back total bytes written, maybe zero*/
+	fseek( fp, 2, SEEK_CUR );
+	code_size = fwrite_module_code( fp );
+	if ( code_size == 0 )
+	{
+		fseek( fp, code_ptr, SEEK_SET );
+		code_ptr = -1;								/* nothing written */
+	}
+	else 
+	{
+		end_code_ptr = ftell( fp );
+		fseek( fp, code_ptr, SEEK_SET );
+		xfput_uint16( fp, code_size & 0xFFFF );		/* two bytes of module code size */
+		fseek( fp, end_code_ptr, SEEK_SET );
+	}
 
     if ( opts.verbose )
-        printf( "Size of module '%s' is %ld bytes\n", module->modname, code_size );
-
-    inc_codesize( code_size);							/* BUG_0015 */
+        printf( "Size of module '%s' is %ld bytes\n", CURRENTMODULE->modname, (long)code_size );
 
 	return code_ptr;
 }
 
-void write_obj_file( char *source_filename, Module *module )
+void write_obj_file( char *source_filename )
 {
 	char *obj_filename;
 	FILE *fp;
@@ -212,7 +221,7 @@ void write_obj_file( char *source_filename, Module *module )
 
 	/* write header */
     xfput_strz( fp, Z80objhdr );
-	xfput_uint16( fp, module->origin );		/* two bytes of origin */
+	xfput_uint16( fp, CURRENTMODULE->origin );		/* two bytes of origin */
 
 	/* write placeholders for 5 pointers pointers */
 	header_ptr = ftell( fp );
@@ -220,11 +229,11 @@ void write_obj_file( char *source_filename, Module *module )
 	    xfput_uint32( fp, -1 );
 
 	/* write sections, return pointers */
-	expr_ptr		= write_expr(		fp, module );
-	symbols_ptr		= write_symbols(	fp, module );
-	externsym_ptr	= write_externsym(	fp, module );
-	modname_ptr		= write_modname(	fp, module );
-	code_ptr		= write_code(		fp, module );
+	expr_ptr		= write_expr( fp );
+	symbols_ptr		= write_symbols( fp );
+	externsym_ptr	= write_externsym( fp );
+	modname_ptr		= write_modname( fp );
+	code_ptr		= write_code( fp );
 
 	/* write pointers to areas */
 	fseek( fp, header_ptr, SEEK_SET );
@@ -451,13 +460,13 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-Bool objmodule_loaded( char *src_filename, Module *module )
+Bool objmodule_loaded( char *src_filename )
 {
 	OFile *ofile = OFile_test_file( get_obj_filename( src_filename ) );
     if ( ofile != NULL )
     {
-        inc_codesize( ofile->code_size );		/* BUG_0015, BUG_0050 */
-        module->modname = ofile->modname;        
+		append_reserve( ofile->code_size );		/* BUG_0015 */
+        CURRENTMODULE->modname = ofile->modname;        
 		OBJ_DELETE( ofile );					/* BUG_0049 */
 
         return TRUE;
@@ -465,193 +474,3 @@ Bool objmodule_loaded( char *src_filename, Module *module )
     else
         return FALSE;
 }
-
-
-
-/*
-* $Log: objfile.c,v $
-* Revision 1.34  2014-06-13 16:00:46  pauloscustodio
-* Extended codearea.c to support different sections of code.
-*
-* Revision 1.33  2014/06/09 13:15:26  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.32  2014/06/03 22:53:14  pauloscustodio
-* Do not sort symbols before writing to object file. Not needed and
-* wastes time.
-*
-* Revision 1.31  2014/06/02 22:29:14  pauloscustodio
-* Write object file in one go at the end of pass 2, instead of writing
-* parts during pass 1 assembly. This allows the object file format to be
-* changed more easily, to allow sections in a near future.
-* Remove global variable objfile and CloseFiles().
-*
-* Revision 1.30  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.29  2014/05/21 20:57:27  pauloscustodio
-* Embryo of write module
-*
-* Revision 1.28  2014/05/19 22:15:54  pauloscustodio
-* Move read_obj_file_data() to objfile.c
-* Move CreateLibfile() to libfile.c, rename to search_libfile()
-*
-* Revision 1.27  2014/05/19 00:21:10  pauloscustodio
-* logic error in test for library
-*
-* Revision 1.26  2014/05/17 23:08:03  pauloscustodio
-* Change origin to Int, use -1 to signal as not defined
-*
-* Revision 1.25  2014/05/17 22:42:25  pauloscustodio
-* Move load_module_object() that loads object file size when assembling
-* with -d option to objfile.c. Change objfile API.
-*
-* Revision 1.24  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.23  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.22  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.21  2014/04/22 23:32:42  pauloscustodio
-* Release 2.2.0 with major fixes:
-*
-* - Object file format changed to version 03, to include address of start
-* of the opcode of each expression stored in the object file, to allow
-* ASMPC to refer to the start of the opcode instead of the patch pointer.
-* This solves long standing BUG_0011 and BUG_0048.
-*
-* - ASMPC no longer stored in the symbol table and evaluated as a separate
-* token, to allow expressions including ASMPC to be relocated. This solves
-* long standing and never detected BUG_0047.
-*
-* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-* every assembled instruction, no need to store list of JRPC addresses as
-* ASMPC is now stored in the expression.
-*
-* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-* ASMPC is computed on zero-base address of the code section and expressions
-* including ASMPC are not relocated at link time.
-* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-* The expression ASMPC+3 is not marked as relocateable, and the resulting
-* code only works when linked at address 0.
-*
-* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-* of instruction-address.
-*
-* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-* Bug only happens with forward references to relative addresses in expressions.
-* See example from zx48.asm ROM image in t/BUG_0011.t test file.
-* Need to change object file format to correct - need patchptr and address of instruction start.
-*
-* Revision 1.20  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.19  2014/02/25 22:39:34  pauloscustodio
-* ws
-*
-* Revision 1.18  2014/02/19 23:59:26  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.17  2014/01/23 22:30:55  pauloscustodio
-* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
-* at fclose()
-*
-* Revision 1.16  2014/01/20 23:29:18  pauloscustodio
-* Moved file.c to lib/fileutil.c
-*
-* Revision 1.15  2014/01/14 23:53:53  pauloscustodio
-* Missing include
-*
-* Revision 1.14  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.13  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-* 
-* Revision 1.12  2013/12/30 02:05:32  pauloscustodio
-* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-* handles both dynamically allocated strings and fixed-size strings.
-* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-* 
-* Revision 1.11  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-* 
-* Revision 1.10  2013/09/08 00:43:59  pauloscustodio
-* New error module with one error function per error, no need for the error
-* constants. Allows compiler to type-check error message arguments.
-* Included the errors module in the init() mechanism, no need to call
-* error initialization from main(). Moved all error-testing scripts to
-* one file errors.t.
-* 
-* Revision 1.9  2013/09/01 18:46:01  pauloscustodio
-* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
-* 
-* Revision 1.8  2013/08/30 21:50:43  pauloscustodio
-* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-* as an identifier reserved by the C standard for implementation-defined behaviour
-* starting with two underscores.
-* 
-* Revision 1.7  2013/08/30 01:06:08  pauloscustodio
-* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
-* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
-* 
-* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
-* - Expressions now use more standard C-like operators
-* - Object and library files changed signature to
-*   "Z80RMF02", "Z80LMF02", to avoid usage of old
-*   object files with expressions inside in the old format
-* 
-* Detail:
-* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
-* - Power:                        changed from '^' to '**'; '^' will be XOR
-* - XOR:                          changed from ':' to '^';
-* - AND:                          changed from '~' to '&';  '~' will be NOT
-* - NOT:                          '~' added as binary not
-* 
-* Revision 1.6  2013/05/12 19:46:35  pauloscustodio
-* New module for object file handling
-* 
-* Revision 1.5  2013/03/30 00:02:22  pauloscustodio
-* include xmalloc.h before any other include
-* 
-* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
-* Updated copyright year to 2013
-* 
-* Revision 1.3  2012/05/24 17:09:27  pauloscustodio
-* Unify copyright header
-* 
-* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
-* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-*         --mode=c
-*         --lineend=linux
-*         --indent=spaces=4
-*         --style=ansi --add-brackets
-*         --indent-switches --indent-classes
-*         --indent-preprocessor --convert-tabs
-*         --break-blocks
-*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-*         --align-pointer=name
-* 
-* Revision 1.1  2011/08/19 15:53:58  pauloscustodio
-* BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
-*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
-*	the heap is corrupted before the exception is raised.
-* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-* 
-*/

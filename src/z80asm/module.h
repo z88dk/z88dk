@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.20 2014-06-13 19:14:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.21 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -36,7 +36,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.20 2014-06-13 19:
 CLASS( Module )
 	char		*modname;			/* module name, kept in strpool */
 	char		*filename;			/* source file name, kept in strpool */
-    UInt		 addr;				/* this module's start offset from start of code buffer */
+	int			 module_id;			/* sequence number of linked modules in sections */
     Int			 origin;			/* ORG address of module, -1 if not defined */
     ExprList	*exprs;				/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
@@ -44,12 +44,14 @@ END_CLASS;
 
 CLASS_LIST( Module );
 
-/* new and delete modules */
+/* new modules set codearea module_id and default (=first) section */
 extern Module *new_module( void );
+
 extern void delete_modules( void );
 
-/* current module */
+/* set current module, set codearea module_id and default (=first) section */
 extern Module *set_cur_module( Module *module ); /* return input to allow chaining */
+
 extern Module *get_cur_module( void );
 
 #define CURRENTMODULE	(get_cur_module())

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.h,v 1.1 2014-06-13 16:00:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.h,v 1.2 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -21,11 +21,3 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.h,v 1.1 2014-06-13 16:
 #include "xmalloc.h"   /* before any other include */
 
 extern void link_modules( void );
-
-/*
-* $Log: modlink.h,v $
-* Revision 1.1  2014-06-13 16:00:46  pauloscustodio
-* Extended codearea.c to support different sections of code.
-*
-*
-*/

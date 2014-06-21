@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.127 2014-06-13 19:14:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.128 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -86,30 +86,16 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 
         switch ( symbol_char )
         {
-        case 'A':
-            symboltype = SYM_ADDR;
-            value += get_first_module( NULL )->origin + CURRENTMODULE->addr;       /* Absolute address */
-            break;
-
-        case 'C':
-            symboltype = 0;
-            break;
-
+        case 'A': symboltype = SYM_ADDR; break;
+        case 'C': symboltype = 0; break;
         default:
             error_not_obj_file( filename );
         }
 
         switch ( scope )
         {
-        case 'L':
-            define_local_sym( name->str, value, symboltype );
-            break;
-
-        case 'G':
-        case 'X':
-            define_global_sym( name->str, value, symboltype );
-            break;
-
+        case 'L': define_local_sym( name->str, value, symboltype ); break;
+        case 'G': define_global_sym( name->str, value, symboltype ); break;
         default:
             error_not_obj_file( filename );
         }
@@ -128,7 +114,8 @@ ReadExpr( FILE *file )
 	int type;
     long constant;
     Expr *expr;
-    UInt asmpc, patchptr, offsetptr;
+    UInt asmpc, offsetptr;
+	UInt base_addr, offset;
 
 	INIT_OBJ( Str, &expr_text );
 	INIT_OBJ( Str, &source_filename );
@@ -152,8 +139,10 @@ ReadExpr( FILE *file )
 		asmpc		= xfget_uint16( file );
         offsetptr	= xfget_uint16( file );
 
-        /* assembler PC as absolute address */
-        set_PC( get_first_module( NULL )->origin + CURRENTMODULE->addr + asmpc );
+		/* assembler PC as absolute address */
+		base_addr = CURRENTSECTION->addr;
+		offset    = get_cur_module_start(); 
+        set_PC( asmpc + base_addr + offset );
 
 		xfget_count_word_Str( file, expr_text );	/* get expression */
 
@@ -175,7 +164,6 @@ ReadExpr( FILE *file )
             else
             {
                 constant = Expr_eval( expr );
-                patchptr = CURRENTMODULE->addr + offsetptr;        /* index to memory buffer */
 
                 switch ( type )
                 {
@@ -183,27 +171,27 @@ ReadExpr( FILE *file )
                     if ( constant < -128 || constant > 255 )
                         warn_int_range( constant );
 
-                    patch_byte( &patchptr, (Byte) constant );
+                    patch_byte( &offsetptr, (Byte) constant );
                     break;
 
                 case 'S':
                     if ( constant < -128 || constant > 127 )
                         warn_int_range( constant );
 
-                    patch_byte( &patchptr, (Byte) constant );  /* opcode is stored, now store signed 8bit value */
+                    patch_byte( &offsetptr, (Byte) constant );  /* opcode is stored, now store signed 8bit value */
                     break;
 
                 case 'C':
                     if ( constant < -32768 || constant > 65535 )
                         warn_int_range( constant );
 
-                    patch_word( &patchptr, constant );
+                    patch_word( &offsetptr, constant ); offsetptr -= 2;
 
                     if ( opts.relocatable )
                         if ( expr->expr_type & SYM_ADDR )
                         {
                             /* Expression contains relocatable address */
-							UInt distance = offsetptr - curroffset;
+							UInt distance = offsetptr + offset - curroffset;
 
                             if ( distance >= 0 && distance <= 255 )
                             {
@@ -219,7 +207,7 @@ ReadExpr( FILE *file )
                             }
 
                             totaladdr++;
-                            curroffset = offsetptr;
+                            curroffset = offsetptr + offset;
                         }
 
                     break;
@@ -228,7 +216,7 @@ ReadExpr( FILE *file )
                     if ( constant < LONG_MIN || constant > LONG_MAX )
                         warn_int_range( constant );
 
-                    patch_long( &patchptr, constant );
+                    patch_long( &offsetptr, constant );
                     break;
                 }
             }
@@ -238,12 +226,109 @@ ReadExpr( FILE *file )
     }
 }
 
+/*-----------------------------------------------------------------------------
+*   relocate all SYM_ADDR symbols based on address from start of sections
+*----------------------------------------------------------------------------*/
+static void relocate_symbols_symtab( SymbolHash *symtab )
+{
+    SymbolHashElem *iter;
+    Symbol         *sym;
+	UInt			base_addr;
+	UInt			offset;
 
+    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+    {
+        sym = (Symbol *) iter->value;
+		if ( sym->sym_type & SYM_ADDR ) 
+		{
+			assert( sym->owner );				/* owner should exist except for -D defines */
+			
+			/* set base address for symbol */
+			set_cur_module(  sym->owner );
+			set_cur_section( sym->section );
 
+			base_addr = sym->section->addr;
+			offset    = get_cur_module_start();
+
+            sym->value += base_addr + offset;	/* Absolute address */
+		}
+	}
+}
+
+static void relocate_symbols( void )
+{
+    Module		   *module;
+	ModuleListElem *iter;
+
+	for ( module = get_first_module( &iter ) ; module != NULL  ;
+		  module = get_next_module( &iter ) )  
+    {
+		relocate_symbols_symtab( module->local_symtab );
+	}
+	relocate_symbols_symtab( global_symtab );
+}
+
+/*-----------------------------------------------------------------------------
+*   Define symbols with sections and code start, end and size
+*----------------------------------------------------------------------------*/
+static void define_location_symbols( void )
+{
+	Section *section;
+	SectionHashElem *iter;
+	DEFINE_STR( name, MAXLINE );
+	UInt start_addr, end_addr;
+
+	/* global code size */
+	start_addr = get_first_section(NULL)->addr;
+	section    = get_last_section();
+	end_addr   = section->addr + get_section_size( section );
+	
+    if ( opts.verbose )
+        printf("Code size of linked modules is %d bytes ($%04X to $%04X)\n",
+		       (int)(end_addr - start_addr), (int)start_addr, (int)end_addr );
+
+	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
+	define_global_def_sym( name->str, start_addr );
+	
+	Str_sprintf( name, ASMTAIL_KW, "", "" ); 
+	define_global_def_sym( name->str, end_addr );
+	
+	Str_sprintf( name, ASMSIZE_KW, "", "" ); 
+	define_global_def_sym( name->str, end_addr - start_addr );
+
+	/* size of each named section - skip "" section */
+	for ( section = get_first_section( &iter ) ; section != NULL ; 
+		  section = get_next_section( &iter ) )
+	{
+		if ( *(section->name) != '\0' )
+		{
+			start_addr = section->addr;
+			end_addr   = start_addr + get_section_size( section );
+
+			if ( opts.verbose )
+				printf("Section '%s' is %d bytes ($%04X to $%04X)\n",
+					   section->name, (int)(end_addr - start_addr), 
+					   (unsigned int)start_addr, (unsigned int)end_addr );
+
+			Str_sprintf( name, ASMHEAD_KW, "_", section->name ); 
+			define_global_def_sym( name->str, start_addr );
+
+			Str_sprintf( name, ASMTAIL_KW, "_", section->name ); 
+			define_global_def_sym( name->str, end_addr );
+
+			Str_sprintf( name, ASMSIZE_KW, "_", section->name ); 
+			define_global_def_sym( name->str, end_addr - start_addr );
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*   link
+*----------------------------------------------------------------------------*/
 void link_modules( void )
 {
     char fheader[9];
-    Int origin;
+    Int origin = -1;
     Module *module, *first_obj_module, *last_obj_module;
 	ModuleListElem *iter;
 	Bool saw_last_obj_module;
@@ -254,9 +339,7 @@ void link_modules( void )
     linkhdr = NULL;
 
     if ( opts.verbose )
-    {
         puts( "linking module(s)...\nPass1..." );
-    }
 
     if ( opts.relocatable )
     {
@@ -274,8 +357,6 @@ void link_modules( void )
 
     TRY
     {
-        set_PC( 0 );
-
 		/* remember current first and last modules, i.e. before adding library modules */
 		first_obj_module = get_first_module( &iter );
 		last_obj_module  = get_last_module( NULL );
@@ -318,39 +399,29 @@ void link_modules( void )
                 break;
             }
 
-            origin = xfget_uint16( file );
-			if ( origin == 0xFFFF )
-				origin = -1;
-
-            if ( CURRENTMODULE == first_obj_module )            /* origin of first module */
+			/* compute origin on first module */
+            if ( CURRENTMODULE == first_obj_module )
             {
-                if ( opts.relocatable )
-                {
-                    CURRENTMODULE->origin = 0;					/* ORG 0 on auto relocation */
-                }
-                else
-                {
-                    if ( opts.origin >= 0 )
-                    {
-                        CURRENTMODULE->origin = opts.origin;    /* use origin from command line */
-                    }
-                    else
-                    {
-                        CURRENTMODULE->origin = origin;
+				origin = xfget_uint16( file );	/* origin of first module */
+				if ( origin == 0xFFFF )
+					origin = -1;
 
-						if ( CURRENTMODULE->origin == -1 )
-                        {
-                            error_org_not_defined();  /* no ORG */
-                            xfclose( file );
-                            break;
-                        }
-                    }
+                if ( opts.relocatable )
+                    origin = 0;					/* ORG 0 on auto relocation */
+                else if ( opts.origin >= 0 )
+                    origin = opts.origin;		/* use origin from command line */
+				else if ( origin < 0 )
+                {
+                    error_org_not_defined();  /* no ORG */
+                    xfclose( file );
+                    break;
+                }
+				else
+				{
                 }
 
                 if ( opts.verbose )
-                {
-                    printf( "ORG address for code is %04X\n", CURRENTMODULE->origin );
-                }
+                    printf( "ORG address for code is $%04X\n", origin );
             }
 
             xfclose( file );
@@ -365,16 +436,19 @@ void link_modules( void )
 
         set_error_null();
 
-        define_global_def_sym( ASMSIZE_KW, get_codesize() );
-        define_global_def_sym( ASMHEAD_KW, first_obj_module->origin );
-        define_global_def_sym( ASMTAIL_KW, first_obj_module->origin + get_codesize() );
+		/* allocate segment addresses and compute absolute addresses of symbols */
+		if ( ! get_num_errors() )
+			sections_alloc_addr( origin );
 
-        if ( opts.verbose )
-            printf( "Code size of linked modules is %d bytes\n", ( int )get_codesize() );
+		if ( ! get_num_errors() )
+			relocate_symbols();
 
-        if ( ! get_num_errors() )
+		/* define assembly size */
+		if ( ! get_num_errors() )
+			define_location_symbols();
+
+		if ( ! get_num_errors() )
             ModuleExpr();               /*  Evaluate expressions in  all modules */
-
     }
     FINALLY
     {
@@ -397,6 +471,7 @@ LinkModule( char *filename, long fptr_base )
     UInt size;
     int flag = 0;
 	FILE *file;
+	UInt addr;
 
     /* open object file for reading */
     file = xfopen( filename, "rb" );           /* CH_0012 */
@@ -420,11 +495,8 @@ LinkModule( char *filename, long fptr_base )
 
         /* read module code at addr of the module */
         /* BUG_0015: was reading at current position in code area, swaping order of modules */
-        fread_codearea_offset( file, CURRENTMODULE->addr, size );
-
-        /* BUG_0015 : was not updating codesize */
-        if ( CURRENTMODULE->addr == get_codesize() )
-            inc_codesize( size );    /* a new module has been added */
+		addr = 0;
+		patch_file_contents( file, &addr, size );
     }
 
     if ( fptr_namedecl != -1 )
@@ -662,15 +734,14 @@ ModuleExpr( void )
 	FILE *file;
 
     if ( opts.verbose )
-    {
         puts( "Pass2..." );
-    }
 
     curlink = linkhdr->firstlink;
 
     do
     {
 		set_cur_module( curlink->moduleinfo );
+
         fptr_base = curlink->modulestart;
 
         set_error_null();
@@ -706,35 +777,29 @@ void
 CreateBinFile( void )
 {
     FILE *binaryfile;
-    UInt codesize, codeblock, offset;
+    UInt codeblock, offset;
     int segment;
     char *filename;
+	UInt codesize = get_sections_size();
+	Bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
+	Bool is_segmented   = ( opts.code_seg && codesize > 16384 );
 
-    if ( opts.bin_file )
-        /* use predined output filename from command line */
-    {
+    if ( opts.bin_file )        /* use predined output filename from command line */
         filename = opts.bin_file;
-    }
     else
     {
         /* create output filename, based on project filename */
         /* get source filename from first module */
-        if ( opts.code_seg && get_codesize() > 16384 )
-        {
-            /* add '.bn0' extension */
-            filename = get_segbin_filename( get_first_module( NULL )->filename, 0 );
-        }
+        if ( ! is_relocatable && is_segmented )
+            filename = get_segbin_filename( get_first_module(NULL)->filename, 0 );	/* add '.bn0' extension */
         else
-        {
-            /* add '.bin' extension */
-            filename = get_bin_filename( get_first_module( NULL )->filename );
-        }
+            filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
     }
 
     /* binary output to filename.bin */
     binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
 
-    if ( opts.relocatable && totaladdr != 0 )
+    if ( is_relocatable )
     {
 		/* relocate routine */
         xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
@@ -749,44 +814,38 @@ CreateBinFile( void )
 
 		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
-        xfclose( binaryfile );
-        binaryfile = NULL;
     }
-    else if ( opts.code_seg && get_codesize() > 16384 )
+    else if ( is_segmented )
     {
-        xfclose( binaryfile );
-        binaryfile = NULL;
         offset = 0;
         segment = 0;
-        codesize = get_codesize();
-
-        do
+        while (TRUE)
         {
-            codeblock = ( codesize > 16384U ) ? 16384U : codesize;
+            codeblock = ( codesize > 16384 ) ? 16384 : codesize;
             codesize -= codeblock;
-            binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
+         
             fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
             xfclose( binaryfile );
-            binaryfile = NULL;
+
+			if ( codesize == 0 )
+				break;
 
             offset += codeblock;
             segment++;
 
             filename = get_segbin_filename( filename, segment );	/* path code file with number */
+			binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
         }
-        while ( codesize );
     }
     else
     {
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
-        xfclose( binaryfile );
-        binaryfile = NULL;
     }
 
+	xfclose( binaryfile );
+
     if ( opts.verbose )
-    {
         puts( "Code generation completed." );
-    }
 }
 
 
@@ -855,659 +914,3 @@ ReleaseLinkInfo( void )
 
     linkhdr = NULL;
 }
-
-
-/*
-* $Log: modlink.c,v $
-* Revision 1.127  2014-06-13 19:14:04  pauloscustodio
-* Move module list to module.c
-*
-* Revision 1.126  2014/06/13 16:00:46  pauloscustodio
-* Extended codearea.c to support different sections of code.
-*
-* Revision 1.125  2014/06/09 13:30:28  pauloscustodio
-* Rename current module abrev
-*
-* Revision 1.124  2014/06/09 13:15:26  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.123  2014/06/02 22:29:14  pauloscustodio
-* Write object file in one go at the end of pass 2, instead of writing
-* parts during pass 1 assembly. This allows the object file format to be
-* changed more easily, to allow sections in a near future.
-* Remove global variable objfile and CloseFiles().
-*
-* Revision 1.122  2014/05/29 00:19:37  pauloscustodio
-* CH_0025: Link-time expression evaluation errors show source filename and line number
-* Object file format changed to version 04, to include the source file
-* location of expressions in order to give meaningful link-time error messages.
-*
-* Revision 1.121  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.120  2014/05/20 21:58:31  pauloscustodio
-* Add ASMHEAD symbol at the end of link with address of start of linked code.
-*
-* Revision 1.119  2014/05/19 00:19:33  pauloscustodio
-* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
-* is deleted in case of error.
-*
-* Revision 1.118  2014/05/17 23:08:03  pauloscustodio
-* Change origin to Int, use -1 to signal as not defined
-*
-* Revision 1.117  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.116  2014/05/06 22:52:01  pauloscustodio
-* Remove OS-dependent defines and dependency on ../config.h.
-* Remove OS_ID constant from predefined defines in assembly.
-*
-* Revision 1.115  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.114  2014/05/02 23:35:19  pauloscustodio
-* Rename startoffset, add constant for NO_ORIGIN
-*
-* Revision 1.113  2014/05/02 21:54:09  pauloscustodio
-* Use ByteArray instead of Str to hold object file
-*
-* Revision 1.112  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.111  2014/05/02 21:00:49  pauloscustodio
-* Hide module list, expose only iterators on CURRENTMODULE
-*
-* Revision 1.110  2014/05/02 20:24:38  pauloscustodio
-* New class Module to replace struct module and struct modules
-*
-* Revision 1.109  2014/04/22 23:32:42  pauloscustodio
-* Release 2.2.0 with major fixes:
-*
-* - Object file format changed to version 03, to include address of start
-* of the opcode of each expression stored in the object file, to allow
-* ASMPC to refer to the start of the opcode instead of the patch pointer.
-* This solves long standing BUG_0011 and BUG_0048.
-*
-* - ASMPC no longer stored in the symbol table and evaluated as a separate
-* token, to allow expressions including ASMPC to be relocated. This solves
-* long standing and never detected BUG_0047.
-*
-* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-* every assembled instruction, no need to store list of JRPC addresses as
-* ASMPC is now stored in the expression.
-*
-* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-* ASMPC is computed on zero-base address of the code section and expressions
-* including ASMPC are not relocated at link time.
-* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-* The expression ASMPC+3 is not marked as relocateable, and the resulting
-* code only works when linked at address 0.
-*
-* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-* of instruction-address.
-*
-* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-* Bug only happens with forward references to relative addresses in expressions.
-* See example from zx48.asm ROM image in t/BUG_0011.t test file.
-* Need to change object file format to correct - need patchptr and address of instruction start.
-*
-* Revision 1.108  2014/04/18 17:46:18  pauloscustodio
-* - Change struct expr to Expr class, use CLASS_LIST instead of linked list
-*   manipulating.
-* - Factor parsing and evaluating contants.
-* - Factor symbol-not-defined error during expression evaluation.
-* - Store module name in strpool instead of xstrdup/xfree.
-*
-* Revision 1.107  2014/04/13 11:54:01  pauloscustodio
-* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
-* Remove 'X' scope for symbols in object files used before for XLIB -
-* all PUBLIC symbols have scope 'G'.
-* Remove SDCC hack on object files trating XLIB and XDEF the same.
-* Created a warning to say XDEF et.al. are deprecated, but for the
-* momment keep it commented.
-*
-* Revision 1.106  2014/03/29 00:20:39  pauloscustodio
-* TK_EOF renamed TK_END
-*
-* Revision 1.105  2014/03/18 22:44:03  pauloscustodio
-* Scanner decodes a number into tok_number.
-* GetConstant(), TK_HEX_CONST, TK_BIN_CONST and TK_DEC_CONST removed.
-* ident[] replaced by tok_name.
-*
-* Revision 1.104  2014/03/17 00:08:24  pauloscustodio
-* Remove unsued local variable
-*
-* Revision 1.103  2014/03/16 23:57:06  pauloscustodio
-* Removed global line[]
-*
-* Revision 1.102  2014/03/16 19:19:49  pauloscustodio
-* Integrate use of srcfile in scanner, removing global variable z80asmfile
-* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-*
-* Revision 1.101  2014/03/15 02:12:07  pauloscustodio
-* Rename last token to tok*
-* GetSym() declared in scan.h
-*
-* Revision 1.100  2014/03/11 23:34:00  pauloscustodio
-* Remove check for feof(z80asmfile), add token TK_END to return on EOF.
-* Allows decoupling of input file used in scanner from callers.
-* Removed TOTALLINES.
-* GetChar() made static to scanner, not called by other modules.
-*
-* Revision 1.99  2014/03/11 22:59:20  pauloscustodio
-* Move EOL flag to scanner
-*
-* Revision 1.98  2014/03/11 00:15:13  pauloscustodio
-* Scanner reads input line-by-line instead of character-by-character.
-* Factor house-keeping at each new line read in the scanner getasmline().
-* Add interface to allow back-tacking of the recursive descent parser by
-* getting the current input buffer position and comming back to the same later.
-* SetTemporaryLine() keeps a stack of previous input lines.
-* Scanner handles single-quoted strings and returns a number.
-* New error for single-quoted string with length != 1.
-* Scanner handles double-quoted strings and returns the quoted string.
-*
-* Revision 1.97  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.96  2014/03/04 11:49:47  pauloscustodio
-* Expression parser and expression evaluator use a look-up table of all
-* supported unary, binary and ternary oprators, instead of a big switch
-* statement to select the operation.
-* Expression operations are stored in a contiguous array instead of
-* a liked list to reduce administrative overhead of adding / iterating.
-*
-* Revision 1.95  2014/03/03 13:43:50  pauloscustodio
-* Renamed symbol and expression type attributes
-*
-* Revision 1.94  2014/03/03 13:27:07  pauloscustodio
-* Rename symbol type constants
-*
-* Revision 1.93  2014/03/01 15:45:31  pauloscustodio
-* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
-* Handle C-like operators, make exponentiation (**) right-associative.
-* Simplify expression parser by handling composed tokens in lexer.
-* Change token ids to TK_...
-*
-* Revision 1.92  2014/02/25 22:39:34  pauloscustodio
-* ws
-*
-* Revision 1.91  2014/02/24 23:08:55  pauloscustodio
-* Rename "enum symbols" to "tokid_t", define in token.h
-*
-* Revision 1.90  2014/02/19 23:59:26  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.89  2014/01/23 22:30:55  pauloscustodio
-* Use xfclose() instead of fclose() to detect file write errors during buffer flush called
-* at fclose()
-*
-* Revision 1.88  2014/01/20 23:29:18  pauloscustodio
-* Moved file.c to lib/fileutil.c
-*
-* Revision 1.87  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.86  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.85  2013/12/30 02:05:32  pauloscustodio
-* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-* handles both dynamically allocated strings and fixed-size strings.
-* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-*
-* Revision 1.84  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-*
-* Revision 1.83  2013/10/05 13:43:05  pauloscustodio
-* Parse command line options via look-up tables:
-* -i, --use-lib
-* -x, --make-lib
-*
-* Revision 1.82  2013/10/05 08:14:43  pauloscustodio
-* Parse command line options via look-up tables:
-* -C, --line-mode
-*
-* Revision 1.81  2013/10/04 23:09:25  pauloscustodio
-* Parse command line options via look-up tables:
-* -R, --relocatable
-* --RCMX000
-*
-* Revision 1.80  2013/10/04 22:24:01  pauloscustodio
-* Parse command line options via look-up tables:
-* -c, --code-seg
-*
-* Revision 1.79  2013/10/03 23:48:30  pauloscustodio
-* Parse command line options via look-up tables:
-* -r, --origin=ORG_HEX
-*
-* Revision 1.78  2013/10/03 22:20:10  pauloscustodio
-* Parse command line options via look-up tables:
-* -o, --output
-*
-* Revision 1.77  2013/10/01 23:23:53  pauloscustodio
-* Parse command line options via look-up tables:
-* -l, --list
-* -nl, --no-list
-*
-* Revision 1.76  2013/10/01 22:50:26  pauloscustodio
-* Parse command line options via look-up tables:
-* -s, --symtable
-* -ns, --no-symtable
-*
-* Revision 1.75  2013/10/01 22:09:33  pauloscustodio
-* Parse command line options via look-up tables:
-* -sdcc
-*
-* Revision 1.74  2013/09/30 00:24:25  pauloscustodio
-* Parse command line options via look-up tables:
-* -e, --asm-ext
-* -M, --obj-ext
-* Move filename extension functions to options.c
-*
-* Revision 1.73  2013/09/27 01:14:33  pauloscustodio
-* Parse command line options via look-up tables:
-* --help, --verbose
-*
-* Revision 1.72  2013/09/22 21:34:48  pauloscustodio
-* Remove legacy xxx_err() interface
-*
-* Revision 1.71  2013/09/12 00:10:02  pauloscustodio
-* Create xfree() macro that NULLs the pointer after free, required
-* by z80asm to find out if a pointer was already freed.
-*
-* Revision 1.70  2013/09/08 08:29:21  pauloscustodio
-* Replaced xmalloc et al with glib functions
-*
-* Revision 1.69  2013/09/08 00:43:59  pauloscustodio
-* New error module with one error function per error, no need for the error
-* constants. Allows compiler to type-check error message arguments.
-* Included the errors module in the init() mechanism, no need to call
-* error initialization from main(). Moved all error-testing scripts to
-* one file errors.t.
-*
-* Revision 1.68  2013/09/01 12:00:07  pauloscustodio
-* Cleanup compilation warnings
-*
-* Revision 1.67  2013/09/01 00:18:28  pauloscustodio
-* - Replaced e4c exception mechanism by a much simpler one based on a few
-*   macros. The former did not allow an exit(1) to be called within a
-*   try-catch block.
-*
-* Revision 1.66  2013/06/16 20:14:39  pauloscustodio
-* Move deffile writing to deffile.c, remove global variable deffile
-*
-* Revision 1.65  2013/06/15 00:26:23  pauloscustodio
-* Move mapfile writing to mapfile.c.
-*
-* Revision 1.64  2013/06/14 23:47:13  pauloscustodio
-* BUG_0036 : Map file does not show local symbols with the same name in different modules
-* If the same local symbol is defined in multiple modules, only one of
-* them appears in the map file.
-* "None." is written in map file if no symbols are defined.
-*
-* Revision 1.63  2013/06/14 22:14:36  pauloscustodio
-* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
-*
-* Revision 1.62  2013/06/11 23:16:06  pauloscustodio
-* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
-* Add error message for invalid symbol and scope chars in object file.
-*
-* Revision 1.61  2013/06/08 23:37:32  pauloscustodio
-* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
-*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-* Define keywords for special symbols ASMSIZE, ASMTAIL
-*
-* Revision 1.60  2013/06/08 23:07:53  pauloscustodio
-* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
-*  and define_global_def_sym().
-*
-* Revision 1.59  2013/06/01 01:24:22  pauloscustodio
-* CH_0022 : Replace avltree by hash table for symbol table
-*
-* Revision 1.58  2013/05/23 22:22:23  pauloscustodio
-* Move symbol to sym.c, rename to Symbol
-*
-* Revision 1.57  2013/05/06 23:02:12  pauloscustodio
-* BUG_0034 : If assembly process fails with fatal error, invalid library is kept
-* Option -x creates an empty library file (just the header). If the
-* assembly process fails with a fatal errror afterwards, the library file
-* is not deleted.
-*
-* Revision 1.56  2013/05/02 21:24:50  pauloscustodio
-* Cleanup assemble login
-* Removed global vars srcfilename, objfilename
-*
-* Revision 1.55  2013/04/07 23:34:19  pauloscustodio
-* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
-* z80asm no longer asks for an ORG address from the standard input
-* if one is not given either by an ORG statement or a -r option;
-* it exists with an error message instead.
-* The old behaviour was causing wrong build scripts to hang waiting
-* for input.
-*
-* Revision 1.54  2013/04/06 13:15:04  pauloscustodio
-* Move default asm and obj extension handling to file.c.
-* srcfilename and objfilename are now pointers to static variables in file.c
-*
-* Revision 1.53  2013/04/04 23:24:18  pauloscustodio
-* Remove global variable errfilename
-*
-* Revision 1.52  2013/04/03 21:53:47  pauloscustodio
-* CreateDeffile() : no need to allocate file name dynamically, use a stack variable
-*
-* Revision 1.51  2013/03/31 13:49:41  pauloscustodio
-* ReadName(), ReadNames(), CheckIfModuleWanted(), LinkLibModules(), SearchLibFile()
-* were using global z80asmfile instead of a local FILE* variable - fixed
-*
-* Revision 1.50  2013/03/04 23:23:37  pauloscustodio
-* Removed writeline, that was used to cancel listing of multi-line
-* constructs, as only the first line was shown on the list file. Fixed
-* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-*
-* Revision 1.49  2013/02/19 22:52:40  pauloscustodio
-* BUG_0030 : List bytes patching overwrites header
-* BUG_0031 : List file garbled with input lines with 255 chars
-* New listfile.c with all the listing related code
-*
-* Revision 1.48  2013/02/12 00:55:00  pauloscustodio
-* CH_0017 : Align with spaces, deprecate -t option
-*
-* Revision 1.47  2013/01/24 23:03:03  pauloscustodio
-* Replaced (unsigned char) by (Byte)
-* Replaced (unisigned int) by (UInt)
-* Replaced (short) by (int)
-*
-* Revision 1.46  2013/01/20 13:18:10  pauloscustodio
-* BUG_0024 : (ix+128) should show warning message
-* Signed integer range was wrongly checked to -128..255 instead
-* of -128..127
-*
-* Revision 1.45  2013/01/14 00:29:37  pauloscustodio
-* CH_0015 : integer out of range error replaced by warning
-*
-* Revision 1.44  2012/11/03 17:39:36  pauloscustodio
-* astyle, comments
-*
-* Revision 1.43  2012/06/14 15:01:27  pauloscustodio
-* Split safe strings from strutil.c to safestr.c
-*
-* Revision 1.42  2012/06/07 11:54:13  pauloscustodio
-* - Make mapfile static to module modlink.
-* - Remove modsrcfile, not used.
-* - GetModuleSize(): use local variable for file handle instead of objfile
-*
-* Revision 1.41  2012/05/29 21:00:35  pauloscustodio
-* BUG_0019 : z80asm closes a closed file handle, crash in Linux
-*
-* Revision 1.40  2012/05/26 18:51:10  pauloscustodio
-* CH_0012 : wrappers on OS calls to raise fatal error
-* CH_0013 : new errors interface to decouple calling code from errors.c
-*
-* Revision 1.39  2012/05/24 17:09:27  pauloscustodio
-* Unify copyright header
-*
-* Revision 1.38  2012/05/23 20:00:38  pauloscustodio
-* BUG_0017 : no error message if fails to create binary file chunk (option -c).
-* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
-*
-* Revision 1.37  2012/05/20 06:39:27  pauloscustodio
-* astyle
-*
-* Revision 1.36  2012/05/20 06:02:09  pauloscustodio
-* Garbage collector
-* Added automatic garbage collection on exit and simple fence mechanism
-* to detect buffer underflow and overflow, to xmalloc functions.
-* No longer needed to call init_malloc().
-* No longer need to try/catch during creation of memory structures to
-* free partially created data - all not freed data is freed atexit().
-* Renamed xfree0() to xfree().
-*
-* Revision 1.35  2012/05/20 05:31:18  pauloscustodio
-* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
-*
-* Revision 1.34  2012/05/17 21:36:06  pauloscustodio
-* Remove global ASMERROR, redundant with TOTALERRORS.
-* Remove IllegalArgumentException, replace by FatalErrorException.
-*
-* Revision 1.33  2012/05/17 17:42:14  pauloscustodio
-* define_symbol() defined as void, a fatal error is
-* always raised on error.
-*
-* Revision 1.32  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
-* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-*         --mode=c
-*         --lineend=linux
-*         --indent=spaces=4
-*         --style=ansi --add-brackets
-*         --indent-switches --indent-classes
-*         --indent-preprocessor --convert-tabs
-*         --break-blocks
-*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-*         --align-pointer=name
-*
-* Revision 1.31  2012/04/05 08:39:19  stefano
-* New reserved words, ASMTAIL and ASMSIZE, referring to the finally linked program block.
-* ASMTAIL could be a good starting point to determine automatically the heap position for malloc() or to insert a stack overflow protection in programs.
-* Note the in some case, after the program packaging, there are extra critical bytes to be preserved as well.
-*
-* Revision 1.30  2011/10/14 14:46:03  pauloscustodio
-* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
-*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
-*
-* Revision 1.29  2011/10/07 17:53:04  pauloscustodio
-* BUG_0015 : Relocation issue - dubious addresses come out of linking
-* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
-* The effect was that all address calculations at link phase were considering
-*  a start offset of zero for all modules.
-* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
-* - Consequence of these two issues were all linked addresses wrong.
-*
-* Revision 1.28  2011/08/21 20:37:20  pauloscustodio
-* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
-* - Factor all pathname manipulation into module file.c.
-* - Make default extensions constants.
-* - Move asm_ext[] and obj_ext[] to the options.c module.
-*
-* Revision 1.27  2011/08/19 15:53:58  pauloscustodio
-* BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
-*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
-*	the heap is corrupted before the exception is raised.
-* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-*
-* Revision 1.26  2011/08/19 10:20:32  pauloscustodio
-* - Factored code to read/write word from file into xfget_u16/xfput_u16.
-* - Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
-*
-* Revision 1.25  2011/08/18 23:27:54  pauloscustodio
-* BUG_0009 : file read/write not tested for errors
-* - In case of disk full file write fails, but assembler does not detect the error
-*   and leaves back corruped object/binary files
-* - Created new exception FileIOException and ERR_FILE_IO error.
-* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
-*
-* Revision 1.24  2011/08/18 21:46:54  pauloscustodio
-* BUG_0008 : code block of 64K is read as zero
-*
-* Revision 1.23  2011/08/15 17:12:31  pauloscustodio
-* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
-*
-* Revision 1.22  2011/08/14 19:42:07  pauloscustodio
-* - link_modules(), ModuleExpr(), CreateBinFile(), CreateLib(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN
-*
-* Revision 1.21  2011/08/05 19:56:37  pauloscustodio
-* CH_0004 : Exception mechanism to handle fatal errors
-* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
-* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
-* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
-* removing all the test code after each memory allocation.
-* Replaced all functions that allocated memory structures by the new xcalloc_struct().
-* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
-* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
-* Created try/catch sequences to clean-up partially created memory structures and rethrow the
-* exception, to cleanup memory leaks.
-* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
-*
-* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
-* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-*
-* Revision 1.19  2011/07/14 01:32:08  pauloscustodio
-*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-*     CH_0003 : Error messages should be more informative
-*         - Added printf-args to error messages, added "Error:" prefix.
-*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-*         - Raise ERR_UNBALANCED_PAREN instead
-*
-* Revision 1.18  2011/07/12 22:47:59  pauloscustodio
-* - Moved all error variables and error reporting code to a separate module errors.c,
-*   replaced all extern declarations of these variables by include errors.h,
-*   created symbolic constants for error codes.
-* - Added test scripts for error messages.
-*
-* Revision 1.17  2011/07/11 16:00:34  pauloscustodio
-* Moved all option variables and option handling code to a separate module options.c,
-* replaced all extern declarations of these variables by include options.h.
-* Created declarations in z80asm.h of objects defined in z80asm.c.
-*
-* Revision 1.16  2011/07/09 18:25:35  pauloscustodio
-* Log keyword in checkin comment was expanded inside Log expansion... recursive
-* Added Z80asm banner to all source files
-*
-* Revision 1.15  2011/07/09 17:36:09  pauloscustodio
-* Copied cvs log into Log history
-*
-* Revision 1.14  2011/07/09 01:46:00  pauloscustodio
-* Added Log keyword
-*
-* Revision 1.13  2011/07/09 01:20:55  pauloscustodio
-* added casts to clean up warnings
-*
-* Revision 1.12  2010/09/19 02:37:57  dom
-* 64bit issue
-*
-* Revision 1.11  2010/09/19 00:06:20  dom
-* Tweaks for compiling code generated by sdcc - it generates XREF rather than
-* LIB so treat XREF as a LIB (this possibly should be the default)
-*
-* Do some _ mapping magic when in sdcc so standard z88dk libs can be used
-* (wrong _ convention chosen a long time ago...)
-*
-* Have -forcexlib flag which treats MODULE as XLIB.
-*
-* Revision 1.10  2010/04/16 17:34:37  dom
-* Make line number an int - 32768 lines isn't big enough...
-*
-* Revision 1.9  2009/09/28 23:14:13  dom
-* Get the length of the right name.
-*
-* Revision 1.8  2009/09/03 17:42:12  dom
-* Remove endian reading kludge and make work on 64 bit
-*
-* Revision 1.7  2009/08/14 22:23:12  dom
-* clean up some compiler warnings
-*
-* Revision 1.6  2009/07/23 20:35:14  dom
-* Get the end position right here as well
-*
-* Revision 1.5  2009/07/17 22:06:48  dom
-* Experimental code to allow a LIB directive to refer to a globally exported
-* symbol from a module.
-*
-* Should provide a better way of doing the ASMDISP stuff.
-*
-* Revision 1.4  2002/11/05 11:45:56  dom
-* powerpc endian detection
-*
-* fix for 64 bit machines, sizeof(long) != 4
-*
-* Revision 1.3  2002/10/22 19:21:10  dom
-* that shouldn't have been committed (oops)
-*
-* Revision 1.2  2002/10/22 19:15:28  dom
-* Makefile changes to use $(RM) instead of rm
-*
-* Revision 1.1  2000/07/04 15:33:30  dom
-* branches:  1.1.1;
-* Initial revision
-*
-* Revision 1.1.1.1  2000/07/04 15:33:30  dom
-* First import of z88dk into the sourceforge system <gulp>
-*
-*/
-
-/* $History: MODLINK.C $ */
-/*  */
-/* *****************  Version 16  ***************** */
-/* User: Gbs          Date: 26-01-00   Time: 22:10 */
-/* Updated in $/Z80asm */
-/* Expression range validation removed from 8bit unsigned (redundant). */
-/*  */
-/* *****************  Version 14  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 20:06 */
-/* Updated in $/Z80asm */
-/* "PC" program counter changed to long (from unsigned short). */
-/*  */
-/* *****************  Version 12  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 12:12 */
-/* Updated in $/Z80asm */
-/* Added Ascii Art "Z80asm" at top of source file. */
-/*  */
-/* *****************  Version 10  ***************** */
-/* User: Gbs          Date: 6-06-99    Time: 11:30 */
-/* Updated in $/Z80asm */
-/* "config.h" included before "symbol.h" */
-/*  */
-/* *****************  Version 9  ***************** */
-/* User: Gbs          Date: 30-05-99   Time: 1:00 */
-/* Updated in $/Z80asm */
-/* Redundant system include files removed. */
-/* Createlib() rewritten to replace low I/O open() with fopen() and */
-/* fread(). */
-/*  */
-/* *****************  Version 8  ***************** */
-/* User: Gbs          Date: 2-05-99    Time: 18:06 */
-/* Updated in $/Z80asm */
-/* File IO errors now handled through new ReportIOError() function. */
-/*  */
-/* *****************  Version 6  ***************** */
-/* User: Gbs          Date: 17-04-99   Time: 0:30 */
-/* Updated in $/Z80asm */
-/* New GNU programming style C format. Improved ANSI C coding style */
-/* eliminating previous compiler warnings. New -o option. Asm sources file */
-/* now parsed even though any line feed standards (CR,LF or CRLF) are */
-/* used. */
-/*  */
-/* *****************  Version 5  ***************** */
-/* User: Gbs          Date: 7-03-99    Time: 13:13 */
-/* Updated in $/Z80asm */
-/* Minor changes to keep C compiler happy. */
-/*  */
-/* *****************  Version 3  ***************** */
-/* User: Gbs          Date: 4-09-98    Time: 0:10 */
-/* Updated in $/Z80asm */
-/* Various changes by Dominic Morris (ENDIAN #if). */
-/*  */
-/* *****************  Version 2  ***************** */
-/* User: Gbs          Date: 20-06-98   Time: 15:10 */
-/* Updated in $/Z80asm */
-/* SourceSafe Version History Comment Block added. */
-
-/* ifdef QDOS changed to ifdef ENDIAN to sort ENDIAN djm 26/6/98 */

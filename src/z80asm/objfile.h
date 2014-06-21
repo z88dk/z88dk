@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.27 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.28 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -31,9 +31,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.27 2014-06-09 13
 #define OBJ_VERSION	"04"
 
 /*-----------------------------------------------------------------------------
-*   Write module to object file - object file name is computed
+*   Write current module to object file - object file name is computed
 *----------------------------------------------------------------------------*/
-extern void write_obj_file( char *src_filename, Module *module );
+extern void write_obj_file( char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Object file class
@@ -95,149 +95,4 @@ extern ByteArray *read_obj_file_data( char *filename );
 
 /* Updates current module name and size, if object file of given source is valid
    load module name and size, when assembling with -d and up-to-date */
-extern Bool objmodule_loaded( char *src_filename, Module *module );
-
-/*
-* $Log: objfile.h,v $
-* Revision 1.27  2014-06-09 13:15:26  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.26  2014/06/03 22:53:14  pauloscustodio
-* Do not sort symbols before writing to object file. Not needed and
-* wastes time.
-*
-* Revision 1.25  2014/06/02 22:29:14  pauloscustodio
-* Write object file in one go at the end of pass 2, instead of writing
-* parts during pass 1 assembly. This allows the object file format to be
-* changed more easily, to allow sections in a near future.
-* Remove global variable objfile and CloseFiles().
-*
-* Revision 1.24  2014/05/29 00:19:37  pauloscustodio
-* CH_0025: Link-time expression evaluation errors show source filename and line number
-* Object file format changed to version 04, to include the source file
-* location of expressions in order to give meaningful link-time error messages.
-*
-* Revision 1.23  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.22  2014/05/21 20:57:27  pauloscustodio
-* Embryo of write module
-*
-* Revision 1.21  2014/05/19 22:15:54  pauloscustodio
-* Move read_obj_file_data() to objfile.c
-* Move CreateLibfile() to libfile.c, rename to search_libfile()
-*
-* Revision 1.20  2014/05/19 00:21:10  pauloscustodio
-* logic error in test for library
-*
-* Revision 1.19  2014/05/17 22:42:25  pauloscustodio
-* Move load_module_object() that loads object file size when assembling
-* with -d option to objfile.c. Change objfile API.
-*
-* Revision 1.18  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.17  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.15  2014/04/22 23:32:42  pauloscustodio
-* Release 2.2.0 with major fixes:
-*
-* - Object file format changed to version 03, to include address of start
-* of the opcode of each expression stored in the object file, to allow
-* ASMPC to refer to the start of the opcode instead of the patch pointer.
-* This solves long standing BUG_0011 and BUG_0048.
-*
-* - ASMPC no longer stored in the symbol table and evaluated as a separate
-* token, to allow expressions including ASMPC to be relocated. This solves
-* long standing and never detected BUG_0047.
-*
-* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-* every assembled instruction, no need to store list of JRPC addresses as
-* ASMPC is now stored in the expression.
-*
-* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-* ASMPC is computed on zero-base address of the code section and expressions
-* including ASMPC are not relocated at link time.
-* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-* The expression ASMPC+3 is not marked as relocateable, and the resulting
-* code only works when linked at address 0.
-*
-* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-* of instruction-address.
-*
-* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-* Bug only happens with forward references to relative addresses in expressions.
-* See example from zx48.asm ROM image in t/BUG_0011.t test file.
-* Need to change object file format to correct - need patchptr and address of instruction start.
-*
-* Revision 1.14  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.13  2014/02/25 22:39:34  pauloscustodio
-* ws
-*
-* Revision 1.12  2014/02/19 23:59:26  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.11  2014/02/17 23:12:38  pauloscustodio
-* ws
-*
-* Revision 1.10  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.9  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-* 
-* Revision 1.8  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-* 
-* Revision 1.7  2013/06/08 23:08:38  pauloscustodio
-* comments
-* 
-* Revision 1.6  2013/05/12 19:46:35  pauloscustodio
-* New module for object file handling
-* 
-* Revision 1.5  2013/01/20 21:24:28  pauloscustodio
-* Updated copyright year to 2013
-* 
-* Revision 1.4  2012/11/03 17:39:36  pauloscustodio
-* astyle, comments
-* 
-* Revision 1.3  2012/05/24 17:09:27  pauloscustodio
-* Unify copyright header
-* 
-* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
-* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-*         --mode=c
-*         --lineend=linux
-*         --indent=spaces=4
-*         --style=ansi --add-brackets
-*         --indent-switches --indent-classes
-*         --indent-preprocessor --convert-tabs
-*         --break-blocks
-*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-*         --align-pointer=name
-* 
-* Revision 1.1  2011/08/19 15:53:58  pauloscustodio
-* BUG_0010 : heap corruption when reaching MAXCODESIZE
-* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); 
-*	if only one byte is available in codearea, and a 2 byte instruction is assembled, 
-*	the heap is corrupted before the exception is raised.
-* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-* 
-*/
+extern Bool objmodule_loaded( char *src_filename );

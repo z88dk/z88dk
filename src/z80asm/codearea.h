@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.30 2014-06-14 11:59:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.31 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -41,8 +41,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.30 2014-06-14 1
 *	The reset_codearea() clears all section data.
 *----------------------------------------------------------------------------*/
 
-extern void reset_codearea( void );			/* init to default section "" */
-
 /*-----------------------------------------------------------------------------
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
@@ -50,8 +48,10 @@ CLASS( Section )
 	char		*name;			/* name of section, kept in strpool */
 	UInt		 addr;			/* start address of this section,
 								   computed by sections_alloc_addr() */
-	UInt		 asmpc;			/* address of current opcode */
-	UInt		 opcode_size;	/* Number of bytes added after last 
+	UInt		 asmpc;			/* address of current opcode relative to start
+								   of the current module, reset to 0 at start
+								   of each module */
+	UInt		 opcode_size;	/* number of bytes added after last 
 								   set_PC() or next_PC() */
 	ByteArray	*bytes;			/* binary code of section, used to compute 
 								   current size */
@@ -61,34 +61,55 @@ END_CLASS;
 
 CLASS_HASH( Section );
 
-/* allocate a new module, setup module_start[] of all sections, return new unique ID */
-extern int section_new_module( void );
+/*-----------------------------------------------------------------------------
+*   Handle list of current sections
+*----------------------------------------------------------------------------*/
 
-/* return start offset for given section and module ID */
-extern UInt section_module_start( Section *section, int module_id );
+/* init to default section ""; only called at startup */
+extern void reset_codearea( void );
 
-/* allocate the addr of each of the sections, concatenating the sections in
-   consecutive addresses. Start at the given org, or at 0 if negative */
-extern void sections_alloc_addr( Int origin );
+/* return size of current section */
+extern UInt get_section_size( Section *section );
 
-/* get section by name, creates a new section if new name */
-extern Section *get_section( char *name );
+/* compute total size of all sections */
+extern UInt get_sections_size( void );
 
-/* list of sections iterator, pointer to iterator may be NULL if no need to iterate */
+/* get section by name, creates a new section if new name; make it the current section */
+extern Section *new_section( char *name );
+
+/* get/set current section */
+extern Section *get_cur_section( void );
+extern Section *set_cur_section( Section *section );
+
+#define CURRENTSECTION	(get_cur_section())
+
+/* iterate through sections, 
+   pointer to iterator may be NULL if no need to iterate */
 extern Section *get_first_section( SectionHashElem **piter );
 extern Section *get_last_section( void );
 extern Section *get_next_section( SectionHashElem **piter );
 
-/* get/set current and default section */
-extern Section *get_default_section( void );
-extern Section *get_cur_section( void );
-extern void     set_cur_section( Section *section );
+/*-----------------------------------------------------------------------------
+*   allocate the addr of each of the sections, concatenating the sections in
+*   consecutive addresses. Start at the given org, or at 0 if negative
+*----------------------------------------------------------------------------*/
+extern void sections_alloc_addr( Int origin );
 
-#define CURRENTSECTION	(get_cur_section())
+/*-----------------------------------------------------------------------------
+*   Handle current module
+*----------------------------------------------------------------------------*/
 
-/* return number of bytes and base address of current section code */
-extern Byte *get_section_code( Section *section );
-extern UInt  get_section_size( Section *section );
+/* allocate a new module, setup module_start[] and reset ASMPC of all sections, 
+   return new unique ID; make it the current module */
+extern int new_module_id( void );
+
+/* get/set current module, i.e. module where the next functions operate */
+extern int  get_cur_module_id( void );
+extern void set_cur_module_id( int module_id );
+
+/* return start and end offset for the current section and module id */
+extern UInt get_cur_module_start( void );
+extern UInt get_cur_module_size( void );
 
 /*-----------------------------------------------------------------------------
 *   Handle ASMPC
@@ -101,27 +122,12 @@ extern UInt next_PC( void );
 extern UInt get_PC( void );
 
 /*-----------------------------------------------------------------------------
-*   reset the code area, return current size
-*----------------------------------------------------------------------------*/
-
-extern UInt get_codesize( void );			/* size of all modules before current,
-                                               i.e. base address of current module */
-extern UInt inc_codesize( UInt n );			/* increment loaded codesize */
-
-/*-----------------------------------------------------------------------------
-*   write code area to an open file
-*----------------------------------------------------------------------------*/
-extern void fwrite_codearea( FILE *file );
-extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size );
-extern void fread_codearea( FILE *file, UInt read_size );		/* append to codearea */
-extern void fread_codearea_offset( FILE *file, UInt offset, UInt read_size );  /* read to codearea at offset */
-
-/*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
-*	the patch address is incremented after store
+*	the patch address is relative to current module and current section
+*	and is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_value( UInt *paddr, UInt value, int num_bytes );
-extern void append_value(              UInt value, int num_bytes );
+extern void  patch_value( UInt *paddr, UInt value, UInt num_bytes );
+extern void append_value(              UInt value, UInt num_bytes );
 
 extern void  patch_byte( UInt *paddr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
@@ -132,3 +138,23 @@ extern void append_word( int word );
 
 extern void  patch_long( UInt *paddr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
+
+/* advance code pointer reserving space, return address of start of buffer */
+extern Byte *append_reserve( UInt num_bytes );	
+
+/* patch/append binary contents of file, whole file if num_bytes < 0 */
+extern void  patch_file_contents( FILE *file, UInt *paddr, long num_bytes );	
+extern void append_file_contents( FILE *file,              long num_bytes );	
+
+/*-----------------------------------------------------------------------------
+*   read/write current module to an open file
+*----------------------------------------------------------------------------*/
+
+/* write object code of the current module, return total size written */
+extern UInt fwrite_module_code( FILE *file );	
+
+/*-----------------------------------------------------------------------------
+*   write whole code area to an open file
+*----------------------------------------------------------------------------*/
+extern void fwrite_codearea( FILE *file );
+extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size );

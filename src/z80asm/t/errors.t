@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.20 2014-06-13 19:16:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.21 2014-06-21 02:15:44 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -568,18 +568,18 @@ t_z80asm_error('binary "'.$bin_file.'"',
 	       "Error at file 'test.asm' line 1: max. code size of 65536 bytes reached");
 
 # Linker
-my $asm_file2 = asm_file(); $asm_file2 =~ s/\.asm$/2.asm/i;
-my $file2_base = $asm_file2; $file2_base =~ s/\.asm$//i;
-write_file($asm_file2, "defb 0xAA");
+write_file(asm1_file(), "defb 0xAA");
 
 write_file(asm_file(), "defs 65535, 0xAA");
-t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "", "", 0);
+t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-r0 -d -b ".asm_file()." ".asm1_file(), "", "", 0);
 t_binary(read_binfile(bin_file()),
 	"\xAA" x 65536);
 
 write_file(asm_file(), "defs 65536, 0xAA");
-t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "",
-	"Error at module 'test2': max. code size of 65536 bytes reached\n".
+t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-r0 -d -b ".asm_file()." ".asm1_file(), "", 
+	"Error: max. code size of 65536 bytes reached\n".
 	"1 errors occurred during assembly\n", 1);
 
 # parseline
@@ -900,211 +900,3 @@ END
 
 unlink_testfiles();
 done_testing();
-
-
-__END__
-# $Log: errors.t,v $
-# Revision 1.20  2014-06-13 19:16:48  pauloscustodio
-# Remove CreateLibfile() - no longer used
-#
-# Revision 1.19  2014/05/29 00:19:37  pauloscustodio
-# CH_0025: Link-time expression evaluation errors show source filename and line number
-# Object file format changed to version 04, to include the source file
-# location of expressions in order to give meaningful link-time error messages.
-#
-# Revision 1.18  2014/05/13 23:42:49  pauloscustodio
-# Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
-# Remove opcode errors and warnings from t/errors.t.
-# Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
-# Remove t/data/z80opcodes*, too complex to maintain.
-#
-# Revision 1.17  2014/05/04 17:36:46  pauloscustodio
-# ws
-#
-# Revision 1.16  2014/05/02 20:24:39  pauloscustodio
-# New class Module to replace struct module and struct modules
-#
-# Revision 1.15  2014/04/28 22:16:11  pauloscustodio
-# Merge tests in same compilation unit to speed up testing.
-#
-# Revision 1.14  2014/04/25 23:39:14  pauloscustodio
-# Create asm and binary files at dev/Makefile using z80pack's assembler as benchmarks
-# to test the z80asm assembler. These files are used during testing.
-#
-# Revision 1.13  2014/04/22 23:32:42  pauloscustodio
-# Release 2.2.0 with major fixes:
-#
-# - Object file format changed to version 03, to include address of start
-# of the opcode of each expression stored in the object file, to allow
-# ASMPC to refer to the start of the opcode instead of the patch pointer.
-# This solves long standing BUG_0011 and BUG_0048.
-#
-# - ASMPC no longer stored in the symbol table and evaluated as a separate
-# token, to allow expressions including ASMPC to be relocated. This solves
-# long standing and never detected BUG_0047.
-#
-# - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-# every assembled instruction, no need to store list of JRPC addresses as
-# ASMPC is now stored in the expression.
-#
-# BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-# ASMPC is computed on zero-base address of the code section and expressions
-# including ASMPC are not relocated at link time.
-# "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-# The expression ASMPC+3 is not marked as relocateable, and the resulting
-# code only works when linked at address 0.
-#
-# BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-# In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-# of instruction-address.
-#
-# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-# Bug only happens with forward references to relative addresses in expressions.
-# See example from zx48.asm ROM image in t/BUG_0011.t test file.
-# Need to change object file format to correct - need patchptr and address of instruction start.
-#
-# Revision 1.12  2014/04/13 20:32:10  pauloscustodio
-# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-#
-# Revision 1.11  2014/04/06 22:55:54  pauloscustodio
-# Merged errors.t and whitebox-errors.t
-#
-# Revision 1.10  2014/04/05 23:36:11  pauloscustodio
-# CH_0024: Case-preserving, case-insensitive symbols
-# Symbols no longer converted to upper-case, but still case-insensitive
-# searched. Warning when a symbol is used with different case than
-# defined. Intermidiate stage before making z80asm case-sensitive, to
-# be more C-code friendly.
-#
-# Revision 1.9  2014/03/16 19:19:49  pauloscustodio
-# Integrate use of srcfile in scanner, removing global variable z80asmfile
-# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-#
-# Revision 1.8  2014/03/11 00:15:13  pauloscustodio
-# Scanner reads input line-by-line instead of character-by-character.
-# Factor house-keeping at each new line read in the scanner getasmline().
-# Add interface to allow back-tacking of the recursive descent parser by
-# getting the current input buffer position and comming back to the same later.
-# SetTemporaryLine() keeps a stack of previous input lines.
-# Scanner handles single-quoted strings and returns a number.
-# New error for single-quoted string with length != 1.
-# Scanner handles double-quoted strings and returns the quoted string.
-#
-# Revision 1.7  2014/02/23 18:48:16  pauloscustodio
-# CH_0021: New operators ==, !=, &&, ||, ?:
-# Handle C-like operators ==, !=, &&, || and ?:.
-# Simplify expression parser by handling composed tokens in lexer.
-#
-# Revision 1.6  2014/02/18 22:59:06  pauloscustodio
-# BUG_0040: Detect and report division by zero instead of crashing
-# BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
-#
-# Revision 1.26  2014/02/08 18:30:49  pauloscustodio (whitebox-errors.t)
-# lib/srcfile.c to read source files and handle recursive includes,
-# used to read @lists, removed opts.files;
-# model.c to hold global data model
-#
-# Revision 1.25  2014/01/20 23:29:18  pauloscustodio (whitebox-errors.t)
-# Moved file.c to lib/fileutil.c
-#
-# Revision 1.5  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.23  2014/01/06 00:33:36  pauloscustodio (whitebox-errors.t)
-# Use init.h mechanism, no need for main() calling init_errors
-# and atexit(fini_errors); use Str and StrHash instead of glib.
-#
-# Revision 1.22  2014/01/02 17:18:17  pauloscustodio (whitebox-errors.t)
-# StrList removed, replaced by List
-#
-# Revision 1.21  2014/01/01 21:23:48  pauloscustodio (whitebox-errors.t)
-# Move generic file utility functions to lib/fileutil.c
-#
-# Revision 1.20  2013/12/30 02:05:34  pauloscustodio (whitebox-errors.t)
-# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-# handles both dynamically allocated strings and fixed-size strings.
-# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-#
-# Revision 1.19  2013/12/26 23:42:28  pauloscustodio (whitebox-errors.t)
-# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
-#
-# Revision 1.18  2013/12/25 14:39:50  pauloscustodio (whitebox-errors.t)
-# Move strutil.c to the z80asm/lib directory
-#
-# Revision 1.17  2013/12/18 23:05:52  pauloscustodio (whitebox-errors.t)
-# Move class.c to the z80asm/lib directory
-#
-# Revision 1.4  2013/12/15 13:20:25  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.15  2013/11/11 23:47:04  pauloscustodio (whitebox-errors.t)
-# Move source code generation tools to dev/Makefile, only called on request,
-# and keep the generated files in z80asm directory, so that build does
-# not require tools used for the code generation (ragel, perl).
-# Remove code generation for structs - use CLASS macro instead.
-#
-# Revision 1.14  2013/10/15 23:24:33  pauloscustodio (whitebox-errors.t)
-# Move reading by lines or tokens and file reading interface to scan.rl
-# to decouple file.c from scan.c.
-# Add singleton interface to scan to be used by parser.
-#
-# Revision 1.3  2013/10/08 21:53:07  pauloscustodio
-# Replace Flex-based lexer by a Ragel-based one.
-# Add interface to file.c to read files by tokens, calling the lexer.
-#
-# Revision 1.2  2013/10/05 09:24:13  pauloscustodio
-# Parse command line options via look-up tables:
-# -t (deprecated)
-#
-# Revision 1.11  2013/09/23 23:14:10  pauloscustodio (whitebox-errors.t)
-# Renamed SzList to StringList, simplified interface by assuming that
-# list lives in memory util program ends; it is used for directory searches
-# only. Moved interface to strutil.c, removed strlist.c.
-#
-# Revision 1.10  2013/09/22 21:04:21  pauloscustodio (whitebox-errors.t)
-# New File and FileStack objects
-#
-# Revision 1.9  2013/09/09 00:20:45  pauloscustodio (whitebox-errors.t)
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.1  2013/09/08 00:43:59  pauloscustodio
-# New error module with one error function per error, no need for the error
-# constants. Allows compiler to type-check error message arguments.
-# Included the errors module in the init() mechanism, no need to call
-# error initialization from main(). Moved all error-testing scripts to
-# one file errors.t.
-#
-# Revision 1.7  2013/09/01 17:45:46  pauloscustodio (whitebox-errors.t)
-# Need to include init.o to have memory initialized
-#
-# Revision 1.6  2013/09/01 00:18:30  pauloscustodio (whitebox-errors.t)
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.5  2013/05/11 00:29:26  pauloscustodio (whitebox-errors.t)
-# CH_0021 : Exceptions on file IO show file name
-# Keep a hash table of all opened file names, so that the file name
-# is shown on a fatal error.
-# Rename file IO funtions: f..._err to xf...
-#
-# Revision 1.4  2013/01/20 21:24:29  pauloscustodio (whitebox-errors.t)
-# Updated copyright year to 2013
-#
-# Revision 1.3  2013/01/19 23:54:04  pauloscustodio (whitebox-errors.t)
-# BUG_0023 : Error file with warning is removed in link phase
-# z80asm -b f1.asm
-# If assembling f1.asm produces a warning, the link phase removes the f1.err
-# file hidding the warning.
-#
-# Revision 1.2  2012/06/14 15:01:27  pauloscustodio (whitebox-errors.t)
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.1  2012/05/26 18:51:10  pauloscustodio (whitebox-errors.t)
-# CH_0012 : wrappers on OS calls to raise fatal error
-# CH_0013 : new errors interface to decouple calling code from errors.c
-#

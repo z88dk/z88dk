@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.20 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.21 2014-06-21 02:15:43 pauloscustodio Exp $
 
 */
 
@@ -75,7 +75,7 @@ extern void ListFile_close( ListFile *self, Bool keep_file );
    3. output the full line */
 extern void ListFile_start_line( ListFile *self, UInt address,
                                  char *source_file, int source_line_nr, char *line );
-extern void ListFile_append( ListFile *self, long value, int num_bytes );
+extern void ListFile_append( ListFile *self, long value, UInt num_bytes );
 extern void ListFile_append_byte( ListFile *self, Byte byte1 );
 extern void ListFile_append_word( ListFile *self, int word );
 extern void ListFile_append_long( ListFile *self, long dword );
@@ -86,7 +86,7 @@ extern void ListFile_end_line( ListFile *self );
 extern void ListFile_end( ListFile *self );
 
 /* patch the bytes at the given patch_pos returned by ListFile_patch_pos() */
-extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes );
+extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, UInt num_bytes );
 
 /* write the symbol table in two steps:
    1. start a new table, provide title
@@ -107,100 +107,15 @@ extern void list_open( char *list_file );
 extern void list_close( Bool keep_file );
 extern void list_start_line( UInt address,
                              char *source_file, int source_line_nr, char *line );
-extern void list_append( long value, int num_bytes );
+extern void list_append( long value, UInt num_bytes );
 extern void list_append_byte( Byte byte1 );
 extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );
 extern void list_end_line( void );
 extern void list_end( void );
-extern void list_patch_data( long patch_pos, long value, int num_bytes );
+extern void list_patch_data( long patch_pos, long value, UInt num_bytes );
 extern void list_start_table( char *title );
 extern void list_symbol( char *symbol_name, long symbol_value,
                          SymbolRefList *references );
 extern int  list_get_page_nr( void );
-
-/*
-* $Log: listfile.h,v $
-* Revision 1.20  2014-06-09 13:15:26  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.19  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.18  2014/05/17 14:27:12  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.17  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.16  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.15  2014/04/15 20:06:43  pauloscustodio
-* Solve warning: no newline at end of file
-*
-* Revision 1.14  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.13  2014/02/19 23:59:26  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.12  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.11  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.10  2014/01/02 18:59:04  pauloscustodio
-* warning: "/","*" within comment [-Wcomment]
-*
-* Revision 1.9  2014/01/02 18:54:56  pauloscustodio
-* warning: "/","*" within comment [-Wcomment]
-*
-* Revision 1.8  2013/12/30 02:05:32  pauloscustodio
-* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-* handles both dynamically allocated strings and fixed-size strings.
-* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-*
-* Revision 1.7  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-*
-* Revision 1.6  2013/09/30 00:24:25  pauloscustodio
-* Parse command line options via look-up tables:
-* -e, --asm-ext
-* -M, --obj-ext
-* Move filename extension functions to options.c
-*
-* Revision 1.5  2013/05/16 23:39:48  pauloscustodio
-* Move struct node to sym.c, rename to Symbol
-* Move SymbolRef to symref.c
-*
-* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
-* Removed pass1 that was used to skip creating page references of created
-* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
-* modified list_get_page_nr() to return -1 after the whole source is
-* processed.
-*
-* Revision 1.3  2013/02/26 02:36:54  pauloscustodio
-* Simplified symbol output to listfile by using SymbolRefList argument
-*
-* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
-* Decouple assembler from listfile handling
-*
-* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
-* BUG_0030 : List bytes patching overwrites header
-* BUG_0031 : List file garbled with input lines with 255 chars
-* New listfile.c with all the listing related code
-*
-*/

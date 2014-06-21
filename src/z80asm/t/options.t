@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.42 2014-06-02 22:29:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.43 2014-06-21 02:15:44 pauloscustodio Exp $
 #
 # Test options
 
@@ -175,8 +175,8 @@ Size of module 'test' is 3 bytes
 
 linking module(s)...
 Pass1...
-ORG address for code is 0000
-Code size of linked modules is 3 bytes
+ORG address for code is $0000
+Code size of linked modules is 3 bytes ($0000 to $0003)
 Pass2...
 Creating map...
 Creating global definition file...
@@ -1132,7 +1132,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.42  2014-06-02 22:29:14  pauloscustodio
+# Revision 1.43  2014-06-21 02:15:44  pauloscustodio
+# Modified the address computations in pass 2 and during linking and
+# the generation of the binary image to support the sections defined
+# in the codearea.
+#
+# Revision 1.42  2014/06/02 22:29:14  pauloscustodio
 # Write object file in one go at the end of pass 2, instead of writing
 # parts during pass 1 assembly. This allows the object file format to be
 # changed more easily, to allow sections in a near future.

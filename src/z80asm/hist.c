@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.109 2014-06-13 16:00:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.110 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.109 2014-06-13 16:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.109  2014-06-13 16:00:45  pauloscustodio
+* Revision 1.110  2014-06-21 02:15:43  pauloscustodio
+* Modified the address computations in pass 2 and during linking and
+* the generation of the binary image to support the sections defined
+* in the codearea.
+*
+* Revision 1.109  2014/06/13 16:00:45  pauloscustodio
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.108  2014/06/09 13:15:26  pauloscustodio
@@ -1966,6 +1971,10 @@ xx.xx.2014 [2.3.1] (pauloscustodio)
 	  wastes time.
 
 	- Extended codearea.c to support different sections of code.
+	
+	- Modified the address computations in pass 2 and during linking and
+	  the generation of the binary image to support the sections defined 
+	  in the codearea.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1992,7 +2001,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1e"
+#define VERSION     "2.3.1f"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.21 2014-06-13 19:14:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.22 2014-06-21 02:15:43 pauloscustodio Exp $
 */
 
 #pragma once
@@ -70,9 +70,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.21 2014-06-13 19:1
 /*-----------------------------------------------------------------------------
 *   Special symbols
 *----------------------------------------------------------------------------*/
-#define ASMHEAD_KW	"ASMHEAD"
-#define ASMTAIL_KW	"ASMTAIL"
-#define ASMSIZE_KW	"ASMSIZE"
+#define ASMHEAD_KW	"ASMHEAD%s%s"
+#define ASMTAIL_KW	"ASMTAIL%s%s"
+#define ASMSIZE_KW	"ASMSIZE%s%s"
 
 /*-----------------------------------------------------------------------------
 *   Initialize data structures
@@ -92,102 +92,3 @@ extern int   src_line_nr( void );
 
 extern void  src_push( void );
 extern Bool  src_pop( void );
-
-/*
-* $Log: model.h,v $
-* Revision 1.21  2014-06-13 19:14:04  pauloscustodio
-* Move module list to module.c
-*
-* Revision 1.20  2014/06/13 16:00:46  pauloscustodio
-* Extended codearea.c to support different sections of code.
-*
-* Revision 1.19  2014/06/09 13:30:28  pauloscustodio
-* Rename current module abrev
-*
-* Revision 1.18  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.17  2014/05/21 20:56:08  pauloscustodio
-* Move special symbols to model.h
-*
-* Revision 1.16  2014/05/18 16:05:28  pauloscustodio
-* Add sections to the Module structure, define default section "".
-* Move module expressions to the Section structure.
-*
-* Revision 1.15  2014/05/06 22:52:01  pauloscustodio
-* Remove OS-dependent defines and dependency on ../config.h.
-* Remove OS_ID constant from predefined defines in assembly.
-*
-* Revision 1.14  2014/05/02 21:00:49  pauloscustodio
-* Hide module list, expose only iterators on CURRENTMODULE
-*
-* Revision 1.13  2014/05/02 20:24:38  pauloscustodio
-* New class Module to replace struct module and struct modules
-*
-* Revision 1.12  2014/04/22 23:32:42  pauloscustodio
-* Release 2.2.0 with major fixes:
-*
-* - Object file format changed to version 03, to include address of start
-* of the opcode of each expression stored in the object file, to allow
-* ASMPC to refer to the start of the opcode instead of the patch pointer.
-* This solves long standing BUG_0011 and BUG_0048.
-*
-* - ASMPC no longer stored in the symbol table and evaluated as a separate
-* token, to allow expressions including ASMPC to be relocated. This solves
-* long standing and never detected BUG_0047.
-*
-* - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-* every assembled instruction, no need to store list of JRPC addresses as
-* ASMPC is now stored in the expression.
-*
-* BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-* ASMPC is computed on zero-base address of the code section and expressions
-* including ASMPC are not relocated at link time.
-* "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-* The expression ASMPC+3 is not marked as relocateable, and the resulting
-* code only works when linked at address 0.
-*
-* BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-* In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-* of instruction-address.
-*
-* BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-* Bug only happens with forward references to relative addresses in expressions.
-* See example from zx48.asm ROM image in t/BUG_0011.t test file.
-* Need to change object file format to correct - need patchptr and address of instruction start.
-*
-* Revision 1.11  2014/04/13 20:32:06  pauloscustodio
-* PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-*
-* Revision 1.10  2014/04/13 11:54:01  pauloscustodio
-* CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-* Use new keywords PUBLIC and EXTERN, make the old ones synonyms.
-* Remove 'X' scope for symbols in object files used before for XLIB -
-* all PUBLIC symbols have scope 'G'.
-* Remove SDCC hack on object files trating XLIB and XDEF the same.
-* Created a warning to say XDEF et.al. are deprecated, but for the
-* momment keep it commented.
-*
-* Revision 1.9  2014/03/15 14:35:51  pauloscustodio
-* Add interface to lookup current file name and line number
-*
-* Revision 1.8  2014/03/03 13:43:50  pauloscustodio
-* Renamed symbol and expression type attributes
-*
-* Revision 1.7  2014/03/03 13:27:07  pauloscustodio
-* Rename symbol type constants
-*
-* Revision 1.6  2014/02/17 23:10:39  pauloscustodio
-* Define EXPR_ADDR as SYM_ADDR, ...
-*
-* Revision 1.5  2014/02/17 22:48:28  pauloscustodio
-* Symbol types and Expression types need to be in sync
-* Move from sym.h and symbol.h to model.h
-*
-* Revision 1.4  2014/02/08 18:30:49  pauloscustodio
-* lib/srcfile.c to read source files and handle recursive includes,
-* used to read @lists, removed opts.files;
-* model.c to hold global data model
-*
-*
-*/
