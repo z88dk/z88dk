@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.10 2014-06-13 19:14:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.11 2014-06-21 02:18:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -124,36 +124,3 @@ Bool src_pop( void )
 	init();
 	return SrcFile_pop( g_src_input );
 }
-
-
-/*
-* $Log: model.c,v $
-* Revision 1.10  2014-06-13 19:14:04  pauloscustodio
-* Move module list to module.c
-*
-* Revision 1.9  2014/06/09 13:30:28  pauloscustodio
-* Rename current module abrev
-*
-* Revision 1.8  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.7  2014/05/02 21:00:49  pauloscustodio
-* Hide module list, expose only iterators on CURRENTMODULE
-*
-* Revision 1.6  2014/05/02 20:24:38  pauloscustodio
-* New class Module to replace struct module and struct modules
-*
-* Revision 1.5  2014/03/16 19:19:49  pauloscustodio
-* Integrate use of srcfile in scanner, removing global variable z80asmfile
-* and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-*
-* Revision 1.4  2014/03/15 14:35:51  pauloscustodio
-* Add interface to lookup current file name and line number
-*
-* Revision 1.3  2014/02/08 18:30:49  pauloscustodio
-* lib/srcfile.c to read source files and handle recursive includes,
-* used to read @lists, removed opts.files;
-* model.c to hold global data model
-*
-*
-*/

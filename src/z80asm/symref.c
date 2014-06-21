@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.9 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.10 2014-06-21 02:18:29 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -83,53 +83,3 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, Bool defined )
         }
     }
 }
-
-/*
-* $Log: symref.c,v $
-* Revision 1.9  2014-05-25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.8  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.7  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-* 
-* Revision 1.6  2014/01/02 23:33:11  pauloscustodio
-* Unify interface of classlist and list.
-* 
-* Revision 1.5  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-* 
-* Revision 1.4  2013/10/01 23:23:53  pauloscustodio
-* Parse command line options via look-up tables:
-* -l, --list
-* -nl, --no-list
-* 
-* Revision 1.3  2013/10/01 22:50:27  pauloscustodio
-* Parse command line options via look-up tables:
-* -s, --symtable
-* -ns, --no-symtable
-* 
-* Revision 1.2  2013/06/01 01:24:22  pauloscustodio
-* CH_0022 : Replace avltree by hash table for symbol table
-* 
-* Revision 1.1  2013/05/16 23:39:48  pauloscustodio
-* Move struct node to sym.c, rename to Symbol
-* Move SymbolRef to symref.c
-* 
-* Revision 1.2  2013/03/04 23:37:09  pauloscustodio
-* Removed pass1 that was used to skip creating page references of created
-* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
-* modified list_get_page_nr() to return -1 after the whole source is
-* processed.
-* 
-* Revision 1.1  2013/02/26 02:11:32  pauloscustodio
-* New model_symref.c with all symbol cross-reference list handling
-* 
-* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
-* 
-*/
