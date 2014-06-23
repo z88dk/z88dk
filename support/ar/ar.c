@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.17 2014-06-03 22:48:01 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.18 2014-06-23 22:07:43 pauloscustodio Exp $
  */
 
 
@@ -18,12 +18,11 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#define END_MARKER 0xFFFFFFFF
 #define MAX_FP     0x7FFFFFFF
-#define END(a, b)  ((a) != END_MARKER ? (a) : (b))
+#define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 4
+#define MAX_VERSION 5
 
 enum file_type { is_none, is_library, is_object };
 
@@ -142,9 +141,10 @@ char *xfread_lstring( FILE *fp, char *filename )
 *----------------------------------------------------------------------------*/
 void usage(char *name)
 {
-	die("Usage %s [-h][-l][-e] library\n"
+	die("Usage %s [-h][-a][-l][-e][-c] library\n"
 		"Display the contents of a z80asm library file\n"
 		"\n"
+		"-a\tShow all\n"
 		"-l\tShow local symbols\n"
 		"-e\tShow expression patches\n"
 		"-c\tShow code dump\n"
@@ -190,19 +190,37 @@ void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 {
 	int scope, type;
 	long value;
-	char *name;
+	char *section_name, *name;
+
+	if ( file_version >= 5 )				/* signal end by zero type */
+		fp_end = MAX_FP;
 
 	printf("  Names:\n");
 	fseek( fp, fp_start, SEEK_SET );
 	while ( ftell( fp ) < fp_end )
 	{
 		scope = xfread_byte( fp, filename );
+		if ( scope == 0 )
+			break;							/* end marker */
+
 		type  = xfread_byte( fp, filename );
+		
+		if ( file_version >= 5 )
+			section_name = strdup( xfread_string( fp, filename ) );
+
 		value = xfread_long( fp, filename );
 		name  = xfread_string( fp, filename );
 
 		if ( opt_showlocal || scope != 'L' )
-			printf("    %c %c $%04X %s\n", scope, type, value, name );
+		{
+			printf("    %c %c $%04X %s", scope, type, value, name );
+			if ( file_version >= 5 )
+			{
+				printf(" (section '%s')", section_name );
+				free( section_name );
+			}
+			printf("\n");
+		}
 	}
 }
 
@@ -222,13 +240,13 @@ void dump_extern( FILE *fp, char *filename, long fp_start, long fp_end )
 void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 {
 	int type, asmpc, patch_ptr, end_marker;
-	char *source_file, *last_source_file;
+	char *source_file, *last_source_file, *section_name;
 	char *expression;
 	long line_number;
 
 	last_source_file = strdup("");
 
-	if ( file_version >= 4 )		/* signal end by zero type */
+	if ( file_version >= 4 )				/* signal end by zero type */
 		fp_end = MAX_FP;
 
 	printf("  Expressions:\n");
@@ -237,7 +255,7 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 	{
 		type = xfread_byte( fp, filename );
 		if ( type == 0 )
-			break;
+			break;							/* end marker */
 
 		printf("    E %c%c", type, type == 'L' ? 'l' : type == 'C' ? 'w' : 'b' );
 		if ( file_version >= 4 )
@@ -253,6 +271,11 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 			printf(" (%s:%ld)", last_source_file, line_number );
 		}
 
+		if ( file_version >= 5 )
+		{
+			section_name = strdup( xfread_string( fp, filename ) );
+		}
+
 		if ( file_version >= 3 )
 		{
 			asmpc = xfread_word( fp, filename );
@@ -266,7 +289,15 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 			expression = xfread_lstring( fp, filename );
 		else
 			expression = xfread_string( fp, filename );
-		printf(": %s\n", expression );
+		printf(": %s", expression );
+
+		if ( file_version >= 5 )
+		{
+			printf(" (section '%s')", section_name );
+			free( section_name );
+		}
+
+		printf("\n");
 
 		if ( file_version < 4 )
 		{
@@ -279,7 +310,7 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 	free( last_source_file );
 }
 
-void dump_code( FILE *fp, char *filename, long fp_start, int size )
+void dump_bytes( FILE *fp, char *filename, int size )
 {
 	int addr = 0, byte;
 
@@ -302,14 +333,49 @@ void dump_code( FILE *fp, char *filename, long fp_start, int size )
 		printf("\n");
 }
 
+void dump_code( FILE *fp, char *filename, long fp_start )
+{
+	int code_size;
+	char *section_name; 
+
+	fseek( fp, fp_start, SEEK_SET );
+
+	if ( file_version >= 5 )
+	{
+		while (1)
+		{
+			code_size = xfread_long( fp, filename );
+			if ( code_size < 0 )
+				break;
+			section_name = xfread_string( fp, filename );
+			printf("  Code: %d bytes (section '%s')\n", code_size, section_name );
+			dump_bytes( fp, filename, code_size );
+		}
+	}
+	else
+	{
+		code_size = xfread_word( fp, filename );
+		if ( code_size == 0 )
+			code_size = 0x10000;
+		if ( code_size > 0 )
+		{
+			printf("  Code: %d bytes\n", code_size );
+			dump_bytes( fp, filename, code_size );
+		}
+	}
+}
 
 void dump_object( FILE *fp, char *filename )
 {
 	long obj_start = ftell(fp) - 8;		/* before signature */
-	int org, code_size;
+	int org;
 	long fp_modname, fp_expr, fp_names, fp_extern, fp_code;
 
-	org			= xfread_word( fp, filename );
+	if ( file_version >= 5 )
+		org		= xfread_long( fp, filename );
+	else
+		org		= xfread_word( fp, filename );
+
 	fp_modname	= xfread_long( fp, filename );
 	fp_expr		= xfread_long( fp, filename );
 	fp_names	= xfread_long( fp, filename );
@@ -321,43 +387,30 @@ void dump_object( FILE *fp, char *filename )
 	printf("  Name: %s\n", xfread_string( fp, filename ) );
 	
 	/* org */
-	if ( org != 0xFFFF )
+	if ( org >= 0 )
 		printf("  Org:  $%04X\n", org );
 
 	/* names */
-	if ( fp_names != END_MARKER ) 
+	if ( fp_names >= 0 ) 
 		dump_names( fp, filename, 
 					obj_start + fp_names, 
 					obj_start + END( fp_extern, fp_modname ) );
 
 	/* extern */
-	if ( fp_extern != END_MARKER ) 
+	if ( fp_extern >= 0 ) 
 		dump_extern( fp, filename, 
 					 obj_start + fp_extern, 
 					 obj_start + fp_modname );
 
 	/* expressions */
-	if ( fp_expr != END_MARKER && opt_showexpr ) 
+	if ( fp_expr >= 0 && opt_showexpr ) 
 		dump_expr( fp, filename, 
 				   obj_start + fp_expr, 
 				   obj_start + END( fp_names, END( fp_extern, fp_modname ) ) );
 
 	/* code */
-	if ( fp_code != END_MARKER ) 
-	{
-		fseek( fp, obj_start + fp_code, SEEK_SET );
-		code_size = xfread_word( fp, filename );
-		if (code_size == 0)
-			code_size = 0x10000;
-	}
-	else 
-	{
-		code_size = 0;
-	}
-	printf("  Code: %d bytes\n", code_size );
-	if ( code_size != 0 && opt_dump_code )
-		dump_code( fp, filename, obj_start + fp_code, code_size );
-
+	if ( fp_code >= 0 && opt_dump_code ) 
+		dump_code( fp, filename, obj_start + fp_code );
 }
 
 /*-----------------------------------------------------------------------------
@@ -387,7 +440,7 @@ void dump_library( FILE *fp, char *filename )
 
 		dump_object( fp, filename );
 
-	} while ( next_ptr != END_MARKER );
+	} while ( next_ptr >= 0 );
 }
 
 /*-----------------------------------------------------------------------------
@@ -400,7 +453,7 @@ int main(int argc, char *argv[])
 	int		flags = 0;
 	int 	opt;
 
-	while ((opt = getopt(argc,argv,"hlec")) != -1 ) 
+	while ((opt = getopt(argc,argv,"hleca")) != -1 ) 
 	{
 		switch (opt ) 
 		{
@@ -412,6 +465,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'c':
 			opt_dump_code = 1;
+			break;
+		case 'a':
+			opt_showlocal = opt_showexpr = opt_dump_code = 1;
 			break;
 		default:
 			usage(argv[0]);
@@ -442,37 +498,3 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
-
-/*
- * $Log: ar.c,v $
- * Revision 1.17  2014-06-03 22:48:01  pauloscustodio
- * Wrong size of code dumped when code size is 64K
- *
- * Revision 1.16  2014/05/28 23:40:11  pauloscustodio
- * Return 0 from main on success.
- *
- * Revision 1.15  2014/05/28 23:36:39  pauloscustodio
- * Added -c option to dump object code bytes
- * Accepts all object file versions 1 to 4, see src/z80asm/doc for the format description.
- *
- * Revision 1.14  2014/05/01 11:33:32  pauloscustodio
- * Output formatting
- *
- * Revision 1.13  2014/04/22 23:04:56  pauloscustodio
- * Update for version 03 object and library files of z80asm.
- * Improved readability of output.
- *
- * Revision 1.12  2013/12/10 23:56:11  pauloscustodio
- * Update to new object file format Z80RMF02, Z80LMF02 (C-type expressions in z80asm).
- * Factor reading of names.
- * Show file name and file version in dump.
- * Accept more that one file in command line.
- * Buffer overrun reading file signature - solved.
- * Renamed variable names to match object file docs.
- * Handle special case: no code in file.
- * Handle special case: 64K code block.
- * Condition for printing symbols was wrong.
- * End condition for printing expressions was wrong.
- *
- *
- */
