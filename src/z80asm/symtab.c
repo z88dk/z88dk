@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.40 2014-06-21 02:18:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.41 2014-06-23 23:40:08 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -115,6 +115,7 @@ Symbol *_define_sym( char *name, long value, Byte type,
         sym->value = value;
         sym->sym_type |= type | SYM_DEFINED;
         sym->owner = owner;
+		sym->section = CURRENTSECTION;
     }
     else											/* already defined */
     {
@@ -295,6 +296,7 @@ static void define_local_symbol( char *name, long value, Byte type )
         sym->value = value;
         sym->sym_type |= type | SYM_LOCAL | SYM_DEFINED;	/* local symbol type set to address label or constant */
         sym->owner = CURRENTMODULE;					/* owner of symbol is always creator */
+		sym->section = CURRENTSECTION;
 
         /* First element in list is definition of symbol */
         add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
@@ -329,6 +331,7 @@ void define_symbol( char *name, long value, Byte type )
             sym->value = value;
             sym->sym_type |= type | SYM_DEFINED;	/* defined, and typed as address label or constant */
             sym->owner = CURRENTMODULE;		/* owner of symbol is always creator */
+			sym->section = CURRENTSECTION;
 
             /* First element in list is definition of symbol */
             add_symbol_ref( sym->references, list_get_page_nr(), TRUE );

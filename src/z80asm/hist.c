@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.111 2014-06-23 22:27:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.112 2014-06-23 23:40:08 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.111 2014-06-23 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.111  2014-06-23 22:27:09  pauloscustodio
+* Revision 1.112  2014-06-23 23:40:08  pauloscustodio
+* SECTION keyword parsed to change to a new section.
+*
+* Revision 1.111  2014/06/23 22:27:09  pauloscustodio
 * Added support to sections in the object code area of the object file.
 * Written ORG to object file as a 32-bit integer to allow ORG 0xFFFF.
 *
@@ -1960,7 +1963,7 @@ Based on 1.0.31
 		location of expressions in order to give meaningful link-time error messages.
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.4.0] (pauloscustodio)
+24.06.2014 [2.4.0] (pauloscustodio)
 -------------------------------------------------------------------------------
 	- Object file format changed to version 05, to include section names for 
 	  expressions, names and object code.
@@ -1987,6 +1990,8 @@ xx.xx.2014 [2.4.0] (pauloscustodio)
 	
 	- Written ORG to object file as a 32-bit integer to allow ORG 0xFFFF.
 
+    - SECTION keyword parsed to change to a new section.
+	
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -2004,15 +2009,13 @@ FUTURE CHANGES - require change of the object file format
 		last in the command line - the -i sequence is not respected and the
 		data appears in the middle of other library modules.
 
-    - Sections
-
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "hist.h"
 
-#define VERSION     "2.4.0b"
+#define VERSION     "2.4.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
