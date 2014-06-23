@@ -1,10 +1,9 @@
-<h1 id="z80asmfileformatsv04">z80asm File formats (v04)</h1>
+<h1 id="z80asmfileformatsv05">z80asm File formats (v05)</h1>
 
 <p>This document describes the object and libary formats used by <em>z80asm</em>
-versions <em>2.3.x</em> onwards. </p>
+from version <em>2.4.0</em> onwards. </p>
 
-<p>The version changed to <em>04</em> to include the source file location of 
-expressions in order to give meaningful link-time error messages.</p>
+<p>The version changed to <em>05</em> to include source code sections.</p>
 
 <p>The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -57,36 +56,36 @@ characters of the string.</p></li>
 </tr>
 <tr>
 	<td align="center">8</td>
-	<td align="center">word</td>
+	<td align="center">long</td>
 	<td align="left"><em>ORG Address</em></td>
 </tr>
 <tr>
-	<td align="center">10</td>
+	<td align="center">12</td>
 	<td align="center">long</td>
 	<td align="left">File pointer to <em>Module Name</em>, always the last section</td>
 </tr>
 <tr>
-	<td align="center">14</td>
+	<td align="center">16</td>
 	<td align="center">long</td>
 	<td align="left">File pointer to <em>Expressions</em>, may be -1</td>
 </tr>
 <tr>
-	<td align="center">18</td>
+	<td align="center">20</td>
 	<td align="center">long</td>
 	<td align="left">File pointer to <em>Module Names</em>, may be -1</td>
 </tr>
 <tr>
-	<td align="center">22</td>
+	<td align="center">24</td>
 	<td align="center">long</td>
 	<td align="left">File pointer to <em>External Names</em>, may be -1</td>
 </tr>
 <tr>
-	<td align="center">26</td>
+	<td align="center">28</td>
 	<td align="center">long</td>
 	<td align="left">File pointer to <em>Machine Code</em>, may be -1</td>
 </tr>
 <tr>
-	<td align="center">30</td>
+	<td align="center">32</td>
 	<td align="center"> </td>
 	<td align="left"><em>Expressions</em></td>
 </tr>
@@ -130,7 +129,7 @@ characters of the string.</p></li>
 
 <ul>
 <li><p><em>ORG Address</em> : contains the ORG address for the linked machine code 
-or <em>0xFFFF</em> for no ORG address defined. </p></li>
+or -1 for no ORG address defined. </p></li>
 <li><p><em>Expressions</em> : contains a set of expressions up to 
 an end marker (<em>type</em> = 0). 
 Each expression has the following format:</p>
@@ -148,6 +147,8 @@ to be used in error messages. May be an empty string, signalling that
 the previous <em>sourcefile</em> of the previous expression should be used.</p></li>
 <li><p><em>line_number</em> (long) : line number in source file where 
 expression was defined, to be used in error messages.</p></li>
+<li><p><em>section</em> (string) : source file section name where expression 
+was defined. </p></li>
 <li><p><em>ASMPC</em> (word) : defines the relative module code address of the 
 start of the assembly instruction to be used as <em>ASMPC</em> during
 expression evaluation.</p></li>
@@ -162,12 +163,15 @@ up to the next existing section. Each name has the following format:</p>
 <ul>
 <li><p><em>scope</em> (char) : defines the scope of the name:</p>
 
-<p>'L' is local, <br />
+<p>0   : end marker <br />
+'L' is local, <br />
 'G' is global,  </p></li>
 <li><p>*type (char) : defines whether it is a: </p>
 
 <p>'A' relocatable address, <br />
 'C' a constant.</p></li>
+<li><p><em>section</em> (string) : source file section name where name 
+was defined. </p></li>
 <li><p><em>value</em> (long) : contains the absolute value for a constant, or the
 relative address to the start of the code block for a relocatable
 address.</p></li>
@@ -186,8 +190,9 @@ following format:</p>
 following format:</p>
 
 <ul>
-<li><p><em>length</em> (word) : defines the total code lenght, and contains 0 if the 
-code is 65536 bytes long.</p></li>
+<li><p><em>length</em> (long) : defines the total code lenght, contains -1
+to signal the end.</p></li>
+<li><p><em>section</em> (string) : source file section name. </p></li>
 <li><p><em>code</em> (byte[length]) : contains the binary code.</p></li>
 </ul></li>
 </ul>
