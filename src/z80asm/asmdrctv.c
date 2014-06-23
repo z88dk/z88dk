@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.100 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.101 2014-06-23 22:27:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -513,7 +513,7 @@ ORG( void )
         {
             constant = Expr_eval( expr );       /* ORG expression must not contain undefined symbols */
 
-            if ( constant >= 0 && constant <= 65535 )
+            if ( constant >= 0 && constant <= 0xFFFF )
             {
                 CURRENTMODULE->origin = constant;
             }

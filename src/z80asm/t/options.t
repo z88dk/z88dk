@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.43 2014-06-21 02:15:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.44 2014-06-23 22:27:09 pauloscustodio Exp $
 #
 # Test options
 
@@ -281,13 +281,13 @@ $base = asm_file(); $base =~ s/\.\w+$//;
 unlink_testfiles();
 write_file(asm_file(), "ret");
 t_z80asm_capture($base, "", "", 0);
-like read_file(obj_file(), binary => ':raw'), qr/\xC9\z/, "assemble ok";
+like read_file(obj_file(), binary => ':raw'), qr/\xC9\xFF\xFF\xFF\xFF\z/, "assemble ok";
 
 for my $options ('-Mo', '-M=o', '--obj-exto', '--obj-ext=o') {
 	unlink_testfiles();
 	write_file(asm_file(), "ret");
 	t_z80asm_capture("$options $base", "", "", 0);
-	like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+	like read_file($base.".o", binary => ':raw'), qr/\xC9\xFF\xFF\xFF\xFF\z/, "assemble ok";
 }
 
 unlink_testfiles($base.".o");
@@ -564,14 +564,14 @@ for my $options ('-d', '--date-stamp') {
 	write_file(asm_file(), "nop");
 
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 	my $date_obj = -M obj_file();
 
 	# now skips compile
 	sleep 1;		# make sure our obj is older
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 	is -M obj_file(), $date_obj;	# same object
 
@@ -579,7 +579,7 @@ for my $options ('-d', '--date-stamp') {
 	sleep 1;		# make sure our obj is older
 	write_file(asm_file(), "nop");
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 	isnt -M obj_file(), $date_obj;	# new object
 
@@ -589,7 +589,7 @@ for my $options ('-d', '--date-stamp') {
 	for my $options2 ('-nd', '--no-date-stamp') {
 		sleep 1;		# make sure our obj is older
 		t_z80asm_capture("$options $options2 ".asm_file(), "", "", 0);
-		is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+		is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 		isnt -M obj_file(), $date_obj;	# new object
 	}
@@ -1125,206 +1125,5 @@ t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
 t_z80asm_capture("-sdcc -r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
-
-
 unlink_testfiles();
 done_testing();
-
-__END__
-# $Log: options.t,v $
-# Revision 1.43  2014-06-21 02:15:44  pauloscustodio
-# Modified the address computations in pass 2 and during linking and
-# the generation of the binary image to support the sections defined
-# in the codearea.
-#
-# Revision 1.42  2014/06/02 22:29:14  pauloscustodio
-# Write object file in one go at the end of pass 2, instead of writing
-# parts during pass 1 assembly. This allows the object file format to be
-# changed more easily, to allow sections in a near future.
-# Remove global variable objfile and CloseFiles().
-#
-# Revision 1.41  2014/05/29 00:19:37  pauloscustodio
-# CH_0025: Link-time expression evaluation errors show source filename and line number
-# Object file format changed to version 04, to include the source file
-# location of expressions in order to give meaningful link-time error messages.
-#
-# Revision 1.40  2014/05/20 22:26:29  pauloscustodio
-# BUG_0051: DEFC and DEFVARS constants do not appear in map file
-# Constants defined with DEFC and DEFVARS, and declared PUBLIC are not
-# written to the map file.
-# Logic to select symbols for map and def files was wrong.
-#
-# Revision 1.39  2014/05/04 16:48:52  pauloscustodio
-# Move tests of BUG_0001 and BUG_0002 to bugfixes.t, using TestZ80asm.pm
-#
-# Revision 1.38  2014/04/13 20:32:10  pauloscustodio
-# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-#
-# Revision 1.37  2014/04/05 23:36:11  pauloscustodio
-# CH_0024: Case-preserving, case-insensitive symbols
-# Symbols no longer converted to upper-case, but still case-insensitive
-# searched. Warning when a symbol is used with different case than
-# defined. Intermidiate stage before making z80asm case-sensitive, to
-# be more C-code friendly.
-#
-# Revision 1.36  2014/04/03 21:31:13  pauloscustodio
-# BUG_0045: -D did not accept symbols starting with '_':
-# (reported and fixed by alvin_albrecht@hotmail.com)
-# Added test code.
-#
-# Revision 1.35  2014/03/16 19:19:49  pauloscustodio
-# Integrate use of srcfile in scanner, removing global variable z80asmfile
-# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-#
-# Revision 1.34  2014/03/11 23:34:00  pauloscustodio
-# Remove check for feof(z80asmfile), add token TK_EOF to return on EOF.
-# Allows decoupling of input file used in scanner from callers.
-# Removed TOTALLINES.
-# GetChar() made static to scanner, not called by other modules.
-#
-# Revision 1.33  2014/02/20 23:36:17  pauloscustodio
-# Failed in Unix due to different handling of cr-lf
-#
-# Revision 1.32  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.31  2013/12/11 23:33:55  pauloscustodio
-# BUG_0039: library not pulled in if XLIB symbol not referenced in expression
-#
-# Revision 1.30  2013/11/22 00:21:43  pauloscustodio
-# Test XREF pulling in a library module by -sdcc
-#
-# Revision 1.29  2013/10/16 00:14:37  pauloscustodio
-# Move FileStack implementation to scan.c, remove FileStack.
-# Move getline_File() to scan.c.
-#
-# Revision 1.28  2013/10/05 13:43:05  pauloscustodio
-# Parse command line options via look-up tables:
-# -i, --use-lib
-# -x, --make-lib
-#
-# Revision 1.27  2013/10/05 11:31:46  pauloscustodio
-# Parse command line options via look-up tables:
-# -D, --define
-#
-# Revision 1.26  2013/10/05 10:54:36  pauloscustodio
-# Parse command line options via look-up tables:
-# -I, --inc-path
-# -L, --lib-path
-#
-# Revision 1.25  2013/10/05 09:24:13  pauloscustodio
-# Parse command line options via look-up tables:
-# -t (deprecated)
-#
-# Revision 1.24  2013/10/05 08:54:01  pauloscustodio
-# Parse command line options via look-up tables:
-# -forcexlib, --forcexlib
-#
-# Revision 1.23  2013/10/05 08:14:43  pauloscustodio
-# Parse command line options via look-up tables:
-# -C, --line-mode
-#
-# Revision 1.22  2013/10/04 23:31:51  pauloscustodio
-# Parse command line options via look-up tables:
-# -IXIY, --swap-ix-iy
-#
-# Revision 1.21  2013/10/04 23:20:21  pauloscustodio
-# Parse command line options via look-up tables:
-# -plus, --ti83plus
-#
-# Revision 1.20  2013/10/04 23:09:25  pauloscustodio
-# Parse command line options via look-up tables:
-# -R, --relocatable
-# --RCMX000
-#
-# Revision 1.19  2013/10/04 22:24:01  pauloscustodio
-# Parse command line options via look-up tables:
-# -c, --code-seg
-#
-# Revision 1.18  2013/10/04 22:04:52  pauloscustodio
-# Unify option describing texts
-#
-# Revision 1.17  2013/10/04 21:18:34  pauloscustodio
-# dont show short_opt if short_opt is same as long_opt, except for extra '-',
-# e.g. -sdcc and --sdcc
-#
-# Revision 1.16  2013/10/03 23:48:31  pauloscustodio
-# Parse command line options via look-up tables:
-# -r, --origin=ORG_HEX
-#
-# Revision 1.15  2013/10/03 22:54:06  pauloscustodio
-# Parse command line options via look-up tables:
-# -a, --make-updated-bin
-#
-# Revision 1.14  2013/10/03 22:35:21  pauloscustodio
-# Parse command line options via look-up tables:
-# -d, --date-stamp
-# -nd, --no-date-stamp
-#
-# Revision 1.13  2013/10/03 22:20:10  pauloscustodio
-# Parse command line options via look-up tables:
-# -o, --output
-#
-# Revision 1.12  2013/10/03 21:58:41  pauloscustodio
-# Parse command line options via look-up tables:
-# -b, --make-bin
-# -nb, --no-make-bin
-#
-# Revision 1.11  2013/10/02 23:42:09  pauloscustodio
-# Parse command line options via look-up tables:
-# add --sdcc in addition to -sdcc, for consistency
-#
-# Revision 1.10  2013/10/02 23:34:44  pauloscustodio
-# Parse command line options via look-up tables:
-# show default option in help
-#
-# Revision 1.9  2013/10/02 23:20:44  pauloscustodio
-# Parse command line options via look-up tables:
-# -g, --globaldef
-# -ng, --no-globaldef
-#
-# Revision 1.8  2013/10/01 23:46:28  pauloscustodio
-# Parse command line options via look-up tables:
-# -m, --map
-# -nm, --no-map
-#
-# Revision 1.7  2013/10/01 23:23:53  pauloscustodio
-# Parse command line options via look-up tables:
-# -l, --list
-# -nl, --no-list
-#
-# Revision 1.6  2013/10/01 22:50:27  pauloscustodio
-# Parse command line options via look-up tables:
-# -s, --symtable
-# -ns, --no-symtable
-#
-# Revision 1.5  2013/10/01 22:09:33  pauloscustodio
-# Parse command line options via look-up tables:
-# -sdcc
-#
-# Revision 1.4  2013/09/30 00:33:11  pauloscustodio
-# help text
-#
-# Revision 1.3  2013/09/30 00:26:57  pauloscustodio
-# Parse command line options via look-up tables:
-# -e, --asm-ext
-# -M, --obj-ext
-# Move filename extension functions to options.c
-#
-# Revision 1.2  2013/09/29 21:43:48  pauloscustodio
-# Parse command line options via look-up tables:
-# move @file handling to options.c
-#
-# Revision 1.1  2013/09/27 01:14:33  pauloscustodio
-# Parse command line options via look-up tables:
-# --help, --verbose
-#
-# Revision 1.3  2013/04/07 22:30:48  pauloscustodio
-# Test output with 3 input lines
-#
-# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2011/07/11 15:46:33  pauloscustodio
-# Added test scripts for all z80asm options

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.65 2014-05-29 00:19:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.66 2014-06-23 22:27:10 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -368,8 +368,8 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF04";
-	$obj .= pack("v", $args{ORG} // -1);
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF05";
+	$obj .= pack("V", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($obj); $obj .= pack("V", -1);
@@ -382,10 +382,11 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$obj, $expr_addr);
 		for (@{$args{EXPR}}) {
-			@$_ == 6 or die;
-			my($type, $filename, $line_nr, $asmptr, $ptr, $string) = @$_;
+			@$_ == 7 or die;
+			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $string) = @$_;
 			$obj .= $type . pack_lstring($filename) . pack("V", $line_nr) .
-			        pack("vv", $asmptr, $ptr) . pack_lstring($string);
+			        pack_string($section) . pack("vv", $asmptr, $ptr) . 
+					pack_lstring($string);
 		}
 		$obj .= "\0";
 	}
@@ -394,9 +395,12 @@ sub objfile {
 	if ($args{SYMBOLS}) {
 		store_ptr(\$obj, $symbols_addr);
 		for (@{$args{SYMBOLS}}) {
-			my($scope, $type, $value, $name) = @$_;
-			$obj .= $scope . $type . pack("V", $value) . pack_string($name);
+			@$_ == 5 or die;
+			my($scope, $type, $section, $value, $name) = @$_;
+			$obj .= $scope . $type . pack_string($section) . 
+					pack("V", $value) . pack_string($name);
 		}
+		$obj .= "\0";
 	}
 
 	# store library
@@ -412,10 +416,15 @@ sub objfile {
 	$obj .= pack_string($args{NAME});
 
 	# store code
-	if (length($args{CODE}) > 0) {
+	if ( $args{CODE} ) {
+		ref($args{CODE}) eq 'ARRAY' or die;
 		store_ptr(\$obj, $code_addr);
-		$obj .= pack("v", length($args{CODE}));
-		$obj .= $args{CODE};
+		for (@{$args{CODE}}) {
+			@$_ == 2 or die;
+			my($section, $code) = @$_;
+			$obj .= pack("V", length($code)) . pack_string($section) . $code;
+		}
+		$obj .= pack("V", -1);
 	}
 
 	return $obj;
@@ -459,7 +468,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF04";
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF05";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?
@@ -1020,290 +1029,4 @@ sub get_gcc_options {
 	return @FLAGS{qw( CFLAGS LDFLAGS )};
 };
 
-
 1;
-
-# $Log: test_utils.pl,v $
-# Revision 1.65  2014-05-29 00:19:37  pauloscustodio
-# CH_0025: Link-time expression evaluation errors show source filename and line number
-# Object file format changed to version 04, to include the source file
-# location of expressions in order to give meaningful link-time error messages.
-#
-# Revision 1.64  2014/05/20 22:27:47  pauloscustodio
-# Show symbol values with 4 digits instead of 8
-#
-# Revision 1.63  2014/05/11 16:35:42  pauloscustodio
-# Move tests of BUG_0026 to bugfixes.t
-#
-# Revision 1.62  2014/04/26 08:12:04  pauloscustodio
-# BUG_0049: Making a library with -d and 512 object files fails - Too many open files
-# Error caused by z80asm not closing the intermediate object files, when
-# assembling with -d.
-#
-# Revision 1.61  2014/04/22 23:32:42  pauloscustodio
-# Release 2.2.0 with major fixes:
-#
-# - Object file format changed to version 03, to include address of start
-# of the opcode of each expression stored in the object file, to allow
-# ASMPC to refer to the start of the opcode instead of the patch pointer.
-# This solves long standing BUG_0011 and BUG_0048.
-#
-# - ASMPC no longer stored in the symbol table and evaluated as a separate
-# token, to allow expressions including ASMPC to be relocated. This solves
-# long standing and never detected BUG_0047.
-#
-# - Handling ASMPC during assembly simplified - no need to call inc_PC() on
-# every assembled instruction, no need to store list of JRPC addresses as
-# ASMPC is now stored in the expression.
-#
-# BUG_0047: Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
-# ASMPC is computed on zero-base address of the code section and expressions
-# including ASMPC are not relocated at link time.
-# "call po, xx" is emulated in --RCMX000 as "jp pe, ASMPC+3; call xx".
-# The expression ASMPC+3 is not marked as relocateable, and the resulting
-# code only works when linked at address 0.
-#
-# BUG_0048: ASMPC used in JP/CALL argument does not refer to start of statement
-# In "JP ASMPC", ASMPC is coded as instruction-address + 1 instead
-# of instruction-address.
-#
-# BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
-# Bug only happens with forward references to relative addresses in expressions.
-# See example from zx48.asm ROM image in t/BUG_0011.t test file.
-# Need to change object file format to correct - need patchptr and address of instruction start.
-#
-# Revision 1.60  2014/04/15 20:06:44  pauloscustodio
-# Solve warning: no newline at end of file
-#
-# Revision 1.59  2014/04/13 20:32:10  pauloscustodio
-# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-#
-# Revision 1.58  2014/04/05 23:36:11  pauloscustodio
-# CH_0024: Case-preserving, case-insensitive symbols
-# Symbols no longer converted to upper-case, but still case-insensitive
-# searched. Warning when a symbol is used with different case than
-# defined. Intermidiate stage before making z80asm case-sensitive, to
-# be more C-code friendly.
-#
-# Revision 1.57  2014/03/16 19:19:49  pauloscustodio
-# Integrate use of srcfile in scanner, removing global variable z80asmfile
-# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-#
-# Revision 1.56  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.55  2014/01/11 00:10:40  pauloscustodio
-# Astyle - format C code
-# Add -Wall option to CFLAGS, remove all warnings
-#
-# Revision 1.54  2013/12/18 01:46:22  pauloscustodio
-# Move strpool.c to the z80asm/lib directory
-#
-# Revision 1.53  2013/12/15 20:30:38  pauloscustodio
-# Move except.c to the z80asm/lib directory
-#
-# Revision 1.52  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.51  2013/12/15 04:02:26  pauloscustodio
-# Move the die and queue modules to the z80asm/lib directory
-#
-# Revision 1.50  2013/10/08 21:53:07  pauloscustodio
-# Replace Flex-based lexer by a Ragel-based one.
-# Add interface to file.c to read files by tokens, calling the lexer.
-#
-# Revision 1.49  2013/10/01 23:46:28  pauloscustodio
-# Parse command line options via look-up tables:
-# -m, --map
-# -nm, --no-map
-#
-# Revision 1.48  2013/10/01 22:50:27  pauloscustodio
-# Parse command line options via look-up tables:
-# -s, --symtable
-# -ns, --no-symtable
-#
-# Revision 1.47  2013/09/29 21:43:48  pauloscustodio
-# Parse command line options via look-up tables:
-# move @file handling to options.c
-#
-# Revision 1.46  2013/09/27 01:14:33  pauloscustodio
-# Parse command line options via look-up tables:
-# --help, --verbose
-#
-# Revision 1.45  2013/09/23 23:15:15  pauloscustodio
-# Abort test if winmergeu fails, as next diffs will notr be synchronized with source file.
-#
-# Revision 1.44  2013/09/22 21:02:18  pauloscustodio
-# Separate init_struct code in one source file per module.
-# Separare obect regsitry code from init code.
-#
-# Revision 1.43  2013/09/09 00:20:45  pauloscustodio
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.42  2013/09/08 00:37:23  pauloscustodio
-# Call winmergeu to show differences in test results
-#
-# Revision 1.41  2013/09/01 18:31:04  pauloscustodio
-# Add information to file compare
-#
-# Revision 1.40  2013/09/01 12:28:52  pauloscustodio
-# Unified glib compilation options between MinGW and Linux
-#
-# Revision 1.39  2013/09/01 11:52:55  pauloscustodio
-# Setup xmalloc on init.c.
-# Setup GLib memory allocation functions to use xmalloc functions.
-#
-# Revision 1.38  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.37  2013/08/30 21:50:43  pauloscustodio
-# By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-# as an identifier reserved by the C standard for implementation-defined behaviour
-# starting with two underscores.
-#
-# Revision 1.36  2013/08/30 01:06:08  pauloscustodio
-# New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
-# behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
-#
-# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
-# - Expressions now use more standard C-like operators
-# - Object and library files changed signature to
-#   "Z80RMF02", "Z80LMF02", to avoid usage of old
-#   object files with expressions inside in the old format
-#
-# Detail:
-# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
-# - Power:                        changed from '^' to '**'; '^' will be XOR
-# - XOR:                          changed from ':' to '^';
-# - AND:                          changed from '~' to '&';  '~' will be NOT
-# - NOT:                          '~' added as binary not
-#
-# Revision 1.35  2013/06/03 23:21:35  pauloscustodio
-# show winmergeu on t_binary() failure
-#
-# Revision 1.34  2013/06/01 01:19:58  pauloscustodio
-# Add linkerr to t_z80asm() for compile OK but failed link.
-#
-# Revision 1.33  2013/05/27 22:45:13  pauloscustodio
-# Allow ASSERT to be used in INIT code in t_compile_module()
-#
-# Revision 1.32  2013/05/16 22:45:21  pauloscustodio
-# Add ObjFile to struct module
-# Use ObjFile to check for valid object file
-#
-# Revision 1.31  2013/05/12 19:41:21  pauloscustodio
-# write binfile
-#
-# Revision 1.30  2013/05/11 00:29:26  pauloscustodio
-# CH_0021 : Exceptions on file IO show file name
-# Keep a hash table of all opened file names, so that the file name
-# is shown on a fatal error.
-# Rename file IO funtions: f..._err to xf...
-#
-# Revision 1.29  2013/03/29 23:53:08  pauloscustodio
-# Added GNU Flex-based scanner. Not yet integrated into assembler.
-#
-# Revision 1.28  2013/03/04 23:23:37  pauloscustodio
-# Removed writeline, that was used to cancel listing of multi-line
-# constructs, as only the first line was shown on the list file. Fixed
-# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-#
-# Revision 1.27  2013/02/27 22:32:38  pauloscustodio
-# Abort test at t_compile_module() if compilation failed
-#
-# Revision 1.26  2013/02/25 21:37:30  pauloscustodio
-# Show output difference of t_run_module() in visual-diff, to allow easy merge of changes
-#
-# Revision 1.25  2013/02/22 17:26:34  pauloscustodio
-# Decouple assembler from listfile handling
-#
-# Revision 1.24  2013/02/19 22:52:40  pauloscustodio
-# BUG_0030 : List bytes patching overwrites header
-# BUG_0031 : List file garbled with input lines with 255 chars
-# New listfile.c with all the listing related code
-#
-# Revision 1.23  2013/02/12 00:55:00  pauloscustodio
-# CH_0017 : Align with spaces, deprecate -t option
-#
-# Revision 1.22  2013/02/11 21:54:38  pauloscustodio
-# BUG_0026 : Incorrect paging in symbol list
-#
-# Revision 1.21  2013/01/20 13:18:10  pauloscustodio
-# BUG_0024 : (ix+128) should show warning message
-# Signed integer range was wrongly checked to -128..255 instead
-# of -128..127
-#
-# Revision 1.20  2013/01/14 00:22:31  pauloscustodio
-# Allow t_z80asm_ok() with warnings
-#
-# Revision 1.19  2012/06/07 10:17:57  pauloscustodio
-# delay after deleting files before calling new z80asm
-#
-# Revision 1.18  2012/05/29 21:02:19  pauloscustodio
-# Changes for linux:
-# - call ./z80asm instead of z80asm
-# - memory addresses appear as 0x0xHHHH in Linux (one 0x by user, one by %p)
-#
-# Revision 1.17  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.16  2012/05/24 10:58:39  pauloscustodio
-# BUG_0018 : stack overflow in '@' includes - wrong range check
-#
-# Revision 1.15  2012/05/23 19:57:59  pauloscustodio
-# Test that files created with -c have correct content
-#
-# Revision 1.14  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.13  2012/05/20 05:51:19  pauloscustodio
-# Need more test files, mask error return after exception
-#
-# Revision 1.12  2012/05/20 05:40:00  pauloscustodio
-# test asm only delete main test files before attempting to assemble, create other test files for multipl-object assembly
-#
-# Revision 1.11  2012/05/17 15:03:37  pauloscustodio
-# Add functions to white-box test C modules by compiling and running a test C main() function
-#
-# Revision 1.10  2012/05/11 19:41:26  pauloscustodio
-# white space
-#
-# Revision 1.9  2012/04/22 20:34:13  pauloscustodio
-# tab width
-#
-# Revision 1.8	2011/10/07 17:29:10  pauloscustodio
-# Add test functions for lib file format
-#
-# Revision 1.7	2011/08/18 21:49:44  pauloscustodio
-# add objfile() to generate expected object file format
-#
-# Revision 1.6	2011/08/14 19:49:05  pauloscustodio
-# - Added test case to verify that incomplete files are deleted on error
-#
-# Revision 1.5	2011/07/14 01:32:09  pauloscustodio
-#	  - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-#	  - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-#	  CH_0003 : Error messages should be more informative
-#		  - Added printf-args to error messages, added "Error:" prefix.
-#	  BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-#		  - Raise ERR_UNBALANCED_PAREN instead
-#
-# Revision 1.4	2011/07/11 16:23:44  pauloscustodio
-# Factor capture code in t_z80asm_capture() in test_utils.pl
-#
-# Revision 1.3	2011/07/09 18:25:35  pauloscustodio
-# Log keyword in checkin comment was expanded inside Log expansion... recursive
-# Added Z80asm banner to all source files
-#
-# Revision 1.2	2011/07/09 17:36:09  pauloscustodio
-# Copied cvs log into Log history
-#
-# Revision 1.1	2011/07/09 01:02:45  pauloscustodio
-# Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
-# Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.

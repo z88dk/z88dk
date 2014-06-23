@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.35 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.36 2014-06-23 22:27:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -88,6 +88,9 @@ static long write_expr( FILE *fp )
 			xfput_count_word_strz( fp, "" );
 
 		xfput_int32(  fp, expr->line_nr );				/* source line number */
+
+		xfput_count_byte_strz( fp, expr->section->name );	/* section name */
+
 		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
 		xfput_uint16( fp, expr->code_pos );				/* patchptr */
 		xfput_count_word_strz( fp, expr->text->str );	/* expression */
@@ -120,6 +123,8 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
         {
 			xfput_uint8( fp, scope );
 			xfput_uint8( fp, type );
+
+			xfput_count_byte_strz( fp, sym->section->name );
 			xfput_uint32(fp, sym->value );
 			xfput_count_byte_strz( fp, sym->name );
 
@@ -140,7 +145,10 @@ static long write_symbols( FILE *fp )
 	written += write_symbols_symtab( fp, global_symtab );
 
 	if ( written )
+	{
+		xfput_uint8( fp, 0 );								/* terminator */
 		return symbols_ptr;
+	}
 	else
 		return -1;
 }
@@ -181,31 +189,19 @@ static long write_modname( FILE *fp )
 
 static long write_code( FILE *fp )
 {
-	long code_ptr, end_code_ptr;
+	long code_ptr;
 	UInt code_size;
 	
-	code_ptr = ftell( fp );
-
-	/* advance past size and try to write code to get back total bytes written, maybe zero*/
-	fseek( fp, 2, SEEK_CUR );
+	code_ptr  = ftell( fp );
 	code_size = fwrite_module_code( fp );
-	if ( code_size == 0 )
-	{
-		fseek( fp, code_ptr, SEEK_SET );
-		code_ptr = -1;								/* nothing written */
-	}
-	else 
-	{
-		end_code_ptr = ftell( fp );
-		fseek( fp, code_ptr, SEEK_SET );
-		xfput_uint16( fp, code_size & 0xFFFF );		/* two bytes of module code size */
-		fseek( fp, end_code_ptr, SEEK_SET );
-	}
 
     if ( opts.verbose )
         printf( "Size of module '%s' is %ld bytes\n", CURRENTMODULE->modname, (long)code_size );
 
-	return code_ptr;
+	if ( code_size > 0 )
+		return code_ptr;
+	else
+		return -1;
 }
 
 void write_obj_file( char *source_filename )
@@ -221,7 +217,7 @@ void write_obj_file( char *source_filename )
 
 	/* write header */
     xfput_strz( fp, Z80objhdr );
-	xfput_uint16( fp, CURRENTMODULE->origin );		/* two bytes of origin */
+	xfput_int32( fp, CURRENTMODULE->origin );		/* origin */
 
 	/* write placeholders for 5 pointers pointers */
 	header_ptr = ftell( fp );
@@ -322,9 +318,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 	self->writing		= FALSE;
 
     /* read object file header */
-    self->origin = xfget_uint16( file );
-	if ( self->origin == 0xFFFF)
-		self->origin = -1;
+    self->origin = xfget_int32( file );
 
     self->modname_ptr	= xfget_int32( file );
     self->expr_ptr		= xfget_int32( file );
@@ -336,18 +330,6 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
     fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
     xfget_count_byte_Str( file, buffer );
     self->modname		= strpool_add( buffer->str );
-
-    /* read code size */
-    if ( self->code_ptr < 0 )
-        self->code_size = 0;
-    else
-    {
-        fseek( file, self->start_ptr + self->code_ptr, SEEK_SET );
-        self->code_size = xfget_uint16( file );
-
-        if ( self->code_size == 0 )		/* BUG_0008 */
-            self->code_size = 0x10000;
-    }
 
 	return self;
 }
@@ -408,20 +390,10 @@ void OFile_close( OFile *self )
 *	test if a object file exists and is the correct version, return object if yes
 *   return NULL if not. 
 *   Object needs to be deleted by caller by OBJ_DELETE()
-*   Opens and closes the object file
 *----------------------------------------------------------------------------*/
 OFile *OFile_test_file( char *filename )
 {
-	OFile *self = _OFile_open_read( filename, TRUE );
-
-	/* close the file */
-	if ( self != NULL && self->file != NULL )
-	{
-		xfclose( self->file );
-		self->file = NULL;
-	}
-
-	return self;
+	return _OFile_open_read( filename, TRUE );
 }
 
 /*-----------------------------------------------------------------------------
@@ -462,11 +434,39 @@ ByteArray *read_obj_file_data( char *filename )
 *----------------------------------------------------------------------------*/
 Bool objmodule_loaded( char *src_filename )
 {
-	OFile *ofile = OFile_test_file( get_obj_filename( src_filename ) );
+	static Str *section_name;
+	Int code_size;
+	OFile *ofile;
+
+	INIT_OBJ( Str, &section_name );
+
+	ofile = OFile_test_file( get_obj_filename( src_filename ) );
     if ( ofile != NULL )
     {
-		append_reserve( ofile->code_size );		/* BUG_0015 */
         CURRENTMODULE->modname = ofile->modname;        
+
+		/* reserve space in each section; BUG_0015 */
+		if ( ofile->code_ptr >= 0 )
+		{
+			fseek( ofile->file, ofile->start_ptr + ofile->code_ptr, SEEK_SET );
+
+			while (TRUE)	/* read sections until end marker */
+			{
+				code_size = xfget_int32( ofile->file );
+				if ( code_size < 0 )
+					break;
+
+				xfget_count_byte_Str( ofile->file, section_name );
+
+				/* reserve space in section */
+				new_section( section_name->str );
+				append_reserve( code_size );
+
+				/* advance past code block */
+				fseek( ofile->file, code_size, SEEK_CUR );
+			}
+		}
+
 		OBJ_DELETE( ofile );					/* BUG_0049 */
 
         return TRUE;

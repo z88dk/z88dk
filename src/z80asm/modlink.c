@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.128 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.129 2014-06-23 22:27:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,7 +52,7 @@ void redefinedmsg( void );
 void SearchLibraries( char *modname );
 void ModuleExpr( void );
 void CreateBinFile( void );
-void ReadNames( char *filename, FILE *file, long nextname, long endnames );
+void ReadNames( char *filename, FILE *file );
 void ReadExpr( FILE *file );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
@@ -68,21 +68,28 @@ struct libfile *CURRENTLIB;
 UInt totaladdr, curroffset;
 
 void
-ReadNames( char *filename, FILE *file, long nextname, long endnames )
+ReadNames( char *filename, FILE *file )
 {
     int scope, symbol_char;
     Byte symboltype = 0;
     long value;
+	DEFINE_STR( section_name, MAXLINE );
 	DEFINE_STR( name, MAXLINE );
 
-    do
+    while (TRUE)
     {
-        scope		= xfget_int8(  file );
+        scope = xfget_int8(  file );
+		if ( scope == 0 )
+			break;								/* terminator */
+
         symbol_char	= xfget_int8(  file );		/* type of name   */
-        value		= xfget_int32( file );		/* read symbol (long) integer */
+
+		xfget_count_byte_Str( file, section_name );	/* read section name */
+
+		value		= xfget_int32( file );		/* read symbol (long) integer */
 		xfget_count_byte_Str( file, name );		/* read symbol name */
 
-        nextname += 1 + 1 + 4 + 1 + name->len;
+		new_section( section_name->str );		/* define CURRENTSECTION */
 
         switch ( symbol_char )
         {
@@ -100,7 +107,6 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
             error_not_obj_file( filename );
         }
     }
-    while ( nextname < endnames );
 }
 
 
@@ -110,6 +116,7 @@ ReadExpr( FILE *file )
 {
 	static Str *expr_text;
 	static Str *source_filename;
+	static Str *section_name;
 	int line_nr;
 	int type;
     long constant;
@@ -119,6 +126,7 @@ ReadExpr( FILE *file )
 
 	INIT_OBJ( Str, &expr_text );
 	INIT_OBJ( Str, &source_filename );
+	INIT_OBJ( Str, &section_name );
 
 	while (1) 
 	{
@@ -136,10 +144,12 @@ ReadExpr( FILE *file )
 			set_error_line( line_nr );
 
 		/* patch location */
+		xfget_count_byte_Str( file, section_name );
 		asmpc		= xfget_uint16( file );
         offsetptr	= xfget_uint16( file );
 
 		/* assembler PC as absolute address */
+		new_section( section_name->str );
 		base_addr = CURRENTSECTION->addr;
 		offset    = get_cur_module_start(); 
         set_PC( asmpc + base_addr + offset );
@@ -402,9 +412,7 @@ void link_modules( void )
 			/* compute origin on first module */
             if ( CURRENTMODULE == first_obj_module )
             {
-				origin = xfget_uint16( file );	/* origin of first module */
-				if ( origin == 0xFFFF )
-					origin = -1;
+				origin = xfget_int32( file );	/* origin of first module */
 
                 if ( opts.relocatable )
                     origin = 0;					/* ORG 0 on auto relocation */
@@ -467,15 +475,18 @@ void link_modules( void )
 int
 LinkModule( char *filename, long fptr_base )
 {
+	static Str *section_name;
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    UInt size;
+    Int code_size;
     int flag = 0;
 	FILE *file;
 	UInt addr;
 
+	INIT_OBJ( Str, &section_name );
+
     /* open object file for reading */
     file = xfopen( filename, "rb" );           /* CH_0012 */
-    fseek( file, fptr_base + 10U, SEEK_SET );
+    fseek( file, fptr_base + 12, SEEK_SET );
 
     fptr_modname	= xfget_int32( file );	/* get file pointer to module name */
 					  xfget_int32( file );	/* get file pointer to expression declarations */
@@ -487,27 +498,27 @@ LinkModule( char *filename, long fptr_base )
     {
         fseek( file, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
 
-        size = xfget_uint16( file );
+		while (TRUE)	/* read sections until end marker */
+		{
+			code_size = xfget_int32( file );
+			if ( code_size < 0 )
+				break;
 
-        /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
-        if ( size == 0 )
-            size = 0x10000;
+			xfget_count_byte_Str( file, section_name );
 
-        /* read module code at addr of the module */
-        /* BUG_0015: was reading at current position in code area, swaping order of modules */
-		addr = 0;
-		patch_file_contents( file, &addr, size );
+			/* load bytes to section */
+			/* BUG_0015: was reading at current position in code area, swaping order of modules */
+			new_section( section_name->str );
+			addr = 0;
+			patch_file_contents( file, &addr, code_size );
+		}
     }
 
     if ( fptr_namedecl != -1 )
     {
         fseek( file, fptr_base + fptr_namedecl, SEEK_SET );  /* set file pointer to point at name
                                                                  * declarations */
-
-        if ( fptr_libnmdecl != -1 )
-            ReadNames( filename, file, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
-        else
-            ReadNames( filename, file, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
+		ReadNames( filename, file );
     }
 
     xfclose( file );
@@ -648,9 +659,10 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
     enum flag found = OFF;
 	DEFINE_STR( got_modname, MAXLINE );
 	DEFINE_STR( symbol_name, MAXLINE );
+	DEFINE_STR( section_name, MAXLINE );
 
     /* found module name? */
-    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     
+    fseek( file, currentlibmodule + 4 + 4 + 8 + 4, SEEK_SET );     
 													/* point at module name  file pointer */
     fptr_mname		= xfget_int32( file );			/* get module name file  pointer   */
 					  xfget_int32( file );			/* fptr_expr */
@@ -669,27 +681,23 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
         /* We didn't find the module name, lets have a look through the exported symbol list */
         if ( fptr_name != 0 )
         {
-            long end = fptr_libname;
-            long red = 0;
-
-            if ( fptr_libname == -1 )
-                end = fptr_mname;
-
             /* Move to the name section */
             fseek( file, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
-            red = fptr_name;
 
-            while ( ! found && red < end )
+            while ( ! found )
             {
                 int scope;
 
-                scope	= xfget_int8(  file );	red++;
-                          xfget_int8(  file );	red++;		/* type */
-						  xfget_int32( file );	red += 4;	/* value */
-				xfget_count_byte_Str( file, symbol_name );
-				red += symbol_name->len + 1;			/* Length byte */
+                scope = xfget_int8(  file );
+				if ( scope == 0 )
+					break;
 
-                if ( ( scope == 'X' || scope == 'G' ) && 
+                xfget_int8(  file );			/* type */
+				xfget_count_byte_Str( file, section_name );
+				xfget_int32( file );			/* value */
+				xfget_count_byte_Str( file, symbol_name );
+
+                if ( ( scope == 'G' ) && 
 					 strcmp( symbol_name->str, modname ) == 0 )
                 {
                     found = ON;
@@ -750,7 +758,7 @@ ModuleExpr( void )
 
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
-        fseek( file, fptr_base + 10, SEEK_SET );		/* point at module name  pointer   */
+        fseek( file, fptr_base + 12, SEEK_SET );		/* point at module name  pointer   */
         fptr_modname	= xfget_int32( file );			/* get file pointer to module name */
         fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
         fptr_namedecl	= xfget_int32( file );			/* get file pointer to name declarations */

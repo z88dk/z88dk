@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.28 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.29 2014-06-23 22:27:09 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,7 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.28 2014-06-21 02
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"04"
+#define OBJ_VERSION	"05"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed
@@ -57,8 +57,6 @@ CLASS( OFile )
 	long	 symbols_ptr;		/* offset if file to Name Definition */
 	long	 externsym_ptr;		/* offset if file to External Name Declaration */
 	long	 code_ptr;			/* offset if file to Machine Code Block */
-
-	UInt	 code_size;			/* size of code block */
 END_CLASS;	
 
 /*-----------------------------------------------------------------------------
@@ -67,8 +65,7 @@ END_CLASS;
 
 /* test if a object file exists and is the correct version, return object if yes
    return NULL if not. 
-   Object needs to be deleted by caller by OBJ_DELETE()
-   Opens and closes the object file */
+   Object needs to be deleted by caller by OBJ_DELETE() */
 extern OFile *OFile_test_file( char *filename );
 
 /* read object file header from within an open library file.

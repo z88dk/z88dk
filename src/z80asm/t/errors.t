@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.21 2014-06-21 02:15:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.22 2014-06-23 22:27:09 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -128,7 +128,9 @@ remove_tree( bin_file() );
 #------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", EXPR => [ ["C", "test.asm",1, 0, 0, "*+VAL"] ] ));
+write_binfile(obj_file(), objfile( NAME => "test", 
+								   CODE => [["", "\0\0"]], 
+								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "*+VAL"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
 				 "Error at file 'test.asm' line 1: syntax error in expression\n".
@@ -380,10 +382,8 @@ t_z80asm(
 	bin		=> "",
 );
 
-diag "BUG org 65535 does not work, 0xFFFF is used as a marker for ORG not defined";
-
 t_z80asm(
-	asm		=> "org 65534",
+	asm		=> "org 65535",
 	bin		=> "",
 );
 
@@ -713,7 +713,9 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-r0 -b -d ".obj_file(), "", "", 0);
-t_binary(read_binfile(obj_file()), objfile(NAME => "test", CODE => "\x00", ORG => 0));
+t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
+										   CODE => [["", "\x00"]], 
+										   ORG => 0));
 t_binary(read_binfile(bin_file()), "\x00");
 	
 # CreateLib uses a different error call
@@ -721,11 +723,13 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
-t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", CODE => "\x00")));
+t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
+												   CODE => [["", "\x00"]])));
 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "test", CODE => "\0\0", 
-								   SYMBOLS => [ [Z => Z => 0, "ABCD"] ] ));
+write_binfile(obj_file(), objfile( NAME => "test", 
+								   CODE => [["", "\0\0"]], 
+								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
 				 "Error at module 'test': file 'test.obj' not an object file\n".

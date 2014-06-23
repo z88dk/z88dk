@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.110 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.111 2014-06-23 22:27:09 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.110 2014-06-21 02:1
 
 /*
 * $Log: hist.c,v $
-* Revision 1.110  2014-06-21 02:15:43  pauloscustodio
+* Revision 1.111  2014-06-23 22:27:09  pauloscustodio
+* Added support to sections in the object code area of the object file.
+* Written ORG to object file as a 32-bit integer to allow ORG 0xFFFF.
+*
+* Revision 1.110  2014/06/21 02:15:43  pauloscustodio
 * Modified the address computations in pass 2 and during linking and
 * the generation of the binary image to support the sections defined
 * in the codearea.
@@ -1956,8 +1960,11 @@ Based on 1.0.31
 		location of expressions in order to give meaningful link-time error messages.
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.3.1] (pauloscustodio)
+xx.xx.2014 [2.4.0] (pauloscustodio)
 -------------------------------------------------------------------------------
+	- Object file format changed to version 05, to include section names for 
+	  expressions, names and object code.
+	
 	- Write expressions to object file only in pass 2, to remove dupplicate code
 	  and allow simplification of object file writing code. All expression
 	  error messages are now output only during pass 2.
@@ -1975,6 +1982,10 @@ xx.xx.2014 [2.3.1] (pauloscustodio)
 	- Modified the address computations in pass 2 and during linking and
 	  the generation of the binary image to support the sections defined 
 	  in the codearea.
+	  
+	- Added support to sections in the object code area of the object file.
+	
+	- Written ORG to object file as a 32-bit integer to allow ORG 0xFFFF.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -2001,7 +2012,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.3.1f"
+#define VERSION     "2.4.0b"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
