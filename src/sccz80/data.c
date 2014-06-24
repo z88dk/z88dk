@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.37 2014-06-24 19:41:39 dom Exp $
+ *      $Id: data.c,v 1.38 2014-06-24 19:56:44 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -181,3 +181,5 @@ int doublestrings;
 int	useframe;
 int	indexix;
 #endif
+
+int     z80asm_sections;

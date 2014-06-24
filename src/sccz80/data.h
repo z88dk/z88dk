@@ -101,3 +101,4 @@ extern int farheapsz;
 extern int printflevel;
 extern int doublestrings;
 extern int usempm;
+extern int z80asm_sections;

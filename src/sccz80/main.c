@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.24 2014-05-20 19:53:32 dom Exp $
+ *      $Id: main.c,v 1.25 2014-06-24 19:56:44 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -34,10 +34,10 @@ int     startup;        /* Which startup to we want? app has it's own
                          */
 int     makeshare;      /* Do we want to make a shared library? */
 int     useshare;      /* Use shared lib routines? */
-int	sharedfile;	/* File contains routines which are to be
-			 * called via lib package - basically jimmy
-			 * the stack but that's it..
-			 */
+int   sharedfile;   /* File contains routines which are to be
+          * called via lib package - basically jimmy
+          * the stack but that's it..
+          */
 
 int     noaltreg;       /* No alternate registers */
 
@@ -59,6 +59,7 @@ void    UnSetExpand(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
 void SetAssembler(char *arg);
+static void SetZ80asmSections(char *);
 
 
 /*
@@ -95,7 +96,7 @@ int main(int argc, char **argv)
         loctab = SYM_CAST mymalloc(NUMLOC*sizeof(SYMBOL)) ;
         wqueue = WQ_CAST mymalloc(NUMWHILE*sizeof(WHILE_TAB)) ;
         gotoq= (GOTO_TAB *)calloc(NUMGOTO,sizeof(GOTO_TAB));
-	if (gotoq==NULL) OutOfMem();
+   if (gotoq==NULL) OutOfMem();
 
         tagptr = tagtab = TAG_CAST mymalloc(NUMTAG*sizeof(TAG_SYMBOL)) ;
         membptr = membtab = SYM_CAST mymalloc(NUMMEMB*sizeof(SYMBOL)) ;
@@ -154,18 +155,18 @@ int main(int argc, char **argv)
         errstop =                       /* don't stop after errors */
         verbose = 0;
         gotocnt=0;
-	defdenums=0;
-	doublestrings = 0;
-	noaltreg = NO;
+   defdenums=0;
+   doublestrings = 0;
+   noaltreg = NO;
         safedata=reqpag = -1;
-	shareoffset=SHAREOFFSET;	/* Offset for shared libs */
-	debuglevel=NO;
-	farheapsz=-1;			/* Size of far heap */
+   shareoffset=SHAREOFFSET;   /* Offset for shared libs */
+   debuglevel=NO;
+   farheapsz=-1;         /* Size of far heap */
     assemtype = ASM_Z80ASM;
-	printflevel=0;
+   printflevel=0;
 #ifdef USEFRAME
-	indexix=YES;
-	useframe=NO;
+   indexix=YES;
+   useframe=NO;
 #endif
 
         /*
@@ -418,7 +419,7 @@ dumpfns()
     while (ptr < ENDGLB) {
         if (ptr->name[0] != 0 && ptr->name[0] != '0' ) {
             ident=ptr->ident;
-			if (ident==FUNCTIONP) ident=FUNCTION;
+         if (ident==FUNCTIONP) ident=FUNCTION;
             type =ptr->type;
             storage=ptr->storage;
             if ( ident == FUNCTION && ptr->size != 0 ) {
@@ -567,10 +568,10 @@ dumpfns()
 
     fclose(fp);
 
-	if ( defvars != 0 )
-		WriteDefined("defvarsaddr",defvars);
+   if ( defvars != 0 )
+      WriteDefined("defvarsaddr",defvars);
 
-	switch(printflevel) {
+   switch(printflevel) {
     case 1:  
         WriteDefined("ministdio",0);
         break;
@@ -580,7 +581,7 @@ dumpfns()
     case 3:
         WriteDefined("floatstdio",0);
         break;
-	}
+   }
  
 
 /*
@@ -612,7 +613,7 @@ void PragmaOutput(char *ptr)
                 }
                 fprintf(fp,"\nIF NEED_%s\n",ptr);
                 fprintf(fp,"\tdefm\t\"%s\"\n",text);
-		fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
+      fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
                 fprintf(fp,"ENDIF\n\n");
                 fclose(fp);
         }
@@ -628,37 +629,37 @@ void PragmaBytes(int flag)
     int     count;
 
     if ( symname(sname) ) {
-	if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
-	    error(E_ZCCOPT);
-	}
-	fprintf(fp,"\nIF NEED_%s\n",sname);
-	if ( flag ) 
-	    fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",sname);
+   if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+       error(E_ZCCOPT);
+   }
+   fprintf(fp,"\nIF NEED_%s\n",sname);
+   if ( flag ) 
+       fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",sname);
 
-	/* Now, do the numbers */
-	count=0;
-	while ( !cmatch(';') ) {
-	    if ( count == 0 )
-		fprintf(fp,"\n\tdefb\t");
-	    else
-		fprintf(fp,",");
-	    if ( number(&value) ) {
-		fprintf(fp,"%d",value);
-	    } else {
-		warning(W_EXPARG);
-	    }
-	    if ( rcmatch(';') ) {
-		break;
-	    }
-	    needchar(',');
-	    count++;
-	    if ( count == 9 ) count=0;
-	}
-	fprintf(fp,"\nENDIF\n");
-	fclose(fp);
-	needchar(';');
+   /* Now, do the numbers */
+   count=0;
+   while ( !cmatch(';') ) {
+       if ( count == 0 )
+      fprintf(fp,"\n\tdefb\t");
+       else
+      fprintf(fp,",");
+       if ( number(&value) ) {
+      fprintf(fp,"%d",value);
+       } else {
+      warning(W_EXPARG);
+       }
+       if ( rcmatch(';') ) {
+      break;
+       }
+       needchar(',');
+       count++;
+       if ( count == 9 ) count=0;
+   }
+   fprintf(fp,"\nENDIF\n");
+   fclose(fp);
+   needchar(';');
     }
-}	
+}   
 
 
 
@@ -680,7 +681,7 @@ void WriteDefined(char *sname, int value)
         }
         fprintf(fp,"\nIF !DEFINED_%s\n",sname);
         fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
-	if (value) fprintf(fp,"\tdefc %s = %d\n",sname,value);
+   if (value) fprintf(fp,"\tdefc %s = %d\n",sname,value);
         fprintf(fp,"ENDIF\n\n");
         fclose(fp);
 }
@@ -1001,10 +1002,10 @@ struct args myargs[]= {
     {"make-app",NO,SetMakeApp, "Turn on ROMable code mode" },
     {"do-inline",NO,SetDoInline, "Inline certain common functions" },
     {"stop-error",NO,SetStopError, "Stop when an error is received" },
-    {"far-pointers",NO,SetFarPtrs, NULL},	/* Obsolete..but maybe useful*/
+    {"far-pointers",NO,SetFarPtrs, NULL},   /* Obsolete..but maybe useful*/
     {"make-lib",NO,SetNoHeader, "Turn on Library code mode" },
     {"make-shared",NO,SetMakeShared, "This Library file is shared" },
-	{"shared-file",NO,SetSharedFile, "All functions within this file are shared" },
+    {"shared-file",NO,SetSharedFile, "All functions within this file are shared" },
     {"use-shared",NO,SetUseShared, "Used shared library functions" },
     {"Wnone",NO,SetNoWarn, "Disable all warnings" },
     {"compact",NO,SetCompactCode, "Enable caller cleanup for all functions" },
@@ -1022,48 +1023,55 @@ struct args myargs[]= {
     {"defvars=",YES,SetDefVar, "Assign all initialised statics to this address" },
     {"safedata=",YES,SetSafeData, "Amount of safedata (z88)" },
     {"startup=",YES,SetStartUp, "Switch between startups" },
-	{"shareoffset=",YES,SetShareOffset, "Define the shared offset (use with -make-shared" },
+    {"shareoffset=",YES,SetShareOffset, "Define the shared offset (use with -make-shared" },
     {"version",NO,DispVersion, "Display the version of sccz80"},
     {"intuition",NO,SetIntuition, "Enable intuition debugging (z88)" },
     {"smartpf",NO,SetSmart, "Enable smart printf format handling" },
     {"no-smartpf",NO,UnSetSmart, "Disable smart printf format handling" },
-	{"pflevel",YES,SetPfLevel, "Set the manual printf level" },
+    {"pflevel",YES,SetPfLevel, "Set the manual printf level" },
     {"expandz88",NO,SetExpand, "Enable use only on expanded z88" },
     {"no-expandz88",NO,UnSetExpand, "Enable use on non-expanded z88"},
-	{"farheap=",YES,SetFarHeap, "Set the size of the far heap (z88)"},
-	{"debug=",YES,SetDebug, "Enable some extra logging" },
-	{"asm=",YES,SetAssembler, "Set the assembler mode to use" },
-	{"asxx",NO,SetASXX, "Use asxx as the output format"},
-	{"doublestr",NO,SetDoubleStrings, "Convert fp strings to values at runtime"},
-	{"noaltreg",NO,SetNoAltReg, "Don't use alternate registers" },
+   {"farheap=",YES,SetFarHeap, "Set the size of the far heap (z88)"},
+   {"debug=",YES,SetDebug, "Enable some extra logging" },
+   {"asm=",YES,SetAssembler, "Set the assembler mode to use" },
+   {"asxx",NO,SetASXX, "Use asxx as the output format"},
+   {"doublestr",NO,SetDoubleStrings, "Convert fp strings to values at runtime"},
+   {"noaltreg",NO,SetNoAltReg, "Don't use alternate registers" },
 #ifdef USEFRAME
-	{"frameix",NO,SetFrameIX},
-	{"frameiy",NO,SetFrameIY},
-	{"noframe",NO,SetNoFrame},
+   {"frameix",NO,SetFrameIX},
+   {"frameiy",NO,SetFrameIY},
+   {"noframe",NO,SetNoFrame},
 #endif
+   {"z80asm-sections",NO,SetZ80asmSections,"Use sections for z80asm"},
 /* Compatibility Modes.. */
     {"f",NO,SetUnsigned, NULL},
     {"l",NO,SetFarPtrs, NULL},
     {"",0, NULL, NULL}
 };
 
+void SetZ80asmSections(char *arg)
+{
+  z80asm_sections =YES;
+}
+
 #ifdef USEFRAME
 void SetNoFrame(char *arg)
 {
-	useframe=NO;
-	indexix=NO;
+   useframe=NO;
+   indexix=NO;
 }
+
 
 void SetFrameIX(char *arg)
 {
-	useframe=YES;
-	indexix=YES;
+   useframe=YES;
+   indexix=YES;
 }
 
 void SetFrameIY(char *arg)
 {
-	useframe=YES;
-	indexix=NO;
+   useframe=YES;
+   indexix=NO;
 }
 #endif
 
@@ -1153,7 +1161,7 @@ void SetExpand(char *arg)
 void UnSetSmart(char *arg)
 {
         smartprintf=NO;
-	printflevel=2;	/* Complex */
+   printflevel=2;   /* Complex */
 }
 
 void SetSmart(char *arg)
@@ -1167,8 +1175,8 @@ void SetPfLevel(char *arg)
         int    num;
         num=0;
         sscanf(arg+8,"%d",&num);
-	if (num>=1 && num<=3)
-		printflevel=num;
+   if (num>=1 && num<=3)
+      printflevel=num;
 }
 
 
@@ -1448,23 +1456,23 @@ void MemCleanup()
 }
 
 /*
- *	Routine to keep DOG happy and avoid nastiness
- *	should really do this any case..so I'll let it
- *	pass!
+ *   Routine to keep DOG happy and avoid nastiness
+ *   should really do this any case..so I'll let it
+ *   pass!
  */
 
 void *mymalloc(size_t size)
 {
-	void *ptr;
+   void *ptr;
 
-	if	( (ptr=calloc(size,1)) != NULL ) return ptr;
-	else OutOfMem();
-	return 0;	/* Sigh */
+   if   ( (ptr=calloc(size,1)) != NULL ) return ptr;
+   else OutOfMem();
+   return 0;   /* Sigh */
 }
 
 void OutOfMem()
 {
-	fprintf(stderr,"Out of memory...\n");
-	exit(1);
+   fprintf(stderr,"Out of memory...\n");
+   exit(1);
 }
 
