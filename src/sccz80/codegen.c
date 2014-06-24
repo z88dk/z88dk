@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.29 2014-04-24 22:09:26 dom Exp $
+ *      $Id: codegen.c,v 1.30 2014-06-24 19:41:39 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -2097,7 +2097,6 @@ void output_section(char *section_name)
     if ( ISASM(ASM_ASXX) ) {
         outfmt("\t.area\t%s\n\n",section_name);
     } else if ( ISASM(ASM_Z80ASM) ) {
-        outfmt(";\tSECTION\t%s\n\n",section_name);
         /* For z80asm we have to map bss into defvars if we're in appz88 mode */
         if ( strcmp(current_section,"bss") == 0 && appz88 ) {
             outstr("}\n");
@@ -2105,6 +2104,8 @@ void output_section(char *section_name)
 
         if ( strcmp(section_name,"bss") == 0 && appz88 ) {
             outstr("DEFVARS\t-1\n{\n");
+        } else {
+            outfmt("\tSECTION\t%s\n\n",section_name);
         }
     } else if ( ISASM(ASM_VASM) ) {
         outfmt("\tSECTION\t%s\n",section_name);
