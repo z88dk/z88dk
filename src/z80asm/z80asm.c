@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.180 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.181 2014-06-26 21:34:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,7 +54,6 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 /* local functions */
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
-Symbol *createsym( Symbol *symptr );
 struct libfile *NewLibrary( void );
 
 extern char Z80objhdr[];
@@ -393,11 +392,4 @@ int main( int argc, char *argv[] )
     {
         return 0;    /* assembler successfully ended */
     }
-}
-
-
-Symbol *
-createsym( Symbol *symptr )
-{
-    return Symbol_create( symptr->name, symptr->value, symptr->sym_type, symptr->owner );
 }
