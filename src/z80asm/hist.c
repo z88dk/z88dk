@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.112 2014-06-23 23:40:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.113 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.112 2014-06-23 23:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.112  2014-06-23 23:40:08  pauloscustodio
+* Revision 1.113  2014-06-26 21:33:24  pauloscustodio
+* Bugfix in sections: wrong address computation when symbols declared
+* public in a different section that the definition.
+* If a symbol was defined in the "code" section, and then declared public
+* in a "data" section, it was stored in the object file as if it was defined
+* in "data", causing wrong address computations at link time.
+*
+* Revision 1.112  2014/06/23 23:40:08  pauloscustodio
 * SECTION keyword parsed to change to a new section.
 *
 * Revision 1.111  2014/06/23 22:27:09  pauloscustodio
@@ -1993,6 +2000,15 @@ Based on 1.0.31
     - SECTION keyword parsed to change to a new section.
 	
 -------------------------------------------------------------------------------
+26.06.2014 [2.4.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Bugfix in sections: wrong address computation when symbols declared
+	  public in a different section that the definition.
+	  If a symbol was defined in the "code" section, and then declared public
+	  in a "data" section, it was stored in the object file as if it was defined
+	  in "data", causing wrong address computations at link time.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -2015,7 +2031,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.4.0"
+#define VERSION     "2.4.1a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

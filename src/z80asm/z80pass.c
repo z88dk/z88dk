@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.107 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.108 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -414,7 +414,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( sym->owner == CURRENTMODULE )
+        if ( sym->module == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
             if ( ( sym->sym_type & SYM_LOCAL ) || ( sym->sym_type & SYM_PUBLIC ) )

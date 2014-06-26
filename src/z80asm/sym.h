@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.21 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.22 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,19 +26,19 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.21 2014-06-21 02:15:
 #include "symref.h"
 #include "types.h"
 
+struct Module;
 struct Section;
 
 /*-----------------------------------------------------------------------------
 *   Symbol
 *----------------------------------------------------------------------------*/
-struct Module;							/* defined in module.h */
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
 	Byte			sym_type;			/* type of symbol */
+	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
-	struct Module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -47,7 +47,8 @@ END_CLASS;
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create( char *name, long value, Byte type, struct Module *owner );
+extern Symbol *Symbol_create( char *name, long value, Byte type, 
+							  struct Module *module, struct Section *section );
 
 /* return full symbol name NAME@MODULE stored in strpool */
 extern char *Symbol_fullname( Symbol *sym );

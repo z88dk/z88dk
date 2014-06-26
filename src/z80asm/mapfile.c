@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.21 2014-06-13 19:14:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.22 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 
@@ -59,7 +59,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
         else
             fputc( 'G', file );
 
-        fprintf( file, ": %s\n", sym->owner ? sym->owner->modname : "" );
+        fprintf( file, ": %s\n", sym->module ? sym->module->modname : "" );
     }
 }
 
@@ -114,7 +114,14 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.21  2014-06-13 19:14:04  pauloscustodio
+* Revision 1.22  2014-06-26 21:33:24  pauloscustodio
+* Bugfix in sections: wrong address computation when symbols declared
+* public in a different section that the definition.
+* If a symbol was defined in the "code" section, and then declared public
+* in a "data" section, it was stored in the object file as if it was defined
+* in "data", causing wrong address computations at link time.
+*
+* Revision 1.21  2014/06/13 19:14:04  pauloscustodio
 * Move module list to module.c
 *
 * Revision 1.20  2014/05/25 01:02:29  pauloscustodio

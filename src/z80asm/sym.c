@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.22 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.23 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,15 +52,16 @@ void Symbol_fini( Symbol *self )
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create( char *name, long value, Byte type, Module *owner )
+Symbol *Symbol_create( char *name, long value, Byte type, 
+					   Module *module, Section *section )
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
 	self->name 		= strpool_add( name );			/* name in strpool, not freed */
 	self->value 	= value;
 	self->sym_type	= type;
-	self->section	= CURRENTSECTION;
-	self->owner 	= owner;
+	self->module 	= module;
+	self->section	= section;
 
     /* add reference */
     add_symbol_ref( self->references, list_get_page_nr(), FALSE );
@@ -77,10 +78,10 @@ char *Symbol_fullname( Symbol *sym )
 
     Str_set( name, sym->name );
 
-    if ( sym->owner && sym->owner->modname )
+    if ( sym->module && sym->module->modname )
     {
         Str_append_char( name, '@' );
-        Str_append( name, sym->owner->modname );
+        Str_append( name, sym->module->modname );
     }
 
     return strpool_add( name->str );

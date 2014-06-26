@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.2 2014-06-23 23:40:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.3 2014-06-26 21:33:24 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -213,11 +213,7 @@ mes2end:
 ASM
 	asm1 => <<'ASM1',
 	
-			public prmes
-			
-			section data
-			public mes0, mes0end
-			
+			section data			
 mes0:		defm "."
 mes0end:
 			
@@ -233,6 +229,14 @@ prmes:		ld 	a, b
 			
 			dec	bc
 			jr 	prmes
+			
+			; declare public in a different section
+			section data 
+			public prmes
+			
+			section code
+			public mes0, mes0end
+			
 ASM1
 	options => "-b -l",
 	bin		=> $expect_bin,

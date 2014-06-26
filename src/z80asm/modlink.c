@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.129 2014-06-23 22:27:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.130 2014-06-26 21:33:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -251,10 +251,10 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
         sym = (Symbol *) iter->value;
 		if ( sym->sym_type & SYM_ADDR ) 
 		{
-			assert( sym->owner );				/* owner should exist except for -D defines */
+			assert( sym->module );				/* owner should exist except for -D defines */
 			
 			/* set base address for symbol */
-			set_cur_module(  sym->owner );
+			set_cur_module(  sym->module );
 			set_cur_section( sym->section );
 
 			base_addr = sym->section->addr;
