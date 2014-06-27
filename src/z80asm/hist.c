@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.113 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.114 2014-06-27 23:31:52 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.113 2014-06-26 21:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.113  2014-06-26 21:33:24  pauloscustodio
+* Revision 1.114  2014-06-27 23:31:52  pauloscustodio
+* Write empty sections to the object file, to allow the user to define
+* the sections sequence in the final binary by writing a list of empty
+* sections at the top of the source file, even if the source does not
+* assembly any data for some of the sections, e.g.:
+* 	section code
+* 	section data
+* 	section bss
+*
+* Revision 1.113  2014/06/26 21:33:24  pauloscustodio
 * Bugfix in sections: wrong address computation when symbols declared
 * public in a different section that the definition.
 * If a symbol was defined in the "code" section, and then declared public
@@ -2007,6 +2016,14 @@ Based on 1.0.31
 	  If a symbol was defined in the "code" section, and then declared public
 	  in a "data" section, it was stored in the object file as if it was defined
 	  in "data", causing wrong address computations at link time.
+
+	- Write empty sections to the object file, to allow the user to define
+	  the sections sequence in the final binary by writing a list of empty 
+	  sections at the top of the source file, even if the source does not
+	  assembly any data for some of the sections, e.g.:
+			section code
+			section data
+			section bss
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.3 2014-06-26 21:33:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.4 2014-06-27 23:31:52 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -329,3 +329,89 @@ ASMTAIL                         = 1265, G:
 ASMTAIL_data                    = 1265, G: 
 mes0end                         = 1265, G: test1
 END
+
+#------------------------------------------------------------------------------
+# Test empty sections
+z80asm(
+	asm 	=> <<'ASM',
+		section code
+		section data
+		section bss
+		
+		section bss
+		defb 3
+ASM
+	asm1 	=> <<'ASM1',
+		section code
+		section data
+		section bss
+		
+		section data
+		defb 2
+ASM1
+	asm2 	=> <<'ASM2',
+		section code
+		section data
+		section bss
+		
+		section code
+		defb 1
+ASM2
+	bin		=> "\1\2\3",
+);
+t_z80nm("test.obj test1.obj test2.obj", <<'END');
+
+File test.obj at $0000: Z80RMF05
+  Name: test
+  Org:  $0000
+  Code: 0 bytes (section 'code')
+  Code: 0 bytes (section 'data')
+  Code: 1 bytes (section 'bss')
+    C $0000: 03
+
+File test1.obj at $0000: Z80RMF05
+  Name: test1
+  Code: 0 bytes (section 'code')
+  Code: 1 bytes (section 'data')
+    C $0000: 02
+  Code: 0 bytes (section 'bss')
+
+File test2.obj at $0000: Z80RMF05
+  Name: test2
+  Code: 1 bytes (section 'code')
+    C $0000: 01
+  Code: 0 bytes (section 'data')
+  Code: 0 bytes (section 'bss')
+END
+
+# link only
+z80asm(
+	options => "-d -b test.obj test1.obj test2.obj",
+	bin		=> "\1\2\3",
+);
+t_z80nm("test.obj test1.obj test2.obj", <<'END');
+
+File test.obj at $0000: Z80RMF05
+  Name: test
+  Org:  $0000
+  Code: 0 bytes (section 'code')
+  Code: 0 bytes (section 'data')
+  Code: 1 bytes (section 'bss')
+    C $0000: 03
+
+File test1.obj at $0000: Z80RMF05
+  Name: test1
+  Code: 0 bytes (section 'code')
+  Code: 1 bytes (section 'data')
+    C $0000: 02
+  Code: 0 bytes (section 'bss')
+
+File test2.obj at $0000: Z80RMF05
+  Name: test2
+  Code: 1 bytes (section 'code')
+    C $0000: 01
+  Code: 0 bytes (section 'data')
+  Code: 0 bytes (section 'bss')
+END
+
+

@@ -116,6 +116,7 @@
     <ClInclude Include="listfile.h" />
     <ClInclude Include="mapfile.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="modlink.h" />
     <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
     <ClInclude Include="options.h" />

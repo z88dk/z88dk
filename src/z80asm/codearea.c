@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.41 2014-06-23 22:27:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.42 2014-06-27 23:31:52 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -516,11 +516,15 @@ UInt fwrite_module_code( FILE *file )
 		addr = section_module_start( section, g_cur_module );
 		size = section_module_size(  section, g_cur_module );
 
-		if ( size > 0 )
+		/* write all sections, even empty ones, to allow user to define sections list by 
+		   a sequence of SECTION statements
+		   exception: empty section, as it is the first one anyway */
+		if ( size > 0 || section != get_first_section(NULL) )
 		{
 			xfput_int32( file, size );
 			xfput_count_byte_strz( file, section->name );
-			xfput_chars( file, (char *) ByteArray_item( section->bytes, addr ), size );
+			if ( size > 0 )		/* ByteArray_item(bytes,0) creates item[0]!! */
+				xfput_chars( file, (char *) ByteArray_item( section->bytes, addr ), size );
 
 			code_size += size;
 		}

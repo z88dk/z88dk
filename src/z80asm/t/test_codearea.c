@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.4 2014-06-21 02:15:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.5 2014-06-27 23:31:52 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -118,7 +118,7 @@ static void dump_file( char *title )
 	int i, c;
 
 	g_printerr("Dump file %s\n\n", title );
-	g_assert( file = fopen("test.bin", "rb") );
+	g_assert( (file = fopen("test.bin", "rb")) != NULL );
 	g_printerr("test.bin =");
 	
 	for ( i = 0; (c = fgetc( file )) != EOF; i++ )
@@ -178,12 +178,12 @@ static void test_sections( void )
 	g_assert_cmpint( p[4], ==, 0 );
 	T( memcpy( p, "hello", 5 ) );
 
-	g_assert( file = fopen("test.bin", "wb") );
+	g_assert( (file = fopen("test.bin", "wb")) != NULL );
 	fwrite("\xF1\xF2\xF3", 1, 3, file );
 	fclose( file );
 	
 	/* read whole file */
-	g_assert( file = fopen("test.bin", "rb") );
+	g_assert( (file = fopen("test.bin", "rb")) != NULL );
 
 	T( append_file_contents( file, -1 ) );
 	T( next_PC() );
@@ -295,7 +295,7 @@ static void test_sections( void )
 	/* write each module */
 #define T_MODULE(n,size) \
 	T( set_cur_module_id( n ) ); \
-	g_assert( file = fopen("test.bin", "wb") ); \
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); \
 	g_assert( size == fwrite_module_code( file ) ); \
 	fclose( file ); \
 	dump_file("module " #n );
@@ -307,7 +307,7 @@ static void test_sections( void )
 #undef T_MODULE
 
 	/* write whole code area */
-	g_assert( file = fopen("test.bin", "wb") ); 
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	fwrite_codearea( file ); 
 	fclose( file );
 	dump_file("code area ");
@@ -321,11 +321,52 @@ static void test_sections( void )
 
 		sprintf(title, "Chunk from %d to %d, %d bytes", i, i+size-1, size );
 
-		g_assert( file = fopen("test.bin", "wb") ); 
+		g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
 		fwrite_codearea_chunk( file, (UInt) i, (UInt) size ); 
 		fclose( file );
 		dump_file( title );
 	}
+
+	/* test reordering of sections */
+	T( reset_codearea() );
+	
+	/* compile */
+	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 0 );
+	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
+	T( new_section("bss") ); T( append_byte(3) ); T( next_PC() );
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	T( fwrite_module_code( file ) );
+	fclose( file );
+	dump_file("code area ");
+
+	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 1 );
+	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
+	T( new_section("data") ); T( append_byte(2) ); T( next_PC() );
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	T( fwrite_module_code( file ) );
+	fclose( file );
+	dump_file("code area ");
+
+	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 2 );
+	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
+	T( new_section("code") ); T( append_byte(1) ); T( next_PC() );
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	T( fwrite_module_code( file ) );
+	fclose( file );
+	dump_file("code area ");
+
+	/* link */
+	T( set_cur_module_id(0) ); T( new_section("bss") );  addr = 0; T( patch_byte(&addr, 3) );
+	T( set_cur_module_id(1) ); T( new_section("data") ); addr = 0; T( patch_byte(&addr, 2) );
+	T( set_cur_module_id(2) ); T( new_section("code") ); addr = 0; T( patch_byte(&addr, 1) );
+	
+	T( sections_alloc_addr(0) );
+
+	/* write bin file */
+	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	fwrite_codearea( file ); 
+	fclose( file );
+	dump_file("code area ");
 }
 
 int main( int argc, char *argv[] )
