@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.18 2014-06-23 22:07:43 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.19 2014-06-28 23:37:18 pauloscustodio Exp $
  */
 
 
@@ -22,7 +22,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 5
+#define MAX_VERSION 6
 
 enum file_type { is_none, is_library, is_object };
 
@@ -186,6 +186,12 @@ enum file_type read_signature( FILE *fp, char *filename )
 /*-----------------------------------------------------------------------------
 *	Dump object file
 *----------------------------------------------------------------------------*/
+void print_section_name( char *section_name )
+{
+	if ( section_name && *section_name )		/* not "" section */
+		printf(" (section %s)", section_name );
+}
+
 void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 {
 	int scope, type;
@@ -216,7 +222,7 @@ void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 			printf("    %c %c $%04X %s", scope, type, value, name );
 			if ( file_version >= 5 )
 			{
-				printf(" (section '%s')", section_name );
+				print_section_name( section_name );
 				free( section_name );
 			}
 			printf("\n");
@@ -240,8 +246,7 @@ void dump_extern( FILE *fp, char *filename, long fp_start, long fp_end )
 void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 {
 	int type, asmpc, patch_ptr, end_marker;
-	char *source_file, *last_source_file, *section_name;
-	char *expression;
+	char *source_file, *last_source_file, *section_name, *target_name;
 	long line_number;
 
 	last_source_file = strdup("");
@@ -257,7 +262,11 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 		if ( type == 0 )
 			break;							/* end marker */
 
-		printf("    E %c%c", type, type == 'L' ? 'l' : type == 'C' ? 'w' : 'b' );
+		printf("    E %c%c", 
+			   type, 
+			   type == '=' ? ' ' :
+			   type == 'L' ? 'l' : 
+			   type == 'C' ? 'w' : 'b' );
 		if ( file_version >= 4 )
 		{
 			source_file = xfread_lstring( fp, filename );
@@ -285,15 +294,22 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 		patch_ptr = xfread_word( fp, filename );
 		printf(" $%04X", patch_ptr);
 
+		printf(": ");
+		if ( file_version >= 6 )
+		{
+			target_name = xfread_string( fp, filename );
+			if ( *target_name )
+				printf("%s := ", target_name );
+		}
+
 		if ( file_version >= 4 )
-			expression = xfread_lstring( fp, filename );
+			printf("%s", xfread_lstring( fp, filename ) );
 		else
-			expression = xfread_string( fp, filename );
-		printf(": %s", expression );
+			printf("%s", xfread_string( fp, filename ) );
 
 		if ( file_version >= 5 )
 		{
-			printf(" (section '%s')", section_name );
+			print_section_name( section_name );
 			free( section_name );
 		}
 
@@ -348,7 +364,11 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 			if ( code_size < 0 )
 				break;
 			section_name = xfread_string( fp, filename );
-			printf("  Code: %d bytes (section '%s')\n", code_size, section_name );
+
+			printf("  Code: %d bytes", code_size );
+			print_section_name( section_name );
+			printf("\n");
+
 			dump_bytes( fp, filename, code_size );
 		}
 	}
