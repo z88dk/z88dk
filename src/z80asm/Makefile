@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.158 2014-06-21 02:15:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.159 2014-06-28 00:17:41 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -57,8 +57,8 @@ INSTALL ?= install
 #		make install
 #	4) Setup environment variable PKG_CONFIG_PATH to C:\MinGW\msys\1.0\lib\pkgconfig
 #------------------------------------------------------------------------------
-CFLAGS	+= $(shell pkg-config --cflags glib-2.0)
-LDFLAGS	+= $(shell pkg-config --libs   glib-2.0)
+#CFLAGS  += $(shell pkg-config --cflags glib-2.0)
+#LDFLAGS += $(shell pkg-config --libs   glib-2.0)
 
 #------------------------------------------------------------------------------
 # Object files
@@ -154,15 +154,17 @@ testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
 
 testzcc : $(TARGET)
+	zcc +zx -lndos       -create-app -oenigma.bin   ../../examples/console/enigma.c
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
 	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
+	eightyone enigma.tap
 	eightyone microman.tap
 	eightyone mandel.tap
 
 clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
-	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
+	$(RM) enigma.bin enigma.tap microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 
 #------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
@@ -359,6 +361,7 @@ lib/array.o: lib/strutil.h
 lib/class.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h lib/die.h
 lib/class.o: lib/init.h lib/strpool.h
 lib/die.o: lib/die.h
+lib/dlist.o: lib/xmalloc.h lib/dlist.h
 lib/except.o: lib/xmalloc.h lib/except.h lib/die.h lib/types.h
 lib/fileutil.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h
 lib/fileutil.o: lib/queue.h lib/types.h lib/strutil.h lib/strpool.h
@@ -377,8 +380,8 @@ lib/xmalloc.o: lib/xmalloc.h lib/die.h lib/queue.h lib/init.h lib/types.h
 t/test_codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h
 t/test_codearea.o: lib/queue.h lib/types.h lib/strutil.h lib/classhash.h
 t/test_codearea.o: lib/strhash.h lib/uthash.h lib/die.h
-t/test_symtab.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
-t/test_symtab.o: lib/strutil.h symref.h lib/classlist.h model.h lib/list.h
-t/test_symtab.o: module.h lib/classhash.h lib/strhash.h lib/uthash.h
-t/test_symtab.o: lib/die.h codearea.h lib/array.h expr.h scan.h scan_def.h
+t/test_symtab.o: lib/xmalloc.h lib/die.h listfile.h lib/class.h lib/queue.h
+t/test_symtab.o: lib/types.h lib/strutil.h symref.h lib/classlist.h model.h
+t/test_symtab.o: lib/list.h module.h lib/classhash.h lib/strhash.h
+t/test_symtab.o: lib/uthash.h codearea.h lib/array.h expr.h scan.h scan_def.h
 t/test_symtab.o: legacy.h symtab.h sym.h options.h options_def.h

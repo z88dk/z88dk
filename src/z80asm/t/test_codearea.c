@@ -3,14 +3,15 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.5 2014-06-27 23:31:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.6 2014-06-28 00:17:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 
-#include <glib.h>
+#include <assert.h>
+#include <die.h>
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -36,44 +37,44 @@ static void dump_sections(char *title, int line)
 		last_section = section;
 
 		size = ByteArray_size( section->bytes );
-		g_assert_cmpuint( size, ==, get_section_size( section ) );
+		assert( size == get_section_size( section ) );
 		total_size += size;
 
 		if ( section == get_cur_section() )
-			g_assert_cmpuint( get_PC(), ==, section->asmpc );
+			assert( get_PC() == section->asmpc );
 
 		num_sections++;
 	}
-	g_assert( last_section == get_last_section() );
-	g_assert_cmpuint( total_size, ==, get_sections_size() );
+	assert( last_section == get_last_section() );
+	assert( total_size == get_sections_size() );
 
-	g_printerr("%s (line %d)\n\n", title, line );
+	warn("%s (line %d)\n\n", title, line );
 
-	g_printerr("Number of sections = %ld, total size = %ld\n", 
+	warn("Number of sections = %ld, total size = %ld\n", 
 		       (long) num_sections, (long) total_size );
 
 	i = 0;
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
-		g_printerr("%c%d. \"%s\", size = %ld, addr = %ld, asmpc = %ld, opcode_size = %ld\n", 
+		warn("%c%d. \"%s\", size = %ld, addr = %ld, asmpc = %ld, opcode_size = %ld\n", 
 				   section == get_cur_section() ? '*' : ' ',
 				   ++i, section->name,  
 				   (long) get_section_size( section ),
 				   (long) section->addr, (long) section->asmpc, (long) section->opcode_size );
-		g_printerr("    bytes =");
+		warn("    bytes =");
 		for ( j = 0; j < ByteArray_size( section->bytes ); j++ )
-			g_printerr("%s$%02X", 
+			warn("%s$%02X", 
 					   j != 1 && (j % 16) == 1 ? "\n            " : " ",
 					   *ByteArray_item( section->bytes, j ) );
-		g_printerr("\n    start =");
+		warn("\n    start =");
 		for ( j = 0; j < UIntArray_size( section->module_start ); j++ )
-			g_printerr(" %3ld", (long) *UIntArray_item( section->module_start, j ) );
-		g_printerr("\n");
+			warn(" %3ld", (long) *UIntArray_item( section->module_start, j ) );
+		warn("\n");
 	}
 
 	num_modules = UIntArray_size( first_section->module_start );
-	g_printerr("\nNumber of modules = %ld\n", 
+	warn("\nNumber of modules = %ld\n", 
 		       (long) num_modules );
 
 	for ( i = 0; i < num_modules; i++ )
@@ -92,24 +93,24 @@ static void dump_sections(char *title, int line)
 			size = get_cur_module_size();
 
 			if ( section == first_section )
-				g_printerr("%c%d. ", i == old_cur_module_id ? '*' : ' ', i );
+				warn("%c%d. ", i == old_cur_module_id ? '*' : ' ', i );
 			else 
-				g_printerr("    ");
+				warn("    ");
 
-			g_printerr("\"%s\", start = %ld, size = %ld\n    bytes =",
+			warn("\"%s\", start = %ld, size = %ld\n    bytes =",
 					   section->name, (long) addr, (long) size );
 			for ( j = 0; j < size; j++ )
-				g_printerr("%s$%02X", 
+				warn("%s$%02X", 
 						   j != 1 && (j % 16) == 1 ? "\n            " : " ",
 						   *ByteArray_item( section->bytes, addr + j )  );
-			g_printerr("\n");
+			warn("\n");
 		}
 
 		set_cur_module_id( old_cur_module_id );
 		set_cur_section( old_cur_section );
 	}
 
-	g_printerr("--------------------------------------------------------------------------------\n");
+	warn("--------------------------------------------------------------------------------\n");
 }
 
 static void dump_file( char *title )
@@ -117,15 +118,15 @@ static void dump_file( char *title )
 	FILE *file;
 	int i, c;
 
-	g_printerr("Dump file %s\n\n", title );
-	g_assert( (file = fopen("test.bin", "rb")) != NULL );
-	g_printerr("test.bin =");
+	warn("Dump file %s\n\n", title );
+	assert( (file = fopen("test.bin", "rb")) != NULL );
+	warn("test.bin =");
 	
 	for ( i = 0; (c = fgetc( file )) != EOF; i++ )
-		g_printerr("%s$%02X", 
+		warn("%s$%02X", 
 				   i != 0 && (i % 16) == 0 ? "\n           " : " ", 
 				   c );
-	g_printerr("\n--------------------------------------------------------------------------------\n");
+	warn("\n--------------------------------------------------------------------------------\n");
 }
 
 #define T(code) code; dump_sections(#code ";", __LINE__);
@@ -144,16 +145,16 @@ static void test_sections( void )
 	
 	/* check "" section */
 	T( section_blank = new_section("") );
-	g_assert( section_blank == get_cur_section() );
+	assert( section_blank == get_cur_section() );
 	
 	/* create module 0 - only bytes in "" */
 	T( module_id = new_module_id() );
-	g_assert_cmpint( module_id, ==, 0 );
-	g_assert( get_cur_section() == section_blank );
+	assert( module_id == 0 );
+	assert( get_cur_section() == section_blank );
 
 	/* append no data */
 	T( p = append_reserve( 0 ) );
-	g_assert( p == NULL );
+	assert( p == NULL );
 
 	/* append */
 	T( append_byte( 1 ) );
@@ -170,20 +171,20 @@ static void test_sections( void )
 	T( next_PC() );
 	
 	/* use buffer from append_reserve */
-	g_assert( p != NULL );
-	g_assert_cmpint( p[0], ==, 0 );
-	g_assert_cmpint( p[1], ==, 0 );
-	g_assert_cmpint( p[2], ==, 0 );
-	g_assert_cmpint( p[3], ==, 0 );
-	g_assert_cmpint( p[4], ==, 0 );
+	assert( p != NULL );
+	assert( p[0] == 0 );
+	assert( p[1] == 0 );
+	assert( p[2] == 0 );
+	assert( p[3] == 0 );
+	assert( p[4] == 0 );
 	T( memcpy( p, "hello", 5 ) );
 
-	g_assert( (file = fopen("test.bin", "wb")) != NULL );
+	assert( (file = fopen("test.bin", "wb")) != NULL );
 	fwrite("\xF1\xF2\xF3", 1, 3, file );
 	fclose( file );
 	
 	/* read whole file */
-	g_assert( (file = fopen("test.bin", "rb")) != NULL );
+	assert( (file = fopen("test.bin", "rb")) != NULL );
 
 	T( append_file_contents( file, -1 ) );
 	T( next_PC() );
@@ -205,37 +206,37 @@ static void test_sections( void )
 	/* patch */
 	addr = 0;
 	T( patch_byte( &addr, 12 ) );
-	g_assert_cmpuint( addr, ==, 1 );
+	assert( addr == 1 );
 
 	T( patch_word( &addr, 0x0A0B ) );
-	g_assert_cmpuint( addr, ==, 3 );
+	assert( addr == 3 );
 
 	T( patch_long( &addr, 0x06070809 ) );
-	g_assert_cmpuint( addr, ==, 7 );
+	assert( addr == 7 );
 
 	T( patch_value( &addr, 0x030405, 3 ) );
-	g_assert_cmpuint( addr, ==, 10 );
+	assert( addr == 10 );
 
 	/* patch whole file */
 	fseek( file, 0, SEEK_SET );
 	T( patch_file_contents( file, &addr, -1 ) );
-	g_assert_cmpuint( addr, ==, 13 );
+	assert( addr == 13 );
 
 	/* patch part of file */
 	fseek( file, 1, SEEK_SET );
 	T( patch_file_contents( file, &addr, -1 ) );
-	g_assert_cmpuint( addr, ==, 15 );
+	assert( addr == 15 );
 
 	/* patch part of file */
 	fseek( file, 0, SEEK_SET );
 	T( patch_file_contents( file, &addr, 2 ) );
-	g_assert_cmpuint( addr, ==, 17 );
+	assert( addr == 17 );
 
 	/* patch expands buffer */
 	addr += 4;
 	fseek( file, 0, SEEK_SET );
 	T( patch_file_contents( file, &addr, -1 ) );
-	g_assert_cmpuint( addr, ==, 24 );
+	assert( addr == 24 );
 
 	T( next_PC() );
 
@@ -244,12 +245,12 @@ static void test_sections( void )
 
 	/* create module 1 - only bytes in "code" */
 	T( module_id = new_module_id() );
-	g_assert_cmpint( module_id, ==, 1 );
-	g_assert( get_cur_section() == section_blank );
+	assert( module_id == 1 );
+	assert( get_cur_section() == section_blank );
 
 	/* create section "code" */
 	T( section_code = new_section("code") );
-	g_assert( get_cur_section() == section_code );
+	assert( get_cur_section() == section_code );
 
 	T( append_long(0x78563412) );
 	T( next_PC() );
@@ -259,32 +260,32 @@ static void test_sections( void )
 
 	/* create module 2 - only bytes in "data" */
 	T( module_id = new_module_id() );
-	g_assert_cmpint( module_id, ==, 2 );
-	g_assert( get_cur_section() == section_blank );
+	assert( module_id == 2 );
+	assert( get_cur_section() == section_blank );
 
 	T( section_data = new_section("data") );
-	g_assert( get_cur_section() == section_data );
+	assert( get_cur_section() == section_data );
 
 	T( memcpy( append_reserve( 11 ), "hello world", 11 ) );
 	T( next_PC() );
 	
 	/* create module 3 - bytes in all sections */
 	T( module_id = new_module_id() );
-	g_assert_cmpint( module_id, ==, 3 );
-	g_assert( get_cur_section() == section_blank );
+	assert( module_id == 3 );
+	assert( get_cur_section() == section_blank );
 
 	T( new_section("data") );
-	g_assert( get_cur_section() == section_data );
+	assert( get_cur_section() == section_data );
 	T( append_byte(0xAA) );
 	T( next_PC() );
 
 	T( new_section("code") );
-	g_assert( get_cur_section() == section_code );
+	assert( get_cur_section() == section_code );
 	T( append_byte(0xAA) );
 	T( next_PC() );
 
 	T( new_section("") );
-	g_assert( get_cur_section() == section_blank );
+	assert( get_cur_section() == section_blank );
 	T( append_byte(0xAA) );
 	T( next_PC() );
 
@@ -295,8 +296,8 @@ static void test_sections( void )
 	/* write each module */
 #define T_MODULE(n,size) \
 	T( set_cur_module_id( n ) ); \
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); \
-	g_assert( size == fwrite_module_code( file ) ); \
+	assert( (file = fopen("test.bin", "wb")) != NULL ); \
+	assert( size == fwrite_module_code( file ) ); \
 	fclose( file ); \
 	dump_file("module " #n );
 
@@ -307,7 +308,7 @@ static void test_sections( void )
 #undef T_MODULE
 
 	/* write whole code area */
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	fwrite_codearea( file ); 
 	fclose( file );
 	dump_file("code area ");
@@ -321,7 +322,7 @@ static void test_sections( void )
 
 		sprintf(title, "Chunk from %d to %d, %d bytes", i, i+size-1, size );
 
-		g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+		assert( (file = fopen("test.bin", "wb")) != NULL ); 
 		fwrite_codearea_chunk( file, (UInt) i, (UInt) size ); 
 		fclose( file );
 		dump_file( title );
@@ -331,26 +332,26 @@ static void test_sections( void )
 	T( reset_codearea() );
 	
 	/* compile */
-	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 0 );
+	T( module_id = new_module_id() ); assert( module_id == 0 );
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("bss") ); T( append_byte(3) ); T( next_PC() );
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	T( fwrite_module_code( file ) );
 	fclose( file );
 	dump_file("code area ");
 
-	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 1 );
+	T( module_id = new_module_id() ); assert( module_id == 1 );
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("data") ); T( append_byte(2) ); T( next_PC() );
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	T( fwrite_module_code( file ) );
 	fclose( file );
 	dump_file("code area ");
 
-	T( module_id = new_module_id() ); g_assert_cmpint( module_id, ==, 2 );
+	T( module_id = new_module_id() ); assert( module_id == 2 );
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("code") ); T( append_byte(1) ); T( next_PC() );
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	T( fwrite_module_code( file ) );
 	fclose( file );
 	dump_file("code area ");
@@ -363,7 +364,7 @@ static void test_sections( void )
 	T( sections_alloc_addr(0) );
 
 	/* write bin file */
-	g_assert( (file = fopen("test.bin", "wb")) != NULL ); 
+	assert( (file = fopen("test.bin", "wb")) != NULL ); 
 	fwrite_codearea( file ); 
 	fclose( file );
 	dump_file("code area ");
@@ -371,8 +372,6 @@ static void test_sections( void )
 
 int main( int argc, char *argv[] )
 {
-	g_test_init( &argc, &argv, NULL );
-	g_test_add_func( "/Sections", test_sections );
-
-	return g_test_run();
+	test_sections();
+	return 0;
 }
