@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.159 2014-06-28 00:17:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.160 2014-06-28 03:02:12 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -66,7 +66,7 @@ INSTALL ?= install
 SRCS1 	:= $(wildcard *.c lib/*.c)
 SRCS	:= $(SRCS1:test.c=)
 OBJS 	:= $(SRCS:.c=.o)
-TEST_SRCS:= $(wildcard t/*.c)
+TEST_SRCS:= $(wildcard t/*.c lib/t/*.c)
 
 #------------------------------------------------------------------------------
 # variables
@@ -116,8 +116,14 @@ install:
 # clean
 #------------------------------------------------------------------------------
 clean::
-	$(RM) *.o $(LOCAL_LIB)/*.o *.exe $(LOCAL_LIB)/*.exe *~ $(LOCAL_LIB)/*~ *.tmp
-	$(RM) *.bak $(LOCAL_LIB)/*.bak *.orig $(LOCAL_LIB)/*.orig core $(LOCAL_LIB)/core
+	$(RM) *.core $(LOCAL_LIB)/*.core $(LOCAL_LIB)/t/*.core
+	$(RM) *.o    $(LOCAL_LIB)/*.o    $(LOCAL_LIB)/t/*.o 
+	$(RM) *.out  $(LOCAL_LIB)/*.out  $(LOCAL_LIB)/t/*.out
+	$(RM) *.orig $(LOCAL_LIB)/*.orig $(LOCAL_LIB)/t/*.orig
+	$(RM) *.exe  $(LOCAL_LIB)/*.exe  $(LOCAL_LIB)/t/*.exe
+	$(RM) *.tmp  $(LOCAL_LIB)/*.tmp  $(LOCAL_LIB)/t/*.tmp
+	$(RM) *.bak  $(LOCAL_LIB)/*.bak  $(LOCAL_LIB)/t/*.bak
+	$(RM) *~     $(LOCAL_LIB)/*~     $(LOCAL_LIB)/t/*~
 	$(RM) -rf Debug Release x1 x2 x3
 
 #------------------------------------------------------------------------------
@@ -385,3 +391,4 @@ t/test_symtab.o: lib/types.h lib/strutil.h symref.h lib/classlist.h model.h
 t/test_symtab.o: lib/list.h module.h lib/classhash.h lib/strhash.h
 t/test_symtab.o: lib/uthash.h codearea.h lib/array.h expr.h scan.h scan_def.h
 t/test_symtab.o: legacy.h symtab.h sym.h options.h options_def.h
+lib/t/test_dlist.o: lib/xmalloc.h lib/die.h lib/dlist.h

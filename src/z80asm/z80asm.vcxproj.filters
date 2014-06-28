@@ -147,6 +147,9 @@
     <ClInclude Include="modlink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\dlist.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -256,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="exprprsr.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\dlist.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
