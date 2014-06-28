@@ -1,9 +1,11 @@
-<h1 id="z80asmfileformatsv05">z80asm File formats (v05)</h1>
+<h1 id="z80asmfileformatsv06">z80asm File formats (v06)</h1>
 
 <p>This document describes the object and libary formats used by <em>z80asm</em>
-versions <em>2.4.x</em>. </p>
+versions <em>2.5.x</em>. </p>
 
-<p>The version changed to <em>05</em> to include source code sections.</p>
+<p>The version changed to <em>06</em> to include <em>DEFC</em> symbols that are defined as
+an expression using other symbols and are computed at link time, after 
+all addresses are allocated.</p>
 
 <p>The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -141,7 +143,8 @@ Each expression has the following format:</p>
 'U' : 8-bit integer (0 to 255) <br />
 'S' : 8-bit signed integer (-128 to 127) <br />
 'C' : 16-bit integer (-32768 to 65535) <br />
-'L' : 32-bit signed integer  </p></li>
+'L' : 32-bit signed integer <br />
+'=' : computed name at link time</p></li>
 <li><p><em>sourcefile</em> (lstring) : source file name where expression was defined,
 to be used in error messages. May be an empty string, signalling that
 the previous <em>sourcefile</em> of the previous expression should be used.</p></li>
@@ -154,6 +157,9 @@ start of the assembly instruction to be used as <em>ASMPC</em> during
 expression evaluation.</p></li>
 <li><p><em>patchptr</em> (word) : defines the relative module code patch pointer to 
 store the result of evaluating the expression.</p></li>
+<li><p><em>target_name</em> (string) : contains the name of the symbol that receives
+the result of evaluating the expression, only used for '=' type expressions,
+empty string for the other types.</p></li>
 <li><p><em>expression</em> (lstring) : contains the expression text as parsed from the 
 source file, in the standard C-like expression syntax.</p></li>
 </ul></li>

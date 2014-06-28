@@ -2,7 +2,7 @@ z80asm File formats (v05)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
-from version *2.4.0* onwards. 
+versions *2.4.x*. 
 
 The version changed to *05* to include source code sections.
 

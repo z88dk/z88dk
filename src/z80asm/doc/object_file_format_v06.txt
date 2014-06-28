@@ -1,12 +1,12 @@
-z80asm File formats (v03)
+z80asm File formats (v06)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
-versions *2.2.x*.
+versions *2.5.x*. 
 
-The version changed to *03* to include the address of the start of the
-assembly instruction in the object file, so that expressions with ASMPC
-are correctly computed at link time.
+The version changed to *06* to include *DEFC* symbols that are defined as
+an expression using other symbols and are computed at link time, after 
+all addresses are allocated.
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -36,6 +36,9 @@ The following object types exist in the file:
 * *string*:	one byte containing the string length followed by the 
 	characters of the string.
 
+* *lstring*: one word containing the string length followed by the 
+	characters of the string.
+
 
 Object file format
 ------------------
@@ -44,14 +47,14 @@ The format of the object file is as follows:
 
 |Addr | Type   | Object													|
 |:---:|:------:|:-------------------------------------------------------|
-|   0 | char[8]| 'Z80RMF03' (file signature and version)				|
-|   8 | word   | *ORG Address*											|
-|  10 | long   | File pointer to *Module Name*, always the last section	|
-|  14 | long   | File pointer to *Expressions*, may be -1				|
-|  18 | long   | File pointer to *Module Names*, may be -1				|
-|  22 | long   | File pointer to *External Names*, may be -1			|
-|  26 | long   | File pointer to *Machine Code*, may be -1				|
-|  30 |        | *Expressions*											|
+|   0 | char[8]| 'Z80RMF04' (file signature and version)				|
+|   8 | long   | *ORG Address*											|
+|  12 | long   | File pointer to *Module Name*, always the last section	|
+|  16 | long   | File pointer to *Expressions*, may be -1				|
+|  20 | long   | File pointer to *Module Names*, may be -1				|
+|  24 | long   | File pointer to *External Names*, may be -1			|
+|  28 | long   | File pointer to *Machine Code*, may be -1				|
+|  32 |        | *Expressions*											|
 |     |  	   | ...													|
 |     |  	   | *Module Names*											|
 |     |  	   | ...													|
@@ -62,19 +65,31 @@ The format of the object file is as follows:
 
 
 * *ORG Address* : contains the ORG address for the linked machine code 
-	or *0xFFFF* for no ORG address defined. 
+	or -1 for no ORG address defined. 
 
 
-* *Expressions* : contains a set of expressions up to the 
-	start of the next existing section. Each expression has the following
-	format:
+* *Expressions* : contains a set of expressions up to 
+    an end marker (*type* = 0). 
+    Each expression has the following format:
 
 	* *type* (char) : defines the resulting evaluation type range:
 
+		0   : end marker  
 		'U' : 8-bit integer (0 to 255)  
 		'S' : 8-bit signed integer (-128 to 127)  
 		'C' : 16-bit integer (-32768 to 65535)  
 		'L' : 32-bit signed integer  
+		'=' : computed name at link time
+
+	* *sourcefile* (lstring) : source file name where expression was defined,
+	to be used in error messages. May be an empty string, signalling that
+	the previous *sourcefile* of the previous expression should be used.
+
+	* *line_number* (long) : line number in source file where 
+	expression was defined, to be used in error messages.
+
+	* *section* (string) : source file section name where expression 
+	was defined. 
 
 	* *ASMPC* (word) : defines the relative module code address of the 
 	start of the assembly instruction to be used as *ASMPC* during
@@ -83,10 +98,12 @@ The format of the object file is as follows:
 	* *patchptr* (word) : defines the relative module code patch pointer to 
 	store the result of evaluating the expression.
 
-	* *expression* (string) : contains the expression text as parsed from the 
+	* *target_name* (string) : contains the name of the symbol that receives
+	the result of evaluating the expression, only used for '=' type expressions,
+	empty string for the other types.
+	
+	* *expression* (lstring) : contains the expression text as parsed from the 
 	source file, in the standard C-like expression syntax.
-
-	* *0* (byte) : is a zero byte end marker, not part of the expression length.
 
 
 * *Module Names* : contains a set of names defined in this module 
@@ -94,6 +111,7 @@ The format of the object file is as follows:
   
 	* *scope* (char) : defines the scope of the name:
   
+		0   : end marker  
 		'L' is local,  
 		'G' is global,  
 
@@ -101,6 +119,9 @@ The format of the object file is as follows:
 
 		'A' relocatable address,   
 		'C' a constant.
+
+	* *section* (string) : source file section name where name 
+	was defined. 
 
 	* *value* (long) : contains the absolute value for a constant, or the
 	relative address to the start of the code block for a relocatable
@@ -123,9 +144,11 @@ The format of the object file is as follows:
   following format:
 
 
-	* *length* (word) : defines the total code lenght, and contains 0 if the 
-	  code is 65536 bytes long.
+	* *length* (long) : defines the total code lenght, contains -1
+	  to signal the end.
 	
+	* *section* (string) : source file section name. 
+
 	* *code* (byte[length]) : contains the binary code.
 
 
