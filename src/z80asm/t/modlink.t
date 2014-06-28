@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.4 2014-06-27 23:31:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.5 2014-06-28 00:18:21 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -413,5 +413,3 @@ File test2.obj at $0000: Z80RMF05
   Code: 0 bytes (section 'data')
   Code: 0 bytes (section 'bss')
 END
-
-
