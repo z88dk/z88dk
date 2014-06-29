@@ -3,7 +3,7 @@ Unit test for dlist.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.3 2014-06-29 23:47:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -110,8 +110,8 @@ int main( int argc, char *argv[] )
 	T( assert( dl_insert_after(  &nodes[0], &nodes[4] ) == &nodes[4] ) );
 
 	/* sort */
-	T( dl_msort(head, compare_asc) );
-	T( dl_msort(head, compare_des) );
+	T( dl_msort(head, (dl_compare_t) compare_asc) );
+	T( dl_msort(head, (dl_compare_t) compare_des) );
 
 	return 0;
 }

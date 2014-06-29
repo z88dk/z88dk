@@ -142,11 +142,11 @@ assert( dl_insert_after( &nodes[0], &nodes[4] ) == &nodes[4] ); (line 110)
 
 list = BCAED.
 --------------------------------------------------------------------------------
-dl_msort(head, compare_asc); (line 113)
+dl_msort(head, (dl_compare_t) compare_asc); (line 113)
 
 list = ABCDE.
 --------------------------------------------------------------------------------
-dl_msort(head, compare_des); (line 114)
+dl_msort(head, (dl_compare_t) compare_des); (line 114)
 
 list = EDCBA.
 --------------------------------------------------------------------------------

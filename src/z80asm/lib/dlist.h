@@ -7,7 +7,7 @@ prev to last element, or to itself if list is empty.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.h,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.h,v 1.3 2014-06-29 23:47:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -64,4 +64,5 @@ extern void *dl_insert_before( void *old_node_, void *new_node_ );
 extern void *dl_remove( DList *list, void *node_ );
 
 /* merge-sort the list */
-extern void  dl_msort( DList *list, int (*compare)( void *node_a_, void *node_b_ ) );
+typedef int (*dl_compare_t)( void *node_a_, void *node_b_ );
+extern void  dl_msort( DList *list, dl_compare_t compare );

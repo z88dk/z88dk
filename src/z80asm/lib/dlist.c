@@ -7,7 +7,7 @@ prev to last element, or to itself if list is empty.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.3 2014-06-29 23:47:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -159,7 +159,7 @@ void *dl_shift( DList *list )
 /*-----------------------------------------------------------------------------
 *   Merge-sort the list
 *----------------------------------------------------------------------------*/
-void dl_msort( DList *list, int (*compare)( void *node_a_, void *node_b_ ) )
+void dl_msort( DList *list, dl_compare_t compare )
 {
 	DList left = DL_INIT, right = DL_INIT;
 	DList *node_a, *node_b;
