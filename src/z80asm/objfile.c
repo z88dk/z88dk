@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.36 2014-06-23 22:27:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.37 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -51,7 +51,7 @@ static long write_expr( FILE *fp )
 	static Str *last_sourcefile = NULL;		/* keep last source file referred to in object */
 	ExprListElem *iter;
     Expr *expr;
-	char range;
+	char range, *target_name;
 	long expr_ptr;
 
 	INIT_OBJ( Str, &last_sourcefile );
@@ -65,15 +65,24 @@ static long write_expr( FILE *fp )
 		expr = iter->obj;
 
 		/* store range */
-		switch ( expr->expr_type & RANGE )
+		if ( expr->target_name )
 		{
-		case RANGE_32SIGN:	range = 'L'; break;
-		case RANGE_16CONST:	range = 'C'; break;
-		case RANGE_8UNSIGN:	range = 'U'; break;
-		case RANGE_8SIGN:	range = 'S'; break;
-		case RANGE_JROFFSET:
-		default:
-			assert(0);
+			target_name = expr->target_name;		/* EQU expression */
+			range = '=';
+		}
+		else
+		{
+			target_name = "";						/* patch expression */
+			switch ( expr->expr_type & RANGE )
+			{
+			case RANGE_32SIGN:	range = 'L'; break;
+			case RANGE_16CONST:	range = 'C'; break;
+			case RANGE_8UNSIGN:	range = 'U'; break;
+			case RANGE_8SIGN:	range = 'S'; break;
+			case RANGE_JROFFSET:
+			default:
+				assert(0);
+			}
 		}
 		xfput_uint8( fp, range );				/* range of expression */
 
@@ -93,6 +102,7 @@ static long write_expr( FILE *fp )
 
 		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
 		xfput_uint16( fp, expr->code_pos );				/* patchptr */
+		xfput_count_byte_strz( fp, target_name );		/* target symbol for expression */
 		xfput_count_word_strz( fp, expr->text->str );	/* expression */
 	}
 

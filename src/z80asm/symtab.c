@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.42 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.43 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -349,6 +349,24 @@ void define_symbol( char *name, long value, Byte type )
         /* the extern symbol is now no longer accessible */
         define_local_symbol( name, value, type );
     }
+}
+
+/*-----------------------------------------------------------------------------
+*   update a symbol value, used to compute EQU symbols
+*----------------------------------------------------------------------------*/
+void update_symbol( char *name, long value )
+{
+    Symbol *sym;
+
+    sym = find_symbol( name, CURRENTMODULE->local_symtab );
+
+	if ( sym == NULL )
+		sym = find_symbol( name, global_symtab );
+
+    if ( sym == NULL )
+		error_org_not_defined();
+	else
+		sym->value = value;
 }
 
 /*-----------------------------------------------------------------------------

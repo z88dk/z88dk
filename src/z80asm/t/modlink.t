@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.5 2014-06-28 00:18:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.6 2014-06-29 22:25:14 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -88,52 +88,52 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF05
+File test.obj at $0000: Z80RMF06
   Name: test
   Org:  $1234
   Names:
-    G A $0013 a1 (section '')
+    G A $0013 a1
   External names:
     U         a2
     U         ASMHEAD
     U         ASMTAIL
     U         ASMSIZE
   Expressions:
-    E Ub (test.asm:6) $0000 $0001: ASMPC-4608 (section '')
-    E Cw (test.asm:7) $0002 $0003: ASMPC (section '')
-    E Ub (test.asm:8) $0005 $0006: a1-4608 (section '')
-    E Cw (test.asm:9) $0007 $0008: a1 (section '')
-    E Cw (test.asm:10) $000A $000B: a2-a1 (section '')
-    E Cw (test.asm:11) $000D $000E: a1-ASMPC (section '')
-    E Cw (test.asm:12) $0010 $0011: a2-ASMPC (section '')
-    E Cw (test.asm:14) $0013 $0014: ASMHEAD (section '')
-    E Cw (test.asm:15) $0016 $0017: ASMTAIL (section '')
-    E Cw (test.asm:16) $0019 $001A: ASMSIZE (section '')
-  Code: 28 bytes (section '')
+    E Ub (test.asm:6) $0000 $0001: ASMPC-4608
+    E Cw (test.asm:7) $0002 $0003: ASMPC
+    E Ub (test.asm:8) $0005 $0006: a1-4608
+    E Cw (test.asm:9) $0007 $0008: a1
+    E Cw (test.asm:10) $000A $000B: a2-a1
+    E Cw (test.asm:11) $000D $000E: a1-ASMPC
+    E Cw (test.asm:12) $0010 $0011: a2-ASMPC
+    E Cw (test.asm:14) $0013 $0014: ASMHEAD
+    E Cw (test.asm:15) $0016 $0017: ASMTAIL
+    E Cw (test.asm:16) $0019 $001A: ASMSIZE
+  Code: 28 bytes
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.obj at $0000: Z80RMF05
+File test1.obj at $0000: Z80RMF06
   Name: test1
   Names:
-    G A $0013 a2 (section '')
+    G A $0013 a2
   External names:
     U         a1
     U         ASMHEAD
     U         ASMTAIL
     U         ASMSIZE
   Expressions:
-    E Ub (test1.asm:4) $0000 $0001: ASMPC-4608 (section '')
-    E Cw (test1.asm:5) $0002 $0003: ASMPC (section '')
-    E Ub (test1.asm:6) $0005 $0006: a2-4608 (section '')
-    E Cw (test1.asm:7) $0007 $0008: a2 (section '')
-    E Cw (test1.asm:8) $000A $000B: a2-a1 (section '')
-    E Cw (test1.asm:9) $000D $000E: ASMPC-a1 (section '')
-    E Cw (test1.asm:10) $0010 $0011: a2-ASMPC (section '')
-    E Cw (test1.asm:12) $0013 $0014: ASMHEAD (section '')
-    E Cw (test1.asm:13) $0016 $0017: ASMTAIL (section '')
-    E Cw (test1.asm:14) $0019 $001A: ASMSIZE (section '')
-  Code: 28 bytes (section '')
+    E Ub (test1.asm:4) $0000 $0001: ASMPC-4608
+    E Cw (test1.asm:5) $0002 $0003: ASMPC
+    E Ub (test1.asm:6) $0005 $0006: a2-4608
+    E Cw (test1.asm:7) $0007 $0008: a2
+    E Cw (test1.asm:8) $000A $000B: a2-a1
+    E Cw (test1.asm:9) $000D $000E: ASMPC-a1
+    E Cw (test1.asm:10) $0010 $0011: a2-ASMPC
+    E Cw (test1.asm:12) $0013 $0014: ASMHEAD
+    E Cw (test1.asm:13) $0016 $0017: ASMTAIL
+    E Cw (test1.asm:14) $0019 $001A: ASMSIZE
+  Code: 28 bytes
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 END
@@ -155,7 +155,7 @@ END
 
 #------------------------------------------------------------------------------
 # Test sections
-my $expect_bin = pack("C*", 
+my $expected_bin = pack("C*", 
 					0x21, 0x59, 0x12, 
 					0x01, 0x05, 0x00, 
 					0xCD, 0x50, 0x12, 
@@ -239,55 +239,55 @@ prmes:		ld 	a, b
 			
 ASM1
 	options => "-b -l",
-	bin		=> $expect_bin,
+	bin		=> $expected_bin,
 );
 
 # link only
 z80asm(
 	options => "-d -b test.obj test1.obj",
-	bin		=> $expect_bin,
+	bin		=> $expected_bin,
 );
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF05
+File test.obj at $0000: Z80RMF06
   Name: test
   Org:  $1234
   Names:
-    L A $0000 start (section 'code')
-    L A $0000 mes1 (section 'data')
-    L A $0005 mes1end (section 'data')
-    L A $0005 mes2 (section 'data')
-    L A $000B mes2end (section 'data')
+    L A $0000 start (section code)
+    L A $0000 mes1 (section data)
+    L A $0005 mes1end (section data)
+    L A $0005 mes2 (section data)
+    L A $000B mes2end (section data)
   External names:
     U         prmes
     U         mes0
     U         mes0end
   Expressions:
-    E Cw (test.asm:6) $0000 $0001: mes1 (section 'code')
-    E Cw (test.asm:7) $0003 $0004: mes1end-mes1 (section 'code')
-    E Cw (test.asm:13) $0006 $0007: prmes (section 'code')
-    E Cw (test.asm:16) $0009 $000A: mes2 (section 'code')
-    E Cw (test.asm:17) $000C $000D: mes2end-mes2 (section 'code')
-    E Cw (test.asm:23) $000F $0010: prmes (section 'code')
-    E Cw (test.asm:25) $0012 $0013: mes0 (section 'code')
-    E Cw (test.asm:26) $0015 $0016: mes0end-mes0 (section 'code')
-    E Cw (test.asm:27) $0018 $0019: prmes (section 'code')
-  Code: 28 bytes (section 'code')
+    E Cw (test.asm:6) $0000 $0001: mes1 (section code)
+    E Cw (test.asm:7) $0003 $0004: mes1end-mes1 (section code)
+    E Cw (test.asm:13) $0006 $0007: prmes (section code)
+    E Cw (test.asm:16) $0009 $000A: mes2 (section code)
+    E Cw (test.asm:17) $000C $000D: mes2end-mes2 (section code)
+    E Cw (test.asm:23) $000F $0010: prmes (section code)
+    E Cw (test.asm:25) $0012 $0013: mes0 (section code)
+    E Cw (test.asm:26) $0015 $0016: mes0end-mes0 (section code)
+    E Cw (test.asm:27) $0018 $0019: prmes (section code)
+  Code: 28 bytes (section code)
     C $0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
     C $0010: 00 00 21 00 00 01 00 00 CD 00 00 C9
-  Code: 11 bytes (section 'data')
+  Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.obj at $0000: Z80RMF05
+File test1.obj at $0000: Z80RMF06
   Name: test1
   Names:
-    G A $0000 prmes (section 'code')
-    G A $0000 mes0 (section 'data')
-    G A $0001 mes0end (section 'data')
-  Code: 9 bytes (section 'code')
+    G A $0000 prmes (section code)
+    G A $0000 mes0 (section data)
+    G A $0001 mes0end (section data)
+  Code: 9 bytes (section code)
     C $0000: 78 B1 C8 7E 23 D7 0B 18 F7
-  Code: 1 bytes (section 'data')
+  Code: 1 bytes (section data)
     C $0000: 2E
 END
 
@@ -361,27 +361,27 @@ ASM2
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF05
+File test.obj at $0000: Z80RMF06
   Name: test
   Org:  $0000
-  Code: 0 bytes (section 'code')
-  Code: 0 bytes (section 'data')
-  Code: 1 bytes (section 'bss')
+  Code: 0 bytes (section code)
+  Code: 0 bytes (section data)
+  Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF05
+File test1.obj at $0000: Z80RMF06
   Name: test1
-  Code: 0 bytes (section 'code')
-  Code: 1 bytes (section 'data')
+  Code: 0 bytes (section code)
+  Code: 1 bytes (section data)
     C $0000: 02
-  Code: 0 bytes (section 'bss')
+  Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF05
+File test2.obj at $0000: Z80RMF06
   Name: test2
-  Code: 1 bytes (section 'code')
+  Code: 1 bytes (section code)
     C $0000: 01
-  Code: 0 bytes (section 'data')
-  Code: 0 bytes (section 'bss')
+  Code: 0 bytes (section data)
+  Code: 0 bytes (section bss)
 END
 
 # link only
@@ -391,25 +391,131 @@ z80asm(
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF05
+File test.obj at $0000: Z80RMF06
   Name: test
   Org:  $0000
-  Code: 0 bytes (section 'code')
-  Code: 0 bytes (section 'data')
-  Code: 1 bytes (section 'bss')
+  Code: 0 bytes (section code)
+  Code: 0 bytes (section data)
+  Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF05
+File test1.obj at $0000: Z80RMF06
   Name: test1
-  Code: 0 bytes (section 'code')
-  Code: 1 bytes (section 'data')
+  Code: 0 bytes (section code)
+  Code: 1 bytes (section data)
     C $0000: 02
-  Code: 0 bytes (section 'bss')
+  Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF05
+File test2.obj at $0000: Z80RMF06
   Name: test2
-  Code: 1 bytes (section 'code')
+  Code: 1 bytes (section code)
     C $0000: 01
-  Code: 0 bytes (section 'data')
-  Code: 0 bytes (section 'bss')
+  Code: 0 bytes (section data)
+  Code: 0 bytes (section bss)
 END
+
+#------------------------------------------------------------------------------
+# Test computed DEFC
+diag "Computed DEFC not working";
+if (0) {
+$expected_bin = pack("C*",
+					# section code		# @ 0x1000
+					0xCD, 0x0A, 0x10,	# @ 0x1000 : main
+					0xCD, 0x09, 0x10,	# @ 0x1003
+					0xC3, 0x0B, 0x10,	# @ 0x1006
+					0xC8,				# @ 0x1009 : func2
+					# section lib		# @ 0x100A
+					0xC9,				# @ 0x100A : func1
+										# @ 0x100B : computed_end
+				);
+z80asm(
+	asm		=> <<'ASM',
+		section code
+		section lib
+
+		extern func1_alias, func2_alias, computed_end
+
+		section code
+		call func1_alias
+		call func2_alias
+		jp   computed_end
+ASM
+	asm1	=> <<'ASM1',
+		section code
+		section lib
+
+		public func1, func2
+		
+		section lib
+func1:	ret
+
+		section code
+func2:	ret z
+
+ASM1
+	asm2	=> <<'ASM2',
+		section code
+		section lib
+
+		extern func1, func2
+		public func1_alias, func2_alias, computed_end
+		
+		defc func1_alias = func1		; link lib to lib
+		defc func2_alias = func2		; link lib to code
+		
+		defc computed_end = chain1 + 1
+		defc chain1 = chain2 - 1
+		defc chain2 = ASMPC
+ASM2
+	options => "-r1000 -b",
+	bin		=> $expected_bin,
+);
+
+# link only
+z80asm(
+	options => "-d -b test.obj test1.obj test2.obj",
+	bin		=> $expected_bin,
+);
+
+t_z80nm("test.obj test1.obj test2.obj", <<'END');
+
+File test.obj at $0000: Z80RMF06
+  Name: test
+  Org:  $1000
+  External names:
+    U         func1_alias
+    U         func2_alias
+    U         computed_end
+  Expressions:
+    E Cw (test.asm:7) $0000 $0001: func1_alias (section code)
+    E Cw (test.asm:8) $0003 $0004: func2_alias (section code)
+    E Cw (test.asm:9) $0006 $0007: computed_end (section code)
+  Code: 9 bytes (section code)
+    C $0000: CD 00 00 CD 00 00 C3 00 00
+  Code: 0 bytes (section lib)
+
+File test1.obj at $0000: Z80RMF06
+  Name: test1
+  Names:
+    G A $0000 func1 (section lib)
+    G A $0000 func2 (section code)
+  Code: 1 bytes (section code)
+    C $0000: C8
+  Code: 1 bytes (section lib)
+    C $0000: C9
+
+File test2.obj at $0000: Z80RMF06
+  Name: test2
+  Names:
+    G A $0000 func1_alias (section lib)
+    G A $0000 func2_alias (section lib)
+    G A $0000 computed_end (section lib)
+  External names:
+    U         func1
+    U         func2
+  Expressions:
+    E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
+    E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
+    E =  (test2.asm:10) $0000 $0000: computed_end := ASMPC (section lib)
+END
+}

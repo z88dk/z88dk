@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.20 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.21 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -355,7 +355,10 @@ void Expr_init (Expr *self)
 	OBJ_AUTODELETE( self->text ) = FALSE;
 
     self->expr_type = 0;
+	
+	self->target_name = NULL;
 
+	self->module	= CURRENTMODULE;
 	self->section	= CURRENTSECTION;
     self->asmpc		= get_PC();					/* BUG_0048 */
     self->code_pos	= get_cur_module_size();	/* BUG_0015 */

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.114 2014-06-27 23:31:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.115 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.114 2014-06-27 23:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.114  2014-06-27 23:31:52  pauloscustodio
+* Revision 1.115  2014-06-29 22:25:14  pauloscustodio
+* Object file format changed to version 06, to include DEFC symbols that
+* are defined as an expression using other symbols and are computed at link
+* time, after all addresses are allocated.
+*
+* DEFC with expressions not yet enabled, need changes in the symbol table first.
+*
+* Two problems need to be solved before DEFC with expressions can be
+* enabled:
+* 1) symbols need to be linked into expressions so that the symbol value
+* is used during expression eval. Today the symbol value is frozen
+* during expression parse.
+* 2) symbols need to have a new category: computed, actual value not
+* yet known.
+*
+* Revision 1.114  2014/06/27 23:31:52  pauloscustodio
 * Write empty sections to the object file, to allow the user to define
 * the sections sequence in the final binary by writing a list of empty
 * sections at the top of the source file, even if the source does not
@@ -2026,6 +2041,23 @@ Based on 1.0.31
 			section bss
 
 -------------------------------------------------------------------------------
+xx.xx.2014 [2.5.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Object file format changed to version 06, to include DEFC symbols that 
+	  are defined as an expression using other symbols and are computed at link 
+	  time, after all addresses are allocated.
+	  
+	  DEFC with expressions not yet enabled, need changes in the symbol table first.
+	  
+	  Two problems need to be solved before DEFC with expressions can be
+	  enabled:
+	  1) symbols need to be linked into expressions so that the symbol value 
+	     is used during expression eval. Today the symbol value is frozen
+		 during expression parse.
+	  2) symbols need to have a new category: computed, actual value not
+	     yet known.
+	
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -2048,7 +2080,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.4.1a"
+#define VERSION     "2.5.0a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

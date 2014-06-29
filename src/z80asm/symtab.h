@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.24 2014-06-21 02:18:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.25 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -89,6 +89,9 @@ extern SymbolHash *static_symtab;
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
 extern void define_symbol( char *name, long value, Byte type );
+
+/* update a symbol value, used to compute EQU symbols */
+extern void update_symbol( char *name, long value );
 
 /* declare a PUBLIC symbol */
 extern void declare_public_symbol( char *name );

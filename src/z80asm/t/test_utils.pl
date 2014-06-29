@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.66 2014-06-23 22:27:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.67 2014-06-29 22:25:14 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -368,7 +368,7 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF05";
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF06";
 	$obj .= pack("V", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
@@ -382,11 +382,11 @@ sub objfile {
 	if ($args{EXPR}) {
 		store_ptr(\$obj, $expr_addr);
 		for (@{$args{EXPR}}) {
-			@$_ == 7 or die;
-			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $string) = @$_;
+			@$_ == 8 or die;
+			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
 			$obj .= $type . pack_lstring($filename) . pack("V", $line_nr) .
 			        pack_string($section) . pack("vv", $asmptr, $ptr) . 
-					pack_lstring($string);
+					pack_string($target_name) . pack_lstring($text);
 		}
 		$obj .= "\0";
 	}
@@ -468,7 +468,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF05";
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF06";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?

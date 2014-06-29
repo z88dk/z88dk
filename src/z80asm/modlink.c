@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.130 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.131 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -48,12 +48,9 @@ int LinkLibModules( char *objfilename, long fptr_base, long startnames, long end
 int LinkLibModule( struct libfile *library, long curmodule, char *modname );
 int SearchLibfile( struct libfile *curlib, char *modname );
 char *ReadName( FILE *file );
-void redefinedmsg( void );
 void SearchLibraries( char *modname );
-void ModuleExpr( void );
 void CreateBinFile( void );
 void ReadNames( char *filename, FILE *file );
-void ReadExpr( FILE *file );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
@@ -109,51 +106,77 @@ ReadNames( char *filename, FILE *file )
     }
 }
 
-
-
-void
-ReadExpr( FILE *file )
+/* set environment to compute expression */
+static void set_asmpc_env( Module *module, char *section_name,
+						   char *filename, int line_nr,
+						   UInt asmpc )
 {
-	static Str *expr_text;
-	static Str *source_filename;
-	static Str *section_name;
-	int line_nr;
-	int type;
-    long constant;
-    Expr *expr;
-    UInt asmpc, offsetptr;
 	UInt base_addr, offset;
 
+	/* point to current module */
+	set_cur_module( module );
+
+	/* source file and line number */
+	set_error_file( filename );
+	set_error_line( line_nr );
+
+	/* assembler PC as absolute address */
+	new_section( section_name );
+	base_addr = CURRENTSECTION->addr;
+	offset    = get_cur_module_start(); 
+    set_PC( asmpc + base_addr + offset );
+}
+
+/* set environment to compute expression */
+static void set_expr_env( Expr *expr )
+{
+	set_asmpc_env( expr->module, expr->section->name, 
+				   expr->filename, expr->line_nr, 
+				   expr->asmpc );
+}
+
+/* read the current modules' expressions to the given list */
+static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
+{
+	static Str *expr_text;
+	static Str *last_filename;
+	static Str *source_filename;
+	static Str *section_name;
+	static Str *target_name;
+
+	int line_nr;
+	int type;
+    Expr *expr;
+    UInt asmpc, code_pos;
+
 	INIT_OBJ( Str, &expr_text );
+	INIT_OBJ( Str, &last_filename );
 	INIT_OBJ( Str, &source_filename );
 	INIT_OBJ( Str, &section_name );
+	INIT_OBJ( Str, &target_name );
 
 	while (1) 
 	{
-        type = xfget_int8(   file );
+        type = xfget_int8( file );
 		if ( type == 0 )
 			break;			/* end marker */
 
 		/* source file and line number */
 		xfget_count_word_Str( file, source_filename );
-		if ( source_filename->len > 0 )
-			set_error_file( source_filename->str );
-		
+		if ( source_filename->len == 0 )
+			Str_set( source_filename, last_filename->str );
+		else
+			Str_set( last_filename, source_filename->str );
+
 		line_nr = xfget_int32( file );
-		if ( line_nr > 0 )
-			set_error_line( line_nr );
 
 		/* patch location */
 		xfget_count_byte_Str( file, section_name );
+
 		asmpc		= xfget_uint16( file );
-        offsetptr	= xfget_uint16( file );
+        code_pos	= xfget_uint16( file );
 
-		/* assembler PC as absolute address */
-		new_section( section_name->str );
-		base_addr = CURRENTSECTION->addr;
-		offset    = get_cur_module_start(); 
-        set_PC( asmpc + base_addr + offset );
-
+		xfget_count_byte_Str( file, target_name );	/* get expression EQU target, if not empty */
 		xfget_count_word_Str( file, expr_text );	/* get expression */
 
 		/* read expression followed by newline */
@@ -164,76 +187,246 @@ ReadExpr( FILE *file )
 
         GetSym();
 
+		/* parse and store expression in the list */
+		set_asmpc_env( CURRENTMODULE, section_name->str, 
+					   source_filename->str, line_nr, 
+					   asmpc );
         if ( ( expr = expr_parse() ) != NULL )
         {
-            /* parse numerical expression */
-            if ( expr->expr_type & NOT_EVALUABLE )
+			expr->expr_type &= ~ RANGE;
+            switch ( type )
             {
-                error_not_defined();
+            case 'U': expr->expr_type |= RANGE_8UNSIGN; break;
+            case 'S': expr->expr_type |= RANGE_8SIGN;   break;
+            case 'C': expr->expr_type |= RANGE_16CONST; break;
+            case 'L': expr->expr_type |= RANGE_32SIGN;  break;
+			case '=':
+				expr->expr_type |= RANGE_16CONST;
+				assert( target_name->len > 0 );
+				expr->target_name = strpool_add( target_name->str );	/* define expression as EQU */
+				break;
+			default:
+				error_not_obj_file( filename );
             }
-            else
+
+			expr->module	= CURRENTMODULE;
+			expr->section	= CURRENTSECTION;
+			expr->asmpc		= asmpc;
+			expr->code_pos	= code_pos;
+			expr->filename	= strpool_add( source_filename->str );
+			expr->line_nr	= line_nr;
+			expr->listpos	= -1;
+
+			ExprList_push( & exprs, expr );
+		}
+    }
+}
+
+/* read all the modules' expressions to the given list */
+static void read_module_exprs( ExprList *exprs )
+{
+    long fptr_namedecl, fptr_modname, fptr_exprdecl, fptr_libnmdecl;
+    long fptr_base;
+    struct linkedmod *curlink;
+	FILE *file;
+
+    curlink = linkhdr->firstlink;
+
+    do
+    {
+		set_cur_module( curlink->moduleinfo );
+
+        fptr_base = curlink->modulestart;
+
+        set_error_null();
+
+        /* open relocatable file for reading */
+        file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
+        fseek( file, fptr_base + 12, SEEK_SET );		/* point at module name  pointer   */
+        fptr_modname	= xfget_int32( file );			/* get file pointer to module name */
+        fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
+        fptr_namedecl	= xfget_int32( file );			/* get file pointer to name declarations */
+        fptr_libnmdecl	= xfget_int32( file );			/* get file pointer to library name declarations */
+
+        if ( fptr_exprdecl != -1 )
+        {
+        	fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
+			read_cur_module_exprs( exprs, file, curlink->objfilename );
+        }
+
+        xfclose( file );
+
+        curlink = curlink->nextlink;
+    }
+    while ( curlink != NULL );
+
+    set_error_null();
+}
+
+/* compute equ expressions and remove them from the list 
+   return >0: number of computed expressions
+   return 0 : nothing done, all EQU expression computed and removed from list
+   return <0: -(number of expressions with unresolved symbols)
+*/
+static int compute_equ_exprs_once( ExprList *exprs, Bool show_error )
+{
+	ExprListElem *iter;
+    Expr *expr, *expr2;
+	long value;
+	int  num_computed   = 0;
+	int  num_unresolved = 0;
+	Bool computed;
+
+	iter = ExprList_first( exprs );
+	while ( iter != NULL )
+	{
+		expr = iter->obj;
+		computed = FALSE;
+
+		if ( expr->target_name )
+		{
+			set_expr_env( expr );
+			value = Expr_eval( expr );
+	        if ( expr->expr_type & NOT_EVALUABLE )		/* unresolved */
+			{
+				num_unresolved++;
+				if ( show_error )
+					error_not_defined();
+			}
+			else
+			{
+				num_computed++;
+				computed = TRUE;
+				update_symbol( expr->target_name, value );
+			}
+		}
+
+		/* continue loop - delete expression if computed */
+		if ( computed )
+		{
+			/* remove current expression, advance iterator */
+			expr2 = ExprList_remove( exprs, &iter );
+			assert( expr == expr2 );
+
+			OBJ_DELETE( expr );	
+		}
+		else
+			iter = ExprList_next( iter );
+	}
+
+	if ( num_computed > 0 )
+		return num_computed;
+	else if ( num_unresolved > 0 )
+		return - num_unresolved;
+	else 
+		return 0;
+}
+
+/* compute all equ expressions, removing them from the list */
+static void compute_equ_exprs( ExprList *exprs )
+{
+	int  compute_result;
+
+	/* loop to solve dependencies while some are solved */
+	do {
+		compute_result = compute_equ_exprs_once( exprs, FALSE );
+	} while ( compute_result > 0 );
+
+	/* if some unresolved, give up and show error */
+	if ( compute_result < 0 )
+		compute_equ_exprs_once( exprs, TRUE );
+}
+
+/* compute and patch expressions */
+static void patch_exprs( ExprList *exprs )
+{
+	ExprListElem *iter;
+    Expr *expr, *expr2;
+	UInt code_pos;
+	long value;
+
+	iter = ExprList_first( exprs );
+	while ( iter != NULL )
+	{
+		expr = iter->obj;
+		assert( expr->target_name == NULL );		/* EQU expressions are already computed */
+
+		set_expr_env( expr );
+		value = Expr_eval( expr );
+
+	    if ( expr->expr_type & NOT_EVALUABLE )		/* unresolved */
+			error_not_defined();
+		else
+		{
+			code_pos = expr->code_pos;
+
+            switch ( expr->expr_type & RANGE )
             {
-                constant = Expr_eval( expr );
+            case RANGE_8UNSIGN:
+                if ( value < -128 || value > 255 )
+                    warn_int_range( value );
 
-                switch ( type )
-                {
-                case 'U':
-                    if ( constant < -128 || constant > 255 )
-                        warn_int_range( constant );
+                patch_byte( &code_pos, (Byte) value );
+                break;
 
-                    patch_byte( &offsetptr, (Byte) constant );
-                    break;
+            case RANGE_8SIGN:
+                if ( value < -128 || value > 127 )
+                    warn_int_range( value );
 
-                case 'S':
-                    if ( constant < -128 || constant > 127 )
-                        warn_int_range( constant );
+                patch_byte( &code_pos, (Byte) value );
+                break;
 
-                    patch_byte( &offsetptr, (Byte) constant );  /* opcode is stored, now store signed 8bit value */
-                    break;
+            case RANGE_16CONST:
+                if ( value < -32768 || value > 65535 )
+                    warn_int_range( value );
 
-                case 'C':
-                    if ( constant < -32768 || constant > 65535 )
-                        warn_int_range( constant );
+                patch_word( &code_pos, value ); code_pos -= 2;
 
-                    patch_word( &offsetptr, constant ); offsetptr -= 2;
+                if ( opts.relocatable )
+				{
+                    if ( expr->expr_type & SYM_ADDR )
+                    {
+                        /* Expression contains relocatable address */
+						UInt offset   = get_cur_module_start(); 
+						UInt distance = code_pos + offset - curroffset;
 
-                    if ( opts.relocatable )
-                        if ( expr->expr_type & SYM_ADDR )
+                        if ( distance >= 0 && distance <= 255 )
                         {
-                            /* Expression contains relocatable address */
-							UInt distance = offsetptr + offset - curroffset;
-
-                            if ( distance >= 0 && distance <= 255 )
-                            {
-                                *relocptr++ = (Byte) distance;
-                                sizeof_reloctable++;
-                            }
-                            else
-                            {
-                                *relocptr++ = 0;
-                                *relocptr++ = distance & 0xFF;
-                                *relocptr++ = distance >> 8;
-                                sizeof_reloctable += 3;
-                            }
-
-                            totaladdr++;
-                            curroffset = offsetptr + offset;
+                            *relocptr++ = (Byte) distance;
+                            sizeof_reloctable++;
+                        }
+                        else
+                        {
+                            *relocptr++ = 0;
+                            *relocptr++ = distance & 0xFF;
+                            *relocptr++ = distance >> 8;
+                            sizeof_reloctable += 3;
                         }
 
-                    break;
+                        totaladdr++;
+                        curroffset = code_pos + offset;
+                    }
+				}
+                break;
 
-                case 'L':
-                    if ( constant < LONG_MIN || constant > LONG_MAX )
-                        warn_int_range( constant );
+            case RANGE_32SIGN:
+                if ( value < LONG_MIN || value > LONG_MAX )
+                    warn_int_range( value );
 
-                    patch_long( &offsetptr, constant );
-                    break;
-                }
+                patch_long( &code_pos, value );
+                break;
+
+			default: assert(0);
             }
 
-            OBJ_DELETE( expr );
-        }
-    }
+		}
+
+		/* remove current expression, advance iterator */
+		expr2 = ExprList_remove( exprs, &iter );
+		assert( expr == expr2 );
+
+		OBJ_DELETE( expr );	
+	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -295,7 +488,7 @@ static void define_location_symbols( void )
 	
     if ( opts.verbose )
         printf("Code size of linked modules is %d bytes ($%04X to $%04X)\n",
-		       (int)(end_addr - start_addr), (int)start_addr, (int)end_addr );
+		       (int)(end_addr - start_addr), (int)start_addr, (int)end_addr-1 );
 
 	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
 	define_global_def_sym( name->str, start_addr );
@@ -318,7 +511,7 @@ static void define_location_symbols( void )
 			if ( opts.verbose )
 				printf("Section '%s' is %d bytes ($%04X to $%04X)\n",
 					   section->name, (int)(end_addr - start_addr), 
-					   (unsigned int)start_addr, (unsigned int)end_addr );
+					   (unsigned int)start_addr, (unsigned int)end_addr-1 );
 
 			Str_sprintf( name, ASMHEAD_KW, "_", section->name ); 
 			define_global_def_sym( name->str, start_addr );
@@ -343,6 +536,7 @@ void link_modules( void )
 	ModuleListElem *iter;
 	Bool saw_last_obj_module;
     char *obj_filename;
+	ExprList *exprs = NULL;
 	FILE *file;
 
     opts.symtable = opts.cur_list = FALSE;
@@ -455,11 +649,24 @@ void link_modules( void )
 		if ( ! get_num_errors() )
 			define_location_symbols();
 
-		if ( ! get_num_errors() )
-            ModuleExpr();               /*  Evaluate expressions in  all modules */
+		if ( opts.verbose )
+			puts( "Pass2..." );
+
+		/* collect expressions from all modules; first compute all EQU expressions,
+		   then patch all other expressions
+		   exprs keeps the current pending list */
+		exprs = OBJ_NEW( ExprList );
+		if ( ! get_num_errors() )		
+			read_module_exprs( exprs );
+		if ( ! get_num_errors() )	
+			compute_equ_exprs( exprs );
+		if ( ! get_num_errors() )	
+			patch_exprs( exprs );
     }
     FINALLY
     {
+		OBJ_DELETE( exprs );
+
         set_error_null();
 
         ReleaseLinkInfo();              /* Release module link information */
@@ -731,54 +938,6 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     set_cur_module( tmpmodule );		/* restore previous current module */
     return flag;
 }
-
-
-void
-ModuleExpr( void )
-{
-    long fptr_namedecl, fptr_modname, fptr_exprdecl, fptr_libnmdecl;
-    long fptr_base;
-    struct linkedmod *curlink;
-	FILE *file;
-
-    if ( opts.verbose )
-        puts( "Pass2..." );
-
-    curlink = linkhdr->firstlink;
-
-    do
-    {
-		set_cur_module( curlink->moduleinfo );
-
-        fptr_base = curlink->modulestart;
-
-        set_error_null();
-        //set_error_module( CURRENTMODULE->modname );
-        //set_error_file(   CURRENTMODULE->filename );
-
-        /* open relocatable file for reading */
-        file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
-        fseek( file, fptr_base + 12, SEEK_SET );		/* point at module name  pointer   */
-        fptr_modname	= xfget_int32( file );			/* get file pointer to module name */
-        fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
-        fptr_namedecl	= xfget_int32( file );			/* get file pointer to name declarations */
-        fptr_libnmdecl	= xfget_int32( file );			/* get file pointer to library name declarations */
-
-        if ( fptr_exprdecl != -1 )
-        {
-        	fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
-			ReadExpr( file );
-        }
-
-        xfclose( file );
-
-        curlink = curlink->nextlink;
-    }
-    while ( curlink != NULL );
-
-    set_error_null();
-}
-
 
 
 void

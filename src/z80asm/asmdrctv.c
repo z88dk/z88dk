@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.101 2014-06-23 22:27:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.102 2014-06-29 22:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -456,14 +456,27 @@ DEFC( void )
 
                 if ( ( expr = expr_parse() ) != NULL )
                 {
-                    /* expr. must not be stored in
-                       * relocatable file */
+#if 0
+					if ( (expr->expr_type & NOT_EVALUABLE) || (expr->expr_type & EXPR_ADDR) )
+                    {
+						/* store in object file to be computed at link time */
+						expr->expr_type |= RANGE_16CONST | EXPR_ADDR;	/* EXPR_ADDR: force storage in object file */
+						expr->target_name = strpool_add( name->str );
+
+						ExprList_push( & CURRENTMODULE->exprs, expr );
+
+						/* create symbol */
+						define_symbol( expr->target_name, 0, SYM_ADDR );
+                    }
+#else
+					/* expr. must not be stored in relocatable file */
                     if ( expr->expr_type & NOT_EVALUABLE )
                     {
                         error_not_defined();
 	                    OBJ_DELETE( expr );
                         break;
                     }
+#endif
                     else
                     {
                         constant = Expr_eval( expr );    /* DEFC expression must not

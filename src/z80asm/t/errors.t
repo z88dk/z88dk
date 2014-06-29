@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.22 2014-06-23 22:27:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.23 2014-06-29 22:25:14 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -130,7 +130,7 @@ remove_tree( bin_file() );
 unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
 								   CODE => [["", "\0\0"]], 
-								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "*+VAL"] ] ));
+								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
 				 "Error at file 'test.asm' line 1: syntax error in expression\n".
