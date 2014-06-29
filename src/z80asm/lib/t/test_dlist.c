@@ -3,7 +3,7 @@ Unit test for dlist.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.1 2014-06-28 03:02:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,6 +50,16 @@ void dump_list(char *title, int line)
 }
 
 #define T(code) do { code; dump_list(#code ";", __LINE__); } while (0)
+
+int compare_asc(Node *node_a, Node *node_b)
+{
+	return (int)node_a->c - (int)node_b->c;
+}
+
+int compare_des(Node *node_a, Node *node_b)
+{
+	return (int)node_b->c - (int)node_a->c;
+}
 
 int main( int argc, char *argv[] )
 {
@@ -98,6 +108,10 @@ int main( int argc, char *argv[] )
 	T( assert( dl_insert_before( &nodes[0], &nodes[2] ) == &nodes[2] ) );
 	T( assert( dl_insert_after(  &nodes[0], &nodes[3] ) == &nodes[3] ) );
 	T( assert( dl_insert_after(  &nodes[0], &nodes[4] ) == &nodes[4] ) );
+
+	/* sort */
+	T( dl_msort(head, compare_asc) );
+	T( dl_msort(head, compare_des) );
 
 	return 0;
 }

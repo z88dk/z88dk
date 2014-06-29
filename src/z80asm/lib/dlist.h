@@ -7,7 +7,7 @@ prev to last element, or to itself if list is empty.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.h,v 1.1 2014-06-28 03:02:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.h,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
 */
 
 #pragma once
@@ -20,7 +20,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.h,v 1.1 2014-0
 *	be linked to list header on first use.
 *	User code:
 *		struct Node { DList link; ... }; 
-*		DList head;
+*		DList head = DL_INIT;
 *----------------------------------------------------------------------------*/
 typedef struct DList
 {
@@ -28,6 +28,8 @@ typedef struct DList
 									/* point to first and last element from head */
 	/* ... user data ... */
 } DList;
+
+#define DL_INIT {NULL,NULL}
 
 /* get first and last elements from the list, NULL if empty */
 extern void *dl_first( DList *list );
@@ -60,3 +62,6 @@ extern void *dl_insert_before( void *old_node_, void *new_node_ );
 
 /* remove and return the given element */
 extern void *dl_remove( DList *list, void *node_ );
+
+/* merge-sort the list */
+extern void  dl_msort( DList *list, int (*compare)( void *node_a_, void *node_b_ ) );

@@ -7,7 +7,7 @@ prev to last element, or to itself if list is empty.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.1 2014-06-28 03:02:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.2 2014-06-29 23:41:57 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -154,4 +154,76 @@ void *dl_shift( DList *list )
 		return dl_remove( list, node );
 	else
 		return NULL;
+}
+
+/*-----------------------------------------------------------------------------
+*   Merge-sort the list
+*----------------------------------------------------------------------------*/
+void dl_msort( DList *list, int (*compare)( void *node_a_, void *node_b_ ) )
+{
+	DList left = DL_INIT, right = DL_INIT;
+	DList *node_a, *node_b;
+
+	/* empty lists or with one element are sorted */
+	node_a = dl_first(list);
+	node_b = dl_last(list);
+	if ( ! node_a || node_a == node_b )
+		return;
+
+	/* move elements from start to the left list, and from end to the right list */
+	dl_init(&left);
+	dl_init(&right);
+	while (1)
+	{
+		/* left element */
+		node_a = dl_shift(list);
+		if ( ! node_a )
+			break;
+		dl_push(&left, node_a);
+
+		/* right element */
+		node_b = dl_pop(list);
+		if ( ! node_b )
+			break;
+		dl_unshift(&right, node_b);
+	}
+
+	/* sort sublists */
+	dl_msort(&left,  compare);
+	dl_msort(&right, compare);
+
+	/* merge two sublists */
+	while (1)
+	{
+		node_a = dl_first(&left);
+		node_b = dl_first(&right);
+		
+		if ( ! node_a && ! node_b )
+			break;						/* finished */
+
+		if ( node_a && node_b )			/* both have items */
+		{
+			if ( compare(node_a, node_b) <= 0 )
+			{
+				node_a = dl_shift(&left);
+				dl_push(list, node_a);
+			}
+			else
+			{
+				node_b = dl_shift(&right);
+				dl_push(list, node_b);
+			}
+		}
+		else if ( node_a )
+		{
+			node_a = dl_shift(&left);
+			dl_push(list, node_a);
+		}
+		else
+		{
+			assert(node_b);
+			node_b = dl_shift(&right);
+			dl_push(list, node_b);
+		}
+	}
 }

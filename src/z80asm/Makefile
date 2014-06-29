@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.161 2014-06-29 22:25:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.162 2014-06-29 23:41:57 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -129,6 +129,8 @@ clean::
 #------------------------------------------------------------------------------
 # test
 #------------------------------------------------------------------------------
+all: t/libtestlib.a
+
 t/libtestlib.a : $(OBJS)
 	ar rcs t/libtestlib.a $(OBJS:z80asm.o=)
 
