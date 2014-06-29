@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.108 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.109 2014-06-29 22:26:49 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -241,7 +241,7 @@ void
 Z80pass2( void )
 {
 	ExprListElem *iter;
-    Expr *expr;
+    Expr *expr, *expr2;
     long value;
     UInt patchptr;
 	Bool do_patch, do_store;
@@ -347,9 +347,11 @@ Z80pass2( void )
 			iter = ExprList_next( iter );
 		else
 		{
-			/* extract current expression (same as expr), advance iterator */
-			expr = ExprList_remove( CURRENTMODULE->exprs, &iter );
-			OBJ_DELETE( expr );		
+			/* remove current expression, advance iterator */
+			expr2 = ExprList_remove( CURRENTMODULE->exprs, &iter );
+			assert( expr == expr2 );
+
+			OBJ_DELETE( expr );	
 		}
     }
 
