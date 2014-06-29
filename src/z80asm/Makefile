@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.160 2014-06-28 03:02:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.161 2014-06-29 22:25:52 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -137,7 +137,7 @@ $(TEST_SRCS:.c=.o) : t/libtestlib.a
 .o.out :
 	$(CC) -static $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
 	$(<:.o=$(EXESUFFIX)) 2> $@~
-	diff $(<:.o=.bmk) $@~
+	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
 
 clean::

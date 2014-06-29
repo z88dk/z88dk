@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.10 2014-04-15 19:20:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.11 2014-06-29 22:25:52 pauloscustodio Exp $
 #
 # Assert that all source files are in UNIX line-ending format; fix if not
 
@@ -26,7 +26,7 @@ use File::Basename;
 
 find(sub {
 		return unless -f $_;
-		return unless /^Makefile$|\.(c|h|pl|t|asm|rl)$/i;
+		return unless /^Makefile$|\.(c|h|pl|t|asm|rl|bmk)$/i;
 		dos2unix($_);
 	}, dirname($0)."/..");
 ok 1;
@@ -71,7 +71,10 @@ sub dos2unix {
 }
 
 # $Log: eol_format.t,v $
-# Revision 1.10  2014-04-15 19:20:28  pauloscustodio
+# Revision 1.11  2014-06-29 22:25:52  pauloscustodio
+# ws
+#
+# Revision 1.10  2014/04/15 19:20:28  pauloscustodio
 # Solve warning: no newline at end of file by checking and fixing also final newline in file
 #
 # Revision 1.9  2014/01/11 01:29:46  pauloscustodio
