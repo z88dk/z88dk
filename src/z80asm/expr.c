@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.21 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.22 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -339,6 +339,26 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 	}
 }
 
+/*-----------------------------------------------------------------------------
+*	Expression range
+*----------------------------------------------------------------------------*/
+
+/* return size in bytes of value of given range */
+int range_size( range_t range )
+{
+	switch ( range )
+	{
+	case RANGE_JR_OFFSET:		return 1;
+	case RANGE_BYTE_UNSIGNED:	return 1;
+	case RANGE_BYTE_SIGNED:		return 1;
+	case RANGE_WORD:			return 2;
+	case RANGE_DWORD:			return 4;
+	default: assert(0);
+	}
+
+	assert(0);
+	return -1;	/* not reached */
+}
 
 /*-----------------------------------------------------------------------------
 *	Class to hold one parsed expression

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.37 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.38 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -73,15 +73,14 @@ static long write_expr( FILE *fp )
 		else
 		{
 			target_name = "";						/* patch expression */
-			switch ( expr->expr_type & RANGE )
+			switch ( expr->range )
 			{
-			case RANGE_32SIGN:	range = 'L'; break;
-			case RANGE_16CONST:	range = 'C'; break;
-			case RANGE_8UNSIGN:	range = 'U'; break;
-			case RANGE_8SIGN:	range = 'S'; break;
-			case RANGE_JROFFSET:
-			default:
-				assert(0);
+			case RANGE_DWORD:			range = 'L'; break;
+			case RANGE_WORD:			range = 'C'; break;
+			case RANGE_BYTE_UNSIGNED:	range = 'U'; break;
+			case RANGE_BYTE_SIGNED:		range = 'S'; break;
+			case RANGE_JR_OFFSET:		assert(0);
+			default:					assert(0);
 			}
 		}
 		xfput_uint8( fp, range );				/* range of expression */

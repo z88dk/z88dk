@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.85 2014-06-09 13:15:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.86 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -40,17 +40,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.85 2014-0
 
 Bool ExprLong( int listoffset )
 {
-	return Pass2info( RANGE_32SIGN, listoffset );
+	return Pass2info( RANGE_DWORD, listoffset );
 }
 
 Bool ExprAddress( int listoffset )
 {
-	return Pass2info( RANGE_16CONST, listoffset );
+	return Pass2info( RANGE_WORD, listoffset );
 }
 
 Bool ExprUnsigned8( int listoffset )
 {
-	return Pass2info( RANGE_8UNSIGN, listoffset );
+	return Pass2info( RANGE_BYTE_UNSIGNED, listoffset );
 }
 
 Bool ExprSigned8( int listoffset )
@@ -64,7 +64,7 @@ Bool ExprSigned8( int listoffset )
 
     case TK_PLUS:
     case TK_MINUS:          /* + or - expected */
-        return Pass2info( RANGE_8SIGN, listoffset );
+        return Pass2info( RANGE_BYTE_SIGNED, listoffset );
 
     default:                /* Syntax error, e.g. (ix 4) */
         error_syntax();
@@ -75,7 +75,11 @@ Bool ExprSigned8( int listoffset )
 
 /*
 * $Log: exprprsr.c,v $
-* Revision 1.85  2014-06-09 13:15:26  pauloscustodio
+* Revision 1.86  2014-06-30 22:29:36  pauloscustodio
+* Separate expression type from expression range - new range_t enum
+* type for ranges and new range attribute in Expr.
+*
+* Revision 1.85  2014/06/09 13:15:26  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.84  2014/06/02 22:29:13  pauloscustodio

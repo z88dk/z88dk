@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.22 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.23 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,19 +47,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.22 2014-06-21 02:1
 /*-----------------------------------------------------------------------------
 *   Expression expr_type bitmasks - bits 3 to 6 same as Symbol type bitmasks
 *----------------------------------------------------------------------------*/
-#define RANGE           7			/* 00000111 Range types are 0 - 4 */
-
-#define RANGE_JROFFSET  0			/* relative jump argument */
-#define RANGE_8UNSIGN   1			/* 8-bit immediate */
-#define RANGE_8SIGN     2			/* (ix+d) */
-#define RANGE_16CONST   3			/* 16-bit immediate */
-#define RANGE_32SIGN    4			/* 32-bit immediate */
-
-/* return 1, 2 or 4 for a expr_type */
-#define RANGE_SIZE(x)	(((x) & RANGE) == RANGE_32SIGN  ? 4 : \
-						 ((x) & RANGE) == RANGE_16CONST ? 2 : \
-														  1 )
-
 #define EXPR_ADDR		SYM_ADDR	/* 00001000 Expression contains reloc. address label */
 #define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
 #define EXPR_PUBLIC		SYM_PUBLIC 	/* 00100000 Expression contains global symbol */

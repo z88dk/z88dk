@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.64 2014-06-21 02:18:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.65 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,6 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.64 2014-06-21 02:
 #include "types.h"
 #include "sym.h"
 #include "strutil.h"
+#include "expr.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -57,4 +58,4 @@ extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
 extern void Z80pass1( char *filename );
-extern Bool Pass2info( int range, long lfileptr );
+extern Bool Pass2info( range_t range, long lfileptr );

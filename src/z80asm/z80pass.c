@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.109 2014-06-29 22:26:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.110 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -267,7 +267,7 @@ Z80pass2( void )
 		do_patch = TRUE;
 		do_store = FALSE;
 
-		if ( ( expr->expr_type & RANGE ) == RANGE_JROFFSET )
+		if ( expr->range == RANGE_JR_OFFSET )
 		{
 			if ( expr->expr_type & EXPR_EXTERN )
 			{
@@ -290,9 +290,9 @@ Z80pass2( void )
         {
             patchptr = expr->code_pos;            /* index in memory buffer */
 
-            switch ( expr->expr_type & RANGE )
+            switch ( expr->range )
             {
-            case RANGE_JROFFSET:
+            case RANGE_JR_OFFSET:
                 value -= get_PC() + 2;		/* get module PC at JR instruction */
 
                 if ( value >= -128 && value <= 127 )
@@ -306,28 +306,28 @@ Z80pass2( void )
                 }
                 break;
 
-            case RANGE_8UNSIGN:
+			case RANGE_BYTE_UNSIGNED:
                 if ( value < -128 || value > 255 )
                     warn_int_range( value );
 
                 patch_byte( &patchptr, (Byte) value );
                 break;
 
-            case RANGE_8SIGN:
+            case RANGE_BYTE_SIGNED:
                 if ( value < -128 || value > 127 )
                     warn_int_range( value );
 
                 patch_byte( &patchptr, (Byte) value );
                 break;
 
-            case RANGE_16CONST:
+            case RANGE_WORD:
                 if ( value < -32768 || value > 65535 )
                     warn_int_range( value );
 
                 patch_word( &patchptr, ( int ) value );
                 break;
 
-            case RANGE_32SIGN:
+            case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 
@@ -340,7 +340,7 @@ Z80pass2( void )
         }
 
 		if ( opts.list )
-			list_patch_data( expr->listpos, value, RANGE_SIZE( expr->expr_type ) );
+			list_patch_data( expr->listpos, value, range_size( expr->range ) );
 			
 		/* continue loop - delete expression unless needs to be stored in object file */
 		if ( do_store )
@@ -376,7 +376,7 @@ Z80pass2( void )
 
 
 Bool
-Pass2info( int range,					/* allowed size of value to be parsed */
+Pass2info( range_t range,				/* allowed size of value to be parsed */
            long byteoffset )			/* position in listing file to patch */
 {
     Expr *expr = expr_parse();
@@ -384,7 +384,7 @@ Pass2info( int range,					/* allowed size of value to be parsed */
 
 	if ( expr != NULL )
 	{
-		expr->expr_type |= (range & RANGE);
+		expr->range = range;
 		if ( opts.cur_list )
 			expr->listpos = list_patch_pos( byteoffset );	/* now calculated as absolute file pointer */
 		else
@@ -394,7 +394,7 @@ Pass2info( int range,					/* allowed size of value to be parsed */
 	}
 
 	/* reserve space */
-	for ( i = 0; i < RANGE_SIZE( range ); i++ )
+	for ( i = 0; i < range_size( range ); i++ )
 		append_byte( 0 );
 
 	return expr == NULL ? FALSE : TRUE;

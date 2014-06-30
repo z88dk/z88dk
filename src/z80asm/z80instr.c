@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.78 2014-06-21 02:18:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.79 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -721,7 +721,7 @@ JP_instr( int opc0, int opc )
 static void RelativeJump( Byte opcode )
 {
 	append_byte( opcode );
-	Pass2info( RANGE_JROFFSET, 1 );
+	Pass2info( RANGE_JR_OFFSET, 1 );
 }
 
 void

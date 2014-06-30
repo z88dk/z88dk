@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.131 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.132 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -193,18 +193,17 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 					   asmpc );
         if ( ( expr = expr_parse() ) != NULL )
         {
-			expr->expr_type &= ~ RANGE;
+			expr->range = 0;
             switch ( type )
             {
-            case 'U': expr->expr_type |= RANGE_8UNSIGN; break;
-            case 'S': expr->expr_type |= RANGE_8SIGN;   break;
-            case 'C': expr->expr_type |= RANGE_16CONST; break;
-            case 'L': expr->expr_type |= RANGE_32SIGN;  break;
-			case '=':
-				expr->expr_type |= RANGE_16CONST;
-				assert( target_name->len > 0 );
-				expr->target_name = strpool_add( target_name->str );	/* define expression as EQU */
-				break;
+            case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
+            case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
+            case 'C': expr->range = RANGE_WORD;			break;
+            case 'L': expr->range = RANGE_DWORD;		break;
+			case '=': expr->range = RANGE_WORD;
+					  assert( target_name->len > 0 );
+					  expr->target_name = strpool_add( target_name->str );	/* define expression as EQU */
+					  break;
 			default:
 				error_not_obj_file( filename );
             }
@@ -360,23 +359,23 @@ static void patch_exprs( ExprList *exprs )
 		{
 			code_pos = expr->code_pos;
 
-            switch ( expr->expr_type & RANGE )
+            switch ( expr->range )
             {
-            case RANGE_8UNSIGN:
+            case RANGE_BYTE_UNSIGNED:
                 if ( value < -128 || value > 255 )
                     warn_int_range( value );
 
                 patch_byte( &code_pos, (Byte) value );
                 break;
 
-            case RANGE_8SIGN:
+            case RANGE_BYTE_SIGNED:
                 if ( value < -128 || value > 127 )
                     warn_int_range( value );
 
                 patch_byte( &code_pos, (Byte) value );
                 break;
 
-            case RANGE_16CONST:
+            case RANGE_WORD:
                 if ( value < -32768 || value > 65535 )
                     warn_int_range( value );
 
@@ -409,7 +408,7 @@ static void patch_exprs( ExprList *exprs )
 				}
                 break;
 
-            case RANGE_32SIGN:
+            case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 

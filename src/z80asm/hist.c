@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.115 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.116 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.115 2014-06-29 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.115  2014-06-29 22:25:14  pauloscustodio
+* Revision 1.116  2014-06-30 22:29:36  pauloscustodio
+* Separate expression type from expression range - new range_t enum
+* type for ranges and new range attribute in Expr.
+*
+* Revision 1.115  2014/06/29 22:25:14  pauloscustodio
 * Object file format changed to version 06, to include DEFC symbols that
 * are defined as an expression using other symbols and are computed at link
 * time, after all addresses are allocated.
@@ -2057,6 +2061,9 @@ xx.xx.2014 [2.5.0] (pauloscustodio)
 	  2) symbols need to have a new category: computed, actual value not
 	     yet known.
 	
+	- Separate expression type from expression range - new range_t enum 
+	  type for ranges and new range attribute in Expr.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -2080,7 +2087,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0a"
+#define VERSION     "2.5.0b"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.25 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.26 2014-06-30 22:29:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -90,11 +90,28 @@ typedef struct ExprOp				/* hold one operation or operand */
 ARRAY( ExprOp );					/* hold list of Expr operations/operands */
 
 /*-----------------------------------------------------------------------------
+*	Expression range
+*----------------------------------------------------------------------------*/
+typedef enum {
+	RANGE_JR_OFFSET = 1,
+	RANGE_BYTE_UNSIGNED,
+	RANGE_BYTE_SIGNED,
+	RANGE_WORD,
+	RANGE_DWORD,
+} range_t;
+
+/* return size in bytes of value of given range */
+extern int range_size( range_t range );
+
+/*-----------------------------------------------------------------------------
 *	Expression
 *----------------------------------------------------------------------------*/
 CLASS( Expr )
 	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
 	Str			*text;			/* expression in infix text */
+	
+	range_t		 range;			/* range of expression result */
+
 	Byte		 expr_type;		/* range type of evaluated expression */
 
 	char		*target_name;	/* name of the symbol, stored in strpool, 
