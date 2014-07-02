@@ -3,7 +3,7 @@ Unit test for dlist.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.3 2014-06-29 23:47:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.4 2014-07-02 22:34:21 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -12,6 +12,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.3
 #include "dlist.h"
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct Node
 {
@@ -22,7 +23,9 @@ typedef struct Node
 #define MAXLINE		1024
 
 Node  nodes[5];
-DList head_, *head = &head_;
+
+DList_decl(head);
+DList_def(head);
 
 void dump_list(char *title, int line)
 {
@@ -38,6 +41,8 @@ void dump_list(char *title, int line)
 		*p++ = node->c;
 	*p = 0;
 	warn("list = %s.\n", text);
+	assert(! node);
+	assert(! dl_next(head, node) );
 
 	/* check backward pointers */
 	DL_FOREACH_R(head, node)
@@ -45,6 +50,8 @@ void dump_list(char *title, int line)
 		p--;
 		assert( p >= text && *p == node->c );
 	}
+	assert(! node);
+	assert(! dl_prev(head, node) );
 
 	warn("--------------------------------------------------------------------------------\n");
 }
@@ -63,17 +70,28 @@ int compare_des(Node *node_a, Node *node_b)
 
 int main( int argc, char *argv[] )
 {
+	DList *list = xcalloc(1, sizeof(DList));	/* init with zeros */
 	int i;
 
 	/* init elems */
 	for ( i = 0; i < 5; i++ )
 		nodes[i].c = 'A'+i;
 
-	/* header is initialized automatically */
-	assert( head->next == NULL && head->prev == NULL );
+	/* header is initialized */
+	assert( head->next == head && head->prev == head );
 	assert( dl_first(head) == NULL );
 	assert( dl_last(head)  == NULL );
-	assert( head->next != NULL && head->prev != NULL );
+	assert( head->next == head && head->prev == head );
+
+	/* zeroed structs are initialized on first use */
+	assert( list->next == NULL && list->prev == NULL );
+	assert( dl_first(list) == NULL );
+	assert( dl_last(list)  == NULL );
+	assert( list->next == list && list->prev == list );
+
+	/* next and prev of an empty list are NULL */
+	assert( dl_next(head, NULL) == NULL );
+	assert( dl_prev(head, NULL) == NULL );
 
 	T(1);
 
@@ -111,7 +129,12 @@ int main( int argc, char *argv[] )
 
 	/* sort */
 	T( dl_msort(head, (dl_compare_t) compare_asc) );
+	T( dl_msort(head, (dl_compare_t) compare_asc) );
+
 	T( dl_msort(head, (dl_compare_t) compare_des) );
+	T( dl_msort(head, (dl_compare_t) compare_des) );
+
+	xfree(list);
 
 	return 0;
 }

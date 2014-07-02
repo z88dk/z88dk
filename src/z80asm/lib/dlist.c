@@ -7,7 +7,7 @@ prev to last element, or to itself if list is empty.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.3 2014-06-29 23:47:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.4 2014-07-02 22:34:21 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -18,11 +18,19 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.3 2014-0
 /*-----------------------------------------------------------------------------
 *   Init head in case it was zeroed (e.g. statically initialized)
 *----------------------------------------------------------------------------*/
-static void dl_init( DList *list )
+#define CHECK_HEAD(head) do { \
+			assert(head); \
+			if ( ! head->prev || ! head->next ) \
+				dl_init( head ); \
+		} while (0)
+
+/*-----------------------------------------------------------------------------
+*   Initialize a list head as an empty list
+*----------------------------------------------------------------------------*/
+void dl_init( DList *list )
 {
 	assert( list );
-	if ( list->next == NULL || list->prev == NULL )
-		list->next = list->prev = list;
+	list->next = list->prev = list;
 }
 
 /*-----------------------------------------------------------------------------
@@ -30,7 +38,7 @@ static void dl_init( DList *list )
 *----------------------------------------------------------------------------*/
 void *dl_first( DList *list )
 {
-	dl_init( list );
+	CHECK_HEAD( list );
 	if ( list->next == list )
 		return NULL;
 	else
@@ -39,7 +47,7 @@ void *dl_first( DList *list )
 
 void *dl_last( DList *list )
 {
-	dl_init( list );
+	CHECK_HEAD( list );
 	if ( list->prev == list )
 		return NULL;
 	else
@@ -53,10 +61,9 @@ void *dl_next( DList *list, void *node_ )
 {
 	DList *node = node_; 
 
-	dl_init( list );
-	assert( node && node->next && node->prev );
-
-	if ( node->next == list )
+	CHECK_HEAD( list );
+	if ( ! node || ! node->next || ! node->prev ||
+		 node->next == list )
 		return NULL;
 	else
 		return node->next;
@@ -66,10 +73,9 @@ void *dl_prev( DList *list, void *node_ )
 {
 	DList *node = node_; 
 	
-	dl_init( list );
-	assert( node && node->next && node->prev );
-
-	if ( node->prev == list )
+	CHECK_HEAD( list );
+	if ( ! node || ! node->next || ! node->prev ||
+		 node->prev == list )
 		return NULL;
 	else
 		return node->prev;
@@ -84,7 +90,7 @@ void *dl_insert_after( void *old_node_, void *new_node_ )
 	DList *old_node = old_node_;
 	DList *new_node = new_node_;
 
-	dl_init( old_node );
+	CHECK_HEAD( old_node );
 	assert( new_node );
 
 	new_node->next = old_node->next;
@@ -99,7 +105,7 @@ void *dl_insert_before( void *old_node_, void *new_node_ )
 {
 	DList *old_node = old_node_;
 
-	dl_init( old_node );
+	CHECK_HEAD( old_node );
 	return dl_insert_after( old_node->prev, new_node_ );
 }
 
@@ -110,7 +116,7 @@ void *dl_remove( DList *list, void *node_ )
 {
 	DList *node = node_; 
 
-	dl_init( list );
+	CHECK_HEAD( list );
 	assert( node != list && node && node->next && node->prev );
 
 	node->next->prev = node->prev;
@@ -161,7 +167,8 @@ void *dl_shift( DList *list )
 *----------------------------------------------------------------------------*/
 void dl_msort( DList *list, dl_compare_t compare )
 {
-	DList left = DL_INIT, right = DL_INIT;
+	DList_def(left);
+	DList_def(right);
 	DList *node_a, *node_b;
 
 	/* empty lists or with one element are sorted */
@@ -171,32 +178,30 @@ void dl_msort( DList *list, dl_compare_t compare )
 		return;
 
 	/* move elements from start to the left list, and from end to the right list */
-	dl_init(&left);
-	dl_init(&right);
 	while (1)
 	{
 		/* left element */
 		node_a = dl_shift(list);
 		if ( ! node_a )
 			break;
-		dl_push(&left, node_a);
+		dl_push(left, node_a);
 
 		/* right element */
 		node_b = dl_pop(list);
 		if ( ! node_b )
 			break;
-		dl_unshift(&right, node_b);
+		dl_unshift(right, node_b);
 	}
 
 	/* sort sublists */
-	dl_msort(&left,  compare);
-	dl_msort(&right, compare);
+	dl_msort(left,  compare);
+	dl_msort(right, compare);
 
 	/* merge two sublists */
 	while (1)
 	{
-		node_a = dl_first(&left);
-		node_b = dl_first(&right);
+		node_a = dl_first(left);
+		node_b = dl_first(right);
 		
 		if ( ! node_a && ! node_b )
 			break;						/* finished */
@@ -205,24 +210,24 @@ void dl_msort( DList *list, dl_compare_t compare )
 		{
 			if ( compare(node_a, node_b) <= 0 )
 			{
-				node_a = dl_shift(&left);
+				node_a = dl_shift(left);
 				dl_push(list, node_a);
 			}
 			else
 			{
-				node_b = dl_shift(&right);
+				node_b = dl_shift(right);
 				dl_push(list, node_b);
 			}
 		}
 		else if ( node_a )
 		{
-			node_a = dl_shift(&left);
+			node_a = dl_shift(left);
 			dl_push(list, node_a);
 		}
 		else
 		{
 			assert(node_b);
-			node_b = dl_shift(&right);
+			node_b = dl_shift(right);
 			dl_push(list, node_b);
 		}
 	}
