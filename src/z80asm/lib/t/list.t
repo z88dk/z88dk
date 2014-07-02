@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.5 2014-05-19 00:11:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test list.c
 
@@ -12,11 +12,10 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c";
 
 write_file("test.c", <<'END');
 #include "list.h"
-#include "die.h"
 #include <stdarg.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
@@ -384,22 +383,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-
-# $Log: list.t,v $
-# Revision 1.5  2014-05-19 00:11:25  pauloscustodio
-# Make sure strpool is deleted after class, because objects defined with class may use strpool
-#
-# Revision 1.4  2014/04/19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.3  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.2  2014/01/02 16:02:28  pauloscustodio
-# Register free() function to be used by remove_all() to delete each element
-#
-# Revision 1.1  2014/01/02 12:48:40  pauloscustodio
-# Generic doubly-linked lists lists
-#

@@ -3,12 +3,11 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.3 2014-06-28 00:17:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.4 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "die.h"
 #include "listfile.h"
 #include "model.h"
 #include "module.h"

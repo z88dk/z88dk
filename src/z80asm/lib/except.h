@@ -28,14 +28,13 @@
  *
  * Copyright (C) Paulo Custodio, 2011-2014
  *
- * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+ * $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/except.h,v 1.4 2014-07-02 23:45:12 pauloscustodio Exp $
  */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "die.h"
 #include "types.h"
 #include <setjmp.h>
 #include <stdlib.h>
@@ -85,7 +84,10 @@ extern int     except_current_count;
 
 /*
 * $Log: except.h,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
+* Revision 1.4  2014-07-02 23:45:12  pauloscustodio
+* Implement die() and warn() as variadic macros, delete die.c module
+*
+* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
 * Extend copyright to 2014.
 * Move CVS log to bottom of file.
 *

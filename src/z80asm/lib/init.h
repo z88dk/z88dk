@@ -3,13 +3,13 @@ Macros to help define init() and fini() functions per module
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.5 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #pragma once
 
+#include "xmalloc.h"
 #include "types.h"
-#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Usage:
@@ -54,7 +54,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.5 2014-05-25 01
 
 /*
 * $Log: init.h,v $
-* Revision 1.5  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.6  2014-07-02 23:45:12  pauloscustodio
+* Implement die() and warn() as variadic macros, delete die.c module
+*
+* Revision 1.5  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.4  2014/04/15 20:06:44  pauloscustodio

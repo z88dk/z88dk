@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.15 2014-05-25 01:02:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.16 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -13,7 +13,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c fileutil.c strutil.c xmalloc.c class.c list.c strpool.c die.c";
+my $compile = "cc -Wall -otest test.c fileutil.c strutil.c xmalloc.c class.c list.c strpool.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -31,7 +31,6 @@ write_file('test.x3/test.f3', "");
 write_file("test.c", <<'END');
 #include "fileutil.h"
 #include "strpool.h"
-#include "die.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -136,7 +135,6 @@ t_capture("./test", "", "", 0);
 # error callback
 write_file("test.c", <<'END');
 #include "fileutil.h"
-#include "die.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -189,7 +187,6 @@ t_capture("./test 3", "", "captured error x/x/x/x/test.1.bin 1\n".
 # file io
 write_file("test.c", <<'END');
 #include "fileutil.h"
-#include "die.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -582,7 +579,6 @@ t_capture("./test J", "", "", 0);
 # order of execution of fini() actions
 write_file("test.c", <<'END');
 #include "fileutil.h"
-#include "die.h"
 #include "init.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
@@ -632,60 +628,3 @@ sub t_capture {
 }
 
 sub read_binfile { scalar(read_file($_[0], { binmode => ':raw' })) }
-
-# $Log: fileutil.t,v $
-# Revision 1.15  2014-05-25 01:02:30  pauloscustodio
-# Byte, Int, UInt added
-#
-# Revision 1.14  2014/04/19 17:42:43  pauloscustodio
-# Update for 64-bit architecture
-#
-# Revision 1.13  2014/04/19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.12  2014/03/05 23:44:55  pauloscustodio
-# Renamed 64-bit portability to BUG_0042
-#
-# Revision 1.11  2014/02/19 23:59:27  pauloscustodio
-# BUG_0042: 64-bit portability issues
-# size_t changes to unsigned long in 64-bit. Usage of size_t * to
-# retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-# breaks on a 64-bit architecture. Make the functions return the value instead
-# of being passed the pointer to the return value, so that the compiler
-# takes care of size convertions.
-# Create uint_t and ulong_t, use uint_t instead of size_t.
-#
-# Revision 1.10  2014/02/08 11:20:20  pauloscustodio
-# Error creating binary file
-#
-# Revision 1.9  2014/02/02 23:00:55  pauloscustodio
-# New xfclose_remove() to remove file after closing.
-#
-# Revision 1.8  2014/01/29 22:40:52  pauloscustodio
-# Mechanism for atomic file write - open a temp file for writing on
-# xfopen_atomic(), close and rename to final name on xfclose().
-# temp_filename() to generate a temporary file name that is
-# deleted atexit.
-#
-# Revision 1.7  2014/01/21 23:12:30  pauloscustodio
-# path_... functions return filename instrpool, no need to pass an array to store result.
-#
-# Revision 1.6  2014/01/21 22:42:18  pauloscustodio
-# New dirname(), temp_filename()
-#
-# Revision 1.5  2014/01/20 23:29:18  pauloscustodio
-# Moved file.c to lib/fileutil.c
-#
-# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2014/01/02 17:18:17  pauloscustodio
-# StrList removed, replaced by List
-#
-# Revision 1.2  2014/01/01 21:36:38  pauloscustodio
-# No dependency on glib
-#
-# Revision 1.1  2014/01/01 21:23:49  pauloscustodio
-# Move generic file utility functions to lib/fileutil.c
-#

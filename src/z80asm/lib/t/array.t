@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.13 2014-05-25 01:02:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.14 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,12 +12,11 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c";
 
 write_file("test.c", <<'END');
 #include "xmalloc.h"
 #include "array.h"
-#include "die.h"
 #include <assert.h>
 
 typedef struct Point 
@@ -247,46 +246,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-# $Log: array.t,v $
-# Revision 1.13  2014-05-25 01:02:30  pauloscustodio
-# Byte, Int, UInt added
-#
-# Revision 1.12  2014/05/19 00:11:25  pauloscustodio
-# Make sure strpool is deleted after class, because objects defined with class may use strpool
-#
-# Revision 1.11  2014/05/17 14:27:13  pauloscustodio
-# Use C99 integer types int8_t, Byte, int16_t, uint16_t, int32_t, uint32_t
-#
-# Revision 1.10  2014/05/06 22:17:38  pauloscustodio
-# Made types Byte, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-#
-# Revision 1.9  2014/05/02 21:34:58  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to Byte, UINT and ULONG
-#
-# Revision 1.8  2014/05/02 21:13:54  pauloscustodio
-# Add byte array to default types
-#
-# Revision 1.7  2014/04/19 15:15:40  pauloscustodio
-# Update for 64-bit architecture
-#
-# Revision 1.6  2014/04/19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.5  2014/04/15 20:06:44  pauloscustodio
-# Solve warning: no newline at end of file
-#
-# Revision 1.4  2014/04/12 15:18:06  pauloscustodio
-# Add intArray and longArray to array.c
-#
-# Revision 1.3  2014/04/07 21:06:23  pauloscustodio
-# Reduce default size to 16 to waste less space when used as base for array.h
-#
-# Revision 1.2  2014/03/02 14:08:42  pauloscustodio
-# Add methods to set size, push, pop and lookup top item
-#
-# Revision 1.1  2014/02/17 22:05:20  pauloscustodio
-# Template array that grows on request. Items may move in memory on reallocation.
-# Uses strutil.h for implementation.
-#
-#

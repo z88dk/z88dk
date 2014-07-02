@@ -7,12 +7,11 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.7 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.8 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 #include "class.h"
-#include "die.h"
 #include "init.h"
 #include "strpool.h"
 #include "types.h"
@@ -123,7 +122,10 @@ void _deregister_obj( Object *obj )
 
 /*
 * $Log: class.c,v $
-* Revision 1.7  2014-05-25 01:02:30  pauloscustodio
+* Revision 1.8  2014-07-02 23:45:12  pauloscustodio
+* Implement die() and warn() as variadic macros, delete die.c module
+*
+* Revision 1.7  2014/05/25 01:02:30  pauloscustodio
 * Byte, Int, UInt added
 *
 * Revision 1.6  2014/05/19 00:11:25  pauloscustodio

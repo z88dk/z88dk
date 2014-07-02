@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.5 2014-04-19 17:44:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -25,7 +25,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-			  "class.c xmalloc.c strpool.c strutil.c fileutil.c die.c list.c";
+			  "class.c xmalloc.c strpool.c strutil.c fileutil.c list.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -39,7 +39,6 @@ write_binfile('test.x1/test.f3', 	"F2 x1\r\n");
 
 write_file("test.c", <<'END');
 #include "srcfile.h"
-#include "die.h"
 #include <string.h>
 #include <assert.h>
 
@@ -380,143 +379,3 @@ sub t_capture {
 
 sub read_binfile  { scalar(read_file($_[0], { binmode => ':raw' })) }
 sub write_binfile { my $file = shift; write_file($file, { binmode => ':raw' }, @_) }
-
-
-# $Log: srcfile.t,v $
-# Revision 1.5  2014-04-19 17:44:01  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.4  2014/03/26 00:12:28  pauloscustodio
-# Integrate use of srcfile in scanner, removing global variable z80asmfile
-# and attributes CURRENTMODULE->cfile->line and CURRENTMODULE->cfile->fname.
-#
-# Revision 1.3  2014/03/15 14:35:51  pauloscustodio
-# Add interface to lookup current file name and line number
-#
-# Revision 1.2  2014/02/08 18:21:18  pauloscustodio
-# new line callback needs text read to pass on to listfile.c.
-# file_stack filenames may be NULL, protect when checking for recursive includes.
-# Remove dead test code.
-#
-# Revision 1.1  2014/02/08 11:21:09  pauloscustodio
-# Moved srcfile.c to lib/
-#
-# Revision 1.28  2014/01/23 22:30:55  pauloscustodio
-# Use xfclose() instead of fclose() to detect file write errors during buffer flush called
-# at fclose()
-#
-# Revision 1.27  2014/01/20 23:29:19  pauloscustodio
-# Moved file.c to lib/fileutil.c
-#
-# Revision 1.26  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.25  2014/01/11 01:06:33  pauloscustodio
-# -Wall comments
-#
-# Revision 1.24  2013/12/30 02:05:34  pauloscustodio
-# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-# handles both dynamically allocated strings and fixed-size strings.
-# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-#
-# Revision 1.23  2013/12/26 23:42:28  pauloscustodio
-# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
-#
-# Revision 1.22  2013/12/25 14:39:50  pauloscustodio
-# Move strutil.c to the z80asm/lib directory
-#
-# Revision 1.21  2013/12/18 23:05:52  pauloscustodio
-# Move class.c to the z80asm/lib directory
-#
-# Revision 1.20  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.19  2013/11/11 23:47:04  pauloscustodio
-# Move source code generation tools to dev/Makefile, only called on request,
-# and keep the generated files in z80asm directory, so that build does
-# not require tools used for the code generation (ragel, perl).
-# Remove code generation for structs - use CLASS macro instead.
-#
-# Revision 1.18  2013/10/15 23:24:33  pauloscustodio
-# Move reading by lines or tokens and file reading interface to scan.rl
-# to decouple file.c from scan.c.
-# Add singleton interface to scan to be used by parser.
-#
-# Revision 1.17  2013/10/08 21:53:07  pauloscustodio
-# Replace Flex-based lexer by a Ragel-based one.
-# Add interface to file.c to read files by tokens, calling the lexer.
-#
-# Revision 1.16  2013/10/05 13:43:05  pauloscustodio
-# Parse command line options via look-up tables:
-# -i, --use-lib
-# -x, --make-lib
-#
-# Revision 1.15  2013/10/05 10:54:36  pauloscustodio
-# Parse command line options via look-up tables:
-# -I, --inc-path
-# -L, --lib-path
-#
-# Revision 1.14  2013/10/05 08:14:43  pauloscustodio
-# Parse command line options via look-up tables:
-# -C, --line-mode
-#
-# Revision 1.13  2013/10/01 23:23:53  pauloscustodio
-# Parse command line options via look-up tables:
-# -l, --list
-# -nl, --no-list
-#
-# Revision 1.12  2013/09/30 00:26:57  pauloscustodio
-# Parse command line options via look-up tables:
-# -e, --asm-ext
-# -M, --obj-ext
-# Move filename extension functions to options.c
-#
-# Revision 1.11  2013/09/23 23:14:10  pauloscustodio
-# Renamed SzList to StringList, simplified interface by assuming that
-# list lives in memory util program ends; it is used for directory searches
-# only. Moved interface to strutil.c, removed strlist.c.
-#
-# Revision 1.10  2013/09/22 21:04:22  pauloscustodio
-# New File and FileStack objects
-#
-# Revision 1.9  2013/09/09 00:20:45  pauloscustodio
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.8  2013/09/08 00:43:59  pauloscustodio
-# New error module with one error function per error, no need for the error
-# constants. Allows compiler to type-check error message arguments.
-# Included the errors module in the init() mechanism, no need to call
-# error initialization from main(). Moved all error-testing scripts to
-# one file errors.t.
-#
-# Revision 1.7  2013/09/01 17:14:02  pauloscustodio
-# Change in test output due to xmalloc change.
-#
-# Revision 1.6  2013/09/01 11:52:56  pauloscustodio
-# Setup xmalloc on init.c.
-# Setup GLib memory allocation functions to use xmalloc functions.
-#
-# Revision 1.5  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.4  2013/05/11 00:29:26  pauloscustodio
-# CH_0021 : Exceptions on file IO show file name
-# Keep a hash table of all opened file names, so that the file name
-# is shown on a fatal error.
-# Rename file IO funtions: f..._err to xf...
-#
-# Revision 1.3  2013/03/10 18:00:24  pauloscustodio
-# Interface with errors (set input position for errors) and  listfile (start list of each input line)
-#
-# Revision 1.2  2013/03/02 23:52:49  pauloscustodio
-# Add API to handle a stack of open sorce files and singleton API
-#
-# Revision 1.1  2013/02/27 22:31:43  pauloscustodio
-# New srcfile.c to handle reading lines from source files
-#

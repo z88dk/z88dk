@@ -3,12 +3,11 @@ Unit test for dlist.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.4 2014-07-02 22:34:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_dlist.c,v 1.5 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "die.h"
 #include "dlist.h"
 #include <assert.h>
 #include <stdio.h>

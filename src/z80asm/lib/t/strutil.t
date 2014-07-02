@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.17 2014-05-25 01:02:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.18 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c die.c xmalloc.c";
+my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c xmalloc.c";
 
 write_file("test.1.asm", {binmode => ':raw'}, "");
 write_file("test.2.asm", {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -24,7 +24,6 @@ write_file("test.7.asm", {binmode => ':raw'}, "x" x 1100);
 write_file("test.8.asm", {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
 
 write_file("test.c", <<'END');
-#include "die.h"
 #include "strutil.h"
 #include <assert.h>
 
@@ -748,115 +747,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-
-# $Log: strutil.t,v $
-# Revision 1.17  2014-05-25 01:02:30  pauloscustodio
-# Byte, Int, UInt added
-#
-# Revision 1.16  2014/05/19 00:11:25  pauloscustodio
-# Make sure strpool is deleted after class, because objects defined with class may use strpool
-#
-# Revision 1.15  2014/05/17 14:27:13  pauloscustodio
-# Use C99 integer types int8_t, Byte, int16_t, uint16_t, int32_t, uint32_t
-#
-# Revision 1.14  2014/05/08 22:37:30  pauloscustodio
-# comment
-#
-# Revision 1.13  2014/05/06 22:17:38  pauloscustodio
-# Made types Byte, UINT and ULONG all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-#
-# Revision 1.12  2014/05/05 22:07:38  pauloscustodio
-# byte_t, uint_t and ulong_t renamed to Byte, UINT and ULONG
-#
-# Revision 1.11  2014/04/19 14:57:37  pauloscustodio
-# BUG_0046: Expressions stored in object file with wrong values in MacOS
-# Symthom: ZERO+2*[1+2*(1+140709214577656)] stored instead of ZERO+2*[1+2*(1+2)]
-# Problem caused by non-portable way of repeating a call to vsnprintf without
-# calling va_start in between. The repeated call is necessary when the
-# dynamically allocated string needs to grow to fit the value to be stored.
-#
-# Revision 1.10  2014/04/07 21:01:51  pauloscustodio
-# Reduce default size to 16 to waste less space when used as base for array.h
-#
-# Revision 1.9  2014/03/29 22:04:11  pauloscustodio
-# Add str_compress_escapes() to compress C-like escape sequences.
-# Accepts \a, \b, \e, \f, \n, \r, \t, \v, \xhh, \{any} \ooo, allows \0 in the string.
-#
-# Revision 1.8  2014/03/19 23:04:57  pauloscustodio
-# Add Str_set_alias() to define an alias char* that always points to self->str
-# Add Str_set_n() and Str_append_n() to copy substrings.
-#
-# Revision 1.7  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.6  2014/01/02 02:46:42  pauloscustodio
-# new strip() function to eliminate start and end blanks from string
-#
-# Revision 1.5  2014/01/01 21:36:38  pauloscustodio
-# No dependency on glib
-#
-# Revision 1.4  2014/01/01 21:16:20  pauloscustodio
-# Of-by-one error
-#
-# Revision 1.3  2013/12/30 02:05:34  pauloscustodio
-# Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-# handles both dynamically allocated strings and fixed-size strings.
-# Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-# g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-#
-# Revision 1.2  2013/12/26 23:42:27  pauloscustodio
-# Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
-#
-# Revision 1.1  2013/12/25 14:39:51  pauloscustodio
-# Move strutil.c to the z80asm/lib directory
-#
-# Revision 1.14  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.13  2013/09/24 00:05:36  pauloscustodio
-#
-# Revision 1.12  2013/09/23 23:14:10  pauloscustodio
-# Renamed SzList to StringList, simplified interface by assuming that
-# list lives in memory util program ends; it is used for directory searches
-# only. Moved interface to strutil.c, removed strlist.c.
-#
-# Revision 1.11  2013/09/09 00:20:45  pauloscustodio
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.10  2013/04/29 22:24:33  pauloscustodio
-# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
-#
-# Revision 1.9  2013/02/22 17:21:29  pauloscustodio
-# Added chomp()
-#
-# Revision 1.8  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.7  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.6  2012/06/07 11:49:59  pauloscustodio
-# stricompare() instead of Flncmp()
-#
-# Revision 1.5  2012/06/06 22:42:57  pauloscustodio
-# BUG_0022 : Different behaviour in string truncation in strutil in Linux and Win32
-#
-# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.3  2012/05/26 17:46:01  pauloscustodio
-# Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
-#
-# Revision 1.2  2012/05/24 15:07:03  pauloscustodio
-# Rename safestr_t to sstr_t, keep length to speed-up appending chars
-#
-# Revision 1.1  2012/05/22 20:26:17  pauloscustodio
-# Safe strings
-# New type sstr_t to hold strings with size to prevent buffer overruns.
-# Remove strtoupper, use POSIX strupr instead
-#

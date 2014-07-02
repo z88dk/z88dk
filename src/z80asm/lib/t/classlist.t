@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.6 2014-05-19 00:11:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.7 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test classlist.c
 
@@ -12,11 +12,10 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c class.c strpool.c xmalloc.c die.c";
+my $compile = "cc -Wall -otest test.c class.c strpool.c xmalloc.c";
 
 write_file("test.c", <<'END');
 #include "classlist.h"
-#include "die.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -466,68 +465,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-
-# $Log: classlist.t,v $
-# Revision 1.6  2014-05-19 00:11:25  pauloscustodio
-# Make sure strpool is deleted after class, because objects defined with class may use strpool
-#
-# Revision 1.5  2014/04/19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2014/01/02 23:33:11  pauloscustodio
-# Unify interface of classlist and list.
-#
-# Revision 1.2  2014/01/01 21:18:37  pauloscustodio
-# Show error line in case of test failure
-#
-# Revision 1.1  2013/12/25 17:37:13  pauloscustodio
-# Move classlist and classhash to the z80asm/lib directory
-#
-# Revision 1.12  2013/12/18 23:05:52  pauloscustodio
-# Move class.c to the z80asm/lib directory
-#
-# Revision 1.11  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.10  2013/09/22 21:06:00  pauloscustodio
-# replace g_free by g_free0
-#
-# Revision 1.9  2013/09/09 00:20:45  pauloscustodio
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.8  2013/09/08 08:29:21  pauloscustodio
-# Replaced xmalloc et al with glib functions
-#
-# Revision 1.7  2013/09/08 00:43:59  pauloscustodio
-# New error module with one error function per error, no need for the error
-# constants. Allows compiler to type-check error message arguments.
-# Included the errors module in the init() mechanism, no need to call
-# error initialization from main(). Moved all error-testing scripts to
-# one file errors.t.
-#
-# Revision 1.6  2013/09/01 18:11:52  pauloscustodio
-# Change in test output due to xmalloc change.
-#
-# Revision 1.5  2013/09/01 11:52:55  pauloscustodio
-# Setup xmalloc on init.c.
-# Setup GLib memory allocation functions to use xmalloc functions.
-#
-# Revision 1.4  2013/02/25 21:36:17  pauloscustodio
-# Uniform the APIs of classhash, classlist, strhash, strlist
-#
-# Revision 1.3  2013/01/30 20:40:07  pauloscustodio
-# Test cases
-#
-# Revision 1.2  2013/01/30 00:48:29  pauloscustodio
-# Test OBJ_DELETE()
-#
-# Revision 1.1  2013/01/30 00:39:26  pauloscustodio
-# New CLASS_LIST() to create lists of objects defined with CLASS()
-#

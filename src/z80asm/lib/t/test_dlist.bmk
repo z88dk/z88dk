@@ -1,160 +1,160 @@
-1; (line 96)
+1; (line 95)
 
 list = .
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 101)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 100)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 101)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 100)
 
 list = AB.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 101)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 100)
 
 list = ABC.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 101)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 100)
 
 list = ABCD.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 101)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 100)
 
 list = ABCDE.
 --------------------------------------------------------------------------------
-assert( dl_pop( head ) == &nodes[i] ); (line 103)
+assert( dl_pop( head ) == &nodes[i] ); (line 102)
 
 list = ABCD.
 --------------------------------------------------------------------------------
-assert( dl_pop( head ) == &nodes[i] ); (line 103)
+assert( dl_pop( head ) == &nodes[i] ); (line 102)
 
 list = ABC.
 --------------------------------------------------------------------------------
-assert( dl_pop( head ) == &nodes[i] ); (line 103)
+assert( dl_pop( head ) == &nodes[i] ); (line 102)
 
 list = AB.
 --------------------------------------------------------------------------------
-assert( dl_pop( head ) == &nodes[i] ); (line 103)
+assert( dl_pop( head ) == &nodes[i] ); (line 102)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_pop( head ) == &nodes[i] ); (line 103)
+assert( dl_pop( head ) == &nodes[i] ); (line 102)
 
 list = .
 --------------------------------------------------------------------------------
-assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 109)
+assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 108)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 109)
+assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 108)
 
 list = BA.
 --------------------------------------------------------------------------------
-assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 109)
+assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 108)
 
 list = CBA.
 --------------------------------------------------------------------------------
-assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 109)
+assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 108)
 
 list = DCBA.
 --------------------------------------------------------------------------------
-assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 109)
+assert( dl_unshift( head, &nodes[i] ) == &nodes[i] ); (line 108)
 
 list = EDCBA.
 --------------------------------------------------------------------------------
-assert( dl_shift( head ) == &nodes[i] ); (line 111)
+assert( dl_shift( head ) == &nodes[i] ); (line 110)
 
 list = DCBA.
 --------------------------------------------------------------------------------
-assert( dl_shift( head ) == &nodes[i] ); (line 111)
+assert( dl_shift( head ) == &nodes[i] ); (line 110)
 
 list = CBA.
 --------------------------------------------------------------------------------
-assert( dl_shift( head ) == &nodes[i] ); (line 111)
+assert( dl_shift( head ) == &nodes[i] ); (line 110)
 
 list = BA.
 --------------------------------------------------------------------------------
-assert( dl_shift( head ) == &nodes[i] ); (line 111)
+assert( dl_shift( head ) == &nodes[i] ); (line 110)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_shift( head ) == &nodes[i] ); (line 111)
+assert( dl_shift( head ) == &nodes[i] ); (line 110)
 
 list = .
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 116)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 115)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 116)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 115)
 
 list = AB.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 116)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 115)
 
 list = ABC.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 116)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 115)
 
 list = ABCD.
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 116)
+assert( dl_push( head, &nodes[i] ) == &nodes[i] ); (line 115)
 
 list = ABCDE.
 --------------------------------------------------------------------------------
-assert( dl_remove( head, &nodes[2] ) == &nodes[2] ); (line 117)
+assert( dl_remove( head, &nodes[2] ) == &nodes[2] ); (line 116)
 
 list = ABDE.
 --------------------------------------------------------------------------------
-assert( dl_remove( head, &nodes[0] ) == &nodes[0] ); (line 118)
+assert( dl_remove( head, &nodes[0] ) == &nodes[0] ); (line 117)
 
 list = BDE.
 --------------------------------------------------------------------------------
-assert( dl_remove( head, &nodes[4] ) == &nodes[4] ); (line 119)
+assert( dl_remove( head, &nodes[4] ) == &nodes[4] ); (line 118)
 
 list = BD.
 --------------------------------------------------------------------------------
-assert( dl_remove( head, &nodes[1] ) == &nodes[1] ); (line 120)
+assert( dl_remove( head, &nodes[1] ) == &nodes[1] ); (line 119)
 
 list = D.
 --------------------------------------------------------------------------------
-assert( dl_remove( head, &nodes[3] ) == &nodes[3] ); (line 121)
+assert( dl_remove( head, &nodes[3] ) == &nodes[3] ); (line 120)
 
 list = .
 --------------------------------------------------------------------------------
-assert( dl_push( head, &nodes[0] ) == &nodes[0] ); (line 124)
+assert( dl_push( head, &nodes[0] ) == &nodes[0] ); (line 123)
 
 list = A.
 --------------------------------------------------------------------------------
-assert( dl_insert_before( &nodes[0], &nodes[1] ) == &nodes[1] ); (line 125)
+assert( dl_insert_before( &nodes[0], &nodes[1] ) == &nodes[1] ); (line 124)
 
 list = BA.
 --------------------------------------------------------------------------------
-assert( dl_insert_before( &nodes[0], &nodes[2] ) == &nodes[2] ); (line 126)
+assert( dl_insert_before( &nodes[0], &nodes[2] ) == &nodes[2] ); (line 125)
 
 list = BCA.
 --------------------------------------------------------------------------------
-assert( dl_insert_after( &nodes[0], &nodes[3] ) == &nodes[3] ); (line 127)
+assert( dl_insert_after( &nodes[0], &nodes[3] ) == &nodes[3] ); (line 126)
 
 list = BCAD.
 --------------------------------------------------------------------------------
-assert( dl_insert_after( &nodes[0], &nodes[4] ) == &nodes[4] ); (line 128)
+assert( dl_insert_after( &nodes[0], &nodes[4] ) == &nodes[4] ); (line 127)
 
 list = BCAED.
+--------------------------------------------------------------------------------
+dl_msort(head, (dl_compare_t) compare_asc); (line 130)
+
+list = ABCDE.
 --------------------------------------------------------------------------------
 dl_msort(head, (dl_compare_t) compare_asc); (line 131)
 
 list = ABCDE.
 --------------------------------------------------------------------------------
-dl_msort(head, (dl_compare_t) compare_asc); (line 132)
-
-list = ABCDE.
---------------------------------------------------------------------------------
-dl_msort(head, (dl_compare_t) compare_des); (line 134)
+dl_msort(head, (dl_compare_t) compare_des); (line 133)
 
 list = EDCBA.
 --------------------------------------------------------------------------------
-dl_msort(head, (dl_compare_t) compare_des); (line 135)
+dl_msort(head, (dl_compare_t) compare_des); (line 134)
 
 list = EDCBA.
 --------------------------------------------------------------------------------

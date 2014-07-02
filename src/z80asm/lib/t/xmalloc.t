@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.7 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/xmalloc.t,v 1.8 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test xmalloc.c
 
@@ -12,8 +12,8 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -DXMALLOC_DEBUG -otest test.c xmalloc.c die.c";
-my $nodebug = "cc -Wall -UXMALLOC_DEBUG -otest test.c xmalloc.c die.c";
+my $compile = "cc -Wall -DXMALLOC_DEBUG -otest test.c xmalloc.c";
+my $nodebug = "cc -Wall -UXMALLOC_DEBUG -otest test.c xmalloc.c";
 
 
 # no allocation
@@ -45,8 +45,8 @@ int main()
 END
 system($nodebug) and die "compile failed: $nodebug\n";
 t_capture("./test", "", <<'ERR', 0);
-xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
-xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (2) allocated at test.c(5)
+xmalloc xmalloc.c(108): leak (1) allocated at test.c(4)
 ERR
 
 
@@ -69,10 +69,10 @@ xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc test.c(5): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (2) allocated at test.c(5)
-xmalloc xmalloc.c(112): free (2) allocated at test.c(5)
-xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (2) allocated at test.c(5)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(5)
+xmalloc xmalloc.c(108): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
 ERR
 
 
@@ -192,10 +192,10 @@ xmalloc: init
 xmalloc test.c(4): alloc (0)
 xmalloc test.c(5): alloc (1)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (1) allocated at test.c(5)
-xmalloc xmalloc.c(112): free (1) allocated at test.c(5)
-xmalloc xmalloc.c(109): leak (0) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (0) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (1) allocated at test.c(5)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(5)
+xmalloc xmalloc.c(108): leak (0) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (0) allocated at test.c(4)
 ERR
 
 
@@ -215,8 +215,8 @@ t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (5) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
 ERR
 
 
@@ -236,8 +236,8 @@ t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (1)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (1) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (1) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (1) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (1) allocated at test.c(4)
 ERR
 
 
@@ -257,8 +257,8 @@ t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (5)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (5) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (5) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (5) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (5) allocated at test.c(4)
 ERR
 
 
@@ -279,8 +279,8 @@ t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (2) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (2) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (2) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(4)
 ERR
 
 
@@ -308,8 +308,8 @@ xmalloc test.c(7): alloc (1)
 xmalloc test.c(9): free (1) allocated at test.c(7)
 xmalloc test.c(9): alloc (0)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (0) allocated at test.c(9)
-xmalloc xmalloc.c(112): free (0) allocated at test.c(9)
+xmalloc xmalloc.c(108): leak (0) allocated at test.c(9)
+xmalloc xmalloc.c(111): free (0) allocated at test.c(9)
 ERR
 
 
@@ -334,8 +334,8 @@ xmalloc test.c(4): alloc (1)
 xmalloc test.c(7): free (1) allocated at test.c(4)
 xmalloc test.c(7): alloc (2)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (2) allocated at test.c(7)
-xmalloc xmalloc.c(112): free (2) allocated at test.c(7)
+xmalloc xmalloc.c(108): leak (2) allocated at test.c(7)
+xmalloc xmalloc.c(111): free (2) allocated at test.c(7)
 ERR
 
 
@@ -354,8 +354,8 @@ t_capture("./test", "", <<'ERR', 0);
 xmalloc: init
 xmalloc test.c(4): alloc (6)
 xmalloc: cleanup
-xmalloc xmalloc.c(109): leak (6) allocated at test.c(4)
-xmalloc xmalloc.c(112): free (6) allocated at test.c(4)
+xmalloc xmalloc.c(108): leak (6) allocated at test.c(4)
+xmalloc xmalloc.c(111): free (6) allocated at test.c(4)
 ERR
 
 
@@ -397,54 +397,3 @@ sub t_capture {
 	}
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-# $Log: xmalloc.t,v $
-# Revision 1.7  2014-04-19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.6  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.5  2014/01/11 00:10:39  pauloscustodio
-# Astyle - format C code
-# Add -Wall option to CFLAGS, remove all warnings
-#
-# Revision 1.4  2013/12/23 19:19:52  pauloscustodio
-# Show difference in command output in case of test failure
-#
-# Revision 1.3  2013/12/18 01:16:36  pauloscustodio
-# Add xmalloc_init() to be called by the init() function of any module that needs
-# malloc to terminate after itself.
-#
-# Revision 1.2  2013/12/15 23:51:24  pauloscustodio
-# Use init.h
-#
-# Revision 1.1  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.7  2013/02/22 17:16:40  pauloscustodio
-# Output memory leaks on exit
-#
-# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.5  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.2  2012/05/20 06:32:50  pauloscustodio
-# Added tests
-#
-# Revision 1.1  2012/05/20 05:48:26  pauloscustodio
-# Test garbage collector
-#
-# Revision 1.1  2012/05/17 15:04:47  pauloscustodio
-# white box test of new modules

@@ -6,11 +6,10 @@ Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.10 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.11 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"
-#include "die.h"
 #include "init.h"
 #include "queue.h"
 #include "strpool.h"
@@ -99,7 +98,10 @@ char *strpool_add( char *str )
 
 /*
 * $Log: strpool.c,v $
-* Revision 1.10  2014-06-09 13:15:27  pauloscustodio
+* Revision 1.11  2014-07-02 23:45:12  pauloscustodio
+* Implement die() and warn() as variadic macros, delete die.c module
+*
+* Revision 1.10  2014/06/09 13:15:27  pauloscustodio
 * Int and UInt types
 *
 * Revision 1.9  2014/05/25 01:02:30  pauloscustodio

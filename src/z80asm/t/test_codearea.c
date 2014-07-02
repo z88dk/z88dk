@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.6 2014-06-28 00:17:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.7 2014-07-02 23:45:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -11,7 +11,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.6 2014-0
 #include "codearea.h"
 
 #include <assert.h>
-#include <die.h>
 #include <stdio.h>
 #include <stdarg.h>
 

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/init.t,v 1.5 2014-04-19 14:57:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/init.t,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test init.h
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c die.c";
+my $compile = "cc -Wall -otest test.c";
 
 # init / fini
 write_file("test.c", <<'END');
@@ -79,24 +79,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-# $Log: init.t,v $
-# Revision 1.5  2014-04-19 14:57:58  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.4  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2013/12/24 17:43:19  pauloscustodio
-# comment
-#
-# Revision 1.2  2013/12/23 19:19:52  pauloscustodio
-# Show difference in command output in case of test failure
-#
-# Revision 1.1  2013/12/15 23:31:04  pauloscustodio
-# Replace code-generation for init() functions by macros in init.h
-# to help define init() and fini() functions per module.
-# Code generation complicates maintenance, as all the modules with init()
-# functions are coupled together, and it may not be clear how the init()
-# module appears.

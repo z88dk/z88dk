@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.4 2014-04-19 17:44:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/except.t,v 1.5 2014-07-02 23:45:12 pauloscustodio Exp $
 #
 # Test except.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c except.c die.c";
+my $compile = "cc -Wall -otest test.c except.c";
 
 # compile
 write_file("test.c", <<'END');
@@ -138,56 +138,3 @@ sub t_capture {
 	eq_or_diff_text $err, $exp_err, "$line err";
 	ok !!$exit == !!$exp_exit, "$line exit";
 }
-
-# $Log: except.t,v $
-# Revision 1.4  2014-04-19 17:44:01  pauloscustodio
-# Fix test scripts to run in UNIX
-#
-# Revision 1.3  2014/01/11 01:29:41  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.2  2013/12/23 19:19:52  pauloscustodio
-# Show difference in command output in case of test failure
-#
-# Revision 1.1  2013/12/15 20:30:39  pauloscustodio
-# Move except.c to the z80asm/lib directory
-#
-# Revision 1.11  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.10  2013/09/09 00:20:45  pauloscustodio
-# Add default set of modules to t_compile_module:
-# -DMEMALLOC_DEBUG xmalloc.c die.o except.o strpool.o
-#
-# Revision 1.9  2013/09/08 00:40:10  pauloscustodio
-# Changed format of output file name and line number in case of fatal error
-#
-# Revision 1.8  2013/09/01 11:52:55  pauloscustodio
-# Setup xmalloc on init.c.
-# Setup GLib memory allocation functions to use xmalloc functions.
-#
-# Revision 1.7  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.5  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.2  2012/05/20 05:53:01  pauloscustodio
-# Test raising RuntimeException and AssertionException
-#
-# Revision 1.1  2012/05/17 15:04:47  pauloscustodio
-# white box test of new modules
