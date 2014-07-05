@@ -3,7 +3,7 @@ Macros to help define init() and fini() functions per module
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.7 2014-07-05 12:26:28 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,51 +32,24 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.6 2014-07-02 23
 *----------------------------------------------------------------------------*/
 
 /* DEFINE_init() */
-#define DEFINE_init()							\
-		static void __fini(void);				\
-		static void __init(void);				\
-		static void init(void)					\
-		{										\
-			static Bool initialized = FALSE;	\
-			if ( ! initialized )				\
-			{									\
-				initialized = TRUE;				\
-				__init();						\
-				xatexit( __fini );				\
-			}									\
-		}										\
-		static void __init(void)
+#define DEFINE_init()									\
+		static Bool __init_called = FALSE;				\
+		static void __fini(void);						\
+		static void __user_init(void);					\
+		static void __init(void)						\
+		{												\
+			if ( ! __init_called )						\
+			{											\
+				__init_called = TRUE;					\
+				__user_init();							\
+				xatexit( __fini );						\
+			}											\
+		}												\
+		static void __user_init(void)
 
 /* DEFINE_fini() */
-#define DEFINE_fini()							\
+#define DEFINE_fini()									\
 		static void __fini(void)
 
-
-/*
-* $Log: init.h,v $
-* Revision 1.6  2014-07-02 23:45:12  pauloscustodio
-* Implement die() and warn() as variadic macros, delete die.c module
-*
-* Revision 1.5  2014/05/25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.4  2014/04/15 20:06:44  pauloscustodio
-* Solve warning: no newline at end of file
-*
-* Revision 1.3  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.2  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.1  2013/12/15 23:31:04  pauloscustodio
-* Replace code-generation for init() functions by macros in init.h
-* to help define init() and fini() functions per module.
-* Code generation complicates maintenance, as all the modules with init()
-* functions are coupled together, and it may not be clear how the init()
-* module appears.
-*
-*
-*/
+/* init() */
+#define init() if ( ! __init_called ) __init(); else

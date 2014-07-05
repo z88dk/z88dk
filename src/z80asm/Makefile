@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.163 2014-07-02 23:45:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.164 2014-07-05 12:26:27 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -389,3 +389,4 @@ t/test_symtab.o: module.h lib/classhash.h lib/strhash.h lib/uthash.h
 t/test_symtab.o: codearea.h lib/array.h expr.h scan.h scan_def.h legacy.h
 t/test_symtab.o: symtab.h sym.h options.h options_def.h
 lib/t/test_dlist.o: lib/xmalloc.h lib/dlist.h
+lib/t/test_init.o: lib/xmalloc.h lib/init.h lib/types.h

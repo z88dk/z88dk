@@ -100,7 +100,6 @@
     <ClInclude Include="lib\class.h" />
     <ClInclude Include="lib\classhash.h" />
     <ClInclude Include="lib\classlist.h" />
-    <ClInclude Include="lib\die.h" />
     <ClInclude Include="lib\dlist.h" />
     <ClInclude Include="lib\except.h" />
     <ClInclude Include="lib\fileutil.h" />
@@ -143,7 +142,6 @@
     <ClCompile Include="libfile.c" />
     <ClCompile Include="lib\array.c" />
     <ClCompile Include="lib\class.c" />
-    <ClCompile Include="lib\die.c" />
     <ClCompile Include="lib\dlist.c" />
     <ClCompile Include="lib\except.c" />
     <ClCompile Include="lib\fileutil.c" />

@@ -75,9 +75,6 @@
     <ClInclude Include="options_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\die.h">
-      <Filter>Header Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\queue.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
@@ -214,9 +211,6 @@
     </ClCompile>
     <ClCompile Include="deffile.c">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\die.c">
-      <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\xmalloc.c">
       <Filter>Source Files\lib</Filter>
