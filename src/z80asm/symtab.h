@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.25 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.26 2014-07-06 22:48:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -62,8 +62,8 @@ extern Symbol *define_global_def_sym( char *name, long value );
 extern Symbol *define_local_def_sym( char *name, long value );
 
 /* define a new symbol in the local or global tabs */
-extern Symbol *define_local_sym( char *name, long value, Byte type );
-extern Symbol *define_global_sym( char *name, long value, Byte type );
+extern Symbol *define_local_sym( char *name, long value, sym_type_t sym_type, Byte type_mask );
+extern Symbol *define_global_sym( char *name, long value, sym_type_t sym_type, Byte type_mask );
 
 /* get the symbols for which the passed function returns TRUE,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
@@ -88,7 +88,7 @@ extern SymbolHash *static_symtab;
    b) if declared global/extern and not defined, define now
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
-extern void define_symbol( char *name, long value, Byte type );
+extern void define_symbol( char *name, long value, sym_type_t sym_type, Byte type_mask );
 
 /* update a symbol value, used to compute EQU symbols */
 extern void update_symbol( char *name, long value );

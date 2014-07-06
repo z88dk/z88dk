@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.116 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.117 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.116 2014-06-30 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.116  2014-06-30 22:29:36  pauloscustodio
+* Revision 1.117  2014-07-06 22:48:53  pauloscustodio
+* Separate symbol type from the bit mask stored in Symbol and Expr,
+* to be able to identify constant values, values that need to be
+* relocated and values that need to be computed at the end of the
+* link phase (for DEFC with expressions).
+*
+* Revision 1.116  2014/06/30 22:29:36  pauloscustodio
 * Separate expression type from expression range - new range_t enum
 * type for ranges and new range attribute in Expr.
 *
@@ -2063,6 +2069,11 @@ xx.xx.2014 [2.5.0] (pauloscustodio)
 	
 	- Separate expression type from expression range - new range_t enum 
 	  type for ranges and new range attribute in Expr.
+	  
+	- Separate symbol type from the bit mask stored in Symbol and Expr, 
+	  to be able to identify constant values, values that need to be 
+	  relocated and values that need to be computed at the end of the 
+	  link phase (for DEFC with expressions). 
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -2087,7 +2098,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0b"
+#define VERSION     "2.5.0c"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

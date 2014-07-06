@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.110 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.111 2014-07-06 22:48:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -86,7 +86,7 @@ parseline( enum flag interpret )
             if ( tok == TK_LABEL || GetSym() == TK_NAME )
             {
                 /* labels must always be touched due to forward referencing problems in expressions */
-                define_symbol( tok_name, get_PC(), SYM_ADDR | SYM_TOUCHED );
+                define_symbol( tok_name, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
 
                 GetSym();      /* check for another identifier */
             }
@@ -269,18 +269,19 @@ Z80pass2( void )
 
 		if ( expr->range == RANGE_JR_OFFSET )
 		{
-			if ( expr->expr_type & EXPR_EXTERN )
+			if ( expr->expr_type_mask & EXPR_EXTERN )
 			{
 				error_jr_not_local();	/* JR must be local */
 				do_patch = FALSE;
 			}
 		}
-		else if ( ( expr->expr_type & EXPR_EXTERN ) || ( expr->expr_type & EXPR_ADDR ) )
+		else if ( expr->sym_type >= TYPE_ADDRESS ||
+			      (expr->expr_type_mask & EXPR_EXTERN) )
 		{
 			do_patch = FALSE;
 			do_store = TRUE;            /* store expression in relocatable file */
 		}
-		else if ( ( expr->expr_type & NOT_EVALUABLE ) )
+		else if ( ( expr->expr_type_mask & NOT_EVALUABLE ) )
 		{
 			error_not_defined();
 			do_patch = FALSE;
@@ -419,9 +420,9 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
         if ( sym->module == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
-            if ( ( sym->sym_type & SYM_LOCAL ) || ( sym->sym_type & SYM_PUBLIC ) )
+            if ( ( sym->sym_type_mask & SYM_LOCAL ) || ( sym->sym_type_mask & SYM_PUBLIC ) )
             {
-                if ( ( sym->sym_type & SYM_TOUCHED ) )
+                if ( ( sym->sym_type_mask & SYM_TOUCHED ) )
                 {
                     list_symbol( sym->name, sym->value, sym->references );
                 }

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.132 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.133 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -68,7 +68,7 @@ void
 ReadNames( char *filename, FILE *file )
 {
     int scope, symbol_char;
-    Byte symboltype = 0;
+	sym_type_t sym_type = TYPE_UNKNOWN;
     long value;
 	DEFINE_STR( section_name, MAXLINE );
 	DEFINE_STR( name, MAXLINE );
@@ -90,16 +90,16 @@ ReadNames( char *filename, FILE *file )
 
         switch ( symbol_char )
         {
-        case 'A': symboltype = SYM_ADDR; break;
-        case 'C': symboltype = 0; break;
+        case 'A': sym_type = TYPE_ADDRESS;  break;
+        case 'C': sym_type = TYPE_CONSTANT; break;
         default:
             error_not_obj_file( filename );
         }
 
         switch ( scope )
         {
-        case 'L': define_local_sym( name->str, value, symboltype ); break;
-        case 'G': define_global_sym( name->str, value, symboltype ); break;
+        case 'L': define_local_sym(  name->str, value, sym_type, 0 ); break;
+        case 'G': define_global_sym( name->str, value, sym_type, 0 ); break;
         default:
             error_not_obj_file( filename );
         }
@@ -286,7 +286,7 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error )
 		{
 			set_expr_env( expr );
 			value = Expr_eval( expr );
-	        if ( expr->expr_type & NOT_EVALUABLE )		/* unresolved */
+	        if ( expr->expr_type_mask & NOT_EVALUABLE )		/* unresolved */
 			{
 				num_unresolved++;
 				if ( show_error )
@@ -353,7 +353,7 @@ static void patch_exprs( ExprList *exprs )
 		set_expr_env( expr );
 		value = Expr_eval( expr );
 
-	    if ( expr->expr_type & NOT_EVALUABLE )		/* unresolved */
+	    if ( expr->expr_type_mask & NOT_EVALUABLE )		/* unresolved */
 			error_not_defined();
 		else
 		{
@@ -383,7 +383,7 @@ static void patch_exprs( ExprList *exprs )
 
                 if ( opts.relocatable )
 				{
-                    if ( expr->expr_type & SYM_ADDR )
+                    if ( expr->sym_type == TYPE_ADDRESS )
                     {
                         /* Expression contains relocatable address */
 						UInt offset   = get_cur_module_start(); 
@@ -441,7 +441,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
     for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
     {
         sym = (Symbol *) iter->value;
-		if ( sym->sym_type & SYM_ADDR ) 
+		if ( sym->sym_type == TYPE_ADDRESS ) 
 		{
 			assert( sym->module );				/* owner should exist except for -D defines */
 			

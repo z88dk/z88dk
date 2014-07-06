@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.76 2014-06-23 23:40:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.77 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -278,7 +278,7 @@ void LINE( void )
         set_error_line( tok_number );
 
 	Str_sprintf( name, "__C_LINE_%ld", tok_number );
-    define_symbol( name->str, get_PC(), SYM_ADDR | SYM_TOUCHED );
+    define_symbol( name->str, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
 }
 
 

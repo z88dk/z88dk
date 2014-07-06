@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.23 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.24 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,7 +37,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.23 2014-06-30 22:2
 
 #define SYM_TYPE		120     	/* 01111000 */
 
-#define SYM_ADDR		8       	/* 00001000 symbol is address */
 #define SYM_LOCAL		16      	/* 00010000 symbol is local */
 #define SYM_PUBLIC		32      	/* 00100000 symbol is PUBLIC */
 #define SYM_EXTERN		64      	/* 01000000 symbol is EXTERN */
@@ -45,9 +44,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.23 2014-06-30 22:2
 #define SYM_NOTDEFINED  0
 
 /*-----------------------------------------------------------------------------
-*   Expression expr_type bitmasks - bits 3 to 6 same as Symbol type bitmasks
+*   Expression expr_type_mask bitmasks - bits 3 to 6 same as Symbol type bitmasks
 *----------------------------------------------------------------------------*/
-#define EXPR_ADDR		SYM_ADDR	/* 00001000 Expression contains reloc. address label */
 #define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
 #define EXPR_PUBLIC		SYM_PUBLIC 	/* 00100000 Expression contains global symbol */
 #define EXPR_EXTERN		SYM_EXTERN	/* 01000000 Expression contains extern symbol */

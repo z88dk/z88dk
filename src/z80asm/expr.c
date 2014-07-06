@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.22 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.23 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -39,7 +39,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.22 2014-06-30 22:29
 
 /* init each type of ExprOp */
 static void ExprOp_init_number(     ExprOp *self, long value );
-static void ExprOp_init_name(       ExprOp *self, char *name, Byte sym_type );
+static void ExprOp_init_name(       ExprOp *self, char *name, Byte sym_type_mask );
 static void ExprOp_init_const_expr( ExprOp *self );
 static void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type );
 
@@ -236,11 +236,11 @@ void ExprOp_init_number( ExprOp *self, long value )
 	self->d.value	= value;
 }
 
-void ExprOp_init_name( ExprOp *self, char *name, Byte sym_type )
+void ExprOp_init_name( ExprOp *self, char *name, Byte sym_type_mask )
 {
 	self->op_type 			= NAME_OP;
 	self->d.ident.name		= strpool_add(name);
-	self->d.ident.sym_type	= sym_type;
+	self->d.ident.sym_type_mask	= sym_type_mask;
 }
 
 void ExprOp_init_const_expr( ExprOp *self )
@@ -267,15 +267,16 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 	{
 	case NAME_OP:
 		/* symbol was not defined and not declared */
-		if ( ( self->d.ident.sym_type & ~ SYM_TOUCHED ) != SYM_NOTDEFINED )
+		if ( ( self->d.ident.sym_type_mask & ~ SYM_TOUCHED ) != SYM_NOTDEFINED )
 		{
 			/* if all bits are set to zero */
-			if ( self->d.ident.sym_type & SYM_LOCAL )
+			if ( self->d.ident.sym_type_mask & SYM_LOCAL )
 			{
 				symptr = find_local_symbol( self->d.ident.name );
 
 				/* copy appropriate type bits */
-				expr->expr_type |= ( symptr->sym_type & SYM_TYPE );
+				expr->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE );
+				expr->sym_type = MAX( expr->sym_type, symptr->sym_type );
 
 				Calc_push( symptr->value );
 			}
@@ -286,21 +287,22 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 				if ( symptr != NULL )
 				{
 					/* copy appropriate type bits */
-					expr->expr_type |= ( symptr->sym_type & SYM_TYPE );
+					expr->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE );
+					expr->sym_type = MAX( expr->sym_type, symptr->sym_type );
 
-					if ( symptr->sym_type & SYM_DEFINED )
+					if ( symptr->sym_type_mask & SYM_DEFINED )
 					{
 						Calc_push( symptr->value );
 					}
 					else
 					{
-						expr->expr_type |= NOT_EVALUABLE;
+						expr->expr_type_mask |= NOT_EVALUABLE;
 						Calc_push( 0 );
 					}
 				}
 				else
 				{
-					expr->expr_type |= NOT_EVALUABLE;
+					expr->expr_type_mask |= NOT_EVALUABLE;
 					Calc_push( 0 );
 				}
 			}
@@ -311,22 +313,23 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 			symptr = get_used_symbol( self->d.ident.name );
 
 			/* copy appropriate type bits */
-			expr->expr_type |= ( symptr->sym_type & SYM_TYPE );
+			expr->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE );
+			expr->sym_type = MAX( expr->sym_type, symptr->sym_type );
 
-			if ( symptr->sym_type & SYM_DEFINED )
+			if ( symptr->sym_type_mask & SYM_DEFINED )
 			{
 				Calc_push( symptr->value );
 			}
 			else
 			{
-				expr->expr_type |= NOT_EVALUABLE;
+				expr->expr_type_mask |= NOT_EVALUABLE;
 				Calc_push( 0 );
 			}
 		}
 		break;
 		
 	case CONST_EXPR_OP:
-		expr->expr_type &= ~ EXPR_ADDR;		/* convert to constant expression */
+		expr->sym_type = TYPE_CONSTANT;		/* convert to constant expression */
 		break;
 		
 	case NUMBER_OP:	Calc_push( self->d.value ); break;		
@@ -374,7 +377,8 @@ void Expr_init (Expr *self)
     self->text = OBJ_NEW( Str );
 	OBJ_AUTODELETE( self->text ) = FALSE;
 
-    self->expr_type = 0;
+	self->sym_type	= TYPE_UNKNOWN;
+    self->expr_type_mask = 0;
 	
 	self->target_name = NULL;
 
@@ -441,7 +445,7 @@ static Bool Expr_parse_factor( Expr *self )
 		asmpc = get_PC();
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 							asmpc );
-		self->expr_type |= SYM_ADDR;
+		self->sym_type = MAX( self->sym_type, TYPE_ADDRESS );
 
 		Str_append(self->text, tok_text);
 		
@@ -450,22 +454,23 @@ static Bool Expr_parse_factor( Expr *self )
 
     case TK_NAME:
 		symptr = get_used_symbol( tok_name );
+		self->sym_type = MAX( self->sym_type, symptr->sym_type );
 
-        if ( symptr->sym_type & SYM_DEFINED )
+        if ( symptr->sym_type_mask & SYM_DEFINED )
         {
             /* copy appropriate type bits */
-            self->expr_type |= ( symptr->sym_type & SYM_TYPE );
+            self->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE );
 			ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 								symptr->value );
         }
         else
         {
             /* copy appropriate declaration bits */
-            self->expr_type |= ( symptr->sym_type & SYM_TYPE ) | NOT_EVALUABLE;
+            self->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE ) | NOT_EVALUABLE;
 
             /* symbol only declared, store symbol name */
 			ExprOp_init_name( ExprOpArray_push( self->rpn_ops ),
-							  tok_name, symptr->sym_type );
+							  tok_name, symptr->sym_type_mask );
         }
 
         Str_append(self->text, tok_name);		/* add identifier to infix expr */
@@ -477,6 +482,7 @@ static Bool Expr_parse_factor( Expr *self )
 		Str_append_sprintf(self->text, "%ld", tok_number);
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 							tok_number );
+		self->sym_type = MAX( self->sym_type, TYPE_CONSTANT );
         GetSym();
         break;
 
@@ -676,7 +682,7 @@ long Expr_eval( Expr *self )
 {
 	size_t i;
 
-	self->expr_type &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
+	self->expr_type_mask &= ~ NOT_EVALUABLE;		/* prefix expression as evaluated */
 
 	for ( i = 0; i < ExprOpArray_size( self->rpn_ops ); i++ )
 	{
@@ -704,7 +710,7 @@ static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
 
 	/* eval and discard expression */
 	*presult = Expr_eval( expr );
-	failed   = (expr->expr_type & NOT_EVALUABLE);
+	failed   = (expr->expr_type_mask & NOT_EVALUABLE);
 	OBJ_DELETE( expr );
 
 	/* check errors */

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.26 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.27 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.26 2014-06-30 22:29
 #include "class.h"
 #include "classlist.h"
 #include "scan.h"
+#include "sym.h"
 #include "strutil.h"
 
 struct Module;
@@ -77,7 +78,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 		struct 
 		{
 			char   *name;			/* name of identifier, stored in strpool */
-			Byte	sym_type;		/* type of identifier (local, global, rel. address or constant) */
+			Byte	sym_type_mask;		/* type of identifier (local, global, rel. address or constant) */
 		} ident;
 
 		/* CONST_EXPR_OP - no data */
@@ -112,7 +113,9 @@ CLASS( Expr )
 	
 	range_t		 range;			/* range of expression result */
 
-	Byte		 expr_type;		/* range type of evaluated expression */
+	sym_type_t	 sym_type;		/* highest type of symbols used in expression */
+
+	Byte		 expr_type_mask;/* range type of evaluated expression */
 
 	char		*target_name;	/* name of the symbol, stored in strpool, 
 								   to receive the result value of the expression 

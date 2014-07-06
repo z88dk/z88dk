@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.4 2014-07-02 23:45:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.5 2014-07-06 22:48:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,7 +21,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.4 2014-07-
 #include <stdio.h>
 
 char *GetLibfile( char *filename ) { return ""; }
-extern Symbol *_define_sym( char *name, long value, Byte type, Module *module, Section *section, SymbolHash **psymtab );
+extern Symbol *_define_sym( char *name, long value, sym_type_t sym_type, Byte type_mask,
+                     Module *module, Section *section,
+					 SymbolHash **psymtab );
 
 /* reuse string - test saving of keys by hash */
 static char *S(char *str)
@@ -45,14 +47,20 @@ static void dump_SymbolRefList ( SymbolRefList *references )
 static void dump_Symbol ( Symbol *sym )
 {
 	warn("Symbol %s (%s) = %ld, type = 0x%02X [", 
-		 sym->name, Symbol_fullname(sym), sym->value, sym->sym_type );
-	if (sym->sym_type & SYM_DEFINED)	warn("DEFINED ");
-	if (sym->sym_type & SYM_TOUCHED)	warn("TOUCHED ");
-	if (sym->sym_type & SYM_DEFINE)		warn("DEF ");
-	if (sym->sym_type & SYM_ADDR)		warn("ADDR ");
-	if (sym->sym_type & SYM_LOCAL)		warn("LOCAL ");
-	if (sym->sym_type & SYM_PUBLIC)		warn("GLOBAL ");
-	if (sym->sym_type & SYM_EXTERN)		warn("EXTERN ");
+		 sym->name, Symbol_fullname(sym), sym->value, sym->sym_type_mask );
+	if (sym->sym_type_mask & SYM_DEFINED)	warn("DEFINED ");
+	if (sym->sym_type_mask & SYM_TOUCHED)	warn("TOUCHED ");
+	if (sym->sym_type_mask & SYM_DEFINE)	warn("DEF ");
+
+	warn( sym->sym_type == TYPE_UNKNOWN		? "TYPE_UNKNOWN " :
+		  sym->sym_type == TYPE_CONSTANT	? "TYPE_CONSTANT " :
+		  sym->sym_type == TYPE_ADDRESS		? "TYPE_ADDRESS " :
+		  sym->sym_type == TYPE_COMPUTED	? "TYPE_COMPUTED " :
+											  "invalid-type " );
+
+	if (sym->sym_type_mask & SYM_LOCAL)		warn("LOCAL ");
+	if (sym->sym_type_mask & SYM_PUBLIC)	warn("GLOBAL ");
+	if (sym->sym_type_mask & SYM_EXTERN)	warn("EXTERN ");
 	warn("], ref = [");
 	dump_SymbolRefList(sym->references);
 	warn("], owner = %s\n", 
@@ -110,11 +118,11 @@ static void test_symtab( void )
 	set_cur_module( new_module() );
 
 	warn("Create symbol\n");	
-	sym = Symbol_create(S("Var1"), 123, 0, NULL, NULL);
+	sym = Symbol_create(S("Var1"), 123, TYPE_CONSTANT, 0, NULL, NULL);
 	dump_Symbol(sym);
 	OBJ_DELETE(sym);
 
-	sym = Symbol_create(S("Var1"), 123, 0, CURRENTMODULE, NULL);
+	sym = Symbol_create(S("Var1"), 123, TYPE_CONSTANT, 0, CURRENTMODULE, NULL);
 	dump_Symbol(sym);
 	CURRENTMODULE->modname = "MODULE";
 	dump_Symbol(sym);
@@ -129,9 +137,9 @@ static void test_symtab( void )
 	warn("check case insensitive - CH_0024\n");
 	symtab = OBJ_NEW(SymbolHash);
 	assert( symtab );
-	_define_sym(S("Var1"),  1, 0, NULL, NULL, &symtab); inc_page_nr();
-	_define_sym(S("Var2"),  2, 0, NULL, NULL, &symtab); inc_page_nr(); 
-	_define_sym(S("Var3"), -3, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Var1"),  1, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Var2"),  2, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr(); 
+	_define_sym(S("Var3"), -3, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
 	dump_SymbolHash(symtab, "tab1");
 	
 	assert( find_symbol(S("Var1"), symtab)->value ==  1 );
@@ -151,16 +159,16 @@ static void test_symtab( void )
 	warn("Concat symbol tables\n");	
 	symtab = OBJ_NEW(SymbolHash);
 	assert( symtab );
-	_define_sym(S("Var1"),  1, 0, NULL, NULL, &symtab); inc_page_nr();
-	_define_sym(S("Var2"),  2, 0, NULL, NULL, &symtab); inc_page_nr(); 
-	_define_sym(S("Var3"), -3, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Var1"),  1, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Var2"),  2, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr(); 
+	_define_sym(S("Var3"), -3, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
 	dump_SymbolHash(symtab, "tab1");
 	
 	symtab2 = OBJ_NEW(SymbolHash);
 	assert( symtab2 );
-	_define_sym(S("Var3"), 3, 0, NULL, NULL, &symtab2); inc_page_nr();
-	_define_sym(S("Var4"), 4, 0, NULL, NULL, &symtab2); inc_page_nr();
-	_define_sym(S("Var5"), 5, 0, NULL, NULL, &symtab2); inc_page_nr();
+	_define_sym(S("Var3"), 3, TYPE_CONSTANT, 0, NULL, NULL, &symtab2); inc_page_nr();
+	_define_sym(S("Var4"), 4, TYPE_CONSTANT, 0, NULL, NULL, &symtab2); inc_page_nr();
+	_define_sym(S("Var5"), 5, TYPE_CONSTANT, 0, NULL, NULL, &symtab2); inc_page_nr();
 	dump_SymbolHash(symtab2, "tab2");
 	
 	SymbolHash_cat( &symtab, symtab2 );
@@ -172,10 +180,10 @@ static void test_symtab( void )
 	warn("Sort\n");	
 	symtab = OBJ_NEW(SymbolHash);
 	assert( symtab );
-	_define_sym(S("One"), 	1, 0, NULL, NULL, &symtab); inc_page_nr();
-	_define_sym(S("Two"),	2, 0, NULL, NULL, &symtab); inc_page_nr(); 
-	_define_sym(S("Three"),	3, 0, NULL, NULL, &symtab); inc_page_nr();
-	_define_sym(S("Four"),	4, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("One"), 	1, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Two"),	2, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr(); 
+	_define_sym(S("Three"),	3, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Four"),	4, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
 	dump_SymbolHash(symtab, "tab");
 	
 	SymbolHash_sort(symtab, SymbolHash_by_name);
@@ -187,24 +195,24 @@ static void test_symtab( void )
 	OBJ_DELETE( symtab );
 
 	warn("Use local symbol before definition\n");
-	_define_sym(S("WIN32"), 1, 0, NULL, NULL, &static_symtab); inc_page_nr();
+	_define_sym(S("WIN32"), 1, TYPE_CONSTANT, 0, NULL, NULL, &static_symtab); inc_page_nr();
 	SymbolHash_cat( & CURRENTMODULE->local_symtab, static_symtab ); inc_page_nr();
-	_define_sym(S("PC"), 0, 0, NULL, NULL, &global_symtab); inc_page_nr();
+	_define_sym(S("PC"), 0, TYPE_CONSTANT, 0, NULL, NULL, &global_symtab); inc_page_nr();
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
-	assert( ! (sym->sym_type & SYM_DEFINED) );
+	assert( ! (sym->sym_type_mask & SYM_DEFINED) );
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
-	assert( ! (sym->sym_type & SYM_DEFINED) );
+	assert( ! (sym->sym_type_mask & SYM_DEFINED) );
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
-	define_symbol(S("NN"), find_symbol( "PC", global_symtab )->value, SYM_ADDR | SYM_TOUCHED ); 
+	define_symbol(S("NN"), find_symbol( "PC", global_symtab )->value, TYPE_ADDRESS, SYM_TOUCHED ); 
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
 	dump_Symbol(sym);
-	assert( sym->sym_type & SYM_DEFINED );
+	assert( sym->sym_type_mask & SYM_DEFINED );
 	
 	dump_symtab();
 

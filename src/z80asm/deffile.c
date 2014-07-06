@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.17 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.18 2014-07-06 22:48:53 pauloscustodio Exp $
 
 */
 
@@ -62,7 +62,7 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
 *----------------------------------------------------------------------------*/
 static Bool cond_global_addr_symbols(Symbol *sym) 
 { 
-	return (sym->sym_type & SYM_ADDR) && ! (sym->sym_type & SYM_LOCAL); 
+	return (sym->sym_type == TYPE_ADDRESS) && ! (sym->sym_type_mask & SYM_LOCAL); 
 }
 
 void write_def_file( void )

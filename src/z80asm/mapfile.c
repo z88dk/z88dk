@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.22 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.23 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 
@@ -54,7 +54,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
             fprintf( file, "= %04lX, ", sym->value );
         }
 
-        if ( sym->sym_type & SYM_LOCAL )
+        if ( sym->sym_type_mask & SYM_LOCAL )
             fputc( 'L', file );
         else
             fputc( 'G', file );
@@ -114,7 +114,13 @@ void write_map_file( void )
 
 /*
 * $Log: mapfile.c,v $
-* Revision 1.22  2014-06-26 21:33:24  pauloscustodio
+* Revision 1.23  2014-07-06 22:48:53  pauloscustodio
+* Separate symbol type from the bit mask stored in Symbol and Expr,
+* to be able to identify constant values, values that need to be
+* relocated and values that need to be computed at the end of the
+* link phase (for DEFC with expressions).
+*
+* Revision 1.22  2014/06/26 21:33:24  pauloscustodio
 * Bugfix in sections: wrong address computation when symbols declared
 * public in a different section that the definition.
 * If a symbol was defined in the "code" section, and then declared public

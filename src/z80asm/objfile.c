@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.38 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.39 2014-07-06 22:48:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -122,13 +122,13 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
         sym = ( Symbol * )iter->value;
 
 		/* scope */
-		scope = ( sym->sym_type & SYM_PUBLIC ) ? 'G' :
-			    ( sym->sym_type & SYM_LOCAL  ) ? 'L' : 0;
+		scope = ( sym->sym_type_mask & SYM_PUBLIC ) ? 'G' :
+			    ( sym->sym_type_mask & SYM_LOCAL  ) ? 'L' : 0;
 
 		/* type */
-		type = ( sym->sym_type & SYM_ADDR ) ? 'A' : 'C';
+		type = ( sym->sym_type == TYPE_ADDRESS ) ? 'A' : 'C';
 
-        if ( scope != 0 && ( sym->sym_type & SYM_TOUCHED ) )
+        if ( scope != 0 && ( sym->sym_type_mask & SYM_TOUCHED ) )
         {
 			xfput_uint8( fp, scope );
 			xfput_uint8( fp, type );
@@ -175,8 +175,8 @@ static long write_externsym( FILE *fp )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->sym_type & SYM_EXTERN ) && 
-			 ( sym->sym_type & SYM_TOUCHED ) )
+        if ( ( sym->sym_type_mask & SYM_EXTERN ) && 
+			 ( sym->sym_type_mask & SYM_TOUCHED ) )
 		{
 			xfput_count_byte_strz( fp, sym->name );
 			written++;

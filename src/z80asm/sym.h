@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.22 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.23 2014-07-06 22:48:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,12 +30,27 @@ struct Module;
 struct Section;
 
 /*-----------------------------------------------------------------------------
+*   Type of symbol
+*	Expressions have the type of the greatest symbol used
+*----------------------------------------------------------------------------*/
+typedef enum {
+	TYPE_UNKNOWN,						/* symbol not defined */
+	TYPE_CONSTANT,						/* can be computed */
+	TYPE_ADDRESS,						/* depends on ASMPC, can be computed after
+										   address allocation */
+	TYPE_COMPUTED,						/* depends on the result of an expression
+										   that has this symbol as target */
+} sym_type_t;
+
+/*-----------------------------------------------------------------------------
 *   Symbol
 *----------------------------------------------------------------------------*/
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-	Byte			sym_type;			/* type of symbol */
+	sym_type_t		sym_type;			/* type of symbol */
+
+	Byte			sym_type_mask;		/* type of symbol */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
@@ -47,7 +62,7 @@ END_CLASS;
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create( char *name, long value, Byte type, 
+extern Symbol *Symbol_create( char *name, long value, sym_type_t sym_type, Byte type_mask, 
 							  struct Module *module, struct Section *section );
 
 /* return full symbol name NAME@MODULE stored in strpool */

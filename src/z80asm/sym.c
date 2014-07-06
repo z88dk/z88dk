@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.23 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.24 2014-07-06 22:48:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,14 +52,15 @@ void Symbol_fini( Symbol *self )
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create( char *name, long value, Byte type, 
+Symbol *Symbol_create( char *name, long value, sym_type_t sym_type, Byte type_mask, 
 					   Module *module, Section *section )
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
 	self->name 		= strpool_add( name );			/* name in strpool, not freed */
 	self->value 	= value;
-	self->sym_type	= type;
+	self->sym_type	= sym_type;
+	self->sym_type_mask	= type_mask;
 	self->module 	= module;
 	self->section	= section;
 
