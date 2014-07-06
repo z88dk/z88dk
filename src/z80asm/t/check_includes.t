@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.5 2014-04-07 22:14:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/check_includes.t,v 1.6 2014-07-06 23:43:21 pauloscustodio Exp $
 #
 # Check that xmalloc.h is included before any other include
 
@@ -47,24 +47,4 @@ sub check_file {
 		}
 	}
 	ok 1, "File $file ok";
-}	
-
-__END__
-# $Log: check_includes.t,v $
-# Revision 1.5  2014-04-07 22:14:08  pauloscustodio
-# Test failed if all files OK
-#
-# Revision 1.4  2014/03/15 01:41:44  pauloscustodio
-# Check that xmalloc.h is first include only in source files
-#
-# Revision 1.3  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.2  2013/12/15 13:18:35  pauloscustodio
-# Move memory allocation routines to lib/xmalloc, instead of glib,
-# introduce memory leak report on exit and memory fence check.
-#
-# Revision 1.1  2013/09/01 11:59:05  pauloscustodio
-# Force xmalloc to be the first include, to be able to use MSVC memory debug tools
-#
+}

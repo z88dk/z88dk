@@ -13,19 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0037.t,v 1.2 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: BUG_0037.t,v $
-# Revision 1.2  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.1  2013/06/15 22:10:01  pauloscustodio
-# BUG_0037 : Symbol already defined error when symbol used in IF expression
-#
-# Revision 1.1  2013/06/10 23:11:33  pauloscustodio
-# CH_0023 : Remove notdecl_tab
-#
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0037.t,v 1.3 2014-07-06 23:43:21 pauloscustodio Exp $
 
 use strict;
 use warnings;

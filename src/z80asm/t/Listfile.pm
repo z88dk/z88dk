@@ -15,7 +15,7 @@
 #
 # Test generation of listfiles by z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.3 2014-05-20 22:27:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Listfile.pm,v 1.4 2014-07-06 23:43:21 pauloscustodio Exp $
 
 package t::Listfile;
 
@@ -378,14 +378,3 @@ sub test {
 }
 
 1;
-
-# $Log: Listfile.pm,v $
-# Revision 1.3  2014-05-20 22:27:47  pauloscustodio
-# Show symbol values with 4 digits instead of 8
-#
-# Revision 1.2  2014/05/11 17:11:04  pauloscustodio
-# Need to create list references before pushing
-#
-# Revision 1.1  2014/05/11 16:35:42  pauloscustodio
-# Move tests of BUG_0026 to bugfixes.t
-#

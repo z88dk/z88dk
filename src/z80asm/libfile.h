@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.h,v 1.1 2014-05-19 00:19:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.h,v 1.2 2014-07-06 23:43:21 pauloscustodio Exp $
 */
 
 #pragma once
@@ -27,12 +27,3 @@ extern char Z80libhdr[];
 
 /* make library from list of files; convert each source to object file name */
 extern void make_library( char *lib_filename, List *src_files );
-
-/*
-* $Log: libfile.h,v $
-* Revision 1.1  2014-05-19 00:19:33  pauloscustodio
-* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
-* is deleted in case of error.
-*
-* 
-*/

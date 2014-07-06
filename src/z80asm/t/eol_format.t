@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.11 2014-06-29 22:25:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.12 2014-07-06 23:43:21 pauloscustodio Exp $
 #
 # Assert that all source files are in UNIX line-ending format; fix if not
 
@@ -69,41 +69,3 @@ sub dos2unix {
 
 	return $ok;
 }
-
-# $Log: eol_format.t,v $
-# Revision 1.11  2014-06-29 22:25:52  pauloscustodio
-# ws
-#
-# Revision 1.10  2014/04/15 19:20:28  pauloscustodio
-# Solve warning: no newline at end of file by checking and fixing also final newline in file
-#
-# Revision 1.9  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.8  2013/08/30 01:07:27  pauloscustodio
-# Convert eol of files but do not fail test if convertion is done
-#
-# Revision 1.7  2013/03/10 17:56:12  pauloscustodio
-# Check also .l files (flex input)
-#
-# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.5  2012/05/11 19:40:53  pauloscustodio
-# note() instead of diag() for messages not to be shown during prove
-#
-# Revision 1.4	2011/10/10 18:24:18  pauloscustodio
-# convert CVS files to UNIX format : do not convert the CVS directories - only for internal
-#  use
-#
-# Revision 1.3	2011/10/07 18:21:47  pauloscustodio
-# Don't fail the test if any of the CVS files in not in UNIX format
-#
-# Revision 1.2	2011/10/07 18:18:36  pauloscustodio
-# Convert CVS files also to UNIX line ending, so that source files are not converted
-# back to DOS format on checkin
-#
-# Revision 1.1	2011/10/07 17:22:13  pauloscustodio
-# Convert to UNIX line end format
-#

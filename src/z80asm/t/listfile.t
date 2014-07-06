@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.6 2014-05-20 22:27:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.7 2014-07-06 23:43:21 pauloscustodio Exp $
 #
 
 use strict;
@@ -114,28 +114,3 @@ list_test();
 
 unlink_testfiles($inc_file);
 done_testing();
-
-
-# $Log: listfile.t,v $
-# Revision 1.6  2014-05-20 22:27:47  pauloscustodio
-# Show symbol values with 4 digits instead of 8
-#
-# Revision 1.5  2014/04/13 20:32:10  pauloscustodio
-# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-#
-# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2013/03/04 23:23:37  pauloscustodio
-# Removed writeline, that was used to cancel listing of multi-line
-# constructs, as only the first line was shown on the list file. Fixed
-# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-#
-# Revision 1.2  2013/02/22 17:26:34  pauloscustodio
-# Decouple assembler from listfile handling
-#
-# Revision 1.1  2013/02/19 22:52:41  pauloscustodio
-# BUG_0030 : List bytes patching overwrites header
-# BUG_0031 : List file garbled with input lines with 255 chars
-# New listfile.c with all the listing related code

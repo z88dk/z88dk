@@ -13,18 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFVARS.t,v 1.3 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: op-DEFVARS.t,v $
-# Revision 1.3  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.2  2013/04/01 22:03:20  pauloscustodio
-# Add conditional assembly tests
-#
-# Revision 1.1  2013/03/06 00:03:05  pauloscustodio
-# Test DEFVARS
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFVARS.t,v 1.4 2014-07-06 23:43:21 pauloscustodio Exp $
 #
 # Test DEFVARS
 

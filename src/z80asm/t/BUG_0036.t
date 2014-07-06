@@ -13,19 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0036.t,v 1.2 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: BUG_0036.t,v $
-# Revision 1.2  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.1  2013/06/14 23:47:14  pauloscustodio
-# BUG_0036 : Map file does not show local symbols with the same name in different modules
-# If the same local symbol is defined in multiple modules, only one of
-# them appears in the map file.
-# "None." is written in map file if no symbols are defined.
-#
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0036.t,v 1.3 2014-07-06 23:43:21 pauloscustodio Exp $
 
 use strict;
 use warnings;

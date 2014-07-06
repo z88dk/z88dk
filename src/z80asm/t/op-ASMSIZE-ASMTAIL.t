@@ -13,27 +13,9 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.6 2014-05-20 22:18:27 pauloscustodio Exp $
-# $Log: op-ASMSIZE-ASMTAIL.t,v $
-# Revision 1.6  2014-05-20 22:18:27  pauloscustodio
-# Add ASMHEAD symbol at the end of link with address of start of linked code.
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.7 2014-07-06 23:43:21 pauloscustodio Exp $
 #
-# Revision 1.5  2014/04/13 20:32:10  pauloscustodio
-# PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-#
-# Revision 1.4  2014/01/11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.3  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.2  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.1  2012/04/22 20:32:20  pauloscustodio
 # Test new ASMTAIL and ASMSIZE keywords
-#
 
 use strict;
 use warnings;

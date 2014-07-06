@@ -13,18 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-JR.t,v 1.3 2014-01-11 01:29:46 pauloscustodio Exp $
-# $Log: op-JR.t,v $
-# Revision 1.3  2014-01-11 01:29:46  pauloscustodio
-# Extend copyright to 2014.
-# Move CVS log to bottom of file.
-#
-# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2011/08/05 19:28:11  pauloscustodio
-# Test JR ranges
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-JR.t,v 1.4 2014-07-06 23:43:21 pauloscustodio Exp $
 #
 # Test JR offset computation directive
 

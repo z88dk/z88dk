@@ -15,7 +15,7 @@
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.4 2014-06-03 22:53:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.5 2014-07-06 23:43:21 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -492,26 +492,3 @@ sub format_iter {
 		}
 	} );
 }
-
-	
-
-# $Log: build_opcodes.pl,v $
-# Revision 1.4  2014-06-03 22:53:13  pauloscustodio
-# Do not sort symbols before writing to object file. Not needed and
-# wastes time.
-#
-# Revision 1.3  2014/06/01 22:16:50  pauloscustodio
-# Write expressions to object file only in pass 2, to remove dupplicate code
-# and allow simplification of object file writing code. All expression
-# error messages are now output only during pass 2.
-#
-# Revision 1.2  2014/05/14 21:30:28  pauloscustodio
-# Indent {} blocks
-#
-# Revision 1.1  2014/05/13 23:42:49  pauloscustodio
-# Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
-# Remove opcode errors and warnings from t/errors.t.
-# Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.
-# Remove t/data/z80opcodes*, too complex to maintain.
-#
-#
