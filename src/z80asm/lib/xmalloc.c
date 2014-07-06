@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.10 2014-07-02 23:45:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.11 2014-07-06 01:11:39 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -104,8 +104,8 @@ DEFINE_fini()
         /* free but do not report memory allocated with NULL file */
         if ( block->file != NULL )
         {
-            warn( "xmalloc %s(%d): leak (%u) allocated at %s(%d)\n",
-                  __FILE__, __LINE__, block->client_size, block->file, block->lineno );
+            warn( "xmalloc: leak (%u) allocated at %s(%d)\n",
+                  block->client_size, block->file, block->lineno );
         }
 
         _xfree( CLIENT_PTR( block ), __FILE__, __LINE__ );  /* deletes from list */
@@ -126,7 +126,7 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
 
     if ( block == NULL )
     {
-        die( "xmalloc %s(%d): alloc (%u) failed\n", file, lineno, block_size );
+        die( "%s(%d): alloc (%u) failed\n", file, lineno, block_size );
         /* not reached */
     }
 
@@ -144,7 +144,7 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
     LIST_INSERT_HEAD( &mem_blocks, block, entries );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): alloc (%u)\n", block->file, block->lineno, CLIENT_SIZE( block ) );
+    warn( "%s(%d): alloc (%u)\n", block->file, block->lineno, CLIENT_SIZE( block ) );
 #endif
 
     return block;
@@ -161,7 +161,7 @@ static MemBlock *find_block( void *client_ptr, char *file, int lineno )
 
     if ( block->signature != MEMBLOCK_SIGN )
     {
-        die( "xmalloc %s(%d): block not found\n", file, lineno );
+        die( "%s(%d): block not found\n", file, lineno );
         /* not reached */
     }
 
@@ -180,14 +180,14 @@ static void check_fences( MemBlock *block, char *file, int lineno )
     /* check fences */
     if ( 0 != memcmp( fence, START_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( "xmalloc %s(%d): buffer underflow, allocated at %s(%d)\n",
+        die( "%s(%d): buffer underflow, allocated at %s(%d)\n",
              file, lineno, block->file, block->lineno );
         /* not reached */
     }
 
     if ( 0 != memcmp( fence, END_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( "xmalloc %s(%d): buffer overflow, allocated at %s(%d)\n",
+        die( "%s(%d): buffer overflow, allocated at %s(%d)\n",
              file, lineno, block->file, block->lineno );
         /* not reached */
     }
@@ -231,7 +231,7 @@ void _xfree( void *client_ptr, char *file, int lineno )
     block = find_block( client_ptr, file, lineno );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n",
+    warn( "%s(%d): free (%u) allocated at %s(%d)\n",
           file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
 #endif
 
@@ -313,7 +313,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
     block = find_block( client_ptr, file, lineno );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): free (%u) allocated at %s(%d)\n",
+    warn( "%s(%d): free (%u) allocated at %s(%d)\n",
           file, lineno, CLIENT_SIZE( block ), block->file, block->lineno );
 #endif
 
@@ -329,7 +329,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
     if ( block == NULL )
     {
-        die( "xmalloc %s(%d): alloc (%u) failed\n", file, lineno, block_size );
+        die( "%s(%d): alloc (%u) failed\n", file, lineno, block_size );
         /* not reached */
     }
 
@@ -347,7 +347,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
     LIST_INSERT_HEAD( &mem_blocks, block, entries );
 
 #ifdef XMALLOC_DEBUG
-    warn( "xmalloc %s(%d): alloc (%u)\n", block->file, block->lineno, CLIENT_SIZE( block ) );
+    warn( "%s(%d): alloc (%u)\n", block->file, block->lineno, CLIENT_SIZE( block ) );
 #endif
 
     return client_ptr;

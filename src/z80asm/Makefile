@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.164 2014-07-05 12:26:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.165 2014-07-06 01:11:39 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -66,7 +66,8 @@ INSTALL ?= install
 SRCS1 	:= $(wildcard *.c lib/*.c)
 SRCS	:= $(SRCS1:test.c=)
 OBJS 	:= $(SRCS:.c=.o)
-TEST_SRCS:= $(wildcard t/*.c lib/t/*.c)
+TEST_SRC_MAIN:= $(wildcard t/test_*.c lib/t/test_*.c)
+TEST_SRC_LIB:=t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
@@ -75,7 +76,7 @@ TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-I. -I$(LOCAL_LIB) -Wall
+CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall
 
 #------------------------------------------------------------------------------
 # main
@@ -131,10 +132,10 @@ clean::
 #------------------------------------------------------------------------------
 all: t/libtestlib.a
 
-t/libtestlib.a : $(OBJS)
-	ar rcs t/libtestlib.a $(OBJS:z80asm.o=)
+t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
+	ar rcs t/libtestlib.a $(OBJS:z80asm.o=) $(TEST_SRC_LIB:.c=.o)
 
-$(TEST_SRCS:.c=.o) : t/libtestlib.a
+$(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
 	$(CC) -static $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
@@ -143,7 +144,7 @@ $(TEST_SRCS:.c=.o) : t/libtestlib.a
 	mv -f $@~ $@
 
 clean::
-	$(RM) t/libtestlib.a t/*.o t/*.out $(TEST_SRCS:.c=$(EXESUFFIX))
+	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
 test:
 	$(MAKE) legacy
@@ -153,7 +154,7 @@ test:
 
 prove: prove_c prove_perl
 
-prove_c: t/libtestlib.a $(TEST_SRCS:.c=.o) $(TEST_SRCS:.c=.out)
+prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
 prove_perl: $(TARGET)
 	perl -S prove t/*.t
@@ -224,7 +225,7 @@ gccmake.bat : Makefile
 # Dependencies
 #------------------------------------------------------------------------------
 depend:
-	makedepend -Y -I. -I$(LOCAL_LIB) $(SRCS) $(TEST_SRCS)
+	makedepend -Y -I. -I$(LOCAL_LIB) $(SRCS) $(TEST_SRC_MAIN) $(TEST_SRC_LIB)
 	
 # DO NOT DELETE
 
@@ -390,3 +391,5 @@ t/test_symtab.o: codearea.h lib/array.h expr.h scan.h scan_def.h legacy.h
 t/test_symtab.o: symtab.h sym.h options.h options_def.h
 lib/t/test_dlist.o: lib/xmalloc.h lib/dlist.h
 lib/t/test_init.o: lib/xmalloc.h lib/init.h lib/types.h
+lib/t/test_xmalloc.o: lib/xmalloc.h
+t/testlib.o: lib/xmalloc.h t/testlib.h

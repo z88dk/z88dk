@@ -1,0 +1,115 @@
+
+> Run test_no_allocation
+
+
+> Exit: 0
+
+> Run test_no_leak
+
+
+> Exit: 0
+
+> Run test_alloc_failed
+
+lib/t/test_xmalloc.c(37): alloc (134217760) failed
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+
+> Exit: 1
+
+> Run test_unmatched_block
+
+lib/t/test_xmalloc.c(44): block not found
+
+> Exit: 1
+
+> Run test_buffer_underflow
+
+lib/t/test_xmalloc.c(52): buffer underflow, allocated at lib/t/test_xmalloc.c(50)
+
+> Exit: 1
+
+> Run test_buffer_overflow
+
+lib/t/test_xmalloc.c(60): buffer overflow, allocated at lib/t/test_xmalloc.c(58)
+
+> Exit: 1
+
+> Run test_xmalloc
+
+xmalloc: leak (2) allocated at lib/t/test_xmalloc.c(74)
+xmalloc: leak (1) allocated at lib/t/test_xmalloc.c(71)
+xmalloc: leak (0) allocated at lib/t/test_xmalloc.c(68)
+
+> Exit: 0
+
+> Run test_xcalloc
+
+xmalloc: leak (5) allocated at lib/t/test_xmalloc.c(88)
+
+> Exit: 0
+
+> Run test_xnew
+
+xmalloc: leak (5) allocated at lib/t/test_xmalloc.c(105)
+xmalloc: leak (1) allocated at lib/t/test_xmalloc.c(100)
+
+> Exit: 0
+
+> Run test_xrealloc
+
+xmalloc: leak (2) allocated at lib/t/test_xmalloc.c(141)
+
+> Exit: 0
+
+> Run test_xstrdup
+
+xmalloc: leak (6) allocated at lib/t/test_xmalloc.c(153)
+
+> Exit: 0
+
+> Run test_xmallocf
+
+xmalloc: leak (1) allocated at lib/xmalloc.c(212)
+
+> Exit: 0
+
+> Run test_warn
+
+This is a warning at lib/t/test_xmalloc.c(180)
+
+> Exit: 0
+
+> Run test_die
+
+This is a death at lib/t/test_xmalloc.c(186)
+
+> Exit: 1
+
+> Run test_xatexit
+
+start
+end
+Message at exit at lib/t/test_xmalloc.c(193)
+Message at exit at lib/t/test_xmalloc.c(193)
+
+> Exit: 0
+
+> Run test_xatexit_failed
+
+[ERROR] (lib/t/test_xmalloc.c(207) errno: None): atexit failed
+
+> Exit: 1
