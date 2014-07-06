@@ -6,7 +6,7 @@ Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.h,v 1.4 2014-07-06 15:45:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,24 +22,3 @@ extern char *strpool_add( char *str );
    destruction is in the correct order (first T, then pool)
 */
 extern void strpool_init( void );
-
-/*
-* $Log: strpool.h,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.2  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.1  2013/12/18 01:46:22  pauloscustodio
-* Move strpool.c to the z80asm/lib directory
-*
-* Revision 1.2  2013/01/19 01:33:16  pauloscustodio
-* Clean-up strpool code
-*
-* Revision 1.1  2012/05/24 17:50:02  pauloscustodio
-* CH_0010 : new string pool to hold strings for all program duration
-*
-*/
