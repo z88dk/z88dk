@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.3 2014-05-25 01:02:29 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.4 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -107,20 +107,3 @@ void make_library( char *lib_filename, List *src_files )
 	/* close and write lib file */
 	xfclose( lib_file );
 }
-
-
-/*
-* $Log: libfile.c,v $
-* Revision 1.3  2014-05-25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.2  2014/05/19 22:15:54  pauloscustodio
-* Move read_obj_file_data() to objfile.c
-* Move CreateLibfile() to libfile.c, rename to search_libfile()
-*
-* Revision 1.1  2014/05/19 00:19:33  pauloscustodio
-* Move library creation to libfile.c, use xfopen_atomic to make sure incomplete library
-* is deleted in case of error.
-*
-* 
-*/

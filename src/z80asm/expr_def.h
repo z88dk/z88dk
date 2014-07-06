@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.7 2014-03-15 02:12:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.8 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 /* Unary, Binary and Ternary operators */
@@ -80,43 +80,3 @@ OPERATOR_1( log_not,	TK_LOG_NOT,		11,	ASSOC_RIGHT,	! a )
 #undef OPERATOR_1
 #undef OPERATOR_2
 #undef OPERATOR_3
-
-/*
-* $Log: expr_def.h,v $
-* Revision 1.7  2014-03-15 02:12:07  pauloscustodio
-* Rename last token to tok*
-* GetSym() declared in scan.h
-*
-* Revision 1.6  2014/03/04 11:49:47  pauloscustodio
-* Expression parser and expression evaluator use a look-up table of all
-* supported unary, binary and ternary oprators, instead of a big switch
-* statement to select the operation.
-* Expression operations are stored in a contiguous array instead of
-* a liked list to reduce administrative overhead of adding / iterating.
-*
-* Revision 1.5  2014/03/03 02:44:15  pauloscustodio
-* Division by zero error was causing memory leaks - made non-fatal.
-* Moved calculator stack to expr.c, made it singleton and based on array.h - no
-* need to allocate on every expression computed, elements are stored in
-* a vector instead of being allocated individually.
-*
-* Revision 1.4  2014/03/01 15:45:31  pauloscustodio
-* CH_0021: New operators ==, !=, &&, ||, <<, >>, ?:
-* Handle C-like operators, make exponentiation (**) right-associative.
-* Simplify expression parser by handling composed tokens in lexer.
-* Change token ids to TK_...
-*
-* Revision 1.3  2014/02/23 18:48:16  pauloscustodio
-* CH_0021: New operators ==, !=, &&, ||, ?:
-* Handle C-like operators ==, !=, &&, || and ?:.
-* Simplify expression parser by handling composed tokens in lexer.
-*
-* Revision 1.2  2014/02/18 22:59:06  pauloscustodio
-* BUG_0040: Detect and report division by zero instead of crashing
-* BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
-*
-* Revision 1.1  2014/02/17 23:41:35  pauloscustodio
-* Embryo of new expression parser
-*
-* 
-*/

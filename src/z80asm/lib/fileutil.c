@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.20 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.21 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -664,82 +664,3 @@ char *search_file( char *filename, List *dir_list )
     path_search( dest, filename, dir_list );
     return strpool_add( dest->str );
 }
-
-/*
-* $Log: fileutil.c,v $
-* Revision 1.20  2014-06-09 13:15:27  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.19  2014/05/29 00:21:14  pauloscustodio
-* Expand string in xfget_Str if needed.
-*
-* Revision 1.18  2014/05/25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.17  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.16  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.15  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.14  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.13  2014/02/20 22:55:27  pauloscustodio
-* xfget_int16() and xfget_int32() were not sign-extending correctly
-* causing link to fail on a 64-bit architecture.
-*
-* Revision 1.12  2014/02/19 23:59:27  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.11  2014/02/02 23:00:54  pauloscustodio
-* New xfclose_remove() to remove file after closing.
-*
-* Revision 1.10  2014/01/29 22:40:52  pauloscustodio
-* Mechanism for atomic file write - open a temp file for writing on
-* xfopen_atomic(), close and rename to final name on xfclose().
-* temp_filename() to generate a temporary file name that is
-* deleted atexit.
-*
-* Revision 1.9  2014/01/21 23:12:30  pauloscustodio
-* path_... functions return filename instrpool, no need to pass an array to store result.
-*
-* Revision 1.8  2014/01/21 22:42:18  pauloscustodio
-* New dirname(), temp_filename()
-*
-* Revision 1.7  2014/01/20 23:29:18  pauloscustodio
-* Moved file.c to lib/fileutil.c
-*
-* Revision 1.6  2014/01/15 00:01:40  pauloscustodio
-* Decouple file.c from errors.c by adding a call-back mechanism in file for
-* fatal errors, setup by errors_init()
-*
-* Revision 1.5  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.4  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.3  2014/01/09 23:13:04  pauloscustodio
-* Use init.h mechanism, no need for main() calling init_options.
-* Use Str instead of glib.
-*
-* Revision 1.2  2014/01/02 17:18:16  pauloscustodio
-* StrList removed, replaced by List
-*
-* Revision 1.1  2014/01/01 21:23:48  pauloscustodio
-* Move generic file utility functions to lib/fileutil.c
-*
-*
-*/

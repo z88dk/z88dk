@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.4 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.5 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -85,56 +85,3 @@ extern int   SrcFile_line_nr(  SrcFile *self );
    and updates current input */
 extern void SrcFile_push( SrcFile *self );
 extern Bool SrcFile_pop( SrcFile *self );
-
-
-/*
-* $Log: srcfile.h,v $
-* Revision 1.4  2014-05-25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.3  2014/03/15 14:35:51  pauloscustodio
-* Add interface to lookup current file name and line number
-*
-* Revision 1.2  2014/02/08 18:21:18  pauloscustodio
-* new line callback needs text read to pass on to listfile.c.
-* file_stack filenames may be NULL, protect when checking for recursive includes.
-* Remove dead test code.
-*
-* Revision 1.1  2014/02/08 11:21:09  pauloscustodio
-* Moved srcfile.c to lib/
-*
-* Revision 1.9  2014/02/03 22:04:03  pauloscustodio
-* ws
-*
-* Revision 1.8  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.7  2014/01/11 01:06:33  pauloscustodio
-* -Wall comments
-*
-* Revision 1.6  2013/12/30 02:05:32  pauloscustodio
-* Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
-* handles both dynamically allocated strings and fixed-size strings.
-* Replaced g_strchomp by chomp by; g_ascii_tolower by tolower;
-* g_ascii_toupper by toupper; g_ascii_strcasecmp by stricompare.
-*
-* Revision 1.5  2013/12/26 23:42:27  pauloscustodio
-* Replace StringList from strutil by StrList in new strlis.c, to keep lists of strings (e.g. directory search paths)
-*
-* Revision 1.4  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-*
-* Revision 1.3  2013/10/05 10:54:36  pauloscustodio
-* Parse command line options via look-up tables:
-* -I, --inc-path
-* -L, --lib-path
-*
-* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
-* Add API to handle a stack of open sorce files and singleton API
-*
-* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
-* New srcfile.c to handle reading lines from source files
-*
-*/

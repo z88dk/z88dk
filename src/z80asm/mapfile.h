@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.h,v 1.3 2014-01-11 01:29:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.h,v 1.4 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,18 +22,3 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.h,v 1.3 2014-01-11 01:
 #include "xmalloc.h"   /* before any other include */
 
 extern void write_map_file( void );
-
-/*
-* $Log: mapfile.h,v $
-* Revision 1.3  2014-01-11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.2  2013/12/15 13:18:34  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-* 
-* Revision 1.1  2013/06/15 00:26:23  pauloscustodio
-* Move mapfile writing to mapfile.c.
-* 
-*/

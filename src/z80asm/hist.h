@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.12 2014-02-25 22:39:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.13 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,56 +23,3 @@ extern char _prog_name[], _version[], _copyright[];
 #endif
 
 extern char copyrightmsg[];
-
-/*
-* $Log: hist.h,v $
-* Revision 1.12  2014-02-25 22:39:34  pauloscustodio
-* ws
-*
-* Revision 1.11  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.10  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.9  2013/01/20 21:24:28  pauloscustodio
-* Updated copyright year to 2013
-*
-* Revision 1.8  2012/05/24 17:09:27  pauloscustodio
-* Unify copyright header
-*
-* Revision 1.7  2012/05/11 19:29:49  pauloscustodio
-* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, 
-* indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-*         --mode=c
-*         --lineend=linux
-*         --indent=spaces=4
-*         --style=ansi --add-brackets
-*         --indent-switches --indent-classes
-*         --indent-preprocessor --convert-tabs
-*         --break-blocks
-*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-*         --align-pointer=name
-*
-* Revision 1.6  2011/07/09 18:25:35  pauloscustodio
-* Log keyword in checkin comment was expanded inside Log expansion... recursive
-* Added Z80asm banner to all source files
-*
-* Revision 1.5  2011/07/09 17:36:09  pauloscustodio
-* Copied cvs log into Log history
-*
-* Revision 1.4  2011/07/09 01:46:00  pauloscustodio
-* Added Log keyword
-*
-* Revision 1.3  2011/07/09 01:40:15  pauloscustodio
-* *** empty log message ***
-*
-* Revision 1.2  2011/07/09 01:38:02  pauloscustodio
-* *** empty log message ***
-*
-* Revision 1.1  2011/07/09 01:07:56  pauloscustodio
-* Moved version strings to hist.c, created hist.h, for easy maintenance.
-*
-*/

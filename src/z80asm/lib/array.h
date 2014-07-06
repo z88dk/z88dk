@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.13 2014-06-13 15:57:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.14 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -149,55 +149,4 @@ ARRAY( long );
 		size_t size = T##Array_size(self);									\
 		assert( size > 0 );													\
 		T##Array_set_size(self, size - 1);									\
-	}																		\
-
-/*
-* $Log: array.h,v $
-* Revision 1.13  2014-06-13 15:57:06  pauloscustodio
-* Added UIntArray
-*
-* Revision 1.12  2014/06/09 13:15:27  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.11  2014/05/25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.10  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.9  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.8  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.7  2014/05/02 21:13:54  pauloscustodio
-* Add byte array to default types
-*
-* Revision 1.6  2014/04/15 20:06:44  pauloscustodio
-* Solve warning: no newline at end of file
-*
-* Revision 1.5  2014/04/12 15:18:05  pauloscustodio
-* Add intArray and longArray to array.c
-*
-* Revision 1.4  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.3  2014/03/02 14:08:42  pauloscustodio
-* Add methods to set size, push, pop and lookup top item
-*
-* Revision 1.2  2014/02/19 23:59:27  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.1  2014/02/17 22:05:20  pauloscustodio
-* Template array that grows on request. Items may move in memory on reallocation.
-* Uses strutil.h for implementation.
-*
-*
-*/
+	}

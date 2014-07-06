@@ -4,7 +4,7 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.5 2014-05-25 01:02:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.6 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */
@@ -202,26 +202,3 @@ Bool List_empty( List *self )
 {
     return List_first( self ) == NULL ? TRUE : FALSE;
 }
-
-
-/*
-* $Log: list.c,v $
-* Revision 1.5  2014-05-25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.3  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.2  2014/01/02 16:02:28  pauloscustodio
-* Register free() function to be used by remove_all() to delete each element
-*
-* Revision 1.1  2014/01/02 12:48:39  pauloscustodio
-* Generic doubly-linked lists lists
-*
-*
-*/

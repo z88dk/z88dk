@@ -3,7 +3,7 @@ Lists of objects defined by class.h
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.11 2014-06-09 13:15:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classlist.h,v 1.12 2014-07-06 23:11:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -256,70 +256,4 @@ DEF_CLASS_LIST(T);
 	Bool T##List_empty( T##List *self )										\
 	{																		\
 		return T##List_first(self) == NULL ? TRUE : FALSE;					\
-	}																		\
- 
-
-/*
-* $Log: classlist.h,v $
-* Revision 1.11  2014-06-09 13:15:27  pauloscustodio
-* Int and UInt types
-*
-* Revision 1.10  2014/05/25 01:02:30  pauloscustodio
-* Byte, Int, UInt added
-*
-* Revision 1.9  2014/05/17 14:27:13  pauloscustodio
-* Use C99 integer types
-*
-* Revision 1.8  2014/05/06 22:17:38  pauloscustodio
-* Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
-*
-* Revision 1.7  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
-*
-* Revision 1.6  2014/03/05 23:44:55  pauloscustodio
-* Renamed 64-bit portability to BUG_0042
-*
-* Revision 1.5  2014/02/19 23:59:27  pauloscustodio
-* BUG_0042: 64-bit portability issues
-* size_t changes to unsigned long in 64-bit. Usage of size_t * to
-* retrieve unsigned integers from an open file by fileutil's xfget_uintxx()
-* breaks on a 64-bit architecture. Make the functions return the value instead
-* of being passed the pointer to the return value, so that the compiler
-* takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
-*
-* Revision 1.4  2014/01/11 01:29:40  pauloscustodio
-* Extend copyright to 2014.
-* Move CVS log to bottom of file.
-*
-* Revision 1.3  2014/01/11 00:10:39  pauloscustodio
-* Astyle - format C code
-* Add -Wall option to CFLAGS, remove all warnings
-*
-* Revision 1.2  2014/01/02 23:33:11  pauloscustodio
-* Unify interface of classlist and list.
-*
-* Revision 1.1  2013/12/25 17:37:13  pauloscustodio
-* Move classlist and classhash to the z80asm/lib directory
-*
-* Revision 1.6  2013/12/15 13:18:33  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
-* introduce memory leak report on exit and memory fence check.
-*
-* Revision 1.5  2013/09/12 00:10:02  pauloscustodio
-* Create xfree() macro that NULLs the pointer after free, required
-* by z80asm to find out if a pointer was already freed.
-*
-* Revision 1.4  2013/09/08 08:29:21  pauloscustodio
-* Replaced xmalloc et al with glib functions
-*
-* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
-* Uniform the APIs of classhash, classlist, strhash, strlist
-*
-* Revision 1.2  2013/01/30 20:38:59  pauloscustodio
-* Double macro call not necessary
-*
-* Revision 1.1  2013/01/30 00:39:25  pauloscustodio
-* New CLASS_LIST() to create lists of objects defined with CLASS()
-*
-*/
+	}
