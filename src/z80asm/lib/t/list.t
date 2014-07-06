@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.6 2014-07-02 23:45:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.7 2014-07-06 03:06:15 pauloscustodio Exp $
 #
 # Test list.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c";
+my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c dlist.c";
 
 write_file("test.c", <<'END');
 #include "list.h"

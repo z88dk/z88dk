@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.165 2014-07-06 01:11:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.166 2014-07-06 03:06:15 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -380,7 +380,7 @@ lib/strpool.o: lib/xmalloc.h lib/init.h lib/types.h lib/queue.h lib/strpool.h
 lib/strpool.o: lib/uthash.h
 lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h lib/class.h
 lib/strutil.o: lib/queue.h lib/types.h
-lib/xmalloc.o: lib/xmalloc.h lib/queue.h lib/init.h lib/types.h
+lib/xmalloc.o: lib/xmalloc.h lib/dlist.h lib/init.h lib/types.h
 t/test_codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h
 t/test_codearea.o: lib/queue.h lib/types.h lib/strutil.h lib/classhash.h
 t/test_codearea.o: lib/strhash.h lib/uthash.h

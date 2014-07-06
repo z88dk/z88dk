@@ -4,9 +4,11 @@ Simple fence mechanism and exception thrown on out of memory.
 Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
+Includes debug macros inspired in the Learn C The Hard Way book
+
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.8 2014-07-06 01:11:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.9 2014-07-06 03:06:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -57,16 +59,22 @@ extern void  xfreef( void *memptr );
 /* show errno */
 #define strerror_() (errno == 0 ? "None" : strerror(errno))
 
+/* show error, warning, info */
+#define log_(type, message, ...)  warn("[" #type "] (%s(%d) errno: %s) " message "\n", \
+									   __FILE__, __LINE__, strerror_(), ##__VA_ARGS__)
+#define log_err(message, ...)  log_(ERROR, message, ##__VA_ARGS__)
+#define log_warn(message, ...) log_(WARN,  message, ##__VA_ARGS__)
+#define log_info(message, ...) log_(INFO,  message, ##__VA_ARGS__)
+
 /* check condition and die if false */
 #define check_or_die(condition, message, ...) \
 				if ( ! (condition) ) { \
-					die("[ERROR] (%s(%d) errno: %s): " message "\n", \
-					    __FILE__, __LINE__, strerror_(), ##__VA_ARGS__); \
+					log_err(message, ##__VA_ARGS__); \
+					exit(1); \
 				} else
 
+/* sentinel: assert that line is not reached */
+#define sentinel_die(message, ...)	check_or_die(0, message, ##__VA_ARGS__)
+
 /* OS-interface - assert no error */
-#define xatexit(func) \
-				do { \
-					int atexit_ret = atexit(func); \
-					check_or_die(atexit_ret == 0, "atexit failed"); \
-				} while (0)
+#define xatexit(func)	check_or_die( atexit(func) == 0, "atexit failed")

@@ -11,91 +11,92 @@
 
 > Run test_alloc_failed
 
-lib/t/test_xmalloc.c(37): alloc (134217760) failed
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
-xmalloc: leak (134217728) allocated at lib/t/test_xmalloc.c(37)
+[ERROR] (lib/xmalloc.c(117) errno: Not enough space) memory alloc (134217760 bytes) failed at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(96) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
 
 > Exit: 1
 
 > Run test_unmatched_block
 
-lib/t/test_xmalloc.c(44): block not found
+[ERROR] (lib/xmalloc.c(144) errno: None) block not found at lib/t/test_xmalloc.c(44)
 
 > Exit: 1
 
 > Run test_buffer_underflow
 
-lib/t/test_xmalloc.c(52): buffer underflow, allocated at lib/t/test_xmalloc.c(50)
+[ERROR] (lib/xmalloc.c(161) errno: None) buffer underflow, memory allocated at lib/t/test_xmalloc.c(50)
 
 > Exit: 1
 
 > Run test_buffer_overflow
 
-lib/t/test_xmalloc.c(60): buffer overflow, allocated at lib/t/test_xmalloc.c(58)
+[ERROR] (lib/xmalloc.c(165) errno: None) buffer overflow, memory allocated at lib/t/test_xmalloc.c(58)
 
 > Exit: 1
 
 > Run test_xmalloc
 
-xmalloc: leak (2) allocated at lib/t/test_xmalloc.c(74)
-xmalloc: leak (1) allocated at lib/t/test_xmalloc.c(71)
-xmalloc: leak (0) allocated at lib/t/test_xmalloc.c(68)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (2 bytes) allocated at lib/t/test_xmalloc.c(74)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (1 bytes) allocated at lib/t/test_xmalloc.c(71)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (0 bytes) allocated at lib/t/test_xmalloc.c(68)
 
 > Exit: 0
 
 > Run test_xcalloc
 
-xmalloc: leak (5) allocated at lib/t/test_xmalloc.c(88)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (5 bytes) allocated at lib/t/test_xmalloc.c(88)
 
 > Exit: 0
 
 > Run test_xnew
 
-xmalloc: leak (5) allocated at lib/t/test_xmalloc.c(105)
-xmalloc: leak (1) allocated at lib/t/test_xmalloc.c(100)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (5 bytes) allocated at lib/t/test_xmalloc.c(105)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (1 bytes) allocated at lib/t/test_xmalloc.c(100)
 
 > Exit: 0
 
 > Run test_xrealloc
 
-xmalloc: leak (2) allocated at lib/t/test_xmalloc.c(141)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (1999 bytes) allocated at lib/t/test_xmalloc.c(151)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (3 bytes) allocated at lib/t/test_xmalloc.c(154)
 
 > Exit: 0
 
 > Run test_xstrdup
 
-xmalloc: leak (6) allocated at lib/t/test_xmalloc.c(153)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (6 bytes) allocated at lib/t/test_xmalloc.c(166)
 
 > Exit: 0
 
 > Run test_xmallocf
 
-xmalloc: leak (1) allocated at lib/xmalloc.c(212)
+[WARN] (lib/xmalloc.c(96) errno: None) memory leak (1 bytes) allocated at lib/xmalloc.c(184)
 
 > Exit: 0
 
 > Run test_warn
 
-This is a warning at lib/t/test_xmalloc.c(180)
+This is a warning at lib/t/test_xmalloc.c(193)
 
 > Exit: 0
 
 > Run test_die
 
-This is a death at lib/t/test_xmalloc.c(186)
+This is a death at lib/t/test_xmalloc.c(199)
 
 > Exit: 1
 
@@ -103,13 +104,28 @@ This is a death at lib/t/test_xmalloc.c(186)
 
 start
 end
-Message at exit at lib/t/test_xmalloc.c(193)
-Message at exit at lib/t/test_xmalloc.c(193)
+Message at exit at lib/t/test_xmalloc.c(206)
+Message at exit at lib/t/test_xmalloc.c(206)
 
 > Exit: 0
 
 > Run test_xatexit_failed
 
-[ERROR] (lib/t/test_xmalloc.c(207) errno: None): atexit failed
+[ERROR] (lib/t/test_xmalloc.c(220) errno: None) atexit failed
 
 > Exit: 1
+
+> Run test_sentinel
+
+[ERROR] (lib/t/test_xmalloc.c(227) errno: None) not reached
+
+> Exit: 1
+
+> Run test_log
+
+[ERROR] (lib/t/test_xmalloc.c(236) errno: None) error at lib/t/test_xmalloc.c(236)
+[WARN] (lib/t/test_xmalloc.c(237) errno: None) warning at lib/t/test_xmalloc.c(237)
+[INFO] (lib/t/test_xmalloc.c(238) errno: None) info at lib/t/test_xmalloc.c(238)
+[ERROR] (lib/t/test_xmalloc.c(243) errno: No such file or directory) open file failed at lib/t/test_xmalloc.c(243)
+
+> Exit: 0

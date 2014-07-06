@@ -3,7 +3,7 @@ Unit test for xmalloc.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_xmalloc.c,v 1.1 2014-07-06 01:11:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/test_xmalloc.c,v 1.2 2014-07-06 03:06:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -112,7 +112,9 @@ int test_xnew(void)
 
 int test_xrealloc(void)
 {
-	char *p1 = xrealloc(NULL, 2);	/* alloc from NULL */
+	char *p1, *p2;
+
+	p1 = xrealloc(NULL, 2);	
 	check_int(p1, !=, NULL);
 
 	p1[0] = 1; p1[1] = 2;
@@ -144,6 +146,17 @@ int test_xrealloc(void)
 	p1[1] = 2;
 
 	check_int( memcmp(p1-4, "\xAA\xAA\xAA\xAA\1\2\xAA\xAA\xAA\xAA", 10), ==, 0 );
+
+	/* keep sequence of free when reallocating */
+	p2 = xmalloc(1999);
+	check_int(p2, !=, NULL);
+
+	p1 = xrealloc(p1, 3);
+	check_int(p1, !=, NULL);
+
+	p1[2] = 3;
+
+	check_int( memcmp(p1-4, "\xAA\xAA\xAA\xAA\1\2\3\xAA\xAA\xAA\xAA", 11), ==, 0 );
 
 	return 0;
 }
@@ -209,6 +222,29 @@ int test_xatexit_failed(void)
 	return 0;
 }
 
+int test_sentinel(void)
+{
+	sentinel_die("not reached");
+	warn("Not reached at %s(%d)\n", __FILE__, __LINE__);
+	return 0;
+}
+
+int test_log(void)
+{
+	FILE *fp;
+
+	log_err(   "error at %s(%d)", __FILE__, __LINE__);
+	log_warn("warning at %s(%d)", __FILE__, __LINE__);
+	log_info(   "info at %s(%d)", __FILE__, __LINE__);
+
+	/* open non-existent file */
+	fp = fopen("x/y/z/hello.c", "r");
+	check_int(fp, ==, NULL);
+	log_err("open file failed at %s(%d)", __FILE__, __LINE__);
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	init_tests(argc, argv);
@@ -228,5 +264,7 @@ int main(int argc, char *argv[])
 	run_test(1, test_die);
 	run_test(0, test_xatexit);
 	run_test(1, test_xatexit_failed);
+	run_test(1, test_sentinel);
+	run_test(0, test_log);
 	return test_result();
 }

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.14 2014-07-02 23:45:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.15 2014-07-06 03:06:15 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c";
+my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c dlist.c";
 
 write_file("test.c", <<'END');
 #include "xmalloc.h"
