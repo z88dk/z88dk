@@ -1,0 +1,5 @@
+stdio/vg5k/fgetc_cons
+stdio/vg5k/getk
+stdio/vg5k/fputc_cons
+stdio/puts_cons
+@z80.lst
