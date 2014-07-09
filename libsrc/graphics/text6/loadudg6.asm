@@ -9,14 +9,12 @@
 ;   starting from character C up to character B-1
 ;
 ;
-;	$Id: loadudg6.asm,v 1.2 2014-05-27 07:02:19 stefano Exp $
+;	$Id: loadudg6.asm,v 1.3 2014-07-09 10:12:55 stefano Exp $
 ;
 
 			XLIB	loadudg6
 
 .loadudg6
-	ld   b,a
-.load_loop
 	;push bc
 	ld  d,c
 	call setbyte
@@ -31,7 +29,7 @@
 	inc  c
 	ld   a,b
 	cp   c
-	jr	 nz,load_loop
+	jr	 nz,loadudg6
 	ret
 
 

@@ -9,7 +9,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.1 2014-05-26 06:15:06 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2014-07-09 10:12:55 stefano Exp $
 ;
 
 
@@ -66,7 +66,7 @@
 			and	a
 			jr	z,r_zero
 
-			ld	de,80
+			ld	de,64
 .r_loop
 			add	hl,de
 			dec	a
@@ -79,7 +79,7 @@
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld	a,(hl)		; get current symbol from screen
-			sub 32
+			sub 192
 			ld	e,a		; ..and its copy
 			
 			pop	hl		;  restore x,y  (y=h, x=l)
@@ -107,15 +107,10 @@
 .iszero
 			
 			bit	0,h
-			jr	z,evenrow
+			jr	nz,evenrow
 			add	a,a		; move down the bit
 .evenrow
-			and  @11011111	; Character generator gap
-			jr  nz,nobug
-			or   @01000000  ;
-.nobug
-;			cpl
-;			and  @11011111	; Character generator bug
+
 			and	e
 			
 
