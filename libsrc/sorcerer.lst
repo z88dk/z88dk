@@ -16,7 +16,7 @@ graphics/sorcerer/xorpixl
 graphics/sorcerer/pointxy
 graphics/fill
 graphics/dfill2
-graphics/putsprite2
+graphics/putsprite3
 graphics/liner
 graphics/stencil_render
 graphics/sorcerer/swapgfxbk

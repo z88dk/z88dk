@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.2 2014-07-09 10:12:55 stefano Exp $
+;	$Id: xorpixl.asm,v 1.3 2014-07-09 16:09:47 stefano Exp $
 ;
 
 
@@ -100,7 +100,7 @@
 .iszero
 			
 			bit	0,h
-			jr	z,evenrow
+			jr	nz,evenrow
 			add	a,a		; move down the bit
 .evenrow
 			xor	e
