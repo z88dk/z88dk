@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.3 2014-07-09 16:09:47 stefano Exp $
+;	$Id: xorpixl.asm,v 1.4 2014-07-10 08:17:16 stefano Exp $
 ;
 
 
@@ -56,7 +56,7 @@
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld    hl,(base_graphics)
-			inc hl
+
 			ld	b,a		; keep y/3
 			and	a
 			jr	z,r_zero

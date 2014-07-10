@@ -9,7 +9,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.2 2014-07-09 10:12:55 stefano Exp $
+;	$Id: pointxy.asm,v 1.3 2014-07-10 08:17:16 stefano Exp $
 ;
 
 
@@ -61,7 +61,7 @@
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld    hl,(base_graphics)
-			inc hl
+
 			ld	b,a		; keep y/3
 			and	a
 			jr	z,r_zero
