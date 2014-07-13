@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.45 2014-06-29 22:25:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.46 2014-07-13 19:16:25 pauloscustodio Exp $
 #
 # Test options
 
@@ -370,6 +370,7 @@ for my $options ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
 #------------------------------------------------------------------------------
 # -m, --map, -nm, --no-map
 #------------------------------------------------------------------------------
+note "BUG_0036";
 $asm = "
 	define not_shown
 	defc zero=0
