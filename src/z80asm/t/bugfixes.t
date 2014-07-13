@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.36 2014-06-21 02:15:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.37 2014-07-13 22:47:11 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -533,6 +533,27 @@ z80asm(
 		loop:
 			ret					;; C9
 ASM
+);
+
+#------------------------------------------------------------------------------
+# BUG_0037 : Symbol already defined error when symbol used in IF expression
+note "BUG_0037";
+z80asm(
+	asm		=> <<'ASM',
+			IF !NEED_floatpack
+				DEFINE	NEED_floatpack
+			ENDIF
+			defb NEED_floatpack		;; 01
+ASM
+);
+z80asm(
+	asm		=> <<'ASM',
+			IF !NEED_floatpack
+				DEFINE	NEED_floatpack
+			ENDIF
+			defb NEED_floatpack		;; 01
+ASM
+	options	=> "-DNEED_floatpack -r0 -b"
 );
 
 #------------------------------------------------------------------------------
