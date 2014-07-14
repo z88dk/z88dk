@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.44 2014-07-06 22:48:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.45 2014-07-14 08:43:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -169,7 +169,7 @@ Symbol *get_used_symbol( char *name )
 *----------------------------------------------------------------------------*/
 Symbol *define_static_def_sym( char *name, long value )
 {
-    return _define_sym( name, value, TYPE_CONSTANT, SYM_DEFINE, 
+    return _define_sym( name, value, TYPE_CONSTANT, 0, 
 						NULL, get_first_section(NULL), 
 						& static_symtab );
 }
@@ -179,7 +179,7 @@ Symbol *define_static_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_global_def_sym( char *name, long value )
 {
-    return _define_sym( name, value, TYPE_CONSTANT, SYM_DEFINE, 
+    return _define_sym( name, value, TYPE_CONSTANT, 0, 
 						NULL, get_first_section(NULL), 
 						& global_symtab );
 }
@@ -189,7 +189,7 @@ Symbol *define_global_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_local_def_sym( char *name, long value )
 {
-    return _define_sym( name, value, TYPE_CONSTANT, SYM_DEFINE, 
+    return _define_sym( name, value, TYPE_CONSTANT, 0, 
 						CURRENTMODULE, CURRENTSECTION, 
 						& CURRENTMODULE->local_symtab );
 }

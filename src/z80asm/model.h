@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.24 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.25 2014-07-14 08:43:32 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,8 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.24 2014-07-06 22:4
 #define SYM_DEFINED		1       	/* 00000001 symbol is defined */
 #define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
 									   a symbol table search */
-#define SYM_DEFINE		4       	/* 00000100 DEFINE, -D
-									   not output in sym list */
 
 #define SYM_TYPE		120     	/* 01111000 */
 

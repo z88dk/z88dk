@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.117 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.118 2014-07-14 08:43:32 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.117 2014-07-06 22:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.117  2014-07-06 22:48:53  pauloscustodio
+* Revision 1.118  2014-07-14 08:43:32  pauloscustodio
+* Remove SYM_DEFINE, not used.
+*
+* Revision 1.117  2014/07/06 22:48:53  pauloscustodio
 * Separate symbol type from the bit mask stored in Symbol and Expr,
 * to be able to identify constant values, values that need to be
 * relocated and values that need to be computed at the end of the
@@ -2074,6 +2077,8 @@ xx.xx.2014 [2.5.0] (pauloscustodio)
 	  to be able to identify constant values, values that need to be 
 	  relocated and values that need to be computed at the end of the 
 	  link phase (for DEFC with expressions). 
+	  
+	- Remove SYM_DEFINE, not used.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -2098,7 +2103,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0c"
+#define VERSION     "2.5.0d"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

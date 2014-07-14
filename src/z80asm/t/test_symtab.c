@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.5 2014-07-06 22:48:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.6 2014-07-14 08:43:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,7 +50,6 @@ static void dump_Symbol ( Symbol *sym )
 		 sym->name, Symbol_fullname(sym), sym->value, sym->sym_type_mask );
 	if (sym->sym_type_mask & SYM_DEFINED)	warn("DEFINED ");
 	if (sym->sym_type_mask & SYM_TOUCHED)	warn("TOUCHED ");
-	if (sym->sym_type_mask & SYM_DEFINE)	warn("DEF ");
 
 	warn( sym->sym_type == TYPE_UNKNOWN		? "TYPE_UNKNOWN " :
 		  sym->sym_type == TYPE_CONSTANT	? "TYPE_CONSTANT " :
