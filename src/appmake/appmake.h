@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.39 2014-05-05 07:26:37 stefano Exp $
+ *   $Id: appmake.h,v 1.40 2014-07-15 08:30:03 stefano Exp $
  */
 
 
@@ -121,6 +121,9 @@ extern option_t  tixx_options;
 
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
+
+extern int       vg5k_exec(char *target);
+extern option_t  vg5k_options;
 
 extern int       vz_exec(char *target);
 extern option_t  vz_options;
@@ -291,6 +294,10 @@ struct {
       "Convert the Laser 200 .vz file to .cas, optionally to WAV",
       NULL,
       vz_exec,    &vz_options },
+    { "vg5k2k7",    "vg5k",     "(C) 2014 Stefano Bodrato",
+      "Convert to Philips VG-5000 .k7 format, optionally to WAV",
+      NULL,
+      vg5k_exec,    &vg5k_options },
     { "appz88",   "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       NULL,

@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.1 2014-07-07 08:25:21 stefano Exp $
+;       $Id: vg5k_crt0.asm,v 1.2 2014-07-15 08:30:03 stefano Exp $
 ;
 
 
@@ -56,11 +56,16 @@ start:
 		xor	a
 		ld	(18434), a ;default character will be normal and black
 
+		ex		de,hl ; preserve HL
+		
         ld      (start1+1),sp	;Save entry stack
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+		
+		push    de ; save HL
+		push    ix
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -82,7 +87,7 @@ ENDIF
 ENDIF
 
         call    _main
-
+		
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
@@ -95,6 +100,8 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
+		pop     ix		; We preserved HL and IX
+		pop     hl		; ..let's restore them !
 start1:
         ld      sp,0
         ret

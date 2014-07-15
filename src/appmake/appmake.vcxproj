@@ -113,6 +113,7 @@
     <ClCompile Include="svi.c" />
     <ClCompile Include="tixx.c" />
     <ClCompile Include="trs80.c" />
+    <ClCompile Include="vg5k.c" />
     <ClCompile Include="vz.c" />
     <ClCompile Include="x07.c" />
     <ClCompile Include="z88.c" />

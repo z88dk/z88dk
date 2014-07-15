@@ -107,6 +107,9 @@
     <ClCompile Include="sorcerer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="vg5k.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="vz.c">
       <Filter>Source Files</Filter>
     </ClCompile>
