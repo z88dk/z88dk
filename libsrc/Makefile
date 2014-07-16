@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.206 2014-07-07 08:25:21 stefano Exp $
+# $Id: Makefile,v 1.207 2014-07-16 09:59:56 stefano Exp $
 
 
 include Make.config
@@ -23,7 +23,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib\
-	trs80_clib.lib vg5k_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
+	trs80_clib.lib vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
@@ -1472,7 +1472,7 @@ x1ansi_clib.lib:
 	cd x1 ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
-# Philips VG5000 lib - Joaopa
+# Philips VG5000 lib - Joaopa, Stefano
 vg5k_clib.lib:
 	@echo ''
 	@echo '--- Building Philips VG5000 Library ---'
@@ -1483,8 +1483,24 @@ vg5k_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lvg5k ; cd ..
 	$(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
+
+# Philips VG5000 ansi lib - Joaopa, Stefano
+vg5kansi_clib.lib:
+	@echo ''
+	@echo '--- Building Philips VG5000 ANSI Library ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lvg5k ; cd ..
+	$(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5kansi_clib @$(LISTFILE_DIRECTORY)/vg5kansi.lst
 
 # S-OS (The Sentinel) - Stefano
 sos_clib.lib:

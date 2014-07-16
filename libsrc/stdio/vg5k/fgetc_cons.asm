@@ -6,9 +6,10 @@
 ;    Jun 2014 - Joaopa
 ;
 ;
-;    $Id: fgetc_cons.asm,v 1.1 2014-07-07 08:25:21 stefano Exp $
+;    $Id: fgetc_cons.asm,v 1.2 2014-07-16 09:59:57 stefano Exp $
 ;
     XLIB    fgetc_cons
+	ld	ix,$47FA
 .fgetc_cons
 ;	push	bc
 ;	push	de
@@ -16,8 +17,8 @@
 .wait_for_a_press
 	call	12983
 ;	ld	(hl), a
-	jr	c, wait_for_a_press
-	or	a
+	;jr	c, wait_for_a_press
+	and	a
 	jr	z, wait_for_a_press	
 
 ;	pop	af

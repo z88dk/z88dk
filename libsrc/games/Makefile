@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.26 2014-04-18 07:38:58 stefano Exp $
+# $Id: Makefile,v 1.27 2014-07-16 09:59:56 stefano Exp $
 
 include	../Make.config
 
@@ -46,7 +46,11 @@ ltrs80:
 	zcc +test $(CFLAGS) -DTRS80 bit_frequency.c
 	zcc +test $(CFLAGS) -DTRS80 bit_play.c
 
-# This piezo speaker has to be accessed	in its own way
+lvg5k:
+	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
+	zcc +test	$(CFLAGS) -DVZ bit_play.c
+
+	# This piezo speaker has to be accessed	in its own way
 lvz:
 	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +test	$(CFLAGS) -DVZ bit_play.c
@@ -74,6 +78,6 @@ lzx81:
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
 	$(RM) ace/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
-	$(RM) sam/*.o spectrum/*.o trs80/*.o vz/*.o z88/*.o
+	$(RM) sam/*.o spectrum/*.o trs80/*.o vg5k/*.o vz/*.o z88/*.o
 	$(RM) gal/*.o ticalc/*.o enterprise/*.o mtx/*.o
 	$(RM) osca/*.o zx81snd/*.o mc1000/*.o p2000/*.o

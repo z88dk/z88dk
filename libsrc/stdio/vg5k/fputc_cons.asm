@@ -3,28 +3,134 @@
 ;
 ;    Print character to the screen
 ;
-;    Jun. 2014 -Joaopa
+;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.1 2014-07-07 08:25:21 stefano Exp $
+;    $Id: fputc_cons.asm,v 1.2 2014-07-16 09:59:57 stefano Exp $
 ;
 
     XLIB  fputc_cons
 ;
 ; Entry:        char to print
 ;
-.fputc_cons
-	push	bc
-	push	af
-	push	de
-	ld	hl, 2
-	add	hl, sp
-	ld	d, (hl); Now D contains the char
-	ld	a, (18434)
-	ld	e, a
-	call	149
 
-	pop	de
-	pop	af
-	pop	bc
+	DEFC	ROWS=25
+	DEFC	COLUMNS=40
+
+
+	.ROW	defb	0
+.COLUMN	defb	0
+
+
+.fputc_cons
+
+	ld	ix,$47FA
+	ld	hl,2
+	add	hl,sp
+	ld	a,(hl)
+	ld	(charput+1),a
+
+	cp	12		; CLS
+	jr	nz,nocls
+	
+	ld  hl,0
+	ld  (ROW),hl
+	push hl
+	ld	a,32
+	ld	(charput+1),a
+	ld  bc,ROWS*COLUMNS
+.clsloop
+	push bc
+	call	charput
+	pop bc
+	dec bc
+	ld	a,b
+	or  c
+	jr nz,clsloop
+	pop hl
+	ld  (ROW),hl
+.nocls
+
+
+
+.doput
+	cp  13		; CR?
+	jr  z,isLF
+	cp  10      ; LF?
+	jr  nz,NoLF
+.isLF
+	xor a
+	ld (COLUMN),a   ; automatic CR
+	ld a,(ROW)
+	inc a
+	ld (ROW),a
+	cp ROWS		; Out of screen?
+	ret nz		; no, return
+	ld a,ROWS-1
+	ld (ROW),a
+	jp  scrolluptxt
+
+.NoLF
+
+	cp  8   ; BackSpace
+	jr	nz,NoBS
+
+	ld	hl,COLUMN
+	cp	(hl)
+	jr	z,firstc ; are we in the first column?
+	dec	(hl)
+	push hl
+	ld	a,32
+	call charput+2
+	pop hl
+	dec	(hl)
+	ret
+
+.firstc
+	ld	 a,(ROW)
+	and	 a
+	ret	 z
+	dec	 a
+	ld	 (ROW),a
+	ld	 a,COLUMNS-1
+	ld   (COLUMN),a
+ 	ret
+
+.NoBS
+
+
+.charput
+	ld	 a,0
+	
+	
+	push af
+	ld	 a,(COLUMN)
+	cp	 COLUMNS    ; top-right column ?   In this way we wait..
+	call z,isLF     ; .. to have a char to print before issuing a CR
+	pop  af
+
+	ld	 d,a
+	
+	ld	e,7		; white on black
+	
+	ld	 a,(ROW)
+	and  a
+	jr   z,zrow
+	add  7
+.zrow
+	ld   h,a
+	ld	 a,(COLUMN)
+	ld   l,a
+
+	call   $92
+
+	ld	 a,(COLUMN)
+	inc	 a
+	ld	 (COLUMN),a
+	cp	 COLUMNS		; last column ?
+	ret	 nz		; no, return
+ 	jp	 isLF
+
+
+scrolluptxt:
 	ret

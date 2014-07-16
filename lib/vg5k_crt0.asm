@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.2 2014-07-15 08:30:03 stefano Exp $
+;       $Id: vg5k_crt0.asm,v 1.3 2014-07-16 09:59:56 stefano Exp $
 ;
 
 
@@ -65,7 +65,7 @@ start:
         ld      (exitsp),sp
 		
 		push    de ; save HL
-		push    ix
+		;push    ix
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -85,9 +85,9 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-
+		di
         call    _main
-		
+		ei
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
@@ -100,8 +100,9 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-		pop     ix		; We preserved HL and IX
+		;pop     ix		; We preserved HL and IX
 		pop     hl		; ..let's restore them !
+		ld		ix,$47FA
 start1:
         ld      sp,0
         ret
@@ -147,7 +148,7 @@ ENDIF
 ; Now some variables
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    $47d0   ; Address of the Graphics map
+base_graphics:  defw    $4000   ; Address of the Graphics map
 
 _std_seed:       defw    0       ; Seed for integer rand() routines
 

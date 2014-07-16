@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.43 2014-04-15 22:25:13 dom Exp $
+# $Id: Makefile,v 1.44 2014-07-16 09:59:57 stefano Exp $
 #
 
 include ../Make.config
@@ -137,6 +137,7 @@ clean:
 	$(RM) ansi/spectrum/*.o
 	$(RM) ansi/ts2068/*.o
 	$(RM) ansi/sprinter/*.o
+	$(RM) ansi/vg5k/*.o
 	$(RM) ansi/vz200/*.o
 	$(RM) ansi/x1/*.o
 	$(RM) ansi/z88/*.o
@@ -174,6 +175,7 @@ clean:
 	$(RM) svi/*.o
 	$(RM) sc3000/*.o
 	$(RM) vz200/*.o
+	$(RM) vg5k/*.o
 	$(RM) x07/*.o
 	$(RM) x1/*.o
 	$(RM) z88/*.o
