@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.12 2014-07-06 03:06:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.13 2014-07-17 11:48:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -14,6 +14,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.12 201
 #include "dlist.h"
 #include "init.h"
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -48,7 +49,8 @@ static DList_def( mem_blocks );
 #define CLIENT_SIZE(block)  ((block)->client_size)
 
 /* convert client block and size to MemBlock and total size */
-#define BLOCK_PTR(ptr)      ((MemBlock *) (((char*) (ptr)) - sizeof(MemBlock)))
+#define BLOCK_PTR(ptr)      ((MemBlock *) (((char*) (ptr)) \
+							 - offsetof(struct MemBlock, fence) - FENCE_SIZE))
 #define BLOCK_SIZE(size)    ((size) + sizeof(MemBlock) + FENCE_SIZE)
 
 /* address of both fences */
