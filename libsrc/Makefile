@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.207 2014-07-16 09:59:56 stefano Exp $
+# $Id: Makefile,v 1.208 2014-07-17 09:37:52 stefano Exp $
 
 
 include Make.config
@@ -934,7 +934,7 @@ abc800_clib.lib:
 # Jupiter ACE library - Stefano
 ace_clib.lib:
 	@echo ''
-	@echo '--- Building Jupiter Ace	Library ---'
+	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..

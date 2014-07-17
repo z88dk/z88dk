@@ -5,9 +5,11 @@ time/ace/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/ace/clsgraph
 graphics/clrarea
+graphics/ace/clsgraph
 graphics/lftscrol
+graphics/text6/div3
+graphics/text6/loadudg6
 graphics/ace/plotpixl
 graphics/ace/respixl
 graphics/ace/xorpixl

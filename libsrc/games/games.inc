@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.25 2014-07-16 09:59:56 stefano Exp $
+;       $Id: games.inc,v 1.26 2014-07-17 09:37:53 stefano Exp $
 ;
 
 IF FORc128

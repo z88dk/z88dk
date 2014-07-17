@@ -1,89 +1,121 @@
+;
+;       Jupiter ACE pseudo graphics routines
+;	Version for the 2x3 graphics symbols (UDG redefined)
+;
+;
+;       Written by Stefano Bodrato 2014
+;
+;
+;       Get pixel at (x,y) coordinate.
+;
+;
+;	$Id: pointxy.asm,v 1.3 2014-07-17 09:37:53 stefano Exp $
+;
 
-	XLIB	pointxy
-	XREF	coords
 
+			INCLUDE	"graphics/grafix.inc"
 
-;
-;	$Id: pointxy.asm,v 1.2 2014-05-22 14:55:51 stefano Exp $
-;
+			XLIB	pointxy
 
-; ******************************************************************
-;
-; Check if pixel at	(x,y) coordinate is	set or not.
-;
-; Jupiter ACE version.  
-; 64x48 dots.
-;
-;
-.pointxy			
-				ld	a,h
-				cp	64
-				ret	nc
-				ld	a,l
-				;cp	maxy
-				cp	48
-				ret	nc		; y0	out of range
-				
-				ld	(coords),hl
-				
+			LIB	div3
+			XREF	coords
+			XREF	base_graphics
+
+.pointxy
+			ld	a,h
+			cp	maxx
+			ret	nc
+			ld	a,l
+			cp	maxy
+			ret	nc		; y0	out of range
+
+			dec	a
+			dec	a
+			
 			push	bc
 			push	de
 			push	hl			
+			
+			ld	(coords),hl
+			
+			;push	bc
 
-				ld	c,l
-				ld	b,h
+			ld	c,a	; y
+			ld	b,h	; x
+			
+			push	bc
+			
+			ld	hl,div3
+			ld	d,0
+			ld	e,c
+			inc	e
+			add	hl,de
+			ld	a,(hl)
+			ld	c,a	; y/3
+			
+			srl	b	; x/2
+			
+			ld	a,c
+			ld	c,b	; !!
 
-				;push	bc
-				
-				srl	b
-				srl	c
-				ld	hl,$2400
-;				inc	hl
-				ld	a,c
-				ld	c,b	; !!
-				and	a
-				jr	z,r_zero
-				ld	b,a
-				ld	de,32
+;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+			ld    hl,(base_graphics)
+
+			ld	b,a		; keep y/3
+			and	a
+			jr	z,r_zero
+
+			ld	de,32
 .r_loop
-				add	hl,de
-				djnz	r_loop
-.r_zero						; hl = char address
-				ld	e,c
-				add	hl,de
-				
-				ld	a,(hl)		; get current symbol
+			add	hl,de
+			dec	a
+			jr	nz,r_loop
+		
+.r_zero     ld	d,0
+			ld	e,c
+			add	hl,de
 
-				cp	8
-				jr	c,islow		; recode graph symbol to binary -> 0..F
-				cp	128
-				jr	c,ischar
-				ld	a,143
-				;ld	a,128+10
-				sub	(hl)
-				;xor	a;;;;
-				jr	islow
-.ischar
-				xor	a		; .. force to blank sym
-.islow
-				ex	(sp),hl		; save char address <=> restore x,y
+;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-				ld	b,a
-				ld	a,1		; the bit we want to draw
-				
-				bit	0,h
-				jr	nz,iseven
-				add	a,a		; move right the bit
+			ld	a,(hl)		; get current symbol from screen
+			sub 128
+			ld	e,a		; ..and its copy
+			
+			pop	hl		;  restore x,y  (y=h, x=l)
+			
 
-.iseven
-				bit	0,l
-				jr	z,evenrow
-				add	a,a
-				add	a,a		; move down the bit
+
+			ld	a,l
+			inc	a
+			inc	a
+			sub	b
+			sub	b
+			sub	b		; we get the remainder of y/3
+			
+			ld	l,a
+			ld	a,1		; the pixel we want to draw
+			
+			jr	z,iszero
+			bit	0,l
+			jr	nz,is1
+			add	a,a
+			add	a,a
+.is1
+			add	a,a
+			add	a,a
+.iszero
+			
+			bit	0,h
+			jr	nz,evenrow
+			add	a,a		; move down the bit
 .evenrow
-				and	b
-				
+
+			and	e
+			
+
 			pop	hl
 			pop	de
 			pop	bc
-				ret
+			
+			ret

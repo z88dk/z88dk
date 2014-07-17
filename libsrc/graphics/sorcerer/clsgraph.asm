@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.1 2014-05-26 06:15:06 stefano Exp $
+;       $Id: clsgraph.asm,v 1.2 2014-07-17 09:37:53 stefano Exp $
 ;
 
 
@@ -27,7 +27,7 @@
 	call loadudg6
 
 	ld	hl,(base_graphics)
-	ld	bc,maxx*maxy/6-1
+	ld	bc,maxx*maxy/6
 .clean
 	ld	(hl),blankch
 	inc	hl

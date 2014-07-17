@@ -1,34 +1,37 @@
+;
+;       Jupiter ACE pseudo graphics routines
+;
+;       cls ()  -- clear screen
+;
+;       Stefano Bodrato - 2014
+;
+;
+;       $Id: clsgraph.asm,v 1.2 2014-07-17 09:37:53 stefano Exp $
+;
 
-	XLIB	cleargraphics
 
-	XREF	base_graphics
+			XLIB    cleargraphics
+			LIB     loadudg6
+			XREF	base_graphics
 
-;
-;	$Id: clsgraph.asm,v 1.1 2001-05-07 16:02:04 stefano Exp $
-;
+			INCLUDE	"graphics/grafix.inc"
 
-; ******************************************************************
-;
-; Clear graphics area
-;
-; Jupiter ACE version.  
-; Emulated 96x64 resolution (TI82/TI83) with 64x48 dots.
-;
-; (x=x*2/3;  y=y*3/4)
-;
-;
+
 .cleargraphics
-			push	bc
-			push	de
-			push	hl
-			ld	hl,$2400
-			ld	(hl),32 ;' '
-			ld	d,h
-			ld	e,l
-			inc	de
-			ld	bc,32*24
-			ldir
-			pop	hl
-			pop	de
-			pop	bc
-			ret
+	
+	ld   c,0	; first UDG chr$ to load
+	ld	 b,64	; number of characters to load
+	ld   hl,$2c00	; UDG area
+	call loadudg6
+
+	ld	hl,(base_graphics)
+	ld	bc,maxx*maxy/6
+.clean
+	ld	(hl),blankch
+	inc	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,clean
+
+	ret
