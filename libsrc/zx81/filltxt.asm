@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: filltxt.asm,v 1.5 2012-12-31 10:38:24 stefano Exp $
+;	$Id: filltxt.asm,v 1.6 2014-07-18 06:18:09 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,10 +13,6 @@
 
 	XLIB   filltxt
 	LIB    zx_topleft
-
-IF FORzx81
-	XREF   base_graphics
-ENDIF
 
 filltxt:
 	; __FASTCALL__ mode

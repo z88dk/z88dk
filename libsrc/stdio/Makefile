@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.44 2014-07-16 09:59:57 stefano Exp $
+# $Id: Makefile,v 1.45 2014-07-18 06:18:09 stefano Exp $
 #
 
 include ../Make.config
@@ -131,6 +131,7 @@ clean:
 	$(RM) ansi/nascom/*.o
 	$(RM) ansi/oz/*.o
 	$(RM) ansi/osca/*.o
+	$(RM) ansi/p2000/*.o
 	$(RM) ansi/pc6001/*.o
 	$(RM) ansi/sam/*.o
 	$(RM) ansi/sharp-mz/*.o
@@ -161,6 +162,7 @@ clean:
 	$(RM) newbrain/*.o
 	$(RM) osca/*.o
 	$(RM) oz/*.o
+	$(RM) p2000/*.o
 	$(RM) pc6001/*.o
 	$(RM) sam/*.o
 	$(RM) sms/*.o

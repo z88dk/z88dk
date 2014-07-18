@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.208 2014-07-17 09:37:52 stefano Exp $
+# $Id: Makefile,v 1.209 2014-07-18 06:18:08 stefano Exp $
 
 
 include Make.config
@@ -45,7 +45,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 
 zxlibs: ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib zxfcntl zx232
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
@@ -107,6 +107,7 @@ zx81deps:
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/zx81/*.o
 	$(RM) -f graphics/zx81/hr/*.o
+	$(RM) -f graphics/zx81/udg/*.o
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f zx81/*.o
 	$(RM) -f zx81/tape/*.o
@@ -623,6 +624,15 @@ gfx81.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(LISTFILE_DIRECTORY)/gfx81.lst
+	$(MAKE) zx81deps
+
+# ZX81 UDG based graphics lib - Stefano
+gfx81udg.lib:
+	@echo ''
+	@echo '--- Building ZX81 UDG based Graphics Library ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81udg -x$(OUTPUT_DIRECTORY)/gfx81udg @$(LISTFILE_DIRECTORY)/gfx81udg.lst
 	$(MAKE) zx81deps
 
 # ZX81 HR graphics lib - Stefano

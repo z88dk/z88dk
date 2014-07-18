@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.34 2014-05-26 06:15:06 stefano Exp $
+# $Id: Makefile,v 1.35 2014-07-18 06:18:08 stefano Exp $
 
 
 lx11:
@@ -56,4 +56,5 @@ clean:
 	$(RM) time/zx81/*.o
 	$(RM) zx81/*.o
 	$(RM) zx81/hr/*.o
+	$(RM) zx81/udg/*.o
 	cd x11 ; $(MAKE) clean ; cd ..

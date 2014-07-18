@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.28 2014-07-17 09:37:53 stefano Exp $
+# $Id: Makefile,v 1.29 2014-07-18 06:18:08 stefano Exp $
 
 include	../Make.config
 
@@ -80,4 +80,4 @@ clean:
 	$(RM) ace/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
 	$(RM) sam/*.o spectrum/*.o trs80/*.o vg5k/*.o vz/*.o z88/*.o
 	$(RM) gal/*.o ticalc/*.o enterprise/*.o mtx/*.o
-	$(RM) osca/*.o zx81snd/*.o mc1000/*.o p2000/*.o
+	$(RM) osca/*.o zx81snd/*.o mc1000/*.o pc6001/*.o p2000/*.o

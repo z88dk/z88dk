@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.23 2014-06-06 05:39:48 stefano Exp $
+# $Id: Makefile,v 1.24 2014-07-18 06:18:09 stefano Exp $
 
 include ../Make.config
 
@@ -19,7 +19,8 @@ lenterprise: enterprise_time
 
 lx1: time x1_time
 
-time: gmtime.o localtime.o mktime.o
+time:
+	gmtime.o localtime.o mktime.o
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c
@@ -31,6 +32,8 @@ z88_time:
 	cd z88 ; $(MAKE) ; cd ..
 
 spectrum_time:
+	$(RM) time.o
+	zcc +test -D__SPECTRUM__ $(CFLAGS) time.c
 	cd spectrum ; $(MAKE) ; cd ..
 
 newbrain_time:
@@ -53,6 +56,7 @@ clean:
 	$(RM) enterprise/*.o*
 	$(RM) newbrain/*.o*
 	$(RM) osca/*.o*
+	$(RM) p2000/*.o*
 	$(RM) rcmx000/*.o*
 	$(RM) mc1000/*.o*
 	cd x1 ; $(MAKE) clean ; cd ..
