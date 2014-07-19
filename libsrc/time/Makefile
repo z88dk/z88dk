@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.24 2014-07-18 06:18:09 stefano Exp $
+# $Id: Makefile,v 1.25 2014-07-19 11:32:21 pauloscustodio Exp $
 
 include ../Make.config
 
@@ -19,8 +19,7 @@ lenterprise: enterprise_time
 
 lx1: time x1_time
 
-time:
-	gmtime.o localtime.o mktime.o
+time: gmtime.o localtime.o mktime.o
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c
