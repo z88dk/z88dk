@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.209 2014-07-18 06:18:08 stefano Exp $
+# $Id: Makefile,v 1.210 2014-07-21 12:39:53 stefano Exp $
 
 
 include Make.config
@@ -1391,6 +1391,22 @@ gal_clib.lib:
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) lgal ; cd ..
 	$(LIBLINKER) -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+
+# Camputers Lynx - Stefano Bodrato
+lynx_clib.lib:
+	@echo ''
+	@echo '--- Building Camputers Lynx Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lgal ; cd ..
+	$(LIBLINKER) -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:

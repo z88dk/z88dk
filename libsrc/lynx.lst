@@ -1,0 +1,5 @@
+stdio/lynx/fgetc_cons
+stdio/lynx/fputc_cons
+stdio/lynx/getk
+stdio/puts_cons
+@z80.lst
