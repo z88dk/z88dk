@@ -94,6 +94,7 @@
     <ClCompile Include="galaksija.c" />
     <ClCompile Include="hex.c" />
     <ClCompile Include="inject.c" />
+    <ClCompile Include="lynx.c" />
     <ClCompile Include="m5.c" />
     <ClCompile Include="mc.c" />
     <ClCompile Include="msx.c" />

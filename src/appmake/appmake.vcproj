@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lynx.c"
+				>
+			</File>
+			<File
 				RelativePath=".\msx.c"
 				>
 			</File>

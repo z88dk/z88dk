@@ -44,6 +44,9 @@
     <ClCompile Include="hex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lynx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="msx.c">
       <Filter>Source Files</Filter>
     </ClCompile>

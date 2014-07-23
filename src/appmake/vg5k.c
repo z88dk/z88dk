@@ -1,9 +1,9 @@
 
 /*
  *      Philips VG-5000 application packager
- * 		(c) 1024 Stefano Bodrato, part of the z88dk kit
+ * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: vg5k.c,v 1.1 2014-07-15 08:30:04 stefano Exp $
+ *      $Id: vg5k.c,v 1.2 2014-07-23 06:31:57 stefano Exp $
  */
 
 
