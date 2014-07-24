@@ -5,7 +5,7 @@
  *
  *	By Stefano Bodrato
  *
- *	$Id: svi.c,v 1.3 2014-07-23 15:31:37 stefano Exp $
+ *	$Id: svi.c,v 1.4 2014-07-24 16:35:18 stefano Exp $
  */
 
 #include "appmake.h"
@@ -50,7 +50,7 @@ void sv_bit (FILE *fpout, unsigned char bit, char tweak)
 	int i, j, period0, period1, period1lo;
 
 	if ( fast ) {
-		period1 = 16;
+		period1 = 14;
 		period0 = 9;
 	} else {
 		period1 = 18;
@@ -65,9 +65,15 @@ void sv_bit (FILE *fpout, unsigned char bit, char tweak)
 		l_lvl=sv_h_lvl;
 	}
 	
-	period1lo = period1 + 1;
+	if ( fast )
+		period1lo = period1 + 3;
+	else
+		period1lo = period1 + 1;
 	
-	if ( tweak ) period1 += 3;
+	if ( tweak )
+		period1 += 3;
+	
+	
 	
 
 	if (bit) {
