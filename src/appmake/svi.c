@@ -5,7 +5,7 @@
  *
  *	By Stefano Bodrato
  *
- *	$Id: svi.c,v 1.4 2014-07-24 16:35:18 stefano Exp $
+ *	$Id: svi.c,v 1.5 2014-07-24 19:34:44 stefano Exp $
  */
 
 #include "appmake.h"
@@ -20,11 +20,8 @@ static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
 
-static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              sv_h_lvl;
-static char              sv_l_lvl;
+static unsigned char              h_lvl;
+static unsigned char              l_lvl;
 
 
 
@@ -45,7 +42,7 @@ option_t svi_options[] = {
 
 /* two fast cycles for '0', two slow cycles for '1' */
 
-void sv_bit (FILE *fpout, unsigned char bit, char tweak)
+void sv_bit (FILE *fpout, int bit, char tweak)
 {
 	int i, j, period0, period1, period1lo;
 
@@ -57,13 +54,6 @@ void sv_bit (FILE *fpout, unsigned char bit, char tweak)
 		period0 = 9;
 	}
 	
-	if (bit_state) {
-		h_lvl=sv_h_lvl;
-		l_lvl=sv_l_lvl;
-	} else {
-		h_lvl=sv_l_lvl;
-		l_lvl=sv_h_lvl;
-	}
 	
 	if ( fast )
 		period1lo = period1 + 3;
@@ -112,7 +102,8 @@ void sv_tone (FILE *fpout)
 	int i;
 
 	for (i=0; (i < 1600); i++)
-		sv_bit(fpout,0,(i % 4));
+           /* workaround (64 bit gcc bug ?) */
+		sv_bit(fpout,0,(i & 4)?1:0);
 		sv_bit(fpout,1,1);
 }
 
@@ -149,11 +140,11 @@ int svi_exec(char *target)
     }
 
 	if (loud) {
-		sv_h_lvl = 0xFF;
-		sv_l_lvl = 0;
+		h_lvl = 0xFF;
+		l_lvl = 0;
 	} else {
-		sv_h_lvl = 0xe0;
-		sv_l_lvl = 0x20;
+		h_lvl = 0xe0;
+		l_lvl = 0x20;
 	}
 
 	
@@ -297,7 +288,7 @@ int svi_exec(char *target)
 
 		/* leading silence and tone*/
 		for (i=0; i < 0x8000; i++)
-			fputc(sv_h_lvl, fpout);
+			fputc(h_lvl, fpout);
 		sv_tone(fpout);
 
 		/* Write $7f */
@@ -330,6 +321,7 @@ int svi_exec(char *target)
     return 0;
 	
 }
+
 
 
 
