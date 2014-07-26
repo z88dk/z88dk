@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.40 2014-07-15 08:30:03 stefano Exp $
+ *   $Id: appmake.h,v 1.41 2014-07-26 10:03:52 stefano Exp $
  */
 
 
@@ -32,7 +32,9 @@ typedef struct {
 } option_t;
 
 #ifdef _WIN32
+#ifndef strncasecmp
 #define strncasecmp(a,b,c) strnicmp(a,b,c)
+#endif
 #endif
 
 
