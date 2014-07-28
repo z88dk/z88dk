@@ -1,11 +1,15 @@
 /*
  *        MSX BIN file
  *
+ *        Disk load command:
  *        BLOAD "PROG.BIN",R
+ *
+ *        tape load command:
+ *        BLOAD "CAS:",R
  *
  *        By Stefano Bodrato
  *
- *        $Id: msx.c,v 1.3 2014-07-25 14:19:12 stefano Exp $
+ *        $Id: msx.c,v 1.4 2014-07-28 06:34:49 stefano Exp $
  */
 
 
@@ -109,18 +113,6 @@ void msx_rawout (FILE *fpout, unsigned char b)
 }
 
 
-void msx_tone (FILE *fpout)
-{
-	int i;
-
-	for (i=0; (i < 3000); i++) {
-		msx_bit(fpout,1);
-	}
-		
-}
-
-
-
 int msx_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
@@ -214,8 +206,8 @@ int msx_exec(char *target)
 				fputc(blockid[i], fpout);
 
 		}
-
-		fputc(254,fpout);
+		else
+			fputc(254,fpout);
 
 		writeword(40000,fpout);        /* Start Address */
 		writeword(40000+len+1,fpout); /* End Address */
@@ -227,6 +219,11 @@ int msx_exec(char *target)
 		for (i=0; i<len;i++) {
 			c=getc(fpin);
 			writebyte(c,fpout);
+		}
+
+
+		if ( fmsx ) {
+			writeword(0,fpout);
 		}
 
 		fclose(fpin);
@@ -261,7 +258,8 @@ int msx_exec(char *target)
 		/* leading silence and tone*/
 		for (i=0; i < 0x3000; i++)
 			fputc(0x80, fpout);
-		msx_tone(fpout);
+		for (i=0; (i < 8000); i++)
+			msx_bit(fpout,1);
 
 		/* Skip the block id bytes  */
 		if ( fmsx ) {
@@ -284,7 +282,8 @@ int msx_exec(char *target)
 		/* leading silence and tone*/
 		for (i=0; i < 0x8000; i++)
 			fputc(0, fpout);
-		msx_tone(fpout);
+		for (i=0; (i < 2000); i++)
+			msx_bit(fpout,1);
 
 		/* Skip the block id bytes  */
 		if ( fmsx ) {
