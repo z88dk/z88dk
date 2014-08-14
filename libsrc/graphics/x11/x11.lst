@@ -15,7 +15,7 @@ XCloseDisplay
 XCreateBitmapFromData
 XCreateGC
 XCreateSimpleWindow
-XestroyWindow
+XDestroyWindow
 XDisplayName
 XDrawLine
 XDrawPoint
