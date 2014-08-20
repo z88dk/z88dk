@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.41 2014-07-26 10:03:52 stefano Exp $
+ *   $Id: appmake.h,v 1.42 2014-08-20 11:13:45 stefano Exp $
  */
 
 
@@ -32,9 +32,7 @@ typedef struct {
 } option_t;
 
 #ifdef _WIN32
-#ifndef strncasecmp
 #define strncasecmp(a,b,c) strnicmp(a,b,c)
-#endif
 #endif
 
 
@@ -66,6 +64,9 @@ extern option_t  hex_options;
 extern int       inject_exec(char *target);
 extern option_t  inject_options;
 extern char      inject_longhelp[];
+
+extern int       lynx_exec(char *target);
+extern option_t  lynx_options;
 
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
@@ -176,8 +177,8 @@ struct {
       "Adds a c128 style disk file header",
       NULL,
       c128_exec,   &c128_options },
-    { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
-      "Creates an AMSDOS file suitable for writing to a .DSK image",
+    { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris, (C) 1997 Pierre Thevenet",
+      "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
@@ -196,6 +197,10 @@ struct {
       "Injects files within other files",
       inject_longhelp,
       inject_exec,     &inject_options },
+    { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
+      "Generates a tape file for the Camputers Lynx, opt. WAV",
+      NULL,
+      lynx_exec,     &lynx_options },
     { "bin2m5",   "m5",      "(C) 2010 Stefano Bodrato",
       "Generates a tape file for the Sord M5, optional WAV file",
       NULL,
