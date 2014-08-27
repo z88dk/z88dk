@@ -19,6 +19,7 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static char             *blockname    = NULL;
 static char              cassette     = 0;
 static char              audio        = 0;
 static char              fast         = 0;
@@ -49,6 +50,7 @@ option_t cpc_options[] = {
     {  0,  "noext",    "Remove the file extension",  OPT_BOOL,  &noext },
     {  0 , "exec",     "Location to start execution",OPT_INT,   &exec },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -342,17 +344,24 @@ int cpc_exec(char *target)
 		memset(header,0,128);
 
 		header[0x01] = 'A';
-		header[0x02] = 'P';
-		header[0x03] = 'P';
+		header[0x02] = ' ';
+		header[0x03] = ' ';
 		header[0x04] = ' ';
 		header[0x05] = ' ';
 		header[0x06] = ' ';
 		header[0x07] = ' ';
 		header[0x08] = ' ';
+
+		if ( blockname == NULL )
+			blockname = binname;
+
+		/* Deal with the block name */
+		for (i=0;(i<=8)&&(isalnum(blockname[i]));i++)
+			header[i+1]=toupper(blockname[i]);
+
 		header[0x09] = 'C';
 		header[0x0A] = 'O';
 		header[0x0B] = 'M';
-
 
 		header[0x12] = 2;           /* File type, 2 is binary apparently */
 		header[0x15] = pos % 256;
@@ -489,7 +498,7 @@ int cpc_exec(char *target)
 				}
 				for (i=0; i<4; i++) putbyte(f,255,&filesize); /* trailer */
 				if (currentblock!=blocks)
-						putsilence(f,2*rate,&filesize);
+						putsilence(f,3*rate/2,&filesize);
 		}
 		
 		if (dumb) printf("Output file size:%ld\n",filesize);
