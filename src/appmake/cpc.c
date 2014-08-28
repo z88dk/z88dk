@@ -498,7 +498,7 @@ int cpc_exec(char *target)
 				}
 				for (i=0; i<4; i++) putbyte(f,255,&filesize); /* trailer */
 				if (currentblock!=blocks)
-						putsilence(f,3*rate/2,&filesize);
+						putsilence(f,rate*2,&filesize);
 		}
 		
 		if (dumb) printf("Output file size:%ld\n",filesize);
