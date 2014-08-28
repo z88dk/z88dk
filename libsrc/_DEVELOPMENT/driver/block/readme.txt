@@ -17,18 +17,3 @@ The intention is that all block devices share the same implementation
 code (this set of base classes) and the code specializing for a
 specific device is small and only needs to implement a few simple
 requests.
-
-The block device drivers are divided into different levels.
-Each level offers different feature/size compromises.  All levels
-are available to each target machine and the intention is the user
-can choose what feature set he needs for his program by selecting
-the appropriate level at compile time.
-
-
-* Level 0
-
-
-
-* Level 1
-
-
