@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.45 2014-07-14 08:43:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.46 2014-09-01 23:37:32 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -382,7 +382,7 @@ void update_symbol( char *name, long value )
 *----------------------------------------------------------------------------*/
 void declare_public_symbol( char *name )
 {
-    Symbol     *sym, *cloned_sym;
+    Symbol     *sym, *global_sym;
 
     sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
 
@@ -428,21 +428,20 @@ void declare_public_symbol( char *name )
     else
     {
         /* local */
-        cloned_sym = find_symbol( name, global_symtab );
+        global_sym = find_symbol( name, global_symtab );
 
-        if ( cloned_sym == NULL )
+        if ( global_sym == NULL )
         {
             /* local, not global */
             /* If no global symbol of identical name has been created, 
 			   then re-declare local symbol as global symbol */
             sym->sym_type_mask &= ~ SYM_LOCAL;
-            sym->sym_type_mask |= SYM_PUBLIC;
-            cloned_sym = Symbol_create( sym->name, sym->value, sym->sym_type, sym->sym_type_mask, 
-										sym->module, sym->section );
-            SymbolHash_set( &global_symtab, name, cloned_sym );
+            sym->sym_type_mask |=   SYM_PUBLIC;
 
-            /* original local symbol cloned as global symbol, now delete old local ... */
-            SymbolHash_remove( CURRENTMODULE->local_symtab, name );
+			global_sym = SymbolHash_extract( CURRENTMODULE->local_symtab, name );
+			assert(global_sym == sym);
+
+			SymbolHash_set( &global_symtab, name, sym );
         }
         else
         {
@@ -499,13 +498,12 @@ void declare_extern_symbol( char *name )
             if ( ( sym->sym_type_mask & SYM_DEFINED ) == 0 )
             {
                 sym->sym_type_mask &= ~ SYM_LOCAL;
-                sym->sym_type_mask |= SYM_EXTERN;
-				ext_sym = Symbol_create( name, 0, sym->sym_type, sym->sym_type_mask, 
-										 sym->module, sym->section );
-                SymbolHash_set( &global_symtab, name, ext_sym );
+                sym->sym_type_mask |=   SYM_EXTERN;
+				
+				ext_sym = SymbolHash_extract( CURRENTMODULE->local_symtab, name );
+				assert(ext_sym == sym);
 
-                /* original local symbol cloned as external symbol, now delete old local ... */
-                SymbolHash_remove( CURRENTMODULE->local_symtab, name );
+                SymbolHash_set( &global_symtab, name, sym );
             }
             else
             {

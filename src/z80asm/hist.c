@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.118 2014-07-14 08:43:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.119 2014-09-01 23:37:32 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.118 2014-07-14 08:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.118  2014-07-14 08:43:32  pauloscustodio
+* Revision 1.119  2014-09-01 23:37:32  pauloscustodio
+* One step towards DEFC with expressions:
+* symbols cannot be deleted and re-created when moving from local to global
+* table, to keep references in expressions pointing to allocated memory.
+*
+* Revision 1.118  2014/07/14 08:43:32  pauloscustodio
 * Remove SYM_DEFINE, not used.
 *
 * Revision 1.117  2014/07/06 22:48:53  pauloscustodio
@@ -2067,8 +2072,8 @@ xx.xx.2014 [2.5.0] (pauloscustodio)
 	  1) symbols need to be linked into expressions so that the symbol value 
 	     is used during expression eval. Today the symbol value is frozen
 		 during expression parse.
-	  2) symbols need to have a new category: computed, actual value not
-	     yet known.
+	  2) symbols cannot be deleted and re-created when moving from local to global
+	     table, to keep references in expressions pointing to allocated memory.
 	
 	- Separate expression type from expression range - new range_t enum 
 	  type for ranges and new range attribute in Expr.
@@ -2103,7 +2108,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0d"
+#define VERSION     "2.5.0e"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
