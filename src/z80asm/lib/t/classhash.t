@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.8 2014-07-06 03:06:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classhash.t,v 1.9 2014-09-01 21:51:55 pauloscustodio Exp $
 #
 # Test classhash.c
 
@@ -88,7 +88,7 @@ char *S(char *str)
 
 int main()
 {
-	Obj *obj;
+	Obj *obj, *obj2;
 	ObjHash *hash, *hash2;
 	ObjHashElem *iter, *elem;
 	
@@ -356,6 +356,56 @@ int main()
 	T_NEXT(hash, "DEF", "456");
 	T_NEXT(hash, "ABC", "321");
 	T_END(hash);
+	
+	/* extract element from one hash to the other */
+	OBJ_DELETE(hash);
+	hash = OBJ_NEW(ObjHash);
+	
+	OBJ_DELETE(hash2);
+	hash2 = OBJ_NEW(ObjHash);
+	
+	ObjHash_set(&hash, S("abc"), new_obj("123"));
+	ObjHash_set(&hash, S("def"), new_obj("456"));
+	ObjHash_set(&hash, S("ghi"), new_obj("789"));
+	
+	ObjHash_set(&hash2, S("jkl"), new_obj("1011"));
+	ObjHash_set(&hash2, S("mno"), new_obj("1213"));
+	ObjHash_set(&hash2, S("pqr"), new_obj("1415"));
+	
+	T_START(hash);
+	T_NEXT(hash, "ABC", "123");
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
+	T_END(hash);
+
+	T_START(hash2);
+	T_NEXT(hash2, "JKL", "1011");
+	T_NEXT(hash2, "MNO", "1213");
+	T_NEXT(hash2, "PQR", "1415");
+	T_END(hash2);
+
+	obj = ObjHash_extract(hash, "123");
+	if (obj != NULL) ERROR;
+	
+	obj = ObjHash_extract(hash, "ABC");
+	if (obj == NULL) ERROR;
+	if (strcmp(obj->string, "123") != 0) ERROR;
+	
+	ObjHash_set(&hash2, S("ABC"), obj);
+	obj2 = ObjHash_get(hash2, S("ABC"));
+	if (obj != obj2) ERROR;
+
+	T_START(hash);
+	T_NEXT(hash, "DEF", "456");
+	T_NEXT(hash, "GHI", "789");
+	T_END(hash);
+
+	T_START(hash2);
+	T_NEXT(hash2, "JKL", "1011");
+	T_NEXT(hash2, "MNO", "1213");
+	T_NEXT(hash2, "PQR", "1415");
+	T_NEXT(hash2, "ABC", "123");
+	T_END(hash2);
 	
 	return 0;
 }

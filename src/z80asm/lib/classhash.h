@@ -6,7 +6,7 @@ Uses StrHash to keep the keys, takes care of memory allocation of values.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.13 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.14 2014-09-01 21:51:55 pauloscustodio Exp $
 */
 
 #pragma once
@@ -58,6 +58,9 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 	/* Remove element from hash if found */									\
 	extern void T##Hash_remove( T##Hash *self, char *key );					\
 																			\
+	/* Extract element from hash if found, return element, undefine key in hash */	\
+	extern T *T##Hash_extract( T##Hash *self, char *key );					\
+																			\
 	/* Remove all entries */												\
 	extern void T##Hash_remove_all( T##Hash *self );						\
 																			\
@@ -66,6 +69,9 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 																			\
 	/* Delete a hash entry if not NULL */									\
 	extern void T##Hash_remove_elem( T##Hash *self, T##HashElem *elem );	\
+																			\
+	/* Extract element from hash if found, return element, undefine key in hash */	\
+	extern T *T##Hash_extract_elem( T##Hash *self, T##HashElem *elem );		\
 																			\
 	/* get the iterator of the first element in the list, NULL if empty */	\
 	extern T##HashElem *T##Hash_first( T##Hash *self );						\
@@ -152,6 +158,22 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 		self->count = self->hash->count;									\
 	}																		\
 																			\
+	/* Extract element from hash if found, return element, undefine key in hash */	\
+	T *T##Hash_extract_elem( T##Hash *self, T##HashElem *elem )				\
+	{																		\
+		T *obj;																\
+																			\
+		if ( self == NULL || elem == NULL )									\
+			return NULL;													\
+																			\
+		obj = (T *)elem->value;												\
+		StrHash_remove_elem( self->hash, elem );							\
+																			\
+		self->count = self->hash->count;									\
+																			\
+		return obj;															\
+	}																		\
+																			\
 	/* set key/value, delete old value if any */							\
 	void T##Hash_set( T##Hash **pself, char *key, T *obj )					\
 	{																		\
@@ -191,6 +213,15 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 																			\
 		elem = T##Hash_find( self, key );									\
 		T##Hash_remove_elem( self, elem );									\
+	}																		\
+																			\
+	/* Extract element from hash if found, return element, undefine key in hash */	\
+	T *T##Hash_extract( T##Hash *self, char *key )							\
+	{																		\
+		T##HashElem *elem;													\
+																			\
+		elem = T##Hash_find( self, key );									\
+		return T##Hash_extract_elem( self, elem );							\
 	}																		\
 																			\
 	/* get first hash entry, maybe NULL */									\
