@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.9 2014-07-06 03:06:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.10 2014-09-01 21:09:08 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -70,10 +70,10 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 			    file, lineno, iter->key, exp_key);
 		}
 		
-		if (strcmp(iter->value, exp_value))
+		if (strcmp((char *)(iter->value), exp_value))
 		{
 			die("%s %d : value mismatch, got %s, expected %s\n", 
-			    file, lineno, iter->value, exp_value);
+			    file, lineno, (char *)(iter->value), exp_value);
 		}
 		
 		if (iter->value != next_elem)
@@ -88,10 +88,10 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 
 		/* check positive and negative StrHash_get() */
 		value = StrHash_get(hash, iter->key);
-		if (value == NULL || strcmp(value, iter->value))
+		if (value == NULL || strcmp(value, (char *)(iter->value)))
 		{
 			die("%s %d : get(%s) = %s, expected %s\n", 
-			    file, lineno, iter->key, value, iter->value);
+			    file, lineno, iter->key, value, (char *)(iter->value));
 		}
 
 		value = StrHash_get(hash, wrong_key);

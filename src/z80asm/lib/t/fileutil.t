@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.17 2014-07-06 03:06:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.18 2014-09-01 21:09:08 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -13,7 +13,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c fileutil.c strutil.c xmalloc.c dlist.c class.c list.c strpool.c";
+my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c strutil.c xmalloc.c dlist.c class.c list.c strpool.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
