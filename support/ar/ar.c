@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.19 2014-06-28 23:37:18 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.20 2014-09-08 23:50:09 pauloscustodio Exp $
  */
 
 
@@ -22,7 +22,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 6
+#define MAX_VERSION 7
 
 enum file_type { is_none, is_library, is_object };
 
