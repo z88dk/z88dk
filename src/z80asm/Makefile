@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.167 2014-07-06 22:48:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.168 2014-09-11 22:30:29 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -151,6 +151,7 @@ test:
 	$(MAKE) prove
 	$(MAKE) new
 	$(MAKE) prove
+	$(MAKE) test_enigma
 
 prove: prove_c prove_perl
 
@@ -162,18 +163,27 @@ prove_perl: $(TARGET)
 testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
 
+
+test_enigma:
+	-zcc +cpm -create-app -oenigma.bin -vn ../../examples/console/enigma.c
+	echo HELLO. | cpm enigma.bin > enigma.out
+	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
+	echo 'HREXLSLEOC .' >> enigma.bmk
+	diff -w enigma.bmk enigma.out
+
+clean::
+	$(RM) enigma.*
+
 testzcc : $(TARGET)
-	zcc +zx -lndos       -create-app -oenigma.bin   ../../examples/console/enigma.c
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
 	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
-	eightyone enigma.tap
 	eightyone microman.tap
 	eightyone mandel.tap
 
 clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
-	$(RM) enigma.bin enigma.tap microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
+	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 
 #------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
@@ -360,7 +370,7 @@ z80pass.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 z80pass.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 z80pass.o: lib/uthash.h errors.h errors_def.h expr.h lib/classlist.h scan.h
 z80pass.o: scan_def.h legacy.h sym.h symref.h lib/fileutil.h lib/list.h
-z80pass.o: hist.h listfile.h model.h module.h symtab.h options.h
+z80pass.o: hist.h listfile.h model.h module.h symtab.h modlink.h options.h
 z80pass.o: options_def.h lib/srcfile.h symbol.h objfile.h z80asm.h
 lib/array.o: lib/xmalloc.h lib/array.h lib/class.h lib/queue.h lib/types.h
 lib/array.o: lib/strutil.h
