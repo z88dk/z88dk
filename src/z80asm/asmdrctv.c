@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.103 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.104 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -113,7 +113,7 @@ Parsevarsize( void )
 
             if ( ( expr = expr_parse() ) != NULL )
             {
-                if ( expr->expr_type_mask & NOT_EVALUABLE )
+                if ( expr->result.not_evaluable )
                 {
                     error_not_defined();
                     OBJ_DELETE( expr );
@@ -184,7 +184,7 @@ DEFVARS( void )
     if ( ( expr = expr_parse() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( expr->expr_type_mask & NOT_EVALUABLE )
+        if ( expr->result.not_evaluable )
         {
             error_not_defined();
             OBJ_DELETE( expr );
@@ -293,7 +293,7 @@ DEFGROUP( void )
 
                             if ( ( expr = expr_parse() ) != NULL )
                             {
-                                if ( expr->expr_type_mask & NOT_EVALUABLE )
+                                if ( expr->result.not_evaluable )
                                 {
                                     error_not_defined();
                                 }
@@ -343,7 +343,7 @@ DEFS()
     if ( ( expr = expr_parse() ) != NULL )
     {
         /* expr. must not be stored in relocatable file */
-        if ( expr->expr_type_mask & NOT_EVALUABLE )
+        if ( expr->result.not_evaluable )
         {
             /* BUG_0007 : memory leaks - was not being released in case of error */
             OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
@@ -364,7 +364,7 @@ DEFS()
 
                 if ( ( constexpr = expr_parse() ) != NULL )
                 {
-                    if ( constexpr->expr_type_mask & NOT_EVALUABLE )
+                    if ( constexpr->result.not_evaluable )
                     {
                         error_not_defined();
                     }
@@ -456,21 +456,22 @@ DEFC( void )
 
                 if ( ( expr = expr_parse() ) != NULL )
                 {
-#if 0
-					if ( (expr->expr_type_mask & NOT_EVALUABLE) || (expr->expr_type_mask & EXPR_ADDR) )
+#if 1
+					if ( (expr->result.not_evaluable) || 
+						 (expr->sym_type >= TYPE_ADDRESS) )
                     {
 						/* store in object file to be computed at link time */
-						expr->expr_type_mask |= RANGE_16CONST | EXPR_ADDR;	/* EXPR_ADDR: force storage in object file */
+						expr->expr_type_mask |= RANGE_WORD;
 						expr->target_name = strpool_add( name->str );
 
 						ExprList_push( & CURRENTMODULE->exprs, expr );
 
 						/* create symbol */
-						define_symbol( expr->target_name, TYPE_COMPUTED, 0 );
+						define_symbol( expr->target_name, 0, TYPE_COMPUTED, 0 );
                     }
 #else
 					/* expr. must not be stored in relocatable file */
-                    if ( expr->expr_type_mask & NOT_EVALUABLE )
+                    if ( expr->result.not_evaluable )
                     {
                         error_not_defined();
 	                    OBJ_DELETE( expr );
@@ -479,8 +480,7 @@ DEFC( void )
 #endif
                     else
                     {
-                        constant = Expr_eval( expr );    /* DEFC expression must not
-                                                            contain undefined symbols */
+                        constant = Expr_eval( expr );    /* DEFC constant expression */
                         define_symbol( name->str, constant, TYPE_CONSTANT, 0 );
 	                    OBJ_DELETE( expr );
                     }
@@ -518,7 +518,7 @@ ORG( void )
 
     if ( ( expr = expr_parse() ) != NULL )
     {
-        if ( expr->expr_type_mask & NOT_EVALUABLE )
+        if ( expr->result.not_evaluable )
         {
             error_not_defined();
         }

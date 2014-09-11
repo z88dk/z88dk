@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.46 2014-09-01 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.47 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -362,7 +362,7 @@ void define_symbol( char *name, long value, sym_type_t sym_type, Byte type_mask 
 /*-----------------------------------------------------------------------------
 *   update a symbol value, used to compute EQU symbols
 *----------------------------------------------------------------------------*/
-void update_symbol( char *name, long value )
+void update_symbol( char *name, long value, sym_type_t sym_type )
 {
     Symbol *sym;
 
@@ -374,7 +374,11 @@ void update_symbol( char *name, long value )
     if ( sym == NULL )
 		error_org_not_defined();
 	else
+	{
 		sym->value = value;
+		sym->sym_type = sym_type;
+		sym->computed = TRUE;
+	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -469,7 +473,7 @@ void declare_extern_symbol( char *name )
         if ( sym == NULL )
         {
             /* not local, not global -> declare symbol as extern */
-            sym = Symbol_create( name, 0, TYPE_UNKNOWN, SYM_EXTERN, 
+            sym = Symbol_create( name, 0, TYPE_CONSTANT, SYM_EXTERN, 
 								 CURRENTMODULE, CURRENTSECTION );
             SymbolHash_set( &global_symtab, name, sym );
         }
@@ -497,6 +501,7 @@ void declare_extern_symbol( char *name )
                symbol as external symbol, but only if local symbol is not defined yet */
             if ( ( sym->sym_type_mask & SYM_DEFINED ) == 0 )
             {
+				sym->sym_type = TYPE_CONSTANT;
                 sym->sym_type_mask &= ~ SYM_LOCAL;
                 sym->sym_type_mask |=   SYM_EXTERN;
 				

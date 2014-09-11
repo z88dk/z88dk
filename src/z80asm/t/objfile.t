@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.18 2014-06-29 22:25:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.19 2014-09-11 22:28:35 pauloscustodio Exp $
 #
 
 use strict;
@@ -56,7 +56,7 @@ $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test'));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
 END
 
@@ -69,7 +69,7 @@ t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Code: 1 bytes
     C $0000: 00
@@ -84,7 +84,7 @@ t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", "\x00" x 0x10000]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Code: 65536 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4195,7 +4195,7 @@ t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $0000
   Code: 1 bytes
@@ -4211,7 +4211,7 @@ t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $FFFF
   Code: 1 bytes
@@ -4236,7 +4236,7 @@ t_binary($obj, objfile(NAME => 'test',
 									"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Code: 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4266,7 +4266,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Names:
     L C $0003 value8
@@ -4299,7 +4299,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Names:
     L C $0003 value8
@@ -4344,7 +4344,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x00\x00\x00\x00"]]));	# addr  14
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $0003
   Names:
@@ -4389,7 +4389,7 @@ t_binary($obj, objfile(NAME => 'test',
 		                "\xCD\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Names:
     L A $0000 local
@@ -4421,16 +4421,16 @@ my $lib  = read_binfile(lib_file());
 t_binary($lib, libfile( $obj1, $obj2 ));
 t_z80nm(lib_file(), <<'END');
 
-File test.lib at $0000: Z80LMF06
+File test.lib at $0000: Z80LMF07
 
-File test.lib at $0010: Z80RMF06
+File test.lib at $0010: Z80RMF07
   Name: test1
   Names:
     G A $0000 mult
   Code: 1 bytes
     C $0000: C9
 
-File test.lib at $0055: Z80RMF06
+File test.lib at $0055: Z80RMF07
   Name: test2
   Names:
     G A $0000 div

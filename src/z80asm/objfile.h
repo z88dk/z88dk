@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.30 2014-06-29 22:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.31 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,7 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.30 2014-06-29 22
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"06"
+#define OBJ_VERSION	"07"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed

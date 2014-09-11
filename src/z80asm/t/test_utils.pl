@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.69 2014-07-06 03:06:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.70 2014-09-11 22:28:36 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -368,7 +368,7 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF06";
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF07";
 	$obj .= pack("V", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
@@ -468,7 +468,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF06";
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF07";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?

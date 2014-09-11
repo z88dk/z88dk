@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.6 2014-06-29 22:25:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.7 2014-09-11 22:28:35 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -88,7 +88,7 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $1234
   Names:
@@ -113,7 +113,7 @@ File test.obj at $0000: Z80RMF06
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.obj at $0000: Z80RMF06
+File test1.obj at $0000: Z80RMF07
   Name: test1
   Names:
     G A $0013 a2
@@ -250,7 +250,7 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $1234
   Names:
@@ -279,7 +279,7 @@ File test.obj at $0000: Z80RMF06
   Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.obj at $0000: Z80RMF06
+File test1.obj at $0000: Z80RMF07
   Name: test1
   Names:
     G A $0000 prmes (section code)
@@ -361,7 +361,7 @@ ASM2
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $0000
   Code: 0 bytes (section code)
@@ -369,14 +369,14 @@ File test.obj at $0000: Z80RMF06
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF06
+File test1.obj at $0000: Z80RMF07
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF06
+File test2.obj at $0000: Z80RMF07
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -391,7 +391,7 @@ z80asm(
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $0000
   Code: 0 bytes (section code)
@@ -399,14 +399,14 @@ File test.obj at $0000: Z80RMF06
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF06
+File test1.obj at $0000: Z80RMF07
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF06
+File test2.obj at $0000: Z80RMF07
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -414,10 +414,51 @@ File test2.obj at $0000: Z80RMF06
   Code: 0 bytes (section bss)
 END
 
+#diag "computed DEFC not working"; exit 0;
+
 #------------------------------------------------------------------------------
-# Test computed DEFC
-diag "Computed DEFC not working";
-if (0) {
+# Test computed DEFC 1
+$expected_bin = pack("v*", 0x100, 0x108, 0x108, 0x108);
+z80asm(
+	asm		=> <<'...',
+			org 0x100
+		start:
+			defw start,end1,end2,end3
+		end1:
+			defc end2 = asmpc
+			defc end3 = end1
+...
+	options => "-b",
+	bin		=> $expected_bin,
+);
+
+# link only
+z80asm(
+	options => "-d -b test.obj",
+	bin		=> $expected_bin,
+);
+
+t_z80nm("test.obj", <<'...');
+
+File test.obj at $0000: Z80RMF07
+  Name: test
+  Org:  $0100
+  Names:
+    L A $0000 start
+    L A $0008 end1
+    L A $0008 end2
+    L A $0008 end3
+  Expressions:
+    E Cw (test.asm:3) $0000 $0000: start
+    E Cw (test.asm:3) $0000 $0002: end1
+    E Cw (test.asm:3) $0000 $0004: end2
+    E Cw (test.asm:3) $0000 $0006: end3
+  Code: 8 bytes
+    C $0000: 00 00 00 00 00 00 00 00
+...
+
+#------------------------------------------------------------------------------
+# Test computed DEFC 2
 $expected_bin = pack("C*",
 					# section code		# @ 0x1000
 					0xCD, 0x0A, 0x10,	# @ 0x1000 : main
@@ -479,7 +520,7 @@ z80asm(
 
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF06
+File test.obj at $0000: Z80RMF07
   Name: test
   Org:  $1000
   External names:
@@ -494,7 +535,7 @@ File test.obj at $0000: Z80RMF06
     C $0000: CD 00 00 CD 00 00 C3 00 00
   Code: 0 bytes (section lib)
 
-File test1.obj at $0000: Z80RMF06
+File test1.obj at $0000: Z80RMF07
   Name: test1
   Names:
     G A $0000 func1 (section lib)
@@ -504,11 +545,13 @@ File test1.obj at $0000: Z80RMF06
   Code: 1 bytes (section lib)
     C $0000: C9
 
-File test2.obj at $0000: Z80RMF06
+File test2.obj at $0000: Z80RMF07
   Name: test2
   Names:
-    G A $0000 func1_alias (section lib)
-    G A $0000 func2_alias (section lib)
+    L A $FFFFFFFF chain1 (section lib)
+    L A $0000 chain2 (section lib)
+    G = $0000 func1_alias (section lib)
+    G = $0000 func2_alias (section lib)
     G A $0000 computed_end (section lib)
   External names:
     U         func1
@@ -516,6 +559,162 @@ File test2.obj at $0000: Z80RMF06
   Expressions:
     E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
     E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
-    E =  (test2.asm:10) $0000 $0000: computed_end := ASMPC (section lib)
 END
-}
+
+#------------------------------------------------------------------------------
+# Use before external declaration
+$expected_bin = pack("C*",
+					0xCD, 0x04, 0x10,	# @ 0x1000 : func1
+					0xC9,				# @ 0x1003
+					0xCD, 0x00, 0x10,	# @ 0x1004 : func2
+					0xC9,				# @ 0x1007
+				);
+
+# declare before define
+z80asm(
+	asm		=> <<'ASM',
+			PUBLIC func1
+			EXTERN func2
+	func1:	call func2
+			ret
+ASM
+	asm1	=> <<'ASM1',
+			PUBLIC func2
+			EXTERN func1
+	func2:	call func1
+			ret
+ASM1
+	options => "-r1000 -b",
+	bin		=> $expected_bin,
+);
+
+# define before declare
+z80asm(
+	asm		=> <<'ASM',
+	func1:	call func2
+			ret
+			PUBLIC func1
+			EXTERN func2
+ASM
+	asm1	=> <<'ASM1',
+	func2:	call func1
+			ret
+			PUBLIC func2
+			EXTERN func1
+ASM1
+	options => "-r1000 -b",
+	bin		=> $expected_bin,
+);
+
+# link only
+z80asm(
+	options => "-d -b test.obj test1.obj test2.obj",
+	bin		=> $expected_bin,
+);
+
+t_z80nm("test.obj test1.obj", <<'END');
+
+File test.obj at $0000: Z80RMF07
+  Name: test
+  Org:  $1000
+  Names:
+    G A $0000 func1
+  External names:
+    U         func2
+  Expressions:
+    E Cw (test.asm:1) $0000 $0001: func2
+  Code: 4 bytes
+    C $0000: CD 00 00 C9
+
+File test1.obj at $0000: Z80RMF07
+  Name: test1
+  Names:
+    G A $0000 func2
+  External names:
+    U         func1
+  Expressions:
+    E Cw (test1.asm:1) $0000 $0001: func1
+  Code: 4 bytes
+    C $0000: CD 00 00 C9
+END
+
+#------------------------------------------------------------------------------
+# Declare label as public, use it in an expression and dont define it - crash
+z80asm(
+	asm		=> <<'...',
+				PUBLIC	sd_write_block_2gb
+				EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+
+			sd_write_sector:
+				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol not defined
+...
+	options	=> " ",
+);
+
+#------------------------------------------------------------------------------
+# DEFC use case for library entry points
+z80asm(
+	asm		=> <<'...',
+				PUBLIC asm_b_vector_at
+				EXTERN asm_b_array_at
+
+				DEFC asm_b_vector_at = asm_b_array_at
+...
+	asm1	=> <<'...',
+				PUBLIC asm_b_array_at
+				
+			asm_b_array_at:				; 1000
+				ret						; 1000 ;; C9
+										; 1001
+...
+	asm2	=> <<'...',
+				EXTERN asm_b_vector_at
+				EXTERN asm_b_array_at
+				
+			start:						; 1001
+				call asm_b_vector_at	; 1001 ;; CD 00 10
+				call asm_b_array_at		; 1004 ;; CD 00 10
+				ret						; 1007 ;; C9
+...
+	options => "-r1000 -b",
+);
+
+# link only
+$expected_bin = read_binfile("test.bin");
+z80asm(
+	options => "-d -b test.obj test1.obj test2.obj",
+	bin		=> $expected_bin,
+);
+
+t_z80nm("test.obj test1.obj test2.obj", <<'...');
+
+File test.obj at $0000: Z80RMF07
+  Name: test
+  Org:  $1000
+  Names:
+    G = $0000 asm_b_vector_at
+  External names:
+    U         asm_b_array_at
+  Expressions:
+    E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
+
+File test1.obj at $0000: Z80RMF07
+  Name: test1
+  Names:
+    G A $0000 asm_b_array_at
+  Code: 1 bytes
+    C $0000: C9
+
+File test2.obj at $0000: Z80RMF07
+  Name: test2
+  Names:
+    L A $0000 start
+  External names:
+    U         asm_b_vector_at
+    U         asm_b_array_at
+  Expressions:
+    E Cw (test2.asm:5) $0000 $0001: asm_b_vector_at
+    E Cw (test2.asm:6) $0003 $0004: asm_b_array_at
+  Code: 7 bytes
+    C $0000: CD 00 00 CD 00 00 C9
+...

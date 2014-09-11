@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.27 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.28 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,7 +37,7 @@ struct Section;
 *----------------------------------------------------------------------------*/
 typedef enum 
 { 
-	NUMBER_OP, NAME_OP, CONST_EXPR_OP, 
+	ASMPC_OP, NUMBER_OP, SYMBOL_OP, CONST_EXPR_OP, 
 	UNARY_OP, BINARY_OP, TERNARY_OP,
 } op_type_t;
 
@@ -71,15 +71,13 @@ typedef struct ExprOp				/* hold one operation or operand */
 	op_type_t	op_type;			/* select type of operator / operand */
 	union
 	{
+		/* ASMPC_OP - no data */
+
 		/* NUMBER_OP */
 		long	value;				/* operand value */
 
-		/* NAME_OP */
-		struct 
-		{
-			char   *name;			/* name of identifier, stored in strpool */
-			Byte	sym_type_mask;		/* type of identifier (local, global, rel. address or constant) */
-		} ident;
+		/* SYMBOL_OP */
+		Symbol *symbol;				/* symbol in symbol table */
 
 		/* CONST_EXPR_OP - no data */
 		
@@ -111,9 +109,17 @@ CLASS( Expr )
 	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
 	Str			*text;			/* expression in infix text */
 	
+	/* flags set during eval */
+	struct {
+		Bool not_evaluable:1;		/* TRUE if expression did not retunr a value */
+		Bool undefined_symbol:1;	/* TRUE if expression contains one undefined symbol */
+		Bool extern_symbol:1;		/* TRUE if expression contains one EXTERN symbol */
+	} result;
+
 	range_t		 range;			/* range of expression result */
 
 	sym_type_t	 sym_type;		/* highest type of symbols used in expression */
+	Bool		 computed;		/* TRUE if all values in expression have been computed */
 
 	Byte		 expr_type_mask;/* range type of evaluated expression */
 
@@ -142,14 +148,14 @@ extern Expr *expr_parse( void );
 
 /* parse and eval an expression, 
    return FALSE and issue syntax error on parse error
-   return FALSE and issue symbol not defined error on NOT_EVALUABLE */
+   return FALSE and issue symbol not defined error on result.not_evaluable */
 extern Bool expr_parse_eval( long *presult );
 
 /* parse and eval an expression as argument to IF, 
    return expression value, ignoring symbol-not-defined errors  */
 extern long expr_parse_eval_if( void );
 
-/* evaluate expression if possible, set NOT_EVALUABLE if failed
+/* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined */
 extern long Expr_eval( Expr *self );
 

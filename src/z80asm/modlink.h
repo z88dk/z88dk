@@ -13,11 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.h,v 1.2 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.h,v 1.3 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "types.h"
+#include "expr.h"
+
 extern void link_modules( void );
+extern void compute_equ_exprs( ExprList *exprs, Bool show_error, Bool module_relative_addr );

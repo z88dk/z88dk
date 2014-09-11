@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.119 2014-09-01 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.120 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,28 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.119 2014-09-01 23:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.119  2014-09-01 23:37:32  pauloscustodio
+* Revision 1.120  2014-09-11 22:28:35  pauloscustodio
+* DEFC with expressions; expressions containing external symbols are stored in the object file
+* and evaluated at link time.
+* e.g.
+*
+* PUBLIC alias
+* EXTERN func
+* DEFC alias = func
+*
+* - Object file format changed to version 07, to include DEFC symbols that
+* are defined as an expression using other symbols and are computed at link
+* time, after all addresses are allocated.
+* - Symbols are now linked into expressions so that the symbol value
+* is used during expression eval. Before the symbol value was frozen
+* during expression parse.
+* - Symbols cannot be deleted and re-created when moving from local to global
+* table, to keep references in expressions pointing to allocated memory.
+* - Symbols need to have a new category: computed, actual value not
+* yet known.
+* - ASMPC needs to be recomputed at pass2 and link time.
+*
+* Revision 1.119  2014/09/01 23:37:32  pauloscustodio
 * One step towards DEFC with expressions:
 * symbols cannot be deleted and re-created when moving from local to global
 * table, to keep references in expressions pointing to allocated memory.
@@ -2059,22 +2080,26 @@ Based on 1.0.31
 			section bss
 
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.5.0] (pauloscustodio)
+11.09.2014 [2.5.0] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Object file format changed to version 06, to include DEFC symbols that 
+	- DEFC with expressions; expressions containing external symbols are 
+	  stored in the object file and evaluated at link time.
+
+	- Object file format changed to version 07, to include DEFC symbols that 
 	  are defined as an expression using other symbols and are computed at link 
 	  time, after all addresses are allocated.
 	  
-	  DEFC with expressions not yet enabled, need changes in the symbol table first.
+	  DEFC with expressions enabled.
 	  
-	  Two problems need to be solved before DEFC with expressions can be
-	  enabled:
-	  1) symbols need to be linked into expressions so that the symbol value 
-	     is used during expression eval. Today the symbol value is frozen
+	  1) Symbols are now linked into expressions so that the symbol value 
+	     is used during expression eval. Before the symbol value was frozen
 		 during expression parse.
-	  2) symbols cannot be deleted and re-created when moving from local to global
+      2) Symbols cannot be deleted and re-created when moving from local to global
 	     table, to keep references in expressions pointing to allocated memory.
-	
+	  3) Symbols need to have a new category: computed, actual value not
+	     yet known.
+	  4) ASMPC needs to be recomputed at pass2 and link time.
+
 	- Separate expression type from expression range - new range_t enum 
 	  type for ranges and new range attribute in Expr.
 	  
@@ -2108,7 +2133,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0e"
+#define VERSION     "2.5.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

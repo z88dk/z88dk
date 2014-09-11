@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.111 2014-07-06 22:48:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.112 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -25,6 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.111 2014-07-06 2
 #include "hist.h"
 #include "listfile.h"
 #include "model.h"
+#include "modlink.h"
 #include "options.h"
 #include "scan.h"
 #include "srcfile.h"
@@ -246,6 +247,9 @@ Z80pass2( void )
     UInt patchptr;
 	Bool do_patch, do_store;
 
+	/* compute all dependent expressions */
+	compute_equ_exprs( CURRENTMODULE->exprs, FALSE, TRUE );
+
 	iter = ExprList_first( CURRENTMODULE->exprs );
 	while ( iter != NULL )
 	{
@@ -267,21 +271,25 @@ Z80pass2( void )
 		do_patch = TRUE;
 		do_store = FALSE;
 
-		if ( expr->range == RANGE_JR_OFFSET )
+		if ( expr->result.undefined_symbol ) 
 		{
-			if ( expr->expr_type_mask & EXPR_EXTERN )
+			error_not_defined();
+			do_patch = FALSE;
+		}
+		else if ( expr->range == RANGE_JR_OFFSET )
+		{
+			if ( expr->result.extern_symbol )
 			{
 				error_jr_not_local();	/* JR must be local */
 				do_patch = FALSE;
 			}
 		}
-		else if ( expr->sym_type >= TYPE_ADDRESS ||
-			      (expr->expr_type_mask & EXPR_EXTERN) )
+		else if ( ( (expr->sym_type >= TYPE_ADDRESS) || expr->result.extern_symbol ) )
 		{
 			do_patch = FALSE;
 			do_store = TRUE;            /* store expression in relocatable file */
 		}
-		else if ( ( expr->expr_type_mask & NOT_EVALUABLE ) )
+		else if ( expr->result.not_evaluable )
 		{
 			error_not_defined();
 			do_patch = FALSE;

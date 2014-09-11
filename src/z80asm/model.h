@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.25 2014-07-14 08:43:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.26 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,8 +47,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.25 2014-07-14 08:4
 #define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
 #define EXPR_PUBLIC		SYM_PUBLIC 	/* 00100000 Expression contains global symbol */
 #define EXPR_EXTERN		SYM_EXTERN	/* 01000000 Expression contains extern symbol */
-
-#define NOT_EVALUABLE	128     	/* 10000000 Expression is not evaluable */
 
 /*-----------------------------------------------------------------------------
 *   Special symbols

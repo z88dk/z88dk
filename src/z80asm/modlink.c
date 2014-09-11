@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.133 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.134 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -92,6 +92,7 @@ ReadNames( char *filename, FILE *file )
         {
         case 'A': sym_type = TYPE_ADDRESS;  break;
         case 'C': sym_type = TYPE_CONSTANT; break;
+        case '=': sym_type = TYPE_COMPUTED; break;
         default:
             error_not_obj_file( filename );
         }
@@ -109,7 +110,8 @@ ReadNames( char *filename, FILE *file )
 /* set environment to compute expression */
 static void set_asmpc_env( Module *module, char *section_name,
 						   char *filename, int line_nr,
-						   UInt asmpc )
+						   UInt asmpc, 
+						   Bool module_relative_addr )
 {
 	UInt base_addr, offset;
 
@@ -122,17 +124,24 @@ static void set_asmpc_env( Module *module, char *section_name,
 
 	/* assembler PC as absolute address */
 	new_section( section_name );
-	base_addr = CURRENTSECTION->addr;
-	offset    = get_cur_module_start(); 
-    set_PC( asmpc + base_addr + offset );
+
+	if ( module_relative_addr ) {
+		set_PC( asmpc );
+	}
+	else {
+		base_addr = CURRENTSECTION->addr;
+		offset    = get_cur_module_start(); 
+		set_PC( asmpc + base_addr + offset );
+	}
 }
 
 /* set environment to compute expression */
-static void set_expr_env( Expr *expr )
+static void set_expr_env( Expr *expr, Bool module_relative_addr )
 {
 	set_asmpc_env( expr->module, expr->section->name, 
 				   expr->filename, expr->line_nr, 
-				   expr->asmpc );
+				   expr->asmpc,
+				   module_relative_addr );
 }
 
 /* read the current modules' expressions to the given list */
@@ -190,7 +199,8 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 		/* parse and store expression in the list */
 		set_asmpc_env( CURRENTMODULE, section_name->str, 
 					   source_filename->str, line_nr, 
-					   asmpc );
+					   asmpc,
+					   FALSE );
         if ( ( expr = expr_parse() ) != NULL )
         {
 			expr->range = 0;
@@ -224,7 +234,7 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 /* read all the modules' expressions to the given list */
 static void read_module_exprs( ExprList *exprs )
 {
-    long fptr_namedecl, fptr_modname, fptr_exprdecl, fptr_libnmdecl;
+    long fptr_exprdecl;
     long fptr_base;
     struct linkedmod *curlink;
 	FILE *file;
@@ -242,10 +252,10 @@ static void read_module_exprs( ExprList *exprs )
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
         fseek( file, fptr_base + 12, SEEK_SET );		/* point at module name  pointer   */
-        fptr_modname	= xfget_int32( file );			/* get file pointer to module name */
+        /*fptr_modname*/  xfget_int32( file );			/* get file pointer to module name */
         fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
-        fptr_namedecl	= xfget_int32( file );			/* get file pointer to name declarations */
-        fptr_libnmdecl	= xfget_int32( file );			/* get file pointer to library name declarations */
+        /*fptr_namedecl*/ xfget_int32( file );			/* get file pointer to name declarations */
+        /*fptr_libnmdecl*/xfget_int32( file );			/* get file pointer to library name declarations */
 
         if ( fptr_exprdecl != -1 )
         {
@@ -267,7 +277,7 @@ static void read_module_exprs( ExprList *exprs )
    return 0 : nothing done, all EQU expression computed and removed from list
    return <0: -(number of expressions with unresolved symbols)
 */
-static int compute_equ_exprs_once( ExprList *exprs, Bool show_error )
+static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module_relative_addr )
 {
 	ExprListElem *iter;
     Expr *expr, *expr2;
@@ -284,19 +294,23 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error )
 
 		if ( expr->target_name )
 		{
-			set_expr_env( expr );
+			set_expr_env( expr, module_relative_addr );
 			value = Expr_eval( expr );
-	        if ( expr->expr_type_mask & NOT_EVALUABLE )		/* unresolved */
+	        if ( expr->result.not_evaluable )		/* unresolved */
 			{
 				num_unresolved++;
 				if ( show_error )
 					error_not_defined();
 			}
+			else if ( ! expr->computed )
+			{
+				/* expression depends on other variables not yet computed */
+			}
 			else
 			{
 				num_computed++;
 				computed = TRUE;
-				update_symbol( expr->target_name, value );
+				update_symbol( expr->target_name, value, expr->sym_type );
 			}
 		}
 
@@ -322,18 +336,18 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error )
 }
 
 /* compute all equ expressions, removing them from the list */
-static void compute_equ_exprs( ExprList *exprs )
+void compute_equ_exprs( ExprList *exprs, Bool show_error, Bool module_relative_addr )
 {
 	int  compute_result;
 
 	/* loop to solve dependencies while some are solved */
 	do {
-		compute_result = compute_equ_exprs_once( exprs, FALSE );
+		compute_result = compute_equ_exprs_once( exprs, FALSE, module_relative_addr );
 	} while ( compute_result > 0 );
 
 	/* if some unresolved, give up and show error */
-	if ( compute_result < 0 )
-		compute_equ_exprs_once( exprs, TRUE );
+	if ( show_error && compute_result < 0 )
+		compute_equ_exprs_once( exprs, TRUE, module_relative_addr );
 }
 
 /* compute and patch expressions */
@@ -350,10 +364,10 @@ static void patch_exprs( ExprList *exprs )
 		expr = iter->obj;
 		assert( expr->target_name == NULL );		/* EQU expressions are already computed */
 
-		set_expr_env( expr );
+		set_expr_env( expr, FALSE );
 		value = Expr_eval( expr );
 
-	    if ( expr->expr_type_mask & NOT_EVALUABLE )		/* unresolved */
+	    if ( expr->result.not_evaluable )		/* unresolved */
 			error_not_defined();
 		else
 		{
@@ -453,6 +467,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
 			offset    = get_cur_module_start();
 
             sym->value += base_addr + offset;	/* Absolute address */
+			sym->computed = TRUE;
 		}
 	}
 }
@@ -658,7 +673,7 @@ void link_modules( void )
 		if ( ! get_num_errors() )		
 			read_module_exprs( exprs );
 		if ( ! get_num_errors() )	
-			compute_equ_exprs( exprs );
+			compute_equ_exprs( exprs, TRUE, FALSE );
 		if ( ! get_num_errors() )	
 			patch_exprs( exprs );
     }
@@ -861,7 +876,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
 static char *
 CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 {
-    long fptr_mname, fptr_name, fptr_libname;
+    long fptr_mname, fptr_name;
     enum flag found = OFF;
 	DEFINE_STR( got_modname, MAXLINE );
 	DEFINE_STR( symbol_name, MAXLINE );
@@ -873,7 +888,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
     fptr_mname		= xfget_int32( file );			/* get module name file  pointer   */
 					  xfget_int32( file );			/* fptr_expr */
     fptr_name		= xfget_int32( file );
-    fptr_libname	= xfget_int32( file );
+    /*fptr_libname*/  xfget_int32( file );
     fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       
 													/* point at module name  */
 	xfget_count_byte_Str( file, got_modname );		/* read module name */

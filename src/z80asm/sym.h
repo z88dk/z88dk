@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.23 2014-07-06 22:48:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.24 2014-09-11 22:28:35 pauloscustodio Exp $
 */
 
 #pragma once
@@ -49,6 +49,8 @@ CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
 	sym_type_t		sym_type;			/* type of symbol */
+	Bool			computed;			/* TRUE if TYPE_COMPUTED or TYPE_ADDRESS 
+										   and value already known */
 
 	Byte			sym_type_mask;		/* type of symbol */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
