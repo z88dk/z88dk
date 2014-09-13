@@ -4,7 +4,7 @@
 XLIB zx_saddrpleft
 
 LIB zx_saddrpleft_callee
-XREF ASMDISP_ZX_SADDEPLEFT_CALLEE
+XREF ASMDISP_ZX_SADDRPLEFT_CALLEE
 
 .zx_saddrpleft
 

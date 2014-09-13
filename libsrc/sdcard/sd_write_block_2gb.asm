@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_block_2gb.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_write_block_2gb.asm,v 1.3 2014-09-13 16:03:09 dom Exp $
 ;
 
 	XLIB	sd_write_block_2gb
@@ -28,5 +28,5 @@ sd_write_sector:
 	
 	push af
 	
-	jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+	jp sd_write_block_2gb_callee + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 

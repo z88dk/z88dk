@@ -3,7 +3,7 @@
 
 XLIB extract_bits
 
-LIB UNSTUFF_BITS_callee
+LIB extract_bits_callee
 XREF ASMDISP_extract_bits_callee
 
 .extract_bits

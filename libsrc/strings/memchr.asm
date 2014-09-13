@@ -15,4 +15,4 @@ XREF ASMDISP_MEMCHR_CALLEE
    push bc
    push af
    
-   jp memchar_callee + ASMDISP_MEMCHR_CALLEE - 1
+   jp memchr_callee + ASMDISP_MEMCHR_CALLEE - 1

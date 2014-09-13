@@ -7,11 +7,12 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.1 2013-11-22 07:40:38 stefano Exp $
+;	$Id: psg_init.asm,v 1.2 2014-09-13 16:03:09 dom Exp $
 ;
 
 	XLIB	psg_init
 	LIB		set_psg_callee
+        XREF ASMDISP_SET_PSG_CALLEE
 	
 psg_init:
 
