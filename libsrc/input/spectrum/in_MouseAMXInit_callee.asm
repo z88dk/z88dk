@@ -70,11 +70,11 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 
    ld l,b
    ld de,XInterrupt
-   call im2_InstallISR_callee + ASMDISP_IM2INSTALLISR_CALLEE
+   call im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
 
    ld l,c
    ld de,YInterrupt
-   call im2_InstallISR_callee + ASMDISP_IM2INSTALLISR_CALLEE
+   call im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
 
    ld a,b
    out ($5f),a                ; PIO vector for X
