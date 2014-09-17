@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.168 2014-09-11 22:30:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.169 2014-09-17 21:40:18 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -164,8 +164,8 @@ testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
 
 
-test_enigma:
-	-zcc +cpm -create-app -oenigma.bin -vn ../../examples/console/enigma.c
+test_enigma: $(TARGET)
+	zcc +cpm -oenigma.bin -vn ../../examples/console/enigma.c
 	echo HELLO. | cpm enigma.bin > enigma.out
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
