@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.46 2014-07-13 19:16:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.47 2014-09-17 21:39:52 pauloscustodio Exp $
 #
 # Test options
 
@@ -110,10 +110,12 @@ Environment:
   -I, --inc-path=PATH    Add directory to include search path
   -L, --lib-path=PATH    Add directory to library search path
   -D, --define=SYMBOL    Define a static symbol
+
+Libraries:
   -x, --make-lib=[FILE]  Create a library file.lib
   -i, --use-lib=[FILE]   Link library file.lib
 
-Output Options:
+Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
 * -nb, --no-make-bin     No binary file
   -d, --date-stamp       Assemble only updated files
@@ -123,7 +125,7 @@ Output Options:
   -c, --code-seg         Split code in 16K banks
   -R, --relocatable      Create relocatable code
 
-Other Output File Options:
+Output File Options:
 * -s, --symtable         Create symbol table file.sym
   -ns, --no-symtable     No symbol table file
   -l, --list             Create listing file.lst

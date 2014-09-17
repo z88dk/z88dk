@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.42 2014-06-26 21:33:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.43 2014-09-17 21:39:52 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -143,11 +143,12 @@ OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PAT
 OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
 OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
 
+OPT_TITLE(	"Libraries:"	)
 OPT( OptCallOptArg, option_make_lib, "-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
 OPT( OptCallOptArg, option_use_lib,	 "-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
 
 
-OPT_TITLE(	"Output Options:" )
+OPT_TITLE(	"Binary Output:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin",	OPT_HELP_NO_MAKE_BIN, "" )
 
@@ -162,7 +163,7 @@ OPT( OptSet,	&opts.code_seg,	"-c", 	"--code-seg",		OPT_HELP_CODE_SEG, "" )
 OPT( OptSet,	&opts.relocatable,
      "-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
 
-OPT_TITLE(	"Other Output File Options:" )
+OPT_TITLE(	"Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
 OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable",	OPT_HELP_NO_SYMTABLE, "" )
 
