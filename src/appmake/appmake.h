@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.43 2014-09-15 22:50:57 pauloscustodio Exp $
+ *   $Id: appmake.h,v 1.44 2014-09-19 16:12:00 stefano Exp $
  */
 
 
@@ -103,6 +103,9 @@ extern option_t  sos_options;
 extern int       newbrain_exec(char *target);
 extern option_t  newbrain_options;
 
+extern int       newext_exec(char *target);
+extern option_t  newext_options;
+
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
 
@@ -183,6 +186,10 @@ struct {
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
+    { "newext",  "newext",      "(C) 2014 Stefano Bodrato",
+      "Changes the binary file extension for CP/M and others",
+      NULL,
+      newext_exec,   &newext_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,

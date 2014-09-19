@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.8 2014-04-15 19:53:07 dom Exp $
+ *      $Id: mtx.c,v 1.9 2014-09-19 16:12:01 stefano Exp $
  */
 
 
@@ -444,7 +444,7 @@ The basic block must contain the following instructions:
 			mtx_leader(fpout);
 			for (i=0; (i < 16); i++) {
 				c=getc(fpin);
-				if (dumb && (c>0 || c<15)) printf("%c",c);
+				if (dumb) printf("%c",c);
 				mtx_rawout(fpout,c);
 			}
 			if (dumb) printf("\n\n");

@@ -59,6 +59,9 @@
     <ClCompile Include="newbrain.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="newext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="p2000.c">
       <Filter>Source Files</Filter>
     </ClCompile>

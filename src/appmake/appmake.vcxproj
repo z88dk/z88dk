@@ -103,6 +103,7 @@
     <ClCompile Include="nascom.c" />
     <ClCompile Include="nec.c" />
     <ClCompile Include="newbrain.c" />
+    <ClCompile Include="newext.c" />
     <ClCompile Include="p2000.c" />
     <ClCompile Include="residos.c" />
     <ClCompile Include="rex6000.c" />

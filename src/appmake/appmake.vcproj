@@ -251,6 +251,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\newext.c"
+				>
+			</File>
+			<File
 				RelativePath=".\rex6000.c"
 				>
 			</File>

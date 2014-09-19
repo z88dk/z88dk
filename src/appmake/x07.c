@@ -6,7 +6,7 @@
  *
  *        Stefano Bodrato Jun 2011
  *
- *        $Id: x07.c,v 1.3 2014-04-15 19:53:07 dom Exp $
+ *        $Id: x07.c,v 1.4 2014-09-19 16:12:03 stefano Exp $
  */
 
 #include "appmake.h"
@@ -351,7 +351,7 @@ int x07_exec(char *target)
 		if (dumb) printf("\nInfo: Program Name found in header: ");
 		for (i=0; (i < 16); i++) {
 			c=getc(fpin);
-			if (dumb && (i>10 || i<16) && c>32 && c<126) printf("%c",c);
+			if (dumb && c>32 && c<126) printf("%c",c);
 			x07_rawout(fpout,c);
 		}
 		if (dumb) printf("\n\n");
