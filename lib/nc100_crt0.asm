@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.9 2013-06-18 06:11:23 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.10 2014-09-19 16:48:39 stefano Exp $
 ;
 
 
@@ -55,7 +55,19 @@ ELSE
 
 		org     $C000
 		jp	start
-		defs	509		;Waste 509 bytes of space
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; We have 509 bytes we can use here..
+_heap:
+		defw 0
+		defw 0
+_mblock:
+		defs	505		; Few bytes for malloc() stuff
+ELSE
+		defs	509		; Waste 509 bytes of space
+ENDIF
 
 ;--------
 ; Card header
@@ -80,7 +92,23 @@ start:				;Entry point at $c2220
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
+		ld hl,_heap
+		; compact way to do "mallinit()"
+		xor	a
+		ld	(hl),a
+		inc hl
+		ld	(hl),a
+		inc hl
+		ld	(hl),a
+		inc hl
+		ld	(hl),a
+		
+		ld hl,_mblock
+		push hl	; data block
+		ld hl,505
+		push hl	; area size
+		LIB sbrk_callee
+		call	sbrk_callee
 	ENDIF
 
 IF !DEFINED_nostreams
@@ -151,16 +179,6 @@ exitcount:	defb	0	;Number of atexit() routines
 heaplast:	defw	0	;heap variables
 heapblocks:	defw	0
 
-IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
 
 base_graphics:  defw	0	;Graphics variables
 coords:         defw	0
