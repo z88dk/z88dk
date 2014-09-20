@@ -1,0 +1,4420 @@
+ Z80MR VER 1.2   FILE CAMEL80  
+
+                ; Listing 2.
+                ; ===============================================
+                ; CamelForth for the Zilog Z80
+                ; (c) 1994 Bradford J. Rodriguez
+                ; Permission is granted to freely copy, modify,
+                ; and distribute this program for personal or
+                ; educational use.  Commercial inquiries should
+                ; be directed to the author at 221 King St. E.,
+                ; #32, Hamilton, Ontario L8N 1B5 Canada
+                ;
+                ; CAMEL80.AZM: Code Primitives
+                ;   Source code is for the Z80MR macro assembler.
+                ;   Forth words are documented as follows:
+                ;x   NAME     stack -- stack    description
+                ;   where x=C for ANS Forth Core words, X for ANS
+                ;   Extensions, Z for internal or private words.
+                ;
+                ; Direct-Threaded Forth model for Zilog Z80
+                ; 16 bit cell, 8 bit char, 8 bit (byte) adrs unit
+                ;    Z80 BC = Forth TOS (top Param Stack item)
+                ;        HL =       W    working register
+                ;        DE =       IP   Interpreter Pointer
+                ;        SP =       PSP  Param Stack Pointer
+                ;        IX =       RSP  Return Stack Pointer
+                ;        IY =       UP   User area Pointer
+                ;    A, alternate register set = temporaries
+                ;
+                ; Revision history:
+                ;   19 Aug 94 v1.0
+                ;   25 Jan 95 v1.01  now using BDOS function 0Ah
+                ;       for interpreter input; TIB at 82h.
+                ;   02 Mar 95 v1.02  changed ALIGN to ALIGNED in
+                ;       S" (S"); changed ,BRANCH to ,XT in DO.
+                ; ===============================================
+                ; Macros to define Forth headers
+                ; HEAD  label,length,name,action
+                ; IMMED label,length,name,action
+                ;    label  = assembler name for this word
+                ;             (special characters not allowed)
+                ;    length = length of name field
+                ;    name   = Forth's name for this word
+                ;    action = code routine for this word, e.g.
+                ;             DOCOLON, or DOCODE for code words
+                ; IMMED defines a header for an IMMEDIATE word.
+                ;
+      0000      DOCODE  EQU 0      ; flag to indicate CODE words
+      0000      link    DEFL 0     ; link to previous Forth word
+                
+                head    MACRO   #label,#length,#name,#action
+                        DW link
+                        DB 0
+                link    DEFL $
+                        DB #length,'#name'
+                #label:
+                        IF  .NOT.(#action=DOCODE)
+                        call #action
+                        ENDIF
+                        ENDM
+                
+                immed   MACRO   #label,#length,#name,#action
+                        DW link
+                        DB 1
+                link    DEFL $
+                        DB #length,'#name'
+                #label:
+                        IF  .NOT.(#action=DOCODE)
+                        call #action
+                        ENDIF
+                        ENDM
+                
+                ; The NEXT macro (7 bytes) assembles the 'next'
+                ; code in-line in every Z80 CamelForth CODE word.
+                next    MACRO
+                        ex de,hl
+                        ld e,(hl)
+                        inc hl
+                        ld d,(hl)
+                        inc hl
+                        ex de,hl
+                        jp (hl)
+                        ENDM
+                
+                ; NEXTHL is used when the IP is already in HL.
+                nexthl  MACRO
+                        ld e,(hl)
+                        inc hl
+                        ld d,(hl)
+                        inc hl
+                        ex de,hl
+                        jp (hl)
+                        ENDM
+                
+                ; RESET AND INTERRUPT VECTORS ===================
+                ; ...are not used in the CP/M implementation
+                ; Instead, we have the...
+                
+                ; CP/M ENTRY POINT
+ 0100                   org 100h
+ 0100 2A0600    reset:  ld hl,(6h)   ; BDOS address, rounded down
+ 0103 2E00              ld l,0       ;    = end of avail.mem (EM)
+ 0105 25                dec h        ; EM-100h
+ 0106 F9                ld sp,hl     ;      = top of param stack
+ 0107 24                inc h        ; EM
+ 0108 E5                push hl
+ 0109 DDE1              pop ix       ;      = top of return stack
+ 010B 25                dec h        ; EM-200h
+ 010C 25                dec h
+ 010D E5                push hl
+ 010E FDE1              pop iy       ;      = bottom of user area
+ 0110 110100            ld de,1      ; do reset if COLD returns
+ 0113 C3A916            jp COLD      ; enter top-level Forth word
+                
+                ; Memory map:
+                ;   0080h       Terminal Input Buffer, 128 bytes
+                ;   0100h       Forth kernel = start of CP/M TPA
+                ;     ? h       Forth dictionary (user RAM)
+                ;   EM-200h     User area, 128 bytes
+                ;   EM-180h     Parameter stack, 128B, grows down
+                ;   EM-100h     HOLD area, 40 bytes, grows down
+                ;   EM-0D8h     PAD buffer, 88 bytes
+                ;   EM-80h      Return stack, 128 B, grows down
+                ;   EM          End of RAM = start of CP/M BDOS
+                ; See also the definitions of U0, S0, and R0
+                ; in the "system variables & constants" area.
+                ; A task w/o terminal input requires 200h bytes.
+                ; Double all except TIB and PAD for 32-bit CPUs.
+                
+                ; INTERPRETER LOGIC =============================
+                ; See also "defining words" at end of this file
+                
+                ;C EXIT     --      exit a colon definition
+ 0116               head EXIT,4,EXIT,docode
+ 0116 0000     +        DW link
+ 0118 00       +        DB 0
+      0119     +link    DEFL $
+ 0119 04455849 +        DB 4,'EXIT'
+ 011E          +EXIT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 011E DD5E00            ld e,(ix+0)    ; pop old IP from ret stk
+ 0121 DD23              inc ix
+ 0123 DD5600            ld d,(ix+0)
+ 0126 DD23              inc ix
+ 0128                   next
+ 0128 EB       +        ex de,hl
+ 0129 5E       +        ld e,(hl)
+ 012A 23       +        inc hl
+ 012B 56       +        ld d,(hl)
+ 012C 23       +        inc hl
+ 012D EB       +        ex de,hl
+ 012E E9       +        jp (hl)
+                
+                ;Z lit      -- x    fetch inline literal to stack
+                ; This is the primtive compiled by LITERAL.
+ 012F               head lit,3,lit,docode
+ 012F 1901     +        DW link
+ 0131 00       +        DB 0
+      0132     +link    DEFL $
+ 0132 034C4954 +        DB 3,'LIT'
+ 0136          +LIT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0136 C5                push bc        ; push old TOS
+ 0137 1A                ld a,(de)      ; fetch cell at IP to TOS,
+ 0138 4F                ld c,a         ;        advancing IP
+ 0139 13                inc de
+ 013A 1A                ld a,(de)
+ 013B 47                ld b,a
+ 013C 13                inc de
+ 013D                   next
+ 013D EB       +        ex de,hl
+ 013E 5E       +        ld e,(hl)
+ 013F 23       +        inc hl
+ 0140 56       +        ld d,(hl)
+ 0141 23       +        inc hl
+ 0142 EB       +        ex de,hl
+ 0143 E9       +        jp (hl)
+                
+                ;C EXECUTE   i*x xt -- j*x   execute Forth word
+                ;C                           at 'xt'
+ 0144               head EXECUTE,7,EXECUTE,docode
+ 0144 3201     +        DW link
+ 0146 00       +        DB 0
+      0147     +link    DEFL $
+ 0147 07455845 +        DB 7,'EXECUTE'
+ 014F          +EXECUTE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 014F 60                ld h,b          ; address of word -> HL
+ 0150 69                ld l,c
+ 0151 C1                pop bc          ; get new TOS
+ 0152 E9                jp (hl)         ; go do Forth word
+                
+                ; DEFINING WORDS ================================
+                
+                ; ENTER, a.k.a. DOCOLON, entered by CALL ENTER
+                ; to enter a new high-level thread (colon def'n.)
+                ; (internal code fragment, not a Forth word)
+                ; N.B.: DOCOLON must be defined before any
+                ; appearance of 'docolon' in a 'word' macro!
+ 0153           docolon:               ; (alternate name)
+ 0153 DD2B      enter:  dec ix         ; push old IP on ret stack
+ 0155 DD7200            ld (ix+0),d
+ 0158 DD2B              dec ix
+ 015A DD7300            ld (ix+0),e
+ 015D E1                pop hl         ; param field adrs -> IP
+ 015E                   nexthl         ; use the faster 'nexthl'
+ 015E 5E       +        ld e,(hl)
+ 015F 23       +        inc hl
+ 0160 56       +        ld d,(hl)
+ 0161 23       +        inc hl
+ 0162 EB       +        ex de,hl
+ 0163 E9       +        jp (hl)
+                
+                ;C VARIABLE   --      define a Forth variable
+                ;   CREATE 1 CELLS ALLOT ;
+                ; Action of RAM variable is identical to CREATE,
+                ; so we don't need a DOES> clause to change it.
+ 0164               head VARIABLE,8,VARIABLE,docolon
+ 0164 4701     +        DW link
+ 0166 00       +        DB 0
+      0167     +link    DEFL $
+ 0167 08564152 +        DB 8,'VARIABLE'
+ 0170          +VARIABLE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0170 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0173 15133601          DW CREATE,LIT,1,CELLS,ALLOT,EXIT
+                ; DOVAR, code action of VARIABLE, entered by CALL
+                ; DOCREATE, code action of newly created words
+ 017F           docreate:
+ 017F           dovar:  ; -- a-addr
+ 017F E1                pop hl     ; parameter field address
+ 0180 C5                push bc    ; push old TOS
+ 0181 44                ld b,h     ; pfa = variable's adrs -> TOS
+ 0182 4D                ld c,l
+ 0183                   next
+ 0183 EB       +        ex de,hl
+ 0184 5E       +        ld e,(hl)
+ 0185 23       +        inc hl
+ 0186 56       +        ld d,(hl)
+ 0187 23       +        inc hl
+ 0188 EB       +        ex de,hl
+ 0189 E9       +        jp (hl)
+                
+                ;C CONSTANT   n --      define a Forth constant
+                ;   CREATE , DOES> (machine code fragment)
+ 018A               head CONSTANT,8,CONSTANT,docolon
+ 018A 6701     +        DW link
+ 018C 00       +        DB 0
+      018D     +link    DEFL $
+ 018D 08434F4E +        DB 8,'CONSTANT'
+ 0196          +CONSTANT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0196 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0199 1513310F          DW CREATE,COMMA,XDOES
+                ; DOCON, code action of CONSTANT,
+                ; entered by CALL DOCON
+ 019F           docon:  ; -- x
+ 019F E1                pop hl     ; parameter field address
+ 01A0 C5                push bc    ; push old TOS
+ 01A1 4E                ld c,(hl)  ; fetch contents of parameter
+ 01A2 23                inc hl     ;    field -> TOS
+ 01A3 46                ld b,(hl)
+ 01A4                   next
+ 01A4 EB       +        ex de,hl
+ 01A5 5E       +        ld e,(hl)
+ 01A6 23       +        inc hl
+ 01A7 56       +        ld d,(hl)
+ 01A8 23       +        inc hl
+ 01A9 EB       +        ex de,hl
+ 01AA E9       +        jp (hl)
+                
+                ;Z USER     n --        define user variable 'n'
+                ;   CREATE , DOES> (machine code fragment)
+ 01AB               head USER,4,USER,docolon
+ 01AB 8D01     +        DW link
+ 01AD 00       +        DB 0
+      01AE     +link    DEFL $
+ 01AE 04555345 +        DB 4,'USER'
+ 01B3          +USER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 01B3 CD5301   +        call DOCOLON
+               +        ENDIF
+ 01B6 1513310F          DW CREATE,COMMA,XDOES
+                ; DOUSER, code action of USER,
+                ; entered by CALL DOUSER
+ 01BC           douser:  ; -- a-addr
+ 01BC E1                pop hl     ; parameter field address
+ 01BD C5                push bc    ; push old TOS
+ 01BE 4E                ld c,(hl)  ; fetch contents of parameter
+ 01BF 23                inc hl     ;    field
+ 01C0 46                ld b,(hl)
+ 01C1 FDE5              push iy    ; copy user base address to HL
+ 01C3 E1                pop hl
+ 01C4 09                add hl,bc  ;    and add offset
+ 01C5 44                ld b,h     ; put result in TOS
+ 01C6 4D                ld c,l
+ 01C7                   next
+ 01C7 EB       +        ex de,hl
+ 01C8 5E       +        ld e,(hl)
+ 01C9 23       +        inc hl
+ 01CA 56       +        ld d,(hl)
+ 01CB 23       +        inc hl
+ 01CC EB       +        ex de,hl
+ 01CD E9       +        jp (hl)
+                
+                ; DODOES, code action of DOES> clause
+                ; entered by       CALL fragment
+                ;                  parameter field
+                ;                       ...
+                ;        fragment: CALL DODOES
+                ;                  high-level thread
+                ; Enters high-level thread with address of
+                ; parameter field on top of stack.
+                ; (internal code fragment, not a Forth word)
+ 01CE           dodoes: ; -- a-addr
+ 01CE DD2B              dec ix         ; push old IP on ret stk
+ 01D0 DD7200            ld (ix+0),d
+ 01D3 DD2B              dec ix
+ 01D5 DD7300            ld (ix+0),e
+ 01D8 D1                pop de         ; adrs of new thread -> IP
+ 01D9 E1                pop hl         ; adrs of parameter field
+ 01DA C5                push bc        ; push old TOS onto stack
+ 01DB 44                ld b,h         ; pfa -> new TOS
+ 01DC 4D                ld c,l
+ 01DD                   next
+ 01DD EB       +        ex de,hl
+ 01DE 5E       +        ld e,(hl)
+ 01DF 23       +        inc hl
+ 01E0 56       +        ld d,(hl)
+ 01E1 23       +        inc hl
+ 01E2 EB       +        ex de,hl
+ 01E3 E9       +        jp (hl)
+                
+                ; CP/M TERMINAL I/O =============================
+      0005      cpmbdos EQU 5h          ; CP/M BDOS entry point
+                
+                ;Z BDOS   de c -- a   call CP/M BDOS
+ 01E4               head BDOS,4,BDOS,docode
+ 01E4 AE01     +        DW link
+ 01E6 00       +        DB 0
+      01E7     +link    DEFL $
+ 01E7 0442444F +        DB 4,'BDOS'
+ 01EC          +BDOS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 01EC EB                ex de,hl    ; save important Forth regs
+ 01ED D1                pop de      ;  (DE,IX,IY) & pop DE value
+ 01EE E5                push hl
+ 01EF DDE5              push ix
+ 01F1 FDE5              push iy
+ 01F3 CD0500            call cpmbdos
+ 01F6 4F                ld c,a      ; result in TOS
+ 01F7 0600              ld b,0
+ 01F9 FDE1              pop iy      ; restore Forth regs
+ 01FB DDE1              pop ix
+ 01FD D1                pop de
+ 01FE                   next
+ 01FE EB       +        ex de,hl
+ 01FF 5E       +        ld e,(hl)
+ 0200 23       +        inc hl
+ 0201 56       +        ld d,(hl)
+ 0202 23       +        inc hl
+ 0203 EB       +        ex de,hl
+ 0204 E9       +        jp (hl)
+                
+                ;C EMIT     c --    output character to console
+                ;   6 BDOS DROP ;
+                ; warning: if c=0ffh, will read one keypress
+ 0205               head EMIT,4,EMIT,docolon
+ 0205 E701     +        DW link
+ 0207 00       +        DB 0
+      0208     +link    DEFL $
+ 0208 04454D49 +        DB 4,'EMIT'
+ 020D          +EMIT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 020D CD5301   +        call DOCOLON
+               +        ENDIF
+ 0210 36010600          DW LIT,06H,BDOS,DROP,EXIT
+                
+                ;Z SAVEKEY  -- addr  temporary storage for KEY?
+ 021A               head savekey,7,SAVEKEY,dovar
+ 021A 0802     +        DW link
+ 021C 00       +        DB 0
+      021D     +link    DEFL $
+ 021D 07534156 +        DB 7,'SAVEKEY'
+ 0225          +SAVEKEY:
+               +        IF  .NOT.(DOVAR=DOCODE)
+ 0225 CD7F01   +        call DOVAR
+               +        ENDIF
+ 0228 0000              DW 0
+                
+                ;X KEY?     -- f    return true if char waiting
+                ;   0FF 6 BDOS DUP SAVEKEY C! ;   rtns 0 or key
+                ; must use BDOS function 6 to work with KEY
+ 022A               head querykey,4,KEY?,docolon
+ 022A 1D02     +        DW link
+ 022C 00       +        DB 0
+      022D     +link    DEFL $
+ 022D 044B4559 +        DB 4,'KEY?'
+ 0232          +QUERYKEY:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0232 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0235 3601FF00          DW LIT,0FFH,LIT,06H,BDOS
+ 023F B4022502          DW DUP,SAVEKEY,CSTORE,EXIT
+                
+                ;C KEY      -- c    get character from keyboard
+                ;   BEGIN SAVEKEY C@ 0= WHILE KEY? DROP REPEAT
+                ;   SAVEKEY C@  0 SAVEKEY C! ;
+                ; must use CP/M direct console I/O to avoid echo
+                ; (BDOS function 6, contained within KEY?)
+ 0247               head KEY,3,KEY,docolon
+ 0247 2D02     +        DW link
+ 0249 00       +        DB 0
+      024A     +link    DEFL $
+ 024A 034B4559 +        DB 3,'KEY'
+ 024E          +KEY:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 024E CD5301   +        call DOCOLON
+               +        ENDIF
+ 0251 25020504  KEY1:   DW SAVEKEY,CFETCH,ZEROEQUAL,qbranch,KEY2
+ 025B 3202D702          DW QUERYKEY,DROP,branch,KEY1
+ 0263 25020504  KEY2:   DW SAVEKEY,CFETCH,LIT,0,SAVEKEY,CSTORE
+ 026F 1E01              DW EXIT
+                
+                ;Z CPMACCEPT  c-addr +n -- +n'  get line of input
+                ;   SWAP 2 - TUCK C!      max # of characters
+                ;   DUP 0A BDOS DROP      CP/M Get Console Buffer
+                ;   1+ C@  0A EMIT ;      get returned count
+                ; Note: requires the two locations before c-addr
+                ; to be available for use.
+ 0271               head CPMACCEPT,9,CPMACCEPT,docolon
+ 0271 4A02     +        DW link
+ 0273 00       +        DB 0
+      0274     +link    DEFL $
+ 0274 0943504D +        DB 9,'CPMACCEPT'
+ 027E          +CPMACCEPT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 027E CD5301   +        call DOCOLON
+               +        ENDIF
+ 0281 E7023601          DW SWOP,LIT,2,MINUS,TUCK,CSTORE
+ 028D B4023601          DW DUP,LIT,0Ah,BDOS,DROP
+ 0297 E1040504          DW ONEPLUS,CFETCH,LIT,0Ah,EMIT,EXIT
+                
+                ;X BYE     i*x --    return to CP/M
+ 02A3               head bye,3,bye,docode
+ 02A3 7402     +        DW link
+ 02A5 00       +        DB 0
+      02A6     +link    DEFL $
+ 02A6 03425945 +        DB 3,'BYE'
+ 02AA          +BYE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02AA C30000            jp 0
+                
+                ; STACK OPERATIONS ==============================
+                
+                ;C DUP      x -- x x      duplicate top of stack
+ 02AD               head DUP,3,DUP,docode
+ 02AD A602     +        DW link
+ 02AF 00       +        DB 0
+      02B0     +link    DEFL $
+ 02B0 03445550 +        DB 3,'DUP'
+ 02B4          +DUP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02B4 C5        pushtos: push bc
+ 02B5                   next
+ 02B5 EB       +        ex de,hl
+ 02B6 5E       +        ld e,(hl)
+ 02B7 23       +        inc hl
+ 02B8 56       +        ld d,(hl)
+ 02B9 23       +        inc hl
+ 02BA EB       +        ex de,hl
+ 02BB E9       +        jp (hl)
+                
+                ;C ?DUP     x -- 0 | x x    DUP if nonzero
+ 02BC               head QDUP,4,?DUP,docode
+ 02BC B002     +        DW link
+ 02BE 00       +        DB 0
+      02BF     +link    DEFL $
+ 02BF 043F4455 +        DB 4,'?DUP'
+ 02C4          +QDUP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02C4 78                ld a,b
+ 02C5 B1                or c
+ 02C6 20EC              jr nz,pushtos
+ 02C8                   next
+ 02C8 EB       +        ex de,hl
+ 02C9 5E       +        ld e,(hl)
+ 02CA 23       +        inc hl
+ 02CB 56       +        ld d,(hl)
+ 02CC 23       +        inc hl
+ 02CD EB       +        ex de,hl
+ 02CE E9       +        jp (hl)
+                
+                ;C DROP     x --          drop top of stack
+ 02CF               head DROP,4,DROP,docode
+ 02CF BF02     +        DW link
+ 02D1 00       +        DB 0
+      02D2     +link    DEFL $
+ 02D2 0444524F +        DB 4,'DROP'
+ 02D7          +DROP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02D7 C1        poptos: pop bc
+ 02D8                   next
+ 02D8 EB       +        ex de,hl
+ 02D9 5E       +        ld e,(hl)
+ 02DA 23       +        inc hl
+ 02DB 56       +        ld d,(hl)
+ 02DC 23       +        inc hl
+ 02DD EB       +        ex de,hl
+ 02DE E9       +        jp (hl)
+                
+                ;C SWAP     x1 x2 -- x2 x1    swap top two items
+ 02DF               head SWOP,4,SWAP,docode
+ 02DF D202     +        DW link
+ 02E1 00       +        DB 0
+      02E2     +link    DEFL $
+ 02E2 04535741 +        DB 4,'SWAP'
+ 02E7          +SWOP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02E7 E1                pop hl
+ 02E8 C5                push bc
+ 02E9 44                ld b,h
+ 02EA 4D                ld c,l
+ 02EB                   next
+ 02EB EB       +        ex de,hl
+ 02EC 5E       +        ld e,(hl)
+ 02ED 23       +        inc hl
+ 02EE 56       +        ld d,(hl)
+ 02EF 23       +        inc hl
+ 02F0 EB       +        ex de,hl
+ 02F1 E9       +        jp (hl)
+                
+                ;C OVER    x1 x2 -- x1 x2 x1   per stack diagram
+ 02F2               head OVER,4,OVER,docode
+ 02F2 E202     +        DW link
+ 02F4 00       +        DB 0
+      02F5     +link    DEFL $
+ 02F5 044F5645 +        DB 4,'OVER'
+ 02FA          +OVER:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 02FA E1                pop hl
+ 02FB E5                push hl
+ 02FC C5                push bc
+ 02FD 44                ld b,h
+ 02FE 4D                ld c,l
+ 02FF                   next
+ 02FF EB       +        ex de,hl
+ 0300 5E       +        ld e,(hl)
+ 0301 23       +        inc hl
+ 0302 56       +        ld d,(hl)
+ 0303 23       +        inc hl
+ 0304 EB       +        ex de,hl
+ 0305 E9       +        jp (hl)
+                
+                ;C ROT    x1 x2 x3 -- x2 x3 x1  per stack diagram
+ 0306               head ROT,3,ROT,docode
+ 0306 F502     +        DW link
+ 0308 00       +        DB 0
+      0309     +link    DEFL $
+ 0309 03524F54 +        DB 3,'ROT'
+ 030D          +ROT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+                        ; x3 is in TOS
+ 030D E1                pop hl          ; x2
+ 030E E3                ex (sp),hl      ; x2 on stack, x1 in hl
+ 030F C5                push bc
+ 0310 44                ld b,h
+ 0311 4D                ld c,l
+ 0312                   next
+ 0312 EB       +        ex de,hl
+ 0313 5E       +        ld e,(hl)
+ 0314 23       +        inc hl
+ 0315 56       +        ld d,(hl)
+ 0316 23       +        inc hl
+ 0317 EB       +        ex de,hl
+ 0318 E9       +        jp (hl)
+                
+                ;X NIP    x1 x2 -- x2           per stack diagram
+ 0319               head NIP,3,NIP,docolon
+ 0319 0903     +        DW link
+ 031B 00       +        DB 0
+      031C     +link    DEFL $
+ 031C 034E4950 +        DB 3,'NIP'
+ 0320          +NIP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0320 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0323 E702D702          DW SWOP,DROP,EXIT
+                
+                ;X TUCK   x1 x2 -- x2 x1 x2     per stack diagram
+ 0329               head TUCK,4,TUCK,docolon
+ 0329 1C03     +        DW link
+ 032B 00       +        DB 0
+      032C     +link    DEFL $
+ 032C 04545543 +        DB 4,'TUCK'
+ 0331          +TUCK:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0331 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0334 E702FA02          DW SWOP,OVER,EXIT
+                
+                ;C >R    x --   R: -- x   push to return stack
+ 033A               head TOR,2,>R,docode
+ 033A 2C03     +        DW link
+ 033C 00       +        DB 0
+      033D     +link    DEFL $
+ 033D 023E52   +        DB 2,'>R'
+ 0340          +TOR:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0340 DD2B              dec ix          ; push TOS onto rtn stk
+ 0342 DD7000            ld (ix+0),b
+ 0345 DD2B              dec ix
+ 0347 DD7100            ld (ix+0),c
+ 034A C1                pop bc          ; pop new TOS
+ 034B                   next
+ 034B EB       +        ex de,hl
+ 034C 5E       +        ld e,(hl)
+ 034D 23       +        inc hl
+ 034E 56       +        ld d,(hl)
+ 034F 23       +        inc hl
+ 0350 EB       +        ex de,hl
+ 0351 E9       +        jp (hl)
+                
+                ;C R>    -- x    R: x --   pop from return stack
+ 0352               head RFROM,2,R>,docode
+ 0352 3D03     +        DW link
+ 0354 00       +        DB 0
+      0355     +link    DEFL $
+ 0355 02523E   +        DB 2,'R>'
+ 0358          +RFROM:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0358 C5                push bc         ; push old TOS
+ 0359 DD4E00            ld c,(ix+0)     ; pop top rtn stk item
+ 035C DD23              inc ix          ;       to TOS
+ 035E DD4600            ld b,(ix+0)
+ 0361 DD23              inc ix
+ 0363                   next
+ 0363 EB       +        ex de,hl
+ 0364 5E       +        ld e,(hl)
+ 0365 23       +        inc hl
+ 0366 56       +        ld d,(hl)
+ 0367 23       +        inc hl
+ 0368 EB       +        ex de,hl
+ 0369 E9       +        jp (hl)
+                
+                ;C R@    -- x     R: x -- x   fetch from rtn stk
+ 036A               head RFETCH,2,R@,docode
+ 036A 5503     +        DW link
+ 036C 00       +        DB 0
+      036D     +link    DEFL $
+ 036D 025240   +        DB 2,'R@'
+ 0370          +RFETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0370 C5                push bc         ; push old TOS
+ 0371 DD4E00            ld c,(ix+0)     ; fetch top rtn stk item
+ 0374 DD4601            ld b,(ix+1)     ;       to TOS
+ 0377                   next
+ 0377 EB       +        ex de,hl
+ 0378 5E       +        ld e,(hl)
+ 0379 23       +        inc hl
+ 037A 56       +        ld d,(hl)
+ 037B 23       +        inc hl
+ 037C EB       +        ex de,hl
+ 037D E9       +        jp (hl)
+                
+                ;Z SP@  -- a-addr       get data stack pointer
+ 037E               head SPFETCH,3,SP@,docode
+ 037E 6D03     +        DW link
+ 0380 00       +        DB 0
+      0381     +link    DEFL $
+ 0381 03535040 +        DB 3,'SP@'
+ 0385          +SPFETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0385 C5                push bc
+ 0386 210000            ld hl,0
+ 0389 39                add hl,sp
+ 038A 44                ld b,h
+ 038B 4D                ld c,l
+ 038C                   next
+ 038C EB       +        ex de,hl
+ 038D 5E       +        ld e,(hl)
+ 038E 23       +        inc hl
+ 038F 56       +        ld d,(hl)
+ 0390 23       +        inc hl
+ 0391 EB       +        ex de,hl
+ 0392 E9       +        jp (hl)
+                
+                ;Z SP!  a-addr --       set data stack pointer
+ 0393               head SPSTORE,3,SP!,docode
+ 0393 8103     +        DW link
+ 0395 00       +        DB 0
+      0396     +link    DEFL $
+ 0396 03535021 +        DB 3,'SP!'
+ 039A          +SPSTORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 039A 60                ld h,b
+ 039B 69                ld l,c
+ 039C F9                ld sp,hl
+ 039D C1                pop bc          ; get new TOS
+ 039E                   next
+ 039E EB       +        ex de,hl
+ 039F 5E       +        ld e,(hl)
+ 03A0 23       +        inc hl
+ 03A1 56       +        ld d,(hl)
+ 03A2 23       +        inc hl
+ 03A3 EB       +        ex de,hl
+ 03A4 E9       +        jp (hl)
+                
+                ;Z RP@  -- a-addr       get return stack pointer
+ 03A5               head RPFETCH,3,RP@,docode
+ 03A5 9603     +        DW link
+ 03A7 00       +        DB 0
+      03A8     +link    DEFL $
+ 03A8 03525040 +        DB 3,'RP@'
+ 03AC          +RPFETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 03AC C5                push bc
+ 03AD DDE5              push ix
+ 03AF C1                pop bc
+ 03B0                   next
+ 03B0 EB       +        ex de,hl
+ 03B1 5E       +        ld e,(hl)
+ 03B2 23       +        inc hl
+ 03B3 56       +        ld d,(hl)
+ 03B4 23       +        inc hl
+ 03B5 EB       +        ex de,hl
+ 03B6 E9       +        jp (hl)
+                
+                ;Z RP!  a-addr --       set return stack pointer
+ 03B7               head RPSTORE,3,RP!,docode
+ 03B7 A803     +        DW link
+ 03B9 00       +        DB 0
+      03BA     +link    DEFL $
+ 03BA 03525021 +        DB 3,'RP!'
+ 03BE          +RPSTORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 03BE C5                push bc
+ 03BF DDE1              pop ix
+ 03C1 C1                pop bc
+ 03C2                   next
+ 03C2 EB       +        ex de,hl
+ 03C3 5E       +        ld e,(hl)
+ 03C4 23       +        inc hl
+ 03C5 56       +        ld d,(hl)
+ 03C6 23       +        inc hl
+ 03C7 EB       +        ex de,hl
+ 03C8 E9       +        jp (hl)
+                
+                ; MEMORY AND I/O OPERATIONS =====================
+                
+                ;C !        x a-addr --   store cell in memory
+ 03C9               head STORE,1,!,docode
+ 03C9 BA03     +        DW link
+ 03CB 00       +        DB 0
+      03CC     +link    DEFL $
+ 03CC 0121     +        DB 1,'!'
+ 03CE          +STORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 03CE 60                ld h,b          ; address in hl
+ 03CF 69                ld l,c
+ 03D0 C1                pop bc          ; data in bc
+ 03D1 71                ld (hl),c
+ 03D2 23                inc hl
+ 03D3 70                ld (hl),b
+ 03D4 C1                pop bc          ; pop new TOS
+ 03D5                   next
+ 03D5 EB       +        ex de,hl
+ 03D6 5E       +        ld e,(hl)
+ 03D7 23       +        inc hl
+ 03D8 56       +        ld d,(hl)
+ 03D9 23       +        inc hl
+ 03DA EB       +        ex de,hl
+ 03DB E9       +        jp (hl)
+                
+                ;C C!      char c-addr --    store char in memory
+ 03DC               head CSTORE,2,C!,docode
+ 03DC CC03     +        DW link
+ 03DE 00       +        DB 0
+      03DF     +link    DEFL $
+ 03DF 024321   +        DB 2,'C!'
+ 03E2          +CSTORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 03E2 60                ld h,b          ; address in hl
+ 03E3 69                ld l,c
+ 03E4 C1                pop bc          ; data in bc
+ 03E5 71                ld (hl),c
+ 03E6 C1                pop bc          ; pop new TOS
+ 03E7                   next
+ 03E7 EB       +        ex de,hl
+ 03E8 5E       +        ld e,(hl)
+ 03E9 23       +        inc hl
+ 03EA 56       +        ld d,(hl)
+ 03EB 23       +        inc hl
+ 03EC EB       +        ex de,hl
+ 03ED E9       +        jp (hl)
+                
+                ;C @       a-addr -- x   fetch cell from memory
+ 03EE               head FETCH,1,@,docode
+ 03EE DF03     +        DW link
+ 03F0 00       +        DB 0
+      03F1     +link    DEFL $
+ 03F1 0140     +        DB 1,'@'
+ 03F3          +FETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 03F3 60                ld h,b          ; address in hl
+ 03F4 69                ld l,c
+ 03F5 4E                ld c,(hl)
+ 03F6 23                inc hl
+ 03F7 46                ld b,(hl)
+ 03F8                   next
+ 03F8 EB       +        ex de,hl
+ 03F9 5E       +        ld e,(hl)
+ 03FA 23       +        inc hl
+ 03FB 56       +        ld d,(hl)
+ 03FC 23       +        inc hl
+ 03FD EB       +        ex de,hl
+ 03FE E9       +        jp (hl)
+                
+                ;C C@     c-addr -- char   fetch char from memory
+ 03FF               head CFETCH,2,C@,docode
+ 03FF F103     +        DW link
+ 0401 00       +        DB 0
+      0402     +link    DEFL $
+ 0402 024340   +        DB 2,'C@'
+ 0405          +CFETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0405 0A                ld a,(bc)
+ 0406 4F                ld c,a
+ 0407 0600              ld b,0
+ 0409                   next
+ 0409 EB       +        ex de,hl
+ 040A 5E       +        ld e,(hl)
+ 040B 23       +        inc hl
+ 040C 56       +        ld d,(hl)
+ 040D 23       +        inc hl
+ 040E EB       +        ex de,hl
+ 040F E9       +        jp (hl)
+                
+                ;Z PC!     char c-addr --    output char to port
+ 0410               head PCSTORE,3,PC!,docode
+ 0410 0204     +        DW link
+ 0412 00       +        DB 0
+      0413     +link    DEFL $
+ 0413 03504321 +        DB 3,'PC!'
+ 0417          +PCSTORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0417 E1                pop hl          ; char in L
+ 0418 ED69              out (c),l       ; to port (BC)
+ 041A C1                pop bc          ; pop new TOS
+ 041B                   next
+ 041B EB       +        ex de,hl
+ 041C 5E       +        ld e,(hl)
+ 041D 23       +        inc hl
+ 041E 56       +        ld d,(hl)
+ 041F 23       +        inc hl
+ 0420 EB       +        ex de,hl
+ 0421 E9       +        jp (hl)
+                
+                ;Z PC@     c-addr -- char   input char from port
+ 0422               head PCFETCH,3,PC@,docode
+ 0422 1304     +        DW link
+ 0424 00       +        DB 0
+      0425     +link    DEFL $
+ 0425 03504340 +        DB 3,'PC@'
+ 0429          +PCFETCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0429 ED48              in c,(c)        ; read port (BC) to C
+ 042B 0600              ld b,0
+ 042D                   next
+ 042D EB       +        ex de,hl
+ 042E 5E       +        ld e,(hl)
+ 042F 23       +        inc hl
+ 0430 56       +        ld d,(hl)
+ 0431 23       +        inc hl
+ 0432 EB       +        ex de,hl
+ 0433 E9       +        jp (hl)
+                
+                ; ARITHMETIC AND LOGICAL OPERATIONS =============
+                
+                ;C +       n1/u1 n2/u2 -- n3/u3     add n1+n2
+ 0434               head PLUS,1,+,docode
+ 0434 2504     +        DW link
+ 0436 00       +        DB 0
+      0437     +link    DEFL $
+ 0437 012B     +        DB 1,'+'
+ 0439          +PLUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0439 E1                pop hl
+ 043A 09                add hl,bc
+ 043B 44                ld b,h
+ 043C 4D                ld c,l
+ 043D                   next
+ 043D EB       +        ex de,hl
+ 043E 5E       +        ld e,(hl)
+ 043F 23       +        inc hl
+ 0440 56       +        ld d,(hl)
+ 0441 23       +        inc hl
+ 0442 EB       +        ex de,hl
+ 0443 E9       +        jp (hl)
+                
+                ;X M+       d n -- d         add single to double
+ 0444               head MPLUS,2,M+,docode
+ 0444 3704     +        DW link
+ 0446 00       +        DB 0
+      0447     +link    DEFL $
+ 0447 024D2B   +        DB 2,'M+'
+ 044A          +MPLUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 044A EB                ex de,hl
+ 044B D1                pop de          ; hi cell
+ 044C E3                ex (sp),hl      ; lo cell, save IP
+ 044D 09                add hl,bc
+ 044E 42                ld b,d          ; hi result in BC (TOS)
+ 044F 4B                ld c,e
+ 0450 3001              jr nc,mplus1
+ 0452 03                inc bc
+ 0453 D1        mplus1: pop de          ; restore saved IP
+ 0454 E5                push hl         ; push lo result
+ 0455                   next
+ 0455 EB       +        ex de,hl
+ 0456 5E       +        ld e,(hl)
+ 0457 23       +        inc hl
+ 0458 56       +        ld d,(hl)
+ 0459 23       +        inc hl
+ 045A EB       +        ex de,hl
+ 045B E9       +        jp (hl)
+                
+                ;C -      n1/u1 n2/u2 -- n3/u3    subtract n1-n2
+ 045C               head MINUS,1,-,docode
+ 045C 4704     +        DW link
+ 045E 00       +        DB 0
+      045F     +link    DEFL $
+ 045F 012D     +        DB 1,'-'
+ 0461          +MINUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0461 E1                pop hl
+ 0462 B7                or a
+ 0463 ED42              sbc hl,bc
+ 0465 44                ld b,h
+ 0466 4D                ld c,l
+ 0467                   next
+ 0467 EB       +        ex de,hl
+ 0468 5E       +        ld e,(hl)
+ 0469 23       +        inc hl
+ 046A 56       +        ld d,(hl)
+ 046B 23       +        inc hl
+ 046C EB       +        ex de,hl
+ 046D E9       +        jp (hl)
+                
+                ;C AND    x1 x2 -- x3            logical AND
+ 046E               head AND,3,AND,docode
+ 046E 5F04     +        DW link
+ 0470 00       +        DB 0
+      0471     +link    DEFL $
+ 0471 03414E44 +        DB 3,'AND'
+ 0475          +AND:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0475 E1                pop hl
+ 0476 78                ld a,b
+ 0477 A4                and h
+ 0478 47                ld b,a
+ 0479 79                ld a,c
+ 047A A5                and l
+ 047B 4F                ld c,a
+ 047C                   next
+ 047C EB       +        ex de,hl
+ 047D 5E       +        ld e,(hl)
+ 047E 23       +        inc hl
+ 047F 56       +        ld d,(hl)
+ 0480 23       +        inc hl
+ 0481 EB       +        ex de,hl
+ 0482 E9       +        jp (hl)
+                
+                ;C OR     x1 x2 -- x3           logical OR
+ 0483               head OR,2,OR,docode
+ 0483 7104     +        DW link
+ 0485 00       +        DB 0
+      0486     +link    DEFL $
+ 0486 024F52   +        DB 2,'OR'
+ 0489          +OR:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0489 E1                pop hl
+ 048A 78                ld a,b
+ 048B B4                or h
+ 048C 47                ld b,a
+ 048D 79                ld a,c
+ 048E B5                or l
+ 048F 4F                ld c,a
+ 0490                   next
+ 0490 EB       +        ex de,hl
+ 0491 5E       +        ld e,(hl)
+ 0492 23       +        inc hl
+ 0493 56       +        ld d,(hl)
+ 0494 23       +        inc hl
+ 0495 EB       +        ex de,hl
+ 0496 E9       +        jp (hl)
+                
+                ;C XOR    x1 x2 -- x3            logical XOR
+ 0497               head XOR,3,XOR,docode
+ 0497 8604     +        DW link
+ 0499 00       +        DB 0
+      049A     +link    DEFL $
+ 049A 03584F52 +        DB 3,'XOR'
+ 049E          +XOR:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 049E E1                pop hl
+ 049F 78                ld a,b
+ 04A0 AC                xor h
+ 04A1 47                ld b,a
+ 04A2 79                ld a,c
+ 04A3 AD                xor l
+ 04A4 4F                ld c,a
+ 04A5                   next
+ 04A5 EB       +        ex de,hl
+ 04A6 5E       +        ld e,(hl)
+ 04A7 23       +        inc hl
+ 04A8 56       +        ld d,(hl)
+ 04A9 23       +        inc hl
+ 04AA EB       +        ex de,hl
+ 04AB E9       +        jp (hl)
+                
+                ;C INVERT   x1 -- x2            bitwise inversion
+ 04AC               head INVERT,6,INVERT,docode
+ 04AC 9A04     +        DW link
+ 04AE 00       +        DB 0
+      04AF     +link    DEFL $
+ 04AF 06494E56 +        DB 6,'INVERT'
+ 04B6          +INVERT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 04B6 78                ld a,b
+ 04B7 2F                cpl
+ 04B8 47                ld b,a
+ 04B9 79                ld a,c
+ 04BA 2F                cpl
+ 04BB 4F                ld c,a
+ 04BC                   next
+ 04BC EB       +        ex de,hl
+ 04BD 5E       +        ld e,(hl)
+ 04BE 23       +        inc hl
+ 04BF 56       +        ld d,(hl)
+ 04C0 23       +        inc hl
+ 04C1 EB       +        ex de,hl
+ 04C2 E9       +        jp (hl)
+                
+                ;C NEGATE   x1 -- x2            two's complement
+ 04C3               head NEGATE,6,NEGATE,docode
+ 04C3 AF04     +        DW link
+ 04C5 00       +        DB 0
+      04C6     +link    DEFL $
+ 04C6 064E4547 +        DB 6,'NEGATE'
+ 04CD          +NEGATE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 04CD 78                ld a,b
+ 04CE 2F                cpl
+ 04CF 47                ld b,a
+ 04D0 79                ld a,c
+ 04D1 2F                cpl
+ 04D2 4F                ld c,a
+ 04D3 03                inc bc
+ 04D4                   next
+ 04D4 EB       +        ex de,hl
+ 04D5 5E       +        ld e,(hl)
+ 04D6 23       +        inc hl
+ 04D7 56       +        ld d,(hl)
+ 04D8 23       +        inc hl
+ 04D9 EB       +        ex de,hl
+ 04DA E9       +        jp (hl)
+                
+                ;C 1+      n1/u1 -- n2/u2       add 1 to TOS
+ 04DB               head ONEPLUS,2,1+,docode
+ 04DB C604     +        DW link
+ 04DD 00       +        DB 0
+      04DE     +link    DEFL $
+ 04DE 02312B   +        DB 2,'1+'
+ 04E1          +ONEPLUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 04E1 03                inc bc
+ 04E2                   next
+ 04E2 EB       +        ex de,hl
+ 04E3 5E       +        ld e,(hl)
+ 04E4 23       +        inc hl
+ 04E5 56       +        ld d,(hl)
+ 04E6 23       +        inc hl
+ 04E7 EB       +        ex de,hl
+ 04E8 E9       +        jp (hl)
+                
+                ;C 1-      n1/u1 -- n2/u2     subtract 1 from TOS
+ 04E9               head ONEMINUS,2,1-,docode
+ 04E9 DE04     +        DW link
+ 04EB 00       +        DB 0
+      04EC     +link    DEFL $
+ 04EC 02312D   +        DB 2,'1-'
+ 04EF          +ONEMINUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 04EF 0B                dec bc
+ 04F0                   next
+ 04F0 EB       +        ex de,hl
+ 04F1 5E       +        ld e,(hl)
+ 04F2 23       +        inc hl
+ 04F3 56       +        ld d,(hl)
+ 04F4 23       +        inc hl
+ 04F5 EB       +        ex de,hl
+ 04F6 E9       +        jp (hl)
+                
+                ;Z ><      x1 -- x2         swap bytes (not ANSI)
+ 04F7               head swapbytes,2,><,docode
+ 04F7 EC04     +        DW link
+ 04F9 00       +        DB 0
+      04FA     +link    DEFL $
+ 04FA 023E3C   +        DB 2,'><'
+ 04FD          +SWAPBYTES:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 04FD 78                ld a,b
+ 04FE 41                ld b,c
+ 04FF 4F                ld c,a
+ 0500                   next
+ 0500 EB       +        ex de,hl
+ 0501 5E       +        ld e,(hl)
+ 0502 23       +        inc hl
+ 0503 56       +        ld d,(hl)
+ 0504 23       +        inc hl
+ 0505 EB       +        ex de,hl
+ 0506 E9       +        jp (hl)
+                
+                ;C 2*      x1 -- x2         arithmetic left shift
+ 0507               head TWOSTAR,2,2*,docode
+ 0507 FA04     +        DW link
+ 0509 00       +        DB 0
+      050A     +link    DEFL $
+ 050A 02322A   +        DB 2,'2*'
+ 050D          +TWOSTAR:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 050D CB21              sla c
+ 050F CB10              rl b
+ 0511                   next
+ 0511 EB       +        ex de,hl
+ 0512 5E       +        ld e,(hl)
+ 0513 23       +        inc hl
+ 0514 56       +        ld d,(hl)
+ 0515 23       +        inc hl
+ 0516 EB       +        ex de,hl
+ 0517 E9       +        jp (hl)
+                
+                ;C 2/      x1 -- x2        arithmetic right shift
+ 0518               head TWOSLASH,2,2/,docode
+ 0518 0A05     +        DW link
+ 051A 00       +        DB 0
+      051B     +link    DEFL $
+ 051B 02322F   +        DB 2,'2/'
+ 051E          +TWOSLASH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 051E CB28              sra b
+ 0520 CB19              rr c
+ 0522                   next
+ 0522 EB       +        ex de,hl
+ 0523 5E       +        ld e,(hl)
+ 0524 23       +        inc hl
+ 0525 56       +        ld d,(hl)
+ 0526 23       +        inc hl
+ 0527 EB       +        ex de,hl
+ 0528 E9       +        jp (hl)
+                
+                ;C LSHIFT  x1 u -- x2    logical L shift u places
+ 0529               head LSHIFT,6,LSHIFT,docode
+ 0529 1B05     +        DW link
+ 052B 00       +        DB 0
+      052C     +link    DEFL $
+ 052C 064C5348 +        DB 6,'LSHIFT'
+ 0533          +LSHIFT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0533 41                ld b,c        ; b = loop counter
+ 0534 E1                pop hl        ;   NB: hi 8 bits ignored!
+ 0535 04                inc b         ; test for counter=0 case
+ 0536 1801              jr lsh2
+ 0538 29        lsh1:   add hl,hl     ; left shift HL, n times
+ 0539 10FD      lsh2:   djnz lsh1
+ 053B 44                ld b,h        ; result is new TOS
+ 053C 4D                ld c,l
+ 053D                   next
+ 053D EB       +        ex de,hl
+ 053E 5E       +        ld e,(hl)
+ 053F 23       +        inc hl
+ 0540 56       +        ld d,(hl)
+ 0541 23       +        inc hl
+ 0542 EB       +        ex de,hl
+ 0543 E9       +        jp (hl)
+                
+                ;C RSHIFT  x1 u -- x2    logical R shift u places
+ 0544               head RSHIFT,6,RSHIFT,docode
+ 0544 2C05     +        DW link
+ 0546 00       +        DB 0
+      0547     +link    DEFL $
+ 0547 06525348 +        DB 6,'RSHIFT'
+ 054E          +RSHIFT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 054E 41                ld b,c        ; b = loop counter
+ 054F E1                pop hl        ;   NB: hi 8 bits ignored!
+ 0550 04                inc b         ; test for counter=0 case
+ 0551 1804              jr rsh2
+ 0553 CB3C      rsh1:   srl h         ; right shift HL, n times
+ 0555 CB1D              rr l
+ 0557 10FA      rsh2:   djnz rsh1
+ 0559 44                ld b,h        ; result is new TOS
+ 055A 4D                ld c,l
+ 055B                   next
+ 055B EB       +        ex de,hl
+ 055C 5E       +        ld e,(hl)
+ 055D 23       +        inc hl
+ 055E 56       +        ld d,(hl)
+ 055F 23       +        inc hl
+ 0560 EB       +        ex de,hl
+ 0561 E9       +        jp (hl)
+                
+                ;C +!     n/u a-addr --       add cell to memory
+ 0562               head PLUSSTORE,2,+!,docode
+ 0562 4705     +        DW link
+ 0564 00       +        DB 0
+      0565     +link    DEFL $
+ 0565 022B21   +        DB 2,'+!'
+ 0568          +PLUSSTORE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0568 E1                pop hl
+ 0569 0A                ld a,(bc)       ; low byte
+ 056A 85                add a,l
+ 056B 02                ld (bc),a
+ 056C 03                inc bc
+ 056D 0A                ld a,(bc)       ; high byte
+ 056E 8C                adc a,h
+ 056F 02                ld (bc),a
+ 0570 C1                pop bc          ; pop new TOS
+ 0571                   next
+ 0571 EB       +        ex de,hl
+ 0572 5E       +        ld e,(hl)
+ 0573 23       +        inc hl
+ 0574 56       +        ld d,(hl)
+ 0575 23       +        inc hl
+ 0576 EB       +        ex de,hl
+ 0577 E9       +        jp (hl)
+                
+                ; COMPARISON OPERATIONS =========================
+                
+                ;C 0=     n/u -- flag    return true if TOS=0
+ 0578               head ZEROEQUAL,2,0=,docode
+ 0578 6505     +        DW link
+ 057A 00       +        DB 0
+      057B     +link    DEFL $
+ 057B 02303D   +        DB 2,'0='
+ 057E          +ZEROEQUAL:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 057E 78                ld a,b
+ 057F B1                or c            ; result=0 if bc was 0
+ 0580 D601              sub 1           ; cy set   if bc was 0
+ 0582 9F                sbc a,a         ; propagate cy through A
+ 0583 47                ld b,a          ; put 0000 or FFFF in TOS
+ 0584 4F                ld c,a
+ 0585                   next
+ 0585 EB       +        ex de,hl
+ 0586 5E       +        ld e,(hl)
+ 0587 23       +        inc hl
+ 0588 56       +        ld d,(hl)
+ 0589 23       +        inc hl
+ 058A EB       +        ex de,hl
+ 058B E9       +        jp (hl)
+                
+                ;C 0<     n -- flag      true if TOS negative
+ 058C               head ZEROLESS,2,0<,docode
+ 058C 7B05     +        DW link
+ 058E 00       +        DB 0
+      058F     +link    DEFL $
+ 058F 02303C   +        DB 2,'0<'
+ 0592          +ZEROLESS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0592 CB20              sla b           ; sign bit -> cy flag
+ 0594 9F                sbc a,a         ; propagate cy through A
+ 0595 47                ld b,a          ; put 0000 or FFFF in TOS
+ 0596 4F                ld c,a
+ 0597                   next
+ 0597 EB       +        ex de,hl
+ 0598 5E       +        ld e,(hl)
+ 0599 23       +        inc hl
+ 059A 56       +        ld d,(hl)
+ 059B 23       +        inc hl
+ 059C EB       +        ex de,hl
+ 059D E9       +        jp (hl)
+                
+                ;C =      x1 x2 -- flag         test x1=x2
+ 059E               head EQUAL,1,=,docode
+ 059E 8F05     +        DW link
+ 05A0 00       +        DB 0
+      05A1     +link    DEFL $
+ 05A1 013D     +        DB 1,'='
+ 05A3          +EQUAL:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 05A3 E1                pop hl
+ 05A4 B7                or a
+ 05A5 ED42              sbc hl,bc       ; x1-x2 in HL, SZVC valid
+ 05A7 2828              jr z,tostrue
+ 05A9 010000    tosfalse: ld bc,0
+ 05AC                   next
+ 05AC EB       +        ex de,hl
+ 05AD 5E       +        ld e,(hl)
+ 05AE 23       +        inc hl
+ 05AF 56       +        ld d,(hl)
+ 05B0 23       +        inc hl
+ 05B1 EB       +        ex de,hl
+ 05B2 E9       +        jp (hl)
+                
+                ;X <>     x1 x2 -- flag    test not eq (not ANSI)
+ 05B3               head NOTEQUAL,2,<>,docolon
+ 05B3 A105     +        DW link
+ 05B5 00       +        DB 0
+      05B6     +link    DEFL $
+ 05B6 023C3E   +        DB 2,'<>'
+ 05B9          +NOTEQUAL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 05B9 CD5301   +        call DOCOLON
+               +        ENDIF
+ 05BC A3057E05          DW EQUAL,ZEROEQUAL,EXIT
+                
+                ;C <      n1 n2 -- flag        test n1<n2, signed
+ 05C2               head LESS,1,<,docode
+ 05C2 B605     +        DW link
+ 05C4 00       +        DB 0
+      05C5     +link    DEFL $
+ 05C5 013C     +        DB 1,'<'
+ 05C7          +LESS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 05C7 E1                pop hl
+ 05C8 B7                or a
+ 05C9 ED42              sbc hl,bc       ; n1-n2 in HL, SZVC valid
+                ; if result negative & not OV, n1<n2
+                ; neg. & OV => n1 +ve, n2 -ve, rslt -ve, so n1>n2
+                ; if result positive & not OV, n1>=n2
+                ; pos. & OV => n1 -ve, n2 +ve, rslt +ve, so n1<n2
+                ; thus OV reverses the sense of the sign bit
+ 05CB EADB05            jp pe,revsense  ; if OV, use rev. sense
+ 05CE F2A905            jp p,tosfalse   ;   if +ve, result false
+ 05D1 01FFFF    tostrue: ld bc,0ffffh   ;   if -ve, result true
+ 05D4                   next
+ 05D4 EB       +        ex de,hl
+ 05D5 5E       +        ld e,(hl)
+ 05D6 23       +        inc hl
+ 05D7 56       +        ld d,(hl)
+ 05D8 23       +        inc hl
+ 05D9 EB       +        ex de,hl
+ 05DA E9       +        jp (hl)
+ 05DB FAA905    revsense: jp m,tosfalse ; OV: if -ve, reslt false
+ 05DE 18F1              jr tostrue      ;     if +ve, result true
+                
+                ;C >     n1 n2 -- flag         test n1>n2, signed
+ 05E0               head GREATER,1,>,docolon
+ 05E0 C505     +        DW link
+ 05E2 00       +        DB 0
+      05E3     +link    DEFL $
+ 05E3 013E     +        DB 1,'>'
+ 05E5          +GREATER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 05E5 CD5301   +        call DOCOLON
+               +        ENDIF
+ 05E8 E702C705          DW SWOP,LESS,EXIT
+                
+                ;C U<    u1 u2 -- flag       test u1<n2, unsigned
+ 05EE               head ULESS,2,U<,docode
+ 05EE E305     +        DW link
+ 05F0 00       +        DB 0
+      05F1     +link    DEFL $
+ 05F1 02553C   +        DB 2,'U<'
+ 05F4          +ULESS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 05F4 E1                pop hl
+ 05F5 B7                or a
+ 05F6 ED42              sbc hl,bc       ; u1-u2 in HL, SZVC valid
+ 05F8 9F                sbc a,a         ; propagate cy through A
+ 05F9 47                ld b,a          ; put 0000 or FFFF in TOS
+ 05FA 4F                ld c,a
+ 05FB                   next
+ 05FB EB       +        ex de,hl
+ 05FC 5E       +        ld e,(hl)
+ 05FD 23       +        inc hl
+ 05FE 56       +        ld d,(hl)
+ 05FF 23       +        inc hl
+ 0600 EB       +        ex de,hl
+ 0601 E9       +        jp (hl)
+                
+                ;X U>    u1 u2 -- flag     u1>u2 unsgd (not ANSI)
+ 0602               head UGREATER,2,U>,docolon
+ 0602 F105     +        DW link
+ 0604 00       +        DB 0
+      0605     +link    DEFL $
+ 0605 02553E   +        DB 2,'U>'
+ 0608          +UGREATER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0608 CD5301   +        call DOCOLON
+               +        ENDIF
+ 060B E702F405          DW SWOP,ULESS,EXIT
+                
+                ; LOOP AND BRANCH OPERATIONS ====================
+                
+                ;Z branch   --                  branch always
+ 0611               head branch,6,branch,docode
+ 0611 0506     +        DW link
+ 0613 00       +        DB 0
+      0614     +link    DEFL $
+ 0614 06425241 +        DB 6,'BRANCH'
+ 061B          +BRANCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 061B 1A        dobranch: ld a,(de)     ; get inline value => IP
+ 061C 6F                ld l,a
+ 061D 13                inc de
+ 061E 1A                ld a,(de)
+ 061F 67                ld h,a
+ 0620                   nexthl
+ 0620 5E       +        ld e,(hl)
+ 0621 23       +        inc hl
+ 0622 56       +        ld d,(hl)
+ 0623 23       +        inc hl
+ 0624 EB       +        ex de,hl
+ 0625 E9       +        jp (hl)
+                
+                ;Z ?branch   x --              branch if TOS zero
+ 0626               head qbranch,7,?branch,docode
+ 0626 1406     +        DW link
+ 0628 00       +        DB 0
+      0629     +link    DEFL $
+ 0629 073F4252 +        DB 7,'?BRANCH'
+ 0631          +QBRANCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0631 78                ld a,b
+ 0632 B1                or c            ; test old TOS
+ 0633 C1                pop bc          ; pop new TOS
+ 0634 28E5              jr z,dobranch   ; if old TOS=0, branch
+ 0636 13                inc de          ; else skip inline value
+ 0637 13                inc de
+ 0638                   next
+ 0638 EB       +        ex de,hl
+ 0639 5E       +        ld e,(hl)
+ 063A 23       +        inc hl
+ 063B 56       +        ld d,(hl)
+ 063C 23       +        inc hl
+ 063D EB       +        ex de,hl
+ 063E E9       +        jp (hl)
+                
+                ;Z (do)    n1|u1 n2|u2 --  R: -- sys1 sys2
+                ;Z                          run-time code for DO
+                ; '83 and ANSI standard loops terminate when the
+                ; boundary of limit-1 and limit is crossed, in
+                ; either direction.  This can be conveniently
+                ; implemented by making the limit 8000h, so that
+                ; arithmetic overflow logic can detect crossing.
+                ; I learned this trick from Laxen & Perry F83.
+                ; fudge factor = 8000h-limit, to be added to
+                ; the start value.
+ 063F               head xdo,4,(do),docode
+ 063F 2906     +        DW link
+ 0641 00       +        DB 0
+      0642     +link    DEFL $
+ 0642 0428444F +        DB 4,'(DO)'
+ 0647          +XDO:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0647 EB                ex de,hl
+ 0648 E3                ex (sp),hl   ; IP on stack, limit in HL
+ 0649 EB                ex de,hl
+ 064A 210080            ld hl,8000h
+ 064D B7                or a
+ 064E ED52              sbc hl,de    ; 8000-limit in HL
+ 0650 DD2B              dec ix       ; push this fudge factor
+ 0652 DD7400            ld (ix+0),h  ;    onto return stack
+ 0655 DD2B              dec ix       ;    for later use by 'I'
+ 0657 DD7500            ld (ix+0),l
+ 065A 09                add hl,bc    ; add fudge to start value
+ 065B DD2B              dec ix       ; push adjusted start value
+ 065D DD7400            ld (ix+0),h  ;    onto return stack
+ 0660 DD2B              dec ix       ;    as the loop index.
+ 0662 DD7500            ld (ix+0),l
+ 0665 D1                pop de       ; restore the saved IP
+ 0666 C1                pop bc       ; pop new TOS
+ 0667                   next
+ 0667 EB       +        ex de,hl
+ 0668 5E       +        ld e,(hl)
+ 0669 23       +        inc hl
+ 066A 56       +        ld d,(hl)
+ 066B 23       +        inc hl
+ 066C EB       +        ex de,hl
+ 066D E9       +        jp (hl)
+                
+                ;Z (loop)   R: sys1 sys2 --  | sys1 sys2
+                ;Z                        run-time code for LOOP
+                ; Add 1 to the loop index.  If loop terminates,
+                ; clean up the return stack and skip the branch.
+                ; Else take the inline branch.  Note that LOOP
+                ; terminates when index=8000h.
+ 066E               head xloop,6,(loop),docode
+ 066E 4206     +        DW link
+ 0670 00       +        DB 0
+      0671     +link    DEFL $
+ 0671 06284C4F +        DB 6,'(LOOP)'
+ 0678          +XLOOP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0678 D9                exx
+ 0679 010100            ld bc,1
+ 067C DD6E00    looptst: ld l,(ix+0)  ; get the loop index
+ 067F DD6601            ld h,(ix+1)
+ 0682 B7                or a
+ 0683 ED4A              adc hl,bc    ; increment w/overflow test
+ 0685 EA9106            jp pe,loopterm  ; overflow=loop done
+                        ; continue the loop
+ 0688 DD7500            ld (ix+0),l  ; save the updated index
+ 068B DD7401            ld (ix+1),h
+ 068E D9                exx
+ 068F 188A              jr dobranch  ; take the inline branch
+ 0691           loopterm: ; terminate the loop
+ 0691 010400            ld bc,4      ; discard the loop info
+ 0694 DD09              add ix,bc
+ 0696 D9                exx
+ 0697 13                inc de       ; skip the inline branch
+ 0698 13                inc de
+ 0699                   next
+ 0699 EB       +        ex de,hl
+ 069A 5E       +        ld e,(hl)
+ 069B 23       +        inc hl
+ 069C 56       +        ld d,(hl)
+ 069D 23       +        inc hl
+ 069E EB       +        ex de,hl
+ 069F E9       +        jp (hl)
+                
+                ;Z (+loop)   n --   R: sys1 sys2 --  | sys1 sys2
+                ;Z                        run-time code for +LOOP
+                ; Add n to the loop index.  If loop terminates,
+                ; clean up the return stack and skip the branch.
+                ; Else take the inline branch.
+ 06A0               head xplusloop,7,(+loop),docode
+ 06A0 7106     +        DW link
+ 06A2 00       +        DB 0
+      06A3     +link    DEFL $
+ 06A3 07282B4C +        DB 7,'(+LOOP)'
+ 06AB          +XPLUSLOOP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 06AB E1                pop hl      ; this will be the new TOS
+ 06AC C5                push bc
+ 06AD 44                ld b,h
+ 06AE 4D                ld c,l
+ 06AF D9                exx
+ 06B0 C1                pop bc      ; old TOS = loop increment
+ 06B1 18C9              jr looptst
+                
+                ;C I        -- n   R: sys1 sys2 -- sys1 sys2
+                ;C                  get the innermost loop index
+ 06B3               head II,1,I,docode
+ 06B3 A306     +        DW link
+ 06B5 00       +        DB 0
+      06B6     +link    DEFL $
+ 06B6 0149     +        DB 1,'I'
+ 06B8          +II:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 06B8 C5                push bc     ; push old TOS
+ 06B9 DD6E00            ld l,(ix+0) ; get current loop index
+ 06BC DD6601            ld h,(ix+1)
+ 06BF DD4E02            ld c,(ix+2) ; get fudge factor
+ 06C2 DD4603            ld b,(ix+3)
+ 06C5 B7                or a
+ 06C6 ED42              sbc hl,bc   ; subtract fudge factor,
+ 06C8 44                ld b,h      ;   returning true index
+ 06C9 4D                ld c,l
+ 06CA                   next
+ 06CA EB       +        ex de,hl
+ 06CB 5E       +        ld e,(hl)
+ 06CC 23       +        inc hl
+ 06CD 56       +        ld d,(hl)
+ 06CE 23       +        inc hl
+ 06CF EB       +        ex de,hl
+ 06D0 E9       +        jp (hl)
+                
+                ;C J        -- n   R: 4*sys -- 4*sys
+                ;C                  get the second loop index
+ 06D1               head JJ,1,J,docode
+ 06D1 B606     +        DW link
+ 06D3 00       +        DB 0
+      06D4     +link    DEFL $
+ 06D4 014A     +        DB 1,'J'
+ 06D6          +JJ:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 06D6 C5                push bc     ; push old TOS
+ 06D7 DD6E04            ld l,(ix+4) ; get current loop index
+ 06DA DD6605            ld h,(ix+5)
+ 06DD DD4E06            ld c,(ix+6) ; get fudge factor
+ 06E0 DD4607            ld b,(ix+7)
+ 06E3 B7                or a
+ 06E4 ED42              sbc hl,bc   ; subtract fudge factor,
+ 06E6 44                ld b,h      ;   returning true index
+ 06E7 4D                ld c,l
+ 06E8                   next
+ 06E8 EB       +        ex de,hl
+ 06E9 5E       +        ld e,(hl)
+ 06EA 23       +        inc hl
+ 06EB 56       +        ld d,(hl)
+ 06EC 23       +        inc hl
+ 06ED EB       +        ex de,hl
+ 06EE E9       +        jp (hl)
+                
+                ;C UNLOOP   --   R: sys1 sys2 --  drop loop parms
+ 06EF               head UNLOOP,6,UNLOOP,docode
+ 06EF D406     +        DW link
+ 06F1 00       +        DB 0
+      06F2     +link    DEFL $
+ 06F2 06554E4C +        DB 6,'UNLOOP'
+ 06F9          +UNLOOP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 06F9 DD23              inc ix
+ 06FB DD23              inc ix
+ 06FD DD23              inc ix
+ 06FF DD23              inc ix
+ 0701                   next
+ 0701 EB       +        ex de,hl
+ 0702 5E       +        ld e,(hl)
+ 0703 23       +        inc hl
+ 0704 56       +        ld d,(hl)
+ 0705 23       +        inc hl
+ 0706 EB       +        ex de,hl
+ 0707 E9       +        jp (hl)
+                
+                ; MULTIPLY AND DIVIDE ===========================
+                
+                ;C UM*     u1 u2 -- ud   unsigned 16x16->32 mult.
+ 0708               head UMSTAR,3,UM*,docode
+ 0708 F206     +        DW link
+ 070A 00       +        DB 0
+      070B     +link    DEFL $
+ 070B 03554D2A +        DB 3,'UM*'
+ 070F          +UMSTAR:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 070F C5                push bc
+ 0710 D9                exx
+ 0711 C1                pop bc      ; u2 in BC
+ 0712 D1                pop de      ; u1 in DE
+ 0713 210000            ld hl,0     ; result will be in HLDE
+ 0716 3E11              ld a,17     ; loop counter
+ 0718 B7                or a        ; clear cy
+ 0719 CB1C      umloop: rr h
+ 071B CB1D              rr l
+ 071D CB1A              rr d
+ 071F CB1B              rr e
+ 0721 3001              jr nc,noadd
+ 0723 09                add hl,bc
+ 0724 3D        noadd:  dec a
+ 0725 20F2              jr nz,umloop
+ 0727 D5                push de     ; lo result
+ 0728 E5                push hl     ; hi result
+ 0729 D9                exx
+ 072A C1                pop bc      ; put TOS back in BC
+ 072B                   next
+ 072B EB       +        ex de,hl
+ 072C 5E       +        ld e,(hl)
+ 072D 23       +        inc hl
+ 072E 56       +        ld d,(hl)
+ 072F 23       +        inc hl
+ 0730 EB       +        ex de,hl
+ 0731 E9       +        jp (hl)
+                
+                ;C UM/MOD   ud u1 -- u2 u3   unsigned 32/16->16
+ 0732               head UMSLASHMOD,6,UM/MOD,docode
+ 0732 0B07     +        DW link
+ 0734 00       +        DB 0
+      0735     +link    DEFL $
+ 0735 06554D2F +        DB 6,'UM/MOD'
+ 073C          +UMSLASHMOD:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 073C C5                push bc
+ 073D D9                exx
+ 073E C1                pop bc      ; BC = divisor
+ 073F E1                pop hl      ; HLDE = dividend
+ 0740 D1                pop de
+ 0741 3E10              ld a,16     ; loop counter
+ 0743 CB23              sla e
+ 0745 CB12              rl d        ; hi bit DE -> carry
+ 0747 ED6A      udloop: adc hl,hl   ; rot left w/ carry
+ 0749 3006              jr nc,udiv3
+                        ; case 1: 17 bit, cy:HL = 1xxxx
+ 074B B7                or a        ; we know we can subtract
+ 074C ED42              sbc hl,bc
+ 074E B7                or a        ; clear cy to indicate sub ok
+ 074F 1806              jr udiv4
+                        ; case 2: 16 bit, cy:HL = 0xxxx
+ 0751 ED42      udiv3:  sbc hl,bc   ; try the subtract
+ 0753 3002              jr nc,udiv4 ; if no cy, subtract ok
+ 0755 09                add hl,bc   ; else cancel the subtract
+ 0756 37                scf         ;   and set cy to indicate
+ 0757 CB13      udiv4:  rl e        ; rotate result bit into DE,
+ 0759 CB12              rl d        ; and next bit of DE into cy
+ 075B 3D                dec a
+ 075C 20E9              jr nz,udloop
+                        ; now have complemented quotient in DE,
+                        ; and remainder in HL
+ 075E 7A                ld a,d
+ 075F 2F                cpl
+ 0760 47                ld b,a
+ 0761 7B                ld a,e
+ 0762 2F                cpl
+ 0763 4F                ld c,a
+ 0764 E5                push hl     ; push remainder
+ 0765 C5                push bc
+ 0766 D9                exx
+ 0767 C1                pop bc      ; quotient remains in TOS
+ 0768                   next
+ 0768 EB       +        ex de,hl
+ 0769 5E       +        ld e,(hl)
+ 076A 23       +        inc hl
+ 076B 56       +        ld d,(hl)
+ 076C 23       +        inc hl
+ 076D EB       +        ex de,hl
+ 076E E9       +        jp (hl)
+                
+                ; BLOCK AND STRING OPERATIONS ===================
+                
+                ;C FILL   c-addr u char --  fill memory with char
+ 076F               head FILL,4,FILL,docode
+ 076F 3507     +        DW link
+ 0771 00       +        DB 0
+      0772     +link    DEFL $
+ 0772 0446494C +        DB 4,'FILL'
+ 0777          +FILL:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0777 79                ld a,c          ; character in a
+ 0778 D9                exx             ; use alt. register set
+ 0779 C1                pop bc          ; count in bc
+ 077A D1                pop de          ; address in de
+ 077B B7                or a            ; clear carry flag
+ 077C 21FFFF            ld hl,0ffffh
+ 077F ED4A              adc hl,bc       ; test for count=0 or 1
+ 0781 3009              jr nc,filldone  ;   no cy: count=0, skip
+ 0783 12                ld (de),a       ; fill first byte
+ 0784 2806              jr z,filldone   ;   zero, count=1, done
+ 0786 0B                dec bc          ; else adjust count,
+ 0787 62                ld h,d          ;   let hl = start adrs,
+ 0788 6B                ld l,e
+ 0789 13                inc de          ;   let de = start adrs+1
+ 078A EDB0              ldir            ;   copy (hl)->(de)
+ 078C D9        filldone: exx           ; back to main reg set
+ 078D C1                pop bc          ; pop new TOS
+ 078E                   next
+ 078E EB       +        ex de,hl
+ 078F 5E       +        ld e,(hl)
+ 0790 23       +        inc hl
+ 0791 56       +        ld d,(hl)
+ 0792 23       +        inc hl
+ 0793 EB       +        ex de,hl
+ 0794 E9       +        jp (hl)
+                
+                ;X CMOVE   c-addr1 c-addr2 u --  move from bottom
+                ; as defined in the ANSI optional String word set
+                ; On byte machines, CMOVE and CMOVE> are logical
+                ; factors of MOVE.  They are easy to implement on
+                ; CPUs which have a block-move instruction.
+ 0795               head CMOVE,5,CMOVE,docode
+ 0795 7207     +        DW link
+ 0797 00       +        DB 0
+      0798     +link    DEFL $
+ 0798 05434D4F +        DB 5,'CMOVE'
+ 079E          +CMOVE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 079E C5                push bc
+ 079F D9                exx
+ 07A0 C1                pop bc      ; count
+ 07A1 D1                pop de      ; destination adrs
+ 07A2 E1                pop hl      ; source adrs
+ 07A3 78                ld a,b      ; test for count=0
+ 07A4 B1                or c
+ 07A5 2802              jr z,cmovedone
+ 07A7 EDB0              ldir        ; move from bottom to top
+ 07A9 D9        cmovedone: exx
+ 07AA C1                pop bc      ; pop new TOS
+ 07AB                   next
+ 07AB EB       +        ex de,hl
+ 07AC 5E       +        ld e,(hl)
+ 07AD 23       +        inc hl
+ 07AE 56       +        ld d,(hl)
+ 07AF 23       +        inc hl
+ 07B0 EB       +        ex de,hl
+ 07B1 E9       +        jp (hl)
+                
+                ;X CMOVE>  c-addr1 c-addr2 u --  move from top
+                ; as defined in the ANSI optional String word set
+ 07B2               head CMOVEUP,6,CMOVE>,docode
+ 07B2 9807     +        DW link
+ 07B4 00       +        DB 0
+      07B5     +link    DEFL $
+ 07B5 06434D4F +        DB 6,'CMOVE>'
+ 07BC          +CMOVEUP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 07BC C5                push bc
+ 07BD D9                exx
+ 07BE C1                pop bc      ; count
+ 07BF E1                pop hl      ; destination adrs
+ 07C0 D1                pop de      ; source adrs
+ 07C1 78                ld a,b      ; test for count=0
+ 07C2 B1                or c
+ 07C3 2807              jr z,umovedone
+ 07C5 09                add hl,bc   ; last byte in destination
+ 07C6 2B                dec hl
+ 07C7 EB                ex de,hl
+ 07C8 09                add hl,bc   ; last byte in source
+ 07C9 2B                dec hl
+ 07CA EDB8              lddr        ; move from top to bottom
+ 07CC D9        umovedone: exx
+ 07CD C1                pop bc      ; pop new TOS
+ 07CE                   next
+ 07CE EB       +        ex de,hl
+ 07CF 5E       +        ld e,(hl)
+ 07D0 23       +        inc hl
+ 07D1 56       +        ld d,(hl)
+ 07D2 23       +        inc hl
+ 07D3 EB       +        ex de,hl
+ 07D4 E9       +        jp (hl)
+                
+                ;Z SKIP   c-addr u c -- c-addr' u'
+                ;Z                          skip matching chars
+                ; Although SKIP, SCAN, and S= are perhaps not the
+                ; ideal factors of WORD and FIND, they closely
+                ; follow the string operations available on many
+                ; CPUs, and so are easy to implement and fast.
+ 07D5               head skip,4,SKIP,docode
+ 07D5 B507     +        DW link
+ 07D7 00       +        DB 0
+      07D8     +link    DEFL $
+ 07D8 04534B49 +        DB 4,'SKIP'
+ 07DD          +SKIP:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 07DD 79                ld a,c      ; skip character
+ 07DE D9                exx
+ 07DF C1                pop bc      ; count
+ 07E0 E1                pop hl      ; address
+ 07E1 5F                ld e,a      ; test for count=0
+ 07E2 78                ld a,b
+ 07E3 B1                or c
+ 07E4 280C              jr z,skipdone
+ 07E6 7B                ld a,e
+ 07E7 EDA1      skiploop: cpi
+ 07E9 2005              jr nz,skipmis   ; char mismatch: exit
+ 07EB EAE707            jp pe,skiploop  ; count not exhausted
+ 07EE 1802              jr skipdone     ; count 0, no mismatch
+ 07F0 03        skipmis: inc bc         ; mismatch!  undo last to
+ 07F1 2B                dec hl          ;  point at mismatch char
+ 07F2 E5        skipdone: push hl   ; updated address
+ 07F3 C5                push bc     ; updated count
+ 07F4 D9                exx
+ 07F5 C1                pop bc      ; TOS in bc
+ 07F6                   next
+ 07F6 EB       +        ex de,hl
+ 07F7 5E       +        ld e,(hl)
+ 07F8 23       +        inc hl
+ 07F9 56       +        ld d,(hl)
+ 07FA 23       +        inc hl
+ 07FB EB       +        ex de,hl
+ 07FC E9       +        jp (hl)
+                
+                ;Z SCAN    c-addr u c -- c-addr' u'
+                ;Z                      find matching char
+ 07FD               head scan,4,SCAN,docode
+ 07FD D807     +        DW link
+ 07FF 00       +        DB 0
+      0800     +link    DEFL $
+ 0800 04534341 +        DB 4,'SCAN'
+ 0805          +SCAN:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0805 79                ld a,c      ; scan character
+ 0806 D9                exx
+ 0807 C1                pop bc      ; count
+ 0808 E1                pop hl      ; address
+ 0809 5F                ld e,a      ; test for count=0
+ 080A 78                ld a,b
+ 080B B1                or c
+ 080C 2807              jr z,scandone
+ 080E 7B                ld a,e
+ 080F EDB1              cpir        ; scan 'til match or count=0
+ 0811 2002              jr nz,scandone  ; no match, BC & HL ok
+ 0813 03                inc bc          ; match!  undo last to
+ 0814 2B                dec hl          ;   point at match char
+ 0815 E5        scandone: push hl   ; updated address
+ 0816 C5                push bc     ; updated count
+ 0817 D9                exx
+ 0818 C1                pop bc      ; TOS in bc
+ 0819                   next
+ 0819 EB       +        ex de,hl
+ 081A 5E       +        ld e,(hl)
+ 081B 23       +        inc hl
+ 081C 56       +        ld d,(hl)
+ 081D 23       +        inc hl
+ 081E EB       +        ex de,hl
+ 081F E9       +        jp (hl)
+                
+                ;Z S=    c-addr1 c-addr2 u -- n   string compare
+                ;Z             n<0: s1<s2, n=0: s1=s2, n>0: s1>s2
+ 0820               head sequal,2,S=,docode
+ 0820 0008     +        DW link
+ 0822 00       +        DB 0
+      0823     +link    DEFL $
+ 0823 02533D   +        DB 2,'S='
+ 0826          +SEQUAL:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0826 C5                push bc
+ 0827 D9                exx
+ 0828 C1                pop bc      ; count
+ 0829 E1                pop hl      ; addr2
+ 082A D1                pop de      ; addr1
+ 082B 78                ld a,b      ; test for count=0
+ 082C B1                or c
+ 082D 2809              jr z,smatch     ; by definition, match!
+ 082F 1A        sloop:  ld a,(de)
+ 0830 13                inc de
+ 0831 EDA1              cpi
+ 0833 2009              jr nz,sdiff     ; char mismatch: exit
+ 0835 EA2F08            jp pe,sloop     ; count not exhausted
+ 0838           smatch: ; count exhausted & no mismatch found
+ 0838 D9                exx
+ 0839 010000            ld bc,0         ; bc=0000  (s1=s2)
+ 083C 1808              jr snext
+ 083E           sdiff:  ; mismatch!  undo last 'cpi' increment
+ 083E 2B                dec hl          ; point at mismatch char
+ 083F BE                cp (hl)         ; set cy if char1 < char2
+ 0840 9F                sbc a,a         ; propagate cy thru A
+ 0841 D9                exx
+ 0842 47                ld b,a          ; bc=FFFF if cy (s1<s2)
+ 0843 F601              or 1            ; bc=0001 if ncy (s1>s2)
+ 0845 4F                ld c,a
+ 0846           snext:  next
+ 0846 EB       +        ex de,hl
+ 0847 5E       +        ld e,(hl)
+ 0848 23       +        inc hl
+ 0849 56       +        ld d,(hl)
+ 084A 23       +        inc hl
+ 084B EB       +        ex de,hl
+ 084C E9       +        jp (hl)
+                
+                *INCLUDE camel80d.azm   ; CPU Dependencies
+                ; LISTING 3.
+                ;
+                ; ===============================================
+                ; CamelForth for the Zilog Z80
+                ; (c) 1994 Bradford J. Rodriguez
+                ; Permission is granted to freely copy, modify,
+                ; and distribute this program for personal or
+                ; educational use.  Commercial inquiries should
+                ; be directed to the author at 221 King St. E.,
+                ; #32, Hamilton, Ontario L8N 1B5 Canada
+                ;
+                ; CAMEL80D.AZM: CPU and Model Dependencies
+                ;   Source code is for the Z80MR macro assembler.
+                ;   Forth words are documented as follows:
+                ;*   NAME     stack -- stack    description
+                ;   Word names in upper case are from the ANS
+                ;   Forth Core word set.  Names in lower case are
+                ;   "internal" implementation words & extensions.
+                ;
+                ; Direct-Threaded Forth model for Zilog Z80
+                ;   cell size is   16 bits (2 bytes)
+                ;   char size is    8 bits (1 byte)
+                ;   address unit is 8 bits (1 byte), i.e.,
+                ;       addresses are byte-aligned.
+                ; ===============================================
+                
+                ; ALIGNMENT AND PORTABILITY OPERATORS ===========
+                ; Many of these are synonyms for other words,
+                ; and so are defined as CODE words.
+                
+                ;C ALIGN    --                         align HERE
+ 084D               head ALIGN,5,ALIGN,docode
+ 084D 2308     +        DW link
+ 084F 00       +        DB 0
+      0850     +link    DEFL $
+ 0850 05414C49 +        DB 5,'ALIGN'
+ 0856          +ALIGN:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0856           noop:   next
+ 0856 EB       +        ex de,hl
+ 0857 5E       +        ld e,(hl)
+ 0858 23       +        inc hl
+ 0859 56       +        ld d,(hl)
+ 085A 23       +        inc hl
+ 085B EB       +        ex de,hl
+ 085C E9       +        jp (hl)
+                
+                ;C ALIGNED  addr -- a-addr       align given addr
+ 085D               head ALIGNED,7,ALIGNED,docode
+ 085D 5008     +        DW link
+ 085F 00       +        DB 0
+      0860     +link    DEFL $
+ 0860 07414C49 +        DB 7,'ALIGNED'
+ 0868          +ALIGNED:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0868 18EC              jr noop
+                
+                ;Z CELL     -- n                 size of one cell
+ 086A               head CELL,4,CELL,docon
+ 086A 6008     +        DW link
+ 086C 00       +        DB 0
+      086D     +link    DEFL $
+ 086D 0443454C +        DB 4,'CELL'
+ 0872          +CELL:
+               +        IF  .NOT.(DOCON=DOCODE)
+ 0872 CD9F01   +        call DOCON
+               +        ENDIF
+ 0875 0200              dw 2
+                
+                ;C CELL+    a-addr1 -- a-addr2      add cell size
+                ;   2 + ;
+ 0877               head CELLPLUS,5,CELL+,docode
+ 0877 6D08     +        DW link
+ 0879 00       +        DB 0
+      087A     +link    DEFL $
+ 087A 0543454C +        DB 5,'CELL+'
+ 0880          +CELLPLUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0880 03                inc bc
+ 0881 03                inc bc
+ 0882                   next
+ 0882 EB       +        ex de,hl
+ 0883 5E       +        ld e,(hl)
+ 0884 23       +        inc hl
+ 0885 56       +        ld d,(hl)
+ 0886 23       +        inc hl
+ 0887 EB       +        ex de,hl
+ 0888 E9       +        jp (hl)
+                
+                ;C CELLS    n1 -- n2            cells->adrs units
+ 0889               head CELLS,5,CELLS,docode
+ 0889 7A08     +        DW link
+ 088B 00       +        DB 0
+      088C     +link    DEFL $
+ 088C 0543454C +        DB 5,'CELLS'
+ 0892          +CELLS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0892 C30D05            jp twostar
+                
+                ;C CHAR+    c-addr1 -- c-addr2   add char size
+ 0895               head CHARPLUS,5,CHAR+,docode
+ 0895 8C08     +        DW link
+ 0897 00       +        DB 0
+      0898     +link    DEFL $
+ 0898 05434841 +        DB 5,'CHAR+'
+ 089E          +CHARPLUS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 089E C3E104            jp oneplus
+                
+                ;C CHARS    n1 -- n2            chars->adrs units
+ 08A1               head CHARS,5,CHARS,docode
+ 08A1 9808     +        DW link
+ 08A3 00       +        DB 0
+      08A4     +link    DEFL $
+ 08A4 05434841 +        DB 5,'CHARS'
+ 08AA          +CHARS:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 08AA 18AA              jr noop
+                
+                ;C >BODY    xt -- a-addr      adrs of param field
+                ;   3 + ;                     Z80 (3 byte CALL)
+ 08AC               head TOBODY,5,>BODY,docolon
+ 08AC A408     +        DW link
+ 08AE 00       +        DB 0
+      08AF     +link    DEFL $
+ 08AF 053E424F +        DB 5,'>BODY'
+ 08B5          +TOBODY:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 08B5 CD5301   +        call DOCOLON
+               +        ENDIF
+ 08B8 36010300          DW LIT,3,PLUS,EXIT
+                
+                ;X COMPILE,  xt --         append execution token
+                ; I called this word ,XT before I discovered that
+                ; it is defined in the ANSI standard as COMPILE,.
+                ; On a DTC Forth this simply appends xt (like , )
+                ; but on an STC Forth this must append 'CALL xt'.
+ 08C0               head COMMAXT,8,'COMPILE,',docode
+ 08C0 AF08     +        DW link
+ 08C2 00       +        DB 0
+      08C3     +link    DEFL $
+ 08C3 08434F4D +        DB 8,'COMPILE,'
+ 08CC          +COMMAXT:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 08CC C3310F            jp COMMA
+                
+                ;Z !CF    adrs cfa --   set code action of a word
+                ;   0CD OVER C!         store 'CALL adrs' instr
+                ;   1+ ! ;              Z80 VERSION
+                ; Depending on the implementation this could
+                ; append CALL adrs or JUMP adrs.
+ 08CF               head STORECF,3,!CF,docolon
+ 08CF C308     +        DW link
+ 08D1 00       +        DB 0
+      08D2     +link    DEFL $
+ 08D2 03214346 +        DB 3,'!CF'
+ 08D6          +STORECF:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 08D6 CD5301   +        call DOCOLON
+               +        ENDIF
+ 08D9 3601CD00          DW LIT,0CDH,OVER,CSTORE
+ 08E1 E104CE03          DW ONEPLUS,STORE,EXIT
+                
+                ;Z ,CF    adrs --       append a code field
+                ;   HERE !CF 3 ALLOT ;  Z80 VERSION (3 bytes)
+ 08E7               head COMMACF,3,',CF',docolon
+ 08E7 D208     +        DW link
+ 08E9 00       +        DB 0
+      08EA     +link    DEFL $
+ 08EA 032C4346 +        DB 3,',CF'
+ 08EE          +COMMACF:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 08EE CD5301   +        call DOCOLON
+               +        ENDIF
+ 08F1 110FD608          DW HERE,STORECF,LIT,3,ALLOT,EXIT
+                
+                ;Z !COLON   --      change code field to docolon
+                ;   -3 ALLOT docolon-adrs ,CF ;
+                ; This should be used immediately after CREATE.
+                ; This is made a distinct word, because on an STC
+                ; Forth, colon definitions have no code field.
+ 08FD               head STORCOLON,6,'!COLON',docolon
+ 08FD EA08     +        DW link
+ 08FF 00       +        DB 0
+      0900     +link    DEFL $
+ 0900 0621434F +        DB 6,'!COLON'
+ 0907          +STORCOLON:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0907 CD5301   +        call DOCOLON
+               +        ENDIF
+ 090A 3601FDFF          DW LIT,-3,ALLOT
+ 0910 36015301          DW LIT,docolon,COMMACF,EXIT
+                
+                ;Z ,EXIT    --      append hi-level EXIT action
+                ;   ['] EXIT ,XT ;
+                ; This is made a distinct word, because on an STC
+                ; Forth, it appends a RET instruction, not an xt.
+ 0918               head CEXIT,5,',EXIT',docolon
+ 0918 0009     +        DW link
+ 091A 00       +        DB 0
+      091B     +link    DEFL $
+ 091B 052C4558 +        DB 5,',EXIT'
+ 0921          +CEXIT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0921 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0924 36011E01          DW LIT,EXIT,COMMAXT,EXIT
+                
+                ; CONTROL STRUCTURES ============================
+                ; These words allow Forth control structure words
+                ; to be defined portably.
+                
+                ;Z ,BRANCH   xt --    append a branch instruction
+                ; xt is the branch operator to use, e.g. qbranch
+                ; or (loop).  It does NOT append the destination
+                ; address.  On the Z80 this is equivalent to ,XT.
+ 092C               head COMMABRANCH,7,',BRANCH',docode
+ 092C 1B09     +        DW link
+ 092E 00       +        DB 0
+      092F     +link    DEFL $
+ 092F 072C4252 +        DB 7,',BRANCH'
+ 0937          +COMMABRANCH:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0937 C3310F            jp COMMA
+                
+                ;Z ,DEST   dest --        append a branch address
+                ; This appends the given destination address to
+                ; the branch instruction.  On the Z80 this is ','
+                ; ...other CPUs may use relative addressing.
+ 093A               head COMMADEST,5,',DEST',docode
+ 093A 2F09     +        DW link
+ 093C 00       +        DB 0
+      093D     +link    DEFL $
+ 093D 052C4445 +        DB 5,',DEST'
+ 0943          +COMMADEST:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 0943 C3310F            jp COMMA
+                
+                ;Z !DEST   dest adrs --    change a branch dest'n
+                ; Changes the destination address found at 'adrs'
+                ; to the given 'dest'.  On the Z80 this is '!'
+                ; ...other CPUs may need relative addressing.
+ 0946               head STOREDEST,5,'!DEST',docode
+ 0946 3D09     +        DW link
+ 0948 00       +        DB 0
+      0949     +link    DEFL $
+ 0949 05214445 +        DB 5,'!DEST'
+ 094F          +STOREDEST:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 094F C3CE03            jp STORE
+                
+                ; HEADER STRUCTURE ==============================
+                ; The structure of the Forth dictionary headers
+                ; (name, link, immediate flag, and "smudge" bit)
+                ; does not necessarily differ across CPUs.  This
+                ; structure is not easily factored into distinct
+                ; "portable" words; instead, it is implicit in
+                ; the definitions of FIND and CREATE, and also in
+                ; NFA>LFA, NFA>CFA, IMMED?, IMMEDIATE, HIDE, and
+                ; REVEAL.  These words must be (substantially)
+                ; rewritten if either the header structure or its
+                ; inherent assumptions are changed.
+                
+                *INCLUDE camel80h.azm   ; High Level words
+                ; LISTING 2.
+                ;
+                ; ===============================================
+                ; CamelForth for the Zilog Z80
+                ; (c) 1994 Bradford J. Rodriguez
+                ; Permission is granted to freely copy, modify,
+                ; and distribute this program for personal or
+                ; educational use.  Commercial inquiries should
+                ; be directed to the author at 221 King St. E.,
+                ; #32, Hamilton, Ontario L8N 1B5 Canada
+                ;
+                ; CAMEL80H.AZM: High Level Words
+                ;   Source code is for the Z80MR macro assembler.
+                ;   Forth words are documented as follows:
+                ;*   NAME     stack -- stack    description
+                ;   Word names in upper case are from the ANS
+                ;   Forth Core word set.  Names in lower case are
+                ;   "internal" implementation words & extensions.
+                ; ===============================================
+                
+                ; SYSTEM VARIABLES & CONSTANTS ==================
+                
+                ;C BL      -- char            an ASCII space
+ 0952               head BL,2,BL,docon
+ 0952 4909     +        DW link
+ 0954 00       +        DB 0
+      0955     +link    DEFL $
+ 0955 02424C   +        DB 2,'BL'
+ 0958          +BL:
+               +        IF  .NOT.(DOCON=DOCODE)
+ 0958 CD9F01   +        call DOCON
+               +        ENDIF
+ 095B 2000              dw 20h
+                
+                ;Z tibsize  -- n         size of TIB
+ 095D               head TIBSIZE,7,TIBSIZE,docon
+ 095D 5509     +        DW link
+ 095F 00       +        DB 0
+      0960     +link    DEFL $
+ 0960 07544942 +        DB 7,'TIBSIZE'
+ 0968          +TIBSIZE:
+               +        IF  .NOT.(DOCON=DOCODE)
+ 0968 CD9F01   +        call DOCON
+               +        ENDIF
+ 096B 7C00              dw 124          ; 2 chars safety zone
+                
+                ;X tib     -- a-addr     Terminal Input Buffer
+                ;  HEX 82 CONSTANT TIB   CP/M systems: 126 bytes
+                ;  HEX -80 USER TIB      others: below user area
+ 096D               head TIB,3,TIB,docon
+ 096D 6009     +        DW link
+ 096F 00       +        DB 0
+      0970     +link    DEFL $
+ 0970 03544942 +        DB 3,'TIB'
+ 0974          +TIB:
+               +        IF  .NOT.(DOCON=DOCODE)
+ 0974 CD9F01   +        call DOCON
+               +        ENDIF
+ 0977 8200              dw 82h
+                
+                ;Z u0      -- a-addr       current user area adrs
+                ;  0 USER U0
+ 0979               head U0,2,U0,douser
+ 0979 7009     +        DW link
+ 097B 00       +        DB 0
+      097C     +link    DEFL $
+ 097C 025530   +        DB 2,'U0'
+ 097F          +U0:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 097F CDBC01   +        call DOUSER
+               +        ENDIF
+ 0982 0000              dw 0
+                
+                ;C >IN     -- a-addr        holds offset into TIB
+                ;  2 USER >IN
+ 0984               head TOIN,3,>IN,douser
+ 0984 7C09     +        DW link
+ 0986 00       +        DB 0
+      0987     +link    DEFL $
+ 0987 033E494E +        DB 3,'>IN'
+ 098B          +TOIN:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 098B CDBC01   +        call DOUSER
+               +        ENDIF
+ 098E 0200              dw 2
+                
+                ;C BASE    -- a-addr       holds conversion radix
+                ;  4 USER BASE
+ 0990               head BASE,4,BASE,douser
+ 0990 8709     +        DW link
+ 0992 00       +        DB 0
+      0993     +link    DEFL $
+ 0993 04424153 +        DB 4,'BASE'
+ 0998          +BASE:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 0998 CDBC01   +        call DOUSER
+               +        ENDIF
+ 099B 0400              dw 4
+                
+                ;C STATE   -- a-addr       holds compiler state
+                ;  6 USER STATE
+ 099D               head STATE,5,STATE,douser
+ 099D 9309     +        DW link
+ 099F 00       +        DB 0
+      09A0     +link    DEFL $
+ 09A0 05535441 +        DB 5,'STATE'
+ 09A6          +STATE:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09A6 CDBC01   +        call DOUSER
+               +        ENDIF
+ 09A9 0600              dw 6
+                
+                ;Z dp      -- a-addr       holds dictionary ptr
+                ;  8 USER DP
+ 09AB               head DP,2,DP,douser
+ 09AB A009     +        DW link
+ 09AD 00       +        DB 0
+      09AE     +link    DEFL $
+ 09AE 024450   +        DB 2,'DP'
+ 09B1          +DP:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09B1 CDBC01   +        call DOUSER
+               +        ENDIF
+ 09B4 0800              dw 8
+                
+                ;Z 'source  -- a-addr      two cells: len, adrs
+                ; 10 USER 'SOURCE
+                ;    head TICKSOURCE,7,'SOURCE,douser
+ 09B6 AE09              DW link                 ; must expand
+ 09B8 00                DB 0                    ; manually
+      09B9      link    DEFL $                  ; because of
+ 09B9 0727534F          DB 7,27h,'SOURCE'       ; tick character
+ 09C1 CDBC01    TICKSOURCE: call douser         ; in name!
+ 09C4 0A00              dw 10
+                
+                ;Z latest    -- a-addr     last word in dict.
+                ;   14 USER LATEST
+ 09C6               head LATEST,6,LATEST,douser
+ 09C6 B909     +        DW link
+ 09C8 00       +        DB 0
+      09C9     +link    DEFL $
+ 09C9 064C4154 +        DB 6,'LATEST'
+ 09D0          +LATEST:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09D0 CDBC01   +        call DOUSER
+               +        ENDIF
+ 09D3 0E00              dw 14
+                
+                ;Z hp       -- a-addr     HOLD pointer
+                ;   16 USER HP
+ 09D5               head HP,2,HP,douser
+ 09D5 C909     +        DW link
+ 09D7 00       +        DB 0
+      09D8     +link    DEFL $
+ 09D8 024850   +        DB 2,'HP'
+ 09DB          +HP:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09DB CDBC01   +        call DOUSER
+               +        ENDIF
+ 09DE 1000              dw 16
+                
+                ;Z LP       -- a-addr     Leave-stack pointer
+                ;   18 USER LP
+ 09E0               head LP,2,LP,douser
+ 09E0 D809     +        DW link
+ 09E2 00       +        DB 0
+      09E3     +link    DEFL $
+ 09E3 024C50   +        DB 2,'LP'
+ 09E6          +LP:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09E6 CDBC01   +        call DOUSER
+               +        ENDIF
+ 09E9 1200              dw 18
+                
+                ;Z s0       -- a-addr     end of parameter stack
+ 09EB               head S0,2,S0,douser
+ 09EB E309     +        DW link
+ 09ED 00       +        DB 0
+      09EE     +link    DEFL $
+ 09EE 025330   +        DB 2,'S0'
+ 09F1          +S0:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09F1 CDBC01   +        call DOUSER
+               +        ENDIF
+ 09F4 0001              dw 100h
+                
+                ;X PAD       -- a-addr    user PAD buffer
+                ;                         = end of hold area!
+ 09F6               head PAD,3,PAD,douser
+ 09F6 EE09     +        DW link
+ 09F8 00       +        DB 0
+      09F9     +link    DEFL $
+ 09F9 03504144 +        DB 3,'PAD'
+ 09FD          +PAD:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 09FD CDBC01   +        call DOUSER
+               +        ENDIF
+ 0A00 2801              dw 128h
+                
+                ;Z l0       -- a-addr     bottom of Leave stack
+ 0A02               head L0,2,L0,douser
+ 0A02 F909     +        DW link
+ 0A04 00       +        DB 0
+      0A05     +link    DEFL $
+ 0A05 024C30   +        DB 2,'L0'
+ 0A08          +L0:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 0A08 CDBC01   +        call DOUSER
+               +        ENDIF
+ 0A0B 8001              dw 180h
+                
+                ;Z r0       -- a-addr     end of return stack
+ 0A0D               head R0,2,R0,douser
+ 0A0D 050A     +        DW link
+ 0A0F 00       +        DB 0
+      0A10     +link    DEFL $
+ 0A10 025230   +        DB 2,'R0'
+ 0A13          +R0:
+               +        IF  .NOT.(DOUSER=DOCODE)
+ 0A13 CDBC01   +        call DOUSER
+               +        ENDIF
+ 0A16 0002              dw 200h
+                
+                ;Z uinit    -- addr  initial values for user area
+ 0A18               head UINIT,5,UINIT,docreate
+ 0A18 100A     +        DW link
+ 0A1A 00       +        DB 0
+      0A1B     +link    DEFL $
+ 0A1B 0555494E +        DB 5,'UINIT'
+ 0A21          +UINIT:
+               +        IF  .NOT.(DOCREATE=DOCODE)
+ 0A21 CD7F01   +        call DOCREATE
+               +        ENDIF
+ 0A24 00000000          DW 0,0,10,0     ; reserved,>IN,BASE,STATE
+ 0A2C E616              DW enddict      ; DP
+ 0A2E 00000000          DW 0,0          ; SOURCE init'd elsewhere
+ 0A32 A416              DW lastword     ; LATEST
+ 0A34 0000              DW 0            ; HP init'd elsewhere
+                
+                ;Z #init    -- n    #bytes of user area init data
+ 0A36               head NINIT,5,#INIT,docon
+ 0A36 1B0A     +        DW link
+ 0A38 00       +        DB 0
+      0A39     +link    DEFL $
+ 0A39 0523494E +        DB 5,'#INIT'
+ 0A3F          +NINIT:
+               +        IF  .NOT.(DOCON=DOCODE)
+ 0A3F CD9F01   +        call DOCON
+               +        ENDIF
+ 0A42 1200              DW 18
+                
+                ; ARITHMETIC OPERATORS ==========================
+                
+                ;C S>D    n -- d          single -> double prec.
+                ;   DUP 0< ;
+ 0A44               head STOD,3,S>D,docolon
+ 0A44 390A     +        DW link
+ 0A46 00       +        DB 0
+      0A47     +link    DEFL $
+ 0A47 03533E44 +        DB 3,'S>D'
+ 0A4B          +STOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0A4B CD5301   +        call DOCOLON
+               +        ENDIF
+ 0A4E B4029205          dw DUP,ZEROLESS,EXIT
+                
+                ;Z ?NEGATE  n1 n2 -- n3  negate n1 if n2 negative
+                ;   0< IF NEGATE THEN ;        ...a common factor
+ 0A54               head QNEGATE,7,?NEGATE,docolon
+ 0A54 470A     +        DW link
+ 0A56 00       +        DB 0
+      0A57     +link    DEFL $
+ 0A57 073F4E45 +        DB 7,'?NEGATE'
+ 0A5F          +QNEGATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0A5F CD5301   +        call DOCOLON
+               +        ENDIF
+ 0A62 92053106          DW ZEROLESS,qbranch,QNEG1,NEGATE
+ 0A6A 1E01      QNEG1:  DW EXIT
+                
+                ;C ABS     n1 -- +n2     absolute value
+                ;   DUP ?NEGATE ;
+ 0A6C               head ABS,3,ABS,docolon
+ 0A6C 570A     +        DW link
+ 0A6E 00       +        DB 0
+      0A6F     +link    DEFL $
+ 0A6F 03414253 +        DB 3,'ABS'
+ 0A73          +ABS:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0A73 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0A76 B4025F0A          DW DUP,QNEGATE,EXIT
+                
+                ;X DNEGATE   d1 -- d2     negate double precision
+                ;   SWAP INVERT SWAP INVERT 1 M+ ;
+ 0A7C               head DNEGATE,7,DNEGATE,docolon
+ 0A7C 6F0A     +        DW link
+ 0A7E 00       +        DB 0
+      0A7F     +link    DEFL $
+ 0A7F 07444E45 +        DB 7,'DNEGATE'
+ 0A87          +DNEGATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0A87 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0A8A E702B604          DW SWOP,INVERT,SWOP,INVERT,LIT,1,MPLUS
+ 0A98 1E01              DW EXIT
+                
+                ;Z ?DNEGATE  d1 n -- d2   negate d1 if n negative
+                ;   0< IF DNEGATE THEN ;       ...a common factor
+ 0A9A               head QDNEGATE,8,?DNEGATE,docolon
+ 0A9A 7F0A     +        DW link
+ 0A9C 00       +        DB 0
+      0A9D     +link    DEFL $
+ 0A9D 083F444E +        DB 8,'?DNEGATE'
+ 0AA6          +QDNEGATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0AA6 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0AA9 92053106          DW ZEROLESS,qbranch,DNEG1,DNEGATE
+ 0AB1 1E01      DNEG1:  DW EXIT
+                
+                ;X DABS     d1 -- +d2    absolute value dbl.prec.
+                ;   DUP ?DNEGATE ;
+ 0AB3               head DABS,4,DABS,docolon
+ 0AB3 9D0A     +        DW link
+ 0AB5 00       +        DB 0
+      0AB6     +link    DEFL $
+ 0AB6 04444142 +        DB 4,'DABS'
+ 0ABB          +DABS:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0ABB CD5301   +        call DOCOLON
+               +        ENDIF
+ 0ABE B402A60A          DW DUP,QDNEGATE,EXIT
+                
+                ;C M*     n1 n2 -- d    signed 16*16->32 multiply
+                ;   2DUP XOR >R        carries sign of the result
+                ;   SWAP ABS SWAP ABS UM*
+                ;   R> ?DNEGATE ;
+ 0AC4               head MSTAR,2,M*,docolon
+ 0AC4 B60A     +        DW link
+ 0AC6 00       +        DB 0
+      0AC7     +link    DEFL $
+ 0AC7 024D2A   +        DB 2,'M*'
+ 0ACA          +MSTAR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0ACA CD5301   +        call DOCOLON
+               +        ENDIF
+ 0ACD 1B0C9E04          DW TWODUP,XOR,TOR
+ 0AD3 E702730A          DW SWOP,ABS,SWOP,ABS,UMSTAR
+ 0ADD 5803A60A          DW RFROM,QDNEGATE,EXIT
+                
+                ;C SM/REM   d1 n1 -- n2 n3   symmetric signed div
+                ;   2DUP XOR >R              sign of quotient
+                ;   OVER >R                  sign of remainder
+                ;   ABS >R DABS R> UM/MOD
+                ;   SWAP R> ?NEGATE
+                ;   SWAP R> ?NEGATE ;
+                ; Ref. dpANS-6 section 3.2.2.1.
+ 0AE3               head SMSLASHREM,6,SM/REM,docolon
+ 0AE3 C70A     +        DW link
+ 0AE5 00       +        DB 0
+      0AE6     +link    DEFL $
+ 0AE6 06534D2F +        DB 6,'SM/REM'
+ 0AED          +SMSLASHREM:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0AED CD5301   +        call DOCOLON
+               +        ENDIF
+ 0AF0 1B0C9E04          DW TWODUP,XOR,TOR,OVER,TOR
+ 0AFA 730A4003          DW ABS,TOR,DABS,RFROM,UMSLASHMOD
+ 0B04 E7025803          DW SWOP,RFROM,QNEGATE,SWOP,RFROM,QNEGATE
+ 0B10 1E01              DW EXIT
+                
+                ;C FM/MOD   d1 n1 -- n2 n3   floored signed div'n
+                ;   DUP >R              save divisor
+                ;   SM/REM
+                ;   DUP 0< IF           if quotient negative,
+                ;       SWAP R> +         add divisor to rem'dr
+                ;       SWAP 1-           decrement quotient
+                ;   ELSE R> DROP THEN ;
+                ; Ref. dpANS-6 section 3.2.2.1.
+ 0B12               head FMSLASHMOD,6,FM/MOD,docolon
+ 0B12 E60A     +        DW link
+ 0B14 00       +        DB 0
+      0B15     +link    DEFL $
+ 0B15 06464D2F +        DB 6,'FM/MOD'
+ 0B1C          +FMSLASHMOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B1C CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B1F B4024003          DW DUP,TOR,SMSLASHREM
+ 0B25 B4029205          DW DUP,ZEROLESS,qbranch,FMMOD1
+ 0B2D E7025803          DW SWOP,RFROM,PLUS,SWOP,ONEMINUS
+ 0B37 1B063F0B          DW branch,FMMOD2
+ 0B3B 5803D702  FMMOD1: DW RFROM,DROP
+ 0B3F 1E01      FMMOD2: DW EXIT
+                
+                ;C *      n1 n2 -- n3       signed multiply
+                ;   M* DROP ;
+ 0B41               head STAR,1,*,docolon
+ 0B41 150B     +        DW link
+ 0B43 00       +        DB 0
+      0B44     +link    DEFL $
+ 0B44 012A     +        DB 1,'*'
+ 0B46          +STAR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B46 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B49 CA0AD702          dw MSTAR,DROP,EXIT
+                
+                ;C /MOD   n1 n2 -- n3 n4    signed divide/rem'dr
+                ;   >R S>D R> FM/MOD ;
+ 0B4F               head SLASHMOD,4,/MOD,docolon
+ 0B4F 440B     +        DW link
+ 0B51 00       +        DB 0
+      0B52     +link    DEFL $
+ 0B52 042F4D4F +        DB 4,'/MOD'
+ 0B57          +SLASHMOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B57 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B5A 40034B0A          dw TOR,STOD,RFROM,FMSLASHMOD,EXIT
+                
+                ;C /      n1 n2 -- n3       signed divide
+                ;   /MOD nip ;
+ 0B64               head SLASH,1,/,docolon
+ 0B64 520B     +        DW link
+ 0B66 00       +        DB 0
+      0B67     +link    DEFL $
+ 0B67 012F     +        DB 1,'/'
+ 0B69          +SLASH:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B69 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B6C 570B2003          dw SLASHMOD,NIP,EXIT
+                
+                ;C MOD    n1 n2 -- n3       signed remainder
+                ;   /MOD DROP ;
+ 0B72               head MOD,3,MOD,docolon
+ 0B72 670B     +        DW link
+ 0B74 00       +        DB 0
+      0B75     +link    DEFL $
+ 0B75 034D4F44 +        DB 3,'MOD'
+ 0B79          +MOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B79 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B7C 570BD702          dw SLASHMOD,DROP,EXIT
+                
+                ;C */MOD  n1 n2 n3 -- n4 n5    n1*n2/n3, rem&quot
+                ;   >R M* R> FM/MOD ;
+ 0B82               head SSMOD,5,*/MOD,docolon
+ 0B82 750B     +        DW link
+ 0B84 00       +        DB 0
+      0B85     +link    DEFL $
+ 0B85 052A2F4D +        DB 5,'*/MOD'
+ 0B8B          +SSMOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B8B CD5301   +        call DOCOLON
+               +        ENDIF
+ 0B8E 4003CA0A          dw TOR,MSTAR,RFROM,FMSLASHMOD,EXIT
+                
+                ;C */     n1 n2 n3 -- n4        n1*n2/n3
+                ;   */MOD nip ;
+ 0B98               head STARSLASH,2,*/,docolon
+ 0B98 850B     +        DW link
+ 0B9A 00       +        DB 0
+      0B9B     +link    DEFL $
+ 0B9B 022A2F   +        DB 2,'*/'
+ 0B9E          +STARSLASH:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0B9E CD5301   +        call DOCOLON
+               +        ENDIF
+ 0BA1 8B0B2003          dw SSMOD,NIP,EXIT
+                
+                ;C MAX    n1 n2 -- n3       signed maximum
+                ;   2DUP < IF SWAP THEN DROP ;
+ 0BA7               head MAX,3,MAX,docolon
+ 0BA7 9B0B     +        DW link
+ 0BA9 00       +        DB 0
+      0BAA     +link    DEFL $
+ 0BAA 034D4158 +        DB 3,'MAX'
+ 0BAE          +MAX:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0BAE CD5301   +        call DOCOLON
+               +        ENDIF
+ 0BB1 1B0CC705          dw TWODUP,LESS,qbranch,MAX1,SWOP
+ 0BBB D7021E01  MAX1:   dw DROP,EXIT
+                
+                ;C MIN    n1 n2 -- n3       signed minimum
+                ;   2DUP > IF SWAP THEN DROP ;
+ 0BBF               head MIN,3,MIN,docolon
+ 0BBF AA0B     +        DW link
+ 0BC1 00       +        DB 0
+      0BC2     +link    DEFL $
+ 0BC2 034D494E +        DB 3,'MIN'
+ 0BC6          +MIN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0BC6 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0BC9 1B0CE505          dw TWODUP,GREATER,qbranch,MIN1,SWOP
+ 0BD3 D7021E01  MIN1:   dw DROP,EXIT
+                
+                ; DOUBLE OPERATORS ==============================
+                
+                ;C 2@    a-addr -- x1 x2    fetch 2 cells
+                ;   DUP CELL+ @ SWAP @ ;
+                ;   the lower address will appear on top of stack
+ 0BD7               head TWOFETCH,2,2@,docolon
+ 0BD7 C20B     +        DW link
+ 0BD9 00       +        DB 0
+      0BDA     +link    DEFL $
+ 0BDA 023240   +        DB 2,'2@'
+ 0BDD          +TWOFETCH:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0BDD CD5301   +        call DOCOLON
+               +        ENDIF
+ 0BE0 B4028008          dw DUP,CELLPLUS,FETCH,SWOP,FETCH,EXIT
+                
+                ;C 2!    x1 x2 a-addr --    store 2 cells
+                ;   SWAP OVER ! CELL+ ! ;
+                ;   the top of stack is stored at the lower adrs
+ 0BEC               head TWOSTORE,2,2!,docolon
+ 0BEC DA0B     +        DW link
+ 0BEE 00       +        DB 0
+      0BEF     +link    DEFL $
+ 0BEF 023221   +        DB 2,'2!'
+ 0BF2          +TWOSTORE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0BF2 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0BF5 E702FA02          dw SWOP,OVER,STORE,CELLPLUS,STORE,EXIT
+                
+                ;C 2DROP  x1 x2 --          drop 2 cells
+                ;   DROP DROP ;
+ 0C01               head TWODROP,5,2DROP,docolon
+ 0C01 EF0B     +        DW link
+ 0C03 00       +        DB 0
+      0C04     +link    DEFL $
+ 0C04 05324452 +        DB 5,'2DROP'
+ 0C0A          +TWODROP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C0A CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C0D D702D702          dw DROP,DROP,EXIT
+                
+                ;C 2DUP   x1 x2 -- x1 x2 x1 x2   dup top 2 cells
+                ;   OVER OVER ;
+ 0C13               head TWODUP,4,2DUP,docolon
+ 0C13 040C     +        DW link
+ 0C15 00       +        DB 0
+      0C16     +link    DEFL $
+ 0C16 04324455 +        DB 4,'2DUP'
+ 0C1B          +TWODUP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C1B CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C1E FA02FA02          dw OVER,OVER,EXIT
+                
+                ;C 2SWAP  x1 x2 x3 x4 -- x3 x4 x1 x2  per diagram
+                ;   ROT >R ROT R> ;
+ 0C24               head TWOSWAP,5,2SWAP,docolon
+ 0C24 160C     +        DW link
+ 0C26 00       +        DB 0
+      0C27     +link    DEFL $
+ 0C27 05325357 +        DB 5,'2SWAP'
+ 0C2D          +TWOSWAP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C2D CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C30 0D034003          dw ROT,TOR,ROT,RFROM,EXIT
+                
+                ;C 2OVER  x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2
+                ;   >R >R 2DUP R> R> 2SWAP ;
+ 0C3A               head TWOOVER,5,2OVER,docolon
+ 0C3A 270C     +        DW link
+ 0C3C 00       +        DB 0
+      0C3D     +link    DEFL $
+ 0C3D 05324F56 +        DB 5,'2OVER'
+ 0C43          +TWOOVER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C43 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C46 40034003          dw TOR,TOR,TWODUP,RFROM,RFROM
+ 0C50 2D0C1E01          dw TWOSWAP,EXIT
+                
+                ; INPUT/OUTPUT ==================================
+                
+                ;C COUNT   c-addr1 -- c-addr2 u  counted->adr/len
+                ;   DUP CHAR+ SWAP C@ ;
+ 0C54               head COUNT,5,COUNT,docolon
+ 0C54 3D0C     +        DW link
+ 0C56 00       +        DB 0
+      0C57     +link    DEFL $
+ 0C57 05434F55 +        DB 5,'COUNT'
+ 0C5D          +COUNT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C5D CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C60 B4029E08          dw DUP,CHARPLUS,SWOP,CFETCH,EXIT
+                
+                ;C CR      --               output newline
+                ;   0D EMIT 0A EMIT ;
+ 0C6A               head CR,2,CR,docolon
+ 0C6A 570C     +        DW link
+ 0C6C 00       +        DB 0
+      0C6D     +link    DEFL $
+ 0C6D 024352   +        DB 2,'CR'
+ 0C70          +CR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C70 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C73 36010D00          dw lit,0dh,EMIT,lit,0ah,EMIT,EXIT
+                
+                ;C SPACE   --               output a space
+                ;   BL EMIT ;
+ 0C81               head SPACE,5,SPACE,docolon
+ 0C81 6D0C     +        DW link
+ 0C83 00       +        DB 0
+      0C84     +link    DEFL $
+ 0C84 05535041 +        DB 5,'SPACE'
+ 0C8A          +SPACE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C8A CD5301   +        call DOCOLON
+               +        ENDIF
+ 0C8D 58090D02          dw BL,EMIT,EXIT
+                
+                ;C SPACES   n --            output n spaces
+                ;   BEGIN DUP WHILE SPACE 1- REPEAT DROP ;
+ 0C93               head SPACES,6,SPACES,docolon
+ 0C93 840C     +        DW link
+ 0C95 00       +        DB 0
+      0C96     +link    DEFL $
+ 0C96 06535041 +        DB 6,'SPACES'
+ 0C9D          +SPACES:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0C9D CD5301   +        call DOCOLON
+               +        ENDIF
+ 0CA0 B4023106  SPCS1:  DW DUP,qbranch,SPCS2
+ 0CA6 8A0CEF04          DW SPACE,ONEMINUS,branch,SPCS1
+ 0CAE D7021E01  SPCS2:  DW DROP,EXIT
+                
+                ;Z umin     u1 u2 -- u      unsigned minimum
+                ;   2DUP U> IF SWAP THEN DROP ;
+ 0CB2               head UMIN,4,UMIN,docolon
+ 0CB2 960C     +        DW link
+ 0CB4 00       +        DB 0
+      0CB5     +link    DEFL $
+ 0CB5 04554D49 +        DB 4,'UMIN'
+ 0CBA          +UMIN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0CBA CD5301   +        call DOCOLON
+               +        ENDIF
+ 0CBD 1B0C0806          DW TWODUP,UGREATER,QBRANCH,UMIN1,SWOP
+ 0CC7 D7021E01  UMIN1:  DW DROP,EXIT
+                
+                ;Z umax    u1 u2 -- u       unsigned maximum
+                ;   2DUP U< IF SWAP THEN DROP ;
+ 0CCB               head UMAX,4,UMAX,docolon
+ 0CCB B50C     +        DW link
+ 0CCD 00       +        DB 0
+      0CCE     +link    DEFL $
+ 0CCE 04554D41 +        DB 4,'UMAX'
+ 0CD3          +UMAX:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0CD3 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0CD6 1B0CF405          DW TWODUP,ULESS,QBRANCH,UMAX1,SWOP
+ 0CE0 D7021E01  UMAX1:  DW DROP,EXIT
+                
+                ;C ACCEPT  c-addr +n -- +n'  get line from term'l
+                ;   OVER + 1- OVER      -- sa ea a
+                ;   BEGIN KEY           -- sa ea a c
+                ;   DUP 0D <> WHILE
+                ;       DUP EMIT        -- sa ea a c
+                ;       DUP 8 = IF  DROP 1-    >R OVER R> UMAX
+                ;             ELSE  OVER C! 1+ OVER UMIN
+                ;       THEN            -- sa ea a
+                ;   REPEAT              -- sa ea a c
+                ;   DROP NIP SWAP - ;
+ 0CE4               head ACCEPT,6,ACCEPT,docolon
+ 0CE4 CE0C     +        DW link
+ 0CE6 00       +        DB 0
+      0CE7     +link    DEFL $
+ 0CE7 06414343 +        DB 6,'ACCEPT'
+ 0CEE          +ACCEPT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0CEE CD5301   +        call DOCOLON
+               +        ENDIF
+ 0CF1 FA023904          DW OVER,PLUS,ONEMINUS,OVER
+ 0CF9 4E02B402  ACC1:   DW KEY,DUP,LIT,0DH,NOTEQUAL,QBRANCH,ACC5
+ 0D07 B4020D02          DW DUP,EMIT,DUP,LIT,8,EQUAL,QBRANCH,ACC3
+ 0D17 D702EF04          DW DROP,ONEMINUS,TOR,OVER,RFROM,UMAX
+ 0D23 1B06310D          DW BRANCH,ACC4
+ 0D27 FA02E203  ACC3:   DW OVER,CSTORE,ONEPLUS,OVER,UMIN
+ 0D31 1B06F90C  ACC4:   DW BRANCH,ACC1
+ 0D35 D7022003  ACC5:   DW DROP,NIP,SWOP,MINUS,EXIT
+                
+                ;C TYPE    c-addr +n --     type line to term'l
+                ;   ?DUP IF
+                ;     OVER + SWAP DO I C@ EMIT LOOP
+                ;   ELSE DROP THEN ;
+ 0D3F               head TYPE,4,TYPE,docolon
+ 0D3F E70C     +        DW link
+ 0D41 00       +        DB 0
+      0D42     +link    DEFL $
+ 0D42 04545950 +        DB 4,'TYPE'
+ 0D47          +TYPE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0D47 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0D4A C4023106          DW QDUP,QBRANCH,TYP4
+ 0D50 FA023904          DW OVER,PLUS,SWOP,XDO
+ 0D58 B8060504  TYP3:   DW II,CFETCH,EMIT,XLOOP,TYP3
+ 0D62 1B06680D          DW BRANCH,TYP5
+ 0D66 D702      TYP4:   DW DROP
+ 0D68 1E01      TYP5:   DW EXIT
+                
+                ;Z (S")     -- c-addr u   run-time code for S"
+                ;   R> COUNT 2DUP + ALIGNED >R  ;
+ 0D6A               head XSQUOTE,4,(S"),docolon
+ 0D6A 420D     +        DW link
+ 0D6C 00       +        DB 0
+      0D6D     +link    DEFL $
+ 0D6D 04285322 +        DB 4,'(S")'
+ 0D72          +XSQUOTE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0D72 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0D75 58035D0C          DW RFROM,COUNT,TWODUP,PLUS,ALIGNED,TOR
+ 0D81 1E01              DW EXIT
+                
+                ;C S"       --         compile in-line string
+                ;   COMPILE (S")  [ HEX ]
+                ;   22 WORD C@ 1+ ALIGNED ALLOT ; IMMEDIATE
+ 0D83               immed SQUOTE,2,S",docolon
+ 0D83 6D0D     +        DW link
+ 0D85 01       +        DB 1
+      0D86     +link    DEFL $
+ 0D86 025322   +        DB 2,'S"'
+ 0D89          +SQUOTE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0D89 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0D8C 3601720D          DW LIT,XSQUOTE,COMMAXT
+ 0D92 36012200          DW LIT,22H,WORD,CFETCH,ONEPLUS
+ 0D9C 6808230F          DW ALIGNED,ALLOT,EXIT
+                
+                ;C ."       --         compile string to print
+                ;   POSTPONE S"  POSTPONE TYPE ; IMMEDIATE
+ 0DA2               immed DOTQUOTE,2,.",docolon
+ 0DA2 860D     +        DW link
+ 0DA4 01       +        DB 1
+      0DA5     +link    DEFL $
+ 0DA5 022E22   +        DB 2,'."'
+ 0DA8          +DOTQUOTE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0DA8 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0DAB 890D              DW SQUOTE
+ 0DAD 3601470D          DW LIT,TYPE,COMMAXT
+ 0DB3 1E01              DW EXIT
+                                        
+                ; NUMERIC OUTPUT ================================
+                ; Numeric conversion is done l.s.digit first, so
+                ; the output buffer is built backwards in memory.
+                
+                ; Some double-precision arithmetic operators are
+                ; needed to implement ANSI numeric conversion.
+                
+                ;Z UD/MOD   ud1 u2 -- u3 ud4   32/16->32 divide
+                ;   >R 0 R@ UM/MOD  ROT ROT R> UM/MOD ROT ;
+ 0DB5               head UDSLASHMOD,6,UD/MOD,docolon
+ 0DB5 A50D     +        DW link
+ 0DB7 00       +        DB 0
+      0DB8     +link    DEFL $
+ 0DB8 0655442F +        DB 6,'UD/MOD'
+ 0DBF          +UDSLASHMOD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0DBF CD5301   +        call DOCOLON
+               +        ENDIF
+ 0DC2 40033601          DW TOR,LIT,0,RFETCH,UMSLASHMOD,ROT,ROT
+ 0DD0 58033C07          DW RFROM,UMSLASHMOD,ROT,EXIT
+                
+                ;Z UD*      ud1 d2 -- ud3      32*16->32 multiply
+                ;   DUP >R UM* DROP  SWAP R> UM* ROT + ;
+ 0DD8               head UDSTAR,3,UD*,docolon
+ 0DD8 B80D     +        DW link
+ 0DDA 00       +        DB 0
+      0DDB     +link    DEFL $
+ 0DDB 0355442A +        DB 3,'UD*'
+ 0DDF          +UDSTAR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0DDF CD5301   +        call DOCOLON
+               +        ENDIF
+ 0DE2 B4024003          DW DUP,TOR,UMSTAR,DROP
+ 0DEA E7025803          DW SWOP,RFROM,UMSTAR,ROT,PLUS,EXIT
+                
+                ;C HOLD  char --        add char to output string
+                ;   -1 HP +!  HP @ C! ;
+ 0DF6               head HOLD,4,HOLD,docolon
+ 0DF6 DB0D     +        DW link
+ 0DF8 00       +        DB 0
+      0DF9     +link    DEFL $
+ 0DF9 04484F4C +        DB 4,'HOLD'
+ 0DFE          +HOLD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0DFE CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E01 3601FFFF          DW LIT,-1,HP,PLUSSTORE
+ 0E09 DB09F303          DW HP,FETCH,CSTORE,EXIT
+                
+                ;C <#    --             begin numeric conversion
+                ;   PAD HP ! ;          (initialize Hold Pointer)
+ 0E11               head LESSNUM,2,<#,docolon
+ 0E11 F90D     +        DW link
+ 0E13 00       +        DB 0
+      0E14     +link    DEFL $
+ 0E14 023C23   +        DB 2,'<#'
+ 0E17          +LESSNUM:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E17 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E1A FD09DB09          DW PAD,HP,STORE,EXIT
+                
+                ;Z >digit   n -- c      convert to 0..9A..Z
+                ;   [ HEX ] DUP 9 > 7 AND + 30 + ;
+ 0E22               head TODIGIT,6,>DIGIT,docolon
+ 0E22 140E     +        DW link
+ 0E24 00       +        DB 0
+      0E25     +link    DEFL $
+ 0E25 063E4449 +        DB 6,'>DIGIT'
+ 0E2C          +TODIGIT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E2C CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E2F B4023601          DW DUP,LIT,9,GREATER,LIT,7,AND,PLUS
+ 0E3F 36013000          DW LIT,30H,PLUS,EXIT
+                
+                ;C #     ud1 -- ud2     convert 1 digit of output
+                ;   BASE @ UD/MOD ROT >digit HOLD ;
+ 0E47               head NUM,1,#,docolon
+ 0E47 250E     +        DW link
+ 0E49 00       +        DB 0
+      0E4A     +link    DEFL $
+ 0E4A 0123     +        DB 1,'#'
+ 0E4C          +NUM:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E4C CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E4F 9809F303          DW BASE,FETCH,UDSLASHMOD,ROT,TODIGIT
+ 0E59 FE0D1E01          DW HOLD,EXIT
+                
+                ;C #S    ud1 -- ud2     convert remaining digits
+                ;   BEGIN # 2DUP OR 0= UNTIL ;
+ 0E5D               head NUMS,2,#S,docolon
+ 0E5D 4A0E     +        DW link
+ 0E5F 00       +        DB 0
+      0E60     +link    DEFL $
+ 0E60 022353   +        DB 2,'#S'
+ 0E63          +NUMS:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E63 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E66 4C0E1B0C  NUMS1:  DW NUM,TWODUP,OR,ZEROEQUAL,qbranch,NUMS1
+ 0E72 1E01              DW EXIT
+                
+                ;C #>    ud1 -- c-addr u    end conv., get string
+                ;   2DROP HP @ PAD OVER - ;
+ 0E74               head NUMGREATER,2,#>,docolon
+ 0E74 600E     +        DW link
+ 0E76 00       +        DB 0
+      0E77     +link    DEFL $
+ 0E77 02233E   +        DB 2,'#>'
+ 0E7A          +NUMGREATER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E7A CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E7D 0A0CDB09          DW TWODROP,HP,FETCH,PAD,OVER,MINUS,EXIT
+                
+                ;C SIGN  n --           add minus sign if n<0
+                ;   0< IF 2D HOLD THEN ;
+ 0E8B               head SIGN,4,SIGN,docolon
+ 0E8B 770E     +        DW link
+ 0E8D 00       +        DB 0
+      0E8E     +link    DEFL $
+ 0E8E 04534947 +        DB 4,'SIGN'
+ 0E93          +SIGN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0E93 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0E96 92053106          DW ZEROLESS,qbranch,SIGN1,LIT,2DH,HOLD
+ 0EA2 1E01      SIGN1:  DW EXIT
+                
+                ;C U.    u --           display u unsigned
+                ;   <# 0 #S #> TYPE SPACE ;
+ 0EA4               head UDOT,2,U.,docolon
+ 0EA4 8E0E     +        DW link
+ 0EA6 00       +        DB 0
+      0EA7     +link    DEFL $
+ 0EA7 02552E   +        DB 2,'U.'
+ 0EAA          +UDOT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0EAA CD5301   +        call DOCOLON
+               +        ENDIF
+ 0EAD 170E3601          DW LESSNUM,LIT,0,NUMS,NUMGREATER,TYPE
+ 0EB9 8A0C1E01          DW SPACE,EXIT
+                
+                ;C .     n --           display n signed
+                ;   <# DUP ABS 0 #S ROT SIGN #> TYPE SPACE ;
+ 0EBD               head DOT,1,'.',docolon
+ 0EBD A70E     +        DW link
+ 0EBF 00       +        DB 0
+      0EC0     +link    DEFL $
+ 0EC0 012E     +        DB 1,'.'
+ 0EC2          +DOT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0EC2 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0EC5 170EB402          DW LESSNUM,DUP,ABS,LIT,0,NUMS
+ 0ED1 0D03930E          DW ROT,SIGN,NUMGREATER,TYPE,SPACE,EXIT
+                
+                ;C DECIMAL  --      set number base to decimal
+                ;   10 BASE ! ;
+ 0EDD               head DECIMAL,7,DECIMAL,docolon
+ 0EDD C00E     +        DW link
+ 0EDF 00       +        DB 0
+      0EE0     +link    DEFL $
+ 0EE0 07444543 +        DB 7,'DECIMAL'
+ 0EE8          +DECIMAL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0EE8 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0EEB 36010A00          DW LIT,10,BASE,STORE,EXIT
+                
+                ;X HEX     --       set number base to hex
+                ;   16 BASE ! ;
+ 0EF5               head HEX,3,HEX,docolon
+ 0EF5 E00E     +        DW link
+ 0EF7 00       +        DB 0
+      0EF8     +link    DEFL $
+ 0EF8 03484558 +        DB 3,'HEX'
+ 0EFC          +HEX:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0EFC CD5301   +        call DOCOLON
+               +        ENDIF
+ 0EFF 36011000          DW LIT,16,BASE,STORE,EXIT
+                
+                ; DICTIONARY MANAGEMENT =========================
+                
+                ;C HERE    -- addr      returns dictionary ptr
+                ;   DP @ ;
+ 0F09               head HERE,4,HERE,docolon
+ 0F09 F80E     +        DW link
+ 0F0B 00       +        DB 0
+      0F0C     +link    DEFL $
+ 0F0C 04484552 +        DB 4,'HERE'
+ 0F11          +HERE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F11 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F14 B109F303          dw DP,FETCH,EXIT
+                
+                ;C ALLOT   n --         allocate n bytes in dict
+                ;   DP +! ;
+ 0F1A               head ALLOT,5,ALLOT,docolon
+ 0F1A 0C0F     +        DW link
+ 0F1C 00       +        DB 0
+      0F1D     +link    DEFL $
+ 0F1D 05414C4C +        DB 5,'ALLOT'
+ 0F23          +ALLOT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F23 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F26 B1096805          dw DP,PLUSSTORE,EXIT
+                
+                ; Note: , and C, are only valid for combined
+                ; Code and Data spaces.
+                
+                ;C ,    x --           append cell to dict
+                ;   HERE ! 1 CELLS ALLOT ;
+ 0F2C               head COMMA,1,',',docolon
+ 0F2C 1D0F     +        DW link
+ 0F2E 00       +        DB 0
+      0F2F     +link    DEFL $
+ 0F2F 012C     +        DB 1,','
+ 0F31          +COMMA:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F31 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F34 110FCE03          dw HERE,STORE,lit,1,CELLS,ALLOT,EXIT
+                
+                ;C C,   char --        append char to dict
+                ;   HERE C! 1 CHARS ALLOT ;
+ 0F42               head CCOMMA,2,'C,',docolon
+ 0F42 2F0F     +        DW link
+ 0F44 00       +        DB 0
+      0F45     +link    DEFL $
+ 0F45 02432C   +        DB 2,'C,'
+ 0F48          +CCOMMA:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F48 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F4B 110FE203          dw HERE,CSTORE,lit,1,CHARS,ALLOT,EXIT
+                
+                ; INTERPRETER ===================================
+                ; Note that NFA>LFA, NFA>CFA, IMMED?, and FIND
+                ; are dependent on the structure of the Forth
+                ; header.  This may be common across many CPUs,
+                ; or it may be different.
+                
+                ;C SOURCE   -- adr n    current input buffer
+                ;   'SOURCE 2@ ;        length is at lower adrs
+ 0F59               head SOURCE,6,SOURCE,docolon
+ 0F59 450F     +        DW link
+ 0F5B 00       +        DB 0
+      0F5C     +link    DEFL $
+ 0F5C 06534F55 +        DB 6,'SOURCE'
+ 0F63          +SOURCE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F63 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F66 C109DD0B          DW TICKSOURCE,TWOFETCH,EXIT
+                
+                ;X /STRING  a u n -- a+n u-n   trim string
+                ;   ROT OVER + ROT ROT - ;
+ 0F6C               head SLASHSTRING,7,/STRING,docolon
+ 0F6C 5C0F     +        DW link
+ 0F6E 00       +        DB 0
+      0F6F     +link    DEFL $
+ 0F6F 072F5354 +        DB 7,'/STRING'
+ 0F77          +SLASHSTRING:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F77 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F7A 0D03FA02          DW ROT,OVER,PLUS,ROT,ROT,MINUS,EXIT
+                
+                ;Z >counted  src n dst --     copy to counted str
+                ;   2DUP C! CHAR+ SWAP CMOVE ;
+ 0F88               head TOCOUNTED,8,>COUNTED,docolon
+ 0F88 6F0F     +        DW link
+ 0F8A 00       +        DB 0
+      0F8B     +link    DEFL $
+ 0F8B 083E434F +        DB 8,'>COUNTED'
+ 0F94          +TOCOUNTED:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0F94 CD5301   +        call DOCOLON
+               +        ENDIF
+ 0F97 1B0CE203          DW TWODUP,CSTORE,CHARPLUS,SWOP,CMOVE,EXIT
+                
+                ;C WORD   char -- c-addr n   word delim'd by char
+                ;   DUP  SOURCE >IN @ /STRING   -- c c adr n
+                ;   DUP >R   ROT SKIP           -- c adr' n'
+                ;   OVER >R  ROT SCAN           -- adr" n"
+                ;   DUP IF CHAR- THEN        skip trailing delim.
+                ;   R> R> ROT -   >IN +!        update >IN offset
+                ;   TUCK -                      -- adr' N
+                ;   HERE >counted               --
+                ;   HERE                        -- a
+                ;   BL OVER COUNT + C! ;    append trailing blank
+ 0FA3               head WORD,4,WORD,docolon
+ 0FA3 8B0F     +        DW link
+ 0FA5 00       +        DB 0
+      0FA6     +link    DEFL $
+ 0FA6 04574F52 +        DB 4,'WORD'
+ 0FAB          +WORD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0FAB CD5301   +        call DOCOLON
+               +        ENDIF
+ 0FAE B402630F          DW DUP,SOURCE,TOIN,FETCH,SLASHSTRING
+ 0FB8 B4024003          DW DUP,TOR,ROT,SKIP
+ 0FC0 FA024003          DW OVER,TOR,ROT,SCAN
+ 0FC8 B4023106          DW DUP,qbranch,WORD1,ONEMINUS  ; char-
+ 0FD0 58035803  WORD1:  DW RFROM,RFROM,ROT,MINUS,TOIN,PLUSSTORE
+ 0FDC 31036104          DW TUCK,MINUS
+ 0FE0 110F940F          DW HERE,TOCOUNTED,HERE
+ 0FE6 5809FA02          DW BL,OVER,COUNT,PLUS,CSTORE,EXIT
+                
+                ;Z NFA>LFA   nfa -- lfa    name adr -> link field
+                ;   3 - ;
+ 0FF2               head NFATOLFA,7,NFA>LFA,docolon
+ 0FF2 A60F     +        DW link
+ 0FF4 00       +        DB 0
+      0FF5     +link    DEFL $
+ 0FF5 074E4641 +        DB 7,'NFA>LFA'
+ 0FFD          +NFATOLFA:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 0FFD CD5301   +        call DOCOLON
+               +        ENDIF
+ 1000 36010300          DW LIT,3,MINUS,EXIT
+                
+                ;Z NFA>CFA   nfa -- cfa    name adr -> code field
+                ;   COUNT 7F AND + ;       mask off 'smudge' bit
+ 1008               head NFATOCFA,7,NFA>CFA,docolon
+ 1008 F50F     +        DW link
+ 100A 00       +        DB 0
+      100B     +link    DEFL $
+ 100B 074E4641 +        DB 7,'NFA>CFA'
+ 1013          +NFATOCFA:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1013 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1016 5D0C3601          DW COUNT,LIT,07FH,AND,PLUS,EXIT
+                
+                ;Z IMMED?    nfa -- f      fetch immediate flag
+                ;   1- C@ ;                     nonzero if immed
+ 1022               head IMMEDQ,6,IMMED?,docolon
+ 1022 0B10     +        DW link
+ 1024 00       +        DB 0
+      1025     +link    DEFL $
+ 1025 06494D4D +        DB 6,'IMMED?'
+ 102C          +IMMEDQ:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 102C CD5301   +        call DOCOLON
+               +        ENDIF
+ 102F EF040504          DW ONEMINUS,CFETCH,EXIT
+                
+                ;C FIND   c-addr -- c-addr 0   if not found
+                ;C                  xt  1      if immediate
+                ;C                  xt -1      if "normal"
+                ;   LATEST @ BEGIN             -- a nfa
+                ;       2DUP OVER C@ CHAR+     -- a nfa a nfa n+1
+                ;       S=                     -- a nfa f
+                ;       DUP IF
+                ;           DROP
+                ;           NFA>LFA @ DUP      -- a link link
+                ;       THEN
+                ;   0= UNTIL                   -- a nfa  OR  a 0
+                ;   DUP IF
+                ;       NIP DUP NFA>CFA        -- nfa xt
+                ;       SWAP IMMED?            -- xt iflag
+                ;       0= 1 OR                -- xt 1/-1
+                ;   THEN ;
+ 1035               head FIND,4,FIND,docolon
+ 1035 2510     +        DW link
+ 1037 00       +        DB 0
+      1038     +link    DEFL $
+ 1038 0446494E +        DB 4,'FIND'
+ 103D          +FIND:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 103D CD5301   +        call DOCOLON
+               +        ENDIF
+ 1040 D009F303          DW LATEST,FETCH
+ 1044 1B0CFA02  FIND1:  DW TWODUP,OVER,CFETCH,CHARPLUS
+ 104C 2608B402          DW SEQUAL,DUP,qbranch,FIND2
+ 1054 D702FD0F          DW DROP,NFATOLFA,FETCH,DUP
+ 105C 7E053106  FIND2:  DW ZEROEQUAL,qbranch,FIND1
+ 1062 B4023106          DW DUP,qbranch,FIND3
+ 1068 2003B402          DW NIP,DUP,NFATOCFA
+ 106E E7022C10          DW SWOP,IMMEDQ,ZEROEQUAL,LIT,1,OR
+ 107A 1E01      FIND3:  DW EXIT
+                
+                ;C LITERAL  x --        append numeric literal
+                ;   STATE @ IF ['] LIT ,XT , THEN ; IMMEDIATE
+                ; This tests STATE so that it can also be used
+                ; interpretively.  (ANSI doesn't require this.)
+ 107C               immed LITERAL,7,LITERAL,docolon
+ 107C 3810     +        DW link
+ 107E 01       +        DB 1
+      107F     +link    DEFL $
+ 107F 074C4954 +        DB 7,'LITERAL'
+ 1087          +LITERAL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1087 CD5301   +        call DOCOLON
+               +        ENDIF
+ 108A A609F303          DW STATE,FETCH,qbranch,LITER1
+ 1092 36013601          DW LIT,LIT,COMMAXT,COMMA
+ 109A 1E01      LITER1: DW EXIT
+                
+                ;Z DIGIT?   c -- n -1   if c is a valid digit
+                ;Z            -- x  0   otherwise
+                ;   [ HEX ] DUP 39 > 100 AND +     silly looking
+                ;   DUP 140 > 107 AND -   30 -     but it works!
+                ;   DUP BASE @ U< ;
+ 109C               head DIGITQ,6,DIGIT?,docolon
+ 109C 7F10     +        DW link
+ 109E 00       +        DB 0
+      109F     +link    DEFL $
+ 109F 06444947 +        DB 6,'DIGIT?'
+ 10A6          +DIGITQ:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 10A6 CD5301   +        call DOCOLON
+               +        ENDIF
+ 10A9 B4023601          DW DUP,LIT,39H,GREATER,LIT,100H,AND,PLUS
+ 10B9 B4023601          DW DUP,LIT,140H,GREATER,LIT,107H,AND
+ 10C7 61043601          DW MINUS,LIT,30H,MINUS
+ 10CF B4029809          DW DUP,BASE,FETCH,ULESS,EXIT
+                
+                ;Z ?SIGN   adr n -- adr' n' f  get optional sign
+                ;Z  advance adr/n if sign; return NZ if negative
+                ;   OVER C@                 -- adr n c
+                ;   2C - DUP ABS 1 = AND    -- +=-1, -=+1, else 0
+                ;   DUP IF 1+               -- +=0, -=+2
+                ;       >R 1 /STRING R>     -- adr' n' f
+                ;   THEN ;
+ 10D9               head QSIGN,5,?SIGN,docolon
+ 10D9 9F10     +        DW link
+ 10DB 00       +        DB 0
+      10DC     +link    DEFL $
+ 10DC 053F5349 +        DB 5,'?SIGN'
+ 10E2          +QSIGN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 10E2 CD5301   +        call DOCOLON
+               +        ENDIF
+ 10E5 FA020504          DW OVER,CFETCH,LIT,2CH,MINUS,DUP,ABS
+ 10F3 36010100          DW LIT,1,EQUAL,AND,DUP,qbranch,QSIGN1
+ 1101 E1044003          DW ONEPLUS,TOR,LIT,1,SLASHSTRING,RFROM
+ 110D 1E01      QSIGN1: DW EXIT
+                
+                ;C >NUMBER  ud adr u -- ud' adr' u'
+                ;C                      convert string to number
+                ;   BEGIN
+                ;   DUP WHILE
+                ;       OVER C@ DIGIT?
+                ;       0= IF DROP EXIT THEN
+                ;       >R 2SWAP BASE @ UD*
+                ;       R> M+ 2SWAP
+                ;       1 /STRING
+                ;   REPEAT ;
+ 110F               head TONUMBER,7,>NUMBER,docolon
+ 110F DC10     +        DW link
+ 1111 00       +        DB 0
+      1112     +link    DEFL $
+ 1112 073E4E55 +        DB 7,'>NUMBER'
+ 111A          +TONUMBER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 111A CD5301   +        call DOCOLON
+               +        ENDIF
+ 111D B4023106  TONUM1: DW DUP,qbranch,TONUM3
+ 1123 FA020504          DW OVER,CFETCH,DIGITQ
+ 1129 7E053106          DW ZEROEQUAL,qbranch,TONUM2,DROP,EXIT
+ 1133 40032D0C  TONUM2: DW TOR,TWOSWAP,BASE,FETCH,UDSTAR
+ 113D 58034A04          DW RFROM,MPLUS,TWOSWAP
+ 1143 36010100          DW LIT,1,SLASHSTRING,branch,TONUM1
+ 114D 1E01      TONUM3: DW EXIT
+                
+                ;Z ?NUMBER  c-addr -- n -1      string->number
+                ;Z                 -- c-addr 0  if convert error
+                ;   DUP  0 0 ROT COUNT      -- ca ud adr n
+                ;   ?SIGN >R  >NUMBER       -- ca ud adr' n'
+                ;   IF   R> 2DROP 2DROP 0   -- ca 0   (error)
+                ;   ELSE 2DROP NIP R>
+                ;       IF NEGATE THEN  -1  -- n -1   (ok)
+                ;   THEN ;
+ 114F               head QNUMBER,7,?NUMBER,docolon
+ 114F 1211     +        DW link
+ 1151 00       +        DB 0
+      1152     +link    DEFL $
+ 1152 073F4E55 +        DB 7,'?NUMBER'
+ 115A          +QNUMBER:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 115A CD5301   +        call DOCOLON
+               +        ENDIF
+ 115D B4023601          DW DUP,LIT,0,DUP,ROT,COUNT
+ 1169 E2104003          DW QSIGN,TOR,TONUMBER,qbranch,QNUM1
+ 1173 58030A0C          DW RFROM,TWODROP,TWODROP,LIT,0
+ 117D 1B069111          DW branch,QNUM3
+ 1181 0A0C2003  QNUM1:  DW TWODROP,NIP,RFROM,qbranch,QNUM2,NEGATE
+ 118D 3601FFFF  QNUM2:  DW LIT,-1
+ 1191 1E01      QNUM3:  DW EXIT
+                
+                ;Z INTERPRET    i*x c-addr u -- j*x
+                ;Z                      interpret given buffer
+                ; This is a common factor of EVALUATE and QUIT.
+                ; ref. dpANS-6, 3.4 The Forth Text Interpreter
+                ;   'SOURCE 2!  0 >IN !
+                ;   BEGIN
+                ;   BL WORD DUP C@ WHILE        -- textadr
+                ;       FIND                    -- a 0/1/-1
+                ;       ?DUP IF                 -- xt 1/-1
+                ;           1+ STATE @ 0= OR    immed or interp?
+                ;           IF EXECUTE ELSE ,XT THEN
+                ;       ELSE                    -- textadr
+                ;           ?NUMBER
+                ;           IF POSTPONE LITERAL     converted ok
+                ;           ELSE COUNT TYPE 3F EMIT CR ABORT  err
+                ;           THEN
+                ;       THEN
+                ;   REPEAT DROP ;
+ 1193               head INTERPRET,9,INTERPRET,docolon
+ 1193 5211     +        DW link
+ 1195 00       +        DB 0
+      1196     +link    DEFL $
+ 1196 09494E54 +        DB 9,'INTERPRET'
+ 11A0          +INTERPRET:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 11A0 CD5301   +        call DOCOLON
+               +        ENDIF
+ 11A3 C109F20B          DW TICKSOURCE,TWOSTORE,LIT,0,TOIN,STORE
+ 11AF 5809AB0F  INTER1: DW BL,WORD,DUP,CFETCH,qbranch,INTER9
+ 11BB 3D10C402          DW FIND,QDUP,qbranch,INTER4
+ 11C3 E104A609          DW ONEPLUS,STATE,FETCH,ZEROEQUAL,OR
+ 11CD 3106D711          DW qbranch,INTER2
+ 11D1 4F011B06          DW EXECUTE,branch,INTER3
+ 11D7 CC08      INTER2: DW COMMAXT
+ 11D9 1B06F711  INTER3: DW branch,INTER8
+ 11DD 5A113106  INTER4: DW QNUMBER,qbranch,INTER5
+ 11E3 87101B06          DW LITERAL,branch,INTER6
+ 11E9 5D0C470D  INTER5: DW COUNT,TYPE,LIT,3FH,EMIT,CR,ABORT
+ 11F7           INTER6:
+ 11F7 1B06AF11  INTER8: DW branch,INTER1
+ 11FB D7021E01  INTER9: DW DROP,EXIT
+                
+                ;C EVALUATE  i*x c-addr u -- j*x  interprt string
+                ;   'SOURCE 2@ >R >R  >IN @ >R
+                ;   INTERPRET
+                ;   R> >IN !  R> R> 'SOURCE 2! ;
+ 11FF               head EVALUATE,8,EVALUATE,docolon
+ 11FF 9611     +        DW link
+ 1201 00       +        DB 0
+      1202     +link    DEFL $
+ 1202 08455641 +        DB 8,'EVALUATE'
+ 120B          +EVALUATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 120B CD5301   +        call DOCOLON
+               +        ENDIF
+ 120E C109DD0B          DW TICKSOURCE,TWOFETCH,TOR,TOR
+ 1216 8B09F303          DW TOIN,FETCH,TOR,INTERPRET
+ 121E 58038B09          DW RFROM,TOIN,STORE,RFROM,RFROM
+ 1228 C109F20B          DW TICKSOURCE,TWOSTORE,EXIT
+                
+                ;C QUIT     --    R: i*x --    interpret from kbd
+                ;   L0 LP !  R0 RP!   0 STATE !
+                ;   BEGIN
+                ;       TIB DUP TIBSIZE ACCEPT  SPACE
+                ;       INTERPRET
+                ;       STATE @ 0= IF CR ." OK" THEN
+                ;   AGAIN ;
+ 122E               head QUIT,4,QUIT,docolon
+ 122E 0212     +        DW link
+ 1230 00       +        DB 0
+      1231     +link    DEFL $
+ 1231 04515549 +        DB 4,'QUIT'
+ 1236          +QUIT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1236 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1239 080AE609          DW L0,LP,STORE
+ 123F 130ABE03          DW R0,RPSTORE,LIT,0,STATE,STORE
+ 124B 7409B402  QUIT1:  DW TIB,DUP,TIBSIZE,CPMACCEPT,SPACE
+ 1255 A011              DW INTERPRET
+ 1257 A609F303          DW STATE,FETCH,ZEROEQUAL,qbranch,QUIT2
+ 1261 700C720D          DW CR,XSQUOTE
+ 1265 036F6B20          DB 3,'ok '
+ 1269 470D              DW TYPE
+ 126B 1B064B12  QUIT2:  DW branch,QUIT1
+                
+                ;C ABORT    i*x --   R: j*x --   clear stk & QUIT
+                ;   S0 SP!  QUIT ;
+ 126F               head ABORT,5,ABORT,docolon
+ 126F 3112     +        DW link
+ 1271 00       +        DB 0
+      1272     +link    DEFL $
+ 1272 0541424F +        DB 5,'ABORT'
+ 1278          +ABORT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1278 CD5301   +        call DOCOLON
+               +        ENDIF
+ 127B F1099A03          DW S0,SPSTORE,QUIT   ; QUIT never returns
+                
+                ;Z ?ABORT   f c-addr u --      abort & print msg
+                ;   ROT IF TYPE ABORT THEN 2DROP ;
+ 1281               head QABORT,6,?ABORT,docolon
+ 1281 7212     +        DW link
+ 1283 00       +        DB 0
+      1284     +link    DEFL $
+ 1284 063F4142 +        DB 6,'?ABORT'
+ 128B          +QABORT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 128B CD5301   +        call DOCOLON
+               +        ENDIF
+ 128E 0D033106          DW ROT,qbranch,QABO1,TYPE,ABORT
+ 1298 0A0C1E01  QABO1:  DW TWODROP,EXIT
+                
+                ;C ABORT"  i*x 0  -- i*x   R: j*x -- j*x  x1=0
+                ;C         i*x x1 --       R: j*x --      x1<>0
+                ;   POSTPONE S" POSTPONE ?ABORT ; IMMEDIATE
+ 129C               immed ABORTQUOTE,6,ABORT",docolon
+ 129C 8412     +        DW link
+ 129E 01       +        DB 1
+      129F     +link    DEFL $
+ 129F 0641424F +        DB 6,'ABORT"'
+ 12A6          +ABORTQUOTE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 12A6 CD5301   +        call DOCOLON
+               +        ENDIF
+ 12A9 890D              DW SQUOTE
+ 12AB 36018B12          DW LIT,QABORT,COMMAXT
+ 12B1 1E01              DW EXIT
+                
+                ;C '    -- xt           find word in dictionary
+                ;   BL WORD FIND
+                ;   0= ABORT" ?" ;
+                ;    head TICK,1,',docolon
+ 12B3 9F12              DW link                 ; must expand
+ 12B5 00                DB 0                    ; manually
+      12B6      link    DEFL $                  ; because of
+ 12B6 0127              DB 1,27h                ; tick character
+ 12B8 CD5301    TICK:   call docolon
+ 12BB 5809AB0F          DW BL,WORD,FIND,ZEROEQUAL,XSQUOTE
+ 12C5 013F              DB 1,'?'
+ 12C7 8B121E01          DW QABORT,EXIT
+                
+                ;C CHAR   -- char           parse ASCII character
+                ;   BL WORD 1+ C@ ;
+ 12CB               head CHAR,4,CHAR,docolon
+ 12CB B612     +        DW link
+ 12CD 00       +        DB 0
+      12CE     +link    DEFL $
+ 12CE 04434841 +        DB 4,'CHAR'
+ 12D3          +CHAR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 12D3 CD5301   +        call DOCOLON
+               +        ENDIF
+ 12D6 5809AB0F          DW BL,WORD,ONEPLUS,CFETCH,EXIT
+                
+                ;C [CHAR]   --          compile character literal
+                ;   CHAR  ['] LIT ,XT  , ; IMMEDIATE
+ 12E0               immed BRACCHAR,6,[CHAR],docolon
+ 12E0 CE12     +        DW link
+ 12E2 01       +        DB 1
+      12E3     +link    DEFL $
+ 12E3 065B4348 +        DB 6,'[CHAR]'
+ 12EA          +BRACCHAR:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 12EA CD5301   +        call DOCOLON
+               +        ENDIF
+ 12ED D312              DW CHAR
+ 12EF 36013601          DW LIT,LIT,COMMAXT
+ 12F5 310F1E01          DW COMMA,EXIT
+                
+                ;C (    --                     skip input until )
+                ;   [ HEX ] 29 WORD DROP ; IMMEDIATE
+ 12F9               immed PAREN,1,(,docolon
+ 12F9 E312     +        DW link
+ 12FB 01       +        DB 1
+      12FC     +link    DEFL $
+ 12FC 0128     +        DB 1,'('
+ 12FE          +PAREN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 12FE CD5301   +        call DOCOLON
+               +        ENDIF
+ 1301 36012900          DW LIT,29H,WORD,DROP,EXIT
+                
+                ; COMPILER ======================================
+                
+                ;C CREATE   --      create an empty definition
+                ;   LATEST @ , 0 C,         link & immed field
+                ;   HERE LATEST !           new "latest" link
+                ;   BL WORD C@ 1+ ALLOT         name field
+                ;   docreate ,CF                code field
+ 130B               head CREATE,6,CREATE,docolon
+ 130B FC12     +        DW link
+ 130D 00       +        DB 0
+      130E     +link    DEFL $
+ 130E 06435245 +        DB 6,'CREATE'
+ 1315          +CREATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1315 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1318 D009F303          DW LATEST,FETCH,COMMA,LIT,0,CCOMMA
+ 1324 110FD009          DW HERE,LATEST,STORE
+ 132A 5809AB0F          DW BL,WORD,CFETCH,ONEPLUS,ALLOT
+ 1334 36017F01          DW LIT,docreate,COMMACF,EXIT
+                        
+                ;Z (DOES>)  --      run-time action of DOES>
+                ;   R>              adrs of headless DOES> def'n
+                ;   LATEST @ NFA>CFA    code field to fix up
+                ;   !CF ;
+ 133C               head XDOES,7,(DOES>),docolon
+ 133C 0E13     +        DW link
+ 133E 00       +        DB 0
+      133F     +link    DEFL $
+ 133F 0728444F +        DB 7,'(DOES>)'
+ 1347          +XDOES:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1347 CD5301   +        call DOCOLON
+               +        ENDIF
+ 134A 5803D009          DW RFROM,LATEST,FETCH,NFATOCFA,STORECF
+ 1354 1E01              DW EXIT
+                
+                ;C DOES>    --      change action of latest def'n
+                ;   COMPILE (DOES>)
+                ;   dodoes ,CF ; IMMEDIATE
+ 1356               immed DOES,5,DOES>,docolon
+ 1356 3F13     +        DW link
+ 1358 01       +        DB 1
+      1359     +link    DEFL $
+ 1359 05444F45 +        DB 5,'DOES>'
+ 135F          +DOES:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 135F CD5301   +        call DOCOLON
+               +        ENDIF
+ 1362 36014713          DW LIT,XDOES,COMMAXT
+ 1368 3601CE01          DW LIT,dodoes,COMMACF,EXIT
+                
+                ;C RECURSE  --      recurse current definition
+                ;   LATEST @ NFA>CFA ,XT ; IMMEDIATE
+ 1370               immed RECURSE,7,RECURSE,docolon
+ 1370 5913     +        DW link
+ 1372 01       +        DB 1
+      1373     +link    DEFL $
+ 1373 07524543 +        DB 7,'RECURSE'
+ 137B          +RECURSE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 137B CD5301   +        call DOCOLON
+               +        ENDIF
+ 137E D009F303          DW LATEST,FETCH,NFATOCFA,COMMAXT,EXIT
+                
+                ;C [        --      enter interpretive state
+                ;   0 STATE ! ; IMMEDIATE
+ 1388               immed LEFTBRACKET,1,[,docolon
+ 1388 7313     +        DW link
+ 138A 01       +        DB 1
+      138B     +link    DEFL $
+ 138B 015B     +        DB 1,'['
+ 138D          +LEFTBRACKET:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 138D CD5301   +        call DOCOLON
+               +        ENDIF
+ 1390 36010000          DW LIT,0,STATE,STORE,EXIT
+                
+                ;C ]        --      enter compiling state
+                ;   -1 STATE ! ;
+ 139A               head RIGHTBRACKET,1,],docolon
+ 139A 8B13     +        DW link
+ 139C 00       +        DB 0
+      139D     +link    DEFL $
+ 139D 015D     +        DB 1,']'
+ 139F          +RIGHTBRACKET:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 139F CD5301   +        call DOCOLON
+               +        ENDIF
+ 13A2 3601FFFF          DW LIT,-1,STATE,STORE,EXIT
+                
+                ;Z HIDE     --      "hide" latest definition
+                ;   LATEST @ DUP C@ 80 OR SWAP C! ;
+ 13AC               head HIDE,4,HIDE,docolon
+ 13AC 9D13     +        DW link
+ 13AE 00       +        DB 0
+      13AF     +link    DEFL $
+ 13AF 04484944 +        DB 4,'HIDE'
+ 13B4          +HIDE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 13B4 CD5301   +        call DOCOLON
+               +        ENDIF
+ 13B7 D009F303          DW LATEST,FETCH,DUP,CFETCH,LIT,80H,OR
+ 13C5 E702E203          DW SWOP,CSTORE,EXIT
+                
+                ;Z REVEAL   --      "reveal" latest definition
+                ;   LATEST @ DUP C@ 7F AND SWAP C! ;
+ 13CB               head REVEAL,6,REVEAL,docolon
+ 13CB AF13     +        DW link
+ 13CD 00       +        DB 0
+      13CE     +link    DEFL $
+ 13CE 06524556 +        DB 6,'REVEAL'
+ 13D5          +REVEAL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 13D5 CD5301   +        call DOCOLON
+               +        ENDIF
+ 13D8 D009F303          DW LATEST,FETCH,DUP,CFETCH,LIT,7FH,AND
+ 13E6 E702E203          DW SWOP,CSTORE,EXIT
+                
+                ;C IMMEDIATE   --   make last def'n immediate
+                ;   1 LATEST @ 1- C! ;   set immediate flag
+ 13EC               head IMMEDIATE,9,IMMEDIATE,docolon
+ 13EC CE13     +        DW link
+ 13EE 00       +        DB 0
+      13EF     +link    DEFL $
+ 13EF 09494D4D +        DB 9,'IMMEDIATE'
+ 13F9          +IMMEDIATE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 13F9 CD5301   +        call DOCOLON
+               +        ENDIF
+ 13FC 36010100          DW LIT,1,LATEST,FETCH,ONEMINUS,CSTORE
+ 1408 1E01              DW EXIT
+                
+                ;C :        --      begin a colon definition
+                ;   CREATE HIDE ] !COLON ;
+ 140A               head COLON,1,:,docode
+ 140A EF13     +        DW link
+ 140C 00       +        DB 0
+      140D     +link    DEFL $
+ 140D 013A     +        DB 1,':'
+ 140F          +COLON:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 140F CD5301            CALL docolon    ; code fwd ref explicitly
+ 1412 1513B413          DW CREATE,HIDE,RIGHTBRACKET,STORCOLON
+ 141A 1E01              DW EXIT
+                
+                ;C ;
+                ;   REVEAL  ,EXIT
+                ;   POSTPONE [  ; IMMEDIATE
+ 141C               immed SEMICOLON,1,';',docolon
+ 141C 0D14     +        DW link
+ 141E 01       +        DB 1
+      141F     +link    DEFL $
+ 141F 013B     +        DB 1,';'
+ 1421          +SEMICOLON:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1421 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1424 D5132109          DW REVEAL,CEXIT
+ 1428 8D131E01          DW LEFTBRACKET,EXIT
+                
+                ;C [']  --         find word & compile as literal
+                ;   '  ['] LIT ,XT  , ; IMMEDIATE
+                ; When encountered in a colon definition, the
+                ; phrase  ['] xxx  will cause   LIT,xxt  to be
+                ; compiled into the colon definition (where
+                ; (where xxt is the execution token of word xxx).
+                ; When the colon definition executes, xxt will
+                ; be put on the stack.  (All xt's are one cell.)
+                ;    immed BRACTICK,3,['],docolon
+ 142C 1F14              DW link                 ; must expand
+ 142E 01                DB 1                    ; manually
+      142F      link    DEFL $                  ; because of
+ 142F 035B275D          DB 3,5Bh,27h,5Dh        ; tick character
+ 1433 CD5301    BRACTICK: call docolon
+ 1436 B812              DW TICK               ; get xt of 'xxx'
+ 1438 36013601          DW LIT,LIT,COMMAXT    ; append LIT action
+ 143E 310F1E01          DW COMMA,EXIT         ; append xt literal
+                
+                ;C POSTPONE  --   postpone compile action of word
+                ;   BL WORD FIND
+                ;   DUP 0= ABORT" ?"
+                ;   0< IF   -- xt  non immed: add code to current
+                ;                  def'n to compile xt later.
+                ;       ['] LIT ,XT  ,      add "LIT,xt,COMMAXT"
+                ;       ['] ,XT ,XT         to current definition
+                ;   ELSE  ,XT      immed: compile into cur. def'n
+                ;   THEN ; IMMEDIATE
+ 1442               immed POSTPONE,8,POSTPONE,docolon
+ 1442 2F14     +        DW link
+ 1444 01       +        DB 1
+      1445     +link    DEFL $
+ 1445 08504F53 +        DB 8,'POSTPONE'
+ 144E          +POSTPONE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 144E CD5301   +        call DOCOLON
+               +        ENDIF
+ 1451 5809AB0F          DW BL,WORD,FIND,DUP,ZEROEQUAL,XSQUOTE
+ 145D 013F              DB 1,'?'
+ 145F 8B129205          DW QABORT,ZEROLESS,qbranch,POST1
+ 1467 36013601          DW LIT,LIT,COMMAXT,COMMA
+ 146F 3601CC08          DW LIT,COMMAXT,COMMAXT,branch,POST2
+ 1479 CC08      POST1:  DW COMMAXT
+ 147B 1E01      POST2:  DW EXIT
+                               
+                ;Z COMPILE   --   append inline execution token
+                ;   R> DUP CELL+ >R @ ,XT ;
+                ; The phrase ['] xxx ,XT appears so often that
+                ; this word was created to combine the actions
+                ; of LIT and ,XT.  It takes an inline literal
+                ; execution token and appends it to the dict.
+                ;    head COMPILE,7,COMPILE,docolon
+                ;        DW RFROM,DUP,CELLPLUS,TOR
+                ;        DW FETCH,COMMAXT,EXIT
+                ; N.B.: not used in the current implementation
+                
+                ; CONTROL STRUCTURES ============================
+                
+                ;C IF       -- adrs    conditional forward branch
+                ;   ['] qbranch ,BRANCH  HERE DUP ,DEST ;
+                ;   IMMEDIATE
+ 147D               immed IF,2,IF,docolon
+ 147D 4514     +        DW link
+ 147F 01       +        DB 1
+      1480     +link    DEFL $
+ 1480 024946   +        DB 2,'IF'
+ 1483          +IF:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1483 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1486 36013106          DW LIT,qbranch,COMMABRANCH
+ 148C 110FB402          DW HERE,DUP,COMMADEST,EXIT
+                
+                ;C THEN     adrs --        resolve forward branch
+                ;   HERE SWAP !DEST ; IMMEDIATE
+ 1494               immed THEN,4,THEN,docolon
+ 1494 8014     +        DW link
+ 1496 01       +        DB 1
+      1497     +link    DEFL $
+ 1497 04544845 +        DB 4,'THEN'
+ 149C          +THEN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 149C CD5301   +        call DOCOLON
+               +        ENDIF
+ 149F 110FE702          DW HERE,SWOP,STOREDEST,EXIT
+                
+                ;C ELSE     adrs1 -- adrs2    branch for IF..ELSE
+                ;   ['] branch ,BRANCH  HERE DUP ,DEST
+                ;   SWAP  POSTPONE THEN ; IMMEDIATE
+ 14A7               immed ELSE,4,ELSE,docolon
+ 14A7 9714     +        DW link
+ 14A9 01       +        DB 1
+      14AA     +link    DEFL $
+ 14AA 04454C53 +        DB 4,'ELSE'
+ 14AF          +ELSE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 14AF CD5301   +        call DOCOLON
+               +        ENDIF
+ 14B2 36011B06          DW LIT,branch,COMMABRANCH
+ 14B8 110FB402          DW HERE,DUP,COMMADEST
+ 14BE E7029C14          DW SWOP,THEN,EXIT
+                
+                ;C BEGIN    -- adrs        target for bwd. branch
+                ;   HERE ; IMMEDIATE
+ 14C4               immed BEGIN,5,BEGIN,docode
+ 14C4 AA14     +        DW link
+ 14C6 01       +        DB 1
+      14C7     +link    DEFL $
+ 14C7 05424547 +        DB 5,'BEGIN'
+ 14CD          +BEGIN:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 14CD C3110F            jp HERE
+                
+                ;C UNTIL    adrs --   conditional backward branch
+                ;   ['] qbranch ,BRANCH  ,DEST ; IMMEDIATE
+                ;   conditional backward branch
+ 14D0               immed UNTIL,5,UNTIL,docolon
+ 14D0 C714     +        DW link
+ 14D2 01       +        DB 1
+      14D3     +link    DEFL $
+ 14D3 05554E54 +        DB 5,'UNTIL'
+ 14D9          +UNTIL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 14D9 CD5301   +        call DOCOLON
+               +        ENDIF
+ 14DC 36013106          DW LIT,qbranch,COMMABRANCH
+ 14E2 43091E01          DW COMMADEST,EXIT
+                
+                ;X AGAIN    adrs --      uncond'l backward branch
+                ;   ['] branch ,BRANCH  ,DEST ; IMMEDIATE
+                ;   unconditional backward branch
+ 14E6               immed AGAIN,5,AGAIN,docolon
+ 14E6 D314     +        DW link
+ 14E8 01       +        DB 1
+      14E9     +link    DEFL $
+ 14E9 05414741 +        DB 5,'AGAIN'
+ 14EF          +AGAIN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 14EF CD5301   +        call DOCOLON
+               +        ENDIF
+ 14F2 36011B06          DW LIT,branch,COMMABRANCH
+ 14F8 43091E01          DW COMMADEST,EXIT
+                
+                ;C WHILE    -- adrs         branch for WHILE loop
+                ;   POSTPONE IF ; IMMEDIATE
+ 14FC               immed WHILE,5,WHILE,docode
+ 14FC E914     +        DW link
+ 14FE 01       +        DB 1
+      14FF     +link    DEFL $
+ 14FF 05574849 +        DB 5,'WHILE'
+ 1505          +WHILE:
+               +        IF  .NOT.(DOCODE=DOCODE)
+               +        call DOCODE
+               +        ENDIF
+ 1505 C38314            jp IF
+                
+                ;C REPEAT   adrs1 adrs2 --     resolve WHILE loop
+                ;   SWAP POSTPONE AGAIN POSTPONE THEN ; IMMEDIATE
+ 1508               immed REPEAT,6,REPEAT,docolon
+ 1508 FF14     +        DW link
+ 150A 01       +        DB 1
+      150B     +link    DEFL $
+ 150B 06524550 +        DB 6,'REPEAT'
+ 1512          +REPEAT:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1512 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1515 E702EF14          DW SWOP,AGAIN,THEN,EXIT
+                
+                ;Z >L   x --   L: -- x        move to leave stack
+                ;   CELL LP +!  LP @ ! ;      (L stack grows up)
+ 151D               head TOL,2,>L,docolon
+ 151D 0B15     +        DW link
+ 151F 00       +        DB 0
+      1520     +link    DEFL $
+ 1520 023E4C   +        DB 2,'>L'
+ 1523          +TOL:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1523 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1526 7208E609          DW CELL,LP,PLUSSTORE,LP,FETCH,STORE,EXIT
+                
+                ;Z L>   -- x   L: x --      move from leave stack
+                ;   LP @ @  CELL NEGATE LP +! ;
+ 1534               head LFROM,2,L>,docolon
+ 1534 2015     +        DW link
+ 1536 00       +        DB 0
+      1537     +link    DEFL $
+ 1537 024C3E   +        DB 2,'L>'
+ 153A          +LFROM:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 153A CD5301   +        call DOCOLON
+               +        ENDIF
+ 153D E609F303          DW LP,FETCH,FETCH
+ 1543 7208CD04          DW CELL,NEGATE,LP,PLUSSTORE,EXIT
+                
+                ;C DO       -- adrs   L: -- 0
+                ;   ['] xdo ,XT   HERE     target for bwd branch
+                ;   0 >L ; IMMEDIATE           marker for LEAVEs
+ 154D               immed DO,2,DO,docolon
+ 154D 3715     +        DW link
+ 154F 01       +        DB 1
+      1550     +link    DEFL $
+ 1550 02444F   +        DB 2,'DO'
+ 1553          +DO:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1553 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1556 36014706          DW LIT,xdo,COMMAXT,HERE
+ 155E 36010000          DW LIT,0,TOL,EXIT
+                
+                ;Z ENDLOOP   adrs xt --   L: 0 a1 a2 .. aN --
+                ;   ,BRANCH  ,DEST                backward loop
+                ;   BEGIN L> ?DUP WHILE POSTPONE THEN REPEAT ;
+                ;                                 resolve LEAVEs
+                ; This is a common factor of LOOP and +LOOP.
+ 1566               head ENDLOOP,7,ENDLOOP,docolon
+ 1566 5015     +        DW link
+ 1568 00       +        DB 0
+      1569     +link    DEFL $
+ 1569 07454E44 +        DB 7,'ENDLOOP'
+ 1571          +ENDLOOP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1571 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1574 37094309          DW COMMABRANCH,COMMADEST
+ 1578 3A15C402  LOOP1:  DW LFROM,QDUP,qbranch,LOOP2
+ 1580 9C141B06          DW THEN,branch,LOOP1
+ 1586 1E01      LOOP2:  DW EXIT
+                
+                ;C LOOP    adrs --   L: 0 a1 a2 .. aN --
+                ;   ['] xloop ENDLOOP ;  IMMEDIATE
+ 1588               immed LOOP,4,LOOP,docolon
+ 1588 6915     +        DW link
+ 158A 01       +        DB 1
+      158B     +link    DEFL $
+ 158B 044C4F4F +        DB 4,'LOOP'
+ 1590          +LOOP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1590 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1593 36017806          DW LIT,xloop,ENDLOOP,EXIT
+                
+                ;C +LOOP   adrs --   L: 0 a1 a2 .. aN --
+                ;   ['] xplusloop ENDLOOP ;  IMMEDIATE
+ 159B               immed PLUSLOOP,5,+LOOP,docolon
+ 159B 8B15     +        DW link
+ 159D 01       +        DB 1
+      159E     +link    DEFL $
+ 159E 052B4C4F +        DB 5,'+LOOP'
+ 15A4          +PLUSLOOP:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 15A4 CD5301   +        call DOCOLON
+               +        ENDIF
+ 15A7 3601AB06          DW LIT,xplusloop,ENDLOOP,EXIT
+                
+                ;C LEAVE    --    L: -- adrs
+                ;   ['] UNLOOP ,XT
+                ;   ['] branch ,BRANCH   HERE DUP ,DEST  >L
+                ;   ; IMMEDIATE      unconditional forward branch
+ 15AF               immed LEAVE,5,LEAVE,docolon
+ 15AF 9E15     +        DW link
+ 15B1 01       +        DB 1
+      15B2     +link    DEFL $
+ 15B2 054C4541 +        DB 5,'LEAVE'
+ 15B8          +LEAVE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 15B8 CD5301   +        call DOCOLON
+               +        ENDIF
+ 15BB 3601F906          DW LIT,unloop,COMMAXT
+ 15C1 36011B06          DW LIT,branch,COMMABRANCH
+ 15C7 110FB402          DW HERE,DUP,COMMADEST,TOL,EXIT
+                
+                ; OTHER OPERATIONS ==============================
+                
+                ;X WITHIN   n1|u1 n2|u2 n3|u3 -- f   n2<=n1<n3?
+                ;  OVER - >R - R> U< ;          per ANS document
+ 15D1               head WITHIN,6,WITHIN,docolon
+ 15D1 B215     +        DW link
+ 15D3 00       +        DB 0
+      15D4     +link    DEFL $
+ 15D4 06574954 +        DB 6,'WITHIN'
+ 15DB          +WITHIN:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 15DB CD5301   +        call DOCOLON
+               +        ENDIF
+ 15DE FA026104          DW OVER,MINUS,TOR,MINUS,RFROM,ULESS,EXIT
+                
+                ;C MOVE    addr1 addr2 u --     smart move
+                ;             VERSION FOR 1 ADDRESS UNIT = 1 CHAR
+                ;  >R 2DUP SWAP DUP R@ +     -- ... dst src src+n
+                ;  WITHIN IF  R> CMOVE>        src <= dst < src+n
+                ;       ELSE  R> CMOVE  THEN ;          otherwise
+ 15EC               head MOVE,4,MOVE,docolon
+ 15EC D415     +        DW link
+ 15EE 00       +        DB 0
+      15EF     +link    DEFL $
+ 15EF 044D4F56 +        DB 4,'MOVE'
+ 15F4          +MOVE:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 15F4 CD5301   +        call DOCOLON
+               +        ENDIF
+ 15F7 40031B0C          DW TOR,TWODUP,SWOP,DUP,RFETCH,PLUS
+ 1603 DB153106          DW WITHIN,qbranch,MOVE1
+ 1609 5803BC07          DW RFROM,CMOVEUP,branch,MOVE2
+ 1611 58039E07  MOVE1:  DW RFROM,CMOVE
+ 1615 1E01      MOVE2:  DW EXIT
+                
+                ;C DEPTH    -- +n        number of items on stack
+                ;   SP@ S0 SWAP - 2/ ;   16-BIT VERSION!
+ 1617               head DEPTH,5,DEPTH,docolon
+ 1617 EF15     +        DW link
+ 1619 00       +        DB 0
+      161A     +link    DEFL $
+ 161A 05444550 +        DB 5,'DEPTH'
+ 1620          +DEPTH:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1620 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1623 8503F109          DW SPFETCH,S0,SWOP,MINUS,TWOSLASH,EXIT
+                
+                ;C ENVIRONMENT?  c-addr u -- false   system query
+                ;                         -- i*x true
+                ;   2DROP 0 ;       the minimal definition!
+ 162F               head ENVIRONMENTQ,12,ENVIRONMENT?,docolon
+ 162F 1A16     +        DW link
+ 1631 00       +        DB 0
+      1632     +link    DEFL $
+ 1632 0C454E56 +        DB 12,'ENVIRONMENT?'
+ 163F          +ENVIRONMENTQ:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 163F CD5301   +        call DOCOLON
+               +        ENDIF
+ 1642 0A0C3601          DW TWODROP,LIT,0,EXIT
+                
+                ; UTILITY WORDS AND STARTUP =====================
+                
+                ;X WORDS    --          list all words in dict.
+                ;   LATEST @ BEGIN
+                ;       DUP COUNT TYPE SPACE
+                ;       NFA>LFA @
+                ;   DUP 0= UNTIL
+                ;   DROP ;
+ 164A               head WORDS,5,WORDS,docolon
+ 164A 3216     +        DW link
+ 164C 00       +        DB 0
+      164D     +link    DEFL $
+ 164D 05574F52 +        DB 5,'WORDS'
+ 1653          +WORDS:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1653 CD5301   +        call DOCOLON
+               +        ENDIF
+ 1656 D009F303          DW LATEST,FETCH
+ 165A B4025D0C  WDS1:   DW DUP,COUNT,TYPE,SPACE,NFATOLFA,FETCH
+ 1666 B4027E05          DW DUP,ZEROEQUAL,qbranch,WDS1
+ 166E D7021E01          DW DROP,EXIT
+                
+                ;X .S      --           print stack contents
+                ;   SP@ S0 - IF
+                ;       SP@ S0 2 - DO I @ U. -2 +LOOP
+                ;   THEN ;
+ 1672               head DOTS,2,.S,docolon
+ 1672 4D16     +        DW link
+ 1674 00       +        DB 0
+      1675     +link    DEFL $
+ 1675 022E53   +        DB 2,'.S'
+ 1678          +DOTS:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 1678 CD5301   +        call DOCOLON
+               +        ENDIF
+ 167B 8503F109          DW SPFETCH,S0,MINUS,qbranch,DOTS2
+ 1685 8503F109          DW SPFETCH,S0,LIT,2,MINUS,XDO
+ 1691 B806F303  DOTS1:  DW II,FETCH,UDOT,LIT,-2,XPLUSLOOP,DOTS1
+ 169F 1E01      DOTS2:  DW EXIT
+                
+                ;Z COLD     --      cold start Forth system
+                ;   UINIT U0 #INIT CMOVE      init user area
+                ;   80 COUNT INTERPRET       interpret CP/M cmd
+                ;   ." Z80 CamelForth etc."
+                ;   ABORT ;
+ 16A1               head COLD,4,COLD,docolon
+ 16A1 7516     +        DW link
+ 16A3 00       +        DB 0
+      16A4     +link    DEFL $
+ 16A4 04434F4C +        DB 4,'COLD'
+ 16A9          +COLD:
+               +        IF  .NOT.(DOCOLON=DOCODE)
+ 16A9 CD5301   +        call DOCOLON
+               +        ENDIF
+ 16AC 210A7F09          DW UINIT,U0,NINIT,CMOVE
+ 16B4 36018000          DW LIT,80h,COUNT,INTERPRET
+ 16BC 720D              DW XSQUOTE
+ 16BE 235A3830          DB 35,'Z80 CamelForth v1.01  25 Jan 1995'
+ 16E0 0D0A              DB 0dh,0ah
+ 16E2 470D7812          DW TYPE,ABORT       ; ABORT never returns
+                
+      16A4      lastword EQU link   ; nfa of last word in dict.
+      16E6      enddict EQU $       ; user's code starts here
+ 16E6                   END
+
+
+REDEFINED SYMBOLS
+
+LINK   16A4 
+
+ASEG SYMBOLS
+
+ABORT  1278 ABORTQ 12A6 ABS    0A73 ACC1   0CF9 ACC3   0D27 
+ACC4   0D31 ACC5   0D35 ACCEPT 0CEE AGAIN  14EF ALIGN  0856 
+ALIGNE 0868 ALLOT  0F23 AND    0475 BASE   0998 BDOS   01EC 
+BEGIN  14CD BL     0958 BRACCH 12EA BRACTI 1433 BRANCH 061B 
+BYE    02AA CCOMMA 0F48 CELL   0872 CELLPL 0880 CELLS  0892 
+CEXIT  0921 CFETCH 0405 CHAR   12D3 CHARPL 089E CHARS  08AA 
+CMOVE  079E CMOVED 07A9 CMOVEU 07BC COLD   16A9 COLON  140F 
+COMMA  0F31 COMMAB 0937 COMMAC 08EE COMMAD 0943 COMMAX 08CC 
+CONSTA 0196 COUNT  0C5D CPMACC 027E CPMBDO 0005 CR     0C70 
+CREATE 1315 CSTORE 03E2 DABS   0ABB DECIMA 0EE8 DEPTH  1620 
+DIGITQ 10A6 DNEG1  0AB1 DNEGAT 0A87 DO     1553 DOBRAN 061B 
+DOCODE 0000 DOCOLO 0153 DOCON  019F DOCREA 017F DODOES 01CE 
+DOES   135F DOT    0EC2 DOTQUO 0DA8 DOTS   1678 DOTS1  1691 
+DOTS2  169F DOUSER 01BC DOVAR  017F DP     09B1 DROP   02D7 
+DUP    02B4 ELSE   14AF EMIT   020D ENDDIC 16E6 ENDLOO 1571 
+ENTER  0153 ENVIRO 163F EQUAL  05A3 EVALUA 120B EXECUT 014F 
+EXIT   011E FETCH  03F3 FILL   0777 FILLDO 078C FIND   103D 
+FIND1  1044 FIND2  105C FIND3  107A FMMOD1 0B3B FMMOD2 0B3F 
+FMSLAS 0B1C GREATE 05E5 HERE   0F11 HEX    0EFC HIDE   13B4 
+HOLD   0DFE HP     09DB IF     1483 II     06B8 IMMEDI 13F9 
+IMMEDQ 102C INTER1 11AF INTER2 11D7 INTER3 11D9 INTER4 11DD 
+INTER5 11E9 INTER6 11F7 INTER8 11F7 INTER9 11FB INTERP 11A0 
+INVERT 04B6 JJ     06D6 KEY    024E KEY1   0251 KEY2   0263 
+L0     0A08 LASTWO 16A4 LATEST 09D0 LEAVE  15B8 LEFTBR 138D 
+LESS   05C7 LESSNU 0E17 LFROM  153A LINK   16A4 LIT    0136 
+LITER1 109A LITERA 1087 LOOP   1590 LOOP1  1578 LOOP2  1586 
+LOOPTE 0691 LOOPTS 067C LP     09E6 LSH1   0538 LSH2   0539 
+LSHIFT 0533 MAX    0BAE MAX1   0BBB MIN    0BC6 MIN1   0BD3 
+MINUS  0461 MOD    0B79 MOVE   15F4 MOVE1  1611 MOVE2  1615 
+MPLUS  044A MPLUS1 0453 MSTAR  0ACA NEGATE 04CD NFATOC 1013 
+NFATOL 0FFD NINIT  0A3F NIP    0320 NOADD  0724 NOOP   0856 
+NOTEQU 05B9 NUM    0E4C NUMGRE 0E7A NUMS   0E63 NUMS1  0E66 
+ONEMIN 04EF ONEPLU 04E1 OR     0489 OVER   02FA PAD    09FD 
+PAREN  12FE PCFETC 0429 PCSTOR 0417 PLUS   0439 PLUSLO 15A4 
+PLUSST 0568 POPTOS 02D7 POST1  1479 POST2  147B POSTPO 144E 
+PUSHTO 02B4 QABO1  1298 QABORT 128B QBRANC 0631 QDNEGA 0AA6 
+QDUP   02C4 QNEG1  0A6A QNEGAT 0A5F QNUM1  1181 QNUM2  118D 
+QNUM3  1191 QNUMBE 115A QSIGN  10E2 QSIGN1 110D QUERYK 0232 
+QUIT   1236 QUIT1  124B QUIT2  126B R0     0A13 RECURS 137B 
+REPEAT 1512 RESET  0100 REVEAL 13D5 REVSEN 05DB RFETCH 0370 
+RFROM  0358 RIGHTB 139F ROT    030D RPFETC 03AC RPSTOR 03BE 
+RSH1   0553 RSH2   0557 RSHIFT 054E S0     09F1 SAVEKE 0225 
+SCAN   0805 SCANDO 0815 SDIFF  083E SEMICO 1421 SEQUAL 0826 
+SIGN   0E93 SIGN1  0EA2 SKIP   07DD SKIPDO 07F2 SKIPLO 07E7 
+SKIPMI 07F0 SLASH  0B69 SLASHM 0B57 SLASHS 0F77 SLOOP  082F 
+SMATCH 0838 SMSLAS 0AED SNEXT  0846 SOURCE 0F63 SPACE  0C8A 
+SPACES 0C9D SPCS1  0CA0 SPCS2  0CAE SPFETC 0385 SPSTOR 039A 
+SQUOTE 0D89 SSMOD  0B8B STAR   0B46 STARSL 0B9E STATE  09A6 
+STOD   0A4B STORCO 0907 STORE  03CE STOREC 08D6 STORED 094F 
+SWAPBY 04FD SWOP   02E7 THEN   149C TIB    0974 TIBSIZ 0968 
+TICK   12B8 TICKSO 09C1 TOBODY 08B5 TOCOUN 0F94 TODIGI 0E2C 
+TOIN   098B TOL    1523 TONUM1 111D TONUM2 1133 TONUM3 114D 
+TONUMB 111A TOR    0340 TOSFAL 05A9 TOSTRU 05D1 TUCK   0331 
+TWODRO 0C0A TWODUP 0C1B TWOFET 0BDD TWOOVE 0C43 TWOSLA 051E 
+TWOSTA 050D TWOSTO 0BF2 TWOSWA 0C2D TYP3   0D58 TYP4   0D66 
+TYP5   0D68 TYPE   0D47 U0     097F UDIV3  0751 UDIV4  0757 
+UDLOOP 0747 UDOT   0EAA UDSLAS 0DBF UDSTAR 0DDF UGREAT 0608 
+UINIT  0A21 ULESS  05F4 UMAX   0CD3 UMAX1  0CE0 UMIN   0CBA 
+UMIN1  0CC7 UMLOOP 0719 UMOVED 07CC UMSLAS 073C UMSTAR 070F 
+UNLOOP 06F9 UNTIL  14D9 USER   01B3 VARIAB 0170 WDS1   165A 
+WHILE  1505 WITHIN 15DB WORD   0FAB WORD1  0FD0 WORDS  1653 
+XDO    0647 XDOES  1347 XLOOP  0678 XOR    049E XPLUSL 06AB 
+XSQUOT 0D72 ZEROEQ 057E ZEROLE 0592 
+
+ 0000 ERROR(S) ASSEMBLY COMPLETE

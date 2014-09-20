@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.169 2014-09-17 21:40:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.170 2014-09-20 22:57:42 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -112,6 +112,7 @@ developer :
 #------------------------------------------------------------------------------
 install:
 	$(INSTALL) $(TARGET) $(PREFIX)/bin/
+	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
 
 #------------------------------------------------------------------------------
 # clean
