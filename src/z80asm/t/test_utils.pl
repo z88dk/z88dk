@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.70 2014-09-11 22:28:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.71 2014-09-20 22:53:03 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -31,7 +31,7 @@ my $test	 = "test";
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err 
-					exe c o asmlst prj ));
+					exe c o asmlst prj i ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);

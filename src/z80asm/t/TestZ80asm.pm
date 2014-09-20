@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.10 2014-06-21 02:15:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.11 2014-09-20 22:53:03 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -188,7 +188,8 @@ sub unlink_temp {
 								c |
 								o |
 								asmlst |
-								prj ) $/ix}
+								prj |
+								i ) $/ix}
 		read_dir(".");
 	@temp = uniq(@temp);
 	
