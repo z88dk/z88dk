@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.7 2014-09-11 22:28:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.8 2014-09-21 15:23:13 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -413,8 +413,6 @@ File test2.obj at $0000: Z80RMF07
   Code: 0 bytes (section data)
   Code: 0 bytes (section bss)
 END
-
-#diag "computed DEFC not working"; exit 0;
 
 #------------------------------------------------------------------------------
 # Test computed DEFC 1
