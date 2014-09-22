@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+		<title>z80asm File formats (v08)</title>
+	</head>
+<body>
+<h1 id="z80asmfileformatsv08">z80asm File formats (v08)</h1>
+
+<p>This document describes the object and libary formats used by <em>z80asm</em>
+versions <em>2.6.x</em>. </p>
+
+<p>The version changed to <em>08</em> to include a user defined ORG address
+per section.</p>
+
+<p>The object and library files are stored in binary form as a set of 
+contiguous objects, i.e. each section follows the previous one without 
+any end-markers. </p>
+
+<p>The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.</p>
+
+<p>A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain <em>0xFFFFFFFF</em> 
+(-1) if that section does not exist.</p>
+
+<p>The following object types exist in the file:</p>
+
+<ul>
+<li><p><em>char</em> :  one byte containing an ASCII character;</p></li>
+<li><p><em>byte</em> :  one 8-bit value;</p></li>
+<li><p><em>word</em> :  one 16-bit value, stored in low byte - high byte order 
+(Little endian format - Z80/Intel notation);</p></li>
+<li><p><em>long</em> :  one 32-bit value, stored in low byte - high byte order, 
+containing the file position where the corresponding 
+section starts; the value is <em>0xFFFFFFFF</em> (-1) if the section 
+does not exist;</p></li>
+<li><p><em>string</em>: one byte containing the string length followed by the 
+characters of the string.</p></li>
+<li><p><em>lstring</em>: one word containing the string length followed by the 
+characters of the string.</p></li>
+</ul>
+
+<h2 id="objectfileformat">Object file format</h2>
+
+<p>The format of the object file is as follows:</p>
+
+<table>
+<col align="center" />
+<col align="center" />
+<col align="left" />
+<thead>
+<tr>
+	<th>Addr</th>
+	<th>Type</th>
+	<th>Object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td align="center">0</td>
+	<td align="center">char[8]</td>
+	<td align="left">'Z80RMF04' (file signature and version)</td>
+</tr>
+<tr>
+	<td align="center">8</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Module Name</em>, always the last section</td>
+</tr>
+<tr>
+	<td align="center">12</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Expressions</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">16</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Module Names</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">20</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>External Names</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">24</td>
+	<td align="center">long</td>
+	<td align="left">File pointer to <em>Machine Code</em>, may be -1</td>
+</tr>
+<tr>
+	<td align="center">28</td>
+	<td align="center"> </td>
+	<td align="left"><em>Expressions</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Module Names</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>External Names</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Module Name</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left"><em>Machine Code</em></td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li><p><em>Expressions</em> : contains a set of expressions up to 
+an end marker (<em>type</em> = 0). 
+Each expression has the following format:</p>
+
+<ul>
+<li><p><em>type</em> (char) : defines the resulting evaluation type range:</p>
+
+<p>0   : end marker <br />
+'U' : 8-bit integer (0 to 255) <br />
+'S' : 8-bit signed integer (-128 to 127) <br />
+'C' : 16-bit integer (-32768 to 65535) <br />
+'L' : 32-bit signed integer <br />
+'=' : computed name at link time</p></li>
+<li><p><em>sourcefile</em> (lstring) : source file name where expression was defined,
+to be used in error messages. May be an empty string, signalling that
+the previous <em>sourcefile</em> of the previous expression should be used.</p></li>
+<li><p><em>line_number</em> (long) : line number in source file where 
+expression was defined, to be used in error messages.</p></li>
+<li><p><em>section</em> (string) : source file section name where expression 
+was defined. </p></li>
+<li><p><em>ASMPC</em> (word) : defines the relative module code address of the 
+start of the assembly instruction to be used as <em>ASMPC</em> during
+expression evaluation.</p></li>
+<li><p><em>patchptr</em> (word) : defines the relative module code patch pointer to 
+store the result of evaluating the expression.</p></li>
+<li><p><em>target_name</em> (string) : contains the name of the symbol that receives
+the result of evaluating the expression, only used for '=' type expressions,
+empty string for the other types.</p></li>
+<li><p><em>expression</em> (lstring) : contains the expression text as parsed from the 
+source file, in the standard C-like expression syntax.</p></li>
+</ul></li>
+<li><p><em>Module Names</em> : contains a set of names defined in this module 
+up to the next existing section. Each name has the following format:</p>
+
+<ul>
+<li><p><em>scope</em> (char) : defines the scope of the name:</p>
+
+<p>0   : end marker <br />
+'L' is local, <br />
+'G' is global,  </p></li>
+<li><p>*type (char) : defines whether it is a: </p>
+
+<p>'A' relocatable address, <br />
+'C' a constant, <br />
+'=' a symbol computed at link time, the corresponding 
+    expression is in the <em>Expressions</em> section.</p></li>
+<li><p><em>section</em> (string) : source file section name where name 
+was defined. </p></li>
+<li><p><em>value</em> (long) : contains the absolute value for a constant, or the
+relative address to the start of the code block for a relocatable
+address.</p></li>
+<li><p><em>name</em> (string) : contains the name.</p></li>
+</ul></li>
+<li><p><em>External Names</em> : contains a set of external names referred 
+by this module up to the next existing section. Each name has the 
+following format:</p>
+
+<ul>
+<li><em>name</em> (string) : contains the name.</li>
+</ul></li>
+<li><p><em>Module Name</em> (string) : contains the module name.</p></li>
+<li><p><em>Machine Code</em> : contains the binary code of the module with the 
+following format:</p>
+
+<ul>
+<li><p><em>length</em> (long) : defines the total code lenght, contains -1
+to signal the end.</p></li>
+<li><p><em>section</em> (string) : source file section name. </p></li>
+<li><p><em>ORG Address</em> (long) : contains the user defined ORG address for 
+the start of this section, or -1 for no ORG address was defined. 
+If multiple setions are given with an ORG address each, the 
+assembler generates one binary file for each section with a defined 
+ORG, followed by all sections without one.</p></li>
+<li><p><em>code</em> (byte[length]) : contains the binary code.</p></li>
+</ul></li>
+</ul>
+
+<h2 id="libraryfileformat">Library file format</h2>
+
+<p>The library file format is a sequense of object files with additional
+structures.</p>
+
+<table>
+<col align="center" />
+<col align="center" />
+<col align="left" />
+<thead>
+<tr>
+	<th>Addr</th>
+	<th>Type</th>
+	<th>Object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td align="center">0</td>
+	<td align="center">char[8]</td>
+	<td align="left">'Z80LMF01' (file signature and version)</td>
+</tr>
+<tr>
+	<td align="center">8</td>
+	<td align="center">word</td>
+	<td align="left"><em>Object File Block</em></td>
+</tr>
+<tr>
+	<td align="center"> </td>
+	<td align="center"> </td>
+	<td align="left">...</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li><p><em>Object File Block</em> : contains the following format: </p>
+
+<ul>
+<li><p><em>next</em> (long) : contains the file pointer of the next object file 
+in the library, or <em>-1</em> if this object file is the last in the library.</p></li>
+<li><p><em>length</em> (long) : contains the length of this object file, 
+or <em>0</em> if this object files has been marked "deleted" and will not be used.</p></li>
+</ul></li>
+</ul>
+</body>
+</html>
