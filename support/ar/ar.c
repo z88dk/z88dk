@@ -6,7 +6,7 @@
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
  *
- *  $Id: ar.c,v 1.20 2014-09-08 23:50:09 pauloscustodio Exp $
+ *  $Id: ar.c,v 1.21 2014-09-22 22:46:22 pauloscustodio Exp $
  */
 
 
@@ -22,7 +22,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 7
+#define MAX_VERSION 8
 
 enum file_type { is_none, is_library, is_object };
 
@@ -352,6 +352,7 @@ void dump_bytes( FILE *fp, char *filename, int size )
 void dump_code( FILE *fp, char *filename, long fp_start )
 {
 	int code_size;
+	int org;
 	char *section_name; 
 
 	fseek( fp, fp_start, SEEK_SET );
@@ -365,7 +366,14 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 				break;
 			section_name = xfread_string( fp, filename );
 
+			if ( file_version >= 8 )
+				org = (int) xfread_long( fp, filename );
+			else 
+				org = -1;
+
 			printf("  Code: %d bytes", code_size );
+			if ( org >= 0 )
+				printf(", ORG at $%04X", org );
 			print_section_name( section_name );
 			printf("\n");
 
@@ -388,11 +396,13 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 void dump_object( FILE *fp, char *filename )
 {
 	long obj_start = ftell(fp) - 8;		/* before signature */
-	int org;
+	int org = -1;
 	long fp_modname, fp_expr, fp_names, fp_extern, fp_code;
 
-	if ( file_version >= 5 )
-		org		= xfread_long( fp, filename );
+	if ( file_version >= 8 )
+		; /* no object ORG - ORG is now per section */
+	else if ( file_version >= 5 )
+		org		= (int) xfread_long( fp, filename );
 	else
 		org		= xfread_word( fp, filename );
 
