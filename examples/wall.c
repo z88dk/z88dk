@@ -11,41 +11,80 @@
  *	  9:right
  *	  0:fast-right
  *
+ *
+ *  Build options
+ *  ===========
+ *  -DSOUND      sound effects
+ *  -DBORDERS    draw the wall borders
+ *  -DLOMEM      minimalistic mode to save memory
+ * 
  *  Values for 'spritesize' need roughly for following resolution table:
  *	8: 256x186
  *  4: 128x94
  *  3: 96x72
- *  2: 64x52
+ *  2: 64x48    spritesizeh=3: 64x72
+ *
+ *
  *
  *  Build hints
  *  ===========
  *
- *  ZX Spectrum 16K
+ *  ZX Spectrum 16K (non-joystick mode saves more memory)
  *     zcc +zx -lndos -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -zorg=24600 -O3 wall.c
  *
  *  ZX81
- *     zcc +zx81 -create-app -Dspritesize=2 wall.c
+ *     zcc +zx81 -create-app -Dspritesize=2 -DBORDERS wall.c
  *
- *  ZX81 WRX
+ *  ZX81 UDG (programmable characters board is required)
+ *     zcc +zx81 -clib=udg -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
+ *
+ *  ZX81 WRX (Wilf Rigter's High Resolution mod on RamPack or RAM addressing lines)
  *     zcc +zx81 -startup=wrx -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -O3 wall.c
  *
+ *  ZX81 ARX (Andy Rea's High Resolution trick based on extra RAM over ROM addresses, could work with few programmable characters boards)
+ *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -O3 wall.c
+ *
+ *  MSX, Spectravideo SVI
+ *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND wall.c
+ *     BLOAD “CAS:”,R
+ *
+ *  SEGA SC-3000
+ *     zcc +sc3000 -create-app -Dspritesize=8 wall.c
+ *     (insert the BASIC cartridge, then..)  LOAD
+ *
+ *  Memotech MTX 500  (use POKE 64122,0 or compile with "-startup=2" for the MTX 512)
+ *     zcc +mtx -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *     LOAD "A"
+ *
+ *  Tatung Einstein
+ *     zcc +cpm -DEINSTEIN -leinstein -oWALL -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *     (transfer WALL.COM on a disk image, i.e. using 'EDIP')
+ *
+ *  Amstrad CPC
+ *     zcc +cpc -subtype=wav -lndos -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *
+ *
  * * * * * * *
  *
- *      wall.c
+ *      $Id: wall.c,v 1.2 2014-09-26 15:58:46 stefano Exp $
  *
  * * * * * * *
  *
  *
- 
- */
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <games.h>
 #include <stdlib.h>
 #include <graphics.h>
+
 #ifdef SPECTRUM
 #include <spectrum.h>
+#endif
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+#include <msx.h>
+#include "msx/gfx.h"
 #endif
 
 #ifdef SOUND
@@ -56,7 +95,9 @@
 #ifndef spritesize
 #define spritesize 4
 #endif
-
+#ifndef spritesizeh
+#define spritesizeh spritesize
+#endif
 
 #include "wallg.h"
 
@@ -69,13 +110,22 @@ int speed;
 char scoretxt[7];
 
 
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+void set_attr (int x, int y, int attr) {
+		for (k=0; k<8; k++)
+			vpoke(MODE2_ATTR + (256*x) + (8*y) + k, attr);
+}
+#endif
+
 void do_delay () {
 		for (k=0; k<speed; k++) {}
 }
 
 int hit_brick() {
-//	if (m==0) return (0);
-	return ((point(n*spritesize,(m+1)*spritesize-1)) && (point((n+1)*spritesize-1,(m+1)*spritesize-1)));
+#if (spritesize == 2)
+	if (m>=20) return (0);
+#endif
+	return ((point(n*spritesize,(m+1)*spritesizeh-1)) && (point((n+1)*spritesize-1,(m+1)*spritesizeh-1)));
 }
 
 void hit_border() {
@@ -85,42 +135,65 @@ void hit_border() {
 
 #ifdef SPECTRUM
 #if (spritesize == 8)
-zx_border (5);
+zx_border (INK_CYAN);
+#endif
+#endif
+
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX)
+#if (spritesize == 8)
+msx_color(WHITE, BLACK, CYAN);
 #endif
 #endif
 
 #ifdef BORDERS
 		/* draw/refresh borders */
 		draw(0,0,32*spritesize-1,0);
-		draw(0,0,0,21*spritesize);
-		draw(32*spritesize-1,0,32*spritesize-1,21*spritesize);
+		draw(0,0,0,21*spritesizeh);
+		draw(32*spritesize-1,0,32*spritesize-1,21*spritesizeh);
 #endif
 }
 
 
 void destroy_brick() {
-	//t = t+10-c/8;
 	t = t+13-m;
 	b = abs(m-n);
 
-	putsprite(spr_and,(n*spritesize),(m*spritesize),blank);
+	putsprite(spr_and,(n*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
 		*zx_cyx2aaddr(m,n) = 56;
 	#endif
 	#endif
+	
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if (spritesize == 8)
+		set_attr (m,n,0x1f);
+	#endif
+	#endif
+
+
 	if ((b&1) && (n>0)) {
-		putsprite(spr_and,((n-1)*spritesize),(m*spritesize),blank);
+		putsprite(spr_and,((n-1)*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
 		*zx_cyx2aaddr(m,n-1) = 56;
 	#endif
 	#endif
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if (spritesize == 8)
+		set_attr (m,n-1,0x1F);
+	#endif
+	#endif
 	}  else if (n<31)  {
-		putsprite(spr_and,((n+1)*spritesize),(m*spritesize),blank);
+		putsprite(spr_and,((n+1)*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
-		*zx_cyx2aaddr(m,n+1) = 56;
+		*zx_cyx2aaddr(m,32*(n+1)) = 56;
+	#endif
+	#endif
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if (spritesize == 8)
+		set_attr (m,n+1,0x1F);
 	#endif
 	#endif
 	}
@@ -131,12 +204,14 @@ void destroy_brick() {
 	#endif
 
 	
+#ifndef LOMEM
 	sprintf (scoretxt,"%05u",tt*1000+t);
 
 	for (i=0; i<5; i++) {
-	  putsprite (spr_and, (2+i)*5, 23*spritesize-3, numblank);
-	  putsprite (spr_or, (2+i)*5, 23*spritesize-3, &numbers[(scoretxt[i]-48)*7]);
+	  putsprite (spr_and, (2+i)*5, 23*spritesizeh-3, numblank);
+	  putsprite (spr_or, (2+i)*5, 23*spritesizeh-3, &numbers[(scoretxt[i]-48)*7]);
 	}
+#endif
 }
 
 
@@ -288,17 +363,29 @@ void move_ball() {
 
 void move_left() {
 	if (a>0) {
-		putsprite(spr_xor,(a*spritesize),(21*spritesize),paddle);
+#if (spritesize == 2)
+		putsprite(spr_xor,(a*spritesize),(21*spritesizeh)-1,paddle);
 		a--;
-		putsprite(spr_or,(a*spritesize),(21*spritesize),paddle);
+		putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
+#else
+		putsprite(spr_xor,(a*spritesize),(21*spritesizeh),paddle);
+		a--;
+		putsprite(spr_or,(a*spritesize),(21*spritesizeh),paddle);
+#endif
 	}
 }
 
 void move_right() {
 	if (a<29) {
-		putsprite(spr_xor,(a*spritesize),(21*spritesize),paddle);
+#if (spritesize == 2)
+		putsprite(spr_xor,(a*spritesize),(21*spritesizeh)-1,paddle);
 		a++;
-		putsprite(spr_or,(a*spritesize),(21*spritesize),paddle);
+		putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
+#else
+		putsprite(spr_xor,(a*spritesize),(21*spritesizeh),paddle);
+		a++;
+		putsprite(spr_or,(a*spritesize),(21*spritesizeh),paddle);
+#endif
 	}
 }
 
@@ -312,6 +399,7 @@ void main()
 {
 
 #ifdef JOYSTICK
+#ifndef LOMEM
 	printf("%c",12);
 
 	for (k=0 ; k!=GAME_DEVICES; k++)
@@ -322,6 +410,7 @@ void main()
 	  stick=getk()-48;
 #else
 	stick=1;
+#endif
 #endif
 
 	tt=-1;
@@ -337,16 +426,20 @@ void main()
 #endif
 
 start_level:
+#ifdef ZX81
+	speed-=100;
+#else
 	speed-=200;
+#endif
 	tt++; t=0; p=1;
 	clg();
 
   for (m=1; m<=4; m+=2)
 	for (n=0; n<=30; n+=2) {
-		putsprite(spr_or,(n*spritesize),((m+3)*spritesize),brick_l);
-		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesize),brick_r);
-		putsprite(spr_or,(n*spritesize),((m+4)*spritesize),brick_r);
-		putsprite(spr_or,((n+1)*spritesize),((m+4)*spritesize),brick_l);
+		putsprite(spr_or,(n*spritesize),((m+3)*spritesizeh),brick_l);
+		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesizeh),brick_r);
+		putsprite(spr_or,(n*spritesize),((m+4)*spritesizeh),brick_r);
+		putsprite(spr_or,((n+1)*spritesize),((m+4)*spritesizeh),brick_l);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
 		*zx_cyx2aaddr(m+3,n) = m<<3;
@@ -355,14 +448,32 @@ start_level:
 		*zx_cyx2aaddr(m+4,n+1) = (m+1)<<3;
 	#endif
 	#endif
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if (spritesize == 8)
+		set_attr(m+3,n,((m+1)<<1)|0x10);
+		set_attr(m+3,n+1,((m+1)<<1)|0x10);
+		set_attr(m+4,n,(m<<1)|0x10);
+		set_attr(m+4,n+1,(m<<1)|0x10);
+//		vpoke(MODE2_ATTR + 128*(m+3) + n, (m+LIGHT_BLUE)<<4);
+//		vpoke(MODE2_ATTR + 128*(m+3) + n+1, (m+LIGHT_BLUE)<<4);
+//		vpoke(MODE2_ATTR + 128*(m+4) + n, (m+LIGHT_BLUE)<<4);
+//		vpoke(MODE2_ATTR + 128*(m+4) + n+1, (m+LIGHT_BLUE)<<4);
+	#endif
+	#endif
 	}
   for (n=0; n<=30; n+=2) {
-		putsprite(spr_or,(n*spritesize),((m+3)*spritesize),brick_l);
-		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesize),brick_r);
+		putsprite(spr_or,(n*spritesize),((m+3)*spritesizeh),brick_l);
+		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesizeh),brick_r);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
 		*zx_cyx2aaddr(m+3,n) = 6<<3;
 		*zx_cyx2aaddr(m+3,n+1) = 6<<3;
+	#endif
+	#endif
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if (spritesize == 8)
+		set_attr(m+3,n,LIGHT_YELLOW|0x10);
+		set_attr(m+3,n+1,LIGHT_YELLOW|0x10);
 	#endif
 	#endif
 	}
@@ -370,16 +481,22 @@ start_level:
 	u=0; v=0; a=14; t=0; w=0;
 
   for (r=0; r<=6; r++) {
-			m=10;  n=8+(char)rand()&15;//+(rand()%14);
+			m=10;  n=8+(char)rand()&15;
 			p=0; a=13;
-		
-	putsprite(spr_or,(a*spritesize),(21*spritesize),paddle);
 
+#if (spritesize == 2)
+	putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
+#else
+	putsprite(spr_or,(a*spritesize),(21*spritesizeh),paddle);
+#endif
+
+#ifndef LOMEM
 	for (i=0; i<=6; i++) {
-	  putsprite (spr_and, (24+i)*spritesize, 23*spritesize, ball);
+	  putsprite (spr_and, (24+i)*spritesize, 23*spritesizeh, ball);
 	  if (i>r)
-		putsprite (spr_or, (24+i)*spritesize, 23*spritesize, ball);
+		putsprite (spr_or, (24+i)*spritesize, 23*spritesizeh, ball);
 	}
+#endif
 
 		g=200;
 
@@ -392,8 +509,8 @@ start_level:
 
 		while (m <= 20) {
 
-		/* delay */
-		do_delay();
+			/* delay */
+			do_delay();
 
 			move_ball();
 
@@ -401,28 +518,23 @@ start_level:
 			if (t>=573) goto start_level;
 
 			if (u==20)
-				putsprite(spr_and,(v*spritesize),(u*spritesize),bounce);
+				putsprite(spr_and,(v*spritesize),(u*spritesizeh),bounce);
 			else
-				putsprite(spr_and,(v*spritesize),(u*spritesize),ball);
+				putsprite(spr_and,(v*spritesize),(u*spritesizeh),ball);
 
-		/* Intermediate step to move the ball smoothly */
-			putsprite(spr_xor,(((n+v)*spritesize)>>1),(((m+u)*spritesize)>>1),ball);
-
-		/* delay */
-		do_delay();
-
-		/* Intermediate step to move the ball smoothly */
-			putsprite(spr_xor,(((n+v)*spritesize)>>1),(((m+u)*spritesize)>>1),ball);
+			/* Intermediate step to move the ball smoothly */
+			putsprite(spr_xor,(((n+v)*spritesize)>>1),(((m+u)*spritesizeh)>>1),ball);
+			do_delay();
+			putsprite(spr_xor,(((n+v)*spritesize)>>1),(((m+u)*spritesizeh)>>1),ball);
 
 			u=m; v=n;
 			if (m==20)
-				putsprite(spr_or,(n*spritesize),(m*spritesize),bounce);
+				putsprite(spr_or,(n*spritesize),(m*spritesizeh),bounce);
 			else
-				putsprite(spr_or,(n*spritesize),(m*spritesize),ball);
+				putsprite(spr_or,(n*spritesize),(m*spritesizeh),ball);
 
 /*
 	#ifdef SOUND
-//		bit_synth(4, 255, 254, 253, 252);
 		bit_click();
 	#endif
 */
@@ -459,11 +571,26 @@ start_level:
 #endif
 		}
 		/* ball is lost */
-	//  printf("\nBall %u lost",r);
-	  putsprite(spr_and,(a*spritesize),(21*spritesize),paddle);
-	
-  }
-  printf("\n\n Score: %u ",tt*1000+t);
 
+#if (spritesize == 2)
+	  putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
+#else	
+	  putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
+#endif
+  }
+
+#ifdef ZX81
+#if (spritesize == 2)
+  #asm
+			ld	a,$1e
+			ld	i,a
+  #endasm
+#endif
+#endif
+  
+  #ifndef LOMEM
+  printf("\n\n Score: %u ",tt*1000+t);
+#endif
+  return (tt*1000+t);
 }
 
