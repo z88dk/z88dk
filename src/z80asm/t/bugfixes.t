@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.37 2014-07-13 22:47:11 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.38 2014-09-27 21:14:35 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -651,3 +651,44 @@ ASMTAIL                         = 0009, G:
 local_label                     = 0009, L: test
 END
 }
+
+#------------------------------------------------------------------------------
+# http://www.z88dk.org/forum/viewtopic.php?id=8561
+# It looks like a z80asm bug with defc.  
+# "DEFC L_DIVENTRY = entry - l_div_u" should result in a small positive
+# constant and " l_div_u + L_DIVENTRY" should not evaluate to a large positive
+# number or a small negative one.
+# Expression evaluator needs to recognize that a subtraction of two
+# labels defined in the same module is a contant and not an address.
+# Remove '#' operator after this is fixed.
+
+z80asm(
+	asm => <<'...',
+		EXTERN l_div
+
+		call l_div					; 0000 ;; CD 04 00
+		ret							; 0003 ;; C9
+...
+	asm1 => <<'...',
+		PUBLIC l_div
+		EXTERN l_div_u, L_DIVENTRY
+		
+	l_div:
+		call l_div_u + L_DIVENTRY	; 0004 ;; CD 0D 00
+		ret							; 0007 ;; C9
+...
+	asm2 => <<'...',
+		PUBLIC l_div_u, L_DIVENTRY
+		
+	l_div_u:
+		nop							; 0008 ;; 00
+		nop							; 0009 ;; 00
+		nop							; 000A ;; 00
+		nop							; 000B ;; 00
+		nop							; 000C ;; 00
+	entry:
+		ret							; 000D ;; C9
+		
+		DEFC L_DIVENTRY = # entry - l_div_u
+...
+);
