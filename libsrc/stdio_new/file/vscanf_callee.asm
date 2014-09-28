@@ -24,4 +24,4 @@ XREF ASMDISP_VFSCANF_CALLEE, _stdin
    ld ix,(_stdin)
    jp vfscanf_callee + ASMDISP_VFSCANF_CALLEE
 
-defc ASMDISP_VSCANF_CALLEE = asmentry - vscanf_callee
+defc ASMDISP_VSCANF_CALLEE = # asmentry - vscanf_callee

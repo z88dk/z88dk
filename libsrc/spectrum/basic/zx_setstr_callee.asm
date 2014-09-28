@@ -9,7 +9,7 @@
 ;
 ;	CPIR, debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_setstr_callee.asm,v 1.3 2014-01-20 09:15:32 stefano Exp $
+;	$Id: zx_setstr_callee.asm,v 1.4 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 XLIB	zx_setstr_callee
@@ -109,4 +109,4 @@ store:
 	ret
 	
 
-DEFC ASMDISP_ZX_SETSTR_CALLEE = asmentry - zx_setstr_callee
+DEFC ASMDISP_ZX_SETSTR_CALLEE = # asmentry - zx_setstr_callee

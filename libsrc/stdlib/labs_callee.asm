@@ -4,7 +4,7 @@
 ; Return absolute value of long
 ;
 ; -----
-; $Id: labs_callee.asm,v 1.1 2007-01-10 08:17:06 aralbrec Exp $
+; $Id: labs_callee.asm,v 1.2 2014-09-28 18:27:00 pauloscustodio Exp $
 
 XLIB labs_callee
 LIB l_long_neg
@@ -24,4 +24,4 @@ XDEF ASMDISP_LABS_CALLEE
    
    jp l_long_neg
 
-DEFC ASMDISP_LABS_CALLEE = asmentry - labs_callee
+DEFC ASMDISP_LABS_CALLEE = # asmentry - labs_callee

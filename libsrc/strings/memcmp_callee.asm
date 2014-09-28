@@ -51,4 +51,4 @@ LIB     rcmx_cpi
    dec h
    ret
 
-DEFC ASMDISP_MEMCMP_CALLEE = asmentry - memcmp_callee
+DEFC ASMDISP_MEMCMP_CALLEE = # asmentry - memcmp_callee

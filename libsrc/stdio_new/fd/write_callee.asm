@@ -42,4 +42,4 @@ INCLUDE "../stdio.def"
    ret nc                      ; ret with hl = bytes written if success
    jp stdio_error_mc
    
-defc ASMDISP_WRITE_CALLEE = asmentry - write_callee
+defc ASMDISP_WRITE_CALLEE = # asmentry - write_callee

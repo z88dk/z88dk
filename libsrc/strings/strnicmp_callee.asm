@@ -69,4 +69,4 @@ LIB asm_tolower
    dec h
    ret
 
-DEFC ASMDISP_STRNICMP_CALLEE = asmentry - strnicmp_callee
+DEFC ASMDISP_STRNICMP_CALLEE = # asmentry - strnicmp_callee

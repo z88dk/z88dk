@@ -49,4 +49,4 @@ XDEF ASMDISP_STRNCPY_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_STRNCPY_CALLEE = asmentry - strncpy_callee
+DEFC ASMDISP_STRNCPY_CALLEE = # asmentry - strncpy_callee

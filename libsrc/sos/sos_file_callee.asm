@@ -7,7 +7,7 @@
 ;	; int sos_file(char *name,type)
 ;
 ;
-;	$Id: sos_file_callee.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;	$Id: sos_file_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 
@@ -31,4 +31,4 @@ sos_file_callee:
 	ld	hl,0	; return code, nothing (yet) implemented
 	ret
 
-DEFC ASMDISP_SOS_FILE_CALLEE = asmentry - sos_file_callee
+DEFC ASMDISP_SOS_FILE_CALLEE = # asmentry - sos_file_callee

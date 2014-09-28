@@ -65,4 +65,4 @@ include "../stdio.def"
    pop bc
    ret
 
-defc ASMDISP_FREAD_CALLEE = asmentry - fread_callee
+defc ASMDISP_FREAD_CALLEE = # asmentry - fread_callee

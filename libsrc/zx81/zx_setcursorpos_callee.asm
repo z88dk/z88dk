@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setcursorpos_callee.asm,v 1.4 2013-10-30 16:09:18 stefano Exp $
+;	$Id: zx_setcursorpos_callee.asm,v 1.5 2014-09-28 18:27:01 pauloscustodio Exp $
 ;
 
 XLIB	zx_setcursorpos_callee
@@ -40,4 +40,4 @@ zx_setcursorpos_callee:
 	jp zx_dfile_addr
 
 
-DEFC ASMDISP_ZX_SETCURSORPOS_CALLEE = asmentry - zx_setcursorpos_callee
+DEFC ASMDISP_ZX_SETCURSORPOS_CALLEE = # asmentry - zx_setcursorpos_callee

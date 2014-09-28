@@ -7,7 +7,7 @@
 ;	int __CALLEE__ setcursorpos_callee(x,y);
 ;
 ;
-;	$Id: setcursorpos_callee.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;	$Id: setcursorpos_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 XLIB	setcursorpos_callee
@@ -28,4 +28,4 @@ setcursorpos_callee:
 	ld h,e
 	jp	$201E
 
-DEFC ASMDISP_SETCURSORPOS_CALLEE = asmentry - setcursorpos_callee
+DEFC ASMDISP_SETCURSORPOS_CALLEE = # asmentry - setcursorpos_callee

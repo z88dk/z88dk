@@ -316,6 +316,6 @@ INCLUDE "../stdio.def"
    defb '0', 16
    defb '#', 8
 
-defc ASMDISP_VFPRINTF_CALLEE = asmentry - vfprintf_callee
-defc LIBDISP_VFPRINTF_CALLEE = libentry - vfprintf_callee
+defc ASMDISP_VFPRINTF_CALLEE = # asmentry - vfprintf_callee
+defc LIBDISP_VFPRINTF_CALLEE = # libentry - vfprintf_callee
  

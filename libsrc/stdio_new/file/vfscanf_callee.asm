@@ -239,5 +239,5 @@ LIB jumptbl_scanf, stdio_consumews
 
    ret
 
-defc ASMDISP_VFSCANF_CALLEE = asmentry - vfscanf_callee
-defc LIBDISP_VFSCANF_CALLEE = libentry - vfscanf_callee
+defc ASMDISP_VFSCANF_CALLEE = # asmentry - vfscanf_callee
+defc LIBDISP_VFSCANF_CALLEE = # libentry - vfscanf_callee

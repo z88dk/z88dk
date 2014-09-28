@@ -33,4 +33,4 @@ XDEF ASMDISP_STRCHR_CALLEE
    scf
    ret
 
-DEFC ASMDISP_STRCHR_CALLEE = asmentry - strchr_callee
+DEFC ASMDISP_STRCHR_CALLEE = # asmentry - strchr_callee

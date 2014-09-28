@@ -5,7 +5,7 @@
 ;	exos_write_character(unsigned char ch_number, char character);
 ;
 ;
-;	$Id: exos_write_character_callee.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_write_character_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 
@@ -32,5 +32,5 @@ exos_write_character_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_WRITE_CHARACTER_CALLEE = asmentry - exos_write_character_callee
+DEFC ASMDISP_EXOS_WRITE_CHARACTER_CALLEE = # asmentry - exos_write_character_callee
  

@@ -77,4 +77,4 @@ XREF _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_QUEUEPUSHBACK_CALLEE = asmentry - adt_QueuePushBack_callee
+DEFC ASMDISP_ADT_QUEUEPUSHBACK_CALLEE = # asmentry - adt_QueuePushBack_callee

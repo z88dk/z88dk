@@ -52,4 +52,4 @@ LIB     rcmx_cpi
    dec h
    ret
 
-DEFC ASMDISP_STRNCMP_CALLEE = asmentry - strncmp_callee
+DEFC ASMDISP_STRNCMP_CALLEE = # asmentry - strncmp_callee

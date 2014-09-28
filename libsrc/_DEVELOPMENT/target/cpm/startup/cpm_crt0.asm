@@ -825,7 +825,7 @@ PUBLIC __crt_segment_bss_len, __crt_segment_bss_end, __crt_segment_bss_begin
 PUBLIC __crt_segment_data_len, __crt_segment_data_end, __crt_segment_data_begin
 PUBLIC __crt_segment_data_source_len, __crt_segment_data_source_end, __crt_segment_data_source_begin
 
-defc __crt_segment_bss_len = __crt_segment_bss_end - __crt_segment_bss_begin
-defc __crt_segment_data_len = __crt_segment_data_end - __crt_segment_data_begin
-defc __crt_segment_data_source_len = __crt_segment_data_source_end - __crt_segment_data_source_begin
+defc __crt_segment_bss_len = # __crt_segment_bss_end - __crt_segment_bss_begin
+defc __crt_segment_data_len = # __crt_segment_data_end - __crt_segment_data_begin
+defc __crt_segment_data_source_len = # __crt_segment_data_source_end - __crt_segment_data_source_begin
 

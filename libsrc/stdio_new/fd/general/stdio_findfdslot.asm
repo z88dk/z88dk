@@ -33,4 +33,4 @@ INCLUDE "../../stdio.def"
    scf
    ret
 
-defc LIBDISP_STDIO_FINDFDSLOT = libentry - stdio_findfdslot
+defc LIBDISP_STDIO_FINDFDSLOT = # libentry - stdio_findfdslot

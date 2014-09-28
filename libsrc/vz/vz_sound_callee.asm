@@ -25,5 +25,5 @@ XREF ASMDISP_VZ_SOUND_CALLEE
  
     jp $345c                 ; sound
  
- DEFC ASMDISP_VZ_SOUND_CALLEE = asmentry - vz_sound_callee
+ DEFC ASMDISP_VZ_SOUND_CALLEE = # asmentry - vz_sound_callee
  

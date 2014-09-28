@@ -35,4 +35,4 @@ INCLUDE "../stdio.def"
    ld h,0                      ; hl = char
    ret
 
-defc ASMDISP_FPUTC_CALLEE = asmentry - fputc_callee
+defc ASMDISP_FPUTC_CALLEE = # asmentry - fputc_callee

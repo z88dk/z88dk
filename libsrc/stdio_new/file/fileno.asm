@@ -39,4 +39,4 @@ INCLUDE "../stdio.def"
    ld h,0
    ret
 
-defc ASMDISP_FILENO = asmentry - fileno
+defc ASMDISP_FILENO = # asmentry - fileno

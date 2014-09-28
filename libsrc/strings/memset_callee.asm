@@ -39,4 +39,4 @@ XDEF ASMDISP_MEMSET_CALLEE
 
    ret
 
-DEFC ASMDISP_MEMSET_CALLEE = asmentry - memset_callee
+DEFC ASMDISP_MEMSET_CALLEE = # asmentry - memset_callee

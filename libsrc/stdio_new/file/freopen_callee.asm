@@ -228,4 +228,4 @@ INCLUDE "../stdio.def"
    or a
    ret
 
-defc ASMDISP_FREOPEN_CALLEE = asmentry - freopen_callee
+defc ASMDISP_FREOPEN_CALLEE = # asmentry - freopen_callee

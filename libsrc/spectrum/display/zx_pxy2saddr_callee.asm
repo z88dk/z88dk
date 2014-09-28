@@ -68,4 +68,4 @@ XDEF ASMDISP_ZX_PXY2SADDR_CALLEE
    ld h,d
    ret
    
-DEFC ASMDISP_ZX_PXY2SADDR_CALLEE = asmentry - zx_pxy2saddr_callee
+DEFC ASMDISP_ZX_PXY2SADDR_CALLEE = # asmentry - zx_pxy2saddr_callee

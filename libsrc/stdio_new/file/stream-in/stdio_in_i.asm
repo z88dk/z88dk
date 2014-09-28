@@ -99,4 +99,4 @@ LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
    jp stdio_incommon2          ; do the rest
 
 
-defc LIBDISP_STDIO_IN_I = libentry - stdio_in_i
+defc LIBDISP_STDIO_IN_I = # libentry - stdio_in_i

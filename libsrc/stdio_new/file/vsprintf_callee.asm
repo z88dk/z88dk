@@ -46,4 +46,4 @@ XREF LIBDISP_VFPRINTF_CALLEE
    or a
    ret
 
-defc ASMDISP_VSPRINTF_CALLEE = asmentry - vsprintf_callee
+defc ASMDISP_VSPRINTF_CALLEE = # asmentry - vsprintf_callee

@@ -40,4 +40,4 @@ LIB     rcmx_cpir
    pop hl                    ; return with hl = char *s
    ret
 
-DEFC ASMDISP_STRCAT_CALLEE = asmentry - strcat_callee
+DEFC ASMDISP_STRCAT_CALLEE = # asmentry - strcat_callee

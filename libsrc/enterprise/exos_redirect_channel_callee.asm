@@ -5,7 +5,7 @@
 ;	exos_redirect_channel(unsigned char main_channel, unsigned char secondary_channel);
 ;
 ;
-;	$Id: exos_redirect_channel_callee.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_redirect_channel_callee.asm,v 1.2 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 
@@ -32,4 +32,4 @@ exos_redirect_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE = asmentry - exos_redirect_channel_callee
+DEFC ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE = # asmentry - exos_redirect_channel_callee

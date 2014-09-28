@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.7 2008-06-29 06:43:03 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.8 2014-09-28 18:27:00 pauloscustodio Exp $
 ; *
 ; */
 ;
@@ -252,4 +252,4 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld l,e
    ret
 
-DEFC ASMDISP_STRTOL_CALLEE = asmentry - strtol_callee
+DEFC ASMDISP_STRTOL_CALLEE = # asmentry - strtol_callee

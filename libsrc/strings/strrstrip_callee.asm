@@ -55,4 +55,4 @@ XDEF ASMDISP_STRRSTRIP_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_STRRSTRIP_CALLEE = asmentry - strrstrip_callee
+DEFC ASMDISP_STRRSTRIP_CALLEE = # asmentry - strrstrip_callee

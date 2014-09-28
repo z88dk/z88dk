@@ -117,4 +117,4 @@ INCLUDE "../stdio.def"
    or a                        ; report no error
    ret
 
-defc ASMDISP_FDOPEN_CALLEE = asmentry - fdopen_callee
+defc ASMDISP_FDOPEN_CALLEE = # asmentry - fdopen_callee

@@ -32,4 +32,4 @@ XREF LIBDISP_LTOA_CALLEE
    ld b,0
    jp ltoa_callee + LIBDISP_LTOA_CALLEE
 
-defc ASMDISP_ULTOA_CALLEE = asmentry - ultoa_callee
+defc ASMDISP_ULTOA_CALLEE = # asmentry - ultoa_callee

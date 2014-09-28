@@ -64,4 +64,4 @@ ENDIF
    sbc hl,de                   ; hl = strlen(src)
    ret
 
-defc ASMDISP_STRLCPY_CALLEE = asmentry - strlcpy_callee
+defc ASMDISP_STRLCPY_CALLEE = # asmentry - strlcpy_callee

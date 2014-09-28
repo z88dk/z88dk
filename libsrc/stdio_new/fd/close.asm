@@ -117,6 +117,6 @@ INCLUDE "../stdio.def"
    call stdio_free
    jp stdio_success_znc
    
-defc LIBDISP_CLOSE = libentry - close
-defc LIBDISP2_CLOSE = libentry2 - close
+defc LIBDISP_CLOSE = # libentry - close
+defc LIBDISP2_CLOSE = # libentry2 - close
 

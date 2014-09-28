@@ -2,7 +2,7 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: outvdc_callee.asm,v 1.1 2008-06-23 17:34:34 stefano Exp $
+;$Id: outvdc_callee.asm,v 1.2 2014-09-28 18:26:57 pauloscustodio Exp $
 ;
 
 ;set vdc register
@@ -34,4 +34,4 @@ test7:
 ;  outp(vdcDataReg,RegVal);                    /* write register */
 ;}
 
-DEFC ASMDISP_OUTVDC_CALLEE = asmentry - outvdc_callee
+DEFC ASMDISP_OUTVDC_CALLEE = # asmentry - outvdc_callee

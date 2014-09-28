@@ -73,4 +73,4 @@ XREF _u_free
 
    ret
 
-DEFC ASMDISP_ADT_STACKEDELETES_CALLEE = asmentry - adt_StackDeleteS_callee
+DEFC ASMDISP_ADT_STACKEDELETES_CALLEE = # asmentry - adt_StackDeleteS_callee

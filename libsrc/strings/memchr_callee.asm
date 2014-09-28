@@ -32,4 +32,4 @@ LIB     rcmx_cpir
    ld l,c
    ret
    
-DEFC ASMDISP_MEMCHR_CALLEE = asmentry - memchr_callee
+DEFC ASMDISP_MEMCHR_CALLEE = # asmentry - memchr_callee

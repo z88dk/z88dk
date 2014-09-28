@@ -35,4 +35,4 @@ INCLUDE "../stdio.def"
    ld d,h
    ret
 
-defc ASMDISP_FTELL = asmentry - ftell
+defc ASMDISP_FTELL = # asmentry - ftell

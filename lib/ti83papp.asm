@@ -237,7 +237,7 @@ IF NEED_floatpack
 	INCLUDE	"float.asm"
 ENDIF
 
-defc intuse = IntProcEnd-IntProcStart
+defc intuse = # IntProcEnd-IntProcStart
 
 DEFVARS $8A3A		; statVars (531 bytes of free space) See graylib83p.asm
 {			;  for more info on free space in this memory area.

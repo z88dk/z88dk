@@ -4,7 +4,7 @@
 ;
 ;       char __LIB__ __CALLEE__ *cpc_rsx_strcpy(char *dst, char *src);
 ;
-;       $Id: cpc_rsx_strcpy_callee.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: cpc_rsx_strcpy_callee.asm,v 1.2 2014-09-28 18:26:57 pauloscustodio Exp $
 ;
 
         XLIB    cpc_rsx_strcpy_callee
@@ -54,4 +54,4 @@
 
         ret
 
-DEFC ASMDISP_CPC_RSX_STRCPY_CALLEE = asmentry - cpc_rsx_strcpy_callee
+DEFC ASMDISP_CPC_RSX_STRCPY_CALLEE = # asmentry - cpc_rsx_strcpy_callee

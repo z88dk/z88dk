@@ -65,4 +65,4 @@ XREF LIBDISP_VFSCANF_CALLEE
    ccf
    ret
 
-defc ASMDISP_VSSCANF_CALLEE = asmentry - vsscanf_callee
+defc ASMDISP_VSSCANF_CALLEE = # asmentry - vsscanf_callee

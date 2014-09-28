@@ -5,7 +5,7 @@
 ;      int __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type)
 ;
 ;
-;	$Id: tape_load_block_callee.asm,v 1.3 2012-01-09 16:02:36 stefano Exp $
+;	$Id: tape_load_block_callee.asm,v 1.4 2014-09-28 18:27:01 pauloscustodio Exp $
 ;
 
 
@@ -86,4 +86,4 @@ LIB  musamy_load
 		ret
 
 
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee
+DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = # asmentry - tape_load_block_callee

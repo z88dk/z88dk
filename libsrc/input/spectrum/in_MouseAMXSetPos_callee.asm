@@ -53,5 +53,5 @@ XREF _in_AMXcoordX, _in_AMXcoordY
    ld (_in_AMXcoordY + 1),a
    ret
 
-DEFC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE = asmentry - in_MouseAMXSetPos_callee
-DEFC CDISP_IN_MOUSEAMXSETPOS_CALLEE = centry - in_MouseAMXSetPos_callee
+DEFC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE = # asmentry - in_MouseAMXSetPos_callee
+DEFC CDISP_IN_MOUSEAMXSETPOS_CALLEE = # centry - in_MouseAMXSetPos_callee

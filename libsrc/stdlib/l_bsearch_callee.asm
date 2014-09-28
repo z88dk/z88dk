@@ -31,4 +31,4 @@ LIB Lbsearch, l_jpiy
    pop de
    ret
 
-DEFC ASMDISP_L_BSEARCH_CALLEE = centry - l_bsearch_callee
+DEFC ASMDISP_L_BSEARCH_CALLEE = # centry - l_bsearch_callee

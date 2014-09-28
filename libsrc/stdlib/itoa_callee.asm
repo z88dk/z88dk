@@ -128,5 +128,5 @@ LIB stdio_basechar, stdio_error_zc
    pop de
    jr exit0
 
-DEFC ASMDISP_ITOA_CALLEE = asmentry - itoa_callee
-DEFC LIBDISP_ITOA_CALLEE = libentry - itoa_callee
+DEFC ASMDISP_ITOA_CALLEE = # asmentry - itoa_callee
+DEFC LIBDISP_ITOA_CALLEE = # libentry - itoa_callee

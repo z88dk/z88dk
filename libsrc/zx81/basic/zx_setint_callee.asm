@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.2 2009-06-22 21:44:17 dom Exp $ 
+;	$Id: zx_setint_callee.asm,v 1.3 2014-09-28 18:27:01 pauloscustodio Exp $ 
 ;  	
 
 XLIB	zx_setint_callee
@@ -130,5 +130,5 @@ store2:
 	
 	ret
  
- DEFC ASMDISP_ZX_SETINT_CALLEE = asmentry - zx_setint_callee
+ DEFC ASMDISP_ZX_SETINT_CALLEE = # asmentry - zx_setint_callee
  

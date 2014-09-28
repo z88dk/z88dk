@@ -28,4 +28,4 @@ XDEF ASMDISP_VZ_MIDSTR_CALLEE
    ld h,0
    ret
 
-DEFC ASMDISP_VZ_MIDSTR_CALLEE = asmentry - vz_midstr_callee
+DEFC ASMDISP_VZ_MIDSTR_CALLEE = # asmentry - vz_midstr_callee

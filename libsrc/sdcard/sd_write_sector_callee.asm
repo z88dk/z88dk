@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_sector_callee.asm,v 1.3 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_write_sector_callee.asm,v 1.4 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 	XLIB	sd_write_sector_callee
@@ -103,4 +103,4 @@ write_end:
 	ret
 
 
-DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = asmentry - sd_write_sector_callee
+DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = # asmentry - sd_write_sector_callee

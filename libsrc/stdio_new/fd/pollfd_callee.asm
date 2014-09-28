@@ -37,4 +37,4 @@ INCLUDE "../stdio.def"
    ld h,0
    ret
    
-defc ASMDISP_POLLFD_CALLEE = asmentry - pollfd_callee
+defc ASMDISP_POLLFD_CALLEE = # asmentry - pollfd_callee

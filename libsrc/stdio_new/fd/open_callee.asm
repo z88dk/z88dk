@@ -190,5 +190,5 @@ INCLUDE "../stdio.def"
    call stdio_free             ; free the fdstruct
    jp stdio_error_mc
 
-defc ASMDISP_OPEN_CALLEE = asmentry - open_callee
-defc LIBDISP_OPEN_CALLEE = libentry - open_callee
+defc ASMDISP_OPEN_CALLEE = # asmentry - open_callee
+defc LIBDISP_OPEN_CALLEE = # libentry - open_callee

@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_getstr_callee(char variable, char *value); 
 ;
 ;
-;	$Id: zx_getstr_callee.asm,v 1.1 2008-07-25 15:31:25 stefano Exp $
+;	$Id: zx_getstr_callee.asm,v 1.2 2014-09-28 18:27:00 pauloscustodio Exp $
 ;
 
 XLIB	zx_getstr_callee
@@ -73,5 +73,5 @@ nextvar:
 	ex	de,hl
 	jr	loop
 
-DEFC ASMDISP_ZX_GETSTR_CALLEE = asmentry - zx_getstr_callee
+DEFC ASMDISP_ZX_GETSTR_CALLEE = # asmentry - zx_getstr_callee
 

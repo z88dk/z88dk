@@ -7,7 +7,7 @@
 ;	int __CALLEE__ screen_callee(x,y);
 ;
 ;
-;	$Id: screen_callee\040.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;	$Id: screen_callee\040.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 
@@ -32,4 +32,4 @@ screen_callee:
 	ld	l,a
 	ret
 
-DEFC ASMDISP_screen_CALLEE = asmentry - screen_callee
+DEFC ASMDISP_screen_CALLEE = # asmentry - screen_callee

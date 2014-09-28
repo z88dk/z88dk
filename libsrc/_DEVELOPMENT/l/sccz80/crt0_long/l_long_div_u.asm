@@ -113,5 +113,5 @@ PUBLIC    L_LONG_DIVIDE0, L_LONG_DIVENTRY
    exx
    ret
 
-DEFC L_LONG_DIVIDE0 = divide0 - l_long_div_u
-DEFC L_LONG_DIVENTRY = entry - l_long_div_u
+DEFC L_LONG_DIVIDE0 = # divide0 - l_long_div_u
+DEFC L_LONG_DIVENTRY = # entry - l_long_div_u

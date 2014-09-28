@@ -60,4 +60,4 @@ XREF ASMDISP_HEAPALLOC_CALLEE
    scf
    ret
 
-DEFC ASMDISP_HEAPCALLOC_CALLEE = asmentry - HeapCalloc_callee
+DEFC ASMDISP_HEAPCALLOC_CALLEE = # asmentry - HeapCalloc_callee

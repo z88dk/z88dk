@@ -24,4 +24,4 @@ XREF ASMDISP_VFPRINTF_CALLEE, _stdout
    ld ix,(_stdout)
    jp vfprintf_callee + ASMDISP_VFPRINTF_CALLEE
 
-defc ASMDISP_VPRINTF_CALLEE = asmentry - vprintf_callee
+defc ASMDISP_VPRINTF_CALLEE = # asmentry - vprintf_callee

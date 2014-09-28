@@ -73,4 +73,4 @@ INCLUDE "../stdio.def"
    pop hl                      ; return char *s
    ret
    
-defc ASMDISP_FGETS_CALLEE = asmentry - fgets_callee
+defc ASMDISP_FGETS_CALLEE = # asmentry - fgets_callee

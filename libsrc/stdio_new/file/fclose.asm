@@ -79,6 +79,6 @@ INCLUDE "../stdio.def"
    jp c, close + LIBDISP_CLOSE ; not in fd table
    jp close + LIBDISP2_CLOSE   ; remove from fd table too
    
-defc ASMDISP_FCLOSE = asmentry - fclose
-defc LIBDISP_FCLOSE = libentry - fclose
-defc LIBDISP2_FCLOSE = libentry2 - fclose
+defc ASMDISP_FCLOSE = # asmentry - fclose
+defc LIBDISP_FCLOSE = # libentry - fclose
+defc LIBDISP2_FCLOSE = # libentry2 - fclose

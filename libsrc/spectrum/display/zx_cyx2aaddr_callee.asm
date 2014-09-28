@@ -34,4 +34,4 @@ XDEF ASMDISP_ZX_CYX2AADDR_CALLEE
    
    ret
 
-DEFC ASMDISP_ZX_CYX2AADDR_CALLEE = asmentry - zx_cyx2aaddr_callee
+DEFC ASMDISP_ZX_CYX2AADDR_CALLEE = # asmentry - zx_cyx2aaddr_callee

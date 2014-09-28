@@ -39,4 +39,4 @@ INCLUDE "../stdio.def"
    res 0,(ix+3)                ; clear unget char
    jp stdio_success_znc
 
-defc ASMDISP_FSEEK_CALLEE = asmentry - fseek_callee
+defc ASMDISP_FSEEK_CALLEE = # asmentry - fseek_callee

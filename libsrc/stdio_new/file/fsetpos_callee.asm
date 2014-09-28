@@ -37,4 +37,4 @@ INCLUDE "../stdio.def"
    ld c,STDIO_SEEK_SET
    jp fseek_callee + ASMDISP_FSEEK_CALLEE
 
-defc ASMDISP_FSETPOS_CALLEE = asmentry - fsetpos_callee
+defc ASMDISP_FSETPOS_CALLEE = # asmentry - fsetpos_callee

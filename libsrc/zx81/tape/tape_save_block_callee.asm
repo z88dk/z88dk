@@ -6,7 +6,7 @@
 ;      int __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type)
 ;
 ;
-;	$Id: tape_save_block_callee.asm,v 1.2 2012-01-09 16:02:36 stefano Exp $
+;	$Id: tape_save_block_callee.asm,v 1.3 2014-09-28 18:27:01 pauloscustodio Exp $
 ;
 
 
@@ -69,4 +69,4 @@ LIB zx_slow
 		ret
 
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee
+DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = # asmentry - tape_save_block_callee

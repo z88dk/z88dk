@@ -50,4 +50,4 @@ INCLUDE "../stdio.def"
    
    jp stdio_success_znc
 
-defc ASMDISP_FGETPOS_CALLEE = asmentry - fgetpos_callee
+defc ASMDISP_FGETPOS_CALLEE = # asmentry - fgetpos_callee

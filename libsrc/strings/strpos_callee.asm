@@ -44,4 +44,4 @@ XDEF ASMDISP_STRPOS_CALLEE
    scf
    ret
 
-DEFC ASMDISP_STRPOS_CALLEE = asmentry - strpos_callee
+DEFC ASMDISP_STRPOS_CALLEE = # asmentry - strpos_callee

@@ -60,4 +60,4 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    exx
    jp stdio_error_enomem_mc
    
-defc ASMDISP_VASPRINTF_CALLEE = asmentry - vasprintf_callee
+defc ASMDISP_VASPRINTF_CALLEE = # asmentry - vasprintf_callee

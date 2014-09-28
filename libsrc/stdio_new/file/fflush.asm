@@ -93,4 +93,4 @@ INCLUDE "../stdio.def"
 
    jp stdio_success_znc
 
-defc ASMDISP_FFLUSH = asmentry - fflush
+defc ASMDISP_FFLUSH = # asmentry - fflush

@@ -5,7 +5,7 @@
 ;	set_exos_variable(unsigned char variable, unsigned char value);
 ;
 ;
-;	$Id: set_exos_variable_callee.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: set_exos_variable_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 
@@ -33,5 +33,5 @@ set_exos_variable_callee:
 	ret
 
 
-DEFC ASMDISP_SET_EXOS_VARIABLE_CALLEE = asmentry - set_exos_variable_callee
+DEFC ASMDISP_SET_EXOS_VARIABLE_CALLEE = # asmentry - set_exos_variable_callee
  

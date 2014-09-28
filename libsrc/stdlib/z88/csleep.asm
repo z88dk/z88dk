@@ -10,7 +10,7 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+; $Id: csleep.asm,v 1.5 2014-09-28 18:27:00 pauloscustodio Exp $
 
 
                 INCLUDE "time.def"
@@ -40,5 +40,5 @@
         ld      hl,0
         ret
 
-DEFC ASMDISP_CSLEEP = asmentry - csleep
+DEFC ASMDISP_CSLEEP = # asmentry - csleep
 

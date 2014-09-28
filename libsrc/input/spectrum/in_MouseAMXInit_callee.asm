@@ -167,4 +167,4 @@ XREF _in_AMXcoordX, _in_AMXcoordY
    ei
    reti
 
-DEFC ASMDISP_IN_MOUSEAMXINIT_CALLEE = asmentry - in_MouseAMXInit_callee
+DEFC ASMDISP_IN_MOUSEAMXINIT_CALLEE = # asmentry - in_MouseAMXInit_callee

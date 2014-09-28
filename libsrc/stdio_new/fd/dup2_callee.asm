@@ -91,4 +91,4 @@ INCLUDE "../stdio.def"
    ld h,0
    ret
  
-defc ASMDISP_DUP2_CALLEE = asmentry - dup2_callee
+defc ASMDISP_DUP2_CALLEE = # asmentry - dup2_callee

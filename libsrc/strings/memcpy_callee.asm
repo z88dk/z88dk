@@ -30,4 +30,4 @@ XDEF ASMDISP_MEMCPY_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_MEMCPY_CALLEE = asmentry - memcpy_callee
+DEFC ASMDISP_MEMCPY_CALLEE = # asmentry - memcpy_callee

@@ -58,4 +58,4 @@ XDEF ASMDISP_MEMMOVE_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_MEMMOVE_CALLEE = asmentry - memmove_callee
+DEFC ASMDISP_MEMMOVE_CALLEE = # asmentry - memmove_callee

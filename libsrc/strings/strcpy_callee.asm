@@ -31,4 +31,4 @@ XDEF ASMDISP_STRCPY_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_STRCPY_CALLEE = asmentry - strcpy_callee
+DEFC ASMDISP_STRCPY_CALLEE = # asmentry - strcpy_callee

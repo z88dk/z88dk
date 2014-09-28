@@ -32,4 +32,4 @@ INCLUDE "../stdio.def"
    
    jp stdio_error_mc
 
-defc ASMDISP_WRITEBYTE_CALLEE = asmentry - writebyte_callee
+defc ASMDISP_WRITEBYTE_CALLEE = # asmentry - writebyte_callee

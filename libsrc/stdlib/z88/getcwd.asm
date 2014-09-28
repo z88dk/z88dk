@@ -11,7 +11,7 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.7 2014-04-09 08:05:57 stefano Exp $
+; $Id: getcwd.asm,v 1.8 2014-09-28 18:27:00 pauloscustodio Exp $
 
                 INCLUDE "syspar.def"
                 INCLUDE	"memory.def"
@@ -61,5 +61,5 @@
         dec     bc
         jr      getcwd2
         
- DEFC ASMDISP_GETCWD = asmentry - getcwd
+ DEFC ASMDISP_GETCWD = # asmentry - getcwd
  

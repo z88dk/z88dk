@@ -31,4 +31,4 @@ LIB ADTHeapAdd, ADThcompare
    ld ix,ADThcompare
    jp ADTHeapAdd
 
-DEFC CDISP_ADT_HEAPADD_CALLEE = centry - adt_HeapAdd_callee
+DEFC CDISP_ADT_HEAPADD_CALLEE = # centry - adt_HeapAdd_callee

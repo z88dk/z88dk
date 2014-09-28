@@ -101,4 +101,4 @@ XREF ASMDISP_STRCHR_CALLEE
 ;
 ;   defw 0
 
-DEFC ASMDISP_STRSEP_CALLEE = asmentry - strsep_callee
+DEFC ASMDISP_STRSEP_CALLEE = # asmentry - strsep_callee

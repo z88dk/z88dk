@@ -35,4 +35,4 @@ INCLUDE "../stdio.def"
    
    jp stdio_error_mc
    
-defc ASMDISP_IOCTL_CALLEE = asmentry - ioctl_callee
+defc ASMDISP_IOCTL_CALLEE = # asmentry - ioctl_callee

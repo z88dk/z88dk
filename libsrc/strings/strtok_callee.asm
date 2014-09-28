@@ -77,4 +77,4 @@ XREF ASMDISP_STRCHR_CALLEE
 
    defw 0
 
-DEFC ASMDISP_STRTOK_CALLEE = asmentry - strtok_callee
+DEFC ASMDISP_STRTOK_CALLEE = # asmentry - strtok_callee

@@ -14,7 +14,7 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: force_load_callee.asm,v 1.1 2012-03-08 07:16:46 stefano Exp $
+;	$Id: force_load_callee.asm,v 1.2 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
@@ -35,4 +35,4 @@ asmentry:
 	call	kjt_force_load
 	jp		flos_err
 
-DEFC ASMDISP_FORCE_LOAD_CALLEE = asmentry - force_load_callee
+DEFC ASMDISP_FORCE_LOAD_CALLEE = # asmentry - force_load_callee

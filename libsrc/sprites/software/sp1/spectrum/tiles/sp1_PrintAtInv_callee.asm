@@ -66,4 +66,4 @@ XREF SP1V_UPDATELISTT
 
    ret
 
-DEFC ASMDISP_SP1_PRINTATINV_CALLEE = asmentry - sp1_PrintAtInv_callee
+DEFC ASMDISP_SP1_PRINTATINV_CALLEE = # asmentry - sp1_PrintAtInv_callee

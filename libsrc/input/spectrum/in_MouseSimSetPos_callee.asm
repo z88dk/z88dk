@@ -33,4 +33,4 @@ LIB l_setmem
    ld (hl),c
    ret
 
-DEFC ASMDISP_IN_MOUSESIMSETPOS_CALLEE = asmentry - in_MouseSimSetPos_callee
+DEFC ASMDISP_IN_MOUSESIMSETPOS_CALLEE = # asmentry - in_MouseSimSetPos_callee

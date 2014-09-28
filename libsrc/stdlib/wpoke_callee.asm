@@ -17,4 +17,4 @@ XDEF ASMDISP_WPOKE_CALLEE
    ld (hl),d
    ret
 
-DEFC ASMDISP_WPOKE_CALLEE = asmentry - wpoke_callee
+DEFC ASMDISP_WPOKE_CALLEE = # asmentry - wpoke_callee

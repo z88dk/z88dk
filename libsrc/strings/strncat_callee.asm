@@ -59,4 +59,4 @@ LIB  rcmx_cpir
    pop hl
    ret
 
-DEFC ASMDISP_STRNCAT_CALLEE = asmentry - strncat_callee
+DEFC ASMDISP_STRNCAT_CALLEE = # asmentry - strncat_callee

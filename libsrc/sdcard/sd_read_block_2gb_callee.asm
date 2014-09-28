@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_block_2gb_callee.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_read_block_2gb_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 	XLIB	sd_read_block_2gb_callee
@@ -79,4 +79,4 @@ read_end:
 	ret
 
 
-DEFC ASMDISP_SD_READ_BLOCK_2GB_CALLEE = asmentry - sd_read_block_2gb_callee
+DEFC ASMDISP_SD_READ_BLOCK_2GB_CALLEE = # asmentry - sd_read_block_2gb_callee

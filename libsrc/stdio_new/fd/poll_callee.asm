@@ -98,4 +98,4 @@ INCLUDE "../stdio.def"
    ld c,$80
    jp reenter
 
-defc ASMDISP_POLL_CALLEE = asmentry - poll_callee
+defc ASMDISP_POLL_CALLEE = # asmentry - poll_callee

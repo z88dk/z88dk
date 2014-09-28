@@ -48,4 +48,4 @@ XREF ASMDISP_STRCHR_CALLEE
    ld h,b
    ret
 
-DEFC ASMDISP_STRSPN_CALLEE = asmentry - strspn_callee
+DEFC ASMDISP_STRSPN_CALLEE = # asmentry - strspn_callee

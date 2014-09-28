@@ -33,4 +33,4 @@ LIB stdio_error_eacces_mc, stdio_error_einval_mc
    ld h,0
    ret
 
-defc ASMDISP_UNGETC_CALLEE = asmentry - ungetc_callee
+defc ASMDISP_UNGETC_CALLEE = # asmentry - ungetc_callee

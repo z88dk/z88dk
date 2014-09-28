@@ -47,4 +47,4 @@ INCLUDE "../stdio.def"
    ld d,h
    ret
 
-defc ASMDISP_LSEEK_CALLEE = asmentry - lseek_callee
+defc ASMDISP_LSEEK_CALLEE = # asmentry - lseek_callee

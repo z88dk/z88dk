@@ -46,4 +46,4 @@ INCLUDE "../stdio.def"
    jp z, stdio_success_znc
    jp stdio_error_mc
 
-defc ASMDISP_FPUTS_CALLEE = asmentry - fputs_callee
+defc ASMDISP_FPUTS_CALLEE = # asmentry - fputs_callee

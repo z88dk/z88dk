@@ -125,4 +125,4 @@ XREF _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTINSERT_CALLEE = asmentry - adt_ListInsert_callee
+DEFC ASMDISP_ADT_LISTINSERT_CALLEE = # asmentry - adt_ListInsert_callee

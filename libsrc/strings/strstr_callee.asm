@@ -66,4 +66,4 @@ XDEF ASMDISP_STRSTR_CALLEE
    pop de
    ret
 
-DEFC ASMDISP_STRSTR_CALLEE = asmentry - strstr_callee
+DEFC ASMDISP_STRSTR_CALLEE = # asmentry - strstr_callee

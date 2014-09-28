@@ -185,4 +185,4 @@ INCLUDE "../stdio.def"
    call stdio_free
    jp stdio_error_mc
 
-defc ASMDISP_FILTER_CALLEE = asmentry - filter_callee
+defc ASMDISP_FILTER_CALLEE = # asmentry - filter_callee

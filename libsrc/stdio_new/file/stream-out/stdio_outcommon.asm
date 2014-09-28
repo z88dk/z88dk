@@ -99,4 +99,4 @@ LIB stdio_outsign, stdio_outbuff, stdio_outpad
    ld b,d
    jp stdio_outbuff
 
-defc LIBDISP_STDIO_OUTCOMMON_SIGNED = signedenter - stdio_outcommon
+defc LIBDISP_STDIO_OUTCOMMON_SIGNED = # signedenter - stdio_outcommon

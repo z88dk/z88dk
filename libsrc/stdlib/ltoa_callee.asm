@@ -131,6 +131,6 @@ LIB stdio_basechar, stdio_error_zc
    ld h,a
    ret
 
-DEFC ASMDISP_LTOA_CALLEE = asmentry - ltoa_callee
-DEFC LIBDISP_LTOA_CALLEE = libentry - ltoa_callee
+DEFC ASMDISP_LTOA_CALLEE = # asmentry - ltoa_callee
+DEFC LIBDISP_LTOA_CALLEE = # libentry - ltoa_callee
 

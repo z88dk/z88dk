@@ -28,4 +28,4 @@ LIB  extract_bits_sub
 	jp extract_bits_sub
 
 
-DEFC ASMDISP_UNSTUFF_BITS_CALLEE = asmentry - UNSTUFF_BITS_callee
+DEFC ASMDISP_UNSTUFF_BITS_CALLEE = # asmentry - UNSTUFF_BITS_callee

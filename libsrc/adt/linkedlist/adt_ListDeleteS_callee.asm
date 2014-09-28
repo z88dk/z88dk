@@ -70,4 +70,4 @@ XREF _u_free
 
    ret
 
-DEFC ASMDISP_ADT_LISTDELETES_CALLEE = asmentry - adt_ListDeleteS_callee
+DEFC ASMDISP_ADT_LISTDELETES_CALLEE = # asmentry - adt_ListDeleteS_callee

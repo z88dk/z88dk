@@ -25,4 +25,4 @@ XREF _u_free
    pop hl
    ret
 
-DEFC ASMDISP_ADT_QUEUEDELETE_CALLEE = asmentry - adt_QueueDelete_callee
+DEFC ASMDISP_ADT_QUEUEDELETE_CALLEE = # asmentry - adt_QueueDelete_callee

@@ -49,4 +49,4 @@ include "../stdio.def"
    or a
    ret
 
-defc ASMDISP_FWRITE_CALLEE = asmentry - fwrite_callee
+defc ASMDISP_FWRITE_CALLEE = # asmentry - fwrite_callee

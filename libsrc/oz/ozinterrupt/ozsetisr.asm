@@ -9,7 +9,7 @@
 ;
 ;
 ; ------
-; $Id: ozsetisr.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozsetisr.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
 	XLIB	ozsetisr
@@ -80,6 +80,6 @@ ISRStub_end:
 ;ISRStub_loc equ 0fff4h - ISRStub_len
 ;r_ozisrpointer equ ISRStub_loc + (ozisrpointer-ISRStub_begin)
 
-defc	ISRStub_len = ISRStub_end-ISRStub_begin
-defc	ISRStub_loc = 0fff4h - ISRStub_len
-defc	r_ozisrpointer = ISRStub_loc + (ozisrpointer+1-ISRStub_begin)
+defc	ISRStub_len = # ISRStub_end-ISRStub_begin
+defc	ISRStub_loc = # 0fff4h - ISRStub_len
+defc	r_ozisrpointer = # ISRStub_loc + (ozisrpointer+1-ISRStub_begin)

@@ -21,4 +21,4 @@ XREF _heap, ASMDISP_HEAPSBRK_CALLEE
    ld de,_heap
    jp HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
 
-DEFC ASMDISP_SBRK_CALLEE = asmentry - sbrk_callee
+DEFC ASMDISP_SBRK_CALLEE = # asmentry - sbrk_callee

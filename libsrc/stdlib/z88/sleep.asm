@@ -10,7 +10,7 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+; $Id: sleep.asm,v 1.5 2014-09-28 18:27:00 pauloscustodio Exp $
 
 
 		INCLUDE "time.def"
@@ -47,5 +47,5 @@
 	ld	b,h
 	ret	
 
-DEFC ASMDISP_SLEEP = asmentry - sleep
+DEFC ASMDISP_SLEEP = # asmentry - sleep
 

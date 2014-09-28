@@ -37,4 +37,4 @@ XDEF ASMDISP_MEMSWAP_CALLEE
    pop hl
    ret
 
-DEFC ASMDISP_MEMSWAP_CALLEE = asmentry - memswap_callee
+DEFC ASMDISP_MEMSWAP_CALLEE = # asmentry - memswap_callee

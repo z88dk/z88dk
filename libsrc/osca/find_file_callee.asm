@@ -6,7 +6,7 @@
 ;
 ;	Find a file and load its properties in a structure
 ;
-;	$Id: find_file_callee.asm,v 1.2 2012-03-16 07:10:13 stefano Exp $
+;	$Id: find_file_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
@@ -75,4 +75,4 @@ err:
 	ld	hl,0	; flag was not zero
 	ret
 
-DEFC ASMDISP_FIND_FILE_CALLEE = asmentry - find_file_callee
+DEFC ASMDISP_FIND_FILE_CALLEE = # asmentry - find_file_callee

@@ -3,7 +3,7 @@
 ; QSORT - compiled, then hand-adjusted
 ; Stefano, 29/10/2010
 ;
-; $Id: qsort_callee.asm,v 1.1 2010-11-03 10:03:49 stefano Exp $
+; $Id: qsort_callee.asm,v 1.2 2014-09-28 18:27:00 pauloscustodio Exp $
 ;
 ; Original code taken from the BDS C by Leor Zolman
 ;
@@ -172,4 +172,4 @@ LIB memswap_callee
 ._gap	defs	2
 
 
-DEFC ASMDISP_QSORT_CALLEE = centry - qsort_callee
+DEFC ASMDISP_QSORT_CALLEE = # centry - qsort_callee

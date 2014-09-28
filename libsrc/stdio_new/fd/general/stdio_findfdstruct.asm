@@ -39,4 +39,4 @@ INCLUDE "../../stdio.def"
    scf
    ret
 
-defc LIBDISP_STDIO_FINDFDSTRUCT = libentry - stdio_findfdstruct
+defc LIBDISP_STDIO_FINDFDSTRUCT = # libentry - stdio_findfdstruct

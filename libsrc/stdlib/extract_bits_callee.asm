@@ -20,4 +20,4 @@ LIB  extract_bits_sub
 .asmentry
 	jp	extract_bits_sub
 
-DEFC ASMDISP_EXTRACT_BITS_CALLEE = asmentry - extract_bits_callee
+DEFC ASMDISP_EXTRACT_BITS_CALLEE = # asmentry - extract_bits_callee

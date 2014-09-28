@@ -82,4 +82,4 @@ LIB     rcmx_cpir
    pop hl
    ret
 
-DEFC ASMDISP_STRRSTR_CALLEE = asmentry - strrstr_callee
+DEFC ASMDISP_STRRSTR_CALLEE = # asmentry - strrstr_callee

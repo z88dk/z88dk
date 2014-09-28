@@ -132,5 +132,5 @@ INCLUDE "../stdio.def"
 
    jp stdio_error_zc - 1
    
-defc ASMDISP_FOPEN_CALLEE = asmentry - fopen_callee
-defc LIBDISP_FOPEN_CALLEE = libentry - fopen_callee
+defc ASMDISP_FOPEN_CALLEE = # asmentry - fopen_callee
+defc LIBDISP_FOPEN_CALLEE = # libentry - fopen_callee

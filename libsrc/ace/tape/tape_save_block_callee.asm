@@ -23,4 +23,4 @@ XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 .asmentry
 		jp	$1820
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee
+DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = # asmentry - tape_save_block_callee

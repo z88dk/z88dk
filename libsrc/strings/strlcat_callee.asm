@@ -130,4 +130,4 @@ ENDIF
    sbc hl,bc                    ; hl = strlen(final dst)
    ret
 
-defc ASMDISP_STRLCAT_CALLEE = asmentry - strlcat_callee
+defc ASMDISP_STRLCAT_CALLEE = # asmentry - strlcat_callee

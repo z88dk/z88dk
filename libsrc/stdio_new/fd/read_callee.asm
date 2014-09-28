@@ -42,4 +42,4 @@ INCLUDE "../stdio.def"
 
    jp stdio_error_mc
 
-defc ASMDISP_READ_CALLEE = asmentry - read_callee
+defc ASMDISP_READ_CALLEE = # asmentry - read_callee
