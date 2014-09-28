@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.104 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.105 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -528,7 +528,16 @@ ORG( void )
 
             if ( constant >= 0 && constant <= 0xFFFF )
             {
-                CURRENTMODULE->origin = constant;
+				if ( CURRENTSECTION->origin_found )
+					error_org_redefined();
+				else
+				{
+					CURRENTSECTION->origin_found = TRUE;
+					if ( CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0 )
+						; /* ignore ORG, as --origin from command line overrides */
+					else
+						CURRENTSECTION->origin = constant;
+				}
             }
             else
             {

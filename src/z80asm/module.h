@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.21 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.22 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -37,7 +37,6 @@ CLASS( Module )
 	char		*modname;			/* module name, kept in strpool */
 	char		*filename;			/* source file name, kept in strpool */
 	int			 module_id;			/* sequence number of linked modules in sections */
-    Int			 origin;			/* ORG address of module, -1 if not defined */
     ExprList	*exprs;				/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
 END_CLASS;

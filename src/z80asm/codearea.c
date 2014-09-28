@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.42 2014-06-27 23:31:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.43 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -64,6 +64,7 @@ void Section_init (Section *self)
 {
 	self->name = "";		/* default: empty section */
 	self->addr	= 0;
+	self->origin = -1;
 	self->asmpc	= 0;
 	self->opcode_size = 0;
 	
@@ -281,9 +282,10 @@ UInt get_cur_module_size(  void ) { return section_module_size(  g_cur_section, 
 
 /*-----------------------------------------------------------------------------
 *   allocate the addr of each of the sections, concatenating the sections in
-*   consecutive addresses. Start at the given org, or at 0 if negative
+*   consecutive addresses, or starting from a new address if a section
+*	has a defined origin. Start at the command line origin, or at 0 if negative
 *----------------------------------------------------------------------------*/
-void sections_alloc_addr( Int origin )
+void sections_alloc_addr(void)
 {
 	Section *section;
 	SectionHashElem *iter;
@@ -291,15 +293,14 @@ void sections_alloc_addr( Int origin )
 
 	init();
 
-	if ( origin < 0 )					/* origin not defined */
-		origin = 0;
-
-	addr = origin;						/* start address */
-
 	/* allocate addr in sequence */
+	addr = 0;
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
+		if ( section->origin >= 0 )		/* break in address space */
+			addr = section->origin;
+
 		section->addr = addr;
 		addr += get_section_size( section );
 	}
@@ -518,11 +519,13 @@ UInt fwrite_module_code( FILE *file )
 
 		/* write all sections, even empty ones, to allow user to define sections list by 
 		   a sequence of SECTION statements
-		   exception: empty section, as it is the first one anyway */
-		if ( size > 0 || section != get_first_section(NULL) )
+		   exception: empty section, as it is the first one anyway, if no ORG is defined */
+		if ( size > 0 || section != get_first_section(NULL) || section->origin >= 0 )
 		{
 			xfput_int32( file, size );
 			xfput_count_byte_strz( file, section->name );
+			xfput_int32( file, section->origin );
+
 			if ( size > 0 )		/* ByteArray_item(bytes,0) creates item[0]!! */
 				xfput_chars( file, (char *) ByteArray_item( section->bytes, addr ), size );
 
@@ -539,41 +542,64 @@ UInt fwrite_module_code( FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write whole code area to an open file
 *----------------------------------------------------------------------------*/
-void fwrite_codearea( FILE *file )
+void fwrite_codearea( char *filename, FILE **pfile )
 {
 	init();
-	fwrite_codearea_chunk( file, 0, get_sections_size() );
+	fwrite_codearea_chunk( filename, pfile, 0, get_sections_size() );
 }
 
 /* write a chunk of data; addr is offset from first section */
-void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size )
+void fwrite_codearea_chunk( char *filename, FILE **pfile, UInt offset, UInt write_size )
 {
+	DEFINE_FILE_STR( new_name );
 	Section *section;
 	SectionHashElem *iter;
-	UInt cur_addr, section_size, block_size;
+	UInt cur_offset, section_size, block_size;
+	Int  cur_addr;
 
 	init();
-	cur_addr = 0;
+
+	cur_offset = 0;
+	cur_addr   = -1;
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
 		section_size = get_section_size( section );
 
+		if ( cur_addr < 0 )
+			cur_addr = section->addr;
+
 		/* bytes from this section */
-		if ( addr >= cur_addr && addr < cur_addr + section_size )
+		if ( section_size > 0 &&
+			 offset >= cur_offset && offset < cur_offset + section_size )
 		{
-			block_size = cur_addr + section_size - addr;
+			/* change current file if address changed */
+			if ( cur_addr != section->addr || 
+				 ( section != get_first_section(NULL) && section->origin >= 0 ) )
+			{
+				Str_set( new_name, path_remove_ext( filename ) );	/* "test" */
+				Str_append_char( new_name, '_' );
+				Str_append( new_name, section->name );
+
+				xfclose( *pfile );
+				*pfile = xfopen( get_bin_filename( new_name->str ), "wb" );         /* CH_0012 */
+
+				cur_addr = section->addr;
+			}
+
+			block_size = cur_offset + section_size - offset;
 			block_size = MIN( block_size, write_size );
 
-			xfput_chars( file, (char *) ByteArray_item( section->bytes, addr - cur_addr ), block_size );
+			xfput_chars( *pfile, (char *) ByteArray_item( section->bytes, offset - cur_offset ), block_size );
 
 			write_size -= block_size;
-			addr       += block_size;
+			offset     += block_size;
 
 			if ( write_size == 0 )
 				break;
 		}
 
+		cur_offset += section_size;
 		cur_addr += section_size;
 	}
 }

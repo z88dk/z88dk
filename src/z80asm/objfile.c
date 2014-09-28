@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.40 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.41 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -235,7 +235,6 @@ void write_obj_file( char *source_filename )
 
 	/* write header */
     xfput_strz( fp, Z80objhdr );
-	xfput_int32( fp, CURRENTMODULE->origin );		/* origin */
 
 	/* write placeholders for 5 pointers pointers */
 	header_ptr = ftell( fp );
@@ -285,7 +284,6 @@ DEF_CLASS( OFile );
 
 void OFile_init( OFile *self )
 {
-	self->origin = -1;
 	self->modname_ptr = 
 	self->expr_ptr = 
 	self->symbols_ptr =
@@ -334,9 +332,6 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 	self->file			= file;
 	self->start_ptr		= start_ptr;
 	self->writing		= FALSE;
-
-    /* read object file header */
-    self->origin = xfget_int32( file );
 
     self->modname_ptr	= xfget_int32( file );
     self->expr_ptr		= xfget_int32( file );
@@ -453,8 +448,9 @@ ByteArray *read_obj_file_data( char *filename )
 Bool objmodule_loaded( char *src_filename )
 {
 	static Str *section_name;
-	Int code_size;
+	Int code_size, origin;
 	OFile *ofile;
+	Section *section;
 
 	INIT_OBJ( Str, &section_name );
 
@@ -475,9 +471,13 @@ Bool objmodule_loaded( char *src_filename )
 					break;
 
 				xfget_count_byte_Str( ofile->file, section_name );
+				origin = xfget_int32( ofile->file );
 
 				/* reserve space in section */
-				new_section( section_name->str );
+				section = new_section( section_name->str );
+				if ( origin >= 0 )
+					section->origin = origin;
+
 				append_reserve( code_size );
 
 				/* advance past code block */

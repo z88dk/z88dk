@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.31 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.32 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,7 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.31 2014-09-11 22
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"07"
+#define OBJ_VERSION	"08"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed
@@ -48,8 +48,6 @@ CLASS( OFile )
 
 	char	*filename;			/* object file name, in strpool */
 	char	*modname;			/* module name, in strpool */
-
-	Int		 origin;			/* ORG address, -1 if not defined */
 
 	/* all file pointers are -1 if not defined */
 	long	 modname_ptr;		/* offset in file to Module Name */

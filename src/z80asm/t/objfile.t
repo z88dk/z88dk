@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.19 2014-09-11 22:28:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.20 2014-09-28 17:37:15 pauloscustodio Exp $
 #
 
 use strict;
@@ -56,7 +56,7 @@ $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test'));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
 END
 
@@ -66,10 +66,10 @@ write_file(asm_file(), "nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test', 
-					   CODE => [["", "\x00"]]));
+					   CODE => [["", -1, "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Code: 1 bytes
     C $0000: 00
@@ -81,10 +81,10 @@ write_file(asm_file(), "nop\n" x 0x10000);
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test', 
-					   CODE => [["", "\x00" x 0x10000]]));
+					   CODE => [["", -1, "\x00" x 0x10000]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Code: 65536 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4191,14 +4191,12 @@ write_file(asm_file(), "org 0 \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test', 
-					   ORG => 0, 
-					   CODE => [["", "\x00"]]));
+					   CODE => [["", 0, "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $0000
-  Code: 1 bytes
+  Code: 1 bytes, ORG at $0000
     C $0000: 00
 END
 
@@ -4207,14 +4205,12 @@ write_file(asm_file(), "org 0xFFFF \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test', 
-					   ORG => 0xFFFF, 
-					   CODE => [["", "\x00"]]));
+					   CODE => [["", 0xFFFF, "\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $FFFF
-  Code: 1 bytes
+  Code: 1 bytes, ORG at $FFFF
     C $0000: 00
 END
 
@@ -4229,14 +4225,14 @@ write_file(asm_file(), "
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
-					   CODE => [["", 
+					   CODE => [["", -1,  
 									"\x3E\x0C".
 									"\xDD\x46\x0C".
 									"\x11\x0C\x00".
 									"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Code: 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4259,14 +4255,14 @@ t_binary($obj, objfile(NAME => 'test',
 					["L", "C", "", 3, "value8"],
 					["L", "C", "", 3, "value16"],
 				],
-		       CODE => [["", 
+		       CODE => [["", -1, 
 					"\x3E\x0C".
 					"\xDD\x46\x0C".
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Names:
     L C $0003 value8
@@ -4292,14 +4288,14 @@ t_binary($obj, objfile(NAME => 'test',
 					["L", "C", "", 3, "value8"],
 					["L", "C", "", 3, "value16"],
 				],
-		       CODE => [["", 
+		       CODE => [["", -1, 
 					"\x3E\x0C".
 					"\xDD\x46\x0C".
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Names:
     L C $0003 value8
@@ -4324,7 +4320,6 @@ label2:	ld de, label2 * 4
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
 t_binary($obj, objfile(NAME => 'test',
-		       ORG => 3,
 		       EXPR => [
 				["U", "test.asm",3,  "", 0,  1, "", "label*4"],
 				["S", "",4,          "", 2,  4, "", "label*5"],
@@ -4335,7 +4330,7 @@ t_binary($obj, objfile(NAME => 'test',
 		       SYMBOLS => [
 					["L", "A", "", 0, "label"],
 					["L", "A", "", 8, "label2"]],
-		       CODE => [["", 
+		       CODE => [["", 3, 
 					"\x3E\x00".				# addr  0
 					"\xDD\x46\x00".			# addr  2
 					"\x01\x00\x00".			# addr  5
@@ -4344,9 +4339,8 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x00\x00\x00\x00"]]));	# addr  14
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $0003
   Names:
     L A $0000 label
     L A $0008 label2
@@ -4357,7 +4351,7 @@ File test.obj at $0000: Z80RMF07
     E Cw (test.asm:6) $0008 $0009: label2*4
     E Cw (test.inc:2) $000B $000C: label*2
     E Ll (test.asm:8) $000E $000E: label2*6
-  Code: 18 bytes
+  Code: 18 bytes, ORG at $0003
     C $0000: 3E 00 DD 46 00 01 00 00 11 00 00 01 00 00 00 00
     C $0010: 00 00
 END
@@ -4383,13 +4377,13 @@ t_binary($obj, objfile(NAME => 'test',
 					["L", "A", "", 0, "local"],
 				    ["G", "A", "", 1, "global"]],
 		       LIBS => ["extobj","extlib"],
-		       CODE => [["", 
+		       CODE => [["", -1, 
 						"\x00".
 		                "\xCD\x00\x00".
 		                "\xCD\x00\x00"]]));
 t_z80nm(obj_file(), <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 local
@@ -4421,16 +4415,16 @@ my $lib  = read_binfile(lib_file());
 t_binary($lib, libfile( $obj1, $obj2 ));
 t_z80nm(lib_file(), <<'END');
 
-File test.lib at $0000: Z80LMF07
+File test.lib at $0000: Z80LMF08
 
-File test.lib at $0010: Z80RMF07
+File test.lib at $0010: Z80RMF08
   Name: test1
   Names:
     G A $0000 mult
   Code: 1 bytes
     C $0000: C9
 
-File test.lib at $0055: Z80RMF07
+File test.lib at $0055: Z80RMF08
   Name: test2
   Names:
     G A $0000 div
@@ -4458,7 +4452,7 @@ $obj = read_binfile(obj2_file());
 t_binary($obj, objfile(NAME => 'test2',
 				EXPR => [["C", "test2.asm",2, "", 0, 1, "", "main"]],
 				LIBS => ["main"],
-				CODE => [["", "\xC3\0\0"]]));
+				CODE => [["", -1, "\xC3\0\0"]]));
 write_binfile(obj3_file(), $obj);
 
 t_z80asm_capture(join(" ", "-r0", "-a", asm_file(), asm1_file(), asm2_file()), "", "", 0);
@@ -4539,7 +4533,6 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -4556,7 +4549,6 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -4575,7 +4567,6 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj->filename == NULL );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->writing == FALSE );
-	ASSERT( obj->origin == -1 );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -4589,7 +4580,7 @@ END
 
 # write test object file
 for my $code_size (0, 1, 65536) {
-	my %code = $code_size ? (CODE => [["", "\x00" x $code_size]]) : ();
+	my %code = $code_size ? (CODE => [["", -1, "\x00" x $code_size]]) : ();
 	my $obj1 = objfile(NAME => "test1", %code);
 	write_binfile(obj1_file(), $obj1); 
 	write_binfile(lib1_file(), libfile($obj1));

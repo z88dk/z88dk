@@ -3,13 +3,13 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.7 2014-07-02 23:45:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.8 2014-09-28 17:37:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
-
+#include "options.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -56,11 +56,12 @@ static void dump_sections(char *title, int line)
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
-		warn("%c%d. \"%s\", size = %ld, addr = %ld, asmpc = %ld, opcode_size = %ld\n", 
+		warn("%c%d. \"%s\", size = %ld, addr = %ld, origin = %ld, asmpc = %ld, opcode_size = %ld\n", 
 				   section == get_cur_section() ? '*' : ' ',
 				   ++i, section->name,  
 				   (long) get_section_size( section ),
-				   (long) section->addr, (long) section->asmpc, (long) section->opcode_size );
+				   (long) section->addr, (long) section->origin, (long) section->asmpc, 
+				   (long) section->opcode_size );
 		warn("    bytes =");
 		for ( j = 0; j < ByteArray_size( section->bytes ); j++ )
 			warn("%s$%02X", 
@@ -289,8 +290,8 @@ static void test_sections( void )
 	T( next_PC() );
 
 	/* compute addresses */
-	T( sections_alloc_addr( -1 ) );
-	T( sections_alloc_addr( 100 ) );
+	T( get_first_section(NULL)->origin = -1;  sections_alloc_addr() );
+	T( get_first_section(NULL)->origin = 100; sections_alloc_addr() );
 
 	/* write each module */
 #define T_MODULE(n,size) \
@@ -308,7 +309,7 @@ static void test_sections( void )
 
 	/* write whole code area */
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	fwrite_codearea( file ); 
+	fwrite_codearea( "test.bin", &file ); 
 	fclose( file );
 	dump_file("code area ");
 
@@ -322,7 +323,7 @@ static void test_sections( void )
 		sprintf(title, "Chunk from %d to %d, %d bytes", i, i+size-1, size );
 
 		assert( (file = fopen("test.bin", "wb")) != NULL ); 
-		fwrite_codearea_chunk( file, (UInt) i, (UInt) size ); 
+		fwrite_codearea_chunk( "test.bin", &file, (UInt) i, (UInt) size ); 
 		fclose( file );
 		dump_file( title );
 	}
@@ -360,11 +361,11 @@ static void test_sections( void )
 	T( set_cur_module_id(1) ); T( new_section("data") ); addr = 0; T( patch_byte(&addr, 2) );
 	T( set_cur_module_id(2) ); T( new_section("code") ); addr = 0; T( patch_byte(&addr, 1) );
 	
-	T( sections_alloc_addr(0) );
+	T( get_first_section(NULL)->origin = -1; sections_alloc_addr() );
 
 	/* write bin file */
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	fwrite_codearea( file ); 
+	fwrite_codearea( "test.bin", &file ); 
 	fclose( file );
 	dump_file("code area ");
 }

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.43 2014-09-17 21:39:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.44 2014-09-28 17:37:15 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -41,7 +41,6 @@ OPT_VAR( Bool,		code_seg,	FALSE	)
 OPT_VAR( Bool,		relocatable, FALSE	)
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
-OPT_VAR( Int,		origin,		-1	)		/* -1 == not defined */
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	asm_ext,	( FILEEXT_ASM ) + 1 )	/* skip "." */

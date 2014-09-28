@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.90 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.91 2014-09-28 17:37:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -440,12 +440,15 @@ static void option_make_updated_bin( void )
 
 static void option_origin( char *origin_hex )
 {
+	Section *default_section;
     Int origin = strtol( origin_hex, NULL, 16 );
 
     if ( origin < 0 || origin > 0xFFFF )
         error_int_range( origin );
 
-    opts.origin = origin;
+	default_section = get_first_section(NULL);
+	default_section->origin			= origin;
+	default_section->origin_opts	= TRUE;
 }
 
 static void option_define( char *symbol )

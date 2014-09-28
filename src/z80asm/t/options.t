@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.47 2014-09-17 21:39:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.48 2014-09-28 17:37:15 pauloscustodio Exp $
 #
 # Test options
 
@@ -177,7 +177,6 @@ Size of module 'test' is 3 bytes
 
 linking module(s)...
 Pass1...
-ORG address for code is $0000
 Code size of linked modules is 3 bytes ($0000 to $0002)
 Pass2...
 Creating map...

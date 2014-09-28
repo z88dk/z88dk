@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.31 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.32 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -48,6 +48,10 @@ CLASS( Section )
 	char		*name;			/* name of section, kept in strpool */
 	UInt		 addr;			/* start address of this section,
 								   computed by sections_alloc_addr() */
+    Int			 origin;		/* ORG address of section, -1 if not defined */
+	Bool		 origin_found;	/* ORG already found in code */
+	Bool		 origin_opts;	/* ORG was defined from command line options, 
+								   override asm code */
 	UInt		 asmpc;			/* address of current opcode relative to start
 								   of the current module, reset to 0 at start
 								   of each module */
@@ -93,7 +97,7 @@ extern Section *get_next_section( SectionHashElem **piter );
 *   allocate the addr of each of the sections, concatenating the sections in
 *   consecutive addresses. Start at the given org, or at 0 if negative
 *----------------------------------------------------------------------------*/
-extern void sections_alloc_addr( Int origin );
+extern void sections_alloc_addr(void);
 
 /*-----------------------------------------------------------------------------
 *   Handle current module
@@ -156,5 +160,6 @@ extern UInt fwrite_module_code( FILE *file );
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea( FILE *file );
-extern void fwrite_codearea_chunk( FILE *file, UInt addr, UInt write_size );
+extern void fwrite_codearea( char *filename, FILE **pfile );
+extern void fwrite_codearea_chunk( char *filename, FILE **pfile, 
+								   UInt offset, UInt write_size );

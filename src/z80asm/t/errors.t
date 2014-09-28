@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.23 2014-06-29 22:25:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.24 2014-09-28 17:37:15 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -129,7 +129,7 @@ remove_tree( bin_file() );
 # error_expression 
 unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
-								   CODE => [["", "\0\0"]], 
+								   CODE => [["", -1, "\0\0"]], 
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",
@@ -612,7 +612,7 @@ t_z80asm_capture(asm_file()." -IllegalFilename", "",
 		"1 errors occurred during assembly\n", 1);
 		
 #------------------------------------------------------------------------------
-# error_org_not_defined
+# error_org_redefined
 unlink_testfiles();
 t_z80asm(
 	org		=> -1,
@@ -626,17 +626,23 @@ t_z80asm(
 	bin		=> "\x00\x10",
 );
 
+t_z80asm(
+	org		=> 0x1000,
+	asm		=> "org 0x8000 \n start: defw start",
+	bin		=> "\x00\x10",
+);
+
 unlink_testfiles();
-write_file( asm_file(), "start: defw start" );
+write_file( asm_file(), "org 0x1000 \n org 0x4000 \n start: defw start" );
 my($stdout, $stderr, $return) = capture {
 	system z80asm()." -l -b ".asm_file();
 };
 is $stdout, "", "output";
-is $stderr, "Error at module 'test': ORG not defined\n1 errors occurred during assembly\n", "error";
+is $stderr, "Error at file 'test.asm' line 2: ORG redefined\n1 errors occurred during assembly\n", "error";
 ok -f err_file(), "error file";
-is read_file( err_file() ), "Error at module 'test': ORG not defined\n", "error file ok";
-ok -f lst_file(), "lst generated in assembly phase, ok";
-ok -f obj_file(), "obj generated in assembly phase, ok";
+is read_file( err_file() ), "Error at file 'test.asm' line 2: ORG redefined\n", "error file ok";
+ok ! -f lst_file(), "no lst file";
+ok ! -f obj_file(), "no obj file";
 ok ! -f bin_file(), "no bin file";
 
 #------------------------------------------------------------------------------
@@ -714,8 +720,8 @@ write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-r0 -b -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
-										   CODE => [["", "\x00"]], 
-										   ORG => 0));
+										   CODE => [["", 0, "\x00"]], 
+										   ));
 t_binary(read_binfile(bin_file()), "\x00");
 	
 # CreateLib uses a different error call
@@ -724,11 +730,11 @@ write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
 t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
-												   CODE => [["", "\x00"]])));
+												   CODE => [["", -1, "\x00"]])));
 
 unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
-								   CODE => [["", "\0\0"]], 
+								   CODE => [["", -1, "\0\0"]], 
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
 t_z80asm_capture("-r0 -a ".obj_file(),
 				 "",

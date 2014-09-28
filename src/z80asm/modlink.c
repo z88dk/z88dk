@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.134 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.135 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -251,7 +251,7 @@ static void read_module_exprs( ExprList *exprs )
 
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
-        fseek( file, fptr_base + 12, SEEK_SET );		/* point at module name  pointer   */
+        fseek( file, fptr_base + 8, SEEK_SET );			/* point at module name  pointer   */
         /*fptr_modname*/  xfget_int32( file );			/* get file pointer to module name */
         fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
         /*fptr_namedecl*/ xfget_int32( file );			/* get file pointer to name declarations */
@@ -502,7 +502,7 @@ static void define_location_symbols( void )
 	
     if ( opts.verbose )
         printf("Code size of linked modules is %d bytes ($%04X to $%04X)\n",
-		       (int)(end_addr - start_addr), (int)start_addr, (int)end_addr-1 );
+		       (int)(get_sections_size()), (int)start_addr, (int)end_addr-1 );
 
 	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
 	define_global_def_sym( name->str, start_addr );
@@ -545,7 +545,6 @@ static void define_location_symbols( void )
 void link_modules( void )
 {
     char fheader[9];
-    Int origin = -1;
     Module *module, *first_obj_module, *last_obj_module;
 	ModuleListElem *iter;
 	Bool saw_last_obj_module;
@@ -617,29 +616,6 @@ void link_modules( void )
                 break;
             }
 
-			/* compute origin on first module */
-            if ( CURRENTMODULE == first_obj_module )
-            {
-				origin = xfget_int32( file );	/* origin of first module */
-
-                if ( opts.relocatable )
-                    origin = 0;					/* ORG 0 on auto relocation */
-                else if ( opts.origin >= 0 )
-                    origin = opts.origin;		/* use origin from command line */
-				else if ( origin < 0 )
-                {
-                    error_org_not_defined();  /* no ORG */
-                    xfclose( file );
-                    break;
-                }
-				else
-				{
-                }
-
-                if ( opts.verbose )
-                    printf( "ORG address for code is $%04X\n", origin );
-            }
-
             xfclose( file );
 
             LinkModule( obj_filename, 0 );       /* link code & read name definitions */
@@ -654,7 +630,7 @@ void link_modules( void )
 
 		/* allocate segment addresses and compute absolute addresses of symbols */
 		if ( ! get_num_errors() )
-			sections_alloc_addr( origin );
+			sections_alloc_addr();
 
 		if ( ! get_num_errors() )
 			relocate_symbols();
@@ -699,15 +675,17 @@ LinkModule( char *filename, long fptr_base )
 	static Str *section_name;
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     Int code_size;
+    Int origin = -1;
     int flag = 0;
 	FILE *file;
 	UInt addr;
+	Section *section;
 
 	INIT_OBJ( Str, &section_name );
 
     /* open object file for reading */
     file = xfopen( filename, "rb" );           /* CH_0012 */
-    fseek( file, fptr_base + 12, SEEK_SET );
+    fseek( file, fptr_base + 8, SEEK_SET );
 
     fptr_modname	= xfget_int32( file );	/* get file pointer to module name */
 					  xfget_int32( file );	/* get file pointer to expression declarations */
@@ -726,10 +704,14 @@ LinkModule( char *filename, long fptr_base )
 				break;
 
 			xfget_count_byte_Str( file, section_name );
+			origin = xfget_int32( file );
 
 			/* load bytes to section */
 			/* BUG_0015: was reading at current position in code area, swaping order of modules */
-			new_section( section_name->str );
+			section = new_section( section_name->str );
+			if ( origin >= 0 )
+				section->origin = origin;
+
 			addr = 0;
 			patch_file_contents( file, &addr, code_size );
 		}
@@ -883,7 +865,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 	DEFINE_STR( section_name, MAXLINE );
 
     /* found module name? */
-    fseek( file, currentlibmodule + 4 + 4 + 8 + 4, SEEK_SET );     
+    fseek( file, currentlibmodule + 4 + 4 + 8, SEEK_SET );     
 													/* point at module name  file pointer */
     fptr_mname		= xfget_int32( file );			/* get module name file  pointer   */
 					  xfget_int32( file );			/* fptr_expr */
@@ -994,7 +976,7 @@ CreateBinFile( void )
         xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
 
 		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
-        fwrite_codearea( binaryfile );                                /* write code as one big chunk */
+        fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
     }
     else if ( is_segmented )
     {
@@ -1005,7 +987,7 @@ CreateBinFile( void )
             codeblock = ( codesize > 16384 ) ? 16384 : codesize;
             codesize -= codeblock;
          
-            fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
+            fwrite_codearea_chunk( filename, &binaryfile, offset, codeblock ); /* code in 16K chunks */
             xfclose( binaryfile );
 
 			if ( codesize == 0 )
@@ -1020,7 +1002,7 @@ CreateBinFile( void )
     }
     else
     {
-        fwrite_codearea( binaryfile );                                /* write code as one big chunk */
+        fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
     }
 
 	xfclose( binaryfile );

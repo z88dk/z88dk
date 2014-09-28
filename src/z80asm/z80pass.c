@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.112 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.113 2014-09-28 17:37:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -367,10 +367,6 @@ Z80pass2( void )
     /* clean error location */
     set_error_null();
     //set_error_module( CURRENTMODULE->modname );
-
-	/* define origin from command line on first module */
-    if ( CURRENTMODULE == get_first_module( NULL ) && opts.origin >= 0 )
-        CURRENTMODULE->origin = opts.origin;
 
 	/* create object file */
 	if ( ! get_num_errors() )

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.15 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.16 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,7 +53,6 @@ DEF_CLASS_LIST( Module );
 void Module_init (Module *self)   
 {
 	self->module_id	= new_module_id();
-	self->origin	= -1;
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
 	OBJ_AUTODELETE( self->local_symtab ) = FALSE;

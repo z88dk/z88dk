@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.120 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.121 2014-09-28 17:37:14 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.120 2014-09-11 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.120  2014-09-11 22:28:35  pauloscustodio
+* Revision 1.121  2014-09-28 17:37:14  pauloscustodio
+* Split binary files for each section with a defined ORG.
+* Object file format changed to version 08, to include ORG address per section.
+*
+* Revision 1.120  2014/09/11 22:28:35  pauloscustodio
 * DEFC with expressions; expressions containing external symbols are stored in the object file
 * and evaluated at link time.
 * e.g.
@@ -2111,6 +2115,14 @@ Based on 1.0.31
 	- Remove SYM_DEFINE, not used.
 
 -------------------------------------------------------------------------------
+28.09.2014 [2.6.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Split binary files for each section with a defined ORG
+	
+	- Object file format changed to version 08, to include ORG address
+      per section.
+	  
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -2133,7 +2145,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.5.0"
+#define VERSION     "2.6.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

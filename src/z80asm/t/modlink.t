@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.8 2014-09-21 15:23:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.9 2014-09-28 17:37:15 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -88,9 +88,8 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $1234
   Names:
     G A $0013 a1
   External names:
@@ -109,11 +108,11 @@ File test.obj at $0000: Z80RMF07
     E Cw (test.asm:14) $0013 $0014: ASMHEAD
     E Cw (test.asm:15) $0016 $0017: ASMTAIL
     E Cw (test.asm:16) $0019 $001A: ASMSIZE
-  Code: 28 bytes
+  Code: 28 bytes, ORG at $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0013 a2
@@ -133,7 +132,7 @@ File test1.obj at $0000: Z80RMF07
     E Cw (test1.asm:12) $0013 $0014: ASMHEAD
     E Cw (test1.asm:13) $0016 $0017: ASMTAIL
     E Cw (test1.asm:14) $0019 $001A: ASMSIZE
-  Code: 28 bytes
+  Code: 28 bytes, ORG at $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 END
@@ -250,9 +249,8 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $1234
   Names:
     L A $0000 start (section code)
     L A $0000 mes1 (section data)
@@ -273,18 +271,20 @@ File test.obj at $0000: Z80RMF07
     E Cw (test.asm:25) $0012 $0013: mes0 (section code)
     E Cw (test.asm:26) $0015 $0016: mes0end-mes0 (section code)
     E Cw (test.asm:27) $0018 $0019: prmes (section code)
+  Code: 0 bytes, ORG at $1234
   Code: 28 bytes (section code)
     C $0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
     C $0010: 00 00 21 00 00 01 00 00 CD 00 00 C9
   Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 prmes (section code)
     G A $0000 mes0 (section data)
     G A $0001 mes0end (section data)
+  Code: 0 bytes, ORG at $1234
   Code: 9 bytes (section code)
     C $0000: 78 B1 C8 7E 23 D7 0B 18 F7
   Code: 1 bytes (section data)
@@ -361,23 +361,25 @@ ASM2
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $0000
+  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
+  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF07
+File test2.obj at $0000: Z80RMF08
   Name: test2
+  Code: 0 bytes, ORG at $0000
   Code: 1 bytes (section code)
     C $0000: 01
   Code: 0 bytes (section data)
@@ -391,23 +393,25 @@ z80asm(
 );
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $0000
+  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
+  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF07
+File test2.obj at $0000: Z80RMF08
   Name: test2
+  Code: 0 bytes, ORG at $0000
   Code: 1 bytes (section code)
     C $0000: 01
   Code: 0 bytes (section data)
@@ -438,9 +442,8 @@ z80asm(
 
 t_z80nm("test.obj", <<'...');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $0100
   Names:
     L A $0000 start
     L A $0008 end1
@@ -451,7 +454,7 @@ File test.obj at $0000: Z80RMF07
     E Cw (test.asm:3) $0000 $0002: end1
     E Cw (test.asm:3) $0000 $0004: end2
     E Cw (test.asm:3) $0000 $0006: end3
-  Code: 8 bytes
+  Code: 8 bytes, ORG at $0100
     C $0000: 00 00 00 00 00 00 00 00
 ...
 
@@ -518,9 +521,8 @@ z80asm(
 
 t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $1000
   External names:
     U         func1_alias
     U         func2_alias
@@ -529,21 +531,23 @@ File test.obj at $0000: Z80RMF07
     E Cw (test.asm:7) $0000 $0001: func1_alias (section code)
     E Cw (test.asm:8) $0003 $0004: func2_alias (section code)
     E Cw (test.asm:9) $0006 $0007: computed_end (section code)
+  Code: 0 bytes, ORG at $1000
   Code: 9 bytes (section code)
     C $0000: CD 00 00 CD 00 00 C3 00 00
   Code: 0 bytes (section lib)
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 func1 (section lib)
     G A $0000 func2 (section code)
+  Code: 0 bytes, ORG at $1000
   Code: 1 bytes (section code)
     C $0000: C8
   Code: 1 bytes (section lib)
     C $0000: C9
 
-File test2.obj at $0000: Z80RMF07
+File test2.obj at $0000: Z80RMF08
   Name: test2
   Names:
     L A $FFFFFFFF chain1 (section lib)
@@ -612,19 +616,18 @@ z80asm(
 
 t_z80nm("test.obj test1.obj", <<'END');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $1000
   Names:
     G A $0000 func1
   External names:
     U         func2
   Expressions:
     E Cw (test.asm:1) $0000 $0001: func2
-  Code: 4 bytes
+  Code: 4 bytes, ORG at $1000
     C $0000: CD 00 00 C9
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 func2
@@ -632,7 +635,7 @@ File test1.obj at $0000: Z80RMF07
     U         func1
   Expressions:
     E Cw (test1.asm:1) $0000 $0001: func1
-  Code: 4 bytes
+  Code: 4 bytes, ORG at $1000
     C $0000: CD 00 00 C9
 END
 
@@ -686,9 +689,8 @@ z80asm(
 
 t_z80nm("test.obj test1.obj test2.obj", <<'...');
 
-File test.obj at $0000: Z80RMF07
+File test.obj at $0000: Z80RMF08
   Name: test
-  Org:  $1000
   Names:
     G = $0000 asm_b_vector_at
   External names:
@@ -696,14 +698,14 @@ File test.obj at $0000: Z80RMF07
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
 
-File test1.obj at $0000: Z80RMF07
+File test1.obj at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 asm_b_array_at
-  Code: 1 bytes
+  Code: 1 bytes, ORG at $1000
     C $0000: C9
 
-File test2.obj at $0000: Z80RMF07
+File test2.obj at $0000: Z80RMF08
   Name: test2
   Names:
     L A $0000 start
@@ -713,6 +715,70 @@ File test2.obj at $0000: Z80RMF07
   Expressions:
     E Cw (test2.asm:5) $0000 $0001: asm_b_vector_at
     E Cw (test2.asm:6) $0003 $0004: asm_b_array_at
-  Code: 7 bytes
+  Code: 7 bytes, ORG at $1000
     C $0000: CD 00 00 CD 00 00 C9
 ...
+
+#------------------------------------------------------------------------------
+# Test output binary files for a banked system
+write_file("test.asm", <<'...');
+
+		section bank0
+		org 0
+		public  start0, bank_switch_0, func0
+		
+	start0:
+		ret
+		
+		defs 8 - ASMPC
+		
+	bank_switch_0:
+		ret
+	
+	func0: 
+		ret
+...
+write_file("test1.asm", <<'...');
+	
+		section bank1
+		org 0
+		public  start1, bank_switch_1, func1
+		extern  start0, func0
+		
+	start1:
+		call bank_switch_1
+		defw start0
+		
+		defs 8 - ASMPC
+		
+	bank_switch_1:
+		ret
+	
+		nop
+		
+	func1:
+		ret
+...
+write_file("test2.asm", <<'...');
+
+		section main
+		org $4000
+		extern  bank_switch_0, func0, bank_switch_1, func1
+		
+	main:
+		call bank_switch_0
+		defw func0
+		call bank_switch_1
+		defw func1
+		ret
+...
+my $cmd = "z80asm -b test.asm test1.asm test2.asm";
+ok 1, $cmd;
+my($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+is read_binfile("test.bin"), "", "test.bin";
+is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
+is read_binfile("test_bank1.bin"), "\xCD\x08\x00\x00\x00\0\0\0\xC9\x00\xC9", "test_bank1.bin";
+is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9", "test_main.bin";

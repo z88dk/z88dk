@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.6 2014-04-22 23:32:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.7 2014-09-28 17:37:15 pauloscustodio Exp $
 #
 # Build ZX Spectrum 48K ROM, compare result
 
@@ -50,7 +50,8 @@ ok open(my $in_src, "<", $src), "open $src";
 ok open(my $out_src, ">", $patched_src), "open $patched_src";
 while (<$in_src>) {
     s/^(\#(define|end))/;$1/;
-    s/^(ORG)/\t$1/i;
+    s/ORG\s+\$3D00//;
+	s/^(ORG)/\t$1/i;
     s/^([a-z]\w*) /$1:/i;
     s/(?<![\w\'])\$(?![\w\'])/ASMPC/;
     s/%([01]+)/\@$1/;
