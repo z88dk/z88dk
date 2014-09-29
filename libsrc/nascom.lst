@@ -14,7 +14,6 @@ graphics/nascom/plotpixl
 graphics/nascom/respixl
 graphics/nascom/xorpixl
 graphics/nascom/pointxy
-graphics/multipoint
 graphics/fill
 graphics/dfill2
 graphics/putsprite2

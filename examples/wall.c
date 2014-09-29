@@ -44,6 +44,15 @@
  *  ZX81 ARX (Andy Rea's High Resolution trick based on extra RAM over ROM addresses, could work with few programmable characters boards)
  *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -O3 wall.c
  *
+ *  Jupiter ACE
+ *     zcc +ace -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
+ *     0 0 bload a.bin
+ *
+ *  Mattel Aquarius
+ *     zcc +aquarius -create-app -Dspritesize=2 -Dspritesizeh=3 -DSOUND wall.c
+ *     CLOAD   (play _a.caq)
+ *     RUN     (play a.caq)
+ *
  *  MSX, Spectravideo SVI
  *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND wall.c
  *     BLOAD “CAS:”,R
@@ -66,7 +75,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.2 2014-09-26 15:58:46 stefano Exp $
+ *      $Id: wall.c,v 1.3 2014-09-29 07:11:50 stefano Exp $
  *
  * * * * * * *
  *
