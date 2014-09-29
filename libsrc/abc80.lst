@@ -9,6 +9,8 @@ graphics/abc80/clsgraph
 graphics/dcircle
 graphics/lftscrol
 graphics/abc80/pixel
+graphics/abc80/pointxy
+graphics/multipoint
 graphics/plotpixl_smc
 graphics/respixl_smc
 graphics/xorpixl_smc
