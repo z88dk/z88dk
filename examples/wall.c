@@ -26,8 +26,8 @@
  *
  *
  *
- *  Build hints
- *  ===========
+ *  Build and RUN hints
+ *  ===================
  *
  *  ZX Spectrum 16K (non-joystick mode saves more memory)
  *     zcc +zx -lndos -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -zorg=24600 -O3 wall.c
@@ -53,6 +53,14 @@
  *     CLOAD   (play _a.caq)
  *     RUN     (play a.caq)
  *
+ *  ABC80 (Intel HEX for the abc80 simulator)
+ *     zcc +abc80 -subtype=hex -create-app -zorg=20000 -owall -Dspritesize=2 -Dspritesizeh=3 wall.c
+ *     A=CALL(20000)
+ *
+ *  ABC80 (BAS & BAC formats)
+ *     zcc +abc80 -create-app -owall -Dspritesize=2 -Dspritesizeh=3 wall.c
+ *     LOAD WALL
+ *
  *  MSX, Spectravideo SVI
  *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND wall.c
  *     BLOAD “CAS:”,R
@@ -75,7 +83,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.3 2014-09-29 07:11:50 stefano Exp $
+ *      $Id: wall.c,v 1.4 2014-09-30 07:08:55 stefano Exp $
  *
  * * * * * * *
  *
