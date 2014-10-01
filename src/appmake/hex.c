@@ -11,7 +11,7 @@
  *
  * djm 26/6/2001
  *
- * $Id: hex.c,v 1.4 2014-05-05 07:26:37 stefano Exp $
+ * $Id: hex.c,v 1.5 2014-10-01 06:01:20 stefano Exp $
  */
 
 #include "appmake.h"
@@ -50,9 +50,11 @@ int hex_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
-		fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
-		origin = 0;
+	if (origin == -1) {
+		if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+			fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
+			origin = 0;
+		}
 	}
 
     if ( (input = fopen(binname,"rb") ) == NULL ) {
