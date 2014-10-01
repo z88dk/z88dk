@@ -6,23 +6,17 @@
 ;	Maj 2000 - Stefano Bodrato
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2014-10-01 20:27:22 stefano Exp $
 ;
 
 	XLIB	fgetc_cons
-
+	
 .fgetc_cons
-	in	a,(56)
-	bit	7,a
-	jr	nz,fgetc_cons
-
-.wkey
-	in	a,(56)
-	bit	7,a
-	jr	z,wkey
-
-	sub	128
-
+	ld	a,(65013)
+	and 127
+	jr	z,fgetc_cons
 	ld	l,a
-	ld	h,0
+	xor a
+	ld (65013),a
+	ld	h,a
 	ret
