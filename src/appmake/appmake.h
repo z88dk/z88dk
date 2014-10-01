@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.44 2014-09-19 16:12:00 stefano Exp $
+ *   $Id: appmake.h,v 1.45 2014-10-01 13:15:31 stefano Exp $
  */
 
 
@@ -166,7 +166,7 @@ struct {
     int      (*exec)();
     option_t  *options;
 } machines[] = {
-    { "bin2bas",  "abc80",    "(C) 2000 Stefano Bodrato",
+    { "abccas",  "abc80",    "(C) 2000 Stefano Bodrato, (C) 2008 Robert Juhasz ",
       "Creates a BASIC loader and a tape file for the ABC computers",
       NULL,
       abc80_exec,   &abc80_options },

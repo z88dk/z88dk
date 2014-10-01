@@ -20,9 +20,7 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char             *blockname    = NULL;
-static char              cassette     = 0;
 static char              audio        = 0;
-static char              fast         = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static char              noext        = 0;
@@ -42,7 +40,6 @@ option_t cpc_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    {  0,  "cassette", "CASette format",             OPT_BOOL,  &cassette },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "rate",     "Rate/speed (8000, 11025..)", OPT_INT,  &rate },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
@@ -395,7 +392,7 @@ int cpc_exec(char *target)
 	/* ***************************************** */
 	/*  Now, if requested, create the audio file */
 	/* ***************************************** */
-	if (( audio ) || ( fast ) || (loud)) {
+	if (( audio ) || (loud)) {
 		if ( (source=fopen(filename,"rb") ) == NULL ) {
 			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
 			myexit(NULL,1);
