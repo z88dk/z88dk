@@ -203,14 +203,6 @@ Define another filename for the compiled binary output than the default
 source filename of the project, appended with the .bin extension.
 
 
-- Splitting completed machine code into 16K segments, -c
-This feature has only meaning to the Z88. Since the Z88 memory organisation is
-based on 16K memory banks to be paged into the 4 segments of the Z80 address
-space, it may be necessary to split your code into 16K blocks if it exceeds 16K
-in size. Due to the size of the Z88 Assembler application, it is necessary to
-position it as to separate blocks on the EPROM; in segment 2 and 3. 
-
-
 - Create address map information file, -m
 When the linking process has been completed and the machine code saved to a
 file, the address map file is produced. This file contains the information of
