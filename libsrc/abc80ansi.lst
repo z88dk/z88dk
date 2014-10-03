@@ -12,6 +12,7 @@ stdio/ansi/abc80/f_ansi_char
 stdio/ansi/abc80/f_ansi_cls
 stdio/ansi/abc80/f_ansi_dline
 stdio/ansi/abc80/f_ansi_scrollup
+time/abc80/clock
 @gfxbase.lst
 graphics/clg
 graphics/clrarea
@@ -26,7 +27,7 @@ graphics/xorpixl_smc
 graphics/pointxy
 graphics/fill
 graphics/dfill2
-graphics/putsprite_smc
+graphics/putsprite3
 graphics/liner
 graphics/stencil_render
 graphics/swapgfxbk_foo

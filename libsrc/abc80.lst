@@ -2,6 +2,7 @@ stdio/abc80/fgetc_cons
 stdio/abc80/fputc_cons
 stdio/abc80/getk
 stdio/puts_cons
+time/abc80/clock
 @gfxbase.lst
 graphics/clg
 graphics/clrarea
@@ -16,7 +17,7 @@ graphics/xorpixl_smc
 graphics/pointxy
 graphics/fill
 graphics/dfill2
-graphics/putsprite_smc
+graphics/putsprite3
 graphics/liner
 graphics/stencil_render
 graphics/swapgfxbk_foo

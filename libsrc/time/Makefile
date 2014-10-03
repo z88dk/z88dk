@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.25 2014-07-19 11:32:21 pauloscustodio Exp $
+# $Id: Makefile,v 1.26 2014-10-03 14:11:04 stefano Exp $
 
 include ../Make.config
 
@@ -50,6 +50,7 @@ x1_time:
 clean:
 	$(RM) *.o* *.i *.sym *.map zcc_opt.def
 	$(RM) zx81/*.o*
+	$(RM) abc80/*.o*
 	$(RM) ace/*.o*
 	$(RM) cpm/*.o*
 	$(RM) enterprise/*.o*
