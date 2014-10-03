@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.121 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.122 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.121 2014-09-28 17:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.121  2014-09-28 17:37:14  pauloscustodio
+* Revision 1.122  2014-10-03 22:57:50  pauloscustodio
+* Remove option -c (split in 16k blocks) - no longer necessary with
+* split binary files for each section with a defined ORG.
+*
+* Revision 1.121  2014/09/28 17:37:14  pauloscustodio
 * Split binary files for each section with a defined ORG.
 * Object file format changed to version 08, to include ORG address per section.
 *
@@ -1391,9 +1395,6 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 26.05.2012 [1.1.15] (pauloscustodio)
 -------------------------------------------------------------------------------
-    BUG_0017 : no error message if fails to create binary file chunk (option -c)
-        Was missing else case for fopen() failure.
-
     BUG_0018 : stack overflow in '@' includes - wrong range check
         if (include_level < sizeof( includes ) - 1) compares size in bytes, not
         number of elements
@@ -2123,6 +2124,12 @@ Based on 1.0.31
       per section.
 	  
 -------------------------------------------------------------------------------
+03.10.2014 [2.6.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Remove option -c (split in 16k blocks) - no longer necessary with
+	  split binary files for each section with a defined ORG.
+	  
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -2145,7 +2152,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.0"
+#define VERSION     "2.6.1"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

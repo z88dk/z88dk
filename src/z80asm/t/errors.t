@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.24 2014-09-28 17:37:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.25 2014-10-03 22:57:50 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -78,7 +78,7 @@ t_z80asm_capture("-r0 -b -ixxxx ".asm_file(), "",
 unlink_testfiles();
 make_path( err_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b -c ".asm_file(),
+t_z80asm_capture("-r0 -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.err'\n".
 				"1 errors occurred during assembly\n",
@@ -88,7 +88,7 @@ remove_tree( err_file() );
 unlink_testfiles();
 make_path( lst_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -r0 -b -c ".asm_file(),
+t_z80asm_capture("-l -r0 -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.lst'\n".
 				"1 errors occurred during assembly\n",
@@ -98,7 +98,7 @@ remove_tree( lst_file() );
 unlink_testfiles();
 make_path( sym_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b -c ".asm_file(),
+t_z80asm_capture("-r0 -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.sym'\n".
 				"1 errors occurred during assembly\n",
@@ -108,7 +108,7 @@ remove_tree( sym_file() );
 unlink_testfiles();
 make_path( obj_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -r0 -b -c ".asm_file(),
+t_z80asm_capture("-l -r0 -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.obj'\n".
 				"1 errors occurred during assembly\n",
@@ -118,7 +118,7 @@ remove_tree( obj_file() );
 unlink_testfiles();
 make_path( bin_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b -c ".asm_file(),
+t_z80asm_capture("-r0 -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.bin'\n".
 				"1 errors occurred during assembly\n",

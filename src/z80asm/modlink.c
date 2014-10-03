@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.135 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.136 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -940,24 +940,14 @@ void
 CreateBinFile( void )
 {
     FILE *binaryfile;
-    UInt codeblock, offset;
-    int segment;
     char *filename;
 	UInt codesize = get_sections_size();
 	Bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
-	Bool is_segmented   = ( opts.code_seg && codesize > 16384 );
 
     if ( opts.bin_file )        /* use predined output filename from command line */
         filename = opts.bin_file;
-    else
-    {
-        /* create output filename, based on project filename */
-        /* get source filename from first module */
-        if ( ! is_relocatable && is_segmented )
-            filename = get_segbin_filename( get_first_module(NULL)->filename, 0 );	/* add '.bn0' extension */
-        else
-            filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
-    }
+    else						/* create output filename, based on project filename */
+        filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
 
     /* binary output to filename.bin */
     binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
@@ -976,35 +966,9 @@ CreateBinFile( void )
         xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
 
 		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
-        fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
-    }
-    else if ( is_segmented )
-    {
-        offset = 0;
-        segment = 0;
-        while (TRUE)
-        {
-            codeblock = ( codesize > 16384 ) ? 16384 : codesize;
-            codesize -= codeblock;
-         
-            fwrite_codearea_chunk( filename, &binaryfile, offset, codeblock ); /* code in 16K chunks */
-            xfclose( binaryfile );
-
-			if ( codesize == 0 )
-				break;
-
-            offset += codeblock;
-            segment++;
-
-            filename = get_segbin_filename( filename, segment );	/* path code file with number */
-			binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
-        }
-    }
-    else
-    {
-        fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
     }
 
+    fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
 	xfclose( binaryfile );
 
     if ( opts.verbose )

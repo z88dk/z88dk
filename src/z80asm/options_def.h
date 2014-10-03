@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.44 2014-09-28 17:37:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.45 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -37,7 +37,6 @@ OPT_VAR( Bool,		line_mode,	FALSE	)
 OPT_VAR( Bool,		globaldef,	FALSE	)
 OPT_VAR( Bool,		make_bin,	FALSE	)
 OPT_VAR( Bool,		date_stamp,	FALSE	)
-OPT_VAR( Bool,		code_seg,	FALSE	)
 OPT_VAR( Bool,		relocatable, FALSE	)
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
@@ -81,7 +80,6 @@ OPT_VAR( List *,	files,		NULL )		/* list of input files */
 								"Assemble updated files and link/relocate to file" FILEEXT_BIN
 #define OPT_HELP_ORIGIN			"Relocate binary file to given address"
 
-#define OPT_HELP_CODE_SEG		"Split code in 16K banks"
 #define OPT_HELP_RELOCATABLE	"Create relocatable code"
 
 #define OPT_HELP_SYMTABLE		"Create symbol table file" FILEEXT_SYM
@@ -158,7 +156,6 @@ OPT( OptCall,	option_make_updated_bin,
      "-a", 	"--make-updated-bin",
      OPT_HELP_MAKE_UPDATED_BIN, "" )
 OPT( OptCallArg, option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
-OPT( OptSet,	&opts.code_seg,	"-c", 	"--code-seg",		OPT_HELP_CODE_SEG, "" )
 OPT( OptSet,	&opts.relocatable,
      "-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
 

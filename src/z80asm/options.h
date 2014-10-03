@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.45 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.46 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -66,7 +66,6 @@ extern char *get_obj_filename( char *filename );
 extern char *get_def_filename( char *filename );
 extern char *get_err_filename( char *filename );
 extern char *get_bin_filename( char *filename );
-extern char *get_segbin_filename( char *filename, int segment );
 extern char *get_lib_filename( char *filename );
 extern char *get_sym_filename( char *filename );
 extern char *get_map_filename( char *filename );

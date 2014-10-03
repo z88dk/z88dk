@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.38 2014-09-27 21:14:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.39 2014-10-03 22:57:50 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -289,17 +289,6 @@ ASM
 	options	=> "-i".z80emu()." $list -b -r0 -RCMX000",
 );
 }
-
-#------------------------------------------------------------------------------
-# BUG_0017 : no error message if fails to create binary file chunk (option -c)
-note "BUG_0017";
-make_path('test.bn1');	# make it impossible to create one of the bin files
-z80asm(
-	asm		=> "defs 0x10000",
-	error	=> "Error: cannot write file 'test.bn1'",
-	options	=> "-r0 -b -c",
-);
-remove_tree('test.bn1');
 
 #------------------------------------------------------------------------------
 # BUG_0018: stack overflow in '@' includes - wrong range check

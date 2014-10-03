@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.43 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.44 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -544,22 +544,14 @@ UInt fwrite_module_code( FILE *file )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( char *filename, FILE **pfile )
 {
-	init();
-	fwrite_codearea_chunk( filename, pfile, 0, get_sections_size() );
-}
-
-/* write a chunk of data; addr is offset from first section */
-void fwrite_codearea_chunk( char *filename, FILE **pfile, UInt offset, UInt write_size )
-{
 	DEFINE_FILE_STR( new_name );
 	Section *section;
 	SectionHashElem *iter;
-	UInt cur_offset, section_size, block_size;
+	UInt section_size;
 	Int  cur_addr;
 
 	init();
 
-	cur_offset = 0;
 	cur_addr   = -1;
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
@@ -570,8 +562,7 @@ void fwrite_codearea_chunk( char *filename, FILE **pfile, UInt offset, UInt writ
 			cur_addr = section->addr;
 
 		/* bytes from this section */
-		if ( section_size > 0 &&
-			 offset >= cur_offset && offset < cur_offset + section_size )
+		if ( section_size > 0 )
 		{
 			/* change current file if address changed */
 			if ( cur_addr != section->addr || 
@@ -587,19 +578,9 @@ void fwrite_codearea_chunk( char *filename, FILE **pfile, UInt offset, UInt writ
 				cur_addr = section->addr;
 			}
 
-			block_size = cur_offset + section_size - offset;
-			block_size = MIN( block_size, write_size );
-
-			xfput_chars( *pfile, (char *) ByteArray_item( section->bytes, offset - cur_offset ), block_size );
-
-			write_size -= block_size;
-			offset     += block_size;
-
-			if ( write_size == 0 )
-				break;
+			xfput_chars( *pfile, (char *) ByteArray_item( section->bytes, 0 ), section_size );
 		}
 
-		cur_offset += section_size;
 		cur_addr += section_size;
 	}
 }

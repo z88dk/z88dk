@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.32 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.33 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -161,5 +161,3 @@ extern UInt fwrite_module_code( FILE *file );
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea( char *filename, FILE **pfile );
-extern void fwrite_codearea_chunk( char *filename, FILE **pfile, 
-								   UInt offset, UInt write_size );

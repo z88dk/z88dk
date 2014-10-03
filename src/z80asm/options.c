@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.91 2014-09-28 17:37:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.92 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.91 2014-09-28 17
 #define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
 #define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
 #define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn"     /* ".bn0" / "_bn0" */
 #define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
 #define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
@@ -423,8 +422,6 @@ static void display_options( void )
 
     if ( opts.make_bin && opts.map )			puts( OPT_HELP_MAP );
 
-    if ( opts.code_seg && ! opts.relocatable )	puts( OPT_HELP_CODE_SEG );
-
     if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
 
     putchar( '\n' );
@@ -556,15 +553,4 @@ char *get_asm_filename( char *filename )
 char *get_obj_filename( char *filename )
 {
     return get_opts_ext_filename( filename, opts.obj_ext );
-}
-
-char *get_segbin_filename( char *filename, int segment )
-{
-    DEFINE_FILE_STR( ext );
-
-    init();
-
-    Str_set( ext, FILEEXT_SEGBIN );
-    Str_append_sprintf( ext, "%d", segment );
-    return path_replace_ext( filename, ext->str );
 }

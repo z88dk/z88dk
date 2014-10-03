@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.8 2014-09-28 17:37:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.9 2014-10-03 22:57:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -138,8 +138,6 @@ static void test_sections( void )
 	int module_id;
 	FILE *file;
 	Byte *p;
-	UInt i, size;
-	char title[256];
 
 	T( reset_codearea() );
 	
@@ -312,21 +310,6 @@ static void test_sections( void )
 	fwrite_codearea( "test.bin", &file ); 
 	fclose( file );
 	dump_file("code area ");
-
-	/* write in chunks of 8 bytes */
-	size = 8;
-	for ( i = 0; i < get_sections_size(); i += size )
-	{
-		if ( i + size > get_sections_size() )
-			size = get_sections_size() - i;
-
-		sprintf(title, "Chunk from %d to %d, %d bytes", i, i+size-1, size );
-
-		assert( (file = fopen("test.bin", "wb")) != NULL ); 
-		fwrite_codearea_chunk( "test.bin", &file, (UInt) i, (UInt) size ); 
-		fclose( file );
-		dump_file( title );
-	}
 
 	/* test reordering of sections */
 	T( reset_codearea() );
