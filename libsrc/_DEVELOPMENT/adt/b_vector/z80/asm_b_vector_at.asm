@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_at
 
 EXTERN asm_b_array_at
 
-asm_b_vector_at:
-
-   jp asm_b_array_at
-
-;defc asm_b_vector_at = asm_b_array_at
+defc asm_b_vector_at = asm_b_array_at
 
    ; enter : hl = vector *
    ;         bc = idx
@@ -35,6 +33,6 @@ asm_b_vector_at:
    ;
    ;            de = vector.size
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl

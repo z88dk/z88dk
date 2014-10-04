@@ -1,6 +1,8 @@
 
 ; int ba_priority_queue_resize(ba_priority_queue_t *q, size_t n)
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC ba_priority_queue_resize
 
 EXTERN asm_ba_priority_queue_resize

@@ -1,6 +1,8 @@
 
 ; size_t b_array_erase(b_array_t *a, size_t idx)
 
+SECTION seg_code_b_array
+
 PUBLIC _b_array_erase
 
 _b_array_erase:

@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_insert_n
 
-EXTERN asm_b_vector_insert_block, asm1_w_array_insert_n, error_einval_mc
+EXTERN asm_b_vector_insert_block, asm1_w_array_insert_n, error_mc
 
 asm_w_vector_insert_n:
 
@@ -30,7 +32,7 @@ asm_w_vector_insert_n:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -39,11 +41,11 @@ asm_w_vector_insert_n:
    
    sla c
    rl b 
-   jp c, error_einval_mc - 2
+   jp c, error_mc - 2
    
    sla e
    rl d
-   jp c, error_einval_mc - 2
+   jp c, error_mc - 2
    
    push de                     ; save n*2
    

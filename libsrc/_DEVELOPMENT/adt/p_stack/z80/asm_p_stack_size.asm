@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_size
 
 EXTERN asm_p_forward_list_size
 
-asm_p_stack_size:
-
-   jp asm_p_forward_list_size
-
-;defc asm_p_stack_size = asm_p_forward_list_size
+defc asm_p_stack_size = asm_p_forward_list_size
 
    ; enter : hl = p_stack_t *s
    ;

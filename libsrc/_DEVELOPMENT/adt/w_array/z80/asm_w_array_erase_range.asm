@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_erase_range
 
-EXTERN asm_b_array_erase_block, error_einval_mc
+EXTERN asm_b_array_erase_block, error_mc
 
 asm_w_array_erase_range:
 
@@ -28,20 +30,20 @@ asm_w_array_erase_range:
    ;         fail if block does not lie within array.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    or a
    sbc hl,bc
-   jp c, error_einval_mc       ; if idx.last < idx.first
+   jp c, error_mc              ; if idx.last < idx.first
    
    add hl,hl
-   jp c, error_einval_mc
+   jp c, error_mc
    
    sla c
    rl b
-   jp c, error_einval_mc
+   jp c, error_mc
 
    ex de,hl
    call asm_b_array_erase_block

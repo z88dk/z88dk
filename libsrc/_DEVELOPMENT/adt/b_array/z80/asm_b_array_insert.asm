@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_insert
 
 EXTERN asm_b_array_insert_block, error_mc

@@ -16,9 +16,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_init
 
-EXTERN asm_bv_priority_queue_init, error_einval_zc
+EXTERN asm_bv_priority_queue_init, error_zc
 
 asm_wv_priority_queue_init:
 
@@ -35,20 +37,20 @@ asm_wv_priority_queue_init:
    ;         fail if max_size < capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if unsuccessful realloc
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    add hl,hl
-   jp c, error_einval_zc
+   jp c, error_zc
    
    sla c
    rl b
    jp nc, asm_bv_priority_queue_init
    
-   jp error_einval_zc
+   jp error_zc

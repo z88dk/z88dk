@@ -4,7 +4,7 @@ ba_stack
 ========
 
 A stack storing bytes modelled on C++'s stack<char>.  b_array
-serves as the underlying container of the stack's contents.
+serves as the underlying container of ba_stack.
 
 The leading "ba_" indicates that this container stores bytes /
 chars using b_array as the container.
@@ -26,3 +26,10 @@ offset   size (bytes)   description
   0           2         void *data, address of the array of char held by b_array
   2           2         size_t size, number of occupied bytes in the data array
   4           2         capacity, full size of the data array
+
+
+========
+sections
+========
+
+seg_code_ba_stack

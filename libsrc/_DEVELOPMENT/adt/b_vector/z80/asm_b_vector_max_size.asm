@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_max_size
 
 EXTERN l_readword_hl
 
-asm_b_vector_max_size:
-
-   jp l_readword_hl - 6
-
-;defc asm_b_vector_max_size = l_readword_hl - 6
+defc asm_b_vector_max_size = l_readword_hl - 6
 
    ; enter : hl = b_vector_t *
    ;

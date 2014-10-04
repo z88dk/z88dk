@@ -1,6 +1,8 @@
 
 ; size_t b_array_append_n(b_array_t *a, size_t n, int c)
 
+SECTION seg_code_b_array
+
 PUBLIC b_array_append_n
 
 EXTERN asm_b_array_append_n

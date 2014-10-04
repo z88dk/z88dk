@@ -1,8 +1,10 @@
 
+SECTION seg_code_b_vector
+
 PUBLIC __vector_realloc_grow
 PUBLIC __0_vector_realloc_grow
 
-EXTERN asm_realloc, error_einval_zc, error_zc
+EXTERN asm_realloc, error_zc
 
 __vector_realloc_grow:
 
@@ -25,13 +27,13 @@ __vector_realloc_grow:
    ;            hl = 0
    ;            de = & vector.capacity + 1b
    ;            
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
    ;            de = & vector.capacity + 1b
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ;
    ; uses  : af, de, hl
@@ -49,7 +51,7 @@ __0_vector_realloc_grow:
    ex de,hl                    ; hl = vector.max_size
    
    sbc hl,bc                   ; hl = vector.max_size - n
-   jp c, error_einval_zc       ; if n > vector.max_size
+   jp c, error_zc              ; if n > vector.max_size
    
    push de                     ; save & vector.capacity + 1b
    

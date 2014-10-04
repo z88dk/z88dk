@@ -1,12 +1,12 @@
 
 ; int bv_stack_pop(bv_stack_t *s)
 
+SECTION seg_code_bv_stack
+
 PUBLIC _bv_stack_pop
 
 EXTERN _b_array_pop_back
 
-_bv_stack_pop:
+defc _bv_stack_pop = _b_array_pop_back
 
-   jp _b_array_pop_back
-
-   INCLUDE "adt/bv_stack/z80/asm_bv_stack_pop.asm"
+INCLUDE "adt/bv_stack/z80/asm_bv_stack_pop.asm"

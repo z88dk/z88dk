@@ -1,6 +1,8 @@
 
 ; int wa_priority_queue_resize(wa_priority_queue_t *q, size_t n)
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC _wa_priority_queue_resize
 
 _wa_priority_queue_resize:

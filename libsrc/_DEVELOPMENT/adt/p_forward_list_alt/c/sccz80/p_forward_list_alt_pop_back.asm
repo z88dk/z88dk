@@ -1,6 +1,8 @@
 
 ; void *p_forward_list_alt_pop_back(p_forward_list_alt_t *list)
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC p_forward_list_alt_pop_back
 
 p_forward_list_alt_pop_back:

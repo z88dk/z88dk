@@ -10,10 +10,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_insert_block
 PUBLIC asm0_b_vector_insert_block
 
-EXTERN error_einval_zc, error_zc
+EXTERN error_zc
 EXTERN asm_b_vector_append_block, asm1_b_array_insert_block
 
 asm_b_vector_insert_block:
@@ -30,12 +32,12 @@ asm_b_vector_insert_block:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if insufficient memory or lock not acquired
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -54,7 +56,7 @@ asm0_b_vector_insert_block:
    
    or a
    sbc hl,bc                   ; hl = vector.size - idx
-   jp c, error_einval_zc - 1   ; if vector.size < idx
+   jp c, error_zc - 1          ; if vector.size < idx
    
    ; bc = idx
    ; hl = vector.size - idx

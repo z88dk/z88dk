@@ -10,10 +10,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_erase_block
 PUBLIC asm0_b_array_erase_block
 
-EXTERN error_einval_mc, l_neg_hl, asm_memcpy
+EXTERN error_mc, l_neg_hl, asm_memcpy
 
 asm_b_array_erase_block:
 
@@ -30,7 +32,7 @@ asm_b_array_erase_block:
    ;         fail if block at least partly extends outside array.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -52,11 +54,11 @@ asm0_b_array_erase_block:
    ex de,hl                    ; de = array.size, hl = n
    
    add hl,bc                   ; hl = idx + n
-   jp c, error_einval_mc - 3   ; if (idx + n) > 64k
+   jp c, error_mc - 3          ; if (idx + n) > 64k
 
    sbc hl,de                   ; hl = idx + n - array.size
    jr z, range_ok              ; if (idx + n) == array.size
-   jp nc, error_einval_mc - 3  ; if (idx + n) > array.size
+   jp nc, error_mc - 3         ; if (idx + n) > array.size
 
 range_ok:
 

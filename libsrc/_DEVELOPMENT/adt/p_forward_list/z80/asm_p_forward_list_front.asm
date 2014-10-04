@@ -9,12 +9,9 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_front
-
-EXTERN error_einval_zc
-
-   inc hl
-   inc hl
 
 asm_p_forward_list_front:
 
@@ -23,12 +20,12 @@ asm_p_forward_list_front:
    ; exit  : success
    ;
    ;            hl = void *item (item at front)
-   ;            carry reset
+   ;            nz flag set
    ;
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            z flag set
    ;
    ; uses  : af, hl
 
@@ -38,6 +35,4 @@ asm_p_forward_list_front:
    ld l,a
    
    or h
-   ret nz
-   
-   jp error_einval_zc
+   ret

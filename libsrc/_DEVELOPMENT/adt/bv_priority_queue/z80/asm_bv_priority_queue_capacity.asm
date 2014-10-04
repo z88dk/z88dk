@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_capacity
 
 EXTERN l_readword_hl
 
-asm_bv_priority_queue_capacity:
-
-   jp l_readword_hl - 6
-
-;defc asm_bv_priority_queue_capacity = l_readword_hl - 6
+defc asm_bv_priority_queue_capacity = l_readword_hl - 6
 
    ; enter : hl = priority_queue *
    ;

@@ -1,6 +1,8 @@
 
 ; w_array_t *w_array_init(void *p, void *data, size_t capacity)
 
+SECTION seg_code_w_array
+
 PUBLIC _w_array_init
 
 _w_array_init:

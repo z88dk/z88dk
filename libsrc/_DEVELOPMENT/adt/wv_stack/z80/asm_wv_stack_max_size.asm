@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_max_size
 
 EXTERN l_readword_2_hl
 
-asm_wv_stack_max_size:
-
-   jp l_readword_2_hl - 6
-
-;defc asm_wv_stack_max_size = l_readword_2_hl - 6
+defc asm_wv_stack_max_size = l_readword_2_hl - 6
 
    ; enter : hl = stack *
    ;

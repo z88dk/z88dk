@@ -17,9 +17,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_resize
 
-EXTERN asm_b_vector_resize, error_enomem_zc
+EXTERN asm_b_vector_resize, error_zc
 
 asm_w_vector_resize:
 
@@ -34,12 +36,12 @@ asm_w_vector_resize:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if insufficient memory or lock not acquired
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -47,4 +49,4 @@ asm_w_vector_resize:
    rl d
    jp nc, asm_b_vector_resize
 
-   jp error_enomem_zc
+   jp error_zc

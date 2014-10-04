@@ -1,4 +1,6 @@
 
+SECTION seg_code_b_array
+
 PUBLIC __array_info
 
 __array_info:

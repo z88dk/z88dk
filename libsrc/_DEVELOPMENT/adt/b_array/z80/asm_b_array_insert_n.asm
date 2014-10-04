@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_insert_n
 
 EXTERN asm_b_array_insert_block, asm_memset, error_mc
@@ -41,11 +43,11 @@ asm_b_array_insert_n:
    call asm_b_array_insert_block
 
    pop bc                      ; bc = n
-   pop de
-   ld e,d                      ; e = char c
+   pop de                      ; d = char
    
    jp c, error_mc - 1
    
+   ld e,d                      ; e = char
    call asm_memset             ; fill inserted block
    
    pop de                      ; de = idx

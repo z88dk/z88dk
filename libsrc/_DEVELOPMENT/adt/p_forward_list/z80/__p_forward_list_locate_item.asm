@@ -1,4 +1,6 @@
 
+SECTION seg_code_p_forward_list
+
 PUBLIC __p_forward_list_locate_item
 
 __p_forward_list_locate_item:

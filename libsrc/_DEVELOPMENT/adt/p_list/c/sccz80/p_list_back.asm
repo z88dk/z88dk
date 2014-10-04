@@ -1,9 +1,9 @@
 
 ; void *p_list_back(p_list_t *list)
 
-PUBLIC p_list_back
+SECTION seg_code_p_list
 
-;defc p_list_back = asm_p_list_back
+PUBLIC p_list_back
 
 p_list_back:
 

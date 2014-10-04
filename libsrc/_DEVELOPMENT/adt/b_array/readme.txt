@@ -31,3 +31,10 @@ offset   size (bytes)   description
   0           2         void *data, address of the array of char held by b_array
   2           2         size_t size, number of occupied bytes in the data array
   4           2         capacity, the maximum size of the data array
+
+
+========
+sections
+========
+
+seg_code_b_array

@@ -13,9 +13,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_init
 
-EXTERN asm_b_vector_init, error_enomem_zc
+EXTERN asm_b_vector_init, error_zc
 
 asm_w_vector_init:
 
@@ -31,25 +33,25 @@ asm_w_vector_init:
    ;         fail if required vector > 64k
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ;         fail if max_size < capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if unsuccessful realloc
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
    
    add hl,hl
-   jp c, error_enomem_zc
+   jp c, error_zc
    
    sla c
    rl b
-   jp c, error_enomem_zc
+   jp c, error_zc
 
    jp asm_b_vector_init

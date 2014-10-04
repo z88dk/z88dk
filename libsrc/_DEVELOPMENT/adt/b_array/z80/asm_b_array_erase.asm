@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_erase
 
 EXTERN asm_b_array_erase_block

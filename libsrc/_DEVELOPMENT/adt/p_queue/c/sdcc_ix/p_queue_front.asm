@@ -1,12 +1,12 @@
 
 ; void *p_queue_front(p_queue_t *q)
 
+SECTION seg_code_p_queue
+
 PUBLIC _p_queue_front
 
 EXTERN _p_forward_list_front
 
-_p_queue_front:
+defc _p_queue_front = _p_forward_list_front
 
-   jp _p_forward_list_front
-
-   INCLUDE "adt/p_queue/z80/asm_p_queue_front.asm"
+INCLUDE "adt/p_queue/z80/asm_p_queue_front.asm"

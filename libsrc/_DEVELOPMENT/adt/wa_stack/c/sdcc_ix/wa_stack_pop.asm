@@ -1,12 +1,12 @@
 
 ; void *wa_stack_pop(wa_stack_t *s)
 
+SECTION seg_code_wa_stack
+
 PUBLIC _wa_stack_pop
 
 EXTERN _w_array_pop_back
 
-_wa_stack_pop:
+defc _wa_stack_pop = _w_array_pop_back
 
-   jp _w_array_pop_back
-
-   INCLUDE "adt/wa_stack/z80/asm_wa_stack_pop.asm"
+INCLUDE "adt/wa_stack/z80/asm_wa_stack_pop.asm"

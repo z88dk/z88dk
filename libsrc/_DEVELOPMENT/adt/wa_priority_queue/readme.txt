@@ -41,3 +41,10 @@ offset   size (bytes)   description
 Note that wa_priority_queue_t is identical to ba_priority_queue_t.  All
 sizes in the structure are measured in bytes, not words.  The
 wa_priority_queue API is where conversion between words and bytes is made.
+
+
+========
+sections
+========
+
+seg_code_wa_priority_queue

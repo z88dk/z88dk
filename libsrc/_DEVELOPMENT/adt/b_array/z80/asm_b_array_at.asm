@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_at
 
-EXTERN __array_at, error_einval_mc
+EXTERN __array_at, error_mc
 
 asm_b_array_at:
 
@@ -31,12 +33,12 @@ asm_b_array_at:
    ;
    ;            de = array.size
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl
    
    call __array_at
-   jp c, error_einval_mc
+   jp c, error_mc
 
    ld e,(hl)
    ld d,0                      ; de = array.data[idx]

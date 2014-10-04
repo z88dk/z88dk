@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_empty
 
 EXTERN l_testword_hl
 
-asm_p_list_empty:
-
-   jp l_testword_hl
-
-;defc asm_p_list_empty = l_testword_hl
+defc asm_p_list_empty = l_testword_hl
 
    ; enter : hl = p_list_t *
    ;

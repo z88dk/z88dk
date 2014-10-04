@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC asm_p_forward_list_alt_push_back
 
 EXTERN asm_p_forward_list_alt_insert_after

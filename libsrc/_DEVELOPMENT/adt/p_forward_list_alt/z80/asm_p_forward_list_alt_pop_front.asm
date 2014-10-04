@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC asm_p_forward_list_alt_pop_front
 
 EXTERN asm_p_forward_list_alt_remove_after
@@ -26,7 +28,7 @@ asm_p_forward_list_alt_pop_front:
    ;         fail if the list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
    

@@ -20,15 +20,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_resize
 
 EXTERN asm_ba_priority_queue_resize
 
-asm_bv_priority_queue_resize:
-
-   jp asm_ba_priority_queue_resize
-
-;defc asm_bv_priority_queue_resize = asm_ba_priority_queue_resize
+defc asm_bv_priority_queue_resize = asm_ba_priority_queue_resize
 
    ; enter : hl = queue *
    ;         de = n = desired size in bytes
@@ -41,6 +39,6 @@ asm_bv_priority_queue_resize:
    ;         fail if queue is too small
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix

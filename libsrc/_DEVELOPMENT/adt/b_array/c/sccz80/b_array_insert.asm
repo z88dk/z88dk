@@ -1,6 +1,8 @@
 
 ; size_t b_array_insert(b_array_t *a, size_t idx, int c)
 
+SECTION seg_code_b_array
+
 PUBLIC b_array_insert
 
 EXTERN asm_b_array_insert

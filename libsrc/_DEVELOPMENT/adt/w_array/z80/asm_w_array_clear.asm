@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_clear
 
 EXTERN l_zeroword_hl
 
-asm_w_array_clear:
-
-   jp l_zeroword_hl - 2
-
-;defc asm_w_array_clear = l_zeroword_hl - 2
+defc asm_w_array_clear = l_zeroword_hl - 2
 
    ; enter : hl = array *
    ;

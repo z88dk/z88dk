@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC asm_ba_priority_queue_pop
 
-EXTERN __array_info, __b_heap_sift_down, error_einval_mc
+EXTERN __array_info, __b_heap_sift_down, error_mc
 
 asm_ba_priority_queue_pop:
 
@@ -25,7 +27,7 @@ asm_ba_priority_queue_pop:
    ;         fail if queue is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 
@@ -38,7 +40,7 @@ asm_ba_priority_queue_pop:
    ld ixh,d                    ; ix = queue.compare
    
    call __array_info
-   jp z, error_einval_mc       ; if no items in queue
+   jp z, error_mc              ; if no items in queue
    
    ; hl = & queue.size + 1b
    ; de = queue.data

@@ -1,9 +1,9 @@
 
 ; void *p_forward_list_front(p_forward_list_t *list)
 
-PUBLIC p_forward_list_front
+SECTION seg_code_p_forward_list
 
-;defc p_forward_list_front = asm_p_forward_list_front
+PUBLIC p_forward_list_front
 
 p_forward_list_front:
 

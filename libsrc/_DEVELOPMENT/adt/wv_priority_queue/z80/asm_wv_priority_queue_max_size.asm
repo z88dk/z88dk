@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_max_size
 
 EXTERN l_readword_2_hl
 
-asm_wv_priority_queue_max_size:
-
-   jp l_readword_2_hl - 8
-
-;defc asm_wv_priority_queue_max_size = l_readword_2_hl - 8
+defc asm_wv_priority_queue_max_size = l_readword_2_hl - 8
 
    ; enter : hl = priority_queue *
    ;

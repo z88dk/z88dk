@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_pop
 
 EXTERN asm_wa_priority_queue_pop
 
-asm_wv_priority_queue_pop:
-
-   jp asm_wa_priority_queue_pop
-
-;defc asm_wv_priority_queue_pop = asm_wa_priority_queue_pop
+defc asm_wv_priority_queue_pop = asm_wa_priority_queue_pop
 
    ; enter : hl = queue *
    ;
@@ -29,6 +27,6 @@ asm_wv_priority_queue_pop:
    ;         fail if queue is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix

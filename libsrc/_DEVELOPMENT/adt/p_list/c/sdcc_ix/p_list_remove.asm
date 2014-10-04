@@ -1,6 +1,8 @@
 
 ; void *p_list_remove(p_list_t *list, void *item)
 
+SECTION seg_code_p_list
+
 PUBLIC _p_list_remove
 
 _p_list_remove:

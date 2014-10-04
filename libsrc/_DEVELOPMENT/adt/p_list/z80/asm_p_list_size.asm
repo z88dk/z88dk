@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_size
 
 EXTERN asm_p_forward_list_size
 
-asm_p_list_size:
-
-   jp asm_p_forward_list_size
-
-;defc asm_p_list_size = asm_p_forward_list_size
+defc asm_p_list_size = asm_p_forward_list_size
 
    ; enter : hl = p_list_t *list
    ;

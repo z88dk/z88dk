@@ -1,6 +1,8 @@
 
 ; void p_forward_list_alt_push_front(p_forward_list_alt_t *list, void *item)
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC p_forward_list_alt_push_front_callee
 
 p_forward_list_alt_push_front_callee:

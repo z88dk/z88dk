@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_at
 
-EXTERN __array_at, error_einval_mc
+EXTERN __array_at, error_mc
 
 asm_w_array_at:
 
@@ -31,16 +33,16 @@ asm_w_array_at:
    ;         fail if idx out of range
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl
 
    sla c
    rl b
-   jp c, error_einval_mc
+   jp c, error_mc
 
    call __array_at
-   jp c, error_einval_mc
+   jp c, error_mc
 
    ld e,(hl)
    inc hl

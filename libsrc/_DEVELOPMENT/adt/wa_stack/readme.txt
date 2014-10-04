@@ -30,3 +30,10 @@ offset   size (bytes)   description
 Note that wa_stack_t is identical to ba_stack_t.  All sizes in the
 structure are measured in bytes, not words.  The wa_stack API is where
 conversion between words and bytes is made.
+
+
+========
+sections
+========
+
+seg_code_wa_stack

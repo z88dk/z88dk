@@ -1,6 +1,8 @@
 
 ; int b_array_resize(b_array_t *a, size_t n)
 
+SECTION seg_code_b_array
+
 PUBLIC _b_array_resize
 
 _b_array_resize:

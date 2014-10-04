@@ -1,6 +1,8 @@
 
 ; size_t b_array_write_block(void *src, size_t n, b_array_t *a, size_t idx)
 
+SECTION seg_code_b_array
+
 PUBLIC b_array_write_block
 
 EXTERN asm_b_array_write_block

@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_front
 
 EXTERN asm_w_array_front
 
-asm_w_vector_front:
-
-   jp asm_w_array_front
-
-;defc asm_w_vector_front = asm_w_array_front
+defc asm_w_vector_front = asm_w_array_front
 
    ; enter : hl = vector *
    ;
@@ -32,6 +30,6 @@ asm_w_vector_front:
    ;         fail if vector is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

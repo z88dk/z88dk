@@ -1,6 +1,8 @@
 
 ; size_t b_array_read_block(void *dst, size_t n, b_array_t *a, size_t idx)
 
+SECTION seg_code_b_array
+
 PUBLIC _b_array_read_block
 
 _b_array_read_block:

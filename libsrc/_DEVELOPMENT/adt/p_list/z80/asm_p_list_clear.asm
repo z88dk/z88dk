@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_clear
 
 EXTERN asm_p_list_init
 
-asm_p_list_clear:
-
-   jp asm_p_list_init
-
-;defc asm_p_list_clear = asm_p_list_init
+defc asm_p_list_clear = asm_p_list_init
 
    ; enter : hl = p_list_t *
    ;

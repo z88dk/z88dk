@@ -11,15 +11,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_shrink_to_fit
 
 EXTERN asm_b_vector_shrink_to_fit
 
-asm_w_vector_shrink_to_fit:
-
-   jp asm_b_vector_shrink_to_fit
-
-;defc asm_w_vector_shrink_to_fit = asm_b_vector_shrink_to_fit
+defc asm_w_vector_shrink_to_fit = asm_b_vector_shrink_to_fit
 
    ; enter : hl = vector *
    ;
@@ -31,6 +29,6 @@ asm_w_vector_shrink_to_fit:
    ;         fail on realloc not getting lock
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

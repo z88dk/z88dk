@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_stack
+
 PUBLIC asm_wa_stack_capacity
 
 EXTERN l_readword_2_hl
 
-asm_wa_stack_capacity:
-
-   jp l_readword_2_hl - 4
-
-;defc asm_wa_stack_capacity = l_readword_2_hl - 4
+defc asm_wa_stack_capacity = l_readword_2_hl - 4
 
    ; enter : hl = stack *
    ;

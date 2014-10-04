@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_stack
+
 PUBLIC asm_ba_stack_destroy
 
 EXTERN asm_b_array_destroy
 
-asm_ba_stack_destroy:
-
-   jp asm_b_array_destroy
-
-;defc asm_ba_stack_destroy = asm_b_array_destroy
+defc asm_ba_stack_destroy = asm_b_array_destroy
 
    ; enter : hl = stack *
    ;

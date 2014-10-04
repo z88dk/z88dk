@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_remove_after
 
-EXTERN error_einval_zc
+EXTERN error_zc
 
 asm_p_forward_list_remove_after:
 
@@ -28,7 +30,7 @@ asm_p_forward_list_remove_after:
    ;         fail if there is no item following list_item
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl
    
@@ -41,7 +43,7 @@ asm_p_forward_list_remove_after:
    
    ld a,h
    or l
-   jp z, error_einval_zc       ; if there is no following item
+   jp z, error_zc              ; if there is no following item
    
    ldi
    inc bc                      ; undo changes to bc

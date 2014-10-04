@@ -1,9 +1,9 @@
 
 ; int bv_priority_queue_shrink_to_fit(bv_priority_queue_t *q)
 
-PUBLIC bv_priority_queue_shrink_to_fit
+SECTION seg_code_bv_priority_queue
 
-;defc bv_priority_queue_shrink_to_fit = asm_bv_priority_queue_shrink_to_fit
+PUBLIC bv_priority_queue_shrink_to_fit
 
 bv_priority_queue_shrink_to_fit:
 

@@ -9,12 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_front
 
-EXTERN __array_info, error_einval_mc
-
-   inc hl
-   inc hl
+EXTERN __array_info, error_mc
 
 asm_w_array_front:
 
@@ -36,7 +35,7 @@ asm_w_array_front:
    ; uses  : af, bc, de, hl
 
    call __array_info
-   jp z, error_einval_mc       ; if array is empty
+   jp z, error_mc              ; if array is empty
    
    ; de = array.data
    ; bc = array.size in bytes

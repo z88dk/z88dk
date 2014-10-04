@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_stack
+
 PUBLIC asm_wa_stack_destroy
 
-EXTERN l_zerostruct6_hl
+EXTERN asm_w_array_destroy
 
-asm_wa_stack_destroy:
-
-   jp l_zerostruct6_hl
-
-;defc asm_wa_stack_destroy = l_zerostruct6_hl
+defc asm_wa_stack_destroy = asm_w_array_destroy
 
    ; enter : hl = stack *
    ;

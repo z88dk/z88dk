@@ -9,26 +9,24 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC asm_p_forward_list_alt_front
 
 EXTERN asm_p_forward_list_front
 
-asm_p_forward_list_alt_front:
-
-   jp asm_p_forward_list_front
-
-;defc asm_p_forward_list_alt_front = asm_p_forward_list_front
+defc asm_p_forward_list_alt_front = asm_p_forward_list_front
 
    ; enter : hl = p_forward_list_alt_t *list
    ;
    ; exit  : success
    ;
    ;            hl = void *item (item at front)
-   ;            carry reset
+   ;            nz flag set
    ;
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            z flag set
    ;
    ; uses  : af, hl

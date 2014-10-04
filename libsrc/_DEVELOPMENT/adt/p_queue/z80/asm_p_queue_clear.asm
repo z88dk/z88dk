@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_clear
 
 EXTERN asm_p_forward_list_alt_init
 
-asm_p_queue_clear:
-
-   jp asm_p_forward_list_alt_init
-
-;defc asm_p_queue_clear = asm_p_forward_list_alt_init
+defc asm_p_queue_clear = asm_p_forward_list_alt_init
 
    ; enter : hl = p_queue_t *
    ;

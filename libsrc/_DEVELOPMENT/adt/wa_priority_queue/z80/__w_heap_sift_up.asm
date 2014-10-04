@@ -1,4 +1,6 @@
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC __w_heap_sift_up
 
 EXTERN l_jpix, __w_heap_swap, error_znc

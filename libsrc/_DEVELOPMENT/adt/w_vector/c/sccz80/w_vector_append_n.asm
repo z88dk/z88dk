@@ -1,6 +1,8 @@
 
 ; size_t w_vector_append_n(b_vector_t *v, size_t n, void *item)
 
+SECTION seg_code_w_vector
+
 PUBLIC w_vector_append_n
 
 EXTERN asm_w_vector_append_n

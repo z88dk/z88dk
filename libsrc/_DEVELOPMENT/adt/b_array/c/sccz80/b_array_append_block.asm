@@ -1,6 +1,8 @@
 
 ; void *b_array_append_block(b_array_t *a, size_t n)
 
+SECTION seg_code_b_array
+
 PUBLIC b_array_append_block
 
 EXTERN b_array_append_block_entry

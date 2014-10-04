@@ -14,9 +14,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC asm_wa_priority_queue_init
 
-EXTERN asm_ba_priority_queue_init, error_einval_zc
+EXTERN asm_ba_priority_queue_init, error_zc
 
 asm_wa_priority_queue_init:
 
@@ -33,7 +35,7 @@ asm_wa_priority_queue_init:
    ;         fail if capacity too large
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc
 
@@ -41,4 +43,4 @@ asm_wa_priority_queue_init:
    rl b
    jp nc, asm_ba_priority_queue_init
    
-   jp error_einval_zc
+   jp error_zc

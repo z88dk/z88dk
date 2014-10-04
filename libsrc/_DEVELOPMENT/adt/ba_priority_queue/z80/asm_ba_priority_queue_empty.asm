@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC asm_ba_priority_queue_empty
 
 EXTERN l_testword_hl
 
-asm_ba_priority_queue_empty:
-
-   jp l_testword_hl - 4
-
-;defc asm_ba_priority_queue_empty = l_testword_hl - 4
+defc asm_ba_priority_queue_empty = l_testword_hl - 4
 
    ; enter : hl = priority_queue *
    ;

@@ -11,15 +11,18 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_reserve
 
 EXTERN asm_w_vector_reserve
 
 asm_wv_priority_queue_reserve:
 
-   jp asm_w_vector_reserve - 2
-
-;defc asm_wv_priority_queue_reserve = asm_w_vector_reserve - 2
+   inc hl
+   inc hl
+   
+   jp asm_w_vector_reserve
 
    ; enter : hl = priority_queue *
    ;         bc = n
@@ -35,11 +38,11 @@ asm_wv_priority_queue_reserve:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, de, hl

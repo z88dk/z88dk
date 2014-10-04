@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_back
 
 EXTERN asm_b_array_back
 
-asm_b_vector_back:
-
-   jp asm_b_array_back
-
-;defc asm_b_vector_back = asm_b_array_back
+defc asm_b_vector_back = asm_b_array_back
 
    ; enter : hl = vector *
    ;

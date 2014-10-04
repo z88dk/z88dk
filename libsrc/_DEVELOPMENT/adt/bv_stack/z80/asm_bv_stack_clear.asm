@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_clear
 
 EXTERN l_zeroword_hl
 
-asm_bv_stack_clear:
-
-   jp l_zeroword_hl - 2
-
-;defc asm_bv_stack_clear = l_zeroword_hl - 2
+defc asm_bv_stack_clear = l_zeroword_hl - 2
 
    ; enter : hl = stack *
    ;

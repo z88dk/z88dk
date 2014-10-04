@@ -9,15 +9,18 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC asm_wa_priority_queue_top
 
 EXTERN asm_w_array_front
 
 asm_wa_priority_queue_top:
 
-   jp asm_w_array_front - 2
-
-;defc asm_wa_priority_queue_top = asm_w_array_front - 2
+   inc hl
+   inc hl
+   
+   jp asm_w_array_front
 
    ; enter : hl = priority_queue *
    ;
@@ -32,6 +35,6 @@ asm_wa_priority_queue_top:
    ;         fail if priority_queue is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

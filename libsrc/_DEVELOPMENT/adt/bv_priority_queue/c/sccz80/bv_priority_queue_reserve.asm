@@ -1,6 +1,8 @@
 
 ; int bv_priority_queue_reserve(bv_priority_queue_t *q, size_t n)
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC bv_priority_queue_reserve
 
 EXTERN asm_bv_priority_queue_reserve

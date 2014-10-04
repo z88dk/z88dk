@@ -11,12 +11,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_shrink_to_fit
 
 EXTERN __array_info, asm_realloc, error_mnc, error_zc
-
-   inc hl
-   inc hl
 
 asm_b_vector_shrink_to_fit:
 

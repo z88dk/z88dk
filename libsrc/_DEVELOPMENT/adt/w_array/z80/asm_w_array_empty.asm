@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_empty
 
 EXTERN l_testword_hl
 
-asm_w_array_empty:
-
-   jp l_testword_hl - 2
-
-;defc asm_w_array_empty = l_testword_hl - 2
+defc asm_w_array_empty = l_testword_hl - 2
 
    ; enter : hl = array *
    ;

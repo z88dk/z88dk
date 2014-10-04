@@ -1,12 +1,12 @@
 
 ; int ba_stack_top(ba_stack_t *s)
 
+SECTION seg_code_ba_stack
+
 PUBLIC _ba_stack_top
 
 EXTERN _b_array_back
 
-_ba_stack_top:
+defc _ba_stack_top = _b_array_back
 
-   jp _b_array_back
-
-   INCLUDE "adt/ba_stack/z80/asm_ba_stack_top.asm"
+INCLUDE "adt/ba_stack/z80/asm_ba_stack_top.asm"

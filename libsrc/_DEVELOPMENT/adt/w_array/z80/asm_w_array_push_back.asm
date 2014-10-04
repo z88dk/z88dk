@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_push_back
 
 EXTERN asm_w_array_append
 
-asm_w_array_push_back:
-
-   jp asm_w_array_append
-
-;defc asm_w_array_push_back = asm_w_array_append
+defc asm_w_array_push_back = asm_w_array_append
 
    ; enter : hl = array *
    ;         bc = item
@@ -33,6 +31,6 @@ asm_w_array_push_back:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, de, hl

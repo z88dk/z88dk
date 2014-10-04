@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_top
 
-EXTERN asm_b_array_front
+EXTERN asm_ba_priority_queue_top
 
-asm_bv_priority_queue_top:
-
-   jp asm_b_array_front - 2
-
-;defc asm_bv_priority_queue_top = asm_b_array_front - 2
+defc asm_bv_priority_queue_top = asm_ba_priority_queue_top
 
    ; enter : hl = priority_queue *
    ;
@@ -32,6 +30,6 @@ asm_bv_priority_queue_top:
    ;         fail if priority_queue is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

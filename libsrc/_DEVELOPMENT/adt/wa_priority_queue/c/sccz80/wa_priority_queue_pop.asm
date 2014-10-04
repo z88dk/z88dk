@@ -1,6 +1,8 @@
 
 ; void *wa_priority_queue_pop(wa_priority_queue_t *q)
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC wa_priority_queue_pop
 
 wa_priority_queue_pop:

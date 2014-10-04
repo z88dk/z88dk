@@ -1,6 +1,8 @@
 
 ; int w_vector_resize(w_vector_t *v, size_t n)
 
+SECTION seg_code_w_vector
+
 PUBLIC _w_vector_resize
 
 _w_vector_resize:

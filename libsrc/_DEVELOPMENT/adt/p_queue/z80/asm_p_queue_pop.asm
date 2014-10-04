@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_pop
 
 EXTERN asm_p_forward_list_alt_pop_front
 
-asm_p_queue_pop:
-
-   jp asm_p_forward_list_alt_pop_front
-
-;defc asm_p_queue_pop = asm_p_forward_list_alt_pop_front
+defc asm_p_queue_pop = asm_p_forward_list_alt_pop_front
 
    ; enter : hl = p_queue_t *q
    ;
@@ -30,6 +28,6 @@ asm_p_queue_pop:
    ;         fail if the list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

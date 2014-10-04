@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_pop_front
 
 EXTERN asm_p_forward_list_remove_after
 
-asm_p_forward_list_pop_front:
-
-   jp asm_p_forward_list_remove_after
-
-;defc asm_p_forward_list_pop_front = asm_p_forward_list_remove_after
+defc asm_p_forward_list_pop_front = asm_p_forward_list_remove_after
 
    ; enter : hl = p_forward_list_t *list
    ;

@@ -5,8 +5,10 @@ adt/p_list/c/sdcc_iy/p_list_front
 adt/p_list/c/sdcc_iy/p_list_init
 adt/p_list/c/sdcc_iy/p_list_insert
 adt/p_list/c/sdcc_iy/p_list_insert_after
+adt/p_list/c/sdcc_iy/p_list_next
 adt/p_list/c/sdcc_iy/p_list_pop_back
 adt/p_list/c/sdcc_iy/p_list_pop_front
+adt/p_list/c/sdcc_iy/p_list_prev
 adt/p_list/c/sdcc_iy/p_list_push_back
 adt/p_list/c/sdcc_iy/p_list_push_front
 adt/p_list/c/sdcc_iy/p_list_remove

@@ -1,9 +1,9 @@
 
 ; int ba_priority_queue_top(ba_priority_queue_t *q)
 
-PUBLIC ba_priority_queue_top
+SECTION seg_code_ba_priority_queue
 
-;defc ba_priority_queue_top = asm_ba_priority_queue_top
+PUBLIC ba_priority_queue_top
 
 ba_priority_queue_top:
 

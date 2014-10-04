@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_append
 
-EXTERN asm_b_array_append_block, error_enomem_mc
+EXTERN asm_b_array_append_block, error_mc
 
 asm_b_array_append:
 
@@ -39,7 +41,7 @@ asm_b_array_append:
    call asm_b_array_append_block
    
    pop bc                      ; bc = char
-   jp c, error_enomem_mc       ; if append error
+   jp c, error_mc              ; if append error
    
    ld (hl),c                   ; append char to end
    

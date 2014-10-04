@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_empty
 
 EXTERN l_testword_hl
 
-asm_p_stack_empty:
-
-   jp l_testword_hl
-
-;defc asm_p_stack_empty = l_testword_hl
+defc asm_p_stack_empty = l_testword_hl
 
    ; enter : hl = p_stack_t *
    ;

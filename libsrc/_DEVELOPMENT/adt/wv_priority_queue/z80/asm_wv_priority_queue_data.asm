@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_data
 
 EXTERN l_readword_hl
 
-asm_wv_priority_queue_data:
-
-   jp l_readword_hl - 2
-
-;defc asm_wv_priority_queue_data = l_readword_hl - 2
+defc asm_wv_priority_queue_data = l_readword_hl - 2
 
    ; enter : hl = priority_queue *
    ;

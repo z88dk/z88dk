@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_capacity
 
 EXTERN l_readword_2_hl
 
-asm_wv_stack_capacity:
-
-   jp l_readword_2_hl - 4
-
-;defc asm_wv_stack_capacity = l_readword_2_hl - 4
+defc asm_wv_stack_capacity = l_readword_2_hl - 4
 
    ; enter : hl = stack *
    ;

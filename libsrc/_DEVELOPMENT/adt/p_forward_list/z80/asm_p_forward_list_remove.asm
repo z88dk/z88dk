@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_remove
 
-EXTERN error_einval_zc
+EXTERN error_zc
 EXTERN __p_forward_list_locate_item, asm_p_forward_list_remove_after
 
 asm_p_forward_list_remove:
@@ -31,11 +33,11 @@ asm_p_forward_list_remove:
    ;         fail if item not member of the list
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl
    
    call __p_forward_list_locate_item
    jp nc, asm_p_forward_list_remove_after
 
-   jp error_einval_zc
+   jp error_zc

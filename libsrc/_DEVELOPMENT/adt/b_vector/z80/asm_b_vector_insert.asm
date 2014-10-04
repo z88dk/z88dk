@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_insert
 
 EXTERN asm_b_vector_insert_block, error_mc
@@ -29,7 +31,7 @@ asm_b_vector_insert:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 

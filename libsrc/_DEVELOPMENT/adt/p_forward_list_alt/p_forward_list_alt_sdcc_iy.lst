@@ -4,8 +4,10 @@ adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_empty
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_front
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_init
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_insert_after
+adt/p_forward_list_alt/c/sdcc_ix/p_forward_list_alt_next
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_pop_back
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_pop_front
+adt/p_forward_list_alt/c/sdcc_ix/p_forward_list_alt_prev
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_push_back
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_push_front
 adt/p_forward_list_alt/c/sdcc_iy/p_forward_list_alt_remove

@@ -1,6 +1,8 @@
 
 ; size_t b_vector_write_block(void *src, size_t n, b_vector_t *v, size_t idx)
 
+SECTION seg_code_b_vector
+
 PUBLIC b_vector_write_block_callee
 
 b_vector_write_block_callee:

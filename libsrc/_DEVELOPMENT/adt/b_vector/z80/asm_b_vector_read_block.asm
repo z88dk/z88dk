@@ -12,15 +12,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_read_block
 
 EXTERN asm_b_array_read_block
 
-asm_b_vector_read_block:
-
-   jp asm_b_array_read_block
-
-;defc asm_b_vector_read_block = asm_b_array_read_block
+defc asm_b_vector_read_block = asm_b_array_read_block
 
    ; enter : de'= void *dst
    ;         hl = vector *

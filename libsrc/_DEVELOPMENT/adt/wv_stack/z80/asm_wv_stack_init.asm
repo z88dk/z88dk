@@ -13,15 +13,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_init
 
 EXTERN asm_w_vector_init
 
-asm_wv_stack_init:
-
-   jp asm_w_vector_init
-
-;defc asm_wv_stack_init = asm_w_vector_init
+defc asm_wv_stack_init = asm_w_vector_init
 
    ; enter : de = void *p
    ;         bc = capacity in words
@@ -35,16 +33,16 @@ asm_wv_stack_init:
    ;         fail if required vector > 64k
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ;         fail if max_size < capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if unsuccessful realloc
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

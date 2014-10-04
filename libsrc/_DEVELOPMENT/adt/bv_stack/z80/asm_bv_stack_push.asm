@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_push
 
 EXTERN asm_b_vector_append
 
-asm_bv_stack_push:
-
-   jp asm_b_vector_append
-
-;defc asm_bv_stack_push = asm_b_vector_append
+defc asm_bv_stack_push = asm_b_vector_append
 
    ; enter : hl = stack *
    ;         bc = int c

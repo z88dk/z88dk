@@ -16,6 +16,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_init
 
 EXTERN asm_b_vector_init
@@ -35,12 +37,12 @@ asm_bv_priority_queue_init:
    ;         fail if max_size < capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if unsuccessful realloc
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 

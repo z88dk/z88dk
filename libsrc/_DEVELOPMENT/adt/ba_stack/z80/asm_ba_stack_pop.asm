@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_stack
+
 PUBLIC asm_ba_stack_pop
 
 EXTERN asm_b_array_pop_back
 
-asm_ba_stack_pop:
-
-   jp asm_b_array_pop_back
-
-;defc asm_ba_stack_pop = asm_b_array_pop_back
+defc asm_ba_stack_pop = asm_b_array_pop_back
 
    ; enter : hl = stack *
    ;

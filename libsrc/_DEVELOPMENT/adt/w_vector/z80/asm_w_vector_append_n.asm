@@ -10,10 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_append_n
 
-EXTERN asm_b_vector_append_block, asm1_w_array_append_n
-EXTERN error_mc, error_enomem_mc
+EXTERN asm_b_vector_append_block, asm1_w_array_append_n, error_mc
 
 asm_w_vector_append_n:
 
@@ -30,13 +31,13 @@ asm_w_vector_append_n:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    sla e
    rl d                        ; num bytes = n * 2
-   jp c, error_enomem_mc
+   jp c, error_mc
 
    push bc                     ; save item
    

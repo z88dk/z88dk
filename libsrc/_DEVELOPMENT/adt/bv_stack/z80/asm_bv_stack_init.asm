@@ -13,15 +13,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_init
 
 EXTERN asm_b_vector_init
 
-asm_bv_stack_init:
-
-   jp asm_b_vector_init
-
-;defc asm_bv_stack_init = asm_b_vector_init
+defc asm_bv_stack_init = asm_b_vector_init
 
    ; enter : de = void *p
    ;         bc = capacity

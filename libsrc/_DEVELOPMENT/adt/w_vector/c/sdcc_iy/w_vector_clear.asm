@@ -1,12 +1,12 @@
 
 ; void w_vector_clear(w_vector_t *v)
 
+SECTION seg_code_w_vector
+
 PUBLIC _w_vector_clear
 
 EXTERN _w_array_clear
 
-_w_vector_clear:
+defc _w_vector_clear = _w_array_clear
 
-   jp _w_array_clear
-
-   INCLUDE "adt/w_vector/z80/asm_w_vector_clear.asm"
+INCLUDE "adt/w_vector/z80/asm_w_vector_clear.asm"

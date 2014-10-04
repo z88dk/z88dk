@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_insert_n
 
 EXTERN asm_b_vector_insert_block, asm_memset, error_mc

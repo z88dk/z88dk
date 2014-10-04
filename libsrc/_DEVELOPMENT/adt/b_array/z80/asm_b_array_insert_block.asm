@@ -10,11 +10,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_insert_block
 PUBLIC asm0_b_array_insert_block, asm1_b_array_insert_block
 
-EXTERN error_einval_zc, error_enomem_zc
-EXTERN asm0_b_array_append_block, asm_memmove
+EXTERN asm0_b_array_append_block, asm_memmove, error_zc
 
 asm_b_array_insert_block:
 
@@ -30,7 +31,7 @@ asm_b_array_insert_block:
    ;         fail if idx > array.size or array too small
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL or ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -49,7 +50,7 @@ asm0_b_array_insert_block:
    
    or a
    sbc hl,bc                   ; hl = array.size - idx
-   jp c, error_einval_zc - 1   ; if array.size < idx
+   jp c, error_zc - 1          ; if array.size < idx
    
    ; bc = idx
    ; hl = array.size - idx
@@ -70,7 +71,7 @@ asm0_b_array_insert_block:
    call asm0_b_array_append_block
    
    pop hl                      ; hl = & array.size
-   jp c, error_enomem_zc - 2   ; if array too small
+   jp c, error_zc - 2          ; if array too small
 
 asm1_b_array_insert_block:
 

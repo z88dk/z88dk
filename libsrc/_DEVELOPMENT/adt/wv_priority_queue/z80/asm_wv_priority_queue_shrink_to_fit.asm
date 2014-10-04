@@ -11,15 +11,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_shrink_to_fit
 
-EXTERN asm_b_vector_shrink_to_fit
+EXTERN asm_bv_priority_queue_shrink_to_fit
 
-asm_wv_priority_queue_shrink_to_fit:
-
-   jp asm_b_vector_shrink_to_fit - 2
-
-;defc asm_wv_priority_queue_shrink_to_fit = asm_b_vector_shrink_to_fit - 2
+defc asm_wv_priority_queue_shrink_to_fit = asm_bv_priority_queue_shrink_to_fit
 
    ; enter : hl = priority_queue *
    ;
@@ -31,6 +29,6 @@ asm_wv_priority_queue_shrink_to_fit:
    ;         fail on realloc not getting lock
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

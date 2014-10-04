@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_pop
 
 EXTERN asm_p_forward_list_remove_after
 
-asm_p_stack_pop:
-
-   jp asm_p_forward_list_remove_after
-
-;defc asm_p_stack_pop = asm_p_forward_list_remove_after
+defc asm_p_stack_pop = asm_p_forward_list_remove_after
 
    ; enter : hl = stack *
    ;
@@ -32,6 +30,6 @@ asm_p_stack_pop:
    ;         fail if the stack is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl

@@ -1,6 +1,8 @@
 
 ; b_array_t *b_array_init(void *p, void *data, size_t capacity)
 
+SECTION seg_code_b_array
+
 PUBLIC _b_array_init
 
 _b_array_init:

@@ -20,15 +20,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_resize
 
 EXTERN asm_wa_priority_queue_resize
 
-asm_wv_priority_queue_resize:
-
-   jp asm_wa_priority_queue_resize
-
-;defc asm_wv_priority_queue_resize = asm_wa_priority_queue_resize
+defc asm_wv_priority_queue_resize = asm_wa_priority_queue_resize
 
    ; enter : hl = queue *
    ;         de = n = desired size in words
@@ -41,6 +39,6 @@ asm_wv_priority_queue_resize:
    ;         fail if queue is too small
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix

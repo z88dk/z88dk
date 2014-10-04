@@ -1,6 +1,8 @@
 
 ; int b_vector_shrink_to_fit(b_vector_t *v)
 
+SECTION seg_code_b_vector
+
 PUBLIC _b_vector_shrink_to_fit
 
 _b_vector_shrink_to_fit:
@@ -10,7 +12,5 @@ _b_vector_shrink_to_fit:
    
    push hl
    push af
-   
-   jr asm_b_vector_shrink_to_fit
 
    INCLUDE "adt/b_vector/z80/asm_b_vector_shrink_to_fit.asm"

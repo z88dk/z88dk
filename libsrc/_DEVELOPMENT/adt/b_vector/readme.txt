@@ -10,7 +10,7 @@ The leading "b_" indicates this container stores bytes / chars.
 To create the container, the caller supplies an 8-byte b_vector_t
 structure to b_vector_init().  In that call, the user also specifies
 the vector's initial capacity in bytes and its maximum size.  The
-initializer will allocated a data array of size capacity bytes and
+initializer will allocate a data array of size capacity bytes and
 the vector's initial size is set to zero.
 
 The caller can insert, append and erase bytes from the vector
@@ -33,3 +33,10 @@ offset   size (bytes)   description
   2           2         size_t size, number of occupied bytes in data
   4           2         capacity, the malloc-allocated size of data
   6           2         max_size, the maximum malloc-allocation size of data
+
+
+========
+sections
+========
+
+seg_code_b_vector

@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_clear
 
 EXTERN l_zeroword_hl
 
-asm_wv_priority_queue_clear:
-
-   jp l_zeroword_hl - 4
-
-;defc asm_wv_priority_queue_clear = l_zeroword_hl - 4
+defc asm_wv_priority_queue_clear = l_zeroword_hl - 4
 
    ; enter : hl = priority_queue *
    ;

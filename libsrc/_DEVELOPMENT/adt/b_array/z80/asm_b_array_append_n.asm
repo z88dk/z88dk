@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_append_n
 
-EXTERN asm_b_array_append_block, asm_memset, error_enomem_mc
+EXTERN asm_b_array_append_block, asm_memset, error_mc
 
 asm_b_array_append_n:
 
@@ -30,14 +32,14 @@ asm_b_array_append_n:
    ;
    ;            hl = -1
    ;            de = n
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    push bc                     ; save char
    
    call asm_b_array_append_block
-   jp c, error_enomem_mc - 1
+   jp c, error_mc - 1
 
    ; append successful, now fill appended area
    

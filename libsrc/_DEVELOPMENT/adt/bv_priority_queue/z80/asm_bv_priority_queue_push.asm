@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_push
 
 EXTERN asm_b_vector_append_block, asm1_ba_priority_queue_push, error_mc
@@ -26,12 +28,12 @@ asm_bv_priority_queue_push:
    ;         fail if max_size exceeded
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if insufficient memory or lock not acquired
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 

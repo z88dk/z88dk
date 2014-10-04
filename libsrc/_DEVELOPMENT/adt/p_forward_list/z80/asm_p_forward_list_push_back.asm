@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_push_back
 
 EXTERN __p_forward_list_locate_item, asm_p_forward_list_insert_after

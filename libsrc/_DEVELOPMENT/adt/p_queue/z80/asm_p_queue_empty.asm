@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_empty
 
 EXTERN l_testword_hl
 
-asm_p_queue_empty:
-
-   jp l_testword_hl
-
-;defc asm_p_queue_empty = l_testword_hl
+defc asm_p_queue_empty = l_testword_hl
 
    ; enter : hl = p_queue_t *
    ;

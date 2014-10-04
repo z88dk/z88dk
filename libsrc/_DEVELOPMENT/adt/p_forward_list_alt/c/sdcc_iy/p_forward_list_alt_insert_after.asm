@@ -1,6 +1,8 @@
 
 ; void *p_forward_list_alt_insert_after(p_forward_list_alt_t *list, void *list_item, void *item)
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC _p_forward_list_alt_insert_after
 
 _p_forward_list_alt_insert_after:

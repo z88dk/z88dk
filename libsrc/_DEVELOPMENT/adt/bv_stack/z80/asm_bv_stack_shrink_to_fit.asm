@@ -11,15 +11,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_shrink_to_fit
 
 EXTERN asm_b_vector_shrink_to_fit
 
-asm_b_vector_shrink_to_fit:
-
-   jp asm_b_vector_shrink_to_fit
-
-;defc asm_bv_stack_shrink_to_fit = asm_b_vector_shrink_to_fit
+defc asm_bv_stack_shrink_to_fit = asm_b_vector_shrink_to_fit
 
    ; enter : hl = stack *
    ;

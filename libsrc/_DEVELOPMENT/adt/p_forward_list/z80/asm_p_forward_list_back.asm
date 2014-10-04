@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list
+
 PUBLIC asm_p_forward_list_back
 
-EXTERN __p_forward_list_locate_item, error_einval_zc
+EXTERN __p_forward_list_locate_item, error_zc
 
 asm_p_forward_list_back:
 
@@ -26,7 +28,7 @@ asm_p_forward_list_back:
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -34,7 +36,7 @@ asm_p_forward_list_back:
    inc hl
    or (hl)
    
-   jp z, error_einval_zc
+   jp z, error_zc
 
    dec hl
    ld bc,0                     ; locate end of list

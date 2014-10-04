@@ -11,15 +11,18 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_shrink_to_fit
 
 EXTERN asm_b_vector_shrink_to_fit
 
 asm_bv_priority_queue_shrink_to_fit:
 
-   jp asm_b_vector_shrink_to_fit - 2
+   inc hl
+   inc hl
 
-;defc asm_bv_priority_queue_shrink_to_fit = asm_b_vector_shrink_to_fit - 2
+   jp asm_b_vector_shrink_to_fit
 
    ; enter : hl = priority_queue *
    ;

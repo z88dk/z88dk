@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_empty
 
 EXTERN l_testword_hl
 
-asm_bv_stack_empty:
-
-   jp l_testword_hl - 2
-
-;defc asm_bv_stack_empty = l_testword_hl - 2
+defc asm_bv_stack_empty = l_testword_hl - 2
 
    ; enter : hl = stack *
    ;

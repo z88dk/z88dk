@@ -12,9 +12,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_read_block
 
-EXTERN __array_at, l_minu_de_hl, asm_memcpy, error_einval_zc
+EXTERN __array_at, l_minu_de_hl, asm_memcpy, error_zc
 
 asm_b_array_read_block:
 
@@ -48,7 +50,7 @@ asm_b_array_read_block:
    ex (sp),hl
    ex de,hl
 
-   jp c, error_einval_zc - 1
+   jp c, error_zc - 1
       
    ; de = n
    ; bc = idx

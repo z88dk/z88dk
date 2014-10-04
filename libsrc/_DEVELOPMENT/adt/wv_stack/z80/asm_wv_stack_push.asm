@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_push
 
 EXTERN asm_w_vector_append
 
-asm_wv_stack_push:
-
-   jp asm_w_vector_append
-
-;defc asm_wv_stack_push = asm_w_vector_append
+defc asm_wv_stack_push = asm_w_vector_append
 
    ; enter : hl = stack *
    ;         bc = item
@@ -33,6 +31,6 @@ asm_wv_stack_push:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, de, hl

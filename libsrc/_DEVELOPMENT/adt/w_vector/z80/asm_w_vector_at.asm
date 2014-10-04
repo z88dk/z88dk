@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_at
 
 EXTERN asm_w_array_at
 
-asm_w_vector_at:
-
-   jp asm_w_array_at
-
-;defc asm_w_vector_at = asm_w_array_at
+defc asm_w_vector_at = asm_w_array_at
 
    ; enter : hl = vector *
    ;         bc = idx
@@ -35,6 +33,6 @@ asm_w_vector_at:
    ;         fail if idx out of range
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl

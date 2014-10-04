@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_insert
 
-EXTERN asm_b_array_insert_block, error_einval_mc, error_mc
+EXTERN asm_b_array_insert_block, error_mc
 
 asm_w_array_insert:
 
@@ -37,7 +39,7 @@ asm_w_array_insert:
    
    sla c
    rl b
-   jp c, error_einval_mc - 1
+   jp c, error_mc - 1
 
    push de                     ; save item
    

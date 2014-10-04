@@ -1,6 +1,8 @@
 
 ; void ba_priority_queue_destroy(ba_priority_queue_t *q)
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC _ba_priority_queue_destroy
 
 _ba_priority_queue_destroy:

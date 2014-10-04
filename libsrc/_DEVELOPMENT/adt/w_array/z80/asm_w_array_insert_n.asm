@@ -10,10 +10,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_insert_n
 PUBLIC asm1_w_array_insert_n
 
-EXTERN error_einval_mc, error_enomem_mc, error_mc
+EXTERN error_mc
 EXTERN asm_b_array_insert_block, __w_array_write_n
 
 asm_w_array_insert_n:
@@ -32,7 +34,7 @@ asm_w_array_insert_n:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -41,11 +43,11 @@ asm_w_array_insert_n:
    
    sla c
    rl b
-   jp c, error_einval_mc - 2
+   jp c, error_mc - 2
    
    sla e
    rl d
-   jp c, error_enomem_mc - 2
+   jp c, error_mc - 2
    
    push de                     ; save n*2
    

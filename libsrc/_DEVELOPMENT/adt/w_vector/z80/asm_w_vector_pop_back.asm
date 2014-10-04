@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_pop_back
 
 EXTERN asm_w_array_pop_back
 
-asm_w_vector_pop_back:
-
-   jp asm_w_array_pop_back
-
-;defc asm_w_vector_pop_back = asm_w_array_pop_back
+defc asm_w_vector_pop_back = asm_w_array_pop_back
 
    ; enter : hl = vector *
    ;
@@ -29,6 +27,6 @@ asm_w_vector_pop_back:
    ;         fail if vector is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

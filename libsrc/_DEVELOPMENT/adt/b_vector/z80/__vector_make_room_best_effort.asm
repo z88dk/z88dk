@@ -1,8 +1,10 @@
 
+SECTION seg_code_b_vector
+
 PUBLIC __vector_make_room_best_effort
 PUBLIC __vector_make_room_best_effort_extra
 
-EXTERN error_enomem_zc
+EXTERN error_zc
 EXTERN __vector_make_room_extra, __array_make_room_best_effort, l_inc_sp
 
 __vector_make_room_best_effort:
@@ -36,7 +38,7 @@ __vector_make_room_best_effort_extra:
    ;         fail if idx > array.capacity and vector could not grow
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -52,4 +54,4 @@ __vector_make_room_best_effort_extra:
    call __array_make_room_best_effort
    ret nc
    
-   jp error_enomem_zc
+   jp error_zc

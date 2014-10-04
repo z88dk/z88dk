@@ -1,9 +1,9 @@
 
 ; void b_array_destroy(b_array_t *a)
 
-PUBLIC b_array_destroy
+SECTION seg_code_b_array
 
-;defc b_array_destroy = asm_b_array_destroy
+PUBLIC b_array_destroy
 
 b_array_destroy:
 

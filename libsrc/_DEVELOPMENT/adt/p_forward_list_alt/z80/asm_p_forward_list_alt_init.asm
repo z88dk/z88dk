@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC asm_p_forward_list_alt_init
 
 EXTERN asm_p_forward_list_init

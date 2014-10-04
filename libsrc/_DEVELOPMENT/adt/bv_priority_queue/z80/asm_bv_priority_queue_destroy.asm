@@ -9,15 +9,18 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_priority_queue
+
 PUBLIC asm_bv_priority_queue_destroy
 
 EXTERN asm_b_vector_destroy
 
 asm_bv_priority_queue_destroy:
 
-   jp asm_b_vector_destroy - 2
-
-;defc asm_bv_priority_queue_destroy = asm_b_vector_destroy - 2
+   inc hl
+   inc hl
+   
+   jp asm b_vector_destroy
 
    ; enter : hl = priority_queue *
    ;

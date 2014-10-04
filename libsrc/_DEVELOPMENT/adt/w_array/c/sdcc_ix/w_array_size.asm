@@ -11,4 +11,6 @@ _w_array_size:
    push hl
    push af
 
+   jp asm_w_array_size
+
    INCLUDE "adt/w_array/z80/asm_w_array_size.asm"

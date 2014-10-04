@@ -17,9 +17,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_resize
 
-EXTERN asm_b_array_resize, error_enomem_zc
+EXTERN asm_b_array_resize, error_zc
 
 asm_w_array_resize:
 
@@ -34,7 +36,7 @@ asm_w_array_resize:
    ;         fail if array is too small
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -42,4 +44,4 @@ asm_w_array_resize:
    rl d
    jp nc, asm_b_array_resize
 
-   jp error_enomem_zc
+   jp error_zc

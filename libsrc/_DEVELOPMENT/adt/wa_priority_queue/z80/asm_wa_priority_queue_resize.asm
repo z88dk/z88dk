@@ -20,9 +20,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC asm_wa_priority_queue_resize
 
-EXTERN __wa_pq_setsize, __w_heap_sift_down, error_einval_mc, error_znc, error_zc
+EXTERN __wa_pq_setsize, __w_heap_sift_down, error_mc, error_znc, error_zc
 
 asm_wa_priority_queue_resize:
 
@@ -37,14 +39,14 @@ asm_wa_priority_queue_resize:
    ;         fail if queue is too small
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 
    push de                     ; save n
    
    call __wa_pq_setsize
-   jp c, error_einval_mc - 1   ; if n*2 > queue.capacity
+   jp c, error_mc - 1          ; if n*2 > queue.capacity
    
    ; de = n*2
    ; bc = queue.data

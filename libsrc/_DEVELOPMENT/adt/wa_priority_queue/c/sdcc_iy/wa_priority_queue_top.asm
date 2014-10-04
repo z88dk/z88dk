@@ -1,6 +1,8 @@
 
 ; void *wa_priority_queue_top(wa_priority_queue_t *q)
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC _wa_priority_queue_top
 
 _wa_priority_queue_top:

@@ -36,3 +36,10 @@ offset   size (bytes)   description
 Note that w_array_t is identical to b_array_t.  All sizes in the
 structure are measured in bytes, not words.  The w_array API is
 where the conversion between words and bytes is made.
+
+
+========
+sections
+========
+
+seg_code_w_array

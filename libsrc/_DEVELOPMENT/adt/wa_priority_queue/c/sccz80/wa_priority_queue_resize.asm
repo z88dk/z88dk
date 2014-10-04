@@ -1,6 +1,8 @@
 
 ; int wa_priority_queue_resize(wa_priority_queue_t *q, size_t n)
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC wa_priority_queue_resize
 
 EXTERN asm_wa_priority_queue_resize

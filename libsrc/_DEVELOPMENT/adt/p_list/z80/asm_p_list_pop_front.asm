@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_pop_front
 
-EXTERN asm_p_list_remove, error_einval_zc
+EXTERN asm_p_list_remove, error_zc
 
 asm_p_list_pop_front:
 
@@ -27,7 +29,7 @@ asm_p_list_pop_front:
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
    
@@ -42,4 +44,4 @@ asm_p_list_pop_front:
    or h
    jp nz, asm_p_list_remove
    
-   jp error_einval_zc
+   jp error_zc

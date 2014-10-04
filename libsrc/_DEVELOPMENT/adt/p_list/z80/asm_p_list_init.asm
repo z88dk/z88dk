@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_init
 
 EXTERN asm_p_forward_list_init, l_setmem_hl

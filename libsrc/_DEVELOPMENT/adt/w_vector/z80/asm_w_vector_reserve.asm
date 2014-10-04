@@ -11,12 +11,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_reserve
 
-EXTERN asm_b_vector_reserve, error_enomem_zc
-
-   inc hl
-   inc hl
+EXTERN asm_b_vector_reserve, error_zc
 
 asm_w_vector_reserve:
 
@@ -34,12 +33,12 @@ asm_w_vector_reserve:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -47,4 +46,4 @@ asm_w_vector_reserve:
    rl b
    jp nc, asm_b_vector_reserve
    
-   jp error_enomem_zc
+   jp error_zc

@@ -11,15 +11,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_reserve
 
 EXTERN asm_w_vector_reserve
 
-asm_wv_stack_reserve:
-
-   jp asm_w_vector_reserve
-
-;defc asm_wv_stack_reserve = asm_w_vector_reserve
+defc asm_wv_stack_reserve = asm_w_vector_reserve
 
    ; enter : hl = stack *
    ;         bc = n words
@@ -35,11 +33,11 @@ asm_wv_stack_reserve:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

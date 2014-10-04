@@ -1,4 +1,6 @@
 
+SECTION seg_code_w_array
+
 PUBLIC __w_array_write_n
 
 EXTERN asm_memcpy

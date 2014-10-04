@@ -17,10 +17,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_resize
 PUBLIC asm0_b_array_resize
 
-EXTERN __array_expand, asm_memset, error_enomem_zc
+EXTERN __array_expand, asm_memset, error_zc
 
 asm_b_array_resize:
 
@@ -35,7 +37,7 @@ asm_b_array_resize:
    ;         fail if array is too small
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
@@ -43,7 +45,7 @@ asm_b_array_resize:
    inc hl                      ; hl = & array.size
 
    call __array_expand
-   jp c, error_enomem_zc
+   jp c, error_zc
 
 asm0_b_array_resize:
 

@@ -38,3 +38,10 @@ offset   size (bytes)   description
 Note that wv_stack_t is identical to bv_stack_t.  All sizes in the
 structure are measured in bytes, not words.  The wv_stack API is
 where conversion between words and bytes is made.
+
+
+========
+sections
+========
+
+seg_code_wv_stack

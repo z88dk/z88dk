@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_stack
+
 PUBLIC asm_wa_stack_pop
 
 EXTERN asm_w_array_pop_back
 
-asm_wa_stack_pop:
-
-   jp asm_w_array_pop_back
-
-;defc asm_wa_stack_pop = asm_w_array_pop_back
+defc asm_wa_stack_pop = asm_w_array_pop_back
 
    ; enter : hl = stack *
    ;
@@ -29,6 +27,6 @@ asm_wa_stack_pop:
    ;         fail if stack is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

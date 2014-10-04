@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_stack
+
 PUBLIC asm_wa_stack_size
 
 EXTERN l_readword_2_hl
 
-asm_wa_stack_size:
-
-   jp l_readword_2_hl - 2
-
-;defc asm_wa_stack_size = l_readword_2_hl - 2
+defc asm_wa_stack_size = l_readword_2_hl - 2
 
    ; enter : hl = stack *
    ;

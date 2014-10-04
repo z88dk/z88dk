@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_init
 
-EXTERN asm_b_array_init, error_einval_zc
+EXTERN asm_b_array_init, error_zc
 
 asm_w_array_init:
 
@@ -28,7 +30,7 @@ asm_w_array_init:
    ;         fail if capacity too large
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc
    
@@ -36,4 +38,4 @@ asm_w_array_init:
    rl b
    jp nc, asm_b_array_init
    
-   jp error_einval_zc
+   jp error_zc

@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_erase
 
-EXTERN asm_b_array_erase_block, error_einval_mc
+EXTERN asm_b_array_erase_block, error_mc
 
 asm_w_array_erase:
 
@@ -28,13 +30,13 @@ asm_w_array_erase:
    ;         fail if idx outside array.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    sla c
    rl b
-   jp c, error_einval_mc
+   jp c, error_mc
    
    ld de,2
    call asm_b_array_erase_block

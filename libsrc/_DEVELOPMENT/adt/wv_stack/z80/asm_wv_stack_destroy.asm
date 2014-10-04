@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_stack
+
 PUBLIC asm_wv_stack_destroy
 
 EXTERN asm_b_vector_destroy
 
-asm_wv_stack_destroy:
-
-   jp asm_b_vector_destroy
-
-;defc asm_wv_stack_destroy = asm_b_vector_destroy
+defc asm_wv_stack_destroy = asm_b_vector_destroy
 
    ; enter : hl = vector *
    ;

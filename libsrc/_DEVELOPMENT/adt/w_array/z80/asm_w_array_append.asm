@@ -9,10 +9,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_append
 PUBLIC asm1_w_array_append
 
-EXTERN asm_b_array_append_block, error_enomem_mc
+EXTERN asm_b_array_append_block, error_mc
 
 asm_w_array_append:
 
@@ -30,7 +32,7 @@ asm_w_array_append:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, de, hl
    
@@ -40,7 +42,7 @@ asm_w_array_append:
    call asm_b_array_append_block
    
    pop bc                      ; bc = item
-   jp c, error_enomem_mc       ; if append error
+   jp c, error_mc              ; if append error
 
 asm1_w_array_append:
 

@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_data
 
 EXTERN l_readword_hl
 
-asm_w_vector_data:
-
-   jp l_readword_hl
-
-;defc asm_w_vector_data = l_readword_hl
+defc asm_w_vector_data = l_readword_hl
 
    ; enter : hl = vector *
    ;

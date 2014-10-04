@@ -10,10 +10,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_append_n
 PUBLIC asm1_w_array_append_n
 
-EXTERN asm_b_array_append_block, __w_array_write_n, error_enomem_mc
+EXTERN asm_b_array_append_block, __w_array_write_n, error_mc
 
 asm_w_array_append_n:
 
@@ -30,18 +32,18 @@ asm_w_array_append_n:
    ;         fail if array too small
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    sla e
    rl d                        ; de = n*2 bytes
-   jp c, error_enomem_mc
+   jp c, error_mc
 
    push bc                     ; save item
    
    call asm_b_array_append_block
-   jp c, error_enomem_mc - 1
+   jp c, error_mc - 1
 
 asm1_w_array_append_n:
 

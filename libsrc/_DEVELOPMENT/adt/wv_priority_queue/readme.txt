@@ -3,7 +3,7 @@
 wv_priority_queue
 =================
 
-A priority queue storing 1-bit words modelled on C++'s
+A priority queue storing 16-bit words modelled on C++'s
 priority_queue<word>.
 
 The words are held in a special order that allows O(lg n) in-order
@@ -44,3 +44,10 @@ offset   size (bytes)   description
 Note that wv_priority_queue_t is identical to bv_priority_queue_t.  All
 sizes in the structure are measured in bytes, not words.  The
 wv_priority_queue API is where conversion between words and bytes is made.
+
+
+========
+sections
+========
+
+seg_code_wv_priority_queue

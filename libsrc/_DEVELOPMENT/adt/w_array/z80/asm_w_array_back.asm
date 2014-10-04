@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_array
+
 PUBLIC asm_w_array_back
 
-EXTERN __array_info, error_einval_mc
+EXTERN __array_info, error_mc
 
 asm_w_array_back:
 
@@ -27,12 +29,12 @@ asm_w_array_back:
    ;         fail if array is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
    
    call __array_info
-   jp z, error_einval_mc
+   jp z, error_mc
 
    ex de,hl                    ; hl = array.data
    

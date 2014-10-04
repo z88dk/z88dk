@@ -1,9 +1,9 @@
 
 ; int b_array_front(b_array_t *a)
 
-PUBLIC b_array_front
+SECTION seg_code_b_array
 
-;defc b_array_front = asm_b_array_front
+PUBLIC b_array_front
 
 b_array_front:
 

@@ -1,8 +1,10 @@
 
+SECTION seg_code_b_vector
+
 PUBLIC __vector_make_room
 PUBLIC __vector_make_room_extra
 
-EXTERN error_einval_zc, error_enomem_zc, error_zc
+EXTERN error_zc
 EXTERN __array_make_room, __0_array_make_room, __vector_realloc_grow
 
 __vector_make_room:
@@ -33,12 +35,12 @@ __vector_make_room_extra:
    ;         fail if idx + n > 64k or max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if idx + n + extra > 64k or realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
       
@@ -51,7 +53,7 @@ __vector_make_room_extra:
 realloc_needed:
 
    or a
-   jp z, error_einval_zc
+   jp z, error_zc
 
    ; de = & vector.size
    ; hl = n
@@ -72,7 +74,7 @@ realloc_needed:
    pop bc                      ; bc = extra
    
    add hl,bc                   ; hl = realloc_size = idx + n + extra
-   jp c, error_enomem_zc - 3
+   jp c, error_zc - 3
    
    ld c,l
    ld b,h                      ; bc = realloc_size

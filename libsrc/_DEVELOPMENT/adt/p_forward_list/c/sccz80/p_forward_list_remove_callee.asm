@@ -1,6 +1,8 @@
 
 ; void *p_forward_list_remove(p_forward_list_t *list, void *item)
 
+SECTION seg_code_p_forward_list
+
 PUBLIC p_forward_list_remove_callee
 
 p_forward_list_remove_callee:

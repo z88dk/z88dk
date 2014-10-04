@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_insert
 
 EXTERN asm_p_list_insert_after, asm_p_list_push_front

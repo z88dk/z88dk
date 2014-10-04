@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_back
 
 EXTERN asm_p_forward_list_alt_back
 
-asm_p_queue_back:
-
-   jp asm_p_forward_list_alt_back
-
-;defc asm_p_queue_back = asm_p_forward_list_alt_back
+defc asm_p_queue_back = asm_p_forward_list_alt_back
 
    ; enter : hl = queue *
    ;
@@ -29,6 +27,6 @@ asm_p_queue_back:
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, hl

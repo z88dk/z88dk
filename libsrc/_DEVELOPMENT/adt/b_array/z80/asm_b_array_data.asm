@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_data
 
 EXTERN l_readword_hl
 
-asm_b_array_data:
-
-   jp l_readword_hl
-
-;defc asm_b_array_data = l_readword_hl
+defc asm_b_array_data = l_readword_hl
 
    ; enter : hl = array *
    ;

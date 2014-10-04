@@ -41,3 +41,10 @@ offset   size (bytes)   description
   6           2         max_size, maximum malloc-allocation for data in bytes
 
 Note that w_vector_t is identical to b_vector_t.
+
+
+========
+sections
+========
+
+seg_code_w_vector

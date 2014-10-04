@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_remove
 
 asm_p_list_remove:
@@ -18,6 +20,7 @@ asm_p_list_remove:
    ;
    ; exit  : bc = p_list_t *list
    ;         hl = void *item
+   ;         carry reset
    ;
    ; uses  : af, de
    

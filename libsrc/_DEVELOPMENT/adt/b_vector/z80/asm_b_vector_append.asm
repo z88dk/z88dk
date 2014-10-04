@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_append
 
 EXTERN asm_b_vector_append_block, error_mc
@@ -29,7 +31,7 @@ asm_b_vector_append:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, de, hl
    

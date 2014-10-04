@@ -1,6 +1,8 @@
 
 ; size_t w_vector_insert_n(w_vector_t *v, size_t idx, size_t n, void *item)
 
+SECTION seg_code_w_vector
+
 PUBLIC _w_vector_insert_n
 
 _w_vector_insert_n:

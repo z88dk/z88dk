@@ -1,10 +1,12 @@
 
 ; void *b_array_append_block(b_array_t *a, size_t n)
 
+SECTION seg_code_b_array
+
 PUBLIC b_array_append_block_callee
 PUBLIC b_array_append_block_entry
 
-EXTERN error_enomem_zc
+EXTERN error_zc
 
 b_array_append_block_callee:
 
@@ -17,6 +19,6 @@ b_array_append_block_entry:
    call asm_b_array_append_block
    ret nc
    
-   jp error_enomem_zc
+   jp error_zc
 
    INCLUDE "adt/b_array/z80/asm_b_array_append_block.asm"

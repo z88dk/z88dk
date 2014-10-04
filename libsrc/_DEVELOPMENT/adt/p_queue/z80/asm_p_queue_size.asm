@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_size
 
 EXTERN asm_p_forward_list_size
 
-asm_p_queue_size:
-
-   jp asm_p_forward_list_size
-
-;defc asm_p_queue_size = asm_p_forward_list_size
+defc asm_p_queue_size = asm_p_forward_list_size
 
    ; enter : hl = p_queue_t *q
    ;

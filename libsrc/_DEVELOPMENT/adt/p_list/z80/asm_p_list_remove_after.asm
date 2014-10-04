@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_list
+
 PUBLIC asm_p_list_remove_after
 
-EXTERN asm_p_list_remove, error_einval_zc
+EXTERN asm_p_list_remove, error_zc
 
 asm_p_list_remove_after:
 
@@ -28,7 +30,7 @@ asm_p_list_remove_after:
    ;         fail if following item does not exist
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl
 
@@ -40,4 +42,4 @@ asm_p_list_remove_after:
    or h
    jp nz, asm_p_list_remove
 
-   jp error_einval_zc
+   jp error_zc

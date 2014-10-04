@@ -9,10 +9,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC asm_ba_priority_queue_push
 PUBLIC asm1_ba_priority_queue_push
 
-EXTERN asm_b_array_append_block, __b_heap_sift_up, error_enomem_mc
+EXTERN asm_b_array_append_block, __b_heap_sift_up, error_mc
 
 asm_ba_priority_queue_push:
 
@@ -27,7 +29,7 @@ asm_ba_priority_queue_push:
    ;         fail if queue full
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 
@@ -41,7 +43,7 @@ asm_ba_priority_queue_push:
    call asm_b_array_append_block
 
    pop bc                      ; bc = item
-   jp c, error_enomem_mc - 1   ; if no room to add item
+   jp c, error_mc - 1          ; if no room to add item
 
 asm1_ba_priority_queue_push:
 

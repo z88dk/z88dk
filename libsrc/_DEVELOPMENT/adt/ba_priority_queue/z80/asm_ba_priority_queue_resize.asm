@@ -20,9 +20,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC asm_ba_priority_queue_resize
 
-EXTERN __ba_pq_setsize, __b_heap_sift_down, error_einval_mc, error_znc, error_zc
+EXTERN __ba_pq_setsize, __b_heap_sift_down, error_mc, error_znc
 
 asm_ba_priority_queue_resize:
 
@@ -37,12 +39,12 @@ asm_ba_priority_queue_resize:
    ;         fail if queue is too small
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 
    call __ba_pq_setsize
-   jp c, error_einval_mc       ; if n > queue.capacity
+   jp c, error_mc              ; if n > queue.capacity
    
    ; de = n
    ; bc = queue.data
@@ -72,7 +74,7 @@ heapify:
 
    ld a,d
    or e
-   jp z, error_zc              ; if reached the top of the heap
+   jp z, error_znc             ; if reached the top of the heap
    
    push bc
    push de

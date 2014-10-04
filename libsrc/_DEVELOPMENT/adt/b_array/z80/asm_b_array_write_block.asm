@@ -11,10 +11,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_write_block
 PUBLIC asm1_b_array_write_block
 
-EXTERN __array_make_room_best_effort, error_enomem_zc
+EXTERN __array_make_room_best_effort, error_zc
 
 asm_b_array_write_block:
 
@@ -35,7 +37,7 @@ asm_b_array_write_block:
    ;         fail if idx > array.capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
@@ -45,7 +47,7 @@ asm_b_array_write_block:
    inc de                     ; de = & array.size
 
    call __array_make_room_best_effort
-   jp c, error_enomem_zc
+   jp c, error_zc
 
 room_available:
 asm1_b_array_write_block:

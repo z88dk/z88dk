@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_push_back
 
 EXTERN asm_w_vector_append
 
-asm_w_vector_push_back:
-
-   jp asm_w_vector_append
-
-;defc asm_w_vector_push_back = asm_w_vector_append
+defc asm_w_vector_push_back = asm_w_vector_append
 
    ; enter : hl = vector *
    ;         bc = item
@@ -33,6 +31,6 @@ asm_w_vector_push_back:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, de, hl

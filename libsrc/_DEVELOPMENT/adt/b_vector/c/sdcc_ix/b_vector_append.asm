@@ -1,6 +1,8 @@
 
 ; size_t b_vector_append(b_vector_t *v, int c)
 
+SECTION seg_code_b_vector
+
 PUBLIC _b_vector_append
 
 _b_vector_append:

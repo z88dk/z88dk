@@ -7,8 +7,10 @@ adt/p_list/c/sccz80/p_list_insert
 adt/p_list/c/sccz80/p_list_insert_after
 adt/p_list/c/sccz80/p_list_insert_after_callee
 adt/p_list/c/sccz80/p_list_insert_callee
+adt/p_list/c/sccz80/p_list_next
 adt/p_list/c/sccz80/p_list_pop_back
 adt/p_list/c/sccz80/p_list_pop_front
+adt/p_list/c/sccz80/p_list_prev
 adt/p_list/c/sccz80/p_list_push_back
 adt/p_list/c/sccz80/p_list_push_back_callee
 adt/p_list/c/sccz80/p_list_push_front

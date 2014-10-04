@@ -1,4 +1,6 @@
 
+SECTION seg_code_b_array
+
 PUBLIC __array_make_room
 PUBLIC __0_array_make_room
 
@@ -69,8 +71,10 @@ __0_array_make_room:
 
 hole_absent:
 
-   add hl,bc
-   inc hl
+;;;   add hl,bc
+;;;   inc hl
+
+   adc hl,bc
 
    ; de = array.data
    ; hl = idx
@@ -99,6 +103,7 @@ hole_present:
 
    ld e,0
    call asm_memset             ; zero the hole
+   
    ex de,hl
    
    ; hl = & array.data[idx]

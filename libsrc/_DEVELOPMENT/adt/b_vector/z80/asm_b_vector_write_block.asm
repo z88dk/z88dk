@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_write_block
 PUBLIC asm_b_vector_write_block_extra
 

@@ -1,12 +1,12 @@
 
 ; size_t b_vector_push_back(b_vector_t *v, int c)
 
+SECTION seg_code_b_vector
+
 PUBLIC _b_vector_push_back
 
 EXTERN _b_vector_append
 
-_b_vector_push_back:
+defc _b_vector_push_back = _b_vector_append
 
-   jp _b_vector_append
-
-   INCLUDE "adt/b_vector/z80/asm_b_vector_push_back.asm"
+INCLUDE "adt/b_vector/z80/asm_b_vector_push_back.asm"

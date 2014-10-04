@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_bv_stack
+
 PUBLIC asm_bv_stack_top
 
 EXTERN asm_b_array_back
 
-asm_bv_stack_top:
-
-   jp asm_b_array_back
-
-;defc asm_bv_stack_top = asm_b_array_back
+defc asm_bv_stack_top = asm_b_array_back
 
    ; enter : hl = stack *
    ;

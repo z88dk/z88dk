@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_queue
+
 PUBLIC asm_p_queue_init
 
 EXTERN asm_p_forward_list_alt_init
 
-asm_p_queue_init:
-
-   jp asm_p_forward_list_alt_init
-
-;defc asm_p_queue_init = asm_p_forward_list_alt_init
+defc asm_p_queue_init = asm_p_forward_list_alt_init
 
    ; enter : hl = void *p
    ;

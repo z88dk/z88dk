@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_erase
 
 EXTERN asm_b_array_erase
 
-asm_b_vector_erase:
-
-   jp asm_b_array_erase
-
-;defc asm_b_vector_erase = asm_b_array_erase
+defc asm_b_vector_erase = asm_b_array_erase
 
    ; enter : hl = vector *
    ;         bc = idx
@@ -32,6 +30,6 @@ asm_b_vector_erase:
    ;         fail if idx outside vector.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

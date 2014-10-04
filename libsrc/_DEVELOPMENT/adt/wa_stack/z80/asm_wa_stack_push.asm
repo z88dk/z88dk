@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_stack
+
 PUBLIC asm_wa_stack_push
 
 EXTERN asm_w_array_append
 
-asm_wa_stack_push:
-
-   jp asm_w_array_append
-
-;defc asm_wa_stack_push = asm_w_array_append
+defc asm_wa_stack_push = asm_w_array_append
 
    ; enter : hl = stack *
    ;         bc = item
@@ -33,6 +31,6 @@ asm_wa_stack_push:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, de, hl

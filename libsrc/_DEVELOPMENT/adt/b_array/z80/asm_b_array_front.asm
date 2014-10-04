@@ -9,12 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_front
 
-EXTERN __array_info, error_einval_mc
-
-   inc hl
-   inc hl
+EXTERN __array_info, error_mc
 
 asm_b_array_front:
 
@@ -31,12 +30,12 @@ asm_b_array_front:
    ;         fail if array is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 
    call __array_info
-   jp z, error_einval_mc       ; if array is empty
+   jp z, error_mc              ; if array is empty
    
    ; de = array.data
    ; bc = array.size

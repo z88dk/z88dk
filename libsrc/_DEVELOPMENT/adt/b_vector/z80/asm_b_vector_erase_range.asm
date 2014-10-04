@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_erase_range
 
 EXTERN asm_b_array_erase_range
 
-asm_b_vector_erase_range:
-
-   jp asm_b_array_erase_range
-
-;defc asm_b_vector_erase_range = asm_b_array_erase_range
+defc asm_b_vector_erase_range = asm_b_array_erase_range
 
    ; enter : hl = idx_last
    ;         bc = idx_first
@@ -32,6 +30,6 @@ asm_b_vector_erase_range:
    ;         fail if block does not lie within vector.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

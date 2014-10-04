@@ -1,6 +1,8 @@
 
 ; void *b_vector_init(void *p, size_t capacity, size_t max_size)
 
+SECTION seg_code_b_vector
+
 PUBLIC b_vector_init_callee
 
 b_vector_init_callee:

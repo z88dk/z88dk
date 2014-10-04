@@ -1,6 +1,8 @@
 
 ; int b_vector_reserve(b_vector_t *v, size_t n)
 
+SECTION seg_code_b_vector
+
 PUBLIC b_vector_reserve
 
 EXTERN asm_b_vector_reserve

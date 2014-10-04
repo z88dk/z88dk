@@ -5,8 +5,6 @@ PUBLIC _w_vector_back
 
 EXTERN _w_array_back
 
-_w_vector_back:
+defc _w_vector_back = _w_array_back
 
-   jp _w_array_back
-
-   INCLUDE "adt/w_vector/z80/asm_w_vector_back.asm"
+INCLUDE "adt/w_vector/z80/asm_w_vector_back.asm"

@@ -1,4 +1,6 @@
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC __b_heap_sift_up
 
 EXTERN l_jpix, error_znc

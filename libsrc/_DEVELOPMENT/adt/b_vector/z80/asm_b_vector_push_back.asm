@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_push_back
 
 EXTERN asm_b_vector_append
 
-asm_b_vector_push_back:
-
-   jp asm_b_vector_append
-
-;defc asm_b_vector_push_back = asm_b_vector_append
+defc asm_b_vector_push_back = asm_b_vector_append
 
    ; enter : hl = vector *
    ;         bc = int c

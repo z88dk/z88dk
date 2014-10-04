@@ -11,13 +11,9 @@
 
 PUBLIC asm_wv_priority_queue_destroy
 
-EXTERN asm_b_vector_destroy
+EXTERN asm_bv_priority_queue_destroy
 
-asm_wv_priority_queue_destroy:
-
-   jp asm_b_vector_destroy - 2
-
-;defc asm_wv_priority_queue_destroy = asm_b_vector_destroy - 2
+defc asm_wv_priority_queue_destroy = asm_bv_priority_queue_destroy
 
    ; enter : hl = priority_queue *
    ;

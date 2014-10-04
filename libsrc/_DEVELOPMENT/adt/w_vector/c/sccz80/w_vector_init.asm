@@ -1,6 +1,8 @@
 
 ; w_vector_t *w_vector_init(void *p, size_t capacity, size_t max_size)
 
+SECTION seg_code_w_vector
+
 PUBLIC w_vector_init
 
 EXTERN asm_w_vector_init

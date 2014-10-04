@@ -1,4 +1,6 @@
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC __w_heap_swap
 
 __w_heap_swap:
@@ -26,4 +28,5 @@ __w_heap_swap:
    dec hl
    ld (hl),c
 
+   inc de
    ret

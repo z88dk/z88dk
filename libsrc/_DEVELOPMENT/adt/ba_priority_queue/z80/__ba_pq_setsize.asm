@@ -1,4 +1,6 @@
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC __ba_pq_setsize
 
 EXTERN l_ltu_bc_hl, error_zc

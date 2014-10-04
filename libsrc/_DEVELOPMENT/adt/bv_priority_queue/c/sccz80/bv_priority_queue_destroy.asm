@@ -1,9 +1,9 @@
 
 ; void bv_priority_queue_destroy(bv_priority_queue_t *q)
 
-PUBLIC bv_priority_queue_destroy
+SECTION seg_code_bv_priority_queue
 
-;defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy
+PUBLIC bv_priority_queue_destroy
 
 bv_priority_queue_destroy:
 

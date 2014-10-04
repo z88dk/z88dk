@@ -1,6 +1,8 @@
 
 ; int ba_priority_queue_resize(ba_priority_queue_t *q, size_t n)
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC ba_priority_queue_resize_callee
 
 ba_priority_queue_resize_callee:

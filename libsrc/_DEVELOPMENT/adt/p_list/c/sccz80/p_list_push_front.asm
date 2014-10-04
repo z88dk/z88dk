@@ -1,6 +1,8 @@
 
 ; void *p_list_push_front(p_list_t *list, void *item)
 
+SECTION seg_code_p_list
+
 PUBLIC p_list_push_front
 
 EXTERN asm_p_list_push_front

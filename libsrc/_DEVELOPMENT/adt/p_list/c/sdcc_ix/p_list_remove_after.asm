@@ -1,6 +1,8 @@
 
 ; void *p_list_remove_after(p_list_t *list, void *list_item)
 
+SECTION seg_code_p_list
+
 PUBLIC _p_list_remove_after
 
 _p_list_remove_after:

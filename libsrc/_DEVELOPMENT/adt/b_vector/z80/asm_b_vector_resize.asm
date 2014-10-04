@@ -17,6 +17,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_resize
 
 EXTERN __array_expand, asm0_b_array_resize, __vector_realloc_grow, error_zc

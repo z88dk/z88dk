@@ -1,12 +1,12 @@
 
 ; void *p_stack_top(p_stack_t *s)
 
+SECTION seg_code_p_stack
+
 PUBLIC _p_stack_top
 
 EXTERN _p_forward_list_front
 
-_p_stack_top:
+defc _p_stack_top = _p_forward_list_front
 
-   jp _p_forward_list_front
-
-   INCLUDE "adt/p_stack/z80/asm_p_stack_top.asm"
+INCLUDE "adt/p_stack/z80/asm_p_stack_top.asm"

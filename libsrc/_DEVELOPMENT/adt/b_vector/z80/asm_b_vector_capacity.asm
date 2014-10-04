@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_capacity
 
 EXTERN l_readword_hl
 
-asm_b_vector_capacity:
-
-   jp l_readword_hl - 4
-
-;defc asm_b_vector_capacity = l_readword_hl - 4
+defc asm_b_vector_capacity = l_readword_hl - 4
 
    ; enter : hl = vector *
    ;

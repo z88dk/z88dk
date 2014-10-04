@@ -1,12 +1,12 @@
 
 ; void *w_vector_size(w_vector_t *v)
 
+SECTION seg_code_w_vector
+
 PUBLIC _w_vector_size
 
 EXTERN _w_array_size
 
-_w_vector_size:
+defc _w_vector_size = _w_array_size
 
-   jp _w_array_size
-
-   INCLUDE "adt/w_vector/z80/asm_w_vector_size.asm"
+INCLUDE "adt/w_vector/z80/asm_w_vector_size.asm"

@@ -9,15 +9,16 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_ba_priority_queue
+
 PUBLIC asm_ba_priority_queue_destroy
 
-EXTERN l_zerostruct8_hl
+EXTERN l_setmem_hl
 
 asm_ba_priority_queue_destroy:
 
-   jp l_zerostruct8_hl
-
-;defc asm_ba_priority_queue_destroy = l_zerostruct8_hl
+   xor a
+   jp l_setmem_hl - 16
 
    ; enter : hl = priority_queue *
    ;

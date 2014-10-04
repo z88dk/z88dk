@@ -1,6 +1,8 @@
 
 ; size_t p_forward_list_size(p_forward_list_t *list)
 
+SECTION seg_code_p_forward_list
+
 PUBLIC _p_forward_list_size
 
 _p_forward_list_size:

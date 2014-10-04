@@ -1,4 +1,6 @@
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC __wa_pq_setsize
 
 EXTERN __ba_pq_setsize, error_zc

@@ -9,12 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_destroy
 
-EXTERN asm_free, l_zerostruct8_hl
-
-   inc hl
-   inc hl
+EXTERN asm_free, l_setmem_hl
    
 asm_b_vector_destroy:
 
@@ -27,7 +26,8 @@ asm_b_vector_destroy:
    ld d,(hl)
    dec hl
    
-   call l_zerostruct8_hl
+   xor a
+   call l_setmem_hl - 16
    
    ex de,hl
    jp asm_free

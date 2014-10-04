@@ -34,3 +34,10 @@ offset   size (bytes)   description
   2           2         size_t size, number of occupied bytes in the data array
   4           2         capacity, the malloc-allocation size of data
   6           2         max_size, the maximum malloc-allocation size for data
+
+
+========
+sections
+========
+
+seg_code_bv_stack

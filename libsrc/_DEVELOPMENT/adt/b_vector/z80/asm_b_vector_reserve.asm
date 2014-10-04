@@ -11,12 +11,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_reserve
 
 EXTERN __0_vector_realloc_grow, error_mnc
-
-   inc hl
-   inc hl
 
 asm_b_vector_reserve:
 
@@ -34,12 +33,12 @@ asm_b_vector_reserve:
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, de, hl
 

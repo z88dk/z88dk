@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_clear
 
 EXTERN l_zeroword_hl
 
-asm_w_vector_clear:
-
-   jp l_zeroword_hl - 2
-
-;defc asm_w_vector_clear = l_zeroword_hl - 2
+defc asm_w_vector_clear = l_zeroword_hl - 2
 
    ; enter : hl = vector *
    ;

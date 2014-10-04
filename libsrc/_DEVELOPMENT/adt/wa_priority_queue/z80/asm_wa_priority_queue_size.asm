@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC asm_wa_priority_queue_size
 
 EXTERN l_readword_2_hl
 
-asm_wa_priority_queue_size:
-
-   jp l_readword_2_hl - 4
-
-;defc asm_wa_priority_queue_size = l_readword_2_hl - 4
+defc asm_wa_priority_queue_size = l_readword_2_hl - 4
 
    ; enter : hl = priority_queue *
    ;

@@ -1,4 +1,7 @@
 
+
+SECTION seg_code_b_array
+
 PUBLIC __array_at
 
 EXTERN l_ltu_bc_hl

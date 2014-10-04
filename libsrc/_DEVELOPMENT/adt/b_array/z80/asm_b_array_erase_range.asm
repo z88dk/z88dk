@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_erase_range
 
-EXTERN asm_b_array_erase_block, error_einval_mc
+EXTERN asm_b_array_erase_block, error_mc
 
 asm_b_array_erase_range:
 
@@ -34,7 +36,7 @@ asm_b_array_erase_range:
 
    or a
    sbc hl,bc
-   jp c, error_einval_mc       ; if idx.last < idx.first
+   jp c, error_mc              ; if idx.last < idx.first
 
    ex de,hl
    jp asm_b_array_erase_block

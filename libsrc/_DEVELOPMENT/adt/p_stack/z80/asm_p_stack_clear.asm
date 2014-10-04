@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_clear
 
 EXTERN asm_p_forward_list_init
 
-asm_p_stack_clear:
-
-   jp asm_p_forward_list_init
-
-;defc asm_p_stack_clear = asm_p_forward_list_init
+defc asm_p_stack_clear = asm_p_forward_list_init
 
    ; enter : hl = p_stack_t *
    ;

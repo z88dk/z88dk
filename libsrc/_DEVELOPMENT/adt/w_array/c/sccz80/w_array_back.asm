@@ -1,6 +1,8 @@
 
 ; void *w_array_back(w_array_t *a)
 
+SECTION seg_code_w_array
+
 PUBLIC w_array_back
 
 w_array_back:

@@ -1,6 +1,8 @@
 
 ; void *w_array_front(w_array_t *a)
 
+SECTION seg_code_w_array
+
 PUBLIC _w_array_front
 
 _w_array_front:
@@ -10,7 +12,5 @@ _w_array_front:
    
    push hl
    push af
-   
-   jr asm_w_array_front
 
    INCLUDE "adt/w_array/z80/asm_w_array_front.asm"

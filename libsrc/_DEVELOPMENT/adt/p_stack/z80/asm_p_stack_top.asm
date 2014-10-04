@@ -9,26 +9,24 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_top
 
 EXTERN asm_p_forward_list_front
 
-asm_p_stack_top:
-
-   jp asm_p_forward_list_front
-
-;defc asm_p_stack_top = asm_p_forward_list_front
+defc asm_p_stack_top = asm_p_forward_list_front
 
    ; enter : hl = stack *
    ;
    ; exit  : success
    ;
-   ;            hl = void *item (item at front)
-   ;            carry reset
+   ;            hl = void *item (item at top)
+   ;            nz flag set
    ;
-   ;         fail if stack is empty
+   ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            z flag set
    ;
    ; uses  : af, hl

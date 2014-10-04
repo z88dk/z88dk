@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_w_vector
+
 PUBLIC asm_w_vector_destroy
 
 EXTERN asm_b_vector_destroy
 
-asm_w_vector_destroy:
-
-   jp asm_b_vector_destroy
-
-;defc asm_w_vector_destroy = asm_b_vector_destroy
+defc asm_w_vector_destroy = asm_b_vector_destroy
 
    ; enter : hl = vector *
    ;

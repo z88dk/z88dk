@@ -1,6 +1,8 @@
 
 ; size_t w_array_capacity(w_array_t *a)
 
+SECTION seg_code_w_array
+
 PUBLIC _w_array_capacity
 
 _w_array_capacity:

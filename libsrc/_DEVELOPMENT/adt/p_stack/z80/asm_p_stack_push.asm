@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_stack
+
 PUBLIC asm_p_stack_push
 
 EXTERN asm_p_forward_list_insert_after
 
-asm_p_stack_push:
-
-   jp asm_p_forward_list_insert_after
-
-;defc asm_p_stack_push = asm_p_forward_list_insert_after
+defc asm_p_stack_push = asm_p_forward_list_insert_after
 
    ; enter : hl = stack *
    ;         de = void *item

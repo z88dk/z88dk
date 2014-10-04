@@ -13,9 +13,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_vector
+
 PUBLIC asm_b_vector_init
 
-EXTERN l_setmem_hl, l_ltu_hl_bc, asm_realloc, error_einval_zc, error_zc
+EXTERN l_setmem_hl, l_ltu_hl_bc, asm_realloc,error_zc
 
 asm_b_vector_init:
 
@@ -31,17 +33,17 @@ asm_b_vector_init:
    ;         fail if max_size < capacity
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if unsuccessful realloc
    ;
    ;            hl = 0
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
    
    call l_ltu_hl_bc
-   jp c, error_einval_zc       ; if hl < bc, max_size < capacity
+   jp c, error_zc              ; if hl < bc, max_size < capacity
    
    push hl                     ; save max_size
    push bc                     ; save capacity

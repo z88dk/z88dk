@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_p_forward_list_alt
+
 PUBLIC asm_p_forward_list_alt_back
 
-EXTERN l_readword_hl, error_einval_zc
+EXTERN l_readword_hl, error_zc
 
 asm_p_forward_list_alt_back:
 
@@ -25,7 +27,7 @@ asm_p_forward_list_alt_back:
    ;         fail if list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, hl
 
@@ -36,4 +38,4 @@ asm_p_forward_list_alt_back:
    
    jp nz, l_readword_hl
    
-   jp error_einval_zc  
+   jp error_zc  

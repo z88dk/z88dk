@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wv_priority_queue
+
 PUBLIC asm_wv_priority_queue_push
 
-EXTERN asm_b_vector_append_block, asm1_wa_priority_queue_push, error_enomem_mc
+EXTERN asm_b_vector_append_block, asm1_wa_priority_queue_push, error_mc
 
 asm_wv_priority_queue_push:
 
@@ -26,7 +28,7 @@ asm_wv_priority_queue_push:
    ;         fail if queue full
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, ix
 
@@ -42,4 +44,4 @@ asm_wv_priority_queue_push:
    pop bc                      ; bc = item
    jp nc, asm1_wa_priority_queue_push
    
-   jp error_enomem_mc - 1      ; if no room to add item
+   jp error_mc - 1             ; if no room to add item

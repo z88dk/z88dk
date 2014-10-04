@@ -1,6 +1,8 @@
 
 ; void p_forward_list_init(void *p)
 
+SECTION seg_code_p_forward_list
+
 PUBLIC p_forward_list_init
 
 p_forward_list_init:

@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_wa_priority_queue
+
 PUBLIC asm_wa_priority_queue_destroy
 
-EXTERN l_zerostruct8_hl
+EXTERN asm_ba_priority_queue_destroy
 
-asm_wa_priority_queue_destroy:
-
-   jp l_zerostruct8_hl
-
-;defc asm_wa_priority_queue_destroy = l_zerostruct8_hl
+defc asm_wa_priority_queue_destroy = asm_ba_priority_queue_destroy
 
    ; enter : hl = priority_queue *
    ;

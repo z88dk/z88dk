@@ -10,16 +10,17 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_b_array
+
 PUBLIC asm_b_array_destroy
 
-EXTERN l_zerostruct6_hl
+EXTERN l_setmem_hl
 
 asm_b_array_destroy:
-
-   jp l_zerostruct6_hl
-
-;defc asm_b_array_destroy = l_zerostruct6_hl
 
    ; enter : hl = array *
    ;
    ; uses  : af, hl
+
+   xor a
+   jp l_setmem_hl - 12
