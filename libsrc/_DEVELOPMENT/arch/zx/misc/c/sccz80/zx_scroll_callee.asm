@@ -1,6 +1,8 @@
 
 ; void zx_scroll_callee(uchar rows, uchar attr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_scroll_callee
 
 zx_scroll_callee:

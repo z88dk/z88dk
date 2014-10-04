@@ -1,6 +1,8 @@
 
 ; uint zx_aaddr2py(void *attraddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_aaddr2py
 
 zx_aaddr2py:

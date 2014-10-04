@@ -1,6 +1,8 @@
 
 ; void *heap_realloc_unlocked(void *heap, void *p, size_t size)
 
+SECTION seg_code_malloc
+
 PUBLIC _heap_realloc_unlocked
 
 _heap_realloc_unlocked:

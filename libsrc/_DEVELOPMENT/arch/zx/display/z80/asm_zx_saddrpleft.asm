@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_arch
+
 PUBLIC asm_zx_saddrpleft
 
 asm_zx_saddrpleft:

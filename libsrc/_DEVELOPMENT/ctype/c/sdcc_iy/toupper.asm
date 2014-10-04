@@ -1,6 +1,8 @@
 
 ; int toupper(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _toupper
 
 EXTERN asm_toupper

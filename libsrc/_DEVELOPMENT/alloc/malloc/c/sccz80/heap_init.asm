@@ -1,6 +1,8 @@
 
 ; void *heap_init(void *heap, size_t size)
 
+SECTION seg_code_malloc
+
 PUBLIC heap_init
 
 EXTERN asm_heap_init

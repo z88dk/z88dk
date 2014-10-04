@@ -39,3 +39,10 @@ offset   size (bytes)   description
    2           2        object = start address of currently growing object
    4           2        end = address of byte following the obstack block
    6          ...       mem[] = available memory
+
+
+========
+sections
+========
+
+seg_code_obstack

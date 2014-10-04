@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_next_free
 
 obstack_next_free:

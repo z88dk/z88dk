@@ -1,6 +1,8 @@
 
 ; void dzx7_smart_rcs(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC _dzx7_smart_rcs
 
 _dzx7_smart_rcs:

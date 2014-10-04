@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_info_unlocked
 
 EXTERN l_jpix, l_inc_sp
@@ -129,11 +131,11 @@ header:
    
    ; hl = & hdr
    
-   ld de,0
-   push de                     ; type    = 0
-   ld e,6
+   ld de,6
    push de                     ; size    = 6
    push hl                     ; address = hdr
+   ld e,0
+   push de                     ; type    = 0
 
 invoke:
 
@@ -154,9 +156,9 @@ allocated:
    
    ld bc,1
 
-   push bc                     ; type
    push hl                     ; size
    push de                     ; address
+   pusb bc                     ; type
 
    jr invoke
 
@@ -169,8 +171,8 @@ free:
 
    ld bc,2
    
-   push bc                     ; type
    push hl                     ; size
    push de                     ; address
+   push bc                     ; type
    
    jr invoke

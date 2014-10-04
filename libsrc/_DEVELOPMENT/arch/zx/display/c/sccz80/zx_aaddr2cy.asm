@@ -1,6 +1,8 @@
 
 ; uint zx_aaddr2cy(void *attraddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_aaddr2cy
 
 zx_aaddr2cy:

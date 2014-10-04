@@ -23,6 +23,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_realloc_unlocked
 
 EXTERN error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked, l_ltu_bc_hl

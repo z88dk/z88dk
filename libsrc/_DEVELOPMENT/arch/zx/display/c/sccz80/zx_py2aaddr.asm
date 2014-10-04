@@ -1,6 +1,8 @@
 
 ; void *zx_py2aaddr(uchar y)
 
+SECTION seg_code_arch
+
 PUBLIC zx_py2aaddr
 
 zx_py2aaddr:

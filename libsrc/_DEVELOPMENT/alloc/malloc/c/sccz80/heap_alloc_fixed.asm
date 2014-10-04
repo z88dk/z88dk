@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,9 +35,7 @@ PUBLIC heap_alloc_fixed
 
 EXTERN heap_alloc_fixed_unlocked
 
-heap_alloc_fixed:
-
-   jp heap_alloc_fixed_unlocked
+defc heap_alloc_fixed = heap_alloc_fixed_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

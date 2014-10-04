@@ -1,4 +1,6 @@
 
+SECTION seg_code_ctype
+
 PUBLIC asm_isbdigit
 
 asm_isbdigit:

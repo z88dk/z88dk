@@ -1,6 +1,8 @@
 
 ; void *zx_cyx2aaddr(uchar row, uchar col)
 
+SECTION seg_code_arch
+
 PUBLIC zx_cyx2aaddr
 
 EXTERN asm_zx_cyx2aaddr

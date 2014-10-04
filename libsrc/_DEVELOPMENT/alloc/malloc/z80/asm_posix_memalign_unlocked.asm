@@ -17,10 +17,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_posix_memalign_unlocked
 PUBLIC asm0_posix_memalign_unlocked
 
-EXTERN __heap, _errno
+EXTERN __malloc_heap, _errno
 
 EXTERN asm_heap_alloc_aligned_unlocked, error_znc
 
@@ -48,7 +50,7 @@ asm_posix_memalign_unlocked:
 
    push de                     ; save memptr
    
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    call asm_heap_alloc_aligned_unlocked
    
 asm0_posix_memalign_unlocked:

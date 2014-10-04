@@ -1,6 +1,8 @@
 
 ; void *balloc_alloc(unsigned int queue)
 
+SECTION seg_code_balloc
+
 PUBLIC balloc_alloc
 
 balloc_alloc:

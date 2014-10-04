@@ -1,6 +1,8 @@
 
 ; int isodigit(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isodigit
 
 EXTERN asm_isodigit, error_zc

@@ -1,6 +1,8 @@
 
 ; int isascii(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isascii
 
 EXTERN error_znc

@@ -1,0 +1,4 @@
+
+; CTYPE.LIB CODE SECTIONS
+
+SECTION seg_code_ctype

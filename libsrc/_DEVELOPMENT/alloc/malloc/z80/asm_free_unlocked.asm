@@ -12,17 +12,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_free_unlocked
-PUBLIC asm_free_unocked_lib
 
 EXTERN asm_heap_free_unlocked
 
-asm_free_unlocked:
-asm_free_unlocked_lib:
-
-   jp asm_heap_free_unlocked
-
-;defc asm_free_unlocked = asm_heap_free_unlocked
+defc asm_free_unlocked = asm_heap_free_unlocked
 
    ; Return the memory block to the heap for reuse without locking
    ;

@@ -1,6 +1,8 @@
 
 ; int ispunct(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _ispunct
 
 EXTERN asm_ispunct, error_zc

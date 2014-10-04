@@ -15,6 +15,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_alloc_fixed_unlocked
 
 EXTERN l_ltu_de_hl, __heap_place_block, __heap_allocate_block, error_enomem_zc

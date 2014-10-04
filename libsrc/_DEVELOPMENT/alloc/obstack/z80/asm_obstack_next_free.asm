@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_next_free
 
 asm_obstack_next_free:

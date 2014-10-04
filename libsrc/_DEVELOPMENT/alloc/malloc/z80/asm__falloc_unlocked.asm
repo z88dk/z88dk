@@ -12,9 +12,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm__falloc_unlocked
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_fixed_unlocked
 
@@ -43,5 +45,5 @@ asm__falloc_unlocked:
    ;
    ; uses  : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_alloc_fixed_unlocked

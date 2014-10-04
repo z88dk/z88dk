@@ -1,4 +1,6 @@
 
+SECTION seg_code_malloc
+
 PUBLIC __heap_lock_acquire
 
 EXTERN asm_mtx_lock

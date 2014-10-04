@@ -1,6 +1,8 @@
 
 ; int isxdigit(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isxdigit
 
 EXTERN asm_isxdigit, error_zc

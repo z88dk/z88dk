@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_blank_fast_callee
 
 obstack_blank_fast_callee:

@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_arch
+
 PUBLIC asm_zx_cy2saddr
 
 asm_zx_cy2saddr:

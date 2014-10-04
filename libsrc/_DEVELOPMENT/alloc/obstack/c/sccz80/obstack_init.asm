@@ -1,6 +1,8 @@
 
 ; void *obstack_init(struct obstack *ob, size_t size)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_init
 
 EXTERN asm_obstack_init

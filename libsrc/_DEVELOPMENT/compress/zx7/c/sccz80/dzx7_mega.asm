@@ -1,6 +1,8 @@
 
 ; void dzx7_mega(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC dzx7_mega
 
 EXTERN asm_dzx7_mega

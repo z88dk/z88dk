@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_align_distance_callee
 
 obstack_align_distance_callee:

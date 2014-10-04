@@ -3,4 +3,3 @@ alloc/balloc/z80/asm_balloc_alloc
 alloc/balloc/z80/asm_balloc_blockcount
 alloc/balloc/z80/asm_balloc_firstfit
 alloc/balloc/z80/asm_balloc_free
-alloc/balloc/z80/asm_balloc_init

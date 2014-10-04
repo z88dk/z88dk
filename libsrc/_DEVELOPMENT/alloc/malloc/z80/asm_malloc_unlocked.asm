@@ -12,15 +12,15 @@
 ;
 ; ===============================================================
 
-PUBLIC asm_malloc_unlocked
-PUBLIC asm_malloc_unlocked_lib
+SECTION seg_code_malloc
 
-EXTERN __heap
+PUBLIC asm_malloc_unlocked
+
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_unlocked
 
 asm_malloc_unlocked:
-asm_malloc_unlocked_lib:
 
    ; Allocate memory from the thread's default heap without locking
    ;
@@ -38,5 +38,5 @@ asm_malloc_unlocked_lib:
    ;
    ; uses  : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_alloc_unlocked

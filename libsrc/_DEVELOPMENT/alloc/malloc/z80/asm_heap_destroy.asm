@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_destroy
 
 EXTERN asm_mtx_destroy
 
-asm_heap_destroy:
-
-   jp asm_mtx_destroy
-
-;defc asm_heap_destroy = asm_mtx_destroy
+defc asm_heap_destroy = asm_mtx_destroy
 
    ; Destroys the mutex associated with the heap
    ;

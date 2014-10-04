@@ -1,6 +1,8 @@
 
 ; int isblank(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC isblank
 
 EXTERN asm_isblank, error_znc

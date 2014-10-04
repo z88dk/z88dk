@@ -1,4 +1,6 @@
 
+SECTION seg_code_arch
+
 PUBLIC asm0_zx_scroll
 
 EXTERN asm_zx_scroll

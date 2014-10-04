@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_blank_fast
 
 asm_obstack_blank_fast:

@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_room
 
 obstack_room:

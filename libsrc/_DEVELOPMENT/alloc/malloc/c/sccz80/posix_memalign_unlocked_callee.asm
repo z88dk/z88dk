@@ -1,6 +1,8 @@
 
 ; int posix_memalign_unlocked(void **memptr, size_t alignment, size_t size)
 
+SECTION seg_code_malloc
+
 PUBLIC posix_memalign_unlocked_callee
 
 posix_memalign_unlocked_callee:

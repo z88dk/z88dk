@@ -1,6 +1,8 @@
 
 ; void *_falloc__unlocked(void *p, size_t size)
 
+SECTION seg_code_malloc
+
 PUBLIC __falloc__unlocked
 
 __falloc__unlocked:

@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_init
 
 EXTERN error_einval_zc

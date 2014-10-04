@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_balloc
+
 PUBLIC asm_balloc_firstfit
 
-EXTERN __qtbl
+EXTERN __balloc_qtbl
 
 EXTERN error_enomem_zc
 
@@ -37,7 +39,7 @@ asm_balloc_firstfit:
    jp z, error_enomem_zc       ; zero queues to search
    
    add hl,hl
-   ld de,(__qtbl)
+   ld de,(__balloc_qtbl)
    add hl,de                   ; forward_list *q
    
    ld b,a

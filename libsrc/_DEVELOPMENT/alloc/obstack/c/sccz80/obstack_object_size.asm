@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_object_size
 
 obstack_object_size:

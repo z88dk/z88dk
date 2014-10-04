@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_init
 
 EXTERN mtx_plain
@@ -46,7 +48,7 @@ asm_heap_init:
    ld c,mtx_plain
    call asm_mtx_init
    
-   jp nz, error_enolck_zc - 2  ; if mutex init failed
+   jp c, error_enolck_zc - 2   ; if mutex init failed
 
    ld hl,6                     ; sizeof(mutex)
    add hl,de

@@ -1,6 +1,8 @@
 
 ; int isupper(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isupper
 
 EXTERN asm_isupper, error_zc

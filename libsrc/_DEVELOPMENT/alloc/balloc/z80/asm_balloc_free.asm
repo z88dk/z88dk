@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_balloc
+
 PUBLIC asm_balloc_free
 
-EXTERN __qtbl
+EXTERN __balloc_qtbl
 
 EXTERN asm_p_forward_list_insert_after
 
@@ -37,7 +39,7 @@ asm_balloc_free:
    
    add hl,hl
    
-   ld bc,(__qtbl)
+   ld bc,(__balloc_qtbl)
    add hl,bc                   ; hl = p_forward_list *q
    
    jp asm_p_forward_list_insert_after

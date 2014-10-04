@@ -19,13 +19,15 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_posix_memalign
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_aligned, asm0_posix_memalign_unlocked
 
@@ -53,7 +55,7 @@ asm_posix_memalign:
 
    push de                     ; save memptr
    
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    call asm_heap_alloc_aligned
    
    jp asm0_posix_memalign_unlocked
@@ -66,9 +68,7 @@ PUBLIC asm_posix_memalign
 
 EXTERN asm_posix_memalign_unlocked
 
-asm_posix_memalign:
-
-   jp asm_posix_memalign_unlocked
+defc asm_posix_memalign = asm_posix_memalign_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

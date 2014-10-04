@@ -1,6 +1,8 @@
 
 ; void *obstack_blank(struct obstack *ob, int size)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_blank
 
 _obstack_blank:

@@ -14,13 +14,15 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm__falloc
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_fixed
 
@@ -49,7 +51,7 @@ asm__falloc:
    ;
    ; uses  : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_alloc_fixed
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,9 +62,7 @@ PUBLIC asm__falloc
 
 EXTERN asm__falloc_unlocked
 
-asm__falloc:
-
-   jp asm__falloc_unlocked
+defc asm__falloc = asm__falloc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

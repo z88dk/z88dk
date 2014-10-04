@@ -18,13 +18,15 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_aligned_alloc
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_aligned
 
@@ -58,7 +60,7 @@ asm_aligned_alloc:
    ;
    ; uses   : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_alloc_aligned
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -69,9 +71,7 @@ PUBLIC asm_aligned_alloc
 
 EXTERN asm_aligned_alloc_unlocked
 
-asm_aligned_alloc:
-
-   jp asm_aligned_alloc_unlocked
+defc asm_aligned_alloc = asm_aligned_alloc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,6 +1,8 @@
 
 ; int isdigit(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC isdigit
 
 EXTERN asm_isdigit, error_zc

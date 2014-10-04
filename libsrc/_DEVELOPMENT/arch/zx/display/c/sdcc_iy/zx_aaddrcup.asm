@@ -1,6 +1,8 @@
 
 ; void *zx_aaddrcup(void *aaddr)
 
+SECTION seg_code_arch
+
 PUBLIC _zx_aaddrcup
 
 _zx_aaddrcup:

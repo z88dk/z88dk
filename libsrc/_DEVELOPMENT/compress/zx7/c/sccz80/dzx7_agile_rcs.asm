@@ -1,6 +1,8 @@
 
 ; void dzx7_agile_rcs(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC dzx7_agile_rcs
 
 EXTERN asm_dzx7_agile_rcs

@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,11 +31,9 @@ PUBLIC _calloc
 
 EXTERN _calloc_unlocked
 
-_calloc:
-
-   jp _calloc_unlocked
+defc _calloc = _calloc_unlocked
    
-   INCLUDE "alloc/malloc/z80/asm_calloc.asm"
+INCLUDE "alloc/malloc/z80/asm_calloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

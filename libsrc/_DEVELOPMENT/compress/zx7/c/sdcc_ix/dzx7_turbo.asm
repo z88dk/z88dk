@@ -1,6 +1,8 @@
 
 ; void dzx7_turbo(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC _dzx7_turbo
 
 _dzx7_turbo:

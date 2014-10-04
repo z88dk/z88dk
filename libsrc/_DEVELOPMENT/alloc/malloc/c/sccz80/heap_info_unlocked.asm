@@ -1,6 +1,8 @@
 
 ; void heap_info_unlocked(void *heap, void *callback)
 
+SECTION seg_code_malloc
+
 PUBLIC heap_info_unlocked
 
 EXTERN asm_heap_info_unlocked

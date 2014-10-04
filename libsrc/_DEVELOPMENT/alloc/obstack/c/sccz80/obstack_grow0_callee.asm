@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_grow0_callee
 
 obstack_grow0_callee:

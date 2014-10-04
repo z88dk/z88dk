@@ -1,6 +1,8 @@
 
 ; void *obstack_finish(struct obstack *ob)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_finish
 
 _obstack_finish:

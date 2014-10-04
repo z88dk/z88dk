@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_align_distance
 
 EXTERN l_power_2_bc, error_einval_mc, error_znc, l_andc_hlbc

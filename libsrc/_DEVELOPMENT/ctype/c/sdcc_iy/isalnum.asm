@@ -1,6 +1,8 @@
 
 ; int isalnum(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isalnum
 
 EXTERN asm_isalnum, error_zc

@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_copy0
 
 EXTERN asm_obstack_copy, error_enomem_zc

@@ -1,6 +1,8 @@
 
 ; int obstack_grow0(struct obstack *ob, void *data, size_t size)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_grow0
 
 EXTERN asm_obstack_grow0

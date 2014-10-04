@@ -1,6 +1,8 @@
 
 ; int isprint(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isprint
 
 EXTERN asm_isprint, error_zc

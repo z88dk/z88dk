@@ -1,6 +1,8 @@
 
 ; void *zx_saddrpdown(void *saddr)
 
+SECTION seg_code_arch
+
 PUBLIC _zx_saddrpdown
 
 _zx_saddrpdown:

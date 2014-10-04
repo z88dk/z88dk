@@ -1,6 +1,8 @@
 
 ; int obstack_align_to(struct obstack *ob, size_t alignment)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_align_to
 
 _obstack_align_to:

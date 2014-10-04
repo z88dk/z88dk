@@ -1,6 +1,8 @@
 
 ; void zx_cls(uchar attr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_cls
 
 zx_cls:

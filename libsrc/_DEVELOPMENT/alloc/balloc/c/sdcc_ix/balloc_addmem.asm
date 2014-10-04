@@ -1,6 +1,8 @@
 
 ; void *balloc_addmem(unsigned char q, size_t num, size_t size, void *addr)
 
+SECTION seg_code_balloc
+
 PUBLIC _balloc_addmem
 
 _balloc_addmem:

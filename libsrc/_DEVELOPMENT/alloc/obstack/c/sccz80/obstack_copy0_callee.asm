@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_copy0_callee
 
 obstack_copy0_callee:

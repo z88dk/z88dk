@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,9 +35,7 @@ PUBLIC posix_memalign
 
 EXTERN posix_memalign_unlocked
 
-posix_memalign:
-
-   jp posix_memalign_unlocked
+defc posix_memalign = posix_memalign_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

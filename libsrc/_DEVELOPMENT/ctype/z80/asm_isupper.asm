@@ -1,4 +1,6 @@
 
+SECTION seg_code_ctype
+
 PUBLIC asm_isupper
 
 asm_isupper:

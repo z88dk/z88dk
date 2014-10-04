@@ -22,3 +22,22 @@ fragmentation.  Each allocated block does incur a one byte overhead
 to identify the array index the block belongs to.  For these reasons,
 block allocation is an attractive alternative to the heap for frequent
 allocation of small fixed-size blocks.
+
+
+========
+sections
+========
+
+seg_code_balloc
+
+
+====
+data
+====
+
+The following variable holds the adress of the queue table
+and should be defined in a data segment:
+
+__balloc_qtbl  defw  address_queue_table
+
+The queue table itself should be allocated in a bss segment.

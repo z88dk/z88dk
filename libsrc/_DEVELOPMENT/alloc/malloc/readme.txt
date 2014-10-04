@@ -60,3 +60,22 @@ block can be resized in place.
 
 The memory allocation strategy is first fit, except for realloc which
 is largest fit.
+
+
+========
+sections
+========
+
+seg_code_malloc
+
+
+====
+data
+====
+
+The following variable holds the address of the default heap and should
+be defined in a data segment:
+
+__malloc_heap  defw  default_heap
+
+The default heap itself should be allocated in a bss segment.

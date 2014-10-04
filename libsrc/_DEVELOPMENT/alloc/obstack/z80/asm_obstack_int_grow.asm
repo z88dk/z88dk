@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_int_grow
 
 EXTERN asm_obstack_room, error_enomem_zc

@@ -1,6 +1,8 @@
 
 ; int obstack_grow(struct obstack *ob, void *data, size_t size)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_grow
 
 _obstack_grow:

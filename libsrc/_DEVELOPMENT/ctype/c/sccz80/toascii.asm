@@ -1,6 +1,8 @@
 
 ; int toascii(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC toascii
 
 toascii:

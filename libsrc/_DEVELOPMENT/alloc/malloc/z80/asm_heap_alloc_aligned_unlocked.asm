@@ -17,6 +17,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_alloc_aligned_unlocked
 
 EXTERN __heap_place_block, __heap_allocate_block, l_andc_hl_bc

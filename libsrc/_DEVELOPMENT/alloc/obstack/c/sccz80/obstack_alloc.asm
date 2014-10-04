@@ -1,6 +1,8 @@
 
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_alloc
 
 EXTERN asm_obstack_alloc

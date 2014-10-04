@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,11 +31,9 @@ PUBLIC _heap_free
 
 EXTERN _heap_free_unlocked
 
-_heap_free:
-
-   jp _heap_free_unlocked
+defc _heap_free = _heap_free_unlocked
    
-   INCLUDE "alloc/malloc/z80/asm_heap_free.asm"
+INCLUDE "alloc/malloc/z80/asm_heap_free.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

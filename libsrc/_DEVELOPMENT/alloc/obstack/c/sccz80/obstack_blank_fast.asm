@@ -1,6 +1,8 @@
 
 ; void *obstack_blank_fast(struct obstack *ob, int size)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_blank_fast
 
 EXTERN asm_obstack_blank_fast

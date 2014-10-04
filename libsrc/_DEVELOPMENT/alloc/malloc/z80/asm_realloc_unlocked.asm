@@ -25,15 +25,15 @@
 ;
 ; ===============================================================
 
-PUBLIC asm_realloc_unlocked
-PUBLIC asm_realloc_unlocked_lib
+SECTION seg_code_malloc
 
-EXTERN __heap
+PUBLIC asm_realloc_unlocked
+
+EXTERN __malloc_heap
 
 EXTERN asm_heap_realloc_unlocked
 
 asm_realloc_unlocked:
-asm_realloc_unlocked_lib:
 
    ; Realloc using the thread's default heap without locking
    ;
@@ -57,5 +57,5 @@ asm_realloc_unlocked_lib:
    ;
    ; uses  : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_realloc_unlocked

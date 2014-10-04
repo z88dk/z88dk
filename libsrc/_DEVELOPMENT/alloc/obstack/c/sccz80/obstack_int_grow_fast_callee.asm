@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_int_grow_fast_callee
 
 obstack_int_grow_fast_callee:

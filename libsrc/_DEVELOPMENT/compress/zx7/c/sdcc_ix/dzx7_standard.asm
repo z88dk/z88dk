@@ -1,6 +1,8 @@
 
 ; void dzx7_standard(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC _dzx7_standard
 
 _dzx7_standard:

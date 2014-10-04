@@ -1,4 +1,6 @@
 
+SECTION seg_code_malloc
+
 PUBLIC __heap_lock_release
 PUBLIC __heap_lock_release_0
 
@@ -31,7 +33,7 @@ __heap_lock_release_0:
 
    ; Release the heap's lock, alternate method
    ;
-   ; enter : stack = void *heap
+   ; enter : stack = ret, void *heap
    ;
    ; exit  : none
    ;

@@ -1,6 +1,8 @@
 
 ; size_t obstack_object_size(struct obstack *ob)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_object_size
 
 _obstack_object_size:

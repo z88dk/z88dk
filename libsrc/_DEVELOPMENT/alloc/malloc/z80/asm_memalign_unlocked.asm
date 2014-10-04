@@ -16,15 +16,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_memalign_unlocked
 
 EXTERN asm_aligned_alloc_unlocked
 
-asm_memalign_unlocked:
-
-   jp asm_aligned_alloc_unlocked
-
-;defc asm_memalign_unlocked = asm_aligned_alloc_unlocked
+defc asm_memalign_unlocked = asm_aligned_alloc_unlocked
 
    ; Attempt to allocate memory at an address that is aligned to a power of 2
    ; from the thread's default heap without locking

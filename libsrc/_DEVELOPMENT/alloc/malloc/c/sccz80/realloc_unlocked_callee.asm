@@ -1,6 +1,8 @@
 
 ; void *realloc_unlocked(void *p, size_t size)
 
+SECTION seg_code_malloc
+
 PUBLIC realloc_unlocked_callee
 
 realloc_unlocked_callee:

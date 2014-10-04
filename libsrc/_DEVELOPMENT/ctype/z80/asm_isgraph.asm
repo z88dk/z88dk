@@ -1,4 +1,6 @@
 
+SECTION seg_code_ctype
+
 PUBLIC asm_isgraph
 
 asm_isgraph:

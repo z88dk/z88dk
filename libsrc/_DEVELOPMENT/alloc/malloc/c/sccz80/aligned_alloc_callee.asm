@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,11 +28,9 @@ PUBLIC aligned_alloc_callee
 
 EXTERN aligned_alloc_unlocked_callee
 
-aligned_alloc_callee:
-
-   jp aligned_alloc_unlocked_callee
+defc aligned_alloc_callee = aligned_alloc_unlocked_callee
    
-   INCLUDE "alloc/malloc/z80/asm_aligned_alloc.asm"
+INCLUDE "alloc/malloc/z80/asm_aligned_alloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

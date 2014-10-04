@@ -1,6 +1,8 @@
 
 ; int isalpha(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _isalpha
 
 EXTERN asm_isalpha, error_zc

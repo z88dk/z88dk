@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_alloc_unlocked
 
 EXTERN __heap_allocate_block, error_enomem_zc

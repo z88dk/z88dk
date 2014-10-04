@@ -15,6 +15,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_finish
 
 asm_obstack_finish:

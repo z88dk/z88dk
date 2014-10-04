@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_free_unlocked
 
 EXTERN l_setmem_hl

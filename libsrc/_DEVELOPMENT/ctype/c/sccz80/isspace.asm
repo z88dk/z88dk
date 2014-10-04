@@ -1,6 +1,8 @@
 
 ; int isspace(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC isspace
 
 EXTERN asm_isspace, error_zc

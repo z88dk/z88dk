@@ -1,6 +1,8 @@
 
 ; void dzx7_agile_rcs(void *src, void *dst)
 
+SECTION seg_code_zx7
+
 PUBLIC _dzx7_agile_rcs
 
 _dzx7_agile_rcs:

@@ -1,6 +1,8 @@
 
 ; uint zx_aaddr2px(void *attraddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_aaddr2px
 
 zx_aaddr2px:

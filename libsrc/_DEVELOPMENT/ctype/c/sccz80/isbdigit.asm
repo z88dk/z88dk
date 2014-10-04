@@ -1,6 +1,8 @@
 
 ; int isbdigit(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC isbdigit
 
 EXTERN asm_isbdigit, error_znc

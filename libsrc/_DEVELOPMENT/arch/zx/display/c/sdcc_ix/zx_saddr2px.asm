@@ -1,6 +1,8 @@
 
 ; uint zx_saddr2px(void *saddr)
 
+SECTION seg_code_arch
+
 PUBLIC _zx_saddr2px
 
 _zx_saddr2px:

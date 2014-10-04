@@ -16,9 +16,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_aligned_alloc_unlocked
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_alloc_aligned_unlocked
 
@@ -47,5 +49,5 @@ asm_aligned_alloc_unlocked:
    ;
    ; uses   : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_alloc_aligned_unlocked

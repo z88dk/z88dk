@@ -1,6 +1,8 @@
 
 ; void *obstack_1grow(struct obstack *ob, char c)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_1grow
 
 EXTERN asm_obstack_1grow

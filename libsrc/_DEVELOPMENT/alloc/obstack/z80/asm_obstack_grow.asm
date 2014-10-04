@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_grow
 
 EXTERN asm0_obstack_blank, asm_memcpy

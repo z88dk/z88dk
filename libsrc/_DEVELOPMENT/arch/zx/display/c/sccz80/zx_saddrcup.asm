@@ -1,6 +1,8 @@
 
 ; void *zx_saddrcup(void *saddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_saddrcup
 
 zx_saddrcup:

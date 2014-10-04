@@ -1,6 +1,8 @@
 
 ; int isgraph(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC isgraph
 
 EXTERN asm_isgraph, error_zc

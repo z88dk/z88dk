@@ -1,6 +1,8 @@
 
 ; size_t obstack_align_distance(struct obstack *ob, size_t alignment)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_align_distance
 
 EXTERN asm_obstack_align_distance

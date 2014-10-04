@@ -1,4 +1,6 @@
 
+SECTION seg_code_malloc
+
 PUBLIC __heap_place_block
 
 EXTERN l_ltu_de_hl
@@ -49,9 +51,12 @@ __heap_place_block:
    sbc hl,bc
    jr c, fail                  ; if avail bytes < gross request size
 
+   ; block_new will fit before block_next
+
    pop hl                      ; hl = & block
-   push hl
-   push bc
+   
+   push hl                     ; save & block
+   push bc                     ; save gross request size
    
    ld c,l
    ld b,h                      ; bc = & block

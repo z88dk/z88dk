@@ -12,6 +12,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_zx7
+
 PUBLIC asm_dzx7_mega
 
 asm_dzx7_mega:

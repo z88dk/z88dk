@@ -1,6 +1,8 @@
 
 ; void *zx_pxy2saddr(uchar x, uchar y)
 
+SECTION seg_code_arch
+
 PUBLIC _zx_pxy2saddr
 
 _zx_pxy2saddr:

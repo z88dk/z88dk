@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,9 +31,7 @@ PUBLIC __falloc_
 
 EXTERN __falloc__unlocked
 
-__falloc_:
-
-   jp __falloc__unlocked
+defc __falloc_ = __falloc__unlocked
    
    INCLUDE "alloc/malloc/z80/asm__falloc.asm"
 

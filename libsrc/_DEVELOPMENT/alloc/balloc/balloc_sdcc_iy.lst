@@ -3,4 +3,3 @@ alloc/balloc/c/sdcc_iy/balloc_alloc
 alloc/balloc/c/sdcc_iy/balloc_blockcount
 alloc/balloc/c/sdcc_iy/balloc_firstfit
 alloc/balloc/c/sdcc_iy/balloc_free
-alloc/balloc/c/sdcc_iy/balloc_init

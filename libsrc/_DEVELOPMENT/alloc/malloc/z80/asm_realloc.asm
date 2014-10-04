@@ -27,19 +27,19 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_realloc
-PUBLIC asm_realloc_lib
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_realloc
 
 asm_realloc:
-asm_realloc_lib:
 
    ; Realloc using the thread's default heap
    ;
@@ -63,7 +63,7 @@ asm_realloc_lib:
    ;
    ; uses  : af, bc, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_realloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -71,14 +71,10 @@ ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_realloc
-PUBLIC asm_realloc_lib
 
 EXTERN asm_realloc_unlocked
 
-asm_realloc:
-asm_realloc_lib:
-
-   jp asm_realloc_unlocked
+defc asm_realloc = asm_realloc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

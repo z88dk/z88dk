@@ -78,6 +78,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_arch
+
 PUBLIC asm_zx_pattern_fill
 
 EXTERN error_einval_zc, error_enomem_zc, error_mnc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask

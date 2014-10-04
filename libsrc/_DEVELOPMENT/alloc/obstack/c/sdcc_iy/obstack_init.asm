@@ -1,6 +1,8 @@
 
 ; void *obstack_init(struct obstack *ob, size_t size)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_init
 
 _obstack_init:

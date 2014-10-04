@@ -1,6 +1,8 @@
 
 ; void *zx_saddrcleft(saddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_saddrcleft
 
 zx_saddrcleft:

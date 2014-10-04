@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_balloc
+
 PUBLIC asm_balloc_alloc
 
-EXTERN __qtbl
+EXTERN __balloc_qtbl
 
 EXTERN asm_p_forward_list_remove_after, error_enomem_zc
 
@@ -26,13 +28,13 @@ asm_balloc_alloc:
    ;
    ;         fail
    ;
-   ;           carry set
+   ;           carry set, errno = ENOMEM
    ;           hl = 0
    ;
    ; uses  : af, de, hl
 
    add hl,hl
-   ld de,(__qtbl)
+   ld de,(__balloc_qtbl)
    add hl,de                   ; p_forward_list *q
 
    call asm_p_forward_list_remove_after

@@ -1,6 +1,8 @@
 
 ; void *zx_aaddrcdown(void *attraddr)
 
+SECTION seg_code_arch
+
 PUBLIC zx_aaddrcdown
 
 zx_aaddrcdown:

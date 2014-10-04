@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -11,11 +13,9 @@ PUBLIC _memalign
 
 EXTERN _aligned_alloc
 
-_memalign:
+defc _memalign = _aligned_alloc
 
-   jp _aligned_alloc
-
-   INCLUDE "alloc/malloc/z80/asm_memalign.asm"
+INCLUDE "alloc/malloc/z80/asm_memalign.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -25,11 +25,9 @@ PUBLIC _memalign
 
 EXTERN _memalign_unlocked
 
-_memalign:
-
-   jp _memalign_unlocked
+defc _memalign = _memalign_unlocked
    
-   INCLUDE "alloc/malloc/z80/asm_memalign.asm"
+INCLUDE "alloc/malloc/z80/asm_memalign.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

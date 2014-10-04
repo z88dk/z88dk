@@ -1,6 +1,8 @@
 
 ; int iscntrl(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC iscntrl
 
 EXTERN asm_iscntrl, error_znc

@@ -1,6 +1,8 @@
 
 ; int obstack_align_to(struct obstack *ob, size_t alignment)
 
+SECTION seg_code_obstack
+
 PUBLIC obstack_align_to
 
 EXTERN asm_obstack_align_to

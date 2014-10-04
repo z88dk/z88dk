@@ -1,6 +1,8 @@
 
 ; int islower(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _islower
 
 EXTERN asm_islower, error_zc

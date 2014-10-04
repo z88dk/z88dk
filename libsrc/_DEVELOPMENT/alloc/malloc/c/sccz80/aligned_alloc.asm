@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,9 +33,7 @@ PUBLIC aligned_alloc
 
 EXTERN aligned_alloc_unlocked
 
-aligned_alloc:
-
-   jp aligned_alloc_unlocked
+defc aligned_alloc = aligned_alloc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

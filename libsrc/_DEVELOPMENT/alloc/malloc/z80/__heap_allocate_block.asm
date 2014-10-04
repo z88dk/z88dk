@@ -1,4 +1,6 @@
 
+SECTION seg_code_malloc
+
 PUBLIC __heap_allocate_block
 
 __heap_allocate_block:

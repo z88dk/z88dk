@@ -1,6 +1,8 @@
 
 ; size_t obstack_room(struct obstack *ob)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_room
 
 _obstack_room:

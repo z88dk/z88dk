@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_copy
 
 EXTERN asm_obstack_alloc, asm_memcpy

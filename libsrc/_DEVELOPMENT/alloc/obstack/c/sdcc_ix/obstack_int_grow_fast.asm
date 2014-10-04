@@ -1,6 +1,8 @@
 
 ; void *obstack_int_grow_fast(struct obstack *ob, int data)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_int_grow_fast
 
 _obstack_int_grow_fast:

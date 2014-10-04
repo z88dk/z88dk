@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,11 +33,9 @@ PUBLIC _heap_realloc
 
 EXTERN _heap_realloc_unlocked
 
-_heap_realloc:
-
-   jp _heap_realloc_unlocked
+defc _heap_realloc = _heap_realloc_unlocked
    
-   INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"
+INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

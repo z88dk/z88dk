@@ -11,10 +11,12 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_obstack
+
 PUBLIC asm_obstack_align_to
 
 EXTERN asm_obstack_align_distance, asm0_obstack_blank
-EXTERN error_einval_zc, error_enomem_zc, error_zc
+EXTERN error_zc
 
 asm_obstack_align_to:
 

@@ -14,19 +14,19 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_malloc
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_free
-PUBLIC asm_free_lib
 
-EXTERN __heap
+EXTERN __malloc_heap
 
 EXTERN asm_heap_free
 
 asm_free:
-asm_free_lib:
 
    ; Return the memory block to the thread's default heap
    ;
@@ -43,7 +43,7 @@ asm_free_lib:
    ;
    ; uses  : af, de, hl
 
-   ld de,(__heap)
+   ld de,(__malloc_heap)
    jp asm_heap_free
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -51,14 +51,10 @@ ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC asm_free
-PUBLIC asm_free_lib
 
 EXTERN asm_free_unlocked
 
-asm_free:
-asm_free_lib:
-
-   jp asm_free_unlocked
+defc asm_free = asm_free_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

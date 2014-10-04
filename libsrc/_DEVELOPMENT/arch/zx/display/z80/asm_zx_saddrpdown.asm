@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_arch
+
 PUBLIC asm_zx_saddrpdown
 PUBLIC asm0_zx_saddrpdown
 

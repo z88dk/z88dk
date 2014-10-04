@@ -1,6 +1,8 @@
 
 ; void *obstack_base(struct obstack *ob)
 
+SECTION seg_code_obstack
+
 PUBLIC _obstack_base
 
 _obstack_base:

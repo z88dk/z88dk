@@ -1,6 +1,8 @@
 
 ; int tolower(int c)
 
+SECTION seg_code_ctype
+
 PUBLIC _tolower
 
 EXTERN asm_tolower

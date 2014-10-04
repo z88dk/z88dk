@@ -14,6 +14,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_malloc
+
 PUBLIC asm_heap_calloc_unlocked
 
 EXTERN l_mulu_16_16x16, asm_heap_alloc_unlocked, asm_memset, error_enomem_zc
