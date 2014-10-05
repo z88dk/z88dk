@@ -1,0 +1,15 @@
+font/fzx/zx/c/sdcc_ix/fzx_buffer_extent
+font/fzx/zx/c/sdcc_ix/fzx_buffer_partition
+font/fzx/zx/c/sdcc_ix/fzx_buffer_partition_ww
+font/fzx/zx/c/sdcc_ix/fzx_char_metrics
+font/fzx/zx/c/sdcc_ix/fzx_mode
+font/fzx/zx/c/sdcc_ix/fzx_putc
+font/fzx/zx/c/sdcc_ix/fzx_puts
+font/fzx/zx/c/sdcc_ix/fzx_setat
+font/fzx/zx/c/sdcc_ix/fzx_string_extent
+font/fzx/zx/c/sdcc_ix/fzx_string_partition
+font/fzx/zx/c/sdcc_ix/fzx_string_partition_ww
+font/fzx/zx/c/sdcc_ix/fzx_write
+font/fzx/zx/z80/__fzx_char_metrics
+font/fzx/zx/z80/__fzx_glyph_width
+font/fzx/zx/z80/__fzx_width_sm

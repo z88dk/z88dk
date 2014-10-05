@@ -1,0 +1,4 @@
+
+; FONT.LIB CODE SECTIONS
+
+SECTION seg_code_fzx
