@@ -1,0 +1,51 @@
+==============================================================================
+ Término 
+==============================================================================
+
+Português 
+---------
+Autor: TK90X Fan (reikainosuke-tk@yahoo.com.br)
+
+Versão: 1
+
+Data: 25/06/2014
+
+Descrição: 
+Término é uma fonte para TK90X e ZX Spectrum em padrão FZX inspirada em Terminus
+(http://terminus-font.sourceforge.net/). Sua altura é de 8 pontos, para se 
+limitar à altura de uma linha de atributos de cores. 
+
+Arquivos: 
+    - Termino.fzx: caracteres codificados na variante Sinclair do ASCII; 
+    - Termino_Latin1.fzx: caracteres codificados em ISO-8859-1 (Latin-1);
+    - Termino_Latin5.fzx: caracteres codificados em ISO-8859-9 (Latin-5). 
+
+Licença: 
+O uso desta fonte, bem como a sua redistribuição, modificação e incorporação em 
+outros trabalhos, comerciais ou não, é totalmente livre. Não há necessidade de
+citar os créditos desta fonte em seu trabalho. Esta fonte não vem absolutamente 
+com NENHUMA GARANTIA.  
+
+English
+-------
+Author: TK90X Fan (reikainosuke-tk@yahoo.com.br)
+
+Version: 1
+
+Date: 06/25/2014
+
+Description:
+Término is a FZX font for ZX Spectrum inspired by Terminus 
+(http://terminus-font.sourceforge.net/). Its height is 8 points, so this font
+can fit into one line of color attributes. 
+
+Files: 
+    - Termino.fzx: Sinclair's ASCII variant encoding; 
+    - Termino_Latin1.fzx: ISO-8859-1 (Latin-1) encoding;
+    - Termino_Latin5.fzx: ISO-8859-9 (Latin-5) encoding. 
+
+License:  
+    This font can be freely used, redistributed, modified and incorporated in 
+any work, commercial or not. There is no need to make credit of this font in 
+your work. This font comes with ABSOLUTELY NO WARRANTY. 
+

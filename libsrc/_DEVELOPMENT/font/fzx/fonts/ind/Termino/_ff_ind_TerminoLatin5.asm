@@ -1,0 +1,8 @@
+
+SECTION seg_rodata_fzx
+
+PUBLIC _ff_ind_TerminoLatin5
+
+_ff_ind_TerminoLatin5:
+
+BINARY "font/fzx/fonts/ind/Termino/Termino_Latin5.fzx"
