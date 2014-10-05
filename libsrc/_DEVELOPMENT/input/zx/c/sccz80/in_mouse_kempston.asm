@@ -1,6 +1,8 @@
 
 ; void in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
+SECTION seg_code_input
+
 PUBLIC in_mouse_kempston
 
 EXTERN asm_in_mouse_kempston

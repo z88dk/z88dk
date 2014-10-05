@@ -28,6 +28,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_mouse_amx_init
 PUBLIC asm_in_mouse_amx_reset
 
@@ -74,7 +76,7 @@ asm_in_mouse_amx_reset:
    ld (__input_amx_mouse_dx),hl
    ld (__input_amx_mouse_dy),hl
    
-   ld hl,0                     ; set mouse coordinate to (0,0)
+   ld h,l                      ; set mouse coordinate to (0,0)
    ld (__input_amx_mouse_x),hl
    ld (__input_amx_mouse_y),hl
    

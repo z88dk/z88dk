@@ -1,6 +1,8 @@
 
 ; uint16_t in_stick_kempston(void)
 
+SECTION seg_code_input
+
 PUBLIC in_stick_kempston
 
 in_stick_kempston:

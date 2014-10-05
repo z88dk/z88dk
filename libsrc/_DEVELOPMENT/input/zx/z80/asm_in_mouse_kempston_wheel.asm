@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_mouse_kemptson_wheel
 
 EXTERN __input_kempston_mouse_wheel
@@ -22,7 +24,7 @@ asm_in_mouse_kempston_wheel:
    ;
    ;        fail
    ;
-   ;           hl = -1
+   ;           hl = 0
    ;           carry set, errno = ENOTSUP
    ;
    ; uses : f, hl

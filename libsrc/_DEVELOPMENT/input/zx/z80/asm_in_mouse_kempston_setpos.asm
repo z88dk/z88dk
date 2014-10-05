@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_mouse_kempston_setpos
 
 EXTERN __input_kempston_mouse_x, __input_kempston_mouse_y

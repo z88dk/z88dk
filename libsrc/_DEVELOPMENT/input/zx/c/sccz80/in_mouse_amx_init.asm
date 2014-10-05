@@ -1,6 +1,8 @@
 
 ; void in_mouse_amx_init(uint8_t x_vector, uint8_t y_vector)
 
+SECTION seg_code_input
+
 PUBLIC in_mouse_amx_init
 
 EXTERN asm_in_mouse_amx_init

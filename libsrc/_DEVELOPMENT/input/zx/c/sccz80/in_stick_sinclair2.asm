@@ -1,6 +1,8 @@
 
 ; uint16_t in_stick_sinclair2(void)
 
+SECTION seg_code_input
+
 PUBLIC in_stick_sinclair2
 
 in_stick_sinclair2:

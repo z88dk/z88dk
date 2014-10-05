@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_stick_cursor
 
 asm_in_stick_cursor:

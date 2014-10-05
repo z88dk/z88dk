@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_wait_key
 
 EXTERN asm_in_test_key

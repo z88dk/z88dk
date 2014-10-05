@@ -5,10 +5,12 @@ input/zx/z80/asm_in_mouse_amx
 input/zx/z80/asm_in_mouse_amx_init
 input/zx/z80/asm_in_mouse_amx_setpos
 input/zx/z80/asm_in_mouse_amx_wheel
+input/zx/z80/asm_in_mouse_amx_wheel_delta
 input/zx/z80/asm_in_mouse_kempston
 input/zx/z80/asm_in_mouse_kempston_init
 input/zx/z80/asm_in_mouse_kempston_setpos
 input/zx/z80/asm_in_mouse_kempston_wheel
+input/zx/z80/asm_in_mouse_kempston_wheel_delta
 input/zx/z80/asm_in_pause
 input/zx/z80/asm_in_stick_cursor
 input/zx/z80/asm_in_stick_fuller

@@ -1,6 +1,8 @@
 
 ; void in_wait_nokey(void)
 
+SECTION seg_code_input
+
 PUBLIC in_wait_nokey
 
 in_wait_nokey:

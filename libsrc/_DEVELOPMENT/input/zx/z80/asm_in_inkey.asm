@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_inkey
 
 EXTERN in_key_translation_table, error_znc, error_zc

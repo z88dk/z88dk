@@ -6,11 +6,13 @@ input/zx/c/sdcc_ix/in_mouse_amx_init
 input/zx/c/sdcc_ix/in_mouse_amx_reset
 input/zx/c/sdcc_ix/in_mouse_amx_setpos
 input/zx/c/sdcc_ix/in_mouse_amx_wheel
+input/zx/c/sdcc_ix/in_mouse_amx_wheel_delta
 input/zx/c/sdcc_ix/in_mouse_kempston
 input/zx/c/sdcc_ix/in_mouse_kempston_init
 input/zx/c/sdcc_ix/in_mouse_kempston_reset
 input/zx/c/sdcc_ix/in_mouse_kempston_setpos
 input/zx/c/sdcc_ix/in_mouse_kempston_wheel
+input/zx/c/sdcc_ix/in_mouse_kempston_wheel_delta
 input/zx/c/sdcc_ix/in_pause
 input/zx/c/sdcc_ix/in_stick_cursor
 input/zx/c/sdcc_ix/in_stick_fuller

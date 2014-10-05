@@ -10,11 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_mouse_amx_wheel
 
-EXTERN error_enotsup_mc
+EXTERN error_enotsup_zc
 
-asm_in_mouse_amx_wheel:
+defc asm_in_mouse_amx_wheel = error_enotsup_zc
 
    ; exit : success
    ;
@@ -23,9 +25,7 @@ asm_in_mouse_amx_wheel:
    ;
    ;        fail
    ;
-   ;           hl = -1
+   ;           hl = 0
    ;           carry set, errno = ENOTSUP
    ;
    ; uses : f, hl
-   
-   jp error_enotsup_mc

@@ -1,6 +1,8 @@
 
 ; void in_mouse_kempston_setpos(uint16_t x, uint16_t y)
 
+SECTION seg_code_input
+
 PUBLIC in_mouse_kempston_setpos
 
 EXTERN asm_in_mouse_kempston_setpos

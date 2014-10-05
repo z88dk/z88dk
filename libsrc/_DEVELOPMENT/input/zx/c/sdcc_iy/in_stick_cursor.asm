@@ -1,6 +1,8 @@
 
 ; uint16_t in_stick_cursor(void)
 
+SECTION seg_code_input
+
 PUBLIC _in_stick_cursor
 
 _in_stick_cursor:

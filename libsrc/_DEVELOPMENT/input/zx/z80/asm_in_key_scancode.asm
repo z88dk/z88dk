@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_key_scancode
 
 EXTERN in_key_translation_table, error_einval_zc

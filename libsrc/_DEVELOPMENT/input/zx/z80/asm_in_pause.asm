@@ -10,9 +10,11 @@
 ;
 ; ===============================================================
 
-PUBLIC asm_in_pause
-
 INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_input
+
+PUBLIC asm_in_pause
 
 EXTERN asm_in_wait_key, asm_in_test_key, asm_z80_delay_tstate
 

@@ -1,6 +1,8 @@
 
 ; void in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
+SECTION seg_code_input
+
 PUBLIC _in_mouse_amx
 
 EXTERN asm_in_mouse_amx

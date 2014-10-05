@@ -1,6 +1,8 @@
 
 ; int in_inkey(void)
 
+SECTION seg_code_input
+
 PUBLIC in_inkey
 
 in_inkey:

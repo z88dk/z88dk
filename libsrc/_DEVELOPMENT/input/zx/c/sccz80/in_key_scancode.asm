@@ -1,6 +1,8 @@
 
 ; uint16_t in_key_scancode(int c)
 
+SECTION seg_code_input
+
 PUBLIC in_key_scancode
 
 in_key_scancode:

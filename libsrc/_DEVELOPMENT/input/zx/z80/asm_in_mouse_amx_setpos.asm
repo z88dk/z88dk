@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_mouse_amx_setpos
 
 EXTERN __input_amx_mouse_x, __input_amx_mouse_y

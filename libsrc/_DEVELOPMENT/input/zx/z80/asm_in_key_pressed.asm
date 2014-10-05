@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_input
+
 PUBLIC asm_in_key_pressed
 
 EXTERN error_znc, error_mc

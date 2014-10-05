@@ -1,6 +1,8 @@
 
 ; void in_mouse_kempston_init(void)
 
+SECTION seg_code_input
+
 PUBLIC _in_mouse_kempston_init
 
 _in_mouse_kempston_init:
