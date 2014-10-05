@@ -13,4 +13,4 @@ _fzx_mode:
    push hl
    push af
 
-   INCLUDE "font/fzx/arch/zx/z80/asm_fzx_mode.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_mode.asm"

@@ -14,4 +14,4 @@ fzx_char_metrics:
    
    ld a,l
    
-   INCLUDE "font/fzx/common/z80/asm_fzx_char_metrics.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_char_metrics.asm"

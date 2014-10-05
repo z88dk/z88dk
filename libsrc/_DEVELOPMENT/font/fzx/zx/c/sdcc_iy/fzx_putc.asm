@@ -15,4 +15,4 @@ _fzx_putc:
 
    ld a,l
    
-   INCLUDE "font/fzx/arch/zx/z80/asm_fzx_putc.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_putc.asm"

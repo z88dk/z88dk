@@ -7,4 +7,4 @@ PUBLIC fzx_puts
 
 fzx_puts:
 
-   INCLUDE "font/fzx/common/z80/asm_fzx_puts.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_puts.asm"

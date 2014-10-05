@@ -15,4 +15,4 @@ _fzx_string_partition:
    push de
    push af
    
-   INCLUDE "font/fzx/common/z80/asm_fzx_string_partition.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_string_partition.asm"

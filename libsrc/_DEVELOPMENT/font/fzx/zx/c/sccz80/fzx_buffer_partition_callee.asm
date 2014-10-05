@@ -13,4 +13,4 @@ fzx_buffer_partition_callee:
    pop de
    push af
    
-   INCLUDE "font/fzx/common/z80/asm_fzx_buffer_partition.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_buffer_partition.asm"

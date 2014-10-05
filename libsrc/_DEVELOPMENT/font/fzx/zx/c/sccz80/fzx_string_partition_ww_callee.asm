@@ -12,4 +12,4 @@ fzx_string_partition_callee:
    pop de
    push af
    
-   INCLUDE "font/fzx/common/z80/asm_fzx_string_partition_ww.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_string_partition_ww.asm"

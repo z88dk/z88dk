@@ -22,4 +22,4 @@ _fzx_buffer_extent:
    pop ix
    ret
    
-   INCLUDE "font/fzx/common/z80/asm_fzx_buffer_extent.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_buffer_extent.asm"

@@ -13,4 +13,4 @@ _fzx_puts:
    push hl
    push af
 
-   INCLUDE "font/fzx/common/z80/asm_fzx_puts.asm"
+   INCLUDE "font/fzx/zx/z80/asm_fzx_puts.asm"
