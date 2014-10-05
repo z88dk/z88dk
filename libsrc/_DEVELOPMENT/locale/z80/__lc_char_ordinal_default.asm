@@ -1,7 +1,11 @@
 
+SECTION seg_code_locale
+
 PUBLIC __lc_char_ordinal_default
 
-__lc_char_ordinal_default:
+EXTERN l_ret
+
+defc __lc_char_ordinal_default = l_ret
 
    ; char to ordinal in current locale
    ;
@@ -10,5 +14,3 @@ __lc_char_ordinal_default:
    ; exit  : a = ordinal
    ;
    ; uses  : af, bc, de, hl
-
-   ret

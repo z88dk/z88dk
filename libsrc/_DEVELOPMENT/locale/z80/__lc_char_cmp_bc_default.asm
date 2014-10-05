@@ -1,4 +1,6 @@
 
+SECTION seg_code_locale
+
 PUBLIC __lc_char_cmp_bc_default
 
 EXTERN __lc_char_ordinal
