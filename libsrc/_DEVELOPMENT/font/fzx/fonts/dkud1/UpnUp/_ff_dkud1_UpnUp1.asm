@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud1_UpnUp1
 
 _ff_dkud1_UpnUp1:

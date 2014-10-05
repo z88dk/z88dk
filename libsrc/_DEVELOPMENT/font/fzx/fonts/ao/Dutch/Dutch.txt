@@ -1,3 +1,7 @@
 Dutch 9pt Roman
 copyright (c) 1996 Andrew Owen
 - a serif font inspired by Times Roman
+
+Latin-1 characters added by TK90X Fan (2014)
+
+Latin-5 characters added by TK90X Fan (2014)

@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud4_Font06
 
 _ff_dkud4_Font06:

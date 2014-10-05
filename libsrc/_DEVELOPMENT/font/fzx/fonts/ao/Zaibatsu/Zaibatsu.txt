@@ -1,3 +1,9 @@
 Zaibatsu 8pt Bold
 copyright (c) 1996 Andrew Owen
 - a futuristic font inspired by Syndicate
+
+Latin-1 characters added by TK90X Fan (c) 2014. 
+The font height was increased to 13 pixels. 
+
+Latin-5 characters added by TK90X Fan (c) 2014. 
+The font height was increased to 13 pixels. 

@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud1_MahJongg
 
 _ff_dkud1_MahJongg:

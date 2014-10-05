@@ -7,6 +7,8 @@ font/fzx/fonts/ao/Cayeux/_ff_ao_Cayeux
 font/fzx/fonts/ao/Cheveron/_ff_ao_Cheveron
 font/fzx/fonts/ao/Chloe/_ff_ao_Chloe
 font/fzx/fonts/ao/Dutch/_ff_ao_Dutch
+font/fzx/fonts/ao/Dutch/_ff_ao_DutchLatin1
+font/fzx/fonts/ao/Dutch/_ff_ao_DutchLatin5
 font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoBold
 font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoBoldItalic
 font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoCyrillic
@@ -14,6 +16,8 @@ font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoItalic
 font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoRoman
 font/fzx/fonts/ao/GenevaMono/_ff_ao_GenevaMonoSymbol
 font/fzx/fonts/ao/Grotesk/_ff_ao_Grotesk
+font/fzx/fonts/ao/Grotesk/_ff_ao_GroteskLatin1
+font/fzx/fonts/ao/Grotesk/_ff_ao_GroteskLatin5
 font/fzx/fonts/ao/Hemery/_ff_ao_Hemery
 font/fzx/fonts/ao/Hiroshi/_ff_ao_Hiroshi
 font/fzx/fonts/ao/Jangeborg/_ff_ao_Jangeborg
@@ -28,9 +32,15 @@ font/fzx/fonts/ao/Orion/_ff_ao_Orion
 font/fzx/fonts/ao/Prefect/_ff_ao_Prefect
 font/fzx/fonts/ao/Programmer/_ff_ao_Programmer
 font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSans
+font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSansLatin1
+font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSansLatin5
 font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSerif
+font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSerifLatin1
+font/fzx/fonts/ao/Roundel/_ff_ao_RoundelSerifLatin5
 font/fzx/fonts/ao/Sabon/_ff_ao_Sabon
 font/fzx/fonts/ao/Sinclair/_ff_ao_Sinclair
+font/fzx/fonts/ao/Sinclair/_ff_ao_SinclairLatin1
+font/fzx/fonts/ao/Sinclair/_ff_ao_SinclairLatin5
 font/fzx/fonts/ao/SoixanteQuatre/_ff_ao_SoixanteQuatre
 font/fzx/fonts/ao/Soxz/_ff_ao_Soxz
 font/fzx/fonts/ao/SpecDings/_ff_ao_SpecDings

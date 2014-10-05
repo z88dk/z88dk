@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_ao_Aribeth6
 
 _ff_ao_Aribeth6:

@@ -1,3 +1,13 @@
 Grotesk 24pt Condensed Bold
 copyright (c) 2013 Andrew Owen
 - a headline font inspired by Hermann Zapf
+- minor errors fixed by TK90X Fan (2014)
+
+Modified by  by TK90X Fan (2014). 
+Latin-1 characters added.
+Fixed errors in space, comma and full stop. 
+
+Modified by  by TK90X Fan (2014). 
+Latin-5 characters added.
+Fixed errors in space, comma and full stop. 
+

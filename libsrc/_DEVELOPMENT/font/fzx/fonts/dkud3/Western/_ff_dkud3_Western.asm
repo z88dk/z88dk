@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud3_Western
 
 _ff_dkud3_Western:

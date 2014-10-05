@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud2_Belegost2
 
 _ff_dkud2_Belegost2:

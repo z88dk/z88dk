@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud2_Eclipse
 
 _ff_dkud2_Eclipse:

@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_dkud1_Beerland2
 
 _ff_dkud1_Beerland2:

@@ -1,3 +1,10 @@
 Roundel 12pt Roman
 copyright (c) 2013 Andrew Owen
 - a pair of serif and sans-serif fonts with circular letterforms.
+
+Latin-1 characters added by TK90X Fan (c) 2014. 
+The font height was increased to 17 pixels. 
+Version 2: improved diacritics on upper case letters; improved some characters.
+
+Latin-5 characters added by TK90X Fan (c) 2014. 
+The font height was increased to 17 pixels. 

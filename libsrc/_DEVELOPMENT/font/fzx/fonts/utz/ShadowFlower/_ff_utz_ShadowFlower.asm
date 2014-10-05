@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_utz_ShadowFlower
 
 _ff_utz_ShadowFlower:

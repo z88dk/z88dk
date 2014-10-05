@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_ao_Prefect
 
 _ff_ao_Prefect:

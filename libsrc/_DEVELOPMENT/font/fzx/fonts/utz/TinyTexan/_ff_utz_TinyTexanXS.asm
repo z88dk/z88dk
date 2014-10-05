@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_utz_TinyTexanXS
 
 _ff_utz_TinyTexanXS:

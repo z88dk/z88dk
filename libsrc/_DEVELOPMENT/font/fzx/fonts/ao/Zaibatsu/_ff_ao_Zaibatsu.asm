@@ -1,4 +1,6 @@
 
+SECTION seg_rodata_fzx
+
 PUBLIC _ff_ao_Zaibatsu
 
 _ff_ao_Zaibatsu:
