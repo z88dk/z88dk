@@ -1,4 +1,6 @@
 
+SECTION seg_code_mutex
+
 PUBLIC asm_spinlock_tryacquire
 
 asm_spinlock_tryacquire:

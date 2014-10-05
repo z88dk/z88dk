@@ -15,6 +15,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_stpncpy
 
 asm_stpncpy:

@@ -1,6 +1,8 @@
 
 ; size_t strrspn(const char *str, const char *cset)
 
+SECTION seg_code_string
+
 PUBLIC strrspn_callee
 
 strrspn_callee:

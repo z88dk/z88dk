@@ -18,6 +18,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_mutex
+
 PUBLIC asm_call_once
 
 EXTERN asm_spinlock_tryacquire, __thread_context_switch, l_jphl

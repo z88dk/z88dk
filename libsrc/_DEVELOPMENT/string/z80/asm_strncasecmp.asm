@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strncasecmp
 
 EXTERN asm_tolower

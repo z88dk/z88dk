@@ -1,6 +1,8 @@
 
 ; long strtol( const char * restrict nptr, char ** restrict endptr, int base)
 
+SECTION seg_code_stdlib
+
 PUBLIC strtol
 
 EXTERN asm_strtol

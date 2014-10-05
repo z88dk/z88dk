@@ -34,6 +34,7 @@
 ; addressing equal items case
 
 
+SECTION seg_code_stdlib
 
 PUBLIC asm_qsort
 

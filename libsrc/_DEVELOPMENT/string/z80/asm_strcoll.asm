@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strcoll
 
 EXTERN __lc_char_cmp_bc

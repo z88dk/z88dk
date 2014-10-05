@@ -1,6 +1,8 @@
 
 ; void *memswap(void *s1, void *s2, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC _memswap
 
 _memswap:

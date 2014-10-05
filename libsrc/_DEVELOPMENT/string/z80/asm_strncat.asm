@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strncat
 PUBLIC asm0_strncat
 

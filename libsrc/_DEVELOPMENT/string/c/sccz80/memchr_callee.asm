@@ -1,6 +1,8 @@
 
 ; void *memchr(const void *s, int c, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC memchr_callee
 
 memchr_callee:

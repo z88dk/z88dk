@@ -9,8 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_labs
-PUBLIC _l_neg_dehl_
+
+EXTERN l_neg_dehl
 
 asm_labs:
 
@@ -23,37 +26,4 @@ asm_labs:
    bit 7,d
    ret z
    
-_l_neg_dehl_:
-
-   ; negate dehl
-   ;
-   ; enter : dehl = long
-   ;
-   ; exit  : dehl = -long
-   ;
-   ; uses  : af, de, hl, carry unaffected
-   
-   ld a,l
-   cpl
-   ld l,a
-   
-   ld a,h
-   cpl
-   ld h,a
-   
-   ld a,e
-   cpl
-   ld e,a
-   
-   ld a,d
-   cpl
-   ld d,a
-   
-   inc l
-   ret nz
-   
-   inc h
-   ret nz
-   
-   inc de
-   ret
+   jp l_neg_dehl

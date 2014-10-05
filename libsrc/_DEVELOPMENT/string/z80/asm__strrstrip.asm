@@ -14,6 +14,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm__strrstrip
 
 EXTERN asm_strlen, asm_isspace

@@ -10,12 +10,14 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdlib
+
 PUBLIC asm_ultoa
 PUBLIC asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
 
-EXTERN error_zero_de, error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
-
-INCLUDE "clib_cfg.asm"
+EXTERN error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
 
 asm_ultoa:
 

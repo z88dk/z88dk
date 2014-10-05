@@ -1,6 +1,8 @@
 
 ; int abs(int j)
 
+SECTION seg_code_stdlib
+
 PUBLIC abs
 
 abs:

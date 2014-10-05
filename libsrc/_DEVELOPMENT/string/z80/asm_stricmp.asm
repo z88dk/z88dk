@@ -10,15 +10,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_stricmp
 
 EXTERN asm_strcasecmp
 
-asm_stricmp:
-
-   jp asm_strcasecmp
-
-;defc asm_stricmp = asm_strcasecmp
+defc asm_stricmp = asm_strcasecmp
 
    ; enter : hl = char *s2
    ;         de = char *s1

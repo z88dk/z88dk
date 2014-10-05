@@ -1,13 +1,13 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
+SECTION seg_code_string
+
 PUBLIC strcasecmp
-PUBLIC stricmp
 
 EXTERN asm_strcasecmp
 
 strcasecmp:
-stricmp:
 
    pop af
    pop hl

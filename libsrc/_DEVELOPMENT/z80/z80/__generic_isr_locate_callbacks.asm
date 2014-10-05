@@ -1,4 +1,6 @@
 
+SECTION seg_code_z80
+
 PUBLIC __generic_isr_locate_callbacks
 
 __generic_isr_locate_callbacks:

@@ -16,6 +16,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm__ldiv
 
 EXTERN l_divs_32_32x32

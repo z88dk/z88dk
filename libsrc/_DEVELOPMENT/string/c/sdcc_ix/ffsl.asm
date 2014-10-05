@@ -1,6 +1,8 @@
 
 ; int ffsl(long i)
 
+SECTION seg_code_string
+
 PUBLIC _ffsl
 
 _ffsl:

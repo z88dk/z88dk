@@ -1,6 +1,8 @@
 
 ; char *_memupr_(void *p, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC _memupr__callee
 
 _memupr__callee:

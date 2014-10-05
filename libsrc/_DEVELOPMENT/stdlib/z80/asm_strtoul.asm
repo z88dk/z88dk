@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_strtoul
 
 EXTERN __strtoul__, error_einval_zc, error_erange_mc, error_erange_zc

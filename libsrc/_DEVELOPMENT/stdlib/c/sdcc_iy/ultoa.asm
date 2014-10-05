@@ -1,6 +1,8 @@
 
 ; char *ultoa(unsigned long num, char *buf, int radix)
 
+SECTION seg_code_stdlib
+
 PUBLIC _ultoa
 
 _ultoa:

@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_z80
+
 PUBLIC asm_im2_create_generic_isr_8080
 
 EXTERN __generic_isr_create, __generic_isr_run_callbacks

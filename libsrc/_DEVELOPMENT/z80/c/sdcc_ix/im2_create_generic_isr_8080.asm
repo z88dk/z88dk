@@ -1,6 +1,8 @@
 
 ; void *im2_create_generic_isr_8080(uint8_t num_callback, void *address)
 
+SECTION seg_code_z80
+
 PUBLIC _im2_create_generic_isr_8080
 
 _im2_create_generic_isr_8080:

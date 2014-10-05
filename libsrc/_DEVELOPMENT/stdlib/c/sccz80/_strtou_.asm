@@ -1,6 +1,8 @@
 
 ; unsigned int _strtou_(const char *nptr, char **endptr, int base)
 
+SECTION seg_code_stdlib
+
 PUBLIC _strtou_
 
 EXTERN asm__strtou

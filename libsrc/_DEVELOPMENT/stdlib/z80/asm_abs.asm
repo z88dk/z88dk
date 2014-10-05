@@ -9,8 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_abs
-PUBLIC _l_neg_hl_
+
+EXTERN l_neg_hl
 
 asm_abs:
 
@@ -23,23 +26,4 @@ asm_abs:
    bit 7,h
    ret z
 
-_l_neg_hl_:
-
-   ; negate hl
-   ;
-   ; enter : hl = int
-   ;
-   ; exit  : hl = -hl
-   ;
-   ; uses  : af, hl, carry unaffected
-
-   ld a,l
-   cpl
-   ld l,a
-   
-   ld a,h
-   cpl
-   ld h,a
-   
-   inc hl
-   ret
+   jp l_neg_hl

@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_z80
+
 PUBLIC asm_im2_prepend_generic_callback
 
 EXTERN __generic_isr_locate_callbacks

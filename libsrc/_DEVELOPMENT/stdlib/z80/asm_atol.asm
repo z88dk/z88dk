@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_atol
 
 EXTERN l_eat_ws, l_eat_sign, l_neg_dehl, l_atoul

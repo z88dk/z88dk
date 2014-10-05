@@ -1,6 +1,8 @@
 
 ; void _div_(div_t *d, int numer, int denom)
 
+SECTION seg_code_stdlib
+
 PUBLIC __div_
 
 __div_:

@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strrchr
 
 EXTERN __str_locate_nul, l_neg_bc, error_zc

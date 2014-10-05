@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_system
 
 EXTERN l_inc_sp, __ch_system

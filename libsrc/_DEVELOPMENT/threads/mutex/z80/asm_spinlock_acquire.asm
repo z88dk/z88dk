@@ -1,4 +1,6 @@
 
+SECTION seg_code_mutex
+
 PUBLIC asm_spinlock_acquire
 
 EXTERN __thread_context_switch

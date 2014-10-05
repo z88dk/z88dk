@@ -1,6 +1,8 @@
 
 ; void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
 
+SECTION seg_code_stdlib
+
 PUBLIC qsort
 
 EXTERN asm_qsort

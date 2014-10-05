@@ -1,6 +1,8 @@
 
 ; void *memset(void *s, int c, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC memset_callee
 
 memset_callee:

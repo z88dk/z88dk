@@ -1,6 +1,8 @@
 
 ; int mtx_init(mtx_t *mtx, int type)
 
+SECTION seg_code_mutex
+
 PUBLIC mtx_init_callee
 
 mtx_init_callee:

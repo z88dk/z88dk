@@ -23,6 +23,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strtok
 
 EXTERN __strtok_ptr

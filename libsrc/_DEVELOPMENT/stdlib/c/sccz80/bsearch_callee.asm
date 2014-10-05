@@ -3,6 +3,8 @@
 ;               size_t nmemb, size_t size,
 ;               int (*compar)(const void *, const void *))
 
+SECTION seg_code_stdlib
+
 PUBLIC bsearch_callee
 
 bsearch_callee:

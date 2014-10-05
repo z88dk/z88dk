@@ -1,10 +1,11 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
-PUBLIC strcasecmp_callee, stricmp_callee
+SECTION seg_code_string
+
+PUBLIC strcasecmp_callee
 
 strcasecmp_callee:
-stricmp_callee:
 
    pop af
    pop hl

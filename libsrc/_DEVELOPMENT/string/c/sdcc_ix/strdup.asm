@@ -1,6 +1,8 @@
 
 ; char *strdup(const char * s)
 
+SECTION seg_code_string
+
 PUBLIC _strdup
 
 _strdup:

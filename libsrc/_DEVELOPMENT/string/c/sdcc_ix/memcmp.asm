@@ -1,6 +1,8 @@
 
 ; int memcmp(const void *s1, const void *s2, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC _memcmp
 
 _memcmp:

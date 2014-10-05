@@ -13,6 +13,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_itoa
 PUBLIC asm0_itoa
 

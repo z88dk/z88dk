@@ -16,6 +16,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm__div
 
 EXTERN l_divs_16_16x16

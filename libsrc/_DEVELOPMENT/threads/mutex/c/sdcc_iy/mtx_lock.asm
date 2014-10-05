@@ -1,6 +1,8 @@
 
 ; int mtx_lock(mtx_t *m)
 
+SECTION seg_code_mutex
+
 PUBLIC _mtx_lock
 
 _mtx_lock:

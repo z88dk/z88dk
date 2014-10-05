@@ -1,6 +1,8 @@
 
 ; char *itoa(int num, char *buf, int radix)
 
+SECTION seg_code_stdlib
+
 PUBLIC _itoa
 
 _itoa:

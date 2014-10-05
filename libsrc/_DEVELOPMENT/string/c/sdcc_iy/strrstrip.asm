@@ -1,6 +1,8 @@
 
 ; char *strrstrip(char *s)
 
+SECTION seg_code_string
+
 PUBLIC _strrstrip
 
 _strrstrip:

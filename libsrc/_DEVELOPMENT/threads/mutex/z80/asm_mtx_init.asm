@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_mutex
+
 PUBLIC asm_mtx_init
 
-EXTERN thrd_error, l_setmem_hl
+EXTERN thrd_error, thrd_success, l_setmem_hl
 
 asm_mtx_init:
 
@@ -51,9 +53,7 @@ asm_mtx_init:
    dec hl
    ld (hl),c                   ; m->mutex_type = c
 
-   ld l,a
-   ld h,a                      ; hl = thrd_success
-   
+   ld hl,thrd_success
    ret
 
 unknown_type:

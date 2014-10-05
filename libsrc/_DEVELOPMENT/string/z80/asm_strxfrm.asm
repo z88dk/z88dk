@@ -16,6 +16,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strxfrm
 
 EXTERN asm_strlen, error_zc, __lc_char_ordinal

@@ -12,6 +12,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_z80
+
 PUBLIC asm_z80_push_di
 
 asm_z80_push_di:

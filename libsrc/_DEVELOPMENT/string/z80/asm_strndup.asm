@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strndup
 
 EXTERN asm_strlen, l_minu_bc_hl, asm0_strdup

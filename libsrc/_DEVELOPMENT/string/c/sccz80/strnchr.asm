@@ -1,6 +1,8 @@
 
 ; char *strnchr(const char *s, size_t n, int c)
 
+SECTION seg_code_string
+
 PUBLIC strnchr
 
 EXTERN asm_strnchr

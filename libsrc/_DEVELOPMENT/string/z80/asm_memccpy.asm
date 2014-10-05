@@ -13,6 +13,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_memccpy
 
 EXTERN error_zc

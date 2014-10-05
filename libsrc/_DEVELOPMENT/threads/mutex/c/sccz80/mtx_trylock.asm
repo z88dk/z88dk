@@ -1,6 +1,8 @@
 
 ; int mtx_trylock(mtx_t *m)
 
+SECTION seg_code_mutex
+
 PUBLIC mtx_trylock
 
 mtx_trylock:

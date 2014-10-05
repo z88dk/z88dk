@@ -14,6 +14,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strrstrip
 
 EXTERN asm__strrstrip

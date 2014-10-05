@@ -1,6 +1,8 @@
 
 ; int ffs(int i)
 
+SECTION seg_code_string
+
 PUBLIC _ffs
 
 _ffs:

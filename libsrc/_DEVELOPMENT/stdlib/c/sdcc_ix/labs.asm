@@ -1,6 +1,8 @@
 
 ; long labs(long j)
 
+SECTION seg_code_stdlib
+
 PUBLIC _labs
 
 _labs:

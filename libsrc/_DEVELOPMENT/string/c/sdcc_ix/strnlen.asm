@@ -1,6 +1,8 @@
 
 ; size_t strnlen(const char *s, size_t maxlen)
 
+SECTION seg_code_string
+
 PUBLIC _strnlen
 
 _strnlen:

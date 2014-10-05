@@ -1,6 +1,8 @@
 
 ; int at_quick_exit(void (*func)(void))
 
+SECTION seg_code_stdlib
+
 PUBLIC _at_quick_exit
 
 _at_quick_exit:

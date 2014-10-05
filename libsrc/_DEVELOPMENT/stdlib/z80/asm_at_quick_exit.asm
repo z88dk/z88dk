@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_at_quick_exit
 
 EXTERN __quickexit_stack, __quickexit_stack_size

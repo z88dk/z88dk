@@ -1,6 +1,8 @@
 
 ; _Noreturn void quick_exit(int status)
 
+SECTION seg_code_stdlib
+
 PUBLIC _quick_exit
 
 _quick_exit:

@@ -1,4 +1,6 @@
 
+SECTION seg_code_mutex
+
 PUBLIC asm_spinlock_release
 
 asm_spinlock_release:

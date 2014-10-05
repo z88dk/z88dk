@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_mutex
+
 PUBLIC asm_mtx_timedlock
 
 EXTERN __thrd_id, thrd_success, thrd_error

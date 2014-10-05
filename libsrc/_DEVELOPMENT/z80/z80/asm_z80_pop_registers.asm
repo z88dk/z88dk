@@ -1,4 +1,6 @@
 
+SECTION seg_code_z80
+
 PUBLIC asm_z80_pop_registers
 
 asm_z80_pop_registers:

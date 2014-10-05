@@ -1,6 +1,8 @@
 
 ; char *_memlwr_(void *p, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC __memlwr_
 
 __memlwr_:

@@ -1,6 +1,8 @@
 
 ; char *strchr(const char *s, int c)
 
+SECTION seg_code_string
+
 PUBLIC strchr_callee
 
 strchr_callee:

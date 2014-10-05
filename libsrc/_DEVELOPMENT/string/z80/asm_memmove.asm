@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_memmove
 
 EXTERN asm0_memcpy, asm1_memcpy

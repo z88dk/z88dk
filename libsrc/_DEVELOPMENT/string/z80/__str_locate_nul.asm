@@ -1,4 +1,6 @@
 
+SECTION seg_code_string
+
 PUBLIC __str_locate_nul
 
 __str_locate_nul:

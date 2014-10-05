@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_exit
 PUBLIC asm0_exit
 

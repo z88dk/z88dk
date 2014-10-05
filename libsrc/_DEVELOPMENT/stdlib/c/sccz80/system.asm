@@ -1,6 +1,8 @@
 
 ; int system(const char *string)
 
+SECTION seg_code_stdlib
+
 PUBLIC system
 
 system:

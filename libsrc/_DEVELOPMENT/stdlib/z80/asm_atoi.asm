@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_atoi
 
 EXTERN l_eat_ws, l_eat_sign, l_neg_hl, l_atou

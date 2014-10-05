@@ -1,6 +1,8 @@
 
 ; void im2_install_isr(uint8_t vector, void *isr)
 
+SECTION seg_code_z80
+
 PUBLIC im2_install_isr
 
 EXTERN asm_im2_install_isr

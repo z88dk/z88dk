@@ -1,6 +1,8 @@
 
 ; char *strrchr(const char *s, int c)
 
+SECTION seg_code_string
+
 PUBLIC _strrchr
 
 _strrchr:

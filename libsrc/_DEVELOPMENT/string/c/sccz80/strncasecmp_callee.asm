@@ -1,10 +1,11 @@
 
 ; int strncasecmp(const char *s1, const char *s2, size_t n)
 
-PUBLIC strncasecmp_callee, strnicmp_callee
+SECTION seg_code_string
+
+PUBLIC strncasecmp_callee
 
 strncasecmp_callee:
-strnicmp_callee:
 
    pop af
    pop bc

@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_memchr
 PUBLIC asm0_memchr
 

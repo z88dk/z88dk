@@ -14,6 +14,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strlcpy
 
 asm_strlcpy:

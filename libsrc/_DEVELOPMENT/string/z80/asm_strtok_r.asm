@@ -12,6 +12,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strtok_r
 
 EXTERN asm_strspn, asm_strpbrk

@@ -1,6 +1,8 @@
 
 ; void spinlock_acquire(char *spinlock)
 
+SECTION seg_code_mutex
+
 PUBLIC spinlock_acquire
 
 spinlock_acquire:

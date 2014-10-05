@@ -1,10 +1,12 @@
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdlib
+
 PUBLIC __strtoul__
 
 EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
 EXTERN l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
-
-INCLUDE "clib_cfg.asm"
 
 __strtoul__:
 

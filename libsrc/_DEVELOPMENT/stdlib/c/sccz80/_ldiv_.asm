@@ -1,6 +1,8 @@
 
 ; void _ldiv_(ldiv_t *ld, long numer, long denom)
 
+SECTION seg_code_stdlib
+
 PUBLIC _ldiv_
 
 EXTERN asm__ldiv

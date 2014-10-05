@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_bsearch
 PUBLIC asm0_bsearch
 

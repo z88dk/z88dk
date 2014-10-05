@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strcspn
 
 EXTERN asm_strchr

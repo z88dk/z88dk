@@ -1,6 +1,8 @@
 
 ; void z80_delay_tstate(uint tstates)
 
+SECTION seg_code_z80
+
 PUBLIC z80_delay_tstate
 
 z80_delay_tstate:

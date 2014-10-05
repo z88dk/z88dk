@@ -1,6 +1,8 @@
 
 ; void spinlock_release(char *spinlock)
 
+SECTION seg_code_mutex
+
 PUBLIC _spinlock_release
 
 _spinlock_release:

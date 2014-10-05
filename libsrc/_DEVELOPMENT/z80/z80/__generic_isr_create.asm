@@ -1,4 +1,6 @@
 
+SECTION seg_code_z80
+
 PUBLIC __generic_isr_create
 
 __generic_isr_create:

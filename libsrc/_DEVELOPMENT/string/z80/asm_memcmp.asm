@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_memcmp
 PUBLIC asm0_memcmp
 

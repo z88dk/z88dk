@@ -1,6 +1,8 @@
 
 ; long atol(const char *buf)
 
+SECTION seg_code_stdlib
+
 PUBLIC atol
 
 atol:

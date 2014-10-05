@@ -9,9 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_srand
 
-EXTERN __seed
+EXTERN __stdlib_seed
 
 asm_srand:
 
@@ -23,11 +25,11 @@ asm_srand:
    or l
    jr nz, seed_ok
    
-   inc hl
+   inc l
 
 seed_ok:
 
-   ld (__seed),hl
-   ld (__seed + 2),hl
+   ld (__stdlib_seed),hl
+   ld (__stdlib_seed + 2),hl
 
    ret

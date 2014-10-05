@@ -1,6 +1,8 @@
 
 ; char *strupr(char *s)
 
+SECTION seg_code_string
+
 PUBLIC _strupr
 
 _strupr:

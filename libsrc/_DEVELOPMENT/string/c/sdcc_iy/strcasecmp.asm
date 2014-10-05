@@ -1,6 +1,8 @@
 
 ; int strcasecmp(const char *s1, const char *s2)
 
+SECTION seg_code_string
+
 PUBLIC _strcasecmp
 
 _strcasecmp:

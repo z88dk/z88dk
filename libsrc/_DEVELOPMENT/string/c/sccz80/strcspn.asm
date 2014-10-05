@@ -1,6 +1,8 @@
 
 ; size_t strcspn(const char *s1, const char *s2)
 
+SECTION seg_code_string
+
 PUBLIC strcspn
 
 EXTERN asm_strcspn

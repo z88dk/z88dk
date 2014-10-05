@@ -17,9 +17,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdlib
+
 PUBLIC asm_rand
 
-EXTERN __seed
+EXTERN __stdlib_seed
 
 asm_rand:
 
@@ -29,8 +31,8 @@ asm_rand:
    ;
    ; uses : af, de, hl
 
-   ld hl,(__seed)
-   ld de,(__seed + 2)
+   ld hl,(__stdlib_seed)
+   ld de,(__stdlib_seed + 2)
 
    ; dehl ^= dehl << 8
 
@@ -85,8 +87,8 @@ asm_rand:
 
    ; store new seed
 
-   ld (__seed),hl
-   ld (__seed + 2),de
+   ld (__stdlib_seed),hl
+   ld (__stdlib_seed + 2),de
    
    ; create a 15-bit result that includes 0
    

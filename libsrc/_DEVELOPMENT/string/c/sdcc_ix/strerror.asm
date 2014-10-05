@@ -1,6 +1,8 @@
 
 ; char *strerror(int errnum)
 
+SECTION seg_code_string
+
 PUBLIC _strerror
 
 _strerror:

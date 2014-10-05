@@ -1,13 +1,13 @@
 
 ; int strncasecmp(const char *s1, const char *s2, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC strncasecmp
-PUBLIC strnicmp
 
 EXTERN asm_strncasecmp
 
 strncasecmp:
-strnicmp:
 
    pop af
    pop bc

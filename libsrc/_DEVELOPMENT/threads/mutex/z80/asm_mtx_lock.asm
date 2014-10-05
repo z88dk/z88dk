@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_mutex
+
 PUBLIC asm_mtx_lock
 
 EXTERN asm_mtx_timedlock

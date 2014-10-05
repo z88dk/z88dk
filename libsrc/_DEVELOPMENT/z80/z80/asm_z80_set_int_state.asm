@@ -11,6 +11,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_z80
+
 PUBLIC asm_z80_set_int_state
 
 asm_z80_set_int_state:

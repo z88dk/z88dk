@@ -1,6 +1,8 @@
 
 ; char *strndup(const char *s, size_t n)
 
+SECTION seg_code_string
+
 PUBLIC strndup_callee
 
 strndup_callee:

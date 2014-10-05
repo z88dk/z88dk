@@ -1,6 +1,8 @@
 
 ; void call_once(once_flag *flag, void (*func)(void))
 
+SECTION seg_code_mutex
+
 PUBLIC call_once
 
 EXTERN asm_call_once

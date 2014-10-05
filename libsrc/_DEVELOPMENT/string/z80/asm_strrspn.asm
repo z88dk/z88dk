@@ -27,6 +27,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strrspn
 
 EXTERN __str_locate_nul, l_neg_bc, asm_strchr, error_znc

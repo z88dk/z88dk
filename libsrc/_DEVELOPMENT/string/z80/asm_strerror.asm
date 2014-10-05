@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_strerror
 
 EXTERN __error_strings, __error_string_default, __str_locate_nul

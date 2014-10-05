@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_string
+
 PUBLIC asm_memcpy
 PUBLIC asm0_memcpy, asm1_memcpy
 
