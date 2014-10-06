@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.82 2014-05-21 21:17:09 dom Exp $
+ *      $Id: zcc.c,v 1.83 2014-10-06 21:34:22 dom Exp $
  */
 
 
@@ -861,7 +861,7 @@ void SetString(arg_t *argument, char *arg)
         *(char **)argument->data = strdup(ptr);
     } else {
         /* Try the next argument up */
-        if (gargc < max_argc && gargv[gargc + 1][0] != '-') {
+        if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-') {
             /* Aha...non option comes next... */
             gargc++;
             *(char **)argument->data = strdup(gargv[gargc]);
