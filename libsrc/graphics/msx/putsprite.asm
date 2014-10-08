@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.5 2010-06-30 13:21:38 stefano Exp $
+; $Id: putsprite.asm,v 1.6 2014-10-08 18:33:51 stefano Exp $
 ;
 
 	XLIB    putsprite
@@ -170,12 +170,16 @@
          push     af
 ;**************
          ld       a,l		; LSB of video memory ptr
-         ;di
+IF FORmsx
+         di
+ENDIF
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-         ;ei
+IF FORmsx
+         ei
+ENDIF
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a
@@ -189,11 +193,15 @@
          ;inc      hl                ;Go to next byte
 ;**************
          ld       a,l		; LSB of video memory ptr
-         ;di
+IF FORmsx
+         di
+ENDIF
          out      (VDP_CMD), a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "read command" bits
-         ;ei
+IF FORmsx
+         ei
+ENDIF
          out      (VDP_CMD), a
          in       a, (VDP_DATAIN)
          ld       (pixelbyte),a
@@ -205,12 +213,16 @@
 	push	af
 ;**************
          ld       a,l		; LSB of video memory ptr
-         ;di
+IF FORmsx
+         di
+ENDIF
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-         ;ei
+IF FORmsx
+         ei
+ENDIF
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a

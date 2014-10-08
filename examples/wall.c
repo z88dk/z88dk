@@ -17,6 +17,7 @@
  *  -DSOUND      sound effects
  *  -DBORDERS    draw the wall borders
  *  -DLOMEM      minimalistic mode to save memory
+ *  -DBANNERS    (where available) big top score display
  * 
  *  Values for 'spritesize' need roughly for following resolution table:
  *	8: 256x186
@@ -30,7 +31,10 @@
  *  ===================
  *
  *  ZX Spectrum 16K (non-joystick mode saves more memory)
- *     zcc +zx -lndos -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -zorg=24600 -O3 wall.c
+ *     zcc +zx -lndos -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
+ *
+ *  ZX Spectrum 48K
+ *     zcc +zx -lndos -create-app -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
  *
  *  ZX81
  *     zcc +zx81 -create-app -Dspritesize=2 -DBORDERS wall.c
@@ -83,7 +87,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.4 2014-09-30 07:08:55 stefano Exp $
+ *      $Id: wall.c,v 1.5 2014-10-08 18:33:51 stefano Exp $
  *
  * * * * * * *
  *
@@ -95,6 +99,7 @@
 #include <games.h>
 #include <stdlib.h>
 #include <graphics.h>
+#include <time.h>
 
 #ifdef SPECTRUM
 #include <spectrum.h>
@@ -124,8 +129,13 @@ int u, v, a, w, r, g;
 int c,b;
 int i,k;
 int speed;
-char scoretxt[7];
 
+#ifndef LOMEM
+char scoretxt[7];
+#ifdef BANNERS
+int temp;
+#endif
+#endif
 
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 void set_attr (int x, int y, int attr) {
@@ -201,11 +211,13 @@ void destroy_brick() {
 		set_attr (m,n-1,0x1F);
 	#endif
 	#endif
-	}  else if (n<31)  {
+	}
+
+	if ((!(b&1)) && (n<31))  {
 		putsprite(spr_and,((n+1)*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
-		*zx_cyx2aaddr(m,32*(n+1)) = 56;
+		*zx_cyx2aaddr(m,n+1) = 56;
 	#endif
 	#endif
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
@@ -274,6 +286,11 @@ void move_ball() {
 				}
 				if (m<1) {
 					hit_border();
+
+					/* A new trick to shake the ball and make possible
+					   to hit all the bricks with a single ball */
+					if (n>30) n--;
+
 					w=1;
 					g=100;  goto l_100;
 				}
@@ -293,6 +310,11 @@ void move_ball() {
 #endif
 				if (m<1) {
 					hit_border();
+
+					/* A new trick to shake the ball and make possible
+					   to hit all the bricks with a single ball */
+					if (n<1) n++;
+
 					w=1;
 					g=160;  goto l_160;
 				}
@@ -414,14 +436,20 @@ void move_right() {
 
 void main()
 {
+restart:
 
 #ifdef JOYSTICK
+	hit_border();
 #ifndef LOMEM
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(EINSTEIN)
+	msx_text();
+#endif
 	printf("%c",12);
 
+	  printf("\n   CHOOSE YOUR JOYSTICK INTERFACE\n\n");
 	for (k=0 ; k!=GAME_DEVICES; k++)
-	  printf("%u - %s\n",k+1,joystick_type[k]);
-		
+	  printf("    %u - %s\n\n",k+1,joystick_type[k]);
+
 	stick=0;
 	while ((stick<1) || (stick>GAME_DEVICES))
 	  stick=getk()-48;
@@ -430,6 +458,9 @@ void main()
 #endif
 #endif
 
+#ifdef CLOCK
+    srand(clock());
+#endif
 	tt=-1;
 
 #ifdef ZX81
@@ -448,8 +479,10 @@ start_level:
 #else
 	speed-=200;
 #endif
+
 	tt++; t=0; p=1;
 	clg();
+	hit_border();
 
   for (m=1; m<=4; m+=2)
 	for (n=0; n<=30; n+=2) {
@@ -498,7 +531,7 @@ start_level:
 	u=0; v=0; a=14; t=0; w=0;
 
   for (r=0; r<=6; r++) {
-			m=10;  n=8+(char)rand()&15;
+			m=10;  n=8+rand()%15;
 			p=0; a=13;
 
 #if (spritesize == 2)
@@ -517,12 +550,19 @@ start_level:
 
 		g=200;
 
+		/* Let's show where the ball stars before the dance begins */
+		putsprite(spr_or,(n*spritesize),(m*spritesizeh),ball);
+
 		hit_border();
 #ifdef SOUND
-		for (i=1; i<14; i++)
+		for (i=1; i<14; i++) {
 			bit_synth(4, 199+i, 200+i, 239+i, 240+i);
+			putsprite(spr_xor,(n*spritesize),(m*spritesizeh),ball);
+		}
 		bit_synth(9, 255, 254, 253, 252);
 #endif
+
+		putsprite(spr_and,(n*spritesize),(m*spritesizeh),ball);
 
 		while (m <= 20) {
 
@@ -591,7 +631,7 @@ start_level:
 
 #if (spritesize == 2)
 	  putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
-#else	
+#else
 	  putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
 #endif
   }
@@ -604,10 +644,33 @@ start_level:
   #endasm
 #endif
 #endif
-  
-  #ifndef LOMEM
-  printf("\n\n Score: %u ",tt*1000+t);
+
+#ifndef LOMEM
+#ifdef BANNERS
+  putsprite(spr_or,40,(12*spritesizeh),scorebanner);
+  sprintf (scoretxt,"%05u",tt*1000+t);
+
+  k=0;
+  for (i=0; i<5; i++) {
+    putsprite (spr_or, 140+i+k, 12*spritesizeh+7, &bigdigit[(scoretxt[i]-48)*38]);
+	if (scoretxt[i]=='1')
+		k+=5;
+	else
+		k+=14;
+  }
+
+#else
+  printf("%c\n\n Score: %u ",12,tt*1000+t);
 #endif
-  return (tt*1000+t);
+#endif
+
+/*  return (tt*1000+t); */
+#ifdef SOUND
+bit_fx2(5);
+#endif
+while (!(getk()>32)) {}
+
+goto restart;
+
 }
 

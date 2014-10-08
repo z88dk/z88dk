@@ -9,7 +9,7 @@
 	INCLUDE	"msx/vdp.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2010-06-30 13:21:38 stefano Exp $
+;	$Id: pixladdr.asm,v 1.7 2014-10-08 18:33:51 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -55,11 +55,15 @@
 	;;add	hl,de
 ;-------
 	ld	a,l		; LSB of video memory ptr
-	;di
+IF FORmsx
+         di
+ENDIF
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	;ei
+IF FORmsx
+         ei
+ENDIF
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
 
@@ -80,12 +84,16 @@
 .pix_return
          ld       (hl),a	; hl points to "pixelbyte"
          ld       a,e		; LSB of video memory ptr
-         ;di
+IF FORmsx
+         di
+ENDIF
          out      (VDP_CMD),a
          ld       a,d		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-         ;ei
+IF FORmsx
+         ei
+ENDIF
          out      (VDP_CMD), a
          ld       a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
          out      (VDP_DATA), a
