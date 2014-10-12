@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
+ *      $Id: rs232_get.c,v 1.3 2014-10-12 20:16:06 dom Exp $
  */
 
 
@@ -24,8 +24,6 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	defc	bank2	= $1ffd
 	defc	bank678 = $5b67
 	
-	push	hl
-
 	push	af
 	call	brkcheck
 	call	page_romin
