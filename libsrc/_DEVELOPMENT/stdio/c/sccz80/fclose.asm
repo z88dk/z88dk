@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,11 +26,9 @@ PUBLIC fclose
 
 EXTERN fclose_unlocked
 
-fclose:
-
-   jp fclose_unlocked
+defc fclose = fclose_unlocked
    
-   INCLUDE "stdio/z80/asm_fclose.asm"
+INCLUDE "stdio/z80/asm_fclose.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_n
 
 EXTERN l_utod_de

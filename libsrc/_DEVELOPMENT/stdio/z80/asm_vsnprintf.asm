@@ -15,10 +15,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_vsnprintf
 
 EXTERN STDIO_MSG_PUTC
-
 EXTERN asm0_vfprintf_unlocked, asm_memset, l_minu_bc_hl, l_neg_hl
 
 asm_vsnprintf:

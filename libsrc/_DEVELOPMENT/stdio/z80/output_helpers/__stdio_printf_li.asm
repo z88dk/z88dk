@@ -1,13 +1,11 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_li
 
 EXTERN __stdio_printf_ld
 
-__stdio_printf_li:
-
-   jp __stdio_printf_ld
-
-;defc __stdio_printf_li = __stdio_printf_ld
+defc __stdio_printf_li = __stdio_printf_ld
 
    ; %ld, %li converter called from vfprintf()
    ;

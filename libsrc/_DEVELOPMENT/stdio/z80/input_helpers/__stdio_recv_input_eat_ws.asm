@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_eat_ws
 PUBLIC __stdio_recv_input_eat_ws_repeat
 

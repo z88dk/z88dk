@@ -1,6 +1,8 @@
 
 ; void clearerr_unlocked(FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC clearerr_unlocked
 
 clearerr_unlocked:

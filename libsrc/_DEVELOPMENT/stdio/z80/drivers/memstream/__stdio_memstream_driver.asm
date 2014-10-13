@@ -3,6 +3,8 @@
 ; Feb 2014
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_memstream_driver
 
 EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT, STDIO_MSG_EATC, STDIO_MSG_READ

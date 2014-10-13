@@ -1,9 +1,11 @@
 
-PUBLIC __stdio_file_destroy
+SECTION seg_code_stdio
 
-EXTERN asm_mtx_destroy, __0_stdio_file_init
+PUBLIC __stdio_file_destructor
 
-__stdio_file_destroy:
+EXTERN asm_mtx_destroy, __0_stdio_file_constructor
+
+__stdio_file_destructor:
 
    ; releases the mutex associated with the FILE
    ; and invalidates the FILE
@@ -21,7 +23,7 @@ __stdio_file_destroy:
    add hl,de                   ; hl = & FILE->mtx
    
    ex de,hl
-   call __0_stdio_file_init
+   call __0_stdio_file_constructor
 
    ex de,hl
    jp asm_mtx_destroy

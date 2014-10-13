@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -39,7 +41,7 @@ asm_getchar:
    ;
    ; uses  : all
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,__stdio_file_stdin
    jp asm_fgetc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -50,9 +52,7 @@ PUBLIC asm_getchar
 
 EXTERN asm_getchar_unlocked
 
-asm_getchar:
-
-   jp asm_getchar_unlocked
+defc asm_getchar = asm_getchar_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

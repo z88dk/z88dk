@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -18,7 +20,6 @@ IF __CLIB_OPT_MULTITHREAD & $02
 PUBLIC asm_vscanf
 
 EXTERN __stdio_file_stdin
-
 EXTERN asm_vfscanf
 
 asm_vscanf:
@@ -52,7 +53,7 @@ asm_vscanf:
    ;            
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,__stdio_file_stdin
    jp asm_vfscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -63,9 +64,7 @@ PUBLIC asm_vscanf
 
 EXTERN asm_vscanf_unlocked
 
-asm_vscanf:
-
-   jp asm_vscanf_unlocked
+defc asm_vscanf = asm_vscanf_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

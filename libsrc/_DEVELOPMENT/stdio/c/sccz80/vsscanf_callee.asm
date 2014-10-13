@@ -1,6 +1,8 @@
 
 ; int vsscanf(const char *s, const char *format, va_list arg)
 
+SECTION seg_code_stdio
+
 PUBLIC vsscanf_callee
 
 vsscanf_callee:

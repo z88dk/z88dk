@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_lock_tryacquire
 
 EXTERN asm_mtx_trylock

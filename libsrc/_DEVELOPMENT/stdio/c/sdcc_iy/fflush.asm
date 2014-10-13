@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,11 +29,9 @@ PUBLIC _fflush
 
 EXTERN _fflush_unlocked
 
-_fflush:
-
-   jp _fflush_unlocked
+defc _fflush = _fflush_unlocked
    
-   INCLUDE "stdio/z80/asm_fflush.asm"
+INCLUDE "stdio/z80/asm_fflush.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

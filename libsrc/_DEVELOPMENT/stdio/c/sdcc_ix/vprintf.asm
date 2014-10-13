@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -36,11 +38,9 @@ PUBLIC _vprintf
 
 EXTERN _vprintf_unlocked
 
-_vprintf:
-
-   jp _vprintf_unlocked
+defc _vprintf = _vprintf_unlocked
    
-   INCLUDE "stdio/z80/asm_vprintf.asm"
+INCLUDE "stdio/z80/asm_vprintf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

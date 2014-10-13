@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,11 +28,9 @@ PUBLIC getline_callee
 
 EXTERN getline_unlocked_callee
 
-getline_callee:
-
-   jp getline_unlocked_callee
+defc getline_callee = getline_unlocked_callee
    
-   INCLUDE "stdio/z80/asm_getline.asm"
+INCLUDE "stdio/z80/asm_getline.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

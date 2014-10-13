@@ -9,11 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_fopen
 
 EXTERN asm_fopen_unlocked
 
-asm_fopen:
+defc asm_fopen = asm_fopen_unlocked
 
    ; enter : de = char *mode
    ;         hl = char *filename
@@ -29,5 +31,3 @@ asm_fopen:
    ;            carry set, errno set
    ;
    ; uses  : all
-
-   jp asm_fopen_unlocked

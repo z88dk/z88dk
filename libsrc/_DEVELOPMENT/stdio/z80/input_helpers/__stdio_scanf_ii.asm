@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_ii
 
 EXTERN __stdio_scanf_sm_i, __stdio_recv_input_eat_ws_repeat, l_inc_sp

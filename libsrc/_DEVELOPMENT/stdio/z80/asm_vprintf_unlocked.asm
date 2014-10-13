@@ -9,10 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_vprintf_unlocked
 
 EXTERN __stdio_file_stdout
-
 EXTERN asm_vfprintf_unlocked
 
 asm_vprintf_unlocked:
@@ -43,5 +44,5 @@ asm_vprintf_unlocked:
    ;            
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,__stdio_file_stdout
    jp asm_vfprintf_unlocked

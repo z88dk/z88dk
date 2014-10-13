@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -19,11 +21,7 @@ PUBLIC asm_putc
 
 EXTERN asm_fputc
 
-asm_putc:
-
-   jp asm_fputc
-
-;defc asm_putc = asm_fputc
+defc asm_putc = asm_fputc
 
    ; enter : ix = FILE *
    ;          e = char c
@@ -50,9 +48,7 @@ PUBLIC asm_putc
 
 EXTERN asm_putc_unlocked
 
-asm_putc:
-
-   jp asm_putc_unlocked
+defc asm_putc = asm_putc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

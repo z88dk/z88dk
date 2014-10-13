@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_obstack_vprintf
 
 EXTERN asm_vsnprintf, l_utod_hl, asm_obstack_blank, error_mc

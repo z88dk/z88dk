@@ -1,13 +1,11 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_lock_acquire
 
 EXTERN asm0_flockfile
 
-__stdio_lock_acquire:
-
-   jp asm0_flockfile
-
-;defc __stdio_lock_acquire = asm_flockfile
+defc __stdio_lock_acquire = asm0_flockfile
 
    ; Acquire the FILE lock
    ;

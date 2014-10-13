@@ -1,6 +1,8 @@
 
 ; int vfprintf_unlocked(FILE *stream, const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC vfprintf_unlocked
 
 EXTERN asm_vfprintf_unlocked

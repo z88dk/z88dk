@@ -1,6 +1,8 @@
 
 ; int fclose_unlocked(FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _fclose_unlocked
 
 _fclose_unlocked:

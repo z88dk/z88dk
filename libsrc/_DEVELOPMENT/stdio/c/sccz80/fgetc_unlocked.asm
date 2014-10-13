@@ -1,6 +1,8 @@
 
 ; int fgetc_unlocked(FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC fgetc_unlocked
 
 fgetc_unlocked:

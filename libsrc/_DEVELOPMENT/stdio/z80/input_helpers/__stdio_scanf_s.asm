@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_s
 PUBLIC __stdio_scanf_s_tail
 
-EXTERN l_incu_hl
 EXTERN __stdio_recv_input_eat_ws_repeat, __stdio_recv_input_eatc, __stdio_scanf_sm_string
 
 __stdio_scanf_s:
@@ -65,7 +66,11 @@ zero_terminate:
    
    ld a,b
    or c
-   call nz, l_incu_hl          ; if at least one char consumed from stream, num items assigned++
+   jr nz, no_chars
+   
+   inc hl                      ; if at least one char consumed from stream, num items assigned++
+
+no_chars:
 
    exx
    

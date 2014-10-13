@@ -1,6 +1,8 @@
 
 ; int vasprintf(char **ptr, const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC _vasprintf
 
 _vasprintf:

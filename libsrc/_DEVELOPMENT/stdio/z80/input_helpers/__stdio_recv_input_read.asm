@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_read
 
 EXTERN STDIO_MSG_READ
-
 EXTERN l_addu_hl_bc, l_incu_de, l_jpix
 
 ; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
@@ -50,9 +51,21 @@ __stdio_recv_input_read:
    inc de
    dec bc
    
+   exx
+   call l_incu_de
+   exx
+   
    ld a,b
    or c
    jr z, len_one   
+
+   call _no_ungetc_rd
+   
+   exx
+   inc bc
+   exx
+   
+   ret
 
 _no_ungetc_rd:
 
@@ -110,7 +123,6 @@ len_one:
 
    exx
    ld bc,1
-   call l_incu_de
    exx
    
    ret

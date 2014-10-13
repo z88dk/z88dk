@@ -1,6 +1,8 @@
 
 ; int feof_unlocked(FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _feof_unlocked
 
 _feof_unlocked:

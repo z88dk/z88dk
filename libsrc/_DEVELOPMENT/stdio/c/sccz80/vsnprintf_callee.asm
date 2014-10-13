@@ -1,6 +1,8 @@
 
 ; int vsnprintf(char *s, size_t n, const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC vsnprintf_callee
 
 vsnprintf_callee:

@@ -1,6 +1,8 @@
 
 ; int obstack_vprintf(struct obstack *obstack, const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC obstack_vprintf
 
 EXTERN asm_obstack_vprintf

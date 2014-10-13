@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_ftell_unlocked
 PUBLIC asm0_ftell_unlocked
 

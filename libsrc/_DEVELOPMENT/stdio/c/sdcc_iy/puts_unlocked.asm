@@ -1,6 +1,8 @@
 
 ; int puts_unlocked(const char *s)
 
+SECTION seg_code_stdio
+
 PUBLIC _puts_unlocked
 
 _puts_unlocked:

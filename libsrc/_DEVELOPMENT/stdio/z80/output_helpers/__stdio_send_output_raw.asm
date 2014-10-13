@@ -1,10 +1,11 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_send_output_raw
 PUBLIC __stdio_send_output_raw_chars, __stdio_send_output_raw_chars_unchecked
 PUBLIC __stdio_send_output_raw_buffer, __stdio_send_output_raw_buffer_unchecked
 
 EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT
-
 EXTERN l_jpix
 
 ; ALL HIGH LEVEL STDIO OUTPUT EXCEPT VFPRINTF PASSES THROUGH THESE FUNCTIONS

@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_funlockfile
 PUBLIC asm0_funlockfile
 

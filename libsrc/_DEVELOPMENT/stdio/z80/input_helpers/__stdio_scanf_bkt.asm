@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_bkt
 
 EXTERN asm_memset, l_bitset_locate, l_inc_sp, __stdio_scanf_sm_bkt

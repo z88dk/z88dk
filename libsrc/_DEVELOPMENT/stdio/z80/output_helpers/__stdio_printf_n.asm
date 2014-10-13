@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_n
 
 EXTERN __stdio_nextarg_hl, l_utod_de

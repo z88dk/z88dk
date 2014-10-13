@@ -1,6 +1,8 @@
 
 ; int fputs_unlocked(const char *s, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC fputs_unlocked
 
 EXTERN asm_fputs_unlocked

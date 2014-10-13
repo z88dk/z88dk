@@ -9,6 +9,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_ungetc_unlocked
 PUBLIC asm0_ungetc_unlocked
 

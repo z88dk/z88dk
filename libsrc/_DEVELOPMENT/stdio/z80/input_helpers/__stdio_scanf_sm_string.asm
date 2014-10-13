@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_sm_string
 PUBLIC __stdio_scanf_sm_string_write
 

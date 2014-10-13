@@ -1,6 +1,8 @@
 
 ; int fsetpos_unlocked(FILE *stream, const fpos_t *pos)
 
+SECTION seg_code_stdio
+
 PUBLIC _fsetpos_unlocked
 
 _fsetpos_unlocked:

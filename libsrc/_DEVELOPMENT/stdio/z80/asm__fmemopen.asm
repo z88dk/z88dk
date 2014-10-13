@@ -18,12 +18,14 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm__fmemopen
 PUBLIC asm0__fmemopen
 
 EXTERN error_einval_zc, error_zc, asm_p_forward_list_push_front
-EXTERN __stdio_parse_permission, asm_malloc, __stdio_file_init, l_setmem_hl
-EXTERN __stdio_memstream_driver, asm_realloc, __stdio_file_destroy, asm_free
+EXTERN __stdio_parse_mode, asm_malloc, __stdio_file_constructor, l_setmem_hl
+EXTERN __stdio_memstream_driver, asm_realloc, __stdio_file_destructor, asm_free
 
 EXTERN __stdio_file_list_open
 
@@ -67,7 +69,7 @@ asm__fmemopen:
    or c
    jp z, error_einval_zc - 3   ; if sizep == 0
    
-   call __stdio_parse_permission
+   call __stdio_parse_mode
    jp c, error_einval_zc - 3   ; if mode string is invalid
    
    pop af
@@ -96,7 +98,7 @@ asm0__fmemopen:
    ld ixl,e
    ld ixh,d                    ; ix = FILE *
    
-   call __stdio_file_init
+   call __stdio_file_constructor
    
    ld hl,13
    add hl,de                   ; hl = & FILE.memstream_flags
@@ -124,7 +126,7 @@ asm0__fmemopen:
    rrca
    rrca
    and $c0
-   inc a
+   add a,7
    ld (ix+3),a                 ; set r/w bits, memstream type
    
    ld a,e
@@ -366,7 +368,7 @@ allocate_fail:
 
    push ix
    
-   call __stdio_file_destroy
+   call __stdio_file_destructor
    
    pop hl
    

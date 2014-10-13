@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_fmemopen
 
 EXTERN asm__fmemopen

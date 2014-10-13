@@ -1,6 +1,8 @@
 
 ; int ftrylockfile (FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC ftrylockfile
 
 ftrylockfile:

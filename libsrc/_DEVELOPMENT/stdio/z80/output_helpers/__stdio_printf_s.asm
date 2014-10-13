@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_s
 
 EXTERN __stdio_nextarg_hl, asm_strnlen

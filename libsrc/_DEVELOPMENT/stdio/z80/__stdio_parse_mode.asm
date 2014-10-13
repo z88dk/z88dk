@@ -1,21 +1,23 @@
 
-PUBLIC __stdio_parse_permission
+SECTION seg_code_stdio
 
-__stdio_parse_permission:
+PUBLIC __stdio_parse_mode
 
-   ; parse the fopen permission string
+__stdio_parse_mode:
+
+   ; parse the fopen mode string
    ; valid characters include "rwabx+"
    ;
-   ; enter : de = char *permission
+   ; enter : de = char *mode
    ;
-   ; exit  : de = char *permission_ptr (address of non-matching char)
+   ; exit  : de = char *mode_ptr (address of non-matching char)
    ;
-   ;         success, permission string valid
+   ;         success, mode string valid
    ;
    ;            c = flags = 0TXC BAWR
    ;            carry reset
    ;
-   ;         fail, permission string invalid
+   ;         fail, mode string invalid
    ;
    ;            carry set
    ;
@@ -37,7 +39,7 @@ __stdio_parse_permission:
 flags_loop:
 
    ld b,6
-   ld hl,permission_table
+   ld hl,mode_table
 
    ld a,(de)
    or a
@@ -82,7 +84,7 @@ check_validity:
    scf
    ret
 
-permission_table:
+mode_table:
 
    defb 'r', $81               ; bit 7 set indicates mode string is complete
    defb 'w', $d2               ; bit 7 set indicates mode string is complete

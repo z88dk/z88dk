@@ -1,6 +1,8 @@
 
 ; int putchar_unlocked(int c)
 
+SECTION seg_code_stdio
+
 PUBLIC putchar_unlocked
 
 putchar_unlocked:

@@ -1,6 +1,8 @@
 
 ; void funlockfile(FILE *file)
 
+SECTION seg_code_stdio
+
 PUBLIC funlockfile
 
 funlockfile:

@@ -12,6 +12,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -19,7 +21,6 @@ IF __CLIB_OPT_MULTITHREAD & $02
 PUBLIC asm_puts
 
 EXTERN __stdio_file_stdout
-
 EXTERN asm0_puts_unlocked, __stdio_lock_release
 
 asm_puts:
@@ -40,7 +41,7 @@ asm_puts:
    ;
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,__stdio_file_stdout
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -71,9 +72,7 @@ PUBLIC asm_puts
 
 EXTERN asm_puts_unlocked
 
-asm_puts:
-
-   jp asm_puts_unlocked
+defc asm_puts = asm_puts_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

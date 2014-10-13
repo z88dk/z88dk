@@ -1,6 +1,8 @@
 
 ; int fseek_unlocked(FILE *stream, long offset, int whence)
 
+SECTION seg_code_stdio
+
 PUBLIC _fseek_unlocked
 
 _fseek_unlocked:

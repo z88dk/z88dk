@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_vsscanf
 
 EXTERN STDIO_MSG_READ, STDIO_MSG_SEEK

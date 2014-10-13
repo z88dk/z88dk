@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_d
 
 EXTERN __stdio_scanf_sm_decimal, __stdio_scanf_number_head

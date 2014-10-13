@@ -1,6 +1,8 @@
 
 ; void perror(const char *s)
 
+SECTION seg_code_stdio
+
 PUBLIC _perror
 
 _perror:

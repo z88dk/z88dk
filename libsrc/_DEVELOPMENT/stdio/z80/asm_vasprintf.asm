@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_vasprintf
 
 EXTERN asm_vsnprintf, error_einval_mc, l_utod_hl, asm_malloc, error_mc

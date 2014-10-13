@@ -14,6 +14,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_fflush_unlocked
 PUBLIC asm0_fflush_unlocked, asm1_fflush_unlocked
 
@@ -78,7 +82,6 @@ last_was_read:
    res 4,(ix+3)                ; clear eof
    
    ld c,STDIO_SEEK_CUR
-   ld a,c
    
    ld hl,$ffff
    ld e,l
@@ -86,7 +89,7 @@ last_was_read:
    
    exx
    
-   ld c,a
+   ld c,STDIO_SEEK_CUR
    ld a,STDIO_MSG_SEEK
    
    call l_jpix                 ; seek backward one byte

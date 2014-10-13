@@ -11,10 +11,11 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm_perror
 
 EXTERN __stdio_file_stderr, _errno
-
 EXTERN asm_strerror, asm0_fputs_unlocked, asm0_fputc_unlocked
 
 asm_perror:
@@ -26,7 +27,7 @@ asm_perror:
    ;
    ; uses  : all except ix
    
-   ld ix,(__stdio_file_stderr)
+   ld ix,__stdio_file_stderr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
@@ -88,7 +89,7 @@ errno_string:
    call asm_strerror
    call asm0_fputs_unlocked
    
-   ld e,CRT_EOL                ; '\n'
+   ld e,ASCII_EOL
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02

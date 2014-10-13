@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,11 +28,9 @@ PUBLIC fsetpos_callee
 
 EXTERN fsetpos_unlocked_callee
 
-fsetpos_callee:
+defc fsetpos_callee = fsetpos_unlocked_callee
 
-   jp fsetpos_unlocked_callee
-
-   INCLUDE "stdio/z80/asm_fsetpos.asm"
+INCLUDE "stdio/z80/asm_fsetpos.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_sm_format
 PUBLIC __stdio_scanf_sm_format_pct
 

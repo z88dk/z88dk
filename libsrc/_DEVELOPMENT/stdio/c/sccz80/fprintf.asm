@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -21,11 +23,9 @@ PUBLIC fprintf
 
 EXTERN fprintf_unlocked
 
-fprintf:
-
-   jp fprintf_unlocked
+defc fprintf = fprintf_unlocked
    
-   INCLUDE "stdio/z80/asm_fprintf.asm"
+INCLUDE "stdio/z80/asm_fprintf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

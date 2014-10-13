@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_c
 
 EXTERN STDIO_SEEK_CUR
@@ -24,7 +26,7 @@ __stdio_scanf_c:
    or c
    jr nz, width_specified
    
-   inc bc                        ; default is one char
+   inc c                         ; default is one char
 
 width_specified:
 
@@ -41,8 +43,7 @@ width_specified:
    exx
    inc hl                        ; number of assigned items++
    exx
-   
-   or a
+
    ret
 
 assignment_suppressed:

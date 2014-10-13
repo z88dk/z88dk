@@ -1,11 +1,12 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm__fflushall_unlocked
 
 EXTERN __stdio_file_list_open
-
-EXTERN asm1_fflush_unlocked, asm_p_forward_list_front
+EXTERN asm1_fflush_unlocked, asm_p_forward_list_next
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -36,7 +37,7 @@ ENDIF
 
 file_loop:
 
-   call asm_p_forward_list_front
+   call asm_p_forward_list_next
 
    push hl
    pop ix
@@ -44,12 +45,11 @@ file_loop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   jp c, __stdio_unlock_file_list  ; if no more open files in list
+   jp z, __stdio_unlock_file_list  ; if no more open files in list
 
 ELSE
 
-   ccf
-   ret nc                          ; if no more open files in list
+   ret z                           ; if no more open files in list
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

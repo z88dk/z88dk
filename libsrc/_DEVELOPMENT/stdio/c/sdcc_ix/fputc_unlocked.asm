@@ -1,6 +1,8 @@
 
 ; int fputc_unlocked(int c, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _fputc_unlocked
 
 _fputc_unlocked:

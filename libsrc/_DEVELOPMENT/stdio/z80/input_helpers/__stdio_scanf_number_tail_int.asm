@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_number_tail_int
 
 __stdio_scanf_number_tail_int:

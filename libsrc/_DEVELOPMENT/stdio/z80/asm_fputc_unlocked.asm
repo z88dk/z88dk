@@ -9,6 +9,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_fputc_unlocked
 PUBLIC asm0_fputc_unlocked
 

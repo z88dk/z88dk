@@ -1,11 +1,13 @@
 
-PUBLIC __stdio_file_init
-PUBLIC __0_stdio_file_init
+SECTION seg_code_stdio
+
+PUBLIC __stdio_file_constructor
+PUBLIC __0_stdio_file_constructor
 
 EXTERN mtx_recursive
 EXTERN error_ebadf_zc, l_setmem_hl, asm_mtx_init
 
-__stdio_file_init:
+__stdio_file_constructor:
 
    ; initialize a FILE structure
    ;
@@ -13,12 +15,12 @@ __stdio_file_init:
    ;
    ; uses  : af, c, hl
 
-   call __0_stdio_file_init
+   call __0_stdio_file_constructor
    
    ld c,mtx_recursive
    jp asm_mtx_init
 
-__0_stdio_file_init:
+__0_stdio_file_constructor:
 
    ld (hl),195
    inc hl
@@ -28,6 +30,4 @@ __0_stdio_file_init:
    inc hl
 
    xor a
-   call l_setmem_hl - 8
-
-   ret
+   jp l_setmem_hl - 8

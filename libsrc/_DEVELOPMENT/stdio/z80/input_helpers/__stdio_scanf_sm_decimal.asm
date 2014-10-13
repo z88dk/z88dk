@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_sm_decimal
 PUBLIC __stdio_scanf_sm_decimal_join
 

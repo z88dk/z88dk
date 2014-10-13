@@ -13,6 +13,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,9 +79,7 @@ PUBLIC asm_fwrite
 
 EXTERN asm_fwrite_unlocked
 
-asm_fwrite:
-
-   jp asm_fwrite_unlocked
+defc asm_fwrite = asm_fwrite_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

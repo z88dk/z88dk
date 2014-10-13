@@ -1,6 +1,8 @@
 
 ; FILE *fmemopen(void *buf, size_t size, const char *mode)
 
+SECTION seg_code_stdio
+
 PUBLIC fmemopen_callee
 
 fmemopen_callee:

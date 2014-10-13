@@ -1,6 +1,8 @@
 
 ; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
+SECTION seg_code_stdio
+
 PUBLIC _fmemopen_
 
 EXTERN asm__fmemopen

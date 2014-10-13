@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_verify_output
 
 EXTERN error_eacces_mc, error_mc

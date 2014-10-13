@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_unlock_file_list
 
 EXTERN __stdio_file_list_lock
-
 EXTERN asm_mtx_unlock
 
 __stdio_unlock_file_list:

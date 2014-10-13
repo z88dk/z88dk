@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,11 +29,9 @@ PUBLIC fwrite_callee
 
 EXTERN fwrite_unlocked_callee
 
-fwrite_callee:
+defc fwrite_callee = fwrite_unlocked_callee
 
-   jp fwrite_unlocked_callee
-
-   INCLUDE "stdio/z80/asm_fwrite.asm"
+INCLUDE "stdio/z80/asm_fwrite.asm"
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

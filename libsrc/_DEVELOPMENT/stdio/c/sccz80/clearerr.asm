@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,11 +26,9 @@ PUBLIC clearerr
 
 EXTERN clearerr_unlocked
 
-clearerr:
+defc clearerr = clearerr_unlocked
 
-   jp clearerr_unlocked
-
-   INCLUDE "stdio/z80/asm_clearerr.asm"
+INCLUDE "stdio/z80/asm_clearerr.asm"
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_sign
 
 __stdio_printf_sign:

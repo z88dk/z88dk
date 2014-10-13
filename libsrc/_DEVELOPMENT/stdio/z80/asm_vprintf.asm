@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,7 +51,7 @@ asm_vprintf:
    ;            
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,__stdio_file_stdout
    jp asm_vfprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,9 +62,7 @@ PUBLIC asm_vprintf
 
 EXTERN asm_vprintf_unlocked
 
-asm_vprintf:
-
-   jp asm_vprintf_unlocked
+defc asm_vprintf = asm_vprintf_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

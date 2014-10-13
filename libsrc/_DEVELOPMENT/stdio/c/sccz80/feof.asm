@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,11 +26,9 @@ PUBLIC feof
 
 EXTERN feof_unlocked
 
-feof:
+defc feof = feof_unlocked
 
-   jp feof_unlocked
-
-   INCLUDE "stdio/z80/asm_feof.asm"
+INCLUDE "stdio/z80/asm_feof.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

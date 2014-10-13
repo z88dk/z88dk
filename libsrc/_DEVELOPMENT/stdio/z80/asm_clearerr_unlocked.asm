@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm_clearerr_unlocked
 PUBLIC asm1_clearerr_unlocked
 

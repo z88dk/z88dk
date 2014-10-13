@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -19,11 +21,7 @@ PUBLIC asm_getc
 
 EXTERN asm_fgetc
 
-asm_getc:
-
-   jp asm_fgetc
-
-;defc asm_getc = asm_fgetc
+defc asm_getc = asm_fgetc
 
    ; enter : ix = FILE *
    ;
@@ -49,9 +47,7 @@ PUBLIC asm_getc
 
 EXTERN asm_getc_unlocked
 
-asm_getc:
-
-   jp asm_getc_unlocked
+defc asm_getc = asm_getc_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

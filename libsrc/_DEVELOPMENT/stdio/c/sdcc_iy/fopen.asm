@@ -1,6 +1,8 @@
 
 ; FILE *fopen(const char *filename, const char *mode)
 
+SECTION seg_code_stdio
+
 PUBLIC _fopen
 
 _fopen:

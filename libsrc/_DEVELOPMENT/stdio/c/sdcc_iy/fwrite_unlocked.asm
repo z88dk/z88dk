@@ -1,6 +1,8 @@
 
 ; size_t fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _fwrite_unlocked
 
 _fwrite_unlocked:

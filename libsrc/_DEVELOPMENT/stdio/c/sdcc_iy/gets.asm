@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,11 +29,9 @@ PUBLIC _gets
 
 EXTERN _gets_unlocked
 
-_gets:
-
-   jp _gets_unlocked
+defc _gets = _gets_unlocked
    
-   INCLUDE "stdio/z80/asm_gets.asm"
+INCLUDE "stdio/z80/asm_gets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

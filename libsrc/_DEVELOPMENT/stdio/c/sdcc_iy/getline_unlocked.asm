@@ -1,6 +1,8 @@
 
 ; size_t getline_unlocked(char **lineptr, size_t *n, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _getline_unlocked
 
 _getline_unlocked:

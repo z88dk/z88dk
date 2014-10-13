@@ -1,10 +1,11 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_verify_valid
 
 EXTERN __p_forward_list_locate_item, error_ebadf_mc
-
 EXTERN __stdio_file_list_open
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,16 +42,19 @@ ENDIF
 
    ld c,ixl
    ld b,ixh
-   
+
    ld a,b
    or c
+   scf
    jr z, invalid_file_0
-   
+
    dec bc
    dec bc                      ; bc = & FILE.link
    
    ld hl,__stdio_file_list_open
    call __p_forward_list_locate_item
+
+invalid_file_0:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -75,11 +79,6 @@ valid_file:
    
    or a
    ret
-
-invalid_file_0:
-
-   pop de
-   pop bc
    
 invalid_file_1:
 

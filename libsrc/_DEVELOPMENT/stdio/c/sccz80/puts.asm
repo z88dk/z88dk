@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -21,11 +23,9 @@ PUBLIC puts
 
 EXTERN puts_unlocked
 
-puts:
-
-   jp puts_unlocked
+defc puts = puts_unlocked
    
-   INCLUDE "stdio/z80/asm_puts.asm"
+INCLUDE "stdio/z80/asm_puts.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

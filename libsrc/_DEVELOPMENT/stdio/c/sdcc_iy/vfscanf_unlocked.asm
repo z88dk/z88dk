@@ -1,6 +1,8 @@
 
 ; int vfscanf_unlocked(FILE *stream, const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC _vfscanf_unlocked
 
 _vfscanf_unlocked:

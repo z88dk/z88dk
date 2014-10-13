@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_scanf_unlocked
 
 EXTERN asm_vscanf_unlocked, __stdio_varg_2

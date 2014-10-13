@@ -9,15 +9,13 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_getc_unlocked
 
 EXTERN asm_fgetc_unlocked
 
-asm_getc_unlocked:
-
-   jp asm_fgetc_unlocked
-
-;defc asm_getc_unlocked = asm_fgetc_unlocked
+defc asm_getc_unlocked = asm_fgetc_unlocked
 
    ; enter : ix = FILE *
    ;

@@ -173,6 +173,7 @@ HL  = length > 0
 
 return:
 
+HL'= void *buffer + num bytes written
 HL = number of bytes successfully output
 carry set if error
 
@@ -321,4 +322,3 @@ input:
 return:
 
 carry set if file is invalid (file will always be closed)
-

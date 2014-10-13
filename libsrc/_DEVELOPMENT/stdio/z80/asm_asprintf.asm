@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_asprintf
 
 EXTERN asm_vasprintf, __stdio_varg_2, __stdio_nextarg_de

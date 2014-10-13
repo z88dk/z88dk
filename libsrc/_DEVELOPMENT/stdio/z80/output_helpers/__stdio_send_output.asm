@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_send_output
 PUBLIC __stdio_send_output_buffer, __stdio_send_output_chars
 
@@ -9,7 +11,6 @@ PUBLIC __stdio_printf_padding_precision
 PUBLIC __stdio_printf_padding_precision_bc, __stdio_printf_padding_precision_hl
 
 EXTERN STDIO_MSG_PUTC, STDIO_MSG_WRIT
-
 EXTERN l_jpix, l_addu_hl_bc
 
 ; ALL VFPRINTF OUTPUT PASSES THROUGH THESE FUNCTIONS

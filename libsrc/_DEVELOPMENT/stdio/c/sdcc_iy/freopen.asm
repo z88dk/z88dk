@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,11 +33,9 @@ PUBLIC _freopen
 
 EXTERN _freopen_unlocked
 
-_freopen:
-
-   jp _freopen_unlocked
+defc _freopen = _freopen_unlocked
    
-   INCLUDE "stdio/z80/asm_freopen.asm"
+INCLUDE "stdio/z80/asm_freopen.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

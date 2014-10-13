@@ -14,6 +14,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_fgets_unlocked
 PUBLIC asm0_fgets_unlocked, asm1_fgets_unlocked
 
@@ -27,7 +31,6 @@ asm_fgets_unlocked:
    ;         de = char *s
    ;
    ; exit  : ix = FILE *
-   ;         bc'= number of chars written to s
    ;
    ;         if success
    ;
@@ -106,13 +109,7 @@ asm0_fgets_unlocked:             ; entry for gets()
    
    push de
    
-   exx
-   push bc
-   
    call __stdio_recv_input_raw_getc  ; throw away \n
-
-   pop bc
-   exx
    
    pop de
    

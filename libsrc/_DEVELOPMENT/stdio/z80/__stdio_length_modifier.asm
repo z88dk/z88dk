@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_length_modifier
 
 __stdio_length_modifier:

@@ -1,6 +1,8 @@
  
 ; int asprintf (char **ptr, const char *format, ...)
 
+SECTION seg_code_stdio
+
 PUBLIC _asprintf
 
 _asprintf:

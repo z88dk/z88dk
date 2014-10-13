@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,11 +28,9 @@ PUBLIC vscanf_callee
 
 EXTERN vscanf_unlocked_callee
 
-vscanf_callee:
-
-   jp vscanf_unlocked_callee
+defc vscanf_callee = vscanf_unlocked_callee
    
-   INCLUDE "stdio/z80/asm_vscanf.asm"
+INCLUDE "stdio/z80/asm_vscanf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

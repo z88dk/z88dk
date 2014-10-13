@@ -23,6 +23,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_getdelim_unlocked
 PUBLIC asm0_getdelim_unlocked
 
@@ -119,7 +123,7 @@ create_vector:
    ex (sp),hl                  ; push vector.max_size
    push hl                     ; push vector.capacity
    push hl                     ; push vector.size
-   push de                     ; push vector.array
+   push de                     ; push vector.data
 
    ; reserve one byte in the vector for zero terminator
    
@@ -136,7 +140,7 @@ create_vector:
    
    ; zero terminate initial vector
    
-   pop hl                      ; hl = vector.array
+   pop hl                      ; hl = vector.data
    push hl
    
    xor a
@@ -181,9 +185,9 @@ no_delim:
    
    ; bc'= 0 if error
    ; stack = size_t *n, char **lineptr, vector.max_size,
-   ;         vector.capacity, vector.size, vector.array
+   ;         vector.capacity, vector.size, vector.data
 
-   pop bc                      ; bc = vector.array = char *line, possibly new address
+   pop bc                      ; bc = vector.data = char *line, possibly new address
    pop de                      ; de = num bytes written including '\0'
    pop hl
    pop hl

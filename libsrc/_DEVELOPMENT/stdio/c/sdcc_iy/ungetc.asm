@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,11 +31,9 @@ PUBLIC _ungetc
 
 EXTERN _ungetc_unlocked
 
-_ungetc:
-
-   jp _ungetc_unlocked
+defc _ungetc = _ungetc_unlocked
    
-   INCLUDE "stdio/z80/asm_ungetc.asm"
+INCLUDE "stdio/z80/asm_ungetc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

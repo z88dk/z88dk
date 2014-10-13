@@ -9,6 +9,10 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_feof_unlocked
 PUBLIC asm1_feof_unlocked
 

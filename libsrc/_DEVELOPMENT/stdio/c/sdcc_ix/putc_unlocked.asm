@@ -1,12 +1,12 @@
 
 ; int putc_unlocked(int c, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _putc_unlocked
 
 EXTERN _fputc_unlocked
 
-_putc_unlocked:
+defc _putc_unlocked = _fputc_unlocked
 
-   jp _fputc_unlocked
-
-   INCLUDE "stdio/z80/asm_putc_unlocked.asm"
+INCLUDE "stdio/z80/asm_putc_unlocked.asm"

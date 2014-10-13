@@ -16,6 +16,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,7 +33,6 @@ asm_gets:
    ; enter : hl = char *s
    ;
    ; exit  : ix = FILE *stdin
-   ;         bc'= number of chars read from stream (includes '\n')
    ;
    ;         if success
    ;
@@ -60,7 +61,7 @@ asm_gets:
    ;
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,__stdio_file_stdin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -91,9 +92,7 @@ PUBLIC asm_gets
 
 EXTERN asm_gets_unlocked
 
-asm_gets:
-
-   jp asm_gets_unlocked
+defc asm_gets = asm_gets_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

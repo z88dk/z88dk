@@ -25,6 +25,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -86,9 +88,7 @@ PUBLIC asm_getdelim
 
 EXTERN asm_getdelim_unlocked
 
-asm_getdelim:
-
-   jp asm_getdelim_unlocked
+defc asm_getdelim = asm_getdelim_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,6 +1,8 @@
 
 ; int ungetc_unlocked(int c, FILE *stream)
 
+SECTION seg_code_stdio
+
 PUBLIC _ungetc_unlocked
 
 _ungetc_unlocked:

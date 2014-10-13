@@ -18,6 +18,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_fseek_unlocked
 PUBLIC asm0_fseek_unlocked
 

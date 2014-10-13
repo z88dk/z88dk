@@ -14,11 +14,14 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
+SECTION seg_code_stdio
+
 PUBLIC asm_gets_unlocked
 PUBLIC asm0_gets_unlocked
 
 EXTERN __stdio_file_stdin
-
 EXTERN asm0_fgets_unlocked, __stdio_input_sm_gets
 
 asm_gets_unlocked:
@@ -26,7 +29,6 @@ asm_gets_unlocked:
    ; enter : hl = char *s
    ;
    ; exit  : ix = FILE *stdin
-   ;         bc'= number of chars read from stream (includes '\n')
    ;
    ;         if success
    ;
@@ -55,7 +57,7 @@ asm_gets_unlocked:
    ;
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,__stdio_file_stdin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

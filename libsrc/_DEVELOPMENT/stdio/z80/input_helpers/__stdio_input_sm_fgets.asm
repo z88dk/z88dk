@@ -1,7 +1,19 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_input_sm_fgets
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (ASMPC & $ff) = 1
+
+   defs 1
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __stdio_input_sm_fgets:
 
@@ -42,7 +54,7 @@ space:
    ld (de),a                   ; write char to buffer
    inc de
    
-   cp CRT_EOL                  ; '\n'
+   cp ASCII_EOL                ; '\n'
    jr z, delim_met
    
    or a                        ; indicate accepted

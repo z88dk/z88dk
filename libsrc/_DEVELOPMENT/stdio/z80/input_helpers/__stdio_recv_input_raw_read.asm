@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_raw_read
 
 EXTERN STDIO_MSG_READ
-
 EXTERN l_jpix
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
@@ -46,6 +47,14 @@ __stdio_recv_input_raw_read:
    ld a,b
    or c
    jr z, len_one   
+
+   call _no_ungetc_rd
+   
+   exx
+   inc bc
+   exx
+   
+   ret
 
 _no_ungetc_rd:
 

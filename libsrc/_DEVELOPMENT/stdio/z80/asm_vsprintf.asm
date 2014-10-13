@@ -9,10 +9,11 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_vsprintf
 
 EXTERN STDIO_MSG_PUTC
-
 EXTERN asm0_vfprintf_unlocked, asm_memset
 
 asm_vsprintf:

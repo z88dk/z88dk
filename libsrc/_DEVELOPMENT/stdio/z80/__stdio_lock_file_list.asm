@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_lock_file_list
 
 EXTERN __stdio_file_list_lock
-
 EXTERN asm_mtx_lock
 
 __stdio_lock_file_list:
@@ -21,5 +22,3 @@ __stdio_lock_file_list:
    ret nc
    
    jr __stdio_lock_file_list   ; do not accept lock error on stdio lock
-
-   

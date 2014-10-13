@@ -1,13 +1,11 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_scanf_lp
 
 EXTERN __stdio_scanf_lx
 
-__stdio_scanf_lp:
-
-   jp __stdio_scanf_lx
-
-;defc __stdio_scanf_lp = __stdio_scanf_lx
+defc __stdio_scanf_lp = __stdio_scanf_lx
 
    ; %lx, %lp converter called from vfscanf()
    ;

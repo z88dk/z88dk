@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,11 +30,9 @@ PUBLIC _fscanf
 
 EXTERN _fscanf_unlocked
 
-_fscanf:
-
-   jp _fscanf_unlocked
+defc _fscanf = _fscanf_unlocked
    
-   INCLUDE "stdio/z80/asm_fscanf.asm"
+INCLUDE "stdio/z80/asm_fscanf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

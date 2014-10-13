@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_obstack_printf
 
 EXTERN asm_obstack_vprintf, __stdio_varg_2, __stdio_nextarg_de

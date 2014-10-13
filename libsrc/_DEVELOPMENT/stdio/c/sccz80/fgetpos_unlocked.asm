@@ -1,6 +1,8 @@
 
 ; int fgetpos_unlocked(FILE *stream, fpos_t *pos)
 
+SECTION seg_code_stdio
+
 PUBLIC fgetpos_unlocked
 
 EXTERN asm_fgetpos_unlocked

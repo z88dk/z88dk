@@ -1,8 +1,9 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_raw_getc
 
 EXTERN STDIO_MSG_GETC
-
 EXTERN l_jpix, error_zc, error_mc
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*

@@ -1,6 +1,8 @@
 
 ; void flockfile(FILE *file)
 
+SECTION seg_code_stdio
+
 PUBLIC flockfile
 
 flockfile:

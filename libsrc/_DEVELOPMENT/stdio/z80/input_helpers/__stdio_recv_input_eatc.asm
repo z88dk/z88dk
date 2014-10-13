@@ -1,9 +1,10 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_eatc
 
 EXTERN STDIO_MSG_EATC
-
-EXTERN l_incu_de, l_incu_bc, l_addu_hl_bc, l_jpix, l_jphl
+EXTERN l_addu_hl_bc, l_jpix, l_jphl
 
 ; ALL INPUT FOR VFSCANF PASSES THROUGH __STDIO_RECV_INPUT_*
 ; DE' IS USED TO TRACK NUMBER OF CHARS READ FROM STREAM
@@ -47,9 +48,10 @@ __stdio_recv_input_eatc:
 
    ld a,b
    or c
-   
-   ld a,(ix+6)                 ; a = unget char
+
    jr z, _ungetc_rejected_ec   ; if max_length is zero only provide peek
+
+   ld a,(ix+6)                 ; a = unget char
    
    exx
    call l_jphl                 ; qualify(a)
@@ -63,19 +65,15 @@ __stdio_recv_input_eatc:
    call _no_ungetc_ec
 
 _post_ungetc:
+   
+   inc de                      ; total num chars read from stream++
+   inc bc                      ; num chars consumed in this operation++
 
-   push af                     ; save error state
-   
-   call l_incu_de              ; total num chars read from stream++
-   call l_incu_bc              ; num chars consumed in this operation++
-   
-   pop af
    ret
 
 _ungetc_rejected_ec:
 
-   ; a = rejected char
-   
+   ld a,(ix+6)                 ; a = rejected unget char   
    ld bc,0                     ; no chars consumed in this operation
    
    or a                        ; indicate no error

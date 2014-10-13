@@ -1,6 +1,8 @@
 
 ; char *gets_unlocked(char *s)
 
+SECTION seg_code_stdio
+
 PUBLIC gets_unlocked
 
 gets_unlocked:

@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm_ftrylockfile
 PUBLIC asm0_ftrylockfile
 

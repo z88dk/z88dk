@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_varg_2
 
 EXTERN __stdio_nextarg_de
@@ -53,13 +55,6 @@ __stdio_varg_2:
    ;         de = first 16-bit argument in list
    ;
    ; uses  : af, de, hl
-
-IF __SDCC_IX
-
-   inc a
-   inc a                       ; all vararg functions save ix and have extra call
-
-ENDIF
 
    inc a
    add a,a

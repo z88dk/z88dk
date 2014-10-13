@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,11 +30,9 @@ PUBLIC fseek_callee
 
 EXTERN fseek_unlocked_callee
 
-fseek_callee:
+defc fseek_callee = fseek_unlocked_callee
 
-   jp fseek_unlocked_callee
-
-   INCLUDE "stdio/z80/asm_fseek.asm"
+INCLUDE "stdio/z80/asm_fseek.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

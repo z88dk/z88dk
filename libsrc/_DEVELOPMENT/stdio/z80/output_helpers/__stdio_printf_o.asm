@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_o
 
 EXTERN __stdio_printf_number_tail_uint

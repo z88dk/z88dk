@@ -1,6 +1,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_verify_valid_lock
 
 EXTERN __p_forward_list_locate_item, __stdio_lock_acquire
@@ -42,17 +44,17 @@ ENDIF
 
    ld c,ixl
    ld b,ixh
-   
+
    ld a,b
    or c
    jr z, exit_error_ebadf
-   
+
    dec bc
    dec bc                      ; bc = & FILE.link
    
    ld hl,__stdio_file_list_open
    call __p_forward_list_locate_item
-   
+
    jr c, exit_error_ebadf
 
    call __stdio_lock_acquire
@@ -82,6 +84,14 @@ exit_success:
    ret
 
 exit_error_ebadf:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+   
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    pop de
    pop bc

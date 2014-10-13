@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_stdio
+
 PUBLIC asm_sscanf
 
 EXTERN asm_vsscanf, __stdio_varg_2, __stdio_nextarg_de

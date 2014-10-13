@@ -12,11 +12,12 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC asm_puts_unlocked
 PUBLIC asm0_puts_unlocked
 
 EXTERN __stdio_file_stdout
-
 EXTERN asm0_fputs_unlocked, asm0_fputc_unlocked, l_utod_hl, error_mc
 
 asm_puts_unlocked:
@@ -37,7 +38,7 @@ asm_puts_unlocked:
    ;
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,__stdio_file_stdout
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -57,7 +58,7 @@ asm0_puts_unlocked:
    
    push hl                     ; save strlen(s)
    
-   ld e,CRT_EOL                ; '\n'
+   ld e,ASCII_EOL
    call asm0_fputc_unlocked    ; output '\n'
    
    pop hl                      ; hl = strlen(s)

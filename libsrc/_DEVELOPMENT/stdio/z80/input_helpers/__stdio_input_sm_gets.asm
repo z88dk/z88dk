@@ -1,7 +1,19 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_input_sm_gets
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (ASMPC & $ff) = 1
+
+   defs 1
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __stdio_input_sm_gets:
 
@@ -20,7 +32,7 @@ __stdio_input_sm_gets:
    ; return: de = void *s_ptr (address past last byte written)
    ;          l = 1 if caller should remove \n
    
-   cp CRT_EOL                  ; '\n'
+   cp ASCII_EOL                ; '\n'
    jr z, delim_met
    
    ld (de),a                   ; write char to buffer

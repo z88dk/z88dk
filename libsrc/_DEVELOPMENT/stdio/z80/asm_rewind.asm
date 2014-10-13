@@ -10,6 +10,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -65,9 +67,7 @@ PUBLIC asm_rewind
 
 EXTERN asm_rewind_unlocked
 
-asm_rewind:
-
-   jp asm_rewind_unlocked
+defc asm_rewind = asm_rewind_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

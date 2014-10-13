@@ -11,6 +11,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -42,7 +44,7 @@ asm_getline:
    ;
    ; uses  : all except ix
 
-   ld bc,13                    ; '\n'
+   ld bc,ASCII_EOL
    jp asm_getdelim
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,9 +55,7 @@ PUBLIC asm_getline
 
 EXTERN asm_getline_unlocked
 
-asm_getline:
-
-   jp asm_getline_unlocked
+defc asm_getline = asm_getline_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -1,4 +1,6 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_printf_c
 
 EXTERN __stdio_nextarg_hl

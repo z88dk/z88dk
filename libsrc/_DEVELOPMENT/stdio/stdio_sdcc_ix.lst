@@ -87,9 +87,8 @@ stdio/c/sdcc_ix/vsscanf
 stdio/c/sdcc_ix/_fmemopen_
 stdio/z80/asm__fflushall
 stdio/z80/asm__fflushall_unlocked
-stdio/z80/__stdio_badfile
-stdio/z80/__stdio_file_destroy
-stdio/z80/__stdio_file_init
+stdio/z80/__stdio_file_constructor
+stdio/z80/__stdio_file_destructor
 stdio/z80/__stdio_length_modifier
 stdio/z80/__stdio_lock_acquire
 stdio/z80/__stdio_lock_file_list
@@ -98,7 +97,7 @@ stdio/z80/__stdio_lock_tryacquire
 stdio/z80/__stdio_nextarg_bc
 stdio/z80/__stdio_nextarg_de
 stdio/z80/__stdio_nextarg_hl
-stdio/z80/__stdio_parse_permission
+stdio/z80/__stdio_parse_mode
 stdio/z80/__stdio_unlock_file_list
 stdio/z80/__stdio_varg
 stdio/z80/__stdio_verify_input

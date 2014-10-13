@@ -20,6 +20,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,6 +49,7 @@ asm_fseek:
    ;           carry set
    ;
    ; uses  : all except ix
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
 
@@ -76,9 +79,7 @@ PUBLIC asm_fseek
 
 EXTERN asm_fseek_unlocked
 
-asm_fseek:
-
-   jp asm_fseek_unlocked
+defc asm_fseek = asm_fseek_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

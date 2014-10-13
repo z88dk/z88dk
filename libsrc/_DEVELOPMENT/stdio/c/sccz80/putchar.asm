@@ -3,6 +3,8 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION seg_code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -21,11 +23,9 @@ PUBLIC putchar
 
 EXTERN putchar_unlocked
 
-putchar:
+defc putchar = putchar_unlocked
 
-   jp putchar_unlocked
-
-   INCLUDE "stdio/z80/asm_putchar.asm"
+INCLUDE "stdio/z80/asm_putchar.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

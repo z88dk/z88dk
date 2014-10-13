@@ -1,6 +1,8 @@
 
 ; int vprintf_unlocked(const char *format, void *arg)
 
+SECTION seg_code_stdio
+
 PUBLIC vprintf_unlocked_callee
 
 vprintf_unlocked_callee:

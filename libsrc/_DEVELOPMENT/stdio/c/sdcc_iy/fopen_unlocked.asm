@@ -1,6 +1,8 @@
 
 ; FILE *fopen_unlocked(const char *filename, const char *mode)
 
+SECTION seg_code_stdio
+
 PUBLIC _fopen_unlocked
 
 _fopen_unlocked:

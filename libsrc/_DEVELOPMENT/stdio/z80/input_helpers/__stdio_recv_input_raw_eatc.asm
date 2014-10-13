@@ -1,9 +1,10 @@
 
+SECTION seg_code_stdio
+
 PUBLIC __stdio_recv_input_raw_eatc
 
 EXTERN STDIO_MSG_EATC
-
-EXTERN l_incu_bc, l_jpix, l_jphl
+EXTERN l_jpix, l_jphl
 
 ; ALL HIGH LEVEL STDIO INPUT PASSES THROUGH __STDIO_RECV_INPUT_RAW_*
 ; EXCEPT FOR VFSCANF.  THIS ENSURES STREAM STATE IS CORRECTLY MAINTAINED
@@ -41,8 +42,9 @@ __stdio_recv_input_raw_eatc:
    ld a,h
    or l
    
-   ld a,(ix+6)                 ; a = unget char
    jr z, _ungetc_rejected_ec   ; if max_length is zero only provide peek
+   
+   ld a,(ix+6)                 ; a = unget char
    
    exx
    call l_jphl                 ; qualify(a)
@@ -52,22 +54,17 @@ __stdio_recv_input_raw_eatc:
 
    res 0,(ix+4)                ; consume the unget char
    dec hl                      ; max_length--
-
+   
    call _no_ungetc_ec
 
 _post_ungetc:
 
-   push af                     ; save error state
-   
-   call l_incu_bc              ; num chars consumed in this operation++
-   
-   pop af
+   inc bc                      ; num chars consumed in this operation++
    ret
 
 _ungetc_rejected_ec:
 
-   ; a = rejected char
-   
+   ld a,(ix+6)                 ; a = rejected unget char
    ld bc,0                     ; no chars consumed in this operation
    
    or a                        ; indicate no error
