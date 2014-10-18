@@ -23,11 +23,9 @@ SECTION seg_code_stdio
 PUBLIC asm__fmemopen
 PUBLIC asm0__fmemopen
 
-EXTERN error_einval_zc, error_zc, asm_p_forward_list_push_front
+EXTERN error_einval_zc, error_zc, __stdio_file_add_list
 EXTERN __stdio_parse_mode, asm_malloc, __stdio_file_constructor, l_setmem_hl
 EXTERN __stdio_memstream_driver, asm_realloc, __stdio_file_destructor, asm_free
-
-EXTERN __stdio_file_list_open
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -285,34 +283,14 @@ vector_no_grow:
    inc hl
    ld (hl),d                   ; fptr = position_index
 
-   ; place FILE on open list
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-   call __stdio_lock_file_list
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; add FILE to open list
 
    ld e,ixl
-   ld d,ixh
+   ld d,ixh                    ; de = FILE *
+
+   call __stdio_file_add_list
    
-   dec de
-   dec de                      ; de = & FILE.link
-   
-   ld hl,__stdio_file_list_open
-   call asm_p_forward_list_push_front
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-   call __stdio_unlock_file_list
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; return FILE
+   ; return FILE*
    
    push ix
    pop hl                      ; hl = FILE *
@@ -366,10 +344,9 @@ allocate_fail:
 
    ; ix = FILE *
 
-   push ix
-   
    call __stdio_file_destructor
-   
+      
+   push ix
    pop hl
    
    dec hl

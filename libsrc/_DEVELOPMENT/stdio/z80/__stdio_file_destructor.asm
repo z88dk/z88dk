@@ -7,8 +7,7 @@ EXTERN asm_mtx_destroy, __0_stdio_file_constructor
 
 __stdio_file_destructor:
 
-   ; releases the mutex associated with the FILE
-   ; and invalidates the FILE
+   ; invalidates the FILE
    ;
    ; enter : ix = FILE *
    ;
@@ -25,5 +24,5 @@ __stdio_file_destructor:
    ex de,hl
    call __0_stdio_file_constructor
 
-   ex de,hl
+   ex de,hl                    ; hl = & FILE->mtx
    jp asm_mtx_destroy
