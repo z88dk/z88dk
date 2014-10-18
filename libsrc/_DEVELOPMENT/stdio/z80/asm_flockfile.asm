@@ -3,7 +3,7 @@
 ; Jan 2014
 ; ===============================================================
 ; 
-; void flockfile(FILE *file)
+; int flockfile(FILE *file)
 ;
 ; Increase lock count on file by one.
 ;
@@ -14,9 +14,8 @@ INCLUDE "clib_cfg.asm"
 SECTION seg_code_stdio
 
 PUBLIC asm_flockfile
-PUBLIC asm0_flockfile
 
-EXTERN asm_mtx_lock
+EXTERN __stdio_lock_acquire, error_znc
 
 asm_flockfile:
 
@@ -25,9 +24,18 @@ asm_flockfile:
    ; enter : ix = FILE *
    ;
    ; exit  : ix = FILE *
-   ;         carry set if failed to acquire
    ;
-   ; uses  : af
+   ;         success
+   ;
+   ;            hl = 0
+   ;            carry reset
+   ;
+   ;         fail if FILE is invalid
+   ;
+   ;            hl = -1
+   ;            carry set, errno = EBADF
+   ;
+   ; uses  : af, hl
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -40,22 +48,7 @@ IF __CLIB_OPT_STDIO & $01
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-asm0_flockfile:
-
-   push bc
-   push de
-   push hl
+   call __stdio_lock_acquire
+   jp nc, error_znc            ; if lock acquired
    
-   ld e,ixl
-   ld d,ixh                    ; de = FILE *
-   
-   ld hl,7
-   add hl,de                   ; hl = & FILE->mtx_t
-   
-   call asm_mtx_lock           ; lock stream
-   
-   pop hl
-   pop de
-   pop bc
-
-   ret
+   jr asm_flockfile            ; try again

@@ -14,7 +14,6 @@ INCLUDE "clib_cfg.asm"
 SECTION seg_code_stdio
 
 PUBLIC asm_ftrylockfile
-PUBLIC asm0_ftrylockfile
 
 EXTERN __stdio_lock_tryacquire, error_znc, error_mc
 
@@ -46,8 +45,6 @@ IF __CLIB_OPT_STDIO & $01
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-asm0_ftrylockfile:
 
    call __stdio_lock_tryacquire
 

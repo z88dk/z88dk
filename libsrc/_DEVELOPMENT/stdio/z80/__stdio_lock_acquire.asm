@@ -3,9 +3,9 @@ SECTION seg_code_stdio
 
 PUBLIC __stdio_lock_acquire
 
-EXTERN asm0_flockfile
+EXTERN asm_mtx_lock
 
-defc __stdio_lock_acquire = asm0_flockfile
+__stdio_lock_acquire:
 
    ; Acquire the FILE lock
    ;
@@ -15,3 +15,21 @@ defc __stdio_lock_acquire = asm0_flockfile
    ;         carry set if failed to acquire
    ;
    ; uses  : af
+
+   push bc
+   push de
+   push hl
+   
+   ld e,ixl
+   ld d,ixh                    ; de = FILE *
+   
+   ld hl,7
+   add hl,de                   ; hl = & FILE->mtx_t
+   
+   call asm_mtx_lock           ; lock stream
+   
+   pop hl
+   pop de
+   pop bc
+
+   ret
