@@ -87,8 +87,12 @@ stdio/c/sdcc_iy/vsscanf
 stdio/c/sdcc_iy/_fmemopen_
 stdio/z80/asm__fflushall
 stdio/z80/asm__fflushall_unlocked
+stdio/z80/__stdio_file_add_list
+stdio/z80/__stdio_file_allocate
 stdio/z80/__stdio_file_constructor
+stdio/z80/__stdio_file_deallocate
 stdio/z80/__stdio_file_destructor
+stdio/z80/__stdio_file_init
 stdio/z80/__stdio_length_modifier
 stdio/z80/__stdio_lock_acquire
 stdio/z80/__stdio_lock_file_list
