@@ -15,7 +15,7 @@ SECTION seg_code_stdio
 
 PUBLIC asm_fdopen
 
-EXTERN __stdio_parse_mode, __fcntl_fdstruct_from_fd
+EXTERN __stdio_parse_mode, __fcntl_fdstruct_from_fd_2
 EXTERN error_einval_zc, error_zc, __stdio_file_allocate
 EXTERN __fcntl_fdchain_descend, __stdio_file_init
 EXTERN __stdio_file_add_list, __stdio_file_deallocate
@@ -67,7 +67,7 @@ IF __CLIB_OPT_MULTITHREAD & $08
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   call __fcntl_fdstruct_from_fd
+   call __fcntl_fdstruct_from_fd_2
    
    pop hl                      ; hl = FILE *
    pop bc                      ; c = mode byte

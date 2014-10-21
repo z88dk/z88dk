@@ -3,6 +3,8 @@ stdio/c/sccz80/clearerr
 stdio/c/sccz80/clearerr_unlocked
 stdio/c/sccz80/fclose
 stdio/c/sccz80/fclose_unlocked
+stdio/c/sccz80/fdopen
+stdio/c/sccz80/fdopen_callee
 stdio/c/sccz80/feof
 stdio/c/sccz80/feof_unlocked
 stdio/c/sccz80/ferror
@@ -19,6 +21,8 @@ stdio/c/sccz80/fgets
 stdio/c/sccz80/fgets_callee
 stdio/c/sccz80/fgets_unlocked
 stdio/c/sccz80/fgets_unlocked_callee
+stdio/c/sccz80/fileno
+stdio/c/sccz80/fileno_unlocked
 stdio/c/sccz80/flockfile
 stdio/c/sccz80/fmemopen
 stdio/c/sccz80/fmemopen_callee

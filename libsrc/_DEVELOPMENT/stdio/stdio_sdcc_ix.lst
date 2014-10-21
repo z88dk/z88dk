@@ -3,6 +3,7 @@ stdio/c/sdcc_ix/clearerr
 stdio/c/sdcc_ix/clearerr_unlocked
 stdio/c/sdcc_ix/fclose
 stdio/c/sdcc_ix/fclose_unlocked
+stdio/c/sdcc_ix/fdopen
 stdio/c/sdcc_ix/feof
 stdio/c/sdcc_ix/feof_unlocked
 stdio/c/sdcc_ix/ferror
@@ -15,6 +16,8 @@ stdio/c/sdcc_ix/fgetpos
 stdio/c/sdcc_ix/fgetpos_unlocked
 stdio/c/sdcc_ix/fgets
 stdio/c/sdcc_ix/fgets_unlocked
+stdio/c/sdcc_ix/fileno
+stdio/c/sdcc_ix/fileno_unlocked
 stdio/c/sdcc_ix/flockfile
 stdio/c/sdcc_ix/fmemopen
 stdio/c/sdcc_ix/fopen
