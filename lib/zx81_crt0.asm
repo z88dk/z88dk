@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.38 2013-10-30 16:09:17 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.39 2014-10-21 12:18:26 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -126,7 +126,11 @@ IF (startup>=2)
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
+ IF (startup=2)
+        call    altint_on
+ ELSE
         call    hrg_on
+ ENDIF
 ENDIF
 
 	; this must be after 'hrg_on', sometimes
@@ -181,7 +185,11 @@ IF (startup>=2)
         xor	a
         ld      (hrgbrkflag),a
  ELSE
+  IF (startup=2)
+        call    altint_off
+  ELSE
         call    hrg_off		; this is valid for mode 2, too !
+  ENDIF
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))

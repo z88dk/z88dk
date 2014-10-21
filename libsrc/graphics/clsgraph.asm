@@ -5,7 +5,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: clsgraph.asm,v 1.4 2014-10-21 12:18:26 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -25,7 +25,8 @@
 				ld	hl,(base_graphics)	; base of	graphics area
 				ld	(hl),0
 				ld	d,h
-				ld	e,1			; de	= base_graphics+1
+				ld	e,l
+				inc de			; de	= base_graphics+1
 				ld	bc,maxx*maxy/8-1
 				ldir				; reset graphics window (2K)
 				pop	hl

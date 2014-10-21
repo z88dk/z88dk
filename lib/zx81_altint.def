@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.15 2011-12-28 14:04:54 stefano Exp $
+;       $Id: zx81_altint.def,v 1.16 2014-10-21 12:18:26 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -19,8 +19,8 @@
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
-XDEF	hrg_on
-XDEF	hrg_off
+XDEF	altint_on
+XDEF	altint_off
 XDEF	zx_fast
 XDEF	zx_slow
 
@@ -39,7 +39,7 @@ zx_fast:
 ;========
 
 zx_slow:
-hrg_on:
+altint_on:
 		call    restore81
 		call    $F2B	; SLOW
         ld      hl,L0281
@@ -59,8 +59,8 @@ nosync:
 
 ;--------------------------------------------------------------
 
-hrg_off:
-		call	hrg_on     ; restore registers and make sure we are in SLOW mode
+altint_off:
+		call	altint_on     ; restore registers and make sure we are in SLOW mode
         ld      hl,$281
         jr      HRG_Sync
 

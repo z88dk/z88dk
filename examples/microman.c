@@ -17,25 +17,29 @@
 
         ZX Spectrum
         -----------
-        zcc +zx -lndos -create-app -omicroman -DSOUND microman.c
+        zcc +zx -lndos -create-app -omicroman -DSOUND -DJOYSTICK_DIALOG microman.c
         
 
-        ZX81 (high resolution and > 16K)
+        ZX81 (high resolution mode)
         --------------------------------
-        SMOOTH, FAST and very compact:
-        zcc +zx81ansi -lgfx81hr64 -startup=5 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman microman.c
-        FAST and compact mode:
-        zcc +zx81ansi -lgfx81hr64 -startup=5 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman microman.c
+        WRX, SMOOTH, FAST and very compact (16K):
+        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM microman.c
+        WRX, FAST and compact mode (16K):
+        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+		As above, ARX mode
+        zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+		As above, Memotech HRG (you may like to uncomment also "mt_hrg_off")
+		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app  -DZX81LOMEM microman.c
         Full board mode (SLOW):
-        zcc +zx81ansi -lgfx81hr192 -startup=3 -DSIZE=8 -create-app -omicroman microman.c
-        
+        zcc +zx81 -subtype=wrx192 -clib=wrx192 -startup=3 -DSIZE=8 -create-app -omicroman microman.c
+
 
         Mattel aquarius
         ---------------
-        zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -omicroman microman.c
+        zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -DJOYSTICK_DIALOG -omicroman microman.c
         
 
-        $Id: microman.c,v 1.3 2008-07-09 10:25:39 stefano Exp $
+        $Id: microman.c,v 1.4 2014-10-21 12:18:26 stefano Exp $
 
 */
 
@@ -47,10 +51,12 @@
 #include <stdlib.h>
 
 // Declare GFX bitmap location for the expanded ZX81
+#ifndef ZX81LOMEM
 #pragma output hrgpage = 36096
+#endif
 
 // Set this one to display a dialog form for the Joystick choices
-#define JOYSTICK_DIALOG 1
+//#define JOYSTICK_DIALOG 1
 
 // Set it to '1' or '2' to reduce the game board, '3' to cut away "score" and "lives"
 //#define COMPACT 2
@@ -1250,7 +1256,7 @@ do_game:
             // Now flash the "Game Over" message for a bit..
             for (a=0; a<3000; a++)
               if ((a % 128) == 0) putsprite (spr_xor, (SIZE2*19-48)/2, SIZE3*4, gameover);
-
+			//mt_hrg_off();
             return(score);
           }
           // Pick current ghost number

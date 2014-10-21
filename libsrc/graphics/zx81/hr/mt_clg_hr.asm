@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode and clear screen
 ;
-;	$Id: mt_clg_hr.asm,v 1.1 2010-02-10 16:15:35 stefano Exp $
+;	$Id: mt_clg_hr.asm,v 1.2 2014-10-21 12:18:26 stefano Exp $
 ;
 
 	XLIB	_clg_hr
@@ -17,12 +17,12 @@
 	
 ._clg_hr
 
-	call	mt_hrg_on
+	jp	mt_hrg_on
 	
-	ld		hl,(base_graphics)
-IF FORzx81hr64
-	ld		c,64
-	jp	$249e		; CLEAR (64 rows only)
-ELSE
-	jp	$249c		; CLEAR
-ENDIF
+;	ld		hl,(base_graphics)
+;IF FORzx81mt64
+;	ld		c,64
+;	jp	$249e		; CLEAR (64 rows only)
+;ELSE
+;	jp	$249c		; CLEAR
+;ENDIF

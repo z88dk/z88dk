@@ -5,13 +5,14 @@
 ;
 ;   Set TEXT mode
 ;
-;	$Id: mt_hrg_off.asm,v 1.1 2010-02-10 16:15:35 stefano Exp $
+;	$Id: mt_hrg_off.asm,v 1.2 2014-10-21 12:18:26 stefano Exp $
 ;
 
 	XLIB	mt_hrg_off
 
 	XREF	MTCH_P1
 	XREF	MTCH_P2
+	XREF	MTCH_P3
 
 .mt_hrg_off
 
@@ -24,5 +25,10 @@
 	
 	ld	a,25			; TEXT row counter
 	ld	(MTCH_P2+2),a	; patch also our custom interrupt handler
+
+IF FORzx81mt64
+	xor a
+	ld	(MTCH_P3+1),a	; patch also our custom interrupt handler
+ENDIF
 	
 	jp	$2490		; MEMOTECH BASIC command

@@ -43,10 +43,13 @@
  *     zcc +zx81 -clib=udg -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
  *
  *  ZX81 WRX (Wilf Rigter's High Resolution mod on RamPack or RAM addressing lines)
- *     zcc +zx81 -startup=wrx -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -O3 wall.c
+ *     zcc +zx81 -startup=wrx -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
  *
  *  ZX81 ARX (Andy Rea's High Resolution trick based on extra RAM over ROM addresses, could work with few programmable characters boards)
- *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -O3 wall.c
+ *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
+ *
+ *  ZX81 + Memotech HRG board (16K or more)
+ *     zcc +zx81 -clib=mt -create-app -Dspritesize=7 -DBANNERS -O3 wall.c
  *
  *  Jupiter ACE
  *     zcc +ace -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
@@ -66,33 +69,36 @@
  *     LOAD WALL
  *
  *  MSX, Spectravideo SVI
- *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND wall.c
+ *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS wall.c
  *     BLOAD “CAS:”,R
  *
  *  SEGA SC-3000
- *     zcc +sc3000 -create-app -Dspritesize=8 wall.c
+ *     zcc +sc3000 -create-app -Dspritesize=8 -DBANNERS wall.c
  *     (insert the BASIC cartridge, then..)  LOAD
  *
  *  Memotech MTX 500  (use POKE 64122,0 or compile with "-startup=2" for the MTX 512)
- *     zcc +mtx -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *     zcc +mtx -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
  *     LOAD "A"
  *
  *  Tatung Einstein
- *     zcc +cpm -DEINSTEIN -leinstein -oWALL -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *     zcc +cpm -DEINSTEIN -leinstein -oWALL -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
  *     (transfer WALL.COM on a disk image, i.e. using 'EDIP')
  *
  *  Amstrad CPC
- *     zcc +cpc -subtype=wav -lndos -create-app -Dspritesize=8 -DJOYSTICK wall.c
+ *     zcc +cpc -subtype=wav -lndos -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
  *
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.5 2014-10-08 18:33:51 stefano Exp $
+ *      $Id: wall.c,v 1.6 2014-10-21 12:18:26 stefano Exp $
  *
  * * * * * * *
  *
  *
 */
+
+//#pragma output hrgpage = 36096
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -504,10 +510,6 @@ start_level:
 		set_attr(m+3,n+1,((m+1)<<1)|0x10);
 		set_attr(m+4,n,(m<<1)|0x10);
 		set_attr(m+4,n+1,(m<<1)|0x10);
-//		vpoke(MODE2_ATTR + 128*(m+3) + n, (m+LIGHT_BLUE)<<4);
-//		vpoke(MODE2_ATTR + 128*(m+3) + n+1, (m+LIGHT_BLUE)<<4);
-//		vpoke(MODE2_ATTR + 128*(m+4) + n, (m+LIGHT_BLUE)<<4);
-//		vpoke(MODE2_ATTR + 128*(m+4) + n+1, (m+LIGHT_BLUE)<<4);
 	#endif
 	#endif
 	}

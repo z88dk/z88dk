@@ -3,12 +3,17 @@
 ;	Note: a swap between IX and IY happens "on the fly" during assembly !
 ; ----------------------------------------------------------------------------------------
 ;
-;       $Id: zx81_altint_core.def,v 1.4 2011-12-28 14:04:54 stefano Exp $
+;       $Id: zx81_altint_core.def,v 1.5 2014-10-21 12:18:26 stefano Exp $
 ;
 ; - - - - - - -
 
 XDEF	MTCH_P1
 XDEF	MTCH_P2
+XDEF	MTCH_P3
+XDEF	L0292
+XDEF	G007_P1
+XDEF	G007_P2
+XDEF	G007_P3
 
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
@@ -90,6 +95,7 @@ MTCH_P1:
         LD      HL,($400C)      ; sv D_FILE_lo
         SET     7,H             ;
 
+G007_P1:
         CALL    L0292           ; routine DISPLAY-3
 
 ; ---
@@ -97,11 +103,12 @@ MTCH_P1:
 ;; R-IX-1
 L0281:  LD      A,R             ;
 MTCH_P2:
+G007_P2:
         LD      BC,$1901        ;
         LD      A,$F5           ;
         CALL    $2B5           ; routine DISPLAY-5
         DEC     HL              ;
-
+G007_P3:
         CALL    L0292           ; routine DISPLAY-3
 
 ; ---
@@ -116,18 +123,22 @@ L0292:  POP     IY              ; return address to IX register (-IXIY swap).
                                 ; will be either L0281 or L028F - see above.
 ; Modified here to keep IY unchanged
 
-	ld	a,(16424)      ; load C with MARGIN
-	ld	c,a
+        ld	a,($4028)      ; load C with MARGIN
+MTCH_P3:
+		add     0             ; more blank lines for fast application code and correct sync
+        ld	c,a
 
-        ld	a,(16443)      ; test CDFLAG
-        and	128            ; is in FAST mode ?
-        jp	z,$2a9         ; if so, jp to DISPLAY-4
+        ld   a,($403B)      ; test CDFLAG
+        and  128            ; is in FAST mode ?
+        jp   z,$2a9         ; if so, jp to DISPLAY-4
 
-        ld 	a,c
+        ; jp $29e       ;  this could save 6 bytes, but I'm not sure the display timing won't be correct.. 
+                        ;  better to reach the 'out' instruction first
+        ld   a,c
         neg
-        inc	a
-        ex 	af,af
-        out 	($FE),a
+        inc  a
+        ex   af,af
+        out  ($FE),a
 
-	jp	$2A4
+        jp	$2A4
 
