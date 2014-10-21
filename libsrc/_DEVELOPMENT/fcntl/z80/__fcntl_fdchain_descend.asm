@@ -2,7 +2,6 @@
 SECTION seg_code_fcntl
 
 PUBLIC __fcntl_fdchain_descend
-PUBLIC __0_fcntl_fdchain_descend
 
 __fcntl_fdchain_descend:
 
