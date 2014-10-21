@@ -274,7 +274,7 @@ input:
 
    A = STDIO_MSG_ICTL
   BC = first parameter
-  DE = ioctl command
+  DE = ioctl request
   HL = void *arg, C argument list (must mind L->R or R->L param order!)
 
 condition:
