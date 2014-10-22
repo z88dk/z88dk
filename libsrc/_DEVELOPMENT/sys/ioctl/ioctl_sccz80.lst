@@ -1,6 +1,0 @@
-sys/ioctl/c/sccz80/_ioctl_
-sys/ioctl/c/sccz80/_ioctl__unlocked
-sys/ioctl/c/sccz80/_vioctl_
-sys/ioctl/c/sccz80/_vioctl__callee
-sys/ioctl/c/sccz80/_vioctl__unlocked
-sys/ioctl/c/sccz80/_vioctl__unlocked_callee
