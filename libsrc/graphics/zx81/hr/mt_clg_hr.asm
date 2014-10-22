@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode and clear screen
 ;
-;	$Id: mt_clg_hr.asm,v 1.2 2014-10-21 12:18:26 stefano Exp $
+;	$Id: mt_clg_hr.asm,v 1.3 2014-10-22 07:16:41 stefano Exp $
 ;
 
 	XLIB	_clg_hr

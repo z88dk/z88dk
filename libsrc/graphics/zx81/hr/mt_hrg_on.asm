@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.4 2014-10-21 12:18:26 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.5 2014-10-22 07:16:41 stefano Exp $
 ;
 
 	XLIB	mt_hrg_on
@@ -36,7 +36,7 @@ ENDIF
 	ld		(base_graphics),hl
 gotpage:
 
-	ld		hl,(base_graphics)
+;	ld		hl,(base_graphics)
 
 	ld	($407b),hl
 

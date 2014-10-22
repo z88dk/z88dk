@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.38 2014-10-21 12:18:26 stefano Exp $
+;	$Id: grafix.inc,v 1.39 2014-10-22 07:16:41 stefano Exp $
 ;
 
 
@@ -107,8 +107,8 @@ ENDIF
 
 IF FORzx81g007
 	DEFINE gotgfx
-	defc maxx	= 256
-	defc maxy	= 192
+	defc maxx	= 256	; It could be 272 but we should switch to 'wide' mode
+	defc maxy	= 185
 ENDIF
 
 IF FORjupiter

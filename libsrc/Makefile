@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.211 2014-10-21 12:18:26 stefano Exp $
+# $Id: Makefile,v 1.212 2014-10-22 07:16:41 stefano Exp $
 
 
 include Make.config
@@ -658,6 +658,8 @@ gfx81hr192.lib:
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(LISTFILE_DIRECTORY)/gfx81arx.lst
 	$(MAKE) zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81mt192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81g007 -x$(OUTPUT_DIRECTORY)/gfx81g007 @$(LISTFILE_DIRECTORY)/gfx81g007.lst
 	$(MAKE) zx81deps
 
 # ZX81 maths library - Stefano
