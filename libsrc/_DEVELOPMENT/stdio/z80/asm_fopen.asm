@@ -14,7 +14,7 @@ SECTION seg_code_stdio
 PUBLIC asm_fopen
 
 EXTERN __stdio_parse_mode, __stdio_file_allocate, __stdio_file_deallocate
-EXTERN __stdio_file_init, __stdio_file_add_list, asm_vopen
+EXTERN __stdio_file_init, __stdio_file_add_list, asm0_vopen
 EXTERN error_einval_zc, error_zc
 
 asm_fopen:
@@ -67,8 +67,9 @@ asm_fopen:
    
    ld hl,0                     ; void *arg = 0
    ld b,h                      ; mode byte made 16-bit
+   set 7,c                     ; indicate ref_count = 2
    
-   call asm_vopen              ; target must open file
+   call asm0_vopen             ; target must open file
    jr c, open_failed           ; if target cannot open file
 
    ; de = FDSTRUCT *, returned by target
