@@ -18,7 +18,7 @@ PUBLIC asm_dup, asm0_dup
 
 EXTERN __fcntl_first_available_fd, __fcntl_fdstruct_from_fd_2
 EXTERN __fcntl_fdtbl_size, __fcntl_inc_refcount
-EXTERN error_emfile_mc, error_ebdfd_mc
+EXTERN error_enfile_mc, error_ebdfd_mc
 
 asm_dup:
 
@@ -57,7 +57,7 @@ asm0_dup:
 
    call __fcntl_first_available_fd
    
-   jp nz, error_emfile_mc - 1  ; if free spot unavailable
+   jp nz, error_enfile_mc - 1  ; if free spot unavailable
 
    ld a,__fcntl_fdtbl_size
    sub b
