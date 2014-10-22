@@ -23,7 +23,6 @@ stdio/z80/asm_fileno_unlocked
 stdio/z80/asm_flockfile
 stdio/z80/asm_fmemopen
 stdio/z80/asm_fopen
-stdio/z80/asm_fopen_unlocked
 stdio/z80/asm_fprintf
 stdio/z80/asm_fprintf_unlocked
 stdio/z80/asm_fputc

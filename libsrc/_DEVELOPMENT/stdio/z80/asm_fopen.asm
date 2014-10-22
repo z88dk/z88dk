@@ -3,19 +3,23 @@
 ; Apr 2014
 ; ===============================================================
 ; 
-; FILE *fopen(const char *filename, const char *mode);
+; FILE *fopen(const char *filename, const char *mode)
 ;
 ; Open a file.
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION seg_code_stdio
 
 PUBLIC asm_fopen
 
-EXTERN asm_fopen_unlocked
+EXTERN __stdio_parse_mode, __stdio_file_allocate, __stdio_file_deallocate
+EXTERN __stdio_file_init, __stdio_file_add_list, asm_target_open
+EXTERN error_einval_zc, error_zc
 
-defc asm_fopen = asm_fopen_unlocked
+asm_fopen:
 
    ; enter : de = char *mode
    ;         hl = char *filename
@@ -30,4 +34,71 @@ defc asm_fopen = asm_fopen_unlocked
    ;            hl = 0
    ;            carry set, errno set
    ;
-   ; uses  : all
+   ; uses  : all except iy
+
+   ld a,h
+   or l
+   jp z, error_einval_zc       ; if filename == NULL
+   
+   ; mode string valid ?
+   
+   push hl                     ; save filename
+   
+   call __stdio_parse_mode
+   jp c, error_einval_zc - 1   ; if mode string is invalid
+   
+   push bc                     ; save mode byte
+   
+   ; allocate a FILE structure
+
+   call __stdio_file_allocate
+   
+   pop bc                      ; c = mode byte
+   pop de                      ; de = filename
+   
+   jp c, error_zc              ; if no available FILE struct
+   
+   ; target must open file on appropriate device
+   
+   push bc                     ; save mode byte
+   push hl                     ; save FILE *
+   
+   ;  c = mode byte
+   ; de = filename
+   ; stack = mode byte, FILE *
+   
+   ld b,0
+   
+   call asm_target_open        ; target must open file
+   jr c, open_failed           ; if target cannot open file
+
+   ; de = FDSTRUCT *, returned by target
+   ; stack = mode byte, FILE *
+
+   pop hl                      ; hl = FILE *
+   pop bc                      ; c = mode byte
+
+   ; initialize FILE structure
+   
+   call __stdio_file_init
+   
+   ; place FILE on open list
+   
+   push hl                     ; save FILE *
+   
+   ex de,hl
+   call __stdio_file_add_list
+   
+   pop hl                      ; hl = FILE *
+   
+   or a
+   ret
+
+open_failed:
+
+   ; stack = mode byte, FILE *
+   
+   pop de                      ; de = FILE *
+   
+   call __stdio_file_deallocate
+   jp error_zc - 1

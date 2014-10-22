@@ -1,5 +1,5 @@
 
-; FILE *fopen(const char *filename, const char *mode);
+; FILE *fopen(const char *filename, const char *mode)
 
 SECTION seg_code_stdio
 

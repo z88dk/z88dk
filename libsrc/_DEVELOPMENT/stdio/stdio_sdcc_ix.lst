@@ -21,7 +21,6 @@ stdio/c/sdcc_ix/fileno_unlocked
 stdio/c/sdcc_ix/flockfile
 stdio/c/sdcc_ix/fmemopen
 stdio/c/sdcc_ix/fopen
-stdio/c/sdcc_ix/fopen_unlocked
 stdio/c/sdcc_ix/fprintf
 stdio/c/sdcc_ix/fprintf_unlocked
 stdio/c/sdcc_ix/fputc

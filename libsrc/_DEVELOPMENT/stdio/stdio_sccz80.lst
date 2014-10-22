@@ -28,8 +28,6 @@ stdio/c/sccz80/fmemopen
 stdio/c/sccz80/fmemopen_callee
 stdio/c/sccz80/fopen
 stdio/c/sccz80/fopen_callee
-stdio/c/sccz80/fopen_unlocked
-stdio/c/sccz80/fopen_unlocked_callee
 stdio/c/sccz80/fprintf
 stdio/c/sccz80/fprintf_unlocked
 stdio/c/sccz80/fputc
