@@ -13,7 +13,7 @@ INCLUDE "clib_cfg.asm"
 
 SECTION seg_code_fcntl
 
-PUBLIC asm_vopen
+PUBLIC asm_vopen, asm0_vopen
 
 EXTERN asm_target_open_p1, asm_target_open_p2
 EXTERN __stdio_heap, asm_heap_alloc, asm_heap_free, asm_memset
@@ -23,7 +23,7 @@ EXTERN error_einval_mc, error_mc, error_enfile_mc
 asm_vopen:
 
    ; enter : de = char *path
-   ;         bc = int oflag
+   ;         bc = int oflag (LSB is mode byte)
    ;         hl = void *arg (0 if no args)
    ;
    ; exit  : success
@@ -45,6 +45,10 @@ asm_vopen:
    and $03
    jp z, error_einval_mc       ; if at least one of RW not set
    
+   res 7,c                     ; set ref_count to one
+
+asm0_vopen:
+
    ; target part 1: is path valid ?
    
    ; de = char *path
@@ -119,7 +123,7 @@ critical_section:
    
    ex de,hl                    ; hl = FDSTRUCT *
    call asm_target_open_p2     ; target creates file, fills FDSTRUCT
-   
+                               ;   (bit 7 of oflag + 1 indicates initial ref_count)
    pop hl                      ; hl = & fdtbl[fd] + 1b
    pop de                      ; de = FDSTRUCT *
    
