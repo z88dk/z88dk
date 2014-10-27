@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.5 2014-10-22 07:16:41 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.6 2014-10-27 20:38:15 stefano Exp $
 ;
 
 	XLIB	mt_hrg_on

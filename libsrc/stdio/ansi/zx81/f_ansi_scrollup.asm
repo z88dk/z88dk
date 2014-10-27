@@ -5,7 +5,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.4 2007-10-06 16:51:39 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.5 2014-10-27 20:38:15 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -16,13 +16,25 @@
 
 .ansi_SCROLLUP
 	ld	hl,(base_graphics)
+IF G007
+	push hl
+	ld	de,272
+	add	hl,de
+	pop de
+ELSE
 	ld	d,h
 	ld	e,l
 	inc	h
+ENDIF
+
+IF G007
+	ld bc,272*23-1
+ELSE
 	ld	a,(text_rows)
 	ld	b,a
 	ld	c,0
 	dec	b
+ENDIF
 	;ld	bc,6144-256
 	ldir
 	ld	a,(text_rows)

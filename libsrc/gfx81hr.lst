@@ -1,6 +1,7 @@
 @gfxbase.lst
 graphics/dcircle2
 graphics/zx81/hr/clg
+graphics/zx81/hr/_clg_hr
 graphics/clrarea2
 graphics/lftscrol
 graphics/liner2

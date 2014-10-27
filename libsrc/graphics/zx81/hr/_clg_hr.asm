@@ -8,7 +8,7 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: _clg_hr.asm,v 1.1 2007-10-02 11:20:24 stefano Exp $
+;	$Id: _clg_hr.asm,v 1.1 2014-10-27 20:38:15 stefano Exp $
 ;
 
                 XLIB    _clg_hr

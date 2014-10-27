@@ -3,7 +3,7 @@
 ;	Note: a swap between IX and IY happens "on the fly" during assembly !
 ; ----------------------------------------------------------------------------------------
 ;
-;       $Id: zx81_altint_core.def,v 1.5 2014-10-21 12:18:26 stefano Exp $
+;       $Id: zx81_altint_core.def,v 1.6 2014-10-27 20:38:15 stefano Exp $
 ;
 ; - - - - - - -
 

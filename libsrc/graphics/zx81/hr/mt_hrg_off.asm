@@ -5,7 +5,7 @@
 ;
 ;   Set TEXT mode
 ;
-;	$Id: mt_hrg_off.asm,v 1.3 2014-10-22 07:16:41 stefano Exp $
+;	$Id: mt_hrg_off.asm,v 1.4 2014-10-27 20:38:15 stefano Exp $
 ;
 
 	XLIB	mt_hrg_off

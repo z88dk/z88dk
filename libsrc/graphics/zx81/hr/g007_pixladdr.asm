@@ -9,7 +9,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: g007_pixladdr.asm,v 1.1 2014-10-22 07:16:41 stefano Exp $
+;	$Id: g007_pixladdr.asm,v 1.2 2014-10-27 20:38:15 stefano Exp $
 ;
 
 ; ******************************************************************

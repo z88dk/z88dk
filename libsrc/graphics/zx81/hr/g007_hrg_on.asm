@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.1 2014-10-22 07:16:41 stefano Exp $
+;	$Id: g007_hrg_on.asm,v 1.2 2014-10-27 20:38:15 stefano Exp $
 ;
 
 	XLIB    hrg_on
@@ -19,13 +19,8 @@
 
 .hrg_on
 
-
-
-	XREF	base_graphics
-
 	ld		hl,($2306)		; Current HRG page (use CLS 2 / SLOW 4, in BASIC, first)
-	ld		(base_graphics),hl
-	
+	ld		(base_graphics),hl	
 	
 ;; if hrgpage has not been specified, then set a default value
 ;	ld      hl,(base_graphics)

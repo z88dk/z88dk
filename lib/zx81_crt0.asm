@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.39 2014-10-21 12:18:26 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.40 2014-10-27 20:38:15 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -128,10 +128,16 @@ IF (startup>=2)
  ENDIF
  IF (startup=2)
         call    altint_on
+	; Trick to get the HRG mode with a #pragma definition
+	; perhaps useful with the MemoTech or the G007 HRG boards
+	IF DEFINED_ANSIHRG
+			call    hrg_on
+	ENDIF
  ELSE
         call    hrg_on
  ENDIF
 ENDIF
+
 
 	; this must be after 'hrg_on', sometimes
 	; the stack will be moved to make room

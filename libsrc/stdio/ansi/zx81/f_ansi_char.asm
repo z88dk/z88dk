@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.7 2011-11-29 21:44:00 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.8 2014-10-27 20:38:15 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -34,11 +34,17 @@ ENDIF
 	XREF	ansi_COLUMN
 
 	XDEF	text_cols
-	;XDEF	text_rows
-		
+IF G007
+	XDEF	text_rows
+ENDIF
+	
 ; Dirty thing for self modifying code
 	XDEF	INVRS
 	XDEF	BOLD
+
+IF A136COL
+.text_cols   defb 136
+ENDIF
 
 IF A128COL
 .text_cols   defb 128
@@ -52,28 +58,48 @@ IF A85COL
 .text_cols   defb 85
 ENDIF
 
+IF A90COL
+.text_cols   defb 90
+ENDIF
+
 IF A64COL
 .text_cols   defb 64
+ENDIF
+
+IF A68COL
+.text_cols   defb 68
 ENDIF
 
 IF A51COL
 .text_cols   defb 51
 ENDIF
 
+IF A54COL
+.text_cols   defb 54
+ENDIF
+
 IF A42COL
 .text_cols   defb 42
 ENDIF
 
-IF A40COL
-.text_cols   defb 40
+IF A45COL
+.text_cols   defb 45
 ENDIF
 
 IF A36COL
 .text_cols   defb 36
 ENDIF
 
+IF A38COL
+.text_cols   defb 38
+ENDIF
+
 IF A32COL
 .text_cols   defb 32
+ENDIF
+
+IF A34COL
+.text_cols   defb 34
 ENDIF
 
 IF A28COL
@@ -84,7 +110,9 @@ IF A24COL
 .text_cols   defb 24
 ENDIF
 
-;text_rows   defb 24
+IF G007
+.text_rows   defb 23
+ENDIF
 
 .ansi_CHAR
 ; --- TO USE ROM FONT WE NEED TO MAP TO THE ASCII CODES ---
@@ -98,11 +126,29 @@ ENDIF
   ld (char+1),a
   ld a,(ansi_ROW)       ; Line text position
   
-  ld	d,a
-  ld	e,0
-  
+IF G007
+	ld  h,0
+	ld  e,a
+	add a
+	add a
+	add a		; *8
+	ld  l,a
+	ld  a,e
+	add	hl,hl	; *16
+	add h
+	ld	h,a		; *272
+	ld de,(base_graphics)
+	add hl,de
+	ld de,9
+	add hl,de
+ELSE
+;  ld	d,a
+;  ld	e,0
   ld hl,(base_graphics)
-  add hl,de
+  add h
+  ld  h,a
+;  add hl,de
+ENDIF  
   ld (RIGA+1),hl
 ;  xor a
   ld hl,DOTS+1
@@ -186,7 +232,11 @@ ENDIF
 .NOLFONT
 
 IF !ARX816
+IF G007
+  ld de,34	; next row
+ELSE
   ld de,32	; next row
+ENDIF
 ENDIF
 
   ld c,8
@@ -243,6 +293,9 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
+IF A136COL
+  ld b,2
+ENDIF
 IF A128COL
   ld b,2
 ENDIF
@@ -252,13 +305,25 @@ ENDIF
 IF A85COL
   ld b,3
 ENDIF
+IF A90COL
+  ld b,3
+ENDIF
 IF A64COL
+  ld b,4
+ENDIF
+IF A68COL
   ld b,4
 ENDIF
 IF A51COL
   ld b,5
 ENDIF
+IF A54COL
+  ld b,5
+ENDIF
 IF A42COL
+  ld b,6
+ENDIF
+IF A45COL
   ld b,6
 ENDIF
 IF A40COL
@@ -267,7 +332,13 @@ ENDIF
 IF A36COL
   ld b,7
 ENDIF
+IF A38COL
+  ld b,7
+ENDIF
 IF A32COL
+  ld b,8
+ENDIF
+IF A34COL
   ld b,8
 ENDIF
 IF A28COL
@@ -329,6 +400,9 @@ ELSE
 	IF PACKEDFONT
 	        BINARY  "stdio/ansi/F4PACK.BIN"
 	ELSE
+		IF A136COL
+			BINARY  "stdio/ansi/F3.BIN"
+		ENDIF
 		IF A128COL
 			BINARY  "stdio/ansi/F3.BIN"
 		ENDIF
@@ -338,13 +412,25 @@ ELSE
 		IF A85COL
 			BINARY  "stdio/ansi/F4.BIN"
 		ENDIF
+		IF A90COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
 		IF A64COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A68COL
 			BINARY  "stdio/ansi/F4.BIN"
 		ENDIF
 		IF A51COL
 			BINARY  "stdio/ansi/F5.BIN"
 		ENDIF
+		IF A54COL
+			BINARY  "stdio/ansi/F5.BIN"
+		ENDIF
 		IF A42COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A45COL
 			BINARY  "stdio/ansi/F6.BIN"
 		ENDIF
 		IF A40COL
@@ -353,7 +439,13 @@ ELSE
 		IF A36COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
+		IF A38COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
 		IF A32COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A34COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
 		IF A28COL
