@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.8 2014-10-27 20:38:15 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.9 2014-10-28 21:07:08 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -37,6 +37,9 @@ ENDIF
 IF G007
 	XDEF	text_rows
 ENDIF
+IF MTHRG
+	XDEF	text_rows
+ENDIF
 	
 ; Dirty thing for self modifying code
 	XDEF	INVRS
@@ -50,8 +53,16 @@ IF A128COL
 .text_cols   defb 128
 ENDIF
 
+IF A124COL
+.text_cols   defb 124
+ENDIF
+
 IF A80COL
 .text_cols   defb 80
+ENDIF
+
+IF A82COL
+.text_cols   defb 82
 ENDIF
 
 IF A85COL
@@ -66,12 +77,20 @@ IF A64COL
 .text_cols   defb 64
 ENDIF
 
+IF A62COL
+.text_cols   defb 62
+ENDIF
+
 IF A68COL
 .text_cols   defb 68
 ENDIF
 
 IF A51COL
 .text_cols   defb 51
+ENDIF
+
+IF A49COL
+.text_cols   defb 49
 ENDIF
 
 IF A54COL
@@ -82,6 +101,14 @@ IF A42COL
 .text_cols   defb 42
 ENDIF
 
+IF A41COL
+.text_cols   defb 41
+ENDIF
+
+IF A40COL
+.text_cols   defb 40
+ENDIF
+
 IF A45COL
 .text_cols   defb 45
 ENDIF
@@ -90,12 +117,24 @@ IF A36COL
 .text_cols   defb 36
 ENDIF
 
+IF B32COL
+.text_cols   defb 32
+ENDIF
+
+IF A35COL
+.text_cols   defb 35
+ENDIF
+
 IF A38COL
 .text_cols   defb 38
 ENDIF
 
 IF A32COL
 .text_cols   defb 32
+ENDIF
+
+IF A31COL
+.text_cols   defb 31
 ENDIF
 
 IF A34COL
@@ -110,8 +149,15 @@ IF A24COL
 .text_cols   defb 24
 ENDIF
 
+IF A27COL
+.text_cols   defb 27
+ENDIF
+
 IF G007
 .text_rows   defb 23
+ENDIF
+IF MTHRG
+.text_rows   defb 24
 ENDIF
 
 .ansi_CHAR
@@ -142,13 +188,27 @@ IF G007
 	ld de,9
 	add hl,de
 ELSE
-;  ld	d,a
-;  ld	e,0
+ IF MTHRG
+	ld  h,a		; *256
+	add a
+	add a
+	add a		; *8   -> * 264
+	ld	l,a
+
+	inc	hl
+	inc	hl
+	;ld		de,($407B)
+	ld de,(base_graphics)
+	add hl,de
+ ELSE
+ ;  ld	d,a
+ ;  ld	e,0
   ld hl,(base_graphics)
   add h
   ld  h,a
-;  add hl,de
-ENDIF  
+ ;  add hl,de
+ ENDIF
+ENDIF
   ld (RIGA+1),hl
 ;  xor a
   ld hl,DOTS+1
@@ -235,7 +295,11 @@ IF !ARX816
 IF G007
   ld de,34	; next row
 ELSE
+IF MTHRG
+  ld de,33	; next row
+ELSE
   ld de,32	; next row
+ENDIF
 ENDIF
 ENDIF
 
@@ -299,7 +363,13 @@ ENDIF
 IF A128COL
   ld b,2
 ENDIF
+IF A124COL
+  ld b,2
+ENDIF
 IF A80COL
+  ld b,3
+ENDIF
+IF A82COL
   ld b,3
 ENDIF
 IF A85COL
@@ -311,16 +381,25 @@ ENDIF
 IF A64COL
   ld b,4
 ENDIF
+IF A62COL
+  ld b,4
+ENDIF
 IF A68COL
   ld b,4
 ENDIF
 IF A51COL
   ld b,5
 ENDIF
+IF A49COL
+  ld b,5
+ENDIF
 IF A54COL
   ld b,5
 ENDIF
 IF A42COL
+  ld b,6
+ENDIF
+IF A41COL
   ld b,6
 ENDIF
 IF A45COL
@@ -332,10 +411,19 @@ ENDIF
 IF A36COL
   ld b,7
 ENDIF
+IF A35COL
+  ld b,7
+ENDIF
+IF B32COL
+  ld b,7
+ENDIF
 IF A38COL
   ld b,7
 ENDIF
 IF A32COL
+  ld b,8
+ENDIF
+IF A31COL
   ld b,8
 ENDIF
 IF A34COL
@@ -345,6 +433,9 @@ IF A28COL
   ld b,8
 ENDIF
 IF A24COL
+  ld b,9
+ENDIF
+IF A27COL
   ld b,9
 ENDIF
 
@@ -406,7 +497,13 @@ ELSE
 		IF A128COL
 			BINARY  "stdio/ansi/F3.BIN"
 		ENDIF
+		IF A124COL
+			BINARY  "stdio/ansi/F3.BIN"
+		ENDIF
 		IF A80COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A82COL
 			BINARY  "stdio/ansi/F4.BIN"
 		ENDIF
 		IF A85COL
@@ -418,16 +515,25 @@ ELSE
 		IF A64COL
 			BINARY  "stdio/ansi/F4.BIN"
 		ENDIF
+		IF A62COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
 		IF A68COL
 			BINARY  "stdio/ansi/F4.BIN"
 		ENDIF
 		IF A51COL
 			BINARY  "stdio/ansi/F5.BIN"
 		ENDIF
+		IF A49COL
+			BINARY  "stdio/ansi/F5.BIN"
+		ENDIF
 		IF A54COL
 			BINARY  "stdio/ansi/F5.BIN"
 		ENDIF
 		IF A42COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A41COL
 			BINARY  "stdio/ansi/F6.BIN"
 		ENDIF
 		IF A45COL
@@ -439,10 +545,19 @@ ELSE
 		IF A36COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
+		IF B32COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A35COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
 		IF A38COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
 		IF A32COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A31COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
 		IF A34COL
@@ -452,6 +567,9 @@ ELSE
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
 		IF A24COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A27COL
 			BINARY  "stdio/ansi/F8.BIN"
 		ENDIF
 	ENDIF

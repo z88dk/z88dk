@@ -5,7 +5,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.5 2014-10-27 20:38:15 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.6 2014-10-28 21:07:08 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -22,18 +22,29 @@ IF G007
 	add	hl,de
 	pop de
 ELSE
+ IF MTHRG
+	push hl
+	ld	de,264
+	add	hl,de
+	pop de
+ ELSE
 	ld	d,h
 	ld	e,l
 	inc	h
+ ENDIF
 ENDIF
 
 IF G007
 	ld bc,272*23-1
 ELSE
+ IF MTHRG
+	ld bc,264*24-1
+ ELSE
 	ld	a,(text_rows)
 	ld	b,a
 	ld	c,0
 	dec	b
+ ENDIF
 ENDIF
 	;ld	bc,6144-256
 	ldir
