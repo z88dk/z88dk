@@ -83,6 +83,12 @@
  *      MSX:
  *      zcc +msx -Dspritesize=16 -DSOUND -create-app dstar.c
  *
+ *      ZX81, various HRG flavours (see also the specific target version):
+ *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
+ *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
+ *      zcc +zx81 -O3 -clib=arx -subtype=arx  -create-app -Dspritesize=16 dstar.c
+ *      zcc +zx81 -O3 -clib=wrx -subtype=wrx  -create-app -Dspritesize=16 dstar.c
+ *
  *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
  *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
  *
@@ -124,7 +130,7 @@
 #endif
 
 /* Single sprite memory usage, including bytes for its size */
-#if (spritesize == 16)
+#if (spritesize == 15)|(spritesize == 16))
   #define spritemem 34
 #endif
 #if (spritesize == 21)

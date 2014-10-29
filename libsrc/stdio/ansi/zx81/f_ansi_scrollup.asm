@@ -5,7 +5,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.6 2014-10-28 21:07:08 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.7 2014-10-29 16:16:54 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -34,21 +34,29 @@ ELSE
  ENDIF
 ENDIF
 
+	ld	a,(text_rows)
+	dec a
+
 IF G007
 	ld bc,272*23-1
 ELSE
  IF MTHRG
-	ld bc,264*24-1
+	;ld bc,264*24-1
+	ld  b,a		; *256
+	add a
+	add a
+	add a		; *8   -> * 264
+	ld	c,a
+	ld	a,b	; keep A for ansi_del_line
  ELSE
-	ld	a,(text_rows)
+	;ld	bc,6144-256
 	ld	b,a
 	ld	c,0
-	dec	b
+	;dec	b
  ENDIF
 ENDIF
-	;ld	bc,6144-256
 	ldir
-	ld	a,(text_rows)
-	dec	a
+;	ld	a,(text_rows)
+;	dec	a
 	call	ansi_del_line
 	ret

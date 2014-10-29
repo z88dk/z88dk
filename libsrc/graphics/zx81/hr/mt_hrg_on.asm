@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.6 2014-10-27 20:38:15 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.7 2014-10-29 16:16:54 stefano Exp $
 ;
 
 	XLIB	mt_hrg_on
@@ -29,7 +29,7 @@ hrgmode:	defb	2
 	or      l
 	jr		nz,gotpage
 IF FORzx81mt64
-	ld		hl,29000		; on a 16K system we leave a space of abt 1.5K bytes for stack
+	ld		hl,29000		; on a 16K system we leave a space of of a bit more than 1.5K bytes for stack
 ELSE
 	ld		hl,25000		; on a 16K system we leave a space of a bit more than 1K for stack
 ENDIF

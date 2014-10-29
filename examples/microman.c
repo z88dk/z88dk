@@ -18,7 +18,7 @@
         ZX Spectrum
         -----------
         zcc +zx -lndos -create-app -omicroman -DSOUND -DJOYSTICK_DIALOG microman.c
-        
+
 
         ZX81 (high resolution mode)
         --------------------------------
@@ -37,9 +37,9 @@
         Mattel aquarius
         ---------------
         zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -DJOYSTICK_DIALOG -omicroman microman.c
-        
 
-        $Id: microman.c,v 1.4 2014-10-21 12:18:26 stefano Exp $
+
+        $Id: microman.c,v 1.5 2014-10-29 16:16:54 stefano Exp $
 
 */
 
@@ -584,7 +584,7 @@ int scared;
 int score, lives;
 
 #if COMPACT!=3
-char scoretxt[7];
+//char scoretxt[7];
 #endif
 
 typedef struct {
@@ -608,7 +608,7 @@ char *basepic;
   *************************/
 
 // Print current score
-
+/*
 void showscore ()
 {
 #if SIZE==6
@@ -626,11 +626,10 @@ void showscore ()
 #endif
 }
 
-
+*/
  /*************************
          SHOW LIVES
   *************************/
-
 void showlives ()
 {
   for (i=0; i<MAXLIVES; i++) {
@@ -650,7 +649,6 @@ void showlives ()
 #endif
   }
 }
-
 #endif
 
 
@@ -662,7 +660,7 @@ void eatdot ()
 {
   score += 10;
 #if COMPACT!=3
-  showscore();
+ // showscore();
 #endif
 #ifdef SOUND
   bit_beep(4,60);
@@ -808,7 +806,7 @@ draw_board:
 
   clg();
 #if COMPACT!=3
-  showscore();
+//  showscore();
 #endif
   dots=MAXDOTS;
 
@@ -1216,7 +1214,7 @@ do_game:
           if (scared <10)
             score += 50;
 #if COMPACT!=3
-          showscore();
+//          showscore();
 #endif
         } else {
           // Man has been eaten !!
@@ -1256,7 +1254,7 @@ do_game:
             // Now flash the "Game Over" message for a bit..
             for (a=0; a<3000; a++)
               if ((a % 128) == 0) putsprite (spr_xor, (SIZE2*19-48)/2, SIZE3*4, gameover);
-			//mt_hrg_off();
+			mt_hrg_off();
             return(score);
           }
           // Pick current ghost number

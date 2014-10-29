@@ -292,7 +292,7 @@ defb	7,7	;4=moveable block
 #endasm
 #endif
 
-#if (spritesize == 16)
+#if ((spritesize == 15)|(spritesize == 16))
 #asm
 ._sprites
  defb    16,16
