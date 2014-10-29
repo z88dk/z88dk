@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Apr 2014
+; Oct 2014
 ; ===============================================================
 ; 
 ; FILE *freopen_unlocked(char *filename, char *mode, FILE *stream)
@@ -11,14 +11,13 @@
 
 INCLUDE "clib_cfg.asm"
 
-PUBLIC asm_freopen_unlocked
-PUBLIC asm0_freopen_unlocked
+PUBLIC asm_freopen_unlocked, asm0_freopen_unlocked
 
-EXTERN __stdio_verify_valid, l_jpix, __stdio_file_destroy
-EXTERN __stdio_parse_permission, asm_open, asm0_fopen_unlocked
-EXTERN error_eacces_zc, error_einval_zc, error_zc
-
-EXTERN STDIO_MSG_CLOS
+EXTERN __stdio_verify_valid, asm1_fclose_unlocked, __stdio_parse_mode
+EXTERN error_zc, error_enotsup_zc, error_einval_zc, l_inc_sp
+EXTERN asm0_vopen, __stdio_file_init, STDIO_MSG_FLSH, l_jpix
+EXTERN __stdio_open_file_list, asm_p_forward_list_remove
+EXTERN __stdio_closed_file_list, asm_p_forward_list_alt_push_back
 
 asm_freopen_unlocked:
 
@@ -26,7 +25,7 @@ asm_freopen_unlocked:
    ;         de = char *mode
    ;         hl = char *filename
    ; 
-   ; exit  : ix = FILE *
+   ; exit  : ix = FILE * (closed & invalid on fail)
    ;
    ;         success
    ;
@@ -40,68 +39,204 @@ asm_freopen_unlocked:
    ;
    ; uses  : all except ix
 
-   ; TODO:
-   ; * change mode when filename == NULL
-   ; * freopen on memstreams
-
    call __stdio_verify_valid
-   jp c, error_zc              ; if FILE is not valid
+   jp c, error_zc              ; if FILE is invalid
 
 asm0_freopen_unlocked:
 
-   push hl                     ; save filename
-   push de                     ; save mode
-   
-   ld a,STDIO_MSG_CLOS         ; deliver close message
-   call l_jpix
-   
+   ; check if filename == NULL
+
    ld a,(ix+3)
-   and $07                     ; af = FILE type
+   inc a
+   and $07                     ; z flag set if memstream
+   
+   push af                     ; save memstream?
 
-   push af
+   ld a,h
+   or l
+   jr z, mode_change           ; if filename == NULL, mode change only
    
-   call __stdio_file_destroy   ; FILE now reports as bad
+   ; close FILE
    
-   pop af
-   ld (ix+3),a                 ; FILE type is preserved
+   push de                     ; save char *mode
+   push hl                     ; save char *filename
    
+   call asm1_fclose_unlocked
+   
+   pop hl                      ; hl = filename
    pop de                      ; de = mode
-   jp nz, error_eacces_zc - 1  ; freopen on memstream not currenty supported
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_STDIO_FILE_EXTRA > 0
+   pop af                      ; z flag set if memstream
    
-   ld (ix+13),0                ; clear driver flags
-   ld (ix+14),0
+   jp z, error_enotsup_zc      ; freopen on memstream not permitted
 
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   call __stdio_parse_permission
+   ; parse mode string
+   
+   push hl                     ; save filename
+   
+   call __stdio_parse_mode
    
    pop de                      ; de = filename
-   jp c, error_einval_zc       ; if mode string is invalid
+   jr c, invalid_mode_string   ; if mode string is invalid
+   
+   ; open file
+   
+   ; ix = FILE *
+   ; de = filename
+   ;  c = mode byte
+   
+   push bc                     ; save mode byte
+   push ix                     ; save FILE *
+   push ix                     ; save FILE *
+   
+   ld hl,0                     ; void *arg = 0
+   ld b,h                      ; mode byte made 16-bit
+   set 7,c                     ; indicate ref_count = 2
+   
+   call asm0_vopen             ; target must open file
+   
+   pop ix                      ; ix = FILE *
+   pop hl                      ; hl = FILE *
+   pop bc                      ; c = mode byte
+   
+   jr c, invalid_open          ; if open failed
+   
+   ; initialize FILE structure
+   
+   ; de = FDSTRUCT *, returned by target open
+   ; hl = ix = FILE *
+   ;  c = mode byte
 
-   ld a,d
-   or e
-   jp z, error_eacces_zc       ; changing mode not yet supported
+   call __stdio_file_init
+   
+   ; hl = ix = FILE *
+   
+   or a
+   ret
+
+invalid_mode_string:
 
    ; ix = FILE *
+   
+   call error_einval_zc        ; errno = EINVAL
+
+invalid_open:
+
+   ; FILE has been closed
+   ; error on open so place closed FILE on closed list
+
+   ; ix = FILE *
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   EXTERN __stdio_lock_file_list
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; remove FILE from open list
+   
+   push ix
+   pop bc                      ; bc = FILE *
+   
+   dec bc
+   dec bc                      ; bc = & FILE.link
+   
+   ld hl,__stdio_open_file_list
+   call asm_p_forward_list_remove
+
+   ; append FILE to closed list
+
+   ld e,c
+   ld d,b                      ; de = & FILE.link
+   
+   ld bc,__stdio_closed_file_list
+   call asm_p_forward_list_alt_push_back
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   EXTERN __stdio_unlock_file_list
+   call __stdio_unlock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   jp error_zc                 ; indicate failure
+
+mode_change:
+
+   ; attempting mode change only
+
+   ; ix = FILE *
+   ; de = char *mode
+   ; stack = memstream?
+
+   call perform_mode_change
+   jp nc, l_inc_sp - 2         ; if mode change successful
+
+mode_change_failed:
+
+   ; ix = FILE *
+   ; stack = memstream?
+   ; close FILE
+   
+   call asm1_fclose_unlocked
+   
+   pop af                      ; z flag set if memstream
+   jp z, error_zc              ; if memstream indicate failure
+   
+   jr invalid_open             ; place closed FILE on closed list
+
+perform_mode_change:
+
+   ; ix = FILE *
+   ; de = char *mode
+   
+   call __stdio_parse_mode
+   jp c, error_einval_zc       ; if mode string invalid
+   
+   ; ix = FILE *
    ;  c = mode byte
-   ; de = filename
+   ; stack = memstream?
+   
+   ld e,(ix+1)
+   ld d,(ix+2)                 ; de = FDSTRUCT *
+   
+   ld hl,8
+   add hl,de                   ; hl = & FDSTRUCT.mode
+   
+   ld a,c
+   and (hl)
+   xor c                       ; a = bits of c not found in FDSTRUCT.mode
+   and $07                     ; only interested in difference in RWA mode bits
+   
+   jp nz, error_enotsup_zc     ; if desired mode not supported by underlying FDSTRUCT
+   
+   ; flush FILE
    
    push bc                     ; save mode byte
    
-   ld b,0
-   call asm_open               ; pass details to target open()
+   ld a,STDIO_MSG_FLSH
+   call l_jpix
    
    pop bc                      ; c = mode byte
-   jp c, error_zc              ; if open failed
    
-   ;  c = mode byte
-   ; de = driver_function from target open()
+   ; alter FILE's mode bits
+   
+   ld a,c
+   rrca
+   rrca
+   and $c0
+   ld (ix+3),a                 ; FILE.state_flags_0   
+
+   ld a,c
+   rla
+   and $02
+   ld (ix+4),a                 ; FILE.state_flags_1
    
    push ix
-   pop hl
+   pop hl                      ; hl = FILE *
    
-   jp asm0_fopen_unlocked      ; fill out the FILE struct
+   ret
