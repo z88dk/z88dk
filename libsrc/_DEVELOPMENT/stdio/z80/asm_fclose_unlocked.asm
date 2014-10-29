@@ -11,22 +11,12 @@
 
 INCLUDE "clib_cfg.asm"
 
-PUBLIC asm_fclose_unlocked
-PUBLIC asm0_fclose_unlocked
+PUBLIC asm_fclose_unlocked, asm0_fclose_unlocked, asm1_fclose_unlocked
 
-EXTERN asm_p_forward_list_remove, asm_p_forward_list_alt_push_back
-EXTERN error_ebadf_mc, error_znc, __stdio_file_destroy, asm_free, l_jpix
-
-EXTERN STDIO_MSG_CLOS
-EXTERN __stdio_file_list_open, __stdio_file_list_avail
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+EXTERN __stdio_open_file_list, asm_p_forward_list_remove, error_ebadf_mc
+EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, l_jpix, __fcntl_fd_from_fdstruct
+EXTERN asm0_close, __stdio_file_destructor, error_znc, asm_free
+EXTERN __stdio_closed_file_list, asm_p_forward_list_alt_push_back
 
 asm_fclose_unlocked:
 
@@ -39,71 +29,71 @@ asm_fclose_unlocked:
    ;            hl = 0
    ;            carry reset
    ;
-   ;         fail
+   ;         fail if invalid FILE
    ;
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : all except ix
-
-   ; attempt to remove FILE from open list
+   ; uses  : all except ix, iy
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
+   EXTERN __stdio_lock_file_list
    call __stdio_lock_file_list
-
-   ; must hang onto this lock until done
-   ; to avoid deadlock problems
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 asm0_fclose_unlocked:
 
-   ld c,ixl
-   ld b,ixh
+   ; remove FILE from open list
+   
+   push ix
+   pop bc                      ; bc = FILE *
    
    dec bc
    dec bc                      ; bc = & FILE.link
    
-   ld hl,__stdio_file_list_open
+   ld hl,__stdio_open_file_list
    call asm_p_forward_list_remove
-
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   jr c, exit_error_ebadf
-
-ELSE
-
-   jp c, error_ebadf_mc
+   push af
+   
+   EXTERN __stdio_unlock_file_list
+   call __stdio_unlock_file_list
+   
+   pop af
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-   ; close FILE
 
-   ld a,STDIO_MSG_CLOS
-   call l_jpix                 ; deliver close message
-   
-   ld a,(ix+3)                 ; examine FILE type
-   and $07
-   jr nz, close_memstream      ; if FILE type == memstream
-   
-   ; disassociate FILE
-   
-   call __stdio_file_destroy   ; FILE returns ebadf errors
-   
-   ; append FILE to available list
+   jp c, error_ebadf_mc        ; if FILE* is invalid
 
-   ld e,ixl
-   ld d,ixh
+   ; close FILE and underlying fd
+   
+   call asm1_fclose_unlocked
+
+   ; append FILE to closed list
+   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $04
+
+   call __stdio_lock_file_list
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   push ix
+   pop de                      ; de = FILE *
    
    dec de
    dec de                      ; de = & FILE.link
    
-   ld bc,__stdio_file_list_avail
+   ld bc,__stdio_closed_file_list
    call asm_p_forward_list_alt_push_back
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,36 +104,90 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; success
+   jp error_znc                ; indicate success
+
+
+asm1_fclose_unlocked:
+
+   ; ix = FILE *
+
+   ; close FILE
    
-   jp error_znc
-
-close_memstream:
-
+   ld a,STDIO_MSG_FLSH
+   call l_jpix
+   
+   ld a,STDIO_MSG_CLOS
+   call l_jpix
+   
+   ; memstreams do not have an underlying fd
+   
+   ld a,(ix+3)
+   inc a
+   and $07
+   
+   jr z, close_memstream
+   
+   ; close any underlying fd
+   
+   ; ix = FILE *
+   
+   ld e,(ix+1)
+   ld d,(ix+2)                 ; de = FDSTRUCT *
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
+IF __CLIB_OPT_MULTITHREAD & $08
 
-   call __stdio_unlock_file_list
+   EXTERN __fcntl_lock_fdtbl
+   call __fcntl_lock_fdbtl
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   call __fcntl_fd_from_fdstruct
+   jr c, no_underlying_fd
+
+   ld (hl),0
+   dec hl
+   ld (hl),0                   ; clear fd entry
+
+no_underlying_fd:
+
+   ; de = FDSTRUCT *
+   ; ix = FILE *
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_MULTITHREAD & $08
+
+   EXTERN __fcntl_unlock_fdtbl
+   call __fcntl_unlock_fdtbl
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   push de
+   ex (sp),ix                  ; ix = FDSTRUCT *
+   
+   ; ix = FDSTRUCT *
+   ; stack = FILE *
+
+   ld c,2                      ; ref_count_adj = 2
+   call asm0_close             ; close underlying fd
+   
+   pop ix                      ; ix = FILE *
+
+   ; disassociate FILE
+   
+   jp __stdio_file_destructor
+
+close_memstream:
+
+   ; ix = FILE *
+   
    push ix
-   pop hl
+   pop hl                      ; hl = FILE *
    
    dec hl
    dec hl                      ; hl = & FILE.link
    
-   call asm_free
-   jp error_znc
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $04
-
-exit_error_ebadf:
-
-   call __stdio_unlock_file_list
-   jp error_ebadf_mc
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   call asm_free               ; memstream FILE allocated from user heap
+   jp error_znc                ; indicate success

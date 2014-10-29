@@ -17,7 +17,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm_fclose
 
-EXTERN asm0_fclose_unlocked, __stdio_lock_acquire, error_enolck_mc
+EXTERN asm0_fclose_unlocked
+EXTERN __stdio_lock_acquire, error_enolck_mc
 
 asm_fclose:
 
@@ -40,14 +41,15 @@ asm_fclose:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
 
-   EXTERN __stdio_lock_file_list, __stdio_unlock_file_list
-   
+   EXTERN __stdio_lock_file_list
    call __stdio_lock_file_list
    
    call __stdio_lock_acquire
    jp nc, asm0_fclose_unlocked
    
+   EXTERN __stdio_unlock_file_list
    call __stdio_unlock_file_list
+   
    jp error_enolck_mc
 
 ELSE
@@ -68,11 +70,8 @@ PUBLIC asm_fclose
 
 EXTERN asm_fclose_unlocked
 
-asm_fclose:
-
-   jp asm_fclose_unlocked
+defc asm_fclose = asm_fclose_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
