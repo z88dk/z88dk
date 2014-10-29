@@ -142,10 +142,13 @@ __setf:
    push bc
    push de
    
+   ld hl,0                     ; no varg
    call forward_ioctl          ; forward to driver
    
    pop de
    pop bc
+
+   ret c                       ; if driver rejects change
 
    ld l,(ix+9)
    ld h,(ix+10)                ; hl = FDSTRUCT.ioctl_flags
