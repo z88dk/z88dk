@@ -16,7 +16,7 @@ SECTION seg_code_fcntl
 
 PUBLIC asm_dup2, asm0_dup2
 
-EXTERN __fcntl_fdstruct_from_fd_1, __fcntl_fdstruct_from_fd_2, asm1_close
+EXTERN __fcntl_fdstruct_from_fd_1, __fcntl_fdstruct_from_fd_2, asm0_close
 EXTERN error_ebdfd_mc, __fcntl_inc_refcount
 
 asm_dup2:
@@ -79,7 +79,8 @@ asm0_dup2:
    ld ixl,e
    ld ixh,d                    ; ix = FDSTRUCT* (fd2)
    
-   call asm1_close             ; close(fd2), lightweight call
+   ld c,1
+   call asm0_close             ; close(fd2)
    
    pop hl
 
