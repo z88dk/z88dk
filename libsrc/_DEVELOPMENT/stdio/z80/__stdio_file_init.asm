@@ -22,7 +22,7 @@ __stdio_file_init:
    ld (hl),195                 ; JP
    inc hl
    
-   ld (hl),e                   ; stdio_next
+   ld (hl),e                   ; FDSTRUCT *
    inc hl
    ld (hl),d
    inc hl

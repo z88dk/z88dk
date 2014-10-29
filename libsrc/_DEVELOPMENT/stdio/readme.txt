@@ -321,4 +321,5 @@ input:
 
 return:
 
-carry set if file is invalid (file will always be closed)
+carry set if error occurred
+

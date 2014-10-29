@@ -55,7 +55,7 @@ asm_fopen:
    pop de                      ; de = filename
    
    jp c, error_zc              ; if no available FILE struct
-   
+
    ; target must open file on appropriate device
    
    push bc                     ; save mode byte
