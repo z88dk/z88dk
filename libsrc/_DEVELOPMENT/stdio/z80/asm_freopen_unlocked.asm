@@ -208,11 +208,13 @@ perform_mode_change:
    add hl,de                   ; hl = & FDSTRUCT.mode
    
    ld a,c
-   and (hl)
-   xor c                       ; a = bits of c not found in FDSTRUCT.mode
-   and $07                     ; only interested in difference in RWA mode bits
+   and $07                     ; only interested in RWA bits
+   ld c,a
    
-   jp nz, error_enotsup_zc     ; if desired mode not supported by underlying FDSTRUCT
+   and (hl)                    ; compare to fd mode bits
+   cp c
+   
+   jp nz, error_enotsup_zc     ; if desired mode not supported
    
    ; flush FILE
    
