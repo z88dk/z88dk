@@ -593,7 +593,8 @@ CLOS:
    ;
    ; enter : none
 
-   call FLSH
+;;;   call FLSH
+;;;   flush always preceeds close message
    
    bit 7,(ix+13)               ; free buffer on close ?
    ret z
