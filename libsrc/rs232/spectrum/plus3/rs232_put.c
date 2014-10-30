@@ -8,7 +8,7 @@
  *
  *	No error checking, for now.
  *
- *      $Id: rs232_put.c,v 1.4 2014-10-30 16:07:24 stefano Exp $
+ *      $Id: rs232_put.c,v 1.5 2014-10-30 17:41:54 stefano Exp $
  */
 
 
@@ -109,7 +109,7 @@ L08FF:  DEC  HL           ; (6) Delay 26*BAUD cycles.
 
 
 	ld	hl,RS_ERR_OK
-	pop	bc	;remove implicit push
+;	pop	bc	;remove implicit push
 
 
 #endasm
