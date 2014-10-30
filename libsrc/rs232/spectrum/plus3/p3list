@@ -3,5 +3,3 @@ rs232_get
 rs232_init
 rs232_params
 rs232_put
-rs232_page_romin
-rs232_page_romout

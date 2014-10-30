@@ -8,7 +8,7 @@
  *
  *	No error checking, for now.
  *
- *      $Id: rs232_put.c,v 1.3 2014-10-30 10:26:48 stefano Exp $
+ *      $Id: rs232_put.c,v 1.4 2014-10-30 16:07:24 stefano Exp $
  */
 
 
@@ -20,17 +20,10 @@ u8_t rs232_put(i8_t char)
 #asm
 
 	LIB   zx_break
-	LIB   rs232_page_romin
-	LIB   rs232_page_romout
 
-	; better to chk the "break" condition ourselves
-	; (old entry points not used anymore)
-	;defc	romsend = 205b
-	;defc	romsend2 = 0x08c2
+	defc	BAUD  = $5B71
+
 	
-	defc	romsend = 0x206a
-	defc	romsend2 = 0x08d1
-
 .sendchar
 	ld	a,l	;get byte
 
@@ -43,6 +36,7 @@ u8_t rs232_put(i8_t char)
 	ld	a,14
 	out	(c),a	; AY reg. to control the RS232 port.
 
+.brkcheck
 	call  zx_break
 ;	jr    c,nobreak
 ;
@@ -50,24 +44,72 @@ u8_t rs232_put(i8_t char)
 ;	ret
 ;
 ;.nobreak
-	ld		a,(romsend2+1)
-	cp		$78		; look for the IN A,(C) instruction
-	jr		nz,p3mode
 
-	pop		af
-	call	romsend2
-	jr		p2mode
-	
-.p3mode
-	call	rs232_page_romin
-	pop	af
-	call	romsend
-	call	rs232_page_romout
+        IN   A,(C)        ; Read status of data register.
+        AND  $40          ; %01000000. Test the DTR line.
+        JR   NZ,brkcheck     ; Jump back until device is ready for data.
 
-.p2mode	
+        LD   HL,(BAUD)    ; $5B5F. HL=Baud rate timing constant.
+        LD   DE,$0002     ;
+        OR   A            ;
+        SBC  HL,DE        ;
+        EX   DE,HL        ; DE=(BAUD)-2.
+
+        POP  AF           ; Retrieve the byte to send.
+        CPL               ; Invert the bits of the byte (RS232 logic is inverted).
+        SCF               ; Carry is used to send START BIT.
+        LD   B,$0B        ; B=Number of bits to send (1 start + 8 data + 2 stop).
+
+        DI                ; Disable interrupts to ensure accurate timing.
+
+;Transmit each bit
+
+L08E7:  PUSH BC           ; Save the number of bits to send.
+        PUSH AF           ; Save the data bits.
+
+        LD   A,$FE        ;
+        LD   H,D          ;
+        LD   L,E          ; HL=(BAUD)-2.
+        LD   BC,$BFFD     ; AY-3-8912 data register.
+
+        JP   NC,L08F9     ; Branch to transmit a 1 or a 0 (initially sending a 0 for the start bit).
+
+;Transmit a 0
+
+        AND  $F7          ; Clear the RXD (out) line.
+        OUT  (C),A        ; Send out a 0 (high level).
+        JR   L08FF        ; Jump ahead to continue with next bit.
+
+;Transmit a 1
+
+L08F9:  OR   8            ; Set the RXD (out) line.
+        OUT  (C),A        ; Send out a 1 (low level).
+        JR   L08FF        ; Jump ahead to continue with next bit.
+
+;Delay the length of a bit
+
+L08FF:  DEC  HL           ; (6) Delay 26*BAUD cycles.
+        LD   A,H          ; (4)
+        OR   L            ; (4)
+        JR   NZ,L08FF     ; (12) Jump back until delay is completed.
+
+        NOP               ; (4) Fine tune the timing.
+        NOP               ; (4)
+        NOP               ; (4)
+
+        POP  AF           ; Retrieve the data bits to send.
+        POP  BC           ; Retrieve the number of bits left to send.
+        OR   A            ; Clear carry flag.
+        RRA               ; Shift the next bit to send into the carry flag.
+        DJNZ L08E7        ; Jump back to send next bit until all bits sent.
+
+        EI                ; Re-enable interrupts.
+;        RET               ; Return with carry and zero flags reset.
+
+
+
 	ld	hl,RS_ERR_OK
 	pop	bc	;remove implicit push
-	ret
 
 
 #endasm
