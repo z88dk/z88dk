@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.3 2014-10-12 20:16:06 dom Exp $
+ *      $Id: rs232_get.c,v 1.4 2014-10-30 10:26:48 stefano Exp $
  */
 
 
@@ -19,58 +19,61 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 {	/* fastcall so implicit push */
 #asm
 .getchar
-	defc	romsend = $205b
-	defc	romrecv = $1e78
-	defc	bank2	= $1ffd
-	defc	bank678 = $5b67
+
+	; better to chk the "break" condition ourselves
+	; (old entry points not used anymore)
+	;defc	romrecv = 0x1e78
+	;defc	romrecv2 = 0x06f7
+
+	defc	romrecv = 0x1e8c
+	defc	romrecv2 = 0x0707
 	
-	push	af
-	call	brkcheck
-	call	page_romin
-	pop	af
+	defc	serfl = $5b61
+	
+	LIB   zx_break
+	LIB   rs232_page_romin
+	LIB   rs232_page_romout
+
+	ld	hl,serfl
+	ld	a,(hl)	; Is the second-character received flag set?
+	jr	z,readchar
+	ld	(hl),0
+	inc hl
+	ld	a,(hl)	; pick the character we already got
+	scf			; C flag == success
+	jr	p2mode
+	
+.readchar
+	call  zx_break
+;	jr    c,nobreak
+;
+;	ld	hl,RS_ERR_BREAK
+;	ret
+;
+;.nobreak
+	ld		a,(romrecv2)
+	cp		$f3		; look for the DI instruction presence
+	jr		nz,p3mode
+
+	call	romrecv2
+	jr		p2mode
+	
+.p3mode
+	call	rs232_page_romin
 	call	romrecv
 	push	af
-	call	page_romout
+	call	rs232_page_romout
 	pop	af
 
+.p2mode
 	pop	de
 	ld	hl,RS_ERR_NO_DATA
-	ret	c
+	ret	nc
+
 	ld	(de),a
 	ld	hl,RS_ERR_OK
-
-        ret
-
-.page_romout
-	di
-	ld	bc,bank2
-	ld	a,(bank678)
-	set	2,a
-	ld	(bank678),a
-	out	(c),a
-	ei
 	ret
 
-.page_romin
-	di
-	ld	bc,bank2
-	ld	a,(bank678)
-	res	2,a
-	ld	(bank678),a
-	out	(c),a
-	ei
-	ret
-
-.brkcheck
-	ld	bc,$7ffe
-	in	a,(c)
-	bit	0,a
-	ret	nz
-	ld	b,$fe
-	in	a,(c)
-	bit	0,a
-	ret	nz
-	jr	brkcheck
 
 #endasm
 }
