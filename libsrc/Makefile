@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.212 2014-10-22 07:16:41 stefano Exp $
+# $Id: Makefile,v 1.213 2014-10-31 07:41:45 stefano Exp $
 
 
 include Make.config
@@ -1243,6 +1243,7 @@ nc_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lnc ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..

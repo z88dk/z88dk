@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2014-04-15 22:22:58 dom Exp $
+# $Id: Makefile,v 1.20 2014-10-31 07:41:45 stefano Exp $
 
 lcpc:
 	cd cpc ; $(MAKE) ; cd ..
@@ -12,6 +12,9 @@ lzx:
 
 losca:	
 	cd osca ; $(MAKE) ; cd ..
+
+lnc:
+	cd nc100 ; $(MAKE) nc_fcntl ; cd ..
 
 lnewbrain:
 	@echo ''
@@ -49,6 +52,7 @@ clean:
 	$(MAKE) -C dummy clean
 	$(MAKE) -C gen_rnd clean
 	$(MAKE) -C spectrum clean
+	$(MAKE) -C nc100 clean
 	$(MAKE) -C newbrain clean
 	$(MAKE) -C sprinter clean
 	$(MAKE) -C z88 clean
