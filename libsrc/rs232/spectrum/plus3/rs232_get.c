@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.6 2014-10-30 17:41:54 stefano Exp $
+ *      $Id: rs232_get.c,v 1.7 2014-11-03 06:59:11 stefano Exp $
  */
 
 
@@ -20,8 +20,13 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 #asm
 .getchar
 
-	defc	SERFL = $5b61
-	defc	BAUD  = $5B71
+	;defc	SERFL = $5b61
+	;defc	BAUD  = $5B71
+
+	XDEF rs232_patch1
+
+	XREF SERFL
+	XREF BAUD
 	
 	LIB   zx_break
 
@@ -173,6 +178,7 @@ L0776:  LD   A,H          ;
 
         LD   H,D          ;
         LD   L,E          ; HL=(BAUD).
+.rs232_patch1
         LD   BC,$0007     ;
         OR   A            ;
         SBC  HL,BC        ; HL=(BAUD)-7.

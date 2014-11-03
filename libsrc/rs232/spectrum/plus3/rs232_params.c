@@ -9,7 +9,7 @@
  *
  *	Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.5 2014-10-30 16:07:24 stefano Exp $
+ *      $Id: rs232_params.c,v 1.6 2014-11-03 06:59:11 stefano Exp $
  */
 
 	/* BAUD system variable: 23391
@@ -21,6 +21,8 @@
 u8_t rs232_params(unsigned char param, unsigned char parity)
 {
 #asm
+		XREF BAUD
+
         pop     bc
         pop     de
         pop     hl
@@ -58,7 +60,8 @@ avail:
         inc     hl
         ld      h,(hl)
         ld      l,a
-        ld      (23391),hl
+;        ld      (23391),hl
+        ld      (BAUD),hl
         ld      hl,0            ; RS_ERR_OK
         ret
 
@@ -74,9 +77,10 @@ tabell:
         defw    54     ;RS_BAUD_2400
         defw    25     ;RS_BAUD_4800
         defw    11     ;RS_BAUD_9600
-        defw    4      ;RS_BAUD_19200      ; experimental
+        defw    4      ;RS_BAUD_19200      ; experimental, TX only
         ; defw    1      ;RS_BAUD_38400      ; experimental
 
+		
 #endasm
 }
 

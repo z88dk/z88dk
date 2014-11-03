@@ -8,7 +8,7 @@
  *
  *	No error checking, for now.
  *
- *      $Id: rs232_put.c,v 1.5 2014-10-30 17:41:54 stefano Exp $
+ *      $Id: rs232_put.c,v 1.6 2014-11-03 06:59:12 stefano Exp $
  */
 
 
@@ -21,8 +21,10 @@ u8_t rs232_put(i8_t char)
 
 	LIB   zx_break
 
-	defc	BAUD  = $5B71
+	XDEF rs232_patch2
 
+;;	defc	BAUD  = $5B71
+	XREF BAUD
 	
 .sendchar
 	ld	a,l	;get byte
@@ -50,6 +52,7 @@ u8_t rs232_put(i8_t char)
         JR   NZ,brkcheck     ; Jump back until device is ready for data.
 
         LD   HL,(BAUD)    ; $5B5F. HL=Baud rate timing constant.
+.rs232_patch2
         LD   DE,$0002     ;
         OR   A            ;
         SBC  HL,DE        ;

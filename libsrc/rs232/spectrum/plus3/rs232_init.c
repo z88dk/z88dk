@@ -9,7 +9,7 @@
  *
  *	Still nothing, here!
  *
- *      $Id: rs232_init.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
+ *      $Id: rs232_init.c,v 1.3 2014-11-03 06:59:11 stefano Exp $
  */
 
 
@@ -20,5 +20,16 @@ u8_t __FASTCALL__ rs232_init()
 {
 #asm
 	ld	hl,RS_ERR_OK
+	ret
+
+	XDEF BAUD
+	XDEF SERFL
+
+	BAUD:
+		; Default speed: 2400 baud 
+		defw 54
+SERFL:
+		; flag + data byte about an eventual 2nd character already transmitted
+		defw 0
 #endasm
 }
