@@ -15,6 +15,6 @@ SECTION seg_code_fcntl
 
 PUBLIC asm__exit
 
-EXTERN _Exit
+EXTERN __Exit
 
-defc asm__exit = _Exit
+defc asm__exit = __Exit

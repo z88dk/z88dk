@@ -75,7 +75,7 @@ ENDIF
 
     ld a,c
     and $07
-    
+
     scf
     jr z, deliver_message      ; if request is not handled by stdio
 
@@ -148,7 +148,7 @@ __setf:
    pop de
    pop bc
 
-   ret c                       ; if driver rejects change
+   jp c, error_mc              ; if driver rejects change
 
    ld l,(ix+9)
    ld h,(ix+10)                ; hl = FDSTRUCT.ioctl_flags
