@@ -1,7 +1,9 @@
 #
 # Wahey, a messed up makefile for building libraries!
+# This version is valid for all the Spectrum 128 versions
+# So it is now renamed to rs232plus.lib
 #
-# $Id: Makefile,v 1.9 2014-11-03 06:59:11 stefano Exp $
+# $Id: Makefile,v 1.10 2014-11-07 07:27:19 stefano Exp $
 
 include ../../../Make.config
 

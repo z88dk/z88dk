@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.7 2014-11-03 06:59:11 stefano Exp $
+ *      $Id: rs232_get.c,v 1.8 2014-11-07 07:27:20 stefano Exp $
  */
 
 
@@ -30,8 +30,8 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	
 	LIB   zx_break
 
+	push hl
 	call doread
-done:
 	pop	de
 	ld	hl,RS_ERR_NO_DATA
 	ret	c

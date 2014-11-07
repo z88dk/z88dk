@@ -9,7 +9,7 @@
  *
  *	Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.6 2014-11-03 06:59:11 stefano Exp $
+ *      $Id: rs232_params.c,v 1.7 2014-11-07 07:27:20 stefano Exp $
  */
 
 	/* BAUD system variable: 23391
@@ -45,8 +45,8 @@ noextra:
         ; baud rate
         ld      a,$0f
         and     l
-        ;cp      14              ; max 38400 baud
-		cp      13              ; max 19200 baud
+        cp      14              ; max 38400 baud
+		;cp      13              ; max 19200 baud
         jr      c,avail
         ld      hl,2            ; RS_ERR_BAUD_TOO_FAST
         ret
@@ -77,8 +77,9 @@ tabell:
         defw    54     ;RS_BAUD_2400
         defw    25     ;RS_BAUD_4800
         defw    11     ;RS_BAUD_9600
-        defw    4      ;RS_BAUD_19200      ; experimental, TX only
-        ; defw    1      ;RS_BAUD_38400      ; experimental
+        ;defw    4      ;RS_BAUD_19200      ; experimental, TX only
+		defw    5      ;RS_BAUD_19200      ; experimental, TX only
+        defw    1      ;RS_BAUD_38400      ; experimental
 
 		
 #endasm
