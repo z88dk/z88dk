@@ -26,7 +26,7 @@
  *		DStar Z88 - C Demo
  *		Original TI game By A Von Dollen
  *		Converted to Z88 By D Morris
- *		Keys: Q,A,O,P,SPACE,H,G
+ *		Keys: Q,A,O,P,M,H,G
  *
  * * * * * * *
  *
@@ -469,28 +469,28 @@ void putpic(int x, int y, int picture) {
 	switch(picture)
 	{
 	case WALL:
-		display[y*66+x*2]=9;
-		display[y*66+x*2+1]=9;
-		display[y*66+33+x*2]=9;
-		display[y*66+33+x*2+1]=9;
+		display[y*66+x*2]=61;
+		display[y*66+x*2+1]=61;
+		display[y*66+33+x*2]=61;
+		display[y*66+33+x*2+1]=61;
 		break;
 	case BUBB:
 		display[y*66+x*2]=7;
 		display[y*66+x*2+1]=0;
 		display[y*66+33+x*2]=0;
-		display[y*66+33+x*2+1]=0;
-		break;
-	case BALL:
-		display[y*66+x*2]=7;
-		display[y*66+x*2+1]=6;
-		display[y*66+33+x*2]=5;
 		display[y*66+33+x*2+1]=4;
 		break;
+	case BALL:
+		display[y*66+x*2]=132;
+		display[y*66+x*2+1]=136;
+		display[y*66+33+x*2]=134;
+		display[y*66+33+x*2+1]=135;
+		break;
 	case BOX:
-		display[y*66+x*2]=135;
-		display[y*66+x*2+1]=134;
-		display[y*66+33+x*2]=133;
-		display[y*66+33+x*2+1]=132;
+		display[y*66+x*2]=9;
+		display[y*66+x*2+1]=137;
+		display[y*66+33+x*2]=137;
+		display[y*66+33+x*2+1]=9;
 		break;
 	case 0:
 		display[y*66+x*2]=0;
@@ -503,28 +503,28 @@ void putpic(int x, int y, int picture) {
 	switch(picture)
 	{
 	case WALL:
-		display[y*66+x*2]=8;
-		display[y*66+x*2+1]=8;
-		display[y*66+33+x*2]=8;
-		display[y*66+33+x*2+1]=8;
+		display[y*66+x*2]=61;
+		display[y*66+x*2+1]=61;
+		display[y*66+33+x*2]=61;
+		display[y*66+33+x*2+1]=61;
 		break;
 	case BUBB:
 		display[y*66+x*2]=135;
-		display[y*66+x*2+1]=0;
-		display[y*66+33+x*2]=0;
-		display[y*66+33+x*2+1]=0;
+		display[y*66+x*2+1]=0;		// 4
+		display[y*66+33+x*2]=0;		// 2
+		display[y*66+33+x*2+1]=1;	// 1
 		break;
 	case BALL:
-		display[y*66+x*2]=135;
-		display[y*66+x*2+1]=4;
-		display[y*66+33+x*2]=2;
-		display[y*66+33+x*2+1]=1;
+		display[y*66+x*2]=6;
+		display[y*66+x*2+1]=130;
+		display[y*66+33+x*2]=132;
+		display[y*66+33+x*2+1]=7;
 		break;
 	case BOX:
-		display[y*66+x*2]=7;
-		display[y*66+x*2+1]=132;
-		display[y*66+33+x*2]=130;
-		display[y*66+33+x*2+1]=129;
+		display[y*66+x*2]=8;		// 7
+		display[y*66+x*2+1]=136;	// 132
+		display[y*66+33+x*2]=136;		// 130
+		display[y*66+33+x*2+1]=8;	//129
 		break;
 	case 0:
 		display[y*66+x*2]=0;
