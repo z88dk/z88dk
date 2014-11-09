@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.8 2014-11-07 07:27:20 stefano Exp $
+ *      $Id: rs232_get.c,v 1.9 2014-11-09 16:37:26 stefano Exp $
  */
 
 
@@ -30,8 +30,8 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	
 	LIB   zx_break
 
-	push hl
-	call doread
+	push	hl
+	call	doread
 	pop	de
 	ld	hl,RS_ERR_NO_DATA
 	ret	c
@@ -44,9 +44,10 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 .doread
 	ld	hl,SERFL
 	ld	a,(hl)	; Is the second-character received flag set?
+	and	a
 	jr	z,readbyte
 	ld	(hl),0
-	inc hl
+	inc	hl
 	ld	a,(hl)	; pick the 2nd character we already got in the past loop
 	scf			; success
 	ret
