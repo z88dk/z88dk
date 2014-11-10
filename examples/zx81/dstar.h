@@ -42,6 +42,10 @@ char Board[144];        /* Space for decompressed Level */
 
 extern char levels[];
 char *display;
+#ifdef CHROMA81
+	char *display_attr;
+	char color[]={240,242,245,241,244}
+#endif
 extern int d_file @16396;
 
 

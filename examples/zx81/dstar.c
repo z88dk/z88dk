@@ -26,7 +26,7 @@
  *		DStar Z88 - C Demo
  *		Original TI game By A Von Dollen
  *		Converted to Z88 By D Morris
- *		Keys: Q,A,O,P,M,H,G
+ *		Keys: Q,A,O,P,SPACE,H,G
  *
  * * * * * * *
  *
@@ -114,13 +114,25 @@ void main()
 	/* dk'tronics (quick board test: PEEK 11905 must give 32)*/
 	memcpy(0x3000, sprites, 136);
 	memcpy(0x3200, sprites, 136);
+	#asm
+	ld	a,$30
+	ld	i,a
+	#endasm
 #endif
 #endif
 
 	/* Interesting way to find the display file address ! */
 	/* (we're working in text mode, with redefinded font) */
 	display=d_file+1;
-
+#ifdef CHROMA81
+	display_attr=d_file+1+32768;
+	#asm
+	ld bc,7FEFh
+	ld a,16+8+5  ; 8="attribute file" mode, (border 7)
+	out (c),a
+	#endasm
+#endif
+	
 	DrawBoard();
 	
 	/* Loop keyhandler till you finished the game */
@@ -523,7 +535,7 @@ void putpic(int x, int y, int picture) {
 	case BOX:
 		display[y*66+x*2]=8;		// 7
 		display[y*66+x*2+1]=136;	// 132
-		display[y*66+33+x*2]=136;		// 130
+		display[y*66+33+x*2]=136;	// 130
 		display[y*66+33+x*2+1]=8;	//129
 		break;
 	case 0:
@@ -547,6 +559,21 @@ void putpic(int x, int y, int picture) {
 		display[y*66+33+x*2]=4*picture-2;
 		display[y*66+33+x*2+1]=4*picture;
 	}
+
+#ifdef CHROMA81
+	if (y>8) {
+		display_attr[y*66+x*2]=208;
+		display_attr[y*66+x*2+1]=208;
+		display_attr[y*66+33+x*2]=208;
+		display_attr[y*66+33+x*2+1]=208;
+	} else {
+		display_attr[y*66+x*2]=color[picture];
+		display_attr[y*66+x*2+1]=color[picture];
+		display_attr[y*66+33+x*2]=color[picture];
+		display_attr[y*66+33+x*2+1]=color[picture];
+	}
+#endif
+
 #endif
 }
 
