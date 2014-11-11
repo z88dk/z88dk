@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.9 2014-11-09 16:37:26 stefano Exp $
+ *      $Id: rs232_get.c,v 1.10 2014-11-11 15:33:20 stefano Exp $
  */
 
 
@@ -18,7 +18,6 @@
 u8_t __FASTCALL__ rs232_get(i8_t *char)
 {	/* fastcall so implicit push */
 #asm
-.getchar
 
 	;defc	SERFL = $5b61
 	;defc	BAUD  = $5B71
@@ -28,10 +27,10 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	XREF SERFL
 	XREF BAUD
 	
-	LIB   zx_break
+;	LIB   zx_break
 
-	push	hl
-	call	doread
+;	(implicit!) push hl 
+	call doread
 	pop	de
 	ld	hl,RS_ERR_NO_DATA
 	ret	c
@@ -44,16 +43,18 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 .doread
 	ld	hl,SERFL
 	ld	a,(hl)	; Is the second-character received flag set?
-	and	a
+	and a
 	jr	z,readbyte
 	ld	(hl),0
-	inc	hl
+	inc hl
 	ld	a,(hl)	; pick the 2nd character we already got in the past loop
 	scf			; success
 	ret
 	
+
 .readbyte
-	call  zx_break
+
+;	call  zx_break
 ;	jr    c,nobreak
 ;
 ;	ld	hl,RS_ERR_BREAK
@@ -61,20 +62,18 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 ;
 ;.nobreak
 
-
         DI                ; Ensure interrupts are disabled to achieve accurate timing.
 
         EXX               ;
-
-        LD   DE,(BAUD)    ; $5B71. Fetch the baud rate timing constant.
-        LD   HL,(BAUD)    ; $5B71.
+        LD   HL,(BAUD)    ; Fetch the baud rate timing constant.
+		ld		d,h			; HL=DE=BAUD
+		ld		e,l
         SRL  H            ;
         RR   L            ; HL=BAUD/2. So that will sync to half way point in each bit.
-
-        OR   A            ; [Redundant byte]
-
+        ; OR   A            ; [Redundant byte]
         LD   B,$FA        ; Waiting time for start bit.
         EXX               ; Save B.
+
         LD   C,$FD        ;
         LD   D,$FF        ;
         LD   E,$BF        ;
@@ -274,7 +273,7 @@ L07D6:  EX   AF,AF        ; Fetch the bit counter.
 ;Exit with the byte that was read in
 
 L07DF:  LD   HL,SERFL     ; $5B61.
-        LD   (HL),$01     ; Set the flag indicating a second byte is in the buffer.
+        LD   (HL),1     ; Set the flag indicating a second byte is in the buffer.
         INC  HL           ;
         LD   (HL),A       ; Store the second byte read in the buffer.
         POP  AF           ; Return the first byte.
