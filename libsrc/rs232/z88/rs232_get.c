@@ -24,7 +24,8 @@ u8_t rs232_get(i8_t *char)
 	ret	c
 	ld	(de),a
 	ld	hl,RS_ERR_OK
-	push	bc		;any rubbish will do
+	ret
+	;push	bc		;any rubbish will do
 #endasm
 }
 

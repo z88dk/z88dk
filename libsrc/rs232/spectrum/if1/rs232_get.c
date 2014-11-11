@@ -7,7 +7,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.2 2008-06-05 14:31:24 stefano Exp $
+ *      $Id: rs232_get.c,v 1.3 2014-11-11 15:23:42 stefano Exp $
  */
 
 
@@ -17,7 +17,7 @@
 u8_t __FASTCALL__ rs232_get(i8_t *char)
 {	/* fastcall so implicit push */
 #asm
-        push	hl
+;        push	hl
 	rst	8
 	defb	$1d
 
@@ -26,6 +26,7 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	ret	nc
 	ld	(de),a
 	ld	hl,RS_ERR_OK
+	ret
 	;;pop	bc; fastcall so implicit push
 #endasm
 }

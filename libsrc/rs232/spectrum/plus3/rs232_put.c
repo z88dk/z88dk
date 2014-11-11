@@ -8,7 +8,7 @@
  *
  *	No error checking, for now.
  *
- *      $Id: rs232_put.c,v 1.6 2014-11-03 06:59:12 stefano Exp $
+ *      $Id: rs232_put.c,v 1.7 2014-11-11 15:23:43 stefano Exp $
  */
 
 
@@ -19,14 +19,14 @@ u8_t rs232_put(i8_t char)
 {	/* Fastcall so implicit push */
 #asm
 
-	LIB   zx_break
+;	LIB   zx_break
 
 	XDEF rs232_patch2
 
 ;;	defc	BAUD  = $5B71
 	XREF BAUD
 	
-.sendchar
+
 	ld	a,l	;get byte
 
 	push	af
@@ -39,7 +39,7 @@ u8_t rs232_put(i8_t char)
 	out	(c),a	; AY reg. to control the RS232 port.
 
 .brkcheck
-	call  zx_break
+;	call  zx_break
 ;	jr    c,nobreak
 ;
 ;	ld	hl,RS_ERR_BREAK

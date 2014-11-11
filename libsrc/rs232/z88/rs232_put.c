@@ -24,6 +24,7 @@ u8_t rs232_put(i8_t char)
 	pop	bc	;remove implicit push
 	ret	nc
 	ld	hl,RS_ERR_OVERFLOW
+	ret
 #endasm
 }
 
