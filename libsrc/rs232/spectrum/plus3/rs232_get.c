@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.10 2014-11-11 15:33:20 stefano Exp $
+ *      $Id: rs232_get.c,v 1.11 2014-11-12 20:50:03 stefano Exp $
  */
 
 
@@ -27,7 +27,7 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	XREF SERFL
 	XREF BAUD
 	
-;	LIB   zx_break
+	LIB   zx_break
 
 ;	(implicit!) push hl 
 	call doread
@@ -54,7 +54,7 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 
 .readbyte
 
-;	call  zx_break
+	call  zx_break
 ;	jr    c,nobreak
 ;
 ;	ld	hl,RS_ERR_BREAK
@@ -70,7 +70,7 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 		ld		e,l
         SRL  H            ;
         RR   L            ; HL=BAUD/2. So that will sync to half way point in each bit.
-        ; OR   A            ; [Redundant byte]
+        OR   A            ; [Redundant byte]
         LD   B,$FA        ; Waiting time for start bit.
         EXX               ; Save B.
 
