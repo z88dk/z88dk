@@ -44,7 +44,8 @@ main() {
 
 	printf("press spacebar to stop\n");
 
-	while (!get_trigger(0)) {}
+//	while (!get_trigger(0)) {}
+	while (getk()!=' ') {}
 
 	psg_envelope(envD, psgT(10), chanAll); // set a fading volume envelope on all channels
 }

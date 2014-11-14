@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.29 2014-01-03 15:20:42 stefano Exp $ */
+/* $Id: stdio.h,v 1.30 2014-11-14 13:48:06 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -291,7 +291,7 @@ extern int __LIB__ fchkstd(FILE *);
 /* All functions below here are machine specific */
 extern int __LIB__ fgetc_cons();
 extern int __LIB__ fputc_cons(char c);
-extern int __LIB__ fgets_cons(char *s, int n) __SMALLCDECL;
+extern char __LIB__ *fgets_cons(char *s, int n) __SMALLCDECL;
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
