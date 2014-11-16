@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.136 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.137 2014-11-16 23:19:56 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -941,7 +941,6 @@ CreateBinFile( void )
 {
     FILE *binaryfile;
     char *filename;
-	UInt codesize = get_sections_size();
 	Bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
 
     if ( opts.bin_file )        /* use predined output filename from command line */
