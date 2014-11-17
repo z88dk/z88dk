@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_addu_hl_de
 
 l_addu_hl_de:

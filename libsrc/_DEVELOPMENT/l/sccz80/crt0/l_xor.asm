@@ -4,15 +4,20 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_xor
+SECTION seg_code_sccz80
 
+PUBLIC l_xor
 
-; "xor" HL and DE into HL
-.l_xor 
-        ld a,l
-        xor   e
-        ld l,a
-        ld a,h
-        xor   d
-        ld h,a
-        ret
+l_xor:
+
+   ; "xor" HL and DE into HL
+
+   ld a,l
+   xor e
+   ld l,a
+   
+   ld a,h
+   xor d
+   ld h,a
+   
+   ret

@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_utod_de
 
 l_utod_de:

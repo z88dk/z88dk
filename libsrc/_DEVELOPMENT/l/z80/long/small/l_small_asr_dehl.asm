@@ -1,5 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_asr_dehl
+
+EXTERN error_lznc
 
 l_small_asr_dehl:
 
@@ -14,6 +18,9 @@ l_small_asr_dehl:
    
    or a
    ret z
+   
+   cp 32
+   jp nc, error_lznc
    
    ld b,a
    ld a,e

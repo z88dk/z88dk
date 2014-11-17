@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_htou
 
 EXTERN l_char2num

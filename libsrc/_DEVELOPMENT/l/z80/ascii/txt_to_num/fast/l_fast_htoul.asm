@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_htoul
 
 EXTERN l_fast_htou, l_char2num

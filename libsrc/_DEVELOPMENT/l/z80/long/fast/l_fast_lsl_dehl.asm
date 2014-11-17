@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_lsl_dehl
 
 l_fast_lsl_dehl:

@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_ex_bc_hl
 
 l_ex_bc_hl:

@@ -4,13 +4,10 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_pint
+SECTION seg_code_sccz80
 
-; store int from HL into (DE)
-.l_pint   
-        ld a,l
-        ld (de),a
-        inc   de
-        ld a,h
-        ld (de),a
-        ret
+PUBLIC l_pint
+
+EXTERN l_pint_pop_pint
+
+defc l_pint = l_pint_pop_pint

@@ -4,12 +4,18 @@
 ;
 ;       23/1/2001  djm
 
-                PUBLIC    l_pint_ex
+SECTION seg_code_sccz80
 
-; store int from HL into (DE)
-.l_pint_ex
-	ex	de,hl
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
-	ret
+PUBLIC l_pint_ex
+
+l_pint_ex:
+
+   ; store int from HL into (DE)
+
+   ex de,hl
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   ret

@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_long_add_stack
 
 l_long_add_stack:
@@ -11,7 +13,7 @@ l_long_add_stack:
    ; exit  : dehl  = a + b
    ;         carry set on overflow
    ;
-   ; uses  : f, de, hl, ix
+   ; uses  : f, bc, de, hl, ix
    
    pop ix
    

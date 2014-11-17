@@ -4,12 +4,15 @@
 ;
 ;	Quicky to make network progs quicker
 
-                PUBLIC    l_ghtonsint
+SECTION seg_code_sccz80
 
+PUBLIC l_ghtonsint
 
-.l_ghtonsint
-        ld a,(hl)
-        inc     hl
-        ld l,(hl)
-        ld h,a
-        ret
+l_ghtonsint:
+
+   ld a,(hl)
+   inc hl
+   ld l,(hl)
+   ld h,a
+   
+   ret

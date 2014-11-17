@@ -4,24 +4,17 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_cm_de
+SECTION seg_code_sccz80
 
+PUBLIC l_cm_de
 
-.l_cm_de
+EXTERN l_neg_de
 
-   ld a,d
-   or a
-   ret p
-   cpl
-   ld d,a
-   ld a,e
-   cpl
-   ld e,a
-   inc de
-   ret
+l_cm_de:
+
+   ; de = abs(de)
    
-;        ld a,d
-;        or a
-;        ret p
-;        call    l_deneg
-;        ret
+   bit 7,d
+   ret z
+   
+   jp l_neg_de

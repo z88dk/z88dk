@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_num2char
 
 l_num2char:

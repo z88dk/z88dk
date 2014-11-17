@@ -1,3 +1,12 @@
+;       Z88 Small C+ Run time Library
+;       Moved functions over to proper libdefs
+;       To make startup code smaller and neater!
+;
+;       6/9/98  djm
+;
+;       22/3/99 djm Rewritten to be shorter..
+
+SECTION seg_code_sccz80
 
 PUBLIC l_asr
 
@@ -5,9 +14,7 @@ EXTERN l_asr_hl
 
 l_asr:
 
-   ; hl = de >> hl
-   
+   ld a,l
    ex de,hl
-   ld a,e
    
    jp l_asr_hl

@@ -24,113 +24,73 @@
 ;              (nz)=number is non-zero 
 ;                 c=number is negative
 ;                nc=number is positive
+;
+;                hl = 1
 
+SECTION seg_code_sccz80
 
-                PUBLIC    l_long_cmp
+PUBLIC l_long_cmp
 
+l_long_cmp:
 
-.l_long_cmp
-        pop     bc      ;return address from this function
-                        ;this leaves return address to real program
-                        ;and the primary on the stack
+   ; computes (primary - secondary)
+   ;
+   ; dehl  = secondary
+   ; stack = primary, return address 1, return address 2
 
-; Code cut from l_long_sub here
-        exx             ;2nd
-        pop     bc
-        pop     hl
-        pop     de
-        push    bc      ;return address to program
-        ld      a,l
-        exx
-        push    bc      ;return address from function
-        sub     l
-        ld      l,a
-        exx             ;1st
-        ld      a,h
-        exx             ;2nd
-        sbc     a,h
-        ld      h,a
-        exx             ;1st
-        ld      a,e
-        exx             ;2nd
-        sbc     a,e
-        ld      e,a     
-        exx             ;1st
-        ld      a,d
-        exx             ;2nd
-        sbc     a,d
-        ld      d,a
+   pop bc                      ; bc = return address 2
+   
+   exx
+   
+   pop bc                      ; bc = return address 1
+   
+   pop hl
+   pop de                      ; dehl = primary
+   
+   push bc                     ; save return address 1
+   ld a,l
+   
+   exx
+   
+   push bc                     ; save return address 2
+   
+   sub l
+   ld l,a
+   
+   exx
+   ld a,h
+   exx
+   
+   sbc a,h
+   ld h,a
+   
+   exx
+   ld a,e
+   exx
+   
+   sbc a,e
+   ld e,a
+   
+   exx
+   ld a,d
+   exx
+   
+   sbc a,d
+   ld d,a
+   
+   ; dehl = result, a = d
+   
+   add a,a
+   jr c, negative
 
-; ATP we have done the comparision and are left with dehl = result of
-; primary - secondary
+positive:
 
-        bit     7,d
-        jr      z,l_long_cmp1
-; Negative numbers
-        ld      a,h
-        or      l
-        or      d
-        or      e
-        ld      hl,1    ; Saves some mem in comparison functions
-        scf
-        ret
+   ld a,h
+   or l
+   or d
+   or e
 
-; Number is positive
-.l_long_cmp1
-        ld      a,h
-        or      l
-        or      d
-        or      e
-        scf             ; Could this be replaced by and a?
-        ccf
-        ld      hl,1    ; Saves some mem in comparision unfunctions
-        ret
+negative:
 
-
-
-
-
-
-
-IF ARCHAIC
-
-.l_long_cmp 
-        pop     bc      ;return to calling function
-        exx             ;1st
-        pop     bc      ;return to program proper
-        pop     hl      ;primary number
-        pop     de
-        push    bc      ;return to program proper
-        ld      a,l
-        exx
-        push    bc
-        sub     l
-        ld      l,a
-        exx
-        ld      a,h
-        exx             ;1st
-        sbc     a,h
-        ld      h,a
-        exx
-        ld      a,e
-        exx             ;1st
-        sbc     a,e
-        ld      e,a
-        exx
-        ld      a,d
-        exx             ;1st
-        sbc     a,d
-        ld      d,a
-;Now, the test
-        ld      de,1
-        ex      de,hl
-        jr      c,l_long_cmp1
-        or      e
-        ret
-.l_long_cmp1
-        or      e
-        scf     
-        ret
-ENDIF
-
-
+   ld hl,1
+   ret

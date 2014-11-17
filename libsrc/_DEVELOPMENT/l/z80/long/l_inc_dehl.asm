@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_inc_dehl
 
 l_inc_dehl:

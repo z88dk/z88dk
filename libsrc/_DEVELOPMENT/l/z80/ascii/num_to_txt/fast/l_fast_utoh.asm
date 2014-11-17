@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_utoh
 
 EXTERN l_hex_nibble_hi, l_hex_nibble_lo

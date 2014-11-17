@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_ultoo
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_ultoo
+SECTION seg_code_l
 
-l_ultoo:
+PUBLIC l_ultoo
 
    ; write unsigned long octal to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_ultoo:
 IF __CLIB_OPT_NUM2TXT_SELECT & $02
 
    EXTERN l_fast_ultoo
-   jp l_fast_ultoo
+   
+   defc l_ultoo = l_fast_ultoo
 
 ELSE
 
    EXTERN l_small_ultoo
-   jp l_small_ultoo
+   
+   defc l_ultoo = l_small_ultoo
 
 ENDIF

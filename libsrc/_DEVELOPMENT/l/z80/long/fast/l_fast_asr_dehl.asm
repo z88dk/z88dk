@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_asr_dehl
 
 EXTERN l0_fast_asr_hl

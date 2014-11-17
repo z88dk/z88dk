@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_eat_base_prefix
 
 EXTERN asm_tolower

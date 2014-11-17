@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_utoo
 
 PUBLIC l2_small_utoo_lz, l2_small_utoo_nlz

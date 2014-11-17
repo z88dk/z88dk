@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_ultoh
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_ultoh
+SECTION seg_code_l
 
-l_ultoh:
+PUBLIC l_ultoh
 
    ; write unsigned long hex to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_ultoh:
 IF __CLIB_OPT_NUM2TXT_SELECT & $08
 
    EXTERN l_fast_ultoh
-   jp l_fast_ultoh
+   
+   defc l_ultoh = l_fast_ultoh
 
 ELSE
 
    EXTERN l_small_ultoh
-   jp l_small_ultoh
+   
+   defc l_ultoh = l_small_ultoh
 
 ENDIF

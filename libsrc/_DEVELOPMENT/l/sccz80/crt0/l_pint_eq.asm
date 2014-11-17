@@ -6,14 +6,19 @@
 ;
 ;	Optimization...check for equality
 
-                PUBLIC    l_pint_eq
+SECTION seg_code_sccz80
 
-; store int from HL into (DE)
-.l_pint_eq   
-        ld a,l
-        ld (de),a
-        inc   de
-        ld a,h
-        ld (de),a
-	or	l
-        ret
+PUBLIC l_pint_eq
+
+l_pint_eq:
+
+   ld a,l
+   
+   ld (de),a
+   inc de
+   
+   ld a,h
+   ld (de),a
+   
+   or l
+   ret

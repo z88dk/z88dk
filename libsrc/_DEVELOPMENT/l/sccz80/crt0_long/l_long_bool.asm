@@ -2,18 +2,22 @@
 ;       Long functions
 ;
 
-                PUBLIC    l_long_bool
+SECTION seg_code_sccz80
 
+PUBLIC l_long_bool
 
-; HL = !!HL
+l_long_bool:
 
-.l_long_bool
-        ld a,h
-        or l
-        or e
-        or d
-        ret z
-        ld hl,1
-        ld e,h
-        ld d,h
-        ret
+   ; HL = !!HL
+
+   ld a,h
+   or l
+   or d
+   or e
+   ret z
+   
+   ld hl,1
+   ld e,h
+   ld d,h
+   
+   ret

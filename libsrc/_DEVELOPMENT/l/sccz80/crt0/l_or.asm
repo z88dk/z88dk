@@ -4,15 +4,20 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_or
+SECTION seg_code_sccz80
 
-; "or" HL and DE into HL
-.l_or  
-        ld a,l
-        or e
-        ld l,a
-        ld a,h
-        or d
-        ld h,a
-        ret
+PUBLIC l_or
 
+l_or:
+
+   ; "or" HL and DE into HL
+
+   ld a,l
+   or e
+   ld l,a
+   
+   ld a,h
+   or d
+   ld h,a
+   
+   ret

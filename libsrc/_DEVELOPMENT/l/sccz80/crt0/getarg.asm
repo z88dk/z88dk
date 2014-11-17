@@ -5,10 +5,10 @@
 ;       This routine is needed by printf & scanf etc
 ;       Added   10/10/98 djm
 
-                PUBLIC    getarg
-                EXTERN     l_sxt
+SECTION seg_code_sccz80
 
-.getarg
-        jp      l_sxt
+PUBLIC getarg
 
+EXTERN l_sxt
 
+defc getarg = l_sxt

@@ -1,6 +1,7 @@
 
-PUBLIC l_fast_lsr_hl
-PUBLIC l0_fast_lsr_hl
+SECTION seg_code_l
+
+PUBLIC l_fast_lsr_hl, l0_fast_lsr_hl
 
 l_fast_lsr_hl:
 

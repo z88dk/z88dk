@@ -1,13 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_neg_dehl
 
-EXTERN _l_neg_dehl_
-
 l_neg_dehl:
-
-   jp _l_neg_dehl_
-
-;defc l_neg_dehl = _l_neg_dehl
 
    ; negate dehl
    ;
@@ -16,3 +12,28 @@ l_neg_dehl:
    ; exit  : dehl = -long
    ;
    ; uses  : af, de, hl, carry unaffected
+   
+   ld a,l
+   cpl
+   ld l,a
+   
+   ld a,h
+   cpl
+   ld h,a
+   
+   ld a,e
+   cpl
+   ld e,a
+   
+   ld a,d
+   cpl
+   ld d,a
+   
+   inc l
+   ret nz
+   
+   inc h
+   ret nz
+   
+   inc de
+   ret

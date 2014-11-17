@@ -2,15 +2,19 @@
 ;       l_gchar variant to be used sometimes by the peephole optimizer
 ;
 
+SECTION seg_code_sccz80
+
 PUBLIC l_gcharspsp
-.l_gcharspsp
-	add	hl,sp
-	inc hl
-	inc hl
-	ld a,(hl)
-	ld l,a
-	rlca
-	sbc   a,a
-	ld h,a
-	ex	(sp),hl
-	jp (hl)
+
+l_gcharspsp:
+
+   add hl,sp
+   inc hl
+   inc hl
+   ld a,(hl)
+   ld l,a
+   rlca
+   sbc a,a
+   ld h,a
+   ex (sp),hl
+   jp (hl)

@@ -4,16 +4,20 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_and
+SECTION seg_code_sccz80
 
-; "and" HL and DE into HL
-.l_and 
-        ld a,l
-        and   e
-        ld l,a
-        ld a,h
-        and   d
-        ld h,a
-        ret
+PUBLIC l_and
 
+l_and:
 
+   ; "and" HL and DE into HL
+
+   ld a,l
+   and e
+   ld l,a
+   
+   ld a,h
+   and d
+   ld h,a
+   
+   ret

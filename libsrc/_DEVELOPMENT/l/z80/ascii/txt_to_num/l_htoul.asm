@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_htoul
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_htoul
+SECTION seg_code_l
 
-l_htoul:
+PUBLIC l_htoul
 
    ; ascii hex string to unsigned long
    ; whitespace is not skipped, leading 0x not interpretted
@@ -24,12 +20,14 @@ l_htoul:
 IF __CLIB_OPT_TXT2NUM_SELECT & $08
 
    EXTERN l_fast_htoul
-   jp l_fast_htoul
+   
+   defc l_htoul = l_fast_htoul
 
 ELSE
 
    EXTERN l_small_htoul
-   jp l_small_htoul
+   
+   defc l_htoul = l_small_htoul
 
 ENDIF
 

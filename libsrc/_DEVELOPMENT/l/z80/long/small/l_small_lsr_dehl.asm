@@ -1,5 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_lsr_dehl
+
+EXTERN error_lznc
 
 l_small_lsr_dehl:
 
@@ -15,7 +19,10 @@ l_small_lsr_dehl:
    or a
    ret z
    
-   ld b,8
+   cp 32
+   jp nc, error_lznc
+   
+   ld b,a
    ld a,e
 
 shift_loop:

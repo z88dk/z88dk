@@ -6,25 +6,23 @@
 ;
 ;       13/5/99 djm, inverted carry conditions
 
-PUBLIC    l_uge
+SECTION seg_code_sccz80
 
-;
-; DE >= HL [unsigned]
-; set carry if true
+PUBLIC l_uge
 
+l_uge:
 
-.l_uge
+   ; DE >= HL [unsigned]
+   ; set carry if true
 
    ld a,d
    cp h
+   
    ccf
    ret nz
+   
    ld a,e
    cp l
+   
    ccf
    ret
-
-;        call    l_ucmp
-;        ccf
-;	ret
-

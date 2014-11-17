@@ -4,14 +4,24 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_gchar
+SECTION seg_code_sccz80
 
-; fetch char from (HL) and sign extend into HL
-.l_gchar  ld a,(hl)
-.l_sxt    ld l,a
-          rlca
-          sbc   a,a
-          ld h,a
-          ret
+PUBLIC l_gchar, l_gchar_sxt
 
+l_gchar:
 
+   ; fetch char from (HL) and sign extend into HL
+
+   ld a,(hl)
+
+l_gchar_sxt:
+
+   ; sign extend a into hl
+   
+   ld l,a
+   
+   rlca
+   sbc a,a
+   ld h,a
+   
+   ret

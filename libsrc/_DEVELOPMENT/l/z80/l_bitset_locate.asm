@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_bitset_locate
 
 l_bitset_locate:

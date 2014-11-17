@@ -1,12 +1,8 @@
 
+SECTION seg_code_l
+
 PUBLIC l_testword_hl
 
-   inc hl
-   inc hl
-   
-   inc hl
-   inc hl
-   
    inc hl
    inc hl
    

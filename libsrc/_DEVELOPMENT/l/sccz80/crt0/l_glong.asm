@@ -2,20 +2,10 @@
 ;       Long functions
 ;
 
-PUBLIC    l_glong
+SECTION seg_code_sccz80
 
+PUBLIC l_glong
 
-;Fetch long dehl from (hl)
+EXTERN l_long_load_mhl
 
-.l_glong
-
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   ex de,hl
-   ret
+defc l_glong = l_long_load_mhl

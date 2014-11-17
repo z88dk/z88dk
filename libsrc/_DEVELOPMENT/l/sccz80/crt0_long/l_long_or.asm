@@ -2,57 +2,35 @@
 ;       Long functions
 ;
 
-PUBLIC    l_long_or
+SECTION seg_code_sccz80
 
-; "or" primary and secondary into dehl
-; dehl = primary
-; stack = secondary, ret
+PUBLIC l_long_or
 
-.l_long_or
+l_long_or:
+
+   ; dehl = primary
+   ; stack = secondary, ret
 
    pop ix
    
    pop bc
+   
    ld a,c
    or l
    ld l,a
+   
    ld a,b
    or h
    ld h,a
    
    pop bc
+   
    ld a,c
    or e
    ld e,a
+   
    ld a,b
    or d
    ld d,a
    
    jp (ix)
-
-
-;.l_long_or   
-;        ld       a,d
-;        exx             ;primary;
-;	pop	bc
-;	pop	hl
-;	pop	de
-;	push	bc
-;       or      d
-;        ld      d,a
-;        ld      a,e
-;        exx             ;2nd
-;        or      e
-;        exx             ;1st
-;        ld      e,a
-;        ld      a,h
-;        exx             ;2nd
-;        or      h
-;        exx             ;1st
-;        ld      h,a
-;        ld      a,l
-;        exx             ;2nd
-;        or      l
-;        exx             ;1st
-;        ld      l,a
-;        ret

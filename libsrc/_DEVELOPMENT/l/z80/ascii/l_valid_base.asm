@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_valid_base
 
 l_valid_base:

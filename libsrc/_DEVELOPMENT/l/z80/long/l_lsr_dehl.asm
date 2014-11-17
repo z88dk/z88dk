@@ -1,9 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_lsr_dehl
 
 INCLUDE "clib_cfg.asm"
-
-l_lsr_dehl:
 
    ; logical shift right 32-bit unsigned long
    ;
@@ -17,11 +17,13 @@ l_lsr_dehl:
    IF __CLIB_OPT_IMATH_SELECT & $02
    
       EXTERN l_fast_lsr_dehl
-      jp l_fast_lsr_dehl
+      
+      defc l_lsr_dehl = l_fast_lsr_dehl
    
    ELSE
    
       EXTERN l_small_lsr_dehl
-      jp l_small_lsr_dehl
+      
+      defc l_lsr_dehl = l_small_lsr_dehl
    
    ENDIF

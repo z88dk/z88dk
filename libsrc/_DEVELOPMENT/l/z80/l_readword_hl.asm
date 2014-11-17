@@ -1,9 +1,11 @@
 
+SECTION seg_code_l
+
 PUBLIC l_readword_hl
 
    inc hl
    inc hl
-   
+
    inc hl
    inc hl
 

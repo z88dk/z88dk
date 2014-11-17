@@ -5,28 +5,20 @@
 ;       6/9/98  djm
 ;       13/5/99 djm Added carry conditions...
 
-                PUBLIC    l_eq
-                EXTERN     l_cmp
+SECTION seg_code_sccz80
 
-;
-;
-; DE == HL
-; carry set if true
+PUBLIC l_eq
 
-.l_eq
+l_eq:
 
-	and	a
-	sbc	hl,de
-	ccf
-	ret z
-	and     a
-	ret
-	
-IF 0
-        call    l_cmp
-        scf
-        ret   z
-        ccf
-        dec   hl
-        ret
-ENDIF
+   ; de == hl
+   ; carry set if true
+   
+   or a
+   sbc hl,de
+   
+   scf
+   ret z
+   
+   or a
+   ret

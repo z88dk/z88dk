@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_atoul
 
 EXTERN l_fast_atou, error_mc

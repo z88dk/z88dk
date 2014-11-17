@@ -4,28 +4,18 @@
 ;
 ;       6/9/98  djm
 
-PUBLIC    l_lneg
+SECTION seg_code_sccz80
 
+PUBLIC l_lneg
 
-; HL = !HL
-; set carry if result true
+l_lneg:
 
-.l_lneg
+   ; HL = !HL
+   ; set carry if result true
 
    ld a,h
    or l
    ret nz
+   
    scf
    ret
-   
-
-;        ld a,h
-;        or l
-;        jr z,l_lneg1
-;        ld hl,0
-;	and	a	;reset c (already done by or l)
-;        ret
-;.l_lneg1  
-;        inc   l
-;	scf
-;        ret

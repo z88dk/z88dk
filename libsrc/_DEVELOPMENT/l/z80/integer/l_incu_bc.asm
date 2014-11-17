@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_incu_bc
 
 l_incu_bc:

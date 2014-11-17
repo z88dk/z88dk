@@ -4,12 +4,10 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_gint
+SECTION seg_code_sccz80
 
+PUBLIC l_gint
 
-.l_gint
-        ld a,(hl)
-        inc     hl
-        ld h,(hl)
-        ld l,a
-        ret
+EXTERN l_gintsp_gint
+
+defc l_gint = l_gintsp_gint

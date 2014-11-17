@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_utoo
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_utoo
+SECTION seg_code_l
 
-l_utoo:
+PUBLIC l_utoo
 
    ; write unsigned octal integer to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_utoo:
 IF __CLIB_OPT_NUM2TXT_SELECT & $02
 
    EXTERN l_fast_utoo
-   jp l_fast_utoo
+   
+   defc l_utoo = l_fast_utoo
 
 ELSE
 
    EXTERN l_small_utoo
-   jp l_small_utoo
+   
+   defc l_utoo = l_small_utoo
 
 ENDIF

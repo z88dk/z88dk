@@ -4,12 +4,26 @@
 ;
 ;       23/1/2001  djm
 
-                PUBLIC    l_pint_pop
-		EXTERN l_pint
+SECTION seg_code_sccz80
 
-; store int from HL into (DE)
-.l_pint_pop   
-	pop	bc	;return address
-	pop	de	;where to put it
-	push	bc
-	jp	l_pint
+PUBLIC l_pint_pop, l_pint_pop_pint
+
+l_pint_pop:
+
+   pop bc                      ; return address
+   pop de                      ; where to put it
+   push bc
+
+l_pint_pop_pint:
+
+   ; store int from HL into (DE)
+
+   ld a,l
+   
+   ld (de),a
+   inc de
+
+   ld a,h
+   ld (de),a
+   
+   ret

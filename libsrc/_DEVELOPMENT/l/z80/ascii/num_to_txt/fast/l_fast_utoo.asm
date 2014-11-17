@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_utoo
 
 PUBLIC l1_fast_utoo_lz, l1_fast_utoo_nlz

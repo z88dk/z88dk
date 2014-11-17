@@ -1,13 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_neg_hl
 
-EXTERN _l_neg_hl_
-
 l_neg_hl:
-
-   jp _l_neg_hl_
-
-;defc l_neg_hl = _l_neg_hl
 
    ; negate hl
    ;
@@ -16,4 +12,14 @@ l_neg_hl:
    ; exit  : hl = -hl
    ;
    ; uses  : af, hl, carry unaffected
+
+   ld a,l
+   cpl
+   ld l,a
    
+   ld a,h
+   cpl
+   ld h,a
+   
+   inc hl
+   ret

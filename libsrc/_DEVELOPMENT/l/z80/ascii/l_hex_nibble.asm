@@ -1,10 +1,12 @@
 
+SECTION seg_code_l
+
 PUBLIC l_hex_nibble
 PUBLIC l_hex_nibble_hi, l_hex_nibble_lo
 
 l_hex_nibble_hi:
 
-    ; translate top nibble of byte into a lowercase ascii hex digit
+    ; translate top nibble of byte into a uppercase ascii hex digit
     ;
     ; enter : a = number
     ;
@@ -20,7 +22,7 @@ l_hex_nibble_hi:
 l_hex_nibble:
 l_hex_nibble_lo:
 
-    ; translate bottom nibble of byte into a lowercase ascii hex digit
+    ; translate bottom nibble of byte into a uppercase ascii hex digit
     ;
     ; enter : a = number
     ;

@@ -1,6 +1,7 @@
 
-PUBLIC l_fast_asr_hl
-PUBLIC l0_fast_asr_hl
+SECTION seg_code_l
+
+PUBLIC l_fast_asr_hl, l0_fast_asr_hl
 
 l_fast_asr_hl:
 
@@ -15,6 +16,7 @@ l_fast_asr_hl:
 
    or a
    ret z
+   
    ld c,8
    
    sub c

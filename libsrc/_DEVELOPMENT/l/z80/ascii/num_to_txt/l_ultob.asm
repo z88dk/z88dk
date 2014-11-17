@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_ultob
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_ultob
+SECTION seg_code_l
 
-l_ultob:
+PUBLIC l_ultob
 
    ; write unsigned long binary to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_ultob:
 IF __CLIB_OPT_NUM2TXT_SELECT & $01
 
    EXTERN l_fast_ultob
-   jp l_fast_ultob
+   
+   defc l_ultob = l_fast_ultob
 
 ELSE
 
    EXTERN l_small_ultob
-   jp l_small_ultob
+   
+   defc l_ultob = l_small_ultob
 
 ENDIF

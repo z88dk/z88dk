@@ -5,16 +5,19 @@
 ;
 ;       djm 24/4/99
 
+SECTION seg_code_sccz80
 
-                PUBLIC    htonl
+PUBLIC htonl
 
-.htonl
-        ex      de,hl   ;exchange order of bytes
-        ld      a,l     ;swap within bytes
-        ld      l,h
-        ld      h,a
-        ld      a,e
-        ld      e,d
-        ld      d,a
-        ret
+htonl:
 
+   ex de,hl                    ; exchange order of bytes
+   
+   ld a,l                      ; swap within bytes
+   ld l,h
+   ld h,a
+   ld a,e
+   ld e,d
+   ld d,a
+   
+   ret

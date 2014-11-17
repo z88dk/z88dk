@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_otou
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_otou
+SECTION seg_code_l
 
-l_otou:
+PUBLIC l_otou
 
    ; ascii octal string to unsigned integer
    ; whitespace is not skipped
@@ -24,11 +20,13 @@ l_otou:
 IF __CLIB_OPT_TXT2NUM_SELECT & $02
 
    EXTERN l_fast_otou
-   jp l_fast_otou
+   
+   defc l_otou = l_fast_otou
 
 ELSE
 
    EXTERN l_small_otou
-   jp l_small_otou
+   
+   defc l_otou = l_small_otou
 
 ENDIF

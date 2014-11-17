@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_eat_ws
 
 EXTERN asm_isspace

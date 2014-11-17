@@ -4,18 +4,10 @@
 ;
 ;       6/9/98  djm
 
-PUBLIC    l_neg
+SECTION seg_code_sccz80
 
+PUBLIC l_neg
 
-; HL = -HL
+EXTERN l_neg_hl
 
-.l_neg
-
-   ld a,h
-   cpl
-   ld h,a
-   ld a,l
-   cpl
-   ld l,a
-   inc hl
-   ret
+defc l_neg = l_neg_hl

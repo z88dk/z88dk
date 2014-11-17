@@ -1,5 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_long_addu_stack
+
+EXTERN error_lmc
 
 l_long_addu_stack:
 
@@ -11,7 +15,7 @@ l_long_addu_stack:
    ; exit  : dehl  = a + b, max $ ffff ffff
    ;         carry set on overflow
    ;
-   ; uses  : f, de, hl, ix
+   ; uses  : f, bc, de, hl, ix
    
    pop ix
    
@@ -23,13 +27,5 @@ l_long_addu_stack:
    adc hl,bc
    ex de,hl
    
-   jr c, oflow
-   jp (ix)
-
-oflow:
-
-   ld de,$ffff
-   ld l,e
-   ld h,d
-   
+   call c, error_lmc
    jp (ix)

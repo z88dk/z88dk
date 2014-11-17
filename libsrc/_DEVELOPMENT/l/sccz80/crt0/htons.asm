@@ -5,12 +5,14 @@
 ;
 ;       djm 24/4/99
 
+SECTION seg_code_sccz80
 
-                PUBLIC    htons
+PUBLIC htons
 
-.htons
-        ld      a,l
-        ld      l,h
-        ld      h,a
-        ret
+htons:
 
+   ld a,l
+   ld l,h
+   ld h,a
+   
+   ret

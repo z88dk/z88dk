@@ -6,18 +6,23 @@
 ;       djm 26/2/2000
 ;       aralbrec 01/2007
 
-PUBLIC    l_long_inc
+SECTION seg_code_sccz80
 
-.l_long_inc
+PUBLIC l_long_inc
+
+l_long_inc:
 
    inc (hl)
    ret nz
+   
    inc hl
    inc (hl)
    ret nz
+   
    inc hl
    inc (hl)
    ret nz
+   
    inc hl
    inc (hl)
    ret

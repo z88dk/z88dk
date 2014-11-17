@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_setmem_hl
 
    ; write byte to buffer pointed at by hl

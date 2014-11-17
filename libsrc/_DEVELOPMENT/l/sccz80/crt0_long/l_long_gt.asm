@@ -2,23 +2,24 @@
 ;       Long functions
 ;
 
-                PUBLIC    l_long_gt
-                EXTERN     l_long_cmp
+SECTION seg_code_sccz80
 
+PUBLIC l_long_gt
 
+EXTERN l_long_cmp
 
+l_long_gt:
 
-;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
-; dehl (stack) > dehl (reg)
-; if true, then the resulting number from l_long_cmp will be +ve
+   ; PRIMARY > SECONDARY? [signed], carry if true
+   ; HL set to 0 (false) or 1 (true)
 
-.l_long_gt  
-        call    l_long_cmp
-	jr	z,l_long_gt1
-        ccf			;true
-        ret     c
-.l_long_gt1
-        dec   hl
-        ret
+   call l_long_cmp
+   jr z, false
+
+   ccf
+   ret c
+
+false:
+
+   dec l
+   ret

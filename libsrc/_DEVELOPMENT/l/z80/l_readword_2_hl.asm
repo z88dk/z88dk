@@ -1,6 +1,8 @@
 
-PUBLIC l_readword_2_hl
+SECTION seg_code_l
 
+PUBLIC l_readword_2_hl
+   
    inc hl
    inc hl
    

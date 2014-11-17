@@ -4,24 +4,17 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_cm_bc
+SECTION seg_code_sccz80
 
-.l_cm_bc
+PUBLIC l_cm_bc
 
-   ld a,b
-   or a
-   ret p
-   cpl
-   ld b,a
-   ld a,c
-   cpl
-   ld c,a
-   inc bc
-   ret
+EXTERN l_neg_bc
 
+l_cm_bc:
 
-;        ld a,b
-;        or a
-;        ret p
-;        call    l_bcneg
-;        ret
+    ; bc = abs(bc)
+    
+    bit 7,b
+    ret z
+    
+    jp l_neg_bc

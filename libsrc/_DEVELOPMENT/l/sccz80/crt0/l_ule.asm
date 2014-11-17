@@ -4,25 +4,23 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_ule
+SECTION seg_code_sccz80
 
-;
-; DE <= HL [unsigned]
-; set carry if true
+PUBLIC l_ule
 
-.l_ule
+l_ule:
+
+   ; DE <= HL [unsigned]
+   ; set carry if true
 
    ld a,h
    cp d
+   
    ccf
    ret nz
+   
    ld a,l
    cp e
+   
    ccf
    ret
-
-;        call    l_ucmp
-;        ret     c
-;	ret	nz	;nc is set
-;        scf
-;        ret

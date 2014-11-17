@@ -10,120 +10,24 @@
 ;
 ;       Replaced use of ix with bcbc'
 
-PUBLIC    l_long_div
+SECTION seg_code_sccz80
 
-EXTERN     l_long_div_u, l_long_neg
-EXTERN    L_LONG_DIVIDE0, L_LONG_DIVENTRY
+PUBLIC l_long_div
 
-; 32 bit division
-; enter:
-;    dehl = arg2
-;   stack = arg1, ret
-; exit:
-;    dehl = arg1/arg2
-;   de'hl'= arg1%arg2
+EXTERN l_divs_32_32x32
 
-.l_long_div
+l_long_div:
 
-   ld a,d
-   or e
-   or h
-   or l
-   jp z, l_long_div_u + L_LONG_DIVIDE0
-
-   pop af
-   push hl
+   ; dehl  = divisor
+   ; stack = dividend, ret
+   
    exx
+   pop bc
+
+   pop hl
    pop de
-   pop bc
-   ld hl,0
+
+   push bc
    exx
-   pop bc
-   ld hl,0
-   push af
-
-   ; bcbc' = arg1
-   ; hlhl' = res
-   ; dede' = arg2
-
-   ; some nastiness to deal with signs
-
-   ld a,c
-   ld c,d
-   push bc                     ; b = sgn(arg1), c = sgn(arg2)
-   ld c,a
-
-   bit 7,b
-   jr z, skipnegbcbc
-
-.negbcbc
-
-   exx
-   ld a,c
-   cpl
-   ld c,a
-   ld a,b
-   cpl
-   ld b,a
-   ld a,b
-   or c
-   inc bc
-   exx
-   ld a,c
-   cpl
-   ld c,a
-   ld a,b
-   cpl
-   ld b,a
-   jr nz, skipnegbcbc
-   inc bc
-
-.skipnegbcbc
-
-   bit 7,d
-   jr z, skipnegdede
-
-.negdede
-
-   exx
-   ld a,e
-   cpl
-   ld e,a
-   ld a,d
-   cpl
-   ld d,a
-   ld a,d
-   or e
-   inc de
-   exx
-   ld a,e
-   cpl
-   ld e,a
-   ld a,d
-   cpl
-   ld d,a
-   jr nz, skipnegdede
-   inc de
-
-.skipnegdede
-
-   call l_long_div_u + L_LONG_DIVENTRY
-
-   ; dehl   = quotient
-   ; de'hl' = remainder
-
-   ; deal with the signs
    
-   pop bc                      ; b = sgn(arg1), c = sgn(arg2)
-
-   ld a,b
-   xor c
-   call m, l_long_neg
-   
-   ld a,b
-   and $80
-   ret p
-   exx
-   call l_long_neg
-   exx
-   ret
+   jp l_divs_32_32x32

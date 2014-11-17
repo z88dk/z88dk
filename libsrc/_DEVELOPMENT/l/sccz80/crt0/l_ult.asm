@@ -4,18 +4,10 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_ult
+SECTION seg_code_sccz80
 
-;
-; DE < HL [unsigned]
-; set carry if true
+PUBLIC l_ult
 
-.l_ult
+EXTERN l_ltu_de_hl
 
-   ld a,d
-   cp h
-   ret nz
-   ld a,e
-   cp l
-   ret
-
+defc l_ult = l_ltu_de_hl

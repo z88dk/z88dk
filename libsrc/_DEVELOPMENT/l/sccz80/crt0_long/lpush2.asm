@@ -13,9 +13,11 @@
 
 ; actually use of ix saves us 4T
 
-PUBLIC    lpush2
+SECTION seg_code_sccz80
 
-.lpush2
+PUBLIC lpush2
+
+lpush2:
 
    pop ix
    
@@ -25,13 +27,3 @@ PUBLIC    lpush2
    push bc
    
    jp (ix)
-
-;        exx
-;        pop     hl      ;save return address
-;        exx
-;        pop     bc      ;save next item on stack
-;        push    de      ;dump our long
-;        push    hl
-;        push    bc      ;store back "next item on stack"
-;        exx
-;        jp      (hl)

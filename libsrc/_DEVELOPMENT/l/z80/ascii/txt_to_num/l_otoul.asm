@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_otoul
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_otoul
+SECTION seg_code_l
 
-l_otoul:
+PUBLIC l_otoul
 
    ; ascii octal string to unsigned long
    ; whitespace is not skipped
@@ -24,11 +20,13 @@ l_otoul:
 IF __CLIB_OPT_TXT2NUM_SELECT & $02
 
    EXTERN l_fast_otoul
-   jp l_fast_otoul
+   
+   defc l_otoul = l_fast_otoul
 
 ELSE
 
    EXTERN l_small_otoul
-   jp l_small_otoul
+   
+   defc l_otoul = l_small_otoul
 
 ENDIF

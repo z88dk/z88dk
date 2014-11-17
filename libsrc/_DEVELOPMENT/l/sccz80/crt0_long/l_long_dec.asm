@@ -5,10 +5,14 @@
 ;
 ;       djm 26/2/2000
 
-PUBLIC    l_long_dec
+SECTION seg_code_sccz80
 
-.l_long_dec
+PUBLIC l_long_dec
 
+l_long_dec:
+
+   ; dec long at address hl
+   
    ld a,$ff
    
    dec (hl)

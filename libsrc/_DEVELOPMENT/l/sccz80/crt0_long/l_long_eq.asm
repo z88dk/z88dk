@@ -2,49 +2,49 @@
 ;       Long functions
 ;
 
-PUBLIC    l_long_eq
+SECTION seg_code_sccz80
 
-;
-; DEHL == secondary
-; set carry if result true
-; stack = secondary MSW, secondary LSW, ret
+PUBLIC l_long_eq
 
-.l_long_eq
+l_long_eq:
 
-   pop ix                      ; return address
+   ; dehl == secondary?  carry if true
+   ;
+   ; dehl  = primary
+   ; stack = secondary, ret
    
-   pop bc                      ; secondary LSW
+   pop ix
+   
+   pop bc
+   
    ld a,c
    cp l
-   jp nz, notequal0
+   jr nz, notequal_0
+   
    ld a,b
    cp h
-   jp nz, notequal0
+   jr nz, notequal_0
    
-   pop bc                      ; secondary MSW
+   pop bc
+   
    ld a,c
    cp e
-   jp nz, notequal1
+   jr nz, notequal_1
+   
    ld a,b
    cp d
-   jp nz, notequal1
-   
+   jr nz, notequal_1
+
+equal:
+
    scf
    jp (ix)
 
-.notequal0
+notequal_0:
 
    pop bc
 
-.notequal1
+notequal_1:
 
    or a
    jp (ix)
-
-   
-;        call    l_long_cmp
-;        scf
-;        ret   z
-;	dec	hl
-;	and	a
-;        ret

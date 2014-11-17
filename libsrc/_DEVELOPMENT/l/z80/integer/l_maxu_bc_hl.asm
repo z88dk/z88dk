@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_maxu_bc_hl
 
 l_maxu_bc_hl:
@@ -10,7 +12,7 @@ l_maxu_bc_hl:
    ;
    ; exit  : hl = larger of the two unsigned numbers
    ;         bc = unchanged
-   ;         carry set if hl was larger
+   ;         carry set if hl was larger, z flag set if equal
    ;
    ; uses  : af, hl
 

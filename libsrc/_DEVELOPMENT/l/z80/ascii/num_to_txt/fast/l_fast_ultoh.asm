@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_ultoh
 
 EXTERN l_fast_utoh

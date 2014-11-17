@@ -5,16 +5,10 @@
 ;       6/9/98  djm
 ;
 
-                PUBLIC    l_ucmp
+SECTION seg_code_sccz80
 
-; unsigned compare of DE and HL
-;   carry is sign of difference [set => DE < HL]
-;   zero is zero/non-zero
+PUBLIC l_ucmp
 
-.l_ucmp
-	ld	a,d
-	cp	h
-	ret	nz
-	ld	a,e
-	cp	l
-	ret
+EXTERN l_ltu_de_hl
+
+defc l_ucmp = l_ltu_de_hl

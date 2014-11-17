@@ -2,21 +2,24 @@
 ;       Long functions
 ;
 
-                PUBLIC    l_long_le
-                EXTERN     l_long_cmp
+SECTION seg_code_sccz80
 
+PUBLIC l_long_le
 
+EXTERN l_long_cmp
 
+l_long_le:
 
-;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
-; DE <= HL [signed]
-.l_long_le
-        call    l_long_cmp
-        ret     c
-        scf
-        ret     z
-        ccf
-        dec     hl
-        ret
+   ; PRIMARY <= SECONDARY [signed], carry set if true
+   ; HL set to 0 (false) or 1 (true)
+   
+   call l_long_cmp
+   ret c
+   
+   scf
+   ret z
+   
+   dec l
+   
+   or a
+   ret

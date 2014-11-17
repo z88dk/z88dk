@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_incu_hl
 
 l_incu_hl:
@@ -15,4 +17,3 @@ l_incu_hl:
    ld hl,$ffff
    scf
    ret
-

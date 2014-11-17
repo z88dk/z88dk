@@ -1,4 +1,8 @@
 
+SECTION seg_code_l
+
+EXTERN error_znc
+
 PUBLIC l_small_lsl_hl
 
 l_small_lsl_hl:
@@ -14,6 +18,9 @@ l_small_lsl_hl:
 
    or a
    ret z
+   
+   cp 16
+   jp nc, error_znc
    
    ld b,a
 

@@ -4,12 +4,10 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_sxt
+SECTION seg_code_sccz80
 
-.l_sxt    ld l,a
-          rlca
-          sbc   a,a
-          ld h,a
-          ret
+PUBLIC l_sxt
 
+EXTERN l_gchar_sxt
 
+defc l_sxt = l_gchar_sxt

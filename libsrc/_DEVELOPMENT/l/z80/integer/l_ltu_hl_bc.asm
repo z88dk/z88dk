@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_ltu_hl_bc
 
 l_ltu_hl_bc:

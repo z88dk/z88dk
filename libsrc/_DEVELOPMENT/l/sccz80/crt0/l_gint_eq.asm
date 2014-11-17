@@ -7,13 +7,16 @@
 ;       13/5/99 djm Optimizer routine to test against zero
 ;       Returns z=0 nz otherwise as well as the int in hl
 
-                PUBLIC    l_gint_eq
+SECTION seg_code_sccz80
 
+PUBLIC l_gint_eq
 
-.l_gint_eq
-        ld a,(hl)
-        inc     hl
-        ld h,(hl)
-        ld l,a
-        or      h
-        ret
+l_gint_eq:
+
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   
+   or h
+   ret

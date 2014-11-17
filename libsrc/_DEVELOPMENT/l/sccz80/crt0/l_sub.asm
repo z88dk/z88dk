@@ -4,22 +4,17 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_sub
+SECTION seg_code_sccz80
 
-; HL = DE - HL
+PUBLIC l_sub
 
-.l_sub 
-	ex	de,hl
-	and	a
-	sbc	hl,de	
-	ret
-IF 0
-        ld a,e
-        sub   l
-        ld l,a
-        ld a,d
-        sbc   a,h
-        ld h,a
-        ret
-ENDIF
+l_sub:
 
+   ; HL = DE - HL
+
+   ex de,hl
+   
+   or a
+   sbc hl,de
+   
+   ret

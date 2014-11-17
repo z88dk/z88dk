@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_btoul
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_btoul
+SECTION seg_code_l
 
-l_btoul:
+PUBLIC l_btoul
 
    ; ascii binary string to unsigned long
    ; whitespace is not skipped
@@ -24,12 +20,14 @@ l_btoul:
 IF __CLIB_OPT_TXT2NUM_SELECT & $01
 
    EXTERN l_fast_btoul
-   jp l_fast_btoul
+   
+   defc l_btoul = l_fast_btoul
 
 ELSE
 
    EXTERN l_small_btoul
-   jp l_small_btoul
+   
+   defc l_btoul = l_small_btoul
 
 ENDIF
 

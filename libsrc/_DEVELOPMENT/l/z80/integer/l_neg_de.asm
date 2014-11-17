@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_neg_de
 
 l_neg_de:

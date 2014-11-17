@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_btou
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_btou
+SECTION seg_code_l
 
-l_btou:
+PUBLIC l_btou
 
    ; ascii binary string to unsigned integer
    ; whitespace is not skipped
@@ -24,12 +20,14 @@ l_btou:
 IF __CLIB_OPT_TXT2NUM_SELECT & $01
 
    EXTERN l_fast_btou
-   jp l_fast_btou
+   
+   defc l_btou = l_fast_btou
 
 ELSE
 
    EXTERN l_small_btou
-   jp l_small_btou
+   
+   defc l_btou = l_small_btou
 
 ENDIF
 

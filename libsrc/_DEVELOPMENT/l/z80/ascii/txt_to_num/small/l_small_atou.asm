@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_atou
 
 l_small_atou:

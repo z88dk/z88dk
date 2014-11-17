@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_htou
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_htou
+SECTION seg_code_l
 
-l_htou:
+PUBLIC l_htou
 
    ; ascii hex string to unsigned integer
    ; whitespace is not skipped, leading 0x not interpretted
@@ -24,11 +20,13 @@ l_htou:
 IF __CLIB_OPT_TXT2NUM_SELECT & $08
 
    EXTERN l_fast_htou
-   jp l_fast_htou
+   
+   defc l_htou = l_fast_htou
 
 ELSE
 
    EXTERN l_small_htou
-   jp l_small_htou
+   
+   defc l_htou = l_small_htou
 
 ENDIF

@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_power_2_bc
 
 EXTERN l_power_2_c

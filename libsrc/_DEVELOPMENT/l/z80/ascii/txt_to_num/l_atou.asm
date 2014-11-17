@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_atou
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_atou
+SECTION seg_code_l
 
-l_atou:
+PUBLIC l_atou
 
    ; ascii to unsigned integer conversion
    ; whitespace is not skipped
@@ -24,12 +20,14 @@ l_atou:
 IF __CLIB_OPT_TXT2NUM_SELECT & $04
 
    EXTERN l_fast_atou
-   jp l_fast_atou
+   
+   defc l_atou = l_fast_atou
 
 ELSE
 
    EXTERN l_small_atou
-   jp l_small_atou
+   
+   defc l_atou = l_small_atou
 
 ENDIF
 

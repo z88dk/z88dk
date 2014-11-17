@@ -1,9 +1,11 @@
 
+SECTION seg_code_l
+
 PUBLIC l_inc_sp
-
+   
    inc sp
    inc sp
-
+   
    inc sp
    inc sp
    

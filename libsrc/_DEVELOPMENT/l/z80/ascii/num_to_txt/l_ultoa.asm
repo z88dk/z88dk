@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_ultoa
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_ultoa
+SECTION seg_code_l
 
-l_ultoa:
+PUBLIC l_ultoa
 
    ; write unsigned long decimal to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_ultoa:
 IF __CLIB_OPT_NUM2TXT_SELECT & $04
 
    EXTERN l_fast_ultoa
-   jp l_fast_ultoa
+   
+   defc l_ultoa = l_fast_ultoa
 
 ELSE
 
    EXTERN l_small_ultoa
-   jp l_small_ultoa
+   
+   defc l_ultoa = l_small_ultoa
 
 ENDIF

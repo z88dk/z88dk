@@ -2,26 +2,25 @@
 ;       Long functions
 ;
 
-PUBLIC    l_long_lneg
+SECTION seg_code_sccz80
 
-; deHL = !deHL
-; set carry if result true and return val in dehl
+PUBLIC l_long_lneg
 
-.l_long_lneg
+EXTERN error_lznc
 
-        ld a,h
-        or l
-        or      e
-        or      d
-        jr z,l_long_lneg1
+l_long_lneg:
 
-        ld hl,0
-	ld	d,h
-	ld	e,l
-        ret
-        
-.l_long_lneg1
-  
-        inc l
-	scf
-        ret
+   ; deHL = !deHL
+   ; set carry if result true and return val in dehl
+
+   ld a,h
+   or l
+   or e
+   or d
+   
+   jp nz, error_lznc
+
+   inc l
+   
+   scf
+   ret

@@ -2,25 +2,24 @@
 ;       Long functions
 ;
 
-                PUBLIC    l_long_uge
-                EXTERN     l_long_ucmp
+SECTION seg_code_sccz80
 
+PUBLIC l_long_uge
 
+EXTERN l_long_ucmp
 
+l_long_uge:
 
-;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
-
-; primary (stack) >= secondary (dehl)
-
-.l_long_uge
-        call    l_long_ucmp
-        ccf
-        ret     c
-        scf
-        ret     z
-;        ret     nc
-        ccf
-        dec     hl
-        ret
+   ; PRIMARY >= SECONDARY, carry set if true
+   ; HL set to 0 (false) or 1 (true)
+   
+   ; dehl  = secondary
+   ; stack = primary, ret
+   
+   call l_long_ucmp
+   
+   ccf
+   ret c
+   
+   dec l
+   ret

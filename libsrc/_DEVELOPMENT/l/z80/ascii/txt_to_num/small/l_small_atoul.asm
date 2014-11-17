@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_small_atoul
 
 l_small_atoul:

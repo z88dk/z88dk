@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_ultoa
 
 EXTERN l_fast_utoa, l0_fast_utoa, l_setmem_de

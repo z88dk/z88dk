@@ -4,25 +4,20 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_ne
+SECTION seg_code_sccz80
 
-                EXTERN     l_cmp
+PUBLIC l_ne
 
-;
-; DE != HL
-; set carry if true
+l_ne:
 
-.l_ne
+   ; DE != HL
+   ; set carry if true
 
    or a
    sbc hl,de
+   
    scf
    ret nz
-   ccf
+   
+   or a
    ret
-
-;        call    l_cmp
-;        scf
-;        ret   nz
-;        ccf
-;        ret

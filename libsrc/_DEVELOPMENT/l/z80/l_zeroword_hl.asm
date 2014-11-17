@@ -1,12 +1,8 @@
 
+SECTION seg_code_l
+
 PUBLIC l_zeroword_hl
 
-   inc hl
-   inc hl
-   
-   inc hl
-   inc hl
-   
    inc hl
    inc hl
 

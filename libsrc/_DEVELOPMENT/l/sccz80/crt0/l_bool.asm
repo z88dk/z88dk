@@ -4,12 +4,15 @@
 ;
 ;       6/9/98  djm
 
-                PUBLIC    l_bool
+SECTION seg_code_sccz80
 
+PUBLIC l_bool
 
-.l_bool
-        ld a,h
-        or l
-        ret z
-        ld hl,1
-        ret
+l_bool:
+
+   ld a,h
+   or l
+   ret z
+   
+   ld hl,1
+   ret

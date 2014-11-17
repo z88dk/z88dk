@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_atoul
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_atoul
+SECTION seg_code_l
 
-l_atoul:
+PUBLIC l_atoul
 
    ; ascii buffer to unsigned long conversion
    ; whitespace is not skipped
@@ -24,12 +20,14 @@ l_atoul:
 IF __CLIB_OPT_TXT2NUM_SELECT & $04
 
    EXTERN l_fast_atoul
-   jp l_fast_atoul
+   
+   defc l_atoul = l_fast_atoul
 
 ELSE
 
    EXTERN l_small_atoul
-   jp l_small_atoul
+   
+   defc l_atoul = l_small_atoul
 
 ENDIF
 

@@ -1,13 +1,9 @@
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; l_utoa
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 INCLUDE "clib_cfg.asm"
 
-PUBLIC l_utoa
+SECTION seg_code_l
 
-l_utoa:
+PUBLIC l_utoa
 
    ; write unsigned decimal integer to ascii buffer (no termination)
    ;
@@ -22,11 +18,13 @@ l_utoa:
 IF __CLIB_OPT_NUM2TXT_SELECT & $04
 
    EXTERN l_fast_utoa
-   jp l_fast_utoa
+   
+   defc l_utoa = l_fast_utoa
 
 ELSE
 
    EXTERN l_small_utoa
-   jp l_small_utoa
+   
+   defc l_utoa = l_small_utoa
 
 ENDIF

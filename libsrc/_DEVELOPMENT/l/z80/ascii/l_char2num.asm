@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_char2num
 
 EXTERN asm_isalpha

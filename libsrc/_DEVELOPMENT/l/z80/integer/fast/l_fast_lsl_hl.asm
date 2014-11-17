@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_lsl_hl
 
 l_fast_lsl_hl:
@@ -31,8 +33,6 @@ l_fast_lsl_hl:
 fine_shift:
 
    add a,b
-   ret z
-   
    ld b,a
 
 fine_shift_loop:

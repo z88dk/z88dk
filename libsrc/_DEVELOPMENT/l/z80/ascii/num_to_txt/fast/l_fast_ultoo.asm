@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_fast_ultoo
 
 EXTERN l_fast_utoo, l_setmem_de

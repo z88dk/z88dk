@@ -1,4 +1,6 @@
 
+SECTION seg_code_l
+
 PUBLIC l_minu_de_hl
 
 l_minu_de_hl:
@@ -10,7 +12,7 @@ l_minu_de_hl:
    ;
    ; exit  : hl = smaller of the two unsigned numbers
    ;         de = unchanged
-   ;         carry set if hl was smaller
+   ;         carry set if hl was smaller, z flag set if equal
    ;
    ; uses  : af, hl
 

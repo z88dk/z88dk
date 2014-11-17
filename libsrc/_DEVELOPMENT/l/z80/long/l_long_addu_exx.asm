@@ -1,5 +1,9 @@
 
+SECTION seg_code_l
+
 PUBLIC l_long_addu_exx
+
+EXTERN error_lmc
 
 l_long_addu_exx:
 
@@ -29,8 +33,4 @@ l_long_addu_exx:
    ex de,hl
    
    ret nc
-   
-   ld de,$ffff
-   ld l,e
-   ld h,d
-   ret
+   jp error_lmc

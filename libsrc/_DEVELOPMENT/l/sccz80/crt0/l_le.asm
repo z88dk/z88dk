@@ -4,31 +4,28 @@
 ;
 ;       6/9/98  djm
 
-PUBLIC    l_le
+SECTION seg_code_sccz80
 
-;
-; DE <= HL [signed]
-; set carry if true
+PUBLIC l_le
 
-.l_le
+l_le:
+
+   ; DE <= HL [signed]
+   ; set carry if true
 
    ld a,d
    add a,$80
    ld b,a
+   
    ld a,h
    add a,$80
-
+   
    cp b
    ccf
    ret nz
+   
    ld a,l
    cp e
    ccf
+   
    ret
-
-;        call    l_cmp
-;        ret     c
-;        scf
-;        ret     z
-;        ccf
-;        ret
