@@ -9,7 +9,7 @@
  *
  *	Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.7 2014-11-07 07:27:20 stefano Exp $
+ *      $Id: rs232_params.c,v 1.8 2014-11-18 07:06:41 stefano Exp $
  */
 
 	/* BAUD system variable: 23391

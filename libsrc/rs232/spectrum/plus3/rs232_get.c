@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.12 2014-11-14 13:48:06 stefano Exp $
+ *      $Id: rs232_get.c,v 1.13 2014-11-18 07:06:41 stefano Exp $
  */
 
 
@@ -27,14 +27,14 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	XREF SERFL
 	XREF BAUD
 	
-	LIB   zx_break
+;	LIB   zx_break
 
-	push hl 
+;	push hl 
 	call doread
 	pop	de
-	pop	bc	; implicit push
+;	pop	bc	; implicit push
 	ld	hl,RS_ERR_NO_DATA
-	ret	c
+	ret	nc
 
 	ld	(de),a
 	ld	hl,RS_ERR_OK
@@ -55,7 +55,7 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 
 .readbyte
 
-	call  zx_break
+;	call  zx_break
 ;	jr    c,nobreak
 ;
 ;	ld	hl,RS_ERR_BREAK

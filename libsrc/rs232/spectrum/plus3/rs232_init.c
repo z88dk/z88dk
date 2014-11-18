@@ -9,7 +9,7 @@
  *
  *	Still nothing, here!
  *
- *      $Id: rs232_init.c,v 1.3 2014-11-03 06:59:11 stefano Exp $
+ *      $Id: rs232_init.c,v 1.4 2014-11-18 07:06:41 stefano Exp $
  */
 
 

@@ -1,9 +1,9 @@
 #
-# $Id: Makefile,v 1.5 2005-09-07 01:30:34 aralbrec Exp $
+# $Id: Makefile,v 1.6 2014-11-18 07:06:41 stefano Exp $
 
 all:
 	@echo ''
-	@echo '---> Building +3 RS232 library <---'
+	@echo '---> Building ZX Plus RS232 library <---'
 	@echo ''
 	cd plus3 ; $(MAKE) ; cd ..
 	@echo ''
