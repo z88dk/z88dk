@@ -30,7 +30,7 @@ asm_obstack_grow:
    ;
    ;         fail on insufficient memory
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, bc, de, hl

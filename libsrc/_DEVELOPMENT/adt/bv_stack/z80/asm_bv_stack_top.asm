@@ -29,6 +29,6 @@ defc asm_bv_stack_top = asm_b_array_back
    ;         fail if stack is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

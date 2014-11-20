@@ -11,10 +11,9 @@
 
 SECTION seg_code_wa_priority_queue
 
-PUBLIC asm_wa_priority_queue_push
-PUBLIC asm1_wa_priority_queue_push
+PUBLIC asm_wa_priority_queue_push, asm0_wa_priority_queue_push
 
-EXTERN asm_b_array_append_block, __w_heap_sift_up, error_mc
+EXTERN asm_w_array_append, __w_heap_sift_up, error_mc
 
 asm_wa_priority_queue_push:
 
@@ -34,27 +33,21 @@ asm_wa_priority_queue_push:
    ; uses  : af, bc, de, hl, ix
 
    push hl                     ; save queue *
-   push bc                     ; save item
    
    inc hl
-   inc hl                      ; hl = & queue.w_array
+   inc hl                      ; hl = w_array *
    
-   ld de,2
-   call asm_b_array_append_block
-
-   pop bc                      ; bc = item
+   call asm_w_array_append
    jp c, error_mc - 1          ; if no room to add item
 
-asm1_wa_priority_queue_push:
+asm0_wa_priority_queue_push:
 
-   ld (hl),c
-   inc hl
-   ld (hl),b                   ; append item to queue
-   dec hl
-
-   ; de = index of last item in bytes
-   ; hl = & queue.data[last_item]
-   ; stack = queue *
+   add hl,hl
+   ex de,hl
+   
+  ; hl = & queue.data[last_item]
+  ; de = index of last item in bytes
+  ; stack = queue*
    
    ex (sp),hl                  ; hl = queue *
    

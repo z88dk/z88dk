@@ -30,8 +30,8 @@ The structure w_array_t:
 offset   size (bytes)   description
 
   0           2         void *data, the address of the array of char held by w_array
-  2           2         size_t size, number of occupied bytes in the data array
-  4           2         capacity, full size of the data array in bytes
+  2           2         size_t size, number of occupied bytes in the data array (even!)
+  4           2         capacity, full size of the data array in bytes (even!)
 
 Note that w_array_t is identical to b_array_t.  All sizes in the
 structure are measured in bytes, not words.  The w_array API is

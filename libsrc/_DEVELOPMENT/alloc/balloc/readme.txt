@@ -35,9 +35,7 @@ seg_code_balloc
 data
 ====
 
-The following variable holds the adress of the queue table
-and should be defined in a data segment:
+__balloc_array (void *)
 
-__balloc_qtbl  defw  address_queue_table
-
-The queue table itself should be allocated in a bss segment.
+Holds a pointer to currently active balloc array.
+Must be supplied by the CRT startup code.

@@ -13,7 +13,7 @@ SECTION seg_code_wv_priority_queue
 
 PUBLIC asm_wv_priority_queue_push
 
-EXTERN asm_b_vector_append_block, asm1_wa_priority_queue_push, error_mc
+EXTERN asm_w_vector_append, asm0_wa_priority_queue_push, error_mc
 
 asm_wv_priority_queue_push:
 
@@ -33,15 +33,8 @@ asm_wv_priority_queue_push:
    ; uses  : af, bc, de, hl, ix
 
    push hl                     ; save queue *
-   push bc                     ; save item
    
-   inc hl
-   inc hl                      ; hl = & queue.w_vector
+   call asm_w_vector_append    ; append item
+   jp nc, asm0_wa_priority_queue_push
    
-   ld de,2
-   call asm_b_vector_append_block
-   
-   pop bc                      ; bc = item
-   jp nc, asm1_wa_priority_queue_push
-   
-   jp error_mc - 1             ; if no room to add item
+   jp error_mc - 1             ; if append failed

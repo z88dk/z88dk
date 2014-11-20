@@ -29,6 +29,6 @@ defc asm_b_vector_back = asm_b_array_back
    ;         fail if vector is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl

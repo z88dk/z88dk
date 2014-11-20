@@ -30,7 +30,7 @@ asm_w_array_front:
    ;         fail if array is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 

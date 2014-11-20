@@ -13,7 +13,7 @@ SECTION seg_code_w_vector
 
 PUBLIC asm_w_vector_append
 
-EXTERN asm_b_vector_append_block, asm1_w_array_append, error_mc
+EXTERN asm_w_array_append, l_inc_sp, error_mc, asm0_b_vector_append_block_extra
 
 asm_w_vector_append:
 
@@ -35,12 +35,55 @@ asm_w_vector_append:
    ;
    ; uses  : af, de, hl
 
+   push hl                     ; save vector*
+   
+   call asm_w_array_append
+   jp nc, l_inc_sp - 2         ; if successful append
+   
+   pop hl
+   
+   ; append failed, need to realloc
+   
+   ; hl = vector *
+   ; bc = item
+   
    push bc                     ; save item
    
-   ld de,2
-   call asm_b_vector_append_block
-
-   pop bc                      ; bc = item
-   jp nc, asm1_w_array_append
+   call grow_word              ; grow vector by two bytes
    
-   jp error_mc                 ; if vector append failed
+   pop bc                      ; bc = item
+   jp c, error_mc              ; grow failed
+
+   ; hl = & word added to vector.data
+   ; de = idx of word in bytes
+   ; bc = item
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; append item
+   dec hl
+   
+   ex de,hl
+   
+   srl h
+   rr l
+   
+   ret
+
+grow_word:
+
+   ld de,2
+   push de
+   
+   ld b,d
+   ld c,d
+   push bc
+   
+   inc hl
+   inc hl
+   
+   ; de = 2
+   ; hl = & vector.size
+   ; stack = n=2, extra=0
+   
+   jp asm0_b_vector_append_block_extra

@@ -13,7 +13,8 @@ SECTION seg_code_b_vector
 
 PUBLIC asm_b_vector_append
 
-EXTERN asm_b_vector_append_block, error_mc
+EXTERN asm0_b_array_append, asm0_b_vector_append_block_extra
+EXTERN l_inc_sp, error_mc
 
 asm_b_vector_append:
 
@@ -34,11 +35,22 @@ asm_b_vector_append:
    ;            carry set
    ;
    ; uses  : af, de, hl
+
+   inc hl
+   inc hl
+   
+   push hl                     ; save & vector.size
+   
+   call asm0_b_array_append    ; append without growing
+   jp nc, l_inc_sp - 2         ; if successful
+   
+   pop hl                      ; hl = & vector.size
+
+   ; must grow vector
    
    push bc                     ; save char
    
-   ld de,1
-   call asm_b_vector_append_block
+   call grow_vector
    
    pop bc                      ; bc = char
    jp c, error_mc              ; if append error
@@ -47,3 +59,19 @@ asm_b_vector_append:
    
    ex de,hl                    ; de = & array.data[idx], hl = idx
    ret
+
+grow_vector:
+
+   ld de,1
+   push de
+   
+   dec de
+   push de
+   
+   inc de
+   
+   ; de = n = 1
+   ; hl = & vector.size
+   ; stack = n, extra
+   
+   jp asm0_b_vector_append_block_extra

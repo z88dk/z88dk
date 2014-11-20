@@ -14,7 +14,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_init
 
-EXTERN error_einval_zc
+EXTERN error_zc
    
 asm_obstack_init:
 
@@ -28,7 +28,7 @@ asm_obstack_init:
    ;
    ;         fail if obstack wraps 64k boundary
    ;
-   ;            carry set, einval
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, de, hl
@@ -52,7 +52,7 @@ asm_obstack_init:
    pop hl                      ; hl = ob
 
    add hl,bc                   ; hl = & byte following obstack
-   jp c, error_einval_zc       ; forbid wrapping 64k boundary
+   jp c, error_zc              ; forbid wrapping 64k boundary
    
    ex de,hl
    ld (hl),e

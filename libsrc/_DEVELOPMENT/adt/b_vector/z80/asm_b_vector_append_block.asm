@@ -13,7 +13,7 @@
 SECTION seg_code_b_vector
 
 PUBLIC asm_b_vector_append_block
-PUBLIC asm_b_vector_append_block_extra
+PUBLIC asm_b_vector_append_block_extra, asm0_b_vector_append_block_extra
 
 EXTERN error_zc
 EXTERN asm_b_array_append_block, __vector_realloc_grow, l_inc_sp
@@ -52,6 +52,8 @@ asm_b_vector_append_block_extra:
    
    call asm_b_array_append_block
    jp nc, l_inc_sp - 4         ; if successful
+
+asm0_b_vector_append_block_extra:
 
    ; must realloc vector.data
    

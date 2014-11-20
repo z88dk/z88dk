@@ -13,8 +13,7 @@ SECTION seg_code_balloc
 
 PUBLIC asm_balloc_blockcount
 
-EXTERN __balloc_qtbl
-
+EXTERN __balloc_array
 EXTERN asm_p_forward_list_size
 
 asm_balloc_blockcount:
@@ -26,7 +25,7 @@ asm_balloc_blockcount:
    ; uses  : af, de, hl
 
    add hl,hl
-   ld de,(__balloc_qtbl)
+   ld de,(__balloc_array)
    add hl,de                   ; p_forward_list *q
 
    jp asm_p_forward_list_size

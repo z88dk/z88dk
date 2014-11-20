@@ -19,7 +19,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_free
 
-EXTERN error_einval_zc
+EXTERN error_zc
 
 asm_obstack_free:
 
@@ -33,7 +33,7 @@ asm_obstack_free:
    ;
    ;         fail on object not part of obstack
    ;
-   ;            carry set, einval
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, de, hl
@@ -51,12 +51,12 @@ asm_obstack_free:
    
    scf
    sbc hl,bc                   ; fence > object otherwise invalid
-   jp c, error_einval_zc
+   jp c, error_zc
    
    ld hl,4
    add hl,de                   ; hl = & ob->mem - 1
    sbc hl,bc                   ; object >= ob->mem otherwise invalid
-   jp nc, error_einval_zc
+   jp nc, error_zc
       
    ex de,hl
    dec hl                      ; hl = & ob->fence

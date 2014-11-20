@@ -13,7 +13,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_1grow
 
-EXTERN asm_obstack_room, error_enomem_zc
+EXTERN asm_obstack_room, error_zc
 
 asm_obstack_1grow:
 
@@ -27,7 +27,7 @@ asm_obstack_1grow:
    ;
    ;         fail
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, de, hl
@@ -35,7 +35,7 @@ asm_obstack_1grow:
    push hl                     ; save ob
    
    call asm_obstack_room       ; de = ob->fence
-   jp z, error_enomem_zc - 1
+   jp z, error_zc - 1
    
    ld a,c
    ld (de),a                   ; append char to object

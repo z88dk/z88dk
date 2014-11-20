@@ -31,6 +31,6 @@ defc asm_bv_stack_push = asm_b_vector_append
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = ENOMEM
+   ;            carry set
    ;
    ; uses  : af, de, hl

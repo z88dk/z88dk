@@ -14,7 +14,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_grow0
 
-EXTERN asm0_obstack_blank, asm_memcpy, error_enomem_zc
+EXTERN asm0_obstack_blank, asm_memcpy, error_zc
 
 asm_obstack_grow0:
 
@@ -31,7 +31,7 @@ asm_obstack_grow0:
    ;
    ;         fail on insufficient memory
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, bc, de, hl
@@ -39,12 +39,12 @@ asm_obstack_grow0:
    inc bc                      ; make space for NUL
    ld a,b
    or c
-   jp z, error_enomem_zc       ; we really have to check for this case :(
+   jp z, error_zc              ; we really have to check for this case :(
    
    push de                     ; save data
    call asm0_obstack_blank     ; de = & allocated bytes
    pop hl                      ; hl = data
-   ret c
+   jp c, error_zc
 
    call asm_memcpy
    

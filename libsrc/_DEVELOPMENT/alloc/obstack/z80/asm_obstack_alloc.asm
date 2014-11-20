@@ -6,7 +6,7 @@
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 ;
 ; Allocate an uninitialized block of size bytes from the obstack.
-; Implicitly closes and growing object.
+; Implicitly closes any growing object.
 ;
 ; ===============================================================
 
@@ -28,7 +28,7 @@ asm_obstack_alloc:
    ;
    ;         fail on insufficient memory
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, bc, de, hl

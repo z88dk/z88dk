@@ -20,7 +20,7 @@ SECTION seg_code_obstack
 PUBLIC asm_obstack_blank
 PUBLIC asm0_obstack_blank
 
-EXTERN asm_obstack_room, error_enomem_zc
+EXTERN asm_obstack_room, error_zc
 
 asm_obstack_blank:
 
@@ -37,7 +37,7 @@ asm_obstack_blank:
    ;
    ;         fail
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, de, hl
@@ -53,7 +53,7 @@ grow_object:
    call asm_obstack_room       ; hl = bytes available, de = ob->fence
    
    sbc hl,bc                   ; room for request?
-   jp c, error_enomem_zc - 1
+   jp c, error_zc - 1
    
    pop hl                      ; hl = ob
    push de                     ; save old ob->fence

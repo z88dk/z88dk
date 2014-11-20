@@ -3,7 +3,7 @@ SECTION seg_code_wa_priority_queue
 
 PUBLIC __w_heap_sift_down
 
-EXTERN l_jpix, __w_heap_swap, l_ltu_de_hl, error_znc
+EXTERN l_compare_de_hl, __w_heap_swap, l_ltu_de_hl, error_znc
 
 __w_heap_sift_down:
 
@@ -63,43 +63,9 @@ while:
    inc hl
    inc hl                      ; hl = & array[right_child]
    
-   push bc                     ; save array
-   push de                     ; save & array[left_child]
-   push ix                     ; save compar
-
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push hl
-   push de
-   call l_jpix                 ; (compar)(de = void *left_child, hl = void *right_child) R->L
-   ld a,h                      ; a = result
-   pop de
-   pop hl
-
-;******************************
-ELSE
-;******************************
-
-   push de
-   push hl
-   call l_jpix                 ; (compar)(de = void *left_child, hl = void *right_child) L->R
-   ld a,h                      ; a = result
-   pop hl
-   pop de
-
-;******************************
-ENDIF
-;******************************
-
-   pop ix                      ; ix = compar
-   pop de                      ; de = & array[left_child]
-   pop bc                      ; bc = array
+   call l_compare_de_hl        ; (compar)(de = void *left_child, hl = void *right_child)
    
    pop hl                      ; hl = left_child_index (*2)
-   
-   or a
    jp m, small_child_found
 
    inc hl
@@ -119,44 +85,11 @@ small_child_found:
    
    ; find out if parent needs to be pushed further down
    
+   call l_compare_de_hl        ; (compar)(de = void *child, hl = void *parent)
+   jp p, error_znc - 2         ; if array[parent] <= array[child], it's in the right place so return
+
    push bc                     ; save array
-   
-   push de                     ; save & array[child]
-   push hl                     ; save & array[parent]
-   push ix                     ; save compar
-   
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push hl
-   push de
-   call l_jpix                 ; (compar)(de = void *child, hl = void *parent) R->L
-   ld a,h                      ; a = result
-   pop de
-   pop hl
-
-;******************************
-ELSE
-;******************************
-
-   push de
-   push hl
-   call l_jpix                 ; (compar)(de = void *child, hl = void *parent) L->R
-   ld a,h                      ; a = result
-   pop hl
-   pop de
-
-;******************************
-ENDIF
-;******************************
-
-   pop ix                      ; ix = compar
-   pop de                      ; de = & array[parent]
-   pop hl                      ; hl = & array[child]
-   
-   or a
-   jp p, error_znc - 3         ; if array[parent] <= array[child], it's in the right place so return
+   ex de,hl
    
    ; swap(array[child], array[parent])
    
@@ -188,7 +121,7 @@ ENDIF
    ; bc = array
    ; stack = & array[parent_index]
 
-   jp while
+   jr while
 
 end_while:
 
@@ -208,42 +141,10 @@ end_while:
    pop de                      ; de = & array[parent]
    ex de,hl
    
-   push de                     ; save & array[child]
-   push hl                     ; save & array[parent]
-   
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push hl
-   push de
-   call l_jpix                 ; (compar)(de = void *child, hl = void *parent) R->L
-   ld a,h                      ; a = result
-   pop de
-   pop hl
-
-;******************************
-ELSE
-;******************************
-
-   push de
-   push hl
-   call l_jpix                 ; (compar)(de = void *child, hl = void *parent) L->R
-   ld a,h                      ; a = result
-   pop hl
-   pop de
-
-;******************************
-ENDIF
-;******************************
-
-   or a
-   jp p, error_znc - 2         ; if array[child] >= array[parent], parent is in right place
+   call l_compare_de_hl        ; (compar)(de = void *child, hl = void *parent)
+   jp p, error_znc             ; if array[child] >= array[parent], parent is in right place
    
    ; swap(array[child], array[parent])
-   
-   pop hl                      ; hl = & array[parent]
-   pop de                      ; de = & array[child]
    
    call __w_heap_swap
    

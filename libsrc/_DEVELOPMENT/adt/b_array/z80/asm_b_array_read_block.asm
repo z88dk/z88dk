@@ -39,7 +39,7 @@ asm_b_array_read_block:
    ;
    ;            hl = 0
    ;            de'= void *dst
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 

@@ -60,7 +60,7 @@ __0_array_make_room_best_effort:
    ; bc = idx
    
    or a
-   sbc hl,de                   ; hl = new_n = array.capacity - idx
+   sbc hl,bc                   ; hl = new_n = array.capacity - idx
    ret c                       ; if array.capacity < idx
 
    call springboard            ; some items need to be on stack

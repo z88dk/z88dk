@@ -30,6 +30,6 @@ defc asm_p_forward_list_pop_front = asm_p_forward_list_remove_after
    ;         fail if the list is empty
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, de, hl

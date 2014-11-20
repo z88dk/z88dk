@@ -33,11 +33,11 @@ defc asm_bv_stack_reserve = asm_b_vector_reserve
    ;         fail if max_size exceeded
    ;
    ;            hl = 0
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ;         fail if realloc failed
    ;
    ;            hl = 0
-   ;            carry set, errno = ENOMEM or ENOLCK
+   ;            carry set
    ;
    ; uses  : af, de, hl

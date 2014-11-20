@@ -13,9 +13,8 @@ SECTION seg_code_balloc
 
 PUBLIC asm_balloc_alloc
 
-EXTERN __balloc_qtbl
-
-EXTERN asm_p_forward_list_remove_after, error_enomem_zc
+EXTERN __balloc_array
+EXTERN asm_p_forward_list_remove_after
 
 asm_balloc_alloc:
 
@@ -23,21 +22,18 @@ asm_balloc_alloc:
    ;
    ; exit  : success
    ;
-   ;           carry reset
    ;           hl = ptr to allocated block
+   ;           carry reset
    ;
    ;         fail
    ;
-   ;           carry set, errno = ENOMEM
    ;           hl = 0
+   ;           carry set
    ;
    ; uses  : af, de, hl
 
    add hl,hl
-   ld de,(__balloc_qtbl)
+   ld de,(__balloc_array)
    add hl,de                   ; p_forward_list *q
 
-   call asm_p_forward_list_remove_after
-   ret nc
-
-   jp error_enomem_zc          ; if queue is empty
+   jp asm_p_forward_list_remove_after

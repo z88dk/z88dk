@@ -15,7 +15,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_copy0
 
-EXTERN asm_obstack_copy, error_enomem_zc
+EXTERN asm_obstack_copy, error_zc
 
 asm_obstack_copy0:
 
@@ -30,7 +30,7 @@ asm_obstack_copy0:
    ;
    ;         fail on insufficient memory
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, bc, de, hl
@@ -38,7 +38,7 @@ asm_obstack_copy0:
    inc bc                      ; make room for terminating NUL
    ld a,b
    or c
-   jp z, error_enomem_zc       ; we really have to check this case :(
+   jp z, error_zc              ; we really have to check this case :(
 
    call asm_obstack_copy
    ret c

@@ -73,9 +73,7 @@ seg_code_malloc
 data
 ====
 
-The following variable holds the address of the default heap and should
-be defined in a data segment:
+__malloc_heap (void *)
 
-__malloc_heap  defw  default_heap
-
-The default heap itself should be allocated in a bss segment.
+Holds the address of the implied heap in calls to malloc, realloc, etc.
+Must be supplied by the CRT startup code.

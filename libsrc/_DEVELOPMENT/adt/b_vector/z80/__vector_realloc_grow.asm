@@ -43,6 +43,8 @@ __vector_realloc_grow:
 
 __0_vector_realloc_grow:
 
+   ; carry reset
+
    ld d,(hl)
    dec hl
    ld e,(hl)                   ; de = vector.max_size

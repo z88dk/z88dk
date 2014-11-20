@@ -30,7 +30,7 @@ asm_b_array_erase_range:
    ;         fail if block does not lie within array.data
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 

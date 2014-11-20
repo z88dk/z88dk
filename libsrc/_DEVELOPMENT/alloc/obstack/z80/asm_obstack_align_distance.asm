@@ -14,7 +14,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_align_distance
 
-EXTERN l_power_2_bc, error_einval_mc, error_znc, l_andc_hlbc
+EXTERN l_power_2_bc, error_mc, error_znc, l_andc_hlbc
 
 asm_obstack_align_distance:
 
@@ -29,13 +29,13 @@ asm_obstack_align_distance:
    ;
    ;         fail invalid alignment
    ;
-   ;            carry set, einval
+   ;            carry set
    ;            hl = -1
    ;
    ; uses  : af, bc, de, hl
    
    call l_power_2_bc           ; bc = power of 2
-   jp c, error_einval_mc
+   jp c, error_mc
    
    dec bc                      ; bc = alignment - 1
    ld a,b
@@ -50,7 +50,7 @@ asm_obstack_align_distance:
    ld h,d                      ; hl = ob->fence
    
    add hl,bc                   ; hl = fence + (alignment-1)
-   jp c, error_einval_mc
+   jp c, error_mc
    
    call l_andc_hlbc            ; hl = next aligned address
    

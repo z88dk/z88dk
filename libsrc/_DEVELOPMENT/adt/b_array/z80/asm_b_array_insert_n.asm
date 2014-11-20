@@ -32,7 +32,7 @@ asm_b_array_insert_n:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno set
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
 

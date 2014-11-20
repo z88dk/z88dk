@@ -14,9 +14,7 @@ SECTION seg_code_balloc
 
 PUBLIC asm_balloc_firstfit
 
-EXTERN __balloc_qtbl
-
-EXTERN error_enomem_zc
+EXTERN __balloc_array, error_zc
 
 asm_balloc_firstfit:
 
@@ -31,15 +29,15 @@ asm_balloc_firstfit:
    ;         fail
    ;
    ;           hl = 0
-   ;           carry set, errno = ENOMEM
+   ;           carry set
    ;
    ; uses  : af, bc, de, hl
 
    or a
-   jp z, error_enomem_zc       ; zero queues to search
+   jp z, error_zc              ; zero queues to search
    
    add hl,hl
-   ld de,(__balloc_qtbl)
+   ld de,(__balloc_array)
    add hl,de                   ; forward_list *q
    
    ld b,a
@@ -56,7 +54,7 @@ loop:
    jr nz, found_block
    
    djnz loop
-   jp error_enomem_zc
+   jp error_zc
 
 found_block:
 

@@ -11,8 +11,7 @@
 
 SECTION seg_code_ba_priority_queue
 
-PUBLIC asm_ba_priority_queue_push
-PUBLIC asm1_ba_priority_queue_push
+PUBLIC asm_ba_priority_queue_push, asm0_ba_priority_queue_push
 
 EXTERN asm_b_array_append_block, __b_heap_sift_up, error_mc
 
@@ -34,25 +33,17 @@ asm_ba_priority_queue_push:
    ; uses  : af, bc, de, hl, ix
 
    push hl                     ; save queue *
-   push bc                     ; save item
    
-   inc hl
-   inc hl                      ; hl = & queue.b_array
-   
-   ld de,1
-   call asm_b_array_append_block
-
-   pop bc                      ; bc = item
+   call asm_b_array_append
    jp c, error_mc - 1          ; if no room to add item
 
-asm1_ba_priority_queue_push:
+asm0_ba_priority_queue_push:
 
-   ld (hl),c                   ; append item to queue
-
-   ; de = index of last item in bytes
-   ; hl = & queue.data[last_item]
+   ; hl = idx of appended char
+   ; de = & queue.data[idx]
    ; stack = queue *
    
+   ex de,hl
    ex (sp),hl                  ; hl = queue *
    
    ld c,(hl)

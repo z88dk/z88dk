@@ -13,7 +13,7 @@ SECTION seg_code_obstack
 
 PUBLIC asm_obstack_int_grow
 
-EXTERN asm_obstack_room, error_enomem_zc
+EXTERN asm_obstack_room, error_zc
 
 asm_obstack_int_grow:
 
@@ -27,7 +27,7 @@ asm_obstack_int_grow:
    ;
    ;         fail
    ;
-   ;            carry set, enomem
+   ;            carry set
    ;            hl = 0
    ;
    ; uses  : af, de, hl
@@ -42,7 +42,7 @@ asm_obstack_int_grow:
 
    ld a,l
    cp 2
-   jp c, error_enomem_zc - 1
+   jp c, error_zc - 1
 
 enough_space:
    

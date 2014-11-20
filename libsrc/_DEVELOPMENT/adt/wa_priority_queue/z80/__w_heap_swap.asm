@@ -16,7 +16,7 @@ __w_heap_swap:
 
    ld a,(de)
    ldi
-   
+
    ld c,a
    ld a,(de)
    ld b,a

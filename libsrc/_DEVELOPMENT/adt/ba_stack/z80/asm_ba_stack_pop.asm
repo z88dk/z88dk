@@ -27,6 +27,6 @@ defc asm_ba_stack_pop = asm_b_array_pop_back
    ;         fail if stack is empty
    ;
    ;            hl = -1
-   ;            carry set, errno = EINVAL
+   ;            carry set
    ;
    ; uses  : af, bc, de, hl
