@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.24 2014-05-05 07:26:37 stefano Exp $
+ *   $Id: appmake.c,v 1.25 2014-11-21 12:28:44 stefano Exp $
  */
 
 #define MAIN_C
@@ -181,7 +181,7 @@ long parameter_search(char *filen, char *ext,char *target)
 void suffix_change(char *name, char *suffix)
 {
     int     j;
-    j = strlen(name)+1;
+    j = strlen(name)-1;
     while ( j && name[j-1] != '.' ) 
         j--;
 

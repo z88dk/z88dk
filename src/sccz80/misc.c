@@ -13,19 +13,20 @@
 
 /* Generic change suffix routine */
 
-
 void changesuffix(char *name, char *suffix)
 {
-        int     j;
-        j=strlen(name)+1;
-        while (j && name[j-1] != '.' ) { j--; }
+    int     j;
+    j = strlen(name)-1;
+    while ( j && name[j-1] != '.' ) 
+        j--;
 
-        if ( j)
-               name[j-1]='\0';
+    if ( j) {
+        name[j-1]='\0';
+	}
 
-        strcat(name,suffix);
+    strcat(name,suffix);
 }
-        
+
 
 /* These two used to keep track of what goes on stack, and what comes
  * off of stack, guess 100 is enough to be going on with?
