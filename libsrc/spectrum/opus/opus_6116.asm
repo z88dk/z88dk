@@ -5,7 +5,7 @@
 ;
 ; 	This routine checks if the 6116 memory expansion is present.
 ;
-;	$Id: opus_6116.asm,v 1.1 2007-10-04 12:18:56 stefano Exp $
+;	$Id: opus_6116.asm,v 1.2 2014-11-21 15:17:37 stefano Exp $
 ;
 
 		XLIB	opus_6116
@@ -14,7 +14,7 @@
 
 .opus_6116
 		call	opus_rommap
-		call	$1708		; Page in the Discovery ROM
+		;call	$1708		; Page in the Discovery ROM
 
 		ld	hl,3001
 		ld	a,(hl)
@@ -26,6 +26,6 @@
 		jr	z,noram
 		inc	hl
 .noram
-		call	$1748		; Page out the Discovery ROM
-		ret
+		jp	$1748		; Page out the Discovery ROM
+		;ret
 	

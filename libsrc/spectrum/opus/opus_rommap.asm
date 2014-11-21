@@ -6,7 +6,7 @@
 ;
 ;	 - init the jump table
 ;
-;	$Id: opus_rommap.asm,v 1.1 2007-10-04 12:18:57 stefano Exp $
+;	$Id: opus_rommap.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
 ;
 
 
@@ -15,13 +15,22 @@
 		XDEF	P_DEVICE
 		XDEF	P_TESTCH
 
-opus_rommap:	; start creating an 'M' channel
+opus_rommap:
 
+		; start creating an 'M' channel
 		;rst	8
 		;defb 	$D4		; Create microdrive system vars
 					; why does it crash ?!??
 
+		push	af
+		push	bc
+		push	de
+		push	hl
 		call	$1708		; Page in the Discovery ROM
+
+		ld		a,(P_DEVICE+2)
+		and		a
+		jr		nz,mapped		; exit if already initialized
 
 		ld	b,0		; Table entry 0: "call physical device"
 		rst	$30		; 'read table' restart
@@ -33,10 +42,16 @@ opus_rommap:	; start creating an 'M' channel
 		defb	$12		; Table number 12h:  SYSTEM
 		ld	(P_TESTCH+1),hl	; Self modifying code
 
-		jp	$1748		; Page out the Discovery ROM
+		;jp	$1748		; Page out the Discovery ROM
+mapped:
+		pop hl
+		pop de
+		pop bc
+		pop af
+		ret
 
 
 ; Jump table
 
-P_DEVICE: 	jp 0		; set temporary "M" channel
+P_DEVICE: 	jp 0		; Call the hardware ('CALL A PHYSICAL DEVICE').
 P_TESTCH: 	jp 0		; test channel

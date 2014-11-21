@@ -5,7 +5,7 @@
 ;
 ;	unsigned char opus_lptread;
 ;	
-;	$Id: opus_lptread.asm,v 1.1 2007-10-04 12:18:56 stefano Exp $
+;	$Id: opus_lptread.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
 ;
 
 
@@ -19,11 +19,10 @@
 opus_lptread:
 		
 		call	opus_rommap
-
-		call	$1708		; Page in the Discovery ROM
+		;call	$1708		; Page in the Discovery ROM
 		ld	b,2
 		ld	a,$81
 		call	P_DEVICE
-		call	$1748		; Page out the Discovery ROM
+		jp	$1748		; Page out the Discovery ROM
 					; HL = number of blocks
-		ret
+		;ret

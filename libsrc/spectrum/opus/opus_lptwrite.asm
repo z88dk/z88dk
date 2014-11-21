@@ -5,7 +5,7 @@
 ;
 ;	void opus_lptwrite (unsigned char databyte);
 ;	
-;	$Id: opus_lptwrite.asm,v 1.1 2007-10-04 12:18:56 stefano Exp $
+;	$Id: opus_lptwrite.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
 ;
 
 
@@ -18,12 +18,11 @@
 
 opus_lptwrite:
 		
-		call	opus_rommap
-
 		ld	ix,2
 		add	ix,sp
 
-		call	$1708		; Page in the Discovery ROM
+		call	opus_rommap
+		;call	$1708		; Page in the Discovery ROM
 		ld	h,(ix+0)	; drive
 		ld	b,2
 		ld	a,$81

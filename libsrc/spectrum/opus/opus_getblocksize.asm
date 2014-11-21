@@ -5,7 +5,7 @@
 ;
 ;	int opus_getblocksize (int drive);
 ;	
-;	$Id: opus_getblocksize.asm,v 1.1 2007-10-04 12:18:56 stefano Exp $
+;	$Id: opus_getblocksize.asm,v 1.2 2014-11-21 15:17:37 stefano Exp $
 ;
 
 
@@ -18,8 +18,6 @@
 
 opus_getblocksize:
 		
-		call	opus_rommap
-
 		ld	ix,2
 		add	ix,sp
 
@@ -32,7 +30,8 @@ opus_getblocksize:
 		cp	5		; drive no. >5 ?
 		ret	nc		; yes, return -1
 
-		call	$1708		; Page in the Discovery ROM
+		call	opus_rommap
+		;call	$1708		; Page in the Discovery ROM
 		ld	a,(ix+0)	; drive
 		ld	bc,$0400	; inquire disk
 		call	P_DEVICE

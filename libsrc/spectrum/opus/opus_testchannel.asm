@@ -6,7 +6,7 @@
 ;	void opus_testchannel (struct X_CHAN channel);
 ;	test channel parameters, return 0 if no errors
 ;	
-;	$Id: opus_testchannel.asm,v 1.1 2007-10-04 12:18:57 stefano Exp $
+;	$Id: opus_testchannel.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
 ;
 
 
@@ -19,12 +19,11 @@
 
 opus_testchannel:
 		
-		call	opus_rommap
-
 		ld	ix,2
 		add	ix,sp
 
-		call	$1708		; Page in the Discovery ROM
+		call	opus_rommap
+		;call	$1708		; Page in the Discovery ROM
 		ld	e,(ix+0)	; channel address
 		ld	d,(ix+0)	; channel address
 		call	P_TESTCH
@@ -34,6 +33,6 @@ opus_testchannel:
 		jr	nz,noerr
 		inc	hl		; error in second part
 noerr:
-		call	$1748		; Page out the Discovery ROM
+		jp	$1748		; Page out the Discovery ROM
 					; HL = zero or error code
-		ret
+		;ret

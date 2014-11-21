@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.5 2010-09-19 00:24:08 dom Exp $
+ *	$Id: zxopus.h,v 1.6 2014-11-21 15:17:37 stefano Exp $
  */
 
 
@@ -128,10 +128,23 @@ extern int __LIB__ opus_getblocks (int drive);
 // get the sector size
 extern int __LIB__ opus_getblocksize (int drive);
 
+// load a sector
+// A standard 178K Opus disk has 0..718 (719?) sectors
+// Each sector is 256 bytes long
+extern int __LIB__ opus_getsect(int drive, int sector, char * buffer) __SMALLCDECL;
+extern int __LIB__ __CALLEE__ opus_getsect_callee(int drive, int sector, char * buffer)__SMALLCDECL;
+#define opus_getsect(a,b)           opus_getsect_callee(a,b)
+
+// save a sector
+// A standard 178K Opus disk has 0..718 (719?) sectors
+// Each sector is 256 bytes long
+extern int __LIB__ opus_putsect(int drive, int sector, char * buffer) __SMALLCDECL;
+extern int __LIB__ __CALLEE__ opus_putsect_callee(int drive, int sector, char * buffer)__SMALLCDECL;
+#define opus_putsect(a,b)           opus_putsect_callee(a,b)
+
 // parallel port put/get byte
 extern void __LIB__ opus_lptwrite (unsigned char databyte);
 extern unsigned char __LIB__ opus_lptread ();
-
 
 // Returns true if the Opus Discovery interface is present
 extern int __LIB__ zx_opus();
