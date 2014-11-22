@@ -1,18 +1,43 @@
 
-PUBLIC error_enolck_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __ENOLCK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
-   pop hl
+   SECTION seg_code_error
+   
+   PUBLIC error_enolck_zc
+   
+   EXTERN error_enolck_mc
+   
+      pop hl
+   
+   error_enolck_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = ENOLCK
+      
+      call error_enolck_mc
+      
+      inc hl
+      ret
 
-error_enolck_zc:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=ENOLCK
+   SECTION seg_code_error
+   
+   PUBLIC error_enolck_zc
+   
+   EXTERN errno_zc
+   
+   defc error_enolck_zc = errno_zc - 2
 
-   ld hl,__ENOLCK
-   jp errno_zc
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

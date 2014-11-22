@@ -1,17 +1,43 @@
 
-PUBLIC error_enotsup_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __ENOTSUP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_enotsup_zc:
+   PUBLIC error_enotsup_zc
+   
+   EXTERN error_enotsup_mc
+   
+      pop hl
+   
+   error_enotsup_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = ENOTSUP
+      
+      call error_enotsup_mc
+      
+      inc hl
+      ret
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=ENOTSUP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__ENOTSUP
-   jp errno_zc
+   SECTION seg_code_error
+   
+   PUBLIC error_enotsup_zc
+   
+   EXTERN errno_zc
+   
+   defc error_enotsup_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

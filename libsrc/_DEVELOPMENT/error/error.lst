@@ -1,10 +1,14 @@
+error/z80/_errno
 error/z80/errno_mc
 error/z80/errno_zc
+error/z80/error_bc_zc
 error/z80/error_divide_by_zero_mc
 error/z80/error_divide_by_zero_zc
 error/z80/error_eacces_mc
 error/z80/error_ebadf_mc
 error/z80/error_ebadf_zc
+error/z80/error_ebdfd_mc
+error/z80/error_ebdfd_zc
 error/z80/error_edom_mc
 error/z80/error_edom_zc
 error/z80/error_efbig_mc
@@ -22,6 +26,7 @@ error/z80/error_eoverflow_mc
 error/z80/error_eoverflow_zc
 error/z80/error_erange_mc
 error/z80/error_erange_zc
+error/z80/error_lzc
 error/z80/error_lznc
 error/z80/error_mc
 error/z80/error_mnc
@@ -29,4 +34,3 @@ error/z80/error_mulu_overflow_mc
 error/z80/error_onc
 error/z80/error_zc
 error/z80/error_znc
-error/z80/__error_strings

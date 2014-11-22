@@ -1,19 +1,43 @@
 
-PUBLIC error_enomem_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __ENOMEM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
-   pop hl
-   pop hl
+   SECTION seg_code_error
    
-error_enomem_zc:
+   PUBLIC error_enomem_zc
+   
+   EXTERN error_enomem_mc
+   
+      pop hl
+   
+   error_enomem_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = ENOMEM
+      
+      call error_enomem_mc
+      
+      inc hl
+      ret
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=ENOMEM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__ENOMEM
-   jp errno_zc
+   SECTION seg_code_error
+   
+   PUBLIC error_enomem_zc
+   
+   EXTERN errno_zc
+   
+   defc error_enomem_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

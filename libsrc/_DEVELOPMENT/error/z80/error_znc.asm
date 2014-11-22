@@ -1,4 +1,6 @@
 
+SECTION seg_code_error
+
 PUBLIC error_znc
 
    pop hl
@@ -7,11 +9,12 @@ PUBLIC error_znc
    
 error_znc:
 
-   ; set hl=0
+   ; set hl = 0
    ; reset carry flag
-
+   
    ld hl,0
-
+   
    scf
    ccf
+   
    ret

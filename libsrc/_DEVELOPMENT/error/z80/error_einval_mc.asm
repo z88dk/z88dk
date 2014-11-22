@@ -1,19 +1,48 @@
 
-PUBLIC error_einval_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EINVAL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
-   pop hl
-   pop hl
+   SECTION seg_code_error
+   
+   PUBLIC error_einval_mc
+   
+   EXTERN __EINVAL, errno_mc
+   
+      pop hl
+   
+   error_einval_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = EINVAL
+      
+      ld l,__EINVAL
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __EINVAL
+   defm "EINVAL - Invalid argument"
+   defb 0
 
-error_einval_mc:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=EINVAL
+   SECTION seg_code_error
+   
+   PUBLIC error_einval_mc
+   
+   EXTERN errno_mc
+   
+   defc error_einval_mc = errno_mc - 2
 
-   ld hl,__EINVAL
-   jp errno_mc
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

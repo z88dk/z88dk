@@ -1,19 +1,43 @@
 
-PUBLIC error_einval_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EINVAL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
-   pop hl
-   pop hl
+   SECTION seg_code_error
+   
+   PUBLIC error_einval_zc
+   
+   EXTERN error_einval_mc
+   
+      pop hl
+   
+   error_einval_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = EINVAL
+      
+      call error_einval_mc
+      
+      inc hl
+      ret
 
-error_einval_zc:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=EINVAL
+   SECTION seg_code_error
+   
+   PUBLIC error_einval_zc
+   
+   EXTERN errno_zc
+   
+   defc error_einval_zc = errno_zc - 2
 
-   ld hl,__EINVAL
-   jp errno_zc
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

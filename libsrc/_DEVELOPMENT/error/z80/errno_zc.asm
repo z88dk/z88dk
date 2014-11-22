@@ -1,15 +1,19 @@
 
+SECTION seg_code_error
+   
 PUBLIC errno_zc
+   
+EXTERN error_zc, _errno
 
-EXTERN _errno
-
-EXTERN error_zc
+   ld l,$ff                    ; unspecified error
 
 errno_zc:
-
-   ; set errno=hl
-   ; set hl=0
+ 
+   ; set errno = l
+   ; set hl = 0
    ; set carry flag
-
+      
+   ld h,0
    ld (_errno),hl
+      
    jp error_zc

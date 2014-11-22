@@ -1,15 +1,11 @@
 
+SECTION seg_code_error
+
 PUBLIC error_divide_by_zero_mc
 
 EXTERN error_edom_mc
 
-error_divide_by_zero_mc:
+; integer divide by zero occurred
+; default behaviour is to note error in errno and carry on
 
-   jp error_edom_mc
-
-;defc error_divide_by_zero_mc = error_edom_mc
-
-   ; integer divide by zero occurred
-   ;
-   ; default behaviour is to carry on and
-   ; record error in errno
+defc error_divide_by_zero_mc = error_edom_mc

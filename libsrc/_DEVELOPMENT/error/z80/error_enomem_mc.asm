@@ -1,19 +1,48 @@
 
-PUBLIC error_enomem_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __ENOMEM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
-   pop hl
-   pop hl
+   SECTION seg_code_error
    
-error_enomem_mc:
+   PUBLIC error_enomem_mc
+   
+   EXTERN __ENOMEM, errno_mc
+   
+      pop hl
+   
+   error_enomem_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = ENOMEM
+      
+      ld l,__ENOMEM
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __ENOMEM
+   defm "ENOMEM - Insufficient memory"
+   defb 0
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=ENOMEM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__ENOMEM
-   jp errno_mc
+   SECTION seg_code_error
+   
+   PUBLIC error_enomem_mc
+   
+   EXTERN errno_mc
+   
+   defc error_enomem_mc = errno_mc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

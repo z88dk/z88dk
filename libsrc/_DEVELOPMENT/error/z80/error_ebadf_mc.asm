@@ -1,17 +1,48 @@
 
-PUBLIC error_ebadf_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EBADF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_ebadf_mc:
+   PUBLIC error_ebadf_mc
+   
+   EXTERN __EBADF, errno_mc
+   
+      pop hl
+   
+   error_ebadf_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = EBADF
+      
+      ld l,__EBADF
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __EBADF
+   defm "EBADF - Invalid stream"
+   defb 0
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=EBADF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EBADF
-   jp errno_mc
+   SECTION seg_code_error
+   
+   PUBLIC error_ebadf_mc
+   
+   EXTERN errno_mc
+   
+   defc error_ebadf_mc = errno_mc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

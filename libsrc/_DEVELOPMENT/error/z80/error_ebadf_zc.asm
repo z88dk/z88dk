@@ -1,18 +1,43 @@
 
-PUBLIC error_ebadf_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EBADF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
-   pop hl
+   SECTION seg_code_error
    
-error_ebadf_zc:
+   PUBLIC error_ebadf_zc
+   
+   EXTERN error_ebadf_mc
+   
+      pop hl
+   
+   error_ebadf_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = EBADF
+      
+      call error_ebadf_mc
+      
+      inc hl
+      ret
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=EBADF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EBADF
-   jp errno_zc
+   SECTION seg_code_error
+   
+   PUBLIC error_ebadf_zc
+   
+   EXTERN errno_zc
+   
+   defc error_ebadf_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

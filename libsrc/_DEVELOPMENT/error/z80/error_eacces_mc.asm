@@ -1,17 +1,48 @@
 
-PUBLIC error_eacces_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EACCES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_eacces_mc:
+   PUBLIC error_eacces_mc
+   
+   EXTERN __EACCES, errno_mc
+   
+      pop hl
+   
+   error_eacces_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = EACCES
+      
+      ld l,__EACCES
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __EACCES
+   defm "EACCES - Permission denied"
+   defb 0
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=EACCES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EACCES
-   jp errno_mc
+   SECTION seg_code_error
+   
+   PUBLIC error_eacces_mc
+   
+   EXTERN errno_mc
+   
+   defc error_eacces_mc = errno_mc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

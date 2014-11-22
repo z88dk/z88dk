@@ -1,17 +1,43 @@
 
-PUBLIC error_edom_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EDOM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_edom_zc:
+   PUBLIC error_edom_zc
+   
+   EXTERN error_edom_mc
+   
+      pop hl
+   
+   error_edom_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = EDOM
+      
+      call error_edom_mc
+      
+      inc hl
+      ret
 
-   ; set hl=0
-   ; set carry flag
-   ; set errno=EDOM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EDOM
-   jp errno_zc
+   SECTION seg_code_error
+   
+   PUBLIC error_edom_zc
+   
+   EXTERN errno_zc
+   
+   defc error_edom_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

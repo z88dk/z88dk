@@ -1,4 +1,6 @@
 
+SECTION seg_code_error
+
 PUBLIC error_lznc
 
 EXTERN error_znc

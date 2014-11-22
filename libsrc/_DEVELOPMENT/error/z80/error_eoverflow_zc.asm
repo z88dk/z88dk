@@ -1,17 +1,43 @@
 
-PUBLIC error_eoverflow_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EOVERFLOW
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_eoverflow_zc:
-
-   ; set hl = 0
-   ; set carry flag
-   ; set errno=EOVERFLOW
+   PUBLIC error_eoverflow_zc
    
-   ld hl,__EOVERFLOW
-   jp errno_zc
+   EXTERN error_eoverflow_mc
+   
+      pop hl
+   
+   error_eoverflow_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = EOVERFLOW
+      
+      call error_eoverflow_mc
+      
+      inc hl
+      ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   SECTION seg_code_error
+   
+   PUBLIC error_eoverflow_zc
+   
+   EXTERN errno_zc
+   
+   defc error_eoverflow_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,17 +1,48 @@
 
-PUBLIC error_erange_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __ERANGE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_erange_mc:
+   PUBLIC error_erange_mc
+   
+   EXTERN __ERANGE, errno_mc
+   
+      pop hl
+   
+   error_erange_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = ERANGE
+      
+      ld l,__ERANGE
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __ERANGE
+   defm "ERANGE - Result too large"
+   defb 0
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=ERANGE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__ERANGE
-   jp errno_mc
+   SECTION seg_code_error
+   
+   PUBLIC error_erange_mc
+   
+   EXTERN errno_mc
+   
+   defc error_erange_mc = errno_mc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

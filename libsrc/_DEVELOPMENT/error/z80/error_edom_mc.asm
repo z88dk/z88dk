@@ -1,17 +1,48 @@
 
-PUBLIC error_edom_mc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EDOM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_mc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_edom_mc:
+   PUBLIC error_edom_mc
+   
+   EXTERN __EDOM, errno_mc
+   
+      pop hl
+   
+   error_edom_mc:
+   
+      ; set hl = -1
+      ; set carry flag
+      ; set errno = EDOM
+      
+      ld l,__EDOM
+      jp errno_mc
+   
+   
+   SECTION seg_rodata_error_strings
+   
+   defb __EDOM
+   defm "EDOM - Math argument out of domain"
+   defb 0
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=EDOM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EDOM
-   jp errno_mc
+   SECTION seg_code_error
+   
+   PUBLIC error_edom_mc
+   
+   EXTERN errno_mc
+   
+   defc error_edom_mc = errno_mc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

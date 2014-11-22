@@ -1,17 +1,43 @@
 
-PUBLIC error_efbig_zc
+INCLUDE "clib_cfg.asm"
 
-EXTERN __EFBIG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN errno_zc
+   ; verbose mode
 
-   pop hl
+   SECTION seg_code_error
    
-error_efbig_zc:
+   PUBLIC error_efbig_zc
+   
+   EXTERN error_efbig_mc
+   
+      pop hl
+   
+   error_efbig_zc:
+   
+      ; set hl = 0
+      ; set carry flag
+      ; set errno = EFBIG
+      
+      call error_efbig_mc
+      
+      inc hl
+      ret
 
-   ; set hl=-1
-   ; set carry flag
-   ; set errno=EFBIG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__EFBIG
-   jp errno_zc
+   SECTION seg_code_error
+   
+   PUBLIC error_efbig_zc
+   
+   EXTERN errno_zc
+   
+   defc error_efbig_zc = errno_zc - 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
