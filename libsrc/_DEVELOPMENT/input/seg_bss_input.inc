@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; INPUT.LIB CODE SECTIONS
+; INPUT.LIB BSS SECTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_input
+SECTION seg_bss_input
