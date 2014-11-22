@@ -67,16 +67,6 @@ button_table:
 
 ; =============================================================
 
-SECTION crt_construct
-
-EXTERN asm_in_mouse_amx_init
-EXTERN ISR_VECTOR_AMX_MOUSE_X, ISR_VECTOR_AMX_MOUSE_Y
-
-ld bc,ISR_VECTOR_AMX_MOUSE_X * 256 + ISR_VECTOR_AMX_MOUSE_Y
-call asm_in_mouse_amx_init
-
-; =============================================================
-
 SECTION seg_bss_input
 
 PUBLIC __input_amx_mouse_x

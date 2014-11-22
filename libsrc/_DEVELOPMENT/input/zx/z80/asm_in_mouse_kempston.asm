@@ -123,13 +123,6 @@ continue_y:
 
 ; =============================================================
 
-SECTION crt_construct
-
-EXTERN asm_in_mouse_kempston_init
-call asm_in_mouse_kempston_init
-
-; =============================================================
-
 SECTION seg_bss_input
 
 PUBLIC __input_kempston_mouse_x
