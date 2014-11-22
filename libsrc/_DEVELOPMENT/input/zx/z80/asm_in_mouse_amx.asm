@@ -64,3 +64,29 @@ button_loop:
 button_table:
 
    defb $07, $03, $05, $01, $06, $02, $04, $00
+
+; =============================================================
+
+SECTION crt_construct
+
+EXTERN asm_in_mouse_amx_init
+EXTERN ISR_VECTOR_AMX_MOUSE_X, ISR_VECTOR_AMX_MOUSE_Y
+
+ld bc,ISR_VECTOR_AMX_MOUSE_X * 256 + ISR_VECTOR_AMX_MOUSE_Y
+call asm_in_mouse_amx_init
+
+; =============================================================
+
+SECTION seg_bss_input
+
+PUBLIC __input_amx_mouse_x
+PUBLIC __input_amx_mouse_y
+PUBLIC __input_amx_mouse_dx
+PUBLIC __input_amx_mouse_dy
+
+__input_amx_mouse_x:           defw 0
+__input_amx_mouse_y:           defw 0
+__input_amx_mouse_dx:          defw 0
+__input_amx_mouse_dy:          defw 0
+
+; =============================================================

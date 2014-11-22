@@ -120,3 +120,26 @@ continue_y:
 
    pop af                      ; a = buttons
    ret
+
+; =============================================================
+
+SECTION crt_construct
+
+EXTERN asm_in_mouse_kempston_init
+call asm_in_mouse_kempston_init
+
+; =============================================================
+
+SECTION seg_bss_input
+
+PUBLIC __input_kempston_mouse_x
+PUBLIC __input_kempston_mouse_y
+PUBLIC __input_kempston_mouse_rawx
+PUBLIC __input_kempston_mouse_rawy
+
+__input_kempston_mouse_x:      defw 0
+__input_kempston_mouse_y:      defw 0
+__input_kempston_mouse_rawx:   defb 0
+__input_kempston_mouse_rawy:   defb 0
+
+; =============================================================
