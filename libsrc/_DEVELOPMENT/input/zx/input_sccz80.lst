@@ -1,3 +1,5 @@
+input/zx/z80/__amx_mouse_variables
+input/zx/z80/__kempston_mouse_variables
 input/zx/c/sccz80/in_inkey
 input/zx/c/sccz80/in_key_pressed
 input/zx/c/sccz80/in_key_scancode
