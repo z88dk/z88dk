@@ -23,7 +23,7 @@ IF (TARGET_T > NOMINAL_T)
 
    defc TARGET_T = TARGET_T - NOMINAL_T
    
-   IF (TARGET_T >= 36) & (TARGET_T < 193) 
+   IF (TARGET_T >= 36) & (TARGET_T < 214) 
    
       push bc
       ld b,#(TARGET_T - 23) / 13
@@ -34,18 +34,20 @@ IF (TARGET_T > NOMINAL_T)
 
    ENDIF
 
-   IF (TARGET_T >= 193)
+   IF (TARGET_T >= 214)
    
       EXTERN asm_z80_delay_tstate
    
+      push af
       push bc
       push hl
       
-      ld hl,TARGET_T - 52
+      ld hl,TARGET_T - 73
       call asm_z80_delay_tstate
       
       pop hl
       pop bc
+      pop af
       
       defc TARGET_T = 0
       
