@@ -1,4 +1,6 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; STRING.LIB CODE SECTIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION seg_code_string
