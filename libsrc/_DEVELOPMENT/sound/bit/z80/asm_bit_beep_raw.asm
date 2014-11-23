@@ -12,6 +12,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_beep_raw
 
 EXTERN asm_bit_open, asm_bit_close

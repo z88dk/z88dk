@@ -28,6 +28,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_play
 
 EXTERN asm_isdigit, asm0_bit_beep, asm_z80_delay_ms

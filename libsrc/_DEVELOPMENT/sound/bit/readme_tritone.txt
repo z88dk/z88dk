@@ -1,5 +1,7 @@
 
+==========================================================
 Tritone beeper music engine by Shiru (shiru@xxxx.ru) 03'11
+==========================================================
 
 
 Features
@@ -74,5 +76,18 @@ than 1 but lesser than 128, it is a drum sound. 255 is end of the
 pattern.
 
 
-NOTE:  A Windows PC editor called Beepola is available to make
-tritone songs.
+===========
+Z88DK NOTES
+===========
+
+The engine has been modified to work on all targets regardless of
+output method.  It has also been modified to play one row at a time.
+This means a program can do other things, like checking for keypress
+to terminate the song, between rows.
+
+Tritone assumes a cpu speed of 3.5 MHz.  Delay loops have been
+added to compensate for faster cpus but there may be some degradation
+for slow cpus or cpus marginally faster than 3.5 MHz.
+
+A Windows PC editor called "Beepola" is now available to compose
+Tritone songs.

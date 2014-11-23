@@ -1,4 +1,6 @@
 
+SECTION seg_code_sound_bit
+
 PUBLIC _bitfx_1
 
 EXTERN asm_bit_beep_raw

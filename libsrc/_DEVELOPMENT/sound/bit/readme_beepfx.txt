@@ -1,6 +1,7 @@
 
+===============
 BeepFX by Shiru
-
+===============
 
 This is a Windows tool that could be used to create beeper sound
 effects for ZX Spectrum.
@@ -75,3 +76,19 @@ v1.01 04.12.11 - Minor fixes, Merge project function
 v1.0  03.12.11 - First release
 
 http://shiru.untergrund.net
+
+
+===========
+Z88DK NOTES
+===========
+
+The sound effects included with the editor have been added to the library and can be
+played by name.  Only data from sound effects referred to in the program will be added
+to the binary.
+
+Other changes:
+
+* use one index register for compatibility with all targets
+* eliminated self-modifying code
+* modified for any sound output method
+* delay loops introduced for fast cpus (target cpu freq is 3.5 MHz)

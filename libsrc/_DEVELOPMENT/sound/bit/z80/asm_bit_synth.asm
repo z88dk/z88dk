@@ -18,6 +18,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_data_sound_bit
+
 PUBLIC asm_bit_synth
 
 EXTERN asm_bit_open, asm_bit_close

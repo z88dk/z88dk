@@ -27,10 +27,11 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_data_sound_bit
+
 PUBLIC asm_bit_play_tritone
 
 EXTERN asm_bit_open, asm_bit_close
-
 EXTERN __sound_bit_state
 
 asm_bit_play_tritone:
@@ -313,7 +314,7 @@ DRUM_SOUND:
 
 drum_tone:
 
-               ; drum set #1
+               ; drum set $1
 
                ld bc,2
 bit_state_4:   ld a,$00
@@ -350,7 +351,7 @@ dtone_loop_1:
 
 drum_noise:
 
-               ; drum set #2
+               ; drum set $2
                ; uses data at address 0 for noise source
 
                ld b,0
@@ -389,33 +390,33 @@ drum_settings_table:
 
    ; 0 (drum selection = 2)
    
-   defb #01,#01                  ; tone, highest
-   defb #01,#02
-   defb #01,#04
-   defb #01,#08
-   defb #01,#20
-   defb #20,#04
-   defb #40,#04
-   defb #40,#08                  ; lowest
-   defb #04,#80                  ; special
-   defb #08,#80
-   defb #10,#80
-   defb #10,#02
+   defb $01,$01                  ; tone, highest
+   defb $01,$02
+   defb $01,$04
+   defb $01,$08
+   defb $01,$20
+   defb $20,$04
+   defb $40,$04
+   defb $40,$08                  ; lowest
+   defb $04,$80                  ; special
+   defb $08,$80
+   defb $10,$80
+   defb $10,$02
    
    ; 24 (drum selection = 14)
    
-   defb ~__sound_bit_toggle,#02
-   defb ~__sound_bit_toggle,#02
-   defb $ff,#01                  ; noise, highest
-   defb $ff,#02
-   defb $ff,#04
-   defb $ff,#08
-   defb $ff,#10
-   defb ~__sound_bit_toggle,#01
-   defb ~__sound_bit_toggle,#02
-   defb ~__sound_bit_toggle,#04
-   defb ~__sound_bit_toggle,#08
-   defb ~__sound_bit_toggle,#10
+   defb ~__sound_bit_toggle,$02
+   defb ~__sound_bit_toggle,$02
+   defb $ff,$01                  ; noise, highest
+   defb $ff,$02
+   defb $ff,$04
+   defb $ff,$08
+   defb $ff,$10
+   defb ~__sound_bit_toggle,$01
+   defb ~__sound_bit_toggle,$02
+   defb ~__sound_bit_toggle,$04
+   defb ~__sound_bit_toggle,$08
+   defb ~__sound_bit_toggle,$10
 
 
 ; *************************************************************
@@ -485,6 +486,12 @@ duty_0:        cp 128
 bit_state_0:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
+               defc NOMINAL_CLOCK = 3500000
+               defc NOMINAL_T     = 64
+               defc TARGET_CLOCK  = __clock_freq
+               
+               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+
                ; channel 1 gets some time beginning at bit output
                
                nop
@@ -495,6 +502,12 @@ duty_1:        cp 128
                and __sound_bit_toggle
 bit_state_1:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
+
+               defc NOMINAL_CLOCK = 3500000
+               defc NOMINAL_T     = 64
+               defc TARGET_CLOCK  = __clock_freq
+               
+               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
                ; channel 2 gets some time beginning at bit output
                
@@ -508,7 +521,13 @@ bit_state_2:   or $00
                dec e
                exx
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
+
+               defc NOMINAL_CLOCK = 3500000
+               defc NOMINAL_T     = 64
+               defc TARGET_CLOCK  = __clock_freq
                
+               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+
                exx
                jp nz, sound_loop
                

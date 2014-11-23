@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_beep_raw_di
 
 EXTERN asm_bit_beep_raw, asm_z80_push_di, asm0_z80_pop_ei

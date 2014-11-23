@@ -1,4 +1,6 @@
 
+SECTION seg_code_sound_bit
+
 PUBLIC _bitfx_17
 
 INCLUDE "clib_target_cfg.asm"

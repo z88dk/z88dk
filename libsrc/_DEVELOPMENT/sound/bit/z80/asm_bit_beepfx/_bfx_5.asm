@@ -2,6 +2,8 @@
 ; BeepFX sound effect by shiru
 ; http://shiru.untergrund.net
 
+SECTION seg_rodata_sound_bit
+
 PUBLIC _bfx_5
 
 _bfx_5:

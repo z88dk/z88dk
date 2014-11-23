@@ -11,6 +11,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_click
 
 EXTERN __sound_bit_state

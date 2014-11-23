@@ -17,9 +17,11 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_beepfx
 
-EXTERN asm_z80_delay_tstate, asm_bit_open, asm_bit_close
+EXTERN asm_bit_open, asm_bit_close
 
 asm_bit_beepfx:
 
@@ -118,41 +120,14 @@ sample_loop_2:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: loop time = 16T
    ;;
-   ;; fast cpu compensation
-   ;;
-   ;; loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 4.57us
-   ;;
-   ;; T state compensation is:
-   ;;
-   ;; T = (4.57us)(Fcpu) - 16
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
+   ;; loop is timed for 3.5 MHZ cpu
 
-   IF (__clock_freq > 8752735) & (__clock_freq <= 45733041)
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 16
+   defc TARGET_CLOCK  = __clock_freq
    
-                       exx
-                       ld l,+(((__clock_freq * 45) / 10000000) + ((__clock_freq * 7) / 100000000) - 24) / 16
-      sample_waste_2:  dec l
-                       jr nz, sample_waste_2
-                       exx
-   
-   ENDIF
-           
-   IF __clock_freq > 45733041
-           
-      push bc
-      push hl
-           
-      ld hl,+((__clock_freq * 45) / 10000000) + ((__clock_freq * 7) / 100000000) - 68
-      call asm_z80_delay_tstate
-      
-      pop hl
-      pop bc
-   
-   ENDIF
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -175,81 +150,31 @@ sample_loop_2:
    ;; note: original loop time    = 72T
    ;;       implemented loop time = 74T, 75T, 76T
    ;;
-   ;; fast cpu compensation
-   ;;
-   ;; loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 20.6us
-   ;;
-   ;; T state compensation is:
-   ;;
-   ;; T = (20.6us)(Fcpu) - 74
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
+   ;; loop is timed for 3.5 MHZ cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 75
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   IF (__clock_freq > 4466019) & (__clock_freq <= 12961165)
-   
-                       ld a,+(((__clock_freq * 20) / 1000000) + ((__clock_freq * 6) / 10000000) - 76) / 16
-      sample_waste_1:  dec a
-                       jr nz, sample_waste_1
-   
-   ENDIF
-           
-   IF __clock_freq > 12961165
-           
-      push bc
-      push hl
-           
-      ld hl,+((__clock_freq * 20) / 1000000) + ((__clock_freq * 6) / 10000000) - 126
-      call asm_z80_delay_tstate
-      
-      pop hl
-      pop bc
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+ 
    dec e
    jr nz, sample_loop_1
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: outer loop time = 46T
    ;;
-   ;; fast cpu compensation
-   ;;
-   ;; outer loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 13.1us
-   ;;
-   ;; T state compensation is:
-   ;;
-   ;; T = (13.1us)(Fcpu) - 46
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
+   ;; loop is timed for a 3.5MHz cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 46
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   IF (__clock_freq > 4885496) & (__clock_freq <= 18244274)
-   
-                       ld a,+(((__clock_freq * 13) / 1000000) + (__clock_freq / 10000000) - 48) / 16
-      sample_waste_0:  dec a
-                       jr nz, sample_waste_0
-   
-   ENDIF
-           
-   IF __clock_freq > 18244274
-           
-      push bc
-      push hl
-           
-      ld hl,+((__clock_freq * 13) / 1000000) + (__clock_freq / 10000000) - 98
-      call asm_z80_delay_tstate
-      
-      pop hl
-      pop bc
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -320,45 +245,18 @@ tone_loop_1:
       
    exx
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: original inner loop time    = 77T
    ;;       implemented inner loop time = 79T, 80T, 81T
+   ;;
+   ;; loop is timed for a 3.5MHz cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 80
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; fast cpu compensation
-   ;;
-   ;; inner loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 22us
-   ;;
-   ;; we can compensate for fast cpus
-   ;; by inserting a T-state delay
-   ;; computed from:
-   ;;
-   ;; T = (22us)(Fcpu) - 79
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
-
-   IF (__clock_freq > 4409090) & (__clock_freq <= 12363636)
-   
-                     ld a,+((__clock_freq * 22) / 1000000 - 81) / 16
-      tone_waste_0:  dec a
-                     jr nz, tone_waste_0
-   
-   ENDIF
-           
-   IF __clock_freq > 12363636
-           
-      push hl
-      push bc
-           
-      ld hl,+(__clock_freq * 22) / 1000000 - 131
-      call asm_z80_delay_tstate
-      
-      pop bc
-      pop hl
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -385,37 +283,14 @@ waste_0:   djnz waste_0
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: outer loop time = 174T
    ;;
-   ;; fast cpu compensation
-   ;;
-   ;; outer loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 49.7us
-   ;;
-   ;; T state compensation is:
-   ;;
-   ;; T = (49.7us)(Fcpu) - 174
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
+   ;; loop is timed for a 3.5MHz cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 174
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   IF (__clock_freq > 3863179) & (__clock_freq <= 6961770)
-   
-                     ld a,+(((__clock_freq * 49) / 1000000) + ((__clock_freq * 7) / 10000000) - 176) / 16
-      tone_waste_1:  dec a
-                     jr nz, tone_waste_1
-   
-   ENDIF
-           
-   IF __clock_freq > 6961770
-           
-      push hl
-           
-      ld hl,+((__clock_freq * 49) / 1000000) + ((__clock_freq * 7) / 10000000) - 205
-      call asm_z80_delay_tstate
-      
-      pop hl
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -502,45 +377,18 @@ noise_loop_1:
 
 period_continue:
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: original inner loop time    = 74T
    ;;       implemented inner loop time = 76T, 77T, 78T
+   ;;
+   ;; loop is timed for a 3.5MHz cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 77
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; fast cpu compensation
-   ;;
-   ;; inner loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 21.1us
-   ;;
-   ;; we can compensate for fast cpus
-   ;; by inserting a T-state delay
-   ;; computed from:
-   ;;
-   ;; T = (21.1us)(Fcpu) - 76
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
-
-   IF (__clock_freq > 4454976) & (__clock_freq <= 12748815)
-   
-                     ld a,+(((__clock_freq * 21) / 1000000) + (__clock_freq / 10000000) - 78) / 16
-      noise_waste_0: dec a
-                     jr nz, noise_waste_0
-   
-   ENDIF
-           
-   IF __clock_freq > 12748815
-           
-      push hl
-      push bc
-           
-      ld hl,+((__clock_freq * 21) / 1000000) + (__clock_freq / 10000000) - 128
-      call asm_z80_delay_tstate
-      
-      pop bc
-      pop hl
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -560,40 +408,17 @@ period_continue:
    ld bc,0
    ld c,0
 
-   ;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; note: outer loop time    = 99T
    ;;
-   ;; fast cpu compensation
-   ;;
-   ;; outer loop is timed for a 3.5MHz
-   ;; cpu and is intended to last 28.3us
-   ;;
-   ;; T state compensation is:
-   ;;
-   ;; T = (28.3us)(Fcpu) - 99
-   ;;
-   ;; Note that fast z80s with different
-   ;; instruction timing would require
-   ;; different compensation.
+   ;; loop is timed for a 3.5MHz cpu
+   
+   defc NOMINAL_CLOCK = 3500000
+   defc NOMINAL_T     = 99
+   defc TARGET_CLOCK  = __clock_freq
+   
+   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
-   IF (__clock_freq > 4134275) & (__clock_freq <= 9575971)
-   
-                     ld a,+(((__clock_freq * 28) / 1000000) + ((__clock_freq * 3) / 10000000) - 101) / 16
-      noise_waste_1: dec a
-                     jr nz, noise_waste_1
-   
-   ENDIF
-           
-   IF __clock_freq > 9575971
-           
-      push hl
-           
-      ld hl,+((__clock_freq * 28) / 1000000) + ((__clock_freq * 3) / 10000000) - 130
-      call asm_z80_delay_tstate
-      
-      pop hl
-   
-   ENDIF
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

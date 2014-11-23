@@ -1,4 +1,6 @@
 
+SECTION seg_code_sound_bit
+
 PUBLIC asm_bit_close
 
 INCLUDE "clib_target_cfg.asm"
