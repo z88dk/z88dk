@@ -13,7 +13,7 @@ SECTION seg_code_string
 
 PUBLIC asm_strerror
 
-EXTERN __error_strings, __error_string_default, __str_locate_nul
+EXTERN __error_strings, __str_locate_nul
 
 asm_strerror:
 
@@ -54,3 +54,7 @@ use_default:
    scf
    ret
 
+__error_string_default:
+
+   defm "ERROR - Unspecified"
+   defb 0
