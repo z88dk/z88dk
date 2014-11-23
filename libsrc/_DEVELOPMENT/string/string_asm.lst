@@ -53,3 +53,4 @@ string/z80/asm__memstrcpy
 string/z80/asm__memupr
 string/z80/asm__strrstrip
 string/z80/__str_locate_nul
+string/z80/__string_strtok_p

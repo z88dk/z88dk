@@ -27,7 +27,7 @@ SECTION seg_code_string
 
 PUBLIC asm_strtok
 
-EXTERN __strtok_ptr
+EXTERN __string_strtok_p
 
 EXTERN asm_strtok_r
 
@@ -50,5 +50,5 @@ asm_strtok:
    ;
    ; uses  : af, bc, hl
 
-   ld bc,__strtok_ptr
+   ld bc,__string_strtok_p
    jp asm_strtok_r

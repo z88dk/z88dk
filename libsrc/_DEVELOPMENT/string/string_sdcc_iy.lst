@@ -53,3 +53,4 @@ string/c/sdcc_iy/_memstrcpy_
 string/c/sdcc_iy/_memupr_
 string/c/sdcc_iy/_strrstrip_
 string/z80/__str_locate_nul
+string/z80/__string_strtok_p

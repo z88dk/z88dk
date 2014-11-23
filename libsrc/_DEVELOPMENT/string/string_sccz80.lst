@@ -96,3 +96,4 @@ string/c/sccz80/_memupr_
 string/c/sccz80/_memupr__callee
 string/c/sccz80/_strrstrip_
 string/z80/__str_locate_nul
+string/z80/__string_strtok_p
