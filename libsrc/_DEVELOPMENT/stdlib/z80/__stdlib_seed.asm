@@ -1,0 +1,6 @@
+
+SECTION seg_data_stdlib
+
+PUBLIC __stdlib_seed
+
+__stdlib_seed:  defw 1, 1
