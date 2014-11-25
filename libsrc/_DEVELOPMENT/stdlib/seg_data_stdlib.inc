@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; STDLIB.LIB CODE SECTIONS
+; STDLIB.LIB DATA SECTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_stdlib
+SECTION seg_data_stdlib
