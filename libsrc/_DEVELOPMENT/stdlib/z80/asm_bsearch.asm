@@ -16,7 +16,7 @@ SECTION seg_code_stdlib
 PUBLIC asm_bsearch
 PUBLIC asm0_bsearch
 
-EXTERN error_zc, l_mulu_16_16x16, l_jpix, l_inc_sp
+EXTERN error_zc, l_mulu_16_16x16, l_compare_de_hl, l_inc_sp
 
 asm_bsearch:
 
@@ -37,6 +37,8 @@ asm_bsearch:
    ;
    ;           carry set
    ;           hl = 0
+   ;           bc = address of an item in array next to where key should be found
+   ;           de = size
    ;
    ; uses  : af, bc, de, hl
 
@@ -76,51 +78,17 @@ bsearch_loop:
    add hl,de                   ; hl = p = base + (lim >> 1) * size
    pop de                      ; de = key
 
-   push de                     ; save key
-   push hl                     ; save p
-   push ix                     ; save compar
+   call l_compare_de_hl        ; (compar)(de = void *key, hl = void *p)
 
-;******************************
-IF __SDCC | __SDCC_IX | __SDCC_IY
-;******************************
-
-   push hl
-   push de
-   call l_jpix                 ; (compar)(de = void *key, hl = void *p) R->L
-   pop de
-   pop bc
-
-;******************************
-ELSE
-;******************************
-
-   push de
-   push hl
-   call l_jpix                 ; (compar)(de = void *key, hl = void *p) L->R
-   pop bc
-   pop de
-
-;******************************
-ENDIF
-;******************************
-
-   pop ix                      ; ix = compar
-   pop bc                      ; bc = p
-   pop de                      ; de = key
-
-   ; bc = p
+   ; hl = p
    ; de = key
-   ; hl = compare result
    ; ix = compare
    ; stack = lim, base, size
    
-   ld a,h
-   or a
    jp p, key_greater_equal
    
 key_less:
 
-   ; bc = p
    ; de = key
    ; ix = compare
    ; stack = lim, base, size
@@ -143,18 +111,18 @@ key_less:
 
 key_greater_equal:
 
-   or l
-   jr z, found_item
-   
-key_greater:
-
-   ; bc = p
+   ; hl = p
    ; de = key
    ; ix = compare
    ; stack = lim, base, size
 
-   pop hl
-   push hl
+   or a
+   jp z, l_inc_sp - 6          ; if item found
+   
+key_greater:
+
+   pop bc
+   push bc
    
    add hl,bc
    ld c,l
@@ -178,19 +146,6 @@ key_greater:
    ; stack = key
    
    jr bsearch_loop
-
-found_item:
-
-   ; bc = p
-   ; de = key
-   ; ix = compare
-   ; stack = lim, base, size
-   ; carry reset
-
-   ld l,c
-   ld h,b
-   
-   jp l_inc_sp - 6             ; pop three items
    
 ; ============================================================
 ;
