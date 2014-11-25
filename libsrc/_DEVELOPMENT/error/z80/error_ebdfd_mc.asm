@@ -26,10 +26,20 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
+
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __EBDFD
+      defm "EBDFD - Bad file descriptor"
+      defb 0
+
+   ELSE
    
-   defb __EBDFD
-   defm "EBDFD - Bad file descriptor"
-   defb 0
+      defb __EBDFD
+      defm "EBDFD"
+      defb 0
+   
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

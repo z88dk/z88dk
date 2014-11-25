@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __ENOTSUP
-   defm "ENOTSUP - Not supported"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __ENOTSUP
+      defm "ENOTSUP - Not supported"
+      defb 0
+
+   ELSE
+   
+      defb __ENOTSUP
+      defm "ENOTSUP"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

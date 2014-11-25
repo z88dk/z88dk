@@ -26,10 +26,20 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
+
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __EDOM
+      defm "EDOM - Math argument out of domain"
+      defb 0
+
+   ELSE
    
-   defb __EDOM
-   defm "EDOM - Math argument out of domain"
-   defb 0
+      defb __EDOM
+      defm "EDOM"
+      defb 0
+   
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

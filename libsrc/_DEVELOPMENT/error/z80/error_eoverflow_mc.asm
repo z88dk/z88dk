@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __EOVERFLOW
-   defm "EOVERFLOW - Value too large for data type"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __EOVERFLOW
+      defm "EOVERFLOW - Value too large for data type"
+      defb 0
+
+   ELSE
+   
+      defb __EOVERFLOW
+      defm "EOVERFLOW"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

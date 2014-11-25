@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __ENOMEM
-   defm "ENOMEM - Insufficient memory"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __ENOMEM
+      defm "ENOMEM - Insufficient memory"
+      defb 0
+
+   ELSE
+   
+      defb __ENOMEM
+      defm "ENOMEM"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

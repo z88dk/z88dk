@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __EBADF
-   defm "EBADF - Invalid stream"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __EBADF
+      defm "EBADF - Invalid stream"
+      defb 0
+
+   ELSE
+   
+      defb __EBADF
+      defm "EBADF"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

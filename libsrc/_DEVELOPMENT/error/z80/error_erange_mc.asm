@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __ERANGE
-   defm "ERANGE - Result too large"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __ERANGE
+      defm "ERANGE - Result too large"
+      defb 0
+
+   ELSE
+   
+      defb __ERANGE
+      defm "ERANGE"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

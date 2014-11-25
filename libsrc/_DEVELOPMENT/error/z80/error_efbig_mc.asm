@@ -26,11 +26,20 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __EFBIG
-   defm "EFBIG - File too large"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __EFBIG
+      defm "EFBIG - File too large"
+      defb 0
+
+   ELSE
+   
+      defb __EFBIG
+      defb "EFBIG"
+      defb 0
+   
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

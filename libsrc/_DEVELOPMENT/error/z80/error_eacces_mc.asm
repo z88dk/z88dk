@@ -27,9 +27,19 @@ IF __CLIB_OPT_ERROR
    
    SECTION seg_rodata_error_strings
    
-   defb __EACCES
-   defm "EACCES - Permission denied"
-   defb 0
+   IF __CLIB_OPT_ERROR & $02
+   
+      defb __EACCES
+      defm "EACCES - Permission denied"
+      defb 0
+
+   ELSE
+   
+      defb __EACCES
+      defm "EACCES"
+      defb 0
+   
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

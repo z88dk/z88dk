@@ -26,11 +26,21 @@ IF __CLIB_OPT_ERROR
    
    
    SECTION seg_rodata_error_strings
-   
-   defb __ENOLCK
-   defm "ENOLCK - Attempt to lock failed"
-   defb 0
 
+   IF __CLIB_OPT_ERROR & $02
+
+      defb __ENOLCK
+      defm "ENOLCK - Attempt to lock failed"
+      defb 0
+
+   ELSE
+   
+      defb __ENOLCK
+      defm "ENOLCK"
+      defb 0
+   
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
