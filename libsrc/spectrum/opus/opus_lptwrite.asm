@@ -5,7 +5,7 @@
 ;
 ;	void opus_lptwrite (unsigned char databyte);
 ;	
-;	$Id: opus_lptwrite.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_lptwrite.asm,v 1.3 2014-11-25 17:09:23 stefano Exp $
 ;
 
 

@@ -6,7 +6,7 @@
 ;
 ;	 - init the jump table
 ;
-;	$Id: opus_rommap.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_rommap.asm,v 1.3 2014-11-25 17:09:24 stefano Exp $
 ;
 
 
@@ -26,6 +26,7 @@ opus_rommap:
 		push	bc
 		push	de
 		push	hl
+
 		call	$1708		; Page in the Discovery ROM
 
 		ld		a,(P_DEVICE+2)

@@ -5,7 +5,7 @@
 ;
 ;	int opus_getblocksize (int drive);
 ;	
-;	$Id: opus_getblocksize.asm,v 1.2 2014-11-21 15:17:37 stefano Exp $
+;	$Id: opus_getblocksize.asm,v 1.3 2014-11-25 17:09:21 stefano Exp $
 ;
 
 

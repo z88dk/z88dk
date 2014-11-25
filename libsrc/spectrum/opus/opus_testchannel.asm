@@ -6,7 +6,7 @@
 ;	void opus_testchannel (struct X_CHAN channel);
 ;	test channel parameters, return 0 if no errors
 ;	
-;	$Id: opus_testchannel.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_testchannel.asm,v 1.3 2014-11-25 17:09:24 stefano Exp $
 ;
 
 

@@ -5,7 +5,7 @@
 ;
 ;	unsigned char opus_lptread;
 ;	
-;	$Id: opus_lptread.asm,v 1.2 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_lptread.asm,v 1.3 2014-11-25 17:09:23 stefano Exp $
 ;
 
 

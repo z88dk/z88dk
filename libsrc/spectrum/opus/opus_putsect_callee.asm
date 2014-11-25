@@ -9,11 +9,13 @@
 ;
 ;	int __CALLEE__ opus_putsect_callee(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_putsect_callee.asm,v 1.1 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_putsect_callee.asm,v 1.2 2014-11-25 17:09:24 stefano Exp $
 ;
 
 
 XLIB	opus_putsect_callee
+;XDEF	ASMDISP_OPUS_PUTSECT_CALLEE
+
 PUBLIC	opus_putsect_asmentry
 
 	LIB	opus_rommap
@@ -30,10 +32,10 @@ opus_putsect_callee:
 
 opus_putsect_asmentry:
 
-	ld	a,c		; drive #
 
 	call	opus_rommap
 ;	call	$1708		; Page in the Discovery ROM
+	ld	a,c		; drive #
 
 	ld	bc,0		; save sector
 	call P_DEVICE
@@ -42,4 +44,4 @@ opus_putsect_asmentry:
 	ld		hl,0
 	ret
 
-
+;DEFC ASMDISP_OPUS_PUTSECT_CALLEE = # opus_putsect_asmentry - opus_putsect_callee

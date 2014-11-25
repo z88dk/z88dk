@@ -9,10 +9,12 @@
 ;
 ;	int opus_putsect(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_putsect.asm,v 1.1 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_putsect.asm,v 1.2 2014-11-25 17:09:23 stefano Exp $
 ;
 
 XLIB opus_putsect
+;XREF ASMDISP_OPUS_PUTSECT_CALLEE
+LIB opus_putsect_callee
 LIB opus_putsect_asmentry
 
 .opus_putsect
@@ -25,5 +27,6 @@ LIB opus_putsect_asmentry
 	push hl		; sector number
 	push de		; buffer location
 	push af
-   
-   jp opus_putsect_asmentry
+	
+	jp	opus_putsect_asmentry
+;   jp ASMDISP_OPUS_PUTSECT_CALLEE + opus_putsect_callee

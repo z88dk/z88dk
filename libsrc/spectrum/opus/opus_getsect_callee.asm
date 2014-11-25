@@ -9,11 +9,13 @@
 ;
 ;	int __CALLEE__ opus_getsect_callee(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_getsect_callee.asm,v 1.1 2014-11-21 15:17:38 stefano Exp $
+;	$Id: opus_getsect_callee.asm,v 1.2 2014-11-25 17:09:23 stefano Exp $
 ;
 
 
 XLIB	opus_getsect_callee
+;XDEF	ASMDISP_OPUS_GETSECT_CALLEE
+
 PUBLIC	opus_getsect_asmentry
 
 	LIB	opus_rommap
@@ -27,19 +29,18 @@ opus_getsect_callee:
 	pop bc		; c=drive#
 	push af
 
-
 opus_getsect_asmentry:
 
-	ld	a,c		; drive #
 
 	call	opus_rommap
 ;	call	$1708		; Page in the Discovery ROM
+	ld	a,c		; drive #
 
-	ld	b,2		; load sector
-	ld	c,0
+	ld	bc,$0200		; load sector
 	call P_DEVICE
 
 	call	$1748		; Page out the Discovery ROM
 	ld		hl,0
 	ret
 
+;DEFC ASMDISP_OPUS_GETSECT_CALLEE = # opus_getsect_asmentry - opus_getsect_callee
