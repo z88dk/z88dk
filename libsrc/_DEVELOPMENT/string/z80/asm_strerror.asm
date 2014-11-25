@@ -56,5 +56,30 @@ use_default:
 
 __error_string_default:
 
-   defm "ERROR - Unspecified"
-   defb 0
+   IF __CLIB_OPT_ERROR & $02
+
+      defm "ERROR - Unspecified"
+      defb 0
+
+   ELSE
+   
+      defm "ERR"
+      defb 0
+   
+   ENDIF
+
+SECTION seg_rodata_error_strings
+
+   IF __CLIB_OPT_ERROR & $02
+
+      defb 0
+      defm "EOK - No error"
+      defb 0
+
+   ELSE
+   
+      defb 0
+      defm "EOK"
+      defb 0
+   
+   ENDIF
