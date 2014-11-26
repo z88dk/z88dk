@@ -30,6 +30,7 @@ asm_vopen:
    ;
    ;            hl = int fd
    ;            de = FDSTRUCT *
+   ;             b = FILE type (0 or 1)
    ;            carry reset
    ;
    ;         fail
@@ -52,7 +53,7 @@ asm0_vopen:
    ; target part 1: is path valid ?
    
    ; de = char *path
-   ; bc = int oflag
+   ; bc = int oflag (bit 7 = 1 for initial ref_count = 2, else 1)
    ; hl = void *arg (0 if no args)
    
    call asm_target_open_p1     ; target can place state in exx set
@@ -122,7 +123,7 @@ critical_section:
    push hl                     ; save & fdtbl[fd] + 1b
    
    ex de,hl                    ; hl = FDSTRUCT *
-   call asm_target_open_p2     ; target creates file, fills FDSTRUCT
+   call asm_target_open_p2     ; target creates file, fills FDSTRUCT, return b = FILE type
                                ;   (bit 7 of oflag + 1 indicates initial ref_count)
    pop hl                      ; hl = & fdtbl[fd] + 1b
    pop de                      ; de = FDSTRUCT *
