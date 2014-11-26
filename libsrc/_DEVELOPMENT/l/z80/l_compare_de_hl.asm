@@ -14,6 +14,7 @@ l_compare_de_hl:
   ; exit  : *de >= *hl if p flag set
   ;         *de << *hl if m flag set
   ;         *de == *hl if z flag set and a==0
+  ;         carry reset
   ;
   ; uses  : af
 
