@@ -8,6 +8,12 @@ z80/c/sdcc_ix/im2_remove_generic_callback
 z80/c/sdcc_ix/z80_delay_ms
 z80/c/sdcc_ix/z80_delay_tstate
 z80/c/sdcc_ix/z80_get_int_state
+z80/c/sdcc_ix/z80_indr
+z80/c/sdcc_ix/z80_inir
+z80/c/sdcc_ix/z80_inp
+z80/c/sdcc_ix/z80_otdr
+z80/c/sdcc_ix/z80_otir
+z80/c/sdcc_ix/z80_outp
 z80/c/sdcc_ix/z80_set_int_state
 z80/z80/asm_z80_pop_ei
 z80/z80/asm_z80_pop_registers
