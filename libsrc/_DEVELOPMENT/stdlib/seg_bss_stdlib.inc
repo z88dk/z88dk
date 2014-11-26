@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; THREADS.LIB CODE SECTIONS
+; STDLIB.LIB BSS SECTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_mutex
+SECTION seg_bss_stdlib

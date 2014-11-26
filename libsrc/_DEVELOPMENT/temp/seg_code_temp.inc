@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; THREADS.LIB CODE SECTIONS
+; TEMP.LIB CODE SECTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_mutex
+SECTION seg_code_sp1

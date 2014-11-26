@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; THREADS.LIB CODE SECTIONS
+; STDIO.LIB CODE SECTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_mutex
+SECTION seg_code_stdio
