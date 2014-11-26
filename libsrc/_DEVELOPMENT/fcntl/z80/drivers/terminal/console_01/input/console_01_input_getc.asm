@@ -1,14 +1,14 @@
 
+INCLUDE "clib_cfg.asm"
+
 SECTION seg_code_fcntl
 
 PUBLIC console_01_input_getc
 
 EXTERN console_01_input_echo, l_setmem_hl, asm_b_array_clear
 EXTERN ITERM_MSG_READLINE, console_01_input_oterm, l_inc_sp
-EXTERN CHAR_CURSOR_UC, CHAR_CURSOR_LC, ITERM_MSG_PRINT_CURSOR
-EXTERN ITERM_MSG_ERASE_CURSOR, CHAR_BS, ITERM_MSG_BS, CHAR_LF
-EXTERN asm_b_array_push_back, asm_b_array_at, ITERM_MSG_GETC
-EXTERN l_jpix, CHAR_CR, CHAR_CAPS, CHAR_ESC
+EXTERN ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS
+EXTERN asm_b_array_push_back, asm_b_array_at, ITERM_MSG_GETC, l_jpix
 
 console_01_input_getc:
 

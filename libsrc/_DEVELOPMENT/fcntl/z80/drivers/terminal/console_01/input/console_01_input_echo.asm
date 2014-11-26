@@ -1,9 +1,11 @@
 
+INCLUDE "clib_cfg.asm"
+
 SECTION seg_code_fcntl
 
 PUBLIC console_01_input_echo, console_01_input_oterm
 
-EXTERN ITERM_MSG_PUTC, l_jpix, CHAR_PASSWORD
+EXTERN ITERM_MSG_PUTC, l_jpix
 
 console_01_input_echo:
 
