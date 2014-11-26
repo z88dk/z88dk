@@ -66,16 +66,16 @@ PUBLIC console_01_output_terminal
 EXTERN STDIO_MSG_WRIT, STDIO_MSG_PUTC, STDIO_MSG_SEEK
 EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS
 
-EXTERN console_01_stdio_msg_writ, console_01_stdio_msg_putc
+EXTERN console_01_output_stdio_msg_writ, console_01_output_stdio_msg_putc
 EXTERN error_znc, error_lznc, error_enotsup_zc
 
 console_01_output_terminal:
 
    cp STDIO_MSG_WRIT
-   jp z, console_01_stdio_msg_writ
+   jp z, console_01_output_stdio_msg_writ
    
    cp STDIO_MSG_PUTC
-   jp z, console_01_stdio_msg_putc
+   jp z, console_01_output_stdio_msg_putc
    
    cp STDIO_MSG_SEEK
    jp z, error_lznc            ; do nothing, report no error
