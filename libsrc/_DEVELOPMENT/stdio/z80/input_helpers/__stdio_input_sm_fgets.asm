@@ -54,7 +54,7 @@ space:
    ld (de),a                   ; write char to buffer
    inc de
    
-   cp ASCII_EOL                ; '\n'
+   cp CHAR_LF                  ; '\n'
    jr z, delim_met
    
    or a                        ; indicate accepted

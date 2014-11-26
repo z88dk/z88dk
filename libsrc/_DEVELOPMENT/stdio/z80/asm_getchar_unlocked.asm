@@ -35,5 +35,5 @@ asm_getchar_unlocked:
    ;
    ; uses  : all
 
-   ld ix,__stdio_file_stdin
+   ld ix,(__stdio_file_stdin)
    jp asm_fgetc_unlocked

@@ -32,7 +32,7 @@ __stdio_input_sm_gets:
    ; return: de = void *s_ptr (address past last byte written)
    ;          l = 1 if caller should remove \n
    
-   cp ASCII_EOL                ; '\n'
+   cp CHAR_LF                  ; '\n'
    jr z, delim_met
    
    ld (de),a                   ; write char to buffer

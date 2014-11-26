@@ -44,5 +44,5 @@ asm_vprintf_unlocked:
    ;            
    ; uses  : all
 
-   ld ix,__stdio_file_stdout
+   ld ix,(__stdio_file_stdout)
    jp asm_vfprintf_unlocked

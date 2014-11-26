@@ -41,7 +41,7 @@ asm_puts:
    ;
    ; uses  : all
 
-   ld ix,__stdio_file_stdout
+   ld ix,(__stdio_file_stdout)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

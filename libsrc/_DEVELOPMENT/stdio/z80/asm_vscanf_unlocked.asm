@@ -47,5 +47,5 @@ asm_vscanf_unlocked:
    ;            
    ; uses  : all except ix
 
-   ld ix,__stdio_file_stdin
+   ld ix,(__stdio_file_stdin)
    jp asm_vfscanf_unlocked

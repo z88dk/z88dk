@@ -40,5 +40,5 @@ asm_getline_unlocked:
    ;
    ; uses  : all except ix
 
-   ld bc,ASCII_EOL
+   ld bc,CHAR_LF
    jp asm_getdelim_unlocked

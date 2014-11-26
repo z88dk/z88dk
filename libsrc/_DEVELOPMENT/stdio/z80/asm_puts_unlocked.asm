@@ -38,7 +38,7 @@ asm_puts_unlocked:
    ;
    ; uses  : all
 
-   ld ix,__stdio_file_stdout
+   ld ix,(__stdio_file_stdout)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
@@ -58,7 +58,7 @@ asm0_puts_unlocked:
    
    push hl                     ; save strlen(s)
    
-   ld e,ASCII_EOL
+   ld e,CHAR_LF
    call asm0_fputc_unlocked    ; output '\n'
    
    pop hl                      ; hl = strlen(s)

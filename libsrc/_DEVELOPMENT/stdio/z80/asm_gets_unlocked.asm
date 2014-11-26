@@ -57,7 +57,7 @@ asm_gets_unlocked:
    ;
    ; uses  : all except ix
 
-   ld ix,__stdio_file_stdin
+   ld ix,(__stdio_file_stdin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

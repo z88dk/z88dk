@@ -41,7 +41,7 @@ asm_getchar:
    ;
    ; uses  : all
 
-   ld ix,__stdio_file_stdin
+   ld ix,(__stdio_file_stdin)
    jp asm_fgetc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

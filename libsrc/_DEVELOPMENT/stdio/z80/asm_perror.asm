@@ -27,7 +27,7 @@ asm_perror:
    ;
    ; uses  : all except ix
    
-   ld ix,__stdio_file_stderr
+   ld ix,(__stdio_file_stderr)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
@@ -89,7 +89,7 @@ errno_string:
    call asm_strerror
    call asm0_fputs_unlocked
    
-   ld e,ASCII_EOL
+   ld e,CHAR_LF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
