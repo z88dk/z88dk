@@ -1,0 +1,12 @@
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_echo
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_getc
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_eatc
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_flsh
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_getc
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_ictl
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_read
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_stdio_msg_seek
+fcntl/z80/drivers/terminal/console_01/input/console_01_input_terminal
+fcntl/z80/drivers/terminal/console_01/output/console_01_output_stdio_msg_putc
+fcntl/z80/drivers/terminal/console_01/output/console_01_output_stdio_msg_writ
+fcntl/z80/drivers/terminal/console_01/output/console_01_output_terminal
