@@ -2,6 +2,8 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair zx version
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_InitCharStruct_callee
 
 sp1_InitCharStruct_callee:

@@ -4,10 +4,13 @@
 
 ; *** PLEASE HELP ME I'VE BEEN MADE UGLY BY BUGFIXES
 
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_MoveSprAbs
 
 EXTERN asm_sp1_GetUpdateStruct, __sp1_add_spr_char, __sp1_remove_spr_char
-EXTERN SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 asm_sp1_MoveSprAbs:
 

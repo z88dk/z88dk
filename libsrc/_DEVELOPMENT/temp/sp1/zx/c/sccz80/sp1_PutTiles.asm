@@ -1,6 +1,8 @@
 ; void sp1_PutTiles(struct sp1_Rect *r, struct sp1_tp *src)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_PutTiles
 
 EXTERN asm_sp1_PutTiles

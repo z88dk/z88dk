@@ -1,5 +1,7 @@
 ; void sp1_PrintAtInv(uchar row, uchar col, uchar colour, uint tile)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_PrintAtInv
 
 _sp1_PrintAtInv:

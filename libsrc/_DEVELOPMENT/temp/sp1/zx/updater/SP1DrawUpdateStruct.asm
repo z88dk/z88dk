@@ -2,10 +2,12 @@
 ; 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_sp1
+
 PUBLIC SP1DrawUpdateStruct
 PUBLIC SP1RETSPRDRAW
-
-EXTERN SP1V_ATTRBUFFER, SP1V_PIXELBUFFER, SP1V_TILEARRAY
 
 ; Draw the tile described by the indicated update struct
 ; to screen -- not meant to be called directly, just a

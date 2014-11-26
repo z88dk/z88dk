@@ -1,5 +1,7 @@
 ; void sp1_GetSprClrAddr(struct sp1_ss *s, uchar **sprdest)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_GetSprClrAddr
 
 _sp1_GetSprClrAddr:

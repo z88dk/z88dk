@@ -1,5 +1,7 @@
 ; void sp1_PrintString(struct sp1_pss *ps, uchar *s)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_PrintString
 
 _sp1_PrintString:

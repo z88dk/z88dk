@@ -1,5 +1,7 @@
 ; void sp1_IterateUpdateArr(struct sp1_update **ua, void *hook)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_IterateUpdateArr
 
 _sp1_IterateUpdateArr:

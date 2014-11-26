@@ -1,5 +1,7 @@
 ; struct sp1_update *sp1_GetUpdateStruct(uchar row, uchar col)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_GetUpdateStruct
 
 _sp1_GetUpdateStruct:

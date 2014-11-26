@@ -1,6 +1,8 @@
 ; void sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_MoveSprAbs
 
 EXTERN asm_sp1_MoveSprAbs

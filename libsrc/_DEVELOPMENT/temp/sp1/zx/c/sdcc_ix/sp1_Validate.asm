@@ -1,5 +1,7 @@
 ; void sp1_Validate(struct sp1_Rect *r)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_Validate
 
 _sp1_Validate:

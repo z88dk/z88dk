@@ -1,5 +1,7 @@
 ; void *sp1_TileEntry(uchar c, void *def)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_TileEntry
 
 _sp1_TileEntry:

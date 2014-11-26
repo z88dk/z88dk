@@ -1,5 +1,7 @@
 ; void sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n)
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_GetSprClr
 
 EXTERN asm_sp1_GetSprClr

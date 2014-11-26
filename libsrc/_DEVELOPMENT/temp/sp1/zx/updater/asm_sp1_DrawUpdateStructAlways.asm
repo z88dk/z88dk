@@ -5,6 +5,8 @@
 
 ; FASTCALL
 
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_DrawUpdateStructAlways
 
 EXTERN SP1DrawUpdateStruct

@@ -1,6 +1,8 @@
 ; void sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_IterateUpdateSpr
 
 EXTERN asm_sp1_IterateUpdateSpr

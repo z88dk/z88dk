@@ -1,6 +1,8 @@
 
 ; sp1_DrawUpdateStructIfVal(struct sp1_update *u)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_DrawUpdateStructIfVal
 
 _sp1_DrawUpdateStructIfVal:

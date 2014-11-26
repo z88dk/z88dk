@@ -3,9 +3,11 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-PUBLIC asm_sp1_InvUpdateStruct
+INCLUDE "clib_target_cfg.asm"
 
-EXTERN SP1V_UPDATELISTT
+SECTION seg_code_sp1
+
+PUBLIC asm_sp1_InvUpdateStruct
 
 ; FASTCALL
 

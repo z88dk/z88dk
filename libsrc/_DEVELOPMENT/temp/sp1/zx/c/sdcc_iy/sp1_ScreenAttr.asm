@@ -1,5 +1,7 @@
 ; uchar sp1_ScreenAttr(uchar row, uchar col)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_ScreenAttr
 
 _sp1_ScreenAttr:

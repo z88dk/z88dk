@@ -2,6 +2,8 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_IterateSprChar
 
 EXTERN l_jpix

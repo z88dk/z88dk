@@ -2,6 +2,8 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_PrintString
 
 EXTERN SP1PrintString, SP1PSPOP, SP1PSPUSH

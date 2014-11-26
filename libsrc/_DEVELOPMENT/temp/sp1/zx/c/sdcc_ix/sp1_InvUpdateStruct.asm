@@ -1,6 +1,8 @@
 
 ; sp1_InvUpdateStruct
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_InvUpdateStruct
 
 _sp1_InvUpdateStruct:

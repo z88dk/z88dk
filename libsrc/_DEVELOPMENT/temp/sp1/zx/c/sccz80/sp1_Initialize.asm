@@ -1,5 +1,7 @@
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_Initialize
 
 EXTERN asm_sp1_Initialize

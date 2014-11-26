@@ -1,5 +1,7 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane)
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_AddColSpr
 
 _sp1_AddColSpr:

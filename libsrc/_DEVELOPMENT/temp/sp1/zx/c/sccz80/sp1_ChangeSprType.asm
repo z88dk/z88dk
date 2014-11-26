@@ -1,5 +1,7 @@
 ; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_ChangeSprType
 
 EXTERN asm_sp1_ChangeSprType

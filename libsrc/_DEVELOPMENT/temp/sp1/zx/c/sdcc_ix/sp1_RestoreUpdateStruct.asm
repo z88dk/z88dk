@@ -1,6 +1,8 @@
 
 ; sp1_RestoreUpdateStruct
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_RestoreUpdateStruct
 
 _sp1_RestoreUpdateStruct:

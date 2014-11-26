@@ -2,10 +2,13 @@
 ; 05.2006, 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_sp1
+
 PUBLIC SP1PrintString
 
 EXTERN asm_sp1_GetUpdateStruct, l_jpix
-EXTERN SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
 ; A sophisticated print string function
 ;

@@ -2,9 +2,11 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-PUBLIC asm_sp1_TileEntry
+INCLUDE "clib_target_cfg.asm"
 
-EXTERN SP1V_TILEARRAY
+SECTION seg_code_sp1
+
+PUBLIC asm_sp1_TileEntry
 
 asm_sp1_TileEntry:
 

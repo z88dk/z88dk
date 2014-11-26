@@ -1,6 +1,8 @@
 
 ; sp1_ValUpdateStruct
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_ValUpdateStruct
 
 _sp1_ValUpdateStruct:

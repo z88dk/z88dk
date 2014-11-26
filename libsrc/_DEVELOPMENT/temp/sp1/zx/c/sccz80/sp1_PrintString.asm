@@ -1,6 +1,8 @@
 ; void sp1_PrintString(struct sp1_pss *ps, uchar *s)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_PrintString
 
 EXTERN asm_sp1_PrintString

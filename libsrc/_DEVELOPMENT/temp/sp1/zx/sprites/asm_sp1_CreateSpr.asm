@@ -2,6 +2,8 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_CreateSpr
 
 EXTERN _sp1_struct_ss_prototype, _sp1_struct_cs_prototype

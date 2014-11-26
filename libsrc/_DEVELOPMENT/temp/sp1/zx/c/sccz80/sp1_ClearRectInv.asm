@@ -1,5 +1,7 @@
 ; void sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_ClearRectInv
 
 EXTERN asm_sp1_ClearRectInv

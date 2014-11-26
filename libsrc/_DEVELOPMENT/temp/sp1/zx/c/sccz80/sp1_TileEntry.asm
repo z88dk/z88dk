@@ -1,6 +1,8 @@
 ; void *sp1_TileEntry(uchar c, void *def)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_TileEntry
 
 EXTERN asm_sp1_TileEntry

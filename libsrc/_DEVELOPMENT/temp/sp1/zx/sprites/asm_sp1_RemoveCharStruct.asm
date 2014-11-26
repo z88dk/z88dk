@@ -3,6 +3,8 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_RemoveCharStruct
 
 EXTERN __sp1_remove_spr_char

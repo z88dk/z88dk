@@ -3,10 +3,14 @@
 ; 01.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_sp1
+
 PUBLIC SP1_DRAW_MASK2RB
 
 EXTERN SP1_DRAW_MASK2LB
-EXTERN SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
+EXTERN SP1RETSPRDRAW
 
 ; following data segment copied into struct sp1_cs
 

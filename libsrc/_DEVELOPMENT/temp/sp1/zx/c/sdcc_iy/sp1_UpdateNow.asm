@@ -1,6 +1,8 @@
 
 ; sp1_UpdateNow
 
+SECTION seg_code_sp1
+
 PUBLIC _sp1_UpdateNow
 
 _sp1_UpdateNow:

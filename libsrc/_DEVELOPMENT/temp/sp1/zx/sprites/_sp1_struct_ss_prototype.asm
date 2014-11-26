@@ -1,7 +1,9 @@
 
-PUBLIC _sp1_struct_ss_prototype
+INCLUDE "clib_target_cfg.asm"
 
-EXTERN SP1V_ROTTBL, SP1V_DISPWIDTH
+SECTION seg_code_sp1
+
+PUBLIC _sp1_struct_ss_prototype
 
 _sp1_struct_ss_prototype:
 

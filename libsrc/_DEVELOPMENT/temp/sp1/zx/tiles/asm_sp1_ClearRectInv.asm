@@ -2,10 +2,13 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_sp1
+
 PUBLIC asm_sp1_ClearRectInv
 
 EXTERN asm_sp1_GetUpdateStruct, asm_sp1_ClearRect, SP1CRSELECT, l_jpix
-EXTERN SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 asm_sp1_ClearRectInv:
 

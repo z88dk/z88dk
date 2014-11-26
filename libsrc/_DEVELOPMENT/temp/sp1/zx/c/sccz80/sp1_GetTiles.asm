@@ -1,5 +1,7 @@
 ; void sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest)
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_GetTiles
 
 EXTERN asm_sp1_GetTiles

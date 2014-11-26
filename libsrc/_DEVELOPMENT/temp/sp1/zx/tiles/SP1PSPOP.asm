@@ -2,6 +2,8 @@
 ; 02.2008 aralbrec
 ; sinclair spectrum version
 
+SECTION seg_code_sp1
+
 PUBLIC SP1PSPOP
 
 ; enter : de  = & string to print (or something else)

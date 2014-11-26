@@ -1,6 +1,8 @@
 ; void sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile)
 ; CALLER linkage for function pointers
 
+SECTION seg_code_sp1
+
 PUBLIC sp1_PrintAt
 
 EXTERN asm_sp1_PrintAt
