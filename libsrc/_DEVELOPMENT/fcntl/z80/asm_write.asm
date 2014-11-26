@@ -16,7 +16,7 @@ SECTION seg_code_fcntl
 PUBLIC asm_write
 
 EXTERN __fcntl_fdstruct_from_fd_2, STDIO_MSG_WRIT, l_jpix
-EXTERN error_znc, error_mc
+EXTERN error_znc, error_mc, error_eacces_mc
 
 asm_write:
 
@@ -78,9 +78,12 @@ ENDIF
    ; hl'= void *buf
    ; bc'= nbyte > 0
    
-   ld a,STDIO_MSG_WRIT
+   bit 1,(ix+8)
+   jp z, error_eacces_mc       ; if write not allowed
    
+   ld a,STDIO_MSG_WRIT
    call l_jpix                 ; deliver message to driver
+   
    ret nc                      ; if successful, hl = num bytes written
 
    ld a,h
