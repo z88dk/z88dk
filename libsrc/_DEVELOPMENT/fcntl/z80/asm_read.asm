@@ -16,7 +16,7 @@ SECTION seg_code_fcntl
 PUBLIC asm_read
 
 EXTERN __fcntl_fdstruct_from_fd_2, STDIO_MSG_READ, l_jpix
-EXTERN error_znc, error_mc
+EXTERN error_znc, error_mc, error_eacces_mc
 
 asm_read:
 
@@ -75,6 +75,9 @@ ENDIF
    ; hl = nbyte > 0
    ; de'= void *buf
    ; bc'= nbyte > 0
+   
+   bit 0,(ix+8)
+   jp z, error_eacces_mc       ; if reads not allowed
    
    ld a,STDIO_MSG_READ
    call l_jpix                 ; deliver message to driver
