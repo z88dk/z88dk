@@ -72,11 +72,16 @@ asm_fopen:
    call asm0_vopen             ; target must open file
    jr c, open_failed           ; if target cannot open file
 
-   ; de = FDSTRUCT *, returned by target
+   ; de = FDSTRUCT *, returned by vopen()
+   ;  c = FILE type, returned by vopen()
    ; stack = mode byte, FILE *
+
+   ld a,c
 
    pop hl                      ; hl = FILE *
    pop bc                      ; c = mode byte
+
+   ld b,a                      ; b = FILE type (0 or 1)
 
    ; initialize FILE structure
    

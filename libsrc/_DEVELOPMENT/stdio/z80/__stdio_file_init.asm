@@ -12,6 +12,7 @@ __stdio_file_init:
    ; enter : hl = FILE *
    ;         de = FDSTRUCT *
    ;          c = mode byte (only RW matter)
+   ;          b = FILE type (0, 1 = stdio handles unget from eatc)
    ;
    ; exit  : hl = FILE *
    ;
@@ -31,6 +32,7 @@ __stdio_file_init:
    rrca
    rrca
    and $c0
+   or b                        ; add FILE type
    ld (hl),a                   ; state_flags_0
    inc hl
    

@@ -94,10 +94,13 @@ asm0_freopen_unlocked:
    
    call asm0_vopen             ; target must open file
    
+   ld a,c                      ; a = FILE type
+   
    pop ix                      ; ix = FILE *
    pop hl                      ; hl = FILE *
    pop bc                      ; c = mode byte
    
+   ld b,a                      ; b = FILE type
    jr c, invalid_open          ; if open failed
    
    ; initialize FILE structure
@@ -105,6 +108,7 @@ asm0_freopen_unlocked:
    ; de = FDSTRUCT *, returned by target open
    ; hl = ix = FILE *
    ;  c = mode byte
+   ;  b = FILE type
 
    call __stdio_file_init
    
@@ -227,10 +231,15 @@ perform_mode_change:
    
    ; alter FILE's mode bits
    
+   ld a,(ix+3)
+   and $07
+   ld b,a                      ; b = FILE type
+   
    ld a,c
    rrca
    rrca
    and $c0
+   or b
    ld (ix+3),a                 ; FILE.state_flags_0   
 
    ld a,c
