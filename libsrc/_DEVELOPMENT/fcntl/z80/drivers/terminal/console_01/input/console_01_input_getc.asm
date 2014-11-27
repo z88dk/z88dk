@@ -5,10 +5,12 @@ SECTION seg_code_fcntl
 
 PUBLIC console_01_input_getc
 
+EXTERN ITERM_MSG_GETC, ITERM_MSG_READLINE, ITERM_MSG_PRINT_CURSOR
+EXTERN ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS, ITERM_MSG_BS_PWD
+
 EXTERN console_01_input_echo, l_setmem_hl, asm_b_array_clear
-EXTERN ITERM_MSG_READLINE, console_01_input_oterm, l_inc_sp
-EXTERN ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS
-EXTERN asm_b_array_push_back, asm_b_array_at, ITERM_MSG_GETC, l_jpix
+EXTERN console_01_input_oterm, l_inc_sp, l_jpix
+EXTERN asm_b_array_push_back, asm_b_array_at
 
 console_01_input_getc:
 
@@ -199,6 +201,15 @@ cursor_erase_end:
    push bc                     ; save b_array.size
    
    ld a,ITERM_MSG_BS
+   
+   bit 6,(ix+6)
+   jr z, not_password_mode
+
+   ld a,ITERM_MSG_BS_PWD
+   ld e,CHAR_PASSWORD
+
+not_password_mode:
+
    call console_01_input_oterm ; instruct output terminal to backspace
    
    pop bc                      ; bc = b_array.size
