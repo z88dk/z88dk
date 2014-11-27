@@ -3,7 +3,7 @@ SECTION seg_code_stdio
 
 PUBLIC __stdio_lock_tryacquire
 
-EXTERN asm_mtx_trylock
+EXTERN asm_mtx_trylock, l_offset_ix_de
 
 __stdio_lock_tryacquire:
 
@@ -20,11 +20,8 @@ __stdio_lock_tryacquire:
    push de
    push hl
 
-   ld e,ixl
-   ld d,ixh                    ; de = FILE *
-   
    ld hl,7
-   add hl,de                   ; hl = & FILE->mtx_t
+   call l_offset_ix_de         ; hl = & FILE->mtx_t
    
    call asm_mtx_trylock        ; lock stream
    

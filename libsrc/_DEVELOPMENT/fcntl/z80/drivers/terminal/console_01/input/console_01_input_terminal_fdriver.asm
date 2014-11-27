@@ -18,21 +18,23 @@ console_01_input_terminal_fdriver:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    IF _CLIB_OPT_MULTITHREAD & $10
    
-   EXTERN asm_mtx_lock, error_enolck_zc
+   EXTERN asm_mtx_lock, l_offset_ix_de, driver_error_enolck_zc
    
    push af
    push bc
    push de
    push hl
    
-   call mutex_address
+   ld hl,8
+   call l_offset_ix_de         ; hl = & FDSTRUCT.mutex
+
    call asm_mtx_lock
    
    pop hl
    pop de
    pop bc
    
-   jp c, error_enolck_zc - 1   ; if lock could not be acquired
+   jp c, driver_error_enolck_zc - 1
    
    pop af
    
@@ -44,13 +46,17 @@ console_01_input_terminal_fdriver:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    IF _CLIB_OPT_MULTITHREAD & $10
 
+   EXTERN asm_mtx_unlock
+
    push af
    push bc
    push de
    push hl
    
-   call mutex_address
-   call asm_mtx_lock
+   ld hl,8
+   call l_offset_ix_de         ; hl = & FDSTRUCT.mutex
+
+   call asm_mtx_unlock
    
    pop hl
    pop de
@@ -62,19 +68,3 @@ console_01_input_terminal_fdriver:
    
    pop ix                      ; restore ix
    ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF _CLIB_OPT_MULTITHREAD & $10
-   
-mutex_address:
-
-   push ix
-   pop hl                      ; hl = & FDSTRUCT.JP
-   
-   ld de,8
-   add hl,de                   ; hl = & FDSTRUCT.mutex
-   
-   ret   
-   
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

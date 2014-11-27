@@ -3,7 +3,7 @@ SECTION seg_code_stdio
 
 PUBLIC __stdio_file_destructor
 
-EXTERN asm_mtx_destroy, __0_stdio_file_constructor
+EXTERN asm_mtx_destroy, __0_stdio_file_constructor, l_offset_ix_de
 
 __stdio_file_destructor:
 
@@ -15,11 +15,8 @@ __stdio_file_destructor:
    ;
    ; uses  : af, bc, de, hl
    
-   ld e,ixl
-   ld d,ixh                    ; de = FILE *
-   
    ld hl,7
-   add hl,de                   ; hl = & FILE->mtx
+   call l_offset_ix_de         ; hl = & FILE->mtx, de = FILE *
    
    ex de,hl
    call __0_stdio_file_constructor
