@@ -58,6 +58,13 @@
 ;         bc = int edit_buffer_len
 ;
 ; last char in edit_buffer is the one being deleted.
+;
+; * ITERM_MSG_BS_PWD
+;
+; enter :  e = CHAR_PASSWORD
+;         bc = int edit_buffer_len
+;
+; all output is CHAR_PASSWORD, delete last one 
 
 SECTION seg_code_fcntl
 

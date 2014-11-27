@@ -9,6 +9,8 @@ l/z80/l_inc_sp
 l/z80/l_jphl
 l/z80/l_jpix
 l/z80/l_jpiy
+l/z80/l_offset_ix_bc
+l/z80/l_offset_ix_de
 l/z80/l_readword_2_hl
 l/z80/l_readword_hl
 l/z80/l_ret
