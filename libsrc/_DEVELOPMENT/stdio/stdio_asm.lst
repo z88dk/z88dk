@@ -97,6 +97,7 @@ stdio/z80/__stdio_file_constructor
 stdio/z80/__stdio_file_deallocate
 stdio/z80/__stdio_file_destructor
 stdio/z80/__stdio_file_init
+stdio/z80/__stdio_file_list_lock
 stdio/z80/__stdio_length_modifier
 stdio/z80/__stdio_lock_acquire
 stdio/z80/__stdio_lock_file_list

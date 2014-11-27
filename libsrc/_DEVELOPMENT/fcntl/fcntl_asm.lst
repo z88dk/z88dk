@@ -3,6 +3,7 @@ fcntl/z80/__fcntl_fd_from_fdstruct
 fcntl/z80/__fcntl_fdchain_descend
 fcntl/z80/__fcntl_fdstruct_from_fd_1
 fcntl/z80/__fcntl_fdstruct_from_fd_2
+fcntl/z80/__fcntl_fdtbl_lock
 fcntl/z80/__fcntl_first_available_fd
 fcntl/z80/__fcntl_inc_refcount
 fcntl/z80/__fcntl_lock_fdtbl

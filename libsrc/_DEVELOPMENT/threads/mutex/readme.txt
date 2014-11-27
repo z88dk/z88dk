@@ -16,3 +16,7 @@ typedef struct mtx_s
    forward_list *q;    // list of threads blocked on mutex, must be fwd_list
                        //   because that container has idempotent remove
 } mtx_t;
+
+mtx_plain     = $01
+mtx_recursive = $02
+mtx_timed     = $04

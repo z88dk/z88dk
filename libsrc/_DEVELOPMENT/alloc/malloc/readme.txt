@@ -73,7 +73,9 @@ seg_code_malloc
 data
 ====
 
+seg_data_malloc
+
 __malloc_heap (void *)
 
-Holds the address of the implied heap in calls to malloc, realloc, etc.
-Must be supplied by the CRT startup code.
+Holds the address of the implied heap used by unnamed heap api
+(malloc, realloc, calloc, free, etc). Externally supplied, section suggested.

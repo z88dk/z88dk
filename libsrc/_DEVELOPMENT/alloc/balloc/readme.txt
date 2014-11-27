@@ -35,7 +35,9 @@ seg_code_balloc
 data
 ====
 
+seg_data_balloc
+
 __balloc_array (void *)
 
-Holds a pointer to currently active balloc array.
-Must be supplied by the CRT startup code.
+Holds a pointer to the currently active balloc array.
+Externally supplied, section suggested.
