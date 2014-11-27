@@ -14,18 +14,12 @@ offset  size  name              purpose
 
  -2      2    link              pointer for linked list of FILEs
   0      1    JP                z80 jump instruction
-  1      2    stdio_next        address of next stdio struct in chain
+1...2    2    fdstruct          address of connected FDSTRUCT
   3      1    state_flags_0     flags used to hold stream state, described below
   4      1    state_flags_1     flags spillover, described below
   5      1    conversion_flags  flags used by printf converters, described below
   6      1    ungetc            unget char
-  7      6    mtx_t file_lock   recursive mutex used for locking file
- 13      ?    (temporary state) __CLIB_OPT_STDIO_FILE_EXTRA free bytes for driver
-
-note:  __CLIB_OPT_STDIO_FILE_EXTRA must be >= 4 currently; the first two
-       bytes at offset 13,14 are driver flags "dflags" (see below).  The
-       next two bytes are normally a pointer to a driver state structure
-       but the specific use is determined by the driver.
+7..12    6    mtx_t file_lock   recursive mutex used for locking file
 
 * state_flags_0
 
@@ -36,12 +30,14 @@ bit   name    purpose
  5    0       reserved
  4    eof     if set the input stream reached eof
  3    err     if set the stream encountered an error
-210   type    stdio structure type (000 = FILE, 001 = FILE_MEMSTREAM)
+210   type    stdio structure type (000 = FILE, 001 = FILE_NO_UNGET, 111 = MEMSTREAM)
 
-note: If type has the LSB set, stdio will not write the unconsumed char
-      to ungetc in the FILE struct.  This is to allow memstreams and 
-      vsscanf to handle ungetc locally, which simplifies that code.
-
+note: If type has the LSB set, stdio will not write any unconsumed char
+      to ungetc in the FILE struct.  Some internal stdio operations can
+      cause a char to be read and rejected and some drivers cannot unget
+      that rejected char.  By resetting the LSB bit, the rejected char
+      can instead be placed in the ungetc spot by stdio automatically.
+            
 * state_flags_1
 
 bit   name    purpose
@@ -67,43 +63,6 @@ bit   name    purpose
  1    base    if set indicates octal conversion
  0    P       if set indicates precision was defined 
 
-* dflags
-
-Flag bits associated with the driver.  This is temporary state information
-that will be moved to the driver when posix file descriptors are added.
-
-if bits 2..0 = 000, the driver has no flags managed by stdio
-
-if bits 2..0 = 001, the driver is an input terminal
-
-   BYTE AT OFFSET 13
-   bit   name      purpose
-
-    7    echo      if set, echo is on
-    6    password  if set, echo asterisks only
-    5    line      if set, input is gathered a line at a time
-    4    cook      if set, input may be processed by the driver
-    3    caps lock if set, indicates processed chars should be capitalized
-   210   type      001 = input terminal
-
-   BYTE AT OFFSET 14
-
-   bit   name      purpose
-
-    76   reserved  reserved for driver use
-    1    cursor    if set, terminal generates a cursor while in line mode
-    0    crlf      if set, terminal performs crlf conversions
-
-if bits 2..0 = 010, the driver is an output terminal
-
-   BYTE AT OFFSET 13
-   bit   name      purpose
-   
-    4    cook      if set, output may be processed by the driver
-   210   type      010 = output terminal
-
-bits 2..0 = 100 reserved to prevent conflict with memstreams
-
 
 MEMORY STREAM FILE STRUCTURE
 ============================
@@ -113,10 +72,10 @@ offset  size  name              purpose
  -2       2   link              pointer for linked list of FILEs
   0      13   FILE              FILE structure not including link
   13      1   memstream_flags   see below
-  14      2   char **bufp       where to store buffer address
-  16      2   size_t *sizep     where to store buffer length
-  18      8   b_vector          byte vector to manage resizeable buffer
-  26      2   fp                file pointer index (index in vector for next read/write)
+14..15    2   char **bufp       where to store buffer address
+16..17    2   size_t *sizep     where to store buffer length
+18..25    8   b_vector          byte vector to manage resizeable buffer
+26..27    2   fp                file pointer index (index in vector for next read/write)
   28      1   mode              mode byte when memstream was created (for freopen() )
 
 * memstream_flags
@@ -313,7 +272,8 @@ carry set on error (write buffers could not be flushed)
 * STDIO_MSG_CLOS
 ****************
 
-Flush the file and then perform any cleanup.
+Flush message is always sent before close.
+Perform any cleanup.
 
 input:
 
