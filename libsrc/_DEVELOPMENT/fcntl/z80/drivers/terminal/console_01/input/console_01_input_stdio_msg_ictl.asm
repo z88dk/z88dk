@@ -4,7 +4,7 @@ SECTION seg_code_fcntl
 PUBLIC console_01_input_stdio_msg_ictl
 
 EXTERN console_01_input_stdio_msg_flsh, asm_memcpy, error_enotsup_mc
-EXTERN IOCTL_ITERM_RESET, IOCTL_ITERM_TIE, IOCTL_ITERM_GET_EDITBUF, IOCTL_ITERM_SET_EDITBUF
+EXTERN IOCTL_ITERM_TIE, IOCTL_ITERM_GET_EDITBUF, IOCTL_ITERM_SET_EDITBUF
 
 console_01_input_stdio_msg_ictl:
 
@@ -15,6 +15,10 @@ console_01_input_stdio_msg_ictl:
    ;
    ; exit  : carry reset if ok, HL = return value != -1
    ;         carry set if fail
+
+   ld a,e
+   and $07
+   jp z, error_enotsup_mc      ; do not understand non-terminal messages
 
    ld a,d
    and $c0
@@ -27,7 +31,6 @@ console_01_input_stdio_msg_ictl:
    ret z                       ; if line mode unaffected return ok
    
    and c
-   and $20
    ret nz                      ; if line mode not being disabled return ok
    
    jp console_01_input_stdio_msg_flsh
@@ -37,19 +40,11 @@ unmanaged_flags:
    inc d
    dec d
    jp z, error_enotsup_mc      ; know nothing about these ICTLs
-
-   ld a,e
-   and $07                     ; ITERMs have device code = 1
-   dec a
-   jp nz, error_enotsup_mc     ; not an ITERM ioctl
    
    ld a,e                      ; a = LSB of ioctl request
    
    cp IOCTL_ITERM_TIE & 0xff
    jr z, tie_oterm             ; tie to an output terminal
-   
-   cp IOCTL_ITERM_RESET & 0xff ; reset means flush
-   jp z, console_01_input_stdio_msg_flsh
 
    cp IOCTL_ITERM_GET_EDITBUF & 0xff
    jr z, get_editbuf           ; return copy of edit buffer
