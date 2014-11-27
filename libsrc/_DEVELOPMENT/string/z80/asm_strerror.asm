@@ -28,6 +28,9 @@ asm_strerror:
    or a
    jr nz, use_default
    
+   or l
+   jr z, use_ok
+   
    ld e,l
    ld hl,__error_strings
    
@@ -54,6 +57,11 @@ use_default:
    scf
    ret
 
+use_ok:
+
+   ld hl,__error_string_ok
+   ret
+
 __error_string_default:
 
    IF __CLIB_OPT_ERROR & $02
@@ -68,17 +76,15 @@ __error_string_default:
    
    ENDIF
 
-SECTION seg_rodata_error_strings
+__error_string_ok:
 
    IF __CLIB_OPT_ERROR & $02
 
-      defb 0
       defm "EOK - No error"
       defb 0
 
    ELSE
    
-      defb 0
       defm "EOK"
       defb 0
    
