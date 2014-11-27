@@ -56,7 +56,7 @@ SECTION seg_code_fcntl
 PUBLIC console_01_input_kbd_lastk
 
 EXTERN console_01_input_terminal, console_01_input_stdio_msg_ictl
-EXTERN console_01_input_stdio_msg_flsh, error_zc
+EXTERN console_01_input_stdio_msg_flsh, l_offset_ix_de, error_zc
 
 EXTERN IOCTL_ITERM_LASTK
 EXTERN ITERM_MSG_GETC, STDIO_MSG_ICTL, STDIO_MSG_FLSH
@@ -170,13 +170,8 @@ __lastk_address:
 
    ; return & LASTK
    
-   push ix
-   pop hl                      ; hl = & FDSTRUCT.JP
-   
-   ld de,25
-   add hl,de                   ; hl = & LASTK
-
-   ret
+   ld hl,25
+   jp l_offset_ix_de           ; hl = & LASTK
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

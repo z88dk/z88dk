@@ -46,7 +46,7 @@ SECTION seg_code_fcntl
 PUBLIC console_01_input_kbd_inkey
 
 EXTERN asm_z80_delay_ms, asm_in_inkey
-EXTERN console_01_input_terminal
+EXTERN console_01_input_terminal, l_offset_ix_de
 
 EXTERN IOCTL_ITERM_SET_DELAYS
 EXTERN ITERM_MSG_GETC, STDIO_MSG_ICTL, STDIO_MSG_FLSH
@@ -278,12 +278,7 @@ __getk_state_address:
 
    ; return & getk_state
    
-   push ix
-   pop hl                      ; hl = & FDSTRUCT.JP
-   
-   ld de,25
-   add hl,de                   ; hl = & getk_state
-   
-   ret
+   ld hl,25
+   jp l_offset_ix_de           ; hl = & getk_state
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
