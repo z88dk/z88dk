@@ -24,7 +24,7 @@ __fcntl_fdstruct_from_fd_1:
    ;           hl = 0
    ;           carry set, errno = EBDFD
    ;
-   ; uses  : af, de, hl, ix
+   ; uses  : af, de, hl
    
    ld a,h
    or a
