@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.7 2014-11-25 17:09:21 stefano Exp $
+ *	$Id: zxopus.h,v 1.8 2014-11-27 15:18:20 stefano Exp $
  */
 
 
@@ -131,14 +131,14 @@ extern int __LIB__ opus_getblocksize (int drive);
 // load a sector
 // A standard 178K Opus disk has 0..718 (719?) sectors
 // Each sector is 256 bytes long
-extern int __LIB__ opus_getsect(int drive, int sector, char * buffer) __SMALLCDECL;
+extern int __LIB__ opus_getsect(int drive, int sector, unsigned char * buffer) __SMALLCDECL;
 extern int __LIB__ __CALLEE__ opus_getsect_callee(int drive, int sector, char * buffer)__SMALLCDECL;
 #define opus_getsect(a,b,c)           opus_getsect_callee(a,b,c)
 
 // save a sector
 // A standard 178K Opus disk has 0..718 (719?) sectors
 // Each sector is 256 bytes long
-extern int __LIB__ opus_putsect(int drive, int sector, char * buffer) __SMALLCDECL;
+extern int __LIB__ opus_putsect(int drive, int sector, unsigned char * buffer) __SMALLCDECL;
 extern int __LIB__ __CALLEE__ opus_putsect_callee(int drive, int sector, char * buffer)__SMALLCDECL;
 #define opus_putsect(a,b,c)           opus_putsect_callee(a,b,c)
 

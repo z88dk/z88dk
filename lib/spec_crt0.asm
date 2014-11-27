@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.35 2014-01-20 09:15:31 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.36 2014-11-27 15:18:20 stefano Exp $
 ;
 
 
@@ -414,8 +414,10 @@ ENDIF
 call_rom3:
         exx                      ; Use alternate registers
 IF DEFINED_NEED_ZXMMC
+		push	af
 		xor		a                ; standard ROM
 		out		($7F),a          ; ZXMMC FASTPAGE
+		pop		af
 ENDIF
         ex      (sp),hl          ; get return address
         ld      c,(hl)

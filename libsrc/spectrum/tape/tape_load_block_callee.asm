@@ -48,10 +48,12 @@ ENDIF
 		ld      (23613),sp
         call    call_rom3
         defw    1366            ;call ROM3 load routine
+;        pop     hl              ;successfull dump the random value
 		ld	hl,0	; no error
 		jr	nc,loadblock1
 
 .loadblock2
+        pop     de
         pop     de
         ld      (23613),de      ;get back original 23613
         ret

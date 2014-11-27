@@ -42,10 +42,11 @@ ENDIF
         ld      (23613),sp
         call    call_rom3
         defw	1218            ;call ROM3 routine
-        pop     hl              ;successfull dump the random value
+        ;pop     hl              ;successfull dump the random value
         ld      hl,0
         
 .saveblock2
+        pop     de
         pop     de
         ld      (23613),de      ;get back original 23613
         ret
