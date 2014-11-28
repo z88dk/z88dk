@@ -30,11 +30,6 @@ Communication from the input terminal to the output terminal
 is unidirectional from input to output.  The output terminal
 must service the following messages from the input terminal:
 
-; * ITERM_MSG_READLINE
-;
-; informs the output terminal that the input terminal
-; is reading a new line.
-;
 ; * ITERM_MSG_PUTC
 ;
 ; enter : c = char to output
@@ -42,6 +37,11 @@ must service the following messages from the input terminal:
 ; use   : af, bc, de, hl, ix
 ;
 ; source of character is input terminal
+;
+; * ITERM_MSG_READLINE
+;
+; informs the output terminal that the input terminal
+; is reading a new line.
 ;
 ; * ITERM_MSG_PRINT_CURSOR
 ;
