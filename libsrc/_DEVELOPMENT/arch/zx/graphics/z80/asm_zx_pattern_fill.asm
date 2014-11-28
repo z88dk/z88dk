@@ -102,7 +102,7 @@ asm_zx_pattern_fill:
    ;            hl = -1
    ;            carry set, errno = ENOMEM or EINVAL
    ;
-   ; uses  : af, bc, de, hl, ix
+   ; uses  : af, bc, de, hl, ix, bc', de', hl'
 
    ld a,h
    cp 192
@@ -429,15 +429,8 @@ no_wrap_new:
 ; FILL BYTE
 ; enter : b = incoming byte, hl = screen address
 ; exit  : b = fill byte, screen blackened with fill byte, carry set if viable
-
+   
 fill_byte:
-
-   ld a,b
-   xor (hl)                    ; zero out incoming pixels that
-   and b                       ; run into set pixels in display
-   ret z
-
-bf_loop:
 
    ld b,a
    rra                         ; expand incoming pixels
@@ -454,10 +447,10 @@ bf_loop:
    
    cp b
    jr nz, bf_loop              ; keep going until incoming byte does not change
-
+   
    or (hl)
    ld (hl),a                   ; blacken byte on screen
-   
+
    scf                         ; indicate that this was a viable step
    ret
 
