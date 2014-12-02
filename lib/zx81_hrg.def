@@ -1,12 +1,15 @@
 ;       CRT0 for the ZX81 - HIGH RESOLUTION MODE (WRX trick by Wilf Rigter)
 ;
 ;       This code comes from the 'HRG_Tool'  by Matthias Swatosch
-;       Display handler modifications (to preserve IY) by Stefano Bodrato
+;       The Chroma81 version is also derived by the "SPONZY" ZX Spectrum emulator by Zsolt
+;                (adapted to Chroma81 and z88dk by Kmurta and Olofsen)
+;
+;       Display handler modifications to preserve IY and 64 row mode by Stefano Bodrato
 ;
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.23 2014-05-21 19:34:14 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.24 2014-12-02 07:37:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -20,8 +23,8 @@ XDEF	zx_fast
 XDEF	zx_slow
 
 
-IF (startup>=5)
- IF (startup=7)
+IF (((startup>=5)&(startup<13))|(startup>=25))
+ IF ((startup=7)|(startup=27))
   IF DEFINED_MEM8K
     DEFC  TOPOFRAM    = $6000
     DEFC  BASE_VRAM   = $5000
@@ -57,7 +60,7 @@ ELSE
     DEFC  WHOLEMEM    = 6144+128   ; size of graphics map in 256x192 mode
 ENDIF
 
-IF ((startup=3)|(startup=5))
+IF ((startup=3)|(startup=5)|(startup=23)|(startup=25))
 hrgbrkflag:
         defb    0
 ENDIF
@@ -104,7 +107,7 @@ IF !DEFINED_hrgpage
         or      l
         call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
 ENDIF
-IF (startup=7)
+IF ((startup=7)|(startup=27))
         ld      hl,(base_graphics)
         ld      (graybit1),hl
 	ld	de,2048
@@ -170,7 +173,7 @@ ENDIF
 ;----------------------------------------------------------------
 
 HRG_BlankHandler:
-IF (startup>=5)
+IF (((startup>=5)&(startup<13))|(startup>=25))
         ld	a,107	; 52 + 55
         ;ld	a,200	; tweaked for speed
 ELSE
@@ -189,6 +192,15 @@ ENDIF
 ;calculation of label above 32k
 
 HRG_handler:
+IF (startup>=23)		; CHROMA_81
+
+		ld	bc,0            ; delay fine tuning here! Do not change!
+		ld	bc,0
+		ld	bc,0
+		nop
+
+ELSE					; WRX
+
         ld      b,6             ; delay sets the left edge of the screen
 HRG_wait_left:
         djnz    HRG_wait_left   ; delay loop
@@ -198,14 +210,27 @@ HRG_wait_left:
                                 ; (Originally the delay was obtained setting B to 7)
 
         dec     b               ; make Z flag=0
-IF (startup=7)
+
+ENDIF
+		
+IF ((startup=7)|(startup=27))
         ld      hl,(current_graphics)
 ELSE
         ld      hl,(base_graphics)
 ENDIF
 
+
+IF (startup>=23)		; CHROMA_81
+
+		ld	(SAVE_SP),sp
+		ld	sp,HRG_STACK
+		ld	iy,HRG_LineStart+$8000
+		ret
+
+ELSE					; WRX
+
         ld      de,32           ; 32 bytes offset is added to HL for next hline
-IF (startup>=5)
+IF (((startup>=5)&(startup<13))|(startup>=25))
         ld      b,64            ; 64 lines per hires screen
 ELSE
         ld      b,192            ; 192 lines per hires screen
@@ -219,12 +244,16 @@ HRG_outloop:
         add     hl,de           ; add 32 to HL to point to next hline
         dec     b               ; decrement line counter
         jp      nz,HRG_outloop  ; test for last line
+ENDIF
 
 ; -------------------------------------------------------
 ;
 HRG_postproc:
 
-        ;call   $0292          ; return to application program
+IF (startup>=23)		; CHROMA_81
+		ld	sp,(SAVE_SP)
+ENDIF
+		;call   $0292          ; return to application program
 
 ; Different from original call to keep IY unchanged
 ; and to eventually add blank lines
@@ -235,7 +264,7 @@ HRG_postproc:
 ; this idea comes from the Wilf Rigter's WRX1K hi-resolution implementation
 ; if we run in 64 lines mode we need to increase the number of border's lines
 
-IF (startup>=5)
+IF (((startup>=5)&(startup<13))|(startup>=25))
         add     140             ; more blank lines for fast application code and correct sync
         			; Siegfried Engel reports that values between 80 and 159 worked
         			; fine on both a normal TV and an LCD one
@@ -280,7 +309,7 @@ ENDIF
         dec   hl
         ld    ($4034),hl
 
-IF (startup=7)
+IF ((startup=7)|(startup=27))
 	ld	hl,gcount
 	;res	7,(hl)
 	inc	(hl)
@@ -307,7 +336,7 @@ HRG_handler_patch:
 ;  Variables for grayscale graphics
 ;----------------------------------------------------------------
 
-IF (startup=7)
+IF ((startup=7)|(startup=27))
 		XDEF	graybit1
 		XDEF	graybit2
 gcount:
@@ -325,6 +354,8 @@ ENDIF
 ; This is a dummy-line used for HRG output
 ;
 ;----------------------------------------------------------------
+IF (startup<13)
+
 HRG_LineStart:
         ld      r,a             ; load LSB to R register which is RFSH address LSB
         defb    0, 0, 0, 0      ; 32 NOPs = 32x8 bits = 256 pixels each HLINE
@@ -336,6 +367,347 @@ HRG_LineStart:
         defb    0, 0, 0, 0
         defb    0, 0, 0, 0
         ret     nz              ; always returns because Z flag=0
+
+ELSE		; CHROMA_81
+
+HRG_LineStart:
+        ld      r,a             ; load LSB to R register which is RFSH address LSB
+        defb    0, 0, 0, 0      ; 32 NOPs = 32x8 bits = 256 pixels each HLINE
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart01:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart02:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart03:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart04:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart05:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart06:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart07:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart08:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart09:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0a:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0b:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0c:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0d:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0e:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart0f:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart10:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart11:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart12:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart13:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart14:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart15:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart16:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_LineStart17:
+        ld      r,a
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret
+
+HRG_STACK:
+	defw	HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart01+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart02+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart03+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart04+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart05+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart06+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart07+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart08+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart09+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0a+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0b+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0c+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0d+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0e+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart0f+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart10+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart11+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart12+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart13+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart14+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart15+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart16+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRGRB,HRG_LineStart17+$8000,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA,HRGRA
+	defw	HRG_postproc
+
+SAVE_SP:
+	defw	0
+
+HRGRA:
+	ld	de,32
+	ld	de,32
+	nop
+	ld	a,h
+	ld	i,a
+	ld	a,l
+	add	hl,de
+	jp	(iy)
+
+HRGRB:
+	pop	iy
+	ld	de,32
+	ld	a,h
+	ld	i,a
+	ld	a,l
+	add	hl,de
+	jp	(iy)
+
+ENDIF
 
 ;----------------------------------------------------------------
 ;

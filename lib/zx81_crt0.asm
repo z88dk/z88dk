@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.41 2014-10-28 21:07:08 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.42 2014-12-02 07:37:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -122,7 +122,7 @@ IF (!DEFINED_startup | (startup=1))
 ENDIF
 
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
@@ -187,7 +187,7 @@ ENDIF
         call    restore81
 
 IF (startup>=2)
- IF ((startup=3)|(startup=5)|(startup=13)|(startup=15))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
         xor	a
         ld      (hrgbrkflag),a
  ELSE
@@ -291,7 +291,7 @@ ENDIF
 ;-------------------------------------------------
 
 IF (startup>=3)
-	IF (startup<=7)
+	IF ((startup<=7)|(startup>=23))
         INCLUDE "zx81_hrg.def"
     ENDIF
 ENDIF
@@ -301,9 +301,13 @@ ENDIF
 ;-------------------------------------------------
 
 IF (startup>=13)
-	IF (startup<=17)
-        INCLUDE "zx81_hrg_arx.def"
-    ENDIF
+	IF (startup>=23)
+	;
+	ELSE
+		IF (startup<=17)
+			INCLUDE "zx81_hrg_arx.def"
+		ENDIF
+	ENDIF
 ENDIF
 
 ;-----------
@@ -313,7 +317,7 @@ IF (startup>=3)
 text_rows:
 hr_rows:
 _hr_rows:
- IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17))
+ IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
 		defw	8	; Current number of text rows in graphics mode
  ELSE
 		defw	24	; Current number of text rows in graphics mode
