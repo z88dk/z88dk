@@ -1,0 +1,23 @@
+
+INCLUDE "clib_target_cfg.asm"
+
+SECTION seg_code_fcntl
+
+PUBLIC zx_01_output_char_32_iterm_msg_bell
+
+EXTERN asm_bit_beep_raw_di
+
+zx_01_output_char_32_iterm_msg_bell:
+
+   bit 1,(ix+7)
+   ret z                       ; if signal bell is disabled
+
+   push ix
+   
+   ld hl,#((__clock_freq / 600) - 236) / 8   ; 600 Hz tone
+   ld de,1200 / 10                           ; 0.1 sec
+   
+   call asm_bit_beep_raw_di
+   
+   pop ix
+   ret
