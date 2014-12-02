@@ -21,18 +21,18 @@ asm_zx_cls:
    ;
    ; uses  : af, bc, de, hl
    
-   ; attributes
-   
-   ld e,l
-   ld hl,$5800
-   ld bc,768
-   
-   call asm_memset
-   
+   ld a,l
+
    ; pixels
    
    ld e,0
    ld hl,$4000
    ld bc,6144
+
+   ; attributes
+   
+   ld e,a
+   ld hl,$5800
+   ld bc,768
    
    jp asm_memset

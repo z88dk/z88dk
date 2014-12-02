@@ -1,5 +1,8 @@
 arch/zx/misc/c/sccz80/zx_border
 arch/zx/misc/c/sccz80/zx_cls
-arch/zx/misc/c/sccz80/zx_scroll
-arch/zx/misc/c/sccz80/zx_scroll_callee
-arch/zx/misc/z80/asm0_zx_scroll
+arch/zx/misc/c/sccz80/zx_scroll_up
+arch/zx/misc/c/sccz80/zx_scroll_up_callee
+arch/zx/misc/c/sccz80/zx_scroll_wc_up
+arch/zx/misc/c/sccz80/zx_scroll_wc_up_callee
+arch/zx/misc/z80/asm_zx_scroll_up_noexx
+arch/zx/misc/z80/asm_scroll_wc_up_noexx

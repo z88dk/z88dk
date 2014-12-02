@@ -3,7 +3,7 @@
 ; 2014
 ; ===============================================================
 ; 
-; void zx_scroll(uchar rows, uchar attr)
+; void zx_scroll_up(uchar rows, uchar attr)
 ;
 ; Scroll screen upward by rows chars and clear vacated area
 ; using attribute.
@@ -12,12 +12,12 @@
 
 SECTION seg_code_arch
 
-PUBLIC asm_zx_scroll
+PUBLIC asm_zx_scroll_up
 
 EXTERN asm_zx_cls, asm_memset
 EXTERN asm_zx_cy2saddr, asm_zx_cy2aaddr, asm0_zx_saddrpdown
 
-asm_zx_scroll:
+asm_zx_scroll_up:
 
    ; enter : de = number of rows to scroll upward by
    ;          l = attr

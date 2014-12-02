@@ -1,13 +1,13 @@
 
 SECTION seg_code_arch
 
-PUBLIC asm0_zx_scroll
+PUBLIC asm_zx_scroll_up_noexx
 
-EXTERN asm_zx_scroll
+EXTERN asm_zx_scroll_up
 
-asm0_zx_scroll:
+asm_zx_scroll_up_noexx:
 
-   ; alternate entry point to asm_zx_scroll that does
+   ; alternate entry point to asm_zx_scroll_up that does
    ; not alter the exx set
    ;
    ; enter : de = number of rows to scroll upward by
@@ -21,9 +21,8 @@ asm0_zx_scroll:
    push hl
    exx
    
-   call asm_zx_scroll
+   call asm_zx_scroll_up
    
-   exx
    pop hl
    pop de
    pop bc
