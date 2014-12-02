@@ -38,10 +38,15 @@ must service the following messages from the input terminal:
 ;
 ; source of character is input terminal
 ;
-; * ITERM_MSG_READLINE
+; * ITERM_MSG_READLINE_BEGIN
 ;
 ; informs the output terminal that the input terminal
 ; is reading a new line.
+;
+; * ITERM_MSG_READLINE_END
+;
+; informs the output terminal that the input terminal
+; has finished reading a new line.
 ;
 ; * ITERM_MSG_PRINT_CURSOR
 ;
@@ -72,6 +77,13 @@ must service the following messages from the input terminal:
 ; use   : af, bc, de, hl, ix
 ;
 ; all output is CHAR_PASSWORD, delete last one 
+;
+; * ITERM_MSG_BELL
+;
+; use   : af, bc, de, hl, ix
+;
+; cannot backspace further on the edit line (sound bell)
+; if not implemented nothing will happen.
 
 These messages allow line editing to be done in the terminal
 window.  Most drivers can treat many of these messages simply

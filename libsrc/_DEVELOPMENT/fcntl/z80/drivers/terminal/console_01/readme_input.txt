@@ -87,7 +87,7 @@ Example code:
   Any platform implementing the library function "asm_in_inkey"
   can reuse this driver changing only the character set translation.
 
-* target/zx/driver/terminal/console_01_input_kbd_last.asm
+* target/zx/driver/terminal/console_01_input_kbd_lastk.asm
 
   Any platform that can supply keypresses via a byte written
   to memory independently of the running thread can reuse
