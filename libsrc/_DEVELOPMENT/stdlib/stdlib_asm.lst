@@ -24,6 +24,7 @@ stdlib/z80/asm__strtou
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
+stdlib/z80/random/asm_random_uniform_xor_8
 stdlib/z80/random/asm_random_uniform_xor_32
 stdlib/z80/sort/__sort_parameters
 stdlib/z80/sort/asm_insertion_sort
