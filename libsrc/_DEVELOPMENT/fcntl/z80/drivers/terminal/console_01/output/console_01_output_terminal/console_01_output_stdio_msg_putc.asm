@@ -30,9 +30,9 @@ putc_loop:
    call l_jpix
    
    exx
-   ret c                       ; if error
    
    cpi                         ; hl++, bc--
    jp pe, putc_loop
 
+   or a
    ret

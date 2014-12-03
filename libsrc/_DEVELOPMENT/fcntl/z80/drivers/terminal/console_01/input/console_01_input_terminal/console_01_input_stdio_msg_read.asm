@@ -3,7 +3,7 @@ SECTION seg_code_fcntl
 
 PUBLIC console_01_input_stdio_msg_read
 
-EXTERN console_01_input_getc
+EXTERN console_01_input_proc_getc
 
 console_01_input_stdio_msg_read:
 
@@ -31,8 +31,8 @@ read_loop:
    
    dec bc                      ; num chars to read -= 1
    
-   call console_01_input_getc  ; a = hl = char
-   jr c, read_exit_error       ; if driver error
+   call console_01_input_proc_getc  ; a = hl = char
+   jr c, read_exit_error            ; if driver error
 
    ld (de),a                   ; write char to buffer
    inc de

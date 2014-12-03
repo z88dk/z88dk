@@ -29,4 +29,3 @@ console_01_output_char_iterm_msg_bs:
    
    ld a,OTERM_MSG_PRINTC
    jp (ix)
-   

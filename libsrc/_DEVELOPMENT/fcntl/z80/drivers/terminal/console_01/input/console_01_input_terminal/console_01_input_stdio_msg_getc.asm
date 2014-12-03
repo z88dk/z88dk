@@ -3,9 +3,9 @@ SECTION seg_code_fcntl
 
 PUBLIC console_01_input_stdio_msg_getc
 
-EXTERN console_01_input_getc
+EXTERN console_01_input_proc_getc
 
-defc console_01_input_stdio_msg_getc = console_01_input_getc
+defc console_01_input_stdio_msg_getc = console_01_input_proc_getc
 
    ; enter : ix = & FDSTRUCT.JP
    ;

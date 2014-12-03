@@ -3,7 +3,7 @@ SECTION seg_code_fcntl
 
 PUBLIC console_01_input_stdio_msg_seek
 
-EXTERN console_01_input_getc
+EXTERN console_01_input_proc_getc
 EXTERN STDIO_MSG_CUR, l_decu_dehl, error_lzc
 
 console_01_input_stdio_msg_seek:
@@ -42,7 +42,7 @@ seek_loop:
    
    call l_decu_dehl
 
-   call console_01_input_getc  ; a = hl = char
-   jr nc, seek_loop            ; if no error
+   call console_01_input_proc_getc  ; a = hl = char
+   jr nc, seek_loop                 ; if no error
    
    jp error_lzc                ; if driver error

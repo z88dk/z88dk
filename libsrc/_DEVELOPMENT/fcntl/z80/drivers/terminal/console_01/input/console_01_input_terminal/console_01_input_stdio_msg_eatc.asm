@@ -3,7 +3,7 @@ SECTION seg_code_fcntl
 
 PUBLIC console_01_input_stdio_msg_eatc
 
-EXTERN console_01_input_getc, l_jphl
+EXTERN console_01_input_proc_getc, l_jphl
 
 console_01_input_stdio_msg_eatc:
 
@@ -38,8 +38,8 @@ eatc_loop:
    ; bc = max number of chars to consume
    ; de = number of chars consumed thus far
    
-   call console_01_input_getc  ; a = hl = char
-   jr c, eatc_exit             ; if driver error
+   call console_01_input_proc_getc  ; a = hl = char
+   jr c, eatc_exit                  ; if driver error
    
    ld a,b
    or c

@@ -31,7 +31,6 @@ writ_loop:
    call l_jpix
    
    exx
-   jr c, writ_end
    
    inc de
    
@@ -44,4 +43,5 @@ writ_end:
    exx
    pop hl                      ; hl = num chars successfully output
    
+   or a
    ret
