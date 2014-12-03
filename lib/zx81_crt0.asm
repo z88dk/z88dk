@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.42 2014-12-02 07:37:04 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.43 2014-12-03 21:26:26 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -138,6 +138,26 @@ IF (startup>=2)
  ENDIF
 ENDIF
 
+IF (startup>=23)	; CHROMA 81
+	ld	a,32+16+7	; 32=colour enabled,  16="attribute file" mode, 7=white border
+	ld bc,7FEFh
+	out (c),a
+
+	ld	a,7*16		; white paper, black ink
+	ld	hl,HRG_LineStart+2+32768
+	ld	c,24
+.rowloop
+	ld	b,32
+.rowattr
+	ld	(hl),a
+	inc hl
+	djnz rowattr
+	inc	hl
+	inc	hl
+	inc	hl
+	dec c
+	jr  nz,rowloop
+ENDIF
 
 	; this must be after 'hrg_on', sometimes
 	; the stack will be moved to make room

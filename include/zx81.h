@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.31 2013-04-09 13:08:12 stefano Exp $
+ * $Id: zx81.h,v 1.32 2014-12-03 21:26:26 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -231,6 +231,71 @@ extern int  __LIB__ zx_break(void);
 extern int  __LIB__              zx_setcursorpos(int x, int y);
 extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y);
 #define zx_setcursorpos(a,b)     zx_setcursorpos_callee(a,b)
+
+
+//////////////////////////
+// CHROMA-81 ONLY
+//////////////////////////
+
+#define INK_BLACK      0x00
+#define INK_BLUE       0x01
+#define INK_RED        0x02
+#define INK_MAGENTA    0x03
+#define INK_GREEN      0x04
+#define INK_CYAN       0x05
+#define INK_YELLOW     0x06
+#define INK_WHITE      0x07
+
+#define PAPER_BLACK    0x00
+#define PAPER_BLUE     0x10
+#define PAPER_RED      0x20
+#define PAPER_MAGENTA  0x30
+#define PAPER_GREEN    0x40
+#define PAPER_CYAN     0x50
+#define PAPER_YELLOW   0x60
+#define PAPER_WHITE    0x70
+
+#define BRIGHT         0x80
+#define PAPER_BRIGHT   0x80
+#define INK_BRIGHT     0x08
+
+// Set the border color
+extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
+// Quickly set the whole screen color attributes
+extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour);
+// Get color attribute at given position
+extern uint  __LIB__              zx_attr(uchar row, uchar col) __SMALLCDECL;
+extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCDECL;
+#define zx_attr(a,b)              zx_attr_callee(a,b)
+
+
+// DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
+// refer to 'spectrum.h' for details about the "aaddr" naming convention
+
+extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __SMALLCDECL;
+extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);           // cx assumed 0
+
+extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __SMALLCDECL;
+extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);        // px assumed 0
+
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr);
+ 
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr);
+
+extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL;
+extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL;
+
+#define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
+#define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
 
 
 ///////////////////////////////////////////

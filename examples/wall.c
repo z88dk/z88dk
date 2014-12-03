@@ -43,7 +43,10 @@
  *     zcc +zx81 -clib=udg -create-app -Dspritesize=2 -Dspritesizeh=3 wall.c
  *
  *  ZX81 WRX (Wilf Rigter's High Resolution mod on RamPack or RAM addressing lines)
- *     zcc +zx81 -startup=wrx -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
+ *     zcc +zx81 -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
+ *
+ *  ZX81 CHROMA-81 (the newest zx81 expansion, color attribute mode)
+ *     zcc +zx81 -subtype=chroma -clib=chroma -create-app -Dspritesize=8 -DBANNERS -DSPECTRUM -O3 wall.c
  *
  *  ZX81 ARX (Andy Rea's High Resolution trick based on extra RAM over ROM addresses, could work with few programmable characters boards)
  *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
@@ -90,7 +93,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.6 2014-10-21 12:18:26 stefano Exp $
+ *      $Id: wall.c,v 1.7 2014-12-03 21:26:26 stefano Exp $
  *
  * * * * * * *
  *
@@ -108,8 +111,13 @@
 #include <time.h>
 
 #ifdef SPECTRUM
+#ifdef ZX81
+#include <zx81.h>
+#else
 #include <spectrum.h>
 #endif
+#endif
+
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 #include <msx.h>
 #include "msx/gfx.h"
@@ -194,7 +202,11 @@ void destroy_brick() {
 	putsprite(spr_and,(n*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
+	#ifdef ZX81
+		*zx_cyx2aaddr(m,n) = 112;
+	#else
 		*zx_cyx2aaddr(m,n) = 56;
+	#endif
 	#endif
 	#endif
 	
@@ -209,7 +221,11 @@ void destroy_brick() {
 		putsprite(spr_and,((n-1)*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
+	#ifdef ZX81
+		*zx_cyx2aaddr(m,n-1) = 112;
+	#else
 		*zx_cyx2aaddr(m,n-1) = 56;
+	#endif
 	#endif
 	#endif
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
@@ -223,7 +239,11 @@ void destroy_brick() {
 		putsprite(spr_and,((n+1)*spritesize),(m*spritesizeh),blank);
 	#ifdef SPECTRUM
 	#if (spritesize == 8)
+	#ifdef ZX81
+		*zx_cyx2aaddr(m,n+1) = 112;
+	#else
 		*zx_cyx2aaddr(m,n+1) = 56;
+	#endif
 	#endif
 	#endif
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
@@ -496,12 +516,19 @@ start_level:
 		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesizeh),brick_r);
 		putsprite(spr_or,(n*spritesize),((m+4)*spritesizeh),brick_r);
 		putsprite(spr_or,((n+1)*spritesize),((m+4)*spritesizeh),brick_l);
-	#ifdef SPECTRUM
 	#if (spritesize == 8)
+	#ifdef SPECTRUM
+	#ifdef ZX81
+		*zx_cyx2aaddr(m+3,n) = m<<4;
+		*zx_cyx2aaddr(m+3,n+1) = m<<4;
+		*zx_cyx2aaddr(m+4,n) = (m+1)<<4;
+		*zx_cyx2aaddr(m+4,n+1) = (m+1)<<4;
+	#else
 		*zx_cyx2aaddr(m+3,n) = m<<3;
 		*zx_cyx2aaddr(m+3,n+1) = m<<3;
 		*zx_cyx2aaddr(m+4,n) = (m+1)<<3;
 		*zx_cyx2aaddr(m+4,n+1) = (m+1)<<3;
+	#endif
 	#endif
 	#endif
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
@@ -516,10 +543,15 @@ start_level:
   for (n=0; n<=30; n+=2) {
 		putsprite(spr_or,(n*spritesize),((m+3)*spritesizeh),brick_l);
 		putsprite(spr_or,((n+1)*spritesize),((m+3)*spritesizeh),brick_r);
-	#ifdef SPECTRUM
 	#if (spritesize == 8)
+	#ifdef SPECTRUM
+	#ifdef ZX81
+		*zx_cyx2aaddr(m+3,n) = 6<<4;
+		*zx_cyx2aaddr(m+3,n+1) = 6<<4;
+	#else
 		*zx_cyx2aaddr(m+3,n) = 6<<3;
 		*zx_cyx2aaddr(m+3,n+1) = 6<<3;
+	#endif
 	#endif
 	#endif
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
