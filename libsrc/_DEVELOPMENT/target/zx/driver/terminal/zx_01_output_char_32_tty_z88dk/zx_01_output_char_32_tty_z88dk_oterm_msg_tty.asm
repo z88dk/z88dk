@@ -4,7 +4,7 @@ SECTION seg_code_fcntl
 PUBLIC zx_01_output_char_32_tty_z88dk_oterm_msg_tty
 
 EXTERN l_offset_ix_de, asm_tty_z88dk
-EXTERN console_01_output_proc_tty_return
+EXTERN tty_execute_action
 
 zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
 
@@ -22,25 +22,9 @@ zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
    ;  c = ascii char
    
    call asm_tty_z88dk
-   
-   ; if producing a char for the terminal
-   ;
-   ;    c = ascii code
-   ;    carry set
-   ;
-   ; if producing nothing for the terminal
-   ;
-   ;    z flag set
-   ;    carry reset
-   ;
-   ; if executing an action
-   ;
-   ;    a = action code (> 0)
-   ;    nz flag set
-   ;    carry reset
 
    ld hl,action_table
-   jp console_01_output_proc_tty_return
+   jp tty_execute_action
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; ACTION TABLE FOR TTY_Z88DK
@@ -56,6 +40,8 @@ zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
    ;;         if not delivering char to terminal
    ;;
    ;;            carry reset
+   ;;
+   ;; uses  : af, bc, de, hl
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 action_table:

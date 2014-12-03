@@ -1,18 +1,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; ZX_01_OUTPUT_CHAR_32_TTY_Z88DK
+; ZX_01_OUTPUT_CHAR_64_TTY_Z88DK
 ; implemented tty_z88dk terminal emulation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; Windowed output terminal for fixed width fonts.
+; Window is constrained to even column width and even x coord.
 ; Implements tty_z88dk terminal emulation.
 ;
 ; Driver class diagram:
 ;
 ; CONSOLE_01_OUTPUT_TERMINAL (root, abstract)
 ; CONSOLE_01_OUTPUT_TERMINAL_CHAR (abstract)
-; ZX_01_OUTPUT_CHAR_32 (concrete)
-; ZX_01_OUTPUT_CHAR_32_TTY_Z88DK (concrete)
+; ZX_01_OUTPUT_CHAR_64 (concrete)
+; ZX_01_OUTPUT_CHAR_64_TTY_Z88DK (concrete)
 ;
 ; Can be instantiated to implement a CONSOLE_01_OUTPUT_TERMINAL.
 ;
@@ -38,15 +39,15 @@
 
 SECTION seg_code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_z88dk
+PUBLIC zx_01_output_char_64_tty_z88dk
 
 EXTERN OTERM_MSG_TTY, STDIO_MSG_FLSH
 
-EXTERN zx_01_output_char_32
+EXTERN zx_01_output_char_64
 EXTERN zx_01_output_char_32_tty_z88dk_oterm_msg_tty
 EXTERN zx_01_output_char_32_tty_z88dk_stdio_msg_flsh
 
-zx_01_output_char_32_tty_z88dk:
+zx_01_output_char_64_tty_z88dk:
 
    cp OTERM_MSG_TTY
    jp z, zx_01_output_char_32_tty_z88dk_oterm_msg_tty
@@ -54,4 +55,4 @@ zx_01_output_char_32_tty_z88dk:
    cp STDIO_MSG_FLSH
    jp z, zx_01_output_char_32_tty_z88dk_stdio_msg_flsh
    
-   jp zx_01_output_char_32     ; forward to library
+   jp zx_01_output_char_64     ; forward to library

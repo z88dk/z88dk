@@ -149,20 +149,25 @@ key_pressed:
    ld a,c                      ; a = ascii char from in_inkey
    
    cp 10
-   jr nz, key_not_cr
-   ld c,CHAR_CR
-
-key_not_cr:
-
+   jr z, key_cr
+   
    cp 13
-   jr nz, key_not_lf
-   ld c,CHAR_LF
+   jr z, key_lf
 
-key_not_lf:
+exit:
 
-   ld l,c
-   ld h,0
-   ld a,c                      ; a = hl = translated char
+   ld l,a
+   ld h,0                      ; a = hl = ascii code
    
    or a
    ret
+
+key_cr:
+
+   ld a,CHAR_CR
+   jr exit
+
+key_lf:
+
+   ld a,CHAR_LF
+   jr exit

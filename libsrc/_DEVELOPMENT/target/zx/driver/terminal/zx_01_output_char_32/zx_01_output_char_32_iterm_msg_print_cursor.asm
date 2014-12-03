@@ -5,7 +5,7 @@ SECTION seg_code_fcntl
 
 PUBLIC zx_01_output_char_32_iterm_msg_print_cursor
 
-EXTERN zx_01_output_char_32_oterm_msg_putc_raw
+EXTERN console_01_output_char_oterm_msg_putc_raw
 
 zx_01_output_char_32_iterm_msg_print_cursor:
 
@@ -28,4 +28,4 @@ cursor:
    ld b,(ix+23)                ; b = foreground colour
    set 7,b                     ; make it flash
 
-   jp zx_01_output_char_32_oterm_msg_putc_raw
+   jp console_01_output_char_oterm_msg_putc_raw

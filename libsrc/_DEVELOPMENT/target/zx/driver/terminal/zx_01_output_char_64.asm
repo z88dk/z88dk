@@ -1,16 +1,21 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; ZX_01_OUTPUT_CHAR_32
-; romless driver for standard 32x24 output
+; ZX_01_OUTPUT_CHAR_64
+; romless driver for 64x24 output
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; Windowed output terminal for fixed width fonts.
+; 64 columns is achieved by using a 4x8 pixel font.
+;
+; The window terminal is constrained to be located
+; on an even x coordinate and to be an even number
+; of characters wide.
 ;
 ; Driver class diagram:
 ;
 ; CONSOLE_01_OUTPUT_TERMINAL (root, abstract)
 ; CONSOLE_01_OUTPUT_TERMINAL_CHAR (abstract)
-; ZX_01_OUTPUT_CHAR_32 (concrete)
+; ZX_01_OUTPUT_CHAR_64 (concrete)
 ;
 ; Can be instantiated to implement a CONSOLE_01_OUTPUT_TERMINAL.
 ;
@@ -25,10 +30,6 @@
 ; * ITERM_MSG_BELL
 ;
 ;   Generates a short signal beep on beeper.
-;
-; * ITERM_MSG_PRINT_CURSOR
-;
-;   Changes cursor to flashing C or L.
 ;
 ; Messages consumed from CONSOLE_01_OUTPUT_TERMINAL_CHAR
 ;
@@ -85,39 +86,36 @@
 
 SECTION seg_code_fcntl
 
-PUBLIC zx_01_output_char_32
+PUBLIC zx_01_output_char_64
 
 EXTERN ITERM_MSG_BELL, ITERM_MSG_PRINT_CURSOR, STDIO_MSG_ICTL
 EXTERN OTERM_MSG_PRINTC, OTERM_MSG_SCROLL, OTERM_MSG_CLS
 EXTERN OTERM_MSG_PAUSE, OTERM_MSG_BELL
 
 EXTERN console_01_output_terminal_char
-EXTERN zx_01_output_char_32_oterm_msg_printc, zx_01_output_char_32_iterm_msg_print_cursor
-EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_32_stdio_msg_ictl
-EXTERN zx_01_output_char_32_oterm_msg_scroll, zx_01_output_char_32_oterm_msg_cls
+EXTERN zx_01_output_char_64_oterm_msg_printc
+EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_64_stdio_msg_ictl
+EXTERN zx_01_output_char_64_oterm_msg_scroll, zx_01_output_char_64_oterm_msg_cls
 EXTERN zx_01_output_char_32_oterm_msg_pause, zx_01_output_char_32_oterm_msg_bell
 
-zx_01_output_char_32:
+zx_01_output_char_64:
 
    cp OTERM_MSG_PRINTC
-   jp z, zx_01_output_char_32_oterm_msg_printc
-
-   cp ITERM_MSG_PRINT_CURSOR
-   jp z, zx_01_output_char_32_iterm_msg_print_cursor
+   jp z, zx_01_output_char_64_oterm_msg_printc
    
    cp ITERM_MSG_BELL
    jp z, zx_01_output_char_32_iterm_msg_bell
    
    cp STDIO_MSG_ICTL
-   jp z, zx_01_output_char_32_stdio_msg_ictl
+   jp z, zx_01_output_char_64_stdio_msg_ictl
 
    cp OTERM_MSG_SCROLL
-   jp z, zx_01_output_char_32_oterm_msg_scroll
+   jp z, zx_01_output_char_64_oterm_msg_scroll
 
    jp c, console_01_output_terminal_char  ; forward to library
 
    cp OTERM_MSG_CLS
-   jp z, zx_01_output_char_32_oterm_msg_cls
+   jp z, zx_01_output_char_64_oterm_msg_cls
    
    cp OTERM_MSG_PAUSE
    jp z, zx_01_output_char_32_oterm_msg_pause

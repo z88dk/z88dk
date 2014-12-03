@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; zx_01_input_kbd_lastk ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; zx_01_input_kbd_lastk ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; The keyboard is read by monitoring a specific memory address
@@ -19,7 +19,7 @@
 ; for an ascii code, read it, then write 0 into LASTK to
 ; indicate the ascii code was consumed.  The external agent
 ; can implement key repeat and buffering features by
-; appropriately monitoring address LASTK.
+; appropriately updating address LASTK.
 ;
 ;   * No ROM dependency unless you expect the ROM to write LASTK
 ;   * Contains busy wait loops
@@ -32,14 +32,31 @@
 ; tied to an output terminal that understands console_01_input
 ; terminal messages.
 ;
-; This device driver must implement at least one message and
-; can forward the rest to the library driver.
+; Driver class diagram:
+;
+; CONSOLE_01_INPUT_TERMINAL (root, abstract)
+; ZX_01_INPUT_KBD_LASTK (concrete)
+;
+; Consumes the following messages from console_01_input_terminal:
 ;
 ;   * ITERM_MSG_GETC
 ;
 ;     exit : a = keyboard char after character set translation
 ;            carry set on error, hl = 0 (stream error) or -1 (eof)
 ;     uses : af, bc, de, hl
+;
+; Consumes the following messages from stdio:
+;
+;   * STDIO_MSG_FLSH
+;     forwards to base class
+;
+;   * STDIO_MSG_ICTL
+;     forwards to base class
+;
+; IOCTLs understood by this driver (in addition to those of base):
+;
+;   * IOCTL_ITERM_LASTK
+;     change the lastk address
 ;
 ; This driver reserves extra bytes in the FDSTRUCT:
 ;

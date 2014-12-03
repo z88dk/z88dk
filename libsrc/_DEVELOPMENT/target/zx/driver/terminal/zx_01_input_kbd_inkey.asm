@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; zx_01_input_kbd_inkey ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; zx_01_input_kbd_inkey ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; The keyboard is read via the library's in_inkey() function.
@@ -18,8 +18,12 @@
 ; tied to an output terminal that understands console_01_input
 ; terminal messages.
 ;
-; This device driver must implement at least one message and
-; can forward the rest to the library driver.
+; Driver class diagram:
+;
+; CONSOLE_01_INPUT_TERMINAL (root, abstract)
+; ZX_01_INPUT_KBD_INKEY (concrete)
+;
+; Consumes the following messages from console_01_input_terminal:
 ;
 ;   * ITERM_MSG_GETC
 ;
@@ -27,6 +31,19 @@
 ;            carry set on error, hl = 0 (stream error) or -1 (eof)
 ;     uses : af, bc, de, hl
 ;
+; Consumes the following messages from stdio:
+;
+;   * STDIO_MSG_FLSH
+;     forwards to base class
+;
+;   * STDIO_MSG_ICTL
+;     forwards to base class
+;
+; IOCTLs understood by this driver (in addition to those of base):
+;
+;   * IOCTL_ITERM_SET_DELAYS
+;     set debounce and repeat rate times in ms.
+; 
 ; This driver reserves extra bytes in the FDSTRUCT:
 ;
 ; offset (wrt FDSTRUCT.JP)  description

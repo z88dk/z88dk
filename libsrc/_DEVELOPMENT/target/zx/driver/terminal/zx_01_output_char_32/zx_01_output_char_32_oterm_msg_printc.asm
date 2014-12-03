@@ -14,7 +14,7 @@ zx_01_output_char_32_oterm_msg_printc:
    ;   can use:  af, bc, de, hl
 
    call asm_zx_cyx2saddr
-   ex de,hl                    ; de = screen coordinates
+   ex de,hl                    ; de = screen address
 
    ld a,b                      ; a = colour
    
@@ -25,8 +25,8 @@ zx_01_output_char_32_oterm_msg_printc:
    add hl,hl
    add hl,hl                   ; hl = 8 * ascii code
    
-   ld c,(ix+20)
-   ld b,(ix+21)                ; bc = font address
+   ld c,(ix+21)
+   ld b,(ix+22)                ; bc = font address
    
    add hl,bc                   ; hl = & character definition
    
@@ -46,12 +46,11 @@ __print_loop:
    djnz print_loop
    
    ld a,(hl)
-   ld (de),a                   ; final pixel row
-   
-   ex de,hl                    ; hl = screen address at bottom of char
+   ld (de),a
    
    ; put colour
    
+   ex de,hl                    ; hl = screen address at bottom of char
    call asm_zx_saddr2aaddr     ; hl = attribute address
    
    ld a,c
