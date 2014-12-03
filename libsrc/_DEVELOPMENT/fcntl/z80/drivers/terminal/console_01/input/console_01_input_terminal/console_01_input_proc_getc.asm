@@ -3,17 +3,17 @@ INCLUDE "clib_cfg.asm"
 
 SECTION seg_code_fcntl
 
-PUBLIC console_01_input_getc
+PUBLIC console_01_input_proc_getc
 
 EXTERN ITERM_MSG_GETC, ITERM_MSG_READLINE_BEGIN, ITERM_MSG_READLINE_END
 EXTERN ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS
 EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_BELL
 
-EXTERN console_01_input_echo, l_setmem_hl, asm_b_array_clear
-EXTERN console_01_input_oterm, l_inc_sp, l_jpix, l_offset_ix_de
+EXTERN console_01_input_proc_echo, l_setmem_hl, asm_b_array_clear
+EXTERN console_01_input_proc_oterm, l_inc_sp, l_jpix, l_offset_ix_de
 EXTERN asm_b_array_push_back, asm_b_array_at
 
-console_01_input_getc:
+console_01_input_proc_getc:
 
    ; enter : ix = & FDSTRUCT.JP
    ;
@@ -54,9 +54,9 @@ char_mode:
    call state_machine_0        ; get char from device
    ret c                       ; if driver error
    
-   push af                     ; save char
-   call console_01_input_echo  ; output to terminal
-   pop af                      ; a = char
+   push af                          ; save char
+   call console_01_input_proc_echo  ; output to terminal
+   pop af                           ; a = char
    
    ret
 
@@ -100,11 +100,8 @@ line_mode_readline:
    
    call asm_b_array_clear      ; empty the edit buffer
    
-   bit 7,(ix+6)
-   jr z, readline_loop         ; if echo off
-   
    ld a,ITERM_MSG_READLINE_BEGIN
-   call console_01_input_oterm ; inform output terminal that new line is starting
+   call console_01_input_proc_oterm  ; inform output terminal that new line is starting
 
 readline_loop:
 
@@ -112,23 +109,26 @@ readline_loop:
 
    ; print cursor
    
-   bit 7,(ix+6)
-   jr z, cursor_print_end      ; if echo off
+   ld a,(ix+6)                ; a = ioctl_f0 flags
+   
+   add a,a
+   jr nc, cursor_print_end     ; if echo off
    
    bit 1,(ix+7)
    jr z, cursor_print_end      ; if no cursor
 
-   ld c,CHAR_CURSOR_UC
-   
-   bit 3,(ix+6)
-   jr nz, cursor_print         ; if caps lock is on
-   
    ld c,CHAR_CURSOR_LC
+   
+   and $30                     ; isolate cook and caps flags
+   cp $30
+   jr nz, cursor_print         ; if !cook || !caps
+   
+   ld c,CHAR_CURSOR_UC
 
 cursor_print:
 
    ld a,ITERM_MSG_PRINT_CURSOR
-   call console_01_input_oterm ; instruct output terminal to print cursor
+   call console_01_input_proc_oterm  ; instruct output terminal to print cursor
 
 cursor_print_end:
 
@@ -146,19 +146,16 @@ cursor_print_end:
    bit 1,(ix+7)
    jr z, cursor_erase_end      ; if no cursor
    
-   pop de
-   push de
+   pop hl
+   push hl                     ; hl = & FDSTRUCT.b_array
    
    push af
-   push hl
    
-   ex de,hl                    ; hl = & FDSTRUCT.b_array
-   call edit_buff_params       ; de = char *edit_buffer, bc = edit_buffer_len
+   call edit_buff_params       ; de = char *edit_buffer, bc = int edit_buffer_len
    
    ld a,ITERM_MSG_ERASE_CURSOR
-   call console_01_input_oterm ; instruct output terminal to erase cursor
+   call console_01_input_proc_oterm  ; instruct output terminal to erase cursor
    
-   pop hl
    pop af
    
 cursor_erase_end:
@@ -198,7 +195,7 @@ cursor_erase_end:
 bell:
 
    ld a,ITERM_MSG_BELL
-   call console_01_input_oterm ; send to output terminal
+   call console_01_input_proc_oterm  ; send to output terminal
    
    jr readline_loop
 
@@ -219,7 +216,7 @@ not_empty:
 
 not_password_mode:
 
-   call console_01_input_oterm ; instruct output terminal to backspace
+   call console_01_input_proc_oterm  ; instruct output terminal to backspace
    
    pop bc                      ; bc = b_array.size
 
@@ -259,6 +256,9 @@ escaped_char:
    
    ld a,c
    
+   bit 7,(ix+7)
+   jr z, put_raw               ; if not an escaped char
+   
    cp CHAR_LF
    jr nz, put_raw
 
@@ -268,10 +268,12 @@ put_raw:
 
    push af
    
-   call console_01_input_echo  ; send char to output terminal
+   call console_01_input_proc_echo  ; send char to output terminal
    
    pop af                      ; a = char
-   jr readline_loop
+   
+   cp CHAR_LF
+   jr nz, readline_loop
 
 readline_done:
 readline_error:

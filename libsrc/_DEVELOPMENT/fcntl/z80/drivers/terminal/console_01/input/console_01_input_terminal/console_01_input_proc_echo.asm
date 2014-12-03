@@ -3,11 +3,11 @@ INCLUDE "clib_cfg.asm"
 
 SECTION seg_code_fcntl
 
-PUBLIC console_01_input_echo, console_01_input_oterm
+PUBLIC console_01_input_proc_echo, console_01_input_proc_oterm
 
 EXTERN ITERM_MSG_PUTC, l_jpix
 
-console_01_input_echo:
+console_01_input_proc_echo:
 
    ; a = char to output to oterm
    
@@ -18,11 +18,11 @@ console_01_input_echo:
    ld a,ITERM_MSG_PUTC
    
    bit 6,(ix+6)
-   jr z, console_01_input_oterm  ; if not password mode
+   jr z, console_01_input_proc_oterm  ; if not password mode
    
    ld c,CHAR_PASSWORD
 
-console_01_input_oterm:
+console_01_input_proc_oterm:
 
    ;  a = message to output terminal
    ; bc = parameter
