@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.123 2014-12-04 23:30:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.124 2014-12-04 23:38:55 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.123 2014-12-04 23:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.123  2014-12-04 23:30:19  pauloscustodio
+* Revision 1.124  2014-12-04 23:38:55  pauloscustodio
+* No longer needs to backtrack during parsing, remove ScanGetPos() and
+* ScanSetPos().
+*
+* Revision 1.123  2014/12/04 23:30:19  pauloscustodio
 * Add lexer tokens for registers, CPU flags and DEFVARS size specifiers,
 * simplifying the parser. As a side effect register names can no longer
 * be used as labels, but this would be confusing anyway.
@@ -2140,6 +2144,9 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	  simplifying the parser. As a side effect register names can no longer 
 	  be used as labels, but this would be confusing anyway.
 	  
+	- No longer needs to backtrack during parsing, remove ScanGetPos() and
+	  ScanSetPos().
+	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -2163,7 +2170,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2b"
+#define VERSION     "2.6.2c"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

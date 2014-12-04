@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.36 2014-12-04 23:30:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.37 2014-12-04 23:38:56 pauloscustodio Exp $
 */
 
 #pragma once
@@ -71,10 +71,6 @@ extern tokid_t GetSym( void );
 /* get the current/next token, error if not the expected one */
 extern void CurSymExpect(tokid_t expected_tok);
 extern void GetSymExpect(tokid_t expected_tok);
-
-/* save the current scan position and back-track to a saved position */
-extern char *ScanGetPos( void );
-extern void  ScanSetPos( char *pos );
 
 /* insert the given text at the current scan position */
 extern void SetTemporaryLine( char *line );

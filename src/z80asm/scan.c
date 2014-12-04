@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.53 2014-12-04 23:30:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.54 2014-12-04 23:38:55 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -337,25 +337,6 @@ void CurSymExpect(tokid_t expected_tok)
 		error_syntax();
 }
 
-
-/*-----------------------------------------------------------------------------
-*   Save the current scan position and back-track to a saved position
-*----------------------------------------------------------------------------*/
-char *ScanGetPos( void )
-{
-	init();
-	return p;
-}
-
-void ScanSetPos( char *pos )
-{
-	init();
-
-	assert( pos != NULL );
-	assert( pos >= input_buf->str && pos <= input_buf->str + input_buf->len );
-
-	p = pos;
-}
 
 /*-----------------------------------------------------------------------------
 *   Insert the given text at the current scan position
