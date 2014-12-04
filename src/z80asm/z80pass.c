@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.113 2014-09-28 17:37:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.114 2014-12-04 23:30:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -118,6 +118,7 @@ parseline( enum flag interpret )
         if ( interpret == ON )
         {
             error_syntax();    /* Syntax error */
+			Skipline();
         }
     }
 
@@ -380,29 +381,64 @@ Z80pass2( void )
 }
 
 
-Bool
-Pass2info( range_t range,				/* allowed size of value to be parsed */
-           long byteoffset )			/* position in listing file to patch */
+Bool Pass2infoExpr(range_t range, int byteoffset, Expr *expr)
 {
-    Expr *expr = expr_parse();
 	int i;
 
-	if ( expr != NULL )
+	if (expr != NULL)
 	{
 		expr->range = range;
-		if ( opts.cur_list )
-			expr->listpos = list_patch_pos( byteoffset );	/* now calculated as absolute file pointer */
+		expr->code_pos = get_cur_module_size();			/* update expression location */
+
+		if (opts.cur_list)
+			expr->listpos = list_patch_pos(byteoffset);	/* now calculated as absolute file pointer */
 		else
 			expr->listpos = -1;
 
-		ExprList_push( & CURRENTMODULE->exprs, expr );
+		ExprList_push(&CURRENTMODULE->exprs, expr);
 	}
 
 	/* reserve space */
-	for ( i = 0; i < range_size( range ); i++ )
-		append_byte( 0 );
+	for (i = 0; i < range_size(range); i++)
+		append_byte(0);
 
 	return expr == NULL ? FALSE : TRUE;
+}
+
+Bool Pass2info( range_t range,				/* allowed size of value to be parsed */
+				int byteoffset )			/* position in listing file to patch */
+{
+	Expr *expr;
+	
+	/* Offset of (ix+d) should be optional; '+' or '-' are necessary */
+	if (range == RANGE_BYTE_SIGNED)
+	{
+		switch (tok)
+		{
+		case TK_RPAREN:
+			append_byte(0);		/* offset zero */
+			return TRUE;		/* OK, zero already stored */
+
+		case TK_PLUS:
+		case TK_MINUS:          /* + or - expected */
+			break;				/* proceed to evaluate expression */
+
+		default:                /* Syntax error, e.g. (ix 4) */
+			error_syntax();
+			return FALSE;		/* FAIL */
+		}
+
+	}
+
+	expr = expr_parse();
+
+	if (range == RANGE_BYTE_SIGNED && tok != TK_RPAREN)
+	{
+		error_syntax();
+		return FALSE;		/* FAIL */
+	}
+
+	return Pass2infoExpr(range, byteoffset, expr);
 }
 
 

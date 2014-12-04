@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.5 2014-07-02 23:45:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.6 2014-12-04 23:30:21 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -283,17 +283,14 @@ t_compile_module($init, <<'END', $objs);
 	T_TILDE();
 	T_END();
 	
-	
 	/* names */
-	SetTemporaryLine(" _Abc_123 Abc_123 123_Abc_0 0 af' ");
+	SetTemporaryLine(" _Abc_123 Abc_123 123_Abc_0 0 ");
 	T_NAME("_Abc_123");	
 	T_NAME("Abc_123");
 	T_NUMBER(123);
 	T_NAME("_Abc_0");
 	T_NUMBER(0);
-	T_NAME("af'");
 	T_END();
-	
 	
 	/* labels */
 	SetTemporaryLine(  "\n . abc   . def ghi : . jkl : "
@@ -334,7 +331,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NEWLINE();
 	T_END();
 	
-	
 	/* numbers - decimal */
 	SetTemporaryLine("2147483647 2147483648 0 1");
 	T_NUMBER(0x7FFFFFFF);
@@ -342,7 +338,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0);
 	T_NUMBER(1);
 	T_END();
-
 	
 	/* numbers - binary */
 	SetTemporaryLine  ("   0000b     0011b      1111111111111111111111111111111b	"
@@ -385,7 +380,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0x80000000);
 	T_END();
 
-
 	/* numbers - hexadecimal */
 	SetTemporaryLine(  "  0h  0ah 0FH  7FFFFFFFh	"
 					   " $0   $a  $F  $7FFFFFFF 	"
@@ -408,7 +402,6 @@ t_compile_module($init, <<'END', $objs);
 	
 	T_NUMBER(0);
 	T_END();
-	
 	
 	/* very long number > MAXLINE = 1024 --> truncates to 0 */
 	SetTemporaryLine(  "0000000000000000000000000000000000000000"
@@ -479,7 +472,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(1);
 	T_END();
 	
-	
 	/* strings - single-quote */
 	SetTemporaryLine(  "'\n"
 					   "'a\n"
@@ -520,7 +512,6 @@ t_compile_module($init, <<'END', $objs);
 	
 	T_NUMBER(0);
 	T_END();
-	
 
 	/* strings - double-quote */
 	SetTemporaryLine(  "\"\n"
@@ -556,7 +547,226 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0);
 	T_END();
 
+	/* keywords */
+	SetTemporaryLine("nz z nc c po pe p m "
+					 "NZ Z NC C PO PE P M ");
+	T_GET(TK_NZ, "NZ"); assert(tok_flag == 0);
+	T_GET(TK_Z,  "Z");  assert(tok_flag == 1);
+	T_GET(TK_NC, "NC"); assert(tok_flag == 2);
+	T_GET(TK_C,  "C");  assert(tok_flag == 3);
+	T_GET(TK_PO, "PO"); assert(tok_flag == 4);
+	T_GET(TK_PE, "PE"); assert(tok_flag == 5);
+	T_GET(TK_P,  "P");  assert(tok_flag == 6);
+	T_GET(TK_M,  "M");  assert(tok_flag == 7);
+
+	T_GET(TK_NZ, "NZ"); assert(tok_flag == 0);
+	T_GET(TK_Z,  "Z");  assert(tok_flag == 1);
+	T_GET(TK_NC, "NC"); assert(tok_flag == 2);
+	T_GET(TK_C,  "C");  assert(tok_flag == 3);
+	T_GET(TK_PO, "PO"); assert(tok_flag == 4);
+	T_GET(TK_PE, "PE"); assert(tok_flag == 5);
+	T_GET(TK_P,  "P");  assert(tok_flag == 6);
+	T_GET(TK_M,  "M");  assert(tok_flag == 7);
+	T_END();
+
+	SetTemporaryLine("b c d e h l a ixh ixl iyh iyl "
+					 "B C D E H L A IXH IXL IYH IYL ");
+	T_GET(TK_B,   "B");   assert(tok_reg8 == 0); assert(tok_idx_reg == 0);
+	T_GET(TK_C,   "C");   assert(tok_reg8 == 1); assert(tok_idx_reg == 0);
+	T_GET(TK_D,   "D");   assert(tok_reg8 == 2); assert(tok_idx_reg == 0);
+	T_GET(TK_E,   "E");   assert(tok_reg8 == 3); assert(tok_idx_reg == 0);
+	T_GET(TK_H,   "H");   assert(tok_reg8 == 4); assert(tok_idx_reg == 0);
+	T_GET(TK_L,   "L");   assert(tok_reg8 == 5); assert(tok_idx_reg == 0);
+	T_GET(TK_A,   "A");   assert(tok_reg8 == 7); assert(tok_idx_reg == 0);
+	T_GET(TK_IXH, "IXH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IXL, "IXL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IYH, "IYH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IYL, "IYL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xFD);
+	
+	T_GET(TK_B,   "B");   assert(tok_reg8 == 0); assert(tok_idx_reg == 0);
+	T_GET(TK_C,   "C");   assert(tok_reg8 == 1); assert(tok_idx_reg == 0);
+	T_GET(TK_D,   "D");   assert(tok_reg8 == 2); assert(tok_idx_reg == 0);
+	T_GET(TK_E,   "E");   assert(tok_reg8 == 3); assert(tok_idx_reg == 0);
+	T_GET(TK_H,   "H");   assert(tok_reg8 == 4); assert(tok_idx_reg == 0);
+	T_GET(TK_L,   "L");   assert(tok_reg8 == 5); assert(tok_idx_reg == 0);
+	T_GET(TK_A,   "A");   assert(tok_reg8 == 7); assert(tok_idx_reg == 0);
+	T_GET(TK_IXH, "IXH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IXL, "IXL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IYH, "IYH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IYL, "IYL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xFD);
+	T_END();
+	
+	SetTemporaryLine("f i iir r eir (c) (\t c \t) "
+					 "F I IIR R EIR (C) (\t C \t) ");
+	T_GET(TK_F,     "F");
+	T_GET(TK_I,     "I");
+	T_GET(TK_IIR,   "IIR");
+	T_GET(TK_R,     "R");
+	T_GET(TK_EIR,   "EIR");
+	T_GET(TK_IND_C, "(C)");
+	T_GET(TK_IND_C, "(C)");
+					 
+	T_GET(TK_F,     "F");
+	T_GET(TK_I,     "I");
+	T_GET(TK_IIR,   "IIR");
+	T_GET(TK_R,     "R");
+	T_GET(TK_EIR,   "EIR");
+	T_GET(TK_IND_C, "(C)");
+	T_GET(TK_IND_C, "(C)");
+	T_END();
+					 
+	SetTemporaryLine("bc de hl af af' sp ix iy "
+					 "BC DE HL AF AF' SP IX IY ");
+	T_GET(TK_BC,  "BC");  assert(tok_reg16_sp == 0);  assert(tok_reg16_af == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_DE,  "DE");  assert(tok_reg16_sp == 1);  assert(tok_reg16_af == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_HL,  "HL");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(tok_reg16_sp == -1); assert(tok_reg16_af == 3);  assert(tok_idx_reg == 0);
+	T_GET(TK_AF1, "AF'"); assert(tok_reg16_sp == -1); assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_SP,  "SP");  assert(tok_reg16_sp == 3);  assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IX,  "IX");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IY,  "IY");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xFD);
+	
+	T_GET(TK_BC,  "BC");  assert(tok_reg16_sp == 0);  assert(tok_reg16_af == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_DE,  "DE");  assert(tok_reg16_sp == 1);  assert(tok_reg16_af == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_HL,  "HL");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(tok_reg16_sp == -1); assert(tok_reg16_af == 3);  assert(tok_idx_reg == 0);
+	T_GET(TK_AF1, "AF'"); assert(tok_reg16_sp == -1); assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_SP,  "SP");  assert(tok_reg16_sp == 3);  assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IX,  "IX");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IY,  "IY");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xFD);
+	T_END();
+	
+	SetTemporaryLine("(bc) (de) (hl) (sp) (\t bc \t) (\t de \t) (\t hl \t) (\t sp \t) "
+					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
+	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+
+	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	
+	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	
+	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	T_END();
+	
+	SetTemporaryLine("(ix) (iy) (\t ix \t) (\t iy \t) "
+					 "(IX) (IY) (\t IX \t) (\t IY \t) ");
+	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_RPAREN();
+	
+	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_RPAREN();
+	T_END();
+	
+	SetTemporaryLine("( \t ix \t ) ( \t ix \t + \t 0 \t ) ( \t ix \t - \t 0 \t ) "
+					 "( \t iy \t ) ( \t iy \t + \t 0 \t ) ( \t iy \t - \t 0 \t ) "
+					 "( \t IX \t ) ( \t IX \t + \t 0 \t ) ( \t IX \t - \t 0 \t ) "
+					 "( \t IY \t ) ( \t IY \t + \t 0 \t ) ( \t IY \t - \t 0 \t ) "
+					 );
+	T_GET(TK_IND_IX, "(IX");
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");
+	T_PLUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");
+	T_MINUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	
+	T_GET(TK_IND_IY, "(IY");
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");
+	T_PLUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");
+	T_MINUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	
+	T_GET(TK_IND_IX, "(IX");
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");
+	T_PLUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	T_GET(TK_IND_IX, "(IX");
+	T_MINUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	
+	T_GET(TK_IND_IY, "(IY");
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");
+	T_PLUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	T_GET(TK_IND_IY, "(IY");
+	T_MINUS();
+	T_NUMBER(0);
+	T_RPAREN();
+	T_END();
+
+	SetTemporaryLine("ds.b ds.w ds.p ds.l "
+					 "DS.B DS.W DS.P DS.L ");
+	T_GET(TK_DS_B, "DS.B"); assert(tok_ds_size == 1);
+	T_GET(TK_DS_W, "DS.W"); assert(tok_ds_size == 2);
+	T_GET(TK_DS_P, "DS.P"); assert(tok_ds_size == 3);
+	T_GET(TK_DS_L, "DS.L"); assert(tok_ds_size == 4);
+
+	T_GET(TK_DS_B, "DS.B"); assert(tok_ds_size == 1);
+	T_GET(TK_DS_W, "DS.W"); assert(tok_ds_size == 2);
+	T_GET(TK_DS_P, "DS.P"); assert(tok_ds_size == 3);
+	T_GET(TK_DS_L, "DS.L"); assert(tok_ds_size == 4);
+	T_END();
+					
+	/* check limit cases */
+	SetTemporaryLine("ld(ix_save+2),ix "
+					 "ld ( ix_save + 2 ) , ix ");
+	T_NAME("ld");
+	T_LPAREN();
+	T_NAME("ix_save");
+	T_PLUS();
+	T_NUMBER(2);
+	T_RPAREN();
+	T_COMMA();
+	T_GET(TK_IX, "IX");
+
+	T_NAME("ld");
+	T_LPAREN();
+	T_NAME("ix_save");
+	T_PLUS();
+	T_NUMBER(2);
+	T_RPAREN();
+	T_COMMA();
+	T_GET(TK_IX, "IX");
+	T_END();
+
 	return 0;
+	
 END
 
 t_run_module([], '', <<'ERR', 0);

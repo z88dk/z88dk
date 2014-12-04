@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.46 2014-06-21 02:15:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.47 2014-12-04 23:30:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,636 +26,399 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.46 2014-06
 #include "z80asm.h"
 #include <stdio.h>
 
-/* external functions */
-int CheckRegister16( void );
-int CheckRegister8( void );
-int IndirectRegisters( void );
-
-/* local functions */
-void LD_HL8bit_indrct( void );
-void LD_16bit_reg( void );
-void LD_index8bit_indrct( int reg );
-void LD_address_indrct( char *exprptr );
-void LD_r_8bit_indrct( int reg );
-
-
-
-
-
-void
-LD( void )
+static void LD_IND_HL(void)
 {
-    char *exprptr;
-    int sourcereg, destreg;
+	int dest_idx = tok_idx_reg;
+	UInt opcodeptr;
+	int bytepos = 0;
 
-    if ( GetSym() == TK_LPAREN )
-    {
-        exprptr = ScanGetPos();    /* remember start of expression */
+	if (dest_idx)
+	{
+		append_byte(dest_idx);			/* 0xDD or 0xFD */
+		bytepos++;
+	}
 
-        switch ( destreg = IndirectRegisters() )
-        {
-        case 2:
-            LD_HL8bit_indrct();   /* LD  (HL),  */
-            break;
+	opcodeptr = get_cur_module_size();	/* pointer to instruction opcode - BUG_0015 */
+	append_byte(0x36);					/* preset 2. opcode to LD (IX|IY+d),n  */
+	bytepos++;
 
-        case 5:
-        case 6:
-            LD_index8bit_indrct( destreg );       /* LD  (IX|IY+d),  */
-            break;
+	if (dest_idx)
+	{
+		GetSym();
+		if (!Pass2info(RANGE_BYTE_SIGNED, bytepos++))
+			return;						/* syntax error in +d expression */
+	}
 
-        case 0:
-            if ( tok == TK_COMMA )
-            {
-                /* LD  (BC),A  */
-                GetSym();
+	GetSymExpect(TK_COMMA);
+	GetSym();
 
-                if ( CheckRegister8() == 7 )
-                {
-                    append_byte( 0x02 );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
+	if (tok_idx_reg)
+	{
+		error_illegal_ident();
+		return;
+	}
 
-            break;
+	switch (tok_reg8)
+	{
+	case REG8_NONE:
+		Pass2info(RANGE_BYTE_UNSIGNED, bytepos++);				/* Execute, store & patch 8bit expression for <n> */
+		break;
 
-        case 1:
-            if ( tok == TK_COMMA )
-            {
-                /* LD  (DE),A  */
-                GetSym();
+	default:
+		patch_byte(&opcodeptr, (Byte)(0x70 + tok_reg8));     /* LD  (IX|IY+d),r  */
+		break;
+	}
 
-                if ( CheckRegister8() == 7 )
-                {
-                    append_byte( 0x12 );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-
-        case 7:
-            LD_address_indrct( exprptr ); /* LD  (nn),rr  ;  LD  (nn),A  */
-            break;
-        }
-    }
-    else
-        switch ( destreg = CheckRegister8() )
-        {
-        case -1:
-            LD_16bit_reg();         /* LD rr,(nn)   ;  LD  rr,nn   ;   LD  SP,HL|IX|IY   */
-            break;
-
-        case 6:
-            error_illegal_ident(); /* LD F,? */
-            break;
-
-        case 8:
-            if ( GetSym() == TK_COMMA )
-            {
-                GetSym();
-
-                if ( CheckRegister8() == 7 )
-                {
-                    /* LD  I,A */
-                    append_2bytes( 0xED, 0x47 );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-
-        case 9:
-            if ( GetSym() == TK_COMMA )
-            {
-                GetSym();
-
-                if ( CheckRegister8() == 7 )
-                {
-                    /* LD  R,A */
-                    append_2bytes( 0xED, 0x4F );
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-
-        default:
-            if ( GetSym() == TK_COMMA )
-            {
-                if ( GetSym() == TK_LPAREN )
-                {
-                    LD_r_8bit_indrct( destreg );    /* LD  r,(HL)  ;   LD  r,(IX|IY+d)  */
-                }
-                else
-                {
-                    sourcereg = CheckRegister8();
-
-                    if ( sourcereg == -1 )
-                    {
-                        /* LD  r,n */
-                        if ( destreg & 8 )
-                        {
-                            if ( ( opts.cpu & CPU_RABBIT ) )
-
-                            {
-                                error_illegal_ident();
-                                return;
-                            }
-
-                            append_byte( 0xDD );    /* LD IXl,n or LD IXh,n */
-                        }
-                        else if ( destreg & 16 )
-                        {
-                            if ( ( opts.cpu & CPU_RABBIT ) )
-                            {
-                                error_illegal_ident();
-                                return;
-                            }
-
-                            append_byte( 0xFD );    /* LD  IYl,n or LD  IYh,n */
-                        }
-
-                        destreg &= 7;
-                        append_byte( (Byte)( destreg * 0x08 + 0x06 ) );
-                        ExprUnsigned8( 1 );
-                        return;
-                    }
-
-                    if ( sourcereg == 6 )
-                    {
-                        /* LD x, F */
-                        error_illegal_ident();
-                        return;
-                    }
-
-                    if ( ( sourcereg == 8 ) && ( destreg == 7 ) )
-                    {
-                        /* LD A,I */
-                        append_2bytes( 0xED, 0x57 );
-                        return;
-                    }
-
-                    if ( ( sourcereg == 9 ) && ( destreg == 7 ) )
-                    {
-                        /* LD A,R */
-                        append_2bytes( 0xED, 0x5F );
-                        return;
-                    }
-
-                    if ( ( destreg & 8 ) || ( sourcereg & 8 ) )
-                    {
-                        /* IXl or IXh */
-                        if ( ( opts.cpu & CPU_RABBIT ) )
-                        {
-                            error_illegal_ident();
-                            return;
-                        }
-
-                        append_byte( 0xDD );
-                    }
-                    else if ( ( destreg & 16 ) || ( sourcereg & 16 ) )
-                    {
-                        /* IYl or IYh */
-                        if ( ( opts.cpu & CPU_RABBIT ) )
-                        {
-                            error_illegal_ident();
-                            return;
-                        }
-
-                        append_byte( 0xFD );
-                    }
-
-                    sourcereg &= 7;
-                    destreg &= 7;
-
-                    append_byte( (Byte)( 0x40 + destreg * 0x08 + sourcereg ) ); /* LD  r,r  */
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-        }
 }
 
-
-/*
- * LD (HL),r LD   (HL),n
- */
-void
-LD_HL8bit_indrct( void )
+static void LD_IND_BC_DE(void)
 {
-    int sourcereg;
+	int dest_reg = tok_ind_reg16;
 
-    if ( tok == TK_COMMA )
-    {
-        GetSym();
+	GetSymExpect(TK_COMMA);
+	GetSym();
 
-        switch ( sourcereg = CheckRegister8() )
-        {
-        case 6:
-        case 8:
-        case 9:
-            error_illegal_ident();
-            break;
-
-        case -1:                /* LD  (HL),n  */
-            append_byte( 0x36 );
-            ExprUnsigned8( 1 );
-            break;
-
-        default:
-            append_byte( (Byte)( 0x70 + sourcereg ) );       /* LD  (HL),r  */
-            break;
-        }
-    }
-    else
-    {
-        error_syntax();
-    }
+	if (tok_reg8 == REG8_A)
+		append_byte(0x02 + (dest_reg << 4));			/* ld (BC)/(DE), A */
+	else
+	{
+		error_illegal_ident();
+	}
 }
 
-
-/*
- * LD (IX|IY+d),r LD   (IX|IY+d),n
- */
-void
-LD_index8bit_indrct( int destreg )
+static void LD_IND_NN(void)
 {
-    int  sourcereg;
-    UInt opcodeptr;
+	Expr *expr;
 
-    if ( destreg == 5 )
-    {
-        append_byte( 0xDD );
-    }
-    else
-    {
-        append_byte( 0xFD );
-    }
+	if (!(expr = expr_parse()))
+		return;					/* syntax error in expression */
 
-    opcodeptr = get_cur_module_size();		/* pointer to instruction opcode - BUG_0015 */
-    append_byte( 0x36 );					/* preset 2. opcode to LD (IX|IY+d),n  */
+	CurSymExpect(TK_RPAREN);
+	GetSym();
 
+	CurSymExpect(TK_COMMA);
+	GetSym();
 
-    if ( !ExprSigned8( 2 ) )
-    {
-        return;    /* IX/IY offset expression */
-    }
+	switch (tok_reg16_sp)
+	{
+	case REG16_HL:			/* LD  (nn),dd  => dd: HL, IX, IY */
+		if (tok_idx_reg)
+		{
+			append_2bytes(tok_idx_reg, 0x22);
+			Pass2infoExpr(RANGE_WORD, 2, expr);
+		}
+		else
+		{
+			append_byte(0x22);
+			Pass2infoExpr(RANGE_WORD, 1, expr);
+		}
+		return;
 
-    if ( tok != TK_RPAREN )
-    {
-        error_syntax(); /* ')' wasn't found in line */
-        return;
-    }
+	case REG16_NONE:
+		break;
 
-    if ( GetSym() == TK_COMMA )
-    {
-        GetSym();
+	default:					/* LD  (nn),dd   => dd: BC,DE,SP  */
+		append_2bytes(0xED, (Byte)(0x43 + (tok_reg16_sp << 4)));
+		Pass2infoExpr(RANGE_WORD, 2, expr);
+		return;
+	}
 
-        switch ( sourcereg = CheckRegister8() )
-        {
-        case 6:
-        case 8:
-        case 9:
-            error_illegal_ident();
-            break;
+	switch (tok_reg8)
+	{
+	case REG8_A:
+		append_byte(0x32);      /* LD  (nn),A  */
+		Pass2infoExpr(RANGE_WORD, 1, expr);
+		return;
 
-        case -1:
-            ExprUnsigned8( 3 );   /* Execute, store & patch 8bit expression for <n> */
-            break;
-
-        default:
-            patch_byte( &opcodeptr, (Byte)( 112 + sourcereg ) );     /* LD  (IX|IY+d),r  */
-            break;
-        }                       /* end switch */
-    }
-    else
-    {
-        error_syntax();
-    }
+	default:
+		error_illegal_ident();
+	}
 }
 
-
-/*
- * LD  r,(HL) LD  r,(IX|IY+d) LD  A,(nn)
- */
-void
-LD_r_8bit_indrct( int destreg )
+static void LD_REG8(void)
 {
-    int sourcereg;
+	int dest_reg = tok_reg8;
+	int dest_idx = tok_idx_reg;
 
-    switch ( sourcereg = IndirectRegisters() )
-    {
-    case 2:
-        append_byte( (Byte)( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
-        break;
+	if (dest_reg != REG8_NONE && dest_idx && (opts.cpu & CPU_RABBIT)) 
+	{
+		error_illegal_ident();
+		return;
+	}
 
-    case 5:
-    case 6:
-        if ( sourcereg == 5 )
-        {
-            append_byte( 0xDD );
-        }
-        else
-        {
-            append_byte( 0xFD );
-        }
+	GetSymExpect(TK_COMMA);
+	GetSym();
 
-        append_byte( (Byte)( 0x40 + destreg * 0x08 + 0x06 ) );
-        ExprSigned8( 2 );
-        break;
+	switch (tok)
+	{
+	case TK_LPAREN:					/* LD  A,(nn)  */
+		if (dest_reg == REG8_A)
+		{
+			append_byte(0x3A);
+			Pass2info(RANGE_WORD, 1);
+		}
+		else
+		{
+			error_illegal_ident();
+		}
+		return;
 
-    case 7:                     /* LD  A,(nn)  */
-        if ( destreg == 7 )
-        {
-            append_byte( 0x3A );
-            ExprAddress( 1 );
-        }
-        else
-        {
-            error_illegal_ident();
-        }
+	case TK_I:						/* LD  A,I */
+		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+			append_2bytes(0xED, 0x57);
+		else 
+			error_illegal_ident();
+		return;
 
-        break;
+	case TK_IIR:					/* LD  A,IIR */
+		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+			append_2bytes(0xED, 0x57);
+		else
+			error_illegal_ident();
+		return;
 
-    case 0:
-        if ( destreg == 7 )
-        {
-            /* LD   A,(BC)  */
-            append_byte( 0x0A );
-        }
-        else
-        {
-            error_illegal_ident();
-        }
+	case TK_R:						/* LD  A,R */
+		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+			append_2bytes(0xED, 0x5F);
+		else
+			error_illegal_ident();
+		return;
 
-        break;
+	case TK_EIR:					/* LD  A,EIR */
+		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+			append_2bytes(0xED, 0x5F);
+		else
+			error_illegal_ident();
+		return;
 
-    case 1:
-        if ( destreg == 7 )
-        {
-            /* LD   A,(DE)  */
-            append_byte( 0x1A );
-        }
-        else
-        {
-            error_illegal_ident();
-        }
+	default:
+		break;
+	}
 
-        break;
+	switch (tok_ind_reg16)
+	{
+	case IND_REG16_BC:				/* LD   A,(BC)  */
+	case IND_REG16_DE:				/* LD   A,(DE)  */
+		if (dest_reg == REG8_A)
+		{
+			append_byte(0x0A + (tok_ind_reg16 << 4));
+		}
+		else
+		{
+			error_illegal_ident();
+		}
+		return;
 
-    default:
-        error_illegal_ident();
-        break;
-    }
+	case IND_REG16_HL:
+		if (dest_idx)
+		{
+			error_illegal_ident();
+		}
+		else if (tok_idx_reg)			/* LD   r,(IX/IY+d)  */
+		{
+			append_2bytes(tok_idx_reg, (Byte)(0x40 + (dest_reg << 3) + 0x06));
+			GetSym();
+			Pass2info(RANGE_BYTE_SIGNED, 2);
+		}
+		else							/* LD   r,(HL)  */
+		{
+			append_byte((Byte)(0x40 + (dest_reg << 3) + 0x06));
+		}
+		return;
+
+	default:
+		break;
+	}
+
+	if (tok_reg8 != REG8_NONE)			/* LD  r,r  */
+	{
+		if (tok_idx_reg && (opts.cpu & CPU_RABBIT))
+		{
+			error_illegal_ident();
+			return;
+		}
+
+		if (dest_idx || tok_idx_reg)
+		{
+			if (dest_idx && tok_idx_reg && dest_idx != tok_idx_reg)
+			{
+				error_illegal_ident();
+				return;
+			}
+			else 
+				append_byte(dest_idx ? dest_idx : tok_idx_reg);
+				
+		}
+		append_byte((Byte)(0x40 + (dest_reg << 3) + tok_reg8));
+	}
+	else								/* LD  r,n */
+	{
+		if (dest_idx)
+		{
+			append_2bytes(dest_idx, (Byte)((dest_reg << 3) + 0x06));
+			Pass2info(RANGE_BYTE_UNSIGNED, 2);
+		}
+		else
+		{
+			append_byte((Byte)((dest_reg << 3) + 0x06));
+			Pass2info(RANGE_BYTE_UNSIGNED, 1);
+		}
+	}
 }
 
-
-void
-LD_address_indrct( char *exprptr )
+static void LD_REG16(void)
 {
-    int sourcereg;
-    long bytepos;
-    Expr *addrexpr;
+	int dest_reg = tok_reg16_sp;
+	int dest_idx = tok_idx_reg;
 
-    if ( ( addrexpr = expr_parse() ) == NULL )
-    {
-        return;    /* parse to right bracket */
-    }
-    else
-    {
-        OBJ_DELETE( addrexpr );    /* remove this expression again */
-    }
+	GetSymExpect(TK_COMMA);
+	GetSym();
 
-    if ( tok != TK_RPAREN )
-    {
-        error_syntax(); /* Right bracket missing! */
-        return;
-    }
+	if (tok == TK_LPAREN)
+	{
+		GetSym();
+		switch (dest_reg)
+		{
+		case REG16_HL:					/* LD   HL/IX/IY,(nn)  */
+			if (dest_idx)
+			{
+				append_2bytes(dest_idx, 0x2A);
+				Pass2info(RANGE_WORD, 2);
+			}
+			else
+			{
+				append_byte(0x2A);
+				Pass2info(RANGE_WORD, 2);
+			}
+			CurSymExpect(TK_RPAREN);
+			return;
 
-    if ( GetSym() == TK_COMMA )
-    {
-        GetSym();
+		case REG16_NONE:
+			error_illegal_ident();
+			return;
 
-        switch ( sourcereg = CheckRegister16() )
-        {
-        case 2:
-            append_byte( 0x22 );  /* LD  (nn),HL  */
-            bytepos = 1;
-            break;
+		default:						/* LD   dd,(nn)  */
+			append_2bytes(0xED, (Byte)(0x4B + (dest_reg << 4)));
+			Pass2info(RANGE_WORD, 2);
+			CurSymExpect(TK_RPAREN);
+			return;
+		}
+	}
 
-        case 0:
-        case 1:         /* LD  (nn),dd   => dd: BC,DE,SP  */
-        case 3:
-            append_byte( 0xED );
-            append_byte( (Byte)( 0x43 + sourcereg * 0x10 ) );
-            bytepos = 2;
-            break;
+	switch (tok_reg16_sp)
+	{
+	case REG16_NONE:					/* LD dd,nn */
+		if (dest_idx)
+		{
+			append_2bytes(dest_idx, 0x21);
+			Pass2info(RANGE_WORD, 2);
+		}
+		else
+		{
+			append_byte((Byte)((dest_reg << 4) + 0x01));
+			Pass2info(RANGE_WORD, 1);
+		}
+		return;
 
-        case 5:         /* LD  (nn),IX    ;    LD  (nn),IY   */
-        case 6:
-            if ( sourcereg == 5 )
-            {
-                append_byte( 0xDD );
-            }
-            else
-            {
-                append_byte( 0xFD );
-            }
+	case REG16_HL:						/* LD SP,HL/IX/IY */
+		if (dest_reg == REG16_SP)
+		{
+			if (tok_idx_reg)
+				append_byte(tok_idx_reg);
+			append_byte(0xF9);
+		}
+		else
+		{
+			error_illegal_ident();
+		}
+		return;
 
-            append_byte( 0x22 );
-            bytepos = 2;
-            break;
+	default:
+		break;
+	}
 
-        case -1:
-            if ( CheckRegister8() == 7 )
-            {
-                append_byte( 0x32 );      /* LD  (nn),A  */
-                bytepos = 1;
-            }
-            else
-            {
-                error_illegal_ident();
-                return;
-            }
-
-            break;
-
-        default:
-            error_illegal_ident();
-            return;
-        }
-    }
-    else
-    {
-        error_syntax();
-        return;
-    }
-
-    ScanSetPos( exprptr );			/* rewind fileptr to beginning of address expression */
-    GetSym();
-    ExprAddress( bytepos );			/* re-parse, evaluate, etc. */
+	error_illegal_ident();
 }
 
-
-void
-LD_16bit_reg( void )
+void LD(void)
 {
-    int sourcereg, destreg;
-    long bytepos;
+	GetSym();
+	switch (tok)
+	{
+	case TK_LPAREN:					/* LD (nn),... */
+		GetSym();
+		LD_IND_NN();
+		return;
 
-    destreg = CheckRegister16();
+	case TK_I:						/* LD  I,A */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (!(opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+			append_2bytes(0xED, 0x47);
+		else
+			error_illegal_ident();
+		return;
 
-    if ( destreg != -1 )
-        if ( GetSym() == TK_COMMA )
-            if ( GetSym() == TK_LPAREN )
-            {
-                switch ( destreg )
-                {
-                case 4:
-                    error_illegal_ident();
-                    return;
+	case TK_IIR:					/* LD  IIR,A */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if ((opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+			append_2bytes(0xED, 0x47);
+		else
+			error_illegal_ident();
+		return;
 
-                case 2:
-                    append_byte( 0x2A );      /* LD   HL,(nn)  */
-                    bytepos = 1;
-                    break;
+	case TK_R:						/* LD  R,A */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (!(opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+			append_2bytes(0xED, 0x4F);
+		else
+			error_illegal_ident();
+		return;
 
-                case 5:             /* LD  IX,(nn)    LD  IY,(nn)  */
-                case 6:
-                    if ( destreg == 5 )
-                    {
-                        append_byte( 0xDD );
-                    }
-                    else
-                    {
-                        append_byte( 0xFD );
-                    }
+	case TK_EIR:					/* LD  EIR,A */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if ((opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+			append_2bytes(0xED, 0x4F);
+		else
+			error_illegal_ident();
+		return;
 
-                    append_byte( 0x2A );
-                    bytepos = 2;
-                    break;
+	default:
+		break;
+	}
+	
+	switch (tok_ind_reg16)
+	{
+	case IND_REG16_BC:
+	case IND_REG16_DE:
+		LD_IND_BC_DE();
+		return;
 
-                default:
-                    append_byte( 0xED );
-                    append_byte( (Byte)( 0x4B + destreg * 0x10 ) );
-                    bytepos = 2;
-                    break;
-                }
+	case IND_REG16_HL:				/* ld (HL),xxx / ld (ix+d),xxx / ld (iy+d),xxx */
+		LD_IND_HL();
+		return;
 
-                GetSym();
-                ExprAddress( bytepos );
-            }
-            else
-                switch ( sourcereg = CheckRegister16() )
-                {
-                case -1:              /* LD  rr,nn  */
-                    switch ( destreg )
-                    {
-                    case 4:
-                        error_illegal_ident();
-                        return;
+	case IND_REG16_NONE:
+		break;
 
-                    case 5:
-                    case 6:
-                        if ( destreg == 5 )
-                        {
-                            append_byte( 0xDD );
-                        }
-                        else
-                        {
-                            append_byte( 0xFD );
-                        }
+	default:
+		assert(0);
+	}
 
-                        append_byte( 0x21 );
-                        bytepos = 2;
-                        break;
+	if (tok_reg8 != REG8_NONE)		/* ld r,... */
+	{
+		LD_REG8();
+		return;
+	}
 
-                    default:
-                        append_byte( (Byte)( destreg * 0x10 + 0x01 ) );
-                        bytepos = 1;
-                        break;
-                    }
+	if (tok_reg16_sp != REG16_NONE)	/* ld dd, ... */
+	{
+		LD_REG16();
+		return;
+	}
 
-                    ExprAddress( bytepos );
-                    break;
-
-                case 2:
-                    if ( destreg == 3 )
-                    {
-                        /* LD  SP,HL  */
-                        append_byte( 0xF9 );
-                    }
-                    else
-                    {
-                        error_illegal_ident();
-                    }
-
-                    break;
-
-                case 5:               /* LD  SP,IX    LD  SP,IY  */
-                case 6:
-                    if ( destreg == 3 )
-                    {
-                        if ( sourcereg == 5 )
-                        {
-                            append_byte( 0xDD );
-                        }
-                        else
-                        {
-                            append_byte( 0xFD );
-                        }
-
-                        append_byte( 0xF9 );
-                    }
-                    else
-                    {
-                        error_illegal_ident();
-                    }
-
-                    break;
-
-                default:
-                    error_illegal_ident();
-                    break;
-                }
-        else
-        {
-            error_syntax();
-        }
-    else
-    {
-        error_syntax();
-    }
+	error_syntax();
 }

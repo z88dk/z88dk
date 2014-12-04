@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.105 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.106 2014-12-04 23:30:18 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -37,7 +37,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.105 2014-
 #include <string.h>
 
 /* external functions */
-int DEFSP( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
@@ -53,88 +52,32 @@ void UNDEFINE( void );
 extern UInt DEFVPC;
 
 
-int
-DEFSP( void )
-{
-    if ( GetSym() == TK_DOT )
-        if ( GetSym() == TK_NAME )
-            switch ( toupper(tok_name[0]) )
-            {
-            case 'B':
-                return 1;
-
-            case 'W':
-                return 2;
-
-            case 'P':
-                return 3;
-
-            case 'L':
-                return 4;
-
-            default:
-                return -1;
-            }
-        else
-        {
-            error_syntax();
-            return -1;
-        }
-    else
-    {
-        error_syntax();
-        return -1;
-    }
-}
-
-
-
 long
 Parsevarsize( void )
 {
-
-    Expr *expr;
-
     long offset = 0, varsize, size_multiplier;
 
-    if ( stricompare( tok_name, "DS" ) != 0 )
-    {
-        error_illegal_ident();
-    }
-    else
-    {
-        if ( ( varsize = DEFSP() ) == -1 )
-        {
-            error_unknown_ident();
-        }
-        else
-        {
-            GetSym();
+	if (!tok_ds_size)
+	{
+		varsize = 0;
+	}
+	else
+	{
+		varsize = tok_ds_size;
+		GetSym();
 
-            if ( ( expr = expr_parse() ) != NULL )
-            {
-                if ( expr->result.not_evaluable )
-                {
-                    error_not_defined();
-                    OBJ_DELETE( expr );
-                }
-                else
-                {
-                    size_multiplier = Expr_eval( expr );
-                    OBJ_DELETE( expr );
-
-                    if ( size_multiplier > 0 && size_multiplier <= MAXCODESIZE )
-                    {
-                        offset = varsize * size_multiplier;
-                    }
-                    else
-                    {
-                        error_int_range( size_multiplier );
-                    }
-                }
-            }
-        }
-    }
+		if (expr_parse_eval(&size_multiplier))		/* error in expr_parse_eval() if failed */
+		{
+			if (size_multiplier > 0 && varsize * size_multiplier <= 0x10000)
+			{
+				offset = varsize * size_multiplier;
+			}
+			else
+			{
+				error_int_range(size_multiplier);
+			}
+		}
+	}
 
     return offset;
 }
@@ -146,25 +89,13 @@ Parsedefvarsize( long offset )
 {
     long varoffset = 0;
 
-    switch ( tok )
-    {
-    case TK_NAME:
-        if ( stricompare( tok_name, "DS" ) != 0 )
-        {
-            define_symbol( tok_name, offset, TYPE_CONSTANT, 0 );
-            GetSym();
-        }
+	if (tok == TK_NAME)
+	{
+		define_symbol(tok_name, offset, TYPE_CONSTANT, 0);
+		GetSym();
+	}
 
-        if ( tok == TK_NAME )
-        {
-            varoffset = Parsevarsize();
-        }
-
-        break;
-
-    default:
-        error_syntax();
-    }
+	varoffset = Parsevarsize();
 
     return varoffset;
 }
@@ -174,50 +105,30 @@ Parsedefvarsize( long offset )
 void
 DEFVARS( void )
 {
-    Expr *expr;
-
     long offset;
     enum flag globaldefv;
 
     GetSym();
+	if (!expr_parse_eval(&offset))
+		return;
 
-    if ( ( expr = expr_parse() ) != NULL )
+    if ( ( offset != -1 ) && ( offset != 0 ) )
     {
-        /* expr. must not be stored in relocatable file */
-        if ( expr->result.not_evaluable )
-        {
-            error_not_defined();
-            OBJ_DELETE( expr );
-            return;
-        }
-        else
-        {
-            offset = Expr_eval( expr ); /* offset expression must not contain undefined symbols */
-            OBJ_DELETE( expr );
-        }
-
-        if ( ( offset != -1 ) && ( offset != 0 ) )
-        {
-            DEFVPC = (UInt)offset;
-            globaldefv = ON;
-        }
-        else
-        {
-            if ( offset == -1 )
-            {
-                globaldefv = ON;
-                offset = DEFVPC;
-            }
-            else
-            {
-                /* offset = 0, use temporarily without smashing DEFVPC */
-                globaldefv = OFF;
-            }
-        }
+        DEFVPC = (UInt)offset;
+        globaldefv = ON;
     }
     else
     {
-        return;    /* syntax error raised in expr_parse() - get next line from file... */
+        if ( offset == -1 )
+        {
+            globaldefv = ON;
+            offset = DEFVPC;
+        }
+        else
+        {
+            /* offset = 0, use temporarily without smashing DEFVPC */
+            globaldefv = OFF;
+        }
     }
 
     while ( tok != TK_END && tok != TK_LCURLY )
@@ -317,7 +228,7 @@ DEFGROUP( void )
                         break;
 
                     default:
-                        error_syntax();
+						error_syntax();
                         break;
                     }
                 }
@@ -411,7 +322,7 @@ UNDEFINE( void )
         }
         else
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -429,7 +340,7 @@ DEFINE( void )
         }
         else
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -492,13 +403,13 @@ DEFC( void )
             }
             else
             {
-                error_syntax();
+				error_syntax();
                 break;
             }
         }
         else
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -559,7 +470,7 @@ DEFB( void )
     {
         GetSym();
 
-        if ( !ExprUnsigned8( bytepos ) )
+		if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
         {
             break;    /* syntax error - get next line from file... */
         }
@@ -572,7 +483,7 @@ DEFB( void )
         }
         else if ( tok != TK_COMMA )
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -590,7 +501,7 @@ DEFW( void )
     {
         GetSym();
 
-        if ( !ExprAddress( bytepos ) )
+		if (!Pass2info(RANGE_WORD, bytepos))
         {
             break;    /* syntax error - get next line from file... */
         }
@@ -603,7 +514,7 @@ DEFW( void )
         }
         else if ( tok != TK_COMMA )
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -621,7 +532,7 @@ DEFP( void )
     {
         GetSym();
 
-        if ( !ExprAddress( bytepos ) )
+		if (!Pass2info(RANGE_WORD, bytepos))
         {
             break;    /* syntax error - get next line from file... */
         }
@@ -631,12 +542,12 @@ DEFP( void )
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
         if ( tok != TK_COMMA )
         {
-            error_syntax();
+			error_syntax();
         }
 
         GetSym();
 
-        if ( !ExprUnsigned8( bytepos ) )
+		if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
         {
             break;    /* syntax error - get next line from file... */
         }
@@ -649,7 +560,7 @@ DEFP( void )
         }
         else if ( tok != TK_COMMA )
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -667,7 +578,7 @@ DEFL( void )
     {
         GetSym();
 
-        if ( !ExprLong( bytepos ) )
+		if (!Pass2info(RANGE_DWORD, bytepos))
         {
             break;    /* syntax error - get next line from file... */
         }
@@ -680,7 +591,7 @@ DEFL( void )
         }
         else if ( tok != TK_COMMA )
         {
-            error_syntax();
+			error_syntax();
             break;
         }
     }
@@ -708,13 +619,13 @@ DEFM( void )
             GetSym();
             if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_END)
             {
-                error_syntax();
+				error_syntax();
                 return;
             }
         }
         else
         {
-            if ( !ExprUnsigned8( bytepos ) )
+			if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
             {
                 break;    /* syntax error - get next line from file... */
             }
@@ -743,7 +654,7 @@ INCLUDE( void )
     }
     else
     {
-        error_syntax();
+		error_syntax();
     }
 
     tok = TK_NEWLINE;
@@ -766,7 +677,7 @@ BINARY( void )
     }
     else
     {
-        error_syntax();
+		error_syntax();
     }
 }
 
@@ -782,7 +693,7 @@ DeclModuleName( void )
         }
         else
         {
-            error_illegal_ident();
+			error_illegal_ident();
         }
     }
     else

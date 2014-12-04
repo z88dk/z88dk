@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.65 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.66 2014-12-04 23:30:20 pauloscustodio Exp $
 */
 
 #pragma once
@@ -28,24 +28,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.65 2014-06-30 22:
 #include <stdio.h>
 #include <stdlib.h>
 
-#define REG16_BC   0
-#define REG16_DE   1
-#define REG16_HL   2
-#define REG16_SP   3
-#define REG16_AF   4
-#define REG16_IX   5
-#define REG16_IY   6
-#define REG16_AF1  7
-
-#define FLAGS_NZ 0
-#define FLAGS_Z  1
-#define FLAGS_NC 2
-#define FLAGS_C  3
-#define FLAGS_PO 4
-#define FLAGS_PE 5
-#define FLAGS_P 6
-#define FLAGS_M 7
-
 #ifdef MSDOS
 #define MAXCODESIZE 65532       /* MSDOS 64K heap boundary */
 #else
@@ -58,4 +40,5 @@ extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
 extern void Z80pass1( char *filename );
-extern Bool Pass2info( range_t range, long lfileptr );
+extern Bool Pass2info(range_t range, int byteoffset);
+extern Bool Pass2infoExpr(range_t range, int byteoffset, Expr *expr);

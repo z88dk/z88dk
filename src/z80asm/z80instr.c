@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.79 2014-06-30 22:29:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.80 2014-12-04 23:30:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -29,12 +29,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.79 2014-0
 #include <stdlib.h>
 #include <string.h>
 
-/* external functions */
-int CheckRegister8( void );
-int IndirectRegisters( void );
-int CheckCondition( void );
-int CheckRegister16( void );
-void ExtAccumulator( int opcode );
 
 /* local functions */
 void ADD_8bit_instr( void );
@@ -44,73 +38,45 @@ void IncDec_8bit_instr( int opcode );
 void ArithLog8_instr( int opcode );
 void JP_instr( int opc0, int opc );
 void Subroutine_addr( int opc0, int opc );
+void ExtAccumulator(int opcode);
 
 void
 PushPop_instr( int opcode )
 {
-    int qq;
-
-    if ( GetSym() == TK_NAME )
-        switch ( qq = CheckRegister16() )
-        {
-        case REG16_BC:
-        case REG16_DE:
-        case REG16_HL:
-            append_byte( (Byte)( opcode + qq * 0x10 ) );
-            break;
-
-        case REG16_AF:
-            append_byte( (Byte)( opcode + 0x30 ) );
-            break;
-
-        case REG16_IX:
-            append_byte( 0xDD );
-            append_byte( (Byte)( opcode + 0x20 ) );
-            break;
-
-        case REG16_IY:
-            append_byte( 0xFD );
-            append_byte( (Byte)( opcode + 0x20 ) );
-            break;
-
-        default:
-            error_illegal_ident();
-        }
-    else
-    {
-        error_syntax();
-    }
+	GetSym();
+	if (tok_reg16_af != REG16_NONE)
+	{
+		if (tok_idx_reg)
+			append_byte(tok_idx_reg);
+		append_byte((Byte)(opcode + (tok_reg16_af << 4)));
+	}
+	else
+	{
+		error_syntax();
+	}
 }
 
 
 void
 RET( void )
 {
-    long constant;
+	GetSym();
 
-    switch ( GetSym() )
-    {
-    case TK_NAME:
-        if ( ( constant = CheckCondition() ) != -1 )
-        {
-            append_byte( (Byte)( 0xC0 + constant * 0x08 ) );  /* RET cc  instruction opcode */
-        }
-        else
-        {
-            error_illegal_ident();
-        }
+	if (tok_flag != FLAG_NONE)
+		append_byte((Byte)(0xC0 + (tok_flag << 3)));  /* RET cc  instruction opcode */
+	else 
+	{
+		switch (tok)
+		{
+		case TK_END:
+		case TK_NEWLINE:
+			append_byte(0xC9);
+			break;
 
-        break;
-
-	case TK_END:
-    case TK_NEWLINE:
-        append_byte( 0xC9 );
-        break;
-
-    default:
-        error_syntax();
-        return;
-    }
+		default:
+			error_syntax();
+		}
+	}
 }
 
 
@@ -118,117 +84,56 @@ RET( void )
 void
 EX( void )
 {
-    if ( GetSym() == TK_LPAREN )
-        if ( GetSym() == TK_NAME )
-            if ( CheckRegister16() == REG16_SP )      /* EX  (SP) */
-                if ( GetSym() == TK_RPAREN )
-                    if ( GetSym() == TK_COMMA )
-                        if ( GetSym() == TK_NAME )
-                            switch ( CheckRegister16() )
-                            {
-                            case REG16_HL:
-                                if ( ( opts.cpu & CPU_RABBIT ) )
-                                {
-                                    /* Instruction code changed */
-                                    append_2bytes( 0xED, 0x54 );
-                                }
-                                else
-                                {
-                                    append_byte( 0xE3 );      /* EX  (SP),HL  */
-                                }
+	GetSym();
 
-                                break;
+	switch (tok)
+	{
+	case TK_IND_SP:									/* EX (SP), HL/IX/IY */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (tok_reg16_af == REG16_HL)
+		{
+			if ((opts.cpu & CPU_RABBIT) && ! tok_idx_reg)
+				append_2bytes(0xED, 0x54);			/* Instruction code changed */
+			else
+			{
+				if (tok_idx_reg)
+					append_byte(tok_idx_reg);
+				append_byte(0xE3);					/* EX (SP),HL/IX/DE */
+			}
+		}
+		else
+		{
+			error_illegal_ident();
+		}
+		break;
 
-                            case REG16_IX:
-                                append_2bytes( 0xDD, 0xE3 );  /* EX  (SP),IX  */
-                                break;
+	case TK_DE:										/* EX DE, HL */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (tok == TK_HL)
+			append_byte(0xEB);
+		else
+		{
+			error_illegal_ident();
+		}
+		break;
 
-                            case REG16_IY:
-                                append_2bytes( 0xFD, 0xE3 );  /* EX  (SP),IY  */
-                                break;
+	case TK_AF:										/* EX AF, AF/AF' */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (tok == TK_AF || tok == TK_AF1)
+			append_byte(0x08);
+		else
+		{
+			error_illegal_ident();
+		}
+		break;
 
-                            default:
-                                error_illegal_ident();
-                            }
-                        else
-                        {
-                            error_syntax();
-                        }
-                    else
-                    {
-                        error_syntax();
-                    }
-                else
-                {
-                    error_syntax();
-                }
-            else
-            {
-                error_illegal_ident();
-            }
-        else
-        {
-            error_syntax();
-        }
-    else if ( tok == TK_NAME )
-    {
-        switch ( CheckRegister16() )
-        {
-        case REG16_DE:
-            if ( GetSym() == TK_COMMA )      /* EX  DE,HL   */
-                if ( GetSym() == TK_NAME )
-                    if ( CheckRegister16() == 2 )
-                    {
-                        append_byte( 0xEB );
-                    }
-                    else
-                    {
-                        error_illegal_ident();
-                    }
-                else
-                {
-                    error_syntax();
-                }
-            else
-            {
-                error_syntax();
-            }
 
-            break;
-
-        case REG16_AF:
-            if ( GetSym() == TK_COMMA )      /* EX  AF,AF'   */
-                if ( GetSym() == TK_NAME )
-				{
-					switch ( CheckRegister16() )
-					{
-					case REG16_AF:
-					case REG16_AF1:
-                        append_byte( 0x08 );
-						break;
-					default:
-						error_illegal_ident();
-                    }
-				}
-                else
-                {
-                    error_syntax();
-                }
-            else
-            {
-                error_syntax();
-            }
-
-            break;
-
-        default:
-            error_illegal_ident();
-        }
-    }
-    else
-    {
-        error_syntax();
-    }
+	default:
+		error_syntax();
+	}
 }
 
 
@@ -236,163 +141,106 @@ EX( void )
 void
 OUT( void )
 {
-    long reg;
+	GetSym();
+	
+	if (opts.cpu & CPU_RABBIT)
+	{
+		error_illegal_ident();
+	}
+	else
+	{
+		switch (tok)
+		{
+		case TK_IND_C:							/* OUT (C), r */
+			GetSymExpect(TK_COMMA);
+			GetSym();
+			if (tok_reg8 != REG8_NONE && !tok_idx_reg)
+				append_2bytes(0xED, (Byte)(0x41 + (tok_reg8 << 3)));
+			else
+			{
+				error_illegal_ident();
+			
+			}
+			break;
 
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        error_illegal_ident();
-        return;
-    }
+		case TK_LPAREN:							/* OUT (N), A */
+			GetSym();
+			append_byte(0xD3);
+			if (!Pass2info(RANGE_BYTE_UNSIGNED, 1))
+				return;							/* error in expression */
 
-    if ( GetSym() == TK_LPAREN )
-    {
-        GetSym();
+			if (tok != TK_RPAREN)
+			{
+				error_syntax();
+			}
 
-        if ( CheckRegister8() == 1 )
-        {
-            /* OUT (C) */
-            if ( GetSym() == TK_RPAREN )
-                if ( GetSym() == TK_COMMA )
-                    if ( GetSym() == TK_NAME )
-                        switch ( reg = CheckRegister8() )
-                        {
-                        case 6:
-                        case 8:
-                        case 9:
-                        case -1:
-                            error_illegal_ident();
-                            break;
+			GetSymExpect(TK_COMMA);
+			GetSym();
+			if (tok != TK_A)
+			{
+				error_illegal_ident();
+			}
 
-                        default:
-                            append_byte( 0xED );
-                            append_byte( (Byte)( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
-                            break;
-                        }
-                    else
-                    {
-                        error_syntax();
-                    }
-                else
-                {
-                    error_syntax();
-                }
-            else
-            {
-                error_syntax();
-            }
-        }
-        else
-        {
-            append_byte( 0xD3 );
+			break;
 
-            if ( !ExprUnsigned8( 1 ) )
-            {
-                return;
-            }
-
-            if ( tok == TK_RPAREN )
-                if ( GetSym() == TK_COMMA )
-                    if ( GetSym() == TK_NAME )
-                    {
-                        if ( CheckRegister8() != 7 )
-                        {
-                            error_illegal_ident();
-                        }
-                    }
-                    else
-                    {
-                        error_syntax();
-                    }
-                else
-                {
-                    error_syntax();
-                }
-            else
-            {
-                error_syntax();
-            }
-        }
-    }
-    else
-    {
-        error_syntax();
-    }
+		default:
+			break;
+		}
+	}
 }
 
 
 void
 IN( void )
 {
-    long inreg;
+    int in_reg;
 
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        error_illegal_ident();
-        return;
-    }
+	GetSym();
 
-    if ( GetSym() == TK_NAME )
-    {
-        switch ( inreg = CheckRegister8() )
-        {
-        case 8:
-        case 9:
-        case -1:
-            error_illegal_ident();
-            break;
+	if (opts.cpu & CPU_RABBIT)
+	{
+		error_illegal_ident();
+	}
+	else
+	{
+		in_reg = tok_reg8;
+		if (in_reg != REG8_NONE && !tok_idx_reg)
+		{
+			GetSymExpect(TK_COMMA);
+			GetSym();
+			switch (tok)
+			{
+			case TK_IND_C:							/* IN r,(C) */
+				append_2bytes(0xED, (Byte)(0x40 + (in_reg << 3)));	
+				break;
 
-        default:
-            if ( GetSym() != TK_COMMA )
-            {
-                error_syntax();
-                break;
-            }
+			case TK_LPAREN:							/* IN A,(N) */
+				if (in_reg != REG8_A)
+				{
+					error_illegal_ident();
+				}
 
-            if ( GetSym() != TK_LPAREN )
-            {
-                error_syntax();
-                break;
-            }
+				GetSym();
+				append_byte(0xDB);
+				if (!Pass2info(RANGE_BYTE_UNSIGNED, 1))
+					return;							/* error in expression */
 
-            GetSym();
+				if (tok != TK_RPAREN)
+				{
+					error_syntax();
+				}
 
-            switch ( CheckRegister8() )
-            {
-            case 1:
-                append_byte( 0xED );
-                append_byte( (Byte)( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
-                break;
+				break;
 
-            case -1:
-                if ( inreg == 7 )
-                {
-                    append_byte( 0xDB );
-
-                    if ( ExprUnsigned8( 1 ) )
-                        if ( tok != TK_RPAREN )
-                        {
-                            error_syntax();
-                        }
-                }
-                else
-                {
-                    error_illegal_ident();
-                }
-
-                break;
-
-            default:
-                error_illegal_ident();
-                break;
-            }
-
-            break;
-        }
-    }
-    else
-    {
-        error_syntax();
-    }
+			default:
+				error_syntax();
+			}
+		}
+		else
+		{
+			error_illegal_ident();
+		}
+	}
 }
 
 
@@ -403,8 +251,8 @@ IM( void )
 
     if ( opts.cpu & CPU_RABBIT )
     {
-        error_illegal_ident();
-        return;
+		error_illegal_ident();
+		return;
     }
 
     GetSym();
@@ -435,10 +283,10 @@ RST( void )
         {
             if ( ( opts.cpu & CPU_RABBIT ) &&
                     ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
-            {
-                error_illegal_ident();
-            }
-            else
+			{
+				error_illegal_ident();
+			}
+			else
             {
                 append_byte( (Byte)( 0xC7 + constant ) );
             }
@@ -556,26 +404,21 @@ FPP( void )
 void
 Subroutine_addr( int opcode0, int opcode )
 {
-    long constant;
 	int listoffset = 0;
+	int flag;
 
-    GetSym();
-
-    if ( ( constant = CheckCondition() ) != -1 ) /* Check for condition */
+	flag = tok_flag;
+	if (flag != FLAG_NONE)			/* Check for condition */
     {
-        if ( GetSym() != TK_COMMA )
-        {
-            error_syntax();
-            return;
-        }
+		GetSymExpect(TK_COMMA);
 
         if ( opcode0 == 205 && ( opts.cpu & CPU_RABBIT ) )
         {
             char buffer[200];
 
-            switch ( constant )
+			switch (flag)
             {
-            case FLAGS_NZ:  /* nz */
+            case FLAG_NZ:  /* nz */
                 append_2bytes( 0x28, 0x03 ); /* jr z */
 				listoffset = 2;
 				next_PC();
@@ -583,7 +426,7 @@ Subroutine_addr( int opcode0, int opcode )
 				append_byte( (Byte)opcode0 );
                 break;
 
-            case FLAGS_Z:  /* z */
+            case FLAG_Z:  /* z */
                 append_2bytes( 0x20, 0x03 ); /* jr nz */
 				listoffset = 2;
 				next_PC();
@@ -591,7 +434,7 @@ Subroutine_addr( int opcode0, int opcode )
                 append_byte( (Byte)opcode0 );
                 break;
 
-            case FLAGS_NC:  /* nc */
+            case FLAG_NC:  /* nc */
                 append_2bytes( 0x38, 0x03 ); /* jr c */
 				listoffset = 2;
 				next_PC();
@@ -599,7 +442,7 @@ Subroutine_addr( int opcode0, int opcode )
                 append_byte( (Byte)opcode0 );
                 break;
 
-            case FLAGS_C:  /* c */
+            case FLAG_C:  /* c */
                 append_2bytes( 0x30, 0x03 ); /* jr nc */
 				listoffset = 2;
 				next_PC();
@@ -607,12 +450,12 @@ Subroutine_addr( int opcode0, int opcode )
                 append_byte( (Byte)opcode0 );
                 break;
 
-            case FLAGS_PO:  /* po */
+            case FLAG_PO:  /* po */
                 append_byte( 0xEA ); /* jp pe */
                 sprintf( buffer, "ASMPC+6\n" );
                 SetTemporaryLine( buffer );
                 GetSym();
-                ExprAddress( 1 );
+				Pass2info(RANGE_WORD, 1);
                 EOL = FALSE;
 				listoffset = 3;
 				next_PC();
@@ -620,12 +463,12 @@ Subroutine_addr( int opcode0, int opcode )
 				append_byte( 0xCD );
                 break;
 
-            case FLAGS_PE:  /* pe */
+            case FLAG_PE:  /* pe */
                 append_byte( 0xE2 ); /* jp po */
                 sprintf( buffer, "ASMPC+6\n" );
                 SetTemporaryLine( buffer );
                 GetSym();
-                ExprAddress( 1 );
+				Pass2info(RANGE_WORD, 1);
                 EOL = FALSE;
 				listoffset = 3;
 				next_PC();
@@ -633,12 +476,12 @@ Subroutine_addr( int opcode0, int opcode )
                 append_byte( 0xCD );
                 break;
 
-            case FLAGS_P:  /* p */
+            case FLAG_P:  /* p */
                 append_byte( 0xFA ); /* jp m */
                 sprintf( buffer, "ASMPC+6\n" );
                 SetTemporaryLine( buffer );
                 GetSym();
-                ExprAddress( 1 );
+				Pass2info(RANGE_WORD, 1);
                 EOL = FALSE;
 				listoffset = 3;
 				next_PC();
@@ -646,23 +489,26 @@ Subroutine_addr( int opcode0, int opcode )
 				append_byte( 0xCD );
                 break;
 
-            case FLAGS_M:  /* m */
+            case FLAG_M:  /* m */
                 append_byte( 0xF2 ); /* jp p */
                 sprintf( buffer, "ASMPC+6\n" );
                 SetTemporaryLine( buffer );
                 GetSym();
-                ExprAddress( 1 );
+				Pass2info(RANGE_WORD, 1);
                 EOL = FALSE;
 				listoffset = 3;
 				next_PC();
 
 				append_byte( 0xCD );
                 break;
+
+			default:
+				assert(0);
             }
         }
         else
         {
-            append_byte( (Byte)( opcode + constant * 0x08 ) ); /* get instruction opcode */
+            append_byte( (Byte)( opcode + (flag << 3) ) ); /* get instruction opcode */
         }
 
         GetSym();
@@ -672,48 +518,26 @@ Subroutine_addr( int opcode0, int opcode )
         append_byte( (Byte)opcode0 );  /* JP nn, CALL nn */
     }
 
-    ExprAddress( listoffset + 1 );
+	Pass2info(RANGE_WORD, listoffset + 1);
 }
 
 
 void
 JP_instr( int opc0, int opc )
 {
-    char *startexpr;				/* scan pointer to start of address expression */
-
-	startexpr = ScanGetPos();		/* remember position of possible start of expression */
-
-    if ( GetSym() == TK_LPAREN )
-    {
-        GetSym();
-
-        switch ( CheckRegister16() )
-        {
-        case 2:         /* JP (HL) */
-            append_byte( 0xE9 );
-            break;
-
-        case 5:         /* JP (IX) */
-            append_2bytes( 0xDD, 0xE9 );
-            break;
-
-        case 6:         /* JP (IY) */
-            append_2bytes( 0xFD, 0xE9 );
-            break;
-
-        case -1:
-            error_syntax();
-            break;
-
-        default:
-            error_illegal_ident();
-            break;
-        }
-    }
-    else
-    {
-		ScanSetPos( startexpr );		/* no indirect register were found, reparse line after 'JP' */
-		Subroutine_addr( opc0, opc );	/* base opcode for <instr> nn; <instr> cc, nn */
+	GetSym();
+	if (tok_ind_reg16 == IND_REG16_HL)	/* JP (HL)/(IX)/(IY) */
+	{
+		if (tok_idx_reg)
+		{
+			append_byte(tok_idx_reg);
+			GetSymExpect(TK_RPAREN);
+		}
+		append_byte(0xE9);
+	}
+	else 
+	{
+		Subroutine_addr( opc0, opc );		/* base opcode for <instr> nn; <instr> cc, nn */
     }
 }
 
@@ -727,48 +551,25 @@ static void RelativeJump( Byte opcode )
 void
 JR( void )
 {
-    long constant;
-	Byte opcode = 0x18;			/* opcode for JR  e */
-    char *startexpr;				/* scan pointer to start of address expression */
+	int flag;
 
-	startexpr = ScanGetPos();		/* remember position of possible start of expression */
+	GetSym();
+	flag = tok_flag;
 
-    if ( GetSym() == TK_NAME )
+	if (flag == FLAG_NONE)
+	{
+		RelativeJump(0x18);
+	}
+	else if (flag < FLAG_PO)
     {
-        switch ( constant = CheckCondition() )
-        {
-            /* check for a condition */
-        case FLAGS_NZ:
-        case FLAGS_Z:
-        case FLAGS_NC:
-        case FLAGS_C:
-            opcode = (Byte)( 0x20 + constant * 0x08 );
-
-            if ( GetSym() == TK_COMMA )
-            {
-                GetSym();			/* point at start of address expression */
-				break;
-            }
-            else
-            {
-                error_syntax(); /* comma missing */
-				return;
-            }
-			break;
-
-        case -1:
-			ScanSetPos( startexpr );
-			GetSym();
-            break;              /* identifier not a condition id - check for legal expression */
-
-        default:
-            error_syntax();      /* illegal condition, syntax */
-            return;
-        }
-
-    }
-
-	RelativeJump( opcode );
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		RelativeJump((Byte)(0x20 + (flag << 3)));
+	}
+	else
+	{
+		error_syntax();				/* illegal condition, syntax */
+	}
 }
 
 
@@ -776,7 +577,6 @@ void
 DJNZ( void )
 {
 	GetSym();
-
 	RelativeJump( 0x10 );
 }
 
@@ -784,553 +584,276 @@ DJNZ( void )
 void
 ADD( void )
 {
-    int acc16, reg16;
-    char *fptr;
-
-    fptr = ScanGetPos();
+	int dest_idx;
 
     GetSym();
+	dest_idx = tok_idx_reg;
 
-    switch ( acc16 = CheckRegister16() )
+	switch (tok_reg16_sp)
     {
-    case -1:
-        ScanSetPos( fptr );
-        ExtAccumulator( 0 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
+    case REG16_NONE:
+        ExtAccumulator( 0 );	/* 16 bit register wasn't found - try to evaluate the 8 bit version */
         break;
 
-    case 2:
-        if ( GetSym() == TK_COMMA )
-        {
-            GetSym();
-            reg16 = CheckRegister16();
-
-            if ( reg16 >= 0 && reg16 <= 3 )
-            {
-                append_byte( (Byte)( 0x09 + 0x10 * reg16 ) ); /* ADD HL,rr */
-            }
-            else
-            {
-                error_illegal_ident();
-            }
-        }
-        else
-        {
-            error_syntax();
-        }
-
-        break;
-
-    case 5:
-    case 6:
-        if ( GetSym() == TK_COMMA )
-        {
-            GetSym();
-            reg16 = CheckRegister16();
-
-            switch ( reg16 )
-            {
-            case 0:
-            case 1:
-            case 3:
-                break;
-
-            case 5:
-            case 6:
-                if ( acc16 == reg16 )
-                {
-                    reg16 = 2;
-                }
-                else
-                {
-                    error_illegal_ident();
-                    return;
-                }
-
-                break;
-
-            default:
-                error_illegal_ident();
-                return;
-            }
-
-            if ( acc16 == 5 )
-            {
-                append_byte( 0xDD );
-            }
-            else
-            {
-                append_byte( 0xFD );
-            }
-
-            append_byte( (Byte)( 0x09 + 0x10 * reg16 ) );
-        }
-        else
-        {
-            error_syntax();
-        }
-
-        break;
+	case REG16_HL:				/* HL, IX, IY */
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (dest_idx || tok_idx_reg)
+		{
+			if (dest_idx && tok_idx_reg && dest_idx != tok_idx_reg)
+			{
+				error_illegal_ident();
+				return;
+			}
+			else
+				append_byte(dest_idx ? dest_idx : tok_idx_reg);
+		}
+		append_byte((Byte)(0x09 + (tok_reg16_sp << 4)));	/* ADD HL,rr */
+		return;
 
     default:
-        error_unknown_ident();
-        break;
+		error_illegal_ident();
+		break;
     }
 }
 
 
+static void SBC_ADC(int opcode8bit, int opcode16bit)
+{
+	GetSym();
+
+	switch (tok_reg16_sp)
+	{
+	case REG16_NONE:
+		ExtAccumulator(opcode8bit);      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
+		break;
+
+	case REG16_HL:
+		if (tok_idx_reg)
+		{
+			error_illegal_ident();
+		}
+		else
+		{
+			GetSymExpect(TK_COMMA);
+			GetSym();
+
+			if (!tok_idx_reg && tok_reg16_sp != REG16_NONE)
+				append_2bytes(0xED, (Byte)(opcode16bit + (tok_reg16_sp << 4)));
+			else
+			{
+				error_illegal_ident();
+			}
+		}
+		break;
+
+	default:
+		error_illegal_ident();
+		break;
+	}
+}
+
 void
 SBC( void )
 {
-    int reg16;
-    char *fptr;
-
-    fptr = ScanGetPos();
-    GetSym();
-
-    switch ( CheckRegister16() )
-    {
-    case -1:
-        ScanSetPos( fptr );
-        ExtAccumulator( 3 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-        break;
-
-    case 2:
-        if ( GetSym() == TK_COMMA )
-        {
-            GetSym();
-            reg16 = CheckRegister16();
-
-            if ( reg16 >= 0 && reg16 <= 3 )
-            {
-                append_byte( 0xED );
-                append_byte( (Byte)( 0x42 + 0x10 * reg16 ) );
-            }
-            else
-            {
-                error_illegal_ident();
-            }
-        }
-        else
-        {
-            error_syntax();
-        }
-
-        break;
-
-    default:
-        error_illegal_ident();
-        break;
-    }
+	SBC_ADC(3, 0x42);
 }
 
 
 void
 ADC( void )
 {
-    int reg16;
-    char *fptr;
-
-    fptr = ScanGetPos();
-
-    GetSym();
-
-    switch ( CheckRegister16() )
-    {
-    case -1:
-        ScanSetPos( fptr );
-        ExtAccumulator( 1 );      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-        break;
-
-    case 2:
-        if ( GetSym() == TK_COMMA )
-        {
-            GetSym();
-            reg16 = CheckRegister16();
-
-            if ( reg16 >= 0 && reg16 <= 3 )
-            {
-                append_byte( 0xED );
-                append_byte( (Byte)( 0x4A + 0x10 * reg16 ) );
-            }
-            else
-            {
-                error_illegal_ident();
-            }
-        }
-        else
-        {
-            error_syntax();
-        }
-
-        break;
-
-    default:
-        error_illegal_ident();
-        break;
-    }
+	SBC_ADC(1, 0x4A);
 }
-
-
-
-
 
 
 void
 ArithLog8_instr( int opcode )
 {
-    long reg;
+	if (tok_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
+	{
+		if (tok_idx_reg)
+			append_byte(tok_idx_reg);
 
-    if ( GetSym() == TK_LPAREN )
-        switch ( reg = IndirectRegisters() )
-        {
-        case 2:
-            append_byte( (Byte)( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
-            break;
+		append_byte((Byte)(0x80 + (opcode << 3) + 0x06));		/* xxx  A,(HL) */
 
-        case 5:                   /* xxx A,(IX+d) */
-        case 6:
-            if ( reg == 5 )
-            {
-                append_byte( 0xDD );
-            }
-            else
-            {
-                append_byte( 0xFD );    /* xxx A,(IY+d) */
-            }
-
-            append_byte( (Byte)( 0x80 + opcode * 0x08 + 0x06 ) );
-            ExprSigned8( 2 );
-            break;
-
-        default:
-            error_syntax();
-            break;
-        }
+		if (tok_idx_reg)
+		{
+			GetSym();
+			Pass2info(RANGE_BYTE_SIGNED, 2);
+		}
+	}
     else
     {
         /* no indirect addressing, try to get an 8bit register */
-        reg = CheckRegister8();
-
-        switch ( reg )
-        {
-            /* 8bit register wasn't found, try to evaluate an expression */
-        case -1:
-            append_byte( (Byte)( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
-            ExprUnsigned8( 1 );
+		switch (tok_reg8)
+		{
+		case REG8_NONE:		/* 8bit register wasn't found, try to evaluate an expression */
+			append_byte((Byte)(0xC0 + (opcode << 3) + 0x06));	/* xxx  A,n */
+			Pass2info(RANGE_BYTE_UNSIGNED, 1);
             break;
 
-        case 6:         /* xxx A,F illegal */
-        case 8:         /* xxx A,I illegal */
-        case 9:         /* xxx A,R illegal */
-            error_illegal_ident();
-            break;
+		default:
+			if (tok_idx_reg)
+			{
+				if (opts.cpu & CPU_RABBIT)
+				{
+					error_illegal_ident();
+					return;
+				}
+				append_byte(tok_idx_reg);
+			}
 
-        default:
-            if ( reg & 8 )
-            {
-                /* IXl or IXh */
-                if ( ( opts.cpu & CPU_RABBIT ) )
-                {
-                    error_illegal_ident();
-                    return;
-                }
-
-                append_byte( 0xDD );
-            }
-            else if ( reg & 16 )
-            {
-                /* IYl or IYh */
-                if ( ( opts.cpu & CPU_RABBIT ) )
-                {
-                    error_illegal_ident();
-                    return;
-                }
-
-                append_byte( 0xFD );
-            }
-
-            reg &= 7;
-
-            append_byte( (Byte)( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
-            break;
+			append_byte((Byte)(0x80 + (opcode << 3) + tok_reg8));	/* xxx  A,r */
         }
     }
 }
 
+static void INC_DEC(int opcode8bit, int opcode16bit)
+{
+	GetSym();
 
+	switch (tok_reg16_sp)
+	{
+	case REG16_NONE:
+		IncDec_8bit_instr(opcode8bit);   /* 16 bit register wasn't found - try to evaluate the 8bit version */
+		break;
+
+	default:
+		if (tok_idx_reg)
+			append_byte(tok_idx_reg);
+
+		append_byte((Byte)(opcode16bit + (tok_reg16_sp << 4)));
+	}
+
+}
 
 void
 INC( void )
 {
-    int reg16;
-
-    GetSym();
-
-    switch ( reg16 = CheckRegister16() )
-    {
-    case -1:
-        IncDec_8bit_instr( 4 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
-        break;
-
-    case 4:
-        error_illegal_ident();
-        break;
-
-    case 5:
-        append_2bytes( 0xDD, 0x23 );
-        break;
-
-    case 6:
-        append_2bytes( 0xFD, 0x23 );
-        break;
-
-    default:
-        append_byte( (Byte)( 0x03 + reg16 * 0x10 ) );
-        break;
-    }
+	INC_DEC(4, 0x03);
 }
-
 
 void
 DEC( void )
 {
-    int reg16;
-
-    GetSym();
-
-    switch ( reg16 = CheckRegister16() )
-    {
-    case -1:
-        IncDec_8bit_instr( 5 );   /* 16 bit register wasn't found - try to evaluate the 8bit version */
-        break;
-
-    case 4:
-        error_illegal_ident();
-        break;
-
-    case 5:
-        append_2bytes( 0xDD, 0x2B );
-        break;
-
-    case 6:
-        append_2bytes( 0xFD, 0x2B );
-        break;
-
-    default:
-        append_byte( (Byte)( 0x0B + reg16 * 0x10 ) );
-        break;
-    }
+	INC_DEC(5, 0x0B);
 }
-
 
 void
-IncDec_8bit_instr( int opcode )
+IncDec_8bit_instr(int opcode)
 {
-    long reg;
+	if (tok_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
+	{
+		if (tok_idx_reg)
+			append_byte(tok_idx_reg);
 
-    if ( tok == TK_LPAREN )
-    {
-        switch ( reg = IndirectRegisters() )
-        {
-        case 2:
-            append_byte( (Byte)( 0x30 + opcode ) ); /* INC/DEC (HL) */
-            break;
+		append_byte((Byte)(0x30 + opcode));		/* INC/DEC (HL) */
 
-        case 5:         /* INC/DEC (IX+d) */
-        case 6:
-            if ( reg == 5 )
-            {
-                append_byte( 0xDD );
-            }
-            else
-            {
-                append_byte( 0xFD );    /* INC/DEC (IY+d) */
-            }
+		if (tok_idx_reg)
+		{
+			GetSym();
+			Pass2info(RANGE_BYTE_SIGNED, 2);
+		}
+	}
+	else if (tok_reg8 != REG8_NONE)
+	{
+		/* no indirect addressing, must be an 8bit register */
+		if (tok_idx_reg)
+		{
+			if (opts.cpu & CPU_RABBIT)
+			{
+				error_illegal_ident();
+				return;
+			}
+			append_byte(tok_idx_reg);
+		}
 
-            append_byte( (Byte)( 0x30 + opcode ) );
-            ExprSigned8( 2 );
-            break;
-
-
-        default:
-            error_syntax();
-            break;
-        }
-    }
-    else
-    {
-        /* no indirect addressing, try to get an 8bit register */
-        reg = CheckRegister8();
-
-        switch ( reg )
-        {
-        case 6:
-        case 8:
-        case 9:
-            error_illegal_ident();       /* INC/DEC I ;  INC/DEC R
-                                                                     * illegal */
-            break;
-
-        case 12:
-        case 13:
-            if ( ( opts.cpu & CPU_RABBIT ) )
-            {
-                error_illegal_ident();
-                return;
-            }
-
-            append_byte( 0xDD );
-            append_byte( (Byte)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
-            break;
-
-        case 20:
-        case 21:
-            if ( ( opts.cpu & CPU_RABBIT ) )
-            {
-                error_illegal_ident();
-                return;
-            }
-
-            append_byte( 0xFD );
-            append_byte( (Byte)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
-            break;
-
-        default:
-            append_byte( (Byte)( reg * 0x08 + opcode ) ); /* INC/DEC  r */
-            break;
-        }
-    }
+		append_byte((Byte)((tok_reg8 << 3) + opcode));			/* INC/DEC  r */
+	}
+	else
+	{
+		error_syntax();
+	}
 }
-
-
 
 void
 BitTest_instr( int opcode )
 {
-    long bitnumber, reg;
+    long bitnumber;
 
     GetSym();
 
-	if ( expr_parse_eval( &bitnumber ) )
+	if (!expr_parse_eval(&bitnumber))
+		return;
+
+	if (bitnumber < 0 || bitnumber > 7)
 	{
-        if ( bitnumber >= 0 && bitnumber <= 7 )
-        {
-            /* bit 0 - 7 */
-            if ( tok == TK_COMMA )
-            {
-                if ( GetSym() == TK_LPAREN )
-                {
-                    switch ( ( reg = IndirectRegisters() ) )
-                    {
-                    case 2:
-                        append_byte( 0xCB );  /* (HL)  */
-                        append_byte( (Byte)( opcode + bitnumber * 0x08 + 0x06 ) );
-                        break;
+		error_int_range(bitnumber);
+		return;
+	}
 
-                    case 5:
-                    case 6:
-                        if ( reg == 5 )
-                        {
-                            append_byte( 0xDD );
-                        }
-                        else
-                        {
-                            append_byte( 0xFD );
-                        }
+	CurSymExpect(TK_COMMA);
+	GetSym();
 
-                        append_byte( 0xCB );
-                        ExprSigned8( 2 );
-                        append_byte( (Byte)( opcode + bitnumber * 0x08 + 0x06 ) );
-                        break;
-
-                    default:
-                        error_syntax();
-                        break;
-                    }
-                }
-                else
-                {
-                    /* no indirect addressing, try to get an 8bit register */
-                    reg = CheckRegister8();
-
-                    switch ( reg )
-                    {
-                    case 6:
-                    case 8:
-                    case 9:
-                    case -1:
-                        error_illegal_ident();
-                        break;
-
-                    default:
-                        append_byte( 0xCB );
-                        append_byte( (Byte)( opcode + bitnumber * 0x08 + reg ) );
-                    }
-                }
-            }
-            else
-            {
-                error_syntax();
-            }
-        }
-        else
-        {
-            error_int_range( bitnumber );
-        }
-    }
+	if (tok_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
+	{
+		if (!tok_idx_reg)
+			append_2bytes(0xCB, (Byte)(opcode + (bitnumber << 3) + 0x06));
+		else
+		{
+			append_2bytes(tok_idx_reg, 0xCB);
+			GetSym();
+			Pass2info(RANGE_BYTE_SIGNED, 2);
+			append_byte((Byte)(opcode + (bitnumber << 3) + 0x06));
+		}
+	}
+	else if (tok_reg8 != REG8_NONE)
+	{
+		/* no indirect addressing, must be an 8bit register */
+		if (tok_idx_reg)
+		{
+			error_illegal_ident();
+		}
+		else
+			append_2bytes(0xCB, (Byte)(opcode + (bitnumber << 3) + tok_reg8));
+	}
+	else
+	{
+		error_illegal_ident();
+	}
 }
 
 
 void
 RotShift_instr( int opcode )
 {
-    long reg;
+	GetSym();
 
-    if ( GetSym() == TK_LPAREN )
-        switch ( ( reg = IndirectRegisters() ) )
-        {
-        case 2:
-            append_byte( 0xCB );
-            append_byte( (Byte)( opcode * 0x08 + 0x06 ) );
-            break;
-
-        case 5:
-        case 6:
-            if ( reg == 5 )
-            {
-                append_byte( 0xDD );
-            }
-            else
-            {
-                append_byte( 0xFD );
-            }
-
-            append_byte( 0xCB );
-            ExprSigned8( 2 );
-            append_byte( (Byte)( opcode * 0x08 + 0x06 ) );
-            break;
-
-        default:
-            error_syntax();
-            break;
-        }
-    else
-    {
-        /* no indirect addressing, try to get an 8bit register */
-        reg = CheckRegister8();
-
-        switch ( reg )
-        {
-        case 6:
-        case 8:
-        case 9:
-        case -1:
-            error_illegal_ident();
-            break;
-
-        default:
-            append_byte( 0xCB );
-            append_byte( (Byte)( opcode * 0x08 + reg ) );
-        }
-    }
+	if (tok_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
+	{
+		if (!tok_idx_reg)
+			append_2bytes(0xCB, (Byte)((opcode << 3) + 0x06));
+		else
+		{
+			append_2bytes(tok_idx_reg, 0xCB);
+			GetSym();
+			Pass2info(RANGE_BYTE_SIGNED, 2);
+			append_byte((Byte)((opcode << 3) + 0x06));
+		}
+	}
+	else if (tok_reg8 != REG8_NONE)
+	{
+		/* no indirect addressing, must be an 8bit register */
+		if (tok_idx_reg)
+		{
+			error_illegal_ident();
+		}
+		else
+			append_2bytes(0xCB, (Byte)((opcode << 3) + tok_reg8));
+	}
+	else
+	{
+		error_illegal_ident();
+	}
 }

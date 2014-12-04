@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0002.t,v 1.6 2014-07-06 23:43:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0002.t,v 1.7 2014-12-04 23:30:21 pauloscustodio Exp $
 #
 # Test correction of CH_0002, see hist.c for description
 
@@ -22,13 +22,13 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_ok(0, "ld a,    3)",   "\x3E\x03");
-t_z80asm_ok(0, "ld a,+ + 3)",   "\x3E\x03");
-t_z80asm_ok(0, "ld a,+ - 3)",   "\x3E\xFD");
+t_z80asm_ok(0, "ld a,    3",   "\x3E\x03");
+t_z80asm_ok(0, "ld a,+ + 3",   "\x3E\x03");
+t_z80asm_ok(0, "ld a,+ - 3",   "\x3E\xFD");
 
-t_z80asm_ok(0, "ld a,-   3)",   "\x3E\xFD");
-t_z80asm_ok(0, "ld a,- + 3)",   "\x3E\xFD");
-t_z80asm_ok(0, "ld a,- - 3)",   "\x3E\x03");
+t_z80asm_ok(0, "ld a,-   3",   "\x3E\xFD");
+t_z80asm_ok(0, "ld a,- + 3",   "\x3E\xFD");
+t_z80asm_ok(0, "ld a,- - 3",   "\x3E\x03");
 
 t_z80asm_ok(0, "inc (ix -  3)", "\xDD\x34\xFD");
 t_z80asm_ok(0, "inc (ix - -3)", "\xDD\x34\x03");

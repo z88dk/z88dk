@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.52 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.53 2014-12-04 23:30:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.52 2014-07-06 23:11
 #include "init.h"
 #include "list.h"
 #include "model.h"
+#include "options.h"
 #include "scan.h"
 #include "strutil.h"
 #include <assert.h>
@@ -42,6 +43,13 @@ static Str	*tok_string_buf = NULL;
 char		*tok_string     = "";
 
 long		 tok_number		= 0;
+int			 tok_flag = FLAG_NONE;
+int			 tok_reg8 = REG8_NONE;
+int			 tok_reg16_af = REG16_NONE;
+int			 tok_reg16_sp = REG16_NONE;
+int			 tok_ind_reg16 = IND_REG16_NONE;
+int			 tok_idx_reg = IDX_REG_HL;
+int	         tok_ds_size = 0;
 
 void       (*tok_parser)(void) = NULL;
 
@@ -63,13 +71,20 @@ static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 *----------------------------------------------------------------------------*/
 static void init_tok( void )
 {
-	tok			= TK_END;
-	tok_text	= "";
-	tok_number	= 0;
-	tok_parser	= NULL;
+	tok = TK_END;
+	tok_text = "";
+	tok_number = 0;
+	tok_flag = FLAG_NONE;
+	tok_reg8 = REG8_NONE;
+	tok_reg16_af = REG16_NONE;
+	tok_reg16_sp = REG16_NONE;
+	tok_ind_reg16 = IND_REG16_NONE;
+	tok_idx_reg = IDX_REG_HL;
+	tok_ds_size = 0;
+	tok_parser = NULL;
 
-	Str_clear( tok_name_buf );
-	Str_clear( tok_string_buf );
+	Str_clear(tok_name_buf);
+	Str_clear(tok_string_buf);
 }
 
 /*-----------------------------------------------------------------------------
@@ -304,6 +319,24 @@ tokid_t GetSym( void )
 	at_bol = EOL = (tok == TK_NEWLINE) ? TRUE : FALSE;
 	return tok;
 }
+
+/* get the next token, error if not the expected one */
+void GetSymExpect(tokid_t expected_tok)
+{
+	init();
+	GetSym();
+	CurSymExpect(expected_tok);
+}
+
+
+/* check the current token, error if not the expected one */
+void CurSymExpect(tokid_t expected_tok)
+{
+	init();
+	if (tok != expected_tok)
+		error_syntax();
+}
+
 
 /*-----------------------------------------------------------------------------
 *   Save the current scan position and back-track to a saved position

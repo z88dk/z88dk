@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.122 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.123 2014-12-04 23:30:19 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.122 2014-10-03 22:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.122  2014-10-03 22:57:50  pauloscustodio
+* Revision 1.123  2014-12-04 23:30:19  pauloscustodio
+* Add lexer tokens for registers, CPU flags and DEFVARS size specifiers,
+* simplifying the parser. As a side effect register names can no longer
+* be used as labels, but this would be confusing anyway.
+*
+* Revision 1.122  2014/10/03 22:57:50  pauloscustodio
 * Remove option -c (split in 16k blocks) - no longer necessary with
 * split binary files for each section with a defined ORG.
 *
@@ -619,8 +624,8 @@ Work on Pass 1 - Z80 commands.
 
 13.09.91, V0.003:
 Getidentifier() renamed to Getident().
-Main body of Z80pass1() finished - all parsing of Z80 instructions and assembler directives implemented. CheckCondition()
-implemented. CheckRegister8() implemented. CheckRegister16() implemented. functions now split up into modules:
+Main body of Z80pass1() finished - all parsing of Z80 instructions and assembler directives implemented. 
+functions now split up into modules:
 
 25.02.92, V0.004:
 Algortihms for symbol storing & lookup, using hash table and linked lists:
@@ -950,7 +955,6 @@ Syntax parsing improvement in DEFB, DEFW and DEFL directives.
 
 14.11.95, V1.00:
 Last changes before final release:
-CheckRegister8(): 'F' now returns 6.
 Syntax check on register mnemonics improved.
 XLIB improved to issue implicit MODULE definition.
 
@@ -1125,10 +1129,10 @@ Based on 1.0.31
          to the .err file.
 
     BUG_0004 : 8bit unsigned constants are not checked for out-of-range
-         Added the check to ExprUnsigned8() and Z80pass2().
+         Added the check
 
     BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
-         ExprSigned8(): Accept (ix) and (iy), use offset zero.
+         Accept (ix) and (iy), use offset zero.
          Raise syntax error for (ix 4), was accepting as (ix+4).
 
     CH_0002 : Unary plus and unary minus added to Factor()
@@ -2130,6 +2134,13 @@ Based on 1.0.31
 	  split binary files for each section with a defined ORG.
 	  
 -------------------------------------------------------------------------------
+xx.xx.2014 [2.6.2] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Add lexer tokens for registers, CPU flags and DEFVARS size specifiers,
+	  simplifying the parser. As a side effect register names can no longer 
+	  be used as labels, but this would be confusing anyway.
+	  
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
 	BUG_0038: library modules not loaded in sequence
@@ -2152,7 +2163,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.1"
+#define VERSION     "2.6.2b"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

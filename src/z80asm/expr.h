@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.28 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.29 2014-12-04 23:30:18 pauloscustodio Exp $
 */
 
 #pragma once
@@ -167,8 +167,3 @@ extern long Calc_pop( void );
 extern void Calc_compute_unary(   long (*calc)(long a) );
 extern void Calc_compute_binary(  long (*calc)(long a, long b) );
 extern void Calc_compute_ternary( long (*calc)(long a, long b, long c) );
-
-extern Bool ExprSigned8( int listoffset );
-extern Bool ExprUnsigned8( int listoffset );
-extern Bool ExprAddress( int listoffset );
-extern Bool ExprLong( int listoffset );

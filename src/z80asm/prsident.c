@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.77 2014-07-06 22:48:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.78 2014-12-04 23:30:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,6 @@ void ADC( void ), ADD( void ), DEC( void ), IM( void ), IN( void ), INC( void ),
 void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void RST( void ), DEFGROUP( void );
-int CheckRegister8( void );
 void UNDEFINE( void );
 
 
@@ -327,7 +326,7 @@ PUBLIC( void )
 
     if ( tok != TK_NEWLINE && tok != TK_END )
     {
-        error_syntax();
+		error_syntax();
     }
 }
 
@@ -360,7 +359,7 @@ EXTERN( void )
         }
         else
         {
-            error_syntax();
+			error_syntax();
             return;
         }
     }
@@ -368,7 +367,7 @@ EXTERN( void )
 
     if ( tok != TK_NEWLINE && tok != TK_END )
     {
-        error_syntax();
+		error_syntax();
     }
 }
 
@@ -546,7 +545,7 @@ INDR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -560,7 +559,7 @@ INI( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -574,7 +573,7 @@ INIR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -588,7 +587,7 @@ OUTI( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -602,7 +601,7 @@ OUTD( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -616,7 +615,7 @@ OTIR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -630,7 +629,7 @@ OTDR( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -647,30 +646,18 @@ OTDR( void )
 void
 ExtAccumulator( int opcode )
 {
-    char *fptr;
-
-    fptr = ScanGetPos();
-
-    if ( GetSym() == TK_NAME )
-    {
-        if ( CheckRegister8() == 7 )
-        {
-            if ( GetSym() == TK_COMMA )
-            {
-                /* <instr> A, ... */
-                ArithLog8_instr( opcode );
-
-                return;
-            }
-        }
-    }
-
-    /* reparse and code generate (if possible) */
-    tok = TK_NIL;
-    EOL = FALSE;
-
-    ScanSetPos( fptr );
-    ArithLog8_instr( opcode );
+	if (tok == TK_A)
+	{
+		GetSym();
+		if (tok == TK_COMMA)
+			GetSym();
+		else
+		{
+			tok = TK_A;				/* push back 'A' */
+			tok_reg8 = REG8_A;
+		}
+	}
+	ArithLog8_instr(opcode);
 }
 
 
@@ -678,7 +665,8 @@ ExtAccumulator( int opcode )
 void
 CP( void )
 {
-    ExtAccumulator( 7 );
+	GetSym();
+	ExtAccumulator(7);
 }
 
 
@@ -687,7 +675,8 @@ CP( void )
 void
 AND( void )
 {
-    ExtAccumulator( 4 );
+	GetSym();
+	ExtAccumulator(4);
 }
 
 
@@ -695,7 +684,8 @@ AND( void )
 void
 OR( void )
 {
-    ExtAccumulator( 6 );
+	GetSym();
+	ExtAccumulator(6);
 }
 
 
@@ -703,14 +693,16 @@ OR( void )
 void
 XOR( void )
 {
-    ExtAccumulator( 5 );
+	GetSym();
+	ExtAccumulator(5);
 }
 
 
 void
 SUB( void )
 {
-    ExtAccumulator( 2 );
+	GetSym();
+	ExtAccumulator(2);
 }
 
 
@@ -793,7 +785,7 @@ SLL( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -888,7 +880,7 @@ RETN( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -936,6 +928,7 @@ NEG( void )
 void
 CALL( void )
 {
+	GetSym();
     Subroutine_addr( 205, 196 );
 }
 
@@ -970,7 +963,7 @@ DI( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -984,7 +977,7 @@ EI( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 
@@ -998,7 +991,7 @@ DAA( void )
 {
     if ( ( opts.cpu & CPU_RABBIT ) )
     {
-        error_illegal_ident();
+		error_illegal_ident();
         return;
     }
 

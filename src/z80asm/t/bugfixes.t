@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.39 2014-10-03 22:57:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.40 2014-12-04 23:30:21 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -318,15 +318,15 @@ note "BUG_0018";
 note "BUG_0020";
 z80asm(
 	asm		=> <<'ASM',
-		IF C
+		IF CC
 		invalid		;; error: unknown identifier
 		ENDIF
 ASM
-	options	=> "-r0 -b -DC",
+	options	=> "-r0 -b -DCC",
 );
 z80asm(
 	asm		=> <<'ASM',
-		IF C
+		IF CC
 		invalid
 		ENDIF
 		defb 0		;; 00
@@ -425,7 +425,7 @@ note "BUG_0028";
 note "BUG_0029";
 {
 	my @items = ( 0  ..  25) x 10;
-	my @vars  = ('A' .. 'Z') x 10;
+	my @vars  = map {$_."1"} ('A' .. 'Z') x 10;
 
 	my $list = t::Listfile->new();
 	for ([defb => "C"], [defw => "v"], [defl => "V"]) {
@@ -439,7 +439,7 @@ note "BUG_0029";
 		}
 	}
 	for (0 .. 25) {		
-		$list->push_asm("defc ".chr(ord('A')+$_)." = $_");
+		$list->push_asm("defc ".chr(ord('A')+$_)."1 = $_");
 	}
 	$list->test();	
 }
@@ -451,8 +451,8 @@ note "BUG_0030";
 	my $list = t::Listfile->new();
 	my $num = (t::Listfile->max_line() - 5) / 2;		# max number of operands
 	$list->push_asm(";") for (1..60);
-	$list->push_asm("defb ".join(",", ('P') x $num), (0x12) x $num);
-	$list->push_asm("defc P = 0x12");
+	$list->push_asm("defb ".join(",", ('X') x $num), (0x12) x $num);
+	$list->push_asm("defc X = 0x12");
 	$list->test();
 }
 
@@ -462,8 +462,8 @@ note "BUG_0031";
 {
 	my $list = t::Listfile->new();
 	my $num = int((255-5)/2);
-	$list->push_asm("defb ".join(",", ('P') x $num), (0x12) x $num) for (1..4);
-	$list->push_asm("defc P = 0x12");
+	$list->push_asm("defb ".join(",", ('X') x $num), (0x12) x $num) for (1..4);
+	$list->push_asm("defc X = 0x12");
 	$list->test();
 }
 

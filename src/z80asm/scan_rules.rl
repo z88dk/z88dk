@@ -15,34 +15,30 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.5 2014-05-25 01:02:29 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.6 2014-12-04 23:30:20 pauloscustodio Exp $ 
 */
 
-#define TOKEN(name, string)				 \
-	string <CAT> i					<NL> \
+#define TOKEN_RE(name, string, regexp, set_value)	 \
+	regexp							<NL> \
 	{								<NL> \
 		<TAB>	tok = name;			<NL> \
 		<TAB>	tok_text = string;	<NL> \
+		<TAB>	set_value;			<NL> \
 		<TAB>	fbreak; 			<NL> \
 	};								<NL>
 
-#define TOKEN2(name, string)	TOKEN(name, string)
+#define TOKEN(name, string, set_value)	TOKEN_RE(name, string, string <CAT> i, set_value)
 
-#define KEYWORD(name, parser, value) 	 \
-	#name <CAT> i					<NL> \
-	{				 				<NL> \
-		<TAB>	tok = TK_NAME; 		<NL> \
-		<TAB>	tok_name = #name; 	<NL> \
-		<TAB>	tok_parser = parser;<NL> \
-		<TAB>	tok_number = value; <NL> \
-		<TAB>	fbreak; 			<NL> \
-	};								<NL>
+#define TOKEN2(name, string, set_value)	TOKEN(name, string, set_value)
 
 %%{
 machine asm;
 
 /* check predicates - beginning of line */
 action at_bol 		{ at_bol }	
+
+/* horizontal white space */
+hspace = (" " | "\t")*;
 
 /* Alpha numeric characters or underscore. */
 alnum_u = alnum | '_';
@@ -54,11 +50,13 @@ alpha_u = alpha | '_';
 name = alpha_u alnum_u*;
 
 /* Label */
-label = "." [ \t]* name | name [ \t]* ":";
+label = "." hspace name | name hspace ":";
 
 /* binary digit */
 bdigit = [01];
 
+/* index register suffix */
+index_reg_suffix = hspace ( "+" | "-" | ")" );
 
 /* STATE MACHINE */
 main := |*
@@ -73,7 +71,7 @@ main := |*
 	any - 0x21..0x7e - '\n'		;
 	
 	/* Identifier */
-	name | "af'"i
+	name
 	{
 		tok = TK_NAME;
 		set_tok_name();
@@ -169,7 +167,9 @@ main := |*
 	{ 
 		tok = TK_STRING;
 		if ( ! get_tok_string() )	/* consumes input up to end quote or \n */
+		{
 			error_unclosed_string(); 
+		}
 		fbreak;
 	};
 	

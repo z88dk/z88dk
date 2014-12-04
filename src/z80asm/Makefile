@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.171 2014-09-28 17:37:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.172 2014-12-04 23:30:18 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -267,12 +267,7 @@ expr.o: lib/strutil.h codearea.h lib/classhash.h lib/strhash.h lib/uthash.h
 expr.o: expr.h lib/classlist.h scan.h scan_def.h legacy.h sym.h symref.h
 expr.o: errors.h errors_def.h lib/init.h model.h lib/list.h module.h symtab.h
 expr.o: lib/strpool.h expr_def.h
-exprprsr.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
-exprprsr.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h
-exprprsr.o: lib/uthash.h errors.h errors_def.h expr.h lib/classlist.h scan.h
-exprprsr.o: scan_def.h legacy.h sym.h symref.h lib/fileutil.h lib/list.h
-exprprsr.o: options.h options_def.h symbol.h model.h module.h symtab.h
-exprprsr.o: objfile.h lib/except.h expr_def.h z80asm.h
+exprprsr.o: lib/xmalloc.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 ldinstr.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
@@ -330,17 +325,12 @@ prsident.o: lib/uthash.h errors.h errors_def.h listfile.h symref.h
 prsident.o: lib/classlist.h options.h lib/list.h options_def.h scan.h
 prsident.o: scan_def.h legacy.h symbol.h expr.h sym.h model.h module.h
 prsident.o: symtab.h objfile.h z80asm.h
-prsline.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
-prsline.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-prsline.o: lib/uthash.h errors.h errors_def.h listfile.h symref.h
-prsline.o: lib/classlist.h options.h lib/list.h options_def.h scan.h
-prsline.o: scan_def.h legacy.h symbol.h expr.h sym.h model.h module.h
-prsline.o: symtab.h objfile.h z80asm.h
+prsline.o: lib/xmalloc.h
 scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/list.h
 scan.o: lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h
 scan.o: lib/strutil.h expr.h scan.h scan_def.h legacy.h sym.h symref.h
-scan.o: symtab.h scan_rules.h
+scan.o: symtab.h options.h options_def.h scan_rules.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h expr.h lib/array.h scan.h
