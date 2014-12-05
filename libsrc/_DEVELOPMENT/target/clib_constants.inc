@@ -103,7 +103,7 @@
       
       ; input terminal messages
       
-      ITERM_MSG_GETC,
+      ITERM_MSG_GETC = 15,
       ITERM_MSG_PUTC,
       ITERM_MSG_PRINT_CURSOR,
       ITERM_MSG_ERASE_CURSOR,
@@ -113,9 +113,11 @@
       ITERM_MSG_READLINE_END,
       ITERM_MSG_BELL,
       
+      __MESSAGE_ITERM_NEXT__,
+      
       ; output terminal messages
       
-      OTERM_MSG_PUTC,
+      OTERM_MSG_PUTC = 30,
       OTERM_MSG_TTY,
       OTERM_MSG_PRINTC,
       OTERM_MSG_SCROLL,
@@ -123,9 +125,11 @@
       OTERM_MSG_PAUSE,
       OTERM_MSG_BELL,
       
+      __MESSAGE_OTERM_NEXT__,
+      
       ; define next message id for targets
       
-      __MESSAGE_NEXT__
+      __MESSAGE_NEXT__ = 45
    
    }
 
