@@ -9,7 +9,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.19 2013-03-13 21:02:56 stefano Exp $
+ *	$Id: games.h,v 1.20 2014-12-05 19:18:41 stefano Exp $
  *
  */
 
@@ -50,72 +50,82 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 
 #ifndef MAKE_LIB
 
-#ifdef CPC
+#ifdef __CPC__
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef ENTERPRISE
+#ifdef __ENTERPRISE__
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2"};
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef PC6001
+#ifdef __PC6001__
 	unsigned char *joystick_type[] = { "Stick/Cursor"};
 	#define GAME_DEVICES 1
 #endif
 
-#ifdef MSX
+#ifdef __MSX__
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef MTX
+#ifdef __MTX__
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
 	#define GAME_DEVICES 2
 #endif
 
-#ifdef MC1000
+#ifdef __MC1000__
 	unsigned char *joystick_type[] = {"Joystick A", "Joystick B"};
 	#define GAME_DEVICES 2
 #endif
 
-#ifdef OSCA
+#ifdef __OSCA__
 	unsigned char *joystick_type[] = { "Cursor", "Joystick"};
 	#define GAME_DEVICES 2
 #endif
 
-#ifdef SVI
+#ifdef __SVI__
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
 	#define GAME_DEVICES 3
 #endif
 
-#ifdef SPECTRUM
+#ifdef __SPECTRUM__
 	unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
 	#define GAME_DEVICES 5
 #endif
 
-#ifdef TI82
+#ifdef __ZX81__
+	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __ZX80__
+	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __TI82__
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
-#ifdef TI83
+#ifdef __TI83__
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
-#ifdef TI85
+#ifdef __TI85__
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
-#ifdef TI86
+#ifdef __TI86__
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
-#ifdef ZXVGS
+#ifdef __ZXVGS__
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
 	#define GAME_DEVICES 4
 #endif
