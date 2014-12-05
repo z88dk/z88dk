@@ -14,6 +14,8 @@ IF __CLIB_OPT_ERROR
    EXTERN error_einval_mc
    
       pop hl
+      pop hl
+      pop hl
    
    error_einval_zc:
    

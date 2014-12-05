@@ -5,7 +5,17 @@ PUBLIC errno_mc
    
 EXTERN error_mc, _errno
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_ERROR = 0
+
+   pop hl
+   pop hl
+   pop hl
+
    ld l,$ff                    ; unspecified error
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 errno_mc:
  

@@ -14,6 +14,7 @@ IF __CLIB_OPT_ERROR
    EXTERN __EBDFD, errno_mc
    
       pop hl
+      pop hl
    
    error_ebdfd_mc:
    

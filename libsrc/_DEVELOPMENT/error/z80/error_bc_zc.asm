@@ -3,6 +3,8 @@ SECTION seg_code_error
 
 PUBLIC error_bc_zc
 
+   pop bc
+
 error_bc_zc:
 
    ; set bc = 0

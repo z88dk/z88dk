@@ -14,6 +14,7 @@ IF __CLIB_OPT_ERROR
    EXTERN error_enolck_mc
    
       pop hl
+      pop hl
    
    error_enolck_zc:
    

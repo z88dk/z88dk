@@ -14,6 +14,7 @@ IF __CLIB_OPT_ERROR
    EXTERN error_enomem_mc
    
       pop hl
+      pop hl
    
    error_enomem_zc:
    
