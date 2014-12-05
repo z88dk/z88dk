@@ -78,8 +78,8 @@ _no_ungetc_ec:
    ld a,l
    jr c, error_occurred
 
-   bit 0,(ix+3)
-   ret nz                      ; if this file is a memstream
+   bit 5,(ix+3)
+   ret nz                      ; if driver manages ungetc
    
    ld (ix+6),a                 ; write unconsumed char to ungetc spot
    set 0,(ix+4)                ; indicate ungetc is present

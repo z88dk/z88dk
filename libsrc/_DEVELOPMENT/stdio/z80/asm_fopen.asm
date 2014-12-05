@@ -81,7 +81,7 @@ asm_fopen:
    pop hl                      ; hl = FILE *
    pop bc                      ; c = mode byte
 
-   ld b,a                      ; b = FILE type (0 or 1)
+   ld b,a                      ; b = FILE type
 
    ; initialize FILE structure
    

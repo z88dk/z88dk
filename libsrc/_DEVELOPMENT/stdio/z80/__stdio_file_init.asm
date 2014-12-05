@@ -12,7 +12,7 @@ __stdio_file_init:
    ; enter : hl = FILE *
    ;         de = FDSTRUCT *
    ;          c = mode byte (only RW matter)
-   ;          b = FILE type (0, 1 = stdio handles unget from eatc)
+   ;          b = FILE type (bit 5 = 0 means stdio handles unget from eatc)
    ;
    ; exit  : hl = FILE *
    ;

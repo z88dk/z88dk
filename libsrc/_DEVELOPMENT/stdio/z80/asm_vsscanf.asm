@@ -69,7 +69,7 @@ asm_vsscanf:
    ; create a fake FILE structure on the stack
    
    push hl                     ; char *s is stored in the FILE *
-   ld hl,$0241
+   ld hl,$0260
    push hl
    ld hl,sscanf_inchar
    push hl

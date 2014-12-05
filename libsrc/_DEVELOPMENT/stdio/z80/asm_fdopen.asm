@@ -91,6 +91,11 @@ ENDIF
    
    ; increase fdstruct chain reference count
    
+   ld a,(ix+6)
+   and $27
+   ld b,a
+   
+   push bc                     ; save FILE type
    push de                     ; save FDSTRUCT *
 
 chain_loop:
@@ -121,10 +126,12 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    pop de                      ; de = FDSTRUCT *
+   pop bc                      ;  b = FILE type
 
    ; de = FDSTRUCT *
    ; hl = FILE *
    ;  c = mode byte (RWA only)
+   ;  b = FILE type
    
    ; initialize FILE struct
    

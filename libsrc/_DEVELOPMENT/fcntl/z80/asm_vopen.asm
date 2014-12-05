@@ -30,7 +30,7 @@ asm_vopen:
    ;
    ;            hl = int fd
    ;            de = FDSTRUCT *
-   ;             c = FILE type (0 or 1)
+   ;             c = FILE type (bit 5 = 0 if stdio manages unget from eatc)
    ;            carry reset
    ;
    ;         fail

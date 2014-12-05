@@ -184,6 +184,7 @@ mode_change_failed:
 
    ; ix = FILE *
    ; stack = memstream?
+   
    ; close FILE
    
    call asm1_fclose_unlocked
@@ -232,7 +233,7 @@ perform_mode_change:
    ; alter FILE's mode bits
    
    ld a,(ix+3)
-   and $07
+   and $27
    ld b,a                      ; b = FILE type
    
    ld a,c

@@ -124,7 +124,7 @@ asm0__fmemopen:
    rrca
    rrca
    and $c0
-   add a,7
+   add a,$27
    ld (ix+3),a                 ; set r/w bits, memstream type
    
    ld a,e

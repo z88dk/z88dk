@@ -27,16 +27,10 @@ bit   name    purpose
 
  7    W       if set indicates the stream is open for writing
  6    R       if set indicates the stream is open for reading
- 5    0       reserved
+ 5    D       if set indicates the driver handles ungetc for eatc message
  4    eof     if set the input stream reached eof
  3    err     if set the stream encountered an error
-210   type    stdio structure type (000 = FILE, 001 = FILE_NO_UNGET, 111 = MEMSTREAM)
-
-note: If type has the LSB set, stdio will not write any unconsumed char
-      to ungetc in the FILE struct.  Some internal stdio operations can
-      cause a char to be read and rejected and some drivers cannot unget
-      that rejected char.  By resetting the LSB bit, the rejected char
-      can instead be placed in the ungetc spot by stdio automatically.
+210   type    stdio structure type (000 = FILE, 001 = INPUT_TERM, 010 = OUTPUT_TERM, 111 = MEMSTREAM)
             
 * state_flags_1
 
