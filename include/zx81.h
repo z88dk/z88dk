@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.32 2014-12-03 21:26:26 stefano Exp $
+ * $Id: zx81.h,v 1.33 2014-12-05 17:35:50 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -202,6 +202,10 @@ extern void __LIB__ mirrortxt();
 // Fill text screen in text mode with specified character code
 // and position text cursor at (0;0)
 extern void __LIB__ __FASTCALL__ filltxt(char character);
+
+// Special effect: roll all displayed text characters vertically
+// 0..7, where '0' is the 'correct' adjustment
+extern void __LIB__ __FASTCALL__ rolltxt(int offset);
 
 // Scroll up text screen
 extern void __LIB__ scrolluptxt();
