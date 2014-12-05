@@ -9,8 +9,10 @@
       
          defc myzorg = CRT_ORG_CODE
       
-      ENDIF
-   
+      ELSE
+      
+         defc myzorg = __crt_org_code
+         
    ENDIF
 
    IF REGISTER_SP

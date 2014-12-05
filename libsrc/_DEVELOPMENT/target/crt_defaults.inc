@@ -11,7 +11,7 @@
 
    defc __crt_model    = 2  ; compress rom model
    
-   defc __register_sp  = 0
+   defc __register_sp  = -1
    
    defc __crt_enable_commandline = 1
    defc __crt_enable_restart     = 1

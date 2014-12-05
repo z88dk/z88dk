@@ -8,6 +8,8 @@
    defc __crt_org_code           = 32768
    defc __crt_model              = 0      ; ram model
    
+   defc __register_sp            = 0      ; crt does not modify
+   
    defc __crt_enable_commandline = 0
    defc __crt_enable_restart     = 0
    
