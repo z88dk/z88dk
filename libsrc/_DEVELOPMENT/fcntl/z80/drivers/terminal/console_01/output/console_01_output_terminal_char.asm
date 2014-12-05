@@ -121,7 +121,7 @@
 ;   * IOCTL_OTERM_PAUSE
 ;     enable / disable pause when window filled
 ;
-;   * IOCTL_OTERM_SCROLL
+;   * IOCTL_OTERM_PAGE
 ;     select scroll or page mode
 ;
 ;   * IOCTL_OTERM_CLEAR
@@ -130,8 +130,20 @@
 ;   * IOCTL_OTERM_CLS
 ;     clear window, set (x,y) = (0,0)
 ;
-;   * IOCTL_OTERM_SET_WINDOW
-;     change window location
+;   * IOCTL_OTERM_RESET_SCROLL
+;     reset scroll count
+;
+;   * IOCTL_OTERM_GET_WINDOW_COORD
+;     get coord of top left corner of window
+;
+;   * IOCTL_OTERM_SET_WINDOW_COORD
+;     set coord of top left corner of window
+;
+;   * IOCTL_OTERM_GET_WINDOW_RECT
+;     get window size
+;
+;   * IOCTL_OTERM_SET_WINDOW_RECT
+;     set window size
 ;
 ; This driver reserves extra bytes in the FDSTRUCT:
 ;

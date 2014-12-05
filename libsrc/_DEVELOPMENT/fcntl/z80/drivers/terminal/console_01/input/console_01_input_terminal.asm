@@ -104,6 +104,12 @@
 ;
 ;   can use: af, bc, de, hl, ix
 ;
+; * ITERM_MSG_BELL
+;
+;   Sound bell to indicate edit buffer limit reached.
+;
+;   can use: af, bc, de, hl, ix
+;
 ; IOCTLs understood by this driver:
 ;
 ; * IOCTL_ITERM_TIE

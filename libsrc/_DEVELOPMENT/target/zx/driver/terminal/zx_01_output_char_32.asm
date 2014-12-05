@@ -70,7 +70,7 @@
 ; * IOCTL_OTERM_SET_FCOLOR / IOCTL_OTERM_SET_FCOLOUR
 ;   set terminal's current text colour
 ;
-; * IOCTL_OTERM_SET_MASK
+; * IOCTL_OTERM_SET_FMASK
 ;   set terminal's current text attribute mask
 ;
 ; This driver reserves extra bytes in the FDSTRUCT:

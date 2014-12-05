@@ -3,7 +3,7 @@ SECTION seg_code_fcntl
 
 PUBLIC zx_01_input_lastk_stdio_msg_ictl
 
-EXTERN IOCTL_ITERM_LASTK
+EXTERN IOCTL_ITERM_SET_LASTK
 
 EXTERN console_01_input_stdio_msg_ictl
 EXTERN zx_01_input_lastk_proc_lastk_address
@@ -15,15 +15,15 @@ zx_01_input_lastk_stdio_msg_ictl:
    ;         de = request
    ;         hl = void *arg
 
-   ld a,IOCTL_ITERM_LASTK % 256
+   ld a,IOCTL_ITERM_SET_LASTK % 256
    cp e
    jp nz, console_01_input_stdio_msg_ictl  ; forward to library
    
-   ld a,IOCTL_ITERM_LASTK / 256
+   ld a,IOCTL_ITERM_SET_LASTK / 256
    cp d
    jp nz, console_01_input_stdio_msg_ictl  ; forward to library
 
-   ; IOCTL_ITERM_LASTK
+   ; IOCTL_ITERM_SET_LASTK
    ; change lastk address
    
    call zx_01_input_lastk_proc_lastk_address   ; hl = & LASTK
