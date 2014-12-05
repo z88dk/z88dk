@@ -12,6 +12,8 @@
       ELSE
       
          defc myzorg = __crt_org_code
+      
+      ENDIF
          
    ENDIF
 
