@@ -1,5 +1,5 @@
 
-SECTION seg_data_sound_bit
+SECTION seg_smc_sound_bit
 
 PUBLIC _bitfx_12
 
