@@ -55,6 +55,7 @@
 ;
 ; IOCTLs understood by this driver (in addition to those of base):
 ;
+;   * IOCTL_ITERM_GET_LASTK
 ;   * IOCTL_ITERM_SET_LASTK
 ;     change the lastk address
 ;

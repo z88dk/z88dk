@@ -34,7 +34,7 @@
       
       ; define next error number for targets
       
-      __ERROR_NEXT__
+      __ERROR_NEXT__ = 50
    }
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -153,11 +153,13 @@
    defc IOCTL_ITERM_CRLF = $c101
    defc IOCTL_ITERM_CURS = $c201
    
+   PUBLIC IOCTL_ITERM_RESET
    PUBLIC IOCTL_ITERM_TIE, IOCTL_ITERM_GET_EDITBUF, IOCTL_ITERM_SET_EDITBUF
    
-   defc IOCTL_ITERM_TIE         = $0101
-   defc IOCTL_ITERM_GET_EDITBUF = $0281
-   defc IOCTL_ITERM_SET_EDITBUF = $0201
+   defc IOCTL_ITERM_RESET       = $0101
+   defc IOCTL_ITERM_TIE         = $0201
+   defc IOCTL_ITERM_GET_EDITBUF = $0381
+   defc IOCTL_ITERM_SET_EDITBUF = $0301
    
    ; console_01_output_terminal, FILE type = $02
    
@@ -176,6 +178,7 @@
    PUBLIC IOCTL_OTERM_CLS, IOCTL_OTERM_RESET_SCROLL
    PUBLIC IOCTL_OTERM_GET_WINDOW_COORD, IOCTL_OTERM_SET_WINDOW_COORD
    PUBLIC IOCTL_OTERM_GET_WINDOW_RECT, IOCTL_OTERM_SET_WINDOW_RECT
+   PUBLIC IOCTL_OTERM_GET_CURSOR_COORD, IOCTL_OTERM_SET_CURSOR_COORD
    
    defc IOCTL_OTERM_CLS              = $0102
    defc IOCTL_OTERM_RESET_SCROLL     = $0202
@@ -183,5 +186,7 @@
    defc IOCTL_OTERM_SET_WINDOW_COORD = $0302
    defc IOCTL_OTERM_GET_WINDOW_RECT  = $0482
    defc IOCTL_OTERM_SET_WINDOW_RECT  = $0402
+   defc IOCTL_OTERM_GET_CURSOR_COORD = $0582
+   defc IOCTL_OTERM_SET_CURSOR_COORD = $0502
 
 ;; END LIBRARY CONSTANTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

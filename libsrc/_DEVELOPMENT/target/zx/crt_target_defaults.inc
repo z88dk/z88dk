@@ -17,6 +17,6 @@
    defc __clib_open_max          = 3
 
    defc __clib_exit_stack_size      = 2
-   defc __clib_quickexit_stack_size = 2
+   defc __clib_quickexit_stack_size = 0
 
 ;; END CRT TARGET DEFAULTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

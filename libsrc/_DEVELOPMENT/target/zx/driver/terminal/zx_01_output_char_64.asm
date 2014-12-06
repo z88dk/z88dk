@@ -62,15 +62,19 @@
 ;
 ; IOCTLs understood by this driver (in addition to base class):
 ;
+; * IOCTL_OTERM_GET_FONT
 ; * IOCTL_OTERM_SET_FONT
 ;   select new font
 ;
-; * IOCTL_OTERM_SET_BCOLOR / IOCTL_OTERM_SET_BCOLOUR
+; * IOCTL_OTERM_GET_BCOLOR
+; * IOCTL_OTERM_SET_BCOLOR
 ;   set terminal's background colour
 ;
-; * IOCTL_OTERM_SET_FCOLOR / IOCTL_OTERM_SET_FCOLOUR
+; * IOCTL_OTERM_GET_FCOLOR
+; * IOCTL_OTERM_SET_FCOLOR
 ;   set terminal's current text colour
 ;
+; * IOCTL_OTERM_GET_MASK
 ; * IOCTL_OTERM_SET_MASK
 ;   set terminal's current text attribute mask
 ;

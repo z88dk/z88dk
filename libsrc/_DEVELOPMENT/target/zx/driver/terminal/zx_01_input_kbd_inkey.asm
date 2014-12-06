@@ -41,7 +41,8 @@
 ;
 ; IOCTLs understood by this driver (in addition to those of base):
 ;
-;   * IOCTL_ITERM_SET_DELAYS
+;   * IOCTL_ITERM_GET_DELAY
+;   * IOCTL_ITERM_SET_DELAY
 ;     set debounce and repeat rate times in ms.
 ; 
 ; This driver reserves extra bytes in the FDSTRUCT:
