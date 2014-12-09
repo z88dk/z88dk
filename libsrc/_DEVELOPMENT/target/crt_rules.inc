@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CRT RULES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IF !myzorg
@@ -49,6 +49,24 @@
    
    ENDIF
    
+   IF CRT_ENABLE_COMMANDLINE
+   
+      defc __crt_enable_commandline = CRT_ENABLE_COMMANDLINE
+   
+   ENDIF
+   
+   IF CRT_ENABLE_RESTART
+   
+      defc __crt_enable_restart = CRT_ENABLE_RESTART
+   
+   ENDIF
+   
+   IF CRT_ENABLE_CLOSE
+   
+      defc __crt_enable_close = CRT_ENABLE_CLOSE
+   
+   ENDIF
+   
    IF CLIB_EXIT_STACK_SIZE
    
       defc __clib_exit_stack_size = CLIB_EXIT_STACK_SIZE
@@ -91,4 +109,4 @@
 
    ENDIF
 
-;; END CRT RULES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

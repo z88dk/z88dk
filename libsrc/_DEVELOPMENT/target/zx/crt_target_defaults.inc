@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CRT TARGET DEFAULTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; opportunity for target to override library defaults
@@ -19,4 +19,4 @@
    defc __clib_exit_stack_size      = 2
    defc __clib_quickexit_stack_size = 0
 
-;; END CRT TARGET DEFAULTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; end crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

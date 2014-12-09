@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CRT DEFAULTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; crt configuration
@@ -9,12 +9,13 @@
    defc __crt_org_data = 0
    defc __crt_org_bss  = 0
 
-   defc __crt_model    = 2  ; compress rom model
+   defc __crt_model    = 2     ; compress rom model
    
-   defc __register_sp  = -1
+   defc __register_sp  = -1    ; means set sp = 0 (top of memory)
    
    defc __crt_enable_commandline = 1
    defc __crt_enable_restart     = 1
+   defc __crt_enable_close       = 1
    
    ; clib defaults
    
@@ -29,4 +30,4 @@
    defc __clib_fopen_max            = 8
    defc __clib_open_max             = 8
 
-;; END CRT DEFAULTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; end crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
