@@ -13,7 +13,7 @@ SECTION seg_code_string
 
 PUBLIC asm_strerror
 
-EXTERN __error_strings, __str_locate_nul
+EXTERN ASMHEAD_rodata_error_strings, __str_locate_nul
 
 asm_strerror:
 
@@ -32,7 +32,7 @@ asm_strerror:
    jr z, use_ok
    
    ld e,l
-   ld hl,__error_strings
+   ld hl,ASMHEAD_rodata_error_strings
    
    ld a,(hl)
    
@@ -66,7 +66,7 @@ __error_string_default:
 
    IF __CLIB_OPT_ERROR & $02
 
-      defm "ERROR - Unspecified"
+      defm "ERR - Unknown"
       defb 0
 
    ELSE
