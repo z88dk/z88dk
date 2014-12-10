@@ -14,7 +14,7 @@ stdio/ansi/zx81/f_ansi_cls
 stdio/ansi/zx81/f_ansi_dline
 stdio/ansi/zx81/f_ansi_scrollup
 time/zx81/clock
-games/joystick
+games/zx81snd/joystick
 games/zx81snd/bit_open
 games/zx81snd/bit_open_di
 games/zx81snd/bit_close

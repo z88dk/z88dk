@@ -2,12 +2,13 @@
 ;	ZX81 game device library
 ;	Stefano Bodrato - Dec. 2014
 ;
-;	$Id: joystick.asm,v 1.1 2014-12-05 19:18:41 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2014-12-10 07:47:41 stefano Exp $
 ;
 
 
     XLIB   joystick
     LIB    getk
+    LIB    restore81
 
 .joystick
 	;__FASTALL__ : joystick no. in HL
@@ -17,6 +18,7 @@
 	cp	1	 ; Kempston Joystick
 	jr	nz,j_no1
 	in	a,(31)
+	ld	l,a
 	jp	j_done
 .j_no1
 
@@ -24,99 +26,109 @@
 	jr	nz,j_no2
 	; Read the joystick.
 	ld bc,$e007 ;1110000000000111
-	ld a, $a0
-	out (c), a
+	ld a,$a0
+	out (c),a
 	nop
 	nop
 	nop   ; [some small delay, 10 clocks or so]
-	in a, (c)
-	
+	in a,(c)
+	ld e,a
 	rra
 	rra
 	rra
+	and 15
+	ld d,a
+	ld a,e
+	rla
+	rla
+	and 16
+	or d
 	; bit 1 -> right
 	; bit 2 -> left
 	; bit 3 -> down
 	; bit 4 -> up
-	jp	j_done
-
+	ld	l,a
+	jr	j_done
 .j_no2
 
 	cp	3	 ; Stick emulation 3 (qaop-mn)
 	jr	nz,j_no3
-	call	getk
+
+	call	restore81
+	call	699
+	
+	ld  d,0
+	bit	7,l
+	jr  nz,nofire
+	ld	a,h		; n,m
+	xor	255
+	rla
+	and @00110000
+	ld	d,a
+.nofire
+; q = 11111101 11111011
+; a = 11111011 11111101
 	ld	a,l
-	ld	l,0
-	or	@00100000	; TO_LOWER
-	cp	'm'
-	jr	nz,no_fire1
-	set	4,l
-	jr	j_done
-.no_fire1
-	cp	'n'
-	jr	nz,no_fire2
-	set	5,l
-	jr	j_done
-.no_fire2
-	cp	'q'
-	jr	nz,no_up
-	set	3,l
-	jr	j_done
-.no_up
-	cp	'a'
-	jr	nz,no_down
-	set	2,l
-	jr	j_done
-.no_down
-	cp	'o'
-	jr	nz,no_left
-	set	1,l
-	jr	j_done
-.no_left
-	cp	'p'
-	jr	nz,no_right
-	set	0,l
-.no_right
+	rla
+	and @00001100
+	cp	12
+	jr	z,doop
+	or	d
+	ld	d,a
+.doop
+	bit	5,l		; o,p
+	ld	a,d
+	jr	nz,qaop_end
+	ld	a,h
+	rra
+	and 3
+	xor 3
+	or	d
+.qaop_end
+	ld	l,a
 	jr	j_done
 .j_no3
 
 	cp	4	 ; Stick emulation 4 (Cursor Keys)
 	jr	nz,j_no4
-	call	getk
-	ld	a,l
-	ld	l,0
-	cp	'0'
-	jr	nz,no_fire1_a
+	call	restore81
+	call	699
+	
+	ld  e,0
+	bit	3,l
+	jr  nz,no5
+	bit	5,h
+	jr  nz,no5
+	set	1,e
+.no5
+	bit	4,l
+	ld	l,e
+	jr	nz,j_done
+
+	bit	1,h
+	jr	nz,no0
 	set	4,l
-	jr	j_done
-.no_fire1_a
-	cp	'9'
-	jr	nz,no_fire2_a
+.no0
+	bit	2,h
+	jr	nz,no9
 	set	5,l
-	jr	j_done
-.no_fire2_a
-	cp	'6'
-	jr	nz,no_up_a
+.no9
+	bit	5,h
+	jr	nz,no6
 	set	3,l
-	jr	j_done
-.no_up_a
-	cp	'7'
-	jr	nz,no_down_a
+.no6
+	bit	4,h
+	jr	nz,no7
 	set	2,l
-	jr	j_done
-.no_down_a
-	cp	'5'
-	jr	nz,no_left_a
-	set	1,l
-	jr	j_done
-.no_left_a
-	cp	'8'
-	jr	nz,no_right_a
+.no7
+	bit	3,h
+	jr	nz,no8
 	set	0,l
-.no_right_a
+.no8
 	jr	j_done
 .j_no4
 
 	xor	a
 .j_done
+	ld	h,0
 	ret
