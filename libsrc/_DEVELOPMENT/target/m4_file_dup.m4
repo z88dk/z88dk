@@ -15,14 +15,14 @@ define(`m4_file_dup',dnl
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
-   ; FILE  : ifelse($1,0,`(none)', $1)
+   ; FILE  : `ifelse($1,0,`(none)', $1)'
    ; flags : $2
    ;
    ; fd    : __I_FCNTL_NUM_FD
    ; dup fd: $3
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ifelse($1,0,,dnl
+   `ifelse($1,0,,dnl
    
    SECTION data_stdio
       
@@ -64,7 +64,7 @@ define(`m4_file_dup',dnl
       defw 0         ; list of blocked threads
 
    define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
-   )dnl
+   )'dnl
    
    ; fd table entry
    
@@ -81,7 +81,7 @@ define(`m4_file_dup',dnl
    
    `ld hl,$3 + 7'     ; & FDSTRUCT.ref_count
    `inc (hl)'
-   ifelse($1,0,,`inc (hl)')
+   `ifelse($1,0,,`inc (hl)')'
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

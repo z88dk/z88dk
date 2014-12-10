@@ -15,20 +15,20 @@ dnl############################################################
 define(`m4_zx_01_input_kbd_lastk',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : ifelse($1,0,`(none)',$1)
+   ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
    ; driver: zx_01_input_kbd_lastk
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : read only
    ; type  : 001 = input terminal
-   ; tie   : ifelse($2,0,`(none)',$2)
+   ; tie   : `ifelse($2,0,`(none)',$2)'
    ;
    ; ioctl_flags   : $3
    ; buffer size   : $4 bytes
-   ; LASTK address : ifelse($5,0,`(none)',$5)
+   ; LASTK address : `ifelse($5,0,`(none)',$5)'
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ifelse($1,0,,dnl   
+   `ifelse($1,0,,dnl   
    
    SECTION data_stdio
    
@@ -70,7 +70,7 @@ define(`m4_zx_01_input_kbd_lastk',dnl
       defw 0         ; list of blocked threads
     
    define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
-   )dnl
+   )'dnl
    
    ; fd table entry
    
@@ -89,7 +89,7 @@ define(`m4_zx_01_input_kbd_lastk',dnl
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw eval($4 + 36)
+      defw `eval($4 + 36)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
 
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
@@ -111,7 +111,7 @@ define(`m4_zx_01_input_kbd_lastk',dnl
       ; mode_byte
       
       defb 0x01      ; stdio handles ungetc + type = input terminal
-      defb ifelse($1,0,1,2)
+      defb `ifelse($1,0,1,2)'
       defb 0x01      ; read only
       
       ; ioctl_flags
@@ -130,13 +130,13 @@ define(`m4_zx_01_input_kbd_lastk',dnl
       ; pending_char
       ; read_index
       
-      defw ifelse($2,0,0,$2)
+      defw `ifelse($2,0,0,$2)'
       defb 0
       defb 0
       
       ; b_array_t edit_buffer
       
-      defw ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)
+      defw `ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)'
       defw 0
       defw $4
       
@@ -144,12 +144,12 @@ define(`m4_zx_01_input_kbd_lastk',dnl
 
       defw $5
       
-      ifelse($4,0,,dnl
+      `ifelse($4,0,,dnl
       
       ; reserve space for edit buffer
       
       __edit_buffer_`'__I_FCNTL_NUM_FD:   defs $4
-      )
+      )'
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -23,7 +23,7 @@ dnl############################################################
 define(`m4_zx_01_output_char_32',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : ifelse($1,0,`(none)',$1)
+   ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
    ; driver: zx_01_output_char_32
    ; fd    : __I_FCNTL_NUM_FD
@@ -40,7 +40,7 @@ define(`m4_zx_01_output_char_32',dnl
    ; background    : $13
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ifelse($1,0,,dnl   
+   `ifelse($1,0,,dnl   
    
    SECTION data_stdio
    
@@ -82,7 +82,7 @@ define(`m4_zx_01_output_char_32',dnl
       defw 0         ; list of blocked threads
     
    define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
-   )dnl
+   )'dnl
    
    ; fd table entry
    
@@ -123,7 +123,7 @@ define(`m4_zx_01_output_char_32',dnl
       ; mode_byte
       
       defb 0x02      ; type = output terminal
-      defb ifelse($1,0,1,2)
+      defb `ifelse($1,0,1,2)'
       defb 0x02      ; write only
       
       ; ioctl_flags

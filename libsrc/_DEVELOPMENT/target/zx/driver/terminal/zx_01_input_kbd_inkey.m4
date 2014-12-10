@@ -17,22 +17,22 @@ dnl############################################################
 define(`m4_zx_01_input_kbd_inkey',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : ifelse($1,0,`(none)',$1)
+   ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
    ; driver: zx_01_input_kbd_inkey
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : read only
    ; type  : 001 = input terminal
-   ; tie   : ifelse($2,0,`(none)',$2)
+   ; tie   : `ifelse($2,0,`(none)',$2)'
    ;
    ; ioctl_flags   : $3
    ; buffer size   : $4 bytes
-   ; debounce      : ifelse($5,,0,$5) ms
-   ; repeat_start  : ifelse($6,,500,$6) ms
-   ; repeat_period : ifelse($7,,15,$7) ms
+   ; debounce      : `ifelse($5,,0,$5)' ms
+   ; repeat_start  : `ifelse($6,,500,$6)' ms
+   ; repeat_period : `ifelse($7,,15,$7)' ms
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ifelse($1,0,,dnl
+   `ifelse($1,0,,dnl
    
    SECTION data_stdio
    
@@ -74,7 +74,7 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       defw 0         ; list of blocked threads
     
    define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
-   )dnl
+   )'dnl
    
    ; fd table entry
    
@@ -115,7 +115,7 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       ; mode_byte
       
       defb 0x01      ; stdio handles ungetc + type = input terminal
-      defb ifelse($1,0,1,2)
+      defb `ifelse($1,0,1,2)'
       defb 0x01      ; read only
       
       ; ioctl_flags
@@ -134,13 +134,13 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       ; pending_char
       ; read_index
       
-      defw ifelse($2,0,0,$2)
+      defw `ifelse($2,0,0,$2)'
       defb 0
       defb 0
       
       ; b_array_t edit_buffer
       
-      defw ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)
+      defw `ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)'
       defw 0
       defw $4
       
@@ -152,16 +152,16 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       
       defb 0
       defb 0
-      defb ifelse($5,,0,$5)
-      defw ifelse($6,,500,$6)
-      defw ifelse($7,,15,$7)
+      defb `ifelse($5,,0,$5)'
+      defw `ifelse($6,,500,$6)'
+      defw `ifelse($7,,15,$7)'
       
-      ifelse($4,0,,dnl
+      `ifelse($4,0,,dnl
       
       ; reserve space for edit buffer
       
       __edit_buffer_`'__I_FCNTL_NUM_FD:   defs $4
-      )
+      )'
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
