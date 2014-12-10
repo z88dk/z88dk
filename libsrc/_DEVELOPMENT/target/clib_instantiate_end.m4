@@ -6,21 +6,19 @@ dnl############################################################
    ;; create open and closed FILE lists
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; __clib_fopen_max = max number of open FILEs specified by user
-   ; I_STDIO_FILE_NUM = number of static FILEs instantiated in crt
-   ; i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
+   ; __clib_fopen_max   = max number of open FILEs specified by user
+   ; __I_STDIO_NUM_FILE = number of static FILEs instantiated in crt
+   ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
    SECTION data_stdio
 
-   defc i_stdio_file_`'I_STDIO_FILE_NUM = 0
-
-   IF (__clib_fopen_max > 0) || (I_STDIO_FILE_NUM > 0)
+   IF (__clib_fopen_max > 0) || (__I_STDIO_NUM_FILE > 0)
 
       ; number of FILEs > 0
 
       ; construct list of open files
 
-      IF I_STDIO_FILE_NUM > 0
+      IF __I_STDIO_NUM_FILE > 0
    
          ; number of FILEs statically generated > 0
       
@@ -28,7 +26,7 @@ dnl############################################################
       
          PUBLIC __stdio_open_file_list
       
-         __stdio_open_file_list:  defw i_stdio_file_0
+         __stdio_open_file_list:  defw __i_stdio_file_`'decr(__I_STDIO_NUM_FILE)
    
       ELSE
    
@@ -50,19 +48,19 @@ dnl############################################################
    
       __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
    
-      IF (__clib_fopen_max > I_STDIO_FILE_NUM)
+      IF __clib_fopen_max > __I_STDIO_NUM_FILE
 
          ; create extra FILE structures
      
          SECTION bss_stdio
       
-         __stdio_file_extra:      defs (__clib_fopen_max - I_STDIO_FILE_NUM) * 15
+         __stdio_file_extra:      defs (__clib_fopen_max - __I_STDIO_NUM_FILE) * 15
       
          SECTION code_crt_init
       
             ld bc,__stdio_closed_file_list
             ld de,__stdio_file_extra
-            ld l,__clib_fopen_max - I_STDIO_FILE_NUM
+            ld l,__clib_fopen_max - __I_STDIO_NUM_FILE
      
          loop:
       
@@ -88,10 +86,10 @@ dnl############################################################
    ;; create fd table
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ; __clib_open_max = max number of open fds specified by user
-   ; I_FCNTL_FD_NUM  = number of static file descriptors created
+   ; __clib_open_max  = max number of open fds specified by user
+   ; __I_FCNTL_NUM_FD = number of static file descriptors created
    
-   IF I_FCNTL_FD_NUM > 0
+   IF __I_FCNTL_NUM_FD > 0
    
       ; create rest of fd table in data segment
       
@@ -103,11 +101,11 @@ dnl############################################################
       
       defc __fcntl_fdtbl = ASMHEAD_data_fcntl_fdtable_body
       
-      IF __clib_open_max > I_FCNTL_FD_NUM
+      IF __clib_open_max > __I_FCNTL_NUM_FD
       
          SECTION data_fcntl_fdtable_body
          
-         defs (__clib_open_max - I_FCNTL_FD_NUM) * 2
+         defs (__clib_open_max - __I_FCNTL_NUM_FD) * 2
       
       ENDIF
    
@@ -132,11 +130,11 @@ dnl############################################################
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; I_FCNTL_STDIO_HEAP_SIZE = byte size of static FDSTRUCTs
-   ; I_FCNTL_FD_NUM  = number of static file descriptors created
-   ; i_fcntl_fdstruct_n = address of static FDSTRUCT #n (0..I_FCNTL_FD_NUM-1)
+   ; __I_FCNTL_HEAP_SIZE  = byte size of static FDSTRUCTs
+   ; __I_FCNTL_NUM_HEAP   = number of heap allocations
+   ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF I_FCNTL_STDIO_HEAP_SIZE > 0
+   IF __I_FCNTL_HEAP_SIZE > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -147,31 +145,39 @@ dnl############################################################
       __stdio_heap:
       
          defb 0                ; no owner
-         defb $01              ; mtx_plain
+         defb 0x01             ; mtx_plain
          defb 0                ; number of lock acquisitions
-         defb $fe              ; spinlock (unlocked)
-         defw 0                ; list of threads block on mutex
+         defb 0xfe             ; spinlock (unlocked)
+         defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (I_FCNTL_STDIO_HEAP_SIZE + 14)
+      IF __clib_stdio_heap_size > (__I_FCNTL_HEAP_SIZE + 14)
       
          ; expand stdio heap to desired size
          
          SECTION data_fcntl_stdio_heap_body
          
-         i_fcntl_fdstruct_`'I_FCNTL_FD_NUM:
-         
-            defw i_fcntl_fdstruct_`'I_FCNTL_FD_NUM
+         __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
+          
+            defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
             defw 0
-            defw i_fcntl_fdstruct_`'decr(I_FCNTL_FD_NUM)
-            defs __clib_stdio_heap_size - I_FCNTL_STDIO_HEAP_SIZE - 14
+            defw __i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP)
+            defs __clib_stdio_heap_size - __I_FCNTL_HEAP_SIZE - 14
+         
+         ; terminate stdio heap
+         
+         SECTION data_fcntl_stdio_heap_tail
+         
+         __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP):   defw 0
+      
+      ELSE
+      
+         ; terminate stdio heap
+      
+         SECTION data_fcntl_stdio_heap_tail
+      
+         __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:   defw 0
       
       ENDIF
-      
-      ; terminate stdio heap
-      
-      SECTION data_fcntl_stdio_heap_tail
-      
-      i_fcntl_fdstruct_`'I_FCNTL_FD_NUM:   defw 0
       
    ELSE
    
