@@ -9,7 +9,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.20 2014-12-05 19:18:41 stefano Exp $
+ *	$Id: games.h,v 1.21 2014-12-10 07:51:31 stefano Exp $
  *
  */
 
@@ -96,11 +96,6 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 #endif
 
 #ifdef __ZX81__
-	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
-	#define GAME_DEVICES 4
-#endif
-
-#ifdef __ZX80__
 	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
 	#define GAME_DEVICES 4
 #endif
