@@ -41,33 +41,43 @@ include(../../clib_instantiate_begin.m4)
 dnl############################################################
 dnl## LIST OF AVAILABLE DRIVERS WITH STATIC INSTANTIATORS #####
 dnl############################################################
-
-; input terminals
-
-include(../driver/terminal/zx_01_input_kbd_inkey.m4)
-include(../driver/terminal/zx_01_input_kbd_lastk.m4)
-
-; output terminals
-
-include(../driver/terminal/zx_01_output_char_32.m4)
-include(../driver/terminal/zx_01_output_char_32_tty_z88dk.m4)
-include(../driver/terminal/zx_01_output_char_64.m4)
-include(../driver/terminal/zx_01_output_char_64_tty_z88dk.m4)
-include(../driver/terminal/zx_01_output_fzx.m4)
-include(../driver/terminal/zx_01_output_fzx_tty_z88dk.m4)
-
+dnl
+dnl## input terminals
+dnl
+dnl#include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
+dnl#include(../driver/terminal/zx_01_input_kbd_lastk.m4)dnl
+dnl
+dnl## output terminals
+dnl
+dnl#include(../driver/terminal/zx_01_output_char_32.m4)dnl
+dnl#include(../driver/terminal/zx_01_output_char_32_tty_z88dk.m4)dnl
+dnl#include(../driver/terminal/zx_01_output_char_64.m4)dnl
+dnl#include(../driver/terminal/zx_01_output_char_64_tty_z88dk.m4)dnl
+dnl#include(../driver/terminal/zx_01_output_fzx.m4)dnl
+dnl#include(../driver/terminal/zx_01_output_fzx_tty_z88dk.m4)dnl
+dnl
+dnl## file dup
+dnl
+dnl#include(../../m4_file_dup.m4)dnl
+dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
 
-; driver instantiation
+include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
+m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x02b0, 64, 0, 500, 15)dnl
 
-define(`m4_read',   64)dnl
-define(`m4_write', 128)dnl
+include(../driver/terminal/zx_01_output_char_32.m4)dnl
+m4_zx_01_output_char_32(_stdout, 0x0370, 0, 0, 0, 32, 0, 24, 24, 15360, 56, 0, 56)dnl
 
-m4_zx_01_input_kbd_inkey(_stdin, i_fcntl_fdstruct_1, 64, 0, 500, 15)dnl
-m4_zx_01_output_char_32_tty_z88dk(_stdout, 0, 0, 0, 32, 0, 24, 24, 15360, 56, 0, 56)dnl
-m4_file_dup(_stderr, i_fcntl_fdstruct_1, m4_write)dnl
+include(../../m4_file_dup.m4)dnl
+m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+
+include(../driver/terminal/zx_01_output_char_64.m4)dnl
+m4_zx_01_output_char_64(0, 0x0370, 0, 0, 0, 64, 0, 24, 24, 15360, 56, 0, 56)dnl
+
+include(../driver/terminal/zx_01_input_kbd_lastk.m4)dnl
+m4_zx_01_input_kbd_lastk(_input_2, __i_fcntl_fdstruct_1, 0x02b0, 0, 23560)dnl
 
 include(../../clib_instantiate_end.m4)
 
