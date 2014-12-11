@@ -1,7 +1,7 @@
 
 ; int ba_stack_push(ba_stack_t *s, int c)
 
-SECTION seg_code_ba_stack
+SECTION code_adt_ba_stack
 
 PUBLIC ba_stack_push
 

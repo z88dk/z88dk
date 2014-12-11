@@ -1,7 +1,7 @@
 
 ; int b_vector_resize(b_vector_t *v, size_t n)
 
-SECTION seg_code_b_vector
+SECTION code_adt_b_vector
 
 PUBLIC b_vector_resize
 

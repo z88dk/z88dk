@@ -1,7 +1,7 @@
 
 ; int w_array_resize(w_array_t *a, size_t n)
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC _w_array_resize
 

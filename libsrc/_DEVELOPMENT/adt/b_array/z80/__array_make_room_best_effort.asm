@@ -1,5 +1,5 @@
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC __array_make_room_best_effort
 PUBLIC __0_array_make_room_best_effort

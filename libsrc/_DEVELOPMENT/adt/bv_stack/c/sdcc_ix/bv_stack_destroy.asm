@@ -1,7 +1,7 @@
 
 ; void bv_stack_destroy(bv_stack_t *s)
 
-SECTION seg_code_bv_stack
+SECTION code_adt_bv_stack
 
 PUBLIC _bv_stack_destroy
 

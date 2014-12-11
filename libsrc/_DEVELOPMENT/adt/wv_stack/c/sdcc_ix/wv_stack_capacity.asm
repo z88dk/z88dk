@@ -1,7 +1,7 @@
 
 ; size_t wv_stack_capacity(wv_stack_t *s)
 
-SECTION seg_code_wv_stack
+SECTION code_adt_wv_stack
 
 PUBLIC _wv_stack_capacity
 

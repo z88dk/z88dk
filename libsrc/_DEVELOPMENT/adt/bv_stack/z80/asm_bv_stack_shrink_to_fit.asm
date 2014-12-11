@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_bv_stack
+SECTION code_adt_bv_stack
 
 PUBLIC asm_bv_stack_shrink_to_fit
 

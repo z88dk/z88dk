@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_p_queue
+SECTION code_adt_p_queue
 
 PUBLIC asm_p_queue_back
 

@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC asm_b_array_write_block
 PUBLIC asm1_b_array_write_block

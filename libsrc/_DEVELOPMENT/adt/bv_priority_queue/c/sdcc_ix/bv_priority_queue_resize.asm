@@ -1,7 +1,7 @@
 
 ; int bv_priority_queue_resize(bv_priority_queue_t *q, size_t n)
 
-SECTION seg_code_bv_priority_queue
+SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_resize
 

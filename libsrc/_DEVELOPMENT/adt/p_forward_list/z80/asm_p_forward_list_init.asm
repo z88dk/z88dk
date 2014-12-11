@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_p_forward_list
+SECTION code_adt_p_forward_list
 
 PUBLIC asm_p_forward_list_init
 

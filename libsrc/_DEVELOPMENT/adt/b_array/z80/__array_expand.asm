@@ -1,5 +1,5 @@
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC __array_expand
 PUBLIC __0_array_expand, __1_array_expand

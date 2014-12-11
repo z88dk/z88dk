@@ -1,7 +1,7 @@
 
 ; void p_list_init(void *p)
 
-SECTION seg_code_p_list
+SECTION code_adt_p_list
 
 PUBLIC p_list_init
 

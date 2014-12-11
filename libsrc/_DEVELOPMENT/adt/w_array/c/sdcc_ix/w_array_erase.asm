@@ -1,7 +1,7 @@
 
 ; size_t w_array_erase(w_array_t *a, size_t idx)
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC _w_array_erase
 

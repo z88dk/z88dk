@@ -16,7 +16,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_wv_priority_queue
+SECTION code_adt_wv_priority_queue
 
 PUBLIC asm_wv_priority_queue_init
 

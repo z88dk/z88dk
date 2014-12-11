@@ -3,7 +3,7 @@
 
 PUBLIC b_array_erase_range_callee
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 b_array_erase_range_callee:
 

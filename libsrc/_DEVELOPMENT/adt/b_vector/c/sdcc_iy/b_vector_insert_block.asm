@@ -1,7 +1,7 @@
 
 ; void *b_vector_insert_block(b_vector_t *v, size_t idx, size_t n)
 
-SECTION seg_code_b_vector
+SECTION code_adt_b_vector
 
 PUBLIC _b_vector_insert_block
 

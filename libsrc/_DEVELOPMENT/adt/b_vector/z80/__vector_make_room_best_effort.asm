@@ -1,5 +1,5 @@
 
-SECTION seg_code_b_vector
+SECTION code_adt_b_vector
 
 PUBLIC __vector_make_room_best_effort
 PUBLIC __vector_make_room_best_effort_extra

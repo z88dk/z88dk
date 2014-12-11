@@ -1,7 +1,7 @@
 
 ; void *p_queue_pop(p_queue_t *q)
 
-SECTION seg_code_p_queue
+SECTION code_adt_p_queue
 
 PUBLIC _p_queue_pop
 

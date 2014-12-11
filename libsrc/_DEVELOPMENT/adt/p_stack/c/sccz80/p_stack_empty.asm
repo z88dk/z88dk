@@ -1,7 +1,7 @@
 
 ; int p_stack_empty(p_stack_t *s)
 
-SECTION seg_code_p_stack
+SECTION code_adt_p_stack
 
 PUBLIC p_stack_empty
 

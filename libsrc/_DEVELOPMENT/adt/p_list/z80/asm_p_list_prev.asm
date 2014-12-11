@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_p_list
+SECTION code_adt_p_list
 
 PUBLIC asm_p_list_prev
 

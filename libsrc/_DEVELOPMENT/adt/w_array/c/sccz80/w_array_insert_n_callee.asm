@@ -1,7 +1,7 @@
 
 ; size_t w_array_insert_n(w_array_t *a, size_t idx, size_t n, void *item)
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC w_array_insert_n_callee
 

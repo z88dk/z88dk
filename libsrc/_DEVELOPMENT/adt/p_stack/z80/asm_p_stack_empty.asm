@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_p_stack
+SECTION code_adt_p_stack
 
 PUBLIC asm_p_stack_empty
 

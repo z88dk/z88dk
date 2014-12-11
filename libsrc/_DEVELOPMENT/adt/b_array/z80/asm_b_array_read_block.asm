@@ -12,7 +12,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC asm_b_array_read_block
 

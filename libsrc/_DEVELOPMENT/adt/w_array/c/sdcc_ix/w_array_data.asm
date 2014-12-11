@@ -1,7 +1,7 @@
 
 ; void *w_array_data(w_array_t *a)
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC _w_array_data
 

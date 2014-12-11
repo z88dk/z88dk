@@ -1,7 +1,7 @@
 
 ; int wa_stack_push(wa_stack_t *s, void *item)
 
-SECTION seg_code_wa_stack
+SECTION code_adt_wa_stack
 
 PUBLIC wa_stack_push_callee
 

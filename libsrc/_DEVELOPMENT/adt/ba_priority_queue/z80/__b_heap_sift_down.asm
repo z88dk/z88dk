@@ -1,5 +1,5 @@
 
-SECTION seg_code_ba_priority_queue
+SECTION code_adt_ba_priority_queue
 
 PUBLIC __b_heap_sift_down
 

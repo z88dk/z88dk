@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_wv_stack
+SECTION code_adt_wv_stack
 
 PUBLIC asm_wv_stack_reserve
 

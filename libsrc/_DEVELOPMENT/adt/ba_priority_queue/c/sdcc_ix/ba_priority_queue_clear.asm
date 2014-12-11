@@ -1,7 +1,7 @@
 
 ; void ba_priority_queue_clear(ba_priority_queue_t *q)
 
-SECTION seg_code_ba_priority_queue
+SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_clear
 

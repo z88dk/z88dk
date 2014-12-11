@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_bv_priority_queue
+SECTION code_adt_bv_priority_queue
 
 PUBLIC asm_bv_priority_queue_pop
 

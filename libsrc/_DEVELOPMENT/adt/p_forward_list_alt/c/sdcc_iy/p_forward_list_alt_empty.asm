@@ -1,7 +1,7 @@
 
 ; int p_forward_list_alt_empty(p_forward_list_alt_t *list)
 
-SECTION seg_code_p_forward_list_alt
+SECTION code_adt_p_forward_list_alt
 
 PUBLIC _p_forward_list_alt_empty
 

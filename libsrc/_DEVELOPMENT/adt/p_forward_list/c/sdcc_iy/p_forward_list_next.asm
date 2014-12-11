@@ -1,7 +1,7 @@
 
 ; void *p_forward_list_next(void *item)
 
-SECTION seg_code_p_forward_list
+SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_next
 

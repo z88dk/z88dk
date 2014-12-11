@@ -1,7 +1,7 @@
 
 ; size_t ba_stack_size(ba_stack_t *s)
 
-SECTION seg_code_ba_stack
+SECTION code_adt_ba_stack
 
 PUBLIC ba_stack_size
 

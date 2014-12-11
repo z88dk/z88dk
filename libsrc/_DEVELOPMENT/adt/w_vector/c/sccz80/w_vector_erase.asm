@@ -1,7 +1,7 @@
 
 ; size_t w_vector_erase(w_vector_t *v, size_t idx)
 
-SECTION seg_code_w_vector
+SECTION code_adt_w_vector
 
 PUBLIC w_vector_erase
 

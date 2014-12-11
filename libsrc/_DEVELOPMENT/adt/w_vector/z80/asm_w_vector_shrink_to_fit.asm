@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_w_vector
+SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_shrink_to_fit
 

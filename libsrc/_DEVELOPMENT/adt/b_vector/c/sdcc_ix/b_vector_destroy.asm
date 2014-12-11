@@ -1,7 +1,7 @@
 
 ; void b_vector_destroy(b_vector_t *v)
 
-SECTION seg_code_b_vector
+SECTION code_adt_b_vector
 
 PUBLIC _b_vector_destroy
 

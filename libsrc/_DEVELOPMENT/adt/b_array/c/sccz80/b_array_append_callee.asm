@@ -1,7 +1,7 @@
 
 ; size_t b_array_append(b_array_t *a, int c)
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC b_array_append_callee
 

@@ -1,7 +1,7 @@
 
 ; size_t b_vector_erase_range(b_vector_t *v, size_t idx_first, size_t idx_last)
 
-SECTION seg_code_b_vector
+SECTION code_adt_b_vector
 
 PUBLIC _b_vector_erase_range
 

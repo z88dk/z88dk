@@ -1,7 +1,7 @@
 
 ; int wv_priority_queue_empty(wv_priority_queue_t *q)
 
-SECTION seg_code_wv_priority_queue
+SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_empty
 

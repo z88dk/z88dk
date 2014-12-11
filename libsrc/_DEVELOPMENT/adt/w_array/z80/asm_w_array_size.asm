@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC asm_w_array_size
 

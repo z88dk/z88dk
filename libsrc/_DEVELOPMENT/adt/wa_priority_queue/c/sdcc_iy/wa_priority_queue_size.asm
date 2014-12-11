@@ -1,7 +1,7 @@
 
 ; size_t wa_priority_queue_size(wa_priority_queue_t *q)
 
-SECTION seg_code_wa_priority_queue
+SECTION code_adt_wa_priority_queue
 
 PUBLIC _wa_priority_queue_size
 

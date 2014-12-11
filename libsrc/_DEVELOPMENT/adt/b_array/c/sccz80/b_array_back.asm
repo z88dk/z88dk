@@ -1,7 +1,7 @@
 
 ; int b_array_back(b_array_t *a)
 
-SECTION seg_code_b_array
+SECTION code_adt_b_array
 
 PUBLIC b_array_back
 

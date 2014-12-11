@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_ba_stack
+SECTION code_adt_ba_stack
 
 PUBLIC asm_ba_stack_top
 

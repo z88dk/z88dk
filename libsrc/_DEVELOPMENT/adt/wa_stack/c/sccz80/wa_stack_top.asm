@@ -1,7 +1,7 @@
 
 ; void *wa_stack_top(wa_stack_t *s)
 
-SECTION seg_code_wa_stack
+SECTION code_adt_wa_stack
 
 PUBLIC wa_stack_top
 

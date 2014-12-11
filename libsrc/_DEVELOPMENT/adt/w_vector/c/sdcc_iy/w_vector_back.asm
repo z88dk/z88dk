@@ -1,7 +1,7 @@
 
 ; void *w_vector_back(b_vector_t *v)
 
-SECTION seg_code_w_vector
+SECTION code_adt_w_vector
 
 PUBLIC _w_vector_back
 

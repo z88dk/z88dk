@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_wa_stack
+SECTION code_adt_wa_stack
 
 PUBLIC asm_wa_stack_push
 

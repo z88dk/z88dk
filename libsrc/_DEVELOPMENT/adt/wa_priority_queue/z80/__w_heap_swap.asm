@@ -1,5 +1,5 @@
 
-SECTION seg_code_wa_priority_queue
+SECTION code_adt_wa_priority_queue
 
 PUBLIC __w_heap_swap
 

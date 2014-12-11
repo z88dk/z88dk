@@ -1,7 +1,7 @@
 
 ; int wa_priority_queue_push(wa_priority_queue_t *q, void *item)
 
-SECTION seg_code_wa_priority_queue
+SECTION code_adt_wa_priority_queue
 
 PUBLIC wa_priority_queue_push
 

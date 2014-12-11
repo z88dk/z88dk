@@ -1,7 +1,7 @@
 
 ; int bv_stack_pop(bv_stack_t *s)
 
-SECTION seg_code_bv_stack
+SECTION code_adt_bv_stack
 
 PUBLIC bv_stack_pop
 

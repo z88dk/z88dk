@@ -1,7 +1,7 @@
 
 ; size_t wv_stack_max_size(wv_stack_t *s)
 
-SECTION seg_code_wv_stack
+SECTION code_adt_wv_stack
 
 PUBLIC wv_stack_max_size
 

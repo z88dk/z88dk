@@ -1,7 +1,7 @@
 
 ; void *p_list_front(p_list_t *list)
 
-SECTION seg_code_p_list
+SECTION code_adt_p_list
 
 PUBLIC _p_list_front
 

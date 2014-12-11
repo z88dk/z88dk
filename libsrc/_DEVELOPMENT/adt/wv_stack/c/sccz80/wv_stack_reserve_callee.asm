@@ -1,7 +1,7 @@
 
 ; int wv_stack_reserve(wv_stack_t *s, size_t n)
 
-SECTION seg_code_wv_stack
+SECTION code_adt_wv_stack
 
 PUBLIC wv_stack_reserve_callee
 

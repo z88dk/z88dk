@@ -1,7 +1,7 @@
 
 ; void ba_stack_clear(ba_stack_t *s)
 
-SECTION seg_code_ba_stack
+SECTION code_adt_ba_stack
 
 PUBLIC _ba_stack_clear
 

@@ -1,7 +1,7 @@
 
 ; size_t w_array_erase_range(w_array_t *a, size_t idx_first, size_t idx_last)
 
-SECTION seg_code_w_array
+SECTION code_adt_w_array
 
 PUBLIC _w_array_erase_range
 
