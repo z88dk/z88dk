@@ -198,5 +198,7 @@ dnl############################################################
          
          EXTERN asm_heap_init
          call asm_heap_init
+      
+      ENDIF
 
    ENDIF

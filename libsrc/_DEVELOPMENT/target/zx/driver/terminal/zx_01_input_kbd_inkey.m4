@@ -73,7 +73,7 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
     
-   define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
+   `define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))'dnl
    )'dnl
    
    ; fd table entry
@@ -136,7 +136,7 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       
       defw `ifelse($2,0,0,$2)'
       defb 0
-      defb 0
+      defw 0
       
       ; b_array_t edit_buffer
       
@@ -163,9 +163,9 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       __edit_buffer_`'__I_FCNTL_NUM_FD:   defs $4
       )'
 
+   `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 41))'dnl
+   `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))dnl
-   define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 41))dnl
-   define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))dnl
 )dnl

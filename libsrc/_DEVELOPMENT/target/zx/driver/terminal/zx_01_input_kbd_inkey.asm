@@ -57,7 +57,7 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC zx_01_input_kbd_inkey
 

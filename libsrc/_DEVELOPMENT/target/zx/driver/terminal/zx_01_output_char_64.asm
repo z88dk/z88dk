@@ -88,7 +88,7 @@
 ;   25                      background colour (cls colour)
 ;   
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC zx_01_output_char_64
 

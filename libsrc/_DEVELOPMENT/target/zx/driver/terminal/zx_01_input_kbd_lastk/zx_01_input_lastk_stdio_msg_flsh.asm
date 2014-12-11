@@ -1,5 +1,5 @@
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC zx_01_input_lastk_stdio_msg_flsh
 

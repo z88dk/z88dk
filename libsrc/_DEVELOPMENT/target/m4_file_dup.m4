@@ -63,7 +63,7 @@ define(`m4_file_dup',dnl
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-   define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))dnl
+   `define(`__I_STDIO_NUM_FILE', incr(__I_STDIO_NUM_FILE))'dnl
    )'dnl
    
    ; fd table entry
@@ -82,8 +82,8 @@ define(`m4_file_dup',dnl
    `ld hl,$3 + 7'     ; & FDSTRUCT.ref_count
    `inc (hl)'
    `ifelse($1,0,,`inc (hl)')'
+
+   `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))dnl
 )dnl
