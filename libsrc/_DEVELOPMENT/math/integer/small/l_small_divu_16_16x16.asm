@@ -2,7 +2,7 @@
 ; 2000 djm
 ; 2014 aralbrec - special case for 8-bit divisor
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_small_divu_16_16x16, l0_small_divu_16_16x16
 PUBLIC l_small_divu_16_16x8, l0_small_divu_16_16x8

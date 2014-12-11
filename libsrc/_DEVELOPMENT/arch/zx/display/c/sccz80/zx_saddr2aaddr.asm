@@ -1,7 +1,7 @@
 
 ; void *zx_saddr2aaddr(void *saddr)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC zx_saddr2aaddr
 

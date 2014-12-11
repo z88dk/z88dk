@@ -1,5 +1,5 @@
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8
 

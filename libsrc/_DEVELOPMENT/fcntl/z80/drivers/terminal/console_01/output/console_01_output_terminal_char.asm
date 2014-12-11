@@ -145,6 +145,10 @@
 ;   * IOCTL_OTERM_SET_WINDOW_RECT
 ;     set window size
 ;
+;   * IOCTL_OTERM_GET_CURSOR_COORD
+;
+;   * IOCTL_OTERM_SET_CURSOR_COORD
+;
 ; This driver reserves extra bytes in the FDSTRUCT:
 ;
 ; offset (wrt FDSTRUCT.JP)  description
@@ -157,7 +161,7 @@
 ;   19                      window.height
 ;   20                      scroll_limit
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC console_01_output_terminal_char
 

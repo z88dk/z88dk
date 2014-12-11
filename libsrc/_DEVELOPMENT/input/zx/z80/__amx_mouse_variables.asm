@@ -1,5 +1,5 @@
 
-SECTION seg_bss_input
+SECTION bss_input
 
 PUBLIC __input_amx_mouse_x
 PUBLIC __input_amx_mouse_y

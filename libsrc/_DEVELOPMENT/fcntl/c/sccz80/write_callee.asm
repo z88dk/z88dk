@@ -1,7 +1,7 @@
 
 ; ssize_t write(int fd, const void *buf, size_t nbyte)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC write_callee
 

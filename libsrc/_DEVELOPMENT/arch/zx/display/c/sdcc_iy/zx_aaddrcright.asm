@@ -1,7 +1,7 @@
 
 ; void *zx_aaddrcright(void *attraddr)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC _zx_aaddrcright
 

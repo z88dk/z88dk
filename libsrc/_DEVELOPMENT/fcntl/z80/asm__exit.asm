@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC asm__exit
 

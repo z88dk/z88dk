@@ -3,9 +3,9 @@
 ;
 ;	Signed integer compare
 ;
-;	$Id: l_cmp.asm,v 1.3 2014-11-17 00:47:54 aralbrec Exp $:
+;	$Id: l_cmp.asm,v 1.4 2014-12-11 04:16:50 aralbrec Exp $:
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_cmp
 

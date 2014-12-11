@@ -1,7 +1,7 @@
 
 ; void *heap_calloc_unlocked(void *heap, size_t nmemb, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC _heap_calloc_unlocked
 

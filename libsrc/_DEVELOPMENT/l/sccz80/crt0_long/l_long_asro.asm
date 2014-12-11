@@ -11,7 +11,7 @@
 ;       aralbrec 01/2007
 ;       Sped up, would be better with counter in a or b
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_asro
 

@@ -5,7 +5,7 @@
 ;       djm 21/2/99
 ;       Rewritten so that I know it works properly!
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_inclong
 

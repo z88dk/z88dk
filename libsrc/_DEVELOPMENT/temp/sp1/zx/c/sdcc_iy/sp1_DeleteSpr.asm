@@ -1,7 +1,7 @@
 
 ; void __FASTCALL__ sp1_DeleteSpr(struct sp1_ss *s)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_DeleteSpr
 

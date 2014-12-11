@@ -1,7 +1,7 @@
 
 ; void *zx_saddrpleft(void *saddr, uchar bitmask)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC _zx_saddrpleft
 

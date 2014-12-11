@@ -4,7 +4,7 @@
 ; Moved from z88_crt0.asm to library function
 ;
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_div
 

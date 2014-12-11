@@ -1,7 +1,7 @@
 
 ; int ungetc_unlocked(int c, FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC ungetc_unlocked_callee
 

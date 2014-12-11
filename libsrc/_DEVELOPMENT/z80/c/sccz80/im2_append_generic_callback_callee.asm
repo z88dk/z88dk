@@ -1,7 +1,7 @@
 
 ; void im2_append_generic_callback_callee(uint8_t vector, void *callback)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC im2_append_generic_callback_callee
 

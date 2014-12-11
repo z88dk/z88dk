@@ -1,7 +1,7 @@
 
 ; char *stpncpy(char * restrict s1, const char * restrict s2, size_t n)
 
-SECTION seg_code_string
+SECTION code_string
 
 PUBLIC stpncpy_callee
 

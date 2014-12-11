@@ -1,5 +1,5 @@
 
-SECTION seg_code_error
+SECTION code_error
 
 PUBLIC error_mnc
 

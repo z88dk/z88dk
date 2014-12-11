@@ -2,7 +2,7 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC asm_sp1_PrintString
 

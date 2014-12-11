@@ -11,7 +11,7 @@
 ; zero width.
 ; ===============================================================
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC asm_fzx_string_extent
 

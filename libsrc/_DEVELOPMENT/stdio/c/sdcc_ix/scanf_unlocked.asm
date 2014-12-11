@@ -1,7 +1,7 @@
 
 ; int scanf_unlocked(const char *format, ...)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _scanf_unlocked
 

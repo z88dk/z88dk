@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC asm_dup2, asm0_dup2
 

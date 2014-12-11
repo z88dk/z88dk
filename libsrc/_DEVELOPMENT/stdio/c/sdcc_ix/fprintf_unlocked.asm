@@ -3,7 +3,7 @@
 
 PUBLIC _fprintf_unlocked
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 _fprintf_unlocked:
 

@@ -1,7 +1,7 @@
 
 ; char *strchrnul(const char *s, int c)
 
-SECTION seg_code_string
+SECTION code_string
 
 PUBLIC strchrnul_callee
 

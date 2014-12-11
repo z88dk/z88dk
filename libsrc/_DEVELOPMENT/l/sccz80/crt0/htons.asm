@@ -5,7 +5,7 @@
 ;
 ;       djm 24/4/99
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC htons
 

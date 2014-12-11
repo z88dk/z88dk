@@ -1,7 +1,7 @@
 
 ; void *zx_saddrcleft(saddr)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC zx_saddrcleft
 

@@ -1,7 +1,7 @@
 
 ; void in_mouse_amx_setpos_callee(uint16_t x, uint16_t y)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC in_mouse_amx_setpos_callee
 

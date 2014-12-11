@@ -1,7 +1,7 @@
 
 ; void heap_info_unlocked(void *heap, void *callback)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC heap_info_unlocked_callee
 

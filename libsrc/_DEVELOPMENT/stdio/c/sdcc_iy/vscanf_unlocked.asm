@@ -1,7 +1,7 @@
 
 ; int vscanf_unlocked(const char *format, void *arg)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _vscanf_unlocked
 

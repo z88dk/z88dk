@@ -1,7 +1,7 @@
 
 ; int vfprintf_unlocked(FILE *stream, const char *format, void *arg)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _vfprintf_unlocked
 

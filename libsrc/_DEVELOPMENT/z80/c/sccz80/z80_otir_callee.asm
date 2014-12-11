@@ -1,7 +1,7 @@
 
 ; void *z80_otir(void *src, uint16_t port)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC z80_otir_callee
 

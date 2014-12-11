@@ -1,5 +1,5 @@
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_send_output_raw
 PUBLIC __stdio_send_output_raw_chars, __stdio_send_output_raw_chars_unchecked

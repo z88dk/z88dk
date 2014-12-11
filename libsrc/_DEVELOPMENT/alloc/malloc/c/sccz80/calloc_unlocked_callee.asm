@@ -1,7 +1,7 @@
 
 ; void *calloc_unlocked(size_t nmemb, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC calloc_unlocked_callee
 

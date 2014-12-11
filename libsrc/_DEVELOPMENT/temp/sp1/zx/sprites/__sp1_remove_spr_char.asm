@@ -1,5 +1,5 @@
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC __sp1_remove_spr_char
 

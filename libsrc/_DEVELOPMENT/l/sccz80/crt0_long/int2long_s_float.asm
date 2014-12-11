@@ -2,7 +2,7 @@
 ;
 ;       Convert signed int to long
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_int2long_s_float
 

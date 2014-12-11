@@ -1,7 +1,7 @@
 
 ; void z80_set_int_state(uint state)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC _z80_set_int_state
 

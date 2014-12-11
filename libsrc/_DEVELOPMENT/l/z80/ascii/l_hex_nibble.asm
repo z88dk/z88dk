@@ -1,5 +1,5 @@
 
-SECTION seg_code_l
+SECTION code_l
 
 PUBLIC l_hex_nibble
 PUBLIC l_hex_nibble_hi, l_hex_nibble_lo

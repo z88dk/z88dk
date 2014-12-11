@@ -1,5 +1,5 @@
 
-SECTION seg_code_l
+SECTION code_l
 
 PUBLIC l_fast_utoa
 PUBLIC l0_fast_utoa

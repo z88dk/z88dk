@@ -1,7 +1,7 @@
 
 ; FILE *open_memstream(char **bufp, size_t *sizep)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC open_memstream
 

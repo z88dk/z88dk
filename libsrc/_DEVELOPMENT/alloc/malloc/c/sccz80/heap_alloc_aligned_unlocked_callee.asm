@@ -1,7 +1,7 @@
 
 ; void *heap_alloc_aligned_unlocked(void *heap, size_t alignment, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC heap_alloc_aligned_unlocked_callee
 

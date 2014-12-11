@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC asm_fmemopen
 

@@ -1,7 +1,7 @@
 
 ; int system(const char *string)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC system
 

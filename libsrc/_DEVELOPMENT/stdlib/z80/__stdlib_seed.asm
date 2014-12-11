@@ -1,5 +1,5 @@
 
-SECTION seg_data_stdlib
+SECTION data_stdlib
 
 PUBLIC __stdlib_seed
 

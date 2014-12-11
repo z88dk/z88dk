@@ -1,7 +1,7 @@
 
 ; int vsscanf(const char *s, const char *format, va_list arg)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC vsscanf
 

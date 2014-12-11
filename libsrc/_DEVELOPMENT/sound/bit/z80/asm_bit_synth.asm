@@ -18,7 +18,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-SECTION seg_smc_sound_bit
+SECTION smc_sound_bit
 
 PUBLIC asm_bit_synth
 

@@ -14,7 +14,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01

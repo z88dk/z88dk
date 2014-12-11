@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC asm_random_uniform_xor_32
 

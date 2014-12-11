@@ -1,7 +1,7 @@
 
 ; int vopen(const char *path, int oflag, void *arg)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC _vopen
 

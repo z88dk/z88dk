@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_balloc
+SECTION code_alloc_balloc
 
 PUBLIC asm_balloc_alloc
 

@@ -1,7 +1,7 @@
 
 ; void *memalign_unlocked(size_t alignment, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC _memalign_unlocked
 

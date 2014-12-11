@@ -1,7 +1,7 @@
 
 ; int posix_memalign_unlocked(void **memptr, size_t alignment, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC _posix_memalign_unlocked
 

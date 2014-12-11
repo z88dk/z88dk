@@ -1,7 +1,7 @@
 
 ; void heap_free_unlocked(void *p)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC _heap_free_unlocked
 

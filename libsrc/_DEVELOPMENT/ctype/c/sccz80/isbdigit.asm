@@ -1,7 +1,7 @@
 
 ; int isbdigit(int c)
 
-SECTION seg_code_ctype
+SECTION code_ctype
 
 PUBLIC isbdigit
 

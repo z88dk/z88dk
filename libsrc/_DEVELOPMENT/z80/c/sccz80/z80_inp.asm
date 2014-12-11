@@ -1,7 +1,7 @@
 
 ; uint8_t z80_inp(uint16_t port)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC z80_inp
 

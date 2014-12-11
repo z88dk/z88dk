@@ -1,7 +1,7 @@
 
 ; void dzx7_agile_rcs_callee(void *src, void *dst)
 
-SECTION seg_code_zx7
+SECTION code_compress_zx7
 
 PUBLIC dzx7_agile_rcs_callee
 

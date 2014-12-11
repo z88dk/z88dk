@@ -1,7 +1,7 @@
 
 ; int feof_unlocked(FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC feof_unlocked
 

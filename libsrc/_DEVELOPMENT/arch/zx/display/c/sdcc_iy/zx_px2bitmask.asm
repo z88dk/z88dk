@@ -1,7 +1,7 @@
 
 ; uint zx_px2bitmask(uchar x)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC _zx_px2bitmask
 

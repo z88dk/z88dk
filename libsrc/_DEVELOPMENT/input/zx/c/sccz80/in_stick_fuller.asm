@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_fuller(void)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC in_stick_fuller
 

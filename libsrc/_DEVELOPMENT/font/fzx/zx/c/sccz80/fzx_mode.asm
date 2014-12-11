@@ -1,7 +1,7 @@
 
 ; int fzx_mode(int mode)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC fzx_mode
 

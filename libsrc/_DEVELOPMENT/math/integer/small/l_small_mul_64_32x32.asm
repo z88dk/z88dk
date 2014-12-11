@@ -3,7 +3,7 @@
 ; zx spectrum rom @ address $30f0
 ; http://www.wearmouth.demon.co.uk/zx82.htm
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_small_mul_64_32x32
 

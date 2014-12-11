@@ -1,6 +1,6 @@
 ; void sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_InitCharStruct
 

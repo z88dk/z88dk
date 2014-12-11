@@ -1,7 +1,7 @@
 
 ; int im2_remove_generic_callback(uint8_t vector, void *callback)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC _im2_remove_generic_callback
 

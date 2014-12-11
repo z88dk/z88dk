@@ -1,7 +1,7 @@
 
 ; void *malloc_unlocked(size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC malloc_unlocked
 

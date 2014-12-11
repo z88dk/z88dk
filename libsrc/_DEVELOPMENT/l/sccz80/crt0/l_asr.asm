@@ -6,7 +6,7 @@
 ;
 ;       22/3/99 djm Rewritten to be shorter..
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_asr
 

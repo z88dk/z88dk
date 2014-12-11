@@ -2,7 +2,7 @@
 ; 2000 djm
 ; 2014 aralbrec - special case for 8-bit multiplicands
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_small_mul_16_16x16, l_small_mul_16_16x8
 

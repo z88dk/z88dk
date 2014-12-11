@@ -1,5 +1,5 @@
 
-SECTION seg_data_stdio
+SECTION data_stdio
 
 PUBLIC __stdio_file_list_lock
 

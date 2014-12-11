@@ -13,7 +13,7 @@
 
 ; actually use of ix saves us 4T
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC lpush2
 

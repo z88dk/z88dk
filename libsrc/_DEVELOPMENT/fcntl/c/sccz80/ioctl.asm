@@ -1,7 +1,7 @@
 
 ; int ioctl(int fildes, int request, ...)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC ioctl
 

@@ -1,7 +1,7 @@
 
 ; void dzx7_mega(void *src, void *dst)
 
-SECTION seg_code_zx7
+SECTION code_compress_zx7
 
 PUBLIC dzx7_mega
 

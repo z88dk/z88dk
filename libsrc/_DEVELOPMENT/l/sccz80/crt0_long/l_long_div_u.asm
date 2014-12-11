@@ -12,7 +12,7 @@
 ;
 ;       Replaced use of ix with bcbc'
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_div_u
 

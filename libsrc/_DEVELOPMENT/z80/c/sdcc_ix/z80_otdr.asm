@@ -1,7 +1,7 @@
 
 ; void *z80_otdr(void *src, uint16_t port)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC _z80_otdr
 

@@ -1,5 +1,5 @@
 
-SECTION seg_code_l
+SECTION code_l
 
 PUBLIC l_fast_lsr_hl, l0_fast_lsr_hl
 

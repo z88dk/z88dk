@@ -11,7 +11,7 @@
 ;
 ;       djm 22/3/99 Unsigned version
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_asr_u
 

@@ -1,7 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_input_sm_gets
 

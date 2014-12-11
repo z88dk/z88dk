@@ -1,7 +1,7 @@
 
 ; int creat(const char *path, mode_t mode)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC creat
 

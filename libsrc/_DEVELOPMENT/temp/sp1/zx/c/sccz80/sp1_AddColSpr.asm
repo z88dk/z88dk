@@ -1,6 +1,6 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, uchar type, int graphic, uchar plane)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC sp1_AddColSpr
 

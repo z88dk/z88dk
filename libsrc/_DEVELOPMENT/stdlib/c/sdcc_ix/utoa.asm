@@ -1,7 +1,7 @@
 
 ; char *utoa(unsigned int num, char *buf, int radix)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC _utoa
 

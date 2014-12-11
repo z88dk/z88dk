@@ -18,7 +18,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_mutex
+SECTION code_threads_mutex
 
 PUBLIC asm_call_once
 

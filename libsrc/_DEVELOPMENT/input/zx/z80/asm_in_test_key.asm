@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC asm_in_test_key
 

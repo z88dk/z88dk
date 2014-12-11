@@ -1,7 +1,7 @@
 
 ; int fflush_unlocked(FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC fflush_unlocked
 

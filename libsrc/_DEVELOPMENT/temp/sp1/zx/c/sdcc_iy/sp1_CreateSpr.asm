@@ -1,6 +1,6 @@
 ; struct sp1_ss *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_CreateSpr
 

@@ -1,5 +1,5 @@
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_file_constructor
 PUBLIC __0_stdio_file_constructor

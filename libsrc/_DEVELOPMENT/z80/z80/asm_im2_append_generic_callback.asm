@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC asm_im2_append_generic_callback
 

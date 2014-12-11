@@ -1,5 +1,5 @@
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC __fcntl_lock_fdtbl
 

@@ -1,7 +1,7 @@
 
 ; void balloc_free(void *m)
 
-SECTION seg_code_balloc
+SECTION code_alloc_balloc
 
 PUBLIC _balloc_free
 

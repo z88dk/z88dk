@@ -52,7 +52,7 @@
 ;
 ;    8..13                  mutex
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC console_01_output_terminal
 

@@ -1,7 +1,7 @@
 
 ; char *ultoa(unsigned long num, char *buf, int radix)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC ultoa_callee
 

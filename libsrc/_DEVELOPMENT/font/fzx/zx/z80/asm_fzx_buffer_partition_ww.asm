@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC asm_fzx_buffer_partition_ww
 

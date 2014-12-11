@@ -1,7 +1,7 @@
 
 ; uint16_t in_stick_keyboard(udk_t *u)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC _in_stick_keyboard
 

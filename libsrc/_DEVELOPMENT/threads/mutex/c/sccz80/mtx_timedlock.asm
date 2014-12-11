@@ -1,7 +1,7 @@
 
 ; int mtx_timedlock(mtx_t *m, struct timespec *ts)
 
-SECTION seg_code_mutex
+SECTION code_threads_mutex
 
 PUBLIC mtx_timedlock
 

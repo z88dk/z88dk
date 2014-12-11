@@ -1,5 +1,5 @@
 
-SECTION seg_bss_string
+SECTION bss_string
 
 PUBLIC __string_strtok_p
 

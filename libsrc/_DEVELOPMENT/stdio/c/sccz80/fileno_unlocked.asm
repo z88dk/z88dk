@@ -1,7 +1,7 @@
 
 ; int fileno_unlocked(FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC fileno_unlocked
 

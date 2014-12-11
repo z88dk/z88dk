@@ -1,7 +1,7 @@
 
 ; int rand(void)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC _rand
 

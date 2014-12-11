@@ -1,7 +1,7 @@
 
 ; FILE *fdopen_callee(int fd, const char *mode)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC fdopen_callee
 

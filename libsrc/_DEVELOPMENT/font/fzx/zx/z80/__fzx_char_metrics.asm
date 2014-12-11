@@ -3,7 +3,7 @@
 ; aralbrec - Nov 2013
 ; ===============================================================
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC __fzx_char_metrics
 

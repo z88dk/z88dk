@@ -1,7 +1,7 @@
 
 ; uint fzx_string_extent(char *s)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC _fzx_string_extent
 

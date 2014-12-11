@@ -1,7 +1,7 @@
 
 ; int fzx_write(void *buf, uint len)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC fzx_write_callee
 

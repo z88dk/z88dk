@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC asm_fzx_mode
 

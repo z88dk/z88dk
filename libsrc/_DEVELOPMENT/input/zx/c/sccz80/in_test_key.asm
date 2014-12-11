@@ -1,7 +1,7 @@
 
 ; int in_test_key(void)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC in_test_key
 

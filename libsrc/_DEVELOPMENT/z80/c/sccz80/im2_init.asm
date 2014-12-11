@@ -1,7 +1,7 @@
 
 ; void im2_init(void *im2_table)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC im2_init
 

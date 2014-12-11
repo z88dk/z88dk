@@ -1,6 +1,6 @@
 ; void sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateUpdateSpr
 

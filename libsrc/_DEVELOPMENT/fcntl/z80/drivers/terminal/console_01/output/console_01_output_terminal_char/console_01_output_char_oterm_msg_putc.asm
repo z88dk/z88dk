@@ -1,7 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC console_01_output_char_oterm_msg_putc
 PUBLIC console_01_output_char_oterm_msg_putc_raw

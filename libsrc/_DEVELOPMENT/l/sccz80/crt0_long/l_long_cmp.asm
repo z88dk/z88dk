@@ -27,7 +27,7 @@
 ;
 ;                hl = 1
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_cmp
 

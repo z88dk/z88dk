@@ -1,7 +1,7 @@
 
 ; long labs(long j)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC _labs
 

@@ -112,6 +112,8 @@
 ;
 ; IOCTLs understood by this driver:
 ;
+; * IOCTL_ITERM_RESET
+;
 ; * IOCTL_ITERM_TIE
 ;   Attach input device to a different output terminal (0 to disconnect)
 ;
@@ -152,7 +154,7 @@
 ;   17..18                  read_index (index of next char to read from edit buffer)
 ;   19..24                  b_array (manages edit buffer)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC console_01_input_terminal
 

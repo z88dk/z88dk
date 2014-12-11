@@ -3,7 +3,7 @@
 ; Feb 2014
 ; ===============================================================
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_memstream_driver
 

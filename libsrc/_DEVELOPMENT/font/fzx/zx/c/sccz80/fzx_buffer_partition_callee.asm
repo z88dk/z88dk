@@ -1,7 +1,7 @@
 
 ; void *fzx_buffer_partition(void *buf, uint len, uint width)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC fzx_buffer_partition_callee
 

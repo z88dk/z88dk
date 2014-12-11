@@ -16,7 +16,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_string
+SECTION code_string
 
 PUBLIC asm_strxfrm
 

@@ -6,7 +6,7 @@
 ;       djm 26/2/2000
 ;       aralbrec 01/2007
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_inc
 

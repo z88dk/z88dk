@@ -1,7 +1,7 @@
 
 ; int islower(int c)
 
-SECTION seg_code_ctype
+SECTION code_ctype
 
 PUBLIC _islower
 

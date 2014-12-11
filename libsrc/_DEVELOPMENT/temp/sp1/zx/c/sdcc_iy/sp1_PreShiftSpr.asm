@@ -1,6 +1,6 @@
 ; void *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_PreShiftSpr
 

@@ -1,5 +1,5 @@
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC __heap_lock_release
 PUBLIC __heap_lock_release_0

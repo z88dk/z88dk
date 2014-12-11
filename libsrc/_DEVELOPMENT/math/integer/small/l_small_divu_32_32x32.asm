@@ -2,7 +2,7 @@
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_small_divu_32_32x32, l0_small_divu_32_32x32
 

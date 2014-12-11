@@ -25,7 +25,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC asm_getdelim_unlocked
 PUBLIC asm0_getdelim_unlocked

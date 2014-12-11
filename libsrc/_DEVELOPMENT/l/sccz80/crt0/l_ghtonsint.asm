@@ -4,7 +4,7 @@
 ;
 ;	Quicky to make network progs quicker
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_ghtonsint
 

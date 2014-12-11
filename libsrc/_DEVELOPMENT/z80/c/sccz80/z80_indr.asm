@@ -1,7 +1,7 @@
 
 ; void *z80_indr(void *dst, uint16_t port)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC z80_indr
 

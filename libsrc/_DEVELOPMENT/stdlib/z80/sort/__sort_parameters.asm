@@ -1,7 +1,7 @@
 
 ; Jan 2014
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC __sort_parameters
 

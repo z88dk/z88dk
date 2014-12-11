@@ -1,7 +1,7 @@
 
 ; _Noreturn void _exit(int status)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC __exit
 

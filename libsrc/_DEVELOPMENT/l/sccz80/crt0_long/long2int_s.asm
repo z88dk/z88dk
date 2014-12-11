@@ -3,7 +3,7 @@
 ;       Convert signed long to int
 ;       NB. This routine will only work if long < +/-32767ish (obvious)
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long2int_s
 

@@ -5,7 +5,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC asm_sp1_UpdateNow
 

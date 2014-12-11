@@ -28,7 +28,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC asm_in_mouse_amx_init
 PUBLIC asm_in_mouse_amx_reset

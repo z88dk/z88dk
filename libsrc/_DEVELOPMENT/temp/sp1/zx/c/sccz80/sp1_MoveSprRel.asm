@@ -1,7 +1,7 @@
 ; void sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot)
 ; CALLER linkage for function pointers
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC sp1_MoveSprRel
 

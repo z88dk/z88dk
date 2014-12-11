@@ -1,5 +1,5 @@
 
-SECTION seg_code_locale
+SECTION code_locale
 
 PUBLIC __lc_char_ordinal_default
 

@@ -2,7 +2,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC asm_sp1_SetPrintPos
 

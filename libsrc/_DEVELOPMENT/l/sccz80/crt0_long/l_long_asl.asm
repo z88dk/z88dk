@@ -7,7 +7,7 @@
 ;       aralbrec 01/2007
 ;       shifts are faster than doubling and ex with de/hl
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_asl
 

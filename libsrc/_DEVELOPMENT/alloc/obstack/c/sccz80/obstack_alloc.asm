@@ -1,7 +1,7 @@
 
 ; void *obstack_alloc(struct obstack *ob, size_t size)
 
-SECTION seg_code_obstack
+SECTION code_alloc_obstack
 
 PUBLIC obstack_alloc
 

@@ -1,7 +1,7 @@
 
 ; void zx_scroll_wc_up(struct r_Rect8 *r, uchar rows, uchar attr)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC zx_scroll_wc_up_callee
 

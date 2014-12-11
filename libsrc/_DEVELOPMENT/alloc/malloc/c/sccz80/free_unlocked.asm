@@ -1,7 +1,7 @@
 
 ; void free_unlocked(void *p)
 
-SECTON seg_code_malloc
+SECTON code_alloc_malloc
 
 PUBLIC free_unlocked
 

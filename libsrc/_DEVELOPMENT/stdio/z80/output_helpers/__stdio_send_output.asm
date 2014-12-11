@@ -1,5 +1,5 @@
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_send_output
 PUBLIC __stdio_send_output_buffer, __stdio_send_output_chars

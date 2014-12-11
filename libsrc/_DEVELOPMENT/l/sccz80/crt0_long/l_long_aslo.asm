@@ -11,7 +11,7 @@
 ;       aralbrec 01/2007
 ;       switched to shifts from slower doubling using de/hl
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_aslo
 

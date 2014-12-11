@@ -1,7 +1,7 @@
 
 ; void *memmem(const void *big, size_t big_len, const void *little, size_t little_len)
 
-SECTION seg_code_string
+SECTION code_string
 
 PUBLIC memmem_callee
 

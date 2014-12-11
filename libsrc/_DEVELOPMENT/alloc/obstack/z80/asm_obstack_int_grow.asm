@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_obstack
+SECTION code_alloc_obstack
 
 PUBLIC asm_obstack_int_grow
 

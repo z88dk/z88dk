@@ -1,7 +1,7 @@
 
 ; void in_wait_key(void)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC _in_wait_key
 

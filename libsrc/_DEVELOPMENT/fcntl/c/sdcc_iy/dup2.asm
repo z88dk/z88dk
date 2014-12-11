@@ -1,7 +1,7 @@
 
 ; int dup2(int fd, int fd2)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC _dup2
 

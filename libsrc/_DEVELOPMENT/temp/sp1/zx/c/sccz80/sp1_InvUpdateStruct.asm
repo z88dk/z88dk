@@ -3,7 +3,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair zx version
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC sp1_InvUpdateStruct
 

@@ -1,7 +1,7 @@
 
 ; uint16_t in_pause(uint16_t dur_ms)
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC _in_pause
 

@@ -1,7 +1,7 @@
 
 ; unsigned long strtoul( const char * restrict nptr, char ** restrict endptr, int base)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC strtoul
 

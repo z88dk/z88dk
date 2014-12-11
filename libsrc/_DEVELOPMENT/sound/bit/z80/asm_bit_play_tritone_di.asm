@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_sound_bit
+SECTION code_sound_bit
 
 PUBLIC asm_bit_play_tritone_di
 

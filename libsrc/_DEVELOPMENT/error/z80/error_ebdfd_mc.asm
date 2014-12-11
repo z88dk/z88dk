@@ -7,7 +7,7 @@ IF __CLIB_OPT_ERROR
 
    ; verbose mode
 
-   SECTION seg_code_error
+   SECTION code_error
    
    PUBLIC error_ebdfd_mc
    
@@ -26,7 +26,7 @@ IF __CLIB_OPT_ERROR
       jp errno_mc
    
    
-   SECTION seg_rodata_error_strings
+   SECTION rodata_error_strings
 
    IF __CLIB_OPT_ERROR & $02
 
@@ -46,7 +46,7 @@ IF __CLIB_OPT_ERROR
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   SECTION seg_code_error
+   SECTION code_error
    
    PUBLIC error_ebdfd_mc
    

@@ -1,5 +1,5 @@
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_small_mul_40_32x8
 

@@ -1,5 +1,5 @@
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_scanf_sm_hex
 PUBLIC __stdio_scanf_sm_hex_join

@@ -12,7 +12,7 @@
 ;;; should we unblock any blocked threads?
 ;;; standard specifically says we don't need to
 
-SECTION seg_code_mutex
+SECTION code_threads_mutex
 
 PUBLIC asm_mtx_destroy
 

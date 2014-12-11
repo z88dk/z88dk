@@ -1,7 +1,7 @@
 
 ; void zx_border(uchar colour)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC zx_border
 

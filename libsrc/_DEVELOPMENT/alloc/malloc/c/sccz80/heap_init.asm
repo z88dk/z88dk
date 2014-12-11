@@ -1,7 +1,7 @@
 
 ; void *heap_init(void *heap, size_t size)
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC heap_init
 

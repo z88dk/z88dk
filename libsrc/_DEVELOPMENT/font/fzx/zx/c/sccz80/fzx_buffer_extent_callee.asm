@@ -1,7 +1,7 @@
 
 ; uint fzx_buffer_extent(void *buf, uint len)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC fzx_buffer_extent_callee
 

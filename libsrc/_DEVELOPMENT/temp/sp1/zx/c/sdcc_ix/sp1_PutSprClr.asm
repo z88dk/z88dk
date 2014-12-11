@@ -1,6 +1,6 @@
 ; void sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_PutSprClr
 

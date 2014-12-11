@@ -17,7 +17,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC asm_posix_memalign_unlocked
 PUBLIC asm0_posix_memalign_unlocked

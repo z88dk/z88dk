@@ -1,7 +1,7 @@
 
 ; void z80_outp(uint16_t port, uint8_t data)
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC _z80_outp
 

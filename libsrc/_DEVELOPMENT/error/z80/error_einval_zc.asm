@@ -7,7 +7,7 @@ IF __CLIB_OPT_ERROR
 
    ; verbose mode
 
-   SECTION seg_code_error
+   SECTION code_error
    
    PUBLIC error_einval_zc
    
@@ -32,7 +32,7 @@ IF __CLIB_OPT_ERROR
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   SECTION seg_code_error
+   SECTION code_error
    
    PUBLIC error_einval_zc
    

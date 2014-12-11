@@ -1,7 +1,7 @@
 
 ; int dup(int fd)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC dup
 

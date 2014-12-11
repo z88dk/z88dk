@@ -1,7 +1,7 @@
 
 ; unsigned long ftell_unlocked(FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _ftell_unlocked
 

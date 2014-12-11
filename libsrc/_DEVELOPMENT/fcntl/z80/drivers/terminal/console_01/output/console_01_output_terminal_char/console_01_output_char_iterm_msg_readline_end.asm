@@ -1,5 +1,5 @@
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC console_01_output_char_iterm_msg_readline_end
 

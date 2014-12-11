@@ -1,7 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC __strtou__
 

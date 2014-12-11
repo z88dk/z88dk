@@ -1,7 +1,7 @@
 
 ; int fzx_setat(uchar y, uchar x)
 
-SECTION seg_code_fzx
+SECTION code_font_fzx
 
 PUBLIC fzx_setat_callee
 

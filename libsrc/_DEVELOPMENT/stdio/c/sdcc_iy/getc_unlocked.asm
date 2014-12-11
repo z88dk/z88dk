@@ -1,7 +1,7 @@
 
 ; int getc_unlocked(FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _getc_unlocked
 

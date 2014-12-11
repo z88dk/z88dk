@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC asm_lseek
 

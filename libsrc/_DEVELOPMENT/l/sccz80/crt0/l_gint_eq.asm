@@ -7,7 +7,7 @@
 ;       13/5/99 djm Optimizer routine to test against zero
 ;       Returns z=0 nz otherwise as well as the int in hl
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_gint_eq
 

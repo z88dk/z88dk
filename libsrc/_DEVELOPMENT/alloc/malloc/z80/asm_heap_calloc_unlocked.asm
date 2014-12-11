@@ -14,7 +14,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_malloc
+SECTION code_alloc_malloc
 
 PUBLIC asm_heap_calloc_unlocked
 

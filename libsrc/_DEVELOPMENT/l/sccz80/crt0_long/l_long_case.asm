@@ -2,7 +2,7 @@
 ;       13/10/98 The new case statement..maybe things will work now!
 ;       11/2014  Removed use of ix
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_case
 

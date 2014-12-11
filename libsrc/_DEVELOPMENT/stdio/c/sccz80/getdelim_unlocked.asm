@@ -1,7 +1,7 @@
 
 ; size_t getdelim_unlocked(char **lineptr, size_t *n, int delimiter, FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC getdelim_unlocked
 

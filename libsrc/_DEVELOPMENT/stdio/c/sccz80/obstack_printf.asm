@@ -1,7 +1,7 @@
 
 ; int obstack_printf(struct obstack *obstack, const char *format, ...)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC obstack_printf
 

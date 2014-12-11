@@ -1,5 +1,5 @@
 
-SECTION seg_code_math
+SECTION code_math
 
 PUBLIC l_fast_divs_16_16x16, l0_fast_divs_16_16x16
 

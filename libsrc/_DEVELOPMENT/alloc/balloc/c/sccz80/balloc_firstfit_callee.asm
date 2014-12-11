@@ -1,7 +1,7 @@
 
 ; void *balloc_firstfit(unsigned int queue, unsigned char num)
 
-SECTION seg_code_balloc
+SECTION code_alloc_balloc
 
 PUBLIC balloc_firstfit_callee
 

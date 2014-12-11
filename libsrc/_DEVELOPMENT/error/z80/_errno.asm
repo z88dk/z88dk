@@ -1,5 +1,5 @@
 
-SECTION seg_bss_error
+SECTION bss_error
 
 PUBLIC _errno
 

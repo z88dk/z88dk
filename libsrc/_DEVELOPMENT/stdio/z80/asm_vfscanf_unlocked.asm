@@ -11,7 +11,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC asm_vfscanf_unlocked
 PUBLIC asm0_vfscanf_unlocked, asm1_vfscanf_unlocked

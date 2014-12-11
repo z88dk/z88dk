@@ -4,7 +4,7 @@
 ; to emulate a PC keyboard with the 'CTRL' key represented
 ; by CAPS SHIFT + SYM SHIFT.
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC in_key_translation_table
 

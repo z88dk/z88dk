@@ -1,7 +1,7 @@
 
 ; void *zx_cyx2saddr(uchar row, uchar col)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC _zx_cyx2saddr
 

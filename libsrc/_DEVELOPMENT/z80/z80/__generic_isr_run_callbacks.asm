@@ -1,5 +1,5 @@
 
-SECTION seg_code_z80
+SECTION code_z80
 
 PUBLIC __generic_isr_run_callbacks
 

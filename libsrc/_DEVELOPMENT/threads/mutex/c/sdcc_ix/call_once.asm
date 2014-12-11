@@ -1,7 +1,7 @@
 
 ; void call_once(once_flag *flag, void (*func)(void))
 
-SECTION seg_code_mutex
+SECTION code_threads_mutex
 
 PUBLIC call_once
 

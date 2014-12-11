@@ -1,6 +1,6 @@
 ; void sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_GetTiles
 

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC asm_fsetpos_unlocked
 PUBLIC asm0_fsetpos_unlocked

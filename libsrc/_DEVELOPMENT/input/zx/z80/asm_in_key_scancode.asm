@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_input
+SECTION code_input
 
 PUBLIC asm_in_key_scancode
 

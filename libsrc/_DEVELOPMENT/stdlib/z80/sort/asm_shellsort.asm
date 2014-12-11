@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
@@ -164,7 +164,7 @@ asm_shellsort:
 	jr	i_11
 
 
-SECTION seg_bss_stdlib
+SECTION bss_stdlib
 
 PUBLIC __stdlib_shellsort_i
 PUBLIC __stdlib_shellsort_j

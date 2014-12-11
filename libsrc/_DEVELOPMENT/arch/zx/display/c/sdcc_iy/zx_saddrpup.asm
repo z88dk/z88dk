@@ -1,7 +1,7 @@
 
 ; void *zx_saddrpup(void *saddr)
 
-SECTION seg_code_arch
+SECTION code_arch
 
 PUBLIC _zx_saddrpup
 

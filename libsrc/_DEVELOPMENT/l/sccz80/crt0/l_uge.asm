@@ -6,7 +6,7 @@
 ;
 ;       13/5/99 djm, inverted carry conditions
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_uge
 

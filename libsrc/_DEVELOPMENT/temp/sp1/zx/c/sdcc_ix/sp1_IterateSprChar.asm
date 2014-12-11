@@ -1,6 +1,6 @@
 ; void sp1_IterateSprChar(struct sp1_ss *s, void *hook1)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateSprChar
 

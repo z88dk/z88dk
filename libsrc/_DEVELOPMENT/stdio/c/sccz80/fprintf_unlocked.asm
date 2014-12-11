@@ -1,7 +1,7 @@
 
 ; int fprintf_unlocked(FILE *stream, const char *format, ...)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC fprintf_unlocked
 

@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC asm_ultoa
 PUBLIC asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa

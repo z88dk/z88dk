@@ -1,7 +1,7 @@
 
 ; FILE *freopen_unlocked(char *filename, char *mode, FILE *stream)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC _freopen_unlocked
 

@@ -5,7 +5,7 @@
 ;       The old routine is fubarred! Written a new one now..but
 ;       I'm mystified!
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_long_sub
 

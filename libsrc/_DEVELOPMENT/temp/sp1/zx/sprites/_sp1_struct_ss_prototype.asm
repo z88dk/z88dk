@@ -1,7 +1,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_struct_ss_prototype
 

@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-SECTION seg_code_sccz80
+SECTION code_l_sccz80
 
 PUBLIC l_or
 

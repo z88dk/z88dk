@@ -1,6 +1,6 @@
 ; void sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC _sp1_PrintAt
 

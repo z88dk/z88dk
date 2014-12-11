@@ -1,7 +1,7 @@
 
 ; int vioctl(int fd, uint16_t request, void *arg)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC _vioctl
 

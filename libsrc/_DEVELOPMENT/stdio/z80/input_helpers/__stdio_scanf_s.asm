@@ -1,5 +1,5 @@
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC __stdio_scanf_s
 PUBLIC __stdio_scanf_s_tail

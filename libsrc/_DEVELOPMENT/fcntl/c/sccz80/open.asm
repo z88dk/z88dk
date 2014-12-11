@@ -1,7 +1,7 @@
 
 ; int open(const char *path, int oflag, ...)
 
-SECTION seg_code_fcntl
+SECTION code_fcntl
 
 PUBLIC open
 

@@ -1,7 +1,7 @@
 
 ; int getchar_unlocked(void)
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC getchar_unlocked
 

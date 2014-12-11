@@ -1,6 +1,6 @@
 ; struct sp1_update __CALLEE__ *sp1_GetUpdateStruct_callee(uchar row, uchar col)
 
-SECTION seg_code_sp1
+SECTION code_temp_sp1
 
 PUBLIC sp1_GetUpdateStruct_callee
 

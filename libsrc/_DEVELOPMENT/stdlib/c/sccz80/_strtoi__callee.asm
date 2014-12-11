@@ -1,7 +1,7 @@
 
 ; int _strtoi_(const char *nptr, char **endptr, int base)
 
-SECTION seg_code_stdlib
+SECTION code_stdlib
 
 PUBLIC _strtoi__callee
 

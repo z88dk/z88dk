@@ -12,7 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION seg_code_stdio
+SECTION code_stdio
 
 PUBLIC asm_puts_unlocked
 PUBLIC asm0_puts_unlocked

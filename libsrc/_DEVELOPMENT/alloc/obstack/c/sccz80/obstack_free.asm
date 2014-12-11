@@ -1,7 +1,7 @@
 
 ; void *obstack_free(struct obstack *ob, void *object)
 
-SECTION seg_code_obstack
+SECTION code_alloc_obstack
 
 PUBLIC obstack_free
 
