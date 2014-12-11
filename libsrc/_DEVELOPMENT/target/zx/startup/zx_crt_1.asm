@@ -47,7 +47,6 @@ include "clib_target_constants.inc"
 
 
 
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
@@ -165,7 +164,7 @@ include "clib_target_constants.inc"
       
       defw __i_fcntl_fdstruct_1
       defb 0
-      defb 0
+      defw 0
       
       ; b_array_t edit_buffer
       
@@ -191,9 +190,9 @@ include "clib_target_constants.inc"
       __edit_buffer_0:   defs 64
       
 
+            
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-         
 
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -272,7 +271,7 @@ include "clib_target_constants.inc"
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 38
+      defw 35
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:
@@ -327,9 +326,9 @@ include "clib_target_constants.inc"
       defb 0
       defb 56
 
+         
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-         
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
@@ -369,7 +368,7 @@ include "clib_target_constants.inc"
       ; ungetc
 
       defb 0x80
-      defb 
+      defb 0
       defb 0
       defb 0
       
@@ -398,302 +397,28 @@ include "clib_target_constants.inc"
    ld hl,__i_fcntl_fdstruct_1 + 7     ; & FDSTRUCT.ref_count
    inc (hl)
    inc (hl)
-   
+
+      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   
-
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : 0
-   ;
-   ; driver: zx_01_output_char_64
-   ; fd    : 3
-   ; mode  : write only
-   ; type  : 002 = output terminal
-   ;
-   ; ioctl_flags   : 0x0370
-   ; cursor coord  : (0,0)
-   ; window        : (0,64,0,24)
-   ; scroll limit  : 24
-   ; font address  : 15360
-   ; text colour   : 56
-   ; text mask     : 0
-   ; background    : 56
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-      
-   SECTION data_stdio
-   
-   ; FILE *
-      
-   PUBLIC 0
-      
-   0:  defw __i_stdio_file_3 + 2
-   
-   ; FILE structure
-   
-   __i_stdio_file_3:
-   
-      ; open files link
-      
-      defw __i_stdio_file_2
-      
-      ; jump to underlying fd
-      
-      defb 195
-      defw __i_fcntl_fdstruct_3
-
-      ; state_flags_0
-      ; state_flags_1
-      ; conversion flags
-      ; ungetc
-
-      defb 0x80         ; write + normal file type
-      defb 0            ; last operation was write
-      defb 0
-      defb 0
-      
-      ; mtx_recursive
-      
-      defb 0         ; thread owner = none
-      defb 0x02      ; mtx_recursive
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-    
-         
-   ; fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_3
-
-   ; FDSTRUCT structure
-   
-   SECTION data_fcntl_stdio_heap_body
-   
-   EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_64
-   
-   __i_fcntl_heap_2:
-   
-      ; heap header
-      
-      defw __i_fcntl_heap_3
-      defw 38
-      defw __i_fcntl_heap_1
-
-   __i_fcntl_fdstruct_3:
-   
-      ; FDSTRUCT structure
-      
-      ; call to first entry to driver
-      
-      defb 205
-      defw console_01_output_terminal_fdriver
-      
-      ; jump to driver
-      
-      defb 195
-      defw zx_01_output_char_64
-      
-      ; flags
-      ; reference_count
-      ; mode_byte
-      
-      defb 0x02      ; type = output terminal
-      defb 2
-      defb 0x02      ; write only
-      
-      ; ioctl_flags
-      
-      defw 0x0370
-      
-      ; mtx_plain
-      
-      defb 0         ; thread owner = none
-      defb 0x01      ; mtx_plain
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-
-      ; cursor coordinate
-      ; window rectangle
-      ; scroll limit
-
-      defb 0, 0
-      defb 0, 64, 0, 24
-      defb 24
-      
-      ; font address
-      ; text colour
-      ; text mask
-      ; background colour
-      
-      defw 15360
-      defb 56
-      defb 0
-      defb 56
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-         
-
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _input_2
-   ;
-   ; driver: zx_01_input_kbd_lastk
-   ; fd    : 4
-   ; mode  : read only
-   ; type  : 001 = input terminal
-   ; tie   : __i_fcntl_fdstruct_1
-   ;
-   ; ioctl_flags   : 0x02b0
-   ; buffer size   : 0 bytes
-   ; LASTK address : 23560
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-      
-   SECTION data_stdio
-   
-   ; FILE *
-      
-   PUBLIC _input_2
-      
-   _input_2:  defw __i_stdio_file_4 + 2
-   
-   ; FILE structure
-   
-   __i_stdio_file_4:
-   
-      ; open files link
-      
-      defw __i_stdio_file_3
-      
-      ; jump to underlying fd
-      
-      defb 195
-      defw __i_fcntl_fdstruct_4
-
-      ; state_flags_0
-      ; state_flags_1
-      ; conversion flags
-      ; ungetc
-
-      defb 0x40      ; read + stdio manages ungetc + normal file type
-      defb 0x02      ; last operation was read
-      defb 0
-      defb 0
-      
-      ; mtx_recursive
-      
-      defb 0         ; thread owner = none
-      defb 0x02      ; mtx_recursive
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-    
-         
-   ; fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_4
-
-   ; FDSTRUCT structure
-   
-   SECTION data_fcntl_stdio_heap_body
-   
-   EXTERN console_01_input_terminal_fdriver
-   EXTERN zx_01_input_kbd_lastk
-   
-   __i_fcntl_heap_3:
-   
-      ; heap header
-      
-      defw __i_fcntl_heap_4
-      defw 
-      defw __i_fcntl_heap_2
-
-   __i_fcntl_fdstruct_4:
-   
-      ; FDSTRUCT structure
-      
-      ; call to first entry to driver
-      
-      defb 205
-      defw console_01_input_terminal_fdriver
-      
-      ; jump to driver
-      
-      defb 195
-      defw zx_01_input_kbd_lastk
-      
-      ; flags
-      ; reference_count
-      ; mode_byte
-      
-      defb 0x01      ; stdio handles ungetc + type = input terminal
-      defb 2
-      defb 0x01      ; read only
-      
-      ; ioctl_flags
-      
-      defw 0x02b0
-      
-      ; mtx_plain
-      
-      defb 0         ; thread owner = none
-      defb 0x01      ; mtx_plain
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-
-      ; tied output terminal
-      ; pending_char
-      ; read_index
-      
-      defw __i_fcntl_fdstruct_1
-      defb 0
-      defb 0
-      
-      ; b_array_t edit_buffer
-      
-      defw __edit_buffer_4
-      defw 0
-      defw 0
-      
-      ; LASTK_address
-
-      defw 23560
-      
-            
-      ; reserve space for edit buffer
-      
-      __edit_buffer_4:   defs 0
-      
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-         
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; create open and closed FILE lists
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; __clib_fopen_max   = max number of open FILEs specified by user
-   ; 5 = number of static FILEs instantiated in crt
+   ; 3 = number of static FILEs instantiated in crt
    ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
    SECTION data_stdio
 
-   IF (__clib_fopen_max > 0) || (5 > 0)
+   IF (__clib_fopen_max > 0) || (3 > 0)
 
       ; number of FILEs > 0
 
       ; construct list of open files
 
-      IF 5 > 0
+      IF 3 > 0
    
          ; number of FILEs statically generated > 0
       
@@ -701,7 +426,7 @@ include "clib_target_constants.inc"
       
          PUBLIC __stdio_open_file_list
       
-         __stdio_open_file_list:  defw __i_stdio_file_4
+         __stdio_open_file_list:  defw __i_stdio_file_2
    
       ELSE
    
@@ -723,19 +448,19 @@ include "clib_target_constants.inc"
    
       __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
    
-      IF __clib_fopen_max > 5
+      IF __clib_fopen_max > 3
 
          ; create extra FILE structures
      
          SECTION bss_stdio
       
-         __stdio_file_extra:      defs (__clib_fopen_max - 5) * 15
+         __stdio_file_extra:      defs (__clib_fopen_max - 3) * 15
       
          SECTION code_crt_init
       
             ld bc,__stdio_closed_file_list
             ld de,__stdio_file_extra
-            ld l,__clib_fopen_max - 5
+            ld l,__clib_fopen_max - 3
      
          loop:
       
@@ -762,9 +487,9 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_open_max  = max number of open fds specified by user
-   ; 5 = number of static file descriptors created
+   ; 3 = number of static file descriptors created
    
-   IF 5 > 0
+   IF 3 > 0
    
       ; create rest of fd table in data segment
       
@@ -776,11 +501,11 @@ include "clib_target_constants.inc"
       
       defc __fcntl_fdtbl = ASMHEAD_data_fcntl_fdtable_body
       
-      IF __clib_open_max > 5
+      IF __clib_open_max > 3
       
          SECTION data_fcntl_fdtable_body
          
-         defs (__clib_open_max - 5) * 2
+         defs (__clib_open_max - 3) * 2
       
       ENDIF
    
@@ -805,11 +530,11 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ;   = byte size of static FDSTRUCTs
-   ; 4   = number of heap allocations
+   ; 140  = byte size of static FDSTRUCTs
+   ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF  > 0
+   IF 140 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -825,24 +550,24 @@ include "clib_target_constants.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > ( + 14)
+      IF __clib_stdio_heap_size > (140 + 14)
       
          ; expand stdio heap to desired size
          
          SECTION data_fcntl_stdio_heap_body
          
-         __i_fcntl_heap_4:
+         __i_fcntl_heap_2:
           
-            defw __i_fcntl_heap_5
-            defw 0
             defw __i_fcntl_heap_3
-            defs __clib_stdio_heap_size -  - 14
+            defw 0
+            defw __i_fcntl_heap_1
+            defs __clib_stdio_heap_size - 140 - 14
          
          ; terminate stdio heap
          
          SECTION data_fcntl_stdio_heap_tail
          
-         __i_fcntl_heap_5:   defw 0
+         __i_fcntl_heap_3:   defw 0
       
       ELSE
       
@@ -850,7 +575,7 @@ include "clib_target_constants.inc"
       
          SECTION data_fcntl_stdio_heap_tail
       
-         __i_fcntl_heap_4:   defw 0
+         __i_fcntl_heap_2:   defw 0
       
       ENDIF
       
@@ -873,6 +598,8 @@ include "clib_target_constants.inc"
          
          EXTERN asm_heap_init
          call asm_heap_init
+      
+      ENDIF
 
    ENDIF
 
@@ -883,25 +610,183 @@ include "clib_target_constants.inc"
 
 SECTION code_crt_start
 
-PUBLIC _start
+PUBLIC __Exit
 
-_start:
+__start:
 
+   IF __crt_enable_restart = 0
+   
+      ; save state required for successful return to basic
+      
+      push iy
+      exx
+      push hl
+   
+   ENDIF
 
+   ; save stack address for safe exit
+   
+   ld (__sp),sp
 
-SECTION code_crt_init
+   ; change stack address
+   
+   IF __register_sp != 0
+      
+      IF __register_sp = -1
+      
+         ld sp,0
+      
+      ELSE
+      
+         ld sp,__register_sp
+      
+      ENDIF
+   
+   ENDIF
+   
+   ; parse command line
+   
+   IF 1                        ; __crt_enable_commandline = 1
+      
+      IF __SDCC | __SDCC_IX | __SDCC_IY
+      
+         ld hl,0
+         push hl               ; environment
+         push hl               ; char *argv[]
+         push hl               ; int argc
 
+      ELSE
+            
+         ld hl,0
+         push hl               ; int argc
+         push hl               ; char *argv[]
+         push hl               ; environment
+   
+      ENDIF
+   
+   ENDIF
+   
+   ; initialize bss section
+   
+   EXTERN ASMHEAD_BSS, ASMSIZE_BSS
 
+   ld hl,ASMHEAD_BSS
+   ld bc,ASMSIZE_BSS
+   
+   ld e,0
+   
+   EXTERN asm_memset
+   call asm_memset
+   
+   ; initialize data section
+   
+   IF __crt_model = 1
+   
+      ; rom model + data segment is not compressed
 
+      EXTERN ASMTAIL_CODE, ASMHEAD_DATA, ASMSIZE_DATA
 
+      ld hl,ASMTAIL_CODE
+      ld de,ASMHEAD_DATA
+      ld bc,ASMSIZE_DATA
+      
+      EXTERN asm_memcpy
+      call asm_memcpy
+   
+   ENDIF
+   
+   IF __crt_model = 2
+   
+      ; rom model + data segment is compressed
+      
+      EXTERN ASMTAIL_CODE, ASMHEAD_DATA
+      
+      ld hl,ASMTAIL_CODE
+      ld de,ASMHEAD_DATA
+      
+      EXTERN asm_dzx7_standard
+      call asm_dzx7_standard
+   
+   ENDIF
+
+SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
+   ; call user program
+   
+   call _main                  ; hl = return status
 
+   ; run exit stack
 
+   IF __clib_exit_stack_size > 0
+   
+      EXTERN asm_exit
+      jp asm_exit              ; exit function jumps to __Exit
+   
+   ENDIF
 
-SECTION code_crt_exit
+__Exit:
 
+   IF __crt_enable_restart = 0
+   
+      ; returning to caller
 
-
+      push hl                  ; save return status
+   
+   ENDIF
+   
+SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
+   ; close files
+   
+   IF __crt_enable_close
+   
+      include "../clib_close.inc"
+
+   ENDIF
+
+   ; exit program
+   
+   IF __crt_enable_restart = 0
+   
+      ; returning to caller
+      
+      pop bc                   ; bc = return status
+      
+      ld sp,(__sp)             ; reset stack location
+      
+      pop hl
+      exx
+      pop iy
+      exx
+      
+      im 1
+      ei
+      ret
+   
+   ELSE
+   
+      ; restarting program
+      
+      ld sp,(__sp)             ; reset stack location
+      jp __start
+   
+   ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION bss_user
+
+__sp:  defw 0
+
+include "../clib_variables.inc"
+include "clib_target_variables.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../clib_stubs.inc"
