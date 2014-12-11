@@ -5,7 +5,7 @@
  *
  * Based on the API from cc65
  *
- * $Id: rs232.h,v 1.3 2010-09-19 00:24:08 dom Exp $
+ * $Id: rs232.h,v 1.4 2014-12-11 20:04:51 stefano Exp $
  */
 
 
@@ -58,6 +58,19 @@
 #define RS_ERR_BAUD_NOT_AVAIL           0x03    /* Baud rate not available */
 #define RS_ERR_NO_DATA                  0x04    /* Nothing to read */
 #define RS_ERR_OVERFLOW                 0x05    /* No room in send buffer */
+
+
+/* Handshaking codes used in XMODEM and its derivatives */
+
+#define	SOH    1
+#define	EOT    4
+#define	ACK    6
+#define	DLE    16
+#define	DC1    17    /* X-On  */
+#define	DC3    19    /* X-Off */
+#define	NAK    21
+#define	SYN    22
+#define	CAN    24
 
 
 /* The functions: Call params, then init then put/get finally close */
