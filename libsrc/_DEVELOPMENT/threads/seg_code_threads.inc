@@ -1,6 +1,0 @@
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; THREADS.LIB CODE SECTIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SECTION seg_code_mutex

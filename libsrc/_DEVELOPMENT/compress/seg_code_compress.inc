@@ -1,6 +1,0 @@
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; COMPRESS.LIB CODE SECTIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SECTION seg_code_zx7
