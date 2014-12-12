@@ -1,25 +1,26 @@
 
 TODO:
 
+[
 * pattern filler
   add shaped fill
 
 * output terminal
   add inverse, underline, italic, xor, or
   word wrap
+]
 
 * fzx output terminal
 
-* fzx reexamined
+* fzx remove smc
 
-* self-modifying code
-  place in separate section seg_smc_...
-  rather than directly into data segments
-
-* finish ioctls on output terminals
+* finish ioctls on output terminals, common getter setter for ioctl
+  move auto flags writing to drivers to make changes while lock held
 
 * target open
 
-* crt
+* crt, remove bss, error on rom model if data address not given
 
 * zx scroll reexamined
+
+* tty_z88dk
