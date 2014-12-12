@@ -1,9 +1,9 @@
 font/fzx/zx/c/sccz80/fzx_buffer_extent
 font/fzx/zx/c/sccz80/fzx_buffer_extent_callee
-font/fzx/zx/c/sccz80/fzx_partition
-font/fzx/zx/c/sccz80/fzx_partition_callee
-font/fzx/zx/c/sccz80/fzx_partition_ww
-font/fzx/zx/c/sccz80/fzx_partition_ww_callee
+font/fzx/zx/c/sccz80/fzx_buffer_partition
+font/fzx/zx/c/sccz80/fzx_buffer_partition_callee
+font/fzx/zx/c/sccz80/fzx_buffer_partition_ww
+font/fzx/zx/c/sccz80/fzx_buffer_partition_ww_callee
 font/fzx/zx/c/sccz80/fzx_char_metrics
 font/fzx/zx/c/sccz80/fzx_char_metrics_callee
 font/fzx/zx/c/sccz80/fzx_mode

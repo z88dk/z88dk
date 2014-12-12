@@ -13,7 +13,7 @@ PUBLIC l_divu_32_32x16, l0_divu_32_32x16
 
 IF __CLIB_OPT_IMATH <= 50
 
-   EXTERN l_small_divu_32_32x16, l0_small_divu_32_32x16
+   EXTERN l_small_divu_32_32x32, l0_small_divu_32_32x32
 
 l_divu_32_32x16:
 

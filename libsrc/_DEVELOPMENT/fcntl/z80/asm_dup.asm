@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib.cfg.asm"
+INCLUDE "clib_cfg.asm"
 
 SECTION code_fcntl
 

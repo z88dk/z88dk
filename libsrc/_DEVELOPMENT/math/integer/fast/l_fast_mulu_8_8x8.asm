@@ -7,16 +7,6 @@ PUBLIC l_fast_mulu_8_8x8
 
 EXTERN l_fast_mulu_16_8x8
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_IMATH_FAST & $80
-
-   EXTERN error_mulu_overflow_mc
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-l_fast_mulu_8_8x8:
-
    ; unsigned multiplication of two 8-bit
    ; multiplicands into a sixteen bit product
    ;
@@ -44,6 +34,8 @@ l_fast_mulu_8_8x8:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_IMATH_FAST & $80
+
+   EXTERN error_mulu_overflow_mc
 
 l_fast_mulu_8_8x8:
 

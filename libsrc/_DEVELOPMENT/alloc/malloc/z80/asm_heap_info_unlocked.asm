@@ -158,7 +158,7 @@ allocated:
 
    push hl                     ; size
    push de                     ; address
-   pusb bc                     ; type
+   push bc                     ; type
 
    jr invoke
 

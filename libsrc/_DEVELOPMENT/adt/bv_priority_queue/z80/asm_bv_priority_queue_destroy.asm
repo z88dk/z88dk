@@ -20,7 +20,7 @@ asm_bv_priority_queue_destroy:
    inc hl
    inc hl
    
-   jp asm b_vector_destroy
+   jp asm_b_vector_destroy
 
    ; enter : hl = priority_queue *
    ;

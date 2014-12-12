@@ -14,14 +14,6 @@ SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
-EXTERN __stdlib_shellsort_i
-EXTERN __stdlib_shellsort_j
-EXTERN __stdlib_shellsort_t1
-EXTERN __stdlib_shellsort_t2
-EXTERN __stdlib_shellsort_jd
-EXTERN __stdlib_shellsort_base
-EXTERN __stdlib_shellsort_gap
-
 EXTERN l_mult, l_le, asm0_memswap
 
 asm_shellsort:
@@ -165,14 +157,6 @@ asm_shellsort:
 
 
 SECTION bss_stdlib
-
-PUBLIC __stdlib_shellsort_i
-PUBLIC __stdlib_shellsort_j
-PUBLIC __stdlib_shellsort_t1
-PUBLIC __stdlib_shellsort_t2
-PUBLIC __stdlib_shellsort_jd
-PUBLIC __stdlib_shellsort_base
-PUBLIC __stdlib_shellsort_gap
 
 __stdlib_shellsort_i:          defw 0
 __stdlib_shellsort_j:          defw 0

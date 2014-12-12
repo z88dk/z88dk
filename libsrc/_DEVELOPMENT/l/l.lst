@@ -1,5 +1,5 @@
 l/z80/l_bitset_locate
-l/z80/compare_de_hl
+l/z80/l_compare_de_hl
 l/z80/l_dec_bc
 l/z80/l_dec_de
 l/z80/l_ex_bc_de

@@ -4,7 +4,7 @@ SECTION code_fcntl
 PUBLIC zx_01_input_inkey_stdio_msg_flsh
 
 EXTERN zx_01_input_inkey_proc_getk_address
-EXTERN zx_01_input_stdio_msg_flsh
+EXTERN console_01_input_stdio_msg_flsh
 
 zx_01_input_inkey_stdio_msg_flsh:
 

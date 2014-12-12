@@ -36,7 +36,7 @@ IF __CLIB_OPT_ERROR
    ELSE
    
       defb __EFBIG
-      defb "EFBIG"
+      defm "EFBIG"
       defb 0
    
    ENDIF

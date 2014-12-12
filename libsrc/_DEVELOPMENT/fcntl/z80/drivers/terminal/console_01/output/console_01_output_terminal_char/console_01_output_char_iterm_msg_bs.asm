@@ -3,7 +3,10 @@ SECTION code_fcntl
 
 PUBLIC console_01_output_char_iterm_msg_bs
 
-EXTERN console_01_output_char_snap
+EXTERN OTERM_MSG_PRINTC
+EXTERN console_01_output_char_proc_snap
+EXTERN console_01_output_char_proc_get_coord
+EXTERN console_01_output_char_proc_set_coord
 
 console_01_output_char_iterm_msg_bs:
 

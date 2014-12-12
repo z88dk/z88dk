@@ -4,7 +4,7 @@ SECTION code_fcntl
 PUBLIC console_01_input_stdio_msg_seek
 
 EXTERN console_01_input_proc_getc
-EXTERN STDIO_MSG_CUR, l_decu_dehl, error_lzc
+EXTERN STDIO_MSG_CUR, l_decu_dehl, error_lzc, error_lznc
 
 console_01_input_stdio_msg_seek:
 

@@ -432,6 +432,10 @@ no_wrap_new:
    
 fill_byte:
 
+   ld a,b
+
+bf_loop:
+
    ld b,a
    rra                         ; expand incoming pixels
    ld c,a                      ; to the right and left within byte

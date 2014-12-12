@@ -43,7 +43,7 @@ __print_loop:
    inc hl
    inc d
    
-   djnz print_loop
+   djnz __print_loop
    
    ld a,(hl)
    ld (de),a

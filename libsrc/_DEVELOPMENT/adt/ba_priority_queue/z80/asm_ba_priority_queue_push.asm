@@ -13,7 +13,7 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC asm_ba_priority_queue_push, asm0_ba_priority_queue_push
 
-EXTERN asm_b_array_append_block, __b_heap_sift_up, error_mc
+EXTERN asm_b_array_append, __b_heap_sift_up, error_mc
 
 asm_ba_priority_queue_push:
 

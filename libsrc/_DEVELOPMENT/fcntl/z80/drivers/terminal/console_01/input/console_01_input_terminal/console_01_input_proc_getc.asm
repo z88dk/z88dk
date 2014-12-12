@@ -11,7 +11,7 @@ EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_BELL
 
 EXTERN console_01_input_proc_echo, l_setmem_hl, asm_b_array_clear
 EXTERN console_01_input_proc_oterm, l_inc_sp, l_jpix, l_offset_ix_de
-EXTERN asm_b_array_push_back, asm_b_array_at
+EXTERN asm_b_array_push_back, asm_b_array_at, asm_toupper
 
 console_01_input_proc_getc:
 
@@ -273,7 +273,7 @@ put_raw:
    pop af                      ; a = char
    
    cp CHAR_LF
-   jr nz, readline_loop
+   jp nz, readline_loop
 
 readline_done:
 readline_error:
