@@ -81,9 +81,9 @@ include(../../clib_instantiate_end.m4)
 
 SECTION code_crt_start
 
-PUBLIC __Exit
+PUBLIC __Start, __Exit
 
-__start:
+__Start:
 
    IF __crt_enable_restart = 0
    
@@ -98,31 +98,15 @@ __start:
    ; save stack address for safe exit
    
    ld (__sp),sp
+   include "../clib_init_sp.inc"
 
-   ; change stack address
-   
-   IF __register_sp != 0
-      
-      IF __register_sp = -1
-      
-         ld sp,0
-      
-      ELSE
-      
-         ld sp,__register_sp
-      
-      ENDIF
-   
-   ENDIF
-   
    ; parse command line
    
-   IF 1                        ; __crt_enable_commandline = 1
+   IF 1                        ; IF __crt_enable_commandline = 1
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
       
          ld hl,0
-         push hl               ; environment
          push hl               ; char *argv[]
          push hl               ; int argc
 
@@ -131,54 +115,15 @@ __start:
          ld hl,0
          push hl               ; int argc
          push hl               ; char *argv[]
-         push hl               ; environment
    
       ENDIF
    
    ENDIF
    
-   ; initialize bss section
+   ; initialize sections
    
-   EXTERN ASMHEAD_BSS, ASMSIZE_BSS
-
-   ld hl,ASMHEAD_BSS
-   ld bc,ASMSIZE_BSS
-   
-   ld e,0
-   
-   EXTERN asm_memset
-   call asm_memset
-   
-   ; initialize data section
-   
-   IF __crt_model = 1
-   
-      ; rom model + data segment is not compressed
-
-      EXTERN ASMTAIL_CODE, ASMHEAD_DATA, ASMSIZE_DATA
-
-      ld hl,ASMTAIL_CODE
-      ld de,ASMHEAD_DATA
-      ld bc,ASMSIZE_DATA
-      
-      EXTERN asm_memcpy
-      call asm_memcpy
-   
-   ENDIF
-   
-   IF __crt_model = 2
-   
-      ; rom model + data segment is compressed
-      
-      EXTERN ASMTAIL_CODE, ASMHEAD_DATA
-      
-      ld hl,ASMTAIL_CODE
-      ld de,ASMHEAD_DATA
-      
-      EXTERN asm_dzx7_standard
-      call asm_dzx7_standard
-   
-   ENDIF
+   include "../clib_init_bss.inc"
+   include "../clib_init_data.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
@@ -211,26 +156,22 @@ SECTION code_crt_return
 
    ; close files
    
-   IF __crt_enable_close
-   
-      include "../clib_close.inc"
-
-   ENDIF
+   include "../clib_close.inc"
 
    ; exit program
    
    IF __crt_enable_restart = 0
    
-      ; returning to caller
+      ; returning to basic
       
       pop bc                   ; bc = return status
       
       ld sp,(__sp)             ; reset stack location
       
+      exx
       pop hl
       exx
       pop iy
-      exx
       
       im 1
       ei
@@ -241,7 +182,7 @@ SECTION code_crt_return
       ; restarting program
       
       ld sp,(__sp)             ; reset stack location
-      jp __start
+      jp __Start
    
    ENDIF
 
