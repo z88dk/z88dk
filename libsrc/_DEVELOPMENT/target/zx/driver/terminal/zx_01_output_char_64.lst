@@ -1,0 +1,5 @@
+target/zx/driver/terminal/zx_01_output_char_64
+target/zx/driver/terminal/zx_01_output_char_64/zx_01_output_char_64/zx_01_output_char_64_oterm_msg_cls
+target/zx/driver/terminal/zx_01_output_char_64/zx_01_output_char_64/zx_01_output_char_64_oterm_msg_printc
+target/zx/driver/terminal/zx_01_output_char_64/zx_01_output_char_64/zx_01_output_char_64_oterm_msg_scroll
+target/zx/driver/terminal/zx_01_output_char_64/zx_01_output_char_64/zx_01_output_char_64_proc_stack_window_32

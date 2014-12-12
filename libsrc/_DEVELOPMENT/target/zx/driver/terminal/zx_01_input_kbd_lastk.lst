@@ -1,0 +1,5 @@
+target/zx/driver/terminal/zx_01_input_kbd_lastk
+target/zx/driver/terminal/zx_01_input_kbd_lastk/zx_01_input_lastk_iterm_msg_getc
+target/zx/driver/terminal/zx_01_input_kbd_lastk/zx_01_input_lastk_proc_lastk_address
+target/zx/driver/terminal/zx_01_input_kbd_lastk/zx_01_input_lastk_stdio_msg_flsh
+target/zx/driver/terminal/zx_01_input_kbd_lastk/zx_01_input_lastk_stdio_msg_ictl

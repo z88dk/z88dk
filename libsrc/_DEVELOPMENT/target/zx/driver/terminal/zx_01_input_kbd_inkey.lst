@@ -1,0 +1,5 @@
+target/zx/driver/terminal/zx_01_input_kbd_inkey
+target/zx/driver/terminal/zx_01_input_kbd_inkey/zx_01_input_inkey_iterm_msg_getc
+target/zx/driver/terminal/zx_01_input_kbd_inkey/zx_01_input_inkey_proc_getk_address
+target/zx/driver/terminal/zx_01_input_kbd_inkey/zx_01_input_inkey_stdio_msg_flsh
+target/zx/driver/terminal/zx_01_input_kbd_inkey/zx_01_input_inkey_stdio_msg_ictl
