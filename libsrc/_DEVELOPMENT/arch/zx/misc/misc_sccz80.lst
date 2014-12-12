@@ -1,3 +1,4 @@
+arch/zx/misc/z80/___sound_bit_state
 arch/zx/misc/c/sccz80/zx_border
 arch/zx/misc/c/sccz80/zx_cls
 arch/zx/misc/c/sccz80/zx_scroll_up

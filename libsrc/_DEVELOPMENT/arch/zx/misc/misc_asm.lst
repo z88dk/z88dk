@@ -1,3 +1,4 @@
+arch/zx/misc/z80/___sound_bit_state
 arch/zx/misc/z80/asm_zx_border
 arch/zx/misc/z80/asm_zx_cls
 arch/zx/misc/z80/asm_zx_cls_wc
