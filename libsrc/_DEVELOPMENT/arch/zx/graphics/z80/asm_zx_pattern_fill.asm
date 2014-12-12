@@ -102,7 +102,7 @@ asm_zx_pattern_fill:
    ;            hl = -1
    ;            carry set, errno = ENOMEM or EINVAL
    ;
-   ; uses  : af, bc, de, hl, ix, bc', de', hl'
+   ; uses  : af, bc, de, hl, ix
 
    ld a,h
    cp 192
@@ -433,6 +433,9 @@ no_wrap_new:
 fill_byte:
 
    ld a,b
+   xor (hl)                    ; zero out incoming pixels that run into display pixels
+   and b
+   ret z
 
 bf_loop:
 
