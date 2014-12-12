@@ -122,11 +122,11 @@ sample_loop_2:
    ;;
    ;; loop is timed for 3.5 MHZ cpu
 
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 16
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 16
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -152,11 +152,11 @@ sample_loop_2:
    ;;
    ;; loop is timed for 3.5 MHZ cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 75
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 75
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,11 +169,11 @@ sample_loop_2:
    ;;
    ;; loop is timed for a 3.5MHz cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 46
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 46
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -251,11 +251,11 @@ tone_loop_1:
    ;;
    ;; loop is timed for a 3.5MHz cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 80
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 80
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -285,11 +285,11 @@ waste_0:   djnz waste_0
    ;;
    ;; loop is timed for a 3.5MHz cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 174
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 174
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -383,11 +383,11 @@ period_continue:
    ;;
    ;; loop is timed for a 3.5MHz cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 77
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 77
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -413,11 +413,11 @@ period_continue:
    ;;
    ;; loop is timed for a 3.5MHz cpu
    
-   defc NOMINAL_CLOCK = 3500000
-   defc NOMINAL_T     = 99
-   defc TARGET_CLOCK  = __clock_freq
-   
-   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;   defc NOMINAL_CLOCK = 3500000
+;   defc NOMINAL_T     = 99
+;   defc TARGET_CLOCK  = __clock_freq
+;   
+;   INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
    ;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

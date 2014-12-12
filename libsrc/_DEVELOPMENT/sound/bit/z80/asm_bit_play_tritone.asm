@@ -486,11 +486,11 @@ duty_0:        cp 128
 bit_state_0:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
-               defc NOMINAL_CLOCK = 3500000
-               defc NOMINAL_T     = 64
-               defc TARGET_CLOCK  = __clock_freq
-               
-               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;               defc NOMINAL_CLOCK = 3500000
+;               defc NOMINAL_T     = 64
+;               defc TARGET_CLOCK  = __clock_freq
+;               
+;               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
                ; channel 1 gets some time beginning at bit output
                
@@ -503,11 +503,11 @@ duty_1:        cp 128
 bit_state_1:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
-               defc NOMINAL_CLOCK = 3500000
-               defc NOMINAL_T     = 64
-               defc TARGET_CLOCK  = __clock_freq
-               
-               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;               defc NOMINAL_CLOCK = 3500000
+;               defc NOMINAL_T     = 64
+;               defc TARGET_CLOCK  = __clock_freq
+;               
+;               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
                ; channel 2 gets some time beginning at bit output
                
@@ -522,11 +522,11 @@ bit_state_2:   or $00
                exx
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
-               defc NOMINAL_CLOCK = 3500000
-               defc NOMINAL_T     = 64
-               defc TARGET_CLOCK  = __clock_freq
-               
-               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
+;               defc NOMINAL_CLOCK = 3500000
+;               defc NOMINAL_T     = 64
+;               defc TARGET_CLOCK  = __clock_freq
+;               
+;               INCLUDE "sound/bit/z80/cpu_speed_compensate.inc"
 
                exx
                jp nz, sound_loop
