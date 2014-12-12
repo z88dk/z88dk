@@ -157,6 +157,11 @@ putchar_scroll:
 
    bit 6,(ix+6)
    jr z, scroll_immediate      ; if pause flag is reset
+   
+   dec (ix+20)
+   jr nz, scroll_immediate     ; if scroll limit not reached
+
+pause_scroll:
 
    ld a,ITERM_MSG_BELL
    call l_jpix                 ; send signal bell
