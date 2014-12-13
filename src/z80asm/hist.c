@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.124 2014-12-04 23:38:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.125 2014-12-13 00:50:55 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.124 2014-12-04 23:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.124  2014-12-04 23:38:55  pauloscustodio
+* Revision 1.125  2014-12-13 00:50:55  pauloscustodio
+* Implemented infrastructure to do parsing based on a RAGEL state machine,
+* and to fall back to the original parser on error. Implemented the first
+* two simple opcodes (NOP and HALT) as a concept check.
+*
+* Revision 1.124  2014/12/04 23:38:55  pauloscustodio
 * No longer needs to backtrack during parsing, remove ScanGetPos() and
 * ScanSetPos().
 *
@@ -2144,8 +2149,9 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	  simplifying the parser. As a side effect register names can no longer 
 	  be used as labels, but this would be confusing anyway.
 	  
-	- No longer needs to backtrack during parsing, remove ScanGetPos() and
-	  ScanSetPos().
+	- Implemented infrastructure to do parsing based on a RAGEL state machine, 
+	  and to fall back to the original parser on error. Implemented the first
+	  two simple opcodes (NOP and HALT) as a concept check.
 	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

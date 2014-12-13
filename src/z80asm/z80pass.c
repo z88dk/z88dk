@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.114 2014-12-04 23:30:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.115 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,6 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.114 2014-12-04 2
 #include "model.h"
 #include "modlink.h"
 #include "options.h"
+#include "parse.h"
 #include "scan.h"
 #include "srcfile.h"
 #include "strutil.h"
@@ -63,8 +64,8 @@ void Z80pass1( char *filename )
 	src_push();
 	{
 		src_open( filename, opts.inc_path );
-		tok = TK_NIL;
-		while ( tok != TK_END )
+		sym.tok = TK_NIL;
+		while ( sym.tok != TK_END )
 			parseline( ON );              /* before parsing it */
 	}
 	src_pop();
@@ -77,51 +78,65 @@ parseline( enum flag interpret )
 {
     next_PC();				/* update assembler program counter */
 	EOL = FALSE;			/* reset END OF LINE flag */
-    GetSym();
 
-    if ( tok == TK_DOT || tok == TK_LABEL )
-    {
-        if ( interpret == ON )
-        {
-            /* Generate only possible label declaration if line parsing is allowed */
-            if ( tok == TK_LABEL || GetSym() == TK_NAME )
-            {
-                /* labels must always be touched due to forward referencing problems in expressions */
-                define_symbol( tok_name, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+	scan_error = FALSE;		/* detect errors in GetSym() */
+	GetSym();
 
-                GetSym();      /* check for another identifier */
-            }
-            else
-            {
-                error_illegal_ident();       /* a name must follow a label declaration */
-                return;       /* read in a new source line */
-            }
-        }
-        else
-        {
-            Skipline();
-            tok = TK_NEWLINE;    /* ignore label and rest of line */
-        }
-    }
-
-    switch ( tok )
-    {
-    case TK_NAME:
-        ParseIdent( interpret );
-        break;
-
-    case TK_END:
-    case TK_NEWLINE:
-        break;                /* empty line, get next... */
-
-    default:
-        if ( interpret == ON )
-        {
-            error_syntax();    /* Syntax error */
+	if (scan_error)
+		Skipline();
+	else if (!parse_statement(interpret))
+	{
+		/* scan error reported during parse_statement() */
+		if (scan_error)
+		{
 			Skipline();
-        }
-    }
+		}
+		else
+		{
+			if (sym.tok == TK_DOT || sym.tok == TK_LABEL)
+			{
+				if (interpret == ON)
+				{
+					/* Generate only possible label declaration if line parsing is allowed */
+					if (sym.tok == TK_LABEL || GetSym() == TK_NAME)
+					{
+						/* labels must always be touched due to forward referencing problems in expressions */
+						define_symbol(sym.string, get_PC(), TYPE_ADDRESS, SYM_TOUCHED);
 
+						GetSym();      /* check for another identifier */
+					}
+					else
+					{
+						error_illegal_ident();       /* a name must follow a label declaration */
+						return;       /* read in a new source line */
+					}
+				}
+				else
+				{
+					Skipline();
+					sym.tok = TK_NEWLINE;    /* ignore label and rest of line */
+				}
+			}
+
+			switch (sym.tok)
+			{
+			case TK_NAME:
+				ParseIdent(interpret);
+				break;
+
+			case TK_END:
+			case TK_NEWLINE:
+				break;                /* empty line, get next... */
+
+			default:
+				if (interpret == ON)
+				{
+					error_syntax();    /* Syntax error */
+					Skipline();
+				}
+			}
+		}
+	}
     list_end_line();				/* Write current source line to list file */
 }
 
@@ -143,7 +158,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is TRUE, interpret lines until #else or #endif */
-                if ( tok != TK_END )
+                if ( sym.tok != TK_END )
                 {
                     parseline( ON );
                 }
@@ -152,14 +167,14 @@ ifstatement( enum flag interpret )
                     return;    /* end of file - exit from this #if level */
                 }
             }
-            while ( ( tok != TK_ELSE_STMT ) && ( tok != TK_ENDIF_STMT ) );
+            while ( ( sym.tok != TK_ELSE_STMT ) && ( sym.tok != TK_ENDIF_STMT ) );
 
-            if ( tok == TK_ELSE_STMT )
+            if ( sym.tok == TK_ELSE_STMT )
             {
                 do
                 {
                     /* then ignore lines until #endif ... */
-                    if ( tok != TK_END )
+                    if ( sym.tok != TK_END )
                     {
                         parseline( OFF );
                     }
@@ -168,7 +183,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( tok != TK_ENDIF_STMT );
+                while ( sym.tok != TK_ENDIF_STMT );
             }
         }
         else
@@ -176,7 +191,7 @@ ifstatement( enum flag interpret )
             do
             {
                 /* expression is FALSE, ignore until #else or #endif */
-                if ( tok != TK_END )
+                if ( sym.tok != TK_END )
                 {
                     parseline( OFF );
                 }
@@ -185,13 +200,13 @@ ifstatement( enum flag interpret )
                     return;
                 }
             }
-            while ( ( tok != TK_ELSE_STMT ) && ( tok != TK_ENDIF_STMT ) );
+            while ( ( sym.tok != TK_ELSE_STMT ) && ( sym.tok != TK_ENDIF_STMT ) );
 
-            if ( tok == TK_ELSE_STMT )
+            if ( sym.tok == TK_ELSE_STMT )
             {
                 do
                 {
-                    if ( tok != TK_END )
+                    if ( sym.tok != TK_END )
                     {
                         parseline( ON );
                     }
@@ -200,7 +215,7 @@ ifstatement( enum flag interpret )
                         return;
                     }
                 }
-                while ( tok != TK_ENDIF_STMT );
+                while ( sym.tok != TK_ENDIF_STMT );
             }
         }
     }
@@ -209,7 +224,7 @@ ifstatement( enum flag interpret )
         do
         {
             /* don't evaluate #if expression and ignore all lines until #endif */
-            if ( tok != TK_END )
+            if ( sym.tok != TK_END )
             {
                 parseline( OFF );
             }
@@ -218,10 +233,10 @@ ifstatement( enum flag interpret )
                 return;    /* end of file - exit from this IF level */
             }
         }
-        while ( tok != TK_ENDIF_STMT );
+        while ( sym.tok != TK_ENDIF_STMT );
     }
 
-    tok = TK_NIL;
+    sym.tok = TK_NIL;
 }
 
 
@@ -413,7 +428,7 @@ Bool Pass2info( range_t range,				/* allowed size of value to be parsed */
 	/* Offset of (ix+d) should be optional; '+' or '-' are necessary */
 	if (range == RANGE_BYTE_SIGNED)
 	{
-		switch (tok)
+		switch (sym.tok)
 		{
 		case TK_RPAREN:
 			append_byte(0);		/* offset zero */
@@ -432,7 +447,7 @@ Bool Pass2info( range_t range,				/* allowed size of value to be parsed */
 
 	expr = expr_parse();
 
-	if (range == RANGE_BYTE_SIGNED && tok != TK_RPAREN)
+	if (range == RANGE_BYTE_SIGNED && sym.tok != TK_RPAREN)
 	{
 		error_syntax();
 		return FALSE;		/* FAIL */

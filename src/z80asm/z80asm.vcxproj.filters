@@ -147,6 +147,15 @@
     <ClInclude Include="lib\dlist.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="parse_rules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\utarray.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -256,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="lib\dlist.c">
       <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="parse.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

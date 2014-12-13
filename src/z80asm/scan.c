@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.54 2014-12-04 23:38:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.55 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,35 +30,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.54 2014-12-04 23:38
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
-* 	Globals - last token retrieved
+* 	Globals
 *----------------------------------------------------------------------------*/
-tokid_t		 tok			= TK_NIL;
-
-char		*tok_text       = "";
-
-static Str	*tok_name_buf   = NULL;
-char		*tok_name       = "";
-
-static Str	*tok_string_buf = NULL;
-char		*tok_string     = "";
-
-long		 tok_number		= 0;
-int			 tok_flag = FLAG_NONE;
-int			 tok_reg8 = REG8_NONE;
-int			 tok_reg16_af = REG16_NONE;
-int			 tok_reg16_sp = REG16_NONE;
-int			 tok_ind_reg16 = IND_REG16_NONE;
-int			 tok_idx_reg = IDX_REG_HL;
-int	         tok_ds_size = 0;
-
-void       (*tok_parser)(void) = NULL;
-
-Bool EOL;								/* scanner EOL state */
+Sym  sym;
+Bool EOL;
+Bool scan_error;
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
 *----------------------------------------------------------------------------*/
-static Str  *input_buf	= NULL;			/* current input buffer */
+static Str  *input_buf = NULL;			/* current input buffer */
 static List *input_stack;				/* stack of previous contexts */
 
 static Bool	 at_bol;					/* true if at beginning of line */
@@ -66,25 +47,59 @@ static Bool	 at_bol;					/* true if at beginning of line */
 static int	 cs, act;					/* Ragel state variables */
 static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
-/*-----------------------------------------------------------------------------
-*   Clear the current token
-*----------------------------------------------------------------------------*/
-static void init_tok( void )
-{
-	tok = TK_END;
-	tok_text = "";
-	tok_number = 0;
-	tok_flag = FLAG_NONE;
-	tok_reg8 = REG8_NONE;
-	tok_reg16_af = REG16_NONE;
-	tok_reg16_sp = REG16_NONE;
-	tok_ind_reg16 = IND_REG16_NONE;
-	tok_idx_reg = IDX_REG_HL;
-	tok_ds_size = 0;
-	tok_parser = NULL;
+static DEFINE_STR(sym_string, MAXLINE);
 
-	Str_clear(tok_name_buf);
-	Str_clear(tok_string_buf);
+/* save scan status */
+static Sym	 save_sym;
+static Bool	 save_at_bol, save_EOL;
+static char *save_p;
+static DEFINE_STR(save_sym_string, MAXLINE);
+
+/*-----------------------------------------------------------------------------
+* 	Init, save and restore current sym
+*----------------------------------------------------------------------------*/
+static void init_sym(void)
+{
+	sym.tok = TK_END;
+	sym.text = "";
+	sym.string = "";
+	sym.filename = NULL;
+	sym.line_nr = 0;
+	sym.number = 0;
+	sym.ds_size = 0;
+#if 0
+	sym.parser = NULL;
+#endif
+	sym.cpu_flag = FLAG_NONE;
+	sym.cpu_reg8 = REG8_NONE;
+	sym.cpu_reg16_af = REG16_NONE;
+	sym.cpu_reg16_sp = REG16_NONE;
+	sym.cpu_ind_reg16 = IND_REG16_NONE;
+	sym.cpu_idx_reg = IDX_REG_HL;
+}
+
+void save_scan_state(void)
+{
+	save_sym = sym;
+
+	Str_set(save_sym_string, sym_string->str);
+	save_sym.string = save_sym_string->str;
+
+	save_at_bol = at_bol;
+	save_EOL = EOL;
+	save_p = p;
+}
+
+void restore_scan_state(void)
+{
+	sym = save_sym;
+
+	Str_set(sym_string, save_sym_string->str);
+	sym.string = sym_string->str;
+
+	at_bol = save_at_bol;
+	EOL = save_EOL;
+	p = save_p;
 }
 
 /*-----------------------------------------------------------------------------
@@ -92,25 +107,19 @@ static void init_tok( void )
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
-	tok_name_buf = OBJ_NEW(Str);
-	Str_set_alias( tok_name_buf, &tok_name );
-
-	tok_string_buf = OBJ_NEW(Str);
-	Str_set_alias( tok_string_buf, &tok_string );
-
 	input_buf = OBJ_NEW(Str);
 	Str_set_alias( input_buf, &p );		/* Ragel pointer to current scan position */
 
 	input_stack	 = OBJ_NEW(List);
 	input_stack->free_data = xfreef;
 
-	init_tok();
+	init_sym();
+	save_scan_state();
+	scan_error = FALSE;
 }
 
 DEFINE_fini()
 {
-	OBJ_DELETE(tok_name_buf);
-	OBJ_DELETE(tok_string_buf);
 	OBJ_DELETE(input_buf);
 	OBJ_DELETE(input_stack);
 }
@@ -176,7 +185,8 @@ static long scan_num ( char *text, int length, int base )
 *----------------------------------------------------------------------------*/
 static void set_tok_name( void )
 {
-	Str_set_n(  tok_name_buf, ts, te-ts );
+	Str_set_n(sym_string, ts, te - ts);
+	sym.string = sym_string->str;
 }
 
 /*-----------------------------------------------------------------------------
@@ -184,7 +194,7 @@ static void set_tok_name( void )
 *	end with p pointing at the end quote, copy characters to tok_string
 *	handling C escape sequences. Return false if string not terminated.
 *----------------------------------------------------------------------------*/
-static Bool get_tok_string( void )
+static Bool get_sym_string( void )
 {
 	char quote;
 
@@ -203,15 +213,22 @@ static Bool get_tok_string( void )
 		else if ( *p == quote )
 		{
 			te = p;
-			Str_set_n( tok_string_buf, ts, te - ts );
-			Str_compress_escapes( tok_string_buf );
+
+			Str_set_n(sym_string, ts, te - ts);
+			sym.string = sym_string->str;
+
+			Str_compress_escapes(sym_string);
+
 			return TRUE;
 		}
 		else if ( *p == '\n' || *p == '\0' )
 		{
 			te = p;
 			p--;						/* point to before separator */
-			Str_clear( tok_string_buf );
+
+			Str_clear(sym_string);
+			sym.string = sym_string->str;
+
 			return FALSE;
 		}
 		p++;
@@ -290,15 +307,15 @@ tokid_t GetSym( void )
 {
 	init();
 
-	init_tok();
+	init_sym();
 
 	/* keep returning TK_NEWLINE until EOL is cleared 
 	*  NOTE: HACK for inconsistent parser in handling newlines, should be removed */
 	if ( EOL )
 	{
 		at_bol = TRUE;
-		tok_text = "\n";
-		return (tok = TK_NEWLINE);			/* assign and return */
+		sym.text = "\n";
+		return (sym.tok = TK_NEWLINE);			/* assign and return */
 	}
 
 	/* loop filling buffer when needed */
@@ -307,18 +324,19 @@ tokid_t GetSym( void )
 		/* refill buffer if needed, check for end of file */
 		if ( ! fill_buffer() )
 		{
-			tok = TK_END;
+			sym.tok = TK_END;
 			break;
 		}
 
 		/* run the state machine */
-		tok = _scan_get();
+		sym.tok = _scan_get();
 
-	} while ( tok == TK_END );
+	} while ( sym.tok == TK_END );
 
-	at_bol = EOL = (tok == TK_NEWLINE) ? TRUE : FALSE;
-	return tok;
+	at_bol = EOL = (sym.tok == TK_NEWLINE) ? TRUE : FALSE;
+	return sym.tok;
 }
+
 
 /* get the next token, error if not the expected one */
 void GetSymExpect(tokid_t expected_tok)
@@ -333,7 +351,7 @@ void GetSymExpect(tokid_t expected_tok)
 void CurSymExpect(tokid_t expected_tok)
 {
 	init();
-	if (tok != expected_tok)
+	if (sym.tok != expected_tok)
 		error_syntax();
 }
 

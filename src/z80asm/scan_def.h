@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.4 2014-12-04 23:30:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.5 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -71,10 +71,9 @@ TOKEN(TK_CONST_EXPR, "#", )
 TOKEN(TK_MOD, "%", )
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(	TK_STRING_CAT,	"&", )
+TOKEN(TK_STRING_CAT, "&", )
 #else
 TOKEN(TK_BIN_AND, "&", )
-#define TK_STRING_CAT	TK_COMMA
 #endif
 
 TOKEN(TK_LOG_AND, "&&", )
@@ -93,8 +92,7 @@ TOKEN(TK_DIVIDE, "/", )
 /* no token for "0" .. "9" */
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(	TK_BIN_XOR,		":", )
-#define TK_COLON		TK_INVALID
+TOKEN(TK_BIN_XOR, ":", )
 #else
 TOKEN(TK_COLON, ":", )
 #endif
@@ -113,7 +111,6 @@ TOKEN(TK_RIGHT_SHIFT, ">>", )
 TOKEN(TK_GREATER_EQ, ">=", )
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
-#define TK_QUESTION		TK_INVALID
 #else
 TOKEN(TK_QUESTION, "?", )
 #endif
@@ -143,7 +140,6 @@ TOKEN(TK_RCURLY, "}", )
 
 #ifdef __LEGACY_Z80ASM_SYNTAX
 TOKEN(	TK_BIN_AND,		"~", )
-#define TK_BIN_NOT		TK_INVALID
 #else
 TOKEN(TK_BIN_NOT, "~", )
 #endif
@@ -151,34 +147,44 @@ TOKEN(TK_BIN_NOT, "~", )
 /*-----------------------------------------------------------------------------
 *	Assembly keywords
 *----------------------------------------------------------------------------*/
-#define SET_IX		tok_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX
-#define SET_IY		tok_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY
+#define SET_IX		sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX
+#define SET_IY		sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY
+
+#define FOR_Z80		if ( opts.cpu & CPU_RABBIT ) { \
+						error_illegal_ident(); \
+						scan_error = TRUE; \
+					}
+						
+#define FOR_RABBIT	if ( ! (opts.cpu & CPU_RABBIT) ) { \
+						error_illegal_ident(); \
+						scan_error = TRUE; \
+					}	
 
 /* flags */
-TOKEN(TK_NZ, "NZ", tok_flag = FLAG_NZ)
-TOKEN(TK_Z, "Z", tok_flag = FLAG_Z)
-TOKEN(TK_NC, "NC", tok_flag = FLAG_NC)
-TOKEN(TK_C, "C", tok_flag = FLAG_C; tok_reg8 = REG8_C)
-TOKEN(TK_PO, "PO", tok_flag = FLAG_PO)
-TOKEN(TK_PE, "PE", tok_flag = FLAG_PE)
-TOKEN(TK_P, "P", tok_flag = FLAG_P)
-TOKEN(TK_M, "M", tok_flag = FLAG_M)
+TOKEN(TK_NZ, "NZ", sym.cpu_flag = FLAG_NZ)
+TOKEN(TK_Z, "Z", sym.cpu_flag = FLAG_Z)
+TOKEN(TK_NC, "NC", sym.cpu_flag = FLAG_NC)
+TOKEN(TK_C, "C", sym.cpu_flag = FLAG_C; sym.cpu_reg8 = REG8_C)
+TOKEN(TK_PO, "PO", sym.cpu_flag = FLAG_PO)
+TOKEN(TK_PE, "PE", sym.cpu_flag = FLAG_PE)
+TOKEN(TK_P, "P", sym.cpu_flag = FLAG_P)
+TOKEN(TK_M, "M", sym.cpu_flag = FLAG_M)
 
 /* 8-bit registers */
-TOKEN(TK_B, "B", tok_reg8 = REG8_B)
+TOKEN(TK_B, "B", sym.cpu_reg8 = REG8_B)
 
-TOKEN(TK_D, "D", tok_reg8 = REG8_D)
-TOKEN(TK_E, "E", tok_reg8 = REG8_E)
+TOKEN(TK_D, "D", sym.cpu_reg8 = REG8_D)
+TOKEN(TK_E, "E", sym.cpu_reg8 = REG8_E)
 
-TOKEN(TK_H, "H", tok_reg8 = REG8_H)
-TOKEN(TK_IXH, "IXH", tok_reg8 = REG8_H; SET_IX)
-TOKEN(TK_IYH, "IYH", tok_reg8 = REG8_H; SET_IY)
+TOKEN(TK_H, "H", sym.cpu_reg8 = REG8_H)
+TOKEN(TK_IXH, "IXH", sym.cpu_reg8 = REG8_H; SET_IX)
+TOKEN(TK_IYH, "IYH", sym.cpu_reg8 = REG8_H; SET_IY)
 
-TOKEN(TK_L, "L", tok_reg8 = REG8_L)
-TOKEN(TK_IXL, "IXL", tok_reg8 = REG8_L; SET_IX)
-TOKEN(TK_IYL, "IYL", tok_reg8 = REG8_L; SET_IY)
+TOKEN(TK_L, "L", sym.cpu_reg8 = REG8_L)
+TOKEN(TK_IXL, "IXL", sym.cpu_reg8 = REG8_L; SET_IX)
+TOKEN(TK_IYL, "IYL", sym.cpu_reg8 = REG8_L; SET_IY)
 
-TOKEN(TK_A, "A", tok_reg8 = REG8_A)
+TOKEN(TK_A, "A", sym.cpu_reg8 = REG8_A)
 
 TOKEN(TK_F, "F", )
 
@@ -192,36 +198,40 @@ TOKEN(TK_EIR, "EIR", )
 TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
 
 /* 16-bit registers */
-TOKEN(TK_BC, "BC", tok_reg16_af = tok_reg16_sp = REG16_BC)
-TOKEN(TK_DE, "DE", tok_reg16_af = tok_reg16_sp = REG16_DE)
+TOKEN(TK_BC, "BC", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_BC)
+TOKEN(TK_DE, "DE", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_DE)
 
-TOKEN(TK_HL, "HL", tok_reg16_af = tok_reg16_sp = REG16_HL)
-TOKEN(TK_IX, "IX", tok_reg16_af = tok_reg16_sp = REG16_HL; SET_IX)
-TOKEN(TK_IY, "IY", tok_reg16_af = tok_reg16_sp = REG16_HL; SET_IY)
+TOKEN(TK_HL, "HL", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL)
+TOKEN(TK_IX, "IX", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IX)
+TOKEN(TK_IY, "IY", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IY)
 
-TOKEN(TK_AF, "AF", tok_reg16_af = REG16_AF)
-TOKEN(TK_SP, "SP", tok_reg16_sp = REG16_SP)
+TOKEN(TK_AF, "AF", sym.cpu_reg16_af = REG16_AF)
+TOKEN(TK_SP, "SP", sym.cpu_reg16_sp = REG16_SP)
 
 TOKEN(TK_AF1, "AF'", )
 
 /* indirect 16-bit registers */
-TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", tok_ind_reg16 = IND_REG16_BC)
-TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", tok_ind_reg16 = IND_REG16_DE)
+TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_BC)
+TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_DE)
 
-TOKEN_RE(TK_IND_HL, "(HL)", "(" hspace "HL"i hspace ")", tok_ind_reg16 = IND_REG16_HL)
+TOKEN_RE(TK_IND_HL, "(HL)", "(" hspace "HL"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_HL)
 
 TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, 
-		 p--; te--; tok_ind_reg16 = IND_REG16_HL; SET_IX)
+		 p--; te--; sym.cpu_ind_reg16 = IND_REG16_HL; SET_IX)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, 
-		 p--; te--; tok_ind_reg16 = IND_REG16_HL; SET_IY)
+		 p--; te--; sym.cpu_ind_reg16 = IND_REG16_HL; SET_IY)
 
 TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
 
 /* DEFGROUP storage specifiers */
-TOKEN(TK_DS_B, "DS.B", tok_ds_size = 1 )
-TOKEN(TK_DS_W, "DS.W", tok_ds_size = 2 )
-TOKEN(TK_DS_P, "DS.P", tok_ds_size = 3 )
-TOKEN(TK_DS_L, "DS.L", tok_ds_size = 4 )
+TOKEN(TK_DS_B, "DS.B", sym.ds_size = 1 )
+TOKEN(TK_DS_W, "DS.W", sym.ds_size = 2 )
+TOKEN(TK_DS_P, "DS.P", sym.ds_size = 3 )
+TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
+
+/* Z80 opcode specifiers */
+TOKEN(TK_HALT, "HALT", FOR_Z80 )
+TOKEN(TK_NOP,  "NOP", )
 
 #undef TOKEN_RE
 #undef TOKEN

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.24 2014-09-11 22:28:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.25 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -393,8 +393,8 @@ static Bool Expr_parse_ternary_cond( Expr *expr );
 															\
 		while ( condition )									\
 		{													\
-			op = tok;										\
-			Str_append(self->text, tok_text);				\
+			op = sym.tok;									\
+			Str_append(self->text, sym.text);				\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
 				return FALSE;								\
@@ -412,19 +412,19 @@ static Bool Expr_parse_factor( Expr *self )
 {
     Symbol  *symptr;
 
-    switch ( tok )
+    switch ( sym.tok )
     {
 	case TK_ASMPC:				/* BUG_0047 */
 		ExprOp_init_asmpc( ExprOpArray_push( self->rpn_ops ) );
 		self->sym_type = MAX( self->sym_type, TYPE_ADDRESS );
 
-		Str_append(self->text, tok_text);
+		Str_append(self->text, sym.text);
 		
 		GetSym();
 		break;
 
     case TK_NAME:
-		symptr = get_used_symbol( tok_name );
+		symptr = get_used_symbol( sym.string );
 		
 		ExprOp_init_symbol( ExprOpArray_push( self->rpn_ops ),
 							symptr );
@@ -438,15 +438,15 @@ static Bool Expr_parse_factor( Expr *self )
 			self->result.not_evaluable		= TRUE;
         }
 
-        Str_append(self->text, tok_name);		/* add identifier to infix expr */
+        Str_append(self->text, sym.string);		/* add identifier to infix expr */
 
         GetSym();
         break;
 
 	case TK_NUMBER:
-		Str_append_sprintf(self->text, "%ld", tok_number);
+		Str_append_sprintf(self->text, "%ld", sym.number);
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
-							tok_number );
+							sym.number );
 		self->sym_type = MAX( self->sym_type, TYPE_CONSTANT );
         GetSym();
         break;
@@ -463,10 +463,10 @@ static Bool Expr_parse_unary( Expr *self )
 {
     tokid_t open_paren;
 
-	switch (tok) 
+	switch (sym.tok) 
 	{
     case TK_MINUS:
-        Str_append(self->text, tok_text);
+        Str_append(self->text, sym.text);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -480,7 +480,7 @@ static Bool Expr_parse_unary( Expr *self )
         return Expr_parse_unary( self );
 
     case TK_BIN_NOT:
-        Str_append(self->text, tok_text);
+        Str_append(self->text, sym.text);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -490,7 +490,7 @@ static Bool Expr_parse_unary( Expr *self )
 		return TRUE;
 
     case TK_LOG_NOT:
-        Str_append(self->text, tok_text);
+        Str_append(self->text, sym.text);
         GetSym();
 
         if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
@@ -502,19 +502,19 @@ static Bool Expr_parse_unary( Expr *self )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-        Str_append(self->text, tok_text);
-        open_paren = tok;
+        Str_append(self->text, sym.text);
+        open_paren = sym.tok;
         GetSym();
 
         if ( ! Expr_parse_ternary_cond( self ) )
 			return FALSE;
 
 		/* chack parentheses balance */
-        if ( ( open_paren == TK_LPAREN  && tok != TK_RPAREN ) ||
-             ( open_paren == TK_LSQUARE && tok != TK_RSQUARE ) )
+        if ( ( open_paren == TK_LPAREN  && sym.tok != TK_RPAREN ) ||
+             ( open_paren == TK_LSQUARE && sym.tok != TK_RSQUARE ) )
 			return FALSE;
 
-        Str_append(self->text, tok_text);
+        Str_append(self->text, sym.text);
         GetSym();
 		return TRUE;
 
@@ -529,9 +529,9 @@ static Bool Expr_parse_power( Expr *self )
     if ( ! Expr_parse_unary( self ) )
         return FALSE;
 
-    while ( tok == TK_POWER )
+    while ( sym.tok == TK_POWER )
     {
-        Str_append(self->text, tok_text);
+        Str_append(self->text, sym.text);
         GetSym();
 		if ( ! Expr_parse_power( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -545,37 +545,37 @@ static Bool Expr_parse_power( Expr *self )
 
 /* parse A * B, A / B, A % B */
 DEFINE_PARSER( Expr_parse_multiplication, Expr_parse_power, 
-			   tok == TK_MULTIPLY || tok == TK_DIVIDE || tok == TK_MOD )
+			   sym.tok == TK_MULTIPLY || sym.tok == TK_DIVIDE || sym.tok == TK_MOD )
 
 /* parse A + B, A - B */
 DEFINE_PARSER( Expr_parse_addition, Expr_parse_multiplication,
-			   tok == TK_PLUS || tok == TK_MINUS )
+			   sym.tok == TK_PLUS || sym.tok == TK_MINUS )
 
 /* parse A << B, A >> B */
 DEFINE_PARSER( Expr_parse_binary_shift, Expr_parse_addition,
-			   tok == TK_LEFT_SHIFT || tok == TK_RIGHT_SHIFT )
+			   sym.tok == TK_LEFT_SHIFT || sym.tok == TK_RIGHT_SHIFT )
 
 /* parse A == B, A < B, A <= B, A > B, A >= B, A != B */
 DEFINE_PARSER( Expr_parse_condition, Expr_parse_binary_shift, 
-			   tok == TK_LESS	|| tok == TK_LESS_EQ ||
-			   tok == TK_EQUAL	|| tok == TK_NOT_EQ  ||
-			   tok == TK_GREATER|| tok == TK_GREATER_EQ )
+			   sym.tok == TK_LESS	|| sym.tok == TK_LESS_EQ ||
+			   sym.tok == TK_EQUAL	|| sym.tok == TK_NOT_EQ  ||
+			   sym.tok == TK_GREATER|| sym.tok == TK_GREATER_EQ )
 
 /* parse A & B */
 DEFINE_PARSER( Expr_parse_binary_and, Expr_parse_condition, 
-			   tok == TK_BIN_AND )
+			   sym.tok == TK_BIN_AND )
 
 /* parse A | B, A ^ B */
 DEFINE_PARSER( Expr_parse_binary_or, Expr_parse_binary_and, 
-			   tok == TK_BIN_OR || tok == TK_BIN_XOR )
+			   sym.tok == TK_BIN_OR || sym.tok == TK_BIN_XOR )
 
 /* parse A && B */
 DEFINE_PARSER( Expr_parse_logical_and, Expr_parse_binary_or, 
-			   tok == TK_LOG_AND )
+			   sym.tok == TK_LOG_AND )
 
 /* parse A || B */
 DEFINE_PARSER( Expr_parse_logical_or, Expr_parse_logical_and, 
-			   tok == TK_LOG_OR )
+			   sym.tok == TK_LOG_OR )
 
 /* parse cond ? true : false */
 static Bool Expr_parse_ternary_cond( Expr *self )
@@ -583,7 +583,7 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 	if ( ! Expr_parse_logical_or(self) )		/* get cond or expression */
 		return FALSE;
 
-	if ( tok != TK_QUESTION )
+	if ( sym.tok != TK_QUESTION )
 		return TRUE;
 
 	/* ternary construct found */
@@ -593,7 +593,7 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 	if ( ! Expr_parse_ternary_cond(self) )	/* get true */
 		return FALSE;
 
-	if ( tok != TK_COLON )
+	if ( sym.tok != TK_COLON )
 		return FALSE;
     Str_append_char(self->text, ':');
 	GetSym();						/* consume ':' */
@@ -613,9 +613,9 @@ Expr *expr_parse( void )
 	Expr *self = OBJ_NEW( Expr );
     Bool is_const_expr = FALSE;
 
-    if ( tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
+    if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
-		Str_append(self->text, tok_text);
+		Str_append(self->text, sym.text);
 
 		GetSym();               
         is_const_expr = TRUE;

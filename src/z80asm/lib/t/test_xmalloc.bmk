@@ -26,6 +26,7 @@
 [WARN] (lib/xmalloc.c(98) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
 [WARN] (lib/xmalloc.c(98) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
 [WARN] (lib/xmalloc.c(98) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
+[WARN] (lib/xmalloc.c(98) errno: Not enough space) memory leak (134217728 bytes) allocated at lib/t/test_xmalloc.c(37)
 
 > Exit: 1
 

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.106 2014-12-04 23:30:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.107 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -57,13 +57,13 @@ Parsevarsize( void )
 {
     long offset = 0, varsize, size_multiplier;
 
-	if (!tok_ds_size)
+	if (!sym.ds_size)
 	{
 		varsize = 0;
 	}
 	else
 	{
-		varsize = tok_ds_size;
+		varsize = sym.ds_size;
 		GetSym();
 
 		if (expr_parse_eval(&size_multiplier))		/* error in expr_parse_eval() if failed */
@@ -89,9 +89,9 @@ Parsedefvarsize( long offset )
 {
     long varoffset = 0;
 
-	if (tok == TK_NAME)
+	if (sym.tok == TK_NAME)
 	{
-		define_symbol(tok_name, offset, TYPE_CONSTANT, 0);
+		define_symbol(sym.string, offset, TYPE_CONSTANT, 0);
 		GetSym();
 	}
 
@@ -131,7 +131,7 @@ DEFVARS( void )
         }
     }
 
-    while ( tok != TK_END && tok != TK_LCURLY )
+    while ( sym.tok != TK_END && sym.tok != TK_LCURLY )
     {
         Skipline();
 
@@ -139,9 +139,9 @@ DEFVARS( void )
         GetSym();
     }
 
-    if ( tok == TK_LCURLY )
+    if ( sym.tok == TK_LCURLY )
     {
-        while ( tok != TK_END && GetSym() != TK_RCURLY )
+        while ( sym.tok != TK_END && GetSym() != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -169,15 +169,15 @@ DEFGROUP( void )
     long constant, enumconst = 0;
 	DEFINE_STR( name, MAXLINE );
 
-    while ( tok != TK_END && GetSym() != TK_LCURLY )
+    while ( sym.tok != TK_END && GetSym() != TK_LCURLY )
     {
         Skipline();
         EOL = FALSE;
     }
 
-    if ( tok == TK_LCURLY )
+    if ( sym.tok == TK_LCURLY )
     {
-        while ( tok != TK_END && tok != TK_RCURLY )
+        while ( sym.tok != TK_END && sym.tok != TK_RCURLY )
         {
             if ( EOL )
             {
@@ -189,14 +189,14 @@ DEFGROUP( void )
                 {
                     GetSym();
 
-                    switch ( tok )
+                    switch ( sym.tok )
                     {
                     case TK_RCURLY:
                     case TK_NEWLINE:
                         break;
 
                     case TK_NAME:
-						Str_set( name, tok_name );     /* remember name */
+						Str_set( name, sym.string );     /* remember name */
 
                         if ( GetSym() == TK_EQUAL )
                         {
@@ -232,7 +232,7 @@ DEFGROUP( void )
                         break;
                     }
                 }
-                while ( tok == TK_COMMA );   /* get enum definitions separated by comma in current line */
+                while ( sym.tok == TK_COMMA );   /* get enum definitions separated by comma in current line */
 
                 Skipline();   /* ignore rest of line */
             }
@@ -265,7 +265,7 @@ DEFS()
             constant = Expr_eval( expr );
             OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
 
-            if ( tok != TK_COMMA )
+            if ( sym.tok != TK_COMMA )
             {
                 val = 0;
             }
@@ -313,12 +313,12 @@ UNDEFINE( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            tok = find_local_symbol( tok_name );
+            tok = find_local_symbol( sym.string );
         }
 
         if ( tok != NULL )
         {
-            SymbolHash_remove( CURRENTMODULE->local_symtab, tok_name );
+            SymbolHash_remove( CURRENTMODULE->local_symtab, sym.string );
         }
         else
         {
@@ -336,7 +336,7 @@ DEFINE( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            define_local_def_sym( tok_name, 1 );
+            define_local_def_sym( sym.string, 1 );
         }
         else
         {
@@ -359,7 +359,7 @@ DEFC( void )
     {
         if ( GetSym() == TK_NAME )
         {
-			Str_set( name, tok_name ); /* remember name */
+			Str_set( name, sym.string ); /* remember name */
 
             if ( GetSym() == TK_EQUAL )
             {
@@ -413,7 +413,7 @@ DEFC( void )
             break;
         }
     }
-    while ( tok == TK_COMMA );       /* get all DEFC definition separated by comma */
+    while ( sym.tok == TK_COMMA );       /* get all DEFC definition separated by comma */
 }
 
 
@@ -477,17 +477,17 @@ DEFB( void )
 
         bytepos++;
 
-        if ( tok == TK_NEWLINE || tok == TK_END )
+        if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
             break;
         }
-        else if ( tok != TK_COMMA )
+        else if ( sym.tok != TK_COMMA )
         {
 			error_syntax();
             break;
         }
     }
-    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( sym.tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -508,17 +508,17 @@ DEFW( void )
 
         bytepos += 2;
 
-        if ( tok == TK_NEWLINE || tok == TK_END )
+        if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
             break;
         }
-        else if ( tok != TK_COMMA )
+        else if ( sym.tok != TK_COMMA )
         {
 			error_syntax();
             break;
         }
     }
-    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( sym.tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -540,7 +540,7 @@ DEFP( void )
         bytepos += 2;
 
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
-        if ( tok != TK_COMMA )
+        if ( sym.tok != TK_COMMA )
         {
 			error_syntax();
         }
@@ -554,17 +554,17 @@ DEFP( void )
 
         bytepos++;
 
-        if ( tok == TK_NEWLINE || tok == TK_END )
+        if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
             break;
         }
-        else if ( tok != TK_COMMA )
+        else if ( sym.tok != TK_COMMA )
         {
 			error_syntax();
             break;
         }
     }
-    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( sym.tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -585,17 +585,17 @@ DEFL( void )
 
         bytepos += 4;
 
-        if ( tok == TK_NEWLINE || tok == TK_END )
+        if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
             break;
         }
-        else if ( tok != TK_COMMA )
+        else if ( sym.tok != TK_COMMA )
         {
 			error_syntax();
             break;
         }
     }
-    while ( tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
+    while ( sym.tok == TK_COMMA );       /* get all DEFB definitions separated by comma */
 }
 
 
@@ -610,14 +610,14 @@ DEFM( void )
     {
         if ( GetSym() == TK_STRING )
         {
-			for ( p = tok_string; *p != '\0'; p++ )
+			for ( p = sym.string; *p != '\0'; p++ )
 			{
                 append_byte( (Byte) *p );
                 ++bytepos;
 			}
 
             GetSym();
-            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_END)
+            if ( sym.tok != TK_STRING_CAT && sym.tok != TK_COMMA && sym.tok != TK_NEWLINE && sym.tok != TK_END)
             {
 				error_syntax();
                 return;
@@ -630,7 +630,7 @@ DEFM( void )
                 break;    /* syntax error - get next line from file... */
             }
 
-            if ( tok != TK_STRING_CAT && tok != TK_COMMA && tok != TK_NEWLINE && tok != TK_END)
+            if ( sym.tok != TK_STRING_CAT && sym.tok != TK_COMMA && sym.tok != TK_NEWLINE && sym.tok != TK_END)
             {
                 error_syntax(); /* expression separator not found */
                 break;
@@ -639,7 +639,7 @@ DEFM( void )
             ++bytepos;
         }
     }
-    while ( tok != TK_NEWLINE && tok != TK_END );
+    while ( sym.tok != TK_NEWLINE && sym.tok != TK_END );
 }
 
 
@@ -650,14 +650,14 @@ INCLUDE( void )
 {
     if ( GetSym() == TK_STRING )
     {
-        Z80pass1( tok_string );				/* parse include file */
+        Z80pass1( sym.string );				/* parse include file */
     }
     else
     {
 		error_syntax();
     }
 
-    tok = TK_NEWLINE;
+    sym.tok = TK_NEWLINE;
 }
 
 
@@ -669,7 +669,7 @@ BINARY( void )
 
     if ( GetSym() == TK_STRING )
     {
-        filename = search_file( tok_string, opts.inc_path );
+        filename = search_file( sym.string, opts.inc_path );
 
         binfile = xfopen( filename, "rb" );           /* CH_0012 */
         append_file_contents( binfile, -1 );  /* read binary code */
@@ -687,9 +687,9 @@ DeclModuleName( void )
 {
     if ( CURRENTMODULE->modname == NULL )
     {
-        if ( tok == TK_NAME )
+        if ( sym.tok == TK_NAME )
         {
-            CURRENTMODULE->modname = strpool_add( tok_name );
+            CURRENTMODULE->modname = strpool_add( sym.string );
         }
         else
         {

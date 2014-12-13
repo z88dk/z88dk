@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.78 2014-12-04 23:30:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.79 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,11 +54,11 @@ void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CALL( void ), CCF( void ), CP( void ), CPD( void );
 void CPDR( void ), CPI( void ), CPIR( void ), CPL( void ), DAA( void );
 void DI( void ), DJNZ( void );
-void EI( void ), EX( void ), EXX( void ), HALT( void );
+void EI( void ), EX( void ), EXX( void );
 void IND( void );
 void INDR( void ), INI( void ), INIR( void ), JP( void );
 void LDD( void ), LDDR( void );
-void LDI( void ), LDIR( void ), NEG( void ), NOP( void ), OR( void ), OTDR( void ), OTIR( void );
+void LDI( void ), LDIR( void ), NEG( void ), OR( void ), OTDR( void ), OTIR( void );
 void OUTD( void ), OUTI( void ), POP( void ), PUSH( void ), RES( void );
 void RETI( void ), RETN( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RLD( void ), RR( void ), RRA( void ), RRC( void );
@@ -123,7 +123,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( EXTERN ),
     DEF_ENTRY( EXX ),
     DEF_ENTRY( FPP ),
-    DEF_ENTRY( HALT ),
     DEF_ENTRY( IF ),
     DEF_ENTRY( IM ),
     DEF_ENTRY( IN ),
@@ -147,7 +146,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( MODULE ),
     DEF_ENTRY( NEG ),
-    DEF_ENTRY( NOP ),
     DEF_ENTRY( OR ),
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OTDR ),
@@ -202,7 +200,7 @@ struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( tok_name, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
+    foundsym = ( struct Z80sym * ) bsearch( sym.string, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }
@@ -270,13 +268,13 @@ void LINE( void )
 	DEFINE_STR( name, MAXLINE );
 
     GetSym();
-	if (tok != TK_NUMBER)
+	if (sym.tok != TK_NUMBER)
 		error_syntax();
 
     if ( opts.line_mode )
-        set_error_line( tok_number );
+        set_error_line( sym.number );
 
-	Str_sprintf( name, "__C_LINE_%ld", tok_number );
+	Str_sprintf( name, "__C_LINE_%ld", sym.number );
     define_symbol( name->str, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
 }
 
@@ -294,7 +292,7 @@ IF( void )
 void
 ELSE( void )
 {
-    tok = TK_ELSE_STMT;
+    sym.tok = TK_ELSE_STMT;
 }
 
 
@@ -303,7 +301,7 @@ ELSE( void )
 void
 ENDIF( void )
 {
-    tok = TK_ENDIF_STMT;
+    sym.tok = TK_ENDIF_STMT;
 }
 
 
@@ -314,7 +312,7 @@ PUBLIC( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_public_symbol( tok_name );
+            declare_public_symbol( sym.string );
         }
         else
         {
@@ -324,7 +322,7 @@ PUBLIC( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( tok != TK_NEWLINE && tok != TK_END )
+    if ( sym.tok != TK_NEWLINE && sym.tok != TK_END )
     {
 		error_syntax();
     }
@@ -355,7 +353,7 @@ EXTERN( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_extern_symbol( tok_name );    /* Define symbol as extern */
+            declare_extern_symbol( sym.string );    /* Define symbol as extern */
         }
         else
         {
@@ -365,7 +363,7 @@ EXTERN( void )
     }
     while ( GetSym() == TK_COMMA );
 
-    if ( tok != TK_NEWLINE && tok != TK_END )
+    if ( sym.tok != TK_NEWLINE && sym.tok != TK_END )
     {
 		error_syntax();
     }
@@ -409,33 +407,11 @@ void
 SECTION( void )
 {
     GetSym();
-	if ( tok == TK_NAME )
-		new_section( tok_name );
+	if ( sym.tok == TK_NAME )
+		new_section( sym.string );
 	else
 		error_syntax();
 }
-
-
-void
-NOP( void )
-{
-    append_byte( 0x00 );
-}
-
-
-
-void
-HALT( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        error_illegal_ident();
-        return;
-    }
-
-    append_byte( 0x76 );
-}
-
 
 
 void
@@ -646,15 +622,15 @@ OTDR( void )
 void
 ExtAccumulator( int opcode )
 {
-	if (tok == TK_A)
+	if (sym.tok == TK_A)
 	{
 		GetSym();
-		if (tok == TK_COMMA)
+		if (sym.tok == TK_COMMA)
 			GetSym();
 		else
 		{
-			tok = TK_A;				/* push back 'A' */
-			tok_reg8 = REG8_A;
+			sym.tok = TK_A;				/* push back 'A' */
+			sym.cpu_reg8 = REG8_A;
 		}
 	}
 	ArithLog8_instr(opcode);

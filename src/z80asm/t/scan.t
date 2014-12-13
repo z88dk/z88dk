@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.6 2014-12-04 23:30:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.7 2014-12-13 00:49:46 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -39,28 +39,28 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_GET( exp_token, exp_text ) \
 	token = GetSym(); \
-	assert( token == exp_token ); \
-	assert( tok   == exp_token ); \
-	assert( strcmp( tok_text, exp_text ) == 0 );
+	assert( token   == exp_token ); \
+	assert( sym.tok == exp_token ); \
+	assert( strcmp( sym.text, exp_text ) == 0 );
 
 #define T_NAME_LABEL( exp_token, exp_text ) \
 	T_GET( exp_token, "" ); \
-	assert( strcmp( tok_name, exp_text ) == 0 );
+	assert( strcmp( sym.string, exp_text ) == 0 );
 	
 #define T_NAME(  exp_text ) 		T_NAME_LABEL( TK_NAME,  exp_text );
 #define T_LABEL( exp_text ) 		T_NAME_LABEL( TK_LABEL, exp_text );
 	
 #define T_NUMBER( exp_value ) \
 	T_GET( TK_NUMBER, "" ); \
-	assert( tok_number == exp_value );
+	assert( sym.number == exp_value );
 	
 #define T_STRING( exp_string ) \
 	T_GET( TK_STRING, "" ); \
-	assert( strcmp( tok_string, exp_string ) == 0 );
+	assert( strcmp( sym.string, exp_string ) == 0 );
 	
 #define T_STRING_N( exp_string, n ) \
 	T_GET( TK_STRING, "" ); \
-	assert( memcmp( tok_string, exp_string, n ) == 0 );
+	assert( memcmp( sym.string, exp_string, n ) == 0 );
 	
 #define T_NEWLINE() \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
@@ -550,50 +550,50 @@ t_compile_module($init, <<'END', $objs);
 	/* keywords */
 	SetTemporaryLine("nz z nc c po pe p m "
 					 "NZ Z NC C PO PE P M ");
-	T_GET(TK_NZ, "NZ"); assert(tok_flag == 0);
-	T_GET(TK_Z,  "Z");  assert(tok_flag == 1);
-	T_GET(TK_NC, "NC"); assert(tok_flag == 2);
-	T_GET(TK_C,  "C");  assert(tok_flag == 3);
-	T_GET(TK_PO, "PO"); assert(tok_flag == 4);
-	T_GET(TK_PE, "PE"); assert(tok_flag == 5);
-	T_GET(TK_P,  "P");  assert(tok_flag == 6);
-	T_GET(TK_M,  "M");  assert(tok_flag == 7);
+	T_GET(TK_NZ, "NZ"); assert(sym.cpu_flag == 0);
+	T_GET(TK_Z,  "Z");  assert(sym.cpu_flag == 1);
+	T_GET(TK_NC, "NC"); assert(sym.cpu_flag == 2);
+	T_GET(TK_C,  "C");  assert(sym.cpu_flag == 3);
+	T_GET(TK_PO, "PO"); assert(sym.cpu_flag == 4);
+	T_GET(TK_PE, "PE"); assert(sym.cpu_flag == 5);
+	T_GET(TK_P,  "P");  assert(sym.cpu_flag == 6);
+	T_GET(TK_M,  "M");  assert(sym.cpu_flag == 7);
 
-	T_GET(TK_NZ, "NZ"); assert(tok_flag == 0);
-	T_GET(TK_Z,  "Z");  assert(tok_flag == 1);
-	T_GET(TK_NC, "NC"); assert(tok_flag == 2);
-	T_GET(TK_C,  "C");  assert(tok_flag == 3);
-	T_GET(TK_PO, "PO"); assert(tok_flag == 4);
-	T_GET(TK_PE, "PE"); assert(tok_flag == 5);
-	T_GET(TK_P,  "P");  assert(tok_flag == 6);
-	T_GET(TK_M,  "M");  assert(tok_flag == 7);
+	T_GET(TK_NZ, "NZ"); assert(sym.cpu_flag == 0);
+	T_GET(TK_Z,  "Z");  assert(sym.cpu_flag == 1);
+	T_GET(TK_NC, "NC"); assert(sym.cpu_flag == 2);
+	T_GET(TK_C,  "C");  assert(sym.cpu_flag == 3);
+	T_GET(TK_PO, "PO"); assert(sym.cpu_flag == 4);
+	T_GET(TK_PE, "PE"); assert(sym.cpu_flag == 5);
+	T_GET(TK_P,  "P");  assert(sym.cpu_flag == 6);
+	T_GET(TK_M,  "M");  assert(sym.cpu_flag == 7);
 	T_END();
 
 	SetTemporaryLine("b c d e h l a ixh ixl iyh iyl "
 					 "B C D E H L A IXH IXL IYH IYL ");
-	T_GET(TK_B,   "B");   assert(tok_reg8 == 0); assert(tok_idx_reg == 0);
-	T_GET(TK_C,   "C");   assert(tok_reg8 == 1); assert(tok_idx_reg == 0);
-	T_GET(TK_D,   "D");   assert(tok_reg8 == 2); assert(tok_idx_reg == 0);
-	T_GET(TK_E,   "E");   assert(tok_reg8 == 3); assert(tok_idx_reg == 0);
-	T_GET(TK_H,   "H");   assert(tok_reg8 == 4); assert(tok_idx_reg == 0);
-	T_GET(TK_L,   "L");   assert(tok_reg8 == 5); assert(tok_idx_reg == 0);
-	T_GET(TK_A,   "A");   assert(tok_reg8 == 7); assert(tok_idx_reg == 0);
-	T_GET(TK_IXH, "IXH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IXL, "IXL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IYH, "IYH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xFD);
-	T_GET(TK_IYL, "IYL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xFD);
+	T_GET(TK_B,   "B");   assert(sym.cpu_reg8 == 0); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_C,   "C");   assert(sym.cpu_reg8 == 1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_D,   "D");   assert(sym.cpu_reg8 == 2); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_E,   "E");   assert(sym.cpu_reg8 == 3); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_H,   "H");   assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_L,   "L");   assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_A,   "A");   assert(sym.cpu_reg8 == 7); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IXH, "IXH"); assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IXL, "IXL"); assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IYH, "IYH"); assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0xFD);
+	T_GET(TK_IYL, "IYL"); assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0xFD);
 	
-	T_GET(TK_B,   "B");   assert(tok_reg8 == 0); assert(tok_idx_reg == 0);
-	T_GET(TK_C,   "C");   assert(tok_reg8 == 1); assert(tok_idx_reg == 0);
-	T_GET(TK_D,   "D");   assert(tok_reg8 == 2); assert(tok_idx_reg == 0);
-	T_GET(TK_E,   "E");   assert(tok_reg8 == 3); assert(tok_idx_reg == 0);
-	T_GET(TK_H,   "H");   assert(tok_reg8 == 4); assert(tok_idx_reg == 0);
-	T_GET(TK_L,   "L");   assert(tok_reg8 == 5); assert(tok_idx_reg == 0);
-	T_GET(TK_A,   "A");   assert(tok_reg8 == 7); assert(tok_idx_reg == 0);
-	T_GET(TK_IXH, "IXH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IXL, "IXL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IYH, "IYH"); assert(tok_reg8 == 4); assert(tok_idx_reg == 0xFD);
-	T_GET(TK_IYL, "IYL"); assert(tok_reg8 == 5); assert(tok_idx_reg == 0xFD);
+	T_GET(TK_B,   "B");   assert(sym.cpu_reg8 == 0); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_C,   "C");   assert(sym.cpu_reg8 == 1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_D,   "D");   assert(sym.cpu_reg8 == 2); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_E,   "E");   assert(sym.cpu_reg8 == 3); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_H,   "H");   assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_L,   "L");   assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_A,   "A");   assert(sym.cpu_reg8 == 7); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IXH, "IXH"); assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IXL, "IXL"); assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IYH, "IYH"); assert(sym.cpu_reg8 == 4); assert(sym.cpu_idx_reg == 0xFD);
+	T_GET(TK_IYL, "IYL"); assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0xFD);
 	T_END();
 	
 	SetTemporaryLine("f i iir r eir (c) (\t c \t) "
@@ -617,66 +617,66 @@ t_compile_module($init, <<'END', $objs);
 					 
 	SetTemporaryLine("bc de hl af af' sp ix iy "
 					 "BC DE HL AF AF' SP IX IY ");
-	T_GET(TK_BC,  "BC");  assert(tok_reg16_sp == 0);  assert(tok_reg16_af == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_DE,  "DE");  assert(tok_reg16_sp == 1);  assert(tok_reg16_af == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_HL,  "HL");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_AF,  "AF");  assert(tok_reg16_sp == -1); assert(tok_reg16_af == 3);  assert(tok_idx_reg == 0);
-	T_GET(TK_AF1, "AF'"); assert(tok_reg16_sp == -1); assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
-	T_GET(TK_SP,  "SP");  assert(tok_reg16_sp == 3);  assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
-	T_GET(TK_IX,  "IX");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IY,  "IY");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_BC,  "BC");  assert(sym.cpu_reg16_sp == 0);  assert(sym.cpu_reg16_af == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_DE,  "DE");  assert(sym.cpu_reg16_sp == 1);  assert(sym.cpu_reg16_af == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_HL,  "HL");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 3);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF1, "AF'"); assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_SP,  "SP");  assert(sym.cpu_reg16_sp == 3);  assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IX,  "IX");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IY,  "IY");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	
-	T_GET(TK_BC,  "BC");  assert(tok_reg16_sp == 0);  assert(tok_reg16_af == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_DE,  "DE");  assert(tok_reg16_sp == 1);  assert(tok_reg16_af == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_HL,  "HL");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_AF,  "AF");  assert(tok_reg16_sp == -1); assert(tok_reg16_af == 3);  assert(tok_idx_reg == 0);
-	T_GET(TK_AF1, "AF'"); assert(tok_reg16_sp == -1); assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
-	T_GET(TK_SP,  "SP");  assert(tok_reg16_sp == 3);  assert(tok_reg16_af == -1); assert(tok_idx_reg == 0);
-	T_GET(TK_IX,  "IX");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xDD);
-	T_GET(TK_IY,  "IY");  assert(tok_reg16_sp == 2);  assert(tok_reg16_af == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_BC,  "BC");  assert(sym.cpu_reg16_sp == 0);  assert(sym.cpu_reg16_af == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_DE,  "DE");  assert(sym.cpu_reg16_sp == 1);  assert(sym.cpu_reg16_af == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_HL,  "HL");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 3);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF1, "AF'"); assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_SP,  "SP");  assert(sym.cpu_reg16_sp == 3);  assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IX,  "IX");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xDD);
+	T_GET(TK_IY,  "IY");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	T_END();
 	
 	SetTemporaryLine("(bc) (de) (hl) (sp) (\t bc \t) (\t de \t) (\t hl \t) (\t sp \t) "
 					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
-	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IND_BC, "(BC)"); assert(sym.cpu_ind_reg16 == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(sym.cpu_ind_reg16 == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(sym.cpu_ind_reg16 == -1); assert(sym.cpu_idx_reg == 0);
 
-	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IND_BC, "(BC)"); assert(sym.cpu_ind_reg16 == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(sym.cpu_ind_reg16 == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(sym.cpu_ind_reg16 == -1); assert(sym.cpu_idx_reg == 0);
 	
-	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IND_BC, "(BC)"); assert(sym.cpu_ind_reg16 == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(sym.cpu_ind_reg16 == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(sym.cpu_ind_reg16 == -1); assert(sym.cpu_idx_reg == 0);
 	
-	T_GET(TK_IND_BC, "(BC)"); assert(tok_ind_reg16 == 0);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_DE, "(DE)"); assert(tok_ind_reg16 == 1);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_HL, "(HL)"); assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0);
-	T_GET(TK_IND_SP, "(SP)"); assert(tok_ind_reg16 == -1); assert(tok_idx_reg == 0);
+	T_GET(TK_IND_BC, "(BC)"); assert(sym.cpu_ind_reg16 == 0);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_DE, "(DE)"); assert(sym.cpu_ind_reg16 == 1);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_HL, "(HL)"); assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_IND_SP, "(SP)"); assert(sym.cpu_ind_reg16 == -1); assert(sym.cpu_idx_reg == 0);
 	T_END();
 	
 	SetTemporaryLine("(ix) (iy) (\t ix \t) (\t iy \t) "
 					 "(IX) (IY) (\t IX \t) (\t IY \t) ");
-	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IND_IX, "(IX");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xDD);
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IND_IY, "(IY");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	T_RPAREN();
-	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IND_IX, "(IX");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xDD);
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IND_IY, "(IY");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	T_RPAREN();
 	
-	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IND_IX, "(IX");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xDD);
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IND_IY, "(IY");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	T_RPAREN();
-	T_GET(TK_IND_IX, "(IX");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xDD);
+	T_GET(TK_IND_IX, "(IX");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xDD);
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(IY");  assert(tok_ind_reg16 == 2);  assert(tok_idx_reg == 0xFD);
+	T_GET(TK_IND_IY, "(IY");  assert(sym.cpu_ind_reg16 == 2);  assert(sym.cpu_idx_reg == 0xFD);
 	T_RPAREN();
 	T_END();
 	
@@ -732,15 +732,15 @@ t_compile_module($init, <<'END', $objs);
 
 	SetTemporaryLine("ds.b ds.w ds.p ds.l "
 					 "DS.B DS.W DS.P DS.L ");
-	T_GET(TK_DS_B, "DS.B"); assert(tok_ds_size == 1);
-	T_GET(TK_DS_W, "DS.W"); assert(tok_ds_size == 2);
-	T_GET(TK_DS_P, "DS.P"); assert(tok_ds_size == 3);
-	T_GET(TK_DS_L, "DS.L"); assert(tok_ds_size == 4);
+	T_GET(TK_DS_B, "DS.B"); assert(sym.ds_size == 1);
+	T_GET(TK_DS_W, "DS.W"); assert(sym.ds_size == 2);
+	T_GET(TK_DS_P, "DS.P"); assert(sym.ds_size == 3);
+	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
 
-	T_GET(TK_DS_B, "DS.B"); assert(tok_ds_size == 1);
-	T_GET(TK_DS_W, "DS.W"); assert(tok_ds_size == 2);
-	T_GET(TK_DS_P, "DS.P"); assert(tok_ds_size == 3);
-	T_GET(TK_DS_L, "DS.L"); assert(tok_ds_size == 4);
+	T_GET(TK_DS_B, "DS.B"); assert(sym.ds_size == 1);
+	T_GET(TK_DS_W, "DS.W"); assert(sym.ds_size == 2);
+	T_GET(TK_DS_P, "DS.P"); assert(sym.ds_size == 3);
+	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
 	T_END();
 					
 	/* check limit cases */

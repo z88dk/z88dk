@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.11 2014-05-13 23:42:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.12 2014-12-13 00:49:46 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -31,20 +31,31 @@ ASTYLE = astyle \
 #------------------------------------------------------------------------------
 all : scan_rules.h
 
-scan_rules.h : scan_rules.rl scan_def.h legacy.h
-	$(CC) -E -xc scan_rules.rl > scan_rules.1.tmp
-	perl -pe "s/^#.*//; s/^\x22\x22.*//; s/\t+/ /g; s/ *<CAT> *//g; s/ *<NL> */\n/g; s/ *<TAB> */\t/g;" < scan_rules.1.tmp > scan_rules.2.tmp
-	ragel -G2 -oscan_rules.3.tmp scan_rules.2.tmp
-	perl -pe "s/^#line.*//; s/\x24Header/:Header/; s/\x24Log/:Log/;" < scan_rules.3.tmp > scan_rules.h
+scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h legacy.h \
+			   dev/parse_ragel.pl dev/Makefile
+	perl dev/parse_ragel.pl scan_rules.rl
 	$(ASTYLE) scan_rules.h
-	$(RM) scan_rules.*.tmp
+
+scan_tokens.h : scan_def.h legacy.h \
+				dev/build_tokens.pl dev/Makefile
+	perl dev/build_tokens.pl	
+
+#------------------------------------------------------------------------------
+# ragel parser generator
+#------------------------------------------------------------------------------
+all : parse_rules.h
+
+parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h legacy.h \
+				dev/parse_ragel.pl dev/Makefile 
+	perl dev/parse_ragel.pl parse_rules.rl
+	$(ASTYLE) parse_rules.h
 	
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation
 #------------------------------------------------------------------------------
 all: t/opcodes.t
 
-t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm
+t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm dev/Makefile
 	perl dev/build_opcodes.pl
 
 #------------------------------------------------------------------------------
@@ -83,7 +94,12 @@ all:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.11  2014-05-13 23:42:48  pauloscustodio
+# Revision 1.12  2014-12-13 00:49:46  pauloscustodio
+# Implemented infrastructure to do parsing based on a RAGEL state machine,
+# and to fall back to the original parser on error. Implemented the first
+# two simple opcodes (NOP and HALT) as a concept check.
+#
+# Revision 1.11  2014/05/13 23:42:48  pauloscustodio
 # Move opcode testing to t/opcodes.t, add errors and warnings checks, build it by dev/build_opcodes.pl and dev/build_opcodes.asm.
 # Remove opcode errors and warnings from t/errors.t.
 # Remove t/cpu-opcodes.t, it was too slow - calling z80asm for every single Z80 opcode.

@@ -114,6 +114,7 @@
     <ClInclude Include="lib\strpool.h" />
     <ClInclude Include="lib\strutil.h" />
     <ClInclude Include="lib\types.h" />
+    <ClInclude Include="lib\utarray.h" />
     <ClInclude Include="lib\uthash.h" />
     <ClInclude Include="lib\xmalloc.h" />
     <ClInclude Include="listfile.h" />
@@ -124,6 +125,8 @@
     <ClInclude Include="objfile.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="options_def.h" />
+    <ClInclude Include="parse.h" />
+    <ClInclude Include="parse_rules.h" />
     <ClInclude Include="scan.h" />
     <ClInclude Include="scan_def.h" />
     <ClInclude Include="scan_rules.h" />
@@ -161,6 +164,7 @@
     <ClCompile Include="module.c" />
     <ClCompile Include="objfile.c" />
     <ClCompile Include="options.c" />
+    <ClCompile Include="parse.c" />
     <ClCompile Include="prsident.c" />
     <ClCompile Include="prsline.c" />
     <ClCompile Include="scan.c" />

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.47 2014-12-04 23:30:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.48 2014-12-13 00:49:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -28,7 +28,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.47 2014-12
 
 static void LD_IND_HL(void)
 {
-	int dest_idx = tok_idx_reg;
+	int dest_idx = sym.cpu_idx_reg;
 	UInt opcodeptr;
 	int bytepos = 0;
 
@@ -52,20 +52,20 @@ static void LD_IND_HL(void)
 	GetSymExpect(TK_COMMA);
 	GetSym();
 
-	if (tok_idx_reg)
+	if (sym.cpu_idx_reg)
 	{
 		error_illegal_ident();
 		return;
 	}
 
-	switch (tok_reg8)
+	switch (sym.cpu_reg8)
 	{
 	case REG8_NONE:
 		Pass2info(RANGE_BYTE_UNSIGNED, bytepos++);				/* Execute, store & patch 8bit expression for <n> */
 		break;
 
 	default:
-		patch_byte(&opcodeptr, (Byte)(0x70 + tok_reg8));     /* LD  (IX|IY+d),r  */
+		patch_byte(&opcodeptr, (Byte)(0x70 + sym.cpu_reg8));     /* LD  (IX|IY+d),r  */
 		break;
 	}
 
@@ -73,12 +73,12 @@ static void LD_IND_HL(void)
 
 static void LD_IND_BC_DE(void)
 {
-	int dest_reg = tok_ind_reg16;
+	int dest_reg = sym.cpu_ind_reg16;
 
 	GetSymExpect(TK_COMMA);
 	GetSym();
 
-	if (tok_reg8 == REG8_A)
+	if (sym.cpu_reg8 == REG8_A)
 		append_byte(0x02 + (dest_reg << 4));			/* ld (BC)/(DE), A */
 	else
 	{
@@ -99,12 +99,12 @@ static void LD_IND_NN(void)
 	CurSymExpect(TK_COMMA);
 	GetSym();
 
-	switch (tok_reg16_sp)
+	switch (sym.cpu_reg16_sp)
 	{
 	case REG16_HL:			/* LD  (nn),dd  => dd: HL, IX, IY */
-		if (tok_idx_reg)
+		if (sym.cpu_idx_reg)
 		{
-			append_2bytes(tok_idx_reg, 0x22);
+			append_2bytes(sym.cpu_idx_reg, 0x22);
 			Pass2infoExpr(RANGE_WORD, 2, expr);
 		}
 		else
@@ -118,12 +118,12 @@ static void LD_IND_NN(void)
 		break;
 
 	default:					/* LD  (nn),dd   => dd: BC,DE,SP  */
-		append_2bytes(0xED, (Byte)(0x43 + (tok_reg16_sp << 4)));
+		append_2bytes(0xED, (Byte)(0x43 + (sym.cpu_reg16_sp << 4)));
 		Pass2infoExpr(RANGE_WORD, 2, expr);
 		return;
 	}
 
-	switch (tok_reg8)
+	switch (sym.cpu_reg8)
 	{
 	case REG8_A:
 		append_byte(0x32);      /* LD  (nn),A  */
@@ -137,8 +137,8 @@ static void LD_IND_NN(void)
 
 static void LD_REG8(void)
 {
-	int dest_reg = tok_reg8;
-	int dest_idx = tok_idx_reg;
+	int dest_reg = sym.cpu_reg8;
+	int dest_idx = sym.cpu_idx_reg;
 
 	if (dest_reg != REG8_NONE && dest_idx && (opts.cpu & CPU_RABBIT)) 
 	{
@@ -149,7 +149,7 @@ static void LD_REG8(void)
 	GetSymExpect(TK_COMMA);
 	GetSym();
 
-	switch (tok)
+	switch (sym.tok)
 	{
 	case TK_LPAREN:					/* LD  A,(nn)  */
 		if (dest_reg == REG8_A)
@@ -195,13 +195,13 @@ static void LD_REG8(void)
 		break;
 	}
 
-	switch (tok_ind_reg16)
+	switch (sym.cpu_ind_reg16)
 	{
 	case IND_REG16_BC:				/* LD   A,(BC)  */
 	case IND_REG16_DE:				/* LD   A,(DE)  */
 		if (dest_reg == REG8_A)
 		{
-			append_byte(0x0A + (tok_ind_reg16 << 4));
+			append_byte(0x0A + (sym.cpu_ind_reg16 << 4));
 		}
 		else
 		{
@@ -214,9 +214,9 @@ static void LD_REG8(void)
 		{
 			error_illegal_ident();
 		}
-		else if (tok_idx_reg)			/* LD   r,(IX/IY+d)  */
+		else if (sym.cpu_idx_reg)			/* LD   r,(IX/IY+d)  */
 		{
-			append_2bytes(tok_idx_reg, (Byte)(0x40 + (dest_reg << 3) + 0x06));
+			append_2bytes(sym.cpu_idx_reg, (Byte)(0x40 + (dest_reg << 3) + 0x06));
 			GetSym();
 			Pass2info(RANGE_BYTE_SIGNED, 2);
 		}
@@ -230,26 +230,26 @@ static void LD_REG8(void)
 		break;
 	}
 
-	if (tok_reg8 != REG8_NONE)			/* LD  r,r  */
+	if (sym.cpu_reg8 != REG8_NONE)			/* LD  r,r  */
 	{
-		if (tok_idx_reg && (opts.cpu & CPU_RABBIT))
+		if (sym.cpu_idx_reg && (opts.cpu & CPU_RABBIT))
 		{
 			error_illegal_ident();
 			return;
 		}
 
-		if (dest_idx || tok_idx_reg)
+		if (dest_idx || sym.cpu_idx_reg)
 		{
-			if (dest_idx && tok_idx_reg && dest_idx != tok_idx_reg)
+			if (dest_idx && sym.cpu_idx_reg && dest_idx != sym.cpu_idx_reg)
 			{
 				error_illegal_ident();
 				return;
 			}
 			else 
-				append_byte(dest_idx ? dest_idx : tok_idx_reg);
+				append_byte(dest_idx ? dest_idx : sym.cpu_idx_reg);
 				
 		}
-		append_byte((Byte)(0x40 + (dest_reg << 3) + tok_reg8));
+		append_byte((Byte)(0x40 + (dest_reg << 3) + sym.cpu_reg8));
 	}
 	else								/* LD  r,n */
 	{
@@ -268,13 +268,13 @@ static void LD_REG8(void)
 
 static void LD_REG16(void)
 {
-	int dest_reg = tok_reg16_sp;
-	int dest_idx = tok_idx_reg;
+	int dest_reg = sym.cpu_reg16_sp;
+	int dest_idx = sym.cpu_idx_reg;
 
 	GetSymExpect(TK_COMMA);
 	GetSym();
 
-	if (tok == TK_LPAREN)
+	if (sym.tok == TK_LPAREN)
 	{
 		GetSym();
 		switch (dest_reg)
@@ -305,7 +305,7 @@ static void LD_REG16(void)
 		}
 	}
 
-	switch (tok_reg16_sp)
+	switch (sym.cpu_reg16_sp)
 	{
 	case REG16_NONE:					/* LD dd,nn */
 		if (dest_idx)
@@ -323,8 +323,8 @@ static void LD_REG16(void)
 	case REG16_HL:						/* LD SP,HL/IX/IY */
 		if (dest_reg == REG16_SP)
 		{
-			if (tok_idx_reg)
-				append_byte(tok_idx_reg);
+			if (sym.cpu_idx_reg)
+				append_byte(sym.cpu_idx_reg);
 			append_byte(0xF9);
 		}
 		else
@@ -343,7 +343,7 @@ static void LD_REG16(void)
 void LD(void)
 {
 	GetSym();
-	switch (tok)
+	switch (sym.tok)
 	{
 	case TK_LPAREN:					/* LD (nn),... */
 		GetSym();
@@ -353,7 +353,7 @@ void LD(void)
 	case TK_I:						/* LD  I,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if (!(opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
 			append_2bytes(0xED, 0x47);
 		else
 			error_illegal_ident();
@@ -362,7 +362,7 @@ void LD(void)
 	case TK_IIR:					/* LD  IIR,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if ((opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
 			append_2bytes(0xED, 0x47);
 		else
 			error_illegal_ident();
@@ -371,7 +371,7 @@ void LD(void)
 	case TK_R:						/* LD  R,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if (!(opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
 			append_2bytes(0xED, 0x4F);
 		else
 			error_illegal_ident();
@@ -380,7 +380,7 @@ void LD(void)
 	case TK_EIR:					/* LD  EIR,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if ((opts.cpu & CPU_RABBIT) && tok_reg8 == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
 			append_2bytes(0xED, 0x4F);
 		else
 			error_illegal_ident();
@@ -390,7 +390,7 @@ void LD(void)
 		break;
 	}
 	
-	switch (tok_ind_reg16)
+	switch (sym.cpu_ind_reg16)
 	{
 	case IND_REG16_BC:
 	case IND_REG16_DE:
@@ -408,13 +408,13 @@ void LD(void)
 		assert(0);
 	}
 
-	if (tok_reg8 != REG8_NONE)		/* ld r,... */
+	if (sym.cpu_reg8 != REG8_NONE)		/* ld r,... */
 	{
 		LD_REG8();
 		return;
 	}
 
-	if (tok_reg16_sp != REG16_NONE)	/* ld dd, ... */
+	if (sym.cpu_reg16_sp != REG16_NONE)	/* ld dd, ... */
 	{
 		LD_REG16();
 		return;

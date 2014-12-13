@@ -15,14 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.6 2014-12-04 23:30:20 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.7 2014-12-13 00:49:45 pauloscustodio Exp $ 
 */
 
 #define TOKEN_RE(name, string, regexp, set_value)	 \
 	regexp							<NL> \
 	{								<NL> \
-		<TAB>	tok = name;			<NL> \
-		<TAB>	tok_text = string;	<NL> \
+		<TAB>	sym.tok = name;		<NL> \
+		<TAB>	sym.text = string;	<NL> \
 		<TAB>	set_value;			<NL> \
 		<TAB>	fbreak; 			<NL> \
 	};								<NL>
@@ -32,7 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.6 2014-12-04
 #define TOKEN2(name, string, set_value)	TOKEN(name, string, set_value)
 
 %%{
-machine asm;
+machine lexer;
 
 /* check predicates - beginning of line */
 action at_bol 		{ at_bol }	
@@ -73,7 +73,7 @@ main := |*
 	/* Identifier */
 	name
 	{
-		tok = TK_NAME;
+		sym.tok = TK_NAME;
 		set_tok_name();
 		fbreak;
 	};
@@ -86,7 +86,7 @@ main := |*
 		while ( te[-1] == ':' || isspace(te[-1]) ) te--;
 		
 		/* copy token */
-		tok = TK_LABEL;
+		sym.tok = TK_LABEL;
 		set_tok_name();
 		fbreak;
 	};
@@ -98,66 +98,67 @@ main := |*
 		if ( toupper(te[-1]) == 'D' ) te--;
 		*/
 		
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts, te - ts, 10 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts, te - ts, 10 ); 
 		fbreak;
 	};
 	digit xdigit* 'h'i
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts, te - ts - 1, 16 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts, te - ts - 1, 16 ); 
 		fbreak;
 	};
 	"$" xdigit+
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts + 1, te - ts - 1, 16 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts + 1, te - ts - 1, 16 ); 
 		fbreak;
 	};
 	'0x'i xdigit+
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts + 2, te - ts - 2, 16 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts + 2, te - ts - 2, 16 ); 
 		fbreak;
 	};
 	bdigit+ 'b'i
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts, te - ts - 1, 2 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts, te - ts - 1, 2 ); 
 		fbreak;
 	};
 	"@" bdigit+
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts + 1, te - ts - 1, 2 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts + 1, te - ts - 1, 2 ); 
 		fbreak;
 	};
 	'0b'i bdigit+
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts + 2, te - ts - 2, 2 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts + 2, te - ts - 2, 2 ); 
 		fbreak;
 	};
 	'@' '"' [\-#]+ '"'
 	{ 
-		tok = TK_NUMBER;
-		tok_number = scan_num( ts + 2, te - ts - 3, 2 ); 
+		sym.tok = TK_NUMBER;
+		sym.number = scan_num( ts + 2, te - ts - 3, 2 ); 
 		fbreak;
 	};
 	
 	/* Single Quote */
 	"'"
 	{ 
-		tok = TK_NUMBER;
-		if ( get_tok_string() && 		/* consumes input up to end quote or \n */
-		     tok_string_buf->len == 1 )
+		sym.tok = TK_NUMBER;
+		if ( get_sym_string() && 		/* consumes input up to end quote or \n */
+		     sym_string->len == 1 )
 		{
-			tok_number = tok_string[0];
+			sym.number = sym_string->str[0];
 		}
 		else
 		{
-			tok_number = 0;
+			sym.number = 0;
 			error_invalid_squoted_string(); 
+			scan_error = TRUE;
 		}
 		fbreak;
 	};
@@ -165,10 +166,11 @@ main := |*
 	/* Double Quote */
 	'"'
 	{ 
-		tok = TK_STRING;
-		if ( ! get_tok_string() )	/* consumes input up to end quote or \n */
+		sym.tok = TK_STRING;
+		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
 		{
 			error_unclosed_string(); 
+			scan_error = TRUE;
 		}
 		fbreak;
 	};
@@ -176,7 +178,7 @@ main := |*
 	/* default */
 	any
 	{
-		tok = TK_NIL;
+		sym.tok = TK_NIL;
 		skip_to_newline();
 		fbreak;
 	};
@@ -184,7 +186,7 @@ main := |*
 *|;
 }%%
 
-%% write data nofinal;
+%%write data nofinal;
 
 static void set_scan_buf( char *text, Bool _at_bol )
 {
@@ -195,11 +197,11 @@ static void set_scan_buf( char *text, Bool _at_bol )
 	pe		= input_buf->str + input_buf->len;
 	eof		= pe;	/* tokens are not split acros input lines */
 	
-	%% write init;
+	%%write init;
 }
 
 static tokid_t _scan_get( void )
 {
-	%% write exec;
-	return tok;
+	%%write exec;
+	return sym.tok;
 }
