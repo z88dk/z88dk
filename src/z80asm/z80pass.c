@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.115 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.116 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -76,21 +76,20 @@ void Z80pass1( char *filename )
 void
 parseline( enum flag interpret )
 {
+	int start_num_errors;
+
     next_PC();				/* update assembler program counter */
 	EOL = FALSE;			/* reset END OF LINE flag */
 
-	scan_error = FALSE;		/* detect errors in GetSym() */
+	start_num_errors = get_num_errors();
 	GetSym();
 
-	if (scan_error)
+	if (get_num_errors() != start_num_errors)		/* detect errors in GetSym() */
 		Skipline();
 	else if (!parse_statement(interpret))
 	{
-		/* scan error reported during parse_statement() */
-		if (scan_error)
-		{
+		if (get_num_errors() != start_num_errors)	/* detect errors during parse_statement() */
 			Skipline();
-		}
 		else
 		{
 			if (sym.tok == TK_DOT || sym.tok == TK_LABEL)
@@ -260,7 +259,6 @@ Z80pass2( void )
 	ExprListElem *iter;
     Expr *expr, *expr2;
     long value;
-    UInt patchptr;
 	Bool do_patch, do_store;
 
 	/* compute all dependent expressions */
@@ -313,8 +311,6 @@ Z80pass2( void )
 
         if ( do_patch )
         {
-            patchptr = expr->code_pos;            /* index in memory buffer */
-
             switch ( expr->range )
             {
             case RANGE_JR_OFFSET:
@@ -322,7 +318,7 @@ Z80pass2( void )
 
                 if ( value >= -128 && value <= 127 )
                 {
-                    patch_byte( &patchptr, (Byte) value );
+					patch_byte(expr->code_pos, (Byte)value);
                     /* opcode is stored, now store relative jump */
                 }
                 else
@@ -335,28 +331,28 @@ Z80pass2( void )
                 if ( value < -128 || value > 255 )
                     warn_int_range( value );
 
-                patch_byte( &patchptr, (Byte) value );
+				patch_byte(expr->code_pos, (Byte)value);
                 break;
 
             case RANGE_BYTE_SIGNED:
                 if ( value < -128 || value > 127 )
                     warn_int_range( value );
 
-                patch_byte( &patchptr, (Byte) value );
+				patch_byte(expr->code_pos, (Byte)value);
                 break;
 
             case RANGE_WORD:
                 if ( value < -32768 || value > 65535 )
                     warn_int_range( value );
 
-                patch_word( &patchptr, ( int ) value );
+				patch_word(expr->code_pos, (int)value);
                 break;
 
             case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 
-                patch_long( &patchptr, value );
+				patch_long(expr->code_pos, value);
                 break;
 
 			default:

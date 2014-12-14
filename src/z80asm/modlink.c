@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.137 2014-11-16 23:19:56 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.138 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -355,7 +355,6 @@ static void patch_exprs( ExprList *exprs )
 {
 	ExprListElem *iter;
     Expr *expr, *expr2;
-	UInt code_pos;
 	long value;
 
 	iter = ExprList_first( exprs );
@@ -371,29 +370,27 @@ static void patch_exprs( ExprList *exprs )
 			error_not_defined();
 		else
 		{
-			code_pos = expr->code_pos;
-
             switch ( expr->range )
             {
             case RANGE_BYTE_UNSIGNED:
                 if ( value < -128 || value > 255 )
                     warn_int_range( value );
 
-                patch_byte( &code_pos, (Byte) value );
+				patch_byte(expr->code_pos, (Byte)value);
                 break;
 
             case RANGE_BYTE_SIGNED:
                 if ( value < -128 || value > 127 )
                     warn_int_range( value );
 
-                patch_byte( &code_pos, (Byte) value );
+				patch_byte(expr->code_pos, (Byte)value);
                 break;
 
             case RANGE_WORD:
                 if ( value < -32768 || value > 65535 )
                     warn_int_range( value );
 
-                patch_word( &code_pos, value ); code_pos -= 2;
+				patch_word(expr->code_pos, value); 
 
                 if ( opts.relocatable )
 				{
@@ -401,7 +398,7 @@ static void patch_exprs( ExprList *exprs )
                     {
                         /* Expression contains relocatable address */
 						UInt offset   = get_cur_module_start(); 
-						UInt distance = code_pos + offset - curroffset;
+						UInt distance = expr->code_pos + offset - curroffset;
 
                         if ( distance >= 0 && distance <= 255 )
                         {
@@ -417,7 +414,7 @@ static void patch_exprs( ExprList *exprs )
                         }
 
                         totaladdr++;
-                        curroffset = code_pos + offset;
+						curroffset = expr->code_pos + offset;
                     }
 				}
                 break;
@@ -426,7 +423,7 @@ static void patch_exprs( ExprList *exprs )
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 
-                patch_long( &code_pos, value );
+				patch_long(expr->code_pos, value);
                 break;
 
 			default: assert(0);
@@ -678,7 +675,6 @@ LinkModule( char *filename, long fptr_base )
     Int origin = -1;
     int flag = 0;
 	FILE *file;
-	UInt addr;
 	Section *section;
 
 	INIT_OBJ( Str, &section_name );
@@ -712,8 +708,7 @@ LinkModule( char *filename, long fptr_base )
 			if ( origin >= 0 )
 				section->origin = origin;
 
-			addr = 0;
-			patch_file_contents( file, &addr, code_size );
+			patch_file_contents( file, 0, code_size );
 		}
     }
 

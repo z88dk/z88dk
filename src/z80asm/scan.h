@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.38 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.39 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -67,7 +67,6 @@ typedef struct sym_t
 *----------------------------------------------------------------------------*/
 extern Sym  sym;			/* last token retrieved */
 extern Bool EOL;			/* scanner EOL state */
-extern Bool scan_error;		/* set to TRUE on a scan error */
 
 /*-----------------------------------------------------------------------------
 *	Scan API

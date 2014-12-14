@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.5 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.6 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -152,12 +152,10 @@ TOKEN(TK_BIN_NOT, "~", )
 
 #define FOR_Z80		if ( opts.cpu & CPU_RABBIT ) { \
 						error_illegal_ident(); \
-						scan_error = TRUE; \
 					}
 						
 #define FOR_RABBIT	if ( ! (opts.cpu & CPU_RABBIT) ) { \
 						error_illegal_ident(); \
-						scan_error = TRUE; \
 					}	
 
 /* flags */

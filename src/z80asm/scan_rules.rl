@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.7 2014-12-13 00:49:45 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.8 2014-12-14 00:14:15 pauloscustodio Exp $ 
 */
 
 #define TOKEN_RE(name, string, regexp, set_value)	 \
@@ -158,7 +158,6 @@ main := |*
 		{
 			sym.number = 0;
 			error_invalid_squoted_string(); 
-			scan_error = TRUE;
 		}
 		fbreak;
 	};
@@ -170,7 +169,6 @@ main := |*
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
 		{
 			error_unclosed_string(); 
-			scan_error = TRUE;
 		}
 		fbreak;
 	};

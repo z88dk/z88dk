@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.9 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.10 2014-12-14 00:14:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -202,39 +202,26 @@ static void test_sections( void )
 	T( next_PC() );
 
 	/* patch */
-	addr = 0;
-	T( patch_byte( &addr, 12 ) );
-	assert( addr == 1 );
-
-	T( patch_word( &addr, 0x0A0B ) );
-	assert( addr == 3 );
-
-	T( patch_long( &addr, 0x06070809 ) );
-	assert( addr == 7 );
-
-	T( patch_value( &addr, 0x030405, 3 ) );
-	assert( addr == 10 );
+	T( patch_byte( 0, 12 ) );
+	T( patch_word( 1, 0x0A0B ) );
+	T( patch_long( 3, 0x06070809 ) );
+	T( patch_value( 7, 0x030405, 3 ) );
 
 	/* patch whole file */
 	fseek( file, 0, SEEK_SET );
-	T( patch_file_contents( file, &addr, -1 ) );
-	assert( addr == 13 );
+	T( patch_file_contents( file, 10, -1 ) );
 
 	/* patch part of file */
 	fseek( file, 1, SEEK_SET );
-	T( patch_file_contents( file, &addr, -1 ) );
-	assert( addr == 15 );
+	T( patch_file_contents( file, 13, -1 ) );
 
 	/* patch part of file */
 	fseek( file, 0, SEEK_SET );
-	T( patch_file_contents( file, &addr, 2 ) );
-	assert( addr == 17 );
+	T( patch_file_contents( file, 15, 2 ) );
 
 	/* patch expands buffer */
-	addr += 4;
 	fseek( file, 0, SEEK_SET );
-	T( patch_file_contents( file, &addr, -1 ) );
-	assert( addr == 24 );
+	T( patch_file_contents( file, 21, -1 ) );
 
 	T( next_PC() );
 
@@ -340,9 +327,9 @@ static void test_sections( void )
 	dump_file("code area ");
 
 	/* link */
-	T( set_cur_module_id(0) ); T( new_section("bss") );  addr = 0; T( patch_byte(&addr, 3) );
-	T( set_cur_module_id(1) ); T( new_section("data") ); addr = 0; T( patch_byte(&addr, 2) );
-	T( set_cur_module_id(2) ); T( new_section("code") ); addr = 0; T( patch_byte(&addr, 1) );
+	T( set_cur_module_id(0) ); T( new_section("bss") );  T( patch_byte(0, 3) );
+	T( set_cur_module_id(1) ); T( new_section("data") ); T( patch_byte(0, 2) );
+	T( set_cur_module_id(2) ); T( new_section("code") ); T( patch_byte(0, 1) );
 	
 	T( get_first_section(NULL)->origin = -1; sections_alloc_addr() );
 

@@ -706,7 +706,6 @@ tr21:
                     if ( opts.cpu & CPU_RABBIT )
                     {
                         error_illegal_ident();
-                        scan_error = TRUE;
                     };
 
                     {
@@ -1049,7 +1048,6 @@ tr42:
                     if ( ! get_sym_string() )
                     {
                         error_unclosed_string();
-                        scan_error = TRUE;
                     }
 
                     {
@@ -1108,7 +1106,6 @@ tr47:
                     {
                         sym.number = 0;
                         error_invalid_squoted_string();
-                        scan_error = TRUE;
                     }
 
                     {

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.48 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.49 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -65,7 +65,7 @@ static void LD_IND_HL(void)
 		break;
 
 	default:
-		patch_byte(&opcodeptr, (Byte)(0x70 + sym.cpu_reg8));     /* LD  (IX|IY+d),r  */
+		patch_byte(opcodeptr, (Byte)(0x70 + sym.cpu_reg8));     /* LD  (IX|IY+d),r  */
 		break;
 	}
 

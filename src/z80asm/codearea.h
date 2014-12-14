@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.33 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.34 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #pragma once
@@ -128,27 +128,26 @@ extern UInt get_PC( void );
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is relative to current module and current section
-*	and is incremented after store
 *----------------------------------------------------------------------------*/
-extern void  patch_value( UInt *paddr, UInt value, UInt num_bytes );
-extern void append_value(              UInt value, UInt num_bytes );
+extern void  patch_value( UInt addr, UInt value, UInt num_bytes );
+extern void append_value(            UInt value, UInt num_bytes );
 
-extern void  patch_byte( UInt *paddr, Byte byte1 );		/* one byte */
+extern void  patch_byte( UInt addr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
 
-extern void  patch_word( UInt *paddr, int word );		/* 2-byte word */
+extern void  patch_word( UInt addr, int word );			/* 2-byte word */
 extern void append_word( int word );
 
-extern void  patch_long( UInt *paddr, long dword );		/* 4-byte long */
+extern void  patch_long( UInt addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
 /* advance code pointer reserving space, return address of start of buffer */
 extern Byte *append_reserve( UInt num_bytes );	
 
 /* patch/append binary contents of file, whole file if num_bytes < 0 */
-extern void  patch_file_contents( FILE *file, UInt *paddr, long num_bytes );	
-extern void append_file_contents( FILE *file,              long num_bytes );	
+extern void  patch_file_contents( FILE *file, UInt addr, long num_bytes );	
+extern void append_file_contents( FILE *file,            long num_bytes );	
 
 /*-----------------------------------------------------------------------------
 *   read/write current module to an open file

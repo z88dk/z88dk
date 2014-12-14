@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.44 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.45 2014-12-14 00:14:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -417,13 +417,12 @@ static Byte *alloc_space( UInt addr, UInt num_bytes )
 *	the patch address is relative to current module and current section
 *	and is incremented after store
 *----------------------------------------------------------------------------*/
-void patch_value( UInt *paddr, UInt value, UInt num_bytes )
+void patch_value( UInt addr, UInt value, UInt num_bytes )
 {
 	Byte *buffer;
 
     init();
-	buffer = alloc_space( *paddr, num_bytes );
-	(*paddr) += num_bytes;
+	buffer = alloc_space( addr, num_bytes );
 	while ( num_bytes-- > 0 )
 	{
 		*buffer++ = value & 0xFF;
@@ -433,19 +432,16 @@ void patch_value( UInt *paddr, UInt value, UInt num_bytes )
 
 void append_value( UInt value, UInt num_bytes )
 {
-	UInt addr;
-
     init();
-	addr = get_cur_module_size();
-	patch_value( &addr, value, num_bytes );
+	patch_value(get_cur_module_size(), value, num_bytes);
 
 	if ( opts.list )
 		list_append( value, num_bytes );
 }
 
-void patch_byte( UInt *paddr, Byte byte1 ) { patch_value( paddr, byte1, 1 ); }
-void patch_word( UInt *paddr, int  word  ) { patch_value( paddr, word,  2 ); }
-void patch_long( UInt *paddr, long dword ) { patch_value( paddr, dword, 4 ); }
+void patch_byte( UInt addr, Byte byte1 ) { patch_value( addr, byte1, 1 ); }
+void patch_word( UInt addr, int  word  ) { patch_value( addr, word,  2 ); }
+void patch_long( UInt addr, long dword ) { patch_value( addr, dword, 4 ); }
 
 void append_byte( Byte byte1 ) { append_value( byte1, 1 ); }
 void append_word( int  word )  { append_value( word,  2 ); }
@@ -465,7 +461,7 @@ Byte *append_reserve( UInt num_bytes )
 }
 
 /* append binary contents of file, whole file if num_bytes < 0 */
-void patch_file_contents( FILE *file, UInt *paddr, long num_bytes )
+void patch_file_contents( FILE *file, UInt addr, long num_bytes )
 {
 	long start_ptr;
 	Byte *buffer;
@@ -485,19 +481,15 @@ void patch_file_contents( FILE *file, UInt *paddr, long num_bytes )
 
 	if ( num_bytes > 0 )
 	{
-		buffer = alloc_space( *paddr, num_bytes );
+		buffer = alloc_space( addr, num_bytes );
 		xfget_chars( file, (char *) buffer, num_bytes );
-		*paddr += num_bytes;
 	}
 }
 
 void append_file_contents( FILE *file, long num_bytes )
 {
-	UInt addr;
-
 	init();
-	addr = get_cur_module_size();
-	patch_file_contents( file, &addr, num_bytes );
+	patch_file_contents(file, get_cur_module_size(), num_bytes);
 }
 
 /*-----------------------------------------------------------------------------

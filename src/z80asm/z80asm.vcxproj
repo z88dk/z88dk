@@ -130,6 +130,7 @@
     <ClInclude Include="scan.h" />
     <ClInclude Include="scan_def.h" />
     <ClInclude Include="scan_rules.h" />
+    <ClInclude Include="scan_tokens.h" />
     <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symref.h" />
