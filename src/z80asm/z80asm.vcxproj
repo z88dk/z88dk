@@ -123,6 +123,7 @@
     <ClInclude Include="modlink.h" />
     <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
+    <ClInclude Include="opcodes.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="options_def.h" />
     <ClInclude Include="parse.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="modlink.c" />
     <ClCompile Include="module.c" />
     <ClCompile Include="objfile.c" />
+    <ClCompile Include="opcodes.c" />
     <ClCompile Include="options.c" />
     <ClCompile Include="parse.c" />
     <ClCompile Include="prsident.c" />

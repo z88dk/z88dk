@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.9 2014-12-13 00:49:45 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.10 2014-12-14 00:42:19 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,6 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.9 2014-12-13 00:49
 #include "codearea.h"
 #include "init.h"
 #include "model.h"
+#include "opcodes.h"
 #include "parse.h"
 #include "scan.h"
 #include "sym.h"

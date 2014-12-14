@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.1 2014-12-13 00:49:46 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.2 2014-12-14 00:42:19 pauloscustodio Exp $ 
 */
 
 #define NO_TOKEN_ENUM
@@ -26,9 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.1 2014-12-1
 						
 #define ADD_OPCODE(x)	ADD_LABEL; \
 						if (compile_active) { \
-							if ( (x) & 0xFF00) \
-								append_byte( ((x) >> 8) & 0xFF ); \
-							append_byte( (x) & 0xFF ); \
+							add_opcode(x); \
 						}
 						
 %%{
@@ -53,8 +51,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.1 2014-12-1
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label             . _TK_NEWLINE		@{ ADD_LABEL; }
-		|	label? . _TK_HALT . _TK_NEWLINE		@{ ADD_OPCODE(0x76); }
-		|	label? . _TK_NOP  . _TK_NEWLINE		@{ ADD_OPCODE(0x00); }
+		|	label? . _TK_HALT . _TK_NEWLINE		@{ ADD_OPCODE(Z80_HALT); }
+		|	label? . _TK_NOP  . _TK_NEWLINE		@{ ADD_OPCODE(Z80_NOP); }
 		;
 
 }%%

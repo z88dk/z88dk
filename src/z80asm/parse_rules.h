@@ -87,9 +87,7 @@ tr6:
 
                 if ( compile_active )
                 {
-                    if ( ( 0x76 ) & 0xFF00 ) append_byte( ( ( 0x76 ) >> 8 ) & 0xFF );
-
-                    append_byte( ( 0x76 ) & 0xFF );
+                    add_opcode( Z80_HALT );
                 };
             }
             goto st5;
@@ -103,9 +101,7 @@ tr7:
 
                 if ( compile_active )
                 {
-                    if ( ( 0x00 ) & 0xFF00 ) append_byte( ( ( 0x00 ) >> 8 ) & 0xFF );
-
-                    append_byte( ( 0x00 ) & 0xFF );
+                    add_opcode( Z80_NOP );
                 };
             }
             goto st5;
