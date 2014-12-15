@@ -14,8 +14,10 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.1 2014-12-14 00:42:19 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.2 2014-12-15 22:32:05 pauloscustodio Exp $ 
 */
+
+#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "opcodes.h"
