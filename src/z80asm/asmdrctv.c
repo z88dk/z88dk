@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.107 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.108 2014-12-15 22:28:47 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -367,7 +367,6 @@ DEFC( void )
 
                 if ( ( expr = expr_parse() ) != NULL )
                 {
-#if 1
 					if ( (expr->result.not_evaluable) || 
 						 (expr->sym_type >= TYPE_ADDRESS) )
                     {
@@ -380,15 +379,6 @@ DEFC( void )
 						/* create symbol */
 						define_symbol( expr->target_name, 0, TYPE_COMPUTED, 0 );
                     }
-#else
-					/* expr. must not be stored in relocatable file */
-                    if ( expr->result.not_evaluable )
-                    {
-                        error_not_defined();
-	                    OBJ_DELETE( expr );
-                        break;
-                    }
-#endif
                     else
                     {
                         constant = Expr_eval( expr );    /* DEFC constant expression */
