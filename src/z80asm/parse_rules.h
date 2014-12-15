@@ -26,8 +26,8 @@ static const int parser_en_main = 1;
 
 static Bool _parse_statement( Bool compile_active )
 {
-    p = tokens;
-    pe = eof = tokens + tokens_len;
+    p = ( Sym * )utarray_front( tokens );
+    pe = eof = ( Sym * )utarray_back( tokens ) + 1;
 
 
 
@@ -46,7 +46,7 @@ static Bool _parse_statement( Bool compile_active )
         switch ( cs )
         {
         case 1:
-            switch ( ( p->tok ) )
+            switch ( ( ( ( int ) p->tok ) ) )
             {
             case 0:
                 goto st5;
@@ -126,7 +126,7 @@ st2:
 
         case 2:
 
-            switch ( ( p->tok ) )
+            switch ( ( ( ( int ) p->tok ) ) )
             {
             case 12:
                 goto tr5;
@@ -145,7 +145,7 @@ st3:
                 goto _test_eof3;
 
         case 3:
-            if ( ( p->tok ) == 12 )
+            if ( ( ( ( int ) p->tok ) ) == 12 )
                 goto tr6;
 
             goto st0;
@@ -155,7 +155,7 @@ st4:
                 goto _test_eof4;
 
         case 4:
-            if ( ( p->tok ) == 12 )
+            if ( ( ( ( int ) p->tok ) ) == 12 )
                 goto tr7;
 
             goto st0;

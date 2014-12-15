@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.2 2014-12-14 00:42:19 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.3 2014-12-15 22:48:41 pauloscustodio Exp $ 
 */
 
 #define NO_TOKEN_ENUM
@@ -34,16 +34,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.2 2014-12-1
 
 	/* type of token and way to retrieve */
 	alphtype int;
-	getkey p->tok;
+	getkey ((int) p->tok);
 
 	/* dynamically grow state stack */
 	prepush {
-		if (top >= stack_size) {
-			stack_size += STACK_GROW;
-			stack = xrealloc(stack, stack_size);
-		}
+		utarray_reserve(state_stack, 1);
+		stack = (int *)utarray_front(state_stack);
 	}
-	
+
 	/* label */
 	label = _TK_LABEL 		@{ stmt_label = p->string; };
 	
@@ -61,8 +59,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.2 2014-12-1
 
 static Bool _parse_statement(Bool compile_active)
 {
-	p = tokens;
-	pe = eof = tokens + tokens_len;
+	p = (Sym *)utarray_front(tokens);
+	pe = eof = (Sym *)utarray_back(tokens) + 1;
 	
 	%%write init;
 	

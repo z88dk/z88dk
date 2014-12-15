@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.10 2014-12-14 00:42:19 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.11 2014-12-15 22:48:41 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -27,32 +27,26 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.10 2014-12-14 00:4
 #include "scan.h"
 #include "sym.h"
 #include "symtab.h"
-
-#define STRINGS_GROW	256
-#define TOKENS_GROW		256
-#define STACK_GROW		256
+#include "utarray.h"
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
 *----------------------------------------------------------------------------*/
 
-typedef struct token_t {
-	int		 tok;						/* token ID */
-	char	*string;					/* string saved in strpool */
-	int		 number;					/* number value */
-} Token;
-
 /* array of tokens in the current statement */
-static Token *tokens, *p, *pe, *eof;
-static int    tokens_len, tokens_size;
+static Sym *p, *pe, *eof;
+static UT_array *tokens;
+static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 
 /* strings saved from the current statement */
-static char *strings;
-static int   strings_len, strings_size;
+static UT_array *token_strings;
 
 /* Ragel state variables */
 static int cs;							/* current state */
-static int *stack, top, stack_size;		/* stack of states */
+
+/* Ragel state stack */
+static UT_array *state_stack;
+static int *stack, top;
 
 /* Statement label, NULL if none */
 static char *stmt_label;
@@ -62,12 +56,16 @@ static char *stmt_label;
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
+	utarray_new(tokens, &ut_Sym_icd);
+	utarray_new(token_strings, &ut_str_icd);
+	utarray_new(state_stack, &ut_int_icd);
 }
 
 DEFINE_fini()
 {
-	xfree(tokens);
-	xfree(strings);
+	utarray_free(tokens);
+	utarray_free(token_strings);
+	utarray_free(state_stack);
 }
 
 /*-----------------------------------------------------------------------------
@@ -78,25 +76,13 @@ DEFINE_fini()
 /*-----------------------------------------------------------------------------
 *   String pool for the current statement
 *----------------------------------------------------------------------------*/
-static char *strings_add(char *str)
+static char *token_strings_add(char *str)
 {
-	int size;
-	char *copy;
+	if (!str)		/* NULL string */
+		return NULL;
 
-	if (!str || str[0] == '\0')		/* NULL or empty string */
-		return "";
-
-	size = strlen(str) + 1;
-	while (strings_len + size >= strings_size)
-	{
-		strings_size += STRINGS_GROW;
-		strings = xrealloc(strings, strings_size);
-	}
-	copy = strings + strings_len;
-	memcpy(copy, str, size);
-	strings_len += size;
-
-	return copy;
+	utarray_push_back(token_strings, &str);
+	return *((char **)utarray_back(token_strings));
 }
 
 /*-----------------------------------------------------------------------------
@@ -105,22 +91,13 @@ static char *strings_add(char *str)
 *----------------------------------------------------------------------------*/
 static void read_tokens(void)
 {
-	int i;
+	Sym sym_copy;
 
-	i = tokens_len;
 	while (TRUE)
 	{
-		/* grow tokens[] if needed */
-		if (i >= tokens_size)
-		{
-			tokens_size += TOKENS_GROW;
-			tokens = xrealloc(tokens, tokens_size * sizeof(Token));
-		}
-		tokens[i].tok = sym.tok;
-		tokens[i].string = strings_add(sym.string);
-		tokens[i].number = sym.number;
-		i++;
-		tokens_len = i;
+		sym_copy = sym;
+		sym_copy.string = token_strings_add(sym.string);
+		utarray_push_back(tokens, &sym_copy);
 
 		if (sym.tok == TK_END || sym.tok == TK_NEWLINE)
 			break;
@@ -131,8 +108,8 @@ static void read_tokens(void)
 
 static void free_tokens(void)
 {
-	tokens_len = 0;
-	strings_len = 0;
+	utarray_clear(tokens);
+	utarray_clear(token_strings);
 }
 
 /*-----------------------------------------------------------------------------
