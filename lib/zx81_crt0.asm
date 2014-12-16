@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.43 2014-12-03 21:26:26 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.44 2014-12-16 07:57:54 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -145,16 +145,22 @@ IF (startup>=23)	; CHROMA 81
 
 	ld	a,7*16		; white paper, black ink
 	ld	hl,HRG_LineStart+2+32768
+	ld	de,(16396)
+	set 7,d
+	inc de
 	ld	c,24
 .rowloop
 	ld	b,32
 .rowattr
 	ld	(hl),a
+	ld	(de),a
 	inc hl
+	inc de
 	djnz rowattr
 	inc	hl
 	inc	hl
 	inc	hl
+	inc de
 	dec c
 	jr  nz,rowloop
 ENDIF
