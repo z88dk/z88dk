@@ -93,16 +93,16 @@ putchar_ok:
 
 x_ok:
 
-   ld a,(ix+19)                ; a = height
-   dec a
+   ld a,d
+   sub (ix+19)                 ; a = y - height
    
-   cp d
-   jr nc, y_ok                 ; if y < height
-   
+   jr c, y_ok                  ; if y < height
+
    ; scroll upward
       
    push bc                     ; save char info
    
+   inc a
    call putchar_scroll
    
    pop bc
@@ -141,7 +141,8 @@ putchar_lf:
    ld c,(ix+19)                ; c = height
    
    ld a,d
-   cp c
+   sub c
+   inc a
    
    call nc, putchar_scroll     ; if y >= height
    jp console_01_output_char_proc_set_coord
@@ -149,8 +150,12 @@ putchar_lf:
 
 putchar_scroll:
 
+   ; enter: a = num rows to scroll
+   ;
    ; exit : e = new x coord
    ;        d = new y coord
+
+   ld c,a                      ; c = num rows to scroll
 
    bit 7,(ix+7)
    jr nz, scroll_it            ; if input terminal is reading input
@@ -158,10 +163,14 @@ putchar_scroll:
    bit 6,(ix+6)
    jr z, scroll_immediate      ; if pause flag is reset
    
-   dec (ix+20)
-   jr nz, scroll_immediate     ; if scroll limit not reached
+   sub (ix+20)
+   ld (ix+20),a
+   
+   jr c, scroll_immediate      ; if scroll limit not reached
 
 pause_scroll:
+
+   push bc
 
    ld a,ITERM_MSG_BELL
    call l_jpix                 ; send signal bell
@@ -171,6 +180,8 @@ pause_scroll:
    ld a,OTERM_MSG_PAUSE
    call l_jpix
 
+   pop bc
+
 scroll_immediate:
 
    bit 7,(ix+6)
@@ -178,7 +189,7 @@ scroll_immediate:
    
 scroll_it:
 
-   ld c,1                      ; scroll one row
+   ; c = num rows to scroll
 
    ld a,OTERM_MSG_SCROLL
    call l_jpix
