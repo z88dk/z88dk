@@ -4,19 +4,19 @@ dnl############################################################
 dnl##                                                        ##
 dnl## m4_zx_01_output_char_32(...)                           ##
 dnl##                                                        ##
-dnl## $`'1 = label attached to FILE or 0 if fd only          ##
-dnl## $`'2 = ioctl_flags (16 bits)                           ##
-dnl## $`'3 = cursor.x coordinate                             ##
-dnl## $`'4 = cursor.y coordinate                             ##
-dnl## $`'5 = window.x coordinate                             ##
-dnl## $`'6 = window.width                                    ##
-dnl## $`'7 = window.y coordinate                             ##
-dnl## $`'8 = window.height                                   ##
-dnl## $`'9 = scroll limit (number of scrolls until pause)    ##
-dnl## $`'10 = font address                                   ##
-dnl## $`'11 = foreground colour (text attribute)             ##
-dnl## $`'12 = foreground mask (set bits = keep screen bits)  ##
-dnl## $`'13 = background colour (cls attribute)              ##
+dnl## $1 = label attached to FILE or 0 if fd only            ##
+dnl## $2 = ioctl_flags (16 bits)                             ##
+dnl## $3 = cursor.x coordinate                               ##
+dnl## $4 = cursor.y coordinate                               ##
+dnl## $5 = window.x coordinate                               ##
+dnl## $6 = window.width                                      ##
+dnl## $7 = window.y coordinate                               ##
+dnl## $8 = window.height                                     ##
+dnl## $9 = scroll limit (number of scrolls until pause)      ##
+dnl## $10 = font address                                     ##
+dnl## $11 = foreground colour (text attribute)               ##
+dnl## $12 = foreground mask (set bits = keep screen bits)    ##
+dnl## $13 = background colour (cls attribute)                ##
 dnl##                                                        ##
 dnl############################################################
 
