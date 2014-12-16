@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.213 2014-10-31 07:41:45 stefano Exp $
+# $Id: Makefile,v 1.214 2014-12-16 14:36:34 dom Exp $
 
 
 include Make.config
@@ -113,63 +113,63 @@ zx81deps:
 	$(RM) -f zx81/tape/*.o
 	$(RM) -f zx81/basic/*.o
 	$(RM) -f time/zx81/*.o
-	cd psg ; $(MAKE) clean ; cd ..
+	$(MAKE) -C psg clean
 
 # interesting algorithms - aralbrec
 algorithm.lib:
 	@echo ''
 	@echo '--- Building Algorithm Library ---'
 	@echo ''
-	cd algorithm ; $(MAKE) ; cd ..
+	$(MAKE) -C algorithm 
 
 # rectangles, intervals and points - aralbrec
 rect.lib:
 	@echo ''
 	@echo '--- Building Rectangles Library ---'
 	@echo ''
-	cd rect ; $(MAKE) ; cd ..
+	$(MAKE) -C rect 
 
 # abstract data types library - aralbrec
 adt.lib:
 	@echo ''
 	@echo '--- Building Abstract Data Types Library ---'
 	@echo ''
-	cd adt ; $(MAKE) ; cd ..
+	$(MAKE) -C adt 
 
 # block memory allocator - aralbrec
 balloc.lib:
 	@echo ''
 	@echo '--- Building Block Memory Allocator Library ---'
 	@echo ''
-	cd balloc ; $(MAKE) ; cd ..
+	$(MAKE) -C balloc 
 
 # interrupt mode 2 library - aralbrec
 im2.lib:
 	@echo ''
 	@echo '--- Building IM 2 Library ---'
 	@echo ''
-	cd im2 ; $(MAKE) ; cd ..
+	$(MAKE) -C im2 
 
 # Garry's z88 far library - garry (probably dom now)
 farz88.lib:
 	@echo ''
 	@echo '--- Building Z88 Far Malloc Library ---'
 	@echo ''
-	cd farz88 ; $(MAKE) ; cd ..
+	$(MAKE) -C farz88 
 
 # Generic maths build - dom, stefano
 gen_math.lib:
 	@echo ''
 	@echo '--- Building Z80 Generic Maths Library ---'
 	@echo ''
-	cd math/genmath; $(MAKE) ; cd ../..
+	$(MAKE) -C math/genmath
 
 # Z88 maths build - dom
 z88_math.lib:
 	@echo ''
 	@echo '--- Building Z88 Maths Library ---'
 	@echo ''
-	cd math/z88math; $(MAKE) ; cd ../..
+	$(MAKE) -C math/z88math
 
 # Graphics library (for both app and basic - diff libs though!) - dom
 gfx.lib:
@@ -186,14 +186,14 @@ lib3d.lib:
 	@echo ''
 	@echo '--- Building 3D Library ---'
 	@echo ''
-	cd lib3d ; $(MAKE) ; cd ..
+	$(MAKE) -C lib3d 
 
 # Xlib / X11 and tiny GUI portable library - stefano
 x11.lib:
 	@echo ''
 	@echo '--- Building X11 emulation Library ---'
 	@echo ''
-	cd graphics ; $(MAKE) lx11 ; cd ..
+	$(MAKE) -C graphics lx11 
 
 # simple malloc library - dom
 # adding multiple heaps and realloc - aralbrec
@@ -201,58 +201,58 @@ malloc.lib:
 	@echo ''
 	@echo '--- Building Near Malloc Library ---'
 	@echo ''
-	cd malloc ; $(MAKE) ; cd ..
+	$(MAKE) -C malloc 
 
 ndos.lib:
-	cd fcntl/dummy ; $(MAKE) ; cd ../..
+	$(MAKE) -C fcntl/dummy 
 
 gendos.lib:
-	cd fcntl ; $(MAKE) lgendos ; cd ..
+	$(MAKE) -C fcntl lgendos 
 
 # Startup code (such as division etc) common to all z80s - dom
 z80_crt0.lib:
 	@echo ''
 	@echo '--- Building Z80 crt0 Library ---'
 	@echo ''
-	cd z80_crt0s ; $(MAKE) ; cd ..
+	$(MAKE) -C z80_crt0s 
 
 # Z88DK DEBUG utilities
 debug.lib:
 	@echo ''
 	@echo '--- Building DEBUG Library ---'
 	@echo ''
-	cd debug ; $(MAKE) ; cd ..
+	$(MAKE) -C debug 
 
 # Custom z88 routines for application - dom
 z88.lib:
 	@echo ''
 	@echo '--- Building Z88 Custom Library ---'
 	@echo ''
-	cd z88 ; $(MAKE) ; cd ..
+	$(MAKE) -C z88 
 
 # ZSock API (wrappers to package calls) - dom
 net.lib:
 	@echo ''
 	@echo '--- Building Z88 ZSock Library ---'
 	@echo ''
-	cd net ; $(MAKE) ; cd ..
+	$(MAKE) -C net 
 
 # z88 library - dom
 z88_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lz88 ; cd ..
-	cd stdio ; $(MAKE) lz88 ; cd ..
-	cd stdlib ; $(MAKE) lz88 ; cd ..
-	cd strings ; $(MAKE) ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lz88 ; cd ..
-	cd rs232 ; $(MAKE) lz88 ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lz88 
+	$(MAKE) -C stdio lz88 
+	$(MAKE) -C stdlib lz88 
+	$(MAKE) -C strings 
+	$(MAKE) -C printflike
+	$(MAKE) -C time lz88
+	$(MAKE) -C rs232 lz88
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lz88 ; cd ..
+	$(MAKE) -C games lz88 
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # z88 ansi library - dom
@@ -260,15 +260,17 @@ z88ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 ANSI Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lz88 ; cd ..
-	cd stdio ; $(MAKE) lz88 ; cd ..
-	cd stdlib ; $(MAKE) lz88 ; cd ..
-	cd strings ; $(MAKE) ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lz88 ; cd ..
-	cd rs232 ; $(MAKE) lz88 ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lz88 
+	$(MAKE) -C stdio lz88 
+	$(MAKE) -C stdlib lz88 
+	$(MAKE) -C strings 
+	$(MAKE) -C printflike
+	$(MAKE) -C time lz88
+	$(MAKE) -C rs232 lz88
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert 
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lz88 
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88ansi_clib @$(LISTFILE_DIRECTORY)/z88ansi.lst
 
 # Network stdio - dom
@@ -276,15 +278,17 @@ z88net_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 Network Aware Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lz88 ; cd ..
-	cd stdio ; $(MAKE) lz88net ; cd ..
-	cd stdlib ; $(MAKE) lz88 ; cd ..
-	cd strings ; $(MAKE) ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lz88 ; cd ..
-	cd rs232 ; $(MAKE) lz88 ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lz88 
+	$(MAKE) -C stdio lz88net
+	$(MAKE) -C stdlib lz88 
+	$(MAKE) -C strings 
+	$(MAKE) -C printflike
+	$(MAKE) -C time lz88
+	$(MAKE) -C rs232 lz88
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert 
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lz88 
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
 # ZX Spectrum fcntl - dom/stefano
@@ -292,7 +296,7 @@ zxfcntl:
 	@echo ''
 	@echo '--- Building ZX Spectrum fcntl libraries ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C fcntl lzx
 
 # 64/32 column library for ZX Spectrum - dom/stefano
 zx_clib.lib:
@@ -300,17 +304,16 @@ zx_clib.lib:
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings 
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 
 # vt100 C lib for spectrum - stefano/dom
@@ -322,22 +325,21 @@ zxan_clib.lib:
 	@echo ''
 	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings 
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxan_clib @$(LISTFILE_DIRECTORY)/zxansi.lst
 
 # ZX Spectrum RS232 libraries - stefano
 zx232:
-	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C rs232 lzx
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 ts2068_clib.lib:
@@ -345,17 +347,17 @@ ts2068_clib.lib:
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lzx
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -DFORts2068 -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # vt100 C lib for TS2068 - stefano/dom
@@ -367,17 +369,17 @@ ts2068an_clib.lib:
 	@echo ''
 	$(RM) stdio/ansi/ts2068/f_ansi_*.o
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lzx
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
 # TS2068 HRG graphics lib - Stefano
@@ -409,8 +411,8 @@ zxvgs.lib:
 	@echo ''
 	@echo '--- Building ZXVGS Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lzxvgs ; cd ..
-	cd zxvgs; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lzxvgs
+	$(MAKE) -C zxvgs
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
 
 # ZX Spectrum maths library - Stefano
@@ -418,13 +420,13 @@ mzx.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Maths Library ---'
 	@echo ''
-	cd math/zxmath ; $(MAKE) mzx ; cd ../..
+	$(MAKE) -C math/zxmath mzx
 
 mzx_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
-	cd math/zxmath ; $(MAKE) mzx_tiny ; cd ../..
+	$(MAKE) -C math/zxmath mzx_tiny
 
 # Philips P2000 lib - Stefano
 p2000_clib.lib:
@@ -432,15 +434,15 @@ p2000_clib.lib:
 	@echo '--- Building Philips P2000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lp2000 ; cd ..
+	$(MAKE) -C psg
+	$(MAKE) -C games lp2000
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
 # Philips P2000 ansi lib - Stefano
@@ -449,15 +451,15 @@ p2000ansi_clib.lib:
 	@echo '--- Building Philips P2000 ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lp2000 ; cd ..
+	$(MAKE) -C psg
+	$(MAKE) -C games lp2000
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000ansi_clib @$(LISTFILE_DIRECTORY)/p2000ansi.lst
 
 # PC6001 lib - Stefano
@@ -466,13 +468,13 @@ pc6001_clib.lib:
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 
 # PC6001 ansi lib - Stefano
@@ -481,13 +483,13 @@ pc6001ansi_clib.lib:
 	@echo '--- Building PC6001 ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001ansi_clib @$(LISTFILE_DIRECTORY)/pc6001ansi.lst
 
 # Native for sprinter - dom
@@ -496,18 +498,18 @@ pps_clib.lib:
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lpps ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lpps ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C fcntl lpps
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lpps
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum 
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
 # vt100 for sprinter - dom
@@ -516,18 +518,18 @@ ppsansi_clib.lib:
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lpps ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lpps ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdio generic
+	$(MAKE) -C fcntl lpps
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lpps
 	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C spectrum 
+	$(MAKE) -C psg
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
 
 # VZ200/300 lib - Stefano
@@ -536,14 +538,14 @@ vz_clib.lib:
 	@echo '--- Building VZ200/300 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lvz ; cd ..
+	$(MAKE) -C games lvz
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
 # VZ200 ansi lib - Stefano
@@ -552,14 +554,14 @@ vzansi_clib.lib:
 	@echo '--- Building VZ200/300 ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lvz ; cd ..
+	$(MAKE) -C games lvz
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vzansi_clib @$(LISTFILE_DIRECTORY)/vzansi.lst
 
 # ZX81 lib - Stefano
@@ -568,15 +570,15 @@ zx80_clib.lib:
 	@echo '--- Building ZX80 Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx80 ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lzx80
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lzx ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C games lzx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 
@@ -586,15 +588,15 @@ zx81_clib.lib:
 	@echo '--- Building ZX81 Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic_iy ; cd ..
-	cd printflike ; $(MAKE) generic_iy ; cd ..
-	cd setjmp ; $(MAKE) generic_iy ; cd ..
-	cd assert ; $(MAKE) generic_iy ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic_iy 
+	$(MAKE) -C printflike generic_iy
+	$(MAKE) -C setjmp generic_iy
+	$(MAKE) -C assert generic_iy
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lzx81 ; cd ..
-	cd psg ; $(MAKE) generic_iy ; cd ..
+	$(MAKE) -C games lzx81
+	$(MAKE) -C psg generic_iy
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
@@ -605,15 +607,15 @@ zx81ansi_clib.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(RM) stdio/ansi/zx81/f_ansi_char.o
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic_iy ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic_iy 
+	$(MAKE) -C printflike generic_iy
+	$(MAKE) -C setjmp generic_iy
+	$(MAKE) -C assert generic_iy
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lzx81 ; cd ..
-	cd psg ; $(MAKE) generic_iy ; cd ..
+	$(MAKE) -C games lzx81
+	$(MAKE) -C psg generic_iy
 	$(LIBLINKER) -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
 	$(MAKE) zx81deps
 
@@ -667,13 +669,13 @@ m81.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Maths Library ---'
 	@echo ''
-	cd math/zxmath ; $(MAKE) m81 ; cd ../..
+	$(MAKE) -C math/zxmath m81
 
 m81_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Tiny Maths Library ---'
 	@echo ''
-	cd math/zxmath ; $(MAKE) m81_tiny ; cd ../..
+	$(MAKE) -C math/zxmath m81_tiny
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
@@ -683,14 +685,14 @@ ti82ansi_clib.lib:
 	@echo '--- Building TI82 ANSI Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti82_clib.lib:
@@ -698,14 +700,14 @@ ti82_clib.lib:
 	@echo '--- Building TI82 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti82 -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83ansi_clib.lib:
@@ -713,14 +715,14 @@ ti83ansi_clib.lib:
 	@echo '--- Building TI83 ANSI Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti83_clib.lib:
@@ -728,14 +730,14 @@ ti83_clib.lib:
 	@echo '--- Building TI83 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti83 -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83pansi_clib.lib:
@@ -743,14 +745,14 @@ ti83pansi_clib.lib:
 	@echo '--- Building TI83+ ANSI Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83pansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti83p_clib.lib:
@@ -758,14 +760,14 @@ ti83p_clib.lib:
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti83p -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti85ansi_clib.lib:
@@ -773,14 +775,14 @@ ti85ansi_clib.lib:
 	@echo '--- Building TI85 ANSI Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti85_clib.lib:
@@ -788,14 +790,14 @@ ti85_clib.lib:
 	@echo '--- Building TI85 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti85 -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti86ansi_clib.lib:
@@ -803,14 +805,14 @@ ti86ansi_clib.lib:
 	@echo '--- Building TI86 ANSI Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti86_clib.lib:
@@ -818,14 +820,14 @@ ti86_clib.lib:
 	@echo '--- Building TI86 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lticalc ; cd ..
+	$(MAKE) -C games lticalc
 	$(LIBLINKER) -DFORti86 -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 # vt100 C lib for the Sharp OZ family - stefano
@@ -836,15 +838,15 @@ ozansi_clib.lib:
 	@echo ''
 	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd oz ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C oz 
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) loz ; cd ..
+	$(MAKE) -C games loz
 	$(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
 # CPM lib - Stefano/dom
@@ -852,14 +854,14 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lcpm ; cd ..
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) lcpm ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lcpm ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lcpm
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio lcpm
+	$(MAKE) -C printflike
+	$(MAKE) -C time lcpm
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 
 # Sorcerer Exidy lib - Stefano
@@ -867,12 +869,12 @@ sorcerer_clib.lib:
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano
@@ -881,12 +883,12 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
 
 # Sharp MZ ansi lib - Stefano
@@ -895,12 +897,12 @@ mzansi_clib.lib:
 	@echo '--- Building Sharp MZ ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/mzansi_clib @$(LISTFILE_DIRECTORY)/mzansi.lst
 
 # ABC80 Library - Stefano
@@ -909,12 +911,12 @@ abc80_clib.lib:
 	@echo '--- Building ABC80 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
 
 # ABC80 ANSI library - Stefano
@@ -923,12 +925,12 @@ abc80ansi_clib.lib:
 	@echo '--- Building ABC80 ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80ansi_clib @$(LISTFILE_DIRECTORY)/abc80ansi.lst
 
 # ABC800 library - Stefano
@@ -937,12 +939,12 @@ abc800_clib.lib:
 	@echo '--- Building ABC800 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
 # Jupiter ACE library - Stefano
@@ -951,15 +953,15 @@ ace_clib.lib:
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd ace ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lace ; cd ..
+	$(MAKE) -C ace 
+	$(MAKE) -C games lace
 	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
 # Jupiter ACE ANSI library - Stefano
@@ -968,15 +970,15 @@ aceansi_clib.lib:
 	@echo '--- Building Jupiter Ace ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd ace ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lace ; cd ..
+	$(MAKE) -C ace 
+	$(MAKE) -C games lace
 	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/aceansi_clib.lib @$(LISTFILE_DIRECTORY)/aceansi.lst
 
 # Mattel Aquarius library - Stefano
@@ -985,15 +987,15 @@ aquarius_clib.lib:
 	@echo '--- Building Mattel Aquarius Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) laquarius ; cd ..
+	$(MAKE) -C psg
+	$(MAKE) -C games laquarius 
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 
 # Mattel Aquarius ANSI library - Stefano
@@ -1002,15 +1004,15 @@ aquansi_clib.lib:
 	@echo '--- Building Mattel Aquarius ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd psg ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) laquarius ; cd ..
+	$(MAKE) -C psg
+	$(MAKE) -C games laquarius
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquansi_clib.lib @$(LISTFILE_DIRECTORY)/aquansi.lst
 
 # Xircom REX 6000 library - Dominic
@@ -1018,10 +1020,10 @@ rex_clib.lib:
 	@echo ''
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib  ; $(MAKE) generic ; cd ..
-	cd setjmp  ; $(MAKE) ; cd ..
-	cd rex     ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C setjmp
+	$(MAKE) -C rex
 	$(LIBLINKER) -DFORrex -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
@@ -1030,15 +1032,15 @@ sam_clib.lib:
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lzx
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Sam Coupe library - Stefano & Frode
@@ -1047,15 +1049,15 @@ samansi_clib.lib:
 	@echo '--- Building Sam Coupe ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C time lzx
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lzx ; cd ..
+	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/samansi_clib @$(LISTFILE_DIRECTORY)/samansi.lst
 
 # Spectravideo SVI library - Stefano
@@ -1064,15 +1066,15 @@ svi_clib.lib:
 	@echo '--- Building Spectravideo Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C games lmsx
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
@@ -1081,16 +1083,16 @@ msx_clib.lib:
 	@echo '--- Building MSX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd fcntl ; $(MAKE) lcpm ; cd ..
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) lcpm ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C fcntl lcpm
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio lcpm
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C games lmsx
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
@@ -1099,15 +1101,15 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C games lmsx
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
@@ -1116,16 +1118,16 @@ enterprise_clib.lib:
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lenterprise ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C time lenterprise
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lenterprise ; cd ..
-	cd enterprise ; $(MAKE) ; cd ..
+	$(MAKE) -C games lenterprise
+	$(MAKE) -C enterprise 
 	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
@@ -1134,7 +1136,7 @@ gfxep.lib:
 	@echo '--- Building Enterprise 64/128 Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd graphics ; $(MAKE) lenterprise ; cd ..
+	$(MAKE) -C graphics lenterprise
 	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
 
 # Enterprise HRG graphics lib - Stefano
@@ -1143,7 +1145,7 @@ gfxephr.lib:
 	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd graphics ; $(MAKE) lenterprisehr ; cd ..
+	$(MAKE) -C graphics lenterprisehr
 	$(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
 
 # Einstein library - Stefano
@@ -1152,9 +1154,9 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd games ; $(MAKE) lmsx ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C games lmzx
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
@@ -1163,14 +1165,14 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings 
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
@@ -1179,15 +1181,15 @@ mc1000_clib.lib:
 	@echo '--- Building CCE MC-1000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lmc1000 ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings 
+	$(MAKE) -C stdlib lmc1000
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lmc1000 ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C games lmc1000
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORmc1000 -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
 # MC-1000 ANSI library - Stefano
@@ -1197,15 +1199,15 @@ mc1000ansi_clib.lib:
 	@echo ''
 	$(RM) stdio/ansi/mc1000/f_ansi_char.o
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lmc1000 ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings 
+	$(MAKE) -C stdlib lmc1000
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lmc1000 ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C games lmc1000
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORmc1000 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000ansi_clib @$(LISTFILE_DIRECTORY)/mc1000ansi.lst
 
 # NASCOM library - Stefano
@@ -1214,12 +1216,12 @@ nascom_clib.lib:
 	@echo '--- Building NASCOM Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
 
 nasansi_clib.lib:
@@ -1227,12 +1229,12 @@ nasansi_clib.lib:
 	@echo '--- Building NASCOM ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nasansi_clib @$(LISTFILE_DIRECTORY)/nasansi.lst
 
 # Untested C lib for NC100 machines - dom
@@ -1240,13 +1242,13 @@ nc_clib.lib:
 	@echo ''
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lnc ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C fcntl lnc
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 
 # Amstrad CPC library - Stefano
@@ -1255,14 +1257,14 @@ cpc_clib.lib:
 	@echo '--- Building Amstrad CPC Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd rs232 ; $(MAKE) lcpc ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C rs232 lcpc
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
@@ -1271,21 +1273,21 @@ cpcansi_clib.lib:
 	@echo '--- Building Amstrad CPC ANSI Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd rs232 ; $(MAKE) lcpc ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C rs232 lcpc
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcansi_clib @$(LISTFILE_DIRECTORY)/cpcansi.lst
 
 cpcfs.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
-	cd fcntl ; $(MAKE) lcpc ; cd ..
+	$(MAKE) -C fcntl lcpc
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @$(LISTFILE_DIRECTORY)/cpcfs.lst
 
 # Amstrad CPC maths libraries - Dom
@@ -1293,22 +1295,22 @@ cpc_math.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC Maths Libraries ---'
 	@echo ''
-	cd math/cpcmath ; $(MAKE) ; cd ../..
+	$(MAKE) -C math/cpcmath 
 
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd c128 ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C c128 
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lc128 ; cd ..
+	$(MAKE) -C games lc128
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 
@@ -1326,7 +1328,7 @@ gfx128hr.lib:
 	@echo '--- Building Commodore 128 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd graphics ; $(MAKE) lc128 ; cd ..
+	$(MAKE) -C graphics lc128
 	$(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/gfx128hr.lst
 
 # C128 640x480 HRG graphics lib - Stefano
@@ -1335,7 +1337,7 @@ gfx128hr480.lib:
 	@echo '--- Building Commodore 128 640x480 HRG Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd graphics ; $(MAKE) lc128 ; cd ..
+	$(MAKE) -C graphics lc128
 	$(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/gfx128hr480.lst
 
 # Grundy NewBrain library - Stefano
@@ -1344,14 +1346,14 @@ newbrain_clib.lib:
 	@echo '--- Building Grundy NewBrain Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lnewbrain ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lnewbrain ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C fcntl lnewbrain
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C time lnewbrain
+	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
@@ -1360,12 +1362,12 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	z80asm -RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
@@ -1373,12 +1375,12 @@ embedded_clib.lib:
 	@echo ''
 	@echo '--- Building Embedded (ns16450) Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) gen ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio gen
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -DFORembedded -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
 
 # Galaksija - Stefano Bodrato
@@ -1387,14 +1389,14 @@ gal_clib.lib:
 	@echo '--- Building Galaksija Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lgal ; cd ..
+	$(MAKE) -C games lgal
 	$(LIBLINKER) -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 
 # Camputers Lynx - Stefano Bodrato
@@ -1403,14 +1405,14 @@ lynx_clib.lib:
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lgal ; cd ..
+	$(MAKE) -C games lgal
 	$(LIBLINKER) -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
@@ -1419,14 +1421,14 @@ sms_clib.lib:
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -1435,14 +1437,14 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd msx ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C msx
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
@@ -1450,12 +1452,12 @@ test_clib.lib:
 	@echo ''
 	@echo '--- Building Test System Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
 # TRS 80 - stefano
@@ -1464,14 +1466,14 @@ trs80_clib.lib:
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ltrs80 ; cd ..
+	$(MAKE) -C games ltrs80
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 
 # Canon X-07 lib - Stefano
@@ -1479,12 +1481,12 @@ x07_clib.lib:
 	@echo ''
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
@@ -1492,15 +1494,15 @@ x1ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp X1 ANSI Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lx1 ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lx1 ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd psg ; $(MAKE) ; cd ..
-	cd x1 ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib lx1
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C time lx1
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C psg
+	$(MAKE) -C x1 
 	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
@@ -1508,14 +1510,14 @@ vg5k_clib.lib:
 	@echo ''
 	@echo '--- Building Philips VG5000 Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lvg5k ; cd ..
+	$(MAKE) -C games lvg5k
 	$(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
 
 # Philips VG5000 ansi lib - Joaopa, Stefano
@@ -1523,14 +1525,14 @@ vg5kansi_clib.lib:
 	@echo ''
 	@echo '--- Building Philips VG5000 ANSI Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lvg5k ; cd ..
+	$(MAKE) -C games lvg5k
 	$(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5kansi_clib @$(LISTFILE_DIRECTORY)/vg5kansi.lst
 
 # S-OS (The Sentinel) - Stefano
@@ -1538,13 +1540,13 @@ sos_clib.lib:
 	@echo ''
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) lcpm ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd sos ; $(MAKE) ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio lcpm
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C sos 
 	$(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
@@ -1552,38 +1554,38 @@ osca_clib.lib:
 	@echo ''
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) losca ; cd ..
-	cd stdio ; $(MAKE) lcpm ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd rs232 ; $(MAKE) losca ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd sdcard ; $(MAKE) clean ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib losca
+	$(MAKE) -C stdio lcpm
+	$(MAKE) -C printflike
+	$(MAKE) -C rs232 losca
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C sdcard clean
+	$(MAKE) -C fcntl losca
 	$(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
-	cd fcntl ; $(MAKE) losca ; cd ..
 
 oscaansi_clib.lib:
 	@echo ''
 	@echo '--- Building OSCA Library ANSI VT version ---'
 	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) losca ; cd ..
-	cd stdio ; $(MAKE) lcpm ; cd ..
-	cd rs232 ; $(MAKE) losca ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd sdcard ; $(MAKE) clean ; cd ..
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib losca
+	$(MAKE) -C stdio lcpm
+	$(MAKE) -C rs232 losca
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(MAKE) -C sdcard clean
+	$(MAKE) -C fcntl losca
 	$(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/oscaansi_clib.lib @$(LISTFILE_DIRECTORY)/oscaansi.lst
-	cd fcntl ; $(MAKE) losca ; cd ..
 
-# Z88 maths build - dom
+# Preempt multitasking library - dom
 preempt.lib:
 	@echo ''
 	@echo '--- Building Preemptive threading Library ---'
 	@echo ''
-	cd threading/preempt; $(MAKE) ; cd ../..
+	$(MAKE) -C threading/preempt
 
 # SP1 sprite library - aralbrec
 sp1:
@@ -1606,19 +1608,19 @@ sp1:
 	@echo
 
 sp1-all:
-	cd sprites/software/sp1 ; $(MAKE) sp1-all; cd ../../..
+	$(MAKE) -C sprites/software/sp1  sp1-all
 
 sp1-spectrum:
-	cd sprites/software/sp1 ; $(MAKE) sp1-spectrum; cd ../../..
+	$(MAKE) -C sprites/software/sp1  sp1-spectrum
 
 sp1-ts2068hr:
-	cd sprites/software/sp1 ; $(MAKE) sp1-ts2068hr; cd ../../..
+	$(MAKE) -C sprites/software/sp1  sp1-ts2068hr
 
 sp1-zx81hr:
-	cd sprites/software/sp1 ; $(MAKE) sp1-zx81hr; cd ../../..
+	$(MAKE) -C sprites/software/sp1  sp1-zx81hr
 
 sp1-clean:
-	cd sprites/software/sp1 ; $(MAKE) clean; cd ../../..
+	$(MAKE) -C sprites/software/sp1 clean
 
 
 clean:
