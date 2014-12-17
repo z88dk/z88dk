@@ -13,7 +13,7 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_fcntl
 
-PUBLIC asm_vioctl
+PUBLIC asm_vioctl, asm_vioctl_driver
 
 EXTERN STDIO_MSG_ICTL
 EXTERN l_jpix, __stdio_nextarg_bc, __fcntl_fdstruct_from_fd_2
@@ -43,30 +43,27 @@ asm_vioctl:
    ;            carry set, errno set
    ;
    ; uses  : af, bc, de, hl, ix
-   
-   push de                     ; save void *arg
-   
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $08
 
    EXTERN __fcntl_lock_fdtbl
+   EXTERN __fcntl_unlock_fdtbl
+   
    call __fcntl_lock_fdtbl
+   call critical_section
+   jp __fcntl_unlock_fdtbl
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+critical_section:
+
+   push de                     ; save void *arg
 
    call __fcntl_fdstruct_from_fd_2
+
    pop hl                      ; hl = void *arg
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_MULTITHREAD & $08
-
-   EXTERN __fcntl_unlock_fdtbl
-   call __fcntl_unlock_fdtbl
-
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
    jp c, error_mc              ; if fd is invalid
 
    ; ix = FDSTRUCT *
@@ -139,20 +136,6 @@ __setf:
    ; de = request
    ; hl = void *arg
 
-   push bc
-   push de
-   
-   ld hl,0                     ; no varg
-   call forward_ioctl          ; forward to driver
-   
-   pop de
-   pop bc
-
-   jp c, error_mc              ; if driver rejects change
-
-   ld l,(ix+9)
-   ld h,(ix+10)                ; hl = FDSTRUCT.ioctl_flags
-   
    ld a,d
    and $3f
    ld d,a                      ; will not affect bits 15..14
@@ -161,25 +144,31 @@ __setf:
    and $f8
    ld e,a                      ; will not affect bits 2..0   
 
-   and c
-   ld c,a
-   ld a,d
-   and b
-   ld b,a                      ; bc = bc & de = final value of affected bits
-   
-   ld a,e
-   cpl
-   and l
-   or c
-   ld (ix+9),a
-   
-   ld a,d
-   cpl
-   and h
-   or b
-   ld (ix+10),a                ; write new value of driver flags
-   
-   ret
+   ld hl,0
+
+   ; ix = FDSTRUCT *
+   ; de = request = affected flag bits
+   ; bc = parameter = value of affected flag bits
+   ; hl = void *arg = 0
+
+   ; flags are managed by stdio (hl == 0 is a valid test by driver)
+   ; send to driver to approve or disapprove (set carry on disapprove)
+   ; driver is expected to jump to "asm_vioctl_driver" to return
+
+   ; fall through
+
+forward_ioctl:
+
+   ; ix = FDSTRUCT *
+   ; bc = parameter
+   ; de = request
+   ; hl = void *arg
+
+   ld a,STDIO_MSG_ICTL
+   call l_jpix
+
+   ret nc   
+   jp error_mc                 ; indicate error
 
 __getf:
 
@@ -196,15 +185,35 @@ __getf:
    
    ret
 
-forward_ioctl:
+asm_vioctl_driver:
 
    ; ix = FDSTRUCT *
-   ; bc = parameter
-   ; de = request
-   ; hl = void *arg
+   ; de = request = affected flag bits
+   ; bc = parameter = value of affected flag bits
+   ; hl = void *arg = 0
 
-   ld a,STDIO_MSG_ICTL
-   call l_jpix
+   ret c                       ; if driver rejects
 
-   ret nc   
-   jp error_mc                 ; indicate error
+   ld l,(ix+6)
+   ld h,(ix+7)                 ; hl = FDSTRUCT.ioctl_flags
+
+   ld a,e
+   and c
+   ld c,a
+   ld a,d
+   and b
+   ld b,a                      ; bc = bc & de = final value of affected bits
+   
+   ld a,e
+   cpl
+   and l
+   or c
+   ld (ix+6),a
+   
+   ld a,d
+   cpl
+   and h
+   or b
+   ld (ix+7),a                 ; write new value of driver flags
+   
+   ret
