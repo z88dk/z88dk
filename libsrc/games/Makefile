@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.29 2014-07-18 06:18:08 stefano Exp $
+# $Id: Makefile,v 1.30 2014-12-17 07:08:35 dom Exp $
 
 include	../Make.config
 
@@ -16,6 +16,7 @@ lenterprise:
 lz88:
 	zcc +test $(CFLAGS) -DZ88 bit_frequency.c
 	zcc +test $(CFLAGS) -DZ88 bit_play.c
+
 
 lzx:
 	zcc +test	$(CFLAGS) -DSPECTRUM bit_frequency.c

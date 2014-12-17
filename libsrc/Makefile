@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.214 2014-12-16 14:36:34 dom Exp $
+# $Id: Makefile,v 1.215 2014-12-17 07:08:35 dom Exp $
 
 
 include Make.config
@@ -271,7 +271,7 @@ z88ansi_clib.lib:
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz88 
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88ansi_clib @$(LISTFILE_DIRECTORY)/z88ansi.lst
+	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88ansi_clib @$(LISTFILE_DIRECTORY)/z88ansi.lst
 
 # Network stdio - dom
 z88net_clib.lib:
@@ -289,7 +289,7 @@ z88net_clib.lib:
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz88 
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
+	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
 # ZX Spectrum fcntl - dom/stefano
 zxfcntl:
@@ -1154,7 +1154,7 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C games lmzx
+	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
 	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst

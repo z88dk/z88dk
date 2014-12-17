@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.26 2014-10-03 14:11:04 stefano Exp $
+# $Id: Makefile,v 1.27 2014-12-17 07:08:35 dom Exp $
 
 include ../Make.config
 
@@ -32,7 +32,7 @@ z88_time:
 
 spectrum_time:
 	$(RM) time.o
-	zcc +test -D__SPECTRUM__ $(CFLAGS) time.c
+	#zcc +test -D__SPECTRUM__ $(CFLAGS) time.c
 	cd spectrum ; $(MAKE) ; cd ..
 
 newbrain_time:
