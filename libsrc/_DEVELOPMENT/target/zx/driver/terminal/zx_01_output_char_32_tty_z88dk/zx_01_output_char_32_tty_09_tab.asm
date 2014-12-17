@@ -7,6 +7,8 @@ zx_01_output_char_32_tty_09_tab:
 
    ; tab to next multiple of eight column
    
+   ; should we be printing spaces to the next tab ??
+   
    ld a,(ix+14)                ; a = x coord
    
    and $f8

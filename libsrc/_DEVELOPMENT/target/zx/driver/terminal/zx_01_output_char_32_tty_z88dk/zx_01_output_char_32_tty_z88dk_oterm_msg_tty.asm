@@ -37,10 +37,11 @@ zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    EXTERN error_einval_znc
+   EXTERN zx_01_output_char_32_tty_01_scroll
    EXTERN zx_01_output_char_32_tty_02_font_address
    EXTERN zx_01_output_char_32_tty_08_backspace
    EXTERN zx_01_output_char_32_tty_09_tab
-   EXTERN zx_01_output_char_32_tty_11_scroll
+   EXTERN zx_01_output_char_32_tty_11_home
    EXTERN zx_01_output_char_32_tty_12_cls
    EXTERN zx_01_output_char_32_tty_14_foreground_mask
    EXTERN zx_01_output_char_32_tty_15_background_attr
@@ -59,7 +60,7 @@ zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
    
 action_table:
 
-   defw error_einval_znc
+   defw zx_01_output_char_32_tty_01_scroll
    defw zx_01_output_char_32_tty_02_font_address
    defw error_einval_znc
    defw error_einval_znc
@@ -69,16 +70,16 @@ action_table:
    defw zx_01_output_char_32_tty_08_backspace
    defw zx_01_output_char_32_tty_09_tab
    defw error_einval_znc
-   defw zx_01_output_char_32_tty_11_scroll
+   defw zx_01_output_char_32_tty_11_home
    defw zx_01_output_char_32_tty_12_cls
    defw error_einval_znc
    defw zx_01_output_char_32_tty_14_foreground_mask   ; [ 14 = foreground mask ]
    defw zx_01_output_char_32_tty_15_background_attr   ; [ 15 = background attr ]
-   defw zx_01_output_char_32_tty_16_ink               ; [ 16 = ink '0'..'7' ]
-   defw zx_01_output_char_32_tty_17_paper             ; [ 17 = paper '0'..'7' ]
-   defw zx_01_output_char_32_tty_18_flash             ; [ 18 = flash '0'..'1' ]
-   defw zx_01_output_char_32_tty_19_bright            ; [ 19 = bright '0'..'1' ]
-   defw zx_01_output_char_32_tty_20_inverse           ; [ 20 = inverse '0'..'1' ]
+   defw zx_01_output_char_32_tty_16_ink               ; [ 16 = ink 0..7 ]
+   defw zx_01_output_char_32_tty_17_paper             ; [ 17 = paper 0..7 ]
+   defw zx_01_output_char_32_tty_18_flash             ; [ 18 = flash 0..1 ]
+   defw zx_01_output_char_32_tty_19_bright            ; [ 19 = bright 0..1 ]
+   defw zx_01_output_char_32_tty_20_inverse           ; [ 20 = inverse 0..1 ]
    defw error_einval_znc
    defw zx_01_output_char_32_tty_22_at
    defw zx_01_output_char_32_tty_23_atr

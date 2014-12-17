@@ -44,13 +44,13 @@ PUBLIC zx_01_output_char_64_tty_z88dk
 EXTERN OTERM_MSG_TTY, STDIO_MSG_FLSH
 
 EXTERN zx_01_output_char_64
-EXTERN zx_01_output_char_32_tty_z88dk_oterm_msg_tty
+EXTERN zx_01_output_char_64_tty_z88dk_oterm_msg_tty
 EXTERN zx_01_output_char_32_tty_z88dk_stdio_msg_flsh
 
 zx_01_output_char_64_tty_z88dk:
 
    cp OTERM_MSG_TTY
-   jp z, zx_01_output_char_32_tty_z88dk_oterm_msg_tty
+   jp z, zx_01_output_char_64_tty_z88dk_oterm_msg_tty
 
    cp STDIO_MSG_FLSH
    jp z, zx_01_output_char_32_tty_z88dk_stdio_msg_flsh

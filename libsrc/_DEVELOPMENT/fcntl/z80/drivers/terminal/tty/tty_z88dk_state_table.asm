@@ -15,7 +15,7 @@ tty_z88dk_state_table:
    ; Specific targets may copy this table and add additional codes.
 
    defw asm_tty_state_param_none_absorb          ;  0 = null, absorb
-   defw asm_tty_output_char                      ;  1 = 
+   defw asm_tty_state_param_none_action          ;  1 = scroll
    defw asm_tty_param_bb_action                  ;  2 = font address
    defw asm_tty_output_char                      ;  3 = 
    defw asm_tty_output_char                      ;  4 = 
@@ -25,7 +25,7 @@ tty_z88dk_state_table:
    defw asm_tty_state_param_none_action          ;  8 = backspace
    defw asm_tty_state_param_none_action          ;  9 = tab
    defw asm_tty_output_char                      ; 10 = lf
-   defw asm_tty_state_param_none_action          ; 11 = scroll
+   defw asm_tty_state_param_none_action          ; 11 = home
    defw asm_tty_state_param_none_action          ; 12 = cls
    defw asm_tty_output_char                      ; 13 = cr
    defw asm_tty_output_char                      ; 14 = 

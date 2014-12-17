@@ -17,7 +17,7 @@ zx_tty_z88dk_state_table:
    ; Target specific command codes are bracketed.
 
    defw asm_tty_state_param_none_absorb          ;  0 = null, absorb
-   defw asm_tty_output_char                      ;  1 = 
+   defw asm_tty_state_param_none_action          ;  1 = scroll
    defw asm_tty_param_bb_action                  ;  2 = font address
    defw asm_tty_output_char                      ;  3 = 
    defw asm_tty_output_char                      ;  4 = 
@@ -27,16 +27,16 @@ zx_tty_z88dk_state_table:
    defw asm_tty_state_param_none_action          ;  8 = backspace
    defw asm_tty_state_param_none_action          ;  9 = tab
    defw asm_tty_output_char                      ; 10 = lf
-   defw asm_tty_state_param_none_action          ; 11 = scroll
+   defw asm_tty_state_param_none_action          ; 11 = home
    defw asm_tty_state_param_none_action          ; 12 = cls
    defw asm_tty_output_char                      ; 13 = cr
    defw asm_tty_param_b_action                   ; [ 14 = foreground mask x ]
    defw asm_tty_param_b_action                   ; [ 15 = background attr x ]
-   defw asm_tty_param_b_action                   ; [ 16 = ink '0'..'7' ]
-   defw asm_tty_param_b_action                   ; [ 17 = paper '0'..'7' ]
-   defw asm_tty_param_b_action                   ; [ 18 = flash '0'..'1' ]
-   defw asm_tty_param_b_action                   ; [ 19 = bright '0'..'1' ]
-   defw asm_tty_param_b_action                   ; [ 20 = inverse '0'..'1' ]
+   defw asm_tty_param_b_action                   ; [ 16 = ink 0..7 ]
+   defw asm_tty_param_b_action                   ; [ 17 = paper 0..7 ]
+   defw asm_tty_param_b_action                   ; [ 18 = flash 0..1 ]
+   defw asm_tty_param_b_action                   ; [ 19 = bright 0..1 ]
+   defw asm_tty_state_param_none_action          ; [ 20 = inverse ]
    defw asm_tty_output_char                      ; 21 = 
    defw asm_tty_param_bb_action                  ; 22 = at x,y
    defw asm_tty_param_bb_action                  ; 23 = atr x,y
