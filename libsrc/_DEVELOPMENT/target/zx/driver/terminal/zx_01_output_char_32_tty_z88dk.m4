@@ -94,7 +94,7 @@ define(`m4_zx_01_output_char_32_tty_z88dk',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_32
+   EXTERN zx_01_output_char_32_tty_z88dk
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
@@ -116,7 +116,7 @@ define(`m4_zx_01_output_char_32_tty_z88dk',dnl
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_32
+      defw zx_01_output_char_32_tty_z88dk
       
       ; flags
       ; reference_count

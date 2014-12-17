@@ -1,8 +1,8 @@
 dnl############################################################
-dnl##      ZX_01_OUTPUT_CHAR_64 STATIC INSTANTIATOR          ##
+dnl##   ZX_01_OUTPUT_CHAR_64_TTY_Z88DK STATIC INSTANTIATOR   ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_zx_01_output_char_64(...)                           ##
+dnl## m4_zx_01_output_char_64_tty_z88dk(...)                 ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = ioctl_flags (16 bits)                             ##
@@ -20,12 +20,12 @@ dnl## $13 = background colour (cls attribute)                ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_zx_01_output_char_64',dnl
+define(`m4_zx_01_output_char_64_tty_z88dk',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: zx_01_output_char_64
+   ; driver: zx_01_output_char_64_tty_z88dk
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : write only
    ; type  : 002 = output terminal
@@ -94,14 +94,14 @@ define(`m4_zx_01_output_char_64',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_64
+   EXTERN zx_01_output_char_64_tty_z88dk
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw 35
+      defw 41
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
 
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
@@ -116,7 +116,7 @@ define(`m4_zx_01_output_char_64',dnl
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_64
+      defw zx_01_output_char_64_tty_z88dk
       
       ; flags
       ; reference_count
@@ -166,7 +166,7 @@ define(`m4_zx_01_output_char_64',dnl
       defb 0,0                 ; parameters
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 35))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 41))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
