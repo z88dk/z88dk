@@ -58,6 +58,10 @@ dnl## file dup
 dnl
 dnl#include(../../m4_file_dup.m4)dnl
 dnl
+dnl## empty fd slot
+dnl
+dnl#include(../../m4_file_absent.m4)dnl
+dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
@@ -82,6 +86,8 @@ include(../../clib_instantiate_end.m4)
 SECTION code_crt_start
 
 PUBLIC __Start, __Exit
+
+EXTERN _main
 
 __Start:
 
