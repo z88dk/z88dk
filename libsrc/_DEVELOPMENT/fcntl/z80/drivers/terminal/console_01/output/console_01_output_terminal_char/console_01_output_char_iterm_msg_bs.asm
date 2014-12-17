@@ -27,8 +27,7 @@ console_01_output_char_iterm_msg_bs:
    
    add hl,de                   ; hl = absolute character coords
    
-   ld b,255
-   ld c,32
+   ld bc,$ff20
    
    ld a,OTERM_MSG_PRINTC
    jp (ix)
