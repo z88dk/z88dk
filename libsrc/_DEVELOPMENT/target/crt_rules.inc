@@ -115,6 +115,25 @@
    ENDIF
    
    
+   IF DEFINE_CRT_INITIALIZE_BSS
+   
+      defc __crt_initialize_bss = CRT_INITIALIZE_BSS
+   
+   ELSE
+   
+      IF DEFINED_TAR__crt_intialize_bss
+      
+         defc __crt_initialize_bss = TAR__crt_initialize_bss
+      
+      ELSE
+      
+         defc __crt_initialize_bss = DEF__crt_initialize_bss
+      
+      ENDIF
+   
+   ENDIF
+   
+   
    IF DEFINED_CRT_ENABLE_COMMANDLINE
    
       defc __crt_enable_commandline = CRT_ENABLE_COMMANDLINE

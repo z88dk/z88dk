@@ -1,9 +1,7 @@
 
    ; initialize bss section
 
-   IF crt_model
-
-      ; zero bss section if not ram model
+   IF __crt_model || __crt_initialize_bss
 
       EXTERN ASMHEAD_BSS, ASMSIZE_BSS
 

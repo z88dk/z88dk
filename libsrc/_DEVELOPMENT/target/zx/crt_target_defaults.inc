@@ -10,6 +10,8 @@
    
    defc TAR__register_sp            = 0      ; crt does not modify
    
+   defc TAR__crt_initialize_bss     = 0      ; do not zero bss for ram model
+   
    defc TAR__crt_enable_commandline = 0
    defc TAR__crt_enable_restart     = 0
    
@@ -22,6 +24,7 @@
    define DEFINED_TAR__crt_org_code
    define DEFINED_TAR__crt_model
    define DEFINED_TAR__register_sp
+   define DEFINED_TAR__crt_initialize_bss
    define DEFINED_TAR__crt_enable_commandline
    define DEFINED_TAR__crt_enable_restart
    define DEFINED_TAR__clib_fopen_max
