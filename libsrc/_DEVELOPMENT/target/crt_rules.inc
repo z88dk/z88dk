@@ -304,4 +304,12 @@
       
    ENDIF
 
+   ;; public definitions
+   
+   PUBLIC __exit_stack_size
+   PUBLIC __quickexit_stack_size
+   
+   defc __exit_stack_size = __clib_exit_stack_size
+   defc __quickexit_stack_size = __clib_quickexit_stack_size
+
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
