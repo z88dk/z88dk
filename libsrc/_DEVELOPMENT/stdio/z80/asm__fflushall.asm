@@ -9,7 +9,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm__fflushall
 
-EXTERN __stdio_file_list_open
+EXTERN __stdio_open_file_list
 
 EXTERN asm1_fflush_unlocked, asm_p_forward_list_next
 EXTERN __stdio_lock_acquire, __stdio_lock_release
@@ -39,7 +39,7 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__stdio_file_list_open
+   ld hl,__stdio_open_file_list
 
 file_loop:
 
