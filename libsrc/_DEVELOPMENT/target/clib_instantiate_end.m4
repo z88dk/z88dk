@@ -88,6 +88,8 @@ dnl############################################################
    
    ; __clib_open_max  = max number of open fds specified by user
    ; __I_FCNTL_NUM_FD = number of static file descriptors created
+
+   PUBLIC __fcntl_fdtbl_size
    
    IF __I_FCNTL_NUM_FD > 0
    
@@ -106,6 +108,11 @@ dnl############################################################
          SECTION data_fcntl_fdtable_body
          
          defs (__clib_open_max - __I_FCNTL_NUM_FD) * 2
+         defc __fcntl_fdtbl_size = __clib_open_max
+      
+      ELSE
+      
+         defc __fcntl_fdtbl_size = __I_FCNTL_NUM_FD
       
       ENDIF
    
@@ -122,6 +129,8 @@ dnl############################################################
          __fcntl_fdtbl:        defs __clib_open_max * 2
       
       ENDIF
+   
+      defc __fcntl_fdtbl_size = __clib_open_max
    
    ENDIF
    
