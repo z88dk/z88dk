@@ -14,15 +14,29 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.1 2014-12-14 00:42:20 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.2 2014-12-18 14:23:19 pauloscustodio Exp $ 
 */
 
 #pragma once
 
+#include "xmalloc.h"   /* before any other include */
+
+#include "errors.h"
+
 /* add 1 or 2 bytes opcode opcode to object code 
-*  bytes in big-endian format, e.g. 0xCB00 */
+*  bytes in big-endian format, e.g. 0xED46 */
 extern void add_opcode(int opcode);
+
+/* choose value, error if none */
+#define _CHOOSE2_(n, i1, o1, i2, o2)	\
+			((n) == (i1) ? (o1) : \
+			 (n) == (i2) ? (o2) : \
+			 (error_int_range(n), 0))		/* ,0 to transform (void) into (int) */
+#define _CHOOSE3_(n, i1, o1, i2, o2, i3, o3)	\
+			((n) == (i1) ? (o1) : \
+			 _CHOOSE2_((n), (i2), (o2), (i3), (o3)))
 
 /* Z80 opcodes */
 #define Z80_NOP		0x00
+#define Z80_IM(n)	_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E)
 #define Z80_HALT	0x76

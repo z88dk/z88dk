@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.57 2014-12-15 22:48:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.58 2014-12-18 14:23:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.57 2014-12-15 22:48
 #include "options.h"
 #include "scan.h"
 #include "strutil.h"
+#include "utarray.h"
 #include <assert.h>
 #include <ctype.h>
 
@@ -49,10 +50,25 @@ static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 static DEFINE_STR(sym_string, MAXLINE);
 
 /* save scan status */
-static Sym	 save_sym;
-static Bool	 save_at_bol, save_EOL;
-static char *save_p;
-static DEFINE_STR(save_sym_string, MAXLINE);
+typedef struct scan_state_t
+{
+	Sym		 sym;
+	char	*input_buf;
+	Bool	 at_bol;
+	Bool	 EOL;
+	int		 cs, act;
+	int		 p, pe, eof, ts, te;
+	char	*sym_string;
+} ScanState;
+
+static void ut_scan_state_dtor(void *elt) 
+{ 
+	ScanState *state = elt; 
+	xfree(state->input_buf); 
+	xfree(state->sym_string);
+}
+static UT_array *scan_state;
+static UT_icd ut_scan_state_icd = { sizeof(ScanState), NULL, NULL, ut_scan_state_dtor };
 
 /*-----------------------------------------------------------------------------
 * 	Init, save and restore current sym
@@ -60,7 +76,7 @@ static DEFINE_STR(save_sym_string, MAXLINE);
 static void init_sym(void)
 {
 	sym.tok = TK_END;
-	sym.text = "";
+	sym.text = sym.ts = sym.te = "";
 	sym.string = NULL;
 	sym.filename = NULL;
 	sym.line_nr = 0;
@@ -77,30 +93,6 @@ static void init_sym(void)
 	sym.cpu_idx_reg = IDX_REG_HL;
 }
 
-void save_scan_state(void)
-{
-	save_sym = sym;
-
-	Str_set(save_sym_string, sym_string->str);
-	save_sym.string = save_sym_string->str;
-
-	save_at_bol = at_bol;
-	save_EOL = EOL;
-	save_p = p;
-}
-
-void restore_scan_state(void)
-{
-	sym = save_sym;
-
-	Str_set(sym_string, save_sym_string->str);
-	sym.string = sym_string->str;
-
-	at_bol = save_at_bol;
-	EOL = save_EOL;
-	p = save_p;
-}
-
 /*-----------------------------------------------------------------------------
 *   Init functions
 *----------------------------------------------------------------------------*/
@@ -113,13 +105,63 @@ DEFINE_init()
 	input_stack->free_data = xfreef;
 
 	init_sym();
-	save_scan_state();
+	utarray_new(scan_state, &ut_scan_state_icd);
 }
 
 DEFINE_fini()
 {
 	OBJ_DELETE(input_buf);
 	OBJ_DELETE(input_stack);
+	utarray_free(scan_state);
+}
+
+/*-----------------------------------------------------------------------------
+* 	Save and restore current state
+*----------------------------------------------------------------------------*/
+void save_scan_state(void)
+{
+	ScanState save;
+
+	save.sym = sym;
+	save.input_buf = xstrdup(input_buf->str);
+	save.at_bol = at_bol;
+	save.EOL = EOL;
+	save.cs = cs;
+	save.act = act;
+	save.p   = p   ? p   - input_buf->str : -1;
+	save.pe  = pe  ? pe  - input_buf->str : -1;
+	save.eof = eof ? eof - input_buf->str : -1;
+	save.ts  = ts  ? ts  - input_buf->str : -1;
+	save.te  = te  ? te  - input_buf->str : -1;
+	save.sym_string = xstrdup(sym_string->str);
+
+	utarray_push_back(scan_state, &save);
+}
+
+void restore_scan_state(void)
+{
+	ScanState *save;
+
+	save = (ScanState *)utarray_back(scan_state);
+	sym = save->sym;
+	Str_set(input_buf, save->input_buf);
+	at_bol = save->at_bol;
+	EOL = save->EOL;
+	cs = save->cs;
+	act = save->act;
+	p   = save->p   >= 0 ? input_buf->str + save->p   : NULL;
+	pe  = save->pe  >= 0 ? input_buf->str + save->pe  : NULL;
+	eof = save->eof >= 0 ? input_buf->str + save->eof : NULL;
+	ts  = save->ts  >= 0 ? input_buf->str + save->ts  : NULL;
+	te  = save->te  >= 0 ? input_buf->str + save->te  : NULL;
+	Str_set(sym_string, save->sym_string);
+
+	utarray_pop_back(scan_state);
+}
+
+void drop_scan_state(void)
+{
+	utarray_pop_back(scan_state);
 }
 
 /*-----------------------------------------------------------------------------
@@ -330,6 +372,8 @@ tokid_t GetSym( void )
 		sym.tok = _scan_get();
 
 	} while ( sym.tok == TK_END );
+
+	sym.ts = ts; sym.te = te;			/* remember token position */
 
 	at_bol = EOL = (sym.tok == TK_NEWLINE) ? TRUE : FALSE;
 	return sym.tok;

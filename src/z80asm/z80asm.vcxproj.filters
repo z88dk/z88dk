@@ -283,5 +283,8 @@
     <None Include="scan_rules.rl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="parse_rules.rl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

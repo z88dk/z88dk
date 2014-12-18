@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.39 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.40 2014-12-18 14:23:20 pauloscustodio Exp $
 */
 
 #pragma once
@@ -47,6 +47,7 @@ typedef struct sym_t
 							*  used in the expression parser */
 	char	*string;		/* identifier to return with TK_NAME and TK_LABEL, or
 							*  double-quoted string without quotes to return with a TK_STRING */
+	char	*ts, *te;		/* Ragel's token start and token end */
 	char	*filename;		/* filename where token found, in strpool */
 	int 	 line_nr;		/* line number where token found */
 	int		 number;		/* number to return with TK_NUMBER */
@@ -76,8 +77,9 @@ extern Bool EOL;			/* scanner EOL state */
 extern tokid_t GetSym( void );
 
 /* save the current scan position and back-track to a saved position */
-extern void save_scan_state(void);
+extern void save_scan_state(void);		/* needs to be balanced with restore_.../drop_... */
 extern void restore_scan_state(void);
+extern void drop_scan_state(void);
 
 /* get the current/next token, error if not the expected one */
 extern void CurSymExpect(tokid_t expected_tok);

@@ -90,7 +90,8 @@
 #define _TK_DS_P           85    /* "DS.P"  */
 #define _TK_DS_L           86    /* "DS.L"  */
 #define _TK_HALT           87    /* "HALT"  */
-#define _TK_NOP            88    /* "NOP"   */
+#define _TK_IM             88    /* "IM"    */
+#define _TK_NOP            89    /* "NOP"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -185,8 +186,8 @@ typedef enum tokid_t
     TK_DS_P        = _TK_DS_P       ,    /* =    85, "DS.P"  */
     TK_DS_L        = _TK_DS_L       ,    /* =    86, "DS.L"  */
     TK_HALT        = _TK_HALT       ,    /* =    87, "HALT"  */
-    TK_NOP         = _TK_NOP        ,    /* =    88, "NOP"   */
+    TK_IM          = _TK_IM         ,    /* =    88, "IM"    */
+    TK_NOP         = _TK_NOP        ,    /* =    89, "NOP"   */
 } tokid_t;
 
 #endif
-

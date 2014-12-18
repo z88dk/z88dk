@@ -179,6 +179,7 @@
     <ClCompile Include="z80pass.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="parse_rules.rl" />
     <None Include="scan_rules.rl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

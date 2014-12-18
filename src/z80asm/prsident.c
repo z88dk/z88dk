@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.79 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.80 2014-12-18 14:23:19 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,7 @@ void DeclModuleName( void );
 void DEFINE( void );
 void ifstatement( enum flag interpret );
 void DEFVARS( void ), DEFS( void ), ORG( void ), INCLUDE( void ), BINARY( void ), CALL_OZ( void ), OZ( void ), CALL_PKG( void ), FPP( void );
-void ADC( void ), ADD( void ), DEC( void ), IM( void ), IN( void ), INC( void ), INVOKE( void );
+void ADC( void ), ADD( void ), DEC( void ), IN( void ), INC( void ), INVOKE( void );
 void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void RST( void ), DEFGROUP( void );
@@ -124,7 +124,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( EXX ),
     DEF_ENTRY( FPP ),
     DEF_ENTRY( IF ),
-    DEF_ENTRY( IM ),
     DEF_ENTRY( IN ),
     DEF_ENTRY( INC ),
     DEF_ENTRY( INCLUDE ),
