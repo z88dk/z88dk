@@ -5,7 +5,7 @@ SECTION code_stdio
 
 PUBLIC asm__fflushall_unlocked
 
-EXTERN __stdio_file_list_open
+EXTERN __stdio_open_file_list
 EXTERN asm1_fflush_unlocked, asm_p_forward_list_next
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,7 +33,7 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__stdio_file_list_open
+   ld hl,__stdio_open_file_list
 
 file_loop:
 

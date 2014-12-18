@@ -6,7 +6,7 @@ SECTION code_stdio
 PUBLIC __stdio_verify_valid
 
 EXTERN __p_forward_list_locate_item, error_ebadf_mc
-EXTERN __stdio_file_list_open
+EXTERN __stdio_open_file_list
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -51,7 +51,7 @@ ENDIF
    dec bc
    dec bc                      ; bc = & FILE.link
    
-   ld hl,__stdio_file_list_open
+   ld hl,__stdio_open_file_list
    call __p_forward_list_locate_item
 
 invalid_file_0:

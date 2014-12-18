@@ -8,7 +8,7 @@ PUBLIC __stdio_verify_valid_lock
 EXTERN __p_forward_list_locate_item, __stdio_lock_acquire
 EXTERN error_ebadf_mc, error_enolck_mc
 
-EXTERN __stdio_file_list_open
+EXTERN __stdio_open_file_list
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $04
@@ -52,7 +52,7 @@ ENDIF
    dec bc
    dec bc                      ; bc = & FILE.link
    
-   ld hl,__stdio_file_list_open
+   ld hl,__stdio_open_file_list
    call __p_forward_list_locate_item
 
    jr c, exit_error_ebadf
