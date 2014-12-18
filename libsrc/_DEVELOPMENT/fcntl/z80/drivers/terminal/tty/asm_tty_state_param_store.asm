@@ -14,7 +14,7 @@ asm_tty_state_param_store:
    
    ld (hl),c                   ; store action code
 
-asm0_tty_state_param_store
+asm0_tty_state_param_store:
 
    dec hl
    ld (hl),d                   ; store next state

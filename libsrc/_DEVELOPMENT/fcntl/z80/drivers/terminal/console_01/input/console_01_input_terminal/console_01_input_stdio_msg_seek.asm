@@ -4,7 +4,7 @@ SECTION code_fcntl
 PUBLIC console_01_input_stdio_msg_seek
 
 EXTERN console_01_input_proc_getc
-EXTERN STDIO_MSG_CUR, l_decu_dehl, error_lzc, error_lznc
+EXTERN STDIO_SEEK_CUR, l_decu_dehl, error_lzc, error_lznc
 
 console_01_input_stdio_msg_seek:
 
@@ -24,7 +24,7 @@ console_01_input_stdio_msg_seek:
    
    ld a,c
    
-   cp STDIO_MSG_CUR
+   cp STDIO_SEEK_CUR
    jp nz, error_lznc           ; if not seeking forward do nothing
    
    bit 7,d

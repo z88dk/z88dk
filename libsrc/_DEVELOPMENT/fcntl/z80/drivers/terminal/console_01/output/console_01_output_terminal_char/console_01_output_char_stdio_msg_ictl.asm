@@ -5,7 +5,7 @@ PUBLIC console_01_output_char_stdio_msg_ictl
 PUBLIC console_01_output_char_stdio_msg_ictl_0
 
 EXTERN OTERM_MSG_CLS, asm_vioctl_driver, l_jpix, l_offset_ix_de
-EXTERN error_einval_zc, __stdio_next_arg_bc, __stdio_next_arg_de
+EXTERN error_einval_zc, __stdio_nextarg_bc, __stdio_nextarg_de
 
 EXTERN console_01_output_char_proc_reset_scroll_limit
 EXTERN console_01_output_char_proc_snap
@@ -81,7 +81,7 @@ _ioctl_getset_cursor_coord:
 
 _ioctl_set_cursor_coord:
 
-   call __stdio_next_arg_de
+   call __stdio_nextarg_de
    
    ld d,e                      ; d = y_coord
    ld e,c                      ; e = x_coord
@@ -104,7 +104,7 @@ _ioctl_get_cursor_coord:
    xor a
    ld (bc),a
    
-   call __stdio_next_arg_bc
+   call __stdio_nextarg_bc
    
    inc bc
    ld (bc),a
