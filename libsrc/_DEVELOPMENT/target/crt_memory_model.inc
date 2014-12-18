@@ -13,8 +13,8 @@ section code_crt_main
 section code_crt_exit
 section code_crt_return
 
-include "code_clib.inc"
-include "rodata_clib.inc"
+include "../../clib_code.inc"
+include "../../clib_rodata.inc"
 
 section code_compiler
 section rodata_compiler
@@ -30,11 +30,11 @@ IF __crt_org_data != 0
 
 ENDIF
 
-include "smc_clib.inc"
+include "../../clib_smc.inc"
 section smc_compiler
 section smc_user
 
-include "data_clib.inc"
+include "../../clib_data.inc"
 section data_compiler
 section data_user
 
@@ -46,7 +46,7 @@ IF __crt_org_bss != 0
 
 ENDIF
 
-include "bss_clib.inc"
+include "../../clib_bss.inc"
 section bss_compiler
 section bss_user
 
