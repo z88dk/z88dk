@@ -16,7 +16,7 @@ SECTION code_stdio
 PUBLIC asm_putchar_unlocked
 PUBLIC asm0_putchar_unlocked
 
-EXTERN __stdio_file_stdout
+EXTERN _stdout
 EXTERN asm0_fputc_unlocked
 
 asm_putchar_unlocked:
@@ -37,7 +37,7 @@ asm_putchar_unlocked:
    ;
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,(_stdout)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

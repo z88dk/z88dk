@@ -19,7 +19,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm_vscanf
 
-EXTERN __stdio_file_stdin
+EXTERN _stdin
 EXTERN asm_vfscanf
 
 asm_vscanf:
@@ -53,7 +53,7 @@ asm_vscanf:
    ;            
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,(_stdin)
    jp asm_vfscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

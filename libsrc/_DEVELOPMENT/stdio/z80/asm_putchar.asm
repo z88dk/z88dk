@@ -19,7 +19,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm_putchar
 
-EXTERN __stdio_file_stdout
+EXTERN _stdout
 EXTERN asm0_putchar_unlocked, __stdio_lock_release
 
 asm_putchar:
@@ -40,7 +40,7 @@ asm_putchar:
    ;
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,(_stdout)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

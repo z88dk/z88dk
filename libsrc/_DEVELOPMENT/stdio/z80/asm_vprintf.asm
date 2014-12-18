@@ -19,7 +19,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm_vprintf
 
-EXTERN __stdio_file_stdout
+EXTERN _stdout
 
 EXTERN asm_vfprintf
 
@@ -51,7 +51,7 @@ asm_vprintf:
    ;            
    ; uses  : all
 
-   ld ix,(__stdio_file_stdout)
+   ld ix,(_stdout)
    jp asm_vfprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

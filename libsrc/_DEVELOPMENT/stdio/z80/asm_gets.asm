@@ -24,7 +24,7 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC asm_gets
 
-EXTERN __stdio_file_stdin
+EXTERN _stdin
 
 EXTERN asm0_gets_unlocked, __stdio_lock_release
 
@@ -61,7 +61,7 @@ asm_gets:
    ;
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,(_stdin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01

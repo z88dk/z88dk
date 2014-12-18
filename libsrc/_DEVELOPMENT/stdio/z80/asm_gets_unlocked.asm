@@ -21,7 +21,7 @@ SECTION code_stdio
 PUBLIC asm_gets_unlocked
 PUBLIC asm0_gets_unlocked
 
-EXTERN __stdio_file_stdin
+EXTERN _stdin
 EXTERN asm0_fgets_unlocked, __stdio_input_sm_gets
 
 asm_gets_unlocked:
@@ -57,7 +57,7 @@ asm_gets_unlocked:
    ;
    ; uses  : all except ix
 
-   ld ix,(__stdio_file_stdin)
+   ld ix,(_stdin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_STDIO & $01
