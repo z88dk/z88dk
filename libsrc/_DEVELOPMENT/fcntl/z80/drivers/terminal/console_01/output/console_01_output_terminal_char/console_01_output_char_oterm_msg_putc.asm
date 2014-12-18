@@ -7,7 +7,7 @@ PUBLIC console_01_output_char_oterm_msg_putc
 PUBLIC console_01_output_char_oterm_msg_putc_raw
 
 EXTERN l_jpix
-EXTERN console_0l_output_char_proc_reset_scroll_limit
+EXTERN console_01_output_char_proc_reset_scroll_limit
 EXTERN console_01_output_char_proc_get_coord
 EXTERN console_01_output_char_proc_set_coord
 
@@ -175,7 +175,7 @@ pause_scroll:
    ld a,ITERM_MSG_BELL
    call l_jpix                 ; send signal bell
 
-   call console_0l_output_char_proc_reset_scroll_limit
+   call console_01_output_char_proc_reset_scroll_limit
 
    ld a,OTERM_MSG_PAUSE
    call l_jpix
