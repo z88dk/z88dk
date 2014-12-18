@@ -112,7 +112,7 @@ y_ok:
    inc e                       ; advance x coord
    
    call console_01_output_char_proc_set_coord
-   
+
    dec e
    
    ld l,(ix+16)                ; l = window.left coord
@@ -176,7 +176,7 @@ pause_scroll:
    call l_jpix                 ; send signal bell
 
    call console_0l_output_char_proc_reset_scroll_limit
-   
+
    ld a,OTERM_MSG_PAUSE
    call l_jpix
 

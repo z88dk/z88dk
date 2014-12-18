@@ -14,13 +14,8 @@ TODO:
 
 * fzx remove smc
 
-* finish ioctls on output terminals, common getter setter for ioctl
-  move auto flags writing to drivers to make changes while lock held
-
 * target open
 
 * crt, remove bss, error on rom model if data address not given
 
 * zx scroll reexamined
-
-* tty_z88dk
