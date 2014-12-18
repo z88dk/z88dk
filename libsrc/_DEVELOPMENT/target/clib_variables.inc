@@ -49,7 +49,7 @@ ENDIF
    
    PUBLIC __exit_stack
    
-   __exit_stack:               defb __exit_stack_size
+   __exit_stack:               defb 0
                                defs __exit_stack_size * 2
    
    ; create quickexit stack
@@ -58,7 +58,7 @@ ENDIF
    
    PUBLIC __quickexit_stack
    
-   __quickexit_stack:          defb __quickexit_stack_size
+   __quickexit_stack:          defb 0
                                defs __quickexit_stack_size * 2
    
    ; assign thread id
