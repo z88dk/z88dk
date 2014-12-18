@@ -27,8 +27,6 @@ include "../crt_memory_model.inc"
 ;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION CODE
-
 include "../clib_constants.inc"
 include "clib_target_constants.inc"
 

@@ -24,8 +24,6 @@ include "../crt_memory_model.inc"
 ;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION CODE
-
 include "../clib_constants.inc"
 include "clib_target_constants.inc"
 
@@ -488,6 +486,8 @@ include "clib_target_constants.inc"
    
    ; __clib_open_max  = max number of open fds specified by user
    ; 3 = number of static file descriptors created
+
+   PUBLIC __fcntl_fdtbl_size
    
    IF 3 > 0
    
@@ -506,6 +506,11 @@ include "clib_target_constants.inc"
          SECTION data_fcntl_fdtable_body
          
          defs (__clib_open_max - 3) * 2
+         defc __fcntl_fdtbl_size = __clib_open_max
+      
+      ELSE
+      
+         defc __fcntl_fdtbl_size = 3
       
       ENDIF
    
@@ -522,6 +527,8 @@ include "clib_target_constants.inc"
          __fcntl_fdtbl:        defs __clib_open_max * 2
       
       ENDIF
+   
+      defc __fcntl_fdtbl_size = __clib_open_max
    
    ENDIF
    
@@ -611,6 +618,8 @@ include "clib_target_constants.inc"
 SECTION code_crt_start
 
 PUBLIC __Start, __Exit
+
+EXTERN _main
 
 __Start:
 

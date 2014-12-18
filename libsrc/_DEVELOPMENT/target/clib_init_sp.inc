@@ -1,7 +1,7 @@
 
    ; change stack address
    
-   IF __register_sp != 0
+   IF __register_sp
       
       IF __register_sp = -1
       
