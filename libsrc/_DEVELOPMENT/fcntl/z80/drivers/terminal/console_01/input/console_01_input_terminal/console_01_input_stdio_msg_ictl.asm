@@ -2,100 +2,144 @@
 SECTION code_fcntl
 
 PUBLIC console_01_input_stdio_msg_ictl
+PUBLIC console_01_input_stdio_msg_ictl_0
 
-EXTERN console_01_input_stdio_msg_flsh, asm_memcpy, l_offset_ix_de, error_enotsup_mc
-EXTERN IOCTL_ITERM_TIE, IOCTL_ITERM_GET_EDITBUF, IOCTL_ITERM_SET_EDITBUF
+EXTERN asm_vioctl_driver, error_einval_zc
+EXTERN l_offset_ix_de, l_setmem_hl
+EXTERN console_01_input_stdio_msg_flsh
 
 console_01_input_stdio_msg_ictl:
 
+   ; ioctl messages understood:
+   ;
+   ; defc IOCTL_ITERM_RESET       = $0101
+   ; defc IOCTL_ITERM_TIE         = $0201
+   ; defc IOCTL_ITERM_GET_EDITBUF = $0381
+   ; defc IOCTL_ITERM_SET_EDITBUF = $0301
+   ;
+   ; in addition to flags managed by stdio
+   ;
    ; enter : ix = & FDSTRUCT.JP
    ;         bc = first parameter
    ;         de = request
-   ;         hl = void *arg
+   ;         hl = void *arg (0 if stdio flags)
    ;
-   ; exit  : carry reset if ok, HL = return value != -1
-   ;         carry set if fail
+   ; exit  : hl = return value
+   ;         carry set if ioctl rejected
+   ;
+   ; uses  : af, bc, de, hl
 
-   ld a,e                      ; input terminals have type == 1
-   dec a
-   and $07
-   jp nz, error_enotsup_mc     ; do not understand non-terminal messages
-
-   ld a,d
-   and $c0
-   jr z, unmanaged_flags       ; if IOCTL is not managed by stdio
+   ; flag bits managed by stdio?
+   
+   ld a,h
+   or l
+   jr nz, _ictl_messages
    
    ; if line mode is being disabled reset the edit buffer
    
    ld a,e
    and $20
-   ret z                       ; if line mode unaffected return ok
+   jp z, asm_vioctl_driver     ; if line mode not being disabled
    
    and c
-   ret nz                      ; if line mode not being disabled return ok
+   jp nz, asm_vioctl_driver    ; if line mode not being disabled
    
-   jp console_01_input_stdio_msg_flsh
-
-unmanaged_flags:
-
-   inc d
-   dec d
-   jp nz, error_enotsup_mc     ; know nothing about these ICTLs
+   call asm_vioctl_driver      ; set stdio flags
    
-   ld a,e                      ; a = LSB of ioctl request
-   
-   cp IOCTL_ITERM_TIE % 256
-   jr z, tie_oterm             ; tie to an output terminal
-
-   cp IOCTL_ITERM_GET_EDITBUF % 256
-   jr z, get_editbuf           ; return copy of edit buffer
-   
-   cp IOCTL_ITERM_SET_EDITBUF % 256
-   jp nz, error_enotsup_mc     ; if unrecognized request
-
-set_editbuf:
-
-   ; bc = b_array * (src edit buffer)
-   
-   ld hl,19
-   call l_offset_ix_de
-
-   ex de,hl                    ; de = & FDSTRUCT.b_array
-
-   ld l,c
-   ld h,b                      ; hl = b_array *
-
-join_editbuf:
-
-   ld bc,6                     ; bc = sizeof(b_array)
-   jp asm_memcpy
-
-get_editbuf:
-
-   ; bc = b_array * (dst edit buffer)
-   
-   ld hl,19
-   call l_offset_ix_de         ; hl = & FDSTRUCT.b_array
-   
-   ld e,c
-   ld d,b                      ; de = b_array *
-   
-   jr join_editbuf
-
-tie_oterm:
-
-   ; bc = void *f_oterm (FDSTRUCT *oterm)
+   push hl                     ; save return value
    
    call console_01_input_stdio_msg_flsh
    
+   pop hl
+   ret
+
+_ictl_messages:
+
+   ; check the message is specifically for an input terminal
+   
+   ld a,e
+   and $07
+   cp $01                      ; input terminals are type $01
+   jp nz, error_einval_zc
+
+console_01_input_stdio_msg_ictl_0:
+
+   ; interpret ioctl message
+   
+   ld a,d
+   
+   dec a
+   jp z, console_01_input_stdio_msg_flsh   ; reset == flush ??
+   
+   dec a
+   jr z, _ioctl_tie
+   
+   dec a
+   jp nz, error_einval_zc
+
+_ioctl_getset_editbuf:
+
+   ; e & $80 = 1 for get
+   ; bc = first parameter (b_array *)
+   ; hl = void *arg
+
+   ld a,e
+
+   ld hl,16
+   call l_offset_ix_de         ; hl = & fdstruct.pending_char
+   
+   ld e,c
+   ld d,b                      ; de = & b_array
+   
+   add a,a
+   jr c, _ioctl_get_editbuf
+
+_ioctl_set_editbuf:
+
+   xor a
+   call l_setmem_hl - 6        ; hl = & fdstruct.b_array
+   
+   ex de,hl
+   jr _ioctl_editbuf_copy
+
+_ioctl_get_editbuf:
+
+   inc hl
+   inc hl
+   inc hl                      ; hl = & fdstruct.b_array
+
+_ioctl_editbuf_copy:
+
+   ld bc,6
+   ldir
+   
+   or a
+   ret
+
+_ioctl_tie:
+
+   ; bc = first parameter (new oterm *)
+   ; hl = void *arg
+
+   call console_01_input_stdio_msg_flsh
+   
    ld hl,14
-   call l_offset_ix_de         ; hl = & FDSTRUCT.oterm
+   call l_offset_ix_de         ; hl = & fdstruct.oterm
    
    ld e,(hl)
-   ld (hl),c
    inc hl
-   ld d,(hl)
-   ld (hl),b                   ; FDSTRUCT.oterm = f_oterm
+   ld d,(hl)                   ; de = old oterm
    
-   ex de,hl                    ; hl = old f_oterm
+   ld a,b
+   and c
+   inc a
+   jr z, _ioctl_tie_exit       ; if oterm == -1
+   
+   ld (hl),b
+   dec hl
+   ld (hl),c                   ; store new oterm
+
+_ioctl_tie_exit:
+
+   ex de,hl                    ; hl = old oterm
    ret

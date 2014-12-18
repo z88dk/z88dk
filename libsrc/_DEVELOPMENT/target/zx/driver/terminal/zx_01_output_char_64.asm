@@ -98,7 +98,7 @@ EXTERN OTERM_MSG_PAUSE, OTERM_MSG_BELL
 
 EXTERN console_01_output_terminal_char
 EXTERN zx_01_output_char_64_oterm_msg_printc
-EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_64_stdio_msg_ictl
+EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_32_stdio_msg_ictl
 EXTERN zx_01_output_char_64_oterm_msg_scroll, zx_01_output_char_64_oterm_msg_cls
 EXTERN zx_01_output_char_32_oterm_msg_pause, zx_01_output_char_32_oterm_msg_bell
 
@@ -111,7 +111,7 @@ zx_01_output_char_64:
    jp z, zx_01_output_char_32_iterm_msg_bell
    
    cp STDIO_MSG_ICTL
-   jp z, zx_01_output_char_64_stdio_msg_ictl
+   jp z, zx_01_output_char_32_stdio_msg_ictl
 
    cp OTERM_MSG_SCROLL
    jp z, zx_01_output_char_64_oterm_msg_scroll

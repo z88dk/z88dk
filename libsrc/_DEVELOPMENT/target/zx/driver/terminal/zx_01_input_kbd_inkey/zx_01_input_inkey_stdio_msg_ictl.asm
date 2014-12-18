@@ -3,38 +3,123 @@ SECTION code_fcntl
 
 PUBLIC zx_01_input_inkey_stdio_msg_ictl
 
-EXTERN IOCTL_ITERM_SET_DELAYS
-EXTERN console_01_input_stdio_msg_ictl, zx_01_input_inkey_proc_getk_address
+EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
+EXTERN error_einval_zc, zx_01_input_inkey_stdio_msg_flsh
+EXTERN zx_01_input_inkey_proc_getk_address, __stdio_nextarg_bc, __stdio_nextarg_de
 
 zx_01_input_inkey_stdio_msg_ictl:
 
+   ; ioctl messages understood:
+   ;
+   ; defc IOCTL_ITERM_RESET      = $0101
+   ; defc IOCTL_ITERM_GET_DELAY  = $0a81
+   ; defc IOCTL_ITERM_SET_DELAY  = $0a01
+   ;
+   ; in addition to flags managed by stdio
+   ; and messages understood by base class
+   ;
    ; enter : ix = & FDSTRUCT.JP
    ;         bc = first parameter
    ;         de = request
-   ;         hl = void *arg
+   ;         hl = void *arg (0 if stdio flags)
+   ;
+   ; exit  : hl = return value
+   ;         carry set if ioctl rejected
+   ;
+   ; uses  : af, bc, de, hl
 
-   ld a,IOCTL_ITERM_SET_DELAYS % 256
-   cp e
-   jp nz, console_01_input_stdio_msg_ictl  ; forward to library
+   ; flags managed by stdio?
    
-   ld a,IOCTL_ITERM_SET_DELAYS / 256
-   cp d
-   jp nz, console_01_input_stdio_msg_ictl  ; forward to library
+   ld a,h
+   or l
+   jp z, console_01_input_stdio_msg_ictl
+   
+   ; check the message is specifically for an input terminal
+   
+   ld a,e
+   and $07
+   cp $01                      ; input terminals are type $01
+   jp nz, error_einval_zc
 
-   ; IOCTL_ITERM_SET_DELAYS
-   ; change repeat rates
+   ; interpret ioctl messages
    
-    call zx_01_input_inkey_proc_getk_address    ; hl = & getk_state
-    
-    inc hl
-    inc hl
-    
-    ex de,hl                    ; de = & getk_debounce_ms
-    
-    ld l,c
-    ld h,b                      ; hl = void *src
-    
-    ld bc,5
-    ldir                        ; copy from src to delay times
-    
-    ret
+   ld a,d
+   
+   dec a
+   jp z, zx_01_input_inkey_stdio_msg_flsh
+   
+   cp $0a - 1
+   jp nz, console_01_input_stdio_msg_ictl_0
+   
+_ioctl_getset_delay:
+
+   ; e & $80 = 1 for get
+   ; bc = first parameter (debounce_ms)
+   ; hl = void *arg
+
+   ld a,e
+   push hl
+
+   call zx_01_input_inkey_proc_getk_address
+   
+   inc hl
+   inc hl                      ; hl = & getk_debounce_ms
+   
+   add a,a
+   jr c, _ioctl_get_delay
+
+_ioctl_set_delay:
+
+   pop de                      ; de = void *arg
+
+   ld (hl),c                   ; set debounce_ms
+   inc hl
+   
+   ex de,hl
+   call __stdio_nextarg_bc
+   ex de,hl
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; set repeatbegin_ms
+   inc hl
+   
+   ex de,hl
+   call __stdio_nextarg_bc
+   ex de,hl
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                   ; set repeatperiod_ms
+   
+   ret
+
+_ioctl_get_delay:
+
+   ld a,(hl)                   ; a = debounce_ms
+   inc hl
+   
+   ld (bc),a
+   inc bc
+   xor a
+   ld (bc),a                   ; write debounce_ms
+   
+   ex (sp),hl                  ; hl = void *arg
+   
+   call __stdio_nextarg_de
+   
+   ex (sp),hl                  ; hl = & getk_repeatbegin_ms
+   
+   ldi
+   ldi
+   
+   ex (sp),hl                  ; hl = void *arg
+   
+   call __stdio_nextarg_de
+   
+   pop hl                      ; hl = & getk_repeatperiod_ms
+   
+   ldi
+   ldi
+
+   ret

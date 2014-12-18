@@ -33,8 +33,11 @@
 ;
 ; offset (wrt FDSTRUCT.JP)  description
 ;
-;   26                      tty_z88dk.
-;
+;   26                      tty_z88dk.call (205)
+;   27..28                  tty_z88dk.state
+;   29                      tty_z88dk.action
+;   30                      tty_z88dk.param_1
+;   31                      tty_z88dk.param_2
 
 SECTION code_fcntl
 
@@ -45,6 +48,7 @@ EXTERN OTERM_MSG_TTY, STDIO_MSG_FLSH
 EXTERN zx_01_output_char_32
 EXTERN zx_01_output_char_32_tty_z88dk_oterm_msg_tty
 EXTERN zx_01_output_char_32_tty_z88dk_stdio_msg_flsh
+EXTERN zx_01_output_char_32_tty_z88dk_stdio_msg_ictl
 
 zx_01_output_char_32_tty_z88dk:
 
@@ -53,5 +57,8 @@ zx_01_output_char_32_tty_z88dk:
 
    cp STDIO_MSG_FLSH
    jp z, zx_01_output_char_32_tty_z88dk_stdio_msg_flsh
+   
+   cp STDIO_MSG_ICTL
+   jp z, zx_01_output_char_32_tty_z88dk_stdio_msg_ictl
    
    jp zx_01_output_char_32     ; forward to library

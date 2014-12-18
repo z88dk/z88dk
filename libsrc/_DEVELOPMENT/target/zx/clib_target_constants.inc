@@ -22,19 +22,16 @@
    
    ; zx_01_input_kbd_lastk
    
-   defc IOCTL_ITERM_GET_LASTK  = $0b81
-   defc IOCTL_ITERM_SET_LASTK  = $0b01
+   defc IOCTL_ITERM_LASTK      = $0b01
    
    ; zx_01_output_char_32
    ; zx_01_output_char_64
+   ; zx_01_output_char_32_tty_z88dk
+   ; zx_01_output_char_64_tty_z88dk
    
-   defc IOCTL_OTERM_GET_FONT   = $0a82
-   defc IOCTL_OTERM_SET_FONT   = $0a02
-   defc IOCTL_OTERM_GET_FCOLOR = $0b82
-   defc IOCTL_OTERM_SET_FCOLOR = $0b02
-   defc IOCTL_OTERM_GET_FMASK  = $0c82
-   defc IOCTL_OTERM_SET_FMASK  = $0c02
-   defc IOCTL_OTERM_GET_BCOLOR = $0d82
-   defc IOCTL_OTERM_SET_BCOLOR = $0d02
+   defc IOCTL_OTERM_FONT       = $0a02
+   defc IOCTL_OTERM_FCOLOR     = $0b02
+   defc IOCTL_OTERM_FMASK      = $0c02
+   defc IOCTL_OTERM_BCOLOR     = $0d02
 
 ;; end target library constants ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

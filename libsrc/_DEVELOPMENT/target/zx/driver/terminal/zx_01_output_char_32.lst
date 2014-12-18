@@ -6,3 +6,4 @@ target/zx/driver/terminal/zx_01_output_char_32/zx_01_output_char_32_oterm_msg_cl
 target/zx/driver/terminal/zx_01_output_char_32/zx_01_output_char_32_oterm_msg_pause
 target/zx/driver/terminal/zx_01_output_char_32/zx_01_output_char_32_oterm_msg_printc
 target/zx/driver/terminal/zx_01_output_char_32/zx_01_output_char_32_oterm_msg_scroll
+target/zx/driver/terminal/zx_01_output_char_32/zx_01_output_char_32_stdio_msg_ictl

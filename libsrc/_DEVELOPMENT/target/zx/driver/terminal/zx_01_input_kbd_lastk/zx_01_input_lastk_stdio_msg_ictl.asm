@@ -3,36 +3,74 @@ SECTION code_fcntl
 
 PUBLIC zx_01_input_lastk_stdio_msg_ictl
 
-EXTERN IOCTL_ITERM_SET_LASTK
-
-EXTERN console_01_input_stdio_msg_ictl
-EXTERN zx_01_input_lastk_proc_lastk_address
+EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
+EXTERN zx_01_input_lastk_proc_lastk_address, zx_01_input_lastk_stdio_msg_flsh
+EXTERN error_einval_zc
 
 zx_01_input_lastk_stdio_msg_ictl:
 
+   ; ioctl messages understood:
+   ;
+   ; defc IOCTL_ITERM_RESET      = $0101
+   ; defc IOCTL_ITERM_LASTK      = $0b01
+   ;
+   ; in addition to flags managed by stdio
+   ; and messages understood by base class
+   ;
    ; enter : ix = & FDSTRUCT.JP
    ;         bc = first parameter
    ;         de = request
-   ;         hl = void *arg
+   ;         hl = void *arg (0 if stdio flags)
+   ;
+   ; exit  : hl = return value
+   ;         carry set if ioctl rejected
+   ;
+   ; uses  : af, bc, de, hl
 
-   ld a,IOCTL_ITERM_SET_LASTK % 256
-   cp e
-   jp nz, console_01_input_stdio_msg_ictl  ; forward to library
+   ; flags managed by stdio?
    
-   ld a,IOCTL_ITERM_SET_LASTK / 256
-   cp d
-   jp nz, console_01_input_stdio_msg_ictl  ; forward to library
+   ld a,h
+   or l
+   jp z, console_01_input_stdio_msg_ictl
+   
+   ; check the message is specifically for an input terminal
+   
+   ld a,e
+   and $07
+   cp $01                      ; input terminals are type $01
+   jp nz, error_einval_zc
+   
+   ; interpret ioctl message
+   
+   ld a,d
+   
+   dec a
+   jp z, zx_01_input_lastk_stdio_msg_flsh
+   
+   cp $0b - 1
+   jp nz, console_01_input_stdio_msg_ictl_0
+   
+_ioctl_iterm_lastk:
 
-   ; IOCTL_ITERM_SET_LASTK
-   ; change lastk address
-   
-   call zx_01_input_lastk_proc_lastk_address   ; hl = & LASTK
+   ; bc = first parameter (lastk address)
+   ; hl = void *arg
+
+   call zx_01_input_lastk_proc_lastk_address
    
    ld e,(hl)
-   ld (hl),c
    inc hl
-   ld d,(hl)
-   ld (hl),b                   ; store new lastk
+   ld d,(hl)                   ; de = old lastk
    
+   ld a,b
+   and c
+   inc a
+   jr z, _ioctl_iterm_lastk_exit
+   
+   ld (hl),b
+   dec hl
+   ld (hl),c                   ; store new lastk
+
+_ioctl_iterm_lastk_exit:
+
    ex de,hl                    ; hl = old lastk
    ret
