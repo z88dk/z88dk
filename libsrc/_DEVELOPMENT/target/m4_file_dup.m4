@@ -77,7 +77,7 @@ define(`m4_file_dup',dnl
    
    ; adjust reference count on duped FDSTRUCT
    
-   SECTION __code_crt_init
+   SECTION code_crt_init
    
    `ld hl,$3 + 7'     ; & FDSTRUCT.ref_count
    `inc (hl)'
