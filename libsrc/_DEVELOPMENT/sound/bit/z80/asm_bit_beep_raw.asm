@@ -100,4 +100,5 @@ be_again:
 
 be_end:
 
+   ld a,c
    jp asm_bit_close
