@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.4 2014-12-18 14:23:19 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.5 2014-12-19 00:59:48 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -86,10 +86,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.4 2014-12-1
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label           _TK_NEWLINE		@{ ADD_LABEL; }
+		|	label? _TK_EXX  _TK_NEWLINE		@{ ADD_OPCODE(Z80_EXX); }
 		|	label? _TK_HALT _TK_NEWLINE		@{ ADD_OPCODE(Z80_HALT); }
 		|	label? _TK_IM   const_expr _TK_NEWLINE
 											@{ ADD_OPCODE(Z80_IM(expr_value)); }
-		|	label? _TK_NOP  _TK_NEWLINE		@{ ADD_OPCODE(Z80_NOP); };
+		|	label? _TK_NOP  _TK_NEWLINE		@{ ADD_OPCODE(Z80_NOP); }
+		;
 
 }%%
 

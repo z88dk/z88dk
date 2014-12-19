@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.81 2014-12-19 00:35:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.82 2014-12-19 00:59:48 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -55,7 +55,7 @@ void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CALL( void ), CCF( void ), CP( void ), CPD( void );
 void CPDR( void ), CPI( void ), CPIR( void ), CPL( void ), DAA( void );
 void DI( void ), DJNZ( void );
-void EI( void ), EX( void ), EXX( void );
+void EI( void ), EX( void );
 void IND( void );
 void INDR( void ), INI( void ), INIR( void ), JP( void );
 void LDD( void ), LDDR( void );
@@ -122,7 +122,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( ENDIF ),
     DEF_ENTRY( EX ),
     DEF_ENTRY( EXTERN ),
-    DEF_ENTRY( EXX ),
     DEF_ENTRY( FPP ),
 	DEF_ENTRY( IF ),
 	DEF_ENTRY( IFDEF ),
@@ -828,14 +827,6 @@ void
 RLCA( void )
 {
     append_byte( 0x07 );
-}
-
-
-
-void
-EXX( void )
-{
-    append_byte( 0xD9 );
 }
 
 

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.7 2014-12-13 00:49:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.8 2014-12-19 00:59:48 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -742,7 +742,21 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_DS_P, "DS.P"); assert(sym.ds_size == 3);
 	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
 	T_END();
-					
+
+	/* assembly opcodes */
+	SetTemporaryLine("exx halt im nop "
+					 "EXX HALT IM NOP ");
+	T_GET(TK_EXX,  "EXX");
+	T_GET(TK_HALT, "HALT");
+	T_GET(TK_IM,   "IM");
+	T_GET(TK_NOP,  "NOP");
+	
+	T_GET(TK_EXX,  "EXX");
+	T_GET(TK_HALT, "HALT");
+	T_GET(TK_IM,   "IM");
+	T_GET(TK_NOP,  "NOP");
+	T_END();
+	
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "
 					 "ld ( ix_save + 2 ) , ix ");
