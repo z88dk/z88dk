@@ -163,10 +163,13 @@ putchar_scroll:
    bit 6,(ix+6)
    jr z, scroll_immediate      ; if pause flag is reset
    
-   sub (ix+20)
+   sub (ix+20)   
+   jr nc, pause_scroll         ; if scroll_amount >= scroll_limit
+
+   neg
    ld (ix+20),a
-   
-   jr c, scroll_immediate      ; if scroll limit not reached
+
+   jr scroll_immediate
 
 pause_scroll:
 
@@ -212,4 +215,6 @@ page_it:
 no_cls:
 
    ld de,0                     ; new x = y = 0
+
+   ld (ix+20),e                ; set scroll_limit to zero
    ret
