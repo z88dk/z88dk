@@ -90,4 +90,5 @@ attr_loop:
    dec c
    jr nz, attr_loop
 
+   pop hl                      ; junk attribute
    ret
