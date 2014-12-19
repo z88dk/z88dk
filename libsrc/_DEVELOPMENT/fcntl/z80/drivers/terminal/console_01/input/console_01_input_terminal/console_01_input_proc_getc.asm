@@ -170,6 +170,9 @@ cursor_erase_end:
    bit 7,(ix+7)
    jr nz, escaped_char         ; if this is an escaped char
    
+   cp CHAR_CAPS
+   jr z, readline_loop         ; change cursor
+   
    cp CHAR_BS
    jr nz, escaped_char         ; if not backspace
    
@@ -423,7 +426,11 @@ sm_capslock:
    xor $08                     ; toggle caps lock bit
    ld (ix+6),a
    
-   jr state_machine_1          ; read another char
+   and $20
+   jr z, state_machine_1       ; read another if char mode
+   
+   ld a,CHAR_CAPS
+   ret
 
 sm_escape:
 
