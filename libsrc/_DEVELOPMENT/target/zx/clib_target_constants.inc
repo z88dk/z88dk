@@ -15,6 +15,8 @@
    ;; target ioctls
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;      
    
+   ; keep consistent with ioctl_spectrum.h
+   
    ; zx_01_input_kbd_inkey
    
    defc IOCTL_ITERM_GET_DELAY  = $0a81
