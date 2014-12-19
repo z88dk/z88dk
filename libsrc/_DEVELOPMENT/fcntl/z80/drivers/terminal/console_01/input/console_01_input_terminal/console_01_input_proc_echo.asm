@@ -31,10 +31,16 @@ console_01_input_proc_oterm:
    
    ld l,(ix+14)
    ld h,(ix+15)                ; hl = FDSTRUCT *oterm
+      
+   inc h
+   dec h
+   jr nz, cont
    
-   ld a,h
-   or l
+   inc l
+   dec l
    ret z                       ; silently fail if output terminal is not connected
+
+cont:
    
    push hl
    ex (sp),ix                  ; ix = FDSTRUCT *oterm
