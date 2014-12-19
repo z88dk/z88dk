@@ -1746,40 +1746,80 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; IFDEF ELSE ENDIF
+;------------------------------------------------------------------------------
+      endif
+
+    endif
+
+    defc ifdef_1 = 0
+    define ifdef_2
+
+    ifdef ZERO
+    defb 1                              ;; 01
+  else
+    defb 2
+  endif
+
+  ifdef undefined
+  defb 3
+  else
+  defb 4                                ;; 04
+  endif
+
+  ifdef ifdef_1
+  defb 5                                ;; 05
+    else
+  defb 6
+    endif
+
+    ifdef ifdef_2
+    defb 7                              ;; 07
+      else
+    defb 8
+      endif
+
+      ifdef ifdef_3
+      defb 9
+        else
+      defb 10                           ;; 0A
+        endif
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
         defgroup
         {
-          f0, f1,
-          f2, f3,
-          f10  = 10,
-          f11,
-          f20  = 20, f21
+      f0, f1,
+      f2, f3,
+      f10  = 10,
+      f11,
+      f20  = 20, f21
         }
         defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
         if   1
-          defgroup
-          {
-            ff   = 1
-          }
+      defgroup
+      {
+    ff   = 1
+      }
         else
-          defgroup
-          {
-            ff   = 2
-          }
+      defgroup
+      {
+    ff   = 2
+      }
         endif
         if   0
-          defgroup
-          {
-            fg   = 1
-          }
+      defgroup
+      {
+    fg   = 1
+      }
         else
-          defgroup
-          {
-            fg   = 2
-          }
+      defgroup
+      {
+    fg   = 2
+      }
         endif
         defb ff, fg                     ;; 01 02
 
@@ -1881,6 +1921,8 @@ z80asm(
         rst  49                         ;; error: integer '49' out of range
         rst  55                         ;; error: integer '55' out of range
         rst  57                         ;; error: integer '57' out of range
+        ifdef                           ;; error: syntax error
+        ifdef 1                         ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
@@ -2357,10 +2399,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD D3 08
-        cpir                            ;; CD F0 08
-        cpd                             ;; CD 1C 09
-        cpdr                            ;; CD 39 09
+        cpi                             ;; CD D8 08
+        cpir                            ;; CD F5 08
+        cpd                             ;; CD 21 09
+        cpdr                            ;; CD 3E 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2789,8 +2831,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 65 09
-        rrd                             ;; CD 87 09
+        rld                             ;; CD 6A 09
+        rrd                             ;; CD 8C 09
 
 ;	# rotate 16 bits
 ;
@@ -3462,40 +3504,80 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; IFDEF ELSE ENDIF
+;------------------------------------------------------------------------------
+      endif
+
+    endif
+
+    defc ifdef_1 = 0
+    define ifdef_2
+
+    ifdef ZERO
+    defb 1                              ;; 01
+  else
+    defb 2
+  endif
+
+  ifdef undefined
+  defb 3
+  else
+  defb 4                                ;; 04
+  endif
+
+  ifdef ifdef_1
+  defb 5                                ;; 05
+    else
+  defb 6
+    endif
+
+    ifdef ifdef_2
+    defb 7                              ;; 07
+      else
+    defb 8
+      endif
+
+      ifdef ifdef_3
+      defb 9
+        else
+      defb 10                           ;; 0A
+        endif
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
         defgroup
         {
-          f0, f1,
-          f2, f3,
-          f10  = 10,
-          f11,
-          f20  = 20, f21
+      f0, f1,
+      f2, f3,
+      f10  = 10,
+      f11,
+      f20  = 20, f21
         }
         defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
         if   1
-          defgroup
-          {
-            ff   = 1
-          }
+      defgroup
+      {
+    ff   = 1
+      }
         else
-          defgroup
-          {
-            ff   = 2
-          }
+      defgroup
+      {
+    ff   = 2
+      }
         endif
         if   0
-          defgroup
-          {
-            fg   = 1
-          }
+      defgroup
+      {
+    fg   = 1
+      }
         else
-          defgroup
-          {
-            fg   = 2
-          }
+      defgroup
+      {
+    fg   = 2
+      }
         endif
         defb ff, fg                     ;; 01 02
 
@@ -3520,7 +3602,7 @@ jr2:
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD F8 08 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 41 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 6C 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 8E 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD FD 08 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 46 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 71 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 93 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3761,6 +3843,8 @@ z80asm(
         otir                            ;; error: illegal identifier
         outd                            ;; error: illegal identifier
         otdr                            ;; error: illegal identifier
+        ifdef                           ;; error: syntax error
+        ifdef 1                         ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.125 2014-12-13 00:50:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.126 2014-12-19 00:35:07 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.125 2014-12-13 00:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.125  2014-12-13 00:50:55  pauloscustodio
+* Revision 1.126  2014-12-19 00:35:07  pauloscustodio
+* IFDEF / ELSE / ENDIF implemented
+*
+* Revision 1.125  2014/12/13 00:50:55  pauloscustodio
 * Implemented infrastructure to do parsing based on a RAGEL state machine,
 * and to fall back to the original parser on error. Implemented the first
 * two simple opcodes (NOP and HALT) as a concept check.
@@ -2153,6 +2156,13 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	  and to fall back to the original parser on error. Implemented the first
 	  two simple opcodes (NOP and HALT) as a concept check.
 	  
+	- Implemented expression parsing within the RAGEL state machine, by calling
+	  the existent recursive-descent parser.
+	  
+	- New opcodes.c module to store away all the Z80 opcode hex bytes.
+	
+	- IFDEF / ELSE / ENDIF implemented
+	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -2176,7 +2186,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2c"
+#define VERSION     "2.6.2d"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.116 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.117 2014-12-19 00:35:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,11 +45,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.116 2014-12-14 0
 void ParseIdent( enum flag interpret );
 
 /* local functions */
-void ifstatement( enum flag interpret );
-void parseline( enum flag interpret );
+void ifstatement(enum flag interpret);
+void ifdefstatement(enum flag interpret);
+void parseline(enum flag interpret);
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
-long Evallogexpr( void );
 struct sourcefile *Prevfile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Setfile( struct sourcefile *curfile, struct sourcefile *newfile, char *fname );
@@ -140,117 +140,148 @@ parseline( enum flag interpret )
 }
 
 
-
-
-
 /* multilevel contitional assembly logic */
+
+static void if_body(enum flag interpret, Bool (*check_condition)(void))
+{
+	int num_errors;
+	Bool condition;
+
+	if (interpret == ON)
+	{
+		/* check if value */
+		num_errors = get_num_errors();
+		condition = check_condition();
+		if (num_errors < get_num_errors())
+		{
+			Skipline();
+			return;					/* synatx error */
+		}
+
+		if (condition)
+		{
+			do
+			{
+				/* expression is TRUE, interpret lines until #else or #endif */
+				if (sym.tok != TK_END)
+				{
+					parseline(ON);
+				}
+				else
+				{
+					return;    /* end of file - exit from this #if level */
+				}
+			} while ((sym.tok != TK_ELSE_STMT) && (sym.tok != TK_ENDIF_STMT));
+
+			if (sym.tok == TK_ELSE_STMT)
+			{
+				do
+				{
+					/* then ignore lines until #endif ... */
+					if (sym.tok != TK_END)
+					{
+						parseline(OFF);
+					}
+					else
+					{
+						return;
+					}
+				} while (sym.tok != TK_ENDIF_STMT);
+			}
+		}
+		else
+		{
+			do
+			{
+				/* expression is FALSE, ignore until #else or #endif */
+				if (sym.tok != TK_END)
+				{
+					parseline(OFF);
+				}
+				else
+				{
+					return;
+				}
+			} while ((sym.tok != TK_ELSE_STMT) && (sym.tok != TK_ENDIF_STMT));
+
+			if (sym.tok == TK_ELSE_STMT)
+			{
+				do
+				{
+					if (sym.tok != TK_END)
+					{
+						parseline(ON);
+					}
+					else
+					{
+						return;
+					}
+				} while (sym.tok != TK_ENDIF_STMT);
+			}
+		}
+	}
+	else
+	{
+		do
+		{
+			/* don't evaluate #if expression and ignore all lines until #endif */
+			if (sym.tok != TK_END)
+			{
+				parseline(OFF);
+			}
+			else
+			{
+				return;    /* end of file - exit from this IF level */
+			}
+		} while (sym.tok != TK_ENDIF_STMT);
+	}
+
+	sym.tok = TK_NIL;
+}
+
+
+static Bool check_if_condition(void)
+{
+	GetSym();							/* get logical expression */
+	if (expr_parse_eval_if() != 0)
+		return TRUE;
+	else
+		return FALSE;
+}
+
 
 void
 ifstatement( enum flag interpret )
 {
-    if ( interpret == ON )
-    {
-        /* evaluate #if expression */
-        if ( Evallogexpr() != 0 )
-        {
-
-            do
-            {
-                /* expression is TRUE, interpret lines until #else or #endif */
-                if ( sym.tok != TK_END )
-                {
-                    parseline( ON );
-                }
-                else
-                {
-                    return;    /* end of file - exit from this #if level */
-                }
-            }
-            while ( ( sym.tok != TK_ELSE_STMT ) && ( sym.tok != TK_ENDIF_STMT ) );
-
-            if ( sym.tok == TK_ELSE_STMT )
-            {
-                do
-                {
-                    /* then ignore lines until #endif ... */
-                    if ( sym.tok != TK_END )
-                    {
-                        parseline( OFF );
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                while ( sym.tok != TK_ENDIF_STMT );
-            }
-        }
-        else
-        {
-            do
-            {
-                /* expression is FALSE, ignore until #else or #endif */
-                if ( sym.tok != TK_END )
-                {
-                    parseline( OFF );
-                }
-                else
-                {
-                    return;
-                }
-            }
-            while ( ( sym.tok != TK_ELSE_STMT ) && ( sym.tok != TK_ENDIF_STMT ) );
-
-            if ( sym.tok == TK_ELSE_STMT )
-            {
-                do
-                {
-                    if ( sym.tok != TK_END )
-                    {
-                        parseline( ON );
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                while ( sym.tok != TK_ENDIF_STMT );
-            }
-        }
-    }
-    else
-    {
-        do
-        {
-            /* don't evaluate #if expression and ignore all lines until #endif */
-            if ( sym.tok != TK_END )
-            {
-                parseline( OFF );
-            }
-            else
-            {
-                return;    /* end of file - exit from this IF level */
-            }
-        }
-        while ( sym.tok != TK_ENDIF_STMT );
-    }
-
-    sym.tok = TK_NIL;
+	if_body(interpret, check_if_condition);
 }
 
 
-
-long
-Evallogexpr( void )
+static Bool check_ifdef_condition(void)
 {
-    long constant;
+	Symbol *symbol;
 
-    GetSym();							/* get logical expression */
+	GetSymExpect(TK_NAME);
 
-	constant = expr_parse_eval_if();	/* ignore errors */
+	symbol = find_symbol(sym.string, CURRENTMODULE->local_symtab);
+	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
+		return TRUE;
 
-    return constant;
+	symbol = find_symbol(sym.string, global_symtab);
+	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
+		return TRUE;
+
+	return FALSE;
 }
+
+
+void
+ifdefstatement(enum flag interpret)
+{
+	if_body(interpret, check_ifdef_condition);
+}
+
+
 
 
 void
