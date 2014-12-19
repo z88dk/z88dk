@@ -121,7 +121,7 @@ _ioctl_cls:
    ld a,OTERM_MSG_CLS
    call l_jpix
    
-   call console_01_output_char_proc_reset_scroll_limit
+   ld (ix+20),0                ; set scroll_limit to zero
    
    xor a                       ; clears carry flag
    
