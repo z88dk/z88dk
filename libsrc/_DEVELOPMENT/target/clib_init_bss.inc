@@ -1,7 +1,7 @@
 
    ; initialize bss section
 
-   IF __crt_model || __crt_initialize_bss
+   IF __crt_model | __crt_initialize_bss
 
       EXTERN ASMHEAD_BSS, ASMSIZE_BSS
 
