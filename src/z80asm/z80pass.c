@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.117 2014-12-19 00:35:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.118 2014-12-19 21:21:08 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -274,6 +274,11 @@ static Bool check_ifdef_condition(void)
 	return FALSE;
 }
 
+static Bool check_ifndef_condition(void)
+{
+	return !check_ifdef_condition();
+}
+
 
 void
 ifdefstatement(enum flag interpret)
@@ -281,7 +286,11 @@ ifdefstatement(enum flag interpret)
 	if_body(interpret, check_ifdef_condition);
 }
 
-
+void
+ifndefstatement(enum flag interpret)
+{
+	if_body(interpret, check_ifndef_condition);
+}
 
 
 void

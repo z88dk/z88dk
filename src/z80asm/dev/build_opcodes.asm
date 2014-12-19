@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.7 2014-12-19 00:35:07 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.8 2014-12-19 21:21:08 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -537,6 +537,48 @@ ENDIF
 	  defb 9							;;
 	else								;;
 	  defb 10							;;	defb 10
+	endif								;;
+	
+;------------------------------------------------------------------------------
+; IFNDEF ELSE ENDIF
+;------------------------------------------------------------------------------
+	ifndef 								;; error: syntax error
+	endif								;;
+	
+	ifndef 1								;; error: syntax error
+	endif								;;
+
+	defc   ifndef_1 = 0					;;
+	define ifndef_2						;;
+
+	ifndef ZERO							;;
+	  defb 1							;;
+	else								;;
+	  defb 2							;;	defb 2
+	endif								;;
+	
+	ifndef undefined					;;
+	  defb 3							;;	defb 3
+	else								;;
+	  defb 4							;;
+	endif								;;
+
+	ifndef ifndef_1						;;
+	  defb 5							;;
+	else								;;
+	  defb 6							;;	defb 6
+	endif								;;
+	
+	ifndef ifndef_2						;;
+	  defb 7							;;
+	else								;;
+	  defb 8							;;	defb 8
+	endif								;;
+	
+	ifndef ifndef_3						;;
+	  defb 9							;;	defb 9
+	else								;;
+	  defb 10							;;
 	endif								;;
 	
 ;------------------------------------------------------------------------------

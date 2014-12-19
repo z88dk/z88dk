@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.83 2014-12-19 01:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.84 2014-12-19 21:21:08 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,6 +42,7 @@ void DeclModuleName( void );
 void DEFINE( void );
 void ifstatement(enum flag interpret);
 void ifdefstatement(enum flag interpret);
+void ifndefstatement(enum flag interpret);
 void DEFVARS(void), DEFS(void), ORG(void), INCLUDE(void), BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
 void ADC( void ), ADD( void ), DEC( void ), IN( void ), INC( void ), INVOKE( void );
 void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
@@ -68,7 +69,7 @@ void SCF( void ), SET( void ), SLA( void ), SLL( void ), SRA( void );
 void SRL( void ), SUB( void ), XOR( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
-void IF( void ), IFDEF(void), ELSE( void ), ENDIF( void );
+void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
 void MODULE( void );
 void SECTION( void );
 void LINE( void );
@@ -123,6 +124,7 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( FPP ),
 	DEF_ENTRY( IF ),
 	DEF_ENTRY( IFDEF ),
+	DEF_ENTRY( IFNDEF ),
 	DEF_ENTRY( IN ),
     DEF_ENTRY( INC ),
     DEF_ENTRY( INCLUDE ),
@@ -232,6 +234,13 @@ ParseIdent( enum flag interpret )
 
 			ifdefstatement(interpret);
 		}
+		else if (foundsym->z80func == IFNDEF)
+		{
+			if (interpret == OFF)
+				Skipline();    /* skip current line until EOL */
+
+			ifndefstatement(interpret);
+		}
 		else if (foundsym->z80func == ELSE ||
                   foundsym->z80func == ENDIF )
         {
@@ -293,6 +302,12 @@ IF(void)
 /* dummy function - not used */
 void
 IFDEF(void)
+{
+}
+
+/* dummy function - not used */
+void
+IFNDEF(void)
 {
 }
 

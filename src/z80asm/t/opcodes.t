@@ -1786,65 +1786,105 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; IFNDEF ELSE ENDIF
+;------------------------------------------------------------------------------
+          endif
+
+            endif
+
+            defc ifndef_1 = 0
+            define ifndef_2
+
+            ifndef ZERO
+            defb 1
+              else
+            defb 2                      ;; 02
+              endif
+
+              ifndef undefined
+              defb 3                    ;; 03
+                else
+              defb 4
+                endif
+
+                ifndef ifndef_1
+                defb 5
+                  else
+                defb 6                  ;; 06
+                  endif
+
+                  ifndef ifndef_2
+                  defb 7
+                    else
+                  defb 8                ;; 08
+                    endif
+
+                    ifndef ifndef_3
+                    defb 9              ;; 09
+                      else
+                    defb 10
+                      endif
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-        defgroup
-        {
-      f0, f1,
-      f2, f3,
-      f10  = 10,
-      f11,
-      f20  = 20, f21
-        }
-        defb f0,f1,f2,f3,f10,f11,f20,f21
+                      defgroup
+                      {
+                    f0, f1,
+                    f2, f3,
+                    f10  = 10,
+                    f11,
+                    f20  = 20, f21
+                      }
+                      defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
-        if   1
-      defgroup
-      {
-    ff   = 1
-      }
-        else
-      defgroup
-      {
-    ff   = 2
-      }
-        endif
-        if   0
-      defgroup
-      {
-    fg   = 1
-      }
-        else
-      defgroup
-      {
-    fg   = 2
-      }
-        endif
-        defb ff, fg                     ;; 01 02
+                      if   1
+                    defgroup
+                    {
+                  ff   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  ff   = 2
+                    }
+                      endif
+                      if   0
+                    defgroup
+                    {
+                  fg   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  fg   = 2
+                    }
+                      endif
+                      defb ff, fg       ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-        call_oz 1                       ;; E7 01
-        oz   1                          ;; E7 01
-        call_oz 255                     ;; E7 FF
-        oz   255                        ;; E7 FF
-        call_oz 256                     ;; E7 00 01
-        oz   256                        ;; E7 00 01
-        call_oz 65535                   ;; E7 FF FF
-        oz   65535                      ;; E7 FF FF
+                      call_oz 1         ;; E7 01
+                      oz   1            ;; E7 01
+                      call_oz 255       ;; E7 FF
+                      oz   255          ;; E7 FF
+                      call_oz 256       ;; E7 00 01
+                      oz   256          ;; E7 00 01
+                      call_oz 65535     ;; E7 FF FF
+                      oz   65535        ;; E7 FF FF
 
-        call_pkg 0                      ;; CF 00 00
-        call_pkg 1                      ;; CF 01 00
-        call_pkg 65535                  ;; CF FF FF
+                      call_pkg 0        ;; CF 00 00
+                      call_pkg 1        ;; CF 01 00
+                      call_pkg 65535    ;; CF FF FF
 
-        fpp  1                          ;; DF 01
-        fpp  254                        ;; DF FE
+                      fpp  1            ;; DF 01
+                      fpp  254          ;; DF FE
 
-        invoke 0                        ;; CD 00 00
-        invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF
+                      invoke 0          ;; CD 00 00
+                      invoke 1          ;; CD 01 00
+                      invoke 65535      ;; CD FF FF
 END_ASM
 );
 
@@ -1923,6 +1963,8 @@ z80asm(
         rst  57                         ;; error: integer '57' out of range
         ifdef                           ;; error: syntax error
         ifdef 1                         ;; error: syntax error
+        ifndef                          ;; error: syntax error
+        ifndef 1                        ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
@@ -2399,10 +2441,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD D8 08
-        cpir                            ;; CD F5 08
-        cpd                             ;; CD 21 09
-        cpdr                            ;; CD 3E 09
+        cpi                             ;; CD DD 08
+        cpir                            ;; CD FA 08
+        cpd                             ;; CD 26 09
+        cpdr                            ;; CD 43 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2831,8 +2873,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 6A 09
-        rrd                             ;; CD 8C 09
+        rld                             ;; CD 6F 09
+        rrd                             ;; CD 91 09
 
 ;	# rotate 16 bits
 ;
@@ -3544,65 +3586,105 @@ jr2:
         endif
 
 ;------------------------------------------------------------------------------
+; IFNDEF ELSE ENDIF
+;------------------------------------------------------------------------------
+          endif
+
+            endif
+
+            defc ifndef_1 = 0
+            define ifndef_2
+
+            ifndef ZERO
+            defb 1
+              else
+            defb 2                      ;; 02
+              endif
+
+              ifndef undefined
+              defb 3                    ;; 03
+                else
+              defb 4
+                endif
+
+                ifndef ifndef_1
+                defb 5
+                  else
+                defb 6                  ;; 06
+                  endif
+
+                  ifndef ifndef_2
+                  defb 7
+                    else
+                  defb 8                ;; 08
+                    endif
+
+                    ifndef ifndef_3
+                    defb 9              ;; 09
+                      else
+                    defb 10
+                      endif
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-        defgroup
-        {
-      f0, f1,
-      f2, f3,
-      f10  = 10,
-      f11,
-      f20  = 20, f21
-        }
-        defb f0,f1,f2,f3,f10,f11,f20,f21
+                      defgroup
+                      {
+                    f0, f1,
+                    f2, f3,
+                    f10  = 10,
+                    f11,
+                    f20  = 20, f21
+                      }
+                      defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
-        if   1
-      defgroup
-      {
-    ff   = 1
-      }
-        else
-      defgroup
-      {
-    ff   = 2
-      }
-        endif
-        if   0
-      defgroup
-      {
-    fg   = 1
-      }
-        else
-      defgroup
-      {
-    fg   = 2
-      }
-        endif
-        defb ff, fg                     ;; 01 02
+                      if   1
+                    defgroup
+                    {
+                  ff   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  ff   = 2
+                    }
+                      endif
+                      if   0
+                    defgroup
+                    {
+                  fg   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  fg   = 2
+                    }
+                      endif
+                      defb ff, fg       ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-        call_oz 1                       ;; E7 01
-        oz   1                          ;; E7 01
-        call_oz 255                     ;; E7 FF
-        oz   255                        ;; E7 FF
-        call_oz 256                     ;; E7 00 01
-        oz   256                        ;; E7 00 01
-        call_oz 65535                   ;; E7 FF FF
-        oz   65535                      ;; E7 FF FF
+                      call_oz 1         ;; E7 01
+                      oz   1            ;; E7 01
+                      call_oz 255       ;; E7 FF
+                      oz   255          ;; E7 FF
+                      call_oz 256       ;; E7 00 01
+                      oz   256          ;; E7 00 01
+                      call_oz 65535     ;; E7 FF FF
+                      oz   65535        ;; E7 FF FF
 
-        call_pkg 0                      ;; CF 00 00
-        call_pkg 1                      ;; CF 01 00
-        call_pkg 65535                  ;; CF FF FF
+                      call_pkg 0        ;; CF 00 00
+                      call_pkg 1        ;; CF 01 00
+                      call_pkg 65535    ;; CF FF FF
 
-        fpp  1                          ;; DF 01
-        fpp  254                        ;; DF FE
+                      fpp  1            ;; DF 01
+                      fpp  254          ;; DF FE
 
-        invoke 0                        ;; CD 00 00
-        invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD FD 08 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 46 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 71 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 93 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                      invoke 0          ;; CD 00 00
+                      invoke 1          ;; CD 01 00
+                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 02 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 76 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 98 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3845,6 +3927,8 @@ z80asm(
         otdr                            ;; error: illegal identifier
         ifdef                           ;; error: syntax error
         ifdef 1                         ;; error: syntax error
+        ifndef                          ;; error: syntax error
+        ifndef 1                        ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
