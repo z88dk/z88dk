@@ -5,7 +5,7 @@ PUBLIC zx_01_output_char_32_oterm_msg_pause
 
 EXTERN asm_in_wait_nokey, asm_in_wait_key
 
-zx_01_output_char_32_oterm_msg_pause:
+;zx_01_output_char_32_oterm_msg_pause:
 
    ;   can use:  af, bc, de, hl
    ;
@@ -15,8 +15,8 @@ zx_01_output_char_32_oterm_msg_pause:
    ;   If multiple threads are running this may have to be
    ;   done differently.
    
-   ;call asm_in_wait_nokey
-   ;call asm_in_wait_key
-   ;jp asm_in_wait_nokey
+;   call asm_in_wait_nokey
+;   call asm_in_wait_key
+;   jp asm_in_wait_nokey
 
-   jp asm_in_wait_key
+defc zx_01_output_char_32_oterm_msg_pause = asm_in_wait_key
