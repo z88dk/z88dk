@@ -700,6 +700,59 @@ tr21:
                     {
                         p = ( ( te ) ) - 1;
                     }
+                    sym.tok = TK_DAA;
+                    sym.text = "DAA";
+
+                    if ( opts.cpu & CPU_RABBIT )
+                    {
+                        error_illegal_ident();
+                    };
+
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+                break;
+
+                case 80:
+                {
+                    {
+                        p = ( ( te ) ) - 1;
+                    }
+                    sym.tok = TK_CCF;
+                    sym.text = "CCF";
+                    ;
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+                break;
+
+                case 81:
+                {
+                    {
+                        p = ( ( te ) ) - 1;
+                    }
+                    sym.tok = TK_CPL;
+                    sym.text = "CPL";
+                    ;
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+                break;
+
+                case 82:
+                {
+                    {
+                        p = ( ( te ) ) - 1;
+                    }
                     sym.tok = TK_EXX;
                     sym.text = "EXX";
                     ;
@@ -711,7 +764,7 @@ tr21:
                 }
                 break;
 
-                case 80:
+                case 83:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -732,7 +785,7 @@ tr21:
                 }
                 break;
 
-                case 81:
+                case 84:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -753,7 +806,23 @@ tr21:
                 }
                 break;
 
-                case 82:
+                case 85:
+                {
+                    {
+                        p = ( ( te ) ) - 1;
+                    }
+                    sym.tok = TK_NEG;
+                    sym.text = "NEG";
+                    ;
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+                break;
+
+                case 86:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -769,7 +838,23 @@ tr21:
                 }
                 break;
 
-                case 85:
+                case 87:
+                {
+                    {
+                        p = ( ( te ) ) - 1;
+                    }
+                    sym.tok = TK_SCF;
+                    sym.text = "SCF";
+                    ;
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+                break;
+
+                case 90:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -784,7 +869,7 @@ tr21:
                 }
                 break;
 
-                case 87:
+                case 92:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -803,7 +888,7 @@ tr21:
                 }
                 break;
 
-                case 89:
+                case 94:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -818,7 +903,7 @@ tr21:
                 }
                 break;
 
-                case 91:
+                case 96:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -833,7 +918,7 @@ tr21:
                 }
                 break;
 
-                case 93:
+                case 98:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -848,7 +933,7 @@ tr21:
                 }
                 break;
 
-                case 97:
+                case 102:
                 {
                     {
                         p = ( ( te ) ) - 1;
@@ -1868,6 +1953,24 @@ tr150:
                 te = p;
                 p--;
                 {
+                    sym.tok = TK_C;
+                    sym.text = "C";
+                    sym.cpu_flag = FLAG_C;
+                    sym.cpu_reg8 = REG8_C;
+                    {
+                        p++;
+                        cs = 21;
+                        goto _out;
+                    }
+                }
+            }
+            goto st21;
+tr155:
+
+            {
+                te = p;
+                p--;
+                {
                     sym.tok = TK_D;
                     sym.text = "D";
                     sym.cpu_reg8 = REG8_D;
@@ -1879,7 +1982,7 @@ tr150:
                 }
             }
             goto st21;
-tr154:
+tr161:
 
             {
                 te = p;
@@ -1896,7 +1999,7 @@ tr154:
                 }
             }
             goto st21;
-tr159:
+tr166:
 
             {
                 te = p;
@@ -1913,7 +2016,7 @@ tr159:
                 }
             }
             goto st21;
-tr164:
+tr171:
 
             {
                 te = p;
@@ -1930,7 +2033,7 @@ tr164:
                 }
             }
             goto st21;
-tr170:
+tr177:
 
             {
                 te = p;
@@ -1948,7 +2051,7 @@ tr170:
                 }
             }
             goto st21;
-tr173:
+tr180:
 
             {
                 te = p;
@@ -1966,7 +2069,7 @@ tr173:
                 }
             }
             goto st21;
-tr180:
+tr189:
 
             {
                 te = p;
@@ -1983,7 +2086,7 @@ tr180:
                 }
             }
             goto st21;
-tr184:
+tr195:
 
             {
                 te = p;
@@ -2000,7 +2103,7 @@ tr184:
                 }
             }
             goto st21;
-tr185:
+tr196:
 
             {
                 te = p;
@@ -2195,22 +2298,22 @@ st21:
             goto st46;
 
         case 323:
-            goto tr77;
-
-        case 324:
             goto st47;
 
+        case 324:
+            goto st50;
+
         case 325:
-            goto st49;
+            goto st53;
 
         case 326:
             goto tr80;
 
         case 328:
-            goto st52;
+            goto st56;
 
         case 329:
-            goto st55;
+            goto st59;
 
         case 332:
             goto tr84;
@@ -2219,16 +2322,16 @@ st21:
             goto tr85;
 
         case 334:
-            goto st59;
+            goto st63;
 
         case 336:
-            goto st61;
+            goto st66;
 
         case 338:
             goto tr88;
 
         case 339:
-            goto st62;
+            goto st67;
 
         case 346:
             goto tr90;
@@ -2243,22 +2346,22 @@ st21:
             goto st46;
 
         case 355:
-            goto tr77;
-
-        case 356:
             goto st47;
 
+        case 356:
+            goto st50;
+
         case 357:
-            goto st49;
+            goto st53;
 
         case 358:
             goto tr80;
 
         case 360:
-            goto st52;
+            goto st56;
 
         case 361:
-            goto st55;
+            goto st59;
 
         case 364:
             goto tr84;
@@ -2267,16 +2370,16 @@ st21:
             goto tr85;
 
         case 366:
-            goto st59;
+            goto st63;
 
         case 368:
-            goto st61;
+            goto st66;
 
         case 370:
             goto tr88;
 
         case 371:
-            goto st62;
+            goto st67;
 
         case 378:
             goto tr90;
@@ -2424,7 +2527,7 @@ tr44:
             }
 
             {
-                act = 97;
+                act = 102;
             }
             goto st23;
 tr110:
@@ -2434,7 +2537,7 @@ tr110:
             }
 
             {
-                act = 89;
+                act = 94;
             }
             goto st23;
 st23:
@@ -2830,7 +2933,7 @@ tr56:
             }
 
             {
-                act = 87;
+                act = 92;
             }
             goto st27;
 st27:
@@ -2887,7 +2990,7 @@ tr57:
             }
 
             {
-                act = 87;
+                act = 92;
             }
             goto st28;
 st28:
@@ -2938,7 +3041,7 @@ tr58:
             }
 
             {
-                act = 87;
+                act = 92;
             }
             goto st29;
 st29:
@@ -3007,7 +3110,7 @@ tr119:
             }
 
             {
-                act = 91;
+                act = 96;
             }
             goto st30;
 st30:
@@ -3047,7 +3150,7 @@ tr117:
             }
 
             {
-                act = 91;
+                act = 96;
             }
             goto st31;
 tr121:
@@ -3057,7 +3160,7 @@ tr121:
             }
 
             {
-                act = 93;
+                act = 98;
             }
             goto st31;
 st31:
@@ -3303,16 +3406,6 @@ st40:
                 goto tr81;
 
             goto tr139;
-tr77:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 40;
-            }
-            goto st41;
 tr80:
 
             {
@@ -3330,7 +3423,7 @@ tr81:
             }
 
             {
-                act = 85;
+                act = 90;
             }
             goto st41;
 tr84:
@@ -3393,47 +3486,7 @@ tr149:
                 act = 61;
             }
             goto st41;
-tr151:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 62;
-            }
-            goto st41;
-tr157:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 59;
-            }
-            goto st41;
-tr158:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 79;
-            }
-            goto st41;
-tr161:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 63;
-            }
-            goto st41;
-tr163:
+tr153:
 
             {
                 te = p + 1;
@@ -3443,7 +3496,7 @@ tr163:
                 act = 80;
             }
             goto st41;
-tr166:
+tr154:
 
             {
                 te = p + 1;
@@ -3453,77 +3506,37 @@ tr166:
                 act = 81;
             }
             goto st41;
-tr169:
+tr157:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 57;
+                act = 62;
             }
             goto st41;
-tr171:
+tr159:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 49;
+                act = 79;
             }
             goto st41;
-tr172:
+tr164:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 52;
+                act = 59;
             }
             goto st41;
-tr174:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 50;
-            }
-            goto st41;
-tr175:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 53;
-            }
-            goto st41;
-tr176:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 39;
-            }
-            goto st41;
-tr178:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 37;
-            }
-            goto st41;
-tr179:
+tr165:
 
             {
                 te = p + 1;
@@ -3533,6 +3546,66 @@ tr179:
                 act = 82;
             }
             goto st41;
+tr168:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 63;
+            }
+            goto st41;
+tr170:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 83;
+            }
+            goto st41;
+tr173:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 84;
+            }
+            goto st41;
+tr176:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 57;
+            }
+            goto st41;
+tr178:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 49;
+            }
+            goto st41;
+tr179:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 52;
+            }
+            goto st41;
 tr181:
 
             {
@@ -3540,7 +3613,7 @@ tr181:
             }
 
             {
-                act = 42;
+                act = 50;
             }
             goto st41;
 tr182:
@@ -3550,7 +3623,7 @@ tr182:
             }
 
             {
-                act = 41;
+                act = 53;
             }
             goto st41;
 tr183:
@@ -3560,7 +3633,77 @@ tr183:
             }
 
             {
+                act = 39;
+            }
+            goto st41;
+tr186:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 37;
+            }
+            goto st41;
+tr187:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 85;
+            }
+            goto st41;
+tr188:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 86;
+            }
+            goto st41;
+tr190:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 42;
+            }
+            goto st41;
+tr191:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 41;
+            }
+            goto st41;
+tr193:
+
+            {
+                te = p + 1;
+            }
+
+            {
                 act = 67;
+            }
+            goto st41;
+tr194:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 87;
             }
             goto st41;
 st41:
@@ -3752,20 +3895,20 @@ st47:
         case 47:
             switch ( ( *p ) )
             {
-            case 69:
-                goto tr151;
+            case 67:
+                goto st48;
 
-            case 83:
-                goto tr152;
+            case 80:
+                goto st49;
 
             case 95:
                 goto tr81;
 
-            case 101:
-                goto tr151;
+            case 99:
+                goto st48;
 
-            case 115:
-                goto tr152;
+            case 112:
+                goto st49;
             }
 
             if ( ( *p ) < 65 )
@@ -3782,18 +3925,158 @@ st47:
                 goto tr81;
 
             goto tr150;
-tr152:
-
-            {
-                te = p + 1;
-            }
-            goto st48;
 st48:
 
             if ( ++p == pe )
                 goto _test_eof48;
 
         case 48:
+            switch ( ( *p ) )
+            {
+            case 70:
+                goto tr153;
+
+            case 95:
+                goto tr81;
+
+            case 102:
+                goto tr153;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st49:
+
+            if ( ++p == pe )
+                goto _test_eof49;
+
+        case 49:
+            switch ( ( *p ) )
+            {
+            case 76:
+                goto tr154;
+
+            case 95:
+                goto tr81;
+
+            case 108:
+                goto tr154;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st50:
+
+            if ( ++p == pe )
+                goto _test_eof50;
+
+        case 50:
+            switch ( ( *p ) )
+            {
+            case 65:
+                goto st51;
+
+            case 69:
+                goto tr157;
+
+            case 83:
+                goto tr158;
+
+            case 95:
+                goto tr81;
+
+            case 97:
+                goto st51;
+
+            case 101:
+                goto tr157;
+
+            case 115:
+                goto tr158;
+            }
+
+            if ( ( *p ) < 66 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 98 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr155;
+st51:
+
+            if ( ++p == pe )
+                goto _test_eof51;
+
+        case 51:
+            switch ( ( *p ) )
+            {
+            case 65:
+                goto tr159;
+
+            case 95:
+                goto tr81;
+
+            case 97:
+                goto tr159;
+            }
+
+            if ( ( *p ) < 66 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 98 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr158:
+
+            {
+                te = p + 1;
+            }
+            goto st52;
+st52:
+
+            if ( ++p == pe )
+                goto _test_eof52;
+
+        case 52:
 
             switch ( ( *p ) )
             {
@@ -3852,146 +4135,6 @@ st18:
             }
 
             goto tr29;
-st49:
-
-            if ( ++p == pe )
-                goto _test_eof49;
-
-        case 49:
-            switch ( ( *p ) )
-            {
-            case 73:
-                goto st50;
-
-            case 88:
-                goto st51;
-
-            case 95:
-                goto tr81;
-
-            case 105:
-                goto st50;
-
-            case 120:
-                goto st51;
-            }
-
-            if ( ( *p ) < 65 )
-            {
-                if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    goto tr81;
-            }
-            else if ( ( *p ) > 90 )
-            {
-                if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    goto tr81;
-            }
-            else
-                goto tr81;
-
-            goto tr154;
-st50:
-
-            if ( ++p == pe )
-                goto _test_eof50;
-
-        case 50:
-            switch ( ( *p ) )
-            {
-            case 82:
-                goto tr157;
-
-            case 95:
-                goto tr81;
-
-            case 114:
-                goto tr157;
-            }
-
-            if ( ( *p ) < 65 )
-            {
-                if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    goto tr81;
-            }
-            else if ( ( *p ) > 90 )
-            {
-                if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    goto tr81;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-st51:
-
-            if ( ++p == pe )
-                goto _test_eof51;
-
-        case 51:
-            switch ( ( *p ) )
-            {
-            case 88:
-                goto tr158;
-
-            case 95:
-                goto tr81;
-
-            case 120:
-                goto tr158;
-            }
-
-            if ( ( *p ) < 65 )
-            {
-                if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    goto tr81;
-            }
-            else if ( ( *p ) > 90 )
-            {
-                if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    goto tr81;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-st52:
-
-            if ( ++p == pe )
-                goto _test_eof52;
-
-        case 52:
-            switch ( ( *p ) )
-            {
-            case 65:
-                goto st53;
-
-            case 76:
-                goto tr161;
-
-            case 95:
-                goto tr81;
-
-            case 97:
-                goto st53;
-
-            case 108:
-                goto tr161;
-            }
-
-            if ( ( *p ) < 66 )
-            {
-                if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    goto tr81;
-            }
-            else if ( ( *p ) > 90 )
-            {
-                if ( 98 <= ( *p ) && ( *p ) <= 122 )
-                    goto tr81;
-            }
-            else
-                goto tr81;
-
-            goto tr159;
 st53:
 
             if ( ++p == pe )
@@ -4000,14 +4143,20 @@ st53:
         case 53:
             switch ( ( *p ) )
             {
-            case 76:
+            case 73:
                 goto st54;
+
+            case 88:
+                goto st55;
 
             case 95:
                 goto tr81;
 
-            case 108:
+            case 105:
                 goto st54;
+
+            case 120:
+                goto st55;
             }
 
             if ( ( *p ) < 65 )
@@ -4023,7 +4172,7 @@ st53:
             else
                 goto tr81;
 
-            goto tr144;
+            goto tr161;
 st54:
 
             if ( ++p == pe )
@@ -4032,14 +4181,14 @@ st54:
         case 54:
             switch ( ( *p ) )
             {
-            case 84:
-                goto tr163;
+            case 82:
+                goto tr164;
 
             case 95:
                 goto tr81;
 
-            case 116:
-                goto tr163;
+            case 114:
+                goto tr164;
             }
 
             if ( ( *p ) < 65 )
@@ -4064,32 +4213,14 @@ st55:
         case 55:
             switch ( ( *p ) )
             {
-            case 73:
-                goto st56;
-
-            case 77:
-                goto tr166;
-
             case 88:
-                goto st57;
-
-            case 89:
-                goto st58;
+                goto tr165;
 
             case 95:
                 goto tr81;
 
-            case 105:
-                goto st56;
-
-            case 109:
-                goto tr166;
-
             case 120:
-                goto st57;
-
-            case 121:
-                goto st58;
+                goto tr165;
             }
 
             if ( ( *p ) < 65 )
@@ -4105,7 +4236,7 @@ st55:
             else
                 goto tr81;
 
-            goto tr164;
+            goto tr144;
 st56:
 
             if ( ++p == pe )
@@ -4114,30 +4245,36 @@ st56:
         case 56:
             switch ( ( *p ) )
             {
-            case 82:
-                goto tr169;
+            case 65:
+                goto st57;
+
+            case 76:
+                goto tr168;
 
             case 95:
                 goto tr81;
 
-            case 114:
-                goto tr169;
+            case 97:
+                goto st57;
+
+            case 108:
+                goto tr168;
             }
 
-            if ( ( *p ) < 65 )
+            if ( ( *p ) < 66 )
             {
                 if ( 48 <= ( *p ) && ( *p ) <= 57 )
                     goto tr81;
             }
             else if ( ( *p ) > 90 )
             {
-                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                if ( 98 <= ( *p ) && ( *p ) <= 122 )
                     goto tr81;
             }
             else
                 goto tr81;
 
-            goto tr144;
+            goto tr166;
 st57:
 
             if ( ++p == pe )
@@ -4146,20 +4283,14 @@ st57:
         case 57:
             switch ( ( *p ) )
             {
-            case 72:
-                goto tr171;
-
             case 76:
-                goto tr172;
+                goto st58;
 
             case 95:
                 goto tr81;
 
-            case 104:
-                goto tr171;
-
             case 108:
-                goto tr172;
+                goto st58;
             }
 
             if ( ( *p ) < 65 )
@@ -4175,7 +4306,7 @@ st57:
             else
                 goto tr81;
 
-            goto tr170;
+            goto tr144;
 st58:
 
             if ( ++p == pe )
@@ -4184,20 +4315,14 @@ st58:
         case 58:
             switch ( ( *p ) )
             {
-            case 72:
-                goto tr174;
-
-            case 76:
-                goto tr175;
+            case 84:
+                goto tr170;
 
             case 95:
                 goto tr81;
 
-            case 104:
-                goto tr174;
-
-            case 108:
-                goto tr175;
+            case 116:
+                goto tr170;
             }
 
             if ( ( *p ) < 65 )
@@ -4213,7 +4338,7 @@ st58:
             else
                 goto tr81;
 
-            goto tr173;
+            goto tr144;
 st59:
 
             if ( ++p == pe )
@@ -4222,26 +4347,32 @@ st59:
         case 59:
             switch ( ( *p ) )
             {
-            case 67:
-                goto tr176;
-
-            case 79:
+            case 73:
                 goto st60;
 
-            case 90:
-                goto tr178;
+            case 77:
+                goto tr173;
+
+            case 88:
+                goto st61;
+
+            case 89:
+                goto st62;
 
             case 95:
                 goto tr81;
 
-            case 99:
-                goto tr176;
-
-            case 111:
+            case 105:
                 goto st60;
 
-            case 122:
-                goto tr178;
+            case 109:
+                goto tr173;
+
+            case 120:
+                goto st61;
+
+            case 121:
+                goto st62;
             }
 
             if ( ( *p ) < 65 )
@@ -4249,15 +4380,15 @@ st59:
                 if ( 48 <= ( *p ) && ( *p ) <= 57 )
                     goto tr81;
             }
-            else if ( ( *p ) > 89 )
+            else if ( ( *p ) > 90 )
             {
-                if ( 97 <= ( *p ) && ( *p ) <= 121 )
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
                     goto tr81;
             }
             else
                 goto tr81;
 
-            goto tr144;
+            goto tr171;
 st60:
 
             if ( ++p == pe )
@@ -4266,14 +4397,14 @@ st60:
         case 60:
             switch ( ( *p ) )
             {
-            case 80:
-                goto tr179;
+            case 82:
+                goto tr176;
 
             case 95:
                 goto tr81;
 
-            case 112:
-                goto tr179;
+            case 114:
+                goto tr176;
             }
 
             if ( ( *p ) < 65 )
@@ -4298,19 +4429,57 @@ st61:
         case 61:
             switch ( ( *p ) )
             {
-            case 69:
+            case 72:
+                goto tr178;
+
+            case 76:
+                goto tr179;
+
+            case 95:
+                goto tr81;
+
+            case 104:
+                goto tr178;
+
+            case 108:
+                goto tr179;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr177;
+st62:
+
+            if ( ++p == pe )
+                goto _test_eof62;
+
+        case 62:
+            switch ( ( *p ) )
+            {
+            case 72:
                 goto tr181;
 
-            case 79:
+            case 76:
                 goto tr182;
 
             case 95:
                 goto tr81;
 
-            case 101:
+            case 104:
                 goto tr181;
 
-            case 111:
+            case 108:
                 goto tr182;
             }
 
@@ -4328,22 +4497,212 @@ st61:
                 goto tr81;
 
             goto tr180;
-st62:
+st63:
 
             if ( ++p == pe )
-                goto _test_eof62;
+                goto _test_eof63;
 
-        case 62:
+        case 63:
+            switch ( ( *p ) )
+            {
+            case 67:
+                goto tr183;
+
+            case 69:
+                goto st64;
+
+            case 79:
+                goto st65;
+
+            case 90:
+                goto tr186;
+
+            case 95:
+                goto tr81;
+
+            case 99:
+                goto tr183;
+
+            case 101:
+                goto st64;
+
+            case 111:
+                goto st65;
+
+            case 122:
+                goto tr186;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 89 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 121 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st64:
+
+            if ( ++p == pe )
+                goto _test_eof64;
+
+        case 64:
+            switch ( ( *p ) )
+            {
+            case 71:
+                goto tr187;
+
+            case 95:
+                goto tr81;
+
+            case 103:
+                goto tr187;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st65:
+
+            if ( ++p == pe )
+                goto _test_eof65;
+
+        case 65:
             switch ( ( *p ) )
             {
             case 80:
-                goto tr183;
+                goto tr188;
 
             case 95:
                 goto tr81;
 
             case 112:
-                goto tr183;
+                goto tr188;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st66:
+
+            if ( ++p == pe )
+                goto _test_eof66;
+
+        case 66:
+            switch ( ( *p ) )
+            {
+            case 69:
+                goto tr190;
+
+            case 79:
+                goto tr191;
+
+            case 95:
+                goto tr81;
+
+            case 101:
+                goto tr190;
+
+            case 111:
+                goto tr191;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr189;
+st67:
+
+            if ( ++p == pe )
+                goto _test_eof67;
+
+        case 67:
+            switch ( ( *p ) )
+            {
+            case 67:
+                goto st68;
+
+            case 80:
+                goto tr193;
+
+            case 95:
+                goto tr81;
+
+            case 99:
+                goto st68;
+
+            case 112:
+                goto tr193;
+            }
+
+            if ( ( *p ) < 65 )
+            {
+                if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    goto tr81;
+            }
+            else if ( ( *p ) > 90 )
+            {
+                if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    goto tr81;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+st68:
+
+            if ( ++p == pe )
+                goto _test_eof68;
+
+        case 68:
+            switch ( ( *p ) )
+            {
+            case 70:
+                goto tr194;
+
+            case 95:
+                goto tr81;
+
+            case 102:
+                goto tr194;
             }
 
             if ( ( *p ) < 65 )
@@ -4365,13 +4724,13 @@ tr91:
             {
                 te = p + 1;
             }
-            goto st63;
-st63:
+            goto st69;
+st69:
 
             if ( ++p == pe )
-                goto _test_eof63;
+                goto _test_eof69;
 
-        case 63:
+        case 69:
 
             _widec = ( *p );
 
@@ -4437,18 +4796,18 @@ st63:
                 goto st19;
 
             case 607:
-                goto st64;
+                goto st70;
             }
 
             if ( _widec > 602 )
             {
                 if ( 609 <= _widec && _widec <= 634 )
-                    goto st64;
+                    goto st70;
             }
             else if ( _widec >= 577 )
-                goto st64;
+                goto st70;
 
-            goto tr184;
+            goto tr195;
 st19:
 
             if ( ++p == pe )
@@ -4519,24 +4878,24 @@ st19:
                 goto st19;
 
             case 607:
-                goto st64;
+                goto st70;
             }
 
             if ( _widec > 602 )
             {
                 if ( 609 <= _widec && _widec <= 634 )
-                    goto st64;
+                    goto st70;
             }
             else if ( _widec >= 577 )
-                goto st64;
+                goto st70;
 
             goto tr34;
-st64:
+st70:
 
             if ( ++p == pe )
-                goto _test_eof64;
+                goto _test_eof70;
 
-        case 64:
+        case 70:
             _widec = ( *p );
 
             if ( ( *p ) < 65 )
@@ -4582,22 +4941,22 @@ st64:
             }
 
             if ( _widec == 607 )
-                goto st64;
+                goto st70;
 
             if ( _widec < 577 )
             {
                 if ( 560 <= _widec && _widec <= 569 )
-                    goto st64;
+                    goto st70;
             }
             else if ( _widec > 602 )
             {
                 if ( 609 <= _widec && _widec <= 634 )
-                    goto st64;
+                    goto st70;
             }
             else
-                goto st64;
+                goto st70;
 
-            goto tr185;
+            goto tr196;
 tr92:
 
             {
@@ -4607,13 +4966,13 @@ tr92:
             {
                 act = 54;
             }
-            goto st65;
-st65:
+            goto st71;
+st71:
 
             if ( ++p == pe )
-                goto _test_eof65;
+                goto _test_eof71;
 
-        case 65:
+        case 71:
 
             _widec = ( *p );
 
@@ -4719,19 +5078,19 @@ st65:
                 goto tr38;
 
             case 582:
-                goto tr186;
+                goto tr197;
 
             case 595:
-                goto tr187;
+                goto tr198;
 
             case 607:
                 goto tr98;
 
             case 614:
-                goto tr186;
+                goto tr197;
 
             case 627:
-                goto tr187;
+                goto tr198;
             }
 
             if ( _widec < 353 )
@@ -4815,16 +5174,6 @@ st20:
             }
 
             goto tr21;
-tr94:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 40;
-            }
-            goto st66;
 tr97:
 
             {
@@ -4834,7 +5183,7 @@ tr97:
             {
                 act = 55;
             }
-            goto st66;
+            goto st72;
 tr98:
 
             {
@@ -4842,9 +5191,9 @@ tr98:
             }
 
             {
-                act = 85;
+                act = 90;
             }
-            goto st66;
+            goto st72;
 tr101:
 
             {
@@ -4854,7 +5203,7 @@ tr101:
             {
                 act = 51;
             }
-            goto st66;
+            goto st72;
 tr102:
 
             {
@@ -4864,7 +5213,7 @@ tr102:
             {
                 act = 44;
             }
-            goto st66;
+            goto st72;
 tr105:
 
             {
@@ -4874,7 +5223,7 @@ tr105:
             {
                 act = 58;
             }
-            goto st66;
+            goto st72;
 tr107:
 
             {
@@ -4884,8 +5233,8 @@ tr107:
             {
                 act = 38;
             }
-            goto st66;
-tr190:
+            goto st72;
+tr201:
 
             {
                 te = p + 1;
@@ -4894,8 +5243,8 @@ tr190:
             {
                 act = 1;
             }
-            goto st66;
-tr191:
+            goto st72;
+tr202:
 
             {
                 te = p + 1;
@@ -4904,48 +5253,8 @@ tr191:
             {
                 act = 61;
             }
-            goto st66;
-tr192:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 62;
-            }
-            goto st66;
-tr196:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 59;
-            }
-            goto st66;
-tr197:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 79;
-            }
-            goto st66;
-tr199:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 63;
-            }
-            goto st66;
-tr201:
+            goto st72;
+tr205:
 
             {
                 te = p + 1;
@@ -4954,8 +5263,8 @@ tr201:
             {
                 act = 80;
             }
-            goto st66;
-tr203:
+            goto st72;
+tr206:
 
             {
                 te = p + 1;
@@ -4964,27 +5273,7 @@ tr203:
             {
                 act = 81;
             }
-            goto st66;
-tr206:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 57;
-            }
-            goto st66;
-tr207:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 49;
-            }
-            goto st66;
+            goto st72;
 tr208:
 
             {
@@ -4992,19 +5281,9 @@ tr208:
             }
 
             {
-                act = 52;
+                act = 62;
             }
-            goto st66;
-tr209:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 50;
-            }
-            goto st66;
+            goto st72;
 tr210:
 
             {
@@ -5012,19 +5291,9 @@ tr210:
             }
 
             {
-                act = 53;
+                act = 79;
             }
-            goto st66;
-tr211:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 39;
-            }
-            goto st66;
+            goto st72;
 tr213:
 
             {
@@ -5032,9 +5301,9 @@ tr213:
             }
 
             {
-                act = 37;
+                act = 59;
             }
-            goto st66;
+            goto st72;
 tr214:
 
             {
@@ -5044,8 +5313,128 @@ tr214:
             {
                 act = 82;
             }
-            goto st66;
-tr215:
+            goto st72;
+tr216:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 63;
+            }
+            goto st72;
+tr218:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 83;
+            }
+            goto st72;
+tr220:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 84;
+            }
+            goto st72;
+tr223:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 57;
+            }
+            goto st72;
+tr224:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 49;
+            }
+            goto st72;
+tr225:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 52;
+            }
+            goto st72;
+tr226:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 50;
+            }
+            goto st72;
+tr227:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 53;
+            }
+            goto st72;
+tr228:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 39;
+            }
+            goto st72;
+tr231:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 37;
+            }
+            goto st72;
+tr232:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 85;
+            }
+            goto st72;
+tr233:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 86;
+            }
+            goto st72;
+tr234:
 
             {
                 te = p + 1;
@@ -5054,8 +5443,8 @@ tr215:
             {
                 act = 42;
             }
-            goto st66;
-tr216:
+            goto st72;
+tr235:
 
             {
                 te = p + 1;
@@ -5064,8 +5453,8 @@ tr216:
             {
                 act = 41;
             }
-            goto st66;
-tr217:
+            goto st72;
+tr237:
 
             {
                 te = p + 1;
@@ -5074,13 +5463,23 @@ tr217:
             {
                 act = 67;
             }
-            goto st66;
-st66:
+            goto st72;
+tr238:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 87;
+            }
+            goto st72;
+st72:
 
             if ( ++p == pe )
-                goto _test_eof66;
+                goto _test_eof72;
 
-        case 66:
+        case 72:
 
             _widec = ( *p );
 
@@ -5206,7 +5605,7 @@ st66:
                 goto tr81;
 
             goto tr21;
-tr186:
+tr197:
 
             {
                 te = p + 1;
@@ -5215,13 +5614,13 @@ tr186:
             {
                 act = 66;
             }
-            goto st67;
-st67:
+            goto st73;
+st73:
 
             if ( ++p == pe )
-                goto _test_eof67;
+                goto _test_eof73;
 
-        case 67:
+        case 73:
 
             _widec = ( *p );
 
@@ -5350,22 +5749,22 @@ st67:
                 goto tr81;
 
             goto tr142;
-tr187:
+tr198:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 90;
             }
-            goto st68;
-st68:
+            goto st74;
+st74:
 
             if ( ++p == pe )
-                goto _test_eof68;
+                goto _test_eof74;
 
-        case 68:
+        case 74:
 
             _widec = ( *p );
 
@@ -5465,13 +5864,13 @@ st68:
                 goto tr38;
 
             case 589:
-                goto tr188;
+                goto tr199;
 
             case 607:
                 goto tr98;
 
             case 621:
-                goto tr188;
+                goto tr199;
             }
 
             if ( _widec < 353 )
@@ -5503,22 +5902,22 @@ st68:
                 goto tr81;
 
             goto tr144;
-tr188:
+tr199:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 90;
             }
-            goto st69;
-st69:
+            goto st75;
+st75:
 
             if ( ++p == pe )
-                goto _test_eof69;
+                goto _test_eof75;
 
-        case 69:
+        case 75:
 
             _widec = ( *p );
 
@@ -5618,13 +6017,13 @@ st69:
                 goto tr38;
 
             case 592:
-                goto tr189;
+                goto tr200;
 
             case 607:
                 goto tr98;
 
             case 624:
-                goto tr189;
+                goto tr200;
             }
 
             if ( _widec < 353 )
@@ -5656,22 +6055,22 @@ st69:
                 goto tr81;
 
             goto tr144;
-tr189:
+tr200:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 90;
             }
-            goto st70;
-st70:
+            goto st76;
+st76:
 
             if ( ++p == pe )
-                goto _test_eof70;
+                goto _test_eof76;
 
-        case 70:
+        case 76:
 
             _widec = ( *p );
 
@@ -5771,13 +6170,13 @@ st70:
                 goto tr38;
 
             case 579:
-                goto tr190;
+                goto tr201;
 
             case 607:
                 goto tr98;
 
             case 611:
-                goto tr190;
+                goto tr201;
             }
 
             if ( _widec < 353 )
@@ -5818,13 +6217,13 @@ tr93:
             {
                 act = 45;
             }
-            goto st71;
-st71:
+            goto st77;
+st77:
 
             if ( ++p == pe )
-                goto _test_eof71;
+                goto _test_eof77;
 
-        case 71:
+        case 77:
 
             _widec = ( *p );
 
@@ -5924,13 +6323,13 @@ st71:
                 goto tr38;
 
             case 579:
-                goto tr191;
+                goto tr202;
 
             case 607:
                 goto tr98;
 
             case 611:
-                goto tr191;
+                goto tr202;
             }
 
             if ( _widec < 353 )
@@ -5962,22 +6361,22 @@ st71:
                 goto tr81;
 
             goto tr148;
-tr95:
+tr94:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 46;
+                act = 40;
             }
-            goto st72;
-st72:
+            goto st78;
+st78:
 
             if ( ++p == pe )
-                goto _test_eof72;
+                goto _test_eof78;
 
-        case 72:
+        case 78:
 
             _widec = ( *p );
 
@@ -6058,20 +6457,20 @@ st72:
 
             switch ( _widec )
             {
-            case 325:
-                goto tr151;
+            case 323:
+                goto st48;
 
-            case 339:
-                goto tr152;
+            case 336:
+                goto st49;
 
             case 351:
                 goto tr81;
 
-            case 357:
-                goto tr151;
+            case 355:
+                goto st48;
 
-            case 371:
-                goto tr152;
+            case 368:
+                goto st49;
 
             case 521:
                 goto st20;
@@ -6082,20 +6481,20 @@ st72:
             case 570:
                 goto tr38;
 
-            case 581:
-                goto tr192;
+            case 579:
+                goto tr203;
 
-            case 595:
-                goto tr193;
+            case 592:
+                goto tr204;
 
             case 607:
                 goto tr98;
 
-            case 613:
-                goto tr192;
+            case 611:
+                goto tr203;
 
-            case 627:
-                goto tr193;
+            case 624:
+                goto tr204;
             }
 
             if ( _widec < 353 )
@@ -6127,22 +6526,658 @@ st72:
                 goto tr81;
 
             goto tr150;
-tr193:
+tr203:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 90;
             }
-            goto st73;
-st73:
+            goto st79;
+st79:
 
             if ( ++p == pe )
-                goto _test_eof73;
+                goto _test_eof79;
 
-        case 73:
+        case 79:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 326:
+                goto tr153;
+
+            case 351:
+                goto tr81;
+
+            case 358:
+                goto tr153;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 582:
+                goto tr205;
+
+            case 607:
+                goto tr98;
+
+            case 614:
+                goto tr205;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr204:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st80;
+st80:
+
+            if ( ++p == pe )
+                goto _test_eof80;
+
+        case 80:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 332:
+                goto tr154;
+
+            case 351:
+                goto tr81;
+
+            case 364:
+                goto tr154;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 588:
+                goto tr206;
+
+            case 607:
+                goto tr98;
+
+            case 620:
+                goto tr206;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr95:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 46;
+            }
+            goto st81;
+st81:
+
+            if ( ++p == pe )
+                goto _test_eof81;
+
+        case 81:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 321:
+                goto st51;
+
+            case 325:
+                goto tr157;
+
+            case 339:
+                goto tr158;
+
+            case 351:
+                goto tr81;
+
+            case 353:
+                goto st51;
+
+            case 357:
+                goto tr157;
+
+            case 371:
+                goto tr158;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 577:
+                goto tr207;
+
+            case 581:
+                goto tr208;
+
+            case 595:
+                goto tr209;
+
+            case 607:
+                goto tr98;
+
+            case 609:
+                goto tr207;
+
+            case 613:
+                goto tr208;
+
+            case 627:
+                goto tr209;
+            }
+
+            if ( _widec < 354 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 322 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 578 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 610 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr155;
+tr207:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st82;
+st82:
+
+            if ( ++p == pe )
+                goto _test_eof82;
+
+        case 82:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 321:
+                goto tr159;
+
+            case 351:
+                goto tr81;
+
+            case 353:
+                goto tr159;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 577:
+                goto tr210;
+
+            case 607:
+                goto tr98;
+
+            case 609:
+                goto tr210;
+            }
+
+            if ( _widec < 354 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 322 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 578 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 610 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr209:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st83;
+st83:
+
+            if ( ++p == pe )
+                goto _test_eof83;
+
+        case 83:
 
             _widec = ( *p );
 
@@ -6280,1620 +7315,6 @@ tr96:
             {
                 act = 47;
             }
-            goto st74;
-st74:
-
-            if ( ++p == pe )
-                goto _test_eof74;
-
-        case 74:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 329:
-                goto st50;
-
-            case 344:
-                goto st51;
-
-            case 351:
-                goto tr81;
-
-            case 361:
-                goto st50;
-
-            case 376:
-                goto st51;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 585:
-                goto tr194;
-
-            case 600:
-                goto tr195;
-
-            case 607:
-                goto tr98;
-
-            case 617:
-                goto tr194;
-
-            case 632:
-                goto tr195;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr154;
-tr194:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
-            goto st75;
-st75:
-
-            if ( ++p == pe )
-                goto _test_eof75;
-
-        case 75:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 338:
-                goto tr157;
-
-            case 351:
-                goto tr81;
-
-            case 370:
-                goto tr157;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 594:
-                goto tr196;
-
-            case 607:
-                goto tr98;
-
-            case 626:
-                goto tr196;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-tr195:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
-            goto st76;
-st76:
-
-            if ( ++p == pe )
-                goto _test_eof76;
-
-        case 76:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 344:
-                goto tr158;
-
-            case 351:
-                goto tr81;
-
-            case 376:
-                goto tr158;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 600:
-                goto tr197;
-
-            case 607:
-                goto tr98;
-
-            case 632:
-                goto tr197;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-tr99:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 48;
-            }
-            goto st77;
-st77:
-
-            if ( ++p == pe )
-                goto _test_eof77;
-
-        case 77:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 321:
-                goto st53;
-
-            case 332:
-                goto tr161;
-
-            case 351:
-                goto tr81;
-
-            case 353:
-                goto st53;
-
-            case 364:
-                goto tr161;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 577:
-                goto tr198;
-
-            case 588:
-                goto tr199;
-
-            case 607:
-                goto tr98;
-
-            case 609:
-                goto tr198;
-
-            case 620:
-                goto tr199;
-            }
-
-            if ( _widec < 354 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 322 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 578 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 610 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr159;
-tr198:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
-            goto st78;
-st78:
-
-            if ( ++p == pe )
-                goto _test_eof78;
-
-        case 78:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 332:
-                goto st54;
-
-            case 351:
-                goto tr81;
-
-            case 364:
-                goto st54;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 588:
-                goto tr200;
-
-            case 607:
-                goto tr98;
-
-            case 620:
-                goto tr200;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-tr200:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
-            goto st79;
-st79:
-
-            if ( ++p == pe )
-                goto _test_eof79;
-
-        case 79:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 340:
-                goto tr163;
-
-            case 351:
-                goto tr81;
-
-            case 372:
-                goto tr163;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 596:
-                goto tr201;
-
-            case 607:
-                goto tr98;
-
-            case 628:
-                goto tr201;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-tr100:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 56;
-            }
-            goto st80;
-st80:
-
-            if ( ++p == pe )
-                goto _test_eof80;
-
-        case 80:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 329:
-                goto st56;
-
-            case 333:
-                goto tr166;
-
-            case 344:
-                goto st57;
-
-            case 345:
-                goto st58;
-
-            case 351:
-                goto tr81;
-
-            case 361:
-                goto st56;
-
-            case 365:
-                goto tr166;
-
-            case 376:
-                goto st57;
-
-            case 377:
-                goto st58;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 585:
-                goto tr202;
-
-            case 589:
-                goto tr203;
-
-            case 600:
-                goto tr204;
-
-            case 601:
-                goto tr205;
-
-            case 607:
-                goto tr98;
-
-            case 617:
-                goto tr202;
-
-            case 621:
-                goto tr203;
-
-            case 632:
-                goto tr204;
-
-            case 633:
-                goto tr205;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr164;
-tr202:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
-            goto st81;
-st81:
-
-            if ( ++p == pe )
-                goto _test_eof81;
-
-        case 81:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 338:
-                goto tr169;
-
-            case 351:
-                goto tr81;
-
-            case 370:
-                goto tr169;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 594:
-                goto tr206;
-
-            case 607:
-                goto tr98;
-
-            case 626:
-                goto tr206;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr144;
-tr204:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 64;
-            }
-            goto st82;
-st82:
-
-            if ( ++p == pe )
-                goto _test_eof82;
-
-        case 82:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 328:
-                goto tr171;
-
-            case 332:
-                goto tr172;
-
-            case 351:
-                goto tr81;
-
-            case 360:
-                goto tr171;
-
-            case 364:
-                goto tr172;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 584:
-                goto tr207;
-
-            case 588:
-                goto tr208;
-
-            case 607:
-                goto tr98;
-
-            case 616:
-                goto tr207;
-
-            case 620:
-                goto tr208;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr170;
-tr205:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 65;
-            }
-            goto st83;
-st83:
-
-            if ( ++p == pe )
-                goto _test_eof83;
-
-        case 83:
-
-            _widec = ( *p );
-
-            if ( ( *p ) < 58 )
-            {
-                if ( ( *p ) < 32 )
-                {
-                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 32 )
-                {
-                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else if ( ( *p ) > 58 )
-            {
-                if ( ( *p ) < 95 )
-                {
-                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else if ( ( *p ) > 95 )
-                {
-                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
-                    {
-                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                        if (
-
-                            at_bol ) _widec += 256;
-                    }
-                }
-                else
-                {
-                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                    if (
-
-                        at_bol ) _widec += 256;
-                }
-            }
-            else
-            {
-                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
-
-                if (
-
-                    at_bol ) _widec += 256;
-            }
-
-            switch ( _widec )
-            {
-            case 328:
-                goto tr174;
-
-            case 332:
-                goto tr175;
-
-            case 351:
-                goto tr81;
-
-            case 360:
-                goto tr174;
-
-            case 364:
-                goto tr175;
-
-            case 521:
-                goto st20;
-
-            case 544:
-                goto st20;
-
-            case 570:
-                goto tr38;
-
-            case 584:
-                goto tr209;
-
-            case 588:
-                goto tr210;
-
-            case 607:
-                goto tr98;
-
-            case 616:
-                goto tr209;
-
-            case 620:
-                goto tr210;
-            }
-
-            if ( _widec < 353 )
-            {
-                if ( _widec > 313 )
-                {
-                    if ( 321 <= _widec && _widec <= 346 )
-                        goto tr81;
-                }
-                else if ( _widec >= 304 )
-                    goto tr81;
-            }
-            else if ( _widec > 378 )
-            {
-                if ( _widec < 577 )
-                {
-                    if ( 560 <= _widec && _widec <= 569 )
-                        goto tr98;
-                }
-                else if ( _widec > 602 )
-                {
-                    if ( 609 <= _widec && _widec <= 634 )
-                        goto tr98;
-                }
-                else
-                    goto tr98;
-            }
-            else
-                goto tr81;
-
-            goto tr173;
-tr103:
-
-            {
-                te = p + 1;
-            }
-
-            {
-                act = 85;
-            }
             goto st84;
 st84:
 
@@ -7981,26 +7402,20 @@ st84:
 
             switch ( _widec )
             {
-            case 323:
-                goto tr176;
+            case 329:
+                goto st54;
 
-            case 335:
-                goto st60;
-
-            case 346:
-                goto tr178;
+            case 344:
+                goto st55;
 
             case 351:
                 goto tr81;
 
-            case 355:
-                goto tr176;
+            case 361:
+                goto st54;
 
-            case 367:
-                goto st60;
-
-            case 378:
-                goto tr178;
+            case 376:
+                goto st55;
 
             case 521:
                 goto st20;
@@ -8011,48 +7426,42 @@ st84:
             case 570:
                 goto tr38;
 
-            case 579:
+            case 585:
                 goto tr211;
 
-            case 591:
+            case 600:
                 goto tr212;
-
-            case 602:
-                goto tr213;
 
             case 607:
                 goto tr98;
 
-            case 611:
+            case 617:
                 goto tr211;
 
-            case 623:
+            case 632:
                 goto tr212;
-
-            case 634:
-                goto tr213;
             }
 
             if ( _widec < 353 )
             {
                 if ( _widec > 313 )
                 {
-                    if ( 321 <= _widec && _widec <= 345 )
+                    if ( 321 <= _widec && _widec <= 346 )
                         goto tr81;
                 }
                 else if ( _widec >= 304 )
                     goto tr81;
             }
-            else if ( _widec > 377 )
+            else if ( _widec > 378 )
             {
                 if ( _widec < 577 )
                 {
                     if ( 560 <= _widec && _widec <= 569 )
                         goto tr98;
                 }
-                else if ( _widec > 601 )
+                else if ( _widec > 602 )
                 {
-                    if ( 609 <= _widec && _widec <= 633 )
+                    if ( 609 <= _widec && _widec <= 634 )
                         goto tr98;
                 }
                 else
@@ -8061,15 +7470,15 @@ st84:
             else
                 goto tr81;
 
-            goto tr144;
-tr212:
+            goto tr161;
+tr211:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 90;
             }
             goto st85;
 st85:
@@ -8158,14 +7567,14 @@ st85:
 
             switch ( _widec )
             {
-            case 336:
-                goto tr179;
+            case 338:
+                goto tr164;
 
             case 351:
                 goto tr81;
 
-            case 368:
-                goto tr179;
+            case 370:
+                goto tr164;
 
             case 521:
                 goto st20;
@@ -8176,14 +7585,14 @@ st85:
             case 570:
                 goto tr38;
 
-            case 592:
-                goto tr214;
+            case 594:
+                goto tr213;
 
             case 607:
                 goto tr98;
 
-            case 624:
-                goto tr214;
+            case 626:
+                goto tr213;
             }
 
             if ( _widec < 353 )
@@ -8215,14 +7624,14 @@ st85:
                 goto tr81;
 
             goto tr144;
-tr104:
+tr212:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 43;
+                act = 90;
             }
             goto st86;
 st86:
@@ -8311,20 +7720,14 @@ st86:
 
             switch ( _widec )
             {
-            case 325:
-                goto tr181;
-
-            case 335:
-                goto tr182;
+            case 344:
+                goto tr165;
 
             case 351:
                 goto tr81;
 
-            case 357:
-                goto tr181;
-
-            case 367:
-                goto tr182;
+            case 376:
+                goto tr165;
 
             case 521:
                 goto st20;
@@ -8335,20 +7738,14 @@ st86:
             case 570:
                 goto tr38;
 
-            case 581:
-                goto tr215;
-
-            case 591:
-                goto tr216;
+            case 600:
+                goto tr214;
 
             case 607:
                 goto tr98;
 
-            case 613:
-                goto tr215;
-
-            case 623:
-                goto tr216;
+            case 632:
+                goto tr214;
             }
 
             if ( _widec < 353 )
@@ -8379,15 +7776,15 @@ st86:
             else
                 goto tr81;
 
-            goto tr180;
-tr106:
+            goto tr144;
+tr99:
 
             {
                 te = p + 1;
             }
 
             {
-                act = 85;
+                act = 48;
             }
             goto st87;
 st87:
@@ -8476,14 +7873,1499 @@ st87:
 
             switch ( _widec )
             {
-            case 336:
+            case 321:
+                goto st57;
+
+            case 332:
+                goto tr168;
+
+            case 351:
+                goto tr81;
+
+            case 353:
+                goto st57;
+
+            case 364:
+                goto tr168;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 577:
+                goto tr215;
+
+            case 588:
+                goto tr216;
+
+            case 607:
+                goto tr98;
+
+            case 609:
+                goto tr215;
+
+            case 620:
+                goto tr216;
+            }
+
+            if ( _widec < 354 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 322 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 578 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 610 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr166;
+tr215:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st88;
+st88:
+
+            if ( ++p == pe )
+                goto _test_eof88;
+
+        case 88:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 332:
+                goto st58;
+
+            case 351:
+                goto tr81;
+
+            case 364:
+                goto st58;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 588:
+                goto tr217;
+
+            case 607:
+                goto tr98;
+
+            case 620:
+                goto tr217;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr217:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st89;
+st89:
+
+            if ( ++p == pe )
+                goto _test_eof89;
+
+        case 89:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 340:
+                goto tr170;
+
+            case 351:
+                goto tr81;
+
+            case 372:
+                goto tr170;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 596:
+                goto tr218;
+
+            case 607:
+                goto tr98;
+
+            case 628:
+                goto tr218;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr100:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 56;
+            }
+            goto st90;
+st90:
+
+            if ( ++p == pe )
+                goto _test_eof90;
+
+        case 90:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 329:
+                goto st60;
+
+            case 333:
+                goto tr173;
+
+            case 344:
+                goto st61;
+
+            case 345:
+                goto st62;
+
+            case 351:
+                goto tr81;
+
+            case 361:
+                goto st60;
+
+            case 365:
+                goto tr173;
+
+            case 376:
+                goto st61;
+
+            case 377:
+                goto st62;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 585:
+                goto tr219;
+
+            case 589:
+                goto tr220;
+
+            case 600:
+                goto tr221;
+
+            case 601:
+                goto tr222;
+
+            case 607:
+                goto tr98;
+
+            case 617:
+                goto tr219;
+
+            case 621:
+                goto tr220;
+
+            case 632:
+                goto tr221;
+
+            case 633:
+                goto tr222;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr171;
+tr219:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st91;
+st91:
+
+            if ( ++p == pe )
+                goto _test_eof91;
+
+        case 91:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 338:
+                goto tr176;
+
+            case 351:
+                goto tr81;
+
+            case 370:
+                goto tr176;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 594:
+                goto tr223;
+
+            case 607:
+                goto tr98;
+
+            case 626:
+                goto tr223;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr221:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 64;
+            }
+            goto st92;
+st92:
+
+            if ( ++p == pe )
+                goto _test_eof92;
+
+        case 92:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 328:
+                goto tr178;
+
+            case 332:
+                goto tr179;
+
+            case 351:
+                goto tr81;
+
+            case 360:
+                goto tr178;
+
+            case 364:
+                goto tr179;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 584:
+                goto tr224;
+
+            case 588:
+                goto tr225;
+
+            case 607:
+                goto tr98;
+
+            case 616:
+                goto tr224;
+
+            case 620:
+                goto tr225;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr177;
+tr222:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 65;
+            }
+            goto st93;
+st93:
+
+            if ( ++p == pe )
+                goto _test_eof93;
+
+        case 93:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 328:
+                goto tr181;
+
+            case 332:
+                goto tr182;
+
+            case 351:
+                goto tr81;
+
+            case 360:
+                goto tr181;
+
+            case 364:
+                goto tr182;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 584:
+                goto tr226;
+
+            case 588:
+                goto tr227;
+
+            case 607:
+                goto tr98;
+
+            case 616:
+                goto tr226;
+
+            case 620:
+                goto tr227;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr180;
+tr103:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st94;
+st94:
+
+            if ( ++p == pe )
+                goto _test_eof94;
+
+        case 94:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 323:
                 goto tr183;
+
+            case 325:
+                goto st64;
+
+            case 335:
+                goto st65;
+
+            case 346:
+                goto tr186;
+
+            case 351:
+                goto tr81;
+
+            case 355:
+                goto tr183;
+
+            case 357:
+                goto st64;
+
+            case 367:
+                goto st65;
+
+            case 378:
+                goto tr186;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 579:
+                goto tr228;
+
+            case 581:
+                goto tr229;
+
+            case 591:
+                goto tr230;
+
+            case 602:
+                goto tr231;
+
+            case 607:
+                goto tr98;
+
+            case 611:
+                goto tr228;
+
+            case 613:
+                goto tr229;
+
+            case 623:
+                goto tr230;
+
+            case 634:
+                goto tr231;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 345 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 377 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 601 )
+                {
+                    if ( 609 <= _widec && _widec <= 633 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr229:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st95;
+st95:
+
+            if ( ++p == pe )
+                goto _test_eof95;
+
+        case 95:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 327:
+                goto tr187;
+
+            case 351:
+                goto tr81;
+
+            case 359:
+                goto tr187;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 583:
+                goto tr232;
+
+            case 607:
+                goto tr98;
+
+            case 615:
+                goto tr232;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr230:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st96;
+st96:
+
+            if ( ++p == pe )
+                goto _test_eof96;
+
+        case 96:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 336:
+                goto tr188;
 
             case 351:
                 goto tr81;
 
             case 368:
-                goto tr183;
+                goto tr188;
 
             case 521:
                 goto st20;
@@ -8495,13 +9377,496 @@ st87:
                 goto tr38;
 
             case 592:
-                goto tr217;
+                goto tr233;
 
             case 607:
                 goto tr98;
 
             case 624:
-                goto tr217;
+                goto tr233;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr104:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 43;
+            }
+            goto st97;
+st97:
+
+            if ( ++p == pe )
+                goto _test_eof97;
+
+        case 97:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 325:
+                goto tr190;
+
+            case 335:
+                goto tr191;
+
+            case 351:
+                goto tr81;
+
+            case 357:
+                goto tr190;
+
+            case 367:
+                goto tr191;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 581:
+                goto tr234;
+
+            case 591:
+                goto tr235;
+
+            case 607:
+                goto tr98;
+
+            case 613:
+                goto tr234;
+
+            case 623:
+                goto tr235;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr189;
+tr106:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st98;
+st98:
+
+            if ( ++p == pe )
+                goto _test_eof98;
+
+        case 98:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 323:
+                goto st68;
+
+            case 336:
+                goto tr193;
+
+            case 351:
+                goto tr81;
+
+            case 355:
+                goto st68;
+
+            case 368:
+                goto tr193;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 579:
+                goto tr236;
+
+            case 592:
+                goto tr237;
+
+            case 607:
+                goto tr98;
+
+            case 611:
+                goto tr236;
+
+            case 624:
+                goto tr237;
+            }
+
+            if ( _widec < 353 )
+            {
+                if ( _widec > 313 )
+                {
+                    if ( 321 <= _widec && _widec <= 346 )
+                        goto tr81;
+                }
+                else if ( _widec >= 304 )
+                    goto tr81;
+            }
+            else if ( _widec > 378 )
+            {
+                if ( _widec < 577 )
+                {
+                    if ( 560 <= _widec && _widec <= 569 )
+                        goto tr98;
+                }
+                else if ( _widec > 602 )
+                {
+                    if ( 609 <= _widec && _widec <= 634 )
+                        goto tr98;
+                }
+                else
+                    goto tr98;
+            }
+            else
+                goto tr81;
+
+            goto tr144;
+tr236:
+
+            {
+                te = p + 1;
+            }
+
+            {
+                act = 90;
+            }
+            goto st99;
+st99:
+
+            if ( ++p == pe )
+                goto _test_eof99;
+
+        case 99:
+
+            _widec = ( *p );
+
+            if ( ( *p ) < 58 )
+            {
+                if ( ( *p ) < 32 )
+                {
+                    if ( 9 <= ( *p ) && ( *p ) <= 9 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 32 )
+                {
+                    if ( 48 <= ( *p ) && ( *p ) <= 57 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else if ( ( *p ) > 58 )
+            {
+                if ( ( *p ) < 95 )
+                {
+                    if ( 65 <= ( *p ) && ( *p ) <= 90 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else if ( ( *p ) > 95 )
+                {
+                    if ( 97 <= ( *p ) && ( *p ) <= 122 )
+                    {
+                        _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                        if (
+
+                            at_bol ) _widec += 256;
+                    }
+                }
+                else
+                {
+                    _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                    if (
+
+                        at_bol ) _widec += 256;
+                }
+            }
+            else
+            {
+                _widec = ( short )( 128 + ( ( *p ) - -128 ) );
+
+                if (
+
+                    at_bol ) _widec += 256;
+            }
+
+            switch ( _widec )
+            {
+            case 326:
+                goto tr194;
+
+            case 351:
+                goto tr81;
+
+            case 358:
+                goto tr194;
+
+            case 521:
+                goto st20;
+
+            case 544:
+                goto st20;
+
+            case 570:
+                goto tr38;
+
+            case 582:
+                goto tr238;
+
+            case 607:
+                goto tr98;
+
+            case 614:
+                goto tr238;
             }
 
             if ( _widec < 353 )
@@ -8670,9 +10035,6 @@ _test_eof47:
 _test_eof48:
         cs = 48;
         goto _test_eof;
-_test_eof18:
-        cs = 18;
-        goto _test_eof;
 _test_eof49:
         cs = 49;
         goto _test_eof;
@@ -8684,6 +10046,9 @@ _test_eof51:
         goto _test_eof;
 _test_eof52:
         cs = 52;
+        goto _test_eof;
+_test_eof18:
+        cs = 18;
         goto _test_eof;
 _test_eof53:
         cs = 53;
@@ -8718,17 +10083,11 @@ _test_eof62:
 _test_eof63:
         cs = 63;
         goto _test_eof;
-_test_eof19:
-        cs = 19;
-        goto _test_eof;
 _test_eof64:
         cs = 64;
         goto _test_eof;
 _test_eof65:
         cs = 65;
-        goto _test_eof;
-_test_eof20:
-        cs = 20;
         goto _test_eof;
 _test_eof66:
         cs = 66;
@@ -8742,11 +10101,17 @@ _test_eof68:
 _test_eof69:
         cs = 69;
         goto _test_eof;
+_test_eof19:
+        cs = 19;
+        goto _test_eof;
 _test_eof70:
         cs = 70;
         goto _test_eof;
 _test_eof71:
         cs = 71;
+        goto _test_eof;
+_test_eof20:
+        cs = 20;
         goto _test_eof;
 _test_eof72:
         cs = 72;
@@ -8795,6 +10160,42 @@ _test_eof86:
         goto _test_eof;
 _test_eof87:
         cs = 87;
+        goto _test_eof;
+_test_eof88:
+        cs = 88;
+        goto _test_eof;
+_test_eof89:
+        cs = 89;
+        goto _test_eof;
+_test_eof90:
+        cs = 90;
+        goto _test_eof;
+_test_eof91:
+        cs = 91;
+        goto _test_eof;
+_test_eof92:
+        cs = 92;
+        goto _test_eof;
+_test_eof93:
+        cs = 93;
+        goto _test_eof;
+_test_eof94:
+        cs = 94;
+        goto _test_eof;
+_test_eof95:
+        cs = 95;
+        goto _test_eof;
+_test_eof96:
+        cs = 96;
+        goto _test_eof;
+_test_eof97:
+        cs = 97;
+        goto _test_eof;
+_test_eof98:
+        cs = 98;
+        goto _test_eof;
+_test_eof99:
+        cs = 99;
         goto _test_eof;
 
 _test_eof:
@@ -8936,92 +10337,92 @@ _test_eof:
             case 48:
                 goto tr144;
 
-            case 18:
-                goto tr29;
-
             case 49:
-                goto tr154;
+                goto tr144;
 
             case 50:
-                goto tr144;
+                goto tr155;
 
             case 51:
                 goto tr144;
 
             case 52:
-                goto tr159;
+                goto tr144;
+
+            case 18:
+                goto tr29;
 
             case 53:
-                goto tr144;
+                goto tr161;
 
             case 54:
                 goto tr144;
 
             case 55:
-                goto tr164;
+                goto tr144;
 
             case 56:
-                goto tr144;
+                goto tr166;
 
             case 57:
-                goto tr170;
+                goto tr144;
 
             case 58:
-                goto tr173;
+                goto tr144;
 
             case 59:
-                goto tr144;
+                goto tr171;
 
             case 60:
                 goto tr144;
 
             case 61:
-                goto tr180;
+                goto tr177;
 
             case 62:
-                goto tr144;
+                goto tr180;
 
             case 63:
-                goto tr184;
-
-            case 19:
-                goto tr34;
+                goto tr144;
 
             case 64:
-                goto tr185;
+                goto tr144;
 
             case 65:
-                goto tr139;
-
-            case 20:
-                goto tr21;
+                goto tr144;
 
             case 66:
-                goto tr21;
+                goto tr189;
 
             case 67:
-                goto tr142;
+                goto tr144;
 
             case 68:
                 goto tr144;
 
             case 69:
-                goto tr144;
+                goto tr195;
+
+            case 19:
+                goto tr34;
 
             case 70:
-                goto tr144;
+                goto tr196;
 
             case 71:
-                goto tr148;
+                goto tr139;
+
+            case 20:
+                goto tr21;
 
             case 72:
-                goto tr150;
+                goto tr21;
 
             case 73:
-                goto tr144;
+                goto tr142;
 
             case 74:
-                goto tr154;
+                goto tr144;
 
             case 75:
                 goto tr144;
@@ -9030,36 +10431,72 @@ _test_eof:
                 goto tr144;
 
             case 77:
-                goto tr159;
+                goto tr148;
 
             case 78:
-                goto tr144;
+                goto tr150;
 
             case 79:
                 goto tr144;
 
             case 80:
-                goto tr164;
+                goto tr144;
 
             case 81:
-                goto tr144;
+                goto tr155;
 
             case 82:
-                goto tr170;
+                goto tr144;
 
             case 83:
-                goto tr173;
+                goto tr144;
 
             case 84:
-                goto tr144;
+                goto tr161;
 
             case 85:
                 goto tr144;
 
             case 86:
-                goto tr180;
+                goto tr144;
 
             case 87:
+                goto tr166;
+
+            case 88:
+                goto tr144;
+
+            case 89:
+                goto tr144;
+
+            case 90:
+                goto tr171;
+
+            case 91:
+                goto tr144;
+
+            case 92:
+                goto tr177;
+
+            case 93:
+                goto tr180;
+
+            case 94:
+                goto tr144;
+
+            case 95:
+                goto tr144;
+
+            case 96:
+                goto tr144;
+
+            case 97:
+                goto tr189;
+
+            case 98:
+                goto tr144;
+
+            case 99:
                 goto tr144;
             }
         }

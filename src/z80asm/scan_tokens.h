@@ -89,10 +89,15 @@
 #define _TK_DS_W           84    /* "DS.W"  */
 #define _TK_DS_P           85    /* "DS.P"  */
 #define _TK_DS_L           86    /* "DS.L"  */
-#define _TK_EXX            87    /* "EXX"   */
-#define _TK_HALT           88    /* "HALT"  */
-#define _TK_IM             89    /* "IM"    */
-#define _TK_NOP            90    /* "NOP"   */
+#define _TK_DAA            87    /* "DAA"   */
+#define _TK_CCF            88    /* "CCF"   */
+#define _TK_CPL            89    /* "CPL"   */
+#define _TK_EXX            90    /* "EXX"   */
+#define _TK_HALT           91    /* "HALT"  */
+#define _TK_IM             92    /* "IM"    */
+#define _TK_NEG            93    /* "NEG"   */
+#define _TK_NOP            94    /* "NOP"   */
+#define _TK_SCF            95    /* "SCF"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -186,10 +191,15 @@ typedef enum tokid_t
     TK_DS_W        = _TK_DS_W       ,    /* =    84, "DS.W"  */
     TK_DS_P        = _TK_DS_P       ,    /* =    85, "DS.P"  */
     TK_DS_L        = _TK_DS_L       ,    /* =    86, "DS.L"  */
-    TK_EXX         = _TK_EXX        ,    /* =    87, "EXX"   */
-    TK_HALT        = _TK_HALT       ,    /* =    88, "HALT"  */
-    TK_IM          = _TK_IM         ,    /* =    89, "IM"    */
-    TK_NOP         = _TK_NOP        ,    /* =    90, "NOP"   */
+    TK_DAA         = _TK_DAA        ,    /* =    87, "DAA"   */
+    TK_CCF         = _TK_CCF        ,    /* =    88, "CCF"   */
+    TK_CPL         = _TK_CPL        ,    /* =    89, "CPL"   */
+    TK_EXX         = _TK_EXX        ,    /* =    90, "EXX"   */
+    TK_HALT        = _TK_HALT       ,    /* =    91, "HALT"  */
+    TK_IM          = _TK_IM         ,    /* =    92, "IM"    */
+    TK_NEG         = _TK_NEG        ,    /* =    93, "NEG"   */
+    TK_NOP         = _TK_NOP        ,    /* =    94, "NOP"   */
+    TK_SCF         = _TK_SCF        ,    /* =    95, "SCF"   */
 } tokid_t;
 
 #endif

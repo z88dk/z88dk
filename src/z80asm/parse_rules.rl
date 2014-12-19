@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.5 2014-12-19 00:59:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.6 2014-12-19 01:25:14 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -85,12 +85,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.5 2014-12-1
 	/* assembly statement */
 	main := _TK_END
 		|	_TK_NEWLINE
-		|	label           _TK_NEWLINE		@{ ADD_LABEL; }
-		|	label? _TK_EXX  _TK_NEWLINE		@{ ADD_OPCODE(Z80_EXX); }
-		|	label? _TK_HALT _TK_NEWLINE		@{ ADD_OPCODE(Z80_HALT); }
-		|	label? _TK_IM   const_expr _TK_NEWLINE
-											@{ ADD_OPCODE(Z80_IM(expr_value)); }
-		|	label? _TK_NOP  _TK_NEWLINE		@{ ADD_OPCODE(Z80_NOP); }
+		|	label           _TK_NEWLINE				@{ ADD_LABEL; }
+		|	label? _TK_DAA  _TK_NEWLINE				@{ ADD_OPCODE(Z80_DAA); }
+		|	label? _TK_CCF  _TK_NEWLINE				@{ ADD_OPCODE(Z80_CCF); }
+		|	label? _TK_CPL  _TK_NEWLINE				@{ ADD_OPCODE(Z80_CPL); }
+		|	label? _TK_EXX  _TK_NEWLINE				@{ ADD_OPCODE(Z80_EXX); }
+		|	label? _TK_HALT _TK_NEWLINE				@{ ADD_OPCODE(Z80_HALT); }
+		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
+		|	label? _TK_NEG  _TK_NEWLINE				@{ ADD_OPCODE(Z80_NEG); }
+		|	label? _TK_NOP  _TK_NEWLINE				@{ ADD_OPCODE(Z80_NOP); }
+		|	label? _TK_SCF  _TK_NEWLINE				@{ ADD_OPCODE(Z80_SCF); }
 		;
 
 }%%

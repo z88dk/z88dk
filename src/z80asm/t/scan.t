@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.8 2014-12-19 00:59:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.9 2014-12-19 01:25:15 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -744,17 +744,27 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 
 	/* assembly opcodes */
-	SetTemporaryLine("exx halt im nop "
-					 "EXX HALT IM NOP ");
+	SetTemporaryLine("exx halt im nop cpl neg ccf scf daa "
+					 "EXX HALT IM NOP CPL NEG CCF SCF DAA ");
 	T_GET(TK_EXX,  "EXX");
 	T_GET(TK_HALT, "HALT");
 	T_GET(TK_IM,   "IM");
 	T_GET(TK_NOP,  "NOP");
+	T_GET(TK_CPL,  "CPL");
+	T_GET(TK_NEG,  "NEG");
+	T_GET(TK_CCF,  "CCF");
+	T_GET(TK_SCF,  "SCF");
+	T_GET(TK_DAA,  "DAA");
 	
 	T_GET(TK_EXX,  "EXX");
 	T_GET(TK_HALT, "HALT");
 	T_GET(TK_IM,   "IM");
 	T_GET(TK_NOP,  "NOP");
+	T_GET(TK_CPL,  "CPL");
+	T_GET(TK_NEG,  "NEG");
+	T_GET(TK_CCF,  "CCF");
+	T_GET(TK_SCF,  "SCF");
+	T_GET(TK_DAA,  "DAA");
 	T_END();
 	
 	/* check limit cases */

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.3 2014-12-19 00:59:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.4 2014-12-19 01:25:14 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -37,7 +37,12 @@ extern void add_opcode(int opcode);
 			 _CHOOSE2_((n), (i2), (o2), (i3), (o3)))
 
 /* Z80 opcodes */
+#define Z80_CCF			0x3F
+#define Z80_CPL			0x2F
+#define Z80_DAA			0x27
 #define Z80_EXX			0xD9
 #define Z80_HALT		0x76
 #define Z80_IM(n)		_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E)
+#define Z80_NEG			0xED44
 #define Z80_NOP			0x00
+#define Z80_SCF			0x37

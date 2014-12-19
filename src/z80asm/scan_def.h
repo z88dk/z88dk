@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.8 2014-12-19 00:59:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.9 2014-12-19 01:25:14 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -228,10 +228,15 @@ TOKEN(TK_DS_P, "DS.P", sym.ds_size = 3 )
 TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
 
 /* Z80 opcode specifiers */
+TOKEN(TK_DAA,  "DAA",  FOR_Z80)
+TOKEN(TK_CCF,  "CCF",  )
+TOKEN(TK_CPL,  "CPL",  )
 TOKEN(TK_EXX,  "EXX",  )
 TOKEN(TK_HALT, "HALT", FOR_Z80)
 TOKEN(TK_IM,   "IM",   FOR_Z80)
+TOKEN(TK_NEG,  "NEG",  )
 TOKEN(TK_NOP,  "NOP",  )
+TOKEN(TK_SCF,  "SCF",  )
 
 #undef TOKEN_RE
 #undef TOKEN

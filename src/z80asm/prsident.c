@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.82 2014-12-19 00:59:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.83 2014-12-19 01:25:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -52,14 +52,14 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent( enum flag interpret );
-void AND( void ), BIT( void ), CALL( void ), CCF( void ), CP( void ), CPD( void );
-void CPDR( void ), CPI( void ), CPIR( void ), CPL( void ), DAA( void );
+void AND( void ), BIT( void ), CALL( void ), CP( void ), CPD( void );
+void CPDR( void ), CPI( void ), CPIR( void ), DAA( void );
 void DI( void ), DJNZ( void );
 void EI( void ), EX( void );
 void IND( void );
 void INDR( void ), INI( void ), INIR( void ), JP( void );
 void LDD( void ), LDDR( void );
-void LDI( void ), LDIR( void ), NEG( void ), OR( void ), OTDR( void ), OTIR( void );
+void LDI( void ), LDIR( void ), OR( void ), OTDR( void ), OTIR( void );
 void OUTD( void ), OUTI( void ), POP( void ), PUSH( void ), RES( void );
 void RETI( void ), RETN( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RLD( void ), RR( void ), RRA( void ), RRC( void );
@@ -96,13 +96,11 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( CALL ),
     DEF_ENTRY( CALL_OZ ),
     DEF_ENTRY( CALL_PKG ),
-    DEF_ENTRY( CCF ),
     DEF_ENTRY( CP ),
     DEF_ENTRY( CPD ),
     DEF_ENTRY( CPDR ),
     DEF_ENTRY( CPI ),
     DEF_ENTRY( CPIR ),
-    DEF_ENTRY( CPL ),
     DEF_ENTRY( DAA ),
     DEF_ENTRY( DEC ),
     DEF_ENTRY( DEFB ),
@@ -145,7 +143,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( LSTOFF ),
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( MODULE ),
-    DEF_ENTRY( NEG ),
     DEF_ENTRY( OR ),
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OTDR ),
@@ -792,14 +789,6 @@ SRL( void )
 
 
 void
-CPL( void )
-{
-    append_byte( 0x2F );
-}
-
-
-
-void
 RLA( void )
 {
     append_byte( 0x17 );
@@ -899,14 +888,6 @@ RRD( void )
 
 
 void
-NEG( void )
-{
-    append_2bytes( 0xED, 0x44 );
-}
-
-
-
-void
 CALL( void )
 {
 	GetSym();
@@ -919,14 +900,6 @@ void
 JP( void )
 {
     JP_instr( 195, 194 );
-}
-
-
-
-void
-CCF( void )
-{
-    append_byte( 0x3F );
 }
 
 
