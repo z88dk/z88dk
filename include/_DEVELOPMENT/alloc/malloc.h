@@ -9,9 +9,9 @@
 typedef struct heap_info_s
 {
 
+   int     type;     // 0 = HEADER, 1 = ALLOCATED, 2 = FREE
    void   *address;
    size_t  size;
-   int     type;     // 0 = HEADER, 1 = ALLOCATED, 2 = FREE
 
 } heap_info_t;
 

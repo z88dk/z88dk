@@ -18,8 +18,10 @@ extern int         p_forward_list_empty(p_forward_list_t *ls);
 extern void       *p_forward_list_front(p_forward_list_t *ls);
 extern void        p_forward_list_init(void *p);
 extern void       *p_forward_list_insert_after(void *ls_item, void *item);
+extern void       *p_forward_list_next(void *item);
 extern void       *p_forward_list_pop_back(p_forward_list_t *ls);
 extern void       *p_forward_list_pop_front(p_forward_list_t *ls);
+extern void       *p_forward_list_prev(p_forward_list_t *ls, void *item);
 extern void        p_forward_list_push_back(p_forward_list_t *ls, void *item);
 extern void        p_forward_list_push_front(p_forward_list_t *ls, void *item);
 extern void       *p_forward_list_remove(p_forward_list_t *ls, void *item);
@@ -36,8 +38,10 @@ extern int        __LIB__ __FASTCALL__  p_forward_list_empty(p_forward_list_t *l
 extern void       __LIB__ __FASTCALL__ *p_forward_list_front(p_forward_list_t *ls);
 extern void       __LIB__ __FASTCALL__  p_forward_list_init(void *p);
 extern void       __LIB__              *p_forward_list_insert_after(void *ls_item, void *item);
+extern void       __LIB__ __FASTCALL__ *p_forward_list_next(void *item);
 extern void       __LIB__ __FASTCALL__ *p_forward_list_pop_back(p_forward_list_t *ls);
 extern void       __LIB__ __FASTCALL__ *p_forward_list_pop_front(p_forward_list_t *ls);
+extern void       __LIB__              *p_forward_list_prev(p_forward_list_t *ls, void *item);
 extern void       __LIB__               p_forward_list_push_back(p_forward_list_t *ls, void *item);
 extern void       __LIB__               p_forward_list_push_front(p_forward_list_t *ls, void *item);
 extern void       __LIB__              *p_forward_list_remove(p_forward_list_t *ls, void *item);
@@ -47,6 +51,7 @@ extern size_t     __LIB__ __FASTCALL__  p_forward_list_size(p_forward_list_t *ls
 // SCCZ80 CALLEE LINKAGE
 
 extern void       __LIB__ __CALLEE__   *p_forward_list_insert_after_callee(void *ls_item, void *item);
+extern void       __LIB__ __CALLEE__   *p_forward_list_prev_callee(p_forward_list_t *ls, void *item);
 extern void       __LIB__ __CALLEE__    p_forward_list_push_back_callee(p_forward_list_t *ls, void *item);
 extern void       __LIB__ __CALLEE__    p_forward_list_push_front_callee(p_forward_list_t *ls, void *item);
 extern void       __LIB__ __CALLEE__   *p_forward_list_remove_callee(p_forward_list_t *ls, void *item);
@@ -54,6 +59,7 @@ extern void       __LIB__ __CALLEE__   *p_forward_list_remove_callee(p_forward_l
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
 #define p_forward_list_insert_after(a,b)         p_forward_list_insert_after_callee(a,b)
+#define p_forward_list_prev(a,b)                 p_forward_list_prev_callee(a,b)
 #define p_forward_list_push_back(a,b)            p_forward_list_push_back_callee(a,b)
 #define p_forward_list_push_front(a,b)           p_forward_list_push_front_callee(a,b)
 #define p_forward_list_remove(a,b)               p_forward_list_remove_callee(a,b)

@@ -115,7 +115,7 @@ extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
 #endif
 
 
-// FZX FONTS BY ANDREW OWEN
+// FZX FONTS BY ANDREW OWEN, LATIN VARIANTS BY TK90X
 
 #ifdef __SDCC
 
@@ -128,6 +128,8 @@ extern struct fzx_font *ff_ao_Cayeux;
 extern struct fzx_font *ff_ao_Cheveron;
 extern struct fzx_font *ff_ao_Chloe;
 extern struct fzx_font *ff_ao_Dutch;
+extern struct fzx_font *ff_ao_DutchLatin1;
+extern struct fzx_font *ff_ao_DutchLatin5;
 extern struct fzx_font *ff_ao_GenevaMonoBold;
 extern struct fzx_font *ff_ao_GenevaMonoBoldItalic;
 extern struct fzx_font *ff_ao_GenevaMonoCyrillic;
@@ -135,6 +137,8 @@ extern struct fzx_font *ff_ao_GenevaMonoItalic;
 extern struct fzx_font *ff_ao_GenevaMonoRoman;
 extern struct fzx_font *ff_ao_GenevaMonoSymbol;
 extern struct fzx_font *ff_ao_Grotesk;
+extern struct fzx_font *ff_ao_GroteskLatin1;
+extern struct fzx_font *ff_ao_GroteskLatin5;
 extern struct fzx_font *ff_ao_Hemery;
 extern struct fzx_font *ff_ao_Hiroshi;
 extern struct fzx_font *ff_ao_Jangeborg;
@@ -149,9 +153,15 @@ extern struct fzx_font *ff_ao_Orion;
 extern struct fzx_font *ff_ao_Prefect;
 extern struct fzx_font *ff_ao_Programmer;
 extern struct fzx_font *ff_ao_RoundelSans;
+extern struct fzx_font *ff_ao_RoundelSansLatin1;
+extern struct fzx_font *ff_ao_RoundelSansLatin5;
 extern struct fzx_font *ff_ao_RoundelSerif;
+extern struct fzx_font *ff_ao_RoundelSerifLatin1;
+extern struct fzx_font *ff_ao_RoundelSerifLatin5;
 extern struct fzx_font *ff_ao_Sabon;
 extern struct fzx_font *ff_ao_Sinclair;
+extern struct fzx_font *ff_ao_SinclairLatin1;
+extern struct fzx_font *ff_ao_SinclairLatin5;
 extern struct fzx_font *ff_ao_SoixanteQuatre;
 extern struct fzx_font *ff_ao_Soxz;
 extern struct fzx_font *ff_ao_SpecDings;
@@ -161,6 +171,8 @@ extern struct fzx_font *ff_ao_Twombly;
 extern struct fzx_font *ff_ao_Vickers;
 extern struct fzx_font *ff_ao_Videotex;
 extern struct fzx_font *ff_ao_Zaibatsu;
+extern struct fzx_font *ff_ao_ZaibatsuLatin1;
+extern struct fzx_font *ff_ao_ZaibatsuLatin5;
 
 #else
 
@@ -173,6 +185,8 @@ extern struct fzx_font *ff_ao_Zaibatsu;
 #define ff_ao_Cheveron              ((struct fzx_font *)(_ff_ao_Cheveron))
 #define ff_ao_Chloe                 ((struct fzx_font *)(_ff_ao_Chloe))
 #define ff_ao_Dutch                 ((struct fzx_font *)(_ff_ao_Dutch))
+#define ff_ao_DutchLatin1           ((struct fzx_font *)(_ff_ao_DutchLatin1))
+#define ff_ao_DutchLatin1           ((struct fzx_font *)(_ff_ao_DutchLatin5))
 #define ff_ao_GenevaMonoBold        ((struct fzx_font *)(_ff_ao_GenevaMonoBold))
 #define ff_ao_GenevaMonoBoldItalic  ((struct fzx_font *)(_ff_ao_GenevaMonoBoldItalic))
 #define ff_ao_GenevaMonoCyrillic    ((struct fzx_font *)(_ff_ao_GenevaMonoCyrillic))
@@ -180,6 +194,8 @@ extern struct fzx_font *ff_ao_Zaibatsu;
 #define ff_ao_GenevaMonoRoman       ((struct fzx_font *)(_ff_ao_GenevaMonoRoman))
 #define ff_ao_GenevaMonoSymbol      ((struct fzx_font *)(_ff_ao_GenevaMonoSymbol))
 #define ff_ao_Grotesk               ((struct fzx_font *)(_ff_ao_Grotesk))
+#define ff_ao_GroteskLatin1         ((struct fzx_font *)(_ff_ao_GroteskLatin1))
+#define ff_ao_GroteskLatin5         ((struct fzx_font *)(_ff_ao_GroteskLatin5))
 #define ff_ao_Hemery                ((struct fzx_font *)(_ff_ao_Hemery))
 #define ff_ao_Hiroshi               ((struct fzx_font *)(_ff_ao_Hiroshi))
 #define ff_ao_Jangeborg             ((struct fzx_font *)(_ff_ao_Jangeborg))
@@ -194,9 +210,15 @@ extern struct fzx_font *ff_ao_Zaibatsu;
 #define ff_ao_Prefect               ((struct fzx_font *)(_ff_ao_Prefect))
 #define ff_ao_Programmer            ((struct fzx_font *)(_ff_ao_Programmer))
 #define ff_ao_RoundelSans           ((struct fzx_font *)(_ff_ao_RoundelSans))
+#define ff_ao_RoundelSansLatin1     ((struct fzx_font *)(_ff_ao_RoundelSansLatin1))
+#define ff_ao_RoundelSansLatin5     ((struct fzx_font *)(_ff_ao_RoundelSansLatin5))
 #define ff_ao_RoundelSerif          ((struct fzx_font *)(_ff_ao_RoundelSerif))
+#define ff_ao_RoundelSerifLatin1    ((struct fzx_font *)(_ff_ao_RoundelSerifLatin1))
+#define ff_ao_RoundelSerifLatin5    ((struct fzx_font *)(_ff_ao_RoundelSerifLatin5))
 #define ff_ao_Sabon                 ((struct fzx_font *)(_ff_ao_Sabon))
 #define ff_ao_Sinclair              ((struct fzx_font *)(_ff_ao_Sinclair))
+#define ff_ao_SinclairLatin1        ((struct fzx_font *)(_ff_ao_SinclairLatin1))
+#define ff_ao_SinclairLatin5        ((struct fzx_font *)(_ff_ao_SinclairLatin5))
 #define ff_ao_SoixanteQuatre        ((struct fzx_font *)(_ff_ao_SoixanteQuatre))
 #define ff_ao_Soxz                  ((struct fzx_font *)(_ff_ao_Soxz))
 #define ff_ao_SpecDings             ((struct fzx_font *)(_ff_ao_SpecDings))
@@ -206,6 +228,8 @@ extern struct fzx_font *ff_ao_Zaibatsu;
 #define ff_ao_Vickers               ((struct fzx_font *)(_ff_ao_Vickers))
 #define ff_ao_Videotex              ((struct fzx_font *)(_ff_ao_Videotex))
 #define ff_ao_Zaibatsu              ((struct fzx_font *)(_ff_ao_Zaibatsu))
+#define ff_ao_ZaibatsuLatin1        ((struct fzx_font *)(_ff_ao_ZaibatsuLatin1))
+#define ff_ao_ZaibatsuLatin5        ((struct fzx_font *)(_ff_ao_ZaibatsuLatin5))
 
 extern void __LIB__ _ff_ao_Aribeth14(void);
 extern void __LIB__ _ff_ao_Aribeth6(void);
@@ -216,6 +240,8 @@ extern void __LIB__ _ff_ao_Cayeux(void);
 extern void __LIB__ _ff_ao_Cheveron(void);
 extern void __LIB__ _ff_ao_Chloe(void);
 extern void __LIB__ _ff_ao_Dutch(void);
+extern void __LIB__ _ff_ao_DutchLatin1(void);
+extern void __LIB__ _ff_ao_DutchLatin5(void);
 extern void __LIB__ _ff_ao_GenevaMonoBold(void);
 extern void __LIB__ _ff_ao_GenevaMonoBoldItalic(void);
 extern void __LIB__ _ff_ao_GenevaMonoCyrillic(void);
@@ -223,6 +249,8 @@ extern void __LIB__ _ff_ao_GenevaMonoItalic(void);
 extern void __LIB__ _ff_ao_GenevaMonoRoman(void);
 extern void __LIB__ _ff_ao_GenevaMonoSymbol(void);
 extern void __LIB__ _ff_ao_Grotesk(void);
+extern void __LIB__ _ff_ao_GroteskLatin1(void);
+extern void __LIB__ _ff_ao_GroteskLatin5(void);
 extern void __LIB__ _ff_ao_Hemery(void);
 extern void __LIB__ _ff_ao_Hiroshi(void);
 extern void __LIB__ _ff_ao_Jangeborg(void);
@@ -237,9 +265,15 @@ extern void __LIB__ _ff_ao_Orion(void);
 extern void __LIB__ _ff_ao_Prefect(void);
 extern void __LIB__ _ff_ao_Programmer(void);
 extern void __LIB__ _ff_ao_RoundelSans(void);
+extern void __LIB__ _ff_ao_RoundelSansLatin1(void);
+extern void __LIB__ _ff_ao_RoundelSansLatin5(void);
 extern void __LIB__ _ff_ao_RoundelSerif(void);
+extern void __LIB__ _ff_ao_RoundelSerifLatin1(void);
+extern void __LIB__ _ff_ao_RoundelSerifLatin5(void);
 extern void __LIB__ _ff_ao_Sabon(void);
 extern void __LIB__ _ff_ao_Sinclair(void);
+extern void __LIB__ _ff_ao_SinclairLatin1(void);
+extern void __LIB__ _ff_ao_SinclairLatin5(void);
 extern void __LIB__ _ff_ao_SoixanteQuatre(void);
 extern void __LIB__ _ff_ao_Soxz(void);
 extern void __LIB__ _ff_ao_SpecDings(void);
@@ -249,6 +283,8 @@ extern void __LIB__ _ff_ao_Twombly(void);
 extern void __LIB__ _ff_ao_Vickers(void);
 extern void __LIB__ _ff_ao_Videotex(void);
 extern void __LIB__ _ff_ao_Zaibatsu(void);
+extern void __LIB__ _ff_ao_ZaibatsuLatin1(void);
+extern void __LIB__ _ff_ao_ZaibatsuLatin5(void);
 
 #endif
 
@@ -572,23 +608,26 @@ extern void __LIB__ _ff_dkud4_Font15(void);
 #endif
 
 
-// FZX FONTS BY INDEPENDENT DESIGNERS
+// FZX FONTS BY INDEPENDENT DESIGNERS KWEEPA & TK90X
 
 #ifdef __SDCC
 
+extern struct fzx_font *ff_ind_Termino;
+extern struct fzx_font *ff_ind_TerminoLatin1;
+extern struct fzx_font *ff_ind_TerminoLatin5;
 extern struct fzx_font *ff_ind_vga;
-extern struct fzx_font *ff_ind_DutchLatin1;
-extern struct fzx_font *ff_ind_SinclairLatin1;
 
 #else
 
+#define ff_ind_Termino         ((struct fzx_font *)(_ff_ind_Termino))
+#define ff_ind_TerminoLatin1   ((struct fzx_font *)(_ff_ind_TerminoLatin1))
+#define ff_ind_TerminoLatin5   ((struct fzx_font *)(_ff_ind_TerminoLatin5))
 #define ff_ind_vga             ((struct fzx_font *)(_ff_ind_vga))
-#define ff_ind_DutchLatin1     ((struct fzx_font *)(_ff_ind_DutchLatin1))
-#define ff_ind_SinclairLatin1  ((struct fzx_font *)(_ff_ind_SinclairLatin1))
 
+extern void __LIB__ _ff_ind_Termino(void);
+extern void __LIB__ _ff_ind_TerminoLatin1(void);
+extern void __LIB__ _ff_ind_TerminoLatin5(void);
 extern void __LIB__ _ff_ind_vga(void);
-extern void __LIB__ _ff_ind_DutchLatin1(void);
-extern void __LIB__ _ff_ind_SinclairLatin1(void);
 
 #endif
 

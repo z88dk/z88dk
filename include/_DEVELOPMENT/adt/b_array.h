@@ -95,18 +95,18 @@ extern size_t    __LIB__ __CALLEE__    b_array_write_block_callee(void *src, siz
 
 #define b_array_append(a,b)                      b_array_append_callee(a,b);
 #define b_array_append_block(a,b)                b_array_append_block_callee(a,b)
-#define b_array_append_n(a,b,c)                  b_array_append_n_callee(b_array_t *a, size_t n, int c);
-#define b_array_at(a,b)                          b_array_at_callee(b_array_t *a, size_t idx);
-#define b_array_erase(a,b)                       b_array_erase_callee(b_array_t *a, size_t idx);
-#define b_array_erase_range(a,b,c)               b_array_erase_range_callee(b_array_t *a, size_t idx_first, size_t idx_last);
-#define b_array_init(a,b,c)                      b_array_init_callee(void *p, void *data, size_t capacity);
-#define b_array_insert(a,b,c)                    b_array_insert_callee(b_array_t *a, size_t idx, int c);
-#define b_array_insert_block(a,b,c)              b_array_insert_block_callee(b_array_t *a, size_t idx, size_t n);
-#define b_array_insert_n(a,b,c,d)                b_array_insert_n_callee(b_array_t *a, size_t idx, size_t n, int c);
-#define b_array_push_back(a,b)                   b_array_push_back_callee(b_array_t *a, int c);
-#define b_array_read_block(a,b,c,d)              b_array_read_block_callee(void *dst, size_t n, b_array_t *a, size_t idx);
-#define b_array_resize(a,b)                      b_array_resize_callee(b_array_t *a, size_t n);
-#define b_array_write_block(a,b,c,d)             b_array_write_block_callee(void *src, size_t n, b_array_t *a, size_t idx);
+#define b_array_append_n(a,b,c)                  b_array_append_n_callee(a,b,c);
+#define b_array_at(a,b)                          b_array_at_callee(a,b);
+#define b_array_erase(a,b)                       b_array_erase_callee(a,b);
+#define b_array_erase_range(a,b,c)               b_array_erase_range_callee(a,b,c);
+#define b_array_init(a,b,c)                      b_array_init_callee(a,b,c);
+#define b_array_insert(a,b,c)                    b_array_insert_callee(a,b,c);
+#define b_array_insert_block(a,b,c)              b_array_insert_block_callee(a,b,c);
+#define b_array_insert_n(a,b,c,d)                b_array_insert_n_callee(a,b,c,d);
+#define b_array_push_back(a,b)                   b_array_push_back_callee(a,b);
+#define b_array_read_block(a,b,c,d)              b_array_read_block_callee(a,b,c,d);
+#define b_array_resize(a,b)                      b_array_resize_callee(a,b);
+#define b_array_write_block(a,b,c,d)             b_array_write_block_callee(a,b,c,d);
 
 #endif
 

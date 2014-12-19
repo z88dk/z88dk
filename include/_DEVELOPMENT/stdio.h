@@ -14,15 +14,11 @@
 #endif
 
 typedef unsigned long fpos_t;
-typedef struct { unsigned char file[17];} FILE;
+typedef struct { unsigned char file[13];} FILE;
 
-extern FILE *_stdio_file_stdin;
-extern FILE *_stdio_file_stdout;
-extern FILE *_stdio_file_stderr; 
-
-#define stdin   (_stdio_file_stdin)
-#define stdout  (_stdio_file_stdout)
-#define stderr  (_stdio_file_stderr)
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr; 
 
 #define _IOFBF          0
 #define _IOLBF          1
@@ -52,12 +48,14 @@ extern FILE   *_fmemopen_(void **bufp, size_t *sizep, char *mode);
 extern int     asprintf(char **ptr, char *format, ...);
 extern void    clearerr(FILE *stream);
 extern int     fclose(FILE *stream);
+extern FILE   *fdopen(int fd, const char *mode);
 extern int     feof(FILE *stream);
 extern int     ferror(FILE *stream);
 extern int     fflush(FILE *stream);
 extern int     fgetc(FILE *stream);
 extern int     fgetpos(FILE *stream, fpos_t *pos);
 extern char   *fgets(char *s, int n, FILE *stream);
+extern int     fileno(FILE *stream);
 extern void    flockfile(FILE *stream);
 extern FILE   *fmemopen(void *buf, size_t size, char *mode);
 extern FILE   *fopen(const char *filename, const char *mode);
@@ -109,7 +107,7 @@ extern int     fflush_unlocked(FILE *stream);
 extern int     fgetc_unlocked(FILE *stream);
 extern int     fgetpos_unlocked(FILE *stream, fpos_t *pos);
 extern char   *fgets_unlocked(char *s, int n, FILE *stream);
-extern FILE   *fopen_unlocked(const char *filename, const char *mode);
+extern int     fileno_unlocked(FILE *stream);
 extern int     fprintf_unlocked(FILE *stream, char *format, ...);
 extern int     fputc_unlocked(int c, FILE *stream);
 extern int     fputs_unlocked(char *s, FILE *stream);
@@ -145,12 +143,14 @@ extern FILE   __LIB__              *_fmemopen_(void **bufp, size_t *sizep, char 
 extern int    __LIB__               asprintf(char **ptr, char *format, ...);
 extern void   __LIB__ __FASTCALL__  clearerr(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fclose(FILE *stream);
+extern FILE   __LIB__              *fdopen(int fd, const char *mode);
 extern int    __LIB__ __FASTCALL__  feof(FILE *stream);
 extern int    __LIB__ __FASTCALL__  ferror(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fflush(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fgetc(FILE *stream);
 extern int    __LIB__               fgetpos(FILE *stream, fpos_t *pos);
 extern char   __LIB__              *fgets(char *s, int n, FILE *stream);
+extern int    __LIB__ __FASTCALL__  fileno(FILE *stream);
 extern void   __LIB__ __FASTCALL__  flockfile(FILE *stream);
 extern FILE   __LIB__              *fmemopen(void *buf, size_t size, char *mode);
 extern FILE   __LIB__              *fopen(const char *filename, const char *mode);
@@ -202,7 +202,7 @@ extern int    __LIB__ __FASTCALL__  fflush_unlocked(FILE *stream);
 extern int    __LIB__ __FASTCALL__  fgetc_unlocked(FILE *stream);
 extern int    __LIB__               fgetpos_unlocked(FILE *stream, fpos_t *pos);
 extern char   __LIB__              *fgets_unlocked(char *s, int n, FILE *stream);
-extern FILE   __LIB__              *fopen_unlocked(const char *filename, const char *mode);
+extern int    __LIB__ __FASTCALL__  fileno_unlocked(FILE *stream);
 extern int    __LIB__               fprintf_unlocked(FILE *stream, char *format, ...);
 extern int    __LIB__               fputc_unlocked(int c, FILE *stream);
 extern int    __LIB__               fputs_unlocked(char *s, FILE *stream);
@@ -233,6 +233,7 @@ extern int    __LIB__               vscanf_unlocked(char *format, void *arg);
 // SCCZ80 CALLEE LINKAGE
 
 extern FILE   __LIB__ __CALLEE__   *_fmemopen__callee(void **bufp, size_t *sizep, char *mode);
+extern FILE   __LIB__ __CALLEE__   *fdopen_callee(int fd, const char *mode);
 extern int    __LIB__ __CALLEE__    fgetpos_callee(FILE *stream, fpos_t *pos);
 extern char   __LIB__ __CALLEE__   *fgets_callee(char *s, int n, FILE *stream);
 extern FILE   __LIB__ __CALLEE__   *fmemopen_callee(void *buf, size_t size, char *mode);
@@ -261,7 +262,6 @@ extern int    __LIB__ __CALLEE__    vsscanf_callee(char *s, char *format, void *
 
 extern int    __LIB__ __CALLEE__    fgetpos_unlocked_callee(FILE *stream, fpos_t *pos);
 extern char   __LIB__ __CALLEE__   *fgets_unlocked_callee(char *s, int n, FILE *stream);
-extern FILE   __LIB__ __CALLEE__   *fopen_unlocked_callee(const char *filename, const char *mode);
 extern int    __LIB__ __CALLEE__    fputc_unlocked_callee(int c, FILE *stream);
 extern int    __LIB__ __CALLEE__    fputs_unlocked_callee(char *s, FILE *stream);
 extern size_t __LIB__ __CALLEE__    fread_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -281,6 +281,7 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
 #define _fmemopen_(a,b,c)           _fmemopen__callee(a,b,c)
+#define fdopen(a,b)                 fdopen_callee(a,b)
 #define fgetpos(a,b)                fgetpos_callee(a,b)
 #define fgets(a,b,c)                fgets_callee(a,b,c)
 #define fmemopen(a,b,c)             fmemopen_callee(a,b,c)
@@ -309,7 +310,6 @@ extern int    __LIB__ __CALLEE__    vscanf_unlocked_callee(char *format, void *a
 
 #define fgetpos_unlocked(a,b)       fgetpos_unlocked_callee(a,b)
 #define fgets_unlocked(a,b,c)       fgets_unlocked_callee(a,b,c)
-#define fopen_unlocked(a,b)         fopen_unlocked_callee(a,b)
 #define fputc_unlocked(a,b)         fputc_unlocked_callee(a,b)
 #define fputs_unlocked(a,b)         fputs_unlocked_callee(a,b)
 #define fread_unlocked(a,b,c,d)     fread_unlocked_callee(a,b,c,d)

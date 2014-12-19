@@ -13,7 +13,6 @@ extern void   *balloc_alloc(int q);
 extern size_t  balloc_blockcount(int q);
 extern void   *balloc_firstfit(int q, int numq);
 extern void    balloc_free(void *p);
-extern void    balloc_init(int numq);
 
 #else
 
@@ -24,7 +23,6 @@ extern void   __LIB__ __FASTCALL__ *balloc_alloc(int q);
 extern size_t __LIB__ __FASTCALL__  balloc_blockcount(int q);
 extern void   __LIB__              *balloc_firstfit(int q, int numq);
 extern void   __LIB__ __FASTCALL__  balloc_free(void *p);
-extern void   __LIB__ __FASTCALL__  balloc_init(int numq);
 
 // SCCZ80 CALLEE LINKAGE
 
