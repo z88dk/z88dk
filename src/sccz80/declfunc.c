@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.14 2010-04-10 00:34:15 dom Exp $
+ *      $Id: declfunc.c,v 1.15 2014-12-19 05:21:23 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -363,7 +363,7 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
         tofile();
     }
 
-    output_section("code");
+    output_section("code_compiler");  // output_section("code");
 
     nl();prefix();outname(currfn->name,dopref(currfn));col();nl();  /* print function name */
 

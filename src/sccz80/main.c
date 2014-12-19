@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.25 2014-06-24 19:56:44 dom Exp $
+ *      $Id: main.c,v 1.26 2014-12-19 05:21:23 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -714,7 +714,7 @@ dumpvars()
  * Even more handlings...if asz80 used we dump into data sectio
  */
 
-    output_section("bss");
+    output_section("bss_compiler");  // output_section("bss");
 
 
     ptr=STARTGLB;
@@ -739,7 +739,7 @@ dumpvars()
     }
 
     /* Switch back to standard section */
-    output_section("code");
+    output_section("code_compiler");  // output_section("code");
 }
 
 /*
@@ -758,7 +758,7 @@ void dumplits(
 
     if ( queueptr ) {
         if ( pr_label ) {
-            output_section("text");
+            output_section("rodata_compiler"); // output_section("text");
             prefix(); queuelabel(queuelab) ;
             col() ; nl();
         }
@@ -799,7 +799,7 @@ void dumplits(
                 }
             }
         }
-        output_section("code");
+        output_section("code_compiler"); // output_section("code");
     }
     nl();
 }

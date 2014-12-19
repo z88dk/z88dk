@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.14 2009-09-06 18:58:37 dom Exp $
+ *      $Id: declinit.c,v 1.15 2014-12-19 05:21:23 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -46,7 +46,7 @@ int initials(char *sname,
             size = 2;
         }
 	    
-        output_section("text");
+        output_section("rodata_compiler");  // output_section("text");
         prefix();
         outname(sname, YES);
         col();
@@ -93,7 +93,7 @@ int initials(char *sname,
                 desize = dim;
             }             
         }
-        output_section("code");
+        output_section("code_compiler");  // output_section("code");
     } else {
         char *dosign, *typ;
         dosign = "";
