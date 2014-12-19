@@ -115,7 +115,7 @@
    ENDIF
    
    
-   IF DEFINE_CRT_INITIALIZE_BSS
+   IF DEFINED_CRT_INITIALIZE_BSS
    
       defc __crt_initialize_bss = CRT_INITIALIZE_BSS
    
