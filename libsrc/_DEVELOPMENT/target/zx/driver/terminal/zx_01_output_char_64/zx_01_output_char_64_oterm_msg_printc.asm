@@ -27,7 +27,7 @@ __screen_address:
    call asm_zx_cyx2saddr
    ex de,hl                    de = screen address
    
-   ld l,0
+   ld l,c
    ld h,0
    
    add hl,hl
