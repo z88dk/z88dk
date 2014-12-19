@@ -1,12 +1,12 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_oterm_msg_scroll
+PUBLIC zx_01_output_char_64_oterm_msg_scroll
 
 EXTERN asm_zx_scroll_wc_up_noexx
 EXTERN zx_01_output_char_64_proc_stack_window_32
 
-zx_01_output_char_oterm_msg_scroll:
+zx_01_output_char_64_oterm_msg_scroll:
 
    ;   enter  :   c = number of rows to scroll
    ;   can use:  af, bc, de, hl
