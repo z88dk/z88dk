@@ -1,4 +1,4 @@
-   IF __crt_enable_clode
+   IF __crt_enable_close
    
       ; close open files
       
