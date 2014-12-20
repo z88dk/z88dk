@@ -1,6 +1,8 @@
 
 ; void bit_fx_di(void *effect)
 
+SECTION code_sound_bit
+
 PUBLIC bit_fx_di
 
 bit_fx_di:

@@ -1,6 +1,8 @@
 
 ; void bit_beepfx_di(void *effect)
 
+SECTION code_sound_bit
+
 PUBLIC _bit_beepfx_di
 
 _bit_beepfx_di:

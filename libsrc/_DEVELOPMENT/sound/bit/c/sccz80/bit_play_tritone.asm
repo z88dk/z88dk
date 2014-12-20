@@ -1,6 +1,8 @@
 
 ; void *bit_play_tritone(void *song)
 
+SECTION smc_sound_bit
+
 PUBLIC bit_play_tritone
 
 bit_play_tritone:

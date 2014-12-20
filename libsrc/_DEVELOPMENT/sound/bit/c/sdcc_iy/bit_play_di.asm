@@ -1,6 +1,8 @@
 
 ; char *bit_play_di(char *melody)
 
+SECTION code_sound_bit
+
 PUBLIC _bit_play_di
 
 _bit_play_di:
