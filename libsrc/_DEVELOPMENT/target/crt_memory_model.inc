@@ -3,9 +3,12 @@
 ;; memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION CODE
 
 org __crt_org_code
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION CODE
 
 section code_crt_start
 section code_crt_init
@@ -24,8 +27,7 @@ section rodata_user
 
 SECTION CODE_END
 
-
-SECTION DATA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __crt_org_data != 0
 
@@ -43,6 +45,10 @@ ELSE
 
 ENDIF
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION DATA
+
 include "../../clib_smc.inc"
 section smc_compiler
 section smc_user
@@ -53,8 +59,7 @@ section data_user
 
 SECTION DATA_END
 
-
-SECTION BSS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __crt_org_bss != 0
 
@@ -72,10 +77,15 @@ ELSE
 
 ENDIF
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION BSS
+
 include "../../clib_bss.inc"
 section bss_compiler
 section bss_user
 
 SECTION BSS_END
+
 
 ;; end memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
