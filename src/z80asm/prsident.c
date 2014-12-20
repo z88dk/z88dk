@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.85 2014-12-20 12:28:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.86 2014-12-20 20:32:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,7 +45,7 @@ void ifdefstatement(enum flag interpret);
 void ifndefstatement(enum flag interpret);
 void DEFVARS(void), DEFS(void), ORG(void), INCLUDE(void), BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
 void ADC( void ), ADD( void ), DEC( void ), IN( void ), INC( void ), INVOKE( void );
-void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
+void LD( void ), OUT( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void RST( void ), DEFGROUP( void );
 void UNDEFINE( void );
@@ -53,16 +53,13 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent( enum flag interpret );
-void AND( void ), BIT( void ), CALL( void ), CP( void ), CPD( void );
-void CPDR( void ), CPI( void ), CPIR( void );
-void DJNZ( void );
+void AND( void ), BIT( void ), CALL( void ), CP( void );
 void IND( void );
 void INDR( void ), INI( void ), INIR( void ), JP( void );
 void OR( void ), OTDR( void ), OTIR( void );
 void OUTD( void ), OUTI( void ), POP( void ), PUSH( void ), RES( void );
-void RETI( void ), RETN( void );
-void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RLD( void ), RR( void ), RRA( void ), RRC( void );
-void RRCA( void ), RRD( void );
+void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RR( void ), RRA( void ), RRC( void );
+void RRCA( void );
 void SET( void ), SLA( void ), SLL( void ), SRA( void );
 void SRL( void ), SUB( void ), XOR( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
@@ -96,10 +93,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( CALL_OZ ),
     DEF_ENTRY( CALL_PKG ),
     DEF_ENTRY( CP ),
-    DEF_ENTRY( CPD ),
-    DEF_ENTRY( CPDR ),
-    DEF_ENTRY( CPI ),
-    DEF_ENTRY( CPIR ),
     DEF_ENTRY( DEC ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
@@ -111,7 +104,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( DEFS ),
     DEF_ENTRY( DEFVARS ),
     DEF_ENTRY( DEFW ),
-    DEF_ENTRY( DJNZ ),
     DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
     DEF_ENTRY( EXTERN ),
@@ -128,7 +120,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( INIR ),
     DEF_ENTRY( INVOKE ),
     DEF_ENTRY( JP ),
-    DEF_ENTRY( JR ),
     DEF_ENTRY( LD ),
     DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
@@ -147,19 +138,14 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( PUSH ),
     DEF_ENTRY( RES ),
-    DEF_ENTRY( RET ),
-    DEF_ENTRY( RETI ),
-    DEF_ENTRY( RETN ),
     DEF_ENTRY( RL ),
     DEF_ENTRY( RLA ),
     DEF_ENTRY( RLC ),
     DEF_ENTRY( RLCA ),
-    DEF_ENTRY( RLD ),
     DEF_ENTRY( RR ),
     DEF_ENTRY( RRA ),
     DEF_ENTRY( RRC ),
     DEF_ENTRY( RRCA ),
-    DEF_ENTRY( RRD ),
     DEF_ENTRY( RST ),
     DEF_ENTRY( SBC ),
     DEF_ENTRY( SECTION ),
@@ -426,62 +412,6 @@ SECTION( void )
 	else
 		error_syntax();
 }
-
-
-void
-CPI( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_cpi \n call rcmx_cpi \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0xA1 );
-}
-
-
-
-void
-CPIR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_cpir \n call rcmx_cpir \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0xB1 );
-}
-
-
-
-void
-CPD( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_cpd \n call rcmx_cpd \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0xA9 );
-}
-
-
-
-void
-CPDR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_cpdr \n call rcmx_cpdr \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0xB9 );
-}
-
 
 
 void
@@ -806,56 +736,6 @@ POP( void )
     PushPop_instr( 193 );
 }
 
-
-
-
-void
-RETI( void )
-{
-    append_2bytes( 0xED, 0x4D );
-}
-
-
-
-void
-RETN( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0x45 );
-}
-
-
-
-void
-RLD( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_rld \n call rcmx_rld \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0x6F );
-}
-
-
-
-void
-RRD( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        SetTemporaryLine( "\n extern rcmx_rrd \n call rcmx_rrd \n" );
-        return;
-    }
-
-    append_2bytes( 0xED, 0x67 );
-}
 
 
 

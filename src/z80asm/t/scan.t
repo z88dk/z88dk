@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.10 2014-12-20 12:28:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.11 2014-12-20 20:32:30 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -737,7 +737,11 @@ t_compile_module($init, <<'END', $objs);
 
 	/* assembly opcodes */
 	SetTemporaryLine("exx ex nop cpl neg ccf scf ldi ldir ldd lddr "
+					 "rld rrd cpi cpir cpd cpdr ret reti "
+					 "djnz jr "
 					 "EXX EX NOP CPL NEG CCF SCF LDI LDIR LDD LDDR "
+					 "RLD RRD CPI CPIR CPD CPDR RET RETI "
+					 "DJNZ JR "
 					);
 	T_GET(TK_EXX,  "EXX");
 	T_GET(TK_EX,   "EX");
@@ -750,6 +754,16 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_LDIR, "LDIR");
 	T_GET(TK_LDD,  "LDD");
 	T_GET(TK_LDDR, "LDDR");
+	T_GET(TK_RLD,  "RLD");
+	T_GET(TK_RRD,  "RRD");
+	T_GET(TK_CPI,  "CPI");
+	T_GET(TK_CPIR, "CPIR");
+	T_GET(TK_CPD,  "CPD");
+	T_GET(TK_CPDR, "CPDR");
+	T_GET(TK_RET,  "RET");
+	T_GET(TK_RETI, "RETI");
+	T_GET(TK_DJNZ, "DJNZ");
+	T_GET(TK_JR,   "JR");
 	
 	T_GET(TK_EXX,  "EXX");
 	T_GET(TK_EX,   "EX");
@@ -762,27 +776,39 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_LDIR, "LDIR");
 	T_GET(TK_LDD,  "LDD");
 	T_GET(TK_LDDR, "LDDR");
+	T_GET(TK_RLD,  "RLD");
+	T_GET(TK_RRD,  "RRD");
+	T_GET(TK_CPI,  "CPI");
+	T_GET(TK_CPIR, "CPIR");
+	T_GET(TK_CPD,  "CPD");
+	T_GET(TK_CPDR, "CPDR");
+	T_GET(TK_RET,  "RET");
+	T_GET(TK_RETI, "RETI");
+	T_GET(TK_DJNZ, "DJNZ");
+	T_GET(TK_JR,   "JR");
 	T_END();
 	
 	/* assembly opcodes - Z80 only */
 	opts.cpu &= ~CPU_RABBIT;
-	SetTemporaryLine("daa di ei halt im i r "
-					 "DAA DI EI HALT IM I R ");
+	SetTemporaryLine("daa di ei halt im i r retn "
+					 "DAA DI EI HALT IM I R RETN ");
 	T_GET(TK_DAA,  "DAA");
 	T_GET(TK_DI,   "DI");
 	T_GET(TK_EI,   "EI");
 	T_GET(TK_HALT, "HALT");
 	T_GET(TK_IM,   "IM");
-	T_GET(TK_I,     "I");
-	T_GET(TK_R,     "R");
+	T_GET(TK_I,    "I");
+	T_GET(TK_R,    "R");
+	T_GET(TK_RETN, "RETN");
 	
 	T_GET(TK_DAA,  "DAA");
 	T_GET(TK_DI,   "DI");
 	T_GET(TK_EI,   "EI");
 	T_GET(TK_HALT, "HALT");
 	T_GET(TK_IM,   "IM");
-	T_GET(TK_I,     "I");
-	T_GET(TK_R,     "R");
+	T_GET(TK_I,    "I");
+	T_GET(TK_R,    "R");
+	T_GET(TK_RETN, "RETN");
 	T_END();
 	opts.cpu &= ~CPU_RABBIT;
 	

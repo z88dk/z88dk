@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.83 2014-12-20 12:28:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.84 2014-12-20 20:32:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -55,30 +55,6 @@ PushPop_instr( int opcode )
 		error_syntax();
 	}
 }
-
-
-void
-RET( void )
-{
-	GetSym();
-
-	if (sym.cpu_flag != FLAG_NONE)
-		append_byte((Byte)(0xC0 + (sym.cpu_flag << 3)));  /* RET cc  instruction opcode */
-	else 
-	{
-		switch (sym.tok)
-		{
-		case TK_END:
-		case TK_NEWLINE:
-			append_byte(0xC9);
-			break;
-
-		default:
-			error_syntax();
-		}
-	}
-}
-
 
 
 void
@@ -456,45 +432,6 @@ JP_instr( int opc0, int opc )
 	{
 		Subroutine_addr( opc0, opc );		/* base opcode for <instr> nn; <instr> cc, nn */
     }
-}
-
-
-static void RelativeJump( Byte opcode )
-{
-	append_byte( opcode );
-	Pass2info( RANGE_JR_OFFSET, 1 );
-}
-
-void
-JR( void )
-{
-	int flag;
-
-	GetSym();
-	flag = sym.cpu_flag;
-
-	if (flag == FLAG_NONE)
-	{
-		RelativeJump(0x18);
-	}
-	else if (flag < FLAG_PO)
-    {
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		RelativeJump((Byte)(0x20 + (flag << 3)));
-	}
-	else
-	{
-		error_syntax();				/* illegal condition, syntax */
-	}
-}
-
-
-void
-DJNZ( void )
-{
-	GetSym();
-	RelativeJump( 0x10 );
 }
 
 

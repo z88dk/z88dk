@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.7 2014-12-20 12:28:05 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.8 2014-12-20 20:32:30 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -31,12 +31,50 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.7 2014-12-2
 							add_opcode(x); \
 						}
 
-#define RULE_OPCODE(op)		label? _TK_##op _TK_NEWLINE \
-							@{ ADD_OPCODE(Z80_##op); }
-#define RULE_OPCODE_EX(a,b,a1,b1)	\
-							label? _TK_EX _TK_##a _TK_COMMA _TK_##b _TK_NEWLINE \
-							@{ ADD_OPCODE(Z80_EX_##a1##_##b1); }
+#define ADD_OPCODE_JR(x) \
+						ADD_LABEL; \
+						{ 	Expr *expr = pop_expr(); \
+							if (compile_active) \
+								add_opcode_jr(x, expr); \
+							else \
+								OBJ_DELETE(expr); \
+						}
 
+#define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_##op); }
+						
+#define OPCODE_EX(a,b,a1,b1)	\
+						label? _TK_EX _TK_##a _TK_COMMA _TK_##b _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_EX_##a1##_##b1); }
+						
+#define OPCODE_RET_FLAG(flag) \
+						label? _TK_RET _TK_##flag _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_RET(FLAG_##flag)); }
+#define OPCODE_RET() \
+						label? _TK_RET _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_RET(FLAG_NONE)); }
+						
+#define OPCODE_JR_FLAG(flag) \
+						label? _TK_JR _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+						@{ ADD_OPCODE_JR(Z80_JR(FLAG_##flag)); }
+
+#define OPCODE_JR(op, code) \
+						label? _TK_##op expr _TK_NEWLINE \
+						@{ ADD_OPCODE_JR(code); }
+
+#define OPCODE_EMUL_RABBIT(op,func)	\
+						label? _TK_##op _TK_NEWLINE \
+						@{ 	ADD_LABEL; \
+							if (compile_active) { \
+								if (opts.cpu & CPU_RABBIT) \
+									insert_macro("extern " #func "\n" \
+												 "call   " #func "\n"); \
+								else \
+									add_opcode(Z80_##op); \
+							} \
+						}
+								
+					
 %%{
 	machine parser;
 
@@ -92,27 +130,50 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.7 2014-12-2
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label           _TK_NEWLINE				@{ ADD_LABEL; }
-		|	RULE_OPCODE(CCF)
-		|	RULE_OPCODE(CPL)
-		|	RULE_OPCODE(DAA)
-		|	RULE_OPCODE(DI)
-		|	RULE_OPCODE(EI)
-		|	RULE_OPCODE(EXX)
-		|	RULE_OPCODE(HALT)
+		|	OPCODE(CCF)
+		|	OPCODE(CPL)
+		|	OPCODE(DAA)
+		|	OPCODE(DI)
+		|	OPCODE(EI)
+		|	OPCODE(EXX)
+		|	OPCODE(HALT)
+		|	OPCODE(LDD)
+		|	OPCODE(LDDR)
+		|	OPCODE(LDI)
+		|	OPCODE(LDIR)
+		|	OPCODE(NEG)
+		|	OPCODE(NOP)
+		|	OPCODE(SCF)
+		|	OPCODE_EMUL_RABBIT(CPD,  rcmx_cpd)
+		|	OPCODE_EMUL_RABBIT(CPDR, rcmx_cpdr)
+		|	OPCODE_EMUL_RABBIT(CPI,  rcmx_cpi)
+		|	OPCODE_EMUL_RABBIT(CPIR, rcmx_cpir)
+		|	OPCODE_EMUL_RABBIT(RLD,  rcmx_rld)
+		|	OPCODE_EMUL_RABBIT(RRD,  rcmx_rrd)
+		|	OPCODE_EX(AF,AF,  AF,AF)
+		|	OPCODE_EX(AF,AF1, AF,AF)
+		|	OPCODE_EX(DE,HL,  DE,HL)
+		|	OPCODE_EX(IND_SP,HL, IND_SP,HL)
+		|	OPCODE_EX(IND_SP,IX, IND_SP,IX)
+		|	OPCODE_EX(IND_SP,IY, IND_SP,IY)
 		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
-		|	RULE_OPCODE(LDD)
-		|	RULE_OPCODE(LDDR)
-		|	RULE_OPCODE(LDI)
-		|	RULE_OPCODE(LDIR)
-		|	RULE_OPCODE(NEG)
-		|	RULE_OPCODE(NOP)
-		|	RULE_OPCODE(SCF)
-		|	RULE_OPCODE_EX(DE,HL,  DE,HL)
-		|	RULE_OPCODE_EX(AF,AF,  AF,AF)
-		|	RULE_OPCODE_EX(AF,AF1, AF,AF)
-		|	RULE_OPCODE_EX(IND_SP,HL, IND_SP,HL)
-		|	RULE_OPCODE_EX(IND_SP,IX, IND_SP,IX)
-		|	RULE_OPCODE_EX(IND_SP,IY, IND_SP,IY)
+		|	OPCODE_RET()
+		|	OPCODE_RET_FLAG(NZ)
+		|	OPCODE_RET_FLAG(Z)
+		|	OPCODE_RET_FLAG(NC)
+		|	OPCODE_RET_FLAG(C)
+		|	OPCODE_RET_FLAG(PO)
+		|	OPCODE_RET_FLAG(PE)
+		|	OPCODE_RET_FLAG(P)
+		|	OPCODE_RET_FLAG(M)
+		|	OPCODE(RETI)
+		|	OPCODE(RETN)
+		|	OPCODE_JR(JR,   Z80_JR(FLAG_NONE))
+		|	OPCODE_JR(DJNZ, Z80_DJNZ)
+		|	OPCODE_JR_FLAG(NZ)
+		|	OPCODE_JR_FLAG(Z)
+		|	OPCODE_JR_FLAG(NC)
+		|	OPCODE_JR_FLAG(C)
 		;
 
 }%%

@@ -14,13 +14,15 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.3 2014-12-18 14:23:18 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.4 2014-12-20 20:32:30 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "expr.h"
 #include "codearea.h"
 #include "opcodes.h"
+#include "z80asm.h"
 
 /* add 1 or 2 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
@@ -29,4 +31,11 @@ void add_opcode(int opcode)
 	if ( opcode & 0xFF00)
 		append_byte( (opcode >> 8) & 0xFF );
 	append_byte( opcode & 0xFF );
+}
+
+/* add opcode followed by jump relative offset expression */
+void add_opcode_jr(int opcode, Expr *expr)
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_JR_OFFSET, 1, expr);
 }

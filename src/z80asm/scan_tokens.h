@@ -90,21 +90,32 @@
 #define _TK_DS_P           85    /* "DS.P"  */
 #define _TK_DS_L           86    /* "DS.L"  */
 #define _TK_CCF            87    /* "CCF"   */
-#define _TK_CPL            88    /* "CPL"   */
-#define _TK_DAA            89    /* "DAA"   */
-#define _TK_DI             90    /* "DI"    */
-#define _TK_EI             91    /* "EI"    */
-#define _TK_EX             92    /* "EX"    */
-#define _TK_EXX            93    /* "EXX"   */
-#define _TK_HALT           94    /* "HALT"  */
-#define _TK_IM             95    /* "IM"    */
-#define _TK_LDD            96    /* "LDD"   */
-#define _TK_LDDR           97    /* "LDDR"  */
-#define _TK_LDI            98    /* "LDI"   */
-#define _TK_LDIR           99    /* "LDIR"  */
-#define _TK_NEG           100    /* "NEG"   */
-#define _TK_NOP           101    /* "NOP"   */
-#define _TK_SCF           102    /* "SCF"   */
+#define _TK_CPD            88    /* "CPD"   */
+#define _TK_CPDR           89    /* "CPDR"  */
+#define _TK_CPI            90    /* "CPI"   */
+#define _TK_CPIR           91    /* "CPIR"  */
+#define _TK_CPL            92    /* "CPL"   */
+#define _TK_DAA            93    /* "DAA"   */
+#define _TK_DI             94    /* "DI"    */
+#define _TK_EI             95    /* "EI"    */
+#define _TK_EX             96    /* "EX"    */
+#define _TK_EXX            97    /* "EXX"   */
+#define _TK_HALT           98    /* "HALT"  */
+#define _TK_IM             99    /* "IM"    */
+#define _TK_LDD           100    /* "LDD"   */
+#define _TK_LDDR          101    /* "LDDR"  */
+#define _TK_LDI           102    /* "LDI"   */
+#define _TK_LDIR          103    /* "LDIR"  */
+#define _TK_NEG           104    /* "NEG"   */
+#define _TK_NOP           105    /* "NOP"   */
+#define _TK_RLD           106    /* "RLD"   */
+#define _TK_RRD           107    /* "RRD"   */
+#define _TK_SCF           108    /* "SCF"   */
+#define _TK_RET           109    /* "RET"   */
+#define _TK_RETI          110    /* "RETI"  */
+#define _TK_RETN          111    /* "RETN"  */
+#define _TK_DJNZ          112    /* "DJNZ"  */
+#define _TK_JR            113    /* "JR"    */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -199,21 +210,32 @@ typedef enum tokid_t
     TK_DS_P        = _TK_DS_P       ,    /* =    85, "DS.P"  */
     TK_DS_L        = _TK_DS_L       ,    /* =    86, "DS.L"  */
     TK_CCF         = _TK_CCF        ,    /* =    87, "CCF"   */
-    TK_CPL         = _TK_CPL        ,    /* =    88, "CPL"   */
-    TK_DAA         = _TK_DAA        ,    /* =    89, "DAA"   */
-    TK_DI          = _TK_DI         ,    /* =    90, "DI"    */
-    TK_EI          = _TK_EI         ,    /* =    91, "EI"    */
-    TK_EX          = _TK_EX         ,    /* =    92, "EX"    */
-    TK_EXX         = _TK_EXX        ,    /* =    93, "EXX"   */
-    TK_HALT        = _TK_HALT       ,    /* =    94, "HALT"  */
-    TK_IM          = _TK_IM         ,    /* =    95, "IM"    */
-    TK_LDD         = _TK_LDD        ,    /* =    96, "LDD"   */
-    TK_LDDR        = _TK_LDDR       ,    /* =    97, "LDDR"  */
-    TK_LDI         = _TK_LDI        ,    /* =    98, "LDI"   */
-    TK_LDIR        = _TK_LDIR       ,    /* =    99, "LDIR"  */
-    TK_NEG         = _TK_NEG        ,    /* =   100, "NEG"   */
-    TK_NOP         = _TK_NOP        ,    /* =   101, "NOP"   */
-    TK_SCF         = _TK_SCF        ,    /* =   102, "SCF"   */
+    TK_CPD         = _TK_CPD        ,    /* =    88, "CPD"   */
+    TK_CPDR        = _TK_CPDR       ,    /* =    89, "CPDR"  */
+    TK_CPI         = _TK_CPI        ,    /* =    90, "CPI"   */
+    TK_CPIR        = _TK_CPIR       ,    /* =    91, "CPIR"  */
+    TK_CPL         = _TK_CPL        ,    /* =    92, "CPL"   */
+    TK_DAA         = _TK_DAA        ,    /* =    93, "DAA"   */
+    TK_DI          = _TK_DI         ,    /* =    94, "DI"    */
+    TK_EI          = _TK_EI         ,    /* =    95, "EI"    */
+    TK_EX          = _TK_EX         ,    /* =    96, "EX"    */
+    TK_EXX         = _TK_EXX        ,    /* =    97, "EXX"   */
+    TK_HALT        = _TK_HALT       ,    /* =    98, "HALT"  */
+    TK_IM          = _TK_IM         ,    /* =    99, "IM"    */
+    TK_LDD         = _TK_LDD        ,    /* =   100, "LDD"   */
+    TK_LDDR        = _TK_LDDR       ,    /* =   101, "LDDR"  */
+    TK_LDI         = _TK_LDI        ,    /* =   102, "LDI"   */
+    TK_LDIR        = _TK_LDIR       ,    /* =   103, "LDIR"  */
+    TK_NEG         = _TK_NEG        ,    /* =   104, "NEG"   */
+    TK_NOP         = _TK_NOP        ,    /* =   105, "NOP"   */
+    TK_RLD         = _TK_RLD        ,    /* =   106, "RLD"   */
+    TK_RRD         = _TK_RRD        ,    /* =   107, "RRD"   */
+    TK_SCF         = _TK_SCF        ,    /* =   108, "SCF"   */
+    TK_RET         = _TK_RET        ,    /* =   109, "RET"   */
+    TK_RETI        = _TK_RETI       ,    /* =   110, "RETI"  */
+    TK_RETN        = _TK_RETN       ,    /* =   111, "RETN"  */
+    TK_DJNZ        = _TK_DJNZ       ,    /* =   112, "DJNZ"  */
+    TK_JR          = _TK_JR         ,    /* =   113, "JR"    */
 } tokid_t;
 
 #endif

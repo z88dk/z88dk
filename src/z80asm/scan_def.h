@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.10 2014-12-20 12:28:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.11 2014-12-20 20:32:30 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -231,6 +231,10 @@ TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
 
 /* Z80 opcode specifiers */
 TOKEN_KW(CCF,  )
+TOKEN_KW(CPD,  )
+TOKEN_KW(CPDR, )
+TOKEN_KW(CPI,  )
+TOKEN_KW(CPIR, )
 TOKEN_KW(CPL,  )
 TOKEN_KW(DAA,  FOR_Z80)
 TOKEN_KW(DI,   FOR_Z80)
@@ -245,7 +249,15 @@ TOKEN_KW(LDI,  )
 TOKEN_KW(LDIR, )
 TOKEN_KW(NEG,  )
 TOKEN_KW(NOP,  )
+TOKEN_KW(RLD,  )
+TOKEN_KW(RRD,  )
 TOKEN_KW(SCF,  )
+
+TOKEN_KW(RET,  )
+TOKEN_KW(RETI, )
+TOKEN_KW(RETN, FOR_Z80)
+TOKEN_KW(DJNZ, )
+TOKEN_KW(JR,   )
 
 #undef TOKEN_KW
 #undef TOKEN_RE

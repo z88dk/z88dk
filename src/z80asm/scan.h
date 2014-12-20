@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.41 2014-12-20 12:28:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.42 2014-12-20 20:32:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -32,7 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.41 2014-12-20 12:28
 #define TK_STRING_CAT	TK_COMMA
 #endif
 
-enum { FLAG_NONE = -1, FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
 enum { REG8_NONE = -1, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A = 7 };
 enum { REG16_NONE = -1, REG16_BC, REG16_DE, REG16_HL, REG16_AF, REG16_SP = 3 };
 enum { IND_REG16_NONE = -1, IND_REG16_BC, IND_REG16_DE, IND_REG16_HL };

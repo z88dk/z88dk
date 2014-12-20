@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.12 2014-12-18 14:23:19 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.13 2014-12-20 20:32:30 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -120,6 +120,21 @@ static void push_expr(char *ts, char *te)
 }
 
 /*-----------------------------------------------------------------------------
+*   Pop and return expression
+*----------------------------------------------------------------------------*/
+static Expr *pop_expr(void)
+{
+	Expr *expr;
+
+	expr = *((Expr **)utarray_back(exprs));
+	*((Expr **)utarray_back(exprs)) = NULL;		/* do not destroy */
+	
+	utarray_pop_back(exprs);
+
+	return expr;
+}
+
+/*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
 static int pop_eval_expr(void)
@@ -128,17 +143,14 @@ static int pop_eval_expr(void)
 	Bool  failed;
 	int   result;
 
-	expr = *((Expr **)utarray_back(exprs));
+	expr = pop_expr();
 	if (expr == NULL)
-	{
-		utarray_pop_back(exprs);
 		return 0;					/* error output by push_expr() */
-	}
 
 	/* eval and discard expression */
 	result = Expr_eval(expr);
 	failed = (expr->result.not_evaluable);
-	utarray_pop_back(exprs);
+	OBJ_DELETE(expr);
 
 	/* check errors */
 	if (failed)
@@ -148,6 +160,14 @@ static int pop_eval_expr(void)
 	}
 
 	return result;
+}
+
+/*-----------------------------------------------------------------------------
+*   insert a macro at the current position in input
+*----------------------------------------------------------------------------*/
+static void insert_macro(char *macro)
+{
+	SetTemporaryLine(macro);
 }
 
 /*-----------------------------------------------------------------------------
