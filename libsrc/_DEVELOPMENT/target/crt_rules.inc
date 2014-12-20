@@ -4,19 +4,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   IF DEFINED_myzorg
+   IFDEF myzorg
    
       defc __crt_org_code = myzorg
    
    ELSE
    
-      IF DEFINED_CRT_ORG_CODE
+      IFDEF CRT_ORG_CODE
       
          defc __crt_org_code = CRT_ORG_CODE
       
       ELSE
       
-         IF DEFINED_TAR__crt_org_code
+         IFDEF TAR__crt_org_code
          
             defc __crt_org_code = TAR__crt_org_code
          
@@ -31,19 +31,19 @@
    ENDIF
 
 
-   IF DEFINED_REGISTER_SP
+   IFDEF REGISTER_SP
    
       defc __register_sp = REGISTER_SP
    
    ELSE
    
-      IF DEFINED_STACKPTR
+      IFDEF STACKPTR
       
          defc __register_sp = STACKPTR
       
       ELSE
       
-         IF DEFINED_TAR__register_sp
+         IFDEF TAR__register_sp
          
             defc __register_sp = TAR__register_sp
          
@@ -58,13 +58,13 @@
    ENDIF
    
       
-   IF DEFINED_CRT_ORG_DATA
+   IFDEF CRT_ORG_DATA
    
       defc __crt_org_data = CRT_ORG_DATA
    
    ELSE
    
-      IF DEFINED_TAR__crt_org_data
+      IFDEF TAR__crt_org_data
       
          defc __crt_org_data = TAR__crt_org_data
       
@@ -77,13 +77,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_ORG_BSS
+   IFDEF CRT_ORG_BSS
    
       defc __crt_org_bss = CRT_ORG_BSS
    
    ELSE
    
-      IF DEFINED_TAR__crt_org_bss
+      IFDEF TAR__crt_org_bss
       
          defc __crt_org_bss = TAR__crt_org_bss
       
@@ -96,13 +96,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_MODEL
+   IFDEF CRT_MODEL
    
       defc __crt_model = CRT_MODEL
    
    ELSE
    
-      IF DEFINED_TAR__crt_model
+      IFDEF TAR__crt_model
       
          defc __crt_model = TAR__crt_model
       
@@ -115,13 +115,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_INITIALIZE_BSS
+   IFDEF CRT_INITIALIZE_BSS
    
       defc __crt_initialize_bss = CRT_INITIALIZE_BSS
    
    ELSE
    
-      IF DEFINED_TAR__crt_intialize_bss
+      IFDEF TAR__crt_initialize_bss
       
          defc __crt_initialize_bss = TAR__crt_initialize_bss
       
@@ -134,13 +134,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_ENABLE_COMMANDLINE
+   IFDEF CRT_ENABLE_COMMANDLINE
    
       defc __crt_enable_commandline = CRT_ENABLE_COMMANDLINE
    
    ELSE
    
-      IF DEFINED_TAR__crt_enable_commandline
+      IFDEF TAR__crt_enable_commandline
       
          defc __crt_enable_commandline = TAR__crt_enable_commandline
       
@@ -153,13 +153,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_ENABLE_RESTART
+   IFDEF CRT_ENABLE_RESTART
    
       defc __crt_enable_restart = CRT_ENABLE_RESTART
    
    ELSE
    
-      IF DEFINED_TAR__crt_enable_restart
+      IFDEF TAR__crt_enable_restart
       
          defc __crt_enable_restart = TAR__crt_enable_restart
       
@@ -172,13 +172,13 @@
    ENDIF
    
    
-   IF DEFINED_CRT_ENABLE_CLOSE
+   IFDEF CRT_ENABLE_CLOSE
    
       defc __crt_enable_close = CRT_ENABLE_CLOSE
    
    ELSE
    
-      IF DEFINED_TAR__crt_enable_close
+      IFDEF TAR__crt_enable_close
       
          defc __crt_enable_close = TAR__crt_enable_close
       
@@ -191,13 +191,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_EXIT_STACK_SIZE
+   IFDEF CLIB_EXIT_STACK_SIZE
    
       defc __clib_exit_stack_size = CLIB_EXIT_STACK_SIZE
    
    ELSE
    
-      IF DEFINED_TAR__clib_exit_stack_size
+      IFDEF TAR__clib_exit_stack_size
       
          defc __clib_exit_stack_size = TAR__clib_exit_stack_size
       
@@ -210,13 +210,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_QUICKEXIT_STACK_SIZE
+   IFDEF CLIB_QUICKEXIT_STACK_SIZE
    
       defc __clib_quickexit_stack_size = CLIB_QUICKEXIT_STACK_SIZE
 
    ELSE
    
-      IF DEFINED_TAR__clib_quickexit_stack_size
+      IFDEF TAR__clib_quickexit_stack_size
       
          defc __clib_quickexit_stack_size = TAR__clib_quickexit_stack_size
       
@@ -229,13 +229,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_MALLOC_HEAP_SIZE
+   IFDEF CLIB_MALLOC_HEAP_SIZE
    
       defc __clib_malloc_heap_size = CLIB_MALLOC_HEAP_SIZE
    
    ELSE
    
-      IF DEFINED_TAR__clib_malloc_heap_size
+      IFDEF TAR__clib_malloc_heap_size
       
          defc __clib_malloc_heap_size = TAR__clib_malloc_heap_size
       
@@ -248,13 +248,13 @@
    ENDIF
 
    
-   IF DEFINED_CLIB_STDIO_HEAP_SIZE
+   IFDEF CLIB_STDIO_HEAP_SIZE
    
       defc __clib_stdio_heap_size = CLIB_STDIO_HEAP_SIZE
    
    ELSE
    
-      IF DEFINED_TAR__clib_stdio_heap_size
+      IFDEF TAR__clib_stdio_heap_size
       
          defc __clib_stdio_heap_size = TAR__clib_stdio_heap_size
       
@@ -267,13 +267,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_BALLOC_TABLE_SIZE
+   IFDEF CLIB_BALLOC_TABLE_SIZE
    
       defc __clib_balloc_table_size = CLIB_BALLOC_TABLE_SIZE
    
    ELSE
    
-      IF DEFINED_TAR__clib_balloc_table_size
+      IFDEF TAR__clib_balloc_table_size
       
          defc __clib_balloc_table_size = TAR__clib_balloc_table_size
       
@@ -286,13 +286,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_FOPEN_MAX
+   IFDEF CLIB_FOPEN_MAX
    
       defc __clib_fopen_max = CLIB_FOPEN_MAX
    
    ELSE
    
-      IF DEFINED_TAR__clib_fopen_max
+      IFDEF TAR__clib_fopen_max
       
          defc __clib_fopen_max = TAR__clib_fopen_max
       
@@ -305,13 +305,13 @@
    ENDIF
    
    
-   IF DEFINED_CLIB_OPEN_MAX
+   IFDEF CLIB_OPEN_MAX
    
       defc __clib_open_max = CLIB_OPEN_MAX
 
    ELSE
    
-      IF DEFINED_TAR__clib_open_max
+      IFDEF TAR__clib_open_max
       
          defc __clib_open_max = TAR__clib_open_max
       

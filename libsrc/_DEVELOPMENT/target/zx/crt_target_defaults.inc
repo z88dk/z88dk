@@ -21,15 +21,4 @@
    defc TAR__clib_exit_stack_size      = 2
    defc TAR__clib_quickexit_stack_size = 0
 
-   define DEFINED_TAR__crt_org_code
-   define DEFINED_TAR__crt_model
-   define DEFINED_TAR__register_sp
-   define DEFINED_TAR__crt_initialize_bss
-   define DEFINED_TAR__crt_enable_commandline
-   define DEFINED_TAR__crt_enable_restart
-   define DEFINED_TAR__clib_fopen_max
-   define DEFINED_TAR__clib_open_max
-   define DEFINED_TAR__clib_exit_stack_size
-   define DEFINED_TAR__clib_quickexit_stack_size
-
 ;; end crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
