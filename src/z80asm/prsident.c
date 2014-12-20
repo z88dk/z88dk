@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.84 2014-12-19 21:21:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.85 2014-12-20 12:28:05 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,18 +54,16 @@ void UNDEFINE( void );
 /* local functions */
 void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CALL( void ), CP( void ), CPD( void );
-void CPDR( void ), CPI( void ), CPIR( void ), DAA( void );
-void DI( void ), DJNZ( void );
-void EI( void ), EX( void );
+void CPDR( void ), CPI( void ), CPIR( void );
+void DJNZ( void );
 void IND( void );
 void INDR( void ), INI( void ), INIR( void ), JP( void );
-void LDD( void ), LDDR( void );
-void LDI( void ), LDIR( void ), OR( void ), OTDR( void ), OTIR( void );
+void OR( void ), OTDR( void ), OTIR( void );
 void OUTD( void ), OUTI( void ), POP( void ), PUSH( void ), RES( void );
 void RETI( void ), RETN( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RLD( void ), RR( void ), RRA( void ), RRC( void );
 void RRCA( void ), RRD( void );
-void SCF( void ), SET( void ), SLA( void ), SLL( void ), SRA( void );
+void SET( void ), SLA( void ), SLL( void ), SRA( void );
 void SRL( void ), SUB( void ), XOR( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
@@ -102,7 +100,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( CPDR ),
     DEF_ENTRY( CPI ),
     DEF_ENTRY( CPIR ),
-    DEF_ENTRY( DAA ),
     DEF_ENTRY( DEC ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
@@ -114,12 +111,9 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( DEFS ),
     DEF_ENTRY( DEFVARS ),
     DEF_ENTRY( DEFW ),
-    DEF_ENTRY( DI ),
     DEF_ENTRY( DJNZ ),
-    DEF_ENTRY( EI ),
     DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
-    DEF_ENTRY( EX ),
     DEF_ENTRY( EXTERN ),
     DEF_ENTRY( FPP ),
 	DEF_ENTRY( IF ),
@@ -136,10 +130,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( JP ),
     DEF_ENTRY( JR ),
     DEF_ENTRY( LD ),
-    DEF_ENTRY( LDD ),
-    DEF_ENTRY( LDDR ),
-    DEF_ENTRY( LDI ),
-    DEF_ENTRY( LDIR ),
     DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
     DEF_ENTRY( LSTOFF ),
@@ -172,7 +162,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( RRD ),
     DEF_ENTRY( RST ),
     DEF_ENTRY( SBC ),
-    DEF_ENTRY( SCF ),
     DEF_ENTRY( SECTION ),
     DEF_ENTRY( SET ),
     DEF_ENTRY( SLA ),
@@ -437,38 +426,6 @@ SECTION( void )
 	else
 		error_syntax();
 }
-
-
-void
-LDI( void )
-{
-    append_2bytes( 0xED, 0xA0 );
-}
-
-
-
-void
-LDIR( void )
-{
-    append_2bytes( 0xED, 0xB0 );
-}
-
-
-
-void
-LDD( void )
-{
-    append_2bytes( 0xED, 0xA8 );
-}
-
-
-
-void
-LDDR( void )
-{
-    append_2bytes( 0xED, 0xB8 );
-}
-
 
 
 void
@@ -915,54 +872,4 @@ void
 JP( void )
 {
     JP_instr( 195, 194 );
-}
-
-
-
-void
-SCF( void )
-{
-    append_byte( 0x37 );
-}
-
-
-
-void
-DI( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_byte( 0xF3 );
-}
-
-
-
-void
-EI( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_byte( 0xFB );
-}
-
-
-
-void
-DAA( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_byte( 0x27 );
 }

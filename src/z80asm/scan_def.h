@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.9 2014-12-19 01:25:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.10 2014-12-20 12:28:05 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -37,6 +37,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.9 2014-12-19 01
 #ifndef TOKEN2
 #define TOKEN2(name, string, set_value)
 #endif
+
+#define TOKEN_KW(name, set_value)	TOKEN(TK_##name, #name, set_value)
 
 TOKEN(	TK_END,			"",)	/* = 0; end of file reached */
 TOKEN(	TK_NIL,			"", )	/* returned for rubish */
@@ -159,52 +161,52 @@ TOKEN(TK_BIN_NOT, "~", )
 					}	
 
 /* flags */
-TOKEN(TK_NZ, "NZ", sym.cpu_flag = FLAG_NZ)
-TOKEN(TK_Z, "Z", sym.cpu_flag = FLAG_Z)
-TOKEN(TK_NC, "NC", sym.cpu_flag = FLAG_NC)
-TOKEN(TK_C, "C", sym.cpu_flag = FLAG_C; sym.cpu_reg8 = REG8_C)
-TOKEN(TK_PO, "PO", sym.cpu_flag = FLAG_PO)
-TOKEN(TK_PE, "PE", sym.cpu_flag = FLAG_PE)
-TOKEN(TK_P, "P", sym.cpu_flag = FLAG_P)
-TOKEN(TK_M, "M", sym.cpu_flag = FLAG_M)
+TOKEN_KW(NZ, sym.cpu_flag = FLAG_NZ)
+TOKEN_KW(Z,  sym.cpu_flag = FLAG_Z)
+TOKEN_KW(NC, sym.cpu_flag = FLAG_NC)
+TOKEN_KW(C,  sym.cpu_flag = FLAG_C; sym.cpu_reg8 = REG8_C)
+TOKEN_KW(PO, sym.cpu_flag = FLAG_PO)
+TOKEN_KW(PE, sym.cpu_flag = FLAG_PE)
+TOKEN_KW(P,  sym.cpu_flag = FLAG_P)
+TOKEN_KW(M,  sym.cpu_flag = FLAG_M)
 
 /* 8-bit registers */
-TOKEN(TK_B, "B", sym.cpu_reg8 = REG8_B)
+TOKEN_KW(B, sym.cpu_reg8 = REG8_B)
 
-TOKEN(TK_D, "D", sym.cpu_reg8 = REG8_D)
-TOKEN(TK_E, "E", sym.cpu_reg8 = REG8_E)
+TOKEN_KW(D, sym.cpu_reg8 = REG8_D)
+TOKEN_KW(E, sym.cpu_reg8 = REG8_E)
 
-TOKEN(TK_H, "H", sym.cpu_reg8 = REG8_H)
-TOKEN(TK_IXH, "IXH", sym.cpu_reg8 = REG8_H; SET_IX)
-TOKEN(TK_IYH, "IYH", sym.cpu_reg8 = REG8_H; SET_IY)
+TOKEN_KW(H, sym.cpu_reg8 = REG8_H)
+TOKEN_KW(IXH, sym.cpu_reg8 = REG8_H; SET_IX)
+TOKEN_KW(IYH, sym.cpu_reg8 = REG8_H; SET_IY)
 
-TOKEN(TK_L, "L", sym.cpu_reg8 = REG8_L)
-TOKEN(TK_IXL, "IXL", sym.cpu_reg8 = REG8_L; SET_IX)
-TOKEN(TK_IYL, "IYL", sym.cpu_reg8 = REG8_L; SET_IY)
+TOKEN_KW(L, sym.cpu_reg8 = REG8_L)
+TOKEN_KW(IXL, sym.cpu_reg8 = REG8_L; SET_IX)
+TOKEN_KW(IYL, sym.cpu_reg8 = REG8_L; SET_IY)
 
-TOKEN(TK_A, "A", sym.cpu_reg8 = REG8_A)
+TOKEN_KW(A, sym.cpu_reg8 = REG8_A)
 
-TOKEN(TK_F, "F", )
+TOKEN_KW(F, )
 
-TOKEN(TK_I, "I", )
-TOKEN(TK_IIR, "IIR", )
+TOKEN_KW(I,   FOR_Z80)
+TOKEN_KW(IIR, FOR_RABBIT)
 
-TOKEN(TK_R, "R", )
-TOKEN(TK_EIR, "EIR", )
+TOKEN_KW(R,   FOR_Z80)
+TOKEN_KW(EIR, FOR_RABBIT)
 
 /* indirect 8-bit register */
 TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
 
 /* 16-bit registers */
-TOKEN(TK_BC, "BC", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_BC)
-TOKEN(TK_DE, "DE", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_DE)
+TOKEN_KW(BC, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_BC)
+TOKEN_KW(DE, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_DE)
 
-TOKEN(TK_HL, "HL", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL)
-TOKEN(TK_IX, "IX", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IX)
-TOKEN(TK_IY, "IY", sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IY)
+TOKEN_KW(HL, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL)
+TOKEN_KW(IX, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IX)
+TOKEN_KW(IY, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IY)
 
-TOKEN(TK_AF, "AF", sym.cpu_reg16_af = REG16_AF)
-TOKEN(TK_SP, "SP", sym.cpu_reg16_sp = REG16_SP)
+TOKEN_KW(AF, sym.cpu_reg16_af = REG16_AF)
+TOKEN_KW(SP, sym.cpu_reg16_sp = REG16_SP)
 
 TOKEN(TK_AF1, "AF'", )
 
@@ -228,16 +230,24 @@ TOKEN(TK_DS_P, "DS.P", sym.ds_size = 3 )
 TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
 
 /* Z80 opcode specifiers */
-TOKEN(TK_DAA,  "DAA",  FOR_Z80)
-TOKEN(TK_CCF,  "CCF",  )
-TOKEN(TK_CPL,  "CPL",  )
-TOKEN(TK_EXX,  "EXX",  )
-TOKEN(TK_HALT, "HALT", FOR_Z80)
-TOKEN(TK_IM,   "IM",   FOR_Z80)
-TOKEN(TK_NEG,  "NEG",  )
-TOKEN(TK_NOP,  "NOP",  )
-TOKEN(TK_SCF,  "SCF",  )
+TOKEN_KW(CCF,  )
+TOKEN_KW(CPL,  )
+TOKEN_KW(DAA,  FOR_Z80)
+TOKEN_KW(DI,   FOR_Z80)
+TOKEN_KW(EI,   FOR_Z80)
+TOKEN_KW(EX,   )
+TOKEN_KW(EXX,  )
+TOKEN_KW(HALT, FOR_Z80)
+TOKEN_KW(IM,   FOR_Z80)
+TOKEN_KW(LDD,  )
+TOKEN_KW(LDDR, )
+TOKEN_KW(LDI,  )
+TOKEN_KW(LDIR, )
+TOKEN_KW(NEG,  )
+TOKEN_KW(NOP,  )
+TOKEN_KW(SCF,  )
 
+#undef TOKEN_KW
 #undef TOKEN_RE
 #undef TOKEN
 #undef TOKEN2

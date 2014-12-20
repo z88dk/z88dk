@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.82 2014-12-18 14:23:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.83 2014-12-20 12:28:05 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -76,63 +76,6 @@ RET( void )
 		default:
 			error_syntax();
 		}
-	}
-}
-
-
-
-void
-EX( void )
-{
-	GetSym();
-
-	switch (sym.tok)
-	{
-	case TK_IND_SP:									/* EX (SP), HL/IX/IY */
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		if (sym.cpu_reg16_af == REG16_HL)
-		{
-			if ((opts.cpu & CPU_RABBIT) && ! sym.cpu_idx_reg)
-				append_2bytes(0xED, 0x54);			/* Instruction code changed */
-			else
-			{
-				if (sym.cpu_idx_reg)
-					append_byte(sym.cpu_idx_reg);
-				append_byte(0xE3);					/* EX (SP),HL/IX/DE */
-			}
-		}
-		else
-		{
-			error_illegal_ident();
-		}
-		break;
-
-	case TK_DE:										/* EX DE, HL */
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		if (sym.tok == TK_HL)
-			append_byte(0xEB);
-		else
-		{
-			error_illegal_ident();
-		}
-		break;
-
-	case TK_AF:										/* EX AF, AF/AF' */
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		if (sym.tok == TK_AF || sym.tok == TK_AF1)
-			append_byte(0x08);
-		else
-		{
-			error_illegal_ident();
-		}
-		break;
-
-
-	default:
-		error_syntax();
 	}
 }
 

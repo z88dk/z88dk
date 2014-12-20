@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.6 2014-12-19 01:25:14 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.7 2014-12-20 12:28:05 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -30,7 +30,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.6 2014-12-1
 						if (compile_active) { \
 							add_opcode(x); \
 						}
-						
+
+#define RULE_OPCODE(op)		label? _TK_##op _TK_NEWLINE \
+							@{ ADD_OPCODE(Z80_##op); }
+#define RULE_OPCODE_EX(a,b,a1,b1)	\
+							label? _TK_EX _TK_##a _TK_COMMA _TK_##b _TK_NEWLINE \
+							@{ ADD_OPCODE(Z80_EX_##a1##_##b1); }
+
 %%{
 	machine parser;
 
@@ -86,15 +92,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.6 2014-12-1
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label           _TK_NEWLINE				@{ ADD_LABEL; }
-		|	label? _TK_DAA  _TK_NEWLINE				@{ ADD_OPCODE(Z80_DAA); }
-		|	label? _TK_CCF  _TK_NEWLINE				@{ ADD_OPCODE(Z80_CCF); }
-		|	label? _TK_CPL  _TK_NEWLINE				@{ ADD_OPCODE(Z80_CPL); }
-		|	label? _TK_EXX  _TK_NEWLINE				@{ ADD_OPCODE(Z80_EXX); }
-		|	label? _TK_HALT _TK_NEWLINE				@{ ADD_OPCODE(Z80_HALT); }
+		|	RULE_OPCODE(CCF)
+		|	RULE_OPCODE(CPL)
+		|	RULE_OPCODE(DAA)
+		|	RULE_OPCODE(DI)
+		|	RULE_OPCODE(EI)
+		|	RULE_OPCODE(EXX)
+		|	RULE_OPCODE(HALT)
 		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
-		|	label? _TK_NEG  _TK_NEWLINE				@{ ADD_OPCODE(Z80_NEG); }
-		|	label? _TK_NOP  _TK_NEWLINE				@{ ADD_OPCODE(Z80_NOP); }
-		|	label? _TK_SCF  _TK_NEWLINE				@{ ADD_OPCODE(Z80_SCF); }
+		|	RULE_OPCODE(LDD)
+		|	RULE_OPCODE(LDDR)
+		|	RULE_OPCODE(LDI)
+		|	RULE_OPCODE(LDIR)
+		|	RULE_OPCODE(NEG)
+		|	RULE_OPCODE(NOP)
+		|	RULE_OPCODE(SCF)
+		|	RULE_OPCODE_EX(DE,HL,  DE,HL)
+		|	RULE_OPCODE_EX(AF,AF,  AF,AF)
+		|	RULE_OPCODE_EX(AF,AF1, AF,AF)
+		|	RULE_OPCODE_EX(IND_SP,HL, IND_SP,HL)
+		|	RULE_OPCODE_EX(IND_SP,IX, IND_SP,IX)
+		|	RULE_OPCODE_EX(IND_SP,IY, IND_SP,IY)
 		;
 
 }%%

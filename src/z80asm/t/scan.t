@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.9 2014-12-19 01:25:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.10 2014-12-20 12:28:05 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -596,21 +596,13 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IYL, "IYL"); assert(sym.cpu_reg8 == 5); assert(sym.cpu_idx_reg == 0xFD);
 	T_END();
 	
-	SetTemporaryLine("f i iir r eir (c) (\t c \t) "
-					 "F I IIR R EIR (C) (\t C \t) ");
+	SetTemporaryLine("f (c) (\t c \t) "
+					 "F (C) (\t C \t) ");
 	T_GET(TK_F,     "F");
-	T_GET(TK_I,     "I");
-	T_GET(TK_IIR,   "IIR");
-	T_GET(TK_R,     "R");
-	T_GET(TK_EIR,   "EIR");
 	T_GET(TK_IND_C, "(C)");
 	T_GET(TK_IND_C, "(C)");
 					 
 	T_GET(TK_F,     "F");
-	T_GET(TK_I,     "I");
-	T_GET(TK_IIR,   "IIR");
-	T_GET(TK_R,     "R");
-	T_GET(TK_EIR,   "EIR");
 	T_GET(TK_IND_C, "(C)");
 	T_GET(TK_IND_C, "(C)");
 	T_END();
@@ -744,28 +736,67 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 
 	/* assembly opcodes */
-	SetTemporaryLine("exx halt im nop cpl neg ccf scf daa "
-					 "EXX HALT IM NOP CPL NEG CCF SCF DAA ");
+	SetTemporaryLine("exx ex nop cpl neg ccf scf ldi ldir ldd lddr "
+					 "EXX EX NOP CPL NEG CCF SCF LDI LDIR LDD LDDR "
+					);
 	T_GET(TK_EXX,  "EXX");
-	T_GET(TK_HALT, "HALT");
-	T_GET(TK_IM,   "IM");
+	T_GET(TK_EX,   "EX");
 	T_GET(TK_NOP,  "NOP");
 	T_GET(TK_CPL,  "CPL");
 	T_GET(TK_NEG,  "NEG");
 	T_GET(TK_CCF,  "CCF");
 	T_GET(TK_SCF,  "SCF");
-	T_GET(TK_DAA,  "DAA");
+	T_GET(TK_LDI,  "LDI");
+	T_GET(TK_LDIR, "LDIR");
+	T_GET(TK_LDD,  "LDD");
+	T_GET(TK_LDDR, "LDDR");
 	
 	T_GET(TK_EXX,  "EXX");
-	T_GET(TK_HALT, "HALT");
-	T_GET(TK_IM,   "IM");
+	T_GET(TK_EX,   "EX");
 	T_GET(TK_NOP,  "NOP");
 	T_GET(TK_CPL,  "CPL");
 	T_GET(TK_NEG,  "NEG");
 	T_GET(TK_CCF,  "CCF");
 	T_GET(TK_SCF,  "SCF");
-	T_GET(TK_DAA,  "DAA");
+	T_GET(TK_LDI,  "LDI");
+	T_GET(TK_LDIR, "LDIR");
+	T_GET(TK_LDD,  "LDD");
+	T_GET(TK_LDDR, "LDDR");
 	T_END();
+	
+	/* assembly opcodes - Z80 only */
+	opts.cpu &= ~CPU_RABBIT;
+	SetTemporaryLine("daa di ei halt im i r "
+					 "DAA DI EI HALT IM I R ");
+	T_GET(TK_DAA,  "DAA");
+	T_GET(TK_DI,   "DI");
+	T_GET(TK_EI,   "EI");
+	T_GET(TK_HALT, "HALT");
+	T_GET(TK_IM,   "IM");
+	T_GET(TK_I,     "I");
+	T_GET(TK_R,     "R");
+	
+	T_GET(TK_DAA,  "DAA");
+	T_GET(TK_DI,   "DI");
+	T_GET(TK_EI,   "EI");
+	T_GET(TK_HALT, "HALT");
+	T_GET(TK_IM,   "IM");
+	T_GET(TK_I,     "I");
+	T_GET(TK_R,     "R");
+	T_END();
+	opts.cpu &= ~CPU_RABBIT;
+	
+	/* assembly opcodes - RABBIT only */
+	opts.cpu |= CPU_RABBIT;
+	SetTemporaryLine("iir eir "
+					 "IIR EIR ");
+	T_GET(TK_IIR,   "IIR");
+	T_GET(TK_EIR,   "EIR");
+
+	T_GET(TK_IIR,   "IIR");
+	T_GET(TK_EIR,   "EIR");
+	T_END();
+	opts.cpu &= ~CPU_RABBIT;
 	
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "
