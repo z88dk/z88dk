@@ -51,7 +51,7 @@ l0_fast_divs_8_8x8:
    or a
    jp p, dividend_ok
 
-   neg a
+   neg
    ld l,a                      ; take absolute value of dividend
 
 dividend_ok:
