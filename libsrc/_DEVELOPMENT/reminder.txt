@@ -19,5 +19,3 @@ TODO:
 * crt, remove bss, error on rom model if data address not given
 
 * zx scroll reexamined
-
-* state of caps lock not immediately reflected in cursor
