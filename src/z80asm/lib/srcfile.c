@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.12 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.13 2014-12-20 20:26:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -316,8 +316,11 @@ void SrcFile_push( SrcFile *self )
 	List_push( & self->file_stack, elem );
 	
 	self->file		= NULL;
-	self->filename	= NULL;
-	self->line_nr 	= 0;
+	/* keep previous file name and location so that errors detected during
+	*  macro expansion are shown on the correct line
+	*	self->filename	= NULL;
+	*	self->line_nr 	= 0;
+	*/
 }
 
 Bool SrcFile_pop( SrcFile *self )
