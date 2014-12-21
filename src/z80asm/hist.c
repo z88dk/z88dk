@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.127 2014-12-19 21:21:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.128 2014-12-21 02:24:42 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.127 2014-12-19 21:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.127  2014-12-19 21:21:08  pauloscustodio
+* Revision 1.128  2014-12-21 02:24:42  pauloscustodio
+* New option --split-bin: Create one binary file per section
+*
+* Revision 1.127  2014/12/19 21:21:08  pauloscustodio
 * IFNDEF / ELSE / ENDIF implemented
 *
 * Revision 1.126  2014/12/19 00:35:07  pauloscustodio
@@ -2167,6 +2170,8 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	- IFDEF / ELSE / ENDIF implemented
 	  
 	- IFNDEF / ELSE / ENDIF implemented
+	
+	- New --split-bin option to split binary file per section.
 	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
