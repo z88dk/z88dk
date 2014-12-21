@@ -68,7 +68,23 @@ console_01_output_char_stdio_msg_ictl_0:
    jr z, _ioctl_getset_window_rect
    
    dec a
+   jr z, _ioctl_getset_cursor_coord
+   
+   dec a
    jp nz, error_einval_zc
+
+_ioctl_get_oterm:
+
+   ; return the address of this oterm's FDSTRUCT
+   
+   push ix
+   pop hl
+   
+   dec hl
+   dec hl
+   dec hl
+   
+   ret
 
 _ioctl_getset_cursor_coord:
 
