@@ -34,7 +34,6 @@ END_ASM
 
         extern ZERO
 
-        defc IND =	05h
         defc N   =	20h
         defc NN  =  30h
         defc DIS =	40h
@@ -2008,7 +2007,6 @@ END_ASM
 
         extern ZERO
 
-        defc IND =	05h
         defc N   =	20h
         defc NN  =  30h
         defc DIS =	40h

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.176 2014-12-20 12:28:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.177 2014-12-21 14:03:03 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -319,10 +319,11 @@ objfile.o: lib/uthash.h errors.h errors_def.h lib/fileutil.h lib/list.h
 objfile.o: options.h options_def.h model.h module.h lib/classlist.h expr.h
 objfile.o: scan.h legacy.h scan_tokens.h opcodes.h sym.h symref.h symtab.h
 objfile.o: objfile.h lib/strpool.h
-opcodes.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
-opcodes.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-opcodes.o: lib/uthash.h opcodes.h errors.h errors_def.h options.h lib/list.h
-opcodes.o: options_def.h
+opcodes.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h
+opcodes.o: lib/types.h lib/strutil.h lib/classlist.h scan.h legacy.h
+opcodes.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h lib/list.h
+opcodes.o: options_def.h sym.h symref.h codearea.h lib/classhash.h
+opcodes.o: lib/strhash.h lib/uthash.h z80asm.h
 options.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 options.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h hist.h
 options.o: lib/init.h model.h module.h lib/classlist.h lib/classhash.h

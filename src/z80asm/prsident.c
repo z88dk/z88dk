@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.86 2014-12-20 20:32:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.87 2014-12-21 14:03:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,10 +54,9 @@ void UNDEFINE( void );
 /* local functions */
 void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CALL( void ), CP( void );
-void IND( void );
-void INDR( void ), INI( void ), INIR( void ), JP( void );
-void OR( void ), OTDR( void ), OTIR( void );
-void OUTD( void ), OUTI( void ), POP( void ), PUSH( void ), RES( void );
+void JP( void );
+void OR( void );
+void POP( void ), PUSH( void ), RES( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RR( void ), RRA( void ), RRC( void );
 void RRCA( void );
 void SET( void ), SLA( void ), SLL( void ), SRA( void );
@@ -114,10 +113,6 @@ struct Z80sym Z80ident[] =
 	DEF_ENTRY( IN ),
     DEF_ENTRY( INC ),
     DEF_ENTRY( INCLUDE ),
-    DEF_ENTRY( IND ),
-    DEF_ENTRY( INDR ),
-    DEF_ENTRY( INI ),
-    DEF_ENTRY( INIR ),
     DEF_ENTRY( INVOKE ),
     DEF_ENTRY( JP ),
     DEF_ENTRY( LD ),
@@ -128,11 +123,7 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( MODULE ),
     DEF_ENTRY( OR ),
     DEF_ENTRY( ORG ),
-    DEF_ENTRY( OTDR ),
-    DEF_ENTRY( OTIR ),
     DEF_ENTRY( OUT ),
-    DEF_ENTRY( OUTD ),
-    DEF_ENTRY( OUTI ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( POP ),
     DEF_ENTRY( PUBLIC ),
@@ -412,119 +403,6 @@ SECTION( void )
 	else
 		error_syntax();
 }
-
-
-void
-IND( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-        error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xAA );
-}
-
-
-
-void
-INDR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xBA );
-}
-
-
-
-void
-INI( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xA2 );
-}
-
-
-
-void
-INIR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xB2 );
-}
-
-
-
-void
-OUTI( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xA3 );
-}
-
-
-
-void
-OUTD( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xAB );
-}
-
-
-
-void
-OTIR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xB3 );
-}
-
-
-
-void
-OTDR( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    append_2bytes( 0xED, 0xBB );
-}
-
-
 
 
 /*

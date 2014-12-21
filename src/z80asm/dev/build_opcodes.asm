@@ -14,14 +14,13 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.8 2014-12-19 21:21:08 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.9 2014-12-21 14:03:03 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
 
 	extern ZERO							;;ZERO    equ 0
 
-	defc IND =	05h						;;IND	equ	05h 
 	defc N   =	20h						;;N		equ	20h 
 	defc NN  =  30h						;;NN	equ 30h 
 	defc DIS =	40h						;;DIS	equ	40h 

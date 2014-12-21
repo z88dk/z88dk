@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.11 2014-12-20 20:32:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.12 2014-12-21 14:03:03 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -791,7 +791,9 @@ t_compile_module($init, <<'END', $objs);
 	/* assembly opcodes - Z80 only */
 	opts.cpu &= ~CPU_RABBIT;
 	SetTemporaryLine("daa di ei halt im i r retn "
-					 "DAA DI EI HALT IM I R RETN ");
+					 "ind indr ini inir outi outd otir otdr "
+					 "DAA DI EI HALT IM I R RETN "
+					 "IND INDR INI INIR OUTI OUTD OTIR OTDR ");
 	T_GET(TK_DAA,  "DAA");
 	T_GET(TK_DI,   "DI");
 	T_GET(TK_EI,   "EI");
@@ -800,6 +802,14 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_I,    "I");
 	T_GET(TK_R,    "R");
 	T_GET(TK_RETN, "RETN");
+	T_GET(TK_IND,  "IND");
+	T_GET(TK_INDR, "INDR");
+	T_GET(TK_INI,  "INI");
+	T_GET(TK_INIR, "INIR");
+	T_GET(TK_OUTI, "OUTI");
+	T_GET(TK_OUTD, "OUTD");
+	T_GET(TK_OTIR, "OTIR");
+	T_GET(TK_OTDR, "OTDR");
 	
 	T_GET(TK_DAA,  "DAA");
 	T_GET(TK_DI,   "DI");
@@ -809,6 +819,14 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_I,    "I");
 	T_GET(TK_R,    "R");
 	T_GET(TK_RETN, "RETN");
+	T_GET(TK_IND,  "IND");
+	T_GET(TK_INDR, "INDR");
+	T_GET(TK_INI,  "INI");
+	T_GET(TK_INIR, "INIR");
+	T_GET(TK_OUTI, "OUTI");
+	T_GET(TK_OUTD, "OUTD");
+	T_GET(TK_OTIR, "OTIR");
+	T_GET(TK_OTDR, "OTDR");
 	T_END();
 	opts.cpu &= ~CPU_RABBIT;
 	

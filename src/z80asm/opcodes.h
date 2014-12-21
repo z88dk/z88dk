@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.7 2014-12-21 02:26:06 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.8 2014-12-21 14:03:03 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -72,6 +72,10 @@ extern void add_opcode_jr(int opcode, struct Expr *expr);
 #define Z80_EX_IND_SP_IY	((_IY_ << 8) | 0xE3)
 #define Z80_HALT			0x76
 #define Z80_IM(n)			_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E)
+#define Z80_IND				0xEDAA
+#define Z80_INDR			0xEDBA
+#define Z80_INI				0xEDA2
+#define Z80_INIR			0xEDB2
 #define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? 0x20 + ((flag) << 3) : 0x18)
 #define Z80_LDD				0xEDA8
 #define Z80_LDDR			0xEDB8
@@ -79,6 +83,10 @@ extern void add_opcode_jr(int opcode, struct Expr *expr);
 #define Z80_LDIR 			0xEDB0
 #define Z80_NEG				0xED44
 #define Z80_NOP				0x00
+#define Z80_OTDR			0xEDBB
+#define Z80_OTIR			0xEDB3
+#define Z80_OUTD			0xEDAB
+#define Z80_OUTI			0xEDA3
 #define Z80_RET(flag)		((flag) >= 0 && (flag) < 8 ? 0xC0 + ((flag) << 3) : 0xC9)
 #define Z80_RETI			0xED4D
 #define Z80_RETN			0xED45

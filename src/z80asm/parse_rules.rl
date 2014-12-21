@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.9 2014-12-21 02:26:06 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.10 2014-12-21 14:03:03 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -137,12 +137,20 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.9 2014-12-2
 		|	OPCODE(EI)
 		|	OPCODE(EXX)
 		|	OPCODE(HALT)
+		|	OPCODE(IND)
+		|	OPCODE(INDR)
+		|	OPCODE(INI)
+		|	OPCODE(INIR)
 		|	OPCODE(LDD)
 		|	OPCODE(LDDR)
 		|	OPCODE(LDI)
 		|	OPCODE(LDIR)
 		|	OPCODE(NEG)
 		|	OPCODE(NOP)
+		|	OPCODE(OTDR)
+		|	OPCODE(OTIR)
+		|	OPCODE(OUTD)
+		|	OPCODE(OUTI)
 		|	OPCODE(RETI)
 		|	OPCODE(RETN)
 		|	OPCODE(SCF)
