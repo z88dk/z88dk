@@ -25,7 +25,7 @@ zx_01_output_char_64_oterm_msg_printc:
 __screen_address:
 
    call asm_zx_cyx2saddr
-   ex de,hl                    de = screen address
+   ex de,hl                    ; de = screen address
    
    ld l,c
    ld h,0
