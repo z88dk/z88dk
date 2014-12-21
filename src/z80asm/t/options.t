@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.49 2014-10-03 22:57:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.50 2014-12-21 01:39:44 pauloscustodio Exp $
 #
 # Test options
 
@@ -118,6 +118,7 @@ Libraries:
 Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
 * -nb, --no-make-bin     No binary file
+  --split-bin            Create one binary file per section
   -d, --date-stamp       Assemble only updated files
 * -nd, --no-date-stamp   Assemble all files
   -a, --make-updated-bin Assemble updated files and link/relocate to file.bin
@@ -1103,6 +1104,50 @@ t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
 t_z80asm_capture("-sdcc -r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
+
+#------------------------------------------------------------------------------
+# --split-bin
+#------------------------------------------------------------------------------
+
+unlink_testfiles();
+write_file("test.asm", <<'END');
+
+	defb 1
+	
+	section code
+	
+	defb 2
+	
+	section data
+	
+	defb 3
+	
+	section bss
+	
+	org 0x4000
+	defb 4
+END
+
+unlink "test.bin", "test_code.bin", "test_data.bin", "test_bss.bin";
+t_z80asm_capture("-b test.asm", "", "", 0);
+ok   -f "test.bin";
+ok ! -f "test_code.bin";
+ok ! -f "test_data.bin";
+ok   -f "test_bss.bin";
+t_binary(read_binfile("test.bin"),     "\1\2\3");
+t_binary(read_binfile("test_bss.bin"), "\4");
+
+unlink "test.bin", "test_code.bin", "test_data.bin", "test_bss.bin";
+t_z80asm_capture("--split-bin -b test.asm", "", "", 0);
+ok   -f "test.bin";
+ok   -f "test_code.bin";
+ok   -f "test_data.bin";
+ok   -f "test_bss.bin";
+t_binary(read_binfile("test.bin"),      "\1");
+t_binary(read_binfile("test_code.bin"), "\2");
+t_binary(read_binfile("test_data.bin"), "\3");
+t_binary(read_binfile("test_bss.bin"),  "\4");
+
 
 unlink_testfiles();
 done_testing();

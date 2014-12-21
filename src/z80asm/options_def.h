@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.45 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.46 2014-12-21 01:39:44 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -36,6 +36,7 @@ OPT_VAR( Bool,		force_xlib,	FALSE	)
 OPT_VAR( Bool,		line_mode,	FALSE	)
 OPT_VAR( Bool,		globaldef,	FALSE	)
 OPT_VAR( Bool,		make_bin,	FALSE	)
+OPT_VAR( Bool,		split_bin,	FALSE   )	/* true to split binary file per section */
 OPT_VAR( Bool,		date_stamp,	FALSE	)
 OPT_VAR( Bool,		relocatable, FALSE	)
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
@@ -72,6 +73,7 @@ OPT_VAR( List *,	files,		NULL )		/* list of input files */
 
 #define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
 #define OPT_HELP_NO_MAKE_BIN	"No binary file"
+#define OPT_HELP_SPLIT_BIN		"Create one binary file per section"
 
 #define OPT_HELP_DATE_STAMP		"Assemble only updated files"
 #define OPT_HELP_NO_DATE_STAMP	"Assemble all files"
@@ -149,7 +151,9 @@ OPT_TITLE(	"Binary Output:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin",	OPT_HELP_NO_MAKE_BIN, "" )
 
-OPT( OptSet,	&opts.date_stamp, "-d", 	"--date-stamp", 	OPT_HELP_DATE_STAMP, "" )
+OPT( OptSet,	&opts.split_bin, "", "--split-bin", OPT_HELP_SPLIT_BIN, "")
+
+OPT( OptSet,	&opts.date_stamp, "-d",  "--date-stamp",    OPT_HELP_DATE_STAMP, "")
 OPT( OptClear,	&opts.date_stamp, "-nd", "--no-date-stamp",	OPT_HELP_NO_DATE_STAMP, "" )
 
 OPT( OptCall,	option_make_updated_bin,

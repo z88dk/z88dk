@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.45 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.46 2014-12-21 01:39:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -556,13 +556,15 @@ void fwrite_codearea( char *filename, FILE **pfile )
 		/* bytes from this section */
 		if ( section_size > 0 )
 		{
-			/* change current file if address changed */
-			if ( cur_addr != section->addr || 
-				 ( section != get_first_section(NULL) && section->origin >= 0 ) )
+			/* change current file if address changed, or option --split-bin */
+			if ((section->name && *section->name) &&				/* only if section name not empty */
+				( opts.split_bin ||
+				  cur_addr != section->addr || 
+				  ( section != get_first_section(NULL) && section->origin >= 0 ) ))
 			{
 				Str_set( new_name, path_remove_ext( filename ) );	/* "test" */
-				Str_append_char( new_name, '_' );
-				Str_append( new_name, section->name );
+				Str_append_char(new_name, '_');
+				Str_append(new_name, section->name);
 
 				xfclose( *pfile );
 				*pfile = xfopen( get_bin_filename( new_name->str ), "wb" );         /* CH_0012 */
