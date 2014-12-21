@@ -1,0 +1,26 @@
+
+#ifndef _SYS_IOCTL_SPECTRUM_H
+#define _SYS_IOCTL_SPECTRUM_H
+
+#include <stdint.h>
+
+// IOCTL FOR ZX_01_INPUT_KBD_INKEY
+
+#define IOCTL_ITERM_GET_DELAY          0x0a81
+#define IOCTL_ITERM_SET_DELAY          0x0a01
+
+// IOCTL FOR ZX_01_INPUT_KBD_LASTK
+
+#define IOCTL_ITERM_LASTK              0x0b01
+
+// IOCTL FOR ZX_01_OUTPUT_CHAR_32
+// IOCTL FOR ZX_01_OUTPUT_CHAR_64
+// IOCTL FOR ZX_01_OUTPUT_CHAR_32_TTY_Z88DK
+// IOCTL FOR ZX_01_OUTPUT_CHAR_64_TTY_Z88DK
+
+#define IOCTL_OTERM_FONT               0x0a02
+#define IOCTL_OTERM_FCOLOR             0x0b02
+#define IOCTL_OTERM_FMASK              0x0c02
+#define IOCTL_OTERM_BCOLOR             0x0d02
+
+#endif
