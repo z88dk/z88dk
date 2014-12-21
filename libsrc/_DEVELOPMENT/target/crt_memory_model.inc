@@ -4,11 +4,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-org __crt_org_code
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION CODE
+
+org __crt_org_code
 
 nop
 
@@ -31,6 +31,8 @@ SECTION CODE_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+SECTION DATA
+
 IF __crt_org_data
 
    org __crt_org_data
@@ -38,18 +40,12 @@ IF __crt_org_data
 ELSE
 
    IF __crt_model
-   
-      EXTERN ASMHEAD_CODE_END
       
-      org ASMHEAD_CODE_END
+      "DATA section address must be specified for rom models"
    
    ENDIF
 
 ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SECTION DATA
 
 defb 0
 
@@ -65,25 +61,21 @@ SECTION DATA_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+SECTION BSS
+
 IF __crt_org_bss
 
    org __crt_org_bss
 
 ELSE
 
-;   IF __crt_model
-;   
-;      EXTERN ASMHEAD_DATA_END
-;     
-;      org ASMHEAD_DATA_END
-;
-;   ENDIF
+   IF __crt_model
+
+      org -1
+
+   ENDIF
 
 ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SECTION BSS
 
 defb 0
 
