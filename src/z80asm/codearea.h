@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.34 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.35 2014-12-21 17:20:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -52,6 +52,8 @@ CLASS( Section )
 	Bool		 origin_found;	/* ORG already found in code */
 	Bool		 origin_opts;	/* ORG was defined from command line options, 
 								   override asm code */
+	Bool		 section_split;	/* ORG -1 was given, signal that this section 
+								*  should be output to a new binary file */
 	UInt		 asmpc;			/* address of current opcode relative to start
 								   of the current module, reset to 0 at start
 								   of each module */

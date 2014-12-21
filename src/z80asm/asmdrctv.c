@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.108 2014-12-15 22:28:47 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.109 2014-12-21 17:20:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -411,43 +411,29 @@ DEFC( void )
 void
 ORG( void )
 {
+	long origin;
 
-    Expr *expr;
-    long constant;
+    GetSym();								/* get numerical expression */
+	if (!expr_parse_eval(&origin))
+		return;
 
-    GetSym();                     /* get numerical expression */
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        if ( expr->result.not_evaluable )
-        {
-            error_not_defined();
-        }
-        else
-        {
-            constant = Expr_eval( expr );       /* ORG expression must not contain undefined symbols */
-
-            if ( constant >= 0 && constant <= 0xFFFF )
-            {
-				if ( CURRENTSECTION->origin_found )
-					error_org_redefined();
-				else
-				{
-					CURRENTSECTION->origin_found = TRUE;
-					if ( CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0 )
-						; /* ignore ORG, as --origin from command line overrides */
-					else
-						CURRENTSECTION->origin = constant;
-				}
-            }
-            else
-            {
-                error_int_range( constant );
-            }
-        }
-
-        OBJ_DELETE( expr );
-    }
+	if (CURRENTSECTION->origin_found)
+		error_org_redefined();
+	else
+	{
+		CURRENTSECTION->origin_found = TRUE;
+		if (origin == -1)					/* signal split section binary file */
+			CURRENTSECTION->section_split = TRUE;
+		else if (origin >= 0 && origin <= 0xFFFF)
+		{
+			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
+				; /* ignore ORG, as --origin from command line overrides */
+			else
+				CURRENTSECTION->origin = origin;
+		}
+		else
+			error_int_range(origin);
+	}
 }
 
 

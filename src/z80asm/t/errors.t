@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.25 2014-10-03 22:57:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.26 2014-12-21 17:20:54 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -373,8 +373,8 @@ t_z80asm(
 
 # org out of range
 t_z80asm(
-	asm		=> "org -1",
-	err		=> "Error at file 'test.asm' line 1: integer '-1' out of range",
+	asm		=> "org -2",
+	err		=> "Error at file 'test.asm' line 1: integer '-2' out of range",
 );
 
 t_z80asm(

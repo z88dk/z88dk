@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.46 2014-12-21 01:39:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.47 2014-12-21 17:20:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -65,6 +65,9 @@ void Section_init (Section *self)
 	self->name = "";		/* default: empty section */
 	self->addr	= 0;
 	self->origin = -1;
+	self->origin_found = FALSE;
+	self->origin_opts = FALSE;
+	self->section_split = FALSE;
 	self->asmpc	= 0;
 	self->opcode_size = 0;
 	
@@ -556,20 +559,23 @@ void fwrite_codearea( char *filename, FILE **pfile )
 		/* bytes from this section */
 		if ( section_size > 0 )
 		{
-			/* change current file if address changed, or option --split-bin */
-			if ((section->name && *section->name) &&				/* only if section name not empty */
-				( opts.split_bin ||
-				  cur_addr != section->addr || 
-				  ( section != get_first_section(NULL) && section->origin >= 0 ) ))
+			if (section->name && *section->name)					/* only if section name not empty */
 			{
-				Str_set( new_name, path_remove_ext( filename ) );	/* "test" */
-				Str_append_char(new_name, '_');
-				Str_append(new_name, section->name);
+				/* change current file if address changed, or option --split-bin, or section_split */
+				if (opts.split_bin || 
+					section->section_split ||
+					cur_addr != section->addr ||
+					(section != get_first_section(NULL) && section->origin >= 0))
+				{
+					Str_set(new_name, path_remove_ext(filename));	/* "test" */
+					Str_append_char(new_name, '_');
+					Str_append(new_name, section->name);
 
-				xfclose( *pfile );
-				*pfile = xfopen( get_bin_filename( new_name->str ), "wb" );         /* CH_0012 */
+					xfclose(*pfile);
+					*pfile = xfopen(get_bin_filename(new_name->str), "wb");         /* CH_0012 */
 
-				cur_addr = section->addr;
+					cur_addr = section->addr;
+				}
 			}
 
 			xfput_chars( *pfile, (char *) ByteArray_item( section->bytes, 0 ), section_size );

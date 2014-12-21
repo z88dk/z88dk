@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.128 2014-12-21 02:24:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.129 2014-12-21 17:20:54 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.128 2014-12-21 02:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.128  2014-12-21 02:24:42  pauloscustodio
+* Revision 1.129  2014-12-21 17:20:54  pauloscustodio
+* New ORG -1 to a section to be written to a new binary file, even if
+* the address is consecutive with the previous section.
+*
+* Revision 1.128  2014/12/21 02:24:42  pauloscustodio
 * New option --split-bin: Create one binary file per section
 *
 * Revision 1.127  2014/12/19 21:21:08  pauloscustodio
@@ -2171,7 +2175,10 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	  
 	- IFNDEF / ELSE / ENDIF implemented
 	
-	- New --split-bin option to split binary file per section.
+	- New --split-bin option to split binary file per section. 
+	
+	- New ORG -1 to a section to be written to a new binary file, even if
+	  the address is consecutive with the previous section.
 	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -2196,7 +2203,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2e"
+#define VERSION     "2.6.2f"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
