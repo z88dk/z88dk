@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.8 2014-12-20 20:32:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.9 2014-12-21 02:26:06 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -143,6 +143,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.8 2014-12-2
 		|	OPCODE(LDIR)
 		|	OPCODE(NEG)
 		|	OPCODE(NOP)
+		|	OPCODE(RETI)
+		|	OPCODE(RETN)
 		|	OPCODE(SCF)
 		|	OPCODE_EMUL_RABBIT(CPD,  rcmx_cpd)
 		|	OPCODE_EMUL_RABBIT(CPDR, rcmx_cpdr)
@@ -156,24 +158,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.8 2014-12-2
 		|	OPCODE_EX(IND_SP,HL, IND_SP,HL)
 		|	OPCODE_EX(IND_SP,IX, IND_SP,IX)
 		|	OPCODE_EX(IND_SP,IY, IND_SP,IY)
-		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
-		|	OPCODE_RET()
-		|	OPCODE_RET_FLAG(NZ)
-		|	OPCODE_RET_FLAG(Z)
-		|	OPCODE_RET_FLAG(NC)
-		|	OPCODE_RET_FLAG(C)
-		|	OPCODE_RET_FLAG(PO)
-		|	OPCODE_RET_FLAG(PE)
-		|	OPCODE_RET_FLAG(P)
-		|	OPCODE_RET_FLAG(M)
-		|	OPCODE(RETI)
-		|	OPCODE(RETN)
-		|	OPCODE_JR(JR,   Z80_JR(FLAG_NONE))
 		|	OPCODE_JR(DJNZ, Z80_DJNZ)
+		|	OPCODE_JR(JR,   Z80_JR(FLAG_NONE))
+		|	OPCODE_JR_FLAG(C)
+		|	OPCODE_JR_FLAG(NC)
 		|	OPCODE_JR_FLAG(NZ)
 		|	OPCODE_JR_FLAG(Z)
-		|	OPCODE_JR_FLAG(NC)
-		|	OPCODE_JR_FLAG(C)
+		|	OPCODE_RET()
+		|	OPCODE_RET_FLAG(C)
+		|	OPCODE_RET_FLAG(M)
+		|	OPCODE_RET_FLAG(NC)
+		|	OPCODE_RET_FLAG(NZ)
+		|	OPCODE_RET_FLAG(P)
+		|	OPCODE_RET_FLAG(PE)
+		|	OPCODE_RET_FLAG(PO)
+		|	OPCODE_RET_FLAG(Z)
+		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
 		;
 
 }%%

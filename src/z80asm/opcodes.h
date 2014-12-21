@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.6 2014-12-20 20:32:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.7 2014-12-21 02:26:06 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -62,6 +62,7 @@ extern void add_opcode_jr(int opcode, struct Expr *expr);
 #define Z80_CPL				0x2F
 #define Z80_DAA				0x27
 #define Z80_DI				0xF3
+#define Z80_DJNZ			0x10
 #define Z80_EI				0xFB
 #define Z80_EXX				0xD9
 #define Z80_EX_AF_AF		0x08
@@ -71,18 +72,16 @@ extern void add_opcode_jr(int opcode, struct Expr *expr);
 #define Z80_EX_IND_SP_IY	((_IY_ << 8) | 0xE3)
 #define Z80_HALT			0x76
 #define Z80_IM(n)			_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E)
+#define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? 0x20 + ((flag) << 3) : 0x18)
 #define Z80_LDD				0xEDA8
 #define Z80_LDDR			0xEDB8
 #define Z80_LDI				0xEDA0
 #define Z80_LDIR 			0xEDB0
 #define Z80_NEG				0xED44
 #define Z80_NOP				0x00
-#define Z80_RLD				0xED6F
-#define Z80_RRD				0xED67
-#define Z80_SCF				0x37
-
 #define Z80_RET(flag)		((flag) >= 0 && (flag) < 8 ? 0xC0 + ((flag) << 3) : 0xC9)
 #define Z80_RETI			0xED4D
 #define Z80_RETN			0xED45
-#define Z80_DJNZ			0x10
-#define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? 0x20 + ((flag) << 3) : 0x18)
+#define Z80_RLD				0xED6F
+#define Z80_RRD				0xED67
+#define Z80_SCF				0x37
