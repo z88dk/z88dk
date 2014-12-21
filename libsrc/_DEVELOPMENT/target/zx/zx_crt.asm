@@ -4,7 +4,7 @@
 
 INCLUDE "zcc_opt.def"
 
-IF !startup
+IFNDEF startup
 
    ; startup undefined so select a default
    
