@@ -10,6 +10,8 @@ org __crt_org_code
 
 SECTION CODE
 
+nop
+
 section code_crt_start
 section code_crt_init
 section code_crt_main
@@ -29,7 +31,7 @@ SECTION CODE_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_org_data != 0
+IF __crt_org_data
 
    org __crt_org_data
 
@@ -49,6 +51,8 @@ ENDIF
 
 SECTION DATA
 
+defb 0
+
 include "../../clib_smc.inc"
 section smc_compiler
 section smc_user
@@ -61,25 +65,27 @@ SECTION DATA_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_org_bss != 0
+IF __crt_org_bss
 
    org __crt_org_bss
 
 ELSE
 
-   IF __crt_model
-   
-      EXTERN ASMHEAD_DATA_END
-      
-      org ASMHEAD_DATA_END
-
-   ENDIF
+;   IF __crt_model
+;   
+;      EXTERN ASMHEAD_DATA_END
+;     
+;      org ASMHEAD_DATA_END
+;
+;   ENDIF
 
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION BSS
+
+defb 0
 
 include "../../clib_bss.inc"
 section bss_compiler
