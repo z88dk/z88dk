@@ -40,6 +40,7 @@
 #define IOCTL_OTERM_SET_WINDOW_RECT    0x0402
 #define IOCTL_OTERM_GET_CURSOR_COORD   0x0582
 #define IOCTL_OTERM_SET_CURSOR_COORD   0x0502
+#define IOCTL_OTERM_GET_OTERM          0x0602
 
 #define IOCTL_OTERM_GETF               0x7ffa
 #define IOCTL_OTERM_SETF               0xbffa
