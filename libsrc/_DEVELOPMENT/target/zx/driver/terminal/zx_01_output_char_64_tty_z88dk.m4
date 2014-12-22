@@ -163,7 +163,7 @@ define(`m4_zx_01_output_char_64_tty_z88dk',dnl
       defb 205                 ; call
       defw asm_tty_state_0     ; start state of tty state machine
       defb 0
-      defb 0,0                 ; parameters
+      defb `0,0'                 ; parameters
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
    `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 41))'dnl
