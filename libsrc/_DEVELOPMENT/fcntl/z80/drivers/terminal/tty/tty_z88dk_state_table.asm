@@ -1,4 +1,6 @@
 
+SECTION code_fcntl
+
 PUBLIC tty_z88dk_state_table
 
 EXTERN asm_tty_state_param_none_absorb
