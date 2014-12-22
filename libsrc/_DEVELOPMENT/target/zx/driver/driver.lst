@@ -2,3 +2,6 @@
 @target/zx/driver/terminal/zx_01_input_kbd_lastk.lst
 @target/zx/driver/terminal/zx_01_output_char_32.lst
 @target/zx/driver/terminal/zx_01_output_char_64.lst
+@target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk.lst
+@target/zx/driver/terminal/zx_01_output_char_64_tty_z88dk.lst
+@target/zx/driver/terminal/zx_tty.lst
