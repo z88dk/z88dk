@@ -1,13 +1,13 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_23_atr
+PUBLIC zx_01_output_char_32_tty_z88dk_23_atr
 
 EXTERN console_01_output_char_proc_snap
 EXTERN console_01_output_char_proc_get_coord
 EXTERN console_01_output_char_proc_set_coord
 
-zx_01_output_char_32_tty_23_atr:
+zx_01_output_char_32_tty_z88dk_23_atr:
 
    ; atr dx,dy
    

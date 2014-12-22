@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_17_paper
+PUBLIC zx_01_output_char_32_tty_z88dk_17_paper
 
-zx_01_output_char_32_tty_17_paper:
+zx_01_output_char_32_tty_z88dk_17_paper:
 
    ; change paper of foreground colour
    

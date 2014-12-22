@@ -1,11 +1,11 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_27_escape
+PUBLIC zx_01_output_char_32_tty_z88dk_27_escape
 
 EXTERN error_zc
 
-zx_01_output_char_32_tty_27_escape:
+zx_01_output_char_32_tty_z88dk_27_escape:
 
    ; output escaped char uninterpretted
    

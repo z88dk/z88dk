@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_20_inverse
+PUBLIC zx_01_output_char_32_tty_z88dk_20_inverse
 
-zx_01_output_char_32_tty_20_inverse:
+zx_01_output_char_32_tty_z88dk_20_inverse:
 
    ; swap paper and ink in foreground colour
 

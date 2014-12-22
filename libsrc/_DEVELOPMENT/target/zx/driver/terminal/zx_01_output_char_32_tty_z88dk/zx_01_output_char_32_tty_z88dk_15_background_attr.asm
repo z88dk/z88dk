@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_15_background_attr
+PUBLIC zx_01_output_char_32_tty_z88dk_15_background_attr
 
-zx_01_output_char_32_tty_15_background_attr:
+zx_01_output_char_32_tty_z88dk_15_background_attr:
 
    ; change background colour
    

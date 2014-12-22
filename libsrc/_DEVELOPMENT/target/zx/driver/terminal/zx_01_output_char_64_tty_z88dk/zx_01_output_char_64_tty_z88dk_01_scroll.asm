@@ -1,11 +1,11 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_64_tty_11_scroll
+PUBLIC zx_01_output_char_64_tty_z88dk_01_scroll
 
 EXTERN zx_01_output_char_64_oterm_msg_scroll
 
-zx_01_output_char_64_tty_11_scroll:
+zx_01_output_char_64_tty_z88dk_01_scroll:
 
    ; scroll window upward one row
    

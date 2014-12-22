@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_09_tab
+PUBLIC zx_01_output_char_32_tty_z88dk_09_tab
 
-zx_01_output_char_32_tty_09_tab:
+zx_01_output_char_32_tty_z88dk_09_tab:
 
    ; tab to next multiple of eight column
    

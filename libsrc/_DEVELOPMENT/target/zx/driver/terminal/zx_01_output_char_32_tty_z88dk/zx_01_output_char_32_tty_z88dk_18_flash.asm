@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_18_flash
+PUBLIC zx_01_output_char_32_tty_z88dk_18_flash
 
-zx_01_output_char_32_tty_18_flash:
+zx_01_output_char_32_tty_z88dk_18_flash:
 
    ; change flash bit of foreground colour
    

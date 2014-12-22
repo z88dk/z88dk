@@ -1,8 +1,0 @@
-
-SECTION code_fcntl
-
-PUBLIC zx_01_output_char_32_tty_08_backspace
-
-EXTERN zx_01_output_char_32_tty_28_left
-
-defc zx_01_output_char_32_tty_08_backspace = zx_01_output_char_32_tty_28_left

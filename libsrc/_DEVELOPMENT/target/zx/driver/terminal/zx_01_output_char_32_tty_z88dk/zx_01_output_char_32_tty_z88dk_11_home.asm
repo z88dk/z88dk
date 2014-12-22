@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_11_home
+PUBLIC zx_01_output_char_32_tty_z88dk_11_home
 
-zx_01_output_char_32_tty_11_home:
+zx_01_output_char_32_tty_z88dk_11_home:
 
    ; move cursor to (0,0)
    

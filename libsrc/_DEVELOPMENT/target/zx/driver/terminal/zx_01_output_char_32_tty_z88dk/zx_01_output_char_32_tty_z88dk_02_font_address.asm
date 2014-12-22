@@ -1,9 +1,9 @@
 
 SECTION code_fcntl
 
-PUBLIC zx_01_output_char_32_tty_02_font_address
+PUBLIC zx_01_output_char_32_tty_z88dk_02_font_address
 
-zx_01_output_char_32_tty_02_font_address:
+zx_01_output_char_32_tty_z88dk_02_font_address:
 
    ; de = parameters *
 
