@@ -289,7 +289,7 @@ readline_error:
    push hl
    
    ld a,ITERM_MSG_READLINE_END
-   call l_jpix
+   call console_01_input_proc_oterm  ; inform output terminal that editing is done
    
    pop hl
 
