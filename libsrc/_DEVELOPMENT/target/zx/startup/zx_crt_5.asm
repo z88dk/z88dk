@@ -198,16 +198,16 @@ EXTERN _font_4x8_def
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: zx_01_output_char_32_tty_z88dk
+   ; driver: zx_01_output_char_64_tty_z88dk
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
    ; ioctl_flags   : 0x2370
    ; cursor coord  : (0,0)
-   ; window        : (0,32,0,24)
+   ; window        : (0,64,0,24)
    ; scroll limit  : 0
-   ; font address  : 15360
+   ; font address  : _font_4x8_def - 256
    ; text colour   : 56
    ; text mask     : 0
    ; background    : 56
@@ -264,7 +264,7 @@ EXTERN _font_4x8_def
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_32_tty_z88dk
+   EXTERN zx_01_output_char_64_tty_z88dk
    
    __i_fcntl_heap_1:
    
@@ -286,7 +286,7 @@ EXTERN _font_4x8_def
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_32_tty_z88dk
+      defw zx_01_output_char_64_tty_z88dk
       
       ; flags
       ; reference_count
@@ -313,7 +313,7 @@ EXTERN _font_4x8_def
       ; scroll limit
 
       defb 0, 0
-      defb 0, 32, 0, 24
+      defb 0, 64, 0, 24
       defb 0
       
       ; font address
@@ -321,7 +321,7 @@ EXTERN _font_4x8_def
       ; text mask
       ; background colour
       
-      defw 15360
+      defw _font_4x8_def - 256
       defb 56
       defb 0
       defb 56

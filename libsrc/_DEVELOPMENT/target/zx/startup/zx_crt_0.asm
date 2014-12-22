@@ -198,7 +198,7 @@ EXTERN _font_4x8_def
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: zx_01_output_char_32_tty_z88dk
+   ; driver: zx_01_output_char_32
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
@@ -264,14 +264,14 @@ EXTERN _font_4x8_def
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_32_tty_z88dk
+   EXTERN zx_01_output_char_32
    
    __i_fcntl_heap_1:
    
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 41
+      defw 35
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:
@@ -286,7 +286,7 @@ EXTERN _font_4x8_def
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_32_tty_z88dk
+      defw zx_01_output_char_32
       
       ; flags
       ; reference_count
@@ -325,15 +325,6 @@ EXTERN _font_4x8_def
       defb 56
       defb 0
       defb 56
-      
-      ; tty_z88dk
-      
-      EXTERN asm_tty_state_0
-      
-      defb 205                 ; call
-      defw asm_tty_state_0     ; start state of tty state machine
-      defb 0
-      defb 0,0                 ; parameters
 
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -548,11 +539,11 @@ EXTERN _font_4x8_def
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 146  = byte size of static FDSTRUCTs
+   ; 140  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 146 > 0
+   IF 140 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -568,7 +559,7 @@ EXTERN _font_4x8_def
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (146 + 14)
+      IF __clib_stdio_heap_size > (140 + 14)
       
          ; expand stdio heap to desired size
          
@@ -579,7 +570,7 @@ EXTERN _font_4x8_def
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 146 - 14
+            defs __clib_stdio_heap_size - 140 - 14
          
          ; terminate stdio heap
          
