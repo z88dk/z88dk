@@ -43,7 +43,7 @@ SECTION code_fcntl
 
 PUBLIC zx_01_output_char_32_tty_z88dk
 
-EXTERN OTERM_MSG_TTY, STDIO_MSG_FLSH
+EXTERN OTERM_MSG_TTY, STDIO_MSG_FLSH, STDIO_MSG_ICTL
 
 EXTERN zx_01_output_char_32
 EXTERN zx_01_output_char_32_tty_z88dk_oterm_msg_tty
