@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.216 2014-12-22 19:02:09 aralbrec Exp $
+# $Id: Makefile,v 1.217 2014-12-23 02:40:31 aralbrec Exp $
 
 
 include Make.config
@@ -13,8 +13,7 @@ include Make.config
 # LIBRARIES not built by the global list below:
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
-#all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
-all: genlibs tilibs zxlibs eplibs c128libs cpclibs \
+all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib mc1000ansi_clib.lib \
