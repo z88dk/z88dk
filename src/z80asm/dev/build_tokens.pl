@@ -16,7 +16,7 @@
 # Preprocess scan_def.h and generate scan_tokens.h with #define macros for each token ID
 # Needed to communicate scanner tokens to the parser
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_tokens.pl,v 1.1 2014-12-13 00:49:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_tokens.pl,v 1.2 2014-12-23 00:26:41 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -27,9 +27,10 @@ open(my $out, ">", "$FILE.c") or die "Output to $FILE.c failed: $!\n";
 print $out <<"END";
 #include "legacy.h"
 
-#define TOKEN_RE(name, string, regexp, set_value)	name	string
-#define TOKEN(name, string, set_value)				name	string
+#define TOKEN_RE(name, string, regexp, set_value)	name		string
+#define TOKEN(name, string, set_value)				name		string
 #define TOKEN2(name, string, set_value)
+#define TOKEN_OPCODE(name, set_value)				TK_##name	#name
 
 #include "scan_def.h"
 

@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.9 2014-12-21 14:03:03 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.10 2014-12-23 00:26:41 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -616,6 +616,25 @@ ENDIF
 		}								;;	
 	endif								;;		
 	defb ff, fg							;; defb 1, 2
+
+;------------------------------------------------------------------------------
+; Allow labels with names of opcodes
+;------------------------------------------------------------------------------
+
+	lib ld								;;
+
+	nop
+	jr nop
+nop:
+
+IF !RABBIT
+	di
+	jr di
+di:
+	ei
+	jr ei
+ei:
+ENDIF
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes

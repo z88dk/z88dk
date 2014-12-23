@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.42 2014-12-20 20:32:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.43 2014-12-23 00:26:53 pauloscustodio Exp $
 */
 
 #pragma once
@@ -74,6 +74,8 @@ extern Bool EOL;			/* scanner EOL state */
 
 /* get the next token, fill the corresponding tok* variables */
 extern tokid_t GetSym( void );
+extern void scan_expect_opcode(void);		/* GetSym() returns NOP as TK_NOP */
+extern void scan_expect_operands(void);		/* GetSym() returns NOP as TK_NAME */
 
 /* save the current scan position and back-track to a saved position */
 extern void save_scan_state(void);		/* needs to be balanced with restore_.../drop_... */

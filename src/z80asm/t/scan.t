@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.12 2014-12-21 14:03:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.13 2014-12-23 00:26:53 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -141,10 +141,47 @@ char *GetLibfile( char *filename ) {return NULL;}
 	T_GET( TK_END, "" ); \
 	T_GET( TK_END, "" );
 
+#define T_Z80		1
+#define T_RABBIT	2
+#define T_ALL		3
+
+#define T_OPCODE1(opcode, opcode_cmp) \
+			SetTemporaryLine(string); \
+			scan_expect_opcode(); \
+			T_GET(TK_##opcode, #opcode); \
+			T_NAME(opcode_cmp); \
+			T_END(); \
+			SetTemporaryLine(string); \
+			scan_expect_operands(); \
+			T_NAME(opcode_cmp); \
+			T_NAME(opcode_cmp); \
+			T_END();
+
+#define T_OPCODE2(opcode, opcode_cmp, _cpu) \
+		if (_cpu & CPU_Z80) { \
+			opts.cpu &= ~CPU_RABBIT; \
+			T_OPCODE1(opcode, opcode_cmp); \
+		} \
+		if (_cpu & CPU_RABBIT) { \
+			opts.cpu |= CPU_RABBIT; \
+			T_OPCODE1(opcode, opcode_cmp); \
+		}
+
+#define T_OPCODE(opcode, _cpu)	\
+		strcpy(opcode_lcase, #opcode); \
+		strtolower(opcode_lcase); \
+		strcpy(string, #opcode " " #opcode); \
+		strtolower(string); \
+		T_OPCODE2(opcode, opcode_lcase, _cpu); \
+		strtoupper(string); \
+		T_OPCODE2(opcode, #opcode, _cpu);
+
 END
 
 t_compile_module($init, <<'END', $objs);
 	tokid_t token;
+	char string[MAXLINE];
+	char opcode_lcase[MAXLINE];
 	
 
 	SetTemporaryLine("");
@@ -735,113 +772,67 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
 	T_END();
 
-	/* assembly opcodes */
-	SetTemporaryLine("exx ex nop cpl neg ccf scf ldi ldir ldd lddr "
-					 "rld rrd cpi cpir cpd cpdr ret reti "
-					 "djnz jr "
-					 "EXX EX NOP CPL NEG CCF SCF LDI LDIR LDD LDDR "
-					 "RLD RRD CPI CPIR CPD CPDR RET RETI "
-					 "DJNZ JR "
-					);
-	T_GET(TK_EXX,  "EXX");
-	T_GET(TK_EX,   "EX");
-	T_GET(TK_NOP,  "NOP");
-	T_GET(TK_CPL,  "CPL");
-	T_GET(TK_NEG,  "NEG");
-	T_GET(TK_CCF,  "CCF");
-	T_GET(TK_SCF,  "SCF");
-	T_GET(TK_LDI,  "LDI");
-	T_GET(TK_LDIR, "LDIR");
-	T_GET(TK_LDD,  "LDD");
-	T_GET(TK_LDDR, "LDDR");
-	T_GET(TK_RLD,  "RLD");
-	T_GET(TK_RRD,  "RRD");
-	T_GET(TK_CPI,  "CPI");
-	T_GET(TK_CPIR, "CPIR");
-	T_GET(TK_CPD,  "CPD");
-	T_GET(TK_CPDR, "CPDR");
-	T_GET(TK_RET,  "RET");
-	T_GET(TK_RETI, "RETI");
-	T_GET(TK_DJNZ, "DJNZ");
-	T_GET(TK_JR,   "JR");
 	
-	T_GET(TK_EXX,  "EXX");
-	T_GET(TK_EX,   "EX");
-	T_GET(TK_NOP,  "NOP");
-	T_GET(TK_CPL,  "CPL");
-	T_GET(TK_NEG,  "NEG");
-	T_GET(TK_CCF,  "CCF");
-	T_GET(TK_SCF,  "SCF");
-	T_GET(TK_LDI,  "LDI");
-	T_GET(TK_LDIR, "LDIR");
-	T_GET(TK_LDD,  "LDD");
-	T_GET(TK_LDDR, "LDDR");
-	T_GET(TK_RLD,  "RLD");
-	T_GET(TK_RRD,  "RRD");
-	T_GET(TK_CPI,  "CPI");
-	T_GET(TK_CPIR, "CPIR");
-	T_GET(TK_CPD,  "CPD");
-	T_GET(TK_CPDR, "CPDR");
-	T_GET(TK_RET,  "RET");
-	T_GET(TK_RETI, "RETI");
-	T_GET(TK_DJNZ, "DJNZ");
-	T_GET(TK_JR,   "JR");
-	T_END();
-	
-	/* assembly opcodes - Z80 only */
+	/* assembly operands - Z80 only */
 	opts.cpu &= ~CPU_RABBIT;
-	SetTemporaryLine("daa di ei halt im i r retn "
-					 "ind indr ini inir outi outd otir otdr "
-					 "DAA DI EI HALT IM I R RETN "
-					 "IND INDR INI INIR OUTI OUTD OTIR OTDR ");
-	T_GET(TK_DAA,  "DAA");
-	T_GET(TK_DI,   "DI");
-	T_GET(TK_EI,   "EI");
-	T_GET(TK_HALT, "HALT");
-	T_GET(TK_IM,   "IM");
+	SetTemporaryLine("i r I R");
+	scan_expect_operands();
 	T_GET(TK_I,    "I");
 	T_GET(TK_R,    "R");
-	T_GET(TK_RETN, "RETN");
-	T_GET(TK_IND,  "IND");
-	T_GET(TK_INDR, "INDR");
-	T_GET(TK_INI,  "INI");
-	T_GET(TK_INIR, "INIR");
-	T_GET(TK_OUTI, "OUTI");
-	T_GET(TK_OUTD, "OUTD");
-	T_GET(TK_OTIR, "OTIR");
-	T_GET(TK_OTDR, "OTDR");
-	
-	T_GET(TK_DAA,  "DAA");
-	T_GET(TK_DI,   "DI");
-	T_GET(TK_EI,   "EI");
-	T_GET(TK_HALT, "HALT");
-	T_GET(TK_IM,   "IM");
 	T_GET(TK_I,    "I");
 	T_GET(TK_R,    "R");
-	T_GET(TK_RETN, "RETN");
-	T_GET(TK_IND,  "IND");
-	T_GET(TK_INDR, "INDR");
-	T_GET(TK_INI,  "INI");
-	T_GET(TK_INIR, "INIR");
-	T_GET(TK_OUTI, "OUTI");
-	T_GET(TK_OUTD, "OUTD");
-	T_GET(TK_OTIR, "OTIR");
-	T_GET(TK_OTDR, "OTDR");
 	T_END();
 	opts.cpu &= ~CPU_RABBIT;
 	
-	/* assembly opcodes - RABBIT only */
+	/* assembly operands - RABBIT only */
 	opts.cpu |= CPU_RABBIT;
-	SetTemporaryLine("iir eir "
-					 "IIR EIR ");
+	SetTemporaryLine("iir eir IIR EIR ");
 	T_GET(TK_IIR,   "IIR");
 	T_GET(TK_EIR,   "EIR");
-
 	T_GET(TK_IIR,   "IIR");
 	T_GET(TK_EIR,   "EIR");
 	T_END();
 	opts.cpu &= ~CPU_RABBIT;
+
 	
+	/* assembly opcodes */
+	T_OPCODE(CCF,	T_ALL);
+	T_OPCODE(CPD,	T_ALL);
+	T_OPCODE(CPDR,	T_ALL);
+	T_OPCODE(CPI,	T_ALL);
+	T_OPCODE(CPIR,	T_ALL);
+	T_OPCODE(CPL,	T_ALL);
+	T_OPCODE(DAA,	T_Z80);
+	T_OPCODE(DI,	T_Z80);
+	T_OPCODE(DJNZ,	T_ALL);
+	T_OPCODE(EI,	T_Z80);
+	T_OPCODE(EX,	T_ALL);
+	T_OPCODE(EXX,	T_ALL);
+	T_OPCODE(HALT,	T_Z80);
+	T_OPCODE(IM,	T_Z80);
+	T_OPCODE(IND,	T_Z80);
+	T_OPCODE(INDR,	T_Z80);
+	T_OPCODE(INI,	T_Z80);
+	T_OPCODE(INIR,	T_Z80);
+	T_OPCODE(JR,	T_ALL);
+	T_OPCODE(LDD,	T_ALL);
+	T_OPCODE(LDDR,	T_ALL);
+	T_OPCODE(LDI,	T_ALL);
+	T_OPCODE(LDIR,	T_ALL);
+	T_OPCODE(NEG,	T_ALL);
+	T_OPCODE(NOP,	T_ALL);
+	T_OPCODE(OTDR,	T_Z80);
+	T_OPCODE(OTIR,	T_Z80);
+	T_OPCODE(OUTD,	T_Z80);
+	T_OPCODE(OUTI,	T_Z80);
+	T_OPCODE(RET,	T_ALL);
+	T_OPCODE(RETI,	T_ALL);
+	T_OPCODE(RETN,	T_Z80);
+	T_OPCODE(RLD,	T_ALL);
+	T_OPCODE(RRD,	T_ALL);
+	T_OPCODE(SCF,	T_ALL);
+	
+
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "
 					 "ld ( ix_save + 2 ) , ix ");

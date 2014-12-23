@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.58 2014-12-18 14:23:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.59 2014-12-23 00:26:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -49,6 +49,9 @@ static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
 static DEFINE_STR(sym_string, MAXLINE);
 
+static Bool	expect_opcode;				/* true to return opcodes as tokens, 
+										*  false to return as names */
+
 /* save scan status */
 typedef struct scan_state_t
 {
@@ -59,6 +62,7 @@ typedef struct scan_state_t
 	int		 cs, act;
 	int		 p, pe, eof, ts, te;
 	char	*sym_string;
+	Bool	 expect_opcode;
 } ScanState;
 
 static void ut_scan_state_dtor(void *elt) 
@@ -134,6 +138,7 @@ void save_scan_state(void)
 	save.ts  = ts  ? ts  - input_buf->str : -1;
 	save.te  = te  ? te  - input_buf->str : -1;
 	save.sym_string = xstrdup(sym_string->str);
+	save.expect_opcode = expect_opcode;
 
 	utarray_push_back(scan_state, &save);
 }
@@ -155,6 +160,7 @@ void restore_scan_state(void)
 	ts  = save->ts  >= 0 ? input_buf->str + save->ts  : NULL;
 	te  = save->te  >= 0 ? input_buf->str + save->te  : NULL;
 	Str_set(sym_string, save->sym_string);
+	expect_opcode = save->expect_opcode;
 
 	utarray_pop_back(scan_state);
 }
@@ -162,6 +168,16 @@ void restore_scan_state(void)
 void drop_scan_state(void)
 {
 	utarray_pop_back(scan_state);
+}
+
+void scan_expect_opcode(void)
+{
+	expect_opcode = TRUE;
+}
+
+void scan_expect_operands(void)
+{
+	expect_opcode = FALSE;
 }
 
 /*-----------------------------------------------------------------------------

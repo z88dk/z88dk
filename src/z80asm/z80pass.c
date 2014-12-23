@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.118 2014-12-19 21:21:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.119 2014-12-23 00:26:53 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -82,12 +82,15 @@ parseline( enum flag interpret )
 	EOL = FALSE;			/* reset END OF LINE flag */
 
 	start_num_errors = get_num_errors();
+
+	scan_expect_opcode();
 	GetSym();
 
 	if (get_num_errors() != start_num_errors)		/* detect errors in GetSym() */
 		Skipline();
 	else if (!parse_statement(interpret))
 	{
+		scan_expect_operands();
 		if (get_num_errors() != start_num_errors)	/* detect errors during parse_statement() */
 			Skipline();
 		else

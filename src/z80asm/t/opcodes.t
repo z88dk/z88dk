@@ -1863,6 +1863,21 @@ jr2:
                       defb ff, fg       ;; 01 02
 
 ;------------------------------------------------------------------------------
+; Allow labels with names of opcodes
+;------------------------------------------------------------------------------
+
+                      nop               ;; 00
+                      jr   nop          ;; 18 00
+nop:                  
+
+                      di                ;; F3
+                      jr   di           ;; 18 00
+di:                   
+                      ei                ;; FB
+                      jr   ei           ;; 18 00
+ei:                   
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
                       call_oz 1         ;; E7 01
@@ -2439,10 +2454,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD DD 08
-        cpir                            ;; CD FA 08
-        cpd                             ;; CD 26 09
-        cpdr                            ;; CD 43 09
+        cpi                             ;; CD E0 08
+        cpir                            ;; CD FD 08
+        cpd                             ;; CD 29 09
+        cpdr                            ;; CD 46 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2871,8 +2886,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 6F 09
-        rrd                             ;; CD 91 09
+        rld                             ;; CD 72 09
+        rrd                             ;; CD 94 09
 
 ;	# rotate 16 bits
 ;
@@ -3662,6 +3677,17 @@ jr2:
                       defb ff, fg       ;; 01 02
 
 ;------------------------------------------------------------------------------
+; Allow labels with names of opcodes
+;------------------------------------------------------------------------------
+
+                      lib  ld
+
+                      nop               ;; 00
+                      jr   nop          ;; 18 00
+nop:                  
+
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
                       call_oz 1         ;; E7 01
@@ -3682,7 +3708,7 @@ jr2:
 
                       invoke 0          ;; CD 00 00
                       invoke 1          ;; CD 01 00
-                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 02 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 76 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 98 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 05 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4E 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 79 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 9B 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 

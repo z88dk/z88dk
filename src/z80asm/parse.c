@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.13 2014-12-20 20:32:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.14 2014-12-23 00:26:53 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -106,6 +106,7 @@ static void push_expr(char *ts, char *te)
 			SetTemporaryLine(expr_text->str);
 			num_errors = get_num_errors();
 			EOL = FALSE;
+			scan_expect_operands();
 			GetSym();
 			expr = expr_parse();		/* may output error */
 			if (sym.tok != TK_END && num_errors == get_num_errors())

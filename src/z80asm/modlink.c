@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.138 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.139 2014-12-23 00:26:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -194,6 +194,7 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 
         EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
+		scan_expect_operands();
         GetSym();
 
 		/* parse and store expression in the list */
