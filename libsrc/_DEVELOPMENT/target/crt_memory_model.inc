@@ -79,6 +79,7 @@ ENDIF
 
 defb 0
 
+section BSS_UNINITIALIZED
 include "../../clib_bss.inc"
 section bss_compiler
 section bss_user

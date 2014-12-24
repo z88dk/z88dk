@@ -3,10 +3,10 @@
 
    IF (__crt_model | __crt_initialize_bss)
 
-      EXTERN ASMHEAD_BSS, ASMHEAD_BSS_END
+      EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
 
-      ld hl,ASMHEAD_BSS
-      ld bc,ASMHEAD_BSS_END - ASMHEAD_BSS
+      ld hl,ASMTAIL_BSS_UNINITIALIZED
+      ld bc,ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED
    
       ld e,0
    
