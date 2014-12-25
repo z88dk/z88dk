@@ -1002,7 +1002,7 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION bss_user
+SECTION BSS_INITIALIZED
 
 __sp:  defw 0
 
