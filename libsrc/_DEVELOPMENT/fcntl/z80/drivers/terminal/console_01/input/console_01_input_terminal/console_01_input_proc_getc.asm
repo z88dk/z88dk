@@ -80,11 +80,12 @@ line_mode:
    or (hl)
    dec hl
    jr z, char_mode             ; if edit buffer does not exist
-   
+
+   bit 6,(ix+7)
+   jr nz, line_mode_readline   ; if ioctl pushed edit buffer
+
    call line_mode_editbuf_1
    ret nc                      ; if char retrieved from edit buffer
-   
-   ; fall through to line_mode_readline
 
 line_mode_readline:
 
@@ -97,11 +98,63 @@ line_mode_readline:
    call l_setmem_hl - 4        ; FDSTRUCT.read_index = 0
 
    push hl                     ; save b_array *
-   
-   call asm_b_array_clear      ; empty the edit buffer
-   
+
    ld a,ITERM_MSG_READLINE_BEGIN
    call console_01_input_proc_oterm  ; inform output terminal that new line is starting
+
+   pop hl                      ; hl = b_array *
+   push hl
+   
+   bit 6,(ix+7)
+   jr z, line_mode_readline_1
+   
+   res 6,(ix+7)
+
+   ; ioctl pushed edit buffer into terminal
+   ; need to echo buffer chars to output terminal
+   
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de = b_array.data
+   inc hl
+   
+   ld c,(hl)
+   inc hl
+   ld b,(hl)                   ; bc = b_array.size
+
+   ex de,hl
+
+push_loop:
+
+   ld a,b
+   or c
+   jr z, readline_loop
+
+   ld a,(hl)
+
+   cp CHAR_LF
+   jr nz, put_raw_0
+
+   ld a,'?'                    ; changed escaped LF to '?'
+
+put_raw_0:
+
+   push bc
+   push hl
+   
+   call console_01_input_proc_echo  ; send char to output terminal
+
+   pop hl
+   pop bc
+   
+   inc hl
+   dec bc
+
+   jr push_loop
+
+line_mode_readline_1:
+
+   call asm_b_array_clear      ; empty the edit buffer
 
 readline_loop:
 

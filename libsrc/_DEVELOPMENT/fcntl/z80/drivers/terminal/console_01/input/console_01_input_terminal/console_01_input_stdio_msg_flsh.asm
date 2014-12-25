@@ -9,6 +9,8 @@ console_01_input_stdio_msg_flsh:
 
    ; carry set on error (write buffers could not be flushed)
    
+   res 6,(ix+7)
+   
    ld hl,16
    call l_offset_ix_de         ; hl = & FDSTRUCT.pending_char
    

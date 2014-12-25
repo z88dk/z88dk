@@ -96,6 +96,8 @@ _ioctl_getset_editbuf:
 
 _ioctl_set_editbuf:
 
+   set 6,(ix+7)                ; indicate buffer pushed into edit terminal
+
    xor a
    call l_setmem_hl - 6        ; hl = & fdstruct.b_array
    
