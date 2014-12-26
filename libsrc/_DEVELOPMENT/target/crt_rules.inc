@@ -323,6 +323,45 @@
       
    ENDIF
 
+
+   IFDEF CRT_ENABLE_RST
+   
+      defc __crt_enable_rst = CRT_ENABLE_RST
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_rst
+      
+         defc __crt_enable_rst = TAR__crt_enable_rst
+      
+      ELSE
+      
+         defc __crt_enable_rst = DEF__crt_enable_rst
+      
+      ENDIF
+   
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_NMI
+   
+      defc __crt_enable_nmi = CRT_ENABLE_NMI
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_nmi
+      
+         defc __crt_enable_nmi = TAR__crt_enable_nmi
+      
+      ELSE
+      
+         defc __crt_enable_nmi = DEF__crt_enable_nmi
+      
+      ENDIF
+      
+   ENDIF
+   
+   
    ;; public definitions
    
    PUBLIC __exit_stack_size

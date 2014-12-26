@@ -9,7 +9,7 @@
    defc DEF__crt_org_data = 0
    defc DEF__crt_org_bss  = 0
 
-   defc DEF__crt_model    = 2     ; compress rom model
+   defc DEF__crt_model    = 2     ; compressed rom model
    
    defc DEF__register_sp  = -1    ; means set sp = 0 (top of memory)
    
@@ -18,6 +18,9 @@
    defc DEF__crt_enable_commandline = 1
    defc DEF__crt_enable_restart     = 1
    defc DEF__crt_enable_close       = 1
+   
+   defc DEF__crt_enable_rst         = 0   ; one bit per z80 rst
+   defc DEF__crt_enable_nmi         = 0
    
    ; clib defaults
    
