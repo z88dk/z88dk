@@ -165,11 +165,12 @@ SECTION code_fcntl
 
 PUBLIC console_01_output_terminal_char
 
-EXTERN console_01_output_terminal
+EXTERN console_01_output_terminal, error_zc
 EXTERN console_01_output_char_oterm_msg_putc, console_01_output_char_stdio_msg_ictl
 EXTERN console_01_output_char_iterm_msg_putc, console_01_output_char_iterm_msg_bs
 EXTERN console_01_output_char_iterm_msg_readline_begin, console_01_output_char_iterm_msg_readline_end
 
+EXTERN OTERM_MSG_TTY
 EXTERN OTERM_MSG_PUTC, STDIO_MSG_ICTL, ITERM_MSG_PUTC, ITERM_MSG_BS, ITERM_MSG_READLINE_BEGIN
 EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_READLINE_END
 
@@ -207,5 +208,8 @@ console_01_output_terminal_char:
    
    cp ITERM_MSG_READLINE_END
    jp z, console_01_output_char_iterm_msg_readline_end
+   
+   cp OTERM_MSG_TTY
+   jp z, error_zc                      ; prevent errno being changed
    
    jp console_01_output_terminal       ; forward to library
