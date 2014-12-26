@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.10 2014-12-21 14:03:03 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-26 11:09:36 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -42,7 +42,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.10 2014-12-
 
 #define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
 						@{ ADD_OPCODE(Z80_##op); }
-						
+
+#define OPCODE_const(op) label? _TK_##op const_expr _TK_NEWLINE	\
+						@{ if (!expr_error) { \
+								ADD_OPCODE(Z80_##op(expr_value)); \
+						   } \
+						}
+
 #define OPCODE_EX(a,b,a1,b1)	\
 						label? _TK_EX _TK_##a _TK_COMMA _TK_##b _TK_NEWLINE \
 						@{ ADD_OPCODE(Z80_EX_##a1##_##b1); }
@@ -124,7 +130,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.10 2014-12-
 			  %{ push_expr(expr_start->ts, (p-1)->te); };
 	
 	const_expr = 
-			  expr %{ expr_value = pop_eval_expr(); };
+			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
 	
 	/* assembly statement */
 	main := _TK_END
@@ -181,7 +187,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.10 2014-12-
 		|	OPCODE_RET_FLAG(PE)
 		|	OPCODE_RET_FLAG(PO)
 		|	OPCODE_RET_FLAG(Z)
-		|	label? _TK_IM   const_expr _TK_NEWLINE	@{ ADD_OPCODE(Z80_IM(expr_value)); }
+		|	OPCODE_const(IM)
+		|	OPCODE_const(RST)
 		;
 
 }%%

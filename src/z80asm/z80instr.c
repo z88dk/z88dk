@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.84 2014-12-20 20:32:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.85 2014-12-26 11:09:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -160,35 +160,6 @@ IN( void )
 			error_illegal_ident();
 		}
 	}
-}
-
-
-void
-RST( void )
-{
-    long constant;
-
-    GetSym();
-
-	if ( expr_parse_eval( &constant ) )
-	{
-        if ( ( constant >= 0 && constant <= 0x38 ) && ( constant % 8 == 0 ) )
-        {
-            if ( ( opts.cpu & CPU_RABBIT ) &&
-                    ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
-			{
-				error_illegal_ident();
-			}
-			else
-            {
-                append_byte( (Byte)( 0xC7 + constant ) );
-            }
-        }
-        else
-        {
-            error_int_range( constant );
-        }
-    }
 }
 
 

@@ -144,7 +144,6 @@
     <ClCompile Include="deffile.c" />
     <ClCompile Include="errors.c" />
     <ClCompile Include="expr.c" />
-    <ClCompile Include="exprprsr.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="libfile.c" />
@@ -169,7 +168,6 @@
     <ClCompile Include="options.c" />
     <ClCompile Include="parse.c" />
     <ClCompile Include="prsident.c" />
-    <ClCompile Include="prsline.c" />
     <ClCompile Include="scan.c" />
     <ClCompile Include="sym.c" />
     <ClCompile Include="symref.c" />

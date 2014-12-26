@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.87 2014-12-21 14:03:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.88 2014-12-26 11:09:36 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,7 +47,7 @@ void DEFVARS(void), DEFS(void), ORG(void), INCLUDE(void), BINARY(void), CALL_OZ(
 void ADC( void ), ADD( void ), DEC( void ), IN( void ), INC( void ), INVOKE( void );
 void LD( void ), OUT( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
-void RST( void ), DEFGROUP( void );
+void DEFGROUP( void );
 void UNDEFINE( void );
 
 
@@ -137,7 +137,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( RRA ),
     DEF_ENTRY( RRC ),
     DEF_ENTRY( RRCA ),
-    DEF_ENTRY( RST ),
     DEF_ENTRY( SBC ),
     DEF_ENTRY( SECTION ),
     DEF_ENTRY( SET ),

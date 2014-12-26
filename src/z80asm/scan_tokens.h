@@ -123,7 +123,8 @@
 #define _TK_RETN          118    /* "RETN"  */
 #define _TK_RLD           119    /* "RLD"   */
 #define _TK_RRD           120    /* "RRD"   */
-#define _TK_SCF           121    /* "SCF"   */
+#define _TK_RST           121    /* "RST"   */
+#define _TK_SCF           122    /* "SCF"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -251,7 +252,8 @@ typedef enum tokid_t
     TK_RETN        = _TK_RETN       ,    /* =   118, "RETN"  */
     TK_RLD         = _TK_RLD        ,    /* =   119, "RLD"   */
     TK_RRD         = _TK_RRD        ,    /* =   120, "RRD"   */
-    TK_SCF         = _TK_SCF        ,    /* =   121, "SCF"   */
+    TK_RST         = _TK_RST        ,    /* =   121, "RST"   */
+    TK_SCF         = _TK_SCF        ,    /* =   122, "SCF"   */
 } tokid_t;
 
 #endif

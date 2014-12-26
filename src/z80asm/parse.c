@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.14 2014-12-23 00:26:53 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.15 2014-12-26 11:09:36 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,6 +50,7 @@ static UT_array *exprs;
 static UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
 static Sym *expr_start;
 static int expr_value;
+static Bool expr_error;
 
 /* Ragel state variables */
 static int cs;							/* current state */
@@ -138,29 +139,28 @@ static Expr *pop_expr(void)
 /*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
-static int pop_eval_expr(void)
+static void pop_eval_expr(int *pvalue, Bool *perror)
 {
 	Expr *expr;
-	Bool  failed;
-	int   result;
+
+	*pvalue = 0;
+	*perror = FALSE;
 
 	expr = pop_expr();
 	if (expr == NULL)
-		return 0;					/* error output by push_expr() */
+	{
+		*perror = TRUE;				/* error output by push_expr() */
+		return;
+	}
 
 	/* eval and discard expression */
-	result = Expr_eval(expr);
-	failed = (expr->result.not_evaluable);
+	*pvalue = Expr_eval(expr);
+	*perror = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
 
 	/* check errors */
-	if (failed)
-	{
+	if (*perror)
 		error_not_defined();
-		return 0;
-	}
-
-	return result;
 }
 
 /*-----------------------------------------------------------------------------
@@ -235,6 +235,7 @@ Bool parse_statement(Bool compile_active)
 	{
 		stmt_label = NULL;
 		expr_value = 0;
+		expr_error = FALSE;
 		parse_ok = _parse_statement(compile_active);
 		free_tokens(); 
 	}
