@@ -15,7 +15,7 @@
    defc TAR__crt_enable_commandline = 0
    defc TAR__crt_enable_restart     = 0
    
-   defc TAR__clib_fopen_max         = 0
+   defc TAR__clib_fopen_max         = -1     ; create empty stdio file lists
    defc TAR__clib_open_max          = 0
 
    defc TAR__clib_exit_stack_size      = 2
