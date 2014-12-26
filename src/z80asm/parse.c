@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.15 2014-12-26 11:09:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.16 2014-12-26 12:50:27 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -161,6 +161,16 @@ static void pop_eval_expr(int *pvalue, Bool *perror)
 	/* check errors */
 	if (*perror)
 		error_not_defined();
+}
+
+/*-----------------------------------------------------------------------------
+*   Compute auto-label
+*----------------------------------------------------------------------------*/
+static char *autolabel(Str *label)
+{
+	static int n;
+	Str_sprintf(label, "__autolabel_%04d", ++n);
+	return label->str;
 }
 
 /*-----------------------------------------------------------------------------

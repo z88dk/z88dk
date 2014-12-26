@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.85 2014-12-26 11:09:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.86 2014-12-26 12:50:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -36,7 +36,6 @@ void ADC_8bit_instr( void );
 void SBC_8bit_instr( void );
 void IncDec_8bit_instr( int opcode );
 void ArithLog8_instr( int opcode );
-void JP_instr( int opc0, int opc );
 void Subroutine_addr( int opc0, int opc );
 void ExtAccumulator(int opcode);
 
@@ -383,26 +382,6 @@ Subroutine_addr( int opcode0, int opcode )
     }
 
 	Pass2info(RANGE_WORD, listoffset + 1);
-}
-
-
-void
-JP_instr( int opc0, int opc )
-{
-	GetSym();
-	if (sym.cpu_ind_reg16 == IND_REG16_HL)	/* JP (HL)/(IX)/(IY) */
-	{
-		if (sym.cpu_idx_reg)
-		{
-			append_byte(sym.cpu_idx_reg);
-			GetSymExpect(TK_RPAREN);
-		}
-		append_byte(0xE9);
-	}
-	else 
-	{
-		Subroutine_addr( opc0, opc );		/* base opcode for <instr> nn; <instr> cc, nn */
-    }
 }
 
 

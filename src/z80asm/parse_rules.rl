@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-26 11:09:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.12 2014-12-26 12:50:27 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -31,6 +31,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-
 							add_opcode(x); \
 						}
 
+#define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_##op); }
+
 #define ADD_OPCODE_JR(x) \
 						ADD_LABEL; \
 						{ 	Expr *expr = pop_expr(); \
@@ -40,8 +43,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-
 								OBJ_DELETE(expr); \
 						}
 
-#define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_##op); }
+#define ADD_OPCODE_nn(x) \
+						ADD_LABEL; \
+						{ 	Expr *expr = pop_expr(); \
+							if (compile_active) \
+								add_opcode_nn(x, expr); \
+							else \
+								OBJ_DELETE(expr); \
+						}
 
 #define OPCODE_const(op) label? _TK_##op const_expr _TK_NEWLINE	\
 						@{ if (!expr_error) { \
@@ -67,6 +76,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-
 #define OPCODE_JR(op, code) \
 						label? _TK_##op expr _TK_NEWLINE \
 						@{ ADD_OPCODE_JR(code); }
+
+#define OPCODE_JP_IND(reg, tail) \
+						label? _TK_JP _TK_IND_##reg tail _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_JP_IND_##reg); }
+
+#define OPCODE_JP_FLAG(flag) \
+						label? _TK_JP _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+						@{ ADD_OPCODE_nn(Z80_JP(FLAG_##flag)); }
+
+#define OPCODE_JP() 	label? _TK_JP expr _TK_NEWLINE \
+						@{ ADD_OPCODE_nn(Z80_JP(FLAG_NONE)); }
 
 #define OPCODE_EMUL_RABBIT(op,func)	\
 						label? _TK_##op _TK_NEWLINE \
@@ -172,6 +192,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.11 2014-12-
 		|	OPCODE_EX(IND_SP,HL, IND_SP,HL)
 		|	OPCODE_EX(IND_SP,IX, IND_SP,IX)
 		|	OPCODE_EX(IND_SP,IY, IND_SP,IY)
+		|	OPCODE_JP()
+		|	OPCODE_JP_FLAG(C)
+		|	OPCODE_JP_FLAG(M)
+		|	OPCODE_JP_FLAG(NC)
+		|	OPCODE_JP_FLAG(NZ)
+		|	OPCODE_JP_FLAG(P)
+		|	OPCODE_JP_FLAG(PE)
+		|	OPCODE_JP_FLAG(PO)
+		|	OPCODE_JP_FLAG(Z)
+		|	OPCODE_JP_IND(HL, )
+		|	OPCODE_JP_IND(IX, _TK_RPAREN)
+		|	OPCODE_JP_IND(IY, _TK_RPAREN)
 		|	OPCODE_JR(DJNZ, Z80_DJNZ)
 		|	OPCODE_JR(JR,   Z80_JR(FLAG_NONE))
 		|	OPCODE_JR_FLAG(C)

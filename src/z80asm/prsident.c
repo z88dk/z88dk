@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.88 2014-12-26 11:09:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.89 2014-12-26 12:50:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,7 +33,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.88 2014-1
 
 /* external functions */
 void Subroutine_addr( int opc0, int opc );
-void JP_instr( int opc0, int opc );
 void PushPop_instr( int opcode );
 void RotShift_instr( int opcode );
 void BitTest_instr( int opcode );
@@ -54,7 +53,6 @@ void UNDEFINE( void );
 /* local functions */
 void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CALL( void ), CP( void );
-void JP( void );
 void OR( void );
 void POP( void ), PUSH( void ), RES( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RR( void ), RRA( void ), RRC( void );
@@ -114,7 +112,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( INC ),
     DEF_ENTRY( INCLUDE ),
     DEF_ENTRY( INVOKE ),
-    DEF_ENTRY( JP ),
     DEF_ENTRY( LD ),
     DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
@@ -621,12 +618,4 @@ CALL( void )
 {
 	GetSym();
     Subroutine_addr( 205, 196 );
-}
-
-
-
-void
-JP( void )
-{
-    JP_instr( 195, 194 );
 }

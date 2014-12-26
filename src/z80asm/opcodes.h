@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.9 2014-12-26 11:09:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.10 2014-12-26 12:50:27 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -37,6 +37,9 @@ extern void add_opcode(int opcode);
 
 /* add opcode followed by jump relative offset expression */
 extern void add_opcode_jr(int opcode, struct Expr *expr);
+
+/* add opcode followed by 16-bit expression */
+extern void add_opcode_nn(int opcode, struct Expr *expr);
 
 /* choose value, error if none */
 #define _CHOOSE2_(n, i1, o1, i2, o2)	\
@@ -76,6 +79,12 @@ extern void add_opcode_jr(int opcode, struct Expr *expr);
 #define Z80_INDR			0xEDBA
 #define Z80_INI				0xEDA2
 #define Z80_INIR			0xEDB2
+#define Z80_JP_IND_HL		0xE9
+#define Z80_JP_IND_IX		((_IX_ << 8) | 0xE9)
+#define Z80_JP_IND_IY		((_IY_ << 8) | 0xE9)
+#define Z80_JP(flag)		((flag) >= 0 && (flag) < 8 ? \
+								0xC2 + ((flag) << 3) : \
+								0xC3)
 #define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? \
 								0x20 + ((flag) << 3) : \
 								0x18)
