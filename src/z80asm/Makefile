@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.177 2014-12-21 14:03:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.178 2014-12-26 10:10:38 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -269,7 +269,6 @@ expr.o: expr.h lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h
 expr.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
 expr.o: symref.h lib/init.h model.h module.h symtab.h lib/strpool.h
 expr.o: expr_def.h
-exprprsr.o: lib/xmalloc.h
 hist.o: lib/xmalloc.h hist.h
 ldinstr.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 ldinstr.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
@@ -342,7 +341,6 @@ prsident.o: lib/uthash.h errors.h errors_def.h listfile.h symref.h
 prsident.o: lib/classlist.h options.h lib/list.h options_def.h scan.h
 prsident.o: legacy.h scan_tokens.h opcodes.h symbol.h expr.h sym.h model.h
 prsident.o: module.h symtab.h objfile.h z80asm.h
-prsline.o: lib/xmalloc.h
 scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/list.h
 scan.o: lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h

@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.45 2014-12-15 22:42:40 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.46 2014-12-26 10:10:38 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -10,7 +10,6 @@ gcc -Ilib -Wall -c -o codearea.o             codearea.c
 gcc -Ilib -Wall -c -o deffile.o              deffile.c
 gcc -Ilib -Wall -c -o errors.o               errors.c
 gcc -Ilib -Wall -c -o expr.o                 expr.c
-gcc -Ilib -Wall -c -o exprprsr.o             exprprsr.c
 gcc -Ilib -Wall -c -o hist.o                 hist.c
 gcc -Ilib -Wall -c -o ldinstr.o              ldinstr.c
 gcc -Ilib -Wall -c -o libfile.o              libfile.c
@@ -24,7 +23,6 @@ gcc -Ilib -Wall -c -o opcodes.o              opcodes.c
 gcc -Ilib -Wall -c -o options.o              options.c
 gcc -Ilib -Wall -c -o parse.o                parse.c
 gcc -Ilib -Wall -c -o prsident.o             prsident.c
-gcc -Ilib -Wall -c -o prsline.o              prsline.c
 gcc -Ilib -Wall -c -o scan.o                 scan.c
 gcc -Ilib -Wall -c -o sym.o                  sym.c
 gcc -Ilib -Wall -c -o symref.o               symref.c
