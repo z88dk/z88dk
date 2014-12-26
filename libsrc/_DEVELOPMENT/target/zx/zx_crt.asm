@@ -13,6 +13,8 @@ IFNDEF startup
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF startup = 0
 
@@ -62,7 +64,82 @@ IF startup = 5
 
 ENDIF
 
-; testing purposes
+IF startup = 31
+
+   ; no instantiated FILEs
+   
+   INCLUDE "startup/zx_crt_31.asm"
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; if 2 cartridge ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF startup = 32
+
+   ; if 2 cartridge
+   ; standard 32 column display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32 full screen
+   ; stderr = dup(stdin)
+
+   INCLUDE "startup/zx_crt_32.asm"
+
+ENDIF
+
+IF startup = 33
+
+   ; if 2 cartridge
+   ; standard 32 column display tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   INCLUDE "startup/zx_crt_33.asm"
+
+ENDIF
+
+IF startup = 36
+
+   ; if 2 cartridge
+   ; 64 column display using fixed width 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+   
+   INCLUDE "startup/zx_crt_36.asm"
+
+ENDIF
+
+IF startup = 37
+
+   ; if 2 cartridge
+   ; 64 column display using fixed width 4x8 font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   INCLUDE "startup/zx_crt_37.asm"
+
+ENDIF
+
+IF startup = 63
+
+   ; if 2 cartridge
+   ; no instantiated FILEs
+   
+   INCLUDE "startup/zx_crt_63.asm"
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; testing purposes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF startup = 100
 
@@ -77,3 +154,5 @@ IF startup = 100
    INCLUDE "startup/zx_crt_100.asm"
 
 ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
