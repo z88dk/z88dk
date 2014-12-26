@@ -25,6 +25,7 @@ defc __CLIB_OPT_MULTITHREAD = $00
 ; bit 1 = $02 = enable recursive locks on FILEs
 ; bit 2 = $04 = enable stdio lock on lists of FILEs
 ; bit 3 = $08 = enable fcntl lock on fd_table
+; bit 4 = $10 = enable fdstruct locks
 
 ; Set to zero if you are making traditional single-threaded
 ; programs.  Setting to zero will reduce code size and
