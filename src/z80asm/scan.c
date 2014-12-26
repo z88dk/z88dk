@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.59 2014-12-23 00:26:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.60 2014-12-26 10:00:21 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -126,6 +126,8 @@ void save_scan_state(void)
 {
 	ScanState save;
 
+	init();
+
 	save.sym = sym;
 	save.input_buf = xstrdup(input_buf->str);
 	save.at_bol = at_bol;
@@ -147,6 +149,8 @@ void restore_scan_state(void)
 {
 	ScanState *save;
 
+	init();
+
 	save = (ScanState *)utarray_back(scan_state);
 	sym = save->sym;
 	Str_set(input_buf, save->input_buf);
@@ -167,16 +171,22 @@ void restore_scan_state(void)
 
 void drop_scan_state(void)
 {
+	init();
+
 	utarray_pop_back(scan_state);
 }
 
 void scan_expect_opcode(void)
 {
+	init();
+
 	expect_opcode = TRUE;
 }
 
 void scan_expect_operands(void)
 {
+	init();
+
 	expect_opcode = FALSE;
 }
 
@@ -307,6 +317,7 @@ static void skip_to_newline( void )
 void Skipline( void )
 {
 	init();
+
 	if ( ! EOL )
 	{
 		char *newline = strchr( p, '\n' );
@@ -400,6 +411,7 @@ tokid_t GetSym( void )
 void GetSymExpect(tokid_t expected_tok)
 {
 	init();
+
 	GetSym();
 	CurSymExpect(expected_tok);
 }
@@ -409,6 +421,7 @@ void GetSymExpect(tokid_t expected_tok)
 void CurSymExpect(tokid_t expected_tok)
 {
 	init();
+
 	if (sym.tok != expected_tok)
 		error_syntax();
 }
@@ -420,7 +433,8 @@ void CurSymExpect(tokid_t expected_tok)
 void SetTemporaryLine( char *line )
 {
 	init();
-	if ( *p != '\0' )
-		List_push( & input_stack, xstrdup( p ) );	/* save current input */
+
+	if (*p != '\0')
+		List_push(&input_stack, xstrdup(p));		/* save current input */
 	set_scan_buf( line, FALSE );					/* assume not at BOL */
 }
