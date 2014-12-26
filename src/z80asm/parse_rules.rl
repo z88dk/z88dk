@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.12 2014-12-26 12:50:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.13 2014-12-26 16:27:07 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -48,6 +48,42 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.12 2014-12-
 						{ 	Expr *expr = pop_expr(); \
 							if (compile_active) \
 								add_opcode_nn(x, expr); \
+							else \
+								OBJ_DELETE(expr); \
+						}
+
+#define ADD_OPCODE_call(flag) \
+						ADD_LABEL; \
+						{ 	Expr *expr = pop_expr(); \
+							if (compile_active) { \
+								if (opts.cpu & CPU_RABBIT) { \
+									char *label = autolabel(); \
+									Expr *label_expr; \
+									int jump_size; \
+									push_expr(label, label+strlen(label)); \
+									label_expr = pop_expr(); \
+									if (FLAG_##flag < 4) { \
+										add_opcode_jr( \
+											Z80_JR_NOT(FLAG_##flag), \
+											label_expr); \
+										jump_size = 2; \
+									} \
+									else { \
+										add_opcode_nn( \
+											Z80_JP_NOT(FLAG_##flag), \
+											label_expr); \
+										jump_size = 3; \
+									} \
+									add_opcode_nn(Z80_CALL(FLAG_NONE), \
+											expr); \
+									define_symbol(label, \
+											get_PC() + jump_size + 3, \
+											TYPE_ADDRESS, SYM_TOUCHED); \
+								} \
+								else \
+									add_opcode_nn(Z80_CALL(FLAG_##flag), \
+												  expr); \
+							} \
 							else \
 								OBJ_DELETE(expr); \
 						}
@@ -87,6 +123,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.12 2014-12-
 
 #define OPCODE_JP() 	label? _TK_JP expr _TK_NEWLINE \
 						@{ ADD_OPCODE_nn(Z80_JP(FLAG_NONE)); }
+
+#define OPCODE_CALL_FLAG(flag) \
+						label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+						@{ ADD_OPCODE_call(flag); }
+
+#define OPCODE_CALL() 	label? _TK_CALL expr _TK_NEWLINE \
+						@{ ADD_OPCODE_nn(Z80_CALL(FLAG_NONE)); }
 
 #define OPCODE_EMUL_RABBIT(op,func)	\
 						label? _TK_##op _TK_NEWLINE \
@@ -180,6 +223,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.12 2014-12-
 		|	OPCODE(RETI)
 		|	OPCODE(RETN)
 		|	OPCODE(SCF)
+		|	OPCODE_CALL()
+		|	OPCODE_CALL_FLAG(C)
+		|	OPCODE_CALL_FLAG(M)
+		|	OPCODE_CALL_FLAG(NC)
+		|	OPCODE_CALL_FLAG(NZ)
+		|	OPCODE_CALL_FLAG(P)
+		|	OPCODE_CALL_FLAG(PE)
+		|	OPCODE_CALL_FLAG(PO)
+		|	OPCODE_CALL_FLAG(Z)
 		|	OPCODE_EMUL_RABBIT(CPD,  rcmx_cpd)
 		|	OPCODE_EMUL_RABBIT(CPDR, rcmx_cpdr)
 		|	OPCODE_EMUL_RABBIT(CPI,  rcmx_cpi)

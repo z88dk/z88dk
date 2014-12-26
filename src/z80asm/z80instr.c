@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.86 2014-12-26 12:50:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.87 2014-12-26 16:27:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -36,7 +36,6 @@ void ADC_8bit_instr( void );
 void SBC_8bit_instr( void );
 void IncDec_8bit_instr( int opcode );
 void ArithLog8_instr( int opcode );
-void Subroutine_addr( int opc0, int opc );
 void ExtAccumulator(int opcode);
 
 void
@@ -261,127 +260,6 @@ FPP( void )
             error_int_range( constant );
         }
     }
-}
-
-
-void
-Subroutine_addr( int opcode0, int opcode )
-{
-	int listoffset = 0;
-	int flag;
-
-	flag = sym.cpu_flag;
-	if (flag != FLAG_NONE)			/* Check for condition */
-    {
-		GetSymExpect(TK_COMMA);
-
-        if ( opcode0 == 205 && ( opts.cpu & CPU_RABBIT ) )
-        {
-            char buffer[200];
-
-			switch (flag)
-            {
-            case FLAG_NZ:  /* nz */
-                append_2bytes( 0x28, 0x03 ); /* jr z */
-				listoffset = 2;
-				next_PC();
-
-				append_byte( (Byte)opcode0 );
-                break;
-
-            case FLAG_Z:  /* z */
-                append_2bytes( 0x20, 0x03 ); /* jr nz */
-				listoffset = 2;
-				next_PC();
-
-                append_byte( (Byte)opcode0 );
-                break;
-
-            case FLAG_NC:  /* nc */
-                append_2bytes( 0x38, 0x03 ); /* jr c */
-				listoffset = 2;
-				next_PC();
-
-                append_byte( (Byte)opcode0 );
-                break;
-
-            case FLAG_C:  /* c */
-                append_2bytes( 0x30, 0x03 ); /* jr nc */
-				listoffset = 2;
-				next_PC();
-
-                append_byte( (Byte)opcode0 );
-                break;
-
-            case FLAG_PO:  /* po */
-                append_byte( 0xEA ); /* jp pe */
-                sprintf( buffer, "ASMPC+6\n" );
-                SetTemporaryLine( buffer );
-                GetSym();
-				Pass2info(RANGE_WORD, 1);
-                EOL = FALSE;
-				listoffset = 3;
-				next_PC();
-
-				append_byte( 0xCD );
-                break;
-
-            case FLAG_PE:  /* pe */
-                append_byte( 0xE2 ); /* jp po */
-                sprintf( buffer, "ASMPC+6\n" );
-                SetTemporaryLine( buffer );
-                GetSym();
-				Pass2info(RANGE_WORD, 1);
-                EOL = FALSE;
-				listoffset = 3;
-				next_PC();
-
-                append_byte( 0xCD );
-                break;
-
-            case FLAG_P:  /* p */
-                append_byte( 0xFA ); /* jp m */
-                sprintf( buffer, "ASMPC+6\n" );
-                SetTemporaryLine( buffer );
-                GetSym();
-				Pass2info(RANGE_WORD, 1);
-                EOL = FALSE;
-				listoffset = 3;
-				next_PC();
-
-				append_byte( 0xCD );
-                break;
-
-            case FLAG_M:  /* m */
-                append_byte( 0xF2 ); /* jp p */
-                sprintf( buffer, "ASMPC+6\n" );
-                SetTemporaryLine( buffer );
-                GetSym();
-				Pass2info(RANGE_WORD, 1);
-                EOL = FALSE;
-				listoffset = 3;
-				next_PC();
-
-				append_byte( 0xCD );
-                break;
-
-			default:
-				assert(0);
-            }
-        }
-        else
-        {
-            append_byte( (Byte)( opcode + (flag << 3) ) ); /* get instruction opcode */
-        }
-
-        GetSym();
-    }
-    else
-    {
-        append_byte( (Byte)opcode0 );  /* JP nn, CALL nn */
-    }
-
-	Pass2info(RANGE_WORD, listoffset + 1);
 }
 
 

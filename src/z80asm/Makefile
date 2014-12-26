@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.178 2014-12-26 10:10:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.179 2014-12-26 16:27:07 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -333,8 +333,8 @@ parse.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 parse.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h lib/uthash.h
 parse.o: expr.h lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h
 parse.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
-parse.o: symref.h lib/init.h model.h module.h symtab.h parse.h lib/utarray.h
-parse.o: parse_rules.h
+parse.o: symref.h lib/init.h model.h module.h symtab.h parse.h lib/strpool.h
+parse.o: lib/utarray.h parse_rules.h
 prsident.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 prsident.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 prsident.o: lib/uthash.h errors.h errors_def.h listfile.h symref.h

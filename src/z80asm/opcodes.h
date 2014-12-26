@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.10 2014-12-26 12:50:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.11 2014-12-26 16:27:07 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -57,6 +57,9 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 *  n is a constant
 *  ix is 0 for HL, 0xDD for IX, 0xFD for IH 
 *  flag is FLAG_NONE, FLAG_... */
+#define Z80_CALL(flag)		((flag) >= 0 && (flag) < 8 ? \
+								0xC4 + ((flag) << 3) : \
+								0xCD)
 #define Z80_CCF				0x3F
 #define Z80_CPD				0xEDA9
 #define Z80_CPDR			0xEDB9
@@ -85,9 +88,11 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 #define Z80_JP(flag)		((flag) >= 0 && (flag) < 8 ? \
 								0xC2 + ((flag) << 3) : \
 								0xC3)
+#define Z80_JP_NOT(flag)	Z80_JP((flag) ^ 1)
 #define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? \
 								0x20 + ((flag) << 3) : \
 								0x18)
+#define Z80_JR_NOT(flag)	Z80_JR((flag) ^ 1)
 #define Z80_LDD				0xEDA8
 #define Z80_LDDR			0xEDB8
 #define Z80_LDI				0xEDA0

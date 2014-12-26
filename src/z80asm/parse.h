@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.6 2014-12-13 00:49:46 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.7 2014-12-26 16:27:07 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -24,3 +24,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.6 2014-12-13 00:49
 /* try to parse the current statement block, return FLASE if failed;
 *  compile_active is FALSE on the FALSE branch of an IF-ELSE-ENDIF */
 extern Bool parse_statement(Bool compile_active);
+
+/* return new auto-label in strpool */
+extern char *autolabel(void);
