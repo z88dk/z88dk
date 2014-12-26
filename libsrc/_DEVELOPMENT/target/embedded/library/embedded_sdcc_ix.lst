@@ -1,0 +1,15 @@
+@adt/adt_sdcc_ix.lst
+@alloc/alloc_sdcc_ix.lst
+@compress/compress_sdcc_ix.lst
+@ctype/ctype_sdcc_ix.lst
+@error/error.lst
+@fcntl/fcntl_sdcc_ix.lst
+@l/l.lst
+@l/sdcc.lst
+@locale/locale.lst
+@math/math.lst
+@stdio/stdio_sdcc_ix.lst
+@stdlib/stdlib_sdcc_ix.lst
+@string/string_sdcc_ix.lst
+@threads/threads_sdcc_ix.lst
+@z80/z80_sdcc_ix.lst
