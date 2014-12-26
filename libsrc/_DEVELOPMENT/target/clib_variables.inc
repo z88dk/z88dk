@@ -35,7 +35,7 @@ IF __clib_malloc_heap_size > 14
    
    SECTION code_crt_init
    
-   ld hl,__malloc_heap
+   ld hl,__malloc_block
    ld bc,__clib_malloc_heap_size
    
    EXTERN asm_heap_init

@@ -161,11 +161,15 @@ dnl############################################################
    
       ; static FDSTRUCTs have been allocated in the heap
       
-      SECTION data_fcntl_stdio_heap_head
-      
+      SECTION data_fcntl
+
       PUBLIC __stdio_heap
       
-      __stdio_heap:
+      __stdio_heap:            defw __stdio_block
+
+      SECTION data_fcntl_stdio_heap_head
+      
+      __stdio_block:
       
          defb 0                ; no owner
          defb 0x01             ; mtx_plain
@@ -208,15 +212,21 @@ dnl############################################################
       
       IF __clib_stdio_heap_size > 14
       
-         SECTION bss_fcntl
+         SECTION data_fcntl
          
          PUBLIC __stdio_heap
          
-         __stdio_heap:         defs __clib_stdio_heap_size
+         __stdio_heap:         defw __stdio_block
+         
+         SECTION bss_fcntl
+         
+         PUBLIC __stdio_block
+         
+         __stdio_block:         defs __clib_stdio_heap_size
          
          SECTION code_crt_init
          
-         ld hl,__stdio_heap
+         ld hl,__stdio_block
          ld bc,__clib_stdio_heap_size
          
          EXTERN asm_heap_init
