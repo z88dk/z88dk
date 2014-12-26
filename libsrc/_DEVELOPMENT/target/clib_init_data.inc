@@ -19,6 +19,7 @@
    IF __crt_model = 2
    
       ; rom model + data segment is compressed
+      ; there is always at least one byte in the data section
       
       EXTERN ASMHEAD_CODE_END, ASMHEAD_DATA
       
