@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.87 2014-12-26 16:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.88 2014-12-26 16:46:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -83,7 +83,7 @@ OUT( void )
 		case TK_LPAREN:							/* OUT (N), A */
 			GetSym();
 			append_byte(0xD3);
-			if (!Pass2info(RANGE_BYTE_UNSIGNED, 1))
+			if (!Pass2info(RANGE_BYTE_UNSIGNED))
 				return;							/* error in expression */
 
 			if (sym.tok != TK_RPAREN)
@@ -139,7 +139,7 @@ IN( void )
 
 				GetSym();
 				append_byte(0xDB);
-				if (!Pass2info(RANGE_BYTE_UNSIGNED, 1))
+				if (!Pass2info(RANGE_BYTE_UNSIGNED))
 					return;							/* error in expression */
 
 				if (sym.tok != TK_RPAREN)
@@ -362,7 +362,7 @@ ArithLog8_instr( int opcode )
 		if (sym.cpu_idx_reg)
 		{
 			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED, 2);
+			Pass2info(RANGE_BYTE_SIGNED);
 		}
 	}
     else
@@ -372,7 +372,7 @@ ArithLog8_instr( int opcode )
 		{
 		case REG8_NONE:		/* 8bit register wasn't found, try to evaluate an expression */
 			append_byte((Byte)(0xC0 + (opcode << 3) + 0x06));	/* xxx  A,n */
-			Pass2info(RANGE_BYTE_UNSIGNED, 1);
+			Pass2info(RANGE_BYTE_UNSIGNED);
             break;
 
 		default:
@@ -435,7 +435,7 @@ IncDec_8bit_instr(int opcode)
 		if (sym.cpu_idx_reg)
 		{
 			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED, 2);
+			Pass2info(RANGE_BYTE_SIGNED);
 		}
 	}
 	else if (sym.cpu_reg8 != REG8_NONE)
@@ -486,7 +486,7 @@ BitTest_instr( int opcode )
 		{
 			append_2bytes(sym.cpu_idx_reg, 0xCB);
 			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED, 2);
+			Pass2info(RANGE_BYTE_SIGNED);
 			append_byte((Byte)(opcode + (bitnumber << 3) + 0x06));
 		}
 	}
@@ -520,7 +520,7 @@ RotShift_instr( int opcode )
 		{
 			append_2bytes(sym.cpu_idx_reg, 0xCB);
 			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED, 2);
+			Pass2info(RANGE_BYTE_SIGNED);
 			append_byte((Byte)((opcode << 3) + 0x06));
 		}
 	}

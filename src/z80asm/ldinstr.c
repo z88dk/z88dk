@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.49 2014-12-14 00:14:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.50 2014-12-26 16:46:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,22 +30,17 @@ static void LD_IND_HL(void)
 {
 	int dest_idx = sym.cpu_idx_reg;
 	UInt opcodeptr;
-	int bytepos = 0;
 
 	if (dest_idx)
-	{
 		append_byte(dest_idx);			/* 0xDD or 0xFD */
-		bytepos++;
-	}
 
 	opcodeptr = get_cur_module_size();	/* pointer to instruction opcode - BUG_0015 */
 	append_byte(0x36);					/* preset 2. opcode to LD (IX|IY+d),n  */
-	bytepos++;
 
 	if (dest_idx)
 	{
 		GetSym();
-		if (!Pass2info(RANGE_BYTE_SIGNED, bytepos++))
+		if (!Pass2info(RANGE_BYTE_SIGNED))
 			return;						/* syntax error in +d expression */
 	}
 
@@ -61,7 +56,7 @@ static void LD_IND_HL(void)
 	switch (sym.cpu_reg8)
 	{
 	case REG8_NONE:
-		Pass2info(RANGE_BYTE_UNSIGNED, bytepos++);				/* Execute, store & patch 8bit expression for <n> */
+		Pass2info(RANGE_BYTE_UNSIGNED);	/* Execute, store & patch 8bit expression for <n> */
 		break;
 
 	default:
@@ -105,12 +100,12 @@ static void LD_IND_NN(void)
 		if (sym.cpu_idx_reg)
 		{
 			append_2bytes(sym.cpu_idx_reg, 0x22);
-			Pass2infoExpr(RANGE_WORD, 2, expr);
+			Pass2infoExpr(RANGE_WORD, expr);
 		}
 		else
 		{
 			append_byte(0x22);
-			Pass2infoExpr(RANGE_WORD, 1, expr);
+			Pass2infoExpr(RANGE_WORD, expr);
 		}
 		return;
 
@@ -119,7 +114,7 @@ static void LD_IND_NN(void)
 
 	default:					/* LD  (nn),dd   => dd: BC,DE,SP  */
 		append_2bytes(0xED, (Byte)(0x43 + (sym.cpu_reg16_sp << 4)));
-		Pass2infoExpr(RANGE_WORD, 2, expr);
+		Pass2infoExpr(RANGE_WORD, expr);
 		return;
 	}
 
@@ -127,7 +122,7 @@ static void LD_IND_NN(void)
 	{
 	case REG8_A:
 		append_byte(0x32);      /* LD  (nn),A  */
-		Pass2infoExpr(RANGE_WORD, 1, expr);
+		Pass2infoExpr(RANGE_WORD, expr);
 		return;
 
 	default:
@@ -155,7 +150,7 @@ static void LD_REG8(void)
 		if (dest_reg == REG8_A)
 		{
 			append_byte(0x3A);
-			Pass2info(RANGE_WORD, 1);
+			Pass2info(RANGE_WORD);
 		}
 		else
 		{
@@ -218,7 +213,7 @@ static void LD_REG8(void)
 		{
 			append_2bytes(sym.cpu_idx_reg, (Byte)(0x40 + (dest_reg << 3) + 0x06));
 			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED, 2);
+			Pass2info(RANGE_BYTE_SIGNED);
 		}
 		else							/* LD   r,(HL)  */
 		{
@@ -256,12 +251,12 @@ static void LD_REG8(void)
 		if (dest_idx)
 		{
 			append_2bytes(dest_idx, (Byte)((dest_reg << 3) + 0x06));
-			Pass2info(RANGE_BYTE_UNSIGNED, 2);
+			Pass2info(RANGE_BYTE_UNSIGNED);
 		}
 		else
 		{
 			append_byte((Byte)((dest_reg << 3) + 0x06));
-			Pass2info(RANGE_BYTE_UNSIGNED, 1);
+			Pass2info(RANGE_BYTE_UNSIGNED);
 		}
 	}
 }
@@ -283,12 +278,12 @@ static void LD_REG16(void)
 			if (dest_idx)
 			{
 				append_2bytes(dest_idx, 0x2A);
-				Pass2info(RANGE_WORD, 2);
+				Pass2info(RANGE_WORD);
 			}
 			else
 			{
 				append_byte(0x2A);
-				Pass2info(RANGE_WORD, 2);
+				Pass2info(RANGE_WORD);
 			}
 			CurSymExpect(TK_RPAREN);
 			return;
@@ -299,7 +294,7 @@ static void LD_REG16(void)
 
 		default:						/* LD   dd,(nn)  */
 			append_2bytes(0xED, (Byte)(0x4B + (dest_reg << 4)));
-			Pass2info(RANGE_WORD, 2);
+			Pass2info(RANGE_WORD);
 			CurSymExpect(TK_RPAREN);
 			return;
 		}
@@ -311,12 +306,12 @@ static void LD_REG16(void)
 		if (dest_idx)
 		{
 			append_2bytes(dest_idx, 0x21);
-			Pass2info(RANGE_WORD, 2);
+			Pass2info(RANGE_WORD);
 		}
 		else
 		{
 			append_byte((Byte)((dest_reg << 4) + 0x01));
-			Pass2info(RANGE_WORD, 1);
+			Pass2info(RANGE_WORD);
 		}
 		return;
 

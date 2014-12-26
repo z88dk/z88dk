@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.109 2014-12-21 17:20:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.110 2014-12-26 16:46:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -440,18 +440,14 @@ ORG( void )
 void
 DEFB( void )
 {
-    long bytepos = 0;
-
     do
     {
         GetSym();
 
-		if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
+		if (!Pass2info(RANGE_BYTE_UNSIGNED))
         {
             break;    /* syntax error - get next line from file... */
         }
-
-        bytepos++;
 
         if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
@@ -471,18 +467,14 @@ DEFB( void )
 void
 DEFW( void )
 {
-    long bytepos = 0;
-
     do
     {
         GetSym();
 
-		if (!Pass2info(RANGE_WORD, bytepos))
+		if (!Pass2info(RANGE_WORD))
         {
             break;    /* syntax error - get next line from file... */
         }
-
-        bytepos += 2;
 
         if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
@@ -502,18 +494,14 @@ DEFW( void )
 void
 DEFP( void )
 {
-    long bytepos = 0;
-
     do
     {
         GetSym();
 
-		if (!Pass2info(RANGE_WORD, bytepos))
+		if (!Pass2info(RANGE_WORD))
         {
             break;    /* syntax error - get next line from file... */
         }
-
-        bytepos += 2;
 
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
         if ( sym.tok != TK_COMMA )
@@ -523,12 +511,10 @@ DEFP( void )
 
         GetSym();
 
-		if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
+		if (!Pass2info(RANGE_BYTE_UNSIGNED))
         {
             break;    /* syntax error - get next line from file... */
         }
-
-        bytepos++;
 
         if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
@@ -548,18 +534,14 @@ DEFP( void )
 void
 DEFL( void )
 {
-    long bytepos = 0;
-
     do
     {
         GetSym();
 
-		if (!Pass2info(RANGE_DWORD, bytepos))
+		if (!Pass2info(RANGE_DWORD))
         {
             break;    /* syntax error - get next line from file... */
         }
-
-        bytepos += 4;
 
         if ( sym.tok == TK_NEWLINE || sym.tok == TK_END )
         {
@@ -579,7 +561,6 @@ DEFL( void )
 void
 DEFM( void )
 {
-    long bytepos = 0;
 	char *p;
 
     do
@@ -589,7 +570,6 @@ DEFM( void )
 			for ( p = sym.string; *p != '\0'; p++ )
 			{
                 append_byte( (Byte) *p );
-                ++bytepos;
 			}
 
             GetSym();
@@ -601,7 +581,7 @@ DEFM( void )
         }
         else
         {
-			if (!Pass2info(RANGE_BYTE_UNSIGNED, bytepos))
+			if (!Pass2info(RANGE_BYTE_UNSIGNED))
             {
                 break;    /* syntax error - get next line from file... */
             }
@@ -611,8 +591,6 @@ DEFM( void )
                 error_syntax(); /* expression separator not found */
                 break;
             }
-
-            ++bytepos;
         }
     }
     while ( sym.tok != TK_NEWLINE && sym.tok != TK_END );

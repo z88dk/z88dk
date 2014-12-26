@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.120 2014-12-26 16:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.121 2014-12-26 16:46:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -435,7 +435,7 @@ Z80pass2( void )
 }
 
 
-Bool Pass2infoExpr(range_t range, int byteoffset, Expr *expr)
+Bool Pass2infoExpr(range_t range, Expr *expr)
 {
 	int i;
 	int list_offset;
@@ -461,8 +461,7 @@ Bool Pass2infoExpr(range_t range, int byteoffset, Expr *expr)
 	return expr == NULL ? FALSE : TRUE;
 }
 
-Bool Pass2info( range_t range,				/* allowed size of value to be parsed */
-				int byteoffset )			/* position in listing file to patch */
+Bool Pass2info(range_t range)
 {
 	Expr *expr;
 	
@@ -494,7 +493,7 @@ Bool Pass2info( range_t range,				/* allowed size of value to be parsed */
 		return FALSE;		/* FAIL */
 	}
 
-	return Pass2infoExpr(range, byteoffset, expr);
+	return Pass2infoExpr(range, expr);
 }
 
 

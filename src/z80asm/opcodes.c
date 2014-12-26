@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.5 2014-12-26 12:50:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.6 2014-12-26 16:46:58 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,14 +37,12 @@ void add_opcode(int opcode)
 void add_opcode_jr(int opcode, Expr *expr)
 {
 	add_opcode(opcode);
-	Pass2infoExpr(RANGE_JR_OFFSET, 1, expr);
+	Pass2infoExpr(RANGE_JR_OFFSET, expr);
 }
 
 /* add opcode followed by 16-bit expression */
 void add_opcode_nn(int opcode, struct Expr *expr)
 {
-	int num_bytes = (opcode & 0xFF00) ? 2 : 1;
-
 	add_opcode(opcode);
-	Pass2infoExpr(RANGE_WORD, num_bytes, expr);
+	Pass2infoExpr(RANGE_WORD, expr);
 }
