@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.17 2014-12-26 16:55:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.18 2014-12-26 18:33:21 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -649,7 +649,7 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_BC,  "BC");  assert(sym.cpu_reg16_sp == 0);  assert(sym.cpu_reg16_af == 0);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_DE,  "DE");  assert(sym.cpu_reg16_sp == 1);  assert(sym.cpu_reg16_af == 1);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_HL,  "HL");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0);
-	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 3);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 4);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_AF1, "AF'"); assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_SP,  "SP");  assert(sym.cpu_reg16_sp == 3);  assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_IX,  "IX");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xDD);
@@ -658,7 +658,7 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_BC,  "BC");  assert(sym.cpu_reg16_sp == 0);  assert(sym.cpu_reg16_af == 0);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_DE,  "DE");  assert(sym.cpu_reg16_sp == 1);  assert(sym.cpu_reg16_af == 1);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_HL,  "HL");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0);
-	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 3);  assert(sym.cpu_idx_reg == 0);
+	T_GET(TK_AF,  "AF");  assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == 4);  assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_AF1, "AF'"); assert(sym.cpu_reg16_sp == -1); assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_SP,  "SP");  assert(sym.cpu_reg16_sp == 3);  assert(sym.cpu_reg16_af == -1); assert(sym.cpu_idx_reg == 0);
 	T_GET(TK_IX,  "IX");  assert(sym.cpu_reg16_sp == 2);  assert(sym.cpu_reg16_af == 2);  assert(sym.cpu_idx_reg == 0xDD);
@@ -827,6 +827,8 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(OTIR,	T_Z80);
 	T_OPCODE(OUTD,	T_Z80);
 	T_OPCODE(OUTI,	T_Z80);
+	T_OPCODE(POP,	T_ALL);
+	T_OPCODE(PUSH,	T_ALL);
 	T_OPCODE(RET,	T_ALL);
 	T_OPCODE(RETI,	T_ALL);
 	T_OPCODE(RETN,	T_Z80);

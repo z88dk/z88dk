@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.13 2014-12-26 16:27:07 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.14 2014-12-26 18:33:20 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -33,6 +33,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.13 2014-12-
 
 #define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
 						@{ ADD_OPCODE(Z80_##op); }
+
+#define OPCODE_reg(op, reg) \
+						label? _TK_##op _TK_##reg _TK_NEWLINE \
+						@{ ADD_OPCODE(Z80_##op(REG_##reg)); }
 
 #define ADD_OPCODE_JR(x) \
 						ADD_LABEL; \
@@ -62,7 +66,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.13 2014-12-
 									int jump_size; \
 									push_expr(label, label+strlen(label)); \
 									label_expr = pop_expr(); \
-									if (FLAG_##flag < 4) { \
+									if (FLAG_##flag <= FLAG_C) { \
 										add_opcode_jr( \
 											Z80_JR_NOT(FLAG_##flag), \
 											label_expr); \
@@ -273,6 +277,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.13 2014-12-
 		|	OPCODE_RET_FLAG(Z)
 		|	OPCODE_const(IM)
 		|	OPCODE_const(RST)
+		|	OPCODE_reg(PUSH, BC)
+		|	OPCODE_reg(PUSH, DE)
+		|	OPCODE_reg(PUSH, HL)
+		|	OPCODE_reg(PUSH, IX)
+		|	OPCODE_reg(PUSH, IY)
+		|	OPCODE_reg(PUSH, AF)
+		|	OPCODE_reg(POP,  BC)
+		|	OPCODE_reg(POP,  DE)
+		|	OPCODE_reg(POP,  HL)
+		|	OPCODE_reg(POP,  IX)
+		|	OPCODE_reg(POP,  IY)
+		|	OPCODE_reg(POP,  AF)
 		;
 
 }%%

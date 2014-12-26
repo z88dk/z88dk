@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.50 2014-12-26 16:46:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.51 2014-12-26 18:33:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -96,7 +96,7 @@ static void LD_IND_NN(void)
 
 	switch (sym.cpu_reg16_sp)
 	{
-	case REG16_HL:			/* LD  (nn),dd  => dd: HL, IX, IY */
+	case REG_HL:			/* LD  (nn),dd  => dd: HL, IX, IY */
 		if (sym.cpu_idx_reg)
 		{
 			append_2bytes(sym.cpu_idx_reg, 0x22);
@@ -109,7 +109,7 @@ static void LD_IND_NN(void)
 		}
 		return;
 
-	case REG16_NONE:
+	case REG_NONE:
 		break;
 
 	default:					/* LD  (nn),dd   => dd: BC,DE,SP  */
@@ -274,7 +274,7 @@ static void LD_REG16(void)
 		GetSym();
 		switch (dest_reg)
 		{
-		case REG16_HL:					/* LD   HL/IX/IY,(nn)  */
+		case REG_HL:					/* LD   HL/IX/IY,(nn)  */
 			if (dest_idx)
 			{
 				append_2bytes(dest_idx, 0x2A);
@@ -288,7 +288,7 @@ static void LD_REG16(void)
 			CurSymExpect(TK_RPAREN);
 			return;
 
-		case REG16_NONE:
+		case REG_NONE:
 			error_illegal_ident();
 			return;
 
@@ -302,7 +302,7 @@ static void LD_REG16(void)
 
 	switch (sym.cpu_reg16_sp)
 	{
-	case REG16_NONE:					/* LD dd,nn */
+	case REG_NONE:					/* LD dd,nn */
 		if (dest_idx)
 		{
 			append_2bytes(dest_idx, 0x21);
@@ -315,8 +315,8 @@ static void LD_REG16(void)
 		}
 		return;
 
-	case REG16_HL:						/* LD SP,HL/IX/IY */
-		if (dest_reg == REG16_SP)
+	case REG_HL:						/* LD SP,HL/IX/IY */
+		if (dest_reg == REG_SP)
 		{
 			if (sym.cpu_idx_reg)
 				append_byte(sym.cpu_idx_reg);
@@ -409,7 +409,7 @@ void LD(void)
 		return;
 	}
 
-	if (sym.cpu_reg16_sp != REG16_NONE)	/* ld dd, ... */
+	if (sym.cpu_reg16_sp != REG_NONE)	/* ld dd, ... */
 	{
 		LD_REG16();
 		return;

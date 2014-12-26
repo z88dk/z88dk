@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.18 2014-12-26 16:55:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.19 2014-12-26 18:33:21 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -202,15 +202,15 @@ TOKEN_KW(EIR, FOR_RABBIT)
 TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
 
 /* 16-bit registers */
-TOKEN_KW(BC, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_BC)
-TOKEN_KW(DE, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_DE)
+TOKEN_KW(BC, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG_BC)
+TOKEN_KW(DE, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG_DE)
 
-TOKEN_KW(HL, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL)
-TOKEN_KW(IX, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IX)
-TOKEN_KW(IY, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG16_HL; SET_IY)
+TOKEN_KW(HL, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG_HL)
+TOKEN_KW(IX, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG_HL; SET_IX)
+TOKEN_KW(IY, sym.cpu_reg16_af = sym.cpu_reg16_sp = REG_HL; SET_IY)
 
-TOKEN_KW(AF, sym.cpu_reg16_af = REG16_AF)
-TOKEN_KW(SP, sym.cpu_reg16_sp = REG16_SP)
+TOKEN_KW(AF, sym.cpu_reg16_af = REG_AF)
+TOKEN_KW(SP, sym.cpu_reg16_sp = REG_SP)
 
 TOKEN(TK_AF1, "AF'", )
 
@@ -265,6 +265,8 @@ TOKEN_OPCODE(OTDR, FOR_Z80)
 TOKEN_OPCODE(OTIR, FOR_Z80)
 TOKEN_OPCODE(OUTD, FOR_Z80)
 TOKEN_OPCODE(OUTI, FOR_Z80)
+TOKEN_OPCODE(POP,  )
+TOKEN_OPCODE(PUSH, )
 TOKEN_OPCODE(RET,  )
 TOKEN_OPCODE(RETI, )
 TOKEN_OPCODE(RETN, FOR_Z80)

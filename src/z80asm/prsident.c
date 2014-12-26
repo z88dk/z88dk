@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.90 2014-12-26 16:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.91 2014-12-26 18:33:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.90 2014-1
 #include <string.h>
 
 /* external functions */
-void PushPop_instr( int opcode );
 void RotShift_instr( int opcode );
 void BitTest_instr( int opcode );
 void ArithLog8_instr( int opcode );
@@ -53,7 +52,7 @@ void UNDEFINE( void );
 void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CP( void );
 void OR( void );
-void POP( void ), PUSH( void ), RES( void );
+void RES( void );
 void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RR( void ), RRA( void ), RRC( void );
 void RRCA( void );
 void SET( void ), SLA( void ), SLL( void ), SRA( void );
@@ -120,9 +119,7 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OUT ),
     DEF_ENTRY( OZ ),
-    DEF_ENTRY( POP ),
     DEF_ENTRY( PUBLIC ),
-    DEF_ENTRY( PUSH ),
     DEF_ENTRY( RES ),
     DEF_ENTRY( RL ),
     DEF_ENTRY( RLA ),
@@ -590,20 +587,4 @@ void
 RLCA( void )
 {
     append_byte( 0x07 );
-}
-
-
-
-void
-PUSH( void )
-{
-    PushPop_instr( 197 );
-}
-
-
-
-void
-POP( void )
-{
-    PushPop_instr( 193 );
 }

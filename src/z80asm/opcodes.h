@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.11 2014-12-26 16:27:07 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.12 2014-12-26 18:33:20 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -30,6 +30,8 @@ struct Expr;
 /* constants */
 enum { IDX_REG_HL = 0, IDX_REG_IX = 0xDD, IDX_REG_IY = 0xFD };
 enum { FLAG_NONE = -1, FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
+enum { REG_NONE = -1, REG_BC, REG_DE, REG_HL, REG_SP, REG_AF, 
+					  REG_IX, REG_IY };
 
 /* add 1 or 2 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xED46 */
@@ -52,14 +54,40 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 
 #define _IX_		(opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX)
 #define _IY_		(opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY)
+#define _IX_IY_OPCODE(reg) \
+			(((reg) == REG_IX ? _IX_ : (reg) == REG_IY ? _IY_ : 0) << 8)
+#define _IX_IY_REG(reg) \
+			(((reg) == REG_IX || (reg) == REG_IY ? REG_HL : (reg))
+
+/* register values to add to opcodes */
+
+#define _PUSH_POP_REG(reg) \
+			(((reg) >= REG_BC && (reg) <= REG_HL ? \
+				(reg) - REG_BC : \
+				(reg) == REG_IX || (reg) == REG_IY ? \
+					2 : \
+					(reg) == REG_AF ? \
+						3 : \
+						(error_syntax(), 0)) \
+			<< 4)
+#define _PUSH_POP_OPCODE(opcode, reg) \
+			(_IX_IY_OPCODE(reg) + (opcode) + _PUSH_POP_REG(reg))
+
+#define _FLAG_OPCODE(flag, max_flag, opcode_none, opcode_flag) \
+			((flag) >= FLAG_NZ && (flag) <= (max_flag) ? \
+				(opcode_flag) + (((flag) - FLAG_NZ) << 3) : \
+				(opcode_none))
+#define _FLAG4_OPCODE(flag, opcode_none, opcode_flag) \
+			_FLAG_OPCODE((flag), FLAG_C, (opcode_none), (opcode_flag)) 
+#define _FLAG8_OPCODE(flag, opcode_none, opcode_flag) \
+			_FLAG_OPCODE((flag), FLAG_M, (opcode_none), (opcode_flag)) 
 
 /* Z80 opcodes 
 *  n is a constant
 *  ix is 0 for HL, 0xDD for IX, 0xFD for IH 
-*  flag is FLAG_NONE, FLAG_... */
-#define Z80_CALL(flag)		((flag) >= 0 && (flag) < 8 ? \
-								0xC4 + ((flag) << 3) : \
-								0xCD)
+*  flag is FLAG_NONE, FLAG_NZ, FLAG_... 
+*  reg is REG_NONE, REG_BC, ... */
+#define Z80_CALL(flag)		_FLAG8_OPCODE((flag), 0xCD, 0xC4)
 #define Z80_CCF				0x3F
 #define Z80_CPD				0xEDA9
 #define Z80_CPDR			0xEDB9
@@ -85,13 +113,9 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 #define Z80_JP_IND_HL		0xE9
 #define Z80_JP_IND_IX		((_IX_ << 8) | 0xE9)
 #define Z80_JP_IND_IY		((_IY_ << 8) | 0xE9)
-#define Z80_JP(flag)		((flag) >= 0 && (flag) < 8 ? \
-								0xC2 + ((flag) << 3) : \
-								0xC3)
+#define Z80_JP(flag)		_FLAG8_OPCODE((flag), 0xC3, 0xC2)
 #define Z80_JP_NOT(flag)	Z80_JP((flag) ^ 1)
-#define Z80_JR(flag)		((flag) >= 0 && (flag) < 4 ? \
-								0x20 + ((flag) << 3) : \
-								0x18)
+#define Z80_JR(flag)		_FLAG4_OPCODE((flag), 0x18, 0x20)
 #define Z80_JR_NOT(flag)	Z80_JR((flag) ^ 1)
 #define Z80_LDD				0xEDA8
 #define Z80_LDDR			0xEDB8
@@ -103,9 +127,9 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 #define Z80_OTIR			0xEDB3
 #define Z80_OUTD			0xEDAB
 #define Z80_OUTI			0xEDA3
-#define Z80_RET(flag)		((flag) >= 0 && (flag) < 8 ? \
-								0xC0 + ((flag) << 3) : \
-								0xC9)
+#define Z80_POP(reg)		_PUSH_POP_OPCODE(0xC1, (reg))
+#define Z80_PUSH(reg)		_PUSH_POP_OPCODE(0xC5, (reg))
+#define Z80_RET(flag)		_FLAG8_OPCODE((flag), 0xC9, 0xC0)
 #define Z80_RETI			0xED4D
 #define Z80_RETN			0xED45
 #define Z80_RLD				0xED6F

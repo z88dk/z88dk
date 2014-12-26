@@ -20,7 +20,7 @@
 
 
 static const int parser_start = 1;
-static const int parser_first_final = 158;
+static const int parser_first_final = 172;
 static const int parser_error = 0;
 
 static const int parser_en_main = 1;
@@ -56,13 +56,13 @@ static Bool _parse_statement( Bool compile_active )
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 0:
-                    goto st158;
+                    goto st172;
 
                 case 4:
                     goto tr2;
 
                 case 12:
-                    goto st158;
+                    goto st172;
 
                 case 87:
                     goto st3;
@@ -161,29 +161,35 @@ static Bool _parse_statement( Bool compile_active )
                     goto st141;
 
                 case 119:
-                    goto st150;
+                    goto st148;
 
                 case 120:
-                    goto st151;
+                    goto st155;
 
                 case 121:
-                    goto st152;
+                    goto st164;
 
                 case 122:
-                    goto st153;
+                    goto st165;
 
                 case 123:
-                    goto st154;
+                    goto st166;
 
                 case 124:
-                    goto st157;
+                    goto st167;
+
+                case 125:
+                    goto st168;
+
+                case 126:
+                    goto st171;
                 }
 
                 goto st0;
 st0:
                 cs = 0;
                 goto _out;
-tr41:
+tr43:
 
                 {
                     if ( compile_active && stmt_label )
@@ -191,8 +197,8 @@ tr41:
                         define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
                     };
                 }
-                goto st158;
-tr52:
+                goto st172;
+tr54:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -211,8 +217,8 @@ tr52:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr58:
+                goto st172;
+tr60:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -237,7 +243,7 @@ tr58:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_NZ < 4 )
+                                if ( FLAG_NZ <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_NZ ), label_expr );
                                     jump_size = 2;
@@ -256,8 +262,8 @@ tr58:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr64:
+                goto st172;
+tr66:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -282,7 +288,7 @@ tr64:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_Z < 4 )
+                                if ( FLAG_Z <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_Z ), label_expr );
                                     jump_size = 2;
@@ -301,8 +307,8 @@ tr64:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr70:
+                goto st172;
+tr72:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -327,7 +333,7 @@ tr70:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_NC < 4 )
+                                if ( FLAG_NC <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_NC ), label_expr );
                                     jump_size = 2;
@@ -346,8 +352,8 @@ tr70:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr76:
+                goto st172;
+tr78:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -372,7 +378,7 @@ tr76:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_C < 4 )
+                                if ( FLAG_C <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_C ), label_expr );
                                     jump_size = 2;
@@ -391,8 +397,8 @@ tr76:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr82:
+                goto st172;
+tr84:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -417,7 +423,7 @@ tr82:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_PO < 4 )
+                                if ( FLAG_PO <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_PO ), label_expr );
                                     jump_size = 2;
@@ -436,8 +442,8 @@ tr82:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr88:
+                goto st172;
+tr90:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -462,7 +468,7 @@ tr88:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_PE < 4 )
+                                if ( FLAG_PE <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_PE ), label_expr );
                                     jump_size = 2;
@@ -481,8 +487,8 @@ tr88:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr94:
+                goto st172;
+tr96:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -507,7 +513,7 @@ tr94:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_P < 4 )
+                                if ( FLAG_P <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_P ), label_expr );
                                     jump_size = 2;
@@ -526,8 +532,8 @@ tr94:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr100:
+                goto st172;
+tr102:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -552,7 +558,7 @@ tr100:
                                 push_expr( label, label + strlen( label ) );
                                 label_expr = pop_expr();
 
-                                if ( FLAG_M < 4 )
+                                if ( FLAG_M <= FLAG_C )
                                 {
                                     add_opcode_jr( Z80_JR_NOT( FLAG_M ), label_expr );
                                     jump_size = 2;
@@ -571,8 +577,8 @@ tr100:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr103:
+                goto st172;
+tr105:
 
                 {
                     if ( compile_active && stmt_label )
@@ -585,8 +591,8 @@ tr103:
                         add_opcode( Z80_CCF );
                     };
                 }
-                goto st158;
-tr104:
+                goto st172;
+tr106:
 
                 {
                     if ( compile_active && stmt_label )
@@ -600,8 +606,8 @@ tr104:
                         else add_opcode( Z80_CPD );
                     }
                 }
-                goto st158;
-tr105:
+                goto st172;
+tr107:
 
                 {
                     if ( compile_active && stmt_label )
@@ -615,8 +621,8 @@ tr105:
                         else add_opcode( Z80_CPDR );
                     }
                 }
-                goto st158;
-tr106:
+                goto st172;
+tr108:
 
                 {
                     if ( compile_active && stmt_label )
@@ -630,8 +636,8 @@ tr106:
                         else add_opcode( Z80_CPI );
                     }
                 }
-                goto st158;
-tr107:
+                goto st172;
+tr109:
 
                 {
                     if ( compile_active && stmt_label )
@@ -645,8 +651,8 @@ tr107:
                         else add_opcode( Z80_CPIR );
                     }
                 }
-                goto st158;
-tr108:
+                goto st172;
+tr110:
 
                 {
                     if ( compile_active && stmt_label )
@@ -659,8 +665,8 @@ tr108:
                         add_opcode( Z80_CPL );
                     };
                 }
-                goto st158;
-tr109:
+                goto st172;
+tr111:
 
                 {
                     if ( compile_active && stmt_label )
@@ -673,8 +679,8 @@ tr109:
                         add_opcode( Z80_DAA );
                     };
                 }
-                goto st158;
-tr110:
+                goto st172;
+tr112:
 
                 {
                     if ( compile_active && stmt_label )
@@ -687,8 +693,8 @@ tr110:
                         add_opcode( Z80_DI );
                     };
                 }
-                goto st158;
-tr113:
+                goto st172;
+tr115:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -707,8 +713,8 @@ tr113:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr116:
+                goto st172;
+tr118:
 
                 {
                     if ( compile_active && stmt_label )
@@ -721,8 +727,8 @@ tr116:
                         add_opcode( Z80_EI );
                     };
                 }
-                goto st158;
-tr122:
+                goto st172;
+tr124:
 
                 {
                     if ( compile_active && stmt_label )
@@ -735,8 +741,8 @@ tr122:
                         add_opcode( Z80_EX_DE_HL );
                     };
                 }
-                goto st158;
-tr126:
+                goto st172;
+tr128:
 
                 {
                     if ( compile_active && stmt_label )
@@ -749,8 +755,8 @@ tr126:
                         add_opcode( Z80_EX_AF_AF );
                     };
                 }
-                goto st158;
-tr127:
+                goto st172;
+tr129:
 
                 {
                     if ( compile_active && stmt_label )
@@ -763,8 +769,8 @@ tr127:
                         add_opcode( Z80_EX_AF_AF );
                     };
                 }
-                goto st158;
-tr132:
+                goto st172;
+tr134:
 
                 {
                     if ( compile_active && stmt_label )
@@ -777,8 +783,8 @@ tr132:
                         add_opcode( Z80_EX_IND_SP_HL );
                     };
                 }
-                goto st158;
-tr133:
+                goto st172;
+tr135:
 
                 {
                     if ( compile_active && stmt_label )
@@ -791,8 +797,8 @@ tr133:
                         add_opcode( Z80_EX_IND_SP_IX );
                     };
                 }
-                goto st158;
-tr134:
+                goto st172;
+tr136:
 
                 {
                     if ( compile_active && stmt_label )
@@ -805,8 +811,8 @@ tr134:
                         add_opcode( Z80_EX_IND_SP_IY );
                     };
                 }
-                goto st158;
-tr135:
+                goto st172;
+tr137:
 
                 {
                     if ( compile_active && stmt_label )
@@ -819,8 +825,8 @@ tr135:
                         add_opcode( Z80_EXX );
                     };
                 }
-                goto st158;
-tr136:
+                goto st172;
+tr138:
 
                 {
                     if ( compile_active && stmt_label )
@@ -833,8 +839,8 @@ tr136:
                         add_opcode( Z80_HALT );
                     };
                 }
-                goto st158;
-tr139:
+                goto st172;
+tr141:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -858,8 +864,8 @@ tr139:
                         };
                     }
                 }
-                goto st158;
-tr142:
+                goto st172;
+tr144:
 
                 {
                     if ( compile_active && stmt_label )
@@ -872,8 +878,8 @@ tr142:
                         add_opcode( Z80_IND );
                     };
                 }
-                goto st158;
-tr143:
+                goto st172;
+tr145:
 
                 {
                     if ( compile_active && stmt_label )
@@ -886,8 +892,8 @@ tr143:
                         add_opcode( Z80_INDR );
                     };
                 }
-                goto st158;
-tr144:
+                goto st172;
+tr146:
 
                 {
                     if ( compile_active && stmt_label )
@@ -900,8 +906,8 @@ tr144:
                         add_opcode( Z80_INI );
                     };
                 }
-                goto st158;
-tr145:
+                goto st172;
+tr147:
 
                 {
                     if ( compile_active && stmt_label )
@@ -914,8 +920,8 @@ tr145:
                         add_opcode( Z80_INIR );
                     };
                 }
-                goto st158;
-tr159:
+                goto st172;
+tr161:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -934,8 +940,8 @@ tr159:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr165:
+                goto st172;
+tr167:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -954,8 +960,8 @@ tr165:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr171:
+                goto st172;
+tr173:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -974,8 +980,8 @@ tr171:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr177:
+                goto st172;
+tr179:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -994,8 +1000,8 @@ tr177:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr183:
+                goto st172;
+tr185:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1014,8 +1020,8 @@ tr183:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr189:
+                goto st172;
+tr191:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1034,8 +1040,8 @@ tr189:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr195:
+                goto st172;
+tr197:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1054,8 +1060,8 @@ tr195:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr201:
+                goto st172;
+tr203:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1074,8 +1080,8 @@ tr201:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr207:
+                goto st172;
+tr209:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1094,8 +1100,8 @@ tr207:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr210:
+                goto st172;
+tr212:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1108,8 +1114,8 @@ tr210:
                         add_opcode( Z80_JP_IND_HL );
                     };
                 }
-                goto st158;
-tr212:
+                goto st172;
+tr214:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1122,8 +1128,8 @@ tr212:
                         add_opcode( Z80_JP_IND_IX );
                     };
                 }
-                goto st158;
-tr214:
+                goto st172;
+tr216:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1136,8 +1142,8 @@ tr214:
                         add_opcode( Z80_JP_IND_IY );
                     };
                 }
-                goto st158;
-tr221:
+                goto st172;
+tr223:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1156,8 +1162,8 @@ tr221:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr227:
+                goto st172;
+tr229:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1176,8 +1182,8 @@ tr227:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr233:
+                goto st172;
+tr235:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1196,8 +1202,8 @@ tr233:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr239:
+                goto st172;
+tr241:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1216,8 +1222,8 @@ tr239:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr245:
+                goto st172;
+tr247:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1236,8 +1242,8 @@ tr245:
                         else OBJ_DELETE( expr );
                     };
                 }
-                goto st158;
-tr248:
+                goto st172;
+tr250:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1250,8 +1256,8 @@ tr248:
                         add_opcode( Z80_LDD );
                     };
                 }
-                goto st158;
-tr249:
+                goto st172;
+tr251:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1264,8 +1270,8 @@ tr249:
                         add_opcode( Z80_LDDR );
                     };
                 }
-                goto st158;
-tr250:
+                goto st172;
+tr252:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1278,8 +1284,8 @@ tr250:
                         add_opcode( Z80_LDI );
                     };
                 }
-                goto st158;
-tr251:
+                goto st172;
+tr253:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1292,8 +1298,8 @@ tr251:
                         add_opcode( Z80_LDIR );
                     };
                 }
-                goto st158;
-tr252:
+                goto st172;
+tr254:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1306,8 +1312,8 @@ tr252:
                         add_opcode( Z80_NEG );
                     };
                 }
-                goto st158;
-tr253:
+                goto st172;
+tr255:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1320,8 +1326,8 @@ tr253:
                         add_opcode( Z80_NOP );
                     };
                 }
-                goto st158;
-tr254:
+                goto st172;
+tr256:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1334,8 +1340,8 @@ tr254:
                         add_opcode( Z80_OTDR );
                     };
                 }
-                goto st158;
-tr255:
+                goto st172;
+tr257:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1348,8 +1354,8 @@ tr255:
                         add_opcode( Z80_OTIR );
                     };
                 }
-                goto st158;
-tr256:
+                goto st172;
+tr258:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1362,8 +1368,8 @@ tr256:
                         add_opcode( Z80_OUTD );
                     };
                 }
-                goto st158;
-tr257:
+                goto st172;
+tr259:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1376,8 +1382,176 @@ tr257:
                         add_opcode( Z80_OUTI );
                     };
                 }
-                goto st158;
-tr258:
+                goto st172;
+tr266:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_BC ) );
+                    };
+                }
+                goto st172;
+tr267:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_DE ) );
+                    };
+                }
+                goto st172;
+tr268:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_HL ) );
+                    };
+                }
+                goto st172;
+tr269:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_IX ) );
+                    };
+                }
+                goto st172;
+tr270:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_IY ) );
+                    };
+                }
+                goto st172;
+tr271:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_POP( REG_AF ) );
+                    };
+                }
+                goto st172;
+tr278:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_BC ) );
+                    };
+                }
+                goto st172;
+tr279:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_DE ) );
+                    };
+                }
+                goto st172;
+tr280:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_HL ) );
+                    };
+                }
+                goto st172;
+tr281:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_IX ) );
+                    };
+                }
+                goto st172;
+tr282:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_IY ) );
+                    };
+                }
+                goto st172;
+tr283:
+
+                {
+                    if ( compile_active && stmt_label )
+                    {
+                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                    };
+
+                    if ( compile_active )
+                    {
+                        add_opcode( Z80_PUSH( REG_AF ) );
+                    };
+                }
+                goto st172;
+tr284:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1390,8 +1564,8 @@ tr258:
                         add_opcode( Z80_RET( FLAG_NONE ) );
                     };
                 }
-                goto st158;
-tr267:
+                goto st172;
+tr293:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1404,8 +1578,8 @@ tr267:
                         add_opcode( Z80_RET( FLAG_NZ ) );
                     };
                 }
-                goto st158;
-tr268:
+                goto st172;
+tr294:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1418,8 +1592,8 @@ tr268:
                         add_opcode( Z80_RET( FLAG_Z ) );
                     };
                 }
-                goto st158;
-tr269:
+                goto st172;
+tr295:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1432,8 +1606,8 @@ tr269:
                         add_opcode( Z80_RET( FLAG_NC ) );
                     };
                 }
-                goto st158;
-tr270:
+                goto st172;
+tr296:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1446,8 +1620,8 @@ tr270:
                         add_opcode( Z80_RET( FLAG_C ) );
                     };
                 }
-                goto st158;
-tr271:
+                goto st172;
+tr297:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1460,8 +1634,8 @@ tr271:
                         add_opcode( Z80_RET( FLAG_PO ) );
                     };
                 }
-                goto st158;
-tr272:
+                goto st172;
+tr298:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1474,8 +1648,8 @@ tr272:
                         add_opcode( Z80_RET( FLAG_PE ) );
                     };
                 }
-                goto st158;
-tr273:
+                goto st172;
+tr299:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1488,8 +1662,8 @@ tr273:
                         add_opcode( Z80_RET( FLAG_P ) );
                     };
                 }
-                goto st158;
-tr274:
+                goto st172;
+tr300:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1502,8 +1676,8 @@ tr274:
                         add_opcode( Z80_RET( FLAG_M ) );
                     };
                 }
-                goto st158;
-tr275:
+                goto st172;
+tr301:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1516,8 +1690,8 @@ tr275:
                         add_opcode( Z80_RETI );
                     };
                 }
-                goto st158;
-tr276:
+                goto st172;
+tr302:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1530,8 +1704,8 @@ tr276:
                         add_opcode( Z80_RETN );
                     };
                 }
-                goto st158;
-tr277:
+                goto st172;
+tr303:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1545,8 +1719,8 @@ tr277:
                         else add_opcode( Z80_RLD );
                     }
                 }
-                goto st158;
-tr278:
+                goto st172;
+tr304:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1560,8 +1734,8 @@ tr278:
                         else add_opcode( Z80_RRD );
                     }
                 }
-                goto st158;
-tr281:
+                goto st172;
+tr307:
 
                 {
                     push_expr( expr_start->ts, ( p - 1 )->te );
@@ -1585,8 +1759,8 @@ tr281:
                         };
                     }
                 }
-                goto st158;
-tr284:
+                goto st172;
+tr310:
 
                 {
                     if ( compile_active && stmt_label )
@@ -1599,13 +1773,13 @@ tr284:
                         add_opcode( Z80_SCF );
                     };
                 }
-                goto st158;
-st158:
+                goto st172;
+st172:
 
                 if ( ++p == pe )
-                    goto _test_eof158;
+                    goto _test_eof172;
 
-            case 158:
+            case 172:
 
                 goto st0;
 tr2:
@@ -1624,7 +1798,7 @@ st2:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr41;
+                    goto tr43;
 
                 case 87:
                     goto st3;
@@ -1723,22 +1897,28 @@ st2:
                     goto st141;
 
                 case 119:
-                    goto st150;
+                    goto st148;
 
                 case 120:
-                    goto st151;
+                    goto st155;
 
                 case 121:
-                    goto st152;
+                    goto st164;
 
                 case 122:
-                    goto st153;
+                    goto st165;
 
                 case 123:
-                    goto st154;
+                    goto st166;
 
                 case 124:
-                    goto st157;
+                    goto st167;
+
+                case 125:
+                    goto st168;
+
+                case 126:
+                    goto st171;
                 }
 
                 goto st0;
@@ -1751,28 +1931,28 @@ st3:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr42;
+                    goto tr44;
 
                 case 5:
-                    goto tr42;
+                    goto tr44;
 
                 case 8:
-                    goto tr42;
+                    goto tr44;
 
                 case 18:
-                    goto tr43;
+                    goto tr45;
 
                 case 21:
-                    goto tr43;
+                    goto tr45;
 
                 case 23:
-                    goto tr43;
+                    goto tr45;
 
                 case 36:
-                    goto tr43;
+                    goto tr45;
 
                 case 44:
-                    goto tr43;
+                    goto tr45;
 
                 case 45:
                     goto st6;
@@ -1800,10 +1980,10 @@ st3:
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr43;
+                    goto tr45;
 
                 goto st0;
-tr42:
+tr44:
 
                 {
                     expr_start = p;
@@ -1819,7 +1999,7 @@ st4:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr52;
+                    goto tr54;
 
                 case 19:
                     goto st4;
@@ -1855,7 +2035,7 @@ st4:
                     goto st5;
 
                 goto st0;
-tr43:
+tr45:
 
                 {
                     expr_start = p;
@@ -1918,35 +2098,35 @@ st7:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr56;
+                    goto tr58;
 
                 case 5:
-                    goto tr56;
+                    goto tr58;
 
                 case 8:
-                    goto tr56;
+                    goto tr58;
 
                 case 18:
-                    goto tr57;
+                    goto tr59;
 
                 case 21:
-                    goto tr57;
+                    goto tr59;
 
                 case 23:
-                    goto tr57;
+                    goto tr59;
 
                 case 36:
-                    goto tr57;
+                    goto tr59;
 
                 case 44:
-                    goto tr57;
+                    goto tr59;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr57;
+                    goto tr59;
 
                 goto st0;
-tr56:
+tr58:
 
                 {
                     expr_start = p;
@@ -1962,7 +2142,7 @@ st8:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr58;
+                    goto tr60;
 
                 case 19:
                     goto st8;
@@ -1998,7 +2178,7 @@ st8:
                     goto st9;
 
                 goto st0;
-tr57:
+tr59:
 
                 {
                     expr_start = p;
@@ -2061,35 +2241,35 @@ st11:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr62;
+                    goto tr64;
 
                 case 5:
-                    goto tr62;
+                    goto tr64;
 
                 case 8:
-                    goto tr62;
+                    goto tr64;
 
                 case 18:
-                    goto tr63;
+                    goto tr65;
 
                 case 21:
-                    goto tr63;
+                    goto tr65;
 
                 case 23:
-                    goto tr63;
+                    goto tr65;
 
                 case 36:
-                    goto tr63;
+                    goto tr65;
 
                 case 44:
-                    goto tr63;
+                    goto tr65;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr63;
+                    goto tr65;
 
                 goto st0;
-tr62:
+tr64:
 
                 {
                     expr_start = p;
@@ -2105,7 +2285,7 @@ st12:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr64;
+                    goto tr66;
 
                 case 19:
                     goto st12;
@@ -2141,7 +2321,7 @@ st12:
                     goto st13;
 
                 goto st0;
-tr63:
+tr65:
 
                 {
                     expr_start = p;
@@ -2204,35 +2384,35 @@ st15:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr68;
+                    goto tr70;
 
                 case 5:
-                    goto tr68;
+                    goto tr70;
 
                 case 8:
-                    goto tr68;
+                    goto tr70;
 
                 case 18:
-                    goto tr69;
+                    goto tr71;
 
                 case 21:
-                    goto tr69;
+                    goto tr71;
 
                 case 23:
-                    goto tr69;
+                    goto tr71;
 
                 case 36:
-                    goto tr69;
+                    goto tr71;
 
                 case 44:
-                    goto tr69;
+                    goto tr71;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr69;
+                    goto tr71;
 
                 goto st0;
-tr68:
+tr70:
 
                 {
                     expr_start = p;
@@ -2248,7 +2428,7 @@ st16:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr70;
+                    goto tr72;
 
                 case 19:
                     goto st16;
@@ -2284,7 +2464,7 @@ st16:
                     goto st17;
 
                 goto st0;
-tr69:
+tr71:
 
                 {
                     expr_start = p;
@@ -2347,35 +2527,35 @@ st19:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr74;
+                    goto tr76;
 
                 case 5:
-                    goto tr74;
+                    goto tr76;
 
                 case 8:
-                    goto tr74;
+                    goto tr76;
 
                 case 18:
-                    goto tr75;
+                    goto tr77;
 
                 case 21:
-                    goto tr75;
+                    goto tr77;
 
                 case 23:
-                    goto tr75;
+                    goto tr77;
 
                 case 36:
-                    goto tr75;
+                    goto tr77;
 
                 case 44:
-                    goto tr75;
+                    goto tr77;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr75;
+                    goto tr77;
 
                 goto st0;
-tr74:
+tr76:
 
                 {
                     expr_start = p;
@@ -2391,7 +2571,7 @@ st20:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr76;
+                    goto tr78;
 
                 case 19:
                     goto st20;
@@ -2427,7 +2607,7 @@ st20:
                     goto st21;
 
                 goto st0;
-tr75:
+tr77:
 
                 {
                     expr_start = p;
@@ -2490,35 +2670,35 @@ st23:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr80;
+                    goto tr82;
 
                 case 5:
-                    goto tr80;
+                    goto tr82;
 
                 case 8:
-                    goto tr80;
+                    goto tr82;
 
                 case 18:
-                    goto tr81;
+                    goto tr83;
 
                 case 21:
-                    goto tr81;
+                    goto tr83;
 
                 case 23:
-                    goto tr81;
+                    goto tr83;
 
                 case 36:
-                    goto tr81;
+                    goto tr83;
 
                 case 44:
-                    goto tr81;
+                    goto tr83;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr81;
+                    goto tr83;
 
                 goto st0;
-tr80:
+tr82:
 
                 {
                     expr_start = p;
@@ -2534,7 +2714,7 @@ st24:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr82;
+                    goto tr84;
 
                 case 19:
                     goto st24;
@@ -2570,7 +2750,7 @@ st24:
                     goto st25;
 
                 goto st0;
-tr81:
+tr83:
 
                 {
                     expr_start = p;
@@ -2633,35 +2813,35 @@ st27:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr86;
+                    goto tr88;
 
                 case 5:
-                    goto tr86;
+                    goto tr88;
 
                 case 8:
-                    goto tr86;
+                    goto tr88;
 
                 case 18:
-                    goto tr87;
+                    goto tr89;
 
                 case 21:
-                    goto tr87;
+                    goto tr89;
 
                 case 23:
-                    goto tr87;
+                    goto tr89;
 
                 case 36:
-                    goto tr87;
+                    goto tr89;
 
                 case 44:
-                    goto tr87;
+                    goto tr89;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr87;
+                    goto tr89;
 
                 goto st0;
-tr86:
+tr88:
 
                 {
                     expr_start = p;
@@ -2677,7 +2857,7 @@ st28:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr88;
+                    goto tr90;
 
                 case 19:
                     goto st28;
@@ -2713,7 +2893,7 @@ st28:
                     goto st29;
 
                 goto st0;
-tr87:
+tr89:
 
                 {
                     expr_start = p;
@@ -2776,35 +2956,35 @@ st31:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr92;
+                    goto tr94;
 
                 case 5:
-                    goto tr92;
+                    goto tr94;
 
                 case 8:
-                    goto tr92;
+                    goto tr94;
 
                 case 18:
-                    goto tr93;
+                    goto tr95;
 
                 case 21:
-                    goto tr93;
+                    goto tr95;
 
                 case 23:
-                    goto tr93;
+                    goto tr95;
 
                 case 36:
-                    goto tr93;
+                    goto tr95;
 
                 case 44:
-                    goto tr93;
+                    goto tr95;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr93;
+                    goto tr95;
 
                 goto st0;
-tr92:
+tr94:
 
                 {
                     expr_start = p;
@@ -2820,7 +3000,7 @@ st32:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr94;
+                    goto tr96;
 
                 case 19:
                     goto st32;
@@ -2856,7 +3036,7 @@ st32:
                     goto st33;
 
                 goto st0;
-tr93:
+tr95:
 
                 {
                     expr_start = p;
@@ -2919,35 +3099,35 @@ st35:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr98;
+                    goto tr100;
 
                 case 5:
-                    goto tr98;
+                    goto tr100;
 
                 case 8:
-                    goto tr98;
+                    goto tr100;
 
                 case 18:
-                    goto tr99;
+                    goto tr101;
 
                 case 21:
-                    goto tr99;
+                    goto tr101;
 
                 case 23:
-                    goto tr99;
+                    goto tr101;
 
                 case 36:
-                    goto tr99;
+                    goto tr101;
 
                 case 44:
-                    goto tr99;
+                    goto tr101;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr99;
+                    goto tr101;
 
                 goto st0;
-tr98:
+tr100:
 
                 {
                     expr_start = p;
@@ -2963,7 +3143,7 @@ st36:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr100;
+                    goto tr102;
 
                 case 19:
                     goto st36;
@@ -2999,7 +3179,7 @@ st36:
                     goto st37;
 
                 goto st0;
-tr99:
+tr101:
 
                 {
                     expr_start = p;
@@ -3050,7 +3230,7 @@ st38:
 
             case 38:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr103;
+                    goto tr105;
 
                 goto st0;
 st39:
@@ -3060,7 +3240,7 @@ st39:
 
             case 39:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr104;
+                    goto tr106;
 
                 goto st0;
 st40:
@@ -3070,7 +3250,7 @@ st40:
 
             case 40:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr105;
+                    goto tr107;
 
                 goto st0;
 st41:
@@ -3080,7 +3260,7 @@ st41:
 
             case 41:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr106;
+                    goto tr108;
 
                 goto st0;
 st42:
@@ -3090,7 +3270,7 @@ st42:
 
             case 42:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr107;
+                    goto tr109;
 
                 goto st0;
 st43:
@@ -3100,7 +3280,7 @@ st43:
 
             case 43:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr108;
+                    goto tr110;
 
                 goto st0;
 st44:
@@ -3110,7 +3290,7 @@ st44:
 
             case 44:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr109;
+                    goto tr111;
 
                 goto st0;
 st45:
@@ -3120,7 +3300,7 @@ st45:
 
             case 45:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr110;
+                    goto tr112;
 
                 goto st0;
 st46:
@@ -3132,35 +3312,35 @@ st46:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr111;
+                    goto tr113;
 
                 case 5:
-                    goto tr111;
+                    goto tr113;
 
                 case 8:
-                    goto tr111;
+                    goto tr113;
 
                 case 18:
-                    goto tr112;
+                    goto tr114;
 
                 case 21:
-                    goto tr112;
+                    goto tr114;
 
                 case 23:
-                    goto tr112;
+                    goto tr114;
 
                 case 36:
-                    goto tr112;
+                    goto tr114;
 
                 case 44:
-                    goto tr112;
+                    goto tr114;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr112;
+                    goto tr114;
 
                 goto st0;
-tr111:
+tr113:
 
                 {
                     expr_start = p;
@@ -3176,7 +3356,7 @@ st47:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr113;
+                    goto tr115;
 
                 case 19:
                     goto st47;
@@ -3212,7 +3392,7 @@ st47:
                     goto st48;
 
                 goto st0;
-tr112:
+tr114:
 
                 {
                     expr_start = p;
@@ -3263,7 +3443,7 @@ st49:
 
             case 49:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr116;
+                    goto tr118;
 
                 goto st0;
 st50:
@@ -3312,7 +3492,7 @@ st53:
 
             case 53:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr122;
+                    goto tr124;
 
                 goto st0;
 st54:
@@ -3348,7 +3528,7 @@ st56:
 
             case 56:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr126;
+                    goto tr128;
 
                 goto st0;
 st57:
@@ -3358,7 +3538,7 @@ st57:
 
             case 57:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr127;
+                    goto tr129;
 
                 goto st0;
 st58:
@@ -3397,7 +3577,7 @@ st60:
 
             case 60:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr132;
+                    goto tr134;
 
                 goto st0;
 st61:
@@ -3407,7 +3587,7 @@ st61:
 
             case 61:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr133;
+                    goto tr135;
 
                 goto st0;
 st62:
@@ -3417,7 +3597,7 @@ st62:
 
             case 62:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr134;
+                    goto tr136;
 
                 goto st0;
 st63:
@@ -3427,7 +3607,7 @@ st63:
 
             case 63:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr135;
+                    goto tr137;
 
                 goto st0;
 st64:
@@ -3437,7 +3617,7 @@ st64:
 
             case 64:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr136;
+                    goto tr138;
 
                 goto st0;
 st65:
@@ -3449,35 +3629,35 @@ st65:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr137;
+                    goto tr139;
 
                 case 5:
-                    goto tr137;
+                    goto tr139;
 
                 case 8:
-                    goto tr137;
+                    goto tr139;
 
                 case 18:
-                    goto tr138;
+                    goto tr140;
 
                 case 21:
-                    goto tr138;
+                    goto tr140;
 
                 case 23:
-                    goto tr138;
+                    goto tr140;
 
                 case 36:
-                    goto tr138;
+                    goto tr140;
 
                 case 44:
-                    goto tr138;
+                    goto tr140;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr138;
+                    goto tr140;
 
                 goto st0;
-tr137:
+tr139:
 
                 {
                     expr_start = p;
@@ -3493,7 +3673,7 @@ st66:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr139;
+                    goto tr141;
 
                 case 19:
                     goto st66;
@@ -3529,7 +3709,7 @@ st66:
                     goto st67;
 
                 goto st0;
-tr138:
+tr140:
 
                 {
                     expr_start = p;
@@ -3580,7 +3760,7 @@ st68:
 
             case 68:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr142;
+                    goto tr144;
 
                 goto st0;
 st69:
@@ -3590,7 +3770,7 @@ st69:
 
             case 69:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr143;
+                    goto tr145;
 
                 goto st0;
 st70:
@@ -3600,7 +3780,7 @@ st70:
 
             case 70:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr144;
+                    goto tr146;
 
                 goto st0;
 st71:
@@ -3610,7 +3790,7 @@ st71:
 
             case 71:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr145;
+                    goto tr147;
 
                 goto st0;
 st72:
@@ -3622,28 +3802,28 @@ st72:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr146;
+                    goto tr148;
 
                 case 5:
-                    goto tr146;
+                    goto tr148;
 
                 case 8:
-                    goto tr146;
+                    goto tr148;
 
                 case 18:
-                    goto tr147;
+                    goto tr149;
 
                 case 21:
-                    goto tr147;
+                    goto tr149;
 
                 case 23:
-                    goto tr147;
+                    goto tr149;
 
                 case 36:
-                    goto tr147;
+                    goto tr149;
 
                 case 44:
-                    goto tr147;
+                    goto tr149;
 
                 case 45:
                     goto st75;
@@ -3680,10 +3860,10 @@ st72:
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr147;
+                    goto tr149;
 
                 goto st0;
-tr146:
+tr148:
 
                 {
                     expr_start = p;
@@ -3699,7 +3879,7 @@ st73:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr159;
+                    goto tr161;
 
                 case 19:
                     goto st73;
@@ -3735,7 +3915,7 @@ st73:
                     goto st74;
 
                 goto st0;
-tr147:
+tr149:
 
                 {
                     expr_start = p;
@@ -3798,35 +3978,35 @@ st76:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr163;
+                    goto tr165;
 
                 case 5:
-                    goto tr163;
+                    goto tr165;
 
                 case 8:
-                    goto tr163;
+                    goto tr165;
 
                 case 18:
-                    goto tr164;
+                    goto tr166;
 
                 case 21:
-                    goto tr164;
+                    goto tr166;
 
                 case 23:
-                    goto tr164;
+                    goto tr166;
 
                 case 36:
-                    goto tr164;
+                    goto tr166;
 
                 case 44:
-                    goto tr164;
+                    goto tr166;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr164;
+                    goto tr166;
 
                 goto st0;
-tr163:
+tr165:
 
                 {
                     expr_start = p;
@@ -3842,7 +4022,7 @@ st77:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr165;
+                    goto tr167;
 
                 case 19:
                     goto st77;
@@ -3878,7 +4058,7 @@ st77:
                     goto st78;
 
                 goto st0;
-tr164:
+tr166:
 
                 {
                     expr_start = p;
@@ -3941,35 +4121,35 @@ st80:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr169;
+                    goto tr171;
 
                 case 5:
-                    goto tr169;
+                    goto tr171;
 
                 case 8:
-                    goto tr169;
+                    goto tr171;
 
                 case 18:
-                    goto tr170;
+                    goto tr172;
 
                 case 21:
-                    goto tr170;
+                    goto tr172;
 
                 case 23:
-                    goto tr170;
+                    goto tr172;
 
                 case 36:
-                    goto tr170;
+                    goto tr172;
 
                 case 44:
-                    goto tr170;
+                    goto tr172;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr170;
+                    goto tr172;
 
                 goto st0;
-tr169:
+tr171:
 
                 {
                     expr_start = p;
@@ -3985,7 +4165,7 @@ st81:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr171;
+                    goto tr173;
 
                 case 19:
                     goto st81;
@@ -4021,7 +4201,7 @@ st81:
                     goto st82;
 
                 goto st0;
-tr170:
+tr172:
 
                 {
                     expr_start = p;
@@ -4084,35 +4264,35 @@ st84:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr175;
+                    goto tr177;
 
                 case 5:
-                    goto tr175;
+                    goto tr177;
 
                 case 8:
-                    goto tr175;
+                    goto tr177;
 
                 case 18:
-                    goto tr176;
+                    goto tr178;
 
                 case 21:
-                    goto tr176;
+                    goto tr178;
 
                 case 23:
-                    goto tr176;
+                    goto tr178;
 
                 case 36:
-                    goto tr176;
+                    goto tr178;
 
                 case 44:
-                    goto tr176;
+                    goto tr178;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr176;
+                    goto tr178;
 
                 goto st0;
-tr175:
+tr177:
 
                 {
                     expr_start = p;
@@ -4128,7 +4308,7 @@ st85:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr177;
+                    goto tr179;
 
                 case 19:
                     goto st85;
@@ -4164,7 +4344,7 @@ st85:
                     goto st86;
 
                 goto st0;
-tr176:
+tr178:
 
                 {
                     expr_start = p;
@@ -4227,35 +4407,35 @@ st88:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr181;
+                    goto tr183;
 
                 case 5:
-                    goto tr181;
+                    goto tr183;
 
                 case 8:
-                    goto tr181;
+                    goto tr183;
 
                 case 18:
-                    goto tr182;
+                    goto tr184;
 
                 case 21:
-                    goto tr182;
+                    goto tr184;
 
                 case 23:
-                    goto tr182;
+                    goto tr184;
 
                 case 36:
-                    goto tr182;
+                    goto tr184;
 
                 case 44:
-                    goto tr182;
+                    goto tr184;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr182;
+                    goto tr184;
 
                 goto st0;
-tr181:
+tr183:
 
                 {
                     expr_start = p;
@@ -4271,7 +4451,7 @@ st89:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr183;
+                    goto tr185;
 
                 case 19:
                     goto st89;
@@ -4307,7 +4487,7 @@ st89:
                     goto st90;
 
                 goto st0;
-tr182:
+tr184:
 
                 {
                     expr_start = p;
@@ -4370,35 +4550,35 @@ st92:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr187;
+                    goto tr189;
 
                 case 5:
-                    goto tr187;
+                    goto tr189;
 
                 case 8:
-                    goto tr187;
+                    goto tr189;
 
                 case 18:
-                    goto tr188;
+                    goto tr190;
 
                 case 21:
-                    goto tr188;
+                    goto tr190;
 
                 case 23:
-                    goto tr188;
+                    goto tr190;
 
                 case 36:
-                    goto tr188;
+                    goto tr190;
 
                 case 44:
-                    goto tr188;
+                    goto tr190;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr188;
+                    goto tr190;
 
                 goto st0;
-tr187:
+tr189:
 
                 {
                     expr_start = p;
@@ -4414,7 +4594,7 @@ st93:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr189;
+                    goto tr191;
 
                 case 19:
                     goto st93;
@@ -4450,7 +4630,7 @@ st93:
                     goto st94;
 
                 goto st0;
-tr188:
+tr190:
 
                 {
                     expr_start = p;
@@ -4513,35 +4693,35 @@ st96:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr193;
+                    goto tr195;
 
                 case 5:
-                    goto tr193;
+                    goto tr195;
 
                 case 8:
-                    goto tr193;
+                    goto tr195;
 
                 case 18:
-                    goto tr194;
+                    goto tr196;
 
                 case 21:
-                    goto tr194;
+                    goto tr196;
 
                 case 23:
-                    goto tr194;
+                    goto tr196;
 
                 case 36:
-                    goto tr194;
+                    goto tr196;
 
                 case 44:
-                    goto tr194;
+                    goto tr196;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr194;
+                    goto tr196;
 
                 goto st0;
-tr193:
+tr195:
 
                 {
                     expr_start = p;
@@ -4557,7 +4737,7 @@ st97:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr195;
+                    goto tr197;
 
                 case 19:
                     goto st97;
@@ -4593,7 +4773,7 @@ st97:
                     goto st98;
 
                 goto st0;
-tr194:
+tr196:
 
                 {
                     expr_start = p;
@@ -4656,35 +4836,35 @@ st100:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr199;
+                    goto tr201;
 
                 case 5:
-                    goto tr199;
+                    goto tr201;
 
                 case 8:
-                    goto tr199;
+                    goto tr201;
 
                 case 18:
-                    goto tr200;
+                    goto tr202;
 
                 case 21:
-                    goto tr200;
+                    goto tr202;
 
                 case 23:
-                    goto tr200;
+                    goto tr202;
 
                 case 36:
-                    goto tr200;
+                    goto tr202;
 
                 case 44:
-                    goto tr200;
+                    goto tr202;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr200;
+                    goto tr202;
 
                 goto st0;
-tr199:
+tr201:
 
                 {
                     expr_start = p;
@@ -4700,7 +4880,7 @@ st101:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr201;
+                    goto tr203;
 
                 case 19:
                     goto st101;
@@ -4736,7 +4916,7 @@ st101:
                     goto st102;
 
                 goto st0;
-tr200:
+tr202:
 
                 {
                     expr_start = p;
@@ -4799,35 +4979,35 @@ st104:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr205;
+                    goto tr207;
 
                 case 5:
-                    goto tr205;
+                    goto tr207;
 
                 case 8:
-                    goto tr205;
+                    goto tr207;
 
                 case 18:
-                    goto tr206;
+                    goto tr208;
 
                 case 21:
-                    goto tr206;
+                    goto tr208;
 
                 case 23:
-                    goto tr206;
+                    goto tr208;
 
                 case 36:
-                    goto tr206;
+                    goto tr208;
 
                 case 44:
-                    goto tr206;
+                    goto tr208;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr206;
+                    goto tr208;
 
                 goto st0;
-tr205:
+tr207:
 
                 {
                     expr_start = p;
@@ -4843,7 +5023,7 @@ st105:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr207;
+                    goto tr209;
 
                 case 19:
                     goto st105;
@@ -4879,7 +5059,7 @@ st105:
                     goto st106;
 
                 goto st0;
-tr206:
+tr208:
 
                 {
                     expr_start = p;
@@ -4930,7 +5110,7 @@ st107:
 
             case 107:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr210;
+                    goto tr212;
 
                 goto st0;
 st108:
@@ -4950,7 +5130,7 @@ st109:
 
             case 109:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr212;
+                    goto tr214;
 
                 goto st0;
 st110:
@@ -4970,7 +5150,7 @@ st111:
 
             case 111:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr214;
+                    goto tr216;
 
                 goto st0;
 st112:
@@ -4982,28 +5162,28 @@ st112:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr215;
+                    goto tr217;
 
                 case 5:
-                    goto tr215;
+                    goto tr217;
 
                 case 8:
-                    goto tr215;
+                    goto tr217;
 
                 case 18:
-                    goto tr216;
+                    goto tr218;
 
                 case 21:
-                    goto tr216;
+                    goto tr218;
 
                 case 23:
-                    goto tr216;
+                    goto tr218;
 
                 case 36:
-                    goto tr216;
+                    goto tr218;
 
                 case 44:
-                    goto tr216;
+                    goto tr218;
 
                 case 45:
                     goto st115;
@@ -5019,10 +5199,10 @@ st112:
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr216;
+                    goto tr218;
 
                 goto st0;
-tr215:
+tr217:
 
                 {
                     expr_start = p;
@@ -5038,7 +5218,7 @@ st113:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr221;
+                    goto tr223;
 
                 case 19:
                     goto st113;
@@ -5074,7 +5254,7 @@ st113:
                     goto st114;
 
                 goto st0;
-tr216:
+tr218:
 
                 {
                     expr_start = p;
@@ -5137,35 +5317,35 @@ st116:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr225;
+                    goto tr227;
 
                 case 5:
-                    goto tr225;
+                    goto tr227;
 
                 case 8:
-                    goto tr225;
+                    goto tr227;
 
                 case 18:
-                    goto tr226;
+                    goto tr228;
 
                 case 21:
-                    goto tr226;
+                    goto tr228;
 
                 case 23:
-                    goto tr226;
+                    goto tr228;
 
                 case 36:
-                    goto tr226;
+                    goto tr228;
 
                 case 44:
-                    goto tr226;
+                    goto tr228;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr226;
+                    goto tr228;
 
                 goto st0;
-tr225:
+tr227:
 
                 {
                     expr_start = p;
@@ -5181,7 +5361,7 @@ st117:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr227;
+                    goto tr229;
 
                 case 19:
                     goto st117;
@@ -5217,7 +5397,7 @@ st117:
                     goto st118;
 
                 goto st0;
-tr226:
+tr228:
 
                 {
                     expr_start = p;
@@ -5280,35 +5460,35 @@ st120:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr231;
+                    goto tr233;
 
                 case 5:
-                    goto tr231;
+                    goto tr233;
 
                 case 8:
-                    goto tr231;
+                    goto tr233;
 
                 case 18:
-                    goto tr232;
+                    goto tr234;
 
                 case 21:
-                    goto tr232;
+                    goto tr234;
 
                 case 23:
-                    goto tr232;
+                    goto tr234;
 
                 case 36:
-                    goto tr232;
+                    goto tr234;
 
                 case 44:
-                    goto tr232;
+                    goto tr234;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr232;
+                    goto tr234;
 
                 goto st0;
-tr231:
+tr233:
 
                 {
                     expr_start = p;
@@ -5324,7 +5504,7 @@ st121:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr233;
+                    goto tr235;
 
                 case 19:
                     goto st121;
@@ -5360,7 +5540,7 @@ st121:
                     goto st122;
 
                 goto st0;
-tr232:
+tr234:
 
                 {
                     expr_start = p;
@@ -5423,35 +5603,35 @@ st124:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr237;
+                    goto tr239;
 
                 case 5:
-                    goto tr237;
+                    goto tr239;
 
                 case 8:
-                    goto tr237;
+                    goto tr239;
 
                 case 18:
-                    goto tr238;
+                    goto tr240;
 
                 case 21:
-                    goto tr238;
+                    goto tr240;
 
                 case 23:
-                    goto tr238;
+                    goto tr240;
 
                 case 36:
-                    goto tr238;
+                    goto tr240;
 
                 case 44:
-                    goto tr238;
+                    goto tr240;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr238;
+                    goto tr240;
 
                 goto st0;
-tr237:
+tr239:
 
                 {
                     expr_start = p;
@@ -5467,7 +5647,7 @@ st125:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr239;
+                    goto tr241;
 
                 case 19:
                     goto st125;
@@ -5503,7 +5683,7 @@ st125:
                     goto st126;
 
                 goto st0;
-tr238:
+tr240:
 
                 {
                     expr_start = p;
@@ -5566,35 +5746,35 @@ st128:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 3:
-                    goto tr243;
+                    goto tr245;
 
                 case 5:
-                    goto tr243;
+                    goto tr245;
 
                 case 8:
-                    goto tr243;
+                    goto tr245;
 
                 case 18:
-                    goto tr244;
+                    goto tr246;
 
                 case 21:
-                    goto tr244;
+                    goto tr246;
 
                 case 23:
-                    goto tr244;
+                    goto tr246;
 
                 case 36:
-                    goto tr244;
+                    goto tr246;
 
                 case 44:
-                    goto tr244;
+                    goto tr246;
                 }
 
                 if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr244;
+                    goto tr246;
 
                 goto st0;
-tr243:
+tr245:
 
                 {
                     expr_start = p;
@@ -5610,7 +5790,7 @@ st129:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr245;
+                    goto tr247;
 
                 case 19:
                     goto st129;
@@ -5646,7 +5826,7 @@ st129:
                     goto st130;
 
                 goto st0;
-tr244:
+tr246:
 
                 {
                     expr_start = p;
@@ -5697,7 +5877,7 @@ st131:
 
             case 131:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr248;
+                    goto tr250;
 
                 goto st0;
 st132:
@@ -5707,7 +5887,7 @@ st132:
 
             case 132:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr249;
+                    goto tr251;
 
                 goto st0;
 st133:
@@ -5717,7 +5897,7 @@ st133:
 
             case 133:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr250;
+                    goto tr252;
 
                 goto st0;
 st134:
@@ -5727,7 +5907,7 @@ st134:
 
             case 134:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr251;
+                    goto tr253;
 
                 goto st0;
 st135:
@@ -5737,7 +5917,7 @@ st135:
 
             case 135:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr252;
+                    goto tr254;
 
                 goto st0;
 st136:
@@ -5747,7 +5927,7 @@ st136:
 
             case 136:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr253;
+                    goto tr255;
 
                 goto st0;
 st137:
@@ -5757,7 +5937,7 @@ st137:
 
             case 137:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr254;
+                    goto tr256;
 
                 goto st0;
 st138:
@@ -5767,7 +5947,7 @@ st138:
 
             case 138:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr255;
+                    goto tr257;
 
                 goto st0;
 st139:
@@ -5777,7 +5957,7 @@ st139:
 
             case 139:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr256;
+                    goto tr258;
 
                 goto st0;
 st140:
@@ -5787,7 +5967,7 @@ st140:
 
             case 140:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr257;
+                    goto tr259;
 
                 goto st0;
 st141:
@@ -5798,32 +5978,23 @@ st141:
             case 141:
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
-                case 12:
-                    goto tr258;
-
-                case 45:
+                case 69:
                     goto st142;
 
-                case 46:
+                case 70:
                     goto st143;
 
-                case 47:
+                case 71:
                     goto st144;
 
-                case 48:
+                case 72:
                     goto st145;
 
-                case 49:
+                case 73:
                     goto st146;
 
-                case 50:
+                case 74:
                     goto st147;
-
-                case 51:
-                    goto st148;
-
-                case 52:
-                    goto st149;
                 }
 
                 goto st0;
@@ -5834,7 +6005,7 @@ st142:
 
             case 142:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr267;
+                    goto tr266;
 
                 goto st0;
 st143:
@@ -5844,7 +6015,7 @@ st143:
 
             case 143:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr268;
+                    goto tr267;
 
                 goto st0;
 st144:
@@ -5854,7 +6025,7 @@ st144:
 
             case 144:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr269;
+                    goto tr268;
 
                 goto st0;
 st145:
@@ -5864,7 +6035,7 @@ st145:
 
             case 145:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr270;
+                    goto tr269;
 
                 goto st0;
 st146:
@@ -5874,7 +6045,7 @@ st146:
 
             case 146:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr271;
+                    goto tr270;
 
                 goto st0;
 st147:
@@ -5884,7 +6055,7 @@ st147:
 
             case 147:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr272;
+                    goto tr271;
 
                 goto st0;
 st148:
@@ -5893,8 +6064,26 @@ st148:
                     goto _test_eof148;
 
             case 148:
-                if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr273;
+                switch ( ( ( ( int ) p->tok ) ) )
+                {
+                case 69:
+                    goto st149;
+
+                case 70:
+                    goto st150;
+
+                case 71:
+                    goto st151;
+
+                case 72:
+                    goto st152;
+
+                case 73:
+                    goto st153;
+
+                case 74:
+                    goto st154;
+                }
 
                 goto st0;
 st149:
@@ -5904,7 +6093,7 @@ st149:
 
             case 149:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr274;
+                    goto tr278;
 
                 goto st0;
 st150:
@@ -5914,7 +6103,7 @@ st150:
 
             case 150:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr275;
+                    goto tr279;
 
                 goto st0;
 st151:
@@ -5924,7 +6113,7 @@ st151:
 
             case 151:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr276;
+                    goto tr280;
 
                 goto st0;
 st152:
@@ -5934,7 +6123,7 @@ st152:
 
             case 152:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr277;
+                    goto tr281;
 
                 goto st0;
 st153:
@@ -5944,7 +6133,7 @@ st153:
 
             case 153:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr278;
+                    goto tr282;
 
                 goto st0;
 st154:
@@ -5953,131 +6142,55 @@ st154:
                     goto _test_eof154;
 
             case 154:
-                switch ( ( ( ( int ) p->tok ) ) )
-                {
-                case 3:
-                    goto tr279;
-
-                case 5:
-                    goto tr279;
-
-                case 8:
-                    goto tr279;
-
-                case 18:
-                    goto tr280;
-
-                case 21:
-                    goto tr280;
-
-                case 23:
-                    goto tr280;
-
-                case 36:
-                    goto tr280;
-
-                case 44:
-                    goto tr280;
-                }
-
-                if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
-                    goto tr280;
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr283;
 
                 goto st0;
-tr279:
-
-                {
-                    expr_start = p;
-                }
-                goto st155;
 st155:
 
                 if ( ++p == pe )
                     goto _test_eof155;
 
             case 155:
-
                 switch ( ( ( ( int ) p->tok ) ) )
                 {
                 case 12:
-                    goto tr281;
+                    goto tr284;
 
-                case 19:
-                    goto st155;
-
-                case 23:
+                case 45:
                     goto st156;
 
-                case 37:
-                    goto st155;
-                }
+                case 46:
+                    goto st157;
 
-                if ( ( ( ( int ) p->tok ) ) < 25 )
-                {
-                    if ( ( ( ( int ) p->tok ) ) > 17 )
-                    {
-                        if ( 20 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 21 )
-                            goto st156;
-                    }
-                    else if ( ( ( ( int ) p->tok ) ) >= 15 )
-                        goto st156;
+                case 47:
+                    goto st158;
+
+                case 48:
+                    goto st159;
+
+                case 49:
+                    goto st160;
+
+                case 50:
+                    goto st161;
+
+                case 51:
+                    goto st162;
+
+                case 52:
+                    goto st163;
                 }
-                else if ( ( ( ( int ) p->tok ) ) > 35 )
-                {
-                    if ( ( ( ( int ) p->tok ) ) > 39 )
-                    {
-                        if ( 41 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 42 )
-                            goto st156;
-                    }
-                    else if ( ( ( ( int ) p->tok ) ) >= 38 )
-                        goto st156;
-                }
-                else
-                    goto st156;
 
                 goto st0;
-tr280:
-
-                {
-                    expr_start = p;
-                }
-                goto st156;
 st156:
 
                 if ( ++p == pe )
                     goto _test_eof156;
 
             case 156:
-
-                switch ( ( ( ( int ) p->tok ) ) )
-                {
-                case 3:
-                    goto st155;
-
-                case 5:
-                    goto st155;
-
-                case 8:
-                    goto st155;
-
-                case 13:
-                    goto st156;
-
-                case 18:
-                    goto st156;
-
-                case 21:
-                    goto st156;
-
-                case 23:
-                    goto st156;
-
-                case 36:
-                    goto st156;
-
-                case 44:
-                    goto st156;
-                }
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr293;
 
                 goto st0;
 st157:
@@ -6087,13 +6200,256 @@ st157:
 
             case 157:
                 if ( ( ( ( int ) p->tok ) ) == 12 )
-                    goto tr284;
+                    goto tr294;
+
+                goto st0;
+st158:
+
+                if ( ++p == pe )
+                    goto _test_eof158;
+
+            case 158:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr295;
+
+                goto st0;
+st159:
+
+                if ( ++p == pe )
+                    goto _test_eof159;
+
+            case 159:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr296;
+
+                goto st0;
+st160:
+
+                if ( ++p == pe )
+                    goto _test_eof160;
+
+            case 160:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr297;
+
+                goto st0;
+st161:
+
+                if ( ++p == pe )
+                    goto _test_eof161;
+
+            case 161:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr298;
+
+                goto st0;
+st162:
+
+                if ( ++p == pe )
+                    goto _test_eof162;
+
+            case 162:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr299;
+
+                goto st0;
+st163:
+
+                if ( ++p == pe )
+                    goto _test_eof163;
+
+            case 163:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr300;
+
+                goto st0;
+st164:
+
+                if ( ++p == pe )
+                    goto _test_eof164;
+
+            case 164:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr301;
+
+                goto st0;
+st165:
+
+                if ( ++p == pe )
+                    goto _test_eof165;
+
+            case 165:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr302;
+
+                goto st0;
+st166:
+
+                if ( ++p == pe )
+                    goto _test_eof166;
+
+            case 166:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr303;
+
+                goto st0;
+st167:
+
+                if ( ++p == pe )
+                    goto _test_eof167;
+
+            case 167:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr304;
+
+                goto st0;
+st168:
+
+                if ( ++p == pe )
+                    goto _test_eof168;
+
+            case 168:
+                switch ( ( ( ( int ) p->tok ) ) )
+                {
+                case 3:
+                    goto tr305;
+
+                case 5:
+                    goto tr305;
+
+                case 8:
+                    goto tr305;
+
+                case 18:
+                    goto tr306;
+
+                case 21:
+                    goto tr306;
+
+                case 23:
+                    goto tr306;
+
+                case 36:
+                    goto tr306;
+
+                case 44:
+                    goto tr306;
+                }
+
+                if ( 13 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 14 )
+                    goto tr306;
+
+                goto st0;
+tr305:
+
+                {
+                    expr_start = p;
+                }
+                goto st169;
+st169:
+
+                if ( ++p == pe )
+                    goto _test_eof169;
+
+            case 169:
+
+                switch ( ( ( ( int ) p->tok ) ) )
+                {
+                case 12:
+                    goto tr307;
+
+                case 19:
+                    goto st169;
+
+                case 23:
+                    goto st170;
+
+                case 37:
+                    goto st169;
+                }
+
+                if ( ( ( ( int ) p->tok ) ) < 25 )
+                {
+                    if ( ( ( ( int ) p->tok ) ) > 17 )
+                    {
+                        if ( 20 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 21 )
+                            goto st170;
+                    }
+                    else if ( ( ( ( int ) p->tok ) ) >= 15 )
+                        goto st170;
+                }
+                else if ( ( ( ( int ) p->tok ) ) > 35 )
+                {
+                    if ( ( ( ( int ) p->tok ) ) > 39 )
+                    {
+                        if ( 41 <= ( ( ( int ) p->tok ) ) && ( ( ( int ) p->tok ) ) <= 42 )
+                            goto st170;
+                    }
+                    else if ( ( ( ( int ) p->tok ) ) >= 38 )
+                        goto st170;
+                }
+                else
+                    goto st170;
+
+                goto st0;
+tr306:
+
+                {
+                    expr_start = p;
+                }
+                goto st170;
+st170:
+
+                if ( ++p == pe )
+                    goto _test_eof170;
+
+            case 170:
+
+                switch ( ( ( ( int ) p->tok ) ) )
+                {
+                case 3:
+                    goto st169;
+
+                case 5:
+                    goto st169;
+
+                case 8:
+                    goto st169;
+
+                case 13:
+                    goto st170;
+
+                case 18:
+                    goto st170;
+
+                case 21:
+                    goto st170;
+
+                case 23:
+                    goto st170;
+
+                case 36:
+                    goto st170;
+
+                case 44:
+                    goto st170;
+                }
+
+                goto st0;
+st171:
+
+                if ( ++p == pe )
+                    goto _test_eof171;
+
+            case 171:
+                if ( ( ( ( int ) p->tok ) ) == 12 )
+                    goto tr310;
 
                 goto st0;
             }
 
-_test_eof158:
-            cs = 158;
+_test_eof172:
+            cs = 172;
             goto _test_eof;
 _test_eof2:
             cs = 2;
@@ -6563,6 +6919,48 @@ _test_eof156:
 _test_eof157:
             cs = 157;
             goto _test_eof;
+_test_eof158:
+            cs = 158;
+            goto _test_eof;
+_test_eof159:
+            cs = 159;
+            goto _test_eof;
+_test_eof160:
+            cs = 160;
+            goto _test_eof;
+_test_eof161:
+            cs = 161;
+            goto _test_eof;
+_test_eof162:
+            cs = 162;
+            goto _test_eof;
+_test_eof163:
+            cs = 163;
+            goto _test_eof;
+_test_eof164:
+            cs = 164;
+            goto _test_eof;
+_test_eof165:
+            cs = 165;
+            goto _test_eof;
+_test_eof166:
+            cs = 166;
+            goto _test_eof;
+_test_eof167:
+            cs = 167;
+            goto _test_eof;
+_test_eof168:
+            cs = 168;
+            goto _test_eof;
+_test_eof169:
+            cs = 169;
+            goto _test_eof;
+_test_eof170:
+            cs = 170;
+            goto _test_eof;
+_test_eof171:
+            cs = 171;
+            goto _test_eof;
 
 _test_eof:
             {}
@@ -6582,7 +6980,7 @@ _out:
 
         if ( cs >=
 
-                158
+                172
 
            )
             return TRUE;

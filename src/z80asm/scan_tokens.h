@@ -120,13 +120,15 @@
 #define _TK_OTIR          115    /* "OTIR"  */
 #define _TK_OUTD          116    /* "OUTD"  */
 #define _TK_OUTI          117    /* "OUTI"  */
-#define _TK_RET           118    /* "RET"   */
-#define _TK_RETI          119    /* "RETI"  */
-#define _TK_RETN          120    /* "RETN"  */
-#define _TK_RLD           121    /* "RLD"   */
-#define _TK_RRD           122    /* "RRD"   */
-#define _TK_RST           123    /* "RST"   */
-#define _TK_SCF           124    /* "SCF"   */
+#define _TK_POP           118    /* "POP"   */
+#define _TK_PUSH          119    /* "PUSH"  */
+#define _TK_RET           120    /* "RET"   */
+#define _TK_RETI          121    /* "RETI"  */
+#define _TK_RETN          122    /* "RETN"  */
+#define _TK_RLD           123    /* "RLD"   */
+#define _TK_RRD           124    /* "RRD"   */
+#define _TK_RST           125    /* "RST"   */
+#define _TK_SCF           126    /* "SCF"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -251,14 +253,15 @@ typedef enum tokid_t
     TK_OTIR        = _TK_OTIR       ,    /* =   115, "OTIR"  */
     TK_OUTD        = _TK_OUTD       ,    /* =   116, "OUTD"  */
     TK_OUTI        = _TK_OUTI       ,    /* =   117, "OUTI"  */
-    TK_RET         = _TK_RET        ,    /* =   118, "RET"   */
-    TK_RETI        = _TK_RETI       ,    /* =   119, "RETI"  */
-    TK_RETN        = _TK_RETN       ,    /* =   120, "RETN"  */
-    TK_RLD         = _TK_RLD        ,    /* =   121, "RLD"   */
-    TK_RRD         = _TK_RRD        ,    /* =   122, "RRD"   */
-    TK_RST         = _TK_RST        ,    /* =   123, "RST"   */
-    TK_SCF         = _TK_SCF        ,    /* =   124, "SCF"   */
+    TK_POP         = _TK_POP        ,    /* =   118, "POP"   */
+    TK_PUSH        = _TK_PUSH       ,    /* =   119, "PUSH"  */
+    TK_RET         = _TK_RET        ,    /* =   120, "RET"   */
+    TK_RETI        = _TK_RETI       ,    /* =   121, "RETI"  */
+    TK_RETN        = _TK_RETN       ,    /* =   122, "RETN"  */
+    TK_RLD         = _TK_RLD        ,    /* =   123, "RLD"   */
+    TK_RRD         = _TK_RRD        ,    /* =   124, "RRD"   */
+    TK_RST         = _TK_RST        ,    /* =   125, "RST"   */
+    TK_SCF         = _TK_SCF        ,    /* =   126, "SCF"   */
 } tokid_t;
 
 #endif
-

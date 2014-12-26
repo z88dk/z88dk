@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.61 2014-12-26 16:55:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.62 2014-12-26 18:33:20 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -90,8 +90,8 @@ static void init_sym(void)
 	sym.parser = NULL;
 #endif
 	sym.cpu_reg8 = REG8_NONE;
-	sym.cpu_reg16_af = REG16_NONE;
-	sym.cpu_reg16_sp = REG16_NONE;
+	sym.cpu_reg16_af = REG_NONE;
+	sym.cpu_reg16_sp = REG_NONE;
 	sym.cpu_ind_reg16 = IND_REG16_NONE;
 	sym.cpu_idx_reg = IDX_REG_HL;
 }

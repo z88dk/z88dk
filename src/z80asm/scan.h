@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.44 2014-12-26 16:55:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.45 2014-12-26 18:33:21 pauloscustodio Exp $
 */
 
 #pragma once
@@ -33,7 +33,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.44 2014-12-26 16:55
 #endif
 
 enum { REG8_NONE = -1, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A = 7 };
-enum { REG16_NONE = -1, REG16_BC, REG16_DE, REG16_HL, REG16_AF, REG16_SP = 3 };
 enum { IND_REG16_NONE = -1, IND_REG16_BC, IND_REG16_DE, IND_REG16_HL };
 
 /*-----------------------------------------------------------------------------
@@ -55,8 +54,8 @@ typedef struct sym_t
 	void   (*parser)(void);	/* parser for this keyword as opcode */
 #endif
 	int	     cpu_reg8;		/* REG8_NONE, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A */
-	int		 cpu_reg16_af;	/* REG16_NONE, REG16_BC, REG16_DE, REG16_HL, REG16_AF */
-	int		 cpu_reg16_sp;	/* REG16_NONE, REG16_BC, REG16_DE, REG16_HL, REG16_SP */
+	int		 cpu_reg16_af;	/* REG_NONE, REG_BC, REG_DE, REG_HL, REG_AF */
+	int		 cpu_reg16_sp;	/* REG_NONE, REG_BC, REG_DE, REG_HL, REG_SP */
 	int		 cpu_ind_reg16;	/* IND_REG16_NONE, IND_REG16_BC, IND_REG16_DE */
 	int      cpu_idx_reg;	/* IDX_REG_HL, IDX_REG_IX, IDX_REG_IY */
 } Sym;

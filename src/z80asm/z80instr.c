@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.88 2014-12-26 16:46:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.89 2014-12-26 18:33:21 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,7 +42,7 @@ void
 PushPop_instr( int opcode )
 {
 	GetSym();
-	if (sym.cpu_reg16_af != REG16_NONE)
+	if (sym.cpu_reg16_af != REG_NONE)
 	{
 		if (sym.cpu_idx_reg)
 			append_byte(sym.cpu_idx_reg);
@@ -273,11 +273,11 @@ ADD( void )
 
 	switch (sym.cpu_reg16_sp)
     {
-    case REG16_NONE:
+    case REG_NONE:
         ExtAccumulator( 0 );	/* 16 bit register wasn't found - try to evaluate the 8 bit version */
         break;
 
-	case REG16_HL:				/* HL, IX, IY */
+	case REG_HL:				/* HL, IX, IY */
 		GetSymExpect(TK_COMMA);
 		GetSym();
 		if (dest_idx || sym.cpu_idx_reg)
@@ -306,11 +306,11 @@ static void SBC_ADC(int opcode8bit, int opcode16bit)
 
 	switch (sym.cpu_reg16_sp)
 	{
-	case REG16_NONE:
+	case REG_NONE:
 		ExtAccumulator(opcode8bit);      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
 		break;
 
-	case REG16_HL:
+	case REG_HL:
 		if (sym.cpu_idx_reg)
 		{
 			error_illegal_ident();
@@ -320,7 +320,7 @@ static void SBC_ADC(int opcode8bit, int opcode16bit)
 			GetSymExpect(TK_COMMA);
 			GetSym();
 
-			if (!sym.cpu_idx_reg && sym.cpu_reg16_sp != REG16_NONE)
+			if (!sym.cpu_idx_reg && sym.cpu_reg16_sp != REG_NONE)
 				append_2bytes(0xED, (Byte)(opcode16bit + (sym.cpu_reg16_sp << 4)));
 			else
 			{
@@ -397,7 +397,7 @@ static void INC_DEC(int opcode8bit, int opcode16bit)
 
 	switch (sym.cpu_reg16_sp)
 	{
-	case REG16_NONE:
+	case REG_NONE:
 		IncDec_8bit_instr(opcode8bit);   /* 16 bit register wasn't found - try to evaluate the 8bit version */
 		break;
 
