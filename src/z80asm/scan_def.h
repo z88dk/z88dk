@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.17 2014-12-26 16:27:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.18 2014-12-26 16:55:46 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -165,14 +165,14 @@ TOKEN(TK_BIN_NOT, "~", )
 					}	
 
 /* flags */
-TOKEN_KW(NZ, sym.cpu_flag = FLAG_NZ)
-TOKEN_KW(Z,  sym.cpu_flag = FLAG_Z)
-TOKEN_KW(NC, sym.cpu_flag = FLAG_NC)
-TOKEN_KW(C,  sym.cpu_flag = FLAG_C; sym.cpu_reg8 = REG8_C)
-TOKEN_KW(PO, sym.cpu_flag = FLAG_PO)
-TOKEN_KW(PE, sym.cpu_flag = FLAG_PE)
-TOKEN_KW(P,  sym.cpu_flag = FLAG_P)
-TOKEN_KW(M,  sym.cpu_flag = FLAG_M)
+TOKEN_KW(NZ, )
+TOKEN_KW(Z,  )
+TOKEN_KW(NC, )
+TOKEN_KW(C,  sym.cpu_reg8 = REG8_C)
+TOKEN_KW(PO, )
+TOKEN_KW(PE, )
+TOKEN_KW(P,  )
+TOKEN_KW(M,  )
 
 /* 8-bit registers */
 TOKEN_KW(B, sym.cpu_reg8 = REG8_B)

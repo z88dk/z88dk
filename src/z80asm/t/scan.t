@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.16 2014-12-26 16:27:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.17 2014-12-26 16:55:46 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -587,23 +587,23 @@ t_compile_module($init, <<'END', $objs);
 	/* keywords */
 	SetTemporaryLine("nz z nc c po pe p m "
 					 "NZ Z NC C PO PE P M ");
-	T_GET(TK_NZ, "NZ"); assert(sym.cpu_flag == 0);
-	T_GET(TK_Z,  "Z");  assert(sym.cpu_flag == 1);
-	T_GET(TK_NC, "NC"); assert(sym.cpu_flag == 2);
-	T_GET(TK_C,  "C");  assert(sym.cpu_flag == 3);
-	T_GET(TK_PO, "PO"); assert(sym.cpu_flag == 4);
-	T_GET(TK_PE, "PE"); assert(sym.cpu_flag == 5);
-	T_GET(TK_P,  "P");  assert(sym.cpu_flag == 6);
-	T_GET(TK_M,  "M");  assert(sym.cpu_flag == 7);
+	T_GET(TK_NZ, "NZ"); 
+	T_GET(TK_Z,  "Z");  
+	T_GET(TK_NC, "NC"); 
+	T_GET(TK_C,  "C");  
+	T_GET(TK_PO, "PO"); 
+	T_GET(TK_PE, "PE"); 
+	T_GET(TK_P,  "P");  
+	T_GET(TK_M,  "M");  
 
-	T_GET(TK_NZ, "NZ"); assert(sym.cpu_flag == 0);
-	T_GET(TK_Z,  "Z");  assert(sym.cpu_flag == 1);
-	T_GET(TK_NC, "NC"); assert(sym.cpu_flag == 2);
-	T_GET(TK_C,  "C");  assert(sym.cpu_flag == 3);
-	T_GET(TK_PO, "PO"); assert(sym.cpu_flag == 4);
-	T_GET(TK_PE, "PE"); assert(sym.cpu_flag == 5);
-	T_GET(TK_P,  "P");  assert(sym.cpu_flag == 6);
-	T_GET(TK_M,  "M");  assert(sym.cpu_flag == 7);
+	T_GET(TK_NZ, "NZ"); 
+	T_GET(TK_Z,  "Z");  
+	T_GET(TK_NC, "NC"); 
+	T_GET(TK_C,  "C");  
+	T_GET(TK_PO, "PO"); 
+	T_GET(TK_PE, "PE"); 
+	T_GET(TK_P,  "P");  
+	T_GET(TK_M,  "M");  
 	T_END();
 
 	SetTemporaryLine("b c d e h l a ixh ixl iyh iyl "

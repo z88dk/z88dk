@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.43 2014-12-23 00:26:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.44 2014-12-26 16:55:46 pauloscustodio Exp $
 */
 
 #pragma once
@@ -54,7 +54,6 @@ typedef struct sym_t
 #if 0
 	void   (*parser)(void);	/* parser for this keyword as opcode */
 #endif
-	int		 cpu_flag;		/* FLAG_NONE, FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M */
 	int	     cpu_reg8;		/* REG8_NONE, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A */
 	int		 cpu_reg16_af;	/* REG16_NONE, REG16_BC, REG16_DE, REG16_HL, REG16_AF */
 	int		 cpu_reg16_sp;	/* REG16_NONE, REG16_BC, REG16_DE, REG16_HL, REG16_SP */

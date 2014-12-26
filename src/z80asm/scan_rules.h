@@ -215,7 +215,7 @@ tr21:
                     }
                     sym.tok = TK_NZ;
                     sym.text = "NZ";
-                    sym.cpu_flag = FLAG_NZ;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -231,7 +231,7 @@ tr21:
                     }
                     sym.tok = TK_Z;
                     sym.text = "Z";
-                    sym.cpu_flag = FLAG_Z;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -247,7 +247,7 @@ tr21:
                     }
                     sym.tok = TK_NC;
                     sym.text = "NC";
-                    sym.cpu_flag = FLAG_NC;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -263,7 +263,6 @@ tr21:
                     }
                     sym.tok = TK_C;
                     sym.text = "C";
-                    sym.cpu_flag = FLAG_C;
                     sym.cpu_reg8 = REG8_C;
                     {
                         p++;
@@ -280,7 +279,7 @@ tr21:
                     }
                     sym.tok = TK_PO;
                     sym.text = "PO";
-                    sym.cpu_flag = FLAG_PO;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -296,7 +295,7 @@ tr21:
                     }
                     sym.tok = TK_PE;
                     sym.text = "PE";
-                    sym.cpu_flag = FLAG_PE;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -312,7 +311,7 @@ tr21:
                     }
                     sym.tok = TK_P;
                     sym.text = "P";
-                    sym.cpu_flag = FLAG_P;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -328,7 +327,7 @@ tr21:
                     }
                     sym.tok = TK_M;
                     sym.text = "M";
-                    sym.cpu_flag = FLAG_M;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -2912,7 +2911,6 @@ tr154:
                 {
                     sym.tok = TK_C;
                     sym.text = "C";
-                    sym.cpu_flag = FLAG_C;
                     sym.cpu_reg8 = REG8_C;
                     {
                         p++;
@@ -3287,7 +3285,7 @@ tr234:
                 {
                     sym.tok = TK_P;
                     sym.text = "P";
-                    sym.cpu_flag = FLAG_P;
+                    ;
                     {
                         p++;
                         cs = 21;
