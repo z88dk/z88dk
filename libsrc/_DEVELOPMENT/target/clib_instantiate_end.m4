@@ -12,7 +12,7 @@ dnl############################################################
 
    SECTION data_stdio
 
-   IF (__clib_fopen_max > 0) || (__I_STDIO_NUM_FILE > 0)
+   IF (__clib_fopen_max > 0) | (__I_STDIO_NUM_FILE > 0)
 
       ; number of FILEs > 0
 
@@ -79,6 +79,20 @@ dnl############################################################
             jr nz, loop
 
       ENDIF   
+
+   ENDIF
+
+   IF (__clib_fopen_max = -1) & (__I_STDIO_NUM_FILE = 0)
+   
+      ; create empty file lists
+      
+      SECTION bss_stdio
+      PUBLIC __stdio_open_file_list
+      __stdio_open_file_list:  defw 0
+      
+      SECTION data_stdio
+      PUBLIC __stdio_closed_file_list
+      __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
 
    ENDIF
 
