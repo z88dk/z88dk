@@ -14,7 +14,7 @@ SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
-EXTERN l_mult, l_le, asm0_memswap
+EXTERN l_mulu_16_16x16, asm0_memswap
 
 asm_shellsort:
 
@@ -35,9 +35,9 @@ asm_shellsort:
 
    ex de,hl
 
-   ; hl = size
+   ; hl = size = width
    ; bc = base
-   ; de = nmemb
+   ; de = nmemb = nel
    ; ix = compare
 
 	push de	; ngap
@@ -45,7 +45,7 @@ asm_shellsort:
 	ld	(__stdlib_shellsort_base),bc
 
 	; t1 = nel * width;
-	call	l_mult
+	call	l_mulu_16_16x16
 	ld	(__stdlib_shellsort_t1),hl
 
 	; for (ngap = nel / 2; ngap > 0; ngap /= 2) {
@@ -65,7 +65,7 @@ asm_shellsort:
 	;ld d,h
 	;ld e,l
 	;ld	hl,(__stdlib_shellsort_width)
-	call	l_mult
+	call	l_mulu_16_16x16
 	ld	(__stdlib_shellsort_gap),hl
 	; t2 = gap + width;
 
@@ -94,13 +94,16 @@ asm_shellsort:
 	add	hl,de
 	;ld	(__stdlib_shellsort_i),hl
 
-	; for (i = t2 ....
+	; for (i = t2; i <= t1; i += width)
 .i_8
 	ld	(__stdlib_shellsort_i),hl
 	ld	de,(__stdlib_shellsort_t1)
-	ex	de,hl
-	call	l_le
-	jr	nc,i_3
+	
+	; hl = i, de = t1
+	
+	scf
+	sbc hl,de
+	jr nc, i_3    ; if i-t1-1 >= 0 (if i>t1)
 
 	; for (j =  i - t2..
 	ld	de,(__stdlib_shellsort_i)
@@ -141,13 +144,16 @@ asm_shellsort:
 	jr	nz,i_6	; Negative sign ?   exit loop
 
 	
-	pop hl		; width
-	push hl
+	; de = 1st arg
+	; bc = 2nd arg
+	; stack = width
 	
-	push de	; 1st arg:  base+j
-	push bc ; 2nd arg: jd+j
-	push hl ; width
-
+	ld l,c
+	ld h,b
+	
+	pop bc
+	push bc
+	
 	call	asm0_memswap
 
 	; for ... j -= gap)
