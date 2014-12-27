@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.20 2014-12-27 22:53:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.21 2014-12-27 23:16:51 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -270,7 +270,11 @@ TOKEN_OPCODE(PUSH, )
 TOKEN_OPCODE(RET,  )
 TOKEN_OPCODE(RETI, )
 TOKEN_OPCODE(RETN, FOR_Z80)
+TOKEN_OPCODE(RLA,  )
+TOKEN_OPCODE(RLCA, )
 TOKEN_OPCODE(RLD,  )
+TOKEN_OPCODE(RRA,  )
+TOKEN_OPCODE(RRCA, )
 TOKEN_OPCODE(RRD,  )
 TOKEN_OPCODE(RST,  )
 TOKEN_OPCODE(SCF,  )

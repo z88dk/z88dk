@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.91 2014-12-26 18:33:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.92 2014-12-27 23:16:51 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -53,8 +53,7 @@ void ParseIdent( enum flag interpret );
 void AND( void ), BIT( void ), CP( void );
 void OR( void );
 void RES( void );
-void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RR( void ), RRA( void ), RRC( void );
-void RRCA( void );
+void RL( void ), RLC( void ), RR( void ), RRC( void );
 void SET( void ), SLA( void ), SLL( void ), SRA( void );
 void SRL( void ), SUB( void ), XOR( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
@@ -122,13 +121,9 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( RES ),
     DEF_ENTRY( RL ),
-    DEF_ENTRY( RLA ),
     DEF_ENTRY( RLC ),
-    DEF_ENTRY( RLCA ),
     DEF_ENTRY( RR ),
-    DEF_ENTRY( RRA ),
     DEF_ENTRY( RRC ),
-    DEF_ENTRY( RRCA ),
     DEF_ENTRY( SBC ),
     DEF_ENTRY( SECTION ),
     DEF_ENTRY( SET ),
@@ -555,36 +550,4 @@ void
 SRL( void )
 {
     RotShift_instr( 7 );
-}
-
-
-
-void
-RLA( void )
-{
-    append_byte( 0x17 );
-}
-
-
-
-void
-RRA( void )
-{
-    append_byte( 0x1F );
-}
-
-
-
-void
-RRCA( void )
-{
-    append_byte( 0x0F );
-}
-
-
-
-void
-RLCA( void )
-{
-    append_byte( 0x07 );
 }

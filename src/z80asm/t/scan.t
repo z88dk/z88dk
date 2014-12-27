@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.19 2014-12-27 22:53:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.20 2014-12-27 23:16:51 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -832,7 +832,11 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(RET,	T_ALL);
 	T_OPCODE(RETI,	T_ALL);
 	T_OPCODE(RETN,	T_Z80);
+	T_OPCODE(RLA,  	T_ALL);
+	T_OPCODE(RLCA, 	T_ALL);
 	T_OPCODE(RLD,	T_ALL);
+	T_OPCODE(RRA,  	T_ALL);
+	T_OPCODE(RRCA, 	T_ALL);
 	T_OPCODE(RRD,	T_ALL);
 	T_OPCODE(RST,	T_ALL);
 	T_OPCODE(SCF,	T_ALL);

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.13 2014-12-27 22:53:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.14 2014-12-27 23:16:51 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -66,9 +66,13 @@ enum { REG_NONE = -1, REG_BC, REG_DE, REG_HL, REG_SP, REG_AF = 3 };
 			((n) == (i1) ? (o1) : \
 			 _CHOOSE2_((n), (i2), (o2), (i3), (o3)))
 
-
-/* register values to add to opcodes */
-
+/* choose RST opcode */
+#define _RST_ARG(n)			((n) < 0 || (n) > 0x38 || (((n) & 7) != 0) ? \
+								(error_int_range(n),0) : \
+								((opts.cpu & CPU_RABBIT) && \
+									((n) == 0 || (n) == 8 || (n) == 0x30) ? \
+										(error_illegal_ident(),0) : \
+										0xC7 + (n)))
 
 /* Z80 opcodes 
 *  n is a constant
@@ -115,15 +119,14 @@ enum { REG_NONE = -1, REG_BC, REG_DE, REG_HL, REG_SP, REG_AF = 3 };
 #define Z80_POP(reg)		(0xC1 + ((reg) << 4))
 #define Z80_PUSH(reg)		(0xC5 + ((reg) << 4))
 #define Z80_RET				0xC9
-#define Z80_RET_FLAG(flag)	(0xC0 + ((flag) << 3))
 #define Z80_RETI			0xED4D
 #define Z80_RETN			0xED45
+#define Z80_RET_FLAG(flag)	(0xC0 + ((flag) << 3))
+#define Z80_RLA				0x17
+#define Z80_RLCA			0x07
 #define Z80_RLD				0xED6F
+#define Z80_RRA				0x1F
+#define Z80_RRCA			0x0F
 #define Z80_RRD				0xED67
-#define Z80_RST(n)			((n) < 0 || (n) > 0x38 || (((n) & 7) != 0) ? \
-								(error_int_range(n),0) : \
-								((opts.cpu & CPU_RABBIT) && \
-									((n) == 0 || (n) == 8 || (n) == 0x30) ? \
-										(error_illegal_ident(),0) : \
-										0xC7 + (n)))
+#define Z80_RST(n)			_RST_ARG(n)
 #define Z80_SCF				0x37

@@ -129,6 +129,10 @@
 #define _TK_RRD           124    /* "RRD"   */
 #define _TK_RST           125    /* "RST"   */
 #define _TK_SCF           126    /* "SCF"   */
+#define _TK_RLA           127    /* "RLA"   */
+#define _TK_RRA           128    /* "RRA"   */
+#define _TK_RRCA          129    /* "RRCA"  */
+#define _TK_RLCA          130    /* "RLCA"  */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -262,7 +266,10 @@ typedef enum tokid_t
     TK_RRD         = _TK_RRD        ,    /* =   124, "RRD"   */
     TK_RST         = _TK_RST        ,    /* =   125, "RST"   */
     TK_SCF         = _TK_SCF        ,    /* =   126, "SCF"   */
+    TK_RLA         = _TK_RLA        ,    /* =   127, "RLA"   */
+    TK_RRA         = _TK_RRA        ,    /* =   128, "RRA"   */
+    TK_RRCA        = _TK_RRCA       ,    /* =   129, "RRCA"  */
+    TK_RLCA        = _TK_RLCA       ,    /* =   130, "RLCA"  */
 } tokid_t;
 
 #endif
-

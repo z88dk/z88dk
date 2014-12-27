@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.15 2014-12-27 22:53:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-27 23:16:51 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -213,20 +213,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.15 2014-12-
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
-		|	OP_stmt_const(IM)
-		|	OP_stmt_const(RST)
-		|	OP_stmt_reg(POP,  AF)
-		|	OP_stmt_reg(POP,  BC)
-		|	OP_stmt_reg(POP,  DE)
-		|	OP_stmt_reg(POP,  HL)
-		|	OP_stmt_idx(POP,  IX)
-		|	OP_stmt_idx(POP,  IY)
-		|	OP_stmt_reg(PUSH, AF)
-		|	OP_stmt_reg(PUSH, BC)
-		|	OP_stmt_reg(PUSH, DE)
-		|	OP_stmt_reg(PUSH, HL)
-		|	OP_stmt_idx(PUSH, IX)
-		|	OP_stmt_idx(PUSH, IY)
 		|	OP_CALL_flag_nn(C)
 		|	OP_CALL_flag_nn(M)
 		|	OP_CALL_flag_nn(NC)
@@ -259,7 +245,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.15 2014-12-
 		|	OP_stmt(RET)
 		|	OP_stmt(RETI)
 		|	OP_stmt(RETN)
+		|	OP_stmt(RLA)
+		|	OP_stmt(RLCA)
+		|	OP_stmt(RRA)
+		|	OP_stmt(RRCA)
 		|	OP_stmt(SCF)
+		|	OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)
+		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)
+		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)
+		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)
+		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)
+		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)
+		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)
+		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)
+		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
+		|	OP_stmt_const(IM)
+		|	OP_stmt_const(RST)
 		|	OP_stmt_dis(DJNZ)
 		|	OP_stmt_dis(JR)
 		|	OP_stmt_emul(CPD,  rcmx_cpd)
@@ -288,17 +289,20 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.15 2014-12-
 		|	OP_stmt_flag_nn(JP, PE)
 		|	OP_stmt_flag_nn(JP, PO)
 		|	OP_stmt_flag_nn(JP, Z)
+		|	OP_stmt_idx(POP,  IX)
+		|	OP_stmt_idx(POP,  IY)
+		|	OP_stmt_idx(PUSH, IX)
+		|	OP_stmt_idx(PUSH, IY)
 		|	OP_stmt_nn(CALL)
 		|	OP_stmt_nn(JP)
-		|	OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)
-		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)
-		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)
-		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)
-		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)
-		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)
-		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)
-		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)
-		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
+		|	OP_stmt_reg(POP,  AF)
+		|	OP_stmt_reg(POP,  BC)
+		|	OP_stmt_reg(POP,  DE)
+		|	OP_stmt_reg(POP,  HL)
+		|	OP_stmt_reg(PUSH, AF)
+		|	OP_stmt_reg(PUSH, BC)
+		|	OP_stmt_reg(PUSH, DE)
+		|	OP_stmt_reg(PUSH, HL)
 		;
 
 }%%
