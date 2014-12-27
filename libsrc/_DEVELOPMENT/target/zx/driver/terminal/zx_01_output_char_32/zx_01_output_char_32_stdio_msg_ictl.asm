@@ -110,7 +110,7 @@ _ioctl_fcolor:
 
    ld a,b
    or a
-   ret z                       ; if fcolour > 255
+   ret nz                      ; if fcolour > 255
 
    ld (ix+23),c
    ret
@@ -125,7 +125,7 @@ _ioctl_fmask:
    
    ld a,b
    or a
-   ret z                       ; if fmask > 255
+   ret nz                      ; if fmask > 255
    
    ld (ix+24),c
    ret
