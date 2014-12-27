@@ -31,6 +31,8 @@ include "clib_target_constants.inc"
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+EXTERN _font_4x8_def
+
 
 ; When FILEs and FDSTRUCTs are instantiated labels are assigned
 ; to point at created structures.
@@ -40,6 +42,7 @@ include "clib_target_constants.inc"
 ; __i_stdio_file_n     = address of static FILE structure #n (0..__I_STDIO_NUM_FILE-1)
 ; __i_fcntl_fdstruct_n = address of static FDSTRUCT #n (0..__I_FCNTL_NUM_FD-1)
 ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
+
 
 
 
@@ -183,6 +186,14 @@ include "clib_target_constants.inc"
          
          __fcntl_fdtbl:        defs __clib_open_max * 2
       
+      ELSE
+      
+         ; no fd table at all
+         
+         PUBLIC __fcntl_fdtbl
+         
+         defc __fcntl_fdtbl = 0
+      
       ENDIF
    
       defc __fcntl_fdtbl_size = __clib_open_max
@@ -202,11 +213,15 @@ include "clib_target_constants.inc"
    
       ; static FDSTRUCTs have been allocated in the heap
       
-      SECTION data_fcntl_stdio_heap_head
-      
+      SECTION data_fcntl
+
       PUBLIC __stdio_heap
       
-      __stdio_heap:
+      __stdio_heap:            defw __stdio_block
+
+      SECTION data_fcntl_stdio_heap_head
+      
+      __stdio_block:
       
          defb 0                ; no owner
          defb 0x01             ; mtx_plain
@@ -249,15 +264,21 @@ include "clib_target_constants.inc"
       
       IF __clib_stdio_heap_size > 14
       
-         SECTION bss_fcntl
+         SECTION data_fcntl
          
          PUBLIC __stdio_heap
          
-         __stdio_heap:         defs __clib_stdio_heap_size
+         __stdio_heap:         defw __stdio_block
+         
+         SECTION bss_fcntl
+         
+         PUBLIC __stdio_block
+         
+         __stdio_block:         defs __clib_stdio_heap_size
          
          SECTION code_crt_init
          
-         ld hl,__stdio_heap
+         ld hl,__stdio_block
          ld bc,__clib_stdio_heap_size
          
          EXTERN asm_heap_init

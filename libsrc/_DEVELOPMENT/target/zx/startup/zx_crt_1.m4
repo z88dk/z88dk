@@ -71,8 +71,8 @@ include(../../clib_instantiate_begin.m4)
 include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
 m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64, 1, 500, 15)dnl
 
-include(../driver/terminal/zx_01_output_char_64_tty_z88dk.m4)dnl
-m4_zx_01_output_char_64_tty_z88dk(_stdout, 0x2370, 0, 0, 0, 64, 0, 24, 0, _font_4x8_def - 256, 56, 0, 56)dnl
+include(../driver/terminal/zx_01_output_char_32.m4)dnl
+m4_zx_01_output_char_32(_stdout, 0x2370, 0, 0, 0, 32, 0, 24, 0, 15360, 56, 0, 56)dnl
 
 include(../../m4_file_dup.m4)dnl
 m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl

@@ -142,6 +142,14 @@ dnl############################################################
          
          __fcntl_fdtbl:        defs __clib_open_max * 2
       
+      ELSE
+      
+         ; no fd table at all
+         
+         PUBLIC __fcntl_fdtbl
+         
+         defc __fcntl_fdtbl = 0
+      
       ENDIF
    
       defc __fcntl_fdtbl_size = __clib_open_max
