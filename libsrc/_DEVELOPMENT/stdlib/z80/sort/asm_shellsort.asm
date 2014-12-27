@@ -14,7 +14,7 @@ SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
-EXTERN l_mulu_16_16x16, asm0_memswap
+EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
 
 asm_shellsort:
 
@@ -118,6 +118,8 @@ asm_shellsort:
 	; for ..; j>0; ..
 	jp	m,i_6
 	
+	push ix
+	
 	; 1st arg:  base+j
 	ld	de,(__stdlib_shellsort_base)
 	;ld	hl,(__stdlib_shellsort_j)
@@ -130,13 +132,12 @@ asm_shellsort:
 	add	hl,de
 	push	hl
 
-	ld bc,ret_addr
-	push bc
-	jp	(ix)		; compare function
-.ret_addr
+        call l_jpix
 
 	pop bc		; we're keeping the same args for the next call !
 	pop de
+
+        pop ix
 
 	; if ((*compar)(base+j, jd+j) <=0) break;
 	dec hl
