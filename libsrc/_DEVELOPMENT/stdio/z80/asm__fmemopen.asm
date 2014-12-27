@@ -23,8 +23,8 @@ SECTION code_stdio
 PUBLIC asm__fmemopen
 PUBLIC asm0__fmemopen
 
-EXTERN error_einval_zc, error_zc, __stdio_file_add_list
-EXTERN __stdio_parse_mode, asm_malloc, __stdio_file_constructor, l_setmem_hl
+EXTERN error_einval_zc, error_zc, __stdio_file_add_list, __stdio_heap
+EXTERN __stdio_parse_mode, asm_heap_alloc, __stdio_file_constructor, l_setmem_hl
 EXTERN __stdio_memstream_driver, asm_realloc, __stdio_file_destructor, asm_free
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,8 +77,11 @@ asm__fmemopen:
    
    push bc                     ; save mode byte
    
+   ; allocate FILE structs from stdio's heap
+   
    ld hl,31                    ; sizeof(memstream FILE *)
-   call asm_malloc
+   ld de,(__stdio_heap)
+   call asm_heap_alloc
    
    jp c, error_zc - 3          ; if malloc failed
 
