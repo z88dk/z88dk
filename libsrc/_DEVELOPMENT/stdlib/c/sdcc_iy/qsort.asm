@@ -19,4 +19,6 @@ _qsort:
    push bc
    push af
    
+   jp asm_qsort
+   
    INCLUDE "stdlib/z80/asm_qsort.asm"
