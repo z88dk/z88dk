@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.17 2014-12-26 16:27:07 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.18 2014-12-27 22:53:22 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -91,21 +91,18 @@ DEFINE_fini()
 /*-----------------------------------------------------------------------------
 *   Parse expression and push it to exprs
 *----------------------------------------------------------------------------*/
-static void push_expr(char *ts, char *te)
+
+/* save the current scanner context and parse the given expression */
+struct Expr *parse_expr(char *expr_text)
 {
-	static Str *expr_text;
 	Expr *expr;
 	int num_errors;
 
-	INIT_OBJ(Str, &expr_text);
-
-	/* parse expression */
-	Str_set_n(expr_text, ts, te - ts);
 	save_scan_state();
 	{
 		src_push();
 		{
-			SetTemporaryLine(expr_text->str);
+			SetTemporaryLine(expr_text);
 			num_errors = get_num_errors();
 			EOL = FALSE;
 			scan_expect_operands();
@@ -117,6 +114,20 @@ static void push_expr(char *ts, char *te)
 		src_pop();
 	}
 	restore_scan_state();
+	
+	return expr;
+}
+
+static void push_expr(char *ts, char *te)
+{
+	static Str *expr_text;
+	Expr *expr;
+
+	INIT_OBJ(Str, &expr_text);
+
+	/* parse expression */
+	Str_set_n(expr_text, ts, te - ts);
+	expr = parse_expr(expr_text->str);
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(exprs, &expr);
@@ -176,14 +187,6 @@ char *autolabel(void)
 
 	Str_sprintf(label, "__autolabel_%04d", ++n);
 	return strpool_add(label->str);
-}
-
-/*-----------------------------------------------------------------------------
-*   insert a macro at the current position in input
-*----------------------------------------------------------------------------*/
-static void insert_macro(char *macro)
-{
-	SetTemporaryLine(macro);
 }
 
 /*-----------------------------------------------------------------------------

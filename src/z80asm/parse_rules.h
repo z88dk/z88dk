@@ -192,9 +192,14 @@ st0:
 tr43:
 
                 {
-                    if ( compile_active && stmt_label )
+                    if ( stmt_label )
                     {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
+                        if ( compile_active )
+                        {
+                            define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                        };
+
+                        stmt_label = NULL;
                     };
                 }
                 goto st172;
@@ -205,15 +210,23 @@ tr54:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_CALL ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -225,42 +238,23 @@ tr60:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_NZ <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_NZ ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_NZ ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_NZ ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_NZ, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr66:
@@ -270,42 +264,23 @@ tr66:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_Z <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_Z ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_Z ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_Z ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_Z, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr72:
@@ -315,42 +290,23 @@ tr72:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_NC <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_NC ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_NC ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_NC ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_NC, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr78:
@@ -360,42 +316,23 @@ tr78:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_C <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_C ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_C ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_C ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_C, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr84:
@@ -405,42 +342,23 @@ tr84:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_PO <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_PO ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_PO ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_PO ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_PO, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr90:
@@ -450,42 +368,23 @@ tr90:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_PE <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_PE ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_PE ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_PE ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_PE, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr96:
@@ -495,42 +394,23 @@ tr96:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_P <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_P ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_P ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_P ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_P, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr102:
@@ -540,54 +420,40 @@ tr102:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
+                    Expr *expr = pop_expr();
 
+                    if ( compile_active )
                     {
-                        Expr *expr = pop_expr();
-
-                        if ( compile_active )
+                        if ( stmt_label )
                         {
-                            if ( opts.cpu & CPU_RABBIT )
+                            if ( compile_active )
                             {
-                                char *label = autolabel();
-                                Expr *label_expr;
-                                int jump_size;
-                                push_expr( label, label + strlen( label ) );
-                                label_expr = pop_expr();
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
 
-                                if ( FLAG_M <= FLAG_C )
-                                {
-                                    add_opcode_jr( Z80_JR_NOT( FLAG_M ), label_expr );
-                                    jump_size = 2;
-                                }
-                                else
-                                {
-                                    add_opcode_nn( Z80_JP_NOT( FLAG_M ), label_expr );
-                                    jump_size = 3;
-                                }
+                            stmt_label = NULL;
+                        };
 
-                                add_opcode_nn( Z80_CALL( FLAG_NONE ), expr );
-                                define_symbol( label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED );
-                            }
-                            else add_opcode_nn( Z80_CALL( FLAG_M ), expr );
-                        }
-                        else OBJ_DELETE( expr );
-                    };
+                        add_call_flag( FLAG_M, expr );
+                    }
+                    else OBJ_DELETE( expr );
                 }
                 goto st172;
 tr105:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_CCF );
                     };
                 }
@@ -595,73 +461,94 @@ tr105:
 tr106:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_cpd" "\n" "call   " "rcmx_cpd" "\n" );
-                        else add_opcode( Z80_CPD );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_CPD, "rcmx_cpd" );
                     }
                 }
                 goto st172;
 tr107:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_cpdr" "\n" "call   " "rcmx_cpdr" "\n" );
-                        else add_opcode( Z80_CPDR );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_CPDR, "rcmx_cpdr" );
                     }
                 }
                 goto st172;
 tr108:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_cpi" "\n" "call   " "rcmx_cpi" "\n" );
-                        else add_opcode( Z80_CPI );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_CPI, "rcmx_cpi" );
                     }
                 }
                 goto st172;
 tr109:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_cpir" "\n" "call   " "rcmx_cpir" "\n" );
-                        else add_opcode( Z80_CPIR );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_CPIR, "rcmx_cpir" );
                     }
                 }
                 goto st172;
 tr110:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_CPL );
                     };
                 }
@@ -669,13 +556,18 @@ tr110:
 tr111:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_DAA );
                     };
                 }
@@ -683,13 +575,18 @@ tr111:
 tr112:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_DI );
                     };
                 }
@@ -701,15 +598,23 @@ tr115:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_DJNZ, expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_DJNZ ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -717,13 +622,18 @@ tr115:
 tr118:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_EI );
                     };
                 }
@@ -731,97 +641,132 @@ tr118:
 tr124:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_DE_HL );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_DE_HL ) );
                     };
                 }
                 goto st172;
 tr128:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_AF_AF );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_AF_AF ) );
                     };
                 }
                 goto st172;
 tr129:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_AF_AF );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_AF_AF ) );
                     };
                 }
                 goto st172;
 tr134:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_IND_SP_HL );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_IND_SP_HL ) );
                     };
                 }
                 goto st172;
 tr135:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_IND_SP_IX );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_IND_SP_idx + P_IX ) );
                     };
                 }
                 goto st172;
 tr136:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_EX_IND_SP_IY );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_EX_IND_SP_idx + P_IY ) );
                     };
                 }
                 goto st172;
 tr137:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_EXX );
                     };
                 }
@@ -829,13 +774,18 @@ tr137:
 tr138:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_HALT );
                     };
                 }
@@ -853,13 +803,18 @@ tr141:
                 {
                     if ( !expr_error )
                     {
-                        if ( compile_active && stmt_label )
-                        {
-                            define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                        };
-
                         if ( compile_active )
                         {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
                             add_opcode( Z80_IM( expr_value ) );
                         };
                     }
@@ -868,13 +823,18 @@ tr141:
 tr144:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_IND );
                     };
                 }
@@ -882,13 +842,18 @@ tr144:
 tr145:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_INDR );
                     };
                 }
@@ -896,13 +861,18 @@ tr145:
 tr146:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_INI );
                     };
                 }
@@ -910,13 +880,18 @@ tr146:
 tr147:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_INIR );
                     };
                 }
@@ -928,15 +903,23 @@ tr161:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_NONE ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -948,15 +931,23 @@ tr167:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_NZ ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_NZ ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -968,15 +959,23 @@ tr173:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_Z ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_Z ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -988,15 +987,23 @@ tr179:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_NC ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_NC ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1008,15 +1015,23 @@ tr185:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_C ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_C ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1028,15 +1043,23 @@ tr191:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_PO ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_PO ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1048,15 +1071,23 @@ tr197:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_PE ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_PE ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1068,15 +1099,23 @@ tr203:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_P ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_P ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1088,15 +1127,23 @@ tr209:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_nn( Z80_JP( FLAG_M ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_nn( ( Z80_JP_FLAG( FLAG_M ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1104,42 +1151,57 @@ tr209:
 tr212:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_JP_IND_HL );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_JP_idx ) );
                     };
                 }
                 goto st172;
 tr214:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_JP_IND_IX );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_JP_idx + P_IX ) );
                     };
                 }
                 goto st172;
 tr216:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_JP_IND_IY );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( ( Z80_JP_idx + P_IY ) );
                     };
                 }
                 goto st172;
@@ -1150,15 +1212,23 @@ tr223:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_JR( FLAG_NONE ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_JR ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1170,15 +1240,23 @@ tr229:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_JR( FLAG_NZ ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_JR_FLAG( FLAG_NZ ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1190,15 +1268,23 @@ tr235:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_JR( FLAG_Z ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_JR_FLAG( FLAG_Z ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1210,15 +1296,23 @@ tr241:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_JR( FLAG_NC ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_JR_FLAG( FLAG_NC ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1230,15 +1324,23 @@ tr247:
                 }
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     {
                         Expr *expr = pop_expr();
 
-                        if ( compile_active ) add_opcode_jr( Z80_JR( FLAG_C ), expr );
+                        if ( compile_active )
+                        {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
+                            add_opcode_dis( ( Z80_JR_FLAG( FLAG_C ) ), expr );
+                        }
                         else OBJ_DELETE( expr );
                     };
                 }
@@ -1246,13 +1348,18 @@ tr247:
 tr250:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_LDD );
                     };
                 }
@@ -1260,13 +1367,18 @@ tr250:
 tr251:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_LDDR );
                     };
                 }
@@ -1274,13 +1386,18 @@ tr251:
 tr252:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_LDI );
                     };
                 }
@@ -1288,13 +1405,18 @@ tr252:
 tr253:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_LDIR );
                     };
                 }
@@ -1302,13 +1424,18 @@ tr253:
 tr254:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_NEG );
                     };
                 }
@@ -1316,13 +1443,18 @@ tr254:
 tr255:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_NOP );
                     };
                 }
@@ -1330,13 +1462,18 @@ tr255:
 tr256:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_OTDR );
                     };
                 }
@@ -1344,13 +1481,18 @@ tr256:
 tr257:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_OTIR );
                     };
                 }
@@ -1358,13 +1500,18 @@ tr257:
 tr258:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_OUTD );
                     };
                 }
@@ -1372,13 +1519,18 @@ tr258:
 tr259:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_OUTI );
                     };
                 }
@@ -1386,13 +1538,18 @@ tr259:
 tr266:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_POP( REG_BC ) );
                     };
                 }
@@ -1400,13 +1557,18 @@ tr266:
 tr267:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_POP( REG_DE ) );
                     };
                 }
@@ -1414,13 +1576,18 @@ tr267:
 tr268:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_POP( REG_HL ) );
                     };
                 }
@@ -1428,41 +1595,56 @@ tr268:
 tr269:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_POP( REG_IX ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_POP( REG_HL ) + P_IX );
                     };
                 }
                 goto st172;
 tr270:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_POP( REG_IY ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_POP( REG_HL ) + P_IY );
                     };
                 }
                 goto st172;
 tr271:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_POP( REG_AF ) );
                     };
                 }
@@ -1470,13 +1652,18 @@ tr271:
 tr278:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_PUSH( REG_BC ) );
                     };
                 }
@@ -1484,13 +1671,18 @@ tr278:
 tr279:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_PUSH( REG_DE ) );
                     };
                 }
@@ -1498,13 +1690,18 @@ tr279:
 tr280:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_PUSH( REG_HL ) );
                     };
                 }
@@ -1512,41 +1709,56 @@ tr280:
 tr281:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_PUSH( REG_IX ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_PUSH( REG_HL ) + P_IX );
                     };
                 }
                 goto st172;
 tr282:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_PUSH( REG_IY ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_PUSH( REG_HL ) + P_IY );
                     };
                 }
                 goto st172;
 tr283:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_PUSH( REG_AF ) );
                     };
                 }
@@ -1554,139 +1766,189 @@ tr283:
 tr284:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_NONE ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET );
                     };
                 }
                 goto st172;
 tr293:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_NZ ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_NZ ) );
                     };
                 }
                 goto st172;
 tr294:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_Z ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_Z ) );
                     };
                 }
                 goto st172;
 tr295:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_NC ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_NC ) );
                     };
                 }
                 goto st172;
 tr296:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_C ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_C ) );
                     };
                 }
                 goto st172;
 tr297:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_PO ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_PO ) );
                     };
                 }
                 goto st172;
 tr298:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_PE ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_PE ) );
                     };
                 }
                 goto st172;
 tr299:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_P ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_P ) );
                     };
                 }
                 goto st172;
 tr300:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        add_opcode( Z80_RET( FLAG_M ) );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode( Z80_RET_FLAG( FLAG_M ) );
                     };
                 }
                 goto st172;
 tr301:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_RETI );
                     };
                 }
@@ -1694,13 +1956,18 @@ tr301:
 tr302:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_RETN );
                     };
                 }
@@ -1708,30 +1975,38 @@ tr302:
 tr303:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_rld" "\n" "call   " "rcmx_rld" "\n" );
-                        else add_opcode( Z80_RLD );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_RLD, "rcmx_rld" );
                     }
                 }
                 goto st172;
 tr304:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
-                        if ( opts.cpu & CPU_RABBIT ) insert_macro( "extern " "rcmx_rrd" "\n" "call   " "rcmx_rrd" "\n" );
-                        else add_opcode( Z80_RRD );
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
+                        add_opcode_emul( Z80_RRD, "rcmx_rrd" );
                     }
                 }
                 goto st172;
@@ -1748,13 +2023,18 @@ tr307:
                 {
                     if ( !expr_error )
                     {
-                        if ( compile_active && stmt_label )
-                        {
-                            define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                        };
-
                         if ( compile_active )
                         {
+                            if ( stmt_label )
+                            {
+                                if ( compile_active )
+                                {
+                                    define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                                };
+
+                                stmt_label = NULL;
+                            };
+
                             add_opcode( Z80_RST( expr_value ) );
                         };
                     }
@@ -1763,13 +2043,18 @@ tr307:
 tr310:
 
                 {
-                    if ( compile_active && stmt_label )
-                    {
-                        define_symbol( stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
-                    };
-
                     if ( compile_active )
                     {
+                        if ( stmt_label )
+                        {
+                            if ( compile_active )
+                            {
+                                define_symbol( ( stmt_label ), get_PC() + ( 0 ), TYPE_ADDRESS, SYM_TOUCHED );
+                            };
+
+                            stmt_label = NULL;
+                        };
+
                         add_opcode( Z80_SCF );
                     };
                 }

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.89 2014-12-26 18:33:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.90 2014-12-27 22:53:23 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,23 +37,6 @@ void SBC_8bit_instr( void );
 void IncDec_8bit_instr( int opcode );
 void ArithLog8_instr( int opcode );
 void ExtAccumulator(int opcode);
-
-void
-PushPop_instr( int opcode )
-{
-	GetSym();
-	if (sym.cpu_reg16_af != REG_NONE)
-	{
-		if (sym.cpu_idx_reg)
-			append_byte(sym.cpu_idx_reg);
-		append_byte((Byte)(opcode + (sym.cpu_reg16_af << 4)));
-	}
-	else
-	{
-		error_syntax();
-	}
-}
-
 
 void
 OUT( void )

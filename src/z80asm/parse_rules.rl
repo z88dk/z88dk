@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.14 2014-12-26 18:33:20 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.15 2014-12-27 22:53:22 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -22,132 +22,142 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.14 2014-12-
 #define NO_TOKEN_ENUM
 #include "scan_tokens.h"
 
-#define ADD_LABEL		if (compile_active && stmt_label) { \
-							define_symbol(stmt_label, get_PC(), TYPE_ADDRESS, SYM_TOUCHED); \
-						}
-						
-#define ADD_OPCODE(x)	ADD_LABEL; \
-						if (compile_active) { \
-							add_opcode(x); \
-						}
+/*-----------------------------------------------------------------------------
+*   Helper macros
+*----------------------------------------------------------------------------*/
 
-#define OPCODE(op)		label? _TK_##op _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_##op); }
+/* macros for actions - labels */
+#define DO_LABEL(name, offset) \
+			if (compile_active) { \
+				define_symbol((name), get_PC() + (offset), \
+							  TYPE_ADDRESS, SYM_TOUCHED); \
+			}
 
-#define OPCODE_reg(op, reg) \
-						label? _TK_##op _TK_##reg _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_##op(REG_##reg)); }
+#define DO_STMT_LABEL() \
+			if (stmt_label) { \
+				DO_LABEL(stmt_label, 0); \
+				stmt_label = NULL; \
+			}
 
-#define ADD_OPCODE_JR(x) \
-						ADD_LABEL; \
-						{ 	Expr *expr = pop_expr(); \
-							if (compile_active) \
-								add_opcode_jr(x, expr); \
-							else \
-								OBJ_DELETE(expr); \
-						}
+/* macros for actions - statements */
+#define DO_stmt(opcode) \
+			if (compile_active) { \
+				DO_STMT_LABEL(); \
+				add_opcode(opcode); \
+			}
 
-#define ADD_OPCODE_nn(x) \
-						ADD_LABEL; \
-						{ 	Expr *expr = pop_expr(); \
-							if (compile_active) \
-								add_opcode_nn(x, expr); \
-							else \
-								OBJ_DELETE(expr); \
-						}
+#define _DO_stmt_(suffix, opcode) \
+			{ 	Expr *expr = pop_expr(); \
+				if (compile_active) { \
+					DO_STMT_LABEL(); \
+					add_opcode_##suffix((opcode), expr); \
+				} \
+				else \
+					OBJ_DELETE(expr); \
+			}
 
-#define ADD_OPCODE_call(flag) \
-						ADD_LABEL; \
-						{ 	Expr *expr = pop_expr(); \
-							if (compile_active) { \
-								if (opts.cpu & CPU_RABBIT) { \
-									char *label = autolabel(); \
-									Expr *label_expr; \
-									int jump_size; \
-									push_expr(label, label+strlen(label)); \
-									label_expr = pop_expr(); \
-									if (FLAG_##flag <= FLAG_C) { \
-										add_opcode_jr( \
-											Z80_JR_NOT(FLAG_##flag), \
-											label_expr); \
-										jump_size = 2; \
-									} \
-									else { \
-										add_opcode_nn( \
-											Z80_JP_NOT(FLAG_##flag), \
-											label_expr); \
-										jump_size = 3; \
-									} \
-									add_opcode_nn(Z80_CALL(FLAG_NONE), \
-											expr); \
-									define_symbol(label, \
-											get_PC() + jump_size + 3, \
-											TYPE_ADDRESS, SYM_TOUCHED); \
-								} \
-								else \
-									add_opcode_nn(Z80_CALL(FLAG_##flag), \
-												  expr); \
-							} \
-							else \
-								OBJ_DELETE(expr); \
-						}
+#define DO_stmt_dis(opcode) 	_DO_stmt_(dis, opcode)
+#define DO_stmt_n(  opcode)		_DO_stmt_(n,   opcode)
+#define DO_stmt_nn( opcode)		_DO_stmt_(nn,  opcode)
 
-#define OPCODE_const(op) label? _TK_##op const_expr _TK_NEWLINE	\
-						@{ if (!expr_error) { \
-								ADD_OPCODE(Z80_##op(expr_value)); \
-						   } \
-						}
+/* macros for rules */
+#define RULE_stmt(token, args, value) \
+			label? _TK_##token args _TK_NEWLINE \
+			@{ DO_stmt(value); }
 
-#define OPCODE_EX(a,b,a1,b1)	\
-						label? _TK_EX _TK_##a _TK_COMMA _TK_##b _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_EX_##a1##_##b1); }
-						
-#define OPCODE_RET_FLAG(flag) \
-						label? _TK_RET _TK_##flag _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_RET(FLAG_##flag)); }
-#define OPCODE_RET() \
-						label? _TK_RET _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_RET(FLAG_NONE)); }
-						
-#define OPCODE_JR_FLAG(flag) \
-						label? _TK_JR _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-						@{ ADD_OPCODE_JR(Z80_JR(FLAG_##flag)); }
+#define OP_stmt(op) \
+			RULE_stmt(op, , Z80_##op)
 
-#define OPCODE_JR(op, code) \
-						label? _TK_##op expr _TK_NEWLINE \
-						@{ ADD_OPCODE_JR(code); }
+#define OP_stmt_reg(op, reg1) \
+			RULE_stmt(op, _TK_##reg1, Z80_##op(REG_##reg1))
 
-#define OPCODE_JP_IND(reg, tail) \
-						label? _TK_JP _TK_IND_##reg tail _TK_NEWLINE \
-						@{ ADD_OPCODE(Z80_JP_IND_##reg); }
+#define OP_stmt_idx(op, idx1) \
+			RULE_stmt(op, _TK_##idx1, Z80_##op(REG_HL) + P_##idx1)
 
-#define OPCODE_JP_FLAG(flag) \
-						label? _TK_JP _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-						@{ ADD_OPCODE_nn(Z80_JP(FLAG_##flag)); }
+#define OP_stmt_arg(op, arg1, value) \
+			RULE_stmt(op, _TK_##arg1, (value))
 
-#define OPCODE_JP() 	label? _TK_JP expr _TK_NEWLINE \
-						@{ ADD_OPCODE_nn(Z80_JP(FLAG_NONE)); }
+#define OP_stmt_arg_arg(op, arg1, arg2, value) \
+			RULE_stmt(op, _TK_##arg1 _TK_COMMA _TK_##arg2, (value))
 
-#define OPCODE_CALL_FLAG(flag) \
-						label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-						@{ ADD_OPCODE_call(flag); }
+#define OP_stmt_const(op) \
+			label? _TK_##op const_expr _TK_NEWLINE	\
+			@{ \
+				if (!expr_error) { \
+					DO_stmt(Z80_##op(expr_value)); \
+				} \
+			}
 
-#define OPCODE_CALL() 	label? _TK_CALL expr _TK_NEWLINE \
-						@{ ADD_OPCODE_nn(Z80_CALL(FLAG_NONE)); }
+			
+#define RULE_stmt_nn(token, value) \
+			label? _TK_##token expr _TK_NEWLINE \
+			@{ DO_stmt_nn(value); }
 
-#define OPCODE_EMUL_RABBIT(op,func)	\
-						label? _TK_##op _TK_NEWLINE \
-						@{ 	ADD_LABEL; \
-							if (compile_active) { \
-								if (opts.cpu & CPU_RABBIT) \
-									insert_macro("extern " #func "\n" \
-												 "call   " #func "\n"); \
-								else \
-									add_opcode(Z80_##op); \
-							} \
-						}
-								
-					
+#define OP_stmt_nn(op) \
+			RULE_stmt_nn(op, Z80_##op)
+
+			
+#define RULE_stmt_dis(token, value) \
+			label? _TK_##token expr _TK_NEWLINE \
+			@{ DO_stmt_dis(value); }
+
+#define OP_stmt_dis(op) \
+			RULE_stmt_dis(op, Z80_##op)
+
+			
+#define RULE_stmt_flag_nn(token, flag, value) \
+			label? _TK_##token _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+			@{ DO_stmt_nn(value); }
+
+#define OP_stmt_flag_nn(op, flag) \
+			RULE_stmt_flag_nn(op, flag, Z80_##op##_FLAG(FLAG_##flag))
+
+
+#define RULE_stmt_flag_dis(token, flag, value) \
+			label? _TK_##token _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+			@{ DO_stmt_dis(value); }
+
+#define OP_stmt_flag_dis(op, flag) \
+			RULE_stmt_flag_dis(op, flag, Z80_##op##_FLAG(FLAG_##flag))
+
+
+#define RULE_stmt_flag(token, flag, value) \
+			label? _TK_##token _TK_##flag _TK_NEWLINE \
+			@{ DO_stmt(value); }
+
+#define OP_stmt_flag(op, flag) \
+			RULE_stmt_flag(op, flag, Z80_##op##_FLAG(FLAG_##flag))
+
+
+
+ 
+/* special opcodes */
+#define OP_CALL_flag_nn(flag) \
+			label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
+			@{ \
+			 	Expr *expr = pop_expr(); \
+				if (compile_active) { \
+					DO_STMT_LABEL(); \
+					add_call_flag(FLAG_##flag, expr); \
+				} \
+				else \
+					OBJ_DELETE(expr); \
+			}
+
+#define OP_stmt_emul(op, emul_func) \
+			label? _TK_##op _TK_NEWLINE \
+			@{ \
+				if (compile_active) { \
+					DO_STMT_LABEL(); \
+					add_opcode_emul(Z80_##op, #emul_func); \
+				} \
+			}
+
+
+/*-----------------------------------------------------------------------------
+*   State Machine
+*----------------------------------------------------------------------------*/
+
 %%{
 	machine parser;
 
@@ -164,7 +174,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.14 2014-12-
 #endif
 
 	/* label */
-	label = _TK_LABEL 		@{ stmt_label = p->string; };
+	label = _TK_LABEL @{ stmt_label = p->string; };
 	
 	/* expression */
 	unary 	= _TK_MINUS | _TK_PLUS |
@@ -202,93 +212,93 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.14 2014-12-
 	/* assembly statement */
 	main := _TK_END
 		|	_TK_NEWLINE
-		|	label           _TK_NEWLINE				@{ ADD_LABEL; }
-		|	OPCODE(CCF)
-		|	OPCODE(CPL)
-		|	OPCODE(DAA)
-		|	OPCODE(DI)
-		|	OPCODE(EI)
-		|	OPCODE(EXX)
-		|	OPCODE(HALT)
-		|	OPCODE(IND)
-		|	OPCODE(INDR)
-		|	OPCODE(INI)
-		|	OPCODE(INIR)
-		|	OPCODE(LDD)
-		|	OPCODE(LDDR)
-		|	OPCODE(LDI)
-		|	OPCODE(LDIR)
-		|	OPCODE(NEG)
-		|	OPCODE(NOP)
-		|	OPCODE(OTDR)
-		|	OPCODE(OTIR)
-		|	OPCODE(OUTD)
-		|	OPCODE(OUTI)
-		|	OPCODE(RETI)
-		|	OPCODE(RETN)
-		|	OPCODE(SCF)
-		|	OPCODE_CALL()
-		|	OPCODE_CALL_FLAG(C)
-		|	OPCODE_CALL_FLAG(M)
-		|	OPCODE_CALL_FLAG(NC)
-		|	OPCODE_CALL_FLAG(NZ)
-		|	OPCODE_CALL_FLAG(P)
-		|	OPCODE_CALL_FLAG(PE)
-		|	OPCODE_CALL_FLAG(PO)
-		|	OPCODE_CALL_FLAG(Z)
-		|	OPCODE_EMUL_RABBIT(CPD,  rcmx_cpd)
-		|	OPCODE_EMUL_RABBIT(CPDR, rcmx_cpdr)
-		|	OPCODE_EMUL_RABBIT(CPI,  rcmx_cpi)
-		|	OPCODE_EMUL_RABBIT(CPIR, rcmx_cpir)
-		|	OPCODE_EMUL_RABBIT(RLD,  rcmx_rld)
-		|	OPCODE_EMUL_RABBIT(RRD,  rcmx_rrd)
-		|	OPCODE_EX(AF,AF,  AF,AF)
-		|	OPCODE_EX(AF,AF1, AF,AF)
-		|	OPCODE_EX(DE,HL,  DE,HL)
-		|	OPCODE_EX(IND_SP,HL, IND_SP,HL)
-		|	OPCODE_EX(IND_SP,IX, IND_SP,IX)
-		|	OPCODE_EX(IND_SP,IY, IND_SP,IY)
-		|	OPCODE_JP()
-		|	OPCODE_JP_FLAG(C)
-		|	OPCODE_JP_FLAG(M)
-		|	OPCODE_JP_FLAG(NC)
-		|	OPCODE_JP_FLAG(NZ)
-		|	OPCODE_JP_FLAG(P)
-		|	OPCODE_JP_FLAG(PE)
-		|	OPCODE_JP_FLAG(PO)
-		|	OPCODE_JP_FLAG(Z)
-		|	OPCODE_JP_IND(HL, )
-		|	OPCODE_JP_IND(IX, _TK_RPAREN)
-		|	OPCODE_JP_IND(IY, _TK_RPAREN)
-		|	OPCODE_JR(DJNZ, Z80_DJNZ)
-		|	OPCODE_JR(JR,   Z80_JR(FLAG_NONE))
-		|	OPCODE_JR_FLAG(C)
-		|	OPCODE_JR_FLAG(NC)
-		|	OPCODE_JR_FLAG(NZ)
-		|	OPCODE_JR_FLAG(Z)
-		|	OPCODE_RET()
-		|	OPCODE_RET_FLAG(C)
-		|	OPCODE_RET_FLAG(M)
-		|	OPCODE_RET_FLAG(NC)
-		|	OPCODE_RET_FLAG(NZ)
-		|	OPCODE_RET_FLAG(P)
-		|	OPCODE_RET_FLAG(PE)
-		|	OPCODE_RET_FLAG(PO)
-		|	OPCODE_RET_FLAG(Z)
-		|	OPCODE_const(IM)
-		|	OPCODE_const(RST)
-		|	OPCODE_reg(PUSH, BC)
-		|	OPCODE_reg(PUSH, DE)
-		|	OPCODE_reg(PUSH, HL)
-		|	OPCODE_reg(PUSH, IX)
-		|	OPCODE_reg(PUSH, IY)
-		|	OPCODE_reg(PUSH, AF)
-		|	OPCODE_reg(POP,  BC)
-		|	OPCODE_reg(POP,  DE)
-		|	OPCODE_reg(POP,  HL)
-		|	OPCODE_reg(POP,  IX)
-		|	OPCODE_reg(POP,  IY)
-		|	OPCODE_reg(POP,  AF)
+		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
+		|	OP_stmt_const(IM)
+		|	OP_stmt_const(RST)
+		|	OP_stmt_reg(POP,  AF)
+		|	OP_stmt_reg(POP,  BC)
+		|	OP_stmt_reg(POP,  DE)
+		|	OP_stmt_reg(POP,  HL)
+		|	OP_stmt_idx(POP,  IX)
+		|	OP_stmt_idx(POP,  IY)
+		|	OP_stmt_reg(PUSH, AF)
+		|	OP_stmt_reg(PUSH, BC)
+		|	OP_stmt_reg(PUSH, DE)
+		|	OP_stmt_reg(PUSH, HL)
+		|	OP_stmt_idx(PUSH, IX)
+		|	OP_stmt_idx(PUSH, IY)
+		|	OP_CALL_flag_nn(C)
+		|	OP_CALL_flag_nn(M)
+		|	OP_CALL_flag_nn(NC)
+		|	OP_CALL_flag_nn(NZ)
+		|	OP_CALL_flag_nn(P)
+		|	OP_CALL_flag_nn(PE)
+		|	OP_CALL_flag_nn(PO)
+		|	OP_CALL_flag_nn(Z)
+		|	OP_stmt(CCF)
+		|	OP_stmt(CPL)
+		|	OP_stmt(DAA)
+		|	OP_stmt(DI)
+		|	OP_stmt(EI)
+		|	OP_stmt(EXX)
+		|	OP_stmt(HALT)
+		|	OP_stmt(IND)
+		|	OP_stmt(INDR)
+		|	OP_stmt(INI)
+		|	OP_stmt(INIR)
+		|	OP_stmt(LDD)
+		|	OP_stmt(LDDR)
+		|	OP_stmt(LDI)
+		|	OP_stmt(LDIR)
+		|	OP_stmt(NEG)
+		|	OP_stmt(NOP)
+		|	OP_stmt(OTDR)
+		|	OP_stmt(OTIR)
+		|	OP_stmt(OUTD)
+		|	OP_stmt(OUTI)
+		|	OP_stmt(RET)
+		|	OP_stmt(RETI)
+		|	OP_stmt(RETN)
+		|	OP_stmt(SCF)
+		|	OP_stmt_dis(DJNZ)
+		|	OP_stmt_dis(JR)
+		|	OP_stmt_emul(CPD,  rcmx_cpd)
+		|	OP_stmt_emul(CPDR, rcmx_cpdr)
+		|	OP_stmt_emul(CPI,  rcmx_cpi)
+		|	OP_stmt_emul(CPIR, rcmx_cpir)
+		|	OP_stmt_emul(RLD,  rcmx_rld)
+		|	OP_stmt_emul(RRD,  rcmx_rrd)
+		|	OP_stmt_flag(RET, C)
+		|	OP_stmt_flag(RET, M)
+		|	OP_stmt_flag(RET, NC)
+		|	OP_stmt_flag(RET, NZ)
+		|	OP_stmt_flag(RET, P)
+		|	OP_stmt_flag(RET, PE)
+		|	OP_stmt_flag(RET, PO)
+		|	OP_stmt_flag(RET, Z)
+		|	OP_stmt_flag_dis(JR, C)
+		|	OP_stmt_flag_dis(JR, NC)
+		|	OP_stmt_flag_dis(JR, NZ)
+		|	OP_stmt_flag_dis(JR, Z)
+		|	OP_stmt_flag_nn(JP, C)
+		|	OP_stmt_flag_nn(JP, M)
+		|	OP_stmt_flag_nn(JP, NC)
+		|	OP_stmt_flag_nn(JP, NZ)
+		|	OP_stmt_flag_nn(JP, P)
+		|	OP_stmt_flag_nn(JP, PE)
+		|	OP_stmt_flag_nn(JP, PO)
+		|	OP_stmt_flag_nn(JP, Z)
+		|	OP_stmt_nn(CALL)
+		|	OP_stmt_nn(JP)
+		|	OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)
+		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)
+		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)
+		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)
+		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)
+		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)
+		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)
+		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)
+		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
 		;
 
 }%%
