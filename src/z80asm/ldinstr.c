@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.51 2014-12-26 18:33:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.52 2014-12-28 07:28:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -55,7 +55,7 @@ static void LD_IND_HL(void)
 
 	switch (sym.cpu_reg8)
 	{
-	case REG8_NONE:
+	case REG_NONE:
 		Pass2info(RANGE_BYTE_UNSIGNED);	/* Execute, store & patch 8bit expression for <n> */
 		break;
 
@@ -73,7 +73,7 @@ static void LD_IND_BC_DE(void)
 	GetSymExpect(TK_COMMA);
 	GetSym();
 
-	if (sym.cpu_reg8 == REG8_A)
+	if (sym.cpu_reg8 == REG_A)
 		append_byte(0x02 + (dest_reg << 4));			/* ld (BC)/(DE), A */
 	else
 	{
@@ -120,7 +120,7 @@ static void LD_IND_NN(void)
 
 	switch (sym.cpu_reg8)
 	{
-	case REG8_A:
+	case REG_A:
 		append_byte(0x32);      /* LD  (nn),A  */
 		Pass2infoExpr(RANGE_WORD, expr);
 		return;
@@ -135,7 +135,7 @@ static void LD_REG8(void)
 	int dest_reg = sym.cpu_reg8;
 	int dest_idx = sym.cpu_idx_reg;
 
-	if (dest_reg != REG8_NONE && dest_idx && (opts.cpu & CPU_RABBIT)) 
+	if (dest_reg != REG_NONE && dest_idx && (opts.cpu & CPU_RABBIT)) 
 	{
 		error_illegal_ident();
 		return;
@@ -147,7 +147,7 @@ static void LD_REG8(void)
 	switch (sym.tok)
 	{
 	case TK_LPAREN:					/* LD  A,(nn)  */
-		if (dest_reg == REG8_A)
+		if (dest_reg == REG_A)
 		{
 			append_byte(0x3A);
 			Pass2info(RANGE_WORD);
@@ -159,28 +159,28 @@ static void LD_REG8(void)
 		return;
 
 	case TK_I:						/* LD  A,I */
-		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG_A)
 			append_2bytes(0xED, 0x57);
 		else 
 			error_illegal_ident();
 		return;
 
 	case TK_IIR:					/* LD  A,IIR */
-		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG_A)
 			append_2bytes(0xED, 0x57);
 		else
 			error_illegal_ident();
 		return;
 
 	case TK_R:						/* LD  A,R */
-		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && dest_reg == REG_A)
 			append_2bytes(0xED, 0x5F);
 		else
 			error_illegal_ident();
 		return;
 
 	case TK_EIR:					/* LD  A,EIR */
-		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && dest_reg == REG_A)
 			append_2bytes(0xED, 0x5F);
 		else
 			error_illegal_ident();
@@ -194,7 +194,7 @@ static void LD_REG8(void)
 	{
 	case IND_REG16_BC:				/* LD   A,(BC)  */
 	case IND_REG16_DE:				/* LD   A,(DE)  */
-		if (dest_reg == REG8_A)
+		if (dest_reg == REG_A)
 		{
 			append_byte(0x0A + (sym.cpu_ind_reg16 << 4));
 		}
@@ -225,7 +225,7 @@ static void LD_REG8(void)
 		break;
 	}
 
-	if (sym.cpu_reg8 != REG8_NONE)			/* LD  r,r  */
+	if (sym.cpu_reg8 != REG_NONE)			/* LD  r,r  */
 	{
 		if (sym.cpu_idx_reg && (opts.cpu & CPU_RABBIT))
 		{
@@ -348,7 +348,7 @@ void LD(void)
 	case TK_I:						/* LD  I,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG_A)
 			append_2bytes(0xED, 0x47);
 		else
 			error_illegal_ident();
@@ -357,7 +357,7 @@ void LD(void)
 	case TK_IIR:					/* LD  IIR,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG_A)
 			append_2bytes(0xED, 0x47);
 		else
 			error_illegal_ident();
@@ -366,7 +366,7 @@ void LD(void)
 	case TK_R:						/* LD  R,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
+		if (!(opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG_A)
 			append_2bytes(0xED, 0x4F);
 		else
 			error_illegal_ident();
@@ -375,7 +375,7 @@ void LD(void)
 	case TK_EIR:					/* LD  EIR,A */
 		GetSymExpect(TK_COMMA);
 		GetSym();
-		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG8_A)
+		if ((opts.cpu & CPU_RABBIT) && sym.cpu_reg8 == REG_A)
 			append_2bytes(0xED, 0x4F);
 		else
 			error_illegal_ident();
@@ -403,7 +403,7 @@ void LD(void)
 		assert(0);
 	}
 
-	if (sym.cpu_reg8 != REG8_NONE)		/* ld r,... */
+	if (sym.cpu_reg8 != REG_NONE)		/* ld r,... */
 	{
 		LD_REG8();
 		return;

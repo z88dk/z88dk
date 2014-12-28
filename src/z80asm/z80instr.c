@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.90 2014-12-27 22:53:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.91 2014-12-28 07:28:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -54,7 +54,7 @@ OUT( void )
 		case TK_IND_C:							/* OUT (C), r */
 			GetSymExpect(TK_COMMA);
 			GetSym();
-			if (sym.cpu_reg8 != REG8_NONE && !sym.cpu_idx_reg)
+			if (sym.cpu_reg8 != REG_NONE && !sym.cpu_idx_reg)
 				append_2bytes(0xED, (Byte)(0x41 + (sym.cpu_reg8 << 3)));
 			else
 			{
@@ -104,7 +104,7 @@ IN( void )
 	else
 	{
 		in_reg = sym.cpu_reg8;
-		if (in_reg != REG8_NONE && !sym.cpu_idx_reg)
+		if (in_reg != REG_NONE && !sym.cpu_idx_reg)
 		{
 			GetSymExpect(TK_COMMA);
 			GetSym();
@@ -115,7 +115,7 @@ IN( void )
 				break;
 
 			case TK_LPAREN:							/* IN A,(N) */
-				if (in_reg != REG8_A)
+				if (in_reg != REG_A)
 				{
 					error_illegal_ident();
 				}
@@ -353,7 +353,7 @@ ArithLog8_instr( int opcode )
         /* no indirect addressing, try to get an 8bit register */
 		switch (sym.cpu_reg8)
 		{
-		case REG8_NONE:		/* 8bit register wasn't found, try to evaluate an expression */
+		case REG_NONE:		/* 8bit register wasn't found, try to evaluate an expression */
 			append_byte((Byte)(0xC0 + (opcode << 3) + 0x06));	/* xxx  A,n */
 			Pass2info(RANGE_BYTE_UNSIGNED);
             break;
@@ -421,7 +421,7 @@ IncDec_8bit_instr(int opcode)
 			Pass2info(RANGE_BYTE_SIGNED);
 		}
 	}
-	else if (sym.cpu_reg8 != REG8_NONE)
+	else if (sym.cpu_reg8 != REG_NONE)
 	{
 		/* no indirect addressing, must be an 8bit register */
 		if (sym.cpu_idx_reg)
@@ -473,7 +473,7 @@ BitTest_instr( int opcode )
 			append_byte((Byte)(opcode + (bitnumber << 3) + 0x06));
 		}
 	}
-	else if (sym.cpu_reg8 != REG8_NONE)
+	else if (sym.cpu_reg8 != REG_NONE)
 	{
 		/* no indirect addressing, must be an 8bit register */
 		if (sym.cpu_idx_reg)
@@ -507,7 +507,7 @@ RotShift_instr( int opcode )
 			append_byte((Byte)((opcode << 3) + 0x06));
 		}
 	}
-	else if (sym.cpu_reg8 != REG8_NONE)
+	else if (sym.cpu_reg8 != REG_NONE)
 	{
 		/* no indirect addressing, must be an 8bit register */
 		if (sym.cpu_idx_reg)

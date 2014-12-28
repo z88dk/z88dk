@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-27 23:16:51 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-28 07:28:09 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -56,9 +56,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 					OBJ_DELETE(expr); \
 			}
 
-#define DO_stmt_dis(opcode) 	_DO_stmt_(dis, opcode)
+#define DO_stmt_jr( opcode)		_DO_stmt_(jr,  opcode)
 #define DO_stmt_n(  opcode)		_DO_stmt_(n,   opcode)
 #define DO_stmt_nn( opcode)		_DO_stmt_(nn,  opcode)
+#define DO_stmt_idx(opcode)		_DO_stmt_(idx, opcode)
+
 
 /* macros for rules */
 #define RULE_stmt(token, args, value) \
@@ -97,12 +99,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 			RULE_stmt_nn(op, Z80_##op)
 
 			
-#define RULE_stmt_dis(token, value) \
+#define RULE_stmt_jr(token, value) \
 			label? _TK_##token expr _TK_NEWLINE \
-			@{ DO_stmt_dis(value); }
+			@{ DO_stmt_jr(value); }
 
-#define OP_stmt_dis(op) \
-			RULE_stmt_dis(op, Z80_##op)
+#define OP_stmt_jr(op) \
+			RULE_stmt_jr(op, Z80_##op)
 
 			
 #define RULE_stmt_flag_nn(token, flag, value) \
@@ -113,12 +115,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 			RULE_stmt_flag_nn(op, flag, Z80_##op##_FLAG(FLAG_##flag))
 
 
-#define RULE_stmt_flag_dis(token, flag, value) \
+#define RULE_stmt_flag_jr(token, flag, value) \
 			label? _TK_##token _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-			@{ DO_stmt_dis(value); }
+			@{ DO_stmt_jr(value); }
 
-#define OP_stmt_flag_dis(op, flag) \
-			RULE_stmt_flag_dis(op, flag, Z80_##op##_FLAG(FLAG_##flag))
+#define OP_stmt_flag_jr(op, flag) \
+			RULE_stmt_flag_jr(op, flag, Z80_##op##_FLAG(FLAG_##flag))
 
 
 #define RULE_stmt_flag(token, flag, value) \
@@ -128,10 +130,53 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 #define OP_stmt_flag(op, flag) \
 			RULE_stmt_flag(op, flag, Z80_##op##_FLAG(FLAG_##flag))
 
+/*-----------------------------------------------------------------------------
+*   ALU operations
+*----------------------------------------------------------------------------*/
+#define _ALU_TOKENS(alu) \
+			label? _TK_##alu (_TK_A _TK_COMMA)? 
 
+#define _OP_alu_idx(alu, idx) \
+			_ALU_TOKENS(alu) _TK_IND_##idx \
+					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
+			@{ DO_stmt((Z80_##alu(REG_idx) + P_##idx) << 8); } \
+		|	_ALU_TOKENS(alu) _TK_IND_##idx \
+					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
+			@{ DO_stmt_idx(Z80_##alu(REG_idx) + P_##idx); } \
+		|	_ALU_TOKENS(alu) _TK_IND_##idx \
+					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
+			@{ DO_stmt_idx(Z80_##alu(REG_idx) + P_##idx); }			
 
+#define _OP_alu_reg(alu, reg) \
+			_ALU_TOKENS(alu) _TK_##reg _TK_NEWLINE			/* reg */ \
+			@{ DO_stmt(Z80_##alu(REG_##reg)); }
+
+#define _OP_alu_idx8(alu, idx) \
+			_ALU_TOKENS(alu) _TK_##idx##H _TK_NEWLINE		/* ixh */ \
+			@{ DO_stmt(Z80_##alu(REG_H) + P_##idx); } \
+		|	_ALU_TOKENS(alu) _TK_##idx##L _TK_NEWLINE		/* ixl */ \
+			@{ DO_stmt(Z80_##alu(REG_L) + P_##idx); } \
+
+#define OP_alu(alu) \
+			_ALU_TOKENS(alu) _TK_IND_HL _TK_NEWLINE 		/* (hl) */ \
+			@{ DO_stmt(Z80_##alu(REG_idx)); } \
+		|	_OP_alu_idx(alu, IX) \
+		|	_OP_alu_idx(alu, IY) \
+		|	_OP_alu_reg(alu, B) \
+		|	_OP_alu_reg(alu, C) \
+		|	_OP_alu_reg(alu, D) \
+		|	_OP_alu_reg(alu, E) \
+		|	_OP_alu_reg(alu, H) \
+		|	_OP_alu_reg(alu, L) \
+		|	_OP_alu_reg(alu, A) \
+		|	_OP_alu_idx8(alu, IX) \
+		|	_OP_alu_idx8(alu, IY) \
+		|	_ALU_TOKENS(alu) expr _TK_NEWLINE 				/* n */ \
+			@{ DO_stmt_n(Z80_##alu##_n); }
  
-/* special opcodes */
+/*-----------------------------------------------------------------------------
+*   special opcodes
+*----------------------------------------------------------------------------*/
 #define OP_CALL_flag_nn(flag) \
 			label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
 			@{ \
@@ -206,6 +251,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 			  >{ expr_start = p; }
 			  %{ push_expr(expr_start->ts, (p-1)->te); };
 	
+	neg_expr = expr1 
+			  >{ expr_start = p; }
+			  %{ push_neg_expr(expr_start->ts, (p-1)->te); };
+	
 	const_expr = 
 			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
 	
@@ -261,8 +310,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
 		|	OP_stmt_const(IM)
 		|	OP_stmt_const(RST)
-		|	OP_stmt_dis(DJNZ)
-		|	OP_stmt_dis(JR)
+		|	OP_stmt_jr(DJNZ)
+		|	OP_stmt_jr(JR)
 		|	OP_stmt_emul(CPD,  rcmx_cpd)
 		|	OP_stmt_emul(CPDR, rcmx_cpdr)
 		|	OP_stmt_emul(CPI,  rcmx_cpi)
@@ -277,10 +326,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 		|	OP_stmt_flag(RET, PE)
 		|	OP_stmt_flag(RET, PO)
 		|	OP_stmt_flag(RET, Z)
-		|	OP_stmt_flag_dis(JR, C)
-		|	OP_stmt_flag_dis(JR, NC)
-		|	OP_stmt_flag_dis(JR, NZ)
-		|	OP_stmt_flag_dis(JR, Z)
+		|	OP_stmt_flag_jr(JR, C)
+		|	OP_stmt_flag_jr(JR, NC)
+		|	OP_stmt_flag_jr(JR, NZ)
+		|	OP_stmt_flag_jr(JR, Z)
 		|	OP_stmt_flag_nn(JP, C)
 		|	OP_stmt_flag_nn(JP, M)
 		|	OP_stmt_flag_nn(JP, NC)
@@ -303,6 +352,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.16 2014-12-
 		|	OP_stmt_reg(PUSH, BC)
 		|	OP_stmt_reg(PUSH, DE)
 		|	OP_stmt_reg(PUSH, HL)
+		|	OP_alu(CP)
 		;
 
 }%%

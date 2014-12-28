@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.14 2014-12-27 23:16:51 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.15 2014-12-28 07:28:09 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -27,18 +27,21 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.14 2014-12-27 23
 /* forward declaration without include cycle */
 struct Expr;
 
-/* add 1 or 2 bytes opcode opcode to object code 
+/* add 1 to 3 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xED46 */
 extern void add_opcode(int opcode);
 
 /* add opcode followed by jump relative offset expression */
-extern void add_opcode_dis(int opcode, struct Expr *expr);
+extern void add_opcode_jr(int opcode, struct Expr *expr);
 
 /* add opcode followed by 8-bit expression */
 extern void add_opcode_n(int opcode, struct Expr *expr);
 
 /* add opcode followed by 16-bit expression */
 extern void add_opcode_nn(int opcode, struct Expr *expr);
+
+/* add opcode followed by IX/IY offset expression */
+extern void add_opcode_idx(int opcode, struct Expr *expr);
 
 /* add "call flag", or emulation on a Rabbit */
 extern void add_call_flag(int flag, struct Expr *target);
@@ -54,8 +57,14 @@ extern void add_opcode_emul(int opcode, char *emul_func);
 enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
 #define NOT_FLAG(flag)	((flag) ^ 1)
 
+/* 8-bit registers */
+enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A };
+
 /* 16-bit registers */
 enum { REG_NONE = -1, REG_BC, REG_DE, REG_HL, REG_SP, REG_AF = 3 };
+
+/* ALU operations */
+enum { ALU_CP = 7 };
 
 /* choose value, error if none */
 #define _CHOOSE2_(n, i1, o1, i2, o2)	\
@@ -130,3 +139,9 @@ enum { REG_NONE = -1, REG_BC, REG_DE, REG_HL, REG_SP, REG_AF = 3 };
 #define Z80_RRD				0xED67
 #define Z80_RST(n)			_RST_ARG(n)
 #define Z80_SCF				0x37
+
+#define Z80_ALU(alu,reg)	(0x80 + ((alu) << 3) + (reg))
+#define Z80_ALU_n(alu)		(0xC0 + ((alu) << 3) + REG_idx)
+
+#define Z80_CP(reg)			Z80_ALU(ALU_CP, (reg))
+#define Z80_CP_n			Z80_ALU_n(ALU_CP)

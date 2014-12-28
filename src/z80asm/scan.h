@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.46 2014-12-27 22:53:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.47 2014-12-28 07:28:09 pauloscustodio Exp $
 */
 
 #pragma once
@@ -33,7 +33,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.46 2014-12-27 22:53
 #endif
 
 enum { IDX_REG_HL = 0, IDX_REG_IX = 0xDD, IDX_REG_IY = 0xFD };
-enum { REG8_NONE = -1, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A = 7 };
 enum { IND_REG16_NONE = -1, IND_REG16_BC, IND_REG16_DE, IND_REG16_HL };
 
 /*-----------------------------------------------------------------------------
@@ -54,7 +53,7 @@ typedef struct sym_t
 #if 0
 	void   (*parser)(void);	/* parser for this keyword as opcode */
 #endif
-	int	     cpu_reg8;		/* REG8_NONE, REG8_B, REG8_C, REG8_D, REG8_E, REG8_H, REG8_L, REG8_A */
+	int	     cpu_reg8;		/* REG_NONE, REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_A */
 	int		 cpu_reg16_sp;	/* REG_NONE, REG_BC, REG_DE, REG_HL, REG_SP */
 	int		 cpu_ind_reg16;	/* IND_REG16_NONE, IND_REG16_BC, IND_REG16_DE */
 	int      cpu_idx_reg;	/* IDX_REG_HL, IDX_REG_IX, IDX_REG_IY */

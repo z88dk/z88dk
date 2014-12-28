@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.7 2014-12-27 22:53:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.8 2014-12-28 07:28:09 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,17 +26,19 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.7 2014-12-27 22:
 #include "parse.h"
 #include "z80asm.h"
 
-/* add 1 or 2 bytes opcode opcode to object code 
+/* add 1 to 3 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
 void add_opcode(int opcode)
 {
-	if ( opcode & 0xFF00)
+	if ( opcode & 0xFF0000 )
+		append_byte( (opcode >> 16) & 0xFF );
+	if ( opcode & 0xFF00 )
 		append_byte( (opcode >> 8) & 0xFF );
 	append_byte( opcode & 0xFF );
 }
 
 /* add opcode followed by jump relative offset expression */
-void add_opcode_dis(int opcode, Expr *expr)
+void add_opcode_jr(int opcode, Expr *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_JR_OFFSET, expr);
@@ -56,6 +58,14 @@ void add_opcode_nn(int opcode, Expr *expr)
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
+/* add opcode followed by IX/IY offset expression */
+void add_opcode_idx(int opcode, Expr *expr)
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
+}
+
+
 /* add "call flag", or emulation on a Rabbit */
 void add_call_flag(int flag, Expr *target)
 {
@@ -72,7 +82,7 @@ void add_call_flag(int flag, Expr *target)
 
 		if (flag <= FLAG_C)
 		{
-			add_opcode_dis(Z80_JR_FLAG(NOT_FLAG(flag)), end_label_expr);
+			add_opcode_jr(Z80_JR_FLAG(NOT_FLAG(flag)), end_label_expr);
 			jump_size = 2;
 		}
 		else

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.18 2014-12-27 22:53:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.19 2014-12-28 07:28:09 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -118,7 +118,8 @@ struct Expr *parse_expr(char *expr_text)
 	return expr;
 }
 
-static void push_expr(char *ts, char *te)
+/* push current expression */
+static void _push_expr(Bool negate, char *ts, char *te)
 {
 	static Str *expr_text;
 	Expr *expr;
@@ -126,11 +127,28 @@ static void push_expr(char *ts, char *te)
 	INIT_OBJ(Str, &expr_text);
 
 	/* parse expression */
-	Str_set_n(expr_text, ts, te - ts);
+	Str_clear(expr_text);
+	if (negate)
+		Str_append(expr_text, "-(");
+	Str_append_n(expr_text, ts, te - ts);
+	if (negate)
+		Str_append(expr_text, ")");
+	
 	expr = parse_expr(expr_text->str);
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(exprs, &expr);
+}
+
+static void push_expr(char *ts, char *te)
+{
+	_push_expr(FALSE, ts, te);
+}
+
+/* push -(expr) of current expression, used in (ix-3) */
+static void push_neg_expr(char *ts, char *te)
+{
+	_push_expr(TRUE, ts, te);
 }
 
 /*-----------------------------------------------------------------------------

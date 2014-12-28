@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.21 2014-12-27 23:16:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.22 2014-12-28 07:28:09 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -168,27 +168,27 @@ TOKEN(TK_BIN_NOT, "~", )
 TOKEN_KW(NZ, )
 TOKEN_KW(Z,  )
 TOKEN_KW(NC, )
-TOKEN_KW(C,  sym.cpu_reg8 = REG8_C)
+TOKEN_KW(C,  sym.cpu_reg8 = REG_C)
 TOKEN_KW(PO, )
 TOKEN_KW(PE, )
 TOKEN_KW(P,  )
 TOKEN_KW(M,  )
 
 /* 8-bit registers */
-TOKEN_KW(B, sym.cpu_reg8 = REG8_B)
+TOKEN_KW(B, sym.cpu_reg8 = REG_B)
 
-TOKEN_KW(D, sym.cpu_reg8 = REG8_D)
-TOKEN_KW(E, sym.cpu_reg8 = REG8_E)
+TOKEN_KW(D, sym.cpu_reg8 = REG_D)
+TOKEN_KW(E, sym.cpu_reg8 = REG_E)
 
-TOKEN_KW(H, sym.cpu_reg8 = REG8_H)
-TOKEN_KW(IXH, sym.cpu_reg8 = REG8_H; SET_IX)
-TOKEN_KW(IYH, sym.cpu_reg8 = REG8_H; SET_IY)
+TOKEN_KW(H, sym.cpu_reg8 = REG_H)
+TOKEN_KW(IXH, FOR_Z80; sym.cpu_reg8 = REG_H; SET_IX)
+TOKEN_KW(IYH, FOR_Z80; sym.cpu_reg8 = REG_H; SET_IY)
 
-TOKEN_KW(L, sym.cpu_reg8 = REG8_L)
-TOKEN_KW(IXL, sym.cpu_reg8 = REG8_L; SET_IX)
-TOKEN_KW(IYL, sym.cpu_reg8 = REG8_L; SET_IY)
+TOKEN_KW(L, sym.cpu_reg8 = REG_L)
+TOKEN_KW(IXL, FOR_Z80; sym.cpu_reg8 = REG_L; SET_IX)
+TOKEN_KW(IYL, FOR_Z80; sym.cpu_reg8 = REG_L; SET_IY)
 
-TOKEN_KW(A, sym.cpu_reg8 = REG8_A)
+TOKEN_KW(A, sym.cpu_reg8 = REG_A)
 
 TOKEN_KW(F, )
 
@@ -236,6 +236,7 @@ TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
 /* Z80 opcode specifiers */
 TOKEN_OPCODE(CALL, )
 TOKEN_OPCODE(CCF,  )
+TOKEN_OPCODE(CP,   )
 TOKEN_OPCODE(CPD,  )
 TOKEN_OPCODE(CPDR, )
 TOKEN_OPCODE(CPI,  )

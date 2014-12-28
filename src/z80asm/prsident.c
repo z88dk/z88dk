@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.92 2014-12-27 23:16:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.93 2014-12-28 07:28:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,7 +50,7 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent( enum flag interpret );
-void AND( void ), BIT( void ), CP( void );
+void AND( void ), BIT( void );
 void OR( void );
 void RES( void );
 void RL( void ), RLC( void ), RR( void ), RRC( void );
@@ -85,7 +85,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( BIT ),
     DEF_ENTRY( CALL_OZ ),
     DEF_ENTRY( CALL_PKG ),
-    DEF_ENTRY( CP ),
     DEF_ENTRY( DEC ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
@@ -406,21 +405,11 @@ ExtAccumulator( int opcode )
 		else
 		{
 			sym.tok = TK_A;				/* push back 'A' */
-			sym.cpu_reg8 = REG8_A;
+			sym.cpu_reg8 = REG_A;
 		}
 	}
 	ArithLog8_instr(opcode);
 }
-
-
-
-void
-CP( void )
-{
-	GetSym();
-	ExtAccumulator(7);
-}
-
 
 
 
