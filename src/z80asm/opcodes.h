@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.17 2014-12-29 18:16:41 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.18 2014-12-29 18:33:30 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -92,11 +92,10 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 *  flag is FLAG_NZ, FLAG_... 
 *  reg is REG_BC, ... */
 #define Z80_ADC(reg)		Z80_ALU(ALU_ADC, (reg))
+#define Z80_ADC16(reg)		(0xED4A + ((reg) << 4))
 #define Z80_ADC_n			Z80_ALU_n(ALU_ADC)
 #define Z80_ADD(reg)		Z80_ALU(ALU_ADD, (reg))
 #define Z80_ADD16(reg)		(0x09 + ((reg) << 4))
-#define Z80_ADC16(reg)		(0xED4A + ((reg) << 4))
-#define Z80_SBC16(reg)		(0xED42 + ((reg) << 4))
 #define Z80_ADD_n			Z80_ALU_n(ALU_ADD)
 #define Z80_AND(reg)		Z80_ALU(ALU_AND, (reg))
 #define Z80_AND_n			Z80_ALU_n(ALU_AND)
@@ -125,6 +124,8 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_INDR			0xEDBA
 #define Z80_INI				0xEDA2
 #define Z80_INIR			0xEDB2
+#define Z80_IN_A_n			0xDB
+#define Z80_IN_REG_C(reg)	(0xED40 + ((reg) << 3))
 #define Z80_JP				0xC3
 #define Z80_JP_FLAG(flag)	(0xC2 + ((flag) << 3))
 #define Z80_JP_idx			0xE9	/* (HL) or (IX) or (IY) */
@@ -142,6 +143,8 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_OTIR			0xEDB3
 #define Z80_OUTD			0xEDAB
 #define Z80_OUTI			0xEDA3
+#define Z80_OUT_C_REG(reg)	(0xED41 + ((reg) << 3))
+#define Z80_OUT_n_A			0xD3
 #define Z80_POP(reg)		(0xC1 + ((reg) << 4))
 #define Z80_PUSH(reg)		(0xC5 + ((reg) << 4))
 #define Z80_RET				0xC9
@@ -156,6 +159,7 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_RRD				0xED67
 #define Z80_RST(n)			_RST_ARG(n)
 #define Z80_SBC(reg)		Z80_ALU(ALU_SBC, (reg))
+#define Z80_SBC16(reg)		(0xED42 + ((reg) << 4))
 #define Z80_SBC_n			Z80_ALU_n(ALU_SBC)
 #define Z80_SCF				0x37
 #define Z80_SUB(reg)		Z80_ALU(ALU_SUB, (reg))
@@ -163,8 +167,3 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_XOR(reg)		Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			Z80_ALU_n(ALU_XOR)
 
-#define Z80_IN_REG_C(reg)	(0xED40 + ((reg) << 3))
-#define Z80_IN_A_n			0xDB
-
-#define Z80_OUT_C_REG(reg)	(0xED41 + ((reg) << 3))
-#define Z80_OUT_n_A			0xD3

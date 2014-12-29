@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.19 2014-12-29 18:16:41 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-29 18:33:30 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -351,16 +351,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.19 2014-12-
 		|	OP_stmt(OTDR)	\
 		|	OP_stmt(OTIR)	\
 		|	OP_stmt(OUTD)	\
-		|	OP_stmt(OUTI)
-#if 0
-		|	_OP_out_reg(B)	
-		|	_OP_out_reg(C)	
-		|	_OP_out_reg(D)	
-		|	_OP_out_reg(E)	
-		|	_OP_out_reg(H)	
-		|	_OP_out_reg(L)	
+		|	OP_stmt(OUTI)	\
+		|	_OP_out_reg(B)	\
+		|	_OP_out_reg(C)	\
+		|	_OP_out_reg(D)	\
+		|	_OP_out_reg(E)	\
+		|	_OP_out_reg(H)	\
+		|	_OP_out_reg(L)	\
 		|	_OP_out_reg(A)	
-		|	_OP_out_A		
+#if 0
+		|	_OP_out_A			/* Ragel cannot parse (expr) */
 #endif
 
 /*-----------------------------------------------------------------------------

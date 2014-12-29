@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.95 2014-12-29 18:16:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.96 2014-12-29 18:33:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -108,7 +108,7 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( MODULE ),
     DEF_ENTRY( ORG ),
-    DEF_ENTRY( OUT ),
+    DEF_ENTRY( OUT ),			/* Ragel cannot parse (expr) */
     DEF_ENTRY( OZ ),
     DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( RES ),

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.123 2014-12-29 18:16:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.124 2014-12-29 18:33:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -91,13 +91,14 @@ parseline( enum flag interpret )
 	else if (!parse_statement(interpret))
 	{
 		scan_expect_operands();
-#if 0
+
+		/* instructions with expressions within parentheses cannot be
+		*  parsed by Ragel - use old parser */
 		switch (sym.tok)
 		{
 		case TK_OUT:	sym.tok = TK_NAME; sym.string = "OUT"; break;
 		default: ;
 		}
-#endif
 		
 		if (get_num_errors() != start_num_errors)	/* detect errors during parse_statement() */
 			Skipline();

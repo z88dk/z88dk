@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.23 2014-12-29 18:16:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.24 2014-12-29 18:33:31 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -831,6 +831,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(OR,	T_ALL);
 	T_OPCODE(OTDR,	T_Z80);
 	T_OPCODE(OTIR,	T_Z80);
+	T_OPCODE(OUT,	T_Z80);
 	T_OPCODE(OUTD,	T_Z80);
 	T_OPCODE(OUTI,	T_Z80);
 	T_OPCODE(POP,	T_ALL);
@@ -850,10 +851,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SUB,	T_ALL);
 	T_OPCODE(XOR,	T_ALL);
 	
-#if 0
-	T_OPCODE(OUT,	T_Z80);
-#endif
-
+	
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "
 					 "ld ( ix_save + 2 ) , ix ");

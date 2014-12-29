@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.93 2014-12-29 18:16:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.94 2014-12-29 18:33:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -21,6 +21,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.93 2014-1
 #include "codearea.h"
 #include "errors.h"
 #include "expr.h"
+#include "opcodes.h"
 #include "options.h"
 #include "scan.h"
 #include "symbol.h"
@@ -33,54 +34,30 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.93 2014-1
 /* local functions */
 void IncDec_8bit_instr( int opcode );
 
-void
-OUT( void )
+/* Ragel cannot parse (expr), handle "OUT (N),A" here */
+void OUT( void )
 {
 	GetSym();
 	
-	if (opts.cpu & CPU_RABBIT)
+	switch (sym.tok)
 	{
-		error_illegal_ident();
-	}
-	else
-	{
-		switch (sym.tok)
-		{
-		case TK_IND_C:							/* OUT (C), r */
-			GetSymExpect(TK_COMMA);
-			GetSym();
-			if (sym.cpu_reg8 != REG_NONE && !sym.cpu_idx_reg)
-				append_2bytes(0xED, (Byte)(0x41 + (sym.cpu_reg8 << 3)));
-			else
-			{
-				error_illegal_ident();
-			
-			}
-			break;
+	case TK_LPAREN:							/* OUT (N), A */
+		GetSym();
+		append_byte(Z80_OUT_n_A);
+		if (!Pass2info(RANGE_BYTE_UNSIGNED))
+			return;							/* error in expression */
 
-		case TK_LPAREN:							/* OUT (N), A */
-			GetSym();
-			append_byte(0xD3);
-			if (!Pass2info(RANGE_BYTE_UNSIGNED))
-				return;							/* error in expression */
+		if (sym.tok != TK_RPAREN)
+			error_syntax();
 
-			if (sym.tok != TK_RPAREN)
-			{
-				error_syntax();
-			}
+		GetSymExpect(TK_COMMA);
+		GetSym();
+		if (sym.tok != TK_A)
+			error_illegal_ident();
+		break;
 
-			GetSymExpect(TK_COMMA);
-			GetSym();
-			if (sym.tok != TK_A)
-			{
-				error_illegal_ident();
-			}
-
-			break;
-
-		default:
-			break;
-		}
+	default:
+		error_syntax();
 	}
 }
 
