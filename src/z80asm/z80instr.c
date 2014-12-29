@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.91 2014-12-28 07:28:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.92 2014-12-29 00:55:10 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,12 +31,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.91 2014-1
 
 
 /* local functions */
-void ADD_8bit_instr( void );
-void ADC_8bit_instr( void );
-void SBC_8bit_instr( void );
 void IncDec_8bit_instr( int opcode );
-void ArithLog8_instr( int opcode );
-void ExtAccumulator(int opcode);
 
 void
 OUT( void )
@@ -241,135 +236,6 @@ FPP( void )
         else
         {
             error_int_range( constant );
-        }
-    }
-}
-
-
-void
-ADD( void )
-{
-	int dest_idx;
-
-    GetSym();
-	dest_idx = sym.cpu_idx_reg;
-
-	switch (sym.cpu_reg16_sp)
-    {
-    case REG_NONE:
-        ExtAccumulator( 0 );	/* 16 bit register wasn't found - try to evaluate the 8 bit version */
-        break;
-
-	case REG_HL:				/* HL, IX, IY */
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		if (dest_idx || sym.cpu_idx_reg)
-		{
-			if (dest_idx && sym.cpu_idx_reg && dest_idx != sym.cpu_idx_reg)
-			{
-				error_illegal_ident();
-				return;
-			}
-			else
-				append_byte(dest_idx ? dest_idx : sym.cpu_idx_reg);
-		}
-		append_byte((Byte)(0x09 + (sym.cpu_reg16_sp << 4)));	/* ADD HL,rr */
-		return;
-
-    default:
-		error_illegal_ident();
-		break;
-    }
-}
-
-
-static void SBC_ADC(int opcode8bit, int opcode16bit)
-{
-	GetSym();
-
-	switch (sym.cpu_reg16_sp)
-	{
-	case REG_NONE:
-		ExtAccumulator(opcode8bit);      /* 16 bit register wasn't found - try to evaluate the 8 bit version */
-		break;
-
-	case REG_HL:
-		if (sym.cpu_idx_reg)
-		{
-			error_illegal_ident();
-		}
-		else
-		{
-			GetSymExpect(TK_COMMA);
-			GetSym();
-
-			if (!sym.cpu_idx_reg && sym.cpu_reg16_sp != REG_NONE)
-				append_2bytes(0xED, (Byte)(opcode16bit + (sym.cpu_reg16_sp << 4)));
-			else
-			{
-				error_illegal_ident();
-			}
-		}
-		break;
-
-	default:
-		error_illegal_ident();
-		break;
-	}
-}
-
-void
-SBC( void )
-{
-	SBC_ADC(3, 0x42);
-}
-
-
-void
-ADC( void )
-{
-	SBC_ADC(1, 0x4A);
-}
-
-
-void
-ArithLog8_instr( int opcode )
-{
-	if (sym.cpu_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
-	{
-		if (sym.cpu_idx_reg)
-			append_byte(sym.cpu_idx_reg);
-
-		append_byte((Byte)(0x80 + (opcode << 3) + 0x06));		/* xxx  A,(HL) */
-
-		if (sym.cpu_idx_reg)
-		{
-			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED);
-		}
-	}
-    else
-    {
-        /* no indirect addressing, try to get an 8bit register */
-		switch (sym.cpu_reg8)
-		{
-		case REG_NONE:		/* 8bit register wasn't found, try to evaluate an expression */
-			append_byte((Byte)(0xC0 + (opcode << 3) + 0x06));	/* xxx  A,n */
-			Pass2info(RANGE_BYTE_UNSIGNED);
-            break;
-
-		default:
-			if (sym.cpu_idx_reg)
-			{
-				if (opts.cpu & CPU_RABBIT)
-				{
-					error_illegal_ident();
-					return;
-				}
-				append_byte(sym.cpu_idx_reg);
-			}
-
-			append_byte((Byte)(0x80 + (opcode << 3) + sym.cpu_reg8));	/* xxx  A,r */
         }
     }
 }

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-28 07:28:09 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-29 00:55:10 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -157,7 +157,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 		|	_ALU_TOKENS(alu) _TK_##idx##L _TK_NEWLINE		/* ixl */ \
 			@{ DO_stmt(Z80_##alu(REG_L) + P_##idx); } \
 
-#define OP_alu(alu) \
+#define _OP_alu(alu) \
 			_ALU_TOKENS(alu) _TK_IND_HL _TK_NEWLINE 		/* (hl) */ \
 			@{ DO_stmt(Z80_##alu(REG_idx)); } \
 		|	_OP_alu_idx(alu, IX) \
@@ -173,11 +173,41 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 		|	_OP_alu_idx8(alu, IY) \
 		|	_ALU_TOKENS(alu) expr _TK_NEWLINE 				/* n */ \
 			@{ DO_stmt_n(Z80_##alu##_n); }
- 
+
+#define OP_alu() \
+			_OP_alu(ADC) \
+		|	_OP_alu(ADD) \
+		|	_OP_alu(AND) \
+		|	_OP_alu(CP)  \
+		|	_OP_alu(OR)  \
+		|	_OP_alu(SBC) \
+		|	_OP_alu(SUB) \
+		|	_OP_alu(XOR)
+
+/*-----------------------------------------------------------------------------
+*   ALU-16 operations
+*----------------------------------------------------------------------------*/
+#define _OP_alu16_reg(alu, idx, reg, prefix) \
+			label? _TK_##alu _TK_##idx _TK_COMMA _TK_##reg _TK_NEWLINE \
+			@{ DO_stmt(Z80_##alu##16(REG_##reg) + prefix); }
+
+#define _OP_alu16(alu, idx, prefix) \
+			_OP_alu16_reg(alu, idx, BC,  prefix) \
+		|	_OP_alu16_reg(alu, idx, DE,  prefix) \
+		|	_OP_alu16_reg(alu, idx, idx, prefix) \
+		|	_OP_alu16_reg(alu, idx, SP,  prefix)
+		
+#define OP_alu16() \
+			_OP_alu16(ADD, HL, 0) \
+		|	_OP_alu16(ADD, IX, P_IX) \
+		|	_OP_alu16(ADD, IY, P_IY) \
+		|	_OP_alu16(ADC, HL, 0) \
+		|	_OP_alu16(SBC, HL, 0)
+
 /*-----------------------------------------------------------------------------
 *   special opcodes
 *----------------------------------------------------------------------------*/
-#define OP_CALL_flag_nn(flag) \
+#define OP_call_flag_nn(flag) \
 			label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
 			@{ \
 			 	Expr *expr = pop_expr(); \
@@ -262,14 +292,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
-		|	OP_CALL_flag_nn(C)
-		|	OP_CALL_flag_nn(M)
-		|	OP_CALL_flag_nn(NC)
-		|	OP_CALL_flag_nn(NZ)
-		|	OP_CALL_flag_nn(P)
-		|	OP_CALL_flag_nn(PE)
-		|	OP_CALL_flag_nn(PO)
-		|	OP_CALL_flag_nn(Z)
+		|	OP_alu()
+		|	OP_alu16()
+		|	OP_call_flag_nn(C)
+		|	OP_call_flag_nn(M)
+		|	OP_call_flag_nn(NC)
+		|	OP_call_flag_nn(NZ)
+		|	OP_call_flag_nn(P)
+		|	OP_call_flag_nn(PE)
+		|	OP_call_flag_nn(PO)
+		|	OP_call_flag_nn(Z)
 		|	OP_stmt(CCF)
 		|	OP_stmt(CPL)
 		|	OP_stmt(DAA)
@@ -310,8 +342,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
 		|	OP_stmt_const(IM)
 		|	OP_stmt_const(RST)
-		|	OP_stmt_jr(DJNZ)
-		|	OP_stmt_jr(JR)
 		|	OP_stmt_emul(CPD,  rcmx_cpd)
 		|	OP_stmt_emul(CPDR, rcmx_cpdr)
 		|	OP_stmt_emul(CPI,  rcmx_cpi)
@@ -342,6 +372,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 		|	OP_stmt_idx(POP,  IY)
 		|	OP_stmt_idx(PUSH, IX)
 		|	OP_stmt_idx(PUSH, IY)
+		|	OP_stmt_jr(DJNZ)
+		|	OP_stmt_jr(JR)
 		|	OP_stmt_nn(CALL)
 		|	OP_stmt_nn(JP)
 		|	OP_stmt_reg(POP,  AF)
@@ -351,8 +383,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.17 2014-12-
 		|	OP_stmt_reg(PUSH, AF)
 		|	OP_stmt_reg(PUSH, BC)
 		|	OP_stmt_reg(PUSH, DE)
-		|	OP_stmt_reg(PUSH, HL)
-		|	OP_alu(CP)
+		|	OP_stmt_reg(PUSH, HL)				
 		;
 
 }%%

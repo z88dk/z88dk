@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.22 2014-12-28 07:28:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.23 2014-12-29 00:55:10 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -234,6 +234,9 @@ TOKEN(TK_DS_P, "DS.P", sym.ds_size = 3 )
 TOKEN(TK_DS_L, "DS.L", sym.ds_size = 4 )
 
 /* Z80 opcode specifiers */
+TOKEN_OPCODE(ADC,  )
+TOKEN_OPCODE(ADD,  )
+TOKEN_OPCODE(AND,  )
 TOKEN_OPCODE(CALL, )
 TOKEN_OPCODE(CCF,  )
 TOKEN_OPCODE(CP,   )
@@ -262,6 +265,7 @@ TOKEN_OPCODE(LDI,  )
 TOKEN_OPCODE(LDIR, )
 TOKEN_OPCODE(NEG,  )
 TOKEN_OPCODE(NOP,  )
+TOKEN_OPCODE(OR,   )
 TOKEN_OPCODE(OTDR, FOR_Z80)
 TOKEN_OPCODE(OTIR, FOR_Z80)
 TOKEN_OPCODE(OUTD, FOR_Z80)
@@ -278,7 +282,10 @@ TOKEN_OPCODE(RRA,  )
 TOKEN_OPCODE(RRCA, )
 TOKEN_OPCODE(RRD,  )
 TOKEN_OPCODE(RST,  )
+TOKEN_OPCODE(SBC,  )
 TOKEN_OPCODE(SCF,  )
+TOKEN_OPCODE(SUB,  )
+TOKEN_OPCODE(XOR,  )
 
 #undef TOKEN_OPCODE
 #undef TOKEN_KW

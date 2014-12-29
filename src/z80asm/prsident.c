@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.93 2014-12-28 07:28:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.94 2014-12-29 00:55:10 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -34,15 +34,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.93 2014-1
 /* external functions */
 void RotShift_instr( int opcode );
 void BitTest_instr( int opcode );
-void ArithLog8_instr( int opcode );
 void DeclModuleName( void );
 void DEFINE( void );
 void ifstatement(enum flag interpret);
 void ifdefstatement(enum flag interpret);
 void ifndefstatement(enum flag interpret);
 void DEFVARS(void), DEFS(void), ORG(void), INCLUDE(void), BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
-void ADC( void ), ADD( void ), DEC( void ), IN( void ), INC( void ), INVOKE( void );
-void LD( void ), OUT( void ), SBC( void );
+void DEC( void ), IN( void ), INC( void ), INVOKE( void );
+void LD( void ), OUT( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void DEFGROUP( void );
 void UNDEFINE( void );
@@ -50,12 +49,11 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent( enum flag interpret );
-void AND( void ), BIT( void );
-void OR( void );
+void BIT( void );
 void RES( void );
 void RL( void ), RLC( void ), RR( void ), RRC( void );
 void SET( void ), SLA( void ), SLL( void ), SRA( void );
-void SRL( void ), SUB( void ), XOR( void );
+void SRL( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
@@ -78,9 +76,6 @@ struct Z80sym
 #define DEF_ENTRY(func)     { #func, func }
 struct Z80sym Z80ident[] =
 {
-    DEF_ENTRY( ADC ),
-    DEF_ENTRY( ADD ),
-    DEF_ENTRY( AND ),
     DEF_ENTRY( BINARY ),
     DEF_ENTRY( BIT ),
     DEF_ENTRY( CALL_OZ ),
@@ -113,7 +108,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( LSTOFF ),
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( MODULE ),
-    DEF_ENTRY( OR ),
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OUT ),
     DEF_ENTRY( OZ ),
@@ -123,18 +117,15 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( RLC ),
     DEF_ENTRY( RR ),
     DEF_ENTRY( RRC ),
-    DEF_ENTRY( SBC ),
     DEF_ENTRY( SECTION ),
     DEF_ENTRY( SET ),
     DEF_ENTRY( SLA ),
     DEF_ENTRY( SLL ),
     DEF_ENTRY( SRA ),
     DEF_ENTRY( SRL ),
-    DEF_ENTRY( SUB ),
     DEF_ENTRY( UNDEFINE ),
     DEF_ENTRY( XDEF ),
     DEF_ENTRY( XLIB ),
-    DEF_ENTRY( XOR ),
     DEF_ENTRY( XREF )
 };
 #undef DEF_ENTRY
@@ -388,65 +379,6 @@ SECTION( void )
 	else
 		error_syntax();
 }
-
-
-/*
- * Allow specification of "<instr> [A,]xxx"
- * in SUB, AND, OR, XOR, CP instructions
- */
-void
-ExtAccumulator( int opcode )
-{
-	if (sym.tok == TK_A)
-	{
-		GetSym();
-		if (sym.tok == TK_COMMA)
-			GetSym();
-		else
-		{
-			sym.tok = TK_A;				/* push back 'A' */
-			sym.cpu_reg8 = REG_A;
-		}
-	}
-	ArithLog8_instr(opcode);
-}
-
-
-
-void
-AND( void )
-{
-	GetSym();
-	ExtAccumulator(4);
-}
-
-
-
-void
-OR( void )
-{
-	GetSym();
-	ExtAccumulator(6);
-}
-
-
-
-void
-XOR( void )
-{
-	GetSym();
-	ExtAccumulator(5);
-}
-
-
-void
-SUB( void )
-{
-	GetSym();
-	ExtAccumulator(2);
-}
-
-
 
 
 void

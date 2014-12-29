@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.21 2014-12-28 07:28:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.22 2014-12-29 00:55:10 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -796,6 +796,9 @@ t_compile_module($init, <<'END', $objs);
 
 	
 	/* assembly opcodes */
+	T_OPCODE(ADC,	T_ALL);
+	T_OPCODE(ADD,	T_ALL);
+	T_OPCODE(AND,	T_ALL);
 	T_OPCODE(CALL,	T_ALL);
 	T_OPCODE(CCF,	T_ALL);
 	T_OPCODE(CP,	T_ALL);
@@ -824,6 +827,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(LDIR,	T_ALL);
 	T_OPCODE(NEG,	T_ALL);
 	T_OPCODE(NOP,	T_ALL);
+	T_OPCODE(OR,	T_ALL);
 	T_OPCODE(OTDR,	T_Z80);
 	T_OPCODE(OTIR,	T_Z80);
 	T_OPCODE(OUTD,	T_Z80);
@@ -840,7 +844,10 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(RRCA, 	T_ALL);
 	T_OPCODE(RRD,	T_ALL);
 	T_OPCODE(RST,	T_ALL);
+	T_OPCODE(SBC,	T_ALL);
 	T_OPCODE(SCF,	T_ALL);
+	T_OPCODE(SUB,	T_ALL);
+	T_OPCODE(XOR,	T_ALL);
 	
 
 	/* check limit cases */
