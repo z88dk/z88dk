@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.122 2014-12-29 00:55:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.123 2014-12-29 18:16:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -94,9 +94,7 @@ parseline( enum flag interpret )
 #if 0
 		switch (sym.tok)
 		{
-		case TK_ADD:	sym.tok = TK_NAME; sym.string = "ADD"; break;
-		case TK_ADC:	sym.tok = TK_NAME; sym.string = "ADC"; break;
-		case TK_SBC:	sym.tok = TK_NAME; sym.string = "SBC"; break;
+		case TK_OUT:	sym.tok = TK_NAME; sym.string = "OUT"; break;
 		default: ;
 		}
 #endif

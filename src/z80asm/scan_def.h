@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.23 2014-12-29 00:55:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.24 2014-12-29 18:16:41 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -253,6 +253,7 @@ TOKEN_OPCODE(EX,   )
 TOKEN_OPCODE(EXX,  )
 TOKEN_OPCODE(HALT, FOR_Z80)
 TOKEN_OPCODE(IM,   FOR_Z80)
+TOKEN_OPCODE(IN,   FOR_Z80)
 TOKEN_OPCODE(IND,  FOR_Z80)
 TOKEN_OPCODE(INDR, FOR_Z80)
 TOKEN_OPCODE(INI,  FOR_Z80)
@@ -286,6 +287,10 @@ TOKEN_OPCODE(SBC,  )
 TOKEN_OPCODE(SCF,  )
 TOKEN_OPCODE(SUB,  )
 TOKEN_OPCODE(XOR,  )
+
+#if 0
+TOKEN_OPCODE(OUT,  FOR_Z80)
+#endif
 
 #undef TOKEN_OPCODE
 #undef TOKEN_KW

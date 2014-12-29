@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.92 2014-12-29 00:55:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.93 2014-12-29 18:16:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -80,60 +80,6 @@ OUT( void )
 
 		default:
 			break;
-		}
-	}
-}
-
-
-void
-IN( void )
-{
-    int in_reg;
-
-	GetSym();
-
-	if (opts.cpu & CPU_RABBIT)
-	{
-		error_illegal_ident();
-	}
-	else
-	{
-		in_reg = sym.cpu_reg8;
-		if (in_reg != REG_NONE && !sym.cpu_idx_reg)
-		{
-			GetSymExpect(TK_COMMA);
-			GetSym();
-			switch (sym.tok)
-			{
-			case TK_IND_C:							/* IN r,(C) */
-				append_2bytes(0xED, (Byte)(0x40 + (in_reg << 3)));	
-				break;
-
-			case TK_LPAREN:							/* IN A,(N) */
-				if (in_reg != REG_A)
-				{
-					error_illegal_ident();
-				}
-
-				GetSym();
-				append_byte(0xDB);
-				if (!Pass2info(RANGE_BYTE_UNSIGNED))
-					return;							/* error in expression */
-
-				if (sym.tok != TK_RPAREN)
-				{
-					error_syntax();
-				}
-
-				break;
-
-			default:
-				error_syntax();
-			}
-		}
-		else
-		{
-			error_illegal_ident();
 		}
 	}
 }

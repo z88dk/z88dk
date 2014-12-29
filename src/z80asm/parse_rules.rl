@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-29 00:55:10 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.19 2014-12-29 18:16:41 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -205,9 +205,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-
 		|	_OP_alu16(SBC, HL, 0)
 
 /*-----------------------------------------------------------------------------
-*   special opcodes
+*   CALL opcodes
 *----------------------------------------------------------------------------*/
-#define OP_call_flag_nn(flag) \
+#define _OP_call_flag_nn(flag) \
 			label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
 			@{ \
 			 	Expr *expr = pop_expr(); \
@@ -219,7 +219,60 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-
 					OBJ_DELETE(expr); \
 			}
 
-#define OP_stmt_emul(op, emul_func) \
+#define OP_call() \
+			_OP_call_flag_nn(C)  \
+		|	_OP_call_flag_nn(M)  \
+		|	_OP_call_flag_nn(NC) \
+		|	_OP_call_flag_nn(NZ) \
+		|	_OP_call_flag_nn(P)  \
+		|	_OP_call_flag_nn(PE) \
+		|	_OP_call_flag_nn(PO) \
+		|	_OP_call_flag_nn(Z)  \
+		|	OP_stmt_nn(CALL)
+		
+/*-----------------------------------------------------------------------------
+*   JP, JR, DJNZ opcodes
+*----------------------------------------------------------------------------*/
+#define OP_jump() \
+			OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)			\
+		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)	\
+		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)	\
+		|	OP_stmt_flag_jr(JR, C)	\
+		|	OP_stmt_flag_jr(JR, NC)	\
+		|	OP_stmt_flag_jr(JR, NZ)	\
+		|	OP_stmt_flag_jr(JR, Z)	\
+		|	OP_stmt_flag_nn(JP, C)	\
+		|	OP_stmt_flag_nn(JP, M)	\
+		|	OP_stmt_flag_nn(JP, NC)	\
+		|	OP_stmt_flag_nn(JP, NZ)	\
+		|	OP_stmt_flag_nn(JP, P)	\
+		|	OP_stmt_flag_nn(JP, PE)	\
+		|	OP_stmt_flag_nn(JP, PO)	\
+		|	OP_stmt_flag_nn(JP, Z)	\
+		|	OP_stmt_jr(DJNZ)		\
+		|	OP_stmt_jr(JR)			\
+		|	OP_stmt_nn(JP)
+
+/*-----------------------------------------------------------------------------
+*   RETx opcodes
+*----------------------------------------------------------------------------*/
+#define OP_ret() \
+			OP_stmt(RET)			\
+		|	OP_stmt(RETI)			\
+		|	OP_stmt(RETN)			\
+		|	OP_stmt_flag(RET, C)	\
+		|	OP_stmt_flag(RET, M)	\
+		|	OP_stmt_flag(RET, NC)	\
+		|	OP_stmt_flag(RET, NZ)	\
+		|	OP_stmt_flag(RET, P)	\
+		|	OP_stmt_flag(RET, PE)	\
+		|	OP_stmt_flag(RET, PO)	\
+		|	OP_stmt_flag(RET, Z)
+
+/*-----------------------------------------------------------------------------
+*   Emulated opcodes
+*----------------------------------------------------------------------------*/
+#define _OP_stmt_emul(op, emul_func) \
 			label? _TK_##op _TK_NEWLINE \
 			@{ \
 				if (compile_active) { \
@@ -228,6 +281,87 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-
 				} \
 			}
 
+#define OP_emulated() \
+			_OP_stmt_emul(CPD,  rcmx_cpd)	\
+		|	_OP_stmt_emul(CPDR, rcmx_cpdr)	\
+		|	_OP_stmt_emul(CPI,  rcmx_cpi)	\
+		|	_OP_stmt_emul(CPIR, rcmx_cpir)	\
+		|	_OP_stmt_emul(RLD,  rcmx_rld)	\
+		|	_OP_stmt_emul(RRD,  rcmx_rrd)
+
+/*-----------------------------------------------------------------------------
+*   PUSH / POP
+*----------------------------------------------------------------------------*/
+#define OP_push_pop() \
+			OP_stmt_idx(POP,  IX)	\
+		|	OP_stmt_idx(POP,  IY)	\
+		|	OP_stmt_idx(PUSH, IX)	\
+		|	OP_stmt_idx(PUSH, IY)	\
+		|	OP_stmt_reg(POP,  AF)	\
+		|	OP_stmt_reg(POP,  BC)	\
+		|	OP_stmt_reg(POP,  DE)	\
+		|	OP_stmt_reg(POP,  HL)	\
+		|	OP_stmt_reg(PUSH, AF)	\
+		|	OP_stmt_reg(PUSH, BC)	\
+		|	OP_stmt_reg(PUSH, DE)	\
+		|	OP_stmt_reg(PUSH, HL)
+
+/*-----------------------------------------------------------------------------
+*   EX, EXX
+*----------------------------------------------------------------------------*/
+#define OP_ex() \
+			OP_stmt(EXX)	\
+		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)	\
+		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)	\
+		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)	\
+		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)	\
+		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)	\
+		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
+
+/*-----------------------------------------------------------------------------
+*   IN, OUT
+*----------------------------------------------------------------------------*/
+#define _OP_in_reg(reg) \
+			label? _TK_IN _TK_##reg _TK_COMMA _TK_IND_C _TK_NEWLINE \
+			@{ DO_stmt(Z80_IN_REG_C(REG_##reg)); }
+
+#define _OP_in_A \
+			label? _TK_IN _TK_A _TK_COMMA \
+					_TK_LPAREN expr _TK_RPAREN _TK_NEWLINE \
+			@{ DO_stmt_n(Z80_IN_A_n); }
+
+#define _OP_out_reg(reg) \
+			label? _TK_OUT _TK_IND_C _TK_COMMA _TK_##reg _TK_NEWLINE \
+			@{ DO_stmt(Z80_OUT_C_REG(REG_##reg)); }
+
+#define _OP_out_A \
+			label? _TK_OUT _TK_LPAREN expr _TK_RPAREN \
+					_TK_COMMA _TK_A _TK_NEWLINE \
+			@{ DO_stmt_n(Z80_OUT_n_A); }
+
+#define OP_in_out() \
+			_OP_in_reg(B) 	\
+		|	_OP_in_reg(C) 	\
+		|	_OP_in_reg(D) 	\
+		|	_OP_in_reg(E) 	\
+		|	_OP_in_reg(H) 	\
+		|	_OP_in_reg(L) 	\
+		|	_OP_in_reg(A) 	\
+		|	_OP_in_A		\
+		|	OP_stmt(OTDR)	\
+		|	OP_stmt(OTIR)	\
+		|	OP_stmt(OUTD)	\
+		|	OP_stmt(OUTI)
+#if 0
+		|	_OP_out_reg(B)	
+		|	_OP_out_reg(C)	
+		|	_OP_out_reg(D)	
+		|	_OP_out_reg(E)	
+		|	_OP_out_reg(H)	
+		|	_OP_out_reg(L)	
+		|	_OP_out_reg(A)	
+		|	_OP_out_A		
+#endif
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -294,20 +428,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-
 		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 		|	OP_alu()
 		|	OP_alu16()
-		|	OP_call_flag_nn(C)
-		|	OP_call_flag_nn(M)
-		|	OP_call_flag_nn(NC)
-		|	OP_call_flag_nn(NZ)
-		|	OP_call_flag_nn(P)
-		|	OP_call_flag_nn(PE)
-		|	OP_call_flag_nn(PO)
-		|	OP_call_flag_nn(Z)
+		|	OP_call()
+		|	OP_emulated()
+		|	OP_ex()
+		|	OP_in_out()
+		|	OP_jump()
+		|	OP_push_pop()
+		|	OP_ret()
 		|	OP_stmt(CCF)
 		|	OP_stmt(CPL)
 		|	OP_stmt(DAA)
 		|	OP_stmt(DI)
 		|	OP_stmt(EI)
-		|	OP_stmt(EXX)
 		|	OP_stmt(HALT)
 		|	OP_stmt(IND)
 		|	OP_stmt(INDR)
@@ -319,71 +451,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.18 2014-12-
 		|	OP_stmt(LDIR)
 		|	OP_stmt(NEG)
 		|	OP_stmt(NOP)
-		|	OP_stmt(OTDR)
-		|	OP_stmt(OTIR)
-		|	OP_stmt(OUTD)
-		|	OP_stmt(OUTI)
-		|	OP_stmt(RET)
-		|	OP_stmt(RETI)
-		|	OP_stmt(RETN)
 		|	OP_stmt(RLA)
 		|	OP_stmt(RLCA)
 		|	OP_stmt(RRA)
 		|	OP_stmt(RRCA)
 		|	OP_stmt(SCF)
-		|	OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)
-		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)
-		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)
-		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)
-		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)
-		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)
-		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)
-		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)
-		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
 		|	OP_stmt_const(IM)
 		|	OP_stmt_const(RST)
-		|	OP_stmt_emul(CPD,  rcmx_cpd)
-		|	OP_stmt_emul(CPDR, rcmx_cpdr)
-		|	OP_stmt_emul(CPI,  rcmx_cpi)
-		|	OP_stmt_emul(CPIR, rcmx_cpir)
-		|	OP_stmt_emul(RLD,  rcmx_rld)
-		|	OP_stmt_emul(RRD,  rcmx_rrd)
-		|	OP_stmt_flag(RET, C)
-		|	OP_stmt_flag(RET, M)
-		|	OP_stmt_flag(RET, NC)
-		|	OP_stmt_flag(RET, NZ)
-		|	OP_stmt_flag(RET, P)
-		|	OP_stmt_flag(RET, PE)
-		|	OP_stmt_flag(RET, PO)
-		|	OP_stmt_flag(RET, Z)
-		|	OP_stmt_flag_jr(JR, C)
-		|	OP_stmt_flag_jr(JR, NC)
-		|	OP_stmt_flag_jr(JR, NZ)
-		|	OP_stmt_flag_jr(JR, Z)
-		|	OP_stmt_flag_nn(JP, C)
-		|	OP_stmt_flag_nn(JP, M)
-		|	OP_stmt_flag_nn(JP, NC)
-		|	OP_stmt_flag_nn(JP, NZ)
-		|	OP_stmt_flag_nn(JP, P)
-		|	OP_stmt_flag_nn(JP, PE)
-		|	OP_stmt_flag_nn(JP, PO)
-		|	OP_stmt_flag_nn(JP, Z)
-		|	OP_stmt_idx(POP,  IX)
-		|	OP_stmt_idx(POP,  IY)
-		|	OP_stmt_idx(PUSH, IX)
-		|	OP_stmt_idx(PUSH, IY)
-		|	OP_stmt_jr(DJNZ)
-		|	OP_stmt_jr(JR)
-		|	OP_stmt_nn(CALL)
-		|	OP_stmt_nn(JP)
-		|	OP_stmt_reg(POP,  AF)
-		|	OP_stmt_reg(POP,  BC)
-		|	OP_stmt_reg(POP,  DE)
-		|	OP_stmt_reg(POP,  HL)
-		|	OP_stmt_reg(PUSH, AF)
-		|	OP_stmt_reg(PUSH, BC)
-		|	OP_stmt_reg(PUSH, DE)
-		|	OP_stmt_reg(PUSH, HL)				
 		;
 
 }%%

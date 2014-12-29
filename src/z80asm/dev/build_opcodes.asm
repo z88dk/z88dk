@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.10 2014-12-23 00:26:41 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.11 2014-12-29 18:16:40 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -634,6 +634,16 @@ di:
 	ei
 	jr ei
 ei:
+ENDIF
+
+;------------------------------------------------------------------------------
+; Test parsing of expressions with parentheses inside parentheses
+;------------------------------------------------------------------------------
+IF !RABBIT
+		out	 N,a						;; error: syntax error
+        out  (N),a
+        out  ((N)),a
+        out  (N+2*(3-3)),a
 ENDIF
 
 ;------------------------------------------------------------------------------

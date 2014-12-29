@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.16 2014-12-29 00:55:10 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.17 2014-12-29 18:16:41 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -162,3 +162,9 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_SUB_n			Z80_ALU_n(ALU_SUB)
 #define Z80_XOR(reg)		Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			Z80_ALU_n(ALU_XOR)
+
+#define Z80_IN_REG_C(reg)	(0xED40 + ((reg) << 3))
+#define Z80_IN_A_n			0xDB
+
+#define Z80_OUT_C_REG(reg)	(0xED41 + ((reg) << 3))
+#define Z80_OUT_n_A			0xD3

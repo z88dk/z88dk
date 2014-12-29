@@ -1880,6 +1880,14 @@ di:
 ei:                   
 
 ;------------------------------------------------------------------------------
+; Test parsing of expressions with parentheses inside parentheses
+;------------------------------------------------------------------------------
+                      out  (N),a        ;; D3 20
+                      out  ((N)),a      ;; D3 20
+                      out  (N+2*(3-3)),a
+                                        ;; D3 20
+
+;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
                       call_oz 1         ;; E7 01
@@ -1981,6 +1989,7 @@ z80asm(
         ifdef 1                         ;; error: syntax error
         ifndef                          ;; error: syntax error
         ifndef 1                        ;; error: syntax error
+        out  N,a                        ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
@@ -3688,6 +3697,10 @@ jr2:
                       jr   nop          ;; 18 00
 nop:                  
 
+
+;------------------------------------------------------------------------------
+; Test parsing of expressions with parentheses inside parentheses
+;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
