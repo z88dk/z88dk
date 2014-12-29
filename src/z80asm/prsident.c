@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.97 2014-12-29 19:03:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.98 2014-12-29 20:09:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.97 2014-1
 #include <string.h>
 
 /* external functions */
-void RotShift_instr( int opcode );
 void BitTest_instr( int opcode );
 void DeclModuleName( void );
 void DEFINE( void );
@@ -51,9 +50,7 @@ void UNDEFINE( void );
 void ParseIdent( enum flag interpret );
 void BIT( void );
 void RES( void );
-void RL( void ), RLC( void ), RR( void ), RRC( void );
-void SET( void ), SLA( void ), SLL( void ), SRA( void );
-void SRL( void );
+void SET( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
@@ -111,16 +108,8 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( OZ ),
     DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( RES ),
-    DEF_ENTRY( RL ),
-    DEF_ENTRY( RLC ),
-    DEF_ENTRY( RR ),
-    DEF_ENTRY( RRC ),
     DEF_ENTRY( SECTION ),
     DEF_ENTRY( SET ),
-    DEF_ENTRY( SLA ),
-    DEF_ENTRY( SLL ),
-    DEF_ENTRY( SRA ),
-    DEF_ENTRY( SRL ),
     DEF_ENTRY( UNDEFINE ),
     DEF_ENTRY( XDEF ),
     DEF_ENTRY( XLIB ),
@@ -399,74 +388,4 @@ void
 BIT( void )
 {
     BitTest_instr( 64 );
-}
-
-
-
-void
-RLC( void )
-{
-    RotShift_instr( 0 );
-}
-
-
-
-void
-RRC( void )
-{
-    RotShift_instr( 1 );
-}
-
-
-
-void
-RL( void )
-{
-    RotShift_instr( 2 );
-}
-
-
-
-void
-RR( void )
-{
-    RotShift_instr( 3 );
-}
-
-
-
-void
-SLA( void )
-{
-    RotShift_instr( 4 );
-}
-
-
-
-void
-SRA( void )
-{
-    RotShift_instr( 5 );
-}
-
-
-
-void
-SLL( void )
-{
-    if ( ( opts.cpu & CPU_RABBIT ) )
-    {
-		error_illegal_ident();
-        return;
-    }
-
-    RotShift_instr( 6 );
-}
-
-
-
-void
-SRL( void )
-{
-    RotShift_instr( 7 );
 }

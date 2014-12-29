@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.18 2014-12-29 18:33:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.19 2014-12-29 20:08:59 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -27,7 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.18 2014-12-29 18
 /* forward declaration without include cycle */
 struct Expr;
 
-/* add 1 to 3 bytes opcode opcode to object code 
+/* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xED46 */
 extern void add_opcode(int opcode);
 
@@ -69,6 +69,10 @@ enum { REG_NONE = -1, REG_BC, REG_DE,
 enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_ALU(alu,reg)	(0x80 + ((alu) << 3) + (reg))
 #define Z80_ALU_n(alu)		(0xC0 + ((alu) << 3) + REG_idx)
+
+/* Rotate and shift operations */
+enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
+#define Z80_RS(rs,reg)		(0xCB00 + ((rs) << 3) + (reg))
 
 /* choose value, error if none */
 #define _CHOOSE2_(n, i1, o1, i2, o2)	\
@@ -166,4 +170,11 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 #define Z80_SUB_n			Z80_ALU_n(ALU_SUB)
 #define Z80_XOR(reg)		Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			Z80_ALU_n(ALU_XOR)
-
+#define Z80_RLC(reg)		Z80_RS(RS_RLC, (reg))
+#define Z80_RRC(reg)		Z80_RS(RS_RRC, (reg))
+#define Z80_RL(reg)			Z80_RS(RS_RL,  (reg))
+#define Z80_RR(reg)			Z80_RS(RS_RR,  (reg))
+#define Z80_SLA(reg)		Z80_RS(RS_SLA, (reg))
+#define Z80_SRA(reg)		Z80_RS(RS_SRA, (reg))
+#define Z80_SLL(reg)		Z80_RS(RS_SLL, (reg))
+#define Z80_SRL(reg)		Z80_RS(RS_SRL, (reg))

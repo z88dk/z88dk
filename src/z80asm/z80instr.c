@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.95 2014-12-29 19:03:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.96 2014-12-29 20:09:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -243,40 +243,6 @@ BitTest_instr( int opcode )
 		}
 		else
 			append_2bytes(0xCB, (Byte)(opcode + (bitnumber << 3) + sym.cpu_reg8));
-	}
-	else
-	{
-		error_illegal_ident();
-	}
-}
-
-
-void
-RotShift_instr( int opcode )
-{
-	GetSym();
-
-	if (sym.cpu_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
-	{
-		if (!sym.cpu_idx_reg)
-			append_2bytes(0xCB, (Byte)((opcode << 3) + 0x06));
-		else
-		{
-			append_2bytes(sym.cpu_idx_reg, 0xCB);
-			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED);
-			append_byte((Byte)((opcode << 3) + 0x06));
-		}
-	}
-	else if (sym.cpu_reg8 != REG_NONE)
-	{
-		/* no indirect addressing, must be an 8bit register */
-		if (sym.cpu_idx_reg)
-		{
-			error_illegal_ident();
-		}
-		else
-			append_2bytes(0xCB, (Byte)((opcode << 3) + sym.cpu_reg8));
 	}
 	else
 	{

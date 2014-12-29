@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.8 2014-12-28 07:28:09 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.9 2014-12-29 20:08:59 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,10 +26,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.8 2014-12-28 07:
 #include "parse.h"
 #include "z80asm.h"
 
-/* add 1 to 3 bytes opcode opcode to object code 
+/* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
 void add_opcode(int opcode)
 {
+	if ( opcode & 0xFF000000 )
+		append_byte( (opcode >> 24) & 0xFF );
 	if ( opcode & 0xFF0000 )
 		append_byte( (opcode >> 16) & 0xFF );
 	if ( opcode & 0xFF00 )
@@ -61,8 +63,17 @@ void add_opcode_nn(int opcode, Expr *expr)
 /* add opcode followed by IX/IY offset expression */
 void add_opcode_idx(int opcode, Expr *expr)
 {
-	add_opcode(opcode);
-	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
+	if (opcode & 0xFF0000) 
+	{				/* 3 bytes, insert idx offset as 2nd byte */
+		add_opcode( (opcode >> 8) & 0xFFFF );
+		Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
+		add_opcode( opcode & 0xFF );
+	}
+	else
+	{
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
+	}
 }
 
 

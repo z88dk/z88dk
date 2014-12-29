@@ -143,6 +143,14 @@
 #define _TK_SCF           138    /* "SCF"   */
 #define _TK_SUB           139    /* "SUB"   */
 #define _TK_XOR           140    /* "XOR"   */
+#define _TK_RLC           141    /* "RLC"   */
+#define _TK_RRC           142    /* "RRC"   */
+#define _TK_RL            143    /* "RL"    */
+#define _TK_RR            144    /* "RR"    */
+#define _TK_SLA           145    /* "SLA"   */
+#define _TK_SRA           146    /* "SRA"   */
+#define _TK_SLL           147    /* "SLL"   */
+#define _TK_SRL           148    /* "SRL"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -290,7 +298,14 @@ typedef enum tokid_t
     TK_SCF         = _TK_SCF        ,    /* =   138, "SCF"   */
     TK_SUB         = _TK_SUB        ,    /* =   139, "SUB"   */
     TK_XOR         = _TK_XOR        ,    /* =   140, "XOR"   */
+    TK_RLC         = _TK_RLC        ,    /* =   141, "RLC"   */
+    TK_RRC         = _TK_RRC        ,    /* =   142, "RRC"   */
+    TK_RL          = _TK_RL         ,    /* =   143, "RL"    */
+    TK_RR          = _TK_RR         ,    /* =   144, "RR"    */
+    TK_SLA         = _TK_SLA        ,    /* =   145, "SLA"   */
+    TK_SRA         = _TK_SRA        ,    /* =   146, "SRA"   */
+    TK_SLL         = _TK_SLL        ,    /* =   147, "SLL"   */
+    TK_SRL         = _TK_SRL        ,    /* =   148, "SRL"   */
 } tokid_t;
 
 #endif
-

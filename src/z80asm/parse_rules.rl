@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.21 2014-12-29 19:03:48 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.22 2014-12-29 20:09:00 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -183,6 +183,52 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.21 2014-12-
 		|	_OP_alu(SBC) \
 		|	_OP_alu(SUB) \
 		|	_OP_alu(XOR)
+
+/*-----------------------------------------------------------------------------
+*   Rotate and Shift operations
+*----------------------------------------------------------------------------*/
+#define _OP_rs_idx(rs, idx) \
+			label? _TK_##rs _TK_IND_##idx \
+					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
+			@{ DO_stmt( ((P_##idx << 16) & 0xFF000000) + \
+						((Z80_##rs(REG_idx) << 8) & 0xFF0000) + \
+						((0 << 8) & 0xFF00) + \
+						((Z80_##rs(REG_idx) << 0) & 0xFF) ); } \
+		|	label? _TK_##rs _TK_IND_##idx \
+					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
+			@{ DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
+						    Z80_##rs(REG_idx) ); } \
+		|	label? _TK_##rs _TK_IND_##idx \
+					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
+			@{ DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
+						    Z80_##rs(REG_idx) ); } \
+
+#define _OP_rs_reg(rs, reg) \
+			label? _TK_##rs _TK_##reg _TK_NEWLINE			/* reg */ \
+			@{ DO_stmt(Z80_##rs(REG_##reg)); }
+
+#define _OP_rs(rs) \
+			label? _TK_##rs _TK_IND_HL _TK_NEWLINE 			/* (hl) */ \
+			@{ DO_stmt(Z80_##rs(REG_idx)); } \
+		|	_OP_rs_idx(rs, IX) \
+		|	_OP_rs_idx(rs, IY) \
+		|	_OP_rs_reg(rs, B) \
+		|	_OP_rs_reg(rs, C) \
+		|	_OP_rs_reg(rs, D) \
+		|	_OP_rs_reg(rs, E) \
+		|	_OP_rs_reg(rs, H) \
+		|	_OP_rs_reg(rs, L) \
+		|	_OP_rs_reg(rs, A) \
+
+#define OP_rot_shift() \
+			_OP_rs(RLC) \
+		|	_OP_rs(RRC) \
+		|	_OP_rs(RL) \
+		|	_OP_rs(RR)  \
+		|	_OP_rs(SLA)  \
+		|	_OP_rs(SRA) \
+		|	_OP_rs(SLL) \
+		|	_OP_rs(SRL)
 
 /*-----------------------------------------------------------------------------
 *   ALU-16 operations
@@ -441,6 +487,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.21 2014-12-
 		|	OP_jump()
 		|	OP_push_pop()
 		|	OP_ret()
+		|	OP_rot_shift()
 		|	OP_stmt(CCF)
 		|	OP_stmt(CPL)
 		|	OP_stmt(DAA)
