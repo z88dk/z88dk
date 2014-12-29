@@ -154,6 +154,8 @@
 #define _TK_SRL           149    /* "SRL"   */
 #define _TK_SUB           150    /* "SUB"   */
 #define _TK_XOR           151    /* "XOR"   */
+#define _TK_INC           152    /* "INC"   */
+#define _TK_DEC           153    /* "DEC"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -312,6 +314,8 @@ typedef enum tokid_t
     TK_SRL         = _TK_SRL        ,    /* =   149, "SRL"   */
     TK_SUB         = _TK_SUB        ,    /* =   150, "SUB"   */
     TK_XOR         = _TK_XOR        ,    /* =   151, "XOR"   */
+    TK_INC         = _TK_INC        ,    /* =   152, "INC"   */
+    TK_DEC         = _TK_DEC        ,    /* =   153, "DEC"   */
 } tokid_t;
 
 #endif

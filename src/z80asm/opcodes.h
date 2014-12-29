@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.20 2014-12-29 20:45:54 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.21 2014-12-29 21:19:27 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -189,3 +189,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_SUB_n			Z80_ALU_n(ALU_SUB)
 #define Z80_XOR(reg)		Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			Z80_ALU_n(ALU_XOR)
+#define Z80_INC(reg)		(0x04 + ((reg) << 3))
+#define Z80_DEC(reg)		(0x05 + ((reg) << 3))
+#define Z80_INC16(reg)		(0x03 + ((reg) << 4))
+#define Z80_DEC16(reg)		(0x0B + ((reg) << 4))

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.97 2014-12-29 20:45:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.98 2014-12-29 21:19:27 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,8 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.97 2014-1
 
 
 /* local functions */
-void IncDec_8bit_instr( int opcode );
-
 void CALL_OZ( void )
 {
     long constant;
@@ -133,72 +131,4 @@ FPP( void )
             error_int_range( constant );
         }
     }
-}
-
-static void INC_DEC(int opcode8bit, int opcode16bit)
-{
-	GetSym();
-
-	switch (sym.cpu_reg16_sp)
-	{
-	case REG_NONE:
-		IncDec_8bit_instr(opcode8bit);   /* 16 bit register wasn't found - try to evaluate the 8bit version */
-		break;
-
-	default:
-		if (sym.cpu_idx_reg)
-			append_byte(sym.cpu_idx_reg);
-
-		append_byte((Byte)(opcode16bit + (sym.cpu_reg16_sp << 4)));
-	}
-
-}
-
-void
-INC( void )
-{
-	INC_DEC(4, 0x03);
-}
-
-void
-DEC( void )
-{
-	INC_DEC(5, 0x0B);
-}
-
-void
-IncDec_8bit_instr(int opcode)
-{
-	if (sym.cpu_ind_reg16 == IND_REG16_HL)							/* (hl), (ix+d), (iy+d) */
-	{
-		if (sym.cpu_idx_reg)
-			append_byte(sym.cpu_idx_reg);
-
-		append_byte((Byte)(0x30 + opcode));		/* INC/DEC (HL) */
-
-		if (sym.cpu_idx_reg)
-		{
-			GetSym();
-			Pass2info(RANGE_BYTE_SIGNED);
-		}
-	}
-	else if (sym.cpu_reg8 != REG_NONE)
-	{
-		/* no indirect addressing, must be an 8bit register */
-		if (sym.cpu_idx_reg)
-		{
-			if (opts.cpu & CPU_RABBIT)
-			{
-				error_illegal_ident();
-				return;
-			}
-			append_byte(sym.cpu_idx_reg);
-		}
-
-		append_byte((Byte)((sym.cpu_reg8 << 3) + opcode));			/* INC/DEC  r */
-	}
-	else
-	{
-		error_syntax();
-	}
 }

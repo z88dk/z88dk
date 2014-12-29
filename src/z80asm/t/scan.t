@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.26 2014-12-29 20:45:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.27 2014-12-29 21:19:28 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -861,6 +861,8 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SRL,  	T_ALL)
 	T_OPCODE(SUB,	T_ALL);
 	T_OPCODE(XOR,	T_ALL);
+	T_OPCODE(INC,	T_ALL);
+	T_OPCODE(DEC,	T_ALL);
 	
 	
 	/* check limit cases */

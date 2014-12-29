@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.23 2014-12-29 20:45:54 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.24 2014-12-29 21:19:27 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -183,6 +183,63 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.23 2014-12-
 		|	_OP_alu(SBC) \
 		|	_OP_alu(SUB) \
 		|	_OP_alu(XOR)
+
+/*-----------------------------------------------------------------------------
+*   INC / DEC operations
+*----------------------------------------------------------------------------*/
+#define _OP_id_idx(id, idx) \
+			label? _TK_##id _TK_IND_##idx \
+					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
+			@{ DO_stmt((Z80_##id(REG_idx) + P_##idx) << 8); } \
+		|	label? _TK_##id _TK_IND_##idx \
+					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
+			@{ DO_stmt_idx(Z80_##id(REG_idx) + P_##idx); } \
+		|	label? _TK_##id _TK_IND_##idx \
+					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
+			@{ DO_stmt_idx(Z80_##id(REG_idx) + P_##idx); }			
+
+#define _OP_id_reg(id, reg) \
+			label? _TK_##id _TK_##reg _TK_NEWLINE			/* reg */ \
+			@{ DO_stmt(Z80_##id(REG_##reg)); }
+
+#define _OP_id_idx8(id, idx) \
+			label? _TK_##id _TK_##idx##H _TK_NEWLINE		/* ixh */ \
+			@{ DO_stmt(Z80_##id(REG_H) + P_##idx); } \
+		|	label? _TK_##id _TK_##idx##L _TK_NEWLINE		/* ixl */ \
+			@{ DO_stmt(Z80_##id(REG_L) + P_##idx); } \
+
+#define _OP_id(id) \
+			label? _TK_##id _TK_IND_HL _TK_NEWLINE 		/* (hl) */ \
+			@{ DO_stmt(Z80_##id(REG_idx)); } \
+		|	_OP_id_idx(id, IX) \
+		|	_OP_id_idx(id, IY) \
+		|	_OP_id_reg(id, B) \
+		|	_OP_id_reg(id, C) \
+		|	_OP_id_reg(id, D) \
+		|	_OP_id_reg(id, E) \
+		|	_OP_id_reg(id, H) \
+		|	_OP_id_reg(id, L) \
+		|	_OP_id_reg(id, A) \
+		|	_OP_id_idx8(id, IX) \
+		|	_OP_id_idx8(id, IY)
+
+#define _OP_id16_reg(id, reg, p, p_reg) \
+			label? _TK_##id _TK_##reg _TK_NEWLINE \
+			@{ DO_stmt((p) + Z80_##id##16(REG_##p_reg)); } \
+
+#define _OP_id16(id) \
+			_OP_id16_reg(id, BC, 0,    BC)	\
+		|	_OP_id16_reg(id, DE, 0,    DE)	\
+		|	_OP_id16_reg(id, HL, 0,    HL)	\
+		|	_OP_id16_reg(id, SP, 0,    SP)	\
+		|	_OP_id16_reg(id, IX, P_IX, HL)	\
+		|	_OP_id16_reg(id, IY, P_IY, HL)
+		
+#define OP_inc_dec() \
+			_OP_id(INC) \
+		|	_OP_id(DEC) \
+		|	_OP_id16(INC) \
+		|	_OP_id16(DEC)
 
 /*-----------------------------------------------------------------------------
 *   Rotate and Shift operations
@@ -530,6 +587,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.23 2014-12-
 		|	OP_call()
 		|	OP_emulated()
 		|	OP_ex()
+		|	OP_inc_dec()
 		|	OP_in_out()
 		|	OP_jump()
 		|	OP_push_pop()

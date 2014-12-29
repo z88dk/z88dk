@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.27 2014-12-29 20:45:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.28 2014-12-29 21:19:27 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -299,6 +299,8 @@ TOKEN_OPCODE(SRA,  )
 TOKEN_OPCODE(SRL,  )
 TOKEN_OPCODE(SUB,  )
 TOKEN_OPCODE(XOR,  )
+TOKEN_OPCODE(INC,  )
+TOKEN_OPCODE(DEC,  )
 
 #undef TOKEN_OPCODE
 #undef TOKEN_KW
