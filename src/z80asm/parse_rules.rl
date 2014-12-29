@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-29 18:33:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.21 2014-12-29 19:03:48 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -326,8 +326,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-
 			@{ DO_stmt(Z80_IN_REG_C(REG_##reg)); }
 
 #define _OP_in_A \
-			label? _TK_IN _TK_A _TK_COMMA \
-					_TK_LPAREN expr _TK_RPAREN _TK_NEWLINE \
+			label? _TK_IN _TK_A _TK_COMMA paren_expr _TK_NEWLINE \
 			@{ DO_stmt_n(Z80_IN_A_n); }
 
 #define _OP_out_reg(reg) \
@@ -335,8 +334,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-
 			@{ DO_stmt(Z80_OUT_C_REG(REG_##reg)); }
 
 #define _OP_out_A \
-			label? _TK_OUT _TK_LPAREN expr _TK_RPAREN \
-					_TK_COMMA _TK_A _TK_NEWLINE \
+			label? _TK_OUT paren_expr _TK_COMMA _TK_A _TK_NEWLINE \
 			@{ DO_stmt_n(Z80_OUT_n_A); }
 
 #define OP_in_out() \
@@ -358,10 +356,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-
 		|	_OP_out_reg(E)	\
 		|	_OP_out_reg(H)	\
 		|	_OP_out_reg(L)	\
-		|	_OP_out_reg(A)	
-#if 0
-		|	_OP_out_A			/* Ragel cannot parse (expr) */
-#endif
+		|	_OP_out_reg(A)	\
+		|	_OP_out_A
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -411,13 +407,23 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.20 2014-12-
 			  
 	expr1 	= _TK_CONST_EXPR ? term ( binary term )**;
 	
+	/* expression */
 	expr 	= expr1 
 			  >{ expr_start = p; }
 			  %{ push_expr(expr_start->ts, (p-1)->te); };
 	
+	/* expression that needs to be negated */
 	neg_expr = expr1 
 			  >{ expr_start = p; }
 			  %{ push_neg_expr(expr_start->ts, (p-1)->te); };
+	
+	/* expression within parentheses */
+	paren_expr = expr1 
+			  >{ expr_start = p; }
+			  %{ if (expr_start->tok != TK_LPAREN)
+					return FALSE;		/* syntax error */
+				 push_expr(expr_start->ts, (p-1)->te); 
+			   };
 	
 	const_expr = 
 			  expr %{ pop_eval_expr(&expr_value, &expr_error); };

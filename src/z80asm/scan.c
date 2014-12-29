@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.64 2014-12-28 07:28:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.65 2014-12-29 19:03:48 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -432,7 +432,9 @@ void SetTemporaryLine( char *line )
 {
 	init();
 
+#if 0
 	if (*p != '\0')
 		List_push(&input_stack, xstrdup(p));		/* save current input */
+#endif
 	set_scan_buf( line, FALSE );					/* assume not at BOL */
 }

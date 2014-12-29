@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.94 2014-12-29 18:33:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.95 2014-12-29 19:03:48 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,34 +33,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.94 2014-1
 
 /* local functions */
 void IncDec_8bit_instr( int opcode );
-
-/* Ragel cannot parse (expr), handle "OUT (N),A" here */
-void OUT( void )
-{
-	GetSym();
-	
-	switch (sym.tok)
-	{
-	case TK_LPAREN:							/* OUT (N), A */
-		GetSym();
-		append_byte(Z80_OUT_n_A);
-		if (!Pass2info(RANGE_BYTE_UNSIGNED))
-			return;							/* error in expression */
-
-		if (sym.tok != TK_RPAREN)
-			error_syntax();
-
-		GetSymExpect(TK_COMMA);
-		GetSym();
-		if (sym.tok != TK_A)
-			error_illegal_ident();
-		break;
-
-	default:
-		error_syntax();
-	}
-}
-
 
 void CALL_OZ( void )
 {
