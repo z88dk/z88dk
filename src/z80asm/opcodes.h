@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.19 2014-12-29 20:08:59 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.20 2014-12-29 20:45:54 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -74,6 +74,14 @@ enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
 enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
 #define Z80_RS(rs,reg)		(0xCB00 + ((rs) << 3) + (reg))
 
+/* Bit instructions */
+enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
+#define _CHECK_BIT(bit)		((bit) >= 0 && (bit) < 8 ? \
+								(bit) : \
+								(error_int_range(bit),0) \
+							)
+#define Z80_BRS(brs,bit,reg) (0xCB00 + (brs) + (_CHECK_BIT(bit) << 3) + (reg))
+
 /* choose value, error if none */
 #define _CHOOSE2_(n, i1, o1, i2, o2)	\
 			((n) == (i1) ? (o1) : \
@@ -103,6 +111,7 @@ enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
 #define Z80_ADD_n			Z80_ALU_n(ALU_ADD)
 #define Z80_AND(reg)		Z80_ALU(ALU_AND, (reg))
 #define Z80_AND_n			Z80_ALU_n(ALU_AND)
+#define Z80_BIT(bit,reg)	Z80_BRS(BRS_BIT, (bit), (reg))
 #define Z80_CALL			0xCD
 #define Z80_CALL_FLAG(flag)	(0xC4 + ((flag) << 3))
 #define Z80_CCF				0x3F
@@ -141,7 +150,7 @@ enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
 #define Z80_LDIR 			0xEDB0
 #define Z80_NEG				0xED44
 #define Z80_NOP				0x00
-#define Z80_OR(reg)		Z80_ALU(ALU_OR, (reg))
+#define Z80_OR(reg)			Z80_ALU(ALU_OR, (reg))
 #define Z80_OR_n			Z80_ALU_n(ALU_OR)
 #define Z80_OTDR			0xEDBB
 #define Z80_OTIR			0xEDB3
@@ -151,14 +160,19 @@ enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
 #define Z80_OUT_n_A			0xD3
 #define Z80_POP(reg)		(0xC1 + ((reg) << 4))
 #define Z80_PUSH(reg)		(0xC5 + ((reg) << 4))
+#define Z80_RES(bit,reg)	Z80_BRS(BRS_RES, (bit), (reg))
 #define Z80_RET				0xC9
 #define Z80_RETI			0xED4D
 #define Z80_RETN			0xED45
 #define Z80_RET_FLAG(flag)	(0xC0 + ((flag) << 3))
+#define Z80_RL(reg)			Z80_RS(RS_RL,  (reg))
 #define Z80_RLA				0x17
+#define Z80_RLC(reg)		Z80_RS(RS_RLC, (reg))
 #define Z80_RLCA			0x07
 #define Z80_RLD				0xED6F
+#define Z80_RR(reg)			Z80_RS(RS_RR,  (reg))
 #define Z80_RRA				0x1F
+#define Z80_RRC(reg)		Z80_RS(RS_RRC, (reg))
 #define Z80_RRCA			0x0F
 #define Z80_RRD				0xED67
 #define Z80_RST(n)			_RST_ARG(n)
@@ -166,15 +180,12 @@ enum { RS_RLC, RS_RRC, RS_RL, RS_RR, RS_SLA, RS_SRA, RS_SLL, RS_SRL };
 #define Z80_SBC16(reg)		(0xED42 + ((reg) << 4))
 #define Z80_SBC_n			Z80_ALU_n(ALU_SBC)
 #define Z80_SCF				0x37
+#define Z80_SET(bit,reg)	Z80_BRS(BRS_SET, (bit), (reg))
+#define Z80_SLA(reg)		Z80_RS(RS_SLA, (reg))
+#define Z80_SLL(reg)		Z80_RS(RS_SLL, (reg))
+#define Z80_SRA(reg)		Z80_RS(RS_SRA, (reg))
+#define Z80_SRL(reg)		Z80_RS(RS_SRL, (reg))
 #define Z80_SUB(reg)		Z80_ALU(ALU_SUB, (reg))
 #define Z80_SUB_n			Z80_ALU_n(ALU_SUB)
 #define Z80_XOR(reg)		Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			Z80_ALU_n(ALU_XOR)
-#define Z80_RLC(reg)		Z80_RS(RS_RLC, (reg))
-#define Z80_RRC(reg)		Z80_RS(RS_RRC, (reg))
-#define Z80_RL(reg)			Z80_RS(RS_RL,  (reg))
-#define Z80_RR(reg)			Z80_RS(RS_RR,  (reg))
-#define Z80_SLA(reg)		Z80_RS(RS_SLA, (reg))
-#define Z80_SRA(reg)		Z80_RS(RS_SRA, (reg))
-#define Z80_SLL(reg)		Z80_RS(RS_SLL, (reg))
-#define Z80_SRL(reg)		Z80_RS(RS_SRL, (reg))

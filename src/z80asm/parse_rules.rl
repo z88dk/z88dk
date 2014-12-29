@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.22 2014-12-29 20:09:00 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.23 2014-12-29 20:45:54 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -229,6 +229,52 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.22 2014-12-
 		|	_OP_rs(SRA) \
 		|	_OP_rs(SLL) \
 		|	_OP_rs(SRL)
+
+/*-----------------------------------------------------------------------------
+*   Bit, Set and Reset operations
+*----------------------------------------------------------------------------*/
+#define _OP_brs_idx(brs, idx) \
+			label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
+					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
+			@{ if ( ! expr_error ) \
+				DO_stmt( ((P_##idx << 16) & 0xFF000000) + \
+						 ((Z80_##brs(expr_value, REG_idx) << 8) & 0xFF0000) + \
+						 ((0 << 8) & 0xFF00) + \
+						 ((Z80_##brs(expr_value, REG_idx) << 0) & 0xFF) ); } \
+		|	label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
+					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
+			@{ if ( ! expr_error ) \
+				DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
+						     Z80_##brs(expr_value, REG_idx) ); } \
+		|	label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
+					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
+			@{ if ( ! expr_error ) \
+				DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
+						    Z80_##brs(expr_value, REG_idx) ); } \
+
+#define _OP_brs_reg(brs, reg) \
+			label? _TK_##brs const_expr _TK_COMMA _TK_##reg _TK_NEWLINE			/* reg */ \
+			@{ if ( ! expr_error ) \
+				DO_stmt(Z80_##brs(expr_value, REG_##reg)); }
+
+#define _OP_brs(brs) \
+			label? _TK_##brs const_expr _TK_COMMA _TK_IND_HL _TK_NEWLINE 			/* (hl) */ \
+			@{ if ( ! expr_error ) \
+				DO_stmt(Z80_##brs(expr_value, REG_idx)); } \
+		|	_OP_brs_idx(brs, IX) \
+		|	_OP_brs_idx(brs, IY) \
+		|	_OP_brs_reg(brs, B) \
+		|	_OP_brs_reg(brs, C) \
+		|	_OP_brs_reg(brs, D) \
+		|	_OP_brs_reg(brs, E) \
+		|	_OP_brs_reg(brs, H) \
+		|	_OP_brs_reg(brs, L) \
+		|	_OP_brs_reg(brs, A) \
+
+#define OP_bit_res_set() \
+			_OP_brs(BIT) \
+		|	_OP_brs(RES) \
+		|	_OP_brs(SET)
 
 /*-----------------------------------------------------------------------------
 *   ALU-16 operations
@@ -480,6 +526,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.22 2014-12-
 		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 		|	OP_alu()
 		|	OP_alu16()
+		|	OP_bit_res_set()
 		|	OP_call()
 		|	OP_emulated()
 		|	OP_ex()

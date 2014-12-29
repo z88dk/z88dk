@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.98 2014-12-29 20:09:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.99 2014-12-29 20:45:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.98 2014-1
 #include <string.h>
 
 /* external functions */
-void BitTest_instr( int opcode );
 void DeclModuleName( void );
 void DEFINE( void );
 void ifstatement(enum flag interpret);
@@ -48,9 +47,6 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent( enum flag interpret );
-void BIT( void );
-void RES( void );
-void SET( void );
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
@@ -74,7 +70,6 @@ struct Z80sym
 struct Z80sym Z80ident[] =
 {
     DEF_ENTRY( BINARY ),
-    DEF_ENTRY( BIT ),
     DEF_ENTRY( CALL_OZ ),
     DEF_ENTRY( CALL_PKG ),
     DEF_ENTRY( DEC ),
@@ -107,9 +102,7 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( ORG ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( PUBLIC ),
-    DEF_ENTRY( RES ),
     DEF_ENTRY( SECTION ),
-    DEF_ENTRY( SET ),
     DEF_ENTRY( UNDEFINE ),
     DEF_ENTRY( XDEF ),
     DEF_ENTRY( XLIB ),
@@ -365,27 +358,4 @@ SECTION( void )
 		new_section( sym.string );
 	else
 		error_syntax();
-}
-
-
-void
-SET( void )
-{
-    BitTest_instr( 192 );
-}
-
-
-
-void
-RES( void )
-{
-    BitTest_instr( 128 );
-}
-
-
-
-void
-BIT( void )
-{
-    BitTest_instr( 64 );
 }
