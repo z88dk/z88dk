@@ -5,6 +5,7 @@ stdio/nc100/getk
 stdio/puts_cons
 games/joystick
 fcntl/nc100/open
+fcntl/nc100/opendir
 fcntl/nc100/creat
 fcntl/nc100/close
 fcntl/nc100/read
