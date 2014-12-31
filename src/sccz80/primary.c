@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.20 2009-09-06 18:58:37 dom Exp $
+ *      $Id: primary.c,v 1.21 2014-12-31 16:18:42 dom Exp $
  */
 
 
@@ -780,7 +780,7 @@ int docast(LVALUE *lval,char df)
         default:
             debug(DBG_CAST2,"Converting %d to %d",lval->ptr_type,lval->c_vtype);
             lval->ptr_type=lval->c_vtype;
-            lval->symbol=dummy_sym[(int)lval->c_vtype];
+//            lval->symbol=dummy_sym[(int)lval->c_vtype];
             temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
             if (df) force(temp_type,lval->val_type,0,0,0);
             lval->val_type=temp_type;
