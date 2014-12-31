@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.19 2014-12-28 07:28:09 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.20 2014-12-31 16:11:15 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -38,6 +38,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.19 2014-12-28 07:2
 
 /* array of tokens in the current statement */
 static Sym *p, *pe, *eof;
+static Sym *expr_start;
 static UT_array *tokens;
 static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 
@@ -47,11 +48,14 @@ static UT_array *token_strings;
 /* array of expressions computed during parse */
 static void ut_exprs_init(void *elt) { Expr *expr = OBJ_NEW(Expr); *((Expr **)elt) = expr;  };
 static void ut_exprs_dtor(void *elt) { Expr *expr = *((Expr **)elt);  OBJ_DELETE(expr); };
+
 static UT_array *exprs;
 static UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
-static Sym *expr_start;
-static int expr_value;
+
+static int  expr_value;
 static Bool expr_error;
+static Bool expr_in_parens;				/* true if expression has enclosing parens */
+static int  expr_open_parens;			/* number of open parens */
 
 /* Ragel state variables */
 static int cs;							/* current state */
@@ -119,36 +123,41 @@ struct Expr *parse_expr(char *expr_text)
 }
 
 /* push current expression */
-static void _push_expr(Bool negate, char *ts, char *te)
+static void _push_expr(Bool negate, Sym *expr_start, Sym *expr_end)
 {
 	static Str *expr_text;
 	Expr *expr;
+	Sym  *expr_p;
 
 	INIT_OBJ(Str, &expr_text);
 
-	/* parse expression */
+	/* build expression text */
 	Str_clear(expr_text);
 	if (negate)
 		Str_append(expr_text, "-(");
-	Str_append_n(expr_text, ts, te - ts);
+	
+	for (expr_p = expr_start; expr_p < expr_end; expr_p++)
+		Str_append(expr_text, expr_p->text);
+
 	if (negate)
 		Str_append(expr_text, ")");
 	
+	/* parse expression */
 	expr = parse_expr(expr_text->str);
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(exprs, &expr);
 }
 
-static void push_expr(char *ts, char *te)
+static void push_expr(Sym *expr_start, Sym *expr_end)
 {
-	_push_expr(FALSE, ts, te);
+	_push_expr(FALSE, expr_start, expr_end);
 }
 
 /* push -(expr) of current expression, used in (ix-3) */
-static void push_neg_expr(char *ts, char *te)
+static void push_neg_expr(Sym *expr_start, Sym *expr_end)
 {
-	_push_expr(TRUE, ts, te);
+	_push_expr(TRUE, expr_start, expr_end);
 }
 
 /*-----------------------------------------------------------------------------
@@ -225,12 +234,44 @@ static char *token_strings_add(char *str)
 *----------------------------------------------------------------------------*/
 static void read_token(void)
 {
+	static Str *buffer;
 	Sym sym_copy;
 	int p_index;
+	int expr_start_index;
+
+	INIT_OBJ(Str, &buffer);
 
 	p_index = p ? p - (Sym *)utarray_front(tokens) : -1;
+	expr_start_index = expr_start ? expr_start - (Sym *)utarray_front(tokens) : -1;
 
 	sym_copy = sym;
+
+	/* make text to be used while concatenating tokens to build an expression to parse */
+	switch (sym_copy.tok)
+	{
+	case TK_NUMBER:
+		Str_sprintf(buffer, "%d", sym_copy.number);
+		sym_copy.text = token_strings_add(buffer->str);
+		break;
+
+	case TK_NAME:
+	case TK_LABEL:
+		sym_copy.text = token_strings_add(sym_copy.string);
+		break;
+
+	case TK_STRING:
+		Str_sprintf(buffer, "\"%s\"", sym_copy.string);
+		sym_copy.text = token_strings_add(buffer->str);
+		break;
+
+	case TK_END:
+		sym_copy.text = "";
+		break;
+
+	default:
+		if (!*(sym_copy.text))
+			assert(*(sym_copy.text));
+	}
 	sym_copy.string = token_strings_add(sym.string);
 	utarray_push_back(tokens, &sym_copy);
 
@@ -241,6 +282,8 @@ static void read_token(void)
 		eof = pe;
 	else
 		eof = NULL;
+
+	expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(tokens)) + expr_start_index : NULL;
 
 	GetSym();
 }

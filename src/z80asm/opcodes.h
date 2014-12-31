@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.21 2014-12-29 21:19:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.22 2014-12-31 16:11:15 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -43,6 +43,10 @@ extern void add_opcode_nn(int opcode, struct Expr *expr);
 /* add opcode followed by IX/IY offset expression */
 extern void add_opcode_idx(int opcode, struct Expr *expr);
 
+/* add opcode followed by IX/IY offset expression and 8 bit expression */
+extern void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
+										 struct Expr *n_expr );
+
 /* add "call flag", or emulation on a Rabbit */
 extern void add_call_flag(int flag, struct Expr *target);
 
@@ -58,12 +62,16 @@ enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
 #define NOT_FLAG(flag)	((flag) ^ 1)
 
 /* 8-bit registers */
-enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A };
+enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A,
+       REG_IXH = REG_H, REG_IYH = REG_H,
+	   REG_IXL = REG_L, REG_IYL = REG_L };
 
 /* 16-bit registers */
-enum { REG_NONE = -1, REG_BC, REG_DE, 
-	   REG_HL = 2, REG_IX = 2, REG_IY = 2, 
-	   REG_SP = 3, REG_AF = 3 };
+enum { REG_NONE = -1, 
+	   REG_BC, REG_DE, REG_HL, REG_SP, 
+	   REG_AF = REG_SP,
+	   REG_IX = REG_HL, REG_IY = REG_HL,
+	   REG_IND_BC = 0, REG_IND_DE };
 
 /* ALU operations */
 enum { ALU_ADD, ALU_ADC, ALU_SUB, ALU_SBC, ALU_AND, ALU_XOR, ALU_OR, ALU_CP };
@@ -193,3 +201,31 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_DEC(reg)		(0x05 + ((reg) << 3))
 #define Z80_INC16(reg)		(0x03 + ((reg) << 4))
 #define Z80_DEC16(reg)		(0x0B + ((reg) << 4))
+
+#define Z80_LD_A_EIR		Z80_LD_A_R
+#define Z80_LD_A_I			0xED57
+#define Z80_LD_A_IIR		Z80_LD_A_I
+#define Z80_LD_A_R			0xED5F
+#define Z80_LD_EIR_A		Z80_LD_R_A
+#define Z80_LD_IIR_A		Z80_LD_I_A
+#define Z80_LD_I_A			0xED47
+#define Z80_LD_R_A			0xED4F
+
+#define Z80_LD_r_r(r1,r2)	(0x40 + ((r1) << 3) + (r2))
+#define Z80_LD_r_n(r)		(0x06 + ((r) << 3))
+
+#define Z80_LD_A_IND_dd(dd)	(0x0A + ((dd) << 4))
+#define Z80_LD_IND_dd_A(dd)	(0x02 + ((dd) << 4))
+
+#define Z80_LD_A_IND_NN		0x3A
+#define Z80_LD_IND_NN_A		0x32
+
+#define Z80_LD_dd_nn(dd)	(0x01 + ((dd) << 4))
+
+#define Z80_LD_dd_IND_nn(dd) (0xED4B + ((dd) << 4))
+#define Z80_LD_idx_IND_nn	0x2A
+
+#define Z80_LD_IND_nn_dd(dd) (0xED43 + ((dd) << 4))
+#define Z80_LD_IND_nn_idx	0x22
+
+#define Z80_LD_SP_idx		0xF9

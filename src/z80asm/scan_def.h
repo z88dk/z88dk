@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.28 2014-12-29 21:19:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.29 2014-12-31 16:11:15 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -261,6 +261,7 @@ TOKEN_OPCODE(INI,  FOR_Z80)
 TOKEN_OPCODE(INIR, FOR_Z80)
 TOKEN_OPCODE(JP,   )
 TOKEN_OPCODE(JR,   )
+TOKEN_OPCODE(LD,   )
 TOKEN_OPCODE(LDD,  )
 TOKEN_OPCODE(LDDR, )
 TOKEN_OPCODE(LDI,  )

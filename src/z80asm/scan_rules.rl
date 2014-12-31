@@ -15,21 +15,23 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.10 2014-12-26 12:50:27 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.11 2014-12-31 16:11:15 pauloscustodio Exp $ 
 */
 
 #define TOKEN_RE(name, string, regexp, set_value)	 \
 	regexp									<NL> \
 	{										<NL> \
-		<TAB>	sym.tok = name;		<NL> \
-		<TAB>	sym.text = string;	<NL> \
+		<TAB>	sym.tok = name;				<NL> \
+		<TAB>	sym.text = string;			<NL> \
 		<TAB>	set_value;					<NL> \
 		<TAB>	fbreak; 					<NL> \
 	};										<NL>
 
-#define TOKEN(name, string, set_value)	TOKEN_RE(name, string, string <CAT> i, set_value)
+#define TOKEN(name, string, set_value)	\
+		TOKEN_RE(name, string, string <CAT> i, set_value)
 
-#define TOKEN2(name, string, set_value)	TOKEN(name, string, set_value)
+#define TOKEN2(name, string, set_value)	\
+		TOKEN(name, string, set_value)
 
 #define TOKEN_OPCODE(opcode, set_value)	 \
 	#opcode <CAT> i										<NL> \

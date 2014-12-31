@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.9 2014-12-29 20:08:59 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.10 2014-12-31 16:11:15 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -76,6 +76,14 @@ void add_opcode_idx(int opcode, Expr *expr)
 	}
 }
 
+/* add opcode followed by IX/IY offset expression and 8 bit expression */
+void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
+								  struct Expr *n_expr )
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_BYTE_SIGNED, idx_expr);
+	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n_expr);
+}
 
 /* add "call flag", or emulation on a Rabbit */
 void add_call_flag(int flag, Expr *target)

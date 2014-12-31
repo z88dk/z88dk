@@ -170,9 +170,6 @@
     <ClCompile Include="hist.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ldinstr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="modlink.c">
       <Filter>Source Files</Filter>
     </ClCompile>

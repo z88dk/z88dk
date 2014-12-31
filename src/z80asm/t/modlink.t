@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.9 2014-09-28 17:37:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.10 2014-12-31 16:11:15 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -252,8 +252,8 @@ t_z80nm("test.obj test1.obj", <<'END');
 File test.obj at $0000: Z80RMF08
   Name: test
   Names:
-    L A $0000 start (section code)
     L A $0000 mes1 (section data)
+    L A $0000 start (section code)
     L A $0005 mes1end (section data)
     L A $0005 mes2 (section data)
     L A $000B mes2end (section data)

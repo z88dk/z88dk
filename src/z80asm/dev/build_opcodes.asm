@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.11 2014-12-29 18:16:40 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.12 2014-12-31 16:11:15 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -32,7 +32,7 @@
 
 	ldx									;; error: unknown identifier
 	ld									;; error: syntax error
-	ld a,1+								;; error: syntax error in expression
+	ld a,1+								;; error: syntax error
 
 ; Byte
 	ld a,{-128 -1 0 1 127 255}
@@ -71,6 +71,13 @@
 	defb 'x								;; error: invalid single quoted character
 	defb ''								;; error: invalid single quoted character
 	defb 'he'							;; error: invalid single quoted character
+
+;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+
+	ld a,'a'
+	ld a,"a"							;; error: syntax error
 
 ;------------------------------------------------------------------------------
 ; 8 bit load group
@@ -132,7 +139,7 @@ ENDIF
 	ld	a,(NN)
 	ld	(NN),a
 
-	ld ({bc de}),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: illegal identifier
+	ld ({bc de}),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: syntax error
 
 IF !RABBIT
 	ld	a,{i r}

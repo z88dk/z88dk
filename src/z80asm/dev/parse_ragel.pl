@@ -17,22 +17,29 @@
 # Needed to allow usage of #define macros and #include in ragel input files
 # Converts special tokens <NL> to "\n", <CAT> to "\t"; <CAT> concatenates.
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.1 2014-12-13 00:49:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.2 2014-12-31 16:11:15 pauloscustodio Exp $
 
 use strict;
 use warnings;
 use File::Basename;
 use File::Copy;
+use File::Slurp;
+
+my $RAGEL = "ragel -G2";
 
 my @TEMP;
 @ARGV == 1 or die "Usage: ",basename($0)," INPUT.rl";
 my $FILE = basename(shift, ".rl");
 
-# make .c
-copy("$FILE.rl", "$FILE.c") or die "read $FILE.rl failed: $!\n";
+# parse loops to .rl -> .rl1
+preprocess("$FILE.rl", "$FILE.rl1");
+push @TEMP, "$FILE.rl1";
+
+# make .rl1 -> .c
+copy("$FILE.rl1", "$FILE.c") or die "read $FILE.rl failed: $!\n";
 push @TEMP, "$FILE.c";
 
-# preprocess to .rl2
+# preprocess to .c -> .rl2
 my $cmd = "cc -E $FILE.c";
 open(my $in, "$cmd |") or die "Input from '$cmd' failed: $!\n";
 open(my $out, ">", "$FILE.rl2") or die "Output to $FILE.rl2 failed: $!\n";
@@ -50,12 +57,12 @@ while (<$in>) {
 close($out) or die;
 close($in) or die "'$cmd' failed: $!\n";
 
-# ragel to .h2
-$cmd = "ragel -G2 -o$FILE.h2 $FILE.rl2";
+# ragel to .rl2 -> .h2
+$cmd = "$RAGEL -o$FILE.h2 $FILE.rl2";
 system($cmd) and die "'$cmd' failed: $!\n";
 push @TEMP, "$FILE.h2";
 
-# remove #line to .h
+# remove #line .h2 -> .h
 open($in, "<", "$FILE.h2") or die "Input from $FILE.h2 failed: $!\n";
 open($out, ">", "$FILE.h") or die "Output to $FILE.h failed: $!\n";
 while (<$in>) {
@@ -66,3 +73,61 @@ close($out) or die;
 close($in) or die;
 
 unlink(@TEMP);
+exit 0;
+
+#-----------------------------------------------------------------------
+# Preprocess input file, expanding loops:
+#	#foreach VAR in A1, A2, \
+#					A3, A4
+#		... VAR ... 			-> exchanged for An
+#	#endfor VAR
+#	... #subst(text,aa,bb) ...	-> replace aa by bb in text
+#-----------------------------------------------------------------------
+sub preprocess {
+	my($in_file, $out_file) = @_;
+
+	my $text = read_file($in_file);
+	$text = expand_foreach($text);
+	$text = expand_subst($text);
+	write_file($out_file, $text);
+}
+
+sub expand_foreach {
+	my($text) = @_;
+	$text =~ s/^ [ \t]* \#foreach [ \t]+ (\S+) [ \t]+ in [ \t]+
+							( (?: \\ \n | [^\n] )+ ) \n
+				 ( .*? )
+			   ^ [ \t]* \#endfor [ \t]+ \1 [ \t]* \n
+			  / expand_one_foreach($1, $2, $3) /xgems;
+	return $text;
+}
+
+sub expand_one_foreach {
+	my($var, $series, $text) = @_;
+	$series =~ s/\\\n/ /g;
+	my $ret = "";
+	my @series = split(/,/, $series);
+	for my $value (@series) {
+		$value =~ s/^\s+//; 
+		$value =~ s/\s+$//; 
+		my $instance = $text;
+		$instance =~ s/$var/$value/g;
+		$instance = expand_foreach($instance);
+		$ret .= $instance;
+	}
+	return $ret;
+}
+
+sub expand_subst {
+	my($text) = @_;
+	$text =~ s/\#subst \( ([^,]*) , ([^,]*) , ([^\)]*) \)
+			  / expand_one_subst($1, $2, $3) /xgem;
+	return $text;
+}
+
+sub expand_one_subst {
+	my($var, $from, $to) = @_;
+	$var =~ s/$from/$to/g;
+	$var = expand_subst($var);
+	return $var;
+}

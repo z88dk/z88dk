@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.65 2014-12-29 19:03:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.66 2014-12-31 16:11:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -247,7 +247,7 @@ static long scan_num ( char *text, int length, int base )
 /*-----------------------------------------------------------------------------
 *   copy ts to te to text and name, upper case name
 *----------------------------------------------------------------------------*/
-static void set_tok_name( void )
+static void set_tok_name(void)
 {
 	Str_set_n(sym_string, ts, te - ts);
 	sym.string = sym_string->str;
@@ -269,11 +269,11 @@ static Bool get_sym_string( void )
 
 	/* search for end quote or end of string */
 	while (TRUE)
-	{
+{
 		if ( *p == '\\' && p[1] != '\0' )
 		{
 			p++;						/* skip char after backslash, may be a quote */
-		}
+}
 		else if ( *p == quote )
 		{
 			te = p;
@@ -286,7 +286,7 @@ static Bool get_sym_string( void )
 			return TRUE;
 		}
 		else if ( *p == '\n' || *p == '\0' )
-		{
+{
 			te = p;
 			p--;						/* point to before separator */
 
@@ -294,7 +294,7 @@ static Bool get_sym_string( void )
 			sym.string = sym_string->str;
 
 			return FALSE;
-		}
+	}
 		p++;
 	}
 }

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.125 2014-12-29 20:45:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.126 2014-12-31 16:11:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -88,18 +88,18 @@ parseline( enum flag interpret )
 
 	if (get_num_errors() != start_num_errors)		/* detect errors in GetSym() */
 		Skipline();
-	else if (!parse_statement(interpret))
+	else if (!interpret || !parse_statement(interpret))
 	{
 		scan_expect_operands();
 
 #if 0
 		switch (sym.tok)
 		{
-		case TK_OUT:	sym.tok = TK_NAME; sym.string = "OUT"; break;
+		//case TK_LD:	sym.tok = TK_NAME; sym.string = "LD"; break;
 		default: ;
 		}
 #endif
-		
+
 		if (get_num_errors() != start_num_errors)	/* detect errors during parse_statement() */
 			Skipline();
 		else
@@ -141,10 +141,8 @@ parseline( enum flag interpret )
 
 			default:
 				if (interpret == ON)
-				{
 					error_syntax();    /* Syntax error */
-					Skipline();
-				}
+				Skipline();
 			}
 		}
 	}

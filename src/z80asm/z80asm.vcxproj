@@ -145,7 +145,6 @@
     <ClCompile Include="errors.c" />
     <ClCompile Include="expr.c" />
     <ClCompile Include="hist.c" />
-    <ClCompile Include="ldinstr.c" />
     <ClCompile Include="libfile.c" />
     <ClCompile Include="lib\array.c" />
     <ClCompile Include="lib\class.c" />

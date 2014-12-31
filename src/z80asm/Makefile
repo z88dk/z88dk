@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.179 2014-12-26 16:27:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.180 2014-12-31 16:11:15 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -270,12 +270,6 @@ expr.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
 expr.o: symref.h lib/init.h model.h module.h symtab.h lib/strpool.h
 expr.o: expr_def.h
 hist.o: lib/xmalloc.h hist.h
-ldinstr.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
-ldinstr.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-ldinstr.o: lib/uthash.h errors.h errors_def.h options.h lib/list.h
-ldinstr.o: options_def.h scan.h legacy.h scan_tokens.h opcodes.h symbol.h
-ldinstr.o: expr.h lib/classlist.h sym.h symref.h model.h module.h symtab.h
-ldinstr.o: objfile.h z80asm.h
 libfile.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 libfile.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h legacy.h
 libfile.o: libfile.h objfile.h lib/array.h module.h lib/classlist.h
@@ -322,7 +316,8 @@ opcodes.o: lib/xmalloc.h expr.h lib/array.h lib/class.h lib/queue.h
 opcodes.o: lib/types.h lib/strutil.h lib/classlist.h scan.h legacy.h
 opcodes.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h lib/list.h
 opcodes.o: options_def.h sym.h symref.h codearea.h lib/classhash.h
-opcodes.o: lib/strhash.h lib/uthash.h z80asm.h
+opcodes.o: lib/strhash.h lib/uthash.h model.h module.h symtab.h parse.h
+opcodes.o: z80asm.h
 options.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 options.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h hist.h
 options.o: lib/init.h model.h module.h lib/classlist.h lib/classhash.h

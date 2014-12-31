@@ -115,6 +115,12 @@ END_ASM
 
 
 ;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+
+        ld   a,'a'                      ;; 3E 61
+
+;------------------------------------------------------------------------------
 ; 8 bit load group
 ;------------------------------------------------------------------------------
 
@@ -1917,33 +1923,34 @@ z80asm(
     asm  => <<'END_ASM',
         ldx                             ;; error: unknown identifier
         ld                              ;; error: syntax error
-        ld   a,1+                       ;; error: syntax error in expression
+        ld   a,1+                       ;; error: syntax error
         defm "                          ;; error: unclosed quoted string
         defm "hello                     ;; error: unclosed quoted string
         defb '                          ;; error: invalid single quoted character
         defb 'x                         ;; error: invalid single quoted character
         defb ''                         ;; error: invalid single quoted character
         defb 'he'                       ;; error: invalid single quoted character
-        ld   (bc),b                     ;; error: illegal identifier
-        ld   (de),b                     ;; error: illegal identifier
-        ld   (bc),c                     ;; error: illegal identifier
-        ld   (de),c                     ;; error: illegal identifier
-        ld   (bc),d                     ;; error: illegal identifier
-        ld   (de),d                     ;; error: illegal identifier
-        ld   (bc),e                     ;; error: illegal identifier
-        ld   (de),e                     ;; error: illegal identifier
-        ld   (bc),h                     ;; error: illegal identifier
-        ld   (de),h                     ;; error: illegal identifier
-        ld   (bc),l                     ;; error: illegal identifier
-        ld   (de),l                     ;; error: illegal identifier
-        ld   (bc),(hl)                  ;; error: illegal identifier
-        ld   (de),(hl)                  ;; error: illegal identifier
-        ld   (bc),(ix+DIS)              ;; error: illegal identifier
-        ld   (de),(ix+DIS)              ;; error: illegal identifier
-        ld   (bc),(iy+DIS)              ;; error: illegal identifier
-        ld   (de),(iy+DIS)              ;; error: illegal identifier
-        ld   (bc),N                     ;; error: illegal identifier
-        ld   (de),N                     ;; error: illegal identifier
+        ld   a,"a"                      ;; error: syntax error
+        ld   (bc),b                     ;; error: syntax error
+        ld   (de),b                     ;; error: syntax error
+        ld   (bc),c                     ;; error: syntax error
+        ld   (de),c                     ;; error: syntax error
+        ld   (bc),d                     ;; error: syntax error
+        ld   (de),d                     ;; error: syntax error
+        ld   (bc),e                     ;; error: syntax error
+        ld   (de),e                     ;; error: syntax error
+        ld   (bc),h                     ;; error: syntax error
+        ld   (de),h                     ;; error: syntax error
+        ld   (bc),l                     ;; error: syntax error
+        ld   (de),l                     ;; error: syntax error
+        ld   (bc),(hl)                  ;; error: syntax error
+        ld   (de),(hl)                  ;; error: syntax error
+        ld   (bc),(ix+DIS)              ;; error: syntax error
+        ld   (de),(ix+DIS)              ;; error: syntax error
+        ld   (bc),(iy+DIS)              ;; error: syntax error
+        ld   (de),(iy+DIS)              ;; error: syntax error
+        ld   (bc),N                     ;; error: syntax error
+        ld   (de),N                     ;; error: syntax error
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
         im   undefined                  ;; error: symbol not defined
@@ -2112,6 +2119,12 @@ END_ASM
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
 
 
+
+;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+
+        ld   a,'a'                      ;; 3E 61
 
 ;------------------------------------------------------------------------------
 ; 8 bit load group
@@ -2465,10 +2478,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD E0 08
-        cpir                            ;; CD FD 08
-        cpd                             ;; CD 29 09
-        cpdr                            ;; CD 46 09
+        cpi                             ;; CD E2 08
+        cpir                            ;; CD FF 08
+        cpd                             ;; CD 2B 09
+        cpdr                            ;; CD 48 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2897,8 +2910,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 72 09
-        rrd                             ;; CD 94 09
+        rld                             ;; CD 74 09
+        rrd                             ;; CD 96 09
 
 ;	# rotate 16 bits
 ;
@@ -3506,10 +3519,10 @@ jr2:
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA 82 08 CD 30 00
-        call pe,NN                      ;; E2 88 08 CD 30 00
-        call p,NN                       ;; FA 8E 08 CD 30 00
-        call m,NN                       ;; F2 94 08 CD 30 00
+        call po,NN                      ;; EA 84 08 CD 30 00
+        call pe,NN                      ;; E2 8A 08 CD 30 00
+        call p,NN                       ;; FA 90 08 CD 30 00
+        call m,NN                       ;; F2 96 08 CD 30 00
 
 
         rst  10h                        ;; D7
@@ -3723,7 +3736,7 @@ nop:
 
                       invoke 0          ;; CD 00 00
                       invoke 1          ;; CD 01 00
-                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 05 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4E 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 79 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 9B 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 07 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 50 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 7B 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 9D 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3732,13 +3745,14 @@ z80asm(
     asm  => <<'END_ASM',
         ldx                             ;; error: unknown identifier
         ld                              ;; error: syntax error
-        ld   a,1+                       ;; error: syntax error in expression
+        ld   a,1+                       ;; error: syntax error
         defm "                          ;; error: unclosed quoted string
         defm "hello                     ;; error: unclosed quoted string
         defb '                          ;; error: invalid single quoted character
         defb 'x                         ;; error: invalid single quoted character
         defb ''                         ;; error: invalid single quoted character
         defb 'he'                       ;; error: invalid single quoted character
+        ld   a,"a"                      ;; error: syntax error
         ld   b,ixh                      ;; error: illegal identifier
         ld   c,ixh                      ;; error: illegal identifier
         ld   d,ixh                      ;; error: illegal identifier
@@ -3799,26 +3813,26 @@ z80asm(
         ld   iyl,a                      ;; error: illegal identifier
         ld   iyh,N                      ;; error: illegal identifier
         ld   iyl,N                      ;; error: illegal identifier
-        ld   (bc),b                     ;; error: illegal identifier
-        ld   (de),b                     ;; error: illegal identifier
-        ld   (bc),c                     ;; error: illegal identifier
-        ld   (de),c                     ;; error: illegal identifier
-        ld   (bc),d                     ;; error: illegal identifier
-        ld   (de),d                     ;; error: illegal identifier
-        ld   (bc),e                     ;; error: illegal identifier
-        ld   (de),e                     ;; error: illegal identifier
-        ld   (bc),h                     ;; error: illegal identifier
-        ld   (de),h                     ;; error: illegal identifier
-        ld   (bc),l                     ;; error: illegal identifier
-        ld   (de),l                     ;; error: illegal identifier
-        ld   (bc),(hl)                  ;; error: illegal identifier
-        ld   (de),(hl)                  ;; error: illegal identifier
-        ld   (bc),(ix+DIS)              ;; error: illegal identifier
-        ld   (de),(ix+DIS)              ;; error: illegal identifier
-        ld   (bc),(iy+DIS)              ;; error: illegal identifier
-        ld   (de),(iy+DIS)              ;; error: illegal identifier
-        ld   (bc),N                     ;; error: illegal identifier
-        ld   (de),N                     ;; error: illegal identifier
+        ld   (bc),b                     ;; error: syntax error
+        ld   (de),b                     ;; error: syntax error
+        ld   (bc),c                     ;; error: syntax error
+        ld   (de),c                     ;; error: syntax error
+        ld   (bc),d                     ;; error: syntax error
+        ld   (de),d                     ;; error: syntax error
+        ld   (bc),e                     ;; error: syntax error
+        ld   (de),e                     ;; error: syntax error
+        ld   (bc),h                     ;; error: syntax error
+        ld   (de),h                     ;; error: syntax error
+        ld   (bc),l                     ;; error: syntax error
+        ld   (de),l                     ;; error: syntax error
+        ld   (bc),(hl)                  ;; error: syntax error
+        ld   (de),(hl)                  ;; error: syntax error
+        ld   (bc),(ix+DIS)              ;; error: syntax error
+        ld   (de),(ix+DIS)              ;; error: syntax error
+        ld   (bc),(iy+DIS)              ;; error: syntax error
+        ld   (de),(iy+DIS)              ;; error: syntax error
+        ld   (bc),N                     ;; error: syntax error
+        ld   (de),N                     ;; error: syntax error
         add  a,ixh                      ;; error: illegal identifier
         adc  a,ixh                      ;; error: illegal identifier
         sbc  a,ixh                      ;; error: illegal identifier
