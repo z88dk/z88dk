@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.20 2014-12-31 16:11:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.21 2015-01-01 02:34:23 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -123,7 +123,7 @@ struct Expr *parse_expr(char *expr_text)
 }
 
 /* push current expression */
-static void _push_expr(Bool negate, Sym *expr_start, Sym *expr_end)
+static void push_expr(Sym *expr_start, Sym *expr_end)
 {
 	static Str *expr_text;
 	Expr *expr;
@@ -133,31 +133,14 @@ static void _push_expr(Bool negate, Sym *expr_start, Sym *expr_end)
 
 	/* build expression text */
 	Str_clear(expr_text);
-	if (negate)
-		Str_append(expr_text, "-(");
-	
 	for (expr_p = expr_start; expr_p < expr_end; expr_p++)
 		Str_append(expr_text, expr_p->text);
-
-	if (negate)
-		Str_append(expr_text, ")");
 	
 	/* parse expression */
 	expr = parse_expr(expr_text->str);
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(exprs, &expr);
-}
-
-static void push_expr(Sym *expr_start, Sym *expr_end)
-{
-	_push_expr(FALSE, expr_start, expr_end);
-}
-
-/* push -(expr) of current expression, used in (ix-3) */
-static void push_neg_expr(Sym *expr_start, Sym *expr_end)
-{
-	_push_expr(TRUE, expr_start, expr_end);
 }
 
 /*-----------------------------------------------------------------------------

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.30 2015-01-01 01:58:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.31 2015-01-01 02:34:23 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -153,9 +153,6 @@ TOKEN(TK_BIN_NOT, "~", )
 /*-----------------------------------------------------------------------------
 *	Assembly keywords
 *----------------------------------------------------------------------------*/
-#define SET_IX		sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX
-#define SET_IY		sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY
-
 #define FOR_Z80		if ( opts.cpu & CPU_RABBIT ) { \
 						error_illegal_ident(); \
 					}
@@ -168,27 +165,27 @@ TOKEN(TK_BIN_NOT, "~", )
 TOKEN_KW(NZ, )
 TOKEN_KW(Z,  )
 TOKEN_KW(NC, )
-TOKEN_KW(C,  sym.cpu_reg8 = REG_C)
+TOKEN_KW(C,  )
 TOKEN_KW(PO, )
 TOKEN_KW(PE, )
 TOKEN_KW(P,  )
 TOKEN_KW(M,  )
 
 /* 8-bit registers */
-TOKEN_KW(B, sym.cpu_reg8 = REG_B)
+TOKEN_KW(B, )
 
-TOKEN_KW(D, sym.cpu_reg8 = REG_D)
-TOKEN_KW(E, sym.cpu_reg8 = REG_E)
+TOKEN_KW(D, )
+TOKEN_KW(E, )
 
-TOKEN_KW(H, sym.cpu_reg8 = REG_H)
-TOKEN_KW(IXH, FOR_Z80; sym.cpu_reg8 = REG_H; SET_IX)
-TOKEN_KW(IYH, FOR_Z80; sym.cpu_reg8 = REG_H; SET_IY)
+TOKEN_KW(H, )
+TOKEN_KW(IXH, FOR_Z80)
+TOKEN_KW(IYH, FOR_Z80)
 
-TOKEN_KW(L, sym.cpu_reg8 = REG_L)
-TOKEN_KW(IXL, FOR_Z80; sym.cpu_reg8 = REG_L; SET_IX)
-TOKEN_KW(IYL, FOR_Z80; sym.cpu_reg8 = REG_L; SET_IY)
+TOKEN_KW(L, )
+TOKEN_KW(IXL, FOR_Z80)
+TOKEN_KW(IYL, FOR_Z80)
 
-TOKEN_KW(A, sym.cpu_reg8 = REG_A)
+TOKEN_KW(A, )
 
 TOKEN_KW(F, )
 
@@ -202,28 +199,28 @@ TOKEN_KW(EIR, FOR_RABBIT)
 TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
 
 /* 16-bit registers */
-TOKEN_KW(BC, sym.cpu_reg16_sp = REG_BC)
-TOKEN_KW(DE, sym.cpu_reg16_sp = REG_DE)
+TOKEN_KW(BC, )
+TOKEN_KW(DE, )
 
-TOKEN_KW(HL, sym.cpu_reg16_sp = REG_HL)
-TOKEN_KW(IX, sym.cpu_reg16_sp = REG_HL; SET_IX)
-TOKEN_KW(IY, sym.cpu_reg16_sp = REG_HL; SET_IY)
+TOKEN_KW(HL, )
+TOKEN_KW(IX, )
+TOKEN_KW(IY, )
 
 TOKEN_KW(AF, )
-TOKEN_KW(SP, sym.cpu_reg16_sp = REG_SP)
+TOKEN_KW(SP, )
 
 TOKEN(TK_AF1, "AF'", )
 
 /* indirect 16-bit registers */
-TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_BC)
-TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_DE)
+TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", )
+TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", )
 
-TOKEN_RE(TK_IND_HL, "(HL)", "(" hspace "HL"i hspace ")", sym.cpu_ind_reg16 = IND_REG16_HL)
+TOKEN_RE(TK_IND_HL, "(HL)", "(" hspace "HL"i hspace ")", )
 
-TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, 
-		 p--; te--; sym.cpu_ind_reg16 = IND_REG16_HL; SET_IX)
-TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, 
-		 p--; te--; sym.cpu_ind_reg16 = IND_REG16_HL; SET_IY)
+/* TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
+*  can collect expression, will be positive or negative depending on symbol */
+TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
 
 TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
 

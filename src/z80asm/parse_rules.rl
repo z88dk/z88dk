@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-01 01:58:31 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.27 2015-01-01 02:34:23 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -159,11 +159,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			  >{ EXPR_START_ACTION(); }
 			  %{ push_expr(expr_start, p); };
 	
-	/* expression that needs to be negated */
-	neg_expr = expr1 
-			  >{ EXPR_START_ACTION(); }
-			  %{ push_neg_expr(expr_start, p); };
-	
 	/* expression within parentheses */
 	paren_expr = expr1 
 			  >{ EXPR_START_ACTION(); }
@@ -206,29 +201,18 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			
 		/* LD r,(ix+d) */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA 
-					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE \
+					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE \
 			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
 			
-		/* LD r,(ix-d) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA 
-					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
-
 		/* LD (ix),r */
 		|	label? _TK_LD _TK_IND_<X> _TK_RPAREN 
 					_TK_COMMA _TK_<R1> _TK_NEWLINE \
 			@{ DO_stmt( (P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ) << 8 ); }
 			
 		/* LD (ix+d),r */
-		|	label? _TK_LD _TK_IND_<X> _TK_PLUS expr _TK_RPAREN 
+		|	label? _TK_LD _TK_IND_<X> expr _TK_RPAREN 
 					_TK_COMMA _TK_<R1> _TK_NEWLINE \
 			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
-			
-		/* LD (ix-d),r */
-		|	label? _TK_LD _TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN 
-					_TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
-
   #endfor  <X>
 		
 		/* LD r,N | LD A,(NN) */
@@ -284,12 +268,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			@{ DO_stmt_n( (P_<X> + Z80_LD_r_n( REG_idx ) ) << 8 ); }
 			
 		/* LD (ix+d),N */
-		|	label? _TK_LD _TK_IND_<X> _TK_PLUS expr _TK_RPAREN 
-					_TK_COMMA expr _TK_NEWLINE \
-			@{ DO_stmt_idx_n( P_<X> + Z80_LD_r_n( REG_idx ) ); }
-			
-		/* LD (ix-d),r */
-		|	label? _TK_LD _TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN 
+		|	label? _TK_LD _TK_IND_<X> expr _TK_RPAREN 
 					_TK_COMMA expr _TK_NEWLINE \
 			@{ DO_stmt_idx_n( P_<X> + Z80_LD_r_n( REG_idx ) ); }
 #endfor  <X>		
@@ -432,12 +411,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			
 		/* (x+d) */
 		| label? _TK_<OP> (_TK_A _TK_COMMA)? 
-					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN  _TK_NEWLINE
-		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
-			
-		/* (x-d) */
-		| label? _TK_<OP> (_TK_A _TK_COMMA)? 
-					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN  _TK_NEWLINE
+					_TK_IND_<X> expr _TK_RPAREN  _TK_NEWLINE
 		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
 	#endfor  <X>
 	
@@ -491,12 +465,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			
 		/* (x+d) */
 		| label? _TK_<OP>  
-					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
-			
-		/* (x-d) */
-		| label? _TK_<OP> 
-					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
 	#endfor  <X>
 	
@@ -530,13 +499,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			
 		/* (x+d) */
 		| label? _TK_<OP>  
-					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
-						  Z80_<OP>( REG_idx ) ); }
-			
-		/* (x-d) */
-		| label? _TK_<OP> 
-					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
 						  Z80_<OP>( REG_idx ) ); }
 	#endfor  <X>
@@ -570,15 +533,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-
 			
 		/* (x+d) */
 		| label? _TK_<OP> const_expr _TK_COMMA  
-					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
-		  @{ if (!expr_error)
-				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
-						     Z80_<OP>( expr_value, REG_idx ) ); 
-		  }
-			
-		/* (x-d) */
-		| label? _TK_<OP> const_expr _TK_COMMA
-					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
 		  @{ if (!expr_error)
 				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
 						     Z80_<OP>( expr_value, REG_idx ) ); 

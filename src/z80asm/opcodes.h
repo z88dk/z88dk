@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.23 2015-01-01 01:58:31 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.24 2015-01-01 02:34:23 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -72,8 +72,7 @@ enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A,
 	   REG_IXL = REG_L, REG_IYL = REG_L };
 
 /* 16-bit registers */
-enum { REG_NONE = -1, 
-	   REG_BC, REG_DE, REG_HL, REG_SP, 
+enum { REG_BC, REG_DE, REG_HL, REG_SP, 
 	   REG_AF = REG_SP,
 	   REG_IX = REG_HL, REG_IY = REG_HL,
 	   REG_IND_BC = 0, REG_IND_DE };

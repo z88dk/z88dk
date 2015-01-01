@@ -76,7 +76,7 @@ tr9:
                 {
                     sym.tok = TK_IND_BC;
                     sym.text = "(BC)";
-                    sym.cpu_ind_reg16 = IND_REG16_BC;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -108,7 +108,7 @@ tr12:
                 {
                     sym.tok = TK_IND_DE;
                     sym.text = "(DE)";
-                    sym.cpu_ind_reg16 = IND_REG16_DE;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -124,7 +124,7 @@ tr14:
                 {
                     sym.tok = TK_IND_HL;
                     sym.text = "(HL)";
-                    sym.cpu_ind_reg16 = IND_REG16_HL;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -142,8 +142,6 @@ tr17:
                     sym.text = "(IX";
                     p--;
                     te--;
-                    sym.cpu_ind_reg16 = IND_REG16_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX;
                     {
                         p++;
                         cs = 21;
@@ -161,8 +159,6 @@ tr18:
                     sym.text = "(IY";
                     p--;
                     te--;
-                    sym.cpu_ind_reg16 = IND_REG16_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY;
                     {
                         p++;
                         cs = 21;
@@ -263,7 +259,7 @@ tr21:
                     }
                     sym.tok = TK_C;
                     sym.text = "C";
-                    sym.cpu_reg8 = REG_C;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -343,7 +339,7 @@ tr21:
                     }
                     sym.tok = TK_B;
                     sym.text = "B";
-                    sym.cpu_reg8 = REG_B;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -359,7 +355,7 @@ tr21:
                     }
                     sym.tok = TK_D;
                     sym.text = "D";
-                    sym.cpu_reg8 = REG_D;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -375,7 +371,7 @@ tr21:
                     }
                     sym.tok = TK_E;
                     sym.text = "E";
-                    sym.cpu_reg8 = REG_E;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -391,7 +387,7 @@ tr21:
                     }
                     sym.tok = TK_H;
                     sym.text = "H";
-                    sym.cpu_reg8 = REG_H;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -412,10 +408,6 @@ tr21:
                     {
                         error_illegal_ident();
                     };
-
-                    sym.cpu_reg8 = REG_H;
-
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX;
 
                     {
                         p++;
@@ -438,10 +430,6 @@ tr21:
                         error_illegal_ident();
                     };
 
-                    sym.cpu_reg8 = REG_H;
-
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY;
-
                     {
                         p++;
                         cs = 21;
@@ -457,7 +445,7 @@ tr21:
                     }
                     sym.tok = TK_L;
                     sym.text = "L";
-                    sym.cpu_reg8 = REG_L;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -478,10 +466,6 @@ tr21:
                     {
                         error_illegal_ident();
                     };
-
-                    sym.cpu_reg8 = REG_L;
-
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX;
 
                     {
                         p++;
@@ -504,10 +488,6 @@ tr21:
                         error_illegal_ident();
                     };
 
-                    sym.cpu_reg8 = REG_L;
-
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY;
-
                     {
                         p++;
                         cs = 21;
@@ -523,7 +503,7 @@ tr21:
                     }
                     sym.tok = TK_A;
                     sym.text = "A";
-                    sym.cpu_reg8 = REG_A;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -639,7 +619,7 @@ tr21:
                     }
                     sym.tok = TK_BC;
                     sym.text = "BC";
-                    sym.cpu_reg16_sp = REG_BC;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -655,7 +635,7 @@ tr21:
                     }
                     sym.tok = TK_DE;
                     sym.text = "DE";
-                    sym.cpu_reg16_sp = REG_DE;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -671,7 +651,7 @@ tr21:
                     }
                     sym.tok = TK_HL;
                     sym.text = "HL";
-                    sym.cpu_reg16_sp = REG_HL;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -687,8 +667,7 @@ tr21:
                     }
                     sym.tok = TK_IX;
                     sym.text = "IX";
-                    sym.cpu_reg16_sp = REG_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -704,8 +683,7 @@ tr21:
                     }
                     sym.tok = TK_IY;
                     sym.text = "IY";
-                    sym.cpu_reg16_sp = REG_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -737,7 +715,7 @@ tr21:
                     }
                     sym.tok = TK_SP;
                     sym.text = "SP";
-                    sym.cpu_reg16_sp = REG_SP;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3685,7 +3663,7 @@ tr145:
                 {
                     sym.tok = TK_A;
                     sym.text = "A";
-                    sym.cpu_reg8 = REG_A;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3751,7 +3729,7 @@ tr159:
                 {
                     sym.tok = TK_B;
                     sym.text = "B";
-                    sym.cpu_reg8 = REG_B;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3768,7 +3746,7 @@ tr163:
                 {
                     sym.tok = TK_C;
                     sym.text = "C";
-                    sym.cpu_reg8 = REG_C;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3866,7 +3844,7 @@ tr178:
                 {
                     sym.tok = TK_D;
                     sym.text = "D";
-                    sym.cpu_reg8 = REG_D;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3883,7 +3861,7 @@ tr185:
                 {
                     sym.tok = TK_DE;
                     sym.text = "DE";
-                    sym.cpu_reg16_sp = REG_DE;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3900,7 +3878,7 @@ tr190:
                 {
                     sym.tok = TK_E;
                     sym.text = "E";
-                    sym.cpu_reg8 = REG_E;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -3976,7 +3954,7 @@ tr197:
                 {
                     sym.tok = TK_H;
                     sym.text = "H";
-                    sym.cpu_reg8 = REG_H;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -4111,8 +4089,7 @@ tr217:
                 {
                     sym.tok = TK_IX;
                     sym.text = "IX";
-                    sym.cpu_reg16_sp = REG_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IY : IDX_REG_IX;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -4129,8 +4106,7 @@ tr220:
                 {
                     sym.tok = TK_IY;
                     sym.text = "IY";
-                    sym.cpu_reg16_sp = REG_HL;
-                    sym.cpu_idx_reg = opts.swap_ix_iy ? IDX_REG_IX : IDX_REG_IY;
+                    ;
                     {
                         p++;
                         cs = 21;
@@ -4147,7 +4123,7 @@ tr225:
                 {
                     sym.tok = TK_L;
                     sym.text = "L";
-                    sym.cpu_reg8 = REG_L;
+                    ;
                     {
                         p++;
                         cs = 21;
