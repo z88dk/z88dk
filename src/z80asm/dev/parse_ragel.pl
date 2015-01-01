@@ -17,7 +17,7 @@
 # Needed to allow usage of #define macros and #include in ragel input files
 # Converts special tokens <NL> to "\n", <CAT> to "\t"; <CAT> concatenates.
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.2 2014-12-31 16:11:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.3 2015-01-01 01:58:31 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -81,14 +81,28 @@ exit 0;
 #					A3, A4
 #		... VAR ... 			-> exchanged for An
 #	#endfor VAR
-#	... #subst(text,aa,bb) ...	-> replace aa by bb in text
+#	... #LCASE(Text) ...		-> replace by TEXT
+#	... #UCASE(Text) ...		-> replace by text
+#	... #SUBST(text,aa,bb) ...	-> replace aa by bb in text
 #-----------------------------------------------------------------------
 sub preprocess {
 	my($in_file, $out_file) = @_;
 
 	my $text = read_file($in_file);
 	$text = expand_foreach($text);
-	$text = expand_subst($text);
+	$text = expand_func($text, "SUBST", 3, 
+				sub {  	my($in, $from, $to) = @_;
+						$in =~ s/$from/$to/g;
+						return $in;
+				});
+	$text = expand_func($text, "LCASE", 1, 
+				sub {  	my($in) = @_;
+						return lc($in);
+				});
+	$text = expand_func($text, "UCASE", 1, 
+				sub {  	my($in) = @_;
+						return uc($in);
+				});
 	write_file($out_file, $text);
 }
 
@@ -118,16 +132,27 @@ sub expand_one_foreach {
 	return $ret;
 }
 
-sub expand_subst {
-	my($text) = @_;
-	$text =~ s/\#subst \( ([^,]*) , ([^,]*) , ([^\)]*) \)
-			  / expand_one_subst($1, $2, $3) /xgem;
+sub expand_func {
+	my($text, $name, $num_args, $func) = @_;
+	$text =~ s/\# $name \( ( .*? ) \)
+	          / expand_one_func($name, $num_args, $func, $1) /xgem;
 	return $text;
 }
 
-sub expand_one_subst {
-	my($var, $from, $to) = @_;
-	$var =~ s/$from/$to/g;
-	$var = expand_subst($var);
-	return $var;
+sub expand_one_func {
+	my($name, $num_args, $func, $in) = @_;
+	for ($in) {
+		s/^\s+//;
+		s/\s+$//;
+	}
+	my @args = split(/,/, $in);
+	@args == $num_args 
+		or die "#name expects $num_args arguments, got ",
+			   scalar(@args), "\n";
+	for (@args) {
+		s/^\s+//;
+		s/\s+$//;
+	}
+	
+	return $func->(@args);
 }

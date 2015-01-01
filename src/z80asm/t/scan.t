@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.28 2014-12-31 16:11:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.29 2015-01-01 01:58:32 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -809,6 +809,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(CPIR,	T_ALL);
 	T_OPCODE(CPL,	T_ALL);
 	T_OPCODE(DAA,	T_Z80);
+	T_OPCODE(DEC,	T_ALL);
 	T_OPCODE(DI,	T_Z80);
 	T_OPCODE(DJNZ,	T_ALL);
 	T_OPCODE(EI,	T_Z80);
@@ -817,6 +818,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(HALT,	T_Z80);
 	T_OPCODE(IM,	T_Z80);
 	T_OPCODE(IN,	T_Z80);
+	T_OPCODE(INC,	T_ALL);
 	T_OPCODE(IND,	T_Z80);
 	T_OPCODE(INDR,	T_Z80);
 	T_OPCODE(INI,	T_Z80);
@@ -862,8 +864,6 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SRL,  	T_ALL)
 	T_OPCODE(SUB,	T_ALL);
 	T_OPCODE(XOR,	T_ALL);
-	T_OPCODE(INC,	T_ALL);
-	T_OPCODE(DEC,	T_ALL);
 	
 	
 	/* check limit cases */

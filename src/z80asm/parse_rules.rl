@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-31 16:11:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.26 2015-01-01 01:58:31 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -75,251 +75,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-
 				} \
 			}
 
-
-/* macros for rules */
-#define RULE_stmt(token, args, value) \
-			label? _TK_##token args _TK_NEWLINE \
-			@{ DO_stmt(value); }
-
-#define OP_stmt(op) \
-			RULE_stmt(op, , Z80_##op)
-
-#define OP_stmt_reg(op, reg1) \
-			RULE_stmt(op, _TK_##reg1, Z80_##op(REG_##reg1))
-
-#define OP_stmt_idx(op, idx1) \
-			RULE_stmt(op, _TK_##idx1, Z80_##op(REG_HL) + P_##idx1)
-
-#define OP_stmt_arg(op, arg1, value) \
-			RULE_stmt(op, _TK_##arg1, (value))
-
-#define OP_stmt_arg_arg(op, arg1, arg2, value) \
-			RULE_stmt(op, _TK_##arg1 _TK_COMMA _TK_##arg2, (value))
-
-#define OP_stmt_const(op) \
-			label? _TK_##op const_expr _TK_NEWLINE	\
-			@{ \
-				if (!expr_error) { \
-					DO_stmt(Z80_##op(expr_value)); \
+#define DO_stmt_emul(opcode, emul_func) \
+			{	if (compile_active) { \
+					DO_STMT_LABEL(); \
+					add_opcode_emul((opcode), #emul_func); \
 				} \
 			}
 
-			
-#define RULE_stmt_nn(token, value) \
-			label? _TK_##token expr _TK_NEWLINE \
-			@{ DO_stmt_nn(value); }
-
-#define OP_stmt_nn(op) \
-			RULE_stmt_nn(op, Z80_##op)
-
-			
-#define RULE_stmt_jr(token, value) \
-			label? _TK_##token expr _TK_NEWLINE \
-			@{ DO_stmt_jr(value); }
-
-#define OP_stmt_jr(op) \
-			RULE_stmt_jr(op, Z80_##op)
-
-			
-#define RULE_stmt_flag_nn(token, flag, value) \
-			label? _TK_##token _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-			@{ DO_stmt_nn(value); }
-
-#define OP_stmt_flag_nn(op, flag) \
-			RULE_stmt_flag_nn(op, flag, Z80_##op##_FLAG(FLAG_##flag))
-
-
-#define RULE_stmt_flag_jr(token, flag, value) \
-			label? _TK_##token _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-			@{ DO_stmt_jr(value); }
-
-#define OP_stmt_flag_jr(op, flag) \
-			RULE_stmt_flag_jr(op, flag, Z80_##op##_FLAG(FLAG_##flag))
-
-
-#define RULE_stmt_flag(token, flag, value) \
-			label? _TK_##token _TK_##flag _TK_NEWLINE \
-			@{ DO_stmt(value); }
-
-#define OP_stmt_flag(op, flag) \
-			RULE_stmt_flag(op, flag, Z80_##op##_FLAG(FLAG_##flag))
-
-/*-----------------------------------------------------------------------------
-*   INC / DEC operations
-*----------------------------------------------------------------------------*/
-#define _OP_id_idx(id, idx) \
-			label? _TK_##id _TK_IND_##idx \
-					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
-			@{ DO_stmt((Z80_##id(REG_idx) + P_##idx) << 8); } \
-		|	label? _TK_##id _TK_IND_##idx \
-					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
-			@{ DO_stmt_idx(Z80_##id(REG_idx) + P_##idx); } \
-		|	label? _TK_##id _TK_IND_##idx \
-					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
-			@{ DO_stmt_idx(Z80_##id(REG_idx) + P_##idx); }			
-
-#define _OP_id_reg(id, reg) \
-			label? _TK_##id _TK_##reg _TK_NEWLINE			/* reg */ \
-			@{ DO_stmt(Z80_##id(REG_##reg)); }
-
-#define _OP_id_idx8(id, idx) \
-			label? _TK_##id _TK_##idx##H _TK_NEWLINE		/* ixh */ \
-			@{ DO_stmt(Z80_##id(REG_H) + P_##idx); } \
-		|	label? _TK_##id _TK_##idx##L _TK_NEWLINE		/* ixl */ \
-			@{ DO_stmt(Z80_##id(REG_L) + P_##idx); } \
-
-#define _OP_id(id) \
-			label? _TK_##id _TK_IND_HL _TK_NEWLINE 		/* (hl) */ \
-			@{ DO_stmt(Z80_##id(REG_idx)); } \
-		|	_OP_id_idx(id, IX) \
-		|	_OP_id_idx(id, IY) \
-		|	_OP_id_reg(id, B) \
-		|	_OP_id_reg(id, C) \
-		|	_OP_id_reg(id, D) \
-		|	_OP_id_reg(id, E) \
-		|	_OP_id_reg(id, H) \
-		|	_OP_id_reg(id, L) \
-		|	_OP_id_reg(id, A) \
-		|	_OP_id_idx8(id, IX) \
-		|	_OP_id_idx8(id, IY)
-
-#define _OP_id16_reg(id, reg, p, p_reg) \
-			label? _TK_##id _TK_##reg _TK_NEWLINE \
-			@{ DO_stmt((p) + Z80_##id##16(REG_##p_reg)); } \
-
-#define _OP_id16(id) \
-			_OP_id16_reg(id, BC, 0,    BC)	\
-		|	_OP_id16_reg(id, DE, 0,    DE)	\
-		|	_OP_id16_reg(id, HL, 0,    HL)	\
-		|	_OP_id16_reg(id, SP, 0,    SP)	\
-		|	_OP_id16_reg(id, IX, P_IX, HL)	\
-		|	_OP_id16_reg(id, IY, P_IY, HL)
-		
-#define OP_inc_dec() \
-			_OP_id(INC) \
-		|	_OP_id(DEC) \
-		|	_OP_id16(INC) \
-		|	_OP_id16(DEC)
-
-/*-----------------------------------------------------------------------------
-*   Rotate and Shift operations
-*----------------------------------------------------------------------------*/
-#define _OP_rs_idx(rs, idx) \
-			label? _TK_##rs _TK_IND_##idx \
-					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
-			@{ DO_stmt( ((P_##idx << 16) & 0xFF000000) + \
-						((Z80_##rs(REG_idx) << 8) & 0xFF0000) + \
-						((0 << 8) & 0xFF00) + \
-						((Z80_##rs(REG_idx) << 0) & 0xFF) ); } \
-		|	label? _TK_##rs _TK_IND_##idx \
-					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
-			@{ DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
-						    Z80_##rs(REG_idx) ); } \
-		|	label? _TK_##rs _TK_IND_##idx \
-					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
-			@{ DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
-						    Z80_##rs(REG_idx) ); } \
-
-#define _OP_rs_reg(rs, reg) \
-			label? _TK_##rs _TK_##reg _TK_NEWLINE			/* reg */ \
-			@{ DO_stmt(Z80_##rs(REG_##reg)); }
-
-#define _OP_rs(rs) \
-			label? _TK_##rs _TK_IND_HL _TK_NEWLINE 			/* (hl) */ \
-			@{ DO_stmt(Z80_##rs(REG_idx)); } \
-		|	_OP_rs_idx(rs, IX) \
-		|	_OP_rs_idx(rs, IY) \
-		|	_OP_rs_reg(rs, B) \
-		|	_OP_rs_reg(rs, C) \
-		|	_OP_rs_reg(rs, D) \
-		|	_OP_rs_reg(rs, E) \
-		|	_OP_rs_reg(rs, H) \
-		|	_OP_rs_reg(rs, L) \
-		|	_OP_rs_reg(rs, A) \
-
-#define OP_rot_shift() \
-			_OP_rs(RLC) \
-		|	_OP_rs(RRC) \
-		|	_OP_rs(RL) \
-		|	_OP_rs(RR)  \
-		|	_OP_rs(SLA)  \
-		|	_OP_rs(SRA) \
-		|	_OP_rs(SLL) \
-		|	_OP_rs(SRL)
-
-/*-----------------------------------------------------------------------------
-*   Bit, Set and Reset operations
-*----------------------------------------------------------------------------*/
-#define _OP_brs_idx(brs, idx) \
-			label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
-					_TK_RPAREN _TK_NEWLINE					/* (ix) */ \
-			@{ if ( ! expr_error ) \
-				DO_stmt( ((P_##idx << 16) & 0xFF000000) + \
-						 ((Z80_##brs(expr_value, REG_idx) << 8) & 0xFF0000) + \
-						 ((0 << 8) & 0xFF00) + \
-						 ((Z80_##brs(expr_value, REG_idx) << 0) & 0xFF) ); } \
-		|	label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
-					_TK_PLUS expr _TK_RPAREN _TK_NEWLINE	/* (ix+d) */ \
-			@{ if ( ! expr_error ) \
-				DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
-						     Z80_##brs(expr_value, REG_idx) ); } \
-		|	label? _TK_##brs const_expr _TK_COMMA _TK_IND_##idx \
-					_TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE	/* (ix-d) */ \
-			@{ if ( ! expr_error ) \
-				DO_stmt_idx( ((P_##idx << 8) & 0xFF0000) + \
-						    Z80_##brs(expr_value, REG_idx) ); } \
-
-#define _OP_brs_reg(brs, reg) \
-			label? _TK_##brs const_expr _TK_COMMA _TK_##reg _TK_NEWLINE			/* reg */ \
-			@{ if ( ! expr_error ) \
-				DO_stmt(Z80_##brs(expr_value, REG_##reg)); }
-
-#define _OP_brs(brs) \
-			label? _TK_##brs const_expr _TK_COMMA _TK_IND_HL _TK_NEWLINE 			/* (hl) */ \
-			@{ if ( ! expr_error ) \
-				DO_stmt(Z80_##brs(expr_value, REG_idx)); } \
-		|	_OP_brs_idx(brs, IX) \
-		|	_OP_brs_idx(brs, IY) \
-		|	_OP_brs_reg(brs, B) \
-		|	_OP_brs_reg(brs, C) \
-		|	_OP_brs_reg(brs, D) \
-		|	_OP_brs_reg(brs, E) \
-		|	_OP_brs_reg(brs, H) \
-		|	_OP_brs_reg(brs, L) \
-		|	_OP_brs_reg(brs, A) \
-
-#define OP_bit_res_set() \
-			_OP_brs(BIT) \
-		|	_OP_brs(RES) \
-		|	_OP_brs(SET)
-
-/*-----------------------------------------------------------------------------
-*   ALU-16 operations
-*----------------------------------------------------------------------------*/
-#define _OP_alu16_reg(alu, idx, reg, prefix) \
-			label? _TK_##alu _TK_##idx _TK_COMMA _TK_##reg _TK_NEWLINE \
-			@{ DO_stmt(Z80_##alu##16(REG_##reg) + prefix); }
-
-#define _OP_alu16(alu, idx, prefix) \
-			_OP_alu16_reg(alu, idx, BC,  prefix) \
-		|	_OP_alu16_reg(alu, idx, DE,  prefix) \
-		|	_OP_alu16_reg(alu, idx, idx, prefix) \
-		|	_OP_alu16_reg(alu, idx, SP,  prefix)
-		
-#define OP_alu16() \
-			_OP_alu16(ADD, HL, 0) \
-		|	_OP_alu16(ADD, IX, P_IX) \
-		|	_OP_alu16(ADD, IY, P_IY) \
-		|	_OP_alu16(ADC, HL, 0) \
-		|	_OP_alu16(SBC, HL, 0)
-
-/*-----------------------------------------------------------------------------
-*   CALL opcodes
-*----------------------------------------------------------------------------*/
-#define _OP_call_flag_nn(flag) \
-			label? _TK_CALL _TK_##flag _TK_COMMA expr _TK_NEWLINE \
-			@{ \
-			 	Expr *expr = pop_expr(); \
+#define DO_stmt_call_flag(flag) \
+			{ 	Expr *expr = pop_expr(); \
 				if (compile_active) { \
 					DO_STMT_LABEL(); \
 					add_call_flag(FLAG_##flag, expr); \
@@ -327,146 +91,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-
 				else \
 					OBJ_DELETE(expr); \
 			}
-
-#define OP_call() \
-			_OP_call_flag_nn(C)  \
-		|	_OP_call_flag_nn(M)  \
-		|	_OP_call_flag_nn(NC) \
-		|	_OP_call_flag_nn(NZ) \
-		|	_OP_call_flag_nn(P)  \
-		|	_OP_call_flag_nn(PE) \
-		|	_OP_call_flag_nn(PO) \
-		|	_OP_call_flag_nn(Z)  \
-		|	OP_stmt_nn(CALL)
-		
-/*-----------------------------------------------------------------------------
-*   JP, JR, DJNZ opcodes
-*----------------------------------------------------------------------------*/
-#define OP_jump() \
-			OP_stmt_arg(JP, IND_HL, 			Z80_JP_idx)			\
-		|	OP_stmt_arg(JP, IND_IX _TK_RPAREN, 	Z80_JP_idx + P_IX)	\
-		|	OP_stmt_arg(JP, IND_IY _TK_RPAREN, 	Z80_JP_idx + P_IY)	\
-		|	OP_stmt_flag_jr(JR, C)	\
-		|	OP_stmt_flag_jr(JR, NC)	\
-		|	OP_stmt_flag_jr(JR, NZ)	\
-		|	OP_stmt_flag_jr(JR, Z)	\
-		|	OP_stmt_flag_nn(JP, C)	\
-		|	OP_stmt_flag_nn(JP, M)	\
-		|	OP_stmt_flag_nn(JP, NC)	\
-		|	OP_stmt_flag_nn(JP, NZ)	\
-		|	OP_stmt_flag_nn(JP, P)	\
-		|	OP_stmt_flag_nn(JP, PE)	\
-		|	OP_stmt_flag_nn(JP, PO)	\
-		|	OP_stmt_flag_nn(JP, Z)	\
-		|	OP_stmt_jr(DJNZ)		\
-		|	OP_stmt_jr(JR)			\
-		|	OP_stmt_nn(JP)
-
-/*-----------------------------------------------------------------------------
-*   RETx opcodes
-*----------------------------------------------------------------------------*/
-#define OP_ret() \
-			OP_stmt(RET)			\
-		|	OP_stmt(RETI)			\
-		|	OP_stmt(RETN)			\
-		|	OP_stmt_flag(RET, C)	\
-		|	OP_stmt_flag(RET, M)	\
-		|	OP_stmt_flag(RET, NC)	\
-		|	OP_stmt_flag(RET, NZ)	\
-		|	OP_stmt_flag(RET, P)	\
-		|	OP_stmt_flag(RET, PE)	\
-		|	OP_stmt_flag(RET, PO)	\
-		|	OP_stmt_flag(RET, Z)
-
-/*-----------------------------------------------------------------------------
-*   Emulated opcodes
-*----------------------------------------------------------------------------*/
-#define _OP_stmt_emul(op, emul_func) \
-			label? _TK_##op _TK_NEWLINE \
-			@{ \
-				if (compile_active) { \
-					DO_STMT_LABEL(); \
-					add_opcode_emul(Z80_##op, #emul_func); \
-				} \
-			}
-
-#define OP_emulated() \
-			_OP_stmt_emul(CPD,  rcmx_cpd)	\
-		|	_OP_stmt_emul(CPDR, rcmx_cpdr)	\
-		|	_OP_stmt_emul(CPI,  rcmx_cpi)	\
-		|	_OP_stmt_emul(CPIR, rcmx_cpir)	\
-		|	_OP_stmt_emul(RLD,  rcmx_rld)	\
-		|	_OP_stmt_emul(RRD,  rcmx_rrd)
-
-/*-----------------------------------------------------------------------------
-*   PUSH / POP
-*----------------------------------------------------------------------------*/
-#define OP_push_pop() \
-			OP_stmt_idx(POP,  IX)	\
-		|	OP_stmt_idx(POP,  IY)	\
-		|	OP_stmt_idx(PUSH, IX)	\
-		|	OP_stmt_idx(PUSH, IY)	\
-		|	OP_stmt_reg(POP,  AF)	\
-		|	OP_stmt_reg(POP,  BC)	\
-		|	OP_stmt_reg(POP,  DE)	\
-		|	OP_stmt_reg(POP,  HL)	\
-		|	OP_stmt_reg(PUSH, AF)	\
-		|	OP_stmt_reg(PUSH, BC)	\
-		|	OP_stmt_reg(PUSH, DE)	\
-		|	OP_stmt_reg(PUSH, HL)
-
-/*-----------------------------------------------------------------------------
-*   EX, EXX
-*----------------------------------------------------------------------------*/
-#define OP_ex() \
-			OP_stmt(EXX)	\
-		|	OP_stmt_arg_arg(EX, AF, AF,		Z80_EX_AF_AF)	\
-		|	OP_stmt_arg_arg(EX, AF, AF1, 	Z80_EX_AF_AF)	\
-		|	OP_stmt_arg_arg(EX, DE, HL,  	Z80_EX_DE_HL)	\
-		|	OP_stmt_arg_arg(EX, IND_SP, HL, Z80_EX_IND_SP_HL)	\
-		|	OP_stmt_arg_arg(EX, IND_SP, IX, Z80_EX_IND_SP_idx + P_IX)	\
-		|	OP_stmt_arg_arg(EX, IND_SP, IY, Z80_EX_IND_SP_idx + P_IY)
-
-/*-----------------------------------------------------------------------------
-*   IN, OUT
-*----------------------------------------------------------------------------*/
-#define _OP_in_reg(reg) \
-			label? _TK_IN _TK_##reg _TK_COMMA _TK_IND_C _TK_NEWLINE \
-			@{ DO_stmt(Z80_IN_REG_C(REG_##reg)); }
-
-#define _OP_in_A \
-			label? _TK_IN _TK_A _TK_COMMA paren_expr _TK_NEWLINE \
-			@{ DO_stmt_n(Z80_IN_A_n); }
-
-#define _OP_out_reg(reg) \
-			label? _TK_OUT _TK_IND_C _TK_COMMA _TK_##reg _TK_NEWLINE \
-			@{ DO_stmt(Z80_OUT_C_REG(REG_##reg)); }
-
-#define _OP_out_A \
-			label? _TK_OUT paren_expr _TK_COMMA _TK_A _TK_NEWLINE \
-			@{ DO_stmt_n(Z80_OUT_n_A); }
-
-#define OP_in_out() \
-			_OP_in_reg(B) 	\
-		|	_OP_in_reg(C) 	\
-		|	_OP_in_reg(D) 	\
-		|	_OP_in_reg(E) 	\
-		|	_OP_in_reg(H) 	\
-		|	_OP_in_reg(L) 	\
-		|	_OP_in_reg(A) 	\
-		|	_OP_in_A		\
-		|	OP_stmt(OTDR)	\
-		|	OP_stmt(OTIR)	\
-		|	OP_stmt(OUTD)	\
-		|	OP_stmt(OUTI)	\
-		|	_OP_out_reg(B)	\
-		|	_OP_out_reg(C)	\
-		|	_OP_out_reg(D)	\
-		|	_OP_out_reg(E)	\
-		|	_OP_out_reg(H)	\
-		|	_OP_out_reg(L)	\
-		|	_OP_out_reg(A)	\
-		|	_OP_out_A
 
 /*-----------------------------------------------------------------------------
 *   Expression macros
@@ -555,22 +179,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-
 	main := _TK_END
 		|	_TK_NEWLINE
 		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
-		|	OP_alu16()
-		|	OP_bit_res_set()
-		|	OP_call()
-		|	OP_emulated()
-		|	OP_ex()
-		|	OP_inc_dec()
-		|	OP_in_out()
-		|	OP_jump()
-		|	OP_push_pop()
-		|	OP_ret()
-		|	OP_rot_shift()
 
 		/*---------------------------------------------------------------------
 		*   8-bit load group
 		*--------------------------------------------------------------------*/
-#foreach <R1> in     B, C, D, E, H, L, A
+#foreach <R1> in   B, C, D, E, H, L, A
   #foreach <R2> in B, C, D, E, H, L, A
 		/* LD r,r */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE \
@@ -711,48 +324,37 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-
 		/*---------------------------------------------------------------------
 		*   16-bit load group
 		*--------------------------------------------------------------------*/
-#foreach <DD> in BC, DE, HL, SP
+#foreach <DD> in BC, DE, HL, SP, IX, IY
 		/* ld dd,NN | ld dd,(NN) */
 		| label? _TK_LD _TK_<DD> _TK_COMMA expr _TK_NEWLINE
 		  @{
 				if ( expr_in_parens ) {
 					if ( REG_<DD> == REG_HL ) {		/* ld hl,(NN) */
-						DO_stmt_nn( Z80_LD_idx_IND_nn );
+						DO_stmt_nn( P_<DD> + Z80_LD_idx_IND_nn );
 					}
 					else {							/* ld dd,(NN) */
 						DO_stmt_nn( Z80_LD_dd_IND_nn( REG_<DD> ) );
 					}
 				}
 				else {								/* ld dd,NN */
-					DO_stmt_nn( Z80_LD_dd_nn( REG_<DD> ) );
+					DO_stmt_nn( P_<DD> + Z80_LD_dd_nn( REG_<DD> ) );
 				}
 			}
 #endfor  <DD>
 
-#foreach <X> in IX, IY
-		/* ld x,NN | ld x,(NN) */
-		| label? _TK_LD _TK_<X> _TK_COMMA expr _TK_NEWLINE
-		  @{
-				if ( expr_in_parens ) {				/* ld x,(NN) */
-					DO_stmt_nn( P_<X> + Z80_LD_idx_IND_nn );
-				}
-				else {								/* ld x,NN */
-					DO_stmt_nn( P_<X> + Z80_LD_dd_nn( REG_<X> ) );
-				}
-			}
-#endfor  <X>
-
-		/* ld (NN),hl */
-		| label? _TK_LD expr _TK_COMMA _TK_HL _TK_NEWLINE
+		/* ld (NN),hl|ix|iy */
+#foreach <DD> in HL, IX, IY
+		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
 				if (! expr_in_parens)
 					return FALSE;			/* syntax error */
 					
-				DO_stmt_nn( Z80_LD_IND_nn_idx );	/* ld (NN),hl */
+				DO_stmt_nn( P_<DD> + Z80_LD_IND_nn_idx );
 			}
+#endfor  <DD>
 
-#foreach <DD> in BC, DE, SP
 		/* ld (NN),dd */
+#foreach <DD> in BC, DE, SP
 		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
 				if (! expr_in_parens)
@@ -762,82 +364,311 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.25 2014-12-
 			}
 #endfor  <DD>
 
-		/* ld (NN),x */
-#foreach <X> in IX, IY
-		| label? _TK_LD expr _TK_COMMA _TK_<X> _TK_NEWLINE
-		  @{
-				if (! expr_in_parens)
-					return FALSE;			/* syntax error */
-				
-				DO_stmt_nn( P_<X> + Z80_LD_IND_nn_idx );	/* ld (NN),x */
-			}
-#endfor  <X>
-
-
 		/* ld sp,hl|ix|iy */
-		| label? _TK_LD _TK_SP _TK_COMMA _TK_HL _TK_NEWLINE
-		  @{ DO_stmt( Z80_LD_SP_idx ); }			/* ld sp,hl */
+#foreach <DD> in HL, IX, IY
+		| label? _TK_LD _TK_SP _TK_COMMA _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_LD_SP_idx ); }
+#endfor  <DD>
+
+		/*---------------------------------------------------------------------
+		*   PUSH / POP
+		*--------------------------------------------------------------------*/
+#foreach <OP> in PUSH, POP
+  #foreach <DD> in BC, DE, HL, AF, IX, IY
+		| label? _TK_<OP> _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_<OP>( REG_<DD> ) ); }
+  #endfor  <DD>
+#endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   EX, EXX
+		*--------------------------------------------------------------------*/
+		| label? _TK_EXX _TK_NEWLINE
+		  @{ DO_stmt( Z80_EXX ); }
 		  
-#foreach <X> in IX, IY
-		| label? _TK_LD _TK_SP _TK_COMMA _TK_<X> _TK_NEWLINE
-		  @{ DO_stmt( P_<X> + Z80_LD_SP_idx ); }	/* ld sp,x */
-#endfor  <X>
+#foreach <DD> in AF, AF1
+		| label? _TK_EX _TK_AF _TK_COMMA _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( Z80_EX_AF_AF ); }
+#endfor  <DD>
 
+		| label? _TK_EX _TK_DE _TK_COMMA _TK_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_EX_DE_HL ); }
 
+		| label? _TK_EX _TK_IND_SP _TK_COMMA _TK_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_EX_IND_SP_HL ); }
 
+#foreach <DD> in IX, IY
+		| label? _TK_EX _TK_IND_SP _TK_COMMA _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_EX_IND_SP_idx ); }
+#endfor  <DD>
 
-		/* opcodes without arguments */
-#foreach <OP> in CCF, CPL, DAA, DI, EI, HALT, \
-				 IND, INDR, INI, INIR, \
-				 LDD, LDDR, LDI, LDIR, \
-				 NEG, NOP, \
-				 RLA, RLCA, RRA, RRCA, \
-				 SCF
-		|	OP_stmt(<OP>)
+		/*---------------------------------------------------------------------
+		*   Emulated opcodes
+		*--------------------------------------------------------------------*/
+#foreach <OP> in CPI, CPIR, CPD, CPDR, RLD, RRD
+		| label? _TK_<OP> _TK_NEWLINE \
+		  @{ DO_stmt_emul( Z80_<OP>, #LCASE( rcmx_<OP> ) ); }  
 #endfor  <OP>
 
-		/* opcodes with constant argument */
-#foreach <OP> in IM, RST
-		|	OP_stmt_const(<OP>)
-#endfor  <OP>
-
-		/* ALU */
+		/*---------------------------------------------------------------------
+		*   8-bit ALU
+		*--------------------------------------------------------------------*/
 #foreach <OP> in ADC, ADD, AND, CP, OR, SBC, SUB, XOR
 	#foreach <R> in B, C, D, E, H, L, A
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
-			@{ DO_stmt( Z80_<OP>( REG_<R> ) ); }
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_<R> ) ); }
 	#endfor  <R>
 
 	#foreach <X> in IX, IY
 		#foreach <R> in L, H
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_<X><R> _TK_NEWLINE
-			@{ DO_stmt( P_<X> + Z80_<OP>( REG_<R> ) ); }
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_<X><R> _TK_NEWLINE
+		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<R> ) ); }
 		#endfor  <R>
 		
 		/* (x) */
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? 
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? 
 					_TK_IND_<X> _TK_RPAREN  _TK_NEWLINE
-			@{ DO_stmt( ( P_<X> + Z80_<OP>( REG_idx ) ) << 8 ); }
+		  @{ DO_stmt( ( P_<X> + Z80_<OP>( REG_idx ) ) << 8 ); }
 			
 		/* (x+d) */
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? 
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? 
 					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN  _TK_NEWLINE
-			@{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
+		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
 			
 		/* (x-d) */
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? 
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? 
 					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN  _TK_NEWLINE
-			@{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
+		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
 	#endfor  <X>
 	
 		/* (hl) */
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
-			@{ DO_stmt( Z80_<OP>( REG_idx ) ); }
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
 
 		/* N */
-		|	label? _TK_<OP> (_TK_A _TK_COMMA)? expr _TK_NEWLINE
-			@{ DO_stmt_n( Z80_<OP>_n ); }
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? expr _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_<OP>_n ); }
+#endfor  <OP>
 
+		/*---------------------------------------------------------------------
+		*   16-bit ALU
+		*--------------------------------------------------------------------*/
+#foreach <X> in HL, IX, IY
+  #foreach <DD> in BC, DE, HL, SP
+		| label? _TK_ADD _TK_<X> _TK_COMMA 
+					#SUBST( _TK_<DD>, HL, <X> ) 
+					_TK_NEWLINE
+		  @{ DO_stmt( P_<X> + Z80_ADD16( REG_<DD> ) ); }
+  #endfor  <DD>
+#endfor  <X>
+
+#foreach <OP> in SBC, ADC
+  #foreach <DD> in BC, DE, HL, SP
+		| label? _TK_<OP> _TK_HL _TK_COMMA _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>16( REG_<DD> ) ); }
+  #endfor  <DD>
+#endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   INC / DEC
+		*--------------------------------------------------------------------*/
+#foreach <OP> in INC, DEC
+	#foreach <R> in B, C, D, E, H, L, A
+		| label? _TK_<OP> _TK_<R> _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_<R> ) ); }
+	#endfor  <R>
+
+	#foreach <X> in IX, IY
+		#foreach <R> in L, H
+		| label? _TK_<OP> _TK_<X><R> _TK_NEWLINE
+		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<R> ) ); }
+		#endfor  <R>
+		
+		/* (x) */
+		| label? _TK_<OP>  
+					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt( ( P_<X> + Z80_<OP>( REG_idx ) ) << 8 ); }
+			
+		/* (x+d) */
+		| label? _TK_<OP>  
+					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
+			
+		/* (x-d) */
+		| label? _TK_<OP> 
+					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt_idx( P_<X> + Z80_<OP>( REG_idx ) ); }
+	#endfor  <X>
+	
+		/* (hl) */
+		| label? _TK_<OP> _TK_IND_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
+
+  #foreach <DD> in BC, DE, HL, SP, IX, IY
+		| label? _TK_<OP> _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_<OP>16( REG_<DD> ) ); }
+  #endfor  <DD>
+#endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   Rotate and shift group
+		*--------------------------------------------------------------------*/
+#foreach <OP> in RLC, RRC, RL, RR, SLA, SRA, SLL, SRL
+	#foreach <R> in B, C, D, E, H, L, A
+		| label? _TK_<OP> _TK_<R> _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_<R> ) ); }
+	#endfor  <R>
+
+	#foreach <X> in IX, IY
+		/* (x) */
+		| label? _TK_<OP>  
+					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt( ((P_<X>               << 16) & 0xFF000000) +
+					  ((Z80_<OP>( REG_idx ) << 8 ) & 0x00FF0000) +
+					  ((0                   << 8 ) & 0x0000FF00) +
+					  ((Z80_<OP>( REG_idx ) << 0 ) & 0x000000FF) ); }
+			
+		/* (x+d) */
+		| label? _TK_<OP>  
+					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
+						  Z80_<OP>( REG_idx ) ); }
+			
+		/* (x-d) */
+		| label? _TK_<OP> 
+					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
+						  Z80_<OP>( REG_idx ) ); }
+	#endfor  <X>
+	
+		/* (hl) */
+		| label? _TK_<OP> _TK_IND_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
+#endfor  <OP>
+		
+		/*---------------------------------------------------------------------
+		*   Bit Set, Reset and Test Group
+		*--------------------------------------------------------------------*/
+#foreach <OP> in BIT, SET, RES
+	#foreach <R> in B, C, D, E, H, L, A
+		| label? _TK_<OP> const_expr _TK_COMMA _TK_<R> _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value, REG_<R> ) ); 
+		  }
+	#endfor  <R>
+	
+	#foreach <X> in IX, IY
+		/* (x) */
+		| label? _TK_<OP> const_expr _TK_COMMA  
+					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt( ((P_<X>                           << 16) & 0xFF000000) +
+						 ((Z80_<OP>( expr_value, REG_idx ) << 8 ) & 0x00FF0000) +
+						 ((0                               << 8 ) & 0x0000FF00) +
+						 ((Z80_<OP>( expr_value, REG_idx ) << 0 ) & 0x000000FF) );
+		   }
+			
+		/* (x+d) */
+		| label? _TK_<OP> const_expr _TK_COMMA  
+					_TK_IND_<X> _TK_PLUS expr _TK_RPAREN _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
+						     Z80_<OP>( expr_value, REG_idx ) ); 
+		  }
+			
+		/* (x-d) */
+		| label? _TK_<OP> const_expr _TK_COMMA
+					_TK_IND_<X> _TK_MINUS neg_expr _TK_RPAREN _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
+						     Z80_<OP>( expr_value, REG_idx ) ); 
+		  }
+	#endfor  <X>
+	
+		/* (hl) */
+		| label? _TK_<OP>  const_expr _TK_COMMA
+					_TK_IND_HL _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value, REG_idx ) ); 
+		  }
+#endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   JP, JR, DJNZ, CALL, RET
+		*--------------------------------------------------------------------*/
+#foreach <OP> in JR, DJNZ
+		| label? _TK_<OP> expr _TK_NEWLINE
+		  @{ DO_stmt_jr( Z80_<OP> ); }
+#endfor  <OP>
+
+#foreach <OP> in JP, CALL
+		| label? _TK_<OP> expr _TK_NEWLINE
+		  @{ DO_stmt_nn( Z80_<OP> ); }
+#endfor  <OP>
+
+#foreach <FLAG> in NZ, Z, NC, C
+		| label? _TK_JR _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
+		  @{ DO_stmt_jr( Z80_JR_FLAG( FLAG_<FLAG> ) ); }
+#endfor  <FLAG>
+
+#foreach <FLAG> in NZ, Z, NC, C, PO, PE, P, M
+		| label? _TK_JP _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
+		  @{ DO_stmt_nn( Z80_JP_FLAG( FLAG_<FLAG> ) ); }
+
+		| label? _TK_CALL _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
+		  @{ DO_stmt_call_flag( <FLAG> ); }
+
+		| label? _TK_RET _TK_<FLAG> _TK_NEWLINE
+		  @{ DO_stmt( Z80_RET_FLAG( FLAG_<FLAG> ) ); }
+#endfor  <FLAG>
+
+		| label? _TK_JP _TK_IND_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_JP_idx ); }
+		
+#foreach <X> in IX, IY
+		| label? _TK_JP _TK_IND_<X> _TK_RPAREN _TK_NEWLINE
+		  @{ DO_stmt( P_<X> + Z80_JP_idx ); }
+#endfor  <X>
+
+		/*---------------------------------------------------------------------
+		*   IN, OUT
+		*--------------------------------------------------------------------*/
+#foreach <R> in B, C, D, E, H, L, A
+		| label? _TK_IN _TK_<R> _TK_COMMA _TK_IND_C _TK_NEWLINE
+		  @{ DO_stmt( Z80_IN_REG_C( REG_<R> ) ); }
+		
+		| label? _TK_OUT _TK_IND_C _TK_COMMA _TK_<R> _TK_NEWLINE 
+		  @{ DO_stmt( Z80_OUT_C_REG( REG_<R> ) ); }
+#endfor  <R>
+
+		| label? _TK_IN _TK_A _TK_COMMA paren_expr _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_IN_A_n ); }
+		
+		| label? _TK_OUT paren_expr _TK_COMMA _TK_A _TK_NEWLINE 
+		  @{ DO_stmt_n( Z80_OUT_n_A ); }
+
+		/*---------------------------------------------------------------------
+		*   opcodes without arguments
+		*--------------------------------------------------------------------*/
+#foreach <OP> in RLA, RLCA, RRA, RRCA, \
+				 CPL, NEG, CCF, SCF, NOP, \
+				 DAA, DI, EI, HALT, \
+				 LDI, LDIR, LDD, LDDR, \
+				 INI, INIR, IND, INDR, \
+				 RET, RETN, RETI, \
+				 OTDR, OTIR, OUTD, OUTI
+		| label? _TK_<OP> _TK_NEWLINE
+		  @{ DO_stmt( Z80_<OP> ); }
+#endfor  <OP>		
+
+		/*---------------------------------------------------------------------
+		*   opcodes constant argument
+		*--------------------------------------------------------------------*/
+#foreach <OP> in IM, RST
+		| label? _TK_<OP> const_expr _TK_NEWLINE
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value ) );
+		  }
 #endfor  <OP>
 		;
 
