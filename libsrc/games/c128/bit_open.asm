@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2008-07-11 15:10:57 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2015-01-02 17:10:02 dom Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -18,17 +18,21 @@
         ld      bc,$d406
         ld      a,$ff
         out     (c),a   ; Set sustain to $F
-        add     c,e     ; next voice
+        ; add     c,e     ; next voice
+	ld	c,$06 + 7 ; next voice
         out     (c),a
-        add     c,e     ; next voice..
+        ; add     c,e     ; next voice
+	ld	c,$06 + 7 
         out     (c),a
         
         ld      bc,$d404
         ld      a,$49   ; Set SID test bit
         out     (c),a
-        add     c,e     ; next voice
+        ;add     c,e     ; next voice
+	ld	c,$04 + 7
         out     (c),a
-        add     c,e     ; next voice..
+        ;add     c,e     ; next voice
+	ld	c,$04 + 7
         out     (c),a
 
 ;-----

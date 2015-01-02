@@ -2,7 +2,7 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: playzb4sid.asm,v 1.2 2008-07-11 15:10:57 stefano Exp $
+;$Id: playzb4sid.asm,v 1.3 2015-01-02 17:10:02 dom Exp $
 ;
 
 ; extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen);
@@ -32,17 +32,21 @@ ld	e,7	; voice address offset
 ld	bc,$d406
 ld	a,$ff
 out	(c),a	; Set sustain to $F
-add	c,e	; next voice
+;add	c,e	; next voice
+ld	c,$06 + 7
 out	(c),a
-add	c,e	; next voice..
+;add	c,e	; next voice..
+ld	c,$06 + 7
 out	(c),a
 
 ld	bc,$d404
 ld	a,$49	; Set SID test bit
 out	(c),a
-add	c,e	; next voice
+;add	c,e	; next voice
+ld      c,$04 + 7
 out	(c),a
-add	c,e	; next voice..
+;add	c,e	; next voice..
+ld      c,$04 + 7
 out	(c),a
 pop	de
 ;-----
