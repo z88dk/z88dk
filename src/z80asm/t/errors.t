@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.26 2014-12-21 17:20:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.27 2015-01-02 14:36:17 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -612,38 +612,7 @@ t_z80asm_capture(asm_file()." -IllegalFilename", "",
 		"1 errors occurred during assembly\n", 1);
 		
 #------------------------------------------------------------------------------
-# error_org_redefined
-unlink_testfiles();
-t_z80asm(
-	org		=> -1,
-	asm		=> "org 0x1000 \n start: defw start",
-	bin		=> "\x00\x10",
-);
-
-t_z80asm(
-	org		=> 0x1000,
-	asm		=> "start: defw start",
-	bin		=> "\x00\x10",
-);
-
-t_z80asm(
-	org		=> 0x1000,
-	asm		=> "org 0x8000 \n start: defw start",
-	bin		=> "\x00\x10",
-);
-
-unlink_testfiles();
-write_file( asm_file(), "org 0x1000 \n org 0x4000 \n start: defw start" );
-my($stdout, $stderr, $return) = capture {
-	system z80asm()." -l -b ".asm_file();
-};
-is $stdout, "", "output";
-is $stderr, "Error at file 'test.asm' line 2: ORG redefined\n1 errors occurred during assembly\n", "error";
-ok -f err_file(), "error file";
-is read_file( err_file() ), "Error at file 'test.asm' line 2: ORG redefined\n", "error file ok";
-ok ! -f lst_file(), "no lst file";
-ok ! -f obj_file(), "no obj file";
-ok ! -f bin_file(), "no bin file";
+# error_org_redefined - tested in directives.t
 
 #------------------------------------------------------------------------------
 # error_jr_not_local

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.181 2014-06-26 21:34:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.182 2015-01-02 14:36:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -337,7 +337,7 @@ int main( int argc, char *argv[] )
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-        libraryhdr = NULL;              /* initialise to no library files */
+		libraryhdr = NULL;              /* initialise to no library files */
 
         /* parse command line and call-back via assemble_file() */
 		parse_argv(argc, argv);

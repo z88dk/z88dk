@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.11 2014-09-20 22:53:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.12 2015-01-02 14:36:17 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -26,7 +26,9 @@ use File::Slurp;
 use List::AllUtils 'uniq';
 use Capture::Tiny::Extended 'capture';
 
-our @EXPORT = qw( z80asm z80emu read_binfile write_binfile get_legacy );
+our @EXPORT = qw( z80asm z80emu 
+				  read_binfile write_binfile test_binfile
+				  get_legacy );
 
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
@@ -52,7 +54,7 @@ END {
 #						;; error: message	- expect error message in this line
 #						;; warn: message	- expect warning message in this line
 #						^;; error|warn:		- expect pass2 error at this module
-# 		options - assemble options; if not defined, "-b -r0" is used
+# 		options - assemble options; if not defined, "-b" is used
 #		ok => 1 - needed if no binary file is generated (i.e. -x)
 #		error - additional error messages not in asm source files
 #		bin - result binary code
@@ -74,7 +76,7 @@ sub z80asm {
 	for (sort keys %args) {
 		if (my($id) = /^asm(\d*)$/) {
 			# asm[n]
-			unlink("test$id.err", "test$id.obj", "test$id.bin");
+			unlink("test$id.err", "test$id.obj", <test$id*.bin>);
 			
 			$bin_file ||=    "test$id.bin";
 			push @asm_files, "test$id.asm"
@@ -127,7 +129,7 @@ sub z80asm {
 	
 	# assembly command line
 	my $z80asm = $Z80ASM." ".
-				($args{options} || "-b -r0").
+				($args{options} || "-b").
 				" @asm_files";
 
 	# assemble
@@ -148,21 +150,17 @@ sub z80asm {
 	
 	# check object file
 	for (sort keys %obj_file) {
-		ok -f $_, "$_ exists";
+		if ($expected_ok) {
+			ok -f $_, "$_ exists";
+		}
+		else {
+			ok ! -f $_, "$_ does not exist";
+		}
 	}
 	
 	# check binary
 	if ($bin ne "") {
-		my $bin_test_name = "binary (".length($bin)." bytes)";
-		$bin_file ||= "test.bin";
-		my $out_bin = read_binfile($bin_file);
-		if ($out_bin eq $bin) {
-			is $out_bin, $bin, $bin_test_name;
-		}
-		else {
-			# slow - always generates hex dump even if equal
-			eq_or_dump_diff $out_bin, $bin, $bin_test_name;
-		}
+		test_binfile( $bin_file || "test.bin", $bin );
 	}
 }
 
@@ -243,6 +241,27 @@ sub get_legacy {
 		$legacy = (/define\s+__LEGACY_Z80ASM_SYNTAX/) ? 1 : 0;
 	}
 	return $legacy;
+}
+
+#------------------------------------------------------------------------------
+# check binary file
+sub test_binfile {
+	my($file, $expected) = @_;
+	
+	note "Test at ",join(" ", caller);
+
+	ok -f $file, "binfile $file exists";
+	if (-f $file) {
+		my $bin_test_name = "binary (".length($expected)." bytes)";
+		my $bin = read_binfile($file);
+		if ($bin eq $expected) {
+			ok 1, $bin_test_name;
+		}
+		else {
+			# slow - always generates hex dump even if equal
+			eq_or_dump_diff $bin, $expected, $bin_test_name;
+		}
+	}
 }
 
 1;

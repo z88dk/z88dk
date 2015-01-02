@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.30 2015-01-01 02:34:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.31 2015-01-02 14:36:17 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -794,6 +794,9 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	opts.cpu &= ~CPU_RABBIT;
 
+
+	/* assembly directives */
+	T_OPCODE(ORG,	T_ALL);
 	
 	/* assembly opcodes */
 	T_OPCODE(ADC,	T_ALL);

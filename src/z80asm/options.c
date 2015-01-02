@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.92 2014-10-03 22:57:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.93 2015-01-02 14:36:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -31,9 +31,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.92 2014-10-03 22
 #include "strutil.h"
 #include "symtab.h"
 #include "z80asm.h"
-#include <ctype.h>
-#include <string.h>
 #include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+#include <string.h>
 
 /* default file name extensions */
 #define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
@@ -437,15 +439,11 @@ static void option_make_updated_bin( void )
 
 static void option_origin( char *origin_hex )
 {
-	Section *default_section;
-    Int origin = strtol( origin_hex, NULL, 16 );
-
-    if ( origin < 0 || origin > 0xFFFF )
-        error_int_range( origin );
-
-	default_section = get_first_section(NULL);
-	default_section->origin			= origin;
-	default_section->origin_opts	= TRUE;
+	long lorigin = strtol(origin_hex, NULL, 16);
+	if (errno == ERANGE || lorigin < INT_MIN || lorigin > INT_MAX)
+		error_int_range(lorigin);
+	else
+		set_origin_option((int)lorigin);
 }
 
 static void option_define( char *symbol )

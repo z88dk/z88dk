@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.10 2014-12-31 16:11:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.11 2015-01-02 14:36:17 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -363,7 +363,6 @@ t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
-  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
@@ -371,7 +370,6 @@ File test.obj at $0000: Z80RMF08
 
 File test1.obj at $0000: Z80RMF08
   Name: test1
-  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
@@ -379,7 +377,6 @@ File test1.obj at $0000: Z80RMF08
 
 File test2.obj at $0000: Z80RMF08
   Name: test2
-  Code: 0 bytes, ORG at $0000
   Code: 1 bytes (section code)
     C $0000: 01
   Code: 0 bytes (section data)
@@ -395,7 +392,6 @@ t_z80nm("test.obj test1.obj test2.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
-  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
@@ -403,7 +399,6 @@ File test.obj at $0000: Z80RMF08
 
 File test1.obj at $0000: Z80RMF08
   Name: test1
-  Code: 0 bytes, ORG at $0000
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
@@ -411,7 +406,6 @@ File test1.obj at $0000: Z80RMF08
 
 File test2.obj at $0000: Z80RMF08
   Name: test2
-  Code: 0 bytes, ORG at $0000
   Code: 1 bytes (section code)
     C $0000: 01
   Code: 0 bytes (section data)

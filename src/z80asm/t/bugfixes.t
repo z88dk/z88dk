@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.40 2014-12-04 23:30:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.41 2015-01-02 14:36:17 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -359,19 +359,6 @@ eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
 Warning at file 'test.asm' line 3: integer '256' out of range
 Warning at file 'test.asm' line 2: integer '-129' out of range
 ERROR
-
-#------------------------------------------------------------------------------
-# BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
-for ('jr', 'djnz')
-{
-	z80asm(
-		asm		=> "$_ ASMPC+2-129 ;; error: integer '-129' out of range",
-	);
-
-	z80asm(
-		asm		=> "$_ ASMPC+2+128 ;; error: integer '128' out of range",
-	);
-}
 
 #------------------------------------------------------------------------------
 # BUG_0026 : Incorrect paging in symbol list

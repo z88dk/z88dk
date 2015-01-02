@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.47 2014-12-21 17:20:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.48 2015-01-02 14:36:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -582,5 +582,47 @@ void fwrite_codearea( char *filename, FILE **pfile )
 		}
 
 		cur_addr += section_size;
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*   Assembly directives
+*----------------------------------------------------------------------------*/
+
+/* define a new origin, called by the ORG directive
+*  if origin is -1, the section is split creating a new binary file */
+void set_origin_directive(int origin)
+{
+	if (CURRENTSECTION->origin_found)
+		error_org_redefined();
+	else
+	{
+		CURRENTSECTION->origin_found = TRUE;
+		if (origin == -1)					/* signal split section binary file */
+			CURRENTSECTION->section_split = TRUE;
+		else if (origin >= 0 && origin <= 0xFFFF)
+		{
+			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
+				; /* ignore ORG, as --origin from command line overrides */
+			else
+				CURRENTSECTION->origin = origin;
+		}
+		else
+			error_int_range(origin);
+	}
+}
+
+/* define a new origin, called by the --orgin command line option */
+void set_origin_option(int origin)
+{
+	Section *default_section;
+
+	if (origin < 0 || origin > 0xFFFF)
+		error_int_range((long)origin);
+	else
+	{
+		default_section = get_first_section(NULL);
+		default_section->origin = origin;
+		default_section->origin_opts = TRUE;
 	}
 }

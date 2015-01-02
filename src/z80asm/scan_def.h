@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.31 2015-01-01 02:34:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.32 2015-01-02 14:36:15 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -223,6 +223,9 @@ TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
 
 TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
+
+/* assembly directives */
+TOKEN_OPCODE(ORG,  )
 
 /* DEFGROUP storage specifiers */
 TOKEN(TK_DS_B, "DS.B", sym.ds_size = 1 )

@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="codearea.h" />
     <ClInclude Include="deffile.h" />
+    <ClInclude Include="directives.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="errors_def.h" />
     <ClInclude Include="expr.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="asmdrctv.c" />
     <ClCompile Include="codearea.c" />
     <ClCompile Include="deffile.c" />
+    <ClCompile Include="directives.c" />
     <ClCompile Include="errors.c" />
     <ClCompile Include="expr.c" />
     <ClCompile Include="hist.c" />

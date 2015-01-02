@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.27 2015-01-01 02:34:23 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.28 2015-01-02 14:36:15 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -170,10 +170,26 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.27 2015-01-
 	const_expr = 
 			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
 	
-	/* assembly statement */
+		/*---------------------------------------------------------------------
+		*   assembly statement
+		*--------------------------------------------------------------------*/
 	main := _TK_END
-		|	_TK_NEWLINE
-		|	label _TK_NEWLINE @{ DO_STMT_LABEL(); }
+		| _TK_NEWLINE
+		
+		/*---------------------------------------------------------------------
+		*   assembly directives
+		*--------------------------------------------------------------------*/
+		| _TK_ORG const_expr _TK_NEWLINE
+		  @{ if (!expr_error)
+				set_origin_directive(expr_value);
+		  }
+		
+		
+		
+		/*---------------------------------------------------------------------
+		*   Z80 assembly
+		*--------------------------------------------------------------------*/
+		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
 		/*---------------------------------------------------------------------
 		*   8-bit load group

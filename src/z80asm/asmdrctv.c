@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.110 2014-12-26 16:46:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.111 2015-01-02 14:36:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -406,35 +406,6 @@ DEFC( void )
     while ( sym.tok == TK_COMMA );       /* get all DEFC definition separated by comma */
 }
 
-
-
-void
-ORG( void )
-{
-	long origin;
-
-    GetSym();								/* get numerical expression */
-	if (!expr_parse_eval(&origin))
-		return;
-
-	if (CURRENTSECTION->origin_found)
-		error_org_redefined();
-	else
-	{
-		CURRENTSECTION->origin_found = TRUE;
-		if (origin == -1)					/* signal split section binary file */
-			CURRENTSECTION->section_split = TRUE;
-		else if (origin >= 0 && origin <= 0xFFFF)
-		{
-			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
-				; /* ignore ORG, as --origin from command line overrides */
-			else
-				CURRENTSECTION->origin = origin;
-		}
-		else
-			error_int_range(origin);
-	}
-}
 
 
 void

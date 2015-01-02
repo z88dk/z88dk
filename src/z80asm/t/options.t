@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.51 2014-12-21 17:20:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.52 2015-01-02 14:36:17 pauloscustodio Exp $
 #
 # Test options
 
@@ -1106,69 +1106,7 @@ t_z80asm_capture("-sdcc -r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 #------------------------------------------------------------------------------
-# --split-bin, ORG -1
-#------------------------------------------------------------------------------
-
-unlink_testfiles();
-write_file("test.asm", <<'END');
-	defw ASMPC
-	
-	section code
-	defw ASMPC
-	
-	section data
-	defw ASMPC
-	
-	section bss
-	org 0x4000
-	defw ASMPC
-END
-
-unlink "test.bin", "test_code.bin", "test_data.bin", "test_bss.bin";
-t_z80asm_capture("-b test.asm", "", "", 0);
-ok   -f "test.bin";
-ok ! -f "test_code.bin";
-ok ! -f "test_data.bin";
-ok   -f "test_bss.bin";
-t_binary(read_binfile("test.bin"),     pack("v*", 0, 2, 4));
-t_binary(read_binfile("test_bss.bin"), pack("v*", 0x4000));
-
-unlink "test.bin", "test_code.bin", "test_data.bin", "test_bss.bin";
-t_z80asm_capture("--split-bin -b test.asm", "", "", 0);
-ok   -f "test.bin";
-ok   -f "test_code.bin";
-ok   -f "test_data.bin";
-ok   -f "test_bss.bin";
-t_binary(read_binfile("test.bin"),      pack("v*", 0));
-t_binary(read_binfile("test_code.bin"), pack("v*", 2));
-t_binary(read_binfile("test_data.bin"), pack("v*", 4));
-t_binary(read_binfile("test_bss.bin"),  pack("v*", 0x4000));
-
-# ORG -1
-write_file("test.asm", <<'END');
-	defw ASMPC
-	
-	section code
-	defw ASMPC
-	
-	section data
-	org 0x4000
-	defw ASMPC
-	
-	section bss
-	org -1
-	defw ASMPC
-END
-
-unlink "test.bin", "test_code.bin", "test_data.bin", "test_bss.bin";
-t_z80asm_capture("-b test.asm", "", "", 0);
-ok   -f "test.bin";
-ok ! -f "test_code.bin";
-ok   -f "test_data.bin";
-ok   -f "test_bss.bin";
-t_binary(read_binfile("test.bin"),      pack("v*", 0, 2));
-t_binary(read_binfile("test_data.bin"), pack("v*", 0x4000));
-t_binary(read_binfile("test_bss.bin"),  pack("v*", 0x4002));
+# --split-bin, ORG -1: tested in directives.t
 
 
 unlink_testfiles();

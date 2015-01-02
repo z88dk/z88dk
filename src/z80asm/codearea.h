@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.35 2014-12-21 17:20:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.36 2015-01-02 14:36:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -48,7 +48,7 @@ CLASS( Section )
 	char		*name;			/* name of section, kept in strpool */
 	UInt		 addr;			/* start address of this section,
 								   computed by sections_alloc_addr() */
-    Int			 origin;		/* ORG address of section, -1 if not defined */
+    int			 origin;		/* ORG address of section, -1 if not defined */
 	Bool		 origin_found;	/* ORG already found in code */
 	Bool		 origin_opts;	/* ORG was defined from command line options, 
 								   override asm code */
@@ -162,3 +162,14 @@ extern UInt fwrite_module_code( FILE *file );
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
 extern void fwrite_codearea( char *filename, FILE **pfile );
+
+/*-----------------------------------------------------------------------------
+*   Assembly directives
+*----------------------------------------------------------------------------*/
+
+/* define a new origin, called by the ORG directive
+*  if origin is -1, the section is split creating a new binary file */
+extern void set_origin_directive(int origin);
+
+/* define a new origin, called by the --orgin command line option */
+extern void set_origin_option(int origin);
