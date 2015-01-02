@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.32 2014-09-28 17:37:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.33 2015-01-02 18:21:15 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -67,8 +67,9 @@ ERR( ErrError,	error_symbol_redecl( char *symbol ),	"re-declaration of '%s' not 
 /* link errors */
 ERR( ErrFatal,	fatal_max_codesize( long size ),		"max. code size of %ld bytes reached" _C_ size )
 ERR( ErrError,	error_module_redefined( void ),			"module name already defined" )
-ERR( ErrError,	error_org_redefined( void ),			"ORG redefined" )
-ERR( ErrError,	error_env_not_defined( char *var ),		"environment variable '%s' not defined" _C_ var )
+ERR(ErrError, error_org_redefined(void), "ORG redefined")
+ERR(ErrError, error_invalid_org_option(char *org_hex), "invalid ORG option '%s'" _C_ org_hex)
+ERR(ErrError, error_env_not_defined(char *var), "environment variable '%s' not defined" _C_ var)
 
 ERR( ErrError,	error_not_obj_file( char *filename ),	"file '%s' not an object file" _C_ filename )
 ERR( ErrError,	error_not_lib_file( char *filename ),	"file '%s' not a library file" _C_ filename )

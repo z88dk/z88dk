@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.1 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.2 2015-01-02 18:21:15 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -81,6 +81,11 @@ for my $origin (-1, 0x10000) {
 		error	=> "Error: integer '$origin' out of range",
 	);
 }
+z80asm(
+	options	=> "-b -r123Z",
+	asm		=> "start: jp start",
+	error	=> "Error: invalid ORG option '123Z'",
+);
 
 # BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 z80asm(
