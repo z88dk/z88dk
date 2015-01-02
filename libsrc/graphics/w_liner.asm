@@ -8,7 +8,7 @@
         XREF    coords
 
 ;
-;       $Id: w_liner.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
+;       $Id: w_liner.asm,v 1.4 2015-01-02 07:22:27 aralbrec Exp $
 ;
 
 ; ******************************************************************************
@@ -148,7 +148,13 @@
                         
                         push   iy
                         pop    bc
-                        add    b,$80
+                        
+                        ; add b,$80
+                        
+                        ld a,b
+                        add a,$80
+                        ld b,a
+                        
                         ld     a,h		; cmp hl,iy
                         add    $80
                         cp     b
