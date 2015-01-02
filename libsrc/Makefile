@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.218 2015-01-02 17:19:51 dom Exp $
+# $Id: Makefile,v 1.219 2015-01-02 17:25:00 dom Exp $
 
 
 include Make.config
@@ -1362,6 +1362,8 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
+	@echo '--- WARNING: RCM2/3000 is temporarily disabled - no library will be produced ---'
+	@echo ''
 	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings
 	$(MAKE) -C stdlib generic
@@ -1369,7 +1371,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	z80asm -RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	#z80asm -RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
