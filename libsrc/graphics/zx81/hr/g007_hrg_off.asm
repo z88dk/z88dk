@@ -5,7 +5,7 @@
 ;
 ;   Exit from HRG mode
 ;
-;	$Id: g007_hrg_off.asm,v 1.1 2014-10-22 07:16:41 stefano Exp $
+;	$Id: g007_hrg_off.asm,v 1.2 2015-01-02 17:23:10 dom Exp $
 ;
 
 	XLIB	hrg_off
@@ -21,8 +21,8 @@
 	ld	(G007_P2+2),A	; patch our custom interrupt handler
 	
 	ld	hl,L0292
-	ld	(G007_P1+1),HL)
-	ld	(G007_P3+1),HL)
+	ld	(G007_P1+1),HL
+	ld	(G007_P3+1),HL
 
 	ld	a,$1e
 	ld	i,a	

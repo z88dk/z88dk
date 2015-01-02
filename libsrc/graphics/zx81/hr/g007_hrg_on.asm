@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.3 2014-10-28 21:07:08 stefano Exp $
+;	$Id: g007_hrg_on.asm,v 1.4 2015-01-02 17:23:10 dom Exp $
 ;
 
 	XLIB    hrg_on
@@ -78,8 +78,8 @@ ENDIF
 	ld	(G007_P2+2),A	; patch our custom interrupt handler
 	
 	ld	hl,display_3
-	ld	(G007_P1+1),hl)
-	ld	(G007_P3+1),hl)
+	ld	(G007_P1+1),hl
+	ld	(G007_P3+1),hl
 
 	
 ;IF FORzx81g64
