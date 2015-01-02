@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.217 2014-12-23 02:40:31 aralbrec Exp $
+# $Id: Makefile,v 1.218 2015-01-02 17:19:51 dom Exp $
 
 
 include Make.config
@@ -1362,6 +1362,7 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
+	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
