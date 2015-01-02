@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.12 2014-12-31 16:11:15 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.13 2015-01-02 19:06:37 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -450,10 +450,10 @@ IF !RABBIT
 	outd
 	otdr
 ELSE
-	in a,(N)							;; error: illegal identifier
+	in a,(0)							;; error: illegal identifier
 	in {b c d e h l a},(c)				;; error: illegal identifier
 	{ini inir ind indr}					;; error: illegal identifier
-	out (N),a							;; error: illegal identifier
+	out (0),a							;; error: illegal identifier
 	out (c),{b c d e h l a}				;; error: illegal identifier
 	{outi otir outd otdr}				;; error: illegal identifier
 ENDIF

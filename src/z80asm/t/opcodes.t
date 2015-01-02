@@ -3954,7 +3954,7 @@ z80asm(
         rst  49                         ;; error: integer '49' out of range
         rst  55                         ;; error: integer '55' out of range
         rst  57                         ;; error: integer '57' out of range
-        in   a,(N)                      ;; error: illegal identifier
+        in   a,(0)                      ;; error: illegal identifier
         in   b,(c)                      ;; error: illegal identifier
         in   c,(c)                      ;; error: illegal identifier
         in   d,(c)                      ;; error: illegal identifier
@@ -3966,7 +3966,7 @@ z80asm(
         inir                            ;; error: illegal identifier
         ind                             ;; error: illegal identifier
         indr                            ;; error: illegal identifier
-        out  (N),a                      ;; error: illegal identifier
+        out  (0),a                      ;; error: illegal identifier
         out  (c),b                      ;; error: illegal identifier
         out  (c),c                      ;; error: illegal identifier
         out  (c),d                      ;; error: illegal identifier

@@ -1085,12 +1085,7 @@ tr21:
                     {
                         sym.tok = TK_DAA;
                         sym.text = "DAA";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1144,12 +1139,7 @@ tr21:
                     {
                         sym.tok = TK_DI;
                         sym.text = "DI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1203,12 +1193,7 @@ tr21:
                     {
                         sym.tok = TK_EI;
                         sym.text = "EI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1289,12 +1274,7 @@ tr21:
                     {
                         sym.tok = TK_HALT;
                         sym.text = "HALT";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1321,12 +1301,7 @@ tr21:
                     {
                         sym.tok = TK_IM;
                         sym.text = "IM";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1353,12 +1328,7 @@ tr21:
                     {
                         sym.tok = TK_IN;
                         sym.text = "IN";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1412,12 +1382,7 @@ tr21:
                     {
                         sym.tok = TK_IND;
                         sym.text = "IND";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1444,12 +1409,7 @@ tr21:
                     {
                         sym.tok = TK_INDR;
                         sym.text = "INDR";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1476,12 +1436,7 @@ tr21:
                     {
                         sym.tok = TK_INI;
                         sym.text = "INI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1508,12 +1463,7 @@ tr21:
                     {
                         sym.tok = TK_INIR;
                         sym.text = "INIR";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1810,12 +1760,7 @@ tr21:
                     {
                         sym.tok = TK_OTDR;
                         sym.text = "OTDR";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1842,12 +1787,7 @@ tr21:
                     {
                         sym.tok = TK_OTIR;
                         sym.text = "OTIR";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1874,12 +1814,7 @@ tr21:
                     {
                         sym.tok = TK_OUT;
                         sym.text = "OUT";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1906,12 +1841,7 @@ tr21:
                     {
                         sym.tok = TK_OUTD;
                         sym.text = "OUTD";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -1938,12 +1868,7 @@ tr21:
                     {
                         sym.tok = TK_OUTI;
                         sym.text = "OUTI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -2105,12 +2030,7 @@ tr21:
                     {
                         sym.tok = TK_RETN;
                         sym.text = "RETN";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -2542,12 +2462,7 @@ tr21:
                     {
                         sym.tok = TK_SLL;
                         sym.text = "SLL";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -3924,12 +3839,7 @@ tr193:
                     {
                         sym.tok = TK_EI;
                         sym.text = "EI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -4022,12 +3932,7 @@ tr209:
                     {
                         sym.tok = TK_IN;
                         sym.text = "IN";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -4054,12 +3959,7 @@ tr213:
                     {
                         sym.tok = TK_IND;
                         sym.text = "IND";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -4086,12 +3986,7 @@ tr215:
                     {
                         sym.tok = TK_INI;
                         sym.text = "INI";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
@@ -4277,12 +4172,7 @@ tr250:
                     {
                         sym.tok = TK_OUT;
                         sym.text = "OUT";
-
-                        if ( opts.cpu & CPU_RABBIT )
-                        {
-                            error_illegal_ident();
-                        };
-
+                        ;
                         expect_opcode = FALSE;
                     }
                     else
