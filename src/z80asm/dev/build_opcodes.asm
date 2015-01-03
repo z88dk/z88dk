@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.13 2015-01-02 19:06:37 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.14 2015-01-03 18:39:06 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -586,6 +586,85 @@ ENDIF
 	else								;;
 	  defb 10							;;
 	endif								;;
+	
+;------------------------------------------------------------------------------
+; DEFVARS
+;------------------------------------------------------------------------------
+	defc defvars_base = 0x80			;;
+	defvars defvars_base				;;
+										;;
+	{									;;
+		df1 ds.b 4;						;; ; df1 = 0x80
+		df2 ds.w 2;						;; ; df2 = 0x80 + 4 = 0x84
+		df3 ds.p 2;						;; ; df3 = 0x84 + 2*2 = 0x88
+		df4 ds.l 2;						;; ; df4 = 0x88 + 2*3 = 0x8E
+		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
+										;;
+	}									;;
+	defb df1, df2, df3, df4, df5		;; defb 80h, 84h, 88h, 8Eh, 96h
+	
+	defvars 0 {							;;
+		df6 ds.b 1						;; ; df6 = 0
+		df7 ds.b 1						;; ; df7 = 1
+		df8 							;; ; df8 = 2
+	}									;;
+	defb df6, df7, df8					;; defb 0, 1, 2
+	
+	defvars -1 ; continue after df5		;;
+	{									;;
+		df9  ds.b 1						;; ; df9 = 0x96
+		df10 ds.b 1						;; ; df10 = 0x97
+		df11							;; ; df11 = 0x98
+		df12							;; ; df12 = 0x98
+	}									;;
+	defb df9, df10, df11, df12			;; defb 96h, 97h, 98h, 98h
+
+	defvars 0 {							;;
+		df13 ds.b 1						;; ; df13 = 0
+		df14 ds.b 1						;; ; df14 = 1
+		df15 							;; ; df15 = 2
+	}									;;
+	defb df13, df14, df15				;; defb 0, 1, 2
+	
+	defvars -1 ; continue after df12	;;
+	{									;;
+		df16 ds.b 1						;; ; df16 = 0x98
+		df17 ds.b 1						;; ; df17 = 0x99
+		df18 ds.b 0						;; ; df18 = 0x9A
+		df19							;; ; df19 = 0x9A
+	}									;;
+	defb df16, df17, df18, df19			;; defb 98h, 99h, 9Ah, 9Ah
+
+	; check with conditional assembly
+	if 1								;;
+		defvars 0 						;;
+		{								;;
+			df20 ds.b 1					;;
+			df21						;;
+		}								;;
+	else								;;
+		defvars 0						;;
+		{								;;
+			df20 ds.w 1					;;
+			df21						;;
+		}								;;
+	endif								;;
+	defb df20, df21						;; defb 0, 1
+	
+	if 0								;;
+		defvars 0 						;;
+		{								;;
+			df30 ds.b 1					;;
+			df31						;;
+		}								;;
+	else								;;
+		defvars 0						;;
+		{								;;
+			df30 ds.w 1					;;
+			df31						;;
+		}								;;
+	endif								;;
+	defb df30, df31						;; defb 0, 2
 	
 ;------------------------------------------------------------------------------
 ; DEFGROUP

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.182 2015-01-02 14:36:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.183 2015-01-03 18:39:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -69,8 +69,6 @@ size_t sizeof_relocroutine = 73;
 size_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
-
-UInt DEFVPC;          /* DEFVARS address counter */
 
 struct liblist *libraryhdr;
 

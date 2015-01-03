@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.180 2014-12-31 16:11:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.181 2015-01-03 18:39:05 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -242,11 +242,11 @@ depend:
 
 asmdrctv.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 asmdrctv.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-asmdrctv.o: lib/uthash.h errors.h errors_def.h expr.h lib/classlist.h scan.h
-asmdrctv.o: legacy.h scan_tokens.h opcodes.h options.h lib/list.h
-asmdrctv.o: options_def.h sym.h symref.h lib/fileutil.h listfile.h expr_def.h
-asmdrctv.o: lib/strpool.h symbol.h model.h module.h symtab.h objfile.h
-asmdrctv.o: z80asm.h
+asmdrctv.o: lib/uthash.h directives.h errors.h errors_def.h expr.h
+asmdrctv.o: lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h options.h
+asmdrctv.o: lib/list.h options_def.h sym.h symref.h lib/fileutil.h listfile.h
+asmdrctv.o: expr_def.h lib/strpool.h symbol.h model.h module.h symtab.h
+asmdrctv.o: objfile.h z80asm.h
 codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 codearea.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 codearea.o: lib/uthash.h errors.h errors_def.h lib/fileutil.h lib/list.h
@@ -259,6 +259,9 @@ deffile.o: lib/classlist.h options.h options_def.h symbol.h expr.h
 deffile.o: lib/array.h scan.h legacy.h scan_tokens.h opcodes.h errors.h
 deffile.o: errors_def.h sym.h model.h module.h lib/classhash.h lib/strhash.h
 deffile.o: lib/uthash.h codearea.h symtab.h objfile.h z80asm.h
+directives.o: lib/xmalloc.h directives.h errors.h errors_def.h lib/types.h
+directives.o: symtab.h lib/classhash.h lib/queue.h lib/class.h lib/strhash.h
+directives.o: lib/uthash.h sym.h symref.h lib/classlist.h
 errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/types.h
 errors.o: lib/fileutil.h lib/list.h lib/class.h lib/queue.h lib/strutil.h
 errors.o: options.h options_def.h lib/srcfile.h lib/strpool.h lib/strhash.h

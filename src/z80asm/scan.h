@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.48 2015-01-01 02:34:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.49 2015-01-03 18:39:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -46,7 +46,6 @@ typedef struct sym_t
 	char	*filename;		/* filename where token found, in strpool */
 	int 	 line_nr;		/* line number where token found */
 	int		 number;		/* number to return with TK_NUMBER */
-	int		 ds_size;		/* DS.x size, 0 if none */
 } Sym;
 
 /*-----------------------------------------------------------------------------

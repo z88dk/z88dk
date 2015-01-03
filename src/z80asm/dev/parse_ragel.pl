@@ -17,7 +17,7 @@
 # Needed to allow usage of #define macros and #include in ragel input files
 # Converts special tokens <NL> to "\n", <CAT> to "\t"; <CAT> concatenates.
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.3 2015-01-01 01:58:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.4 2015-01-03 18:39:06 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -67,6 +67,7 @@ open($in, "<", "$FILE.h2") or die "Input from $FILE.h2 failed: $!\n";
 open($out, ">", "$FILE.h") or die "Output to $FILE.h failed: $!\n";
 while (<$in>) {
 	s/^#.*//; 
+	next unless /\S/;
 	print $out $_;
 }
 close($out) or die;

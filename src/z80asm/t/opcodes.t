@@ -1831,90 +1831,177 @@ jr2:
                       endif
 
 ;------------------------------------------------------------------------------
+; DEFVARS
+;------------------------------------------------------------------------------
+                      defc defvars_base = 0x80
+                      defvars defvars_base
+                                        ;;
+                      {
+                    df1  ds.b 4
+                    df2  ds.w 2
+                    df3  ds.p 2
+                    df4  ds.l 2
+                    df5
+                                        ;;
+                      }
+                      defb df1, df2, df3, df4, df5
+                                        ;; 80 84 88 8E 96
+
+                      defvars 0 {
+                      df6  ds.b 1
+                      df7  ds.b 1
+                      df8
+                        }
+                        defb df6, df7, df8
+                                        ;; 00 01 02
+
+                        defvars -1
+                        {
+                      df9  ds.b 1
+                      df10 ds.b 1
+                      df11
+                      df12
+                        }
+                        defb df9, df10, df11, df12
+                                        ;; 96 97 98 98
+
+                        defvars 0 {
+                        df13 ds.b 1
+                        df14 ds.b 1
+                        df15
+                          }
+                          defb df13, df14, df15
+                                        ;; 00 01 02
+
+                          defvars -1
+                          {
+                        df16 ds.b 1
+                        df17 ds.b 1
+                        df18 ds.b 0
+                        df19
+                          }
+                          defb df16, df17, df18, df19
+                                        ;; 98 99 9A 9A
+
+                                        ; check with conditional assembly
+                          if   1
+                        defvars 0
+                        {
+                      df20 ds.b 1
+                      df21
+                        }
+                          else
+                        defvars 0
+                        {
+                      df20 ds.w 1
+                      df21
+                        }
+                          endif
+                          defb df20, df21
+                                        ;; 00 01
+
+                          if   0
+                        defvars 0
+                        {
+                      df30 ds.b 1
+                      df31
+                        }
+                          else
+                        defvars 0
+                        {
+                      df30 ds.w 1
+                      df31
+                        }
+                          endif
+                          defb df30, df31
+                                        ;; 00 02
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-                      defgroup
-                      {
-                    f0, f1,
-                    f2, f3,
-                    f10  = 10,
-                    f11,
-                    f20  = 20, f21
-                      }
-                      defb f0,f1,f2,f3,f10,f11,f20,f21
+                          defgroup
+                          {
+                        f0, f1,
+                        f2, f3,
+                        f10  = 10,
+                        f11,
+                        f20  = 20, f21
+                          }
+                          defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
-                      if   1
-                    defgroup
-                    {
-                  ff   = 1
-                    }
-                      else
-                    defgroup
-                    {
-                  ff   = 2
-                    }
-                      endif
-                      if   0
-                    defgroup
-                    {
-                  fg   = 1
-                    }
-                      else
-                    defgroup
-                    {
-                  fg   = 2
-                    }
-                      endif
-                      defb ff, fg       ;; 01 02
+                          if   1
+                        defgroup
+                        {
+                      ff   = 1
+                        }
+                          else
+                        defgroup
+                        {
+                      ff   = 2
+                        }
+                          endif
+                          if   0
+                        defgroup
+                        {
+                      fg   = 1
+                        }
+                          else
+                        defgroup
+                        {
+                      fg   = 2
+                        }
+                          endif
+                          defb ff, fg   ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                      lib  ld
+                          lib  ld
 
-                      nop               ;; 00
-                      jr   nop          ;; 18 00
-nop:                  
+                          nop           ;; 00
+                          jr   nop      ;; 18 00
+nop:                      
 
-                      di                ;; F3
-                      jr   di           ;; 18 00
-di:                   
-                      ei                ;; FB
-                      jr   ei           ;; 18 00
-ei:                   
+                          di            ;; F3
+                          jr   di       ;; 18 00
+di:                       
+                          ei            ;; FB
+                          jr   ei       ;; 18 00
+ei:                       
 
 ;------------------------------------------------------------------------------
 ; Test parsing of expressions with parentheses inside parentheses
 ;------------------------------------------------------------------------------
-                      out  (N),a        ;; D3 20
-                      out  ((N)),a      ;; D3 20
-                      out  (N+2*(3-3)),a
+                          out  (N),a    ;; D3 20
+                          out  ((N)),a  ;; D3 20
+                          out  (N+2*(3-3)),a
                                         ;; D3 20
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-                      call_oz 1         ;; E7 01
-                      oz   1            ;; E7 01
-                      call_oz 255       ;; E7 FF
-                      oz   255          ;; E7 FF
-                      call_oz 256       ;; E7 00 01
-                      oz   256          ;; E7 00 01
-                      call_oz 65535     ;; E7 FF FF
-                      oz   65535        ;; E7 FF FF
+                          call_oz 1     ;; E7 01
+                          oz   1        ;; E7 01
+                          call_oz 255   ;; E7 FF
+                          oz   255      ;; E7 FF
+                          call_oz 256   ;; E7 00 01
+                          oz   256      ;; E7 00 01
+                          call_oz 65535 ;; E7 FF FF
+                          oz   65535    ;; E7 FF FF
 
-                      call_pkg 0        ;; CF 00 00
-                      call_pkg 1        ;; CF 01 00
-                      call_pkg 65535    ;; CF FF FF
+                          call_pkg 0    ;; CF 00 00
+                          call_pkg 1    ;; CF 01 00
+                          call_pkg 65535
+                                        ;; CF FF FF
 
-                      fpp  1            ;; DF 01
-                      fpp  254          ;; DF FE
+                          fpp  1        ;; DF 01
+                          fpp  254      ;; DF FE
 
-                      invoke 0          ;; CD 00 00
-                      invoke 1          ;; CD 01 00
-                      invoke 65535      ;; CD FF FF
+                          invoke 0      ;; CD 00 00
+                          invoke 1      ;; CD 01 00
+                          invoke 65535  ;; CD FF FF
 END_ASM
 );
 
@@ -2478,10 +2565,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD E2 08
-        cpir                            ;; CD FF 08
-        cpd                             ;; CD 2B 09
-        cpdr                            ;; CD 48 09
+        cpi                             ;; CD F9 08
+        cpir                            ;; CD 16 09
+        cpd                             ;; CD 42 09
+        cpdr                            ;; CD 5F 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2910,8 +2997,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 74 09
-        rrd                             ;; CD 96 09
+        rld                             ;; CD 8B 09
+        rrd                             ;; CD AD 09
 
 ;	# rotate 16 bits
 ;
@@ -3663,52 +3750,138 @@ jr2:
                       endif
 
 ;------------------------------------------------------------------------------
+; DEFVARS
+;------------------------------------------------------------------------------
+                      defc defvars_base = 0x80
+                      defvars defvars_base
+                                        ;;
+                      {
+                    df1  ds.b 4
+                    df2  ds.w 2
+                    df3  ds.p 2
+                    df4  ds.l 2
+                    df5
+                                        ;;
+                      }
+                      defb df1, df2, df3, df4, df5
+                                        ;; 80 84 88 8E 96
+
+                      defvars 0 {
+                      df6  ds.b 1
+                      df7  ds.b 1
+                      df8
+                        }
+                        defb df6, df7, df8
+                                        ;; 00 01 02
+
+                        defvars -1
+                        {
+                      df9  ds.b 1
+                      df10 ds.b 1
+                      df11
+                      df12
+                        }
+                        defb df9, df10, df11, df12
+                                        ;; 96 97 98 98
+
+                        defvars 0 {
+                        df13 ds.b 1
+                        df14 ds.b 1
+                        df15
+                          }
+                          defb df13, df14, df15
+                                        ;; 00 01 02
+
+                          defvars -1
+                          {
+                        df16 ds.b 1
+                        df17 ds.b 1
+                        df18 ds.b 0
+                        df19
+                          }
+                          defb df16, df17, df18, df19
+                                        ;; 98 99 9A 9A
+
+                                        ; check with conditional assembly
+                          if   1
+                        defvars 0
+                        {
+                      df20 ds.b 1
+                      df21
+                        }
+                          else
+                        defvars 0
+                        {
+                      df20 ds.w 1
+                      df21
+                        }
+                          endif
+                          defb df20, df21
+                                        ;; 00 01
+
+                          if   0
+                        defvars 0
+                        {
+                      df30 ds.b 1
+                      df31
+                        }
+                          else
+                        defvars 0
+                        {
+                      df30 ds.w 1
+                      df31
+                        }
+                          endif
+                          defb df30, df31
+                                        ;; 00 02
+
+;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-                      defgroup
-                      {
-                    f0, f1,
-                    f2, f3,
-                    f10  = 10,
-                    f11,
-                    f20  = 20, f21
-                      }
-                      defb f0,f1,f2,f3,f10,f11,f20,f21
+                          defgroup
+                          {
+                        f0, f1,
+                        f2, f3,
+                        f10  = 10,
+                        f11,
+                        f20  = 20, f21
+                          }
+                          defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
-                      if   1
-                    defgroup
-                    {
-                  ff   = 1
-                    }
-                      else
-                    defgroup
-                    {
-                  ff   = 2
-                    }
-                      endif
-                      if   0
-                    defgroup
-                    {
-                  fg   = 1
-                    }
-                      else
-                    defgroup
-                    {
-                  fg   = 2
-                    }
-                      endif
-                      defb ff, fg       ;; 01 02
+                          if   1
+                        defgroup
+                        {
+                      ff   = 1
+                        }
+                          else
+                        defgroup
+                        {
+                      ff   = 2
+                        }
+                          endif
+                          if   0
+                        defgroup
+                        {
+                      fg   = 1
+                        }
+                          else
+                        defgroup
+                        {
+                      fg   = 2
+                        }
+                          endif
+                          defb ff, fg   ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                      lib  ld
+                          lib  ld
 
-                      nop               ;; 00
-                      jr   nop          ;; 18 00
-nop:                  
+                          nop           ;; 00
+                          jr   nop      ;; 18 00
+nop:                      
 
 
 ;------------------------------------------------------------------------------
@@ -3718,25 +3891,26 @@ nop:
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-                      call_oz 1         ;; E7 01
-                      oz   1            ;; E7 01
-                      call_oz 255       ;; E7 FF
-                      oz   255          ;; E7 FF
-                      call_oz 256       ;; E7 00 01
-                      oz   256          ;; E7 00 01
-                      call_oz 65535     ;; E7 FF FF
-                      oz   65535        ;; E7 FF FF
+                          call_oz 1     ;; E7 01
+                          oz   1        ;; E7 01
+                          call_oz 255   ;; E7 FF
+                          oz   255      ;; E7 FF
+                          call_oz 256   ;; E7 00 01
+                          oz   256      ;; E7 00 01
+                          call_oz 65535 ;; E7 FF FF
+                          oz   65535    ;; E7 FF FF
 
-                      call_pkg 0        ;; CF 00 00
-                      call_pkg 1        ;; CF 01 00
-                      call_pkg 65535    ;; CF FF FF
+                          call_pkg 0    ;; CF 00 00
+                          call_pkg 1    ;; CF 01 00
+                          call_pkg 65535
+                                        ;; CF FF FF
 
-                      fpp  1            ;; DF 01
-                      fpp  254          ;; DF FE
+                          fpp  1        ;; DF 01
+                          fpp  254      ;; DF FE
 
-                      invoke 0          ;; CD 00 00
-                      invoke 1          ;; CD 01 00
-                      invoke 65535      ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 07 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 50 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 7B 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD 9D 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                          invoke 0      ;; CD 00 00
+                          invoke 1      ;; CD 01 00
+                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 1E 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 67 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 92 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD B4 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 

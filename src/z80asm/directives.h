@@ -15,9 +15,22 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.1 2015-01-02 14:36:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.2 2015-01-03 18:39:05 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
+
+enum {
+	DEFVARS_SIZE_B = 1,
+	DEFVARS_SIZE_W = 2,
+	DEFVARS_SIZE_P = 3,
+	DEFVARS_SIZE_L = 4,
+};
+
+/* start a new DEFVARS context, closing any previously open one */
+extern void defvars_start(int start_addr);
+
+/* define one constant in the current context */
+extern void defvars_define_const(char *name, int elem_size, int count);

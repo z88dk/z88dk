@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.28 2015-01-02 14:36:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.29 2015-01-03 18:39:06 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -119,8 +119,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.28 2015-01-
 	}
 #endif
 
-	/* label */
+	/* label, name */
 	label = _TK_LABEL @{ stmt_label = p->string; };
+	name  = _TK_NAME  @{ name       = p->string; };
 	
 	/* expression */
 	action parens_open { expr_open_parens > 0 }
@@ -170,21 +171,20 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.28 2015-01-
 	const_expr = 
 			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
 	
-		/*---------------------------------------------------------------------
-		*   assembly statement
-		*--------------------------------------------------------------------*/
-	main := _TK_END
+	/*---------------------------------------------------------------------
+	*   assembly statement
+	*--------------------------------------------------------------------*/
+	main := 
+		  _TK_END
 		| _TK_NEWLINE
-		
+		  
 		/*---------------------------------------------------------------------
-		*   assembly directives
+		*   ORG
 		*--------------------------------------------------------------------*/
 		| _TK_ORG const_expr _TK_NEWLINE
 		  @{ if (!expr_error)
 				set_origin_directive(expr_value);
 		  }
-		
-		
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly
@@ -641,32 +641,86 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.28 2015-01-
 				DO_stmt( Z80_<OP>( expr_value ) );
 		  }
 #endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   DEFVARS
+		*--------------------------------------------------------------------*/
+		| _TK_DEFVARS const_expr _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_start(expr_value);
+			 current_sm = SM_DEFVARS_OPEN;
+		  }
+		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_start(expr_value);
+			 current_sm = SM_DEFVARS_LINE;
+		  }
+
+		; /* end of main */
+		
+	/*---------------------------------------------------------------------
+	*   DEFVARS state machine
+	*--------------------------------------------------------------------*/
+	defvars_open :=
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_block(); }
+		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFVARS_LINE; }
+		;
+		
+	defvars_line := 
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_close_block(); }
+		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
+		| name _TK_NEWLINE
+		  @{ defvars_define_const( name, 0, 0 ); }
+#foreach <S> in B, W, P, L
+		| name _TK_DS_<S> const_expr _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_define_const( name, DEFVARS_SIZE_<S>, expr_value ); 
+		  }
+#endfor  <S>
 		;
 
 }%%
 
 %%write data;
 
+static void _parse_init(void)
+{
+	current_sm = SM_MAIN;
+}
+
 static Bool _parse_statement(Bool compile_active)
 {
 	int start_num_errors;
+	char *name;
 	
+	%%write init nocs;
+	switch (current_sm)
+	{
+	case SM_MAIN:			cs = parser_en_main; break;
+	case SM_DEFVARS_OPEN:	cs = parser_en_defvars_open; break;
+	case SM_DEFVARS_LINE:	cs = parser_en_defvars_line; break;
+	default: assert(0);
+	}
+
 	p = pe = eof = NULL;
 	
-	%%write init;
-	
 	start_num_errors = get_num_errors();
-	while ( (eof == NULL || eof != pe) &&
-			get_num_errors() == start_num_errors )
+	while ( eof == NULL || eof != pe )
 	{
 		read_token();
 		
 		%%write exec;
-	
+
+		/* assembly error? */
+		if (get_num_errors() != start_num_errors) 
+			break;
+
 		/* Did parsing succeed? */
 		if ( cs == %%{ write error; }%% )
 			return FALSE;
-			
+		
 		if ( cs >= %%{ write first_final; }%% )
 			return TRUE;
 	}

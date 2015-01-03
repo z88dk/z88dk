@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.31 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.32 2015-01-03 18:39:06 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -761,15 +761,15 @@ t_compile_module($init, <<'END', $objs);
 
 	SetTemporaryLine("ds.b ds.w ds.p ds.l "
 					 "DS.B DS.W DS.P DS.L ");
-	T_GET(TK_DS_B, "DS.B"); assert(sym.ds_size == 1);
-	T_GET(TK_DS_W, "DS.W"); assert(sym.ds_size == 2);
-	T_GET(TK_DS_P, "DS.P"); assert(sym.ds_size == 3);
-	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
+	T_GET(TK_DS_B, "DS.B"); 
+	T_GET(TK_DS_W, "DS.W"); 
+	T_GET(TK_DS_P, "DS.P"); 
+	T_GET(TK_DS_L, "DS.L"); 
 
-	T_GET(TK_DS_B, "DS.B"); assert(sym.ds_size == 1);
-	T_GET(TK_DS_W, "DS.W"); assert(sym.ds_size == 2);
-	T_GET(TK_DS_P, "DS.P"); assert(sym.ds_size == 3);
-	T_GET(TK_DS_L, "DS.L"); assert(sym.ds_size == 4);
+	T_GET(TK_DS_B, "DS.B"); 
+	T_GET(TK_DS_W, "DS.W"); 
+	T_GET(TK_DS_P, "DS.P"); 
+	T_GET(TK_DS_L, "DS.L"); 
 	T_END();
 
 	
@@ -796,7 +796,8 @@ t_compile_module($init, <<'END', $objs);
 
 
 	/* assembly directives */
-	T_OPCODE(ORG,	T_ALL);
+	T_OPCODE(DEFVARS,	T_ALL);
+	T_OPCODE(ORG,		T_ALL);
 	
 	/* assembly opcodes */
 	T_OPCODE(ADC,	T_ALL);

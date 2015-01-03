@@ -13,12 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.111 2015-01-02 14:36:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.112 2015-01-03 18:39:05 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
 
 #include "codearea.h"
+#include "directives.h"
 #include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
@@ -46,120 +47,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 void DeclModuleName( void );
 void DEFINE( void );
 void UNDEFINE( void );
-
-
-/* global variables */
-extern UInt DEFVPC;
-
-
-long
-Parsevarsize( void )
-{
-    long offset = 0, varsize, size_multiplier;
-
-	if (!sym.ds_size)
-	{
-		varsize = 0;
-	}
-	else
-	{
-		varsize = sym.ds_size;
-		GetSym();
-
-		if (expr_parse_eval(&size_multiplier))		/* error in expr_parse_eval() if failed */
-		{
-			if (size_multiplier > 0 && varsize * size_multiplier <= 0x10000)
-			{
-				offset = varsize * size_multiplier;
-			}
-			else
-			{
-				error_int_range(size_multiplier);
-			}
-		}
-	}
-
-    return offset;
-}
-
-
-
-long
-Parsedefvarsize( long offset )
-{
-    long varoffset = 0;
-
-	if (sym.tok == TK_NAME)
-	{
-		define_symbol(sym.string, offset, TYPE_CONSTANT, 0);
-		GetSym();
-	}
-
-	varoffset = Parsevarsize();
-
-    return varoffset;
-}
-
-
-
-void
-DEFVARS( void )
-{
-    long offset;
-    enum flag globaldefv;
-
-    GetSym();
-	if (!expr_parse_eval(&offset))
-		return;
-
-    if ( ( offset != -1 ) && ( offset != 0 ) )
-    {
-        DEFVPC = (UInt)offset;
-        globaldefv = ON;
-    }
-    else
-    {
-        if ( offset == -1 )
-        {
-            globaldefv = ON;
-            offset = DEFVPC;
-        }
-        else
-        {
-            /* offset = 0, use temporarily without smashing DEFVPC */
-            globaldefv = OFF;
-        }
-    }
-
-    while ( sym.tok != TK_END && sym.tok != TK_LCURLY )
-    {
-        Skipline();
-
-        EOL = FALSE;
-        GetSym();
-    }
-
-    if ( sym.tok == TK_LCURLY )
-    {
-        while ( sym.tok != TK_END && GetSym() != TK_RCURLY )
-        {
-            if ( EOL )
-            {
-                EOL = FALSE;
-            }
-            else
-            {
-                offset += Parsedefvarsize( offset );
-            }
-        }
-
-        if ( globaldefv == ON )
-        {
-            DEFVPC = (UInt)offset;
-        }
-    }
-}
-
 
 
 void

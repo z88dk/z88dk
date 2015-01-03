@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.126 2014-12-31 16:11:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.127 2015-01-03 18:39:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -64,6 +64,7 @@ void Z80pass1( char *filename )
 	src_push();
 	{
 		src_open( filename, opts.inc_path );
+		parse_init();
 		sym.tok = TK_NIL;
 		while ( sym.tok != TK_END )
 			parseline( ON );              /* before parsing it */

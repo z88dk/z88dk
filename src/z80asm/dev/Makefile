@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.12 2014-12-13 00:49:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.13 2015-01-03 18:39:06 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -34,7 +34,7 @@ all : scan_rules.h
 scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h legacy.h \
 			   dev/parse_ragel.pl dev/Makefile
 	perl dev/parse_ragel.pl scan_rules.rl
-	$(ASTYLE) scan_rules.h
+#	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 
 scan_tokens.h : scan_def.h legacy.h \
 				dev/build_tokens.pl dev/Makefile
@@ -48,7 +48,7 @@ all : parse_rules.h
 parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h legacy.h \
 				dev/parse_ragel.pl dev/Makefile 
 	perl dev/parse_ragel.pl parse_rules.rl
-	$(ASTYLE) parse_rules.h
+#	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
 	
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation
@@ -94,7 +94,10 @@ all:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.12  2014-12-13 00:49:46  pauloscustodio
+# Revision 1.13  2015-01-03 18:39:06  pauloscustodio
+# Implemented DEFVARS within the RAGEL parser
+#
+# Revision 1.12  2014/12/13 00:49:46  pauloscustodio
 # Implemented infrastructure to do parsing based on a RAGEL state machine,
 # and to fall back to the original parser on error. Implemented the first
 # two simple opcodes (NOP and HALT) as a concept check.

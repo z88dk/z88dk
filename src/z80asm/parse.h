@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.8 2014-12-27 22:53:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.9 2015-01-03 18:39:05 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -23,7 +23,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.8 2014-12-27 22:53
 
 struct Expr;
 
-/* try to parse the current statement block, return FLASE if failed;
+/* init the parser state */
+extern void parse_init(void);
+
+/* try to parse the current statement, return FLASE if failed;
 *  compile_active is FALSE on the FALSE branch of an IF-ELSE-ENDIF */
 extern Bool parse_statement(Bool compile_active);
 

@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.10 2014-12-14 00:14:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.11 2015-01-03 18:39:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -134,7 +134,6 @@ static void dump_file( char *title )
 static void test_sections( void )
 {
 	Section *section_blank, *section_code, *section_data;
-	UInt addr;
 	int module_id;
 	FILE *file;
 	Byte *p;

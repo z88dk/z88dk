@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.33 2015-01-02 18:21:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.34 2015-01-03 18:39:05 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -50,6 +50,8 @@ ERR( ErrError,	error_syntax_expr( void ),				"syntax error in expression" )
 ERR( ErrError,	error_invalid_squoted_string( void ),	"invalid single quoted character" )
 ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
 ERR( ErrError,	error_divide_by_zero( void ),			"division by zero" )
+ERR(ErrError, error_missing_block(void), "missing {} block")
+ERR(ErrError, error_missing_close_block(void), "{} block not closed")
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
 

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.27 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.28 2015-01-03 18:39:06 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -302,37 +302,7 @@ t_binary(read_binfile(bin_file()), pack("C*",
 		0x01, 0x00, 0x00,
 ));
 
-# defvar out of range
-t_z80asm(
-	asm		=> "defvars 0
-				{
-					s1  ds.b 1
-					s2  ds.b 65536
-					s3  ds.b 1
-				}
-				defl s1, s2, s3
-			   ",
-	bin		=> "\0\0\0\0"."\1\0\0\0"."\1\0\1\0",
-);
-
-t_z80asm(
-	asm		=> "defvars 0
-				{
-					s1  ds.b 0
-				}
-			   ",
-	err		=> "Error at file 'test.asm' line 3: integer '0' out of range",
-);
-
-t_z80asm(
-	asm		=> "defvars 0
-				{
-					s1  ds.b 65537
-				}
-			   ",
-	err		=> "Error at file 'test.asm' line 3: integer '65537' out of range",
-);
-
+# defvar out of range - tested in directives.t
 
 # defs out of range
 t_z80asm(

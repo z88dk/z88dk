@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.41 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.42 2015-01-03 18:39:06 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -579,54 +579,6 @@ z80asm(
 	options => "-d -ns -nm -xtest.lib test1 test2",
 	ok => 1,
 );
-
-#------------------------------------------------------------------------------
-# BUG_0051: DEFC and DEFVARS constants do not appear in map file
-note "BUG_0051";
-{
-	z80asm(
-		asm		=> <<'ASM',
-			public minus_d_var, defc_var, defvars_var, public_label
-			defc defc_var = 2
-			defvars 3 { 
-			defvars_var ds.b 1
-			}
-		public_label: 
-			defb minus_d_var	;; 01
-			defb defc_var		;; 02
-			defb defvars_var	;; 03
-			defb public_label	;; 04
-			defb local_label 	;; 09
-		local_label:
-ASM
-		options	=> "-r4 -b -m -g -Dminus_d_var"
-	);
-
-	eq_or_diff scalar(read_file("test.def")), <<'END', "test.def";
-DEFC public_label                    = $0004 ; Module test
-END
-
-	eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
-ASMHEAD                         = 0004, G: 
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0009, G: 
-defc_var                        = 0002, G: test
-defvars_var                     = 0003, G: test
-local_label                     = 0009, L: test
-minus_d_var                     = 0001, G: test
-public_label                    = 0004, G: test
-
-
-minus_d_var                     = 0001, G: test
-defc_var                        = 0002, G: test
-defvars_var                     = 0003, G: test
-ASMHEAD                         = 0004, G: 
-public_label                    = 0004, G: test
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0009, G: 
-local_label                     = 0009, L: test
-END
-}
 
 #------------------------------------------------------------------------------
 # http://www.z88dk.org/forum/viewtopic.php?id=8561

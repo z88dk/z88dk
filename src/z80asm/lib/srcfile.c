@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.13 2014-12-20 20:26:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.14 2015-01-03 18:39:06 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -247,7 +247,7 @@ char *SrcFile_getline( SrcFile *self )
         xfclose( self->file );				/* close input */
         self->file = NULL;
 
-		call_new_line_cb( NULL, 0, NULL );
+//		call_new_line_cb( NULL, 0, NULL );
         return NULL;						/* EOF */
     }
 }
