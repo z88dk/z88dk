@@ -48,9 +48,26 @@ LIB stdio_basechar, stdio_error_zc
    call l_long_neg             ; dehl = -dehl
    inc b                       ; count++
 
+IF FORrcmx000
+
+   push bc
+   
+   push ix
+   pop bc
+   
+   ld a,b
+   or c
+   
+   pop bc
+   jr z, notneg
+
+ELSE
+
    ld a,ixh
    or ixl
    jr z, notneg
+
+ENDIF
    
    ld (ix+0),'-'               ; write negative sign
    inc ix
@@ -80,11 +97,27 @@ LIB stdio_basechar, stdio_error_zc
    ld l,c                      ; dehl = radix
    
    call l_long_div_u           ; dehl = num/radix, de'hl' = num % radix
+
+IF FORrcmx000
+
+   push ix
+   pop bc
+   
+   ld a,b
+   or c
+   
+   pop bc
+   jr z, nowrite0
+
+ELSE
+
    pop bc                      ; b = num chars, c = radix
    
    ld a,ixh
    or ixl
    jr z, nowrite0
+
+ENDIF
 
    exx
    ld de, stdio_basechar
@@ -109,9 +142,22 @@ LIB stdio_basechar, stdio_error_zc
    ; ix = address of soon-to-be-written '\0' in buffer
    ; hl = char *s
 
+IF FORrcmx000
+
+   push ix
+   pop de
+   
+   ld a,d
+   or e
+   jr z, exit
+
+ELSE
+
    ld a,ixh
    or ixl
    jr z, exit
+
+ENDIF
    
    ld (ix+0),e                 ; terminate string
    
@@ -123,8 +169,8 @@ LIB stdio_basechar, stdio_error_zc
 
 .exit
 
-   ld e,ixl
-   ld d,ixh                    ; de = end of char *s
+   push ix
+   pop de                      ; de = end of char *s 
 
    ld l,b
    xor a                       ; clears carry flag

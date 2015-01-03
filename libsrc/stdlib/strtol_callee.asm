@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.8 2014-09-28 18:27:00 pauloscustodio Exp $
+; * $Id: strtol_callee.asm,v 1.9 2015-01-03 16:05:53 aralbrec Exp $
 ; *
 ; */
 ;
@@ -178,8 +178,8 @@ XDEF ASMDISP_STRTOL_CALLEE
    ; bc = base
    ; hl = char *
 
-   ld ixh,b
-   ld ixl,c                  ; ix = base
+   push bc
+   pop ix                    ; ix = base
    
    ld d,b
    ld e,b
@@ -216,8 +216,24 @@ XDEF ASMDISP_STRTOL_CALLEE
    
 .noadj2
 
+IF FORrcmx000
+
+   push bc
+   
+   push ix
+   pop bc
+   
+   cp c
+   
+   pop bc
+   ret nc
+
+ELSE
+
    cp ixl                    ; base
    ret nc
+
+ENDIF
 
 .havedigit
 
