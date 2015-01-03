@@ -151,15 +151,17 @@ IF FORrcmx000
    or e
    jr z, exit
 
+   ld (ix+0),0                 ; terminate string
+
 ELSE
 
    ld a,ixh
    or ixl
    jr z, exit
-
-ENDIF
    
    ld (ix+0),e                 ; terminate string
+
+ENDIF
    
    ; now we have a backward string in the buffer so we need to reverse it!
 
