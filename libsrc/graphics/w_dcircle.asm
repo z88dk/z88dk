@@ -3,7 +3,7 @@
 ;       Adapted from my Spectrum Routine
 ;       (C) 1995-1998 D.J.Morris
 ;
-;	$Id: w_dcircle.asm,v 1.1 2010-11-25 13:46:40 stefano Exp $
+;	$Id: w_dcircle.asm,v 1.2 2015-01-04 18:34:15 dom Exp $
 ;
 
 
@@ -16,7 +16,7 @@ DEFVARS 0
         x0h     ds.b    1
         y0l     ds.b    1
         y0h     ds.b    1
-        rl      ds.b    1
+        rlv      ds.b    1
         rh      ds.b    1
         cxl     ds.b    1
         cxh     ds.b    1
@@ -43,7 +43,7 @@ DEFVARS 0
 		ld (iy+x0h),d
 		ld (iy+y0l),l
 		ld (iy+y0h),h
-		ld (iy+rl),c
+		ld (iy+rlv),c
 		ld (iy+rh),b
 		ld (iy+scale),a        ;step factor - usually 1
 
@@ -64,7 +64,7 @@ DEFVARS 0
 ;Line 9905
 .l9905
 		ld b,(iy+rh)
-		ld c,(iy+rl)
+		ld c,(iy+rlv)
 		ld d,(iy+cxh)
 		ld e,(iy+cxl)
 		ld h,b
@@ -77,7 +77,7 @@ DEFVARS 0
 
 		ld c,(iy+dal)
 		ld b,(iy+dahi)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld h,(iy+rh)
 		add hl,bc
 		ld b,h
@@ -86,7 +86,7 @@ DEFVARS 0
 		ld (iy+dahi),b
 
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld c,(iy+scale)
 		ld b,0
 		ld h,d
@@ -95,7 +95,7 @@ DEFVARS 0
 		sbc hl,bc
 		ld b,h
 		ld c,l
-		ld (iy+rl),c
+		ld (iy+rlv),c
 		ld (iy+rh),b
 ;Line 9915
 .l9915
@@ -117,7 +117,7 @@ DEFVARS 0
 		ld b,(iy+y0h)
 		ld c,(iy+y0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		srl d
 		rr e
 		ld h,b
@@ -139,7 +139,7 @@ DEFVARS 0
 		ld b,(iy+y0h)
 		ld c,(iy+y0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		srl d
 		rr e
 		ld h,b
@@ -162,7 +162,7 @@ DEFVARS 0
 		ld b,(iy+y0h)
 		ld c,(iy+y0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		srl d
 		rr e
 		ld h,b
@@ -185,7 +185,7 @@ DEFVARS 0
 		ld b,(iy+y0h)
 		ld c,(iy+y0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		srl d
 		rr e
 		ld h,b
@@ -222,7 +222,7 @@ DEFVARS 0
 		ld b,(iy+x0h)
 		ld c,(iy+x0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -244,7 +244,7 @@ DEFVARS 0
 		ld b,(iy+x0h)
 		ld c,(iy+x0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld h,b
 		ld l,c
 		or a
@@ -268,7 +268,7 @@ DEFVARS 0
 		ld b,(iy+x0h)
 		ld c,(iy+x0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -291,7 +291,7 @@ DEFVARS 0
 		ld b,(iy+x0h)
 		ld c,(iy+x0l)
 		ld d,(iy+rh)
-		ld e,(iy+rl)
+		ld e,(iy+rlv)
 		ld h,b
 		ld l,c
 		or a
