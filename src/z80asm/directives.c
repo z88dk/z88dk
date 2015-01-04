@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.2 2015-01-03 18:39:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.3 2015-01-04 23:10:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -24,6 +24,31 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.2 2015-01-03 
 #include "errors.h"
 #include "types.h"
 #include "symtab.h"
+#include <assert.h>
+
+/*-----------------------------------------------------------------------------
+*   DEFGROUP
+*----------------------------------------------------------------------------*/
+
+static int DEFGROUP_PC;			/* next value to assign */
+
+/* start a new DEFGROUP context, give the value of the next defined constant */
+void defgroup_start(int next_value)
+{
+	DEFGROUP_PC = next_value;
+}
+
+/* define one constant with the next value, increment the value */
+void defgroup_define_const(char *name)
+{
+	assert(name != NULL);
+	
+	if (DEFGROUP_PC > 0xFFFF || DEFGROUP_PC < -0x8000)
+		error_int_range(DEFGROUP_PC);
+	else 
+		define_symbol(name, DEFGROUP_PC, TYPE_CONSTANT, 0);
+	DEFGROUP_PC++;
+}
 
 /*-----------------------------------------------------------------------------
 *   DEFVARS
@@ -60,15 +85,15 @@ void defvars_define_const(char *name, int elem_size, int count)
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
 
+	assert(name != NULL);
+
 	if (var_size > 0xFFFF)
 		error_int_range(var_size);
 	else if (next_pc > 0xFFFF)
 		error_int_range(next_pc);
 	else
 	{
-		if (name != NULL)
-			define_symbol(name, *DEFVARS_PC, TYPE_CONSTANT, 0);
-
+		define_symbol(name, *DEFVARS_PC, TYPE_CONSTANT, 0);
 		*DEFVARS_PC = next_pc;
 	}
 }

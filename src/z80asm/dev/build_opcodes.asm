@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.14 2015-01-03 18:39:06 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.15 2015-01-04 23:10:31 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -671,7 +671,7 @@ ENDIF
 ;------------------------------------------------------------------------------
 	defgroup 							;;	
 	{ 									;;
-		f0, f1,  						;;	
+		f0, f1  						;;	
 		f2, f3,  						;;	
 		f10 = 10,  						;;	
 		f11,  							;;	
@@ -679,6 +679,14 @@ ENDIF
 	} 									;;	
 	defb f0,f1,f2,f3,f10,f11,f20,f21	;; defb 0,1,2,3,10,11,20,21
 
+	defgroup 							;;	
+	{ 									;;
+		dg1, dg2 = 3					;;	
+		dg3 = 7,						;;
+	}			  						;;	
+	defb dg1,dg2,dg3					;; defb 0,3,7
+
+	; check with conditional assembly
 	if 1								;;	
 		defgroup 						;;	
 		{ 								;;	

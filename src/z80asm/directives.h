@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.2 2015-01-03 18:39:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.3 2015-01-04 23:10:30 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,3 +34,9 @@ extern void defvars_start(int start_addr);
 
 /* define one constant in the current context */
 extern void defvars_define_const(char *name, int elem_size, int count);
+
+/* start a new DEFGROUP context, give the value of the next defined constant */
+extern void defgroup_start(int next_value);
+
+/* define one constant with the next value, increment the value */
+extern void defgroup_define_const(char *name);

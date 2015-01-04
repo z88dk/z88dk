@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.22 2015-01-03 18:39:05 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.23 2015-01-04 23:10:30 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -68,11 +68,10 @@ static UT_array *state_stack;
 static int *stack, top;
 #endif
 
-/* Statement label, NULL if none */
-static char *stmt_label;
-
 /* current parser state machine */
-static enum { SM_MAIN, SM_DEFVARS_OPEN, SM_DEFVARS_LINE }
+static enum { SM_MAIN, 
+			  SM_DEFVARS_OPEN, SM_DEFVARS_LINE, 
+			  SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE }
 	current_sm = SM_MAIN;
 
 /*-----------------------------------------------------------------------------
@@ -314,7 +313,6 @@ Bool parse_statement(Bool compile_active)
 
 	save_scan_state();
 	{
-		stmt_label = NULL;
 		expr_value = 0;
 		expr_error = FALSE;
 		parse_ok = _parse_statement(compile_active);

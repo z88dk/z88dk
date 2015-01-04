@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.103 2015-01-03 18:39:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.104 2015-01-04 23:10:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -40,7 +40,6 @@ void ifndefstatement(enum flag interpret);
 void DEFS(void), INCLUDE(void), BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
 void INVOKE( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
-void DEFGROUP( void );
 void UNDEFINE( void );
 
 
@@ -73,7 +72,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( CALL_PKG ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
-    DEF_ENTRY( DEFGROUP ),
     DEF_ENTRY( DEFINE ),
     DEF_ENTRY( DEFL ),
     DEF_ENTRY( DEFM ),

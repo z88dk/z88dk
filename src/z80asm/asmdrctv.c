@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.112 2015-01-03 18:39:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.113 2015-01-04 23:10:30 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -47,85 +47,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 void DeclModuleName( void );
 void DEFINE( void );
 void UNDEFINE( void );
-
-
-void
-DEFGROUP( void )
-{
-    Expr *expr;
-    long constant, enumconst = 0;
-	DEFINE_STR( name, MAXLINE );
-
-    while ( sym.tok != TK_END && GetSym() != TK_LCURLY )
-    {
-        Skipline();
-        EOL = FALSE;
-    }
-
-    if ( sym.tok == TK_LCURLY )
-    {
-        while ( sym.tok != TK_END && sym.tok != TK_RCURLY )
-        {
-            if ( EOL )
-            {
-                EOL = FALSE;
-            }
-            else
-            {
-                do
-                {
-                    GetSym();
-
-                    switch ( sym.tok )
-                    {
-                    case TK_RCURLY:
-                    case TK_NEWLINE:
-                        break;
-
-                    case TK_NAME:
-						Str_set( name, sym.string );     /* remember name */
-
-                        if ( GetSym() == TK_EQUAL )
-                        {
-                            GetSym();
-
-                            if ( ( expr = expr_parse() ) != NULL )
-                            {
-                                if ( expr->result.not_evaluable )
-                                {
-                                    error_not_defined();
-                                }
-                                else
-                                {
-                                    constant = Expr_eval( expr );
-                                    enumconst = constant;
-                                    define_symbol( name->str, enumconst++, TYPE_CONSTANT, 0 );
-                                }
-
-                                OBJ_DELETE( expr );
-                            }
-
-                            /* BUG_0032 - removed: GetSym(); */
-                        }
-                        else
-                        {
-                            define_symbol( name->str, enumconst++, TYPE_CONSTANT, 0 );
-                        }
-
-                        break;
-
-                    default:
-						error_syntax();
-                        break;
-                    }
-                }
-                while ( sym.tok == TK_COMMA );   /* get enum definitions separated by comma in current line */
-
-                Skipline();   /* ignore rest of line */
-            }
-        }
-    }
-}
 
 
 void

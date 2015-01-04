@@ -1921,7 +1921,7 @@ jr2:
 ;------------------------------------------------------------------------------
                           defgroup
                           {
-                        f0, f1,
+                        f0, f1
                         f2, f3,
                         f10  = 10,
                         f11,
@@ -1930,6 +1930,13 @@ jr2:
                           defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
+                          defgroup
+                          {
+                        dg1, dg2  = 3
+                        dg3  = 7,
+                          }
+                          defb dg1,dg2,dg3
+                                        ;; 00 03 07
                           if   1
                         defgroup
                         {
@@ -2565,10 +2572,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD F9 08
-        cpir                            ;; CD 16 09
-        cpd                             ;; CD 42 09
-        cpdr                            ;; CD 5F 09
+        cpi                             ;; CD FC 08
+        cpir                            ;; CD 19 09
+        cpd                             ;; CD 45 09
+        cpdr                            ;; CD 62 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2997,8 +3004,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 8B 09
-        rrd                             ;; CD AD 09
+        rld                             ;; CD 8E 09
+        rrd                             ;; CD B0 09
 
 ;	# rotate 16 bits
 ;
@@ -3840,7 +3847,7 @@ jr2:
 ;------------------------------------------------------------------------------
                           defgroup
                           {
-                        f0, f1,
+                        f0, f1
                         f2, f3,
                         f10  = 10,
                         f11,
@@ -3849,6 +3856,13 @@ jr2:
                           defb f0,f1,f2,f3,f10,f11,f20,f21
                                         ;; 00 01 02 03 0A 0B 14 15
 
+                          defgroup
+                          {
+                        dg1, dg2  = 3
+                        dg3  = 7,
+                          }
+                          defb dg1,dg2,dg3
+                                        ;; 00 03 07
                           if   1
                         defgroup
                         {
@@ -3910,7 +3924,7 @@ nop:
 
                           invoke 0      ;; CD 00 00
                           invoke 1      ;; CD 01 00
-                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 1E 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 67 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 92 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD B4 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 21 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 6A 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 95 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD B7 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 

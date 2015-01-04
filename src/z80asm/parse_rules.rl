@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.29 2015-01-03 18:39:06 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.30 2015-01-04 23:10:31 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -172,19 +172,98 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.29 2015-01-
 			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
 	
 	/*---------------------------------------------------------------------
+	*   DEFGROUP
+	*--------------------------------------------------------------------*/
+	defgroup =
+		  _TK_DEFGROUP _TK_NEWLINE
+		  @{ defgroup_start(0);
+		     current_sm = SM_DEFGROUP_OPEN; }
+		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE
+		  @{ defgroup_start(0);
+		     current_sm = SM_DEFGROUP_LINE; }
+		;
+
+	defgroup_var_value =
+		  name _TK_EQUAL const_expr	
+		  %{ if (! expr_error) 
+				defgroup_start(expr_value);
+			 defgroup_define_const(name);
+		  };
+	
+	defgroup_var_next =
+		  name
+		  %{ defgroup_define_const(name); }
+		;
+
+	defgroup_var = defgroup_var_value | defgroup_var_next;
+	
+	defgroup_open :=
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_block(); }
+		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFGROUP_LINE; }
+		;
+	
+	defgroup_line := 
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_close_block(); }
+		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
+		| defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? _TK_NEWLINE
+		;
+	
+	/*---------------------------------------------------------------------
+	*   DEFVARS
+	*--------------------------------------------------------------------*/
+	defvars = 
+		  _TK_DEFVARS const_expr _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_start(expr_value);
+			 current_sm = SM_DEFVARS_OPEN;
+		  }
+		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_start(expr_value);
+			 current_sm = SM_DEFVARS_LINE;
+		  }
+		;
+		
+	defvars_open :=
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_block(); }
+		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFVARS_LINE; }
+		;
+		
+	defvars_line := 
+		  _TK_NEWLINE
+		| _TK_END 					@{ error_missing_close_block(); }
+		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
+		| name _TK_NEWLINE
+		  @{ defvars_define_const( name, 0, 0 ); }
+#foreach <S> in B, W, P, L
+		| name _TK_DS_<S> const_expr _TK_NEWLINE
+		  @{ if (! expr_error) 
+				defvars_define_const( name, DEFVARS_SIZE_<S>, expr_value ); 
+		  }
+#endfor  <S>
+		;
+
+	/*---------------------------------------------------------------------
+	*   ORG
+	*--------------------------------------------------------------------*/
+	org = _TK_ORG const_expr _TK_NEWLINE
+		  @{ if (!expr_error)
+				set_origin_directive(expr_value);
+		  };
+	
+	/*---------------------------------------------------------------------
 	*   assembly statement
 	*--------------------------------------------------------------------*/
 	main := 
 		  _TK_END
 		| _TK_NEWLINE
-		  
-		/*---------------------------------------------------------------------
-		*   ORG
-		*--------------------------------------------------------------------*/
-		| _TK_ORG const_expr _TK_NEWLINE
-		  @{ if (!expr_error)
-				set_origin_directive(expr_value);
-		  }
+		
+		| defgroup
+		| defvars
+		| org
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly
@@ -642,45 +721,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.29 2015-01-
 		  }
 #endfor  <OP>
 
-		/*---------------------------------------------------------------------
-		*   DEFVARS
-		*--------------------------------------------------------------------*/
-		| _TK_DEFVARS const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_start(expr_value);
-			 current_sm = SM_DEFVARS_OPEN;
-		  }
-		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_start(expr_value);
-			 current_sm = SM_DEFVARS_LINE;
-		  }
-
 		; /* end of main */
 		
-	/*---------------------------------------------------------------------
-	*   DEFVARS state machine
-	*--------------------------------------------------------------------*/
-	defvars_open :=
-		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_block(); }
-		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFVARS_LINE; }
-		;
-		
-	defvars_line := 
-		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_close_block(); }
-		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
-		| name _TK_NEWLINE
-		  @{ defvars_define_const( name, 0, 0 ); }
-#foreach <S> in B, W, P, L
-		| name _TK_DS_<S> const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_define_const( name, DEFVARS_SIZE_<S>, expr_value ); 
-		  }
-#endfor  <S>
-		;
-
 }%%
 
 %%write data;
@@ -693,7 +735,8 @@ static void _parse_init(void)
 static Bool _parse_statement(Bool compile_active)
 {
 	int start_num_errors;
-	char *name;
+	char *name = NULL;			/* identifier name */
+	char *stmt_label = NULL;	/* statement label, NULL if none */
 	
 	%%write init nocs;
 	switch (current_sm)
@@ -701,6 +744,8 @@ static Bool _parse_statement(Bool compile_active)
 	case SM_MAIN:			cs = parser_en_main; break;
 	case SM_DEFVARS_OPEN:	cs = parser_en_defvars_open; break;
 	case SM_DEFVARS_LINE:	cs = parser_en_defvars_line; break;
+	case SM_DEFGROUP_OPEN:	cs = parser_en_defgroup_open; break;
+	case SM_DEFGROUP_LINE:	cs = parser_en_defgroup_line; break;
 	default: assert(0);
 	}
 

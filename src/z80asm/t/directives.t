@@ -13,12 +13,53 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.3 2015-01-03 18:39:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.4 2015-01-04 23:10:31 pauloscustodio Exp $
 #
 # Test assembly directives
 
 use Modern::Perl;
 use t::TestZ80asm;
+
+#------------------------------------------------------------------------------
+# DEFGROUP - simple use tested in optcodes.t
+# test error messages here
+#------------------------------------------------------------------------------
+z80asm(
+	asm 	=> <<END,
+	defgroup {
+		dg1 = 65535
+		dg2	= 65536					;; error: integer '65536' out of range
+		dg3 = -32768
+		dg4 = -32769				;; error: integer '-32769' out of range
+		dg5 = undefined				;; error: symbol not defined
+	}
+END
+);
+
+z80asm(
+	asm 	=> <<END,
+	defgroup 
+END
+	error	=> "Error at file 'test.asm' line 2: missing {} block",
+);
+
+z80asm(
+	asm 	=> <<END,
+	defgroup {
+END
+	error	=> "Error at file 'test.asm' line 2: {} block not closed",
+);
+
+# BUG_0032 : DEFGROUP ignores name after assignment
+z80asm(
+	asm 	=> <<END,
+		defgroup
+		{
+			f10 = 10, f11
+		}
+		defb f10, f11		;; 0A 0B
+END
+);
 
 #------------------------------------------------------------------------------
 # DEFVARS - simple use tested in optcodes.t
