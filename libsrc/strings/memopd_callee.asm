@@ -28,7 +28,35 @@ LIB l_jpix, memops
    ret z
 
    push hl
+
+IF FORrcmx000
+
+   push ix
+   pop hl
    
+   ld a,h
+   or a
+   jr nz, func_enter
+   
+   ld a,h
+   cp 10
+   jr nc, func_enter
+   
+   add a,a
+   add a,memops%256
+   ld h,a
+   ld a,0
+   adc a,memops/256
+   ld l,a
+
+   push hl
+   pop ix
+   
+   pop hl
+   push hl
+   
+ELSE
+
    ld a,ixh
    or a
    jr nz, func
@@ -43,6 +71,8 @@ LIB l_jpix, memops
    ld a,0
    adc a,memops/256
    ld ixh,a
+
+ENDIF
 
    ; ix = addr of op function
    
@@ -67,6 +97,16 @@ LIB l_jpix, memops
    
    pop hl
    ret
+
+IF FORrcmx000
+
+.func_enter
+
+   pop hl
+   push hl
+
+ENDIF
+
 
 .func
 
