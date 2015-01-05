@@ -1831,6 +1831,72 @@ jr2:
                       endif
 
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+                      defgroup
+                      {
+                    f0, f1
+                    f2, f3,
+                    f10  = 10,
+                    f11,
+                    f20  = 20, f21
+                      }
+                      defb f0,f1,f2,f3,f10,f11,f20,f21
+                                        ;; 00 01 02 03 0A 0B 14 15
+
+                      defgroup
+                      {
+                    dg1, dg2  = 3
+                    dg3  = 7,
+                      }
+                      defb dg1,dg2,dg3  ;; 00 03 07
+
+                                        ; check with conditional assembly
+                      if   1
+                    defgroup
+                    {
+                  ff   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  ff   = 2
+                    }
+                      endif
+                      if   0
+                    defgroup
+                    {
+                  fg   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  fg   = 2
+                    }
+                      endif
+                      defb ff, fg       ;; 01 02
+
+;------------------------------------------------------------------------------
+; DEFS
+;------------------------------------------------------------------------------
+                      defs 0
+                      defs 1            ;; 00
+                      defs 2            ;; 00 00
+                      defs 3            ;; 00 00 00
+                      defs 4            ;; 00 00 00 00
+
+                      defs 2,-128       ;; 80 80
+                      defs 2,-127       ;; 81 81
+                      defs 2,0          ;; 00 00
+                      defs 2,255        ;; FF FF
+
+                      if   0
+                    defs 2,0
+                      else
+                    defs 2,2            ;; 02 02
+                      endif
+
+;------------------------------------------------------------------------------
 ; DEFVARS
 ;------------------------------------------------------------------------------
                       defc defvars_base = 0x80
@@ -1915,51 +1981,6 @@ jr2:
                           endif
                           defb df30, df31
                                         ;; 00 02
-
-;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-                          defgroup
-                          {
-                        f0, f1
-                        f2, f3,
-                        f10  = 10,
-                        f11,
-                        f20  = 20, f21
-                          }
-                          defb f0,f1,f2,f3,f10,f11,f20,f21
-                                        ;; 00 01 02 03 0A 0B 14 15
-
-                          defgroup
-                          {
-                        dg1, dg2  = 3
-                        dg3  = 7,
-                          }
-                          defb dg1,dg2,dg3
-                                        ;; 00 03 07
-                          if   1
-                        defgroup
-                        {
-                      ff   = 1
-                        }
-                          else
-                        defgroup
-                        {
-                      ff   = 2
-                        }
-                          endif
-                          if   0
-                        defgroup
-                        {
-                      fg   = 1
-                        }
-                          else
-                        defgroup
-                        {
-                      fg   = 2
-                        }
-                          endif
-                          defb ff, fg   ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
@@ -2090,6 +2111,13 @@ z80asm(
         ifdef 1                         ;; error: syntax error
         ifndef                          ;; error: syntax error
         ifndef 1                        ;; error: syntax error
+ds:     defs not_defined                ;; error: symbol not defined
+                                        ; BUG_0007
+        defs -1                         ;; error: integer '-1' out of range
+        defs 65537                      ;; error: integer '65537' out of range
+        defs 2,not_defined              ;; error: symbol not defined
+        defs 2,-129                     ;; error: integer '-129' out of range
+        defs 2,256                      ;; error: integer '256' out of range
         out  N,a                        ;; error: syntax error
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
@@ -2572,10 +2600,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD FC 08
-        cpir                            ;; CD 19 09
-        cpd                             ;; CD 45 09
-        cpdr                            ;; CD 62 09
+        cpi                             ;; CD 10 09
+        cpir                            ;; CD 2D 09
+        cpd                             ;; CD 59 09
+        cpdr                            ;; CD 76 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -3004,8 +3032,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 8E 09
-        rrd                             ;; CD B0 09
+        rld                             ;; CD A2 09
+        rrd                             ;; CD C4 09
 
 ;	# rotate 16 bits
 ;
@@ -3757,6 +3785,72 @@ jr2:
                       endif
 
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+                      defgroup
+                      {
+                    f0, f1
+                    f2, f3,
+                    f10  = 10,
+                    f11,
+                    f20  = 20, f21
+                      }
+                      defb f0,f1,f2,f3,f10,f11,f20,f21
+                                        ;; 00 01 02 03 0A 0B 14 15
+
+                      defgroup
+                      {
+                    dg1, dg2  = 3
+                    dg3  = 7,
+                      }
+                      defb dg1,dg2,dg3  ;; 00 03 07
+
+                                        ; check with conditional assembly
+                      if   1
+                    defgroup
+                    {
+                  ff   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  ff   = 2
+                    }
+                      endif
+                      if   0
+                    defgroup
+                    {
+                  fg   = 1
+                    }
+                      else
+                    defgroup
+                    {
+                  fg   = 2
+                    }
+                      endif
+                      defb ff, fg       ;; 01 02
+
+;------------------------------------------------------------------------------
+; DEFS
+;------------------------------------------------------------------------------
+                      defs 0
+                      defs 1            ;; 00
+                      defs 2            ;; 00 00
+                      defs 3            ;; 00 00 00
+                      defs 4            ;; 00 00 00 00
+
+                      defs 2,-128       ;; 80 80
+                      defs 2,-127       ;; 81 81
+                      defs 2,0          ;; 00 00
+                      defs 2,255        ;; FF FF
+
+                      if   0
+                    defs 2,0
+                      else
+                    defs 2,2            ;; 02 02
+                      endif
+
+;------------------------------------------------------------------------------
 ; DEFVARS
 ;------------------------------------------------------------------------------
                       defc defvars_base = 0x80
@@ -3843,51 +3937,6 @@ jr2:
                                         ;; 00 02
 
 ;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-                          defgroup
-                          {
-                        f0, f1
-                        f2, f3,
-                        f10  = 10,
-                        f11,
-                        f20  = 20, f21
-                          }
-                          defb f0,f1,f2,f3,f10,f11,f20,f21
-                                        ;; 00 01 02 03 0A 0B 14 15
-
-                          defgroup
-                          {
-                        dg1, dg2  = 3
-                        dg3  = 7,
-                          }
-                          defb dg1,dg2,dg3
-                                        ;; 00 03 07
-                          if   1
-                        defgroup
-                        {
-                      ff   = 1
-                        }
-                          else
-                        defgroup
-                        {
-                      ff   = 2
-                        }
-                          endif
-                          if   0
-                        defgroup
-                        {
-                      fg   = 1
-                        }
-                          else
-                        defgroup
-                        {
-                      fg   = 2
-                        }
-                          endif
-                          defb ff, fg   ;; 01 02
-
-;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
@@ -3924,7 +3973,7 @@ nop:
 
                           invoke 0      ;; CD 00 00
                           invoke 1      ;; CD 01 00
-                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 21 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 6A 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD 95 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD B7 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 35 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 7E 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD A9 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD CB 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -4170,6 +4219,13 @@ z80asm(
         ifdef 1                         ;; error: syntax error
         ifndef                          ;; error: syntax error
         ifndef 1                        ;; error: syntax error
+ds:     defs not_defined                ;; error: symbol not defined
+                                        ; BUG_0007
+        defs -1                         ;; error: integer '-1' out of range
+        defs 65537                      ;; error: integer '65537' out of range
+        defs 2,not_defined              ;; error: symbol not defined
+        defs 2,-129                     ;; error: integer '-129' out of range
+        defs 2,256                      ;; error: integer '256' out of range
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range

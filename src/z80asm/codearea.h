@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.36 2015-01-02 14:36:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.37 2015-01-05 23:34:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -143,6 +143,8 @@ extern void append_word( int word );
 
 extern void  patch_long( UInt addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
+
+extern void append_defs(UInt num_bytes, Byte fill);
 
 /* advance code pointer reserving space, return address of start of buffer */
 extern Byte *append_reserve( UInt num_bytes );	

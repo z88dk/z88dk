@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.30 2015-01-04 23:10:31 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-05 23:34:02 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -211,6 +211,21 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.30 2015-01-
 		;
 	
 	/*---------------------------------------------------------------------
+	*   DEFS
+	*--------------------------------------------------------------------*/
+	defs = 
+		  label? _TK_DEFS const_expr _TK_NEWLINE 
+		  @{ DO_STMT_LABEL(); 
+		     if (compile_active && ! expr_error) defs(expr_value, 0); }
+		| label? _TK_DEFS 
+				const_expr _TK_COMMA
+				@{ value1 = expr_error ? 0 : expr_value; }
+				const_expr _TK_NEWLINE
+		  @{ DO_STMT_LABEL(); 
+		     if (compile_active && ! expr_error) defs(value1, expr_value); }
+		;			     
+		
+	/*---------------------------------------------------------------------
 	*   DEFVARS
 	*--------------------------------------------------------------------*/
 	defvars = 
@@ -262,6 +277,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.30 2015-01-
 		| _TK_NEWLINE
 		
 		| defgroup
+		| defs
 		| defvars
 		| org
 		
@@ -734,9 +750,10 @@ static void _parse_init(void)
 
 static Bool _parse_statement(Bool compile_active)
 {
-	int start_num_errors;
+	int start_num_errors = get_num_errors();;
 	char *name = NULL;			/* identifier name */
 	char *stmt_label = NULL;	/* statement label, NULL if none */
+	int value1 = 0;
 	
 	%%write init nocs;
 	switch (current_sm)
@@ -751,7 +768,6 @@ static Bool _parse_statement(Bool compile_active)
 
 	p = pe = eof = NULL;
 	
-	start_num_errors = get_num_errors();
 	while ( eof == NULL || eof != pe )
 	{
 		read_token();

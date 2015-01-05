@@ -15,11 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.3 2015-01-04 23:10:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.4 2015-01-05 23:34:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
 
+#include "codearea.h"
 #include "directives.h"
 #include "errors.h"
 #include "types.h"
@@ -48,6 +49,21 @@ void defgroup_define_const(char *name)
 	else 
 		define_symbol(name, DEFGROUP_PC, TYPE_CONSTANT, 0);
 	DEFGROUP_PC++;
+}
+
+/*-----------------------------------------------------------------------------
+*   DEFS
+*----------------------------------------------------------------------------*/
+
+/* create a block of empty bytes, called by the DEFS directive */
+void defs(int count, int fill)
+{
+	if (count < 0 || count > 0x10000)
+		error_int_range(count);
+	else if (fill < -128 || fill > 255)
+		error_int_range(fill);
+	else
+		append_defs(count, fill);
 }
 
 /*-----------------------------------------------------------------------------

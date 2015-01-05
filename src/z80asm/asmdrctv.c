@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.113 2015-01-04 23:10:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.114 2015-01-05 23:34:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -48,69 +48,6 @@ void DeclModuleName( void );
 void DEFINE( void );
 void UNDEFINE( void );
 
-
-void
-DEFS()
-{
-    Expr *expr;
-    Expr *constexpr;
-
-    long constant = 0, val = 0;
-
-    GetSym();                     /* get numerical expression */
-
-    if ( ( expr = expr_parse() ) != NULL )
-    {
-        /* expr. must not be stored in relocatable file */
-        if ( expr->result.not_evaluable )
-        {
-            /* BUG_0007 : memory leaks - was not being released in case of error */
-            OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
-            error_not_defined();
-        }
-        else
-        {
-            constant = Expr_eval( expr );
-            OBJ_DELETE( expr ); /* remove linked list, expression evaluated */
-
-            if ( sym.tok != TK_COMMA )
-            {
-                val = 0;
-            }
-            else
-            {
-                GetSym();
-
-                if ( ( constexpr = expr_parse() ) != NULL )
-                {
-                    if ( constexpr->result.not_evaluable )
-                    {
-                        error_not_defined();
-                    }
-                    else
-                    {
-                        val = Expr_eval( constexpr );
-                    }
-
-                    OBJ_DELETE( constexpr );
-                }
-            }
-
-            if ( constant >= 0 )
-            {
-                while ( constant-- )
-                {
-                    append_byte( (Byte) val );
-                }
-            }
-            else
-            {
-                error_int_range( constant );
-                return;
-            }
-        }
-    }
-}
 
 void
 UNDEFINE( void )

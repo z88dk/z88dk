@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.3 2015-01-04 23:10:30 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.4 2015-01-05 23:34:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -40,3 +40,6 @@ extern void defgroup_start(int next_value);
 
 /* define one constant with the next value, increment the value */
 extern void defgroup_define_const(char *name);
+
+/* create a block of empty bytes, called by the DEFS directive */
+extern void defs(int count, int fill);

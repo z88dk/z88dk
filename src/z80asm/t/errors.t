@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.28 2015-01-03 18:39:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.29 2015-01-05 23:34:03 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -304,42 +304,7 @@ t_binary(read_binfile(bin_file()), pack("C*",
 
 # defvar out of range - tested in directives.t
 
-# defs out of range
-t_z80asm(
-	asm		=> "defs -1",
-	err		=> "Error at file 'test.asm' line 1: integer '-1' out of range",
-);
-
-t_z80asm(
-	asm		=> "defs 0",
-	bin		=> "",
-);
-
-t_z80asm(
-	asm		=> "defs 1",
-	bin		=> "\x00",
-);
-
-t_z80asm(
-	asm		=> "defs 1, 0xAA",
-	bin		=> "\xAA",
-);
-
-t_z80asm(
-	asm		=> "defs 65536",
-	bin		=> "\x00" x 65536,
-);
-
-t_z80asm(
-	asm		=> "defs 65536,0xAA",
-	bin		=> "\xAA" x 65536,
-);
-
-t_z80asm(
-	asm		=> "defs 65537",
-	err		=> "Error at file 'test.asm' line 1: max. code size of 65536 bytes reached",
-);
-
+# defs out of range - tested in opcodes.t
 
 # org out of range
 t_z80asm(
@@ -484,10 +449,6 @@ t_z80asm_ok(0, "defs 65532, 0xAA \n defw 0xAAAA, 0xAAAA \n",
 	    "\xAA" x 65536);
 t_z80asm_error("defs 65533, 0xAA \n defw 0xAAAA, 0xAAAA \n",
 	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-# DEFS
-t_z80asm_ok(0, "defs 65536,0xAA", "\xAA" x 65536);
-t_z80asm_error("defs 65537,0xAA", "Error at file 'test.asm' line 1: max. code size of 65536 bytes reached");
 
 # DEFP
 t_z80asm_ok(0, "defs 65533, 0xAA \n defp 0xAAAA,0xAA \n",

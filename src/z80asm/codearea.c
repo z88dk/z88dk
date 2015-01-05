@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.48 2015-01-02 14:36:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.49 2015-01-05 23:34:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -454,6 +454,12 @@ void append_2bytes( Byte byte1, Byte byte2 )
 {
 	append_value( byte1, 1 );
 	append_value( byte2, 1 );
+}
+
+void append_defs(UInt num_bytes, Byte fill)
+{
+	while (num_bytes-- > 0)
+		append_byte(fill);
 }
 
 /* advance code pointer reserving space, return address of start of buffer */

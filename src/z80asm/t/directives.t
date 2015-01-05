@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.4 2015-01-04 23:10:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.5 2015-01-05 23:34:03 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -21,7 +21,7 @@ use Modern::Perl;
 use t::TestZ80asm;
 
 #------------------------------------------------------------------------------
-# DEFGROUP - simple use tested in optcodes.t
+# DEFGROUP - simple use tested in opcodes.t
 # test error messages here
 #------------------------------------------------------------------------------
 z80asm(
@@ -62,7 +62,32 @@ END
 );
 
 #------------------------------------------------------------------------------
-# DEFVARS - simple use tested in optcodes.t
+# DEFS - simple use tested in opcodes.t
+# test error messages here
+#------------------------------------------------------------------------------
+z80asm(
+	asm		=> <<END,
+		defs 65536
+END
+	bin		=> "\x00" x 65536,
+);
+z80asm(
+	asm		=> <<END,
+		defb 0
+		defs 65535
+END
+	bin		=> "\x00" x 65536,
+);
+z80asm(
+	asm		=> <<END,
+		defb 0
+		defs 65536			;; error: max. code size of 65536 bytes reached
+END
+);
+
+
+#------------------------------------------------------------------------------
+# DEFVARS - simple use tested in opcodes.t
 # test multi-file and error messages here
 #------------------------------------------------------------------------------
 z80asm(
@@ -142,6 +167,15 @@ z80asm(
 	defvars 0 {
 END
 	error	=> "Error at file 'test.asm' line 2: {} block not closed",
+);
+
+z80asm(
+	asm 	=> <<END,
+	defvars undefined					;; error: symbol not defined
+	{
+		df2	ds.l 1
+	}
+END
 );
 
 # BUG_0051: DEFC and DEFVARS constants do not appear in map file

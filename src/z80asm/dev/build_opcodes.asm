@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.15 2015-01-04 23:10:31 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.16 2015-01-05 23:34:02 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -588,6 +588,77 @@ ENDIF
 	endif								;;
 	
 ;------------------------------------------------------------------------------
+; DEFGROUP
+;------------------------------------------------------------------------------
+	defgroup 							;;	
+	{ 									;;
+		f0, f1  						;;	
+		f2, f3,  						;;	
+		f10 = 10,  						;;	
+		f11,  							;;	
+		f20 = 20, f21					;;	
+	} 									;;	
+	defb f0,f1,f2,f3,f10,f11,f20,f21	;; defb 0,1,2,3,10,11,20,21
+
+	defgroup 							;;	
+	{ 									;;
+		dg1, dg2 = 3					;;	
+		dg3 = 7,						;;
+	}			  						;;	
+	defb dg1,dg2,dg3					;; defb 0,3,7
+
+	; check with conditional assembly
+	if 1								;;	
+		defgroup 						;;	
+		{ 								;;	
+			ff = 1						;;	
+		}								;;	
+	else								;;	
+		defgroup 						;;	
+		{								;;	
+			ff = 2						;;	
+		}								;;	
+	endif								;;	
+	if 0								;;	
+		defgroup 						;;	
+		{ 								;;	
+			fg = 1						;;	
+		}								;;	
+	else								;;	
+		defgroup 						;;	
+		{								;;	
+			fg = 2						;;	
+		}								;;	
+	endif								;;		
+	defb ff, fg							;; defb 1, 2
+
+;------------------------------------------------------------------------------
+; DEFS
+;------------------------------------------------------------------------------
+ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
+	defs -1								;; error: integer '-1' out of range
+	defs 0								;;
+	defs 1								;; defb 0
+	defs 2								;; defb 0,0
+	defs 3								;; defb 0,0,0
+	defs 4								;; defb 0,0,0,0
+	defs 65537							;; error: integer '65537' out of range
+	
+	defs 2,not_defined					;; error: symbol not defined
+	defs 2,-129							;; error: integer '-129' out of range
+	defs 2,-128							;; defb 80h,80h
+	defs 2,-127							;; defb 81h,81h
+	defs 2,0							;; defb 0,0
+	defs 2,255							;; defb 0FFh,0FFh
+	defs 2,256							;; error: integer '256' out of range
+	
+	if 0								;;
+		defs 2,0						;;
+	else								;;
+		defs 2,2						;; defb 2,2
+	endif								;;
+
+;------------------------------------------------------------------------------
 ; DEFVARS
 ;------------------------------------------------------------------------------
 	defc defvars_base = 0x80			;;
@@ -666,51 +737,6 @@ ENDIF
 	endif								;;
 	defb df30, df31						;; defb 0, 2
 	
-;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-	defgroup 							;;	
-	{ 									;;
-		f0, f1  						;;	
-		f2, f3,  						;;	
-		f10 = 10,  						;;	
-		f11,  							;;	
-		f20 = 20, f21					;;	
-	} 									;;	
-	defb f0,f1,f2,f3,f10,f11,f20,f21	;; defb 0,1,2,3,10,11,20,21
-
-	defgroup 							;;	
-	{ 									;;
-		dg1, dg2 = 3					;;	
-		dg3 = 7,						;;
-	}			  						;;	
-	defb dg1,dg2,dg3					;; defb 0,3,7
-
-	; check with conditional assembly
-	if 1								;;	
-		defgroup 						;;	
-		{ 								;;	
-			ff = 1						;;	
-		}								;;	
-	else								;;	
-		defgroup 						;;	
-		{								;;	
-			ff = 2						;;	
-		}								;;	
-	endif								;;	
-	if 0								;;	
-		defgroup 						;;	
-		{ 								;;	
-			fg = 1						;;	
-		}								;;	
-	else								;;	
-		defgroup 						;;	
-		{								;;	
-			fg = 2						;;	
-		}								;;	
-	endif								;;		
-	defb ff, fg							;; defb 1, 2
-
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
