@@ -118,16 +118,32 @@ char_defined:
    ;  e = kern
    ;  a'= font height
    ; stack = tracking, & bitmap
-   
-   xor a
-   
-   rld
-   push af                     ; save shift
 
-   rld
+; Unfortunately Einar's trick here requires the
+; font to be writable which means fonts cannot sit
+; in a rom section and they are not MT safe.
+;
+;   xor a
+;   
+;   rld
+;   push af                     ; save shift
+;
+;   rld
+;   ld c,a                      ; c = width - 1
+;
+;   rld                         ; restore shift_width_1
+
+   ld a,(hl)
+   and $0f
    ld c,a                      ; c = width - 1
-
-   rld                         ; restore shift_width_1
+   
+   ld a,(hl)
+   rra
+   rra
+   rra
+   rra
+   and $0f
+   push af                     ; save vertical shift
 
    ; ix = struct fzx_state *
    ; hl = & fzx_char.shift_width_1
