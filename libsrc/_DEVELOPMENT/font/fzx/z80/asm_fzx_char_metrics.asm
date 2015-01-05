@@ -1,4 +1,6 @@
 
+; void fzx_char_metrics(struct fzx_font *ff, struct fzx_cmetric *fm, int c)
+
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_char_metrics
@@ -48,7 +50,7 @@ asm_fzx_char_metrics:
    
    rld
    
-   pop af
    pop hl
+   pop af
    
    ret

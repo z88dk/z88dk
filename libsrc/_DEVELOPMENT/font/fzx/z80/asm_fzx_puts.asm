@@ -1,4 +1,6 @@
 
+; int fzx_puts(struct fzx_state *fs, char *s)
+
 INCLUDE "clib_cfg.asm"
 
 SECTION code_font_fzx
@@ -22,12 +24,12 @@ asm_fzx_puts:
    ;            de = & terminating NUL in s
    ;            carry reset
    ;
-   ;         fail if can't fit window
+   ;         fail if can't fit window vertically
    ;
    ;            de = & next char in s
    ;            carry set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, af'
    
    ld hl,0                     ; number of chars written
 

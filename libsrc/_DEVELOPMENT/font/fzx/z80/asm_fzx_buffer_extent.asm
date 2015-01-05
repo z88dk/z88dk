@@ -1,4 +1,6 @@
 
+; uint16_t fzx_buffer_extent(struct fzx_font *ff, char *buf, uint16_t buflen)
+
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_buffer_extent
@@ -25,7 +27,7 @@ asm_fzx_buffer_extent:
    or c
    jp z, error_znc             ; if empty buffer
 
-   inc hl                      ; hl = & fzx_font_tracking
+   inc hl                      ; hl = & fzx_font.tracking
    
    push hl
    ld hl,0
@@ -78,5 +80,7 @@ no_inc:
    
    pop hl                      ; hl = extent
    
+   scf
    sbc hl,bc
+   
    ret

@@ -1,4 +1,6 @@
 
+; void fzx_state_init(struct fzx_state *fs, struct fzx_font *ff, struct r_Rect16 *window)
+
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_state_init

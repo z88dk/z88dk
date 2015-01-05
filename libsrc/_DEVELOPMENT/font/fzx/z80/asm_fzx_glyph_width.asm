@@ -1,4 +1,6 @@
 
+; uint16_t fzx_glyph_width(struct fzx_font *ff, int c)
+
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_glyph_width

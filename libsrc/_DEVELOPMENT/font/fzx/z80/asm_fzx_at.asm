@@ -1,4 +1,6 @@
 
+; void fzx_at(struct fzx_state *fs, uint16_t x, uint16_t y)
+
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_at
@@ -65,7 +67,7 @@ x_ok:
    sbc hl,bc
    add hl,bc
    
-   jr c, y_ok
+   jr nc, y_ok
    
    ld c,l
    ld b,h                      ; bc = window.height - 1

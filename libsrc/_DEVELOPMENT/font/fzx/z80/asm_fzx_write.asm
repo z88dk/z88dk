@@ -1,4 +1,6 @@
 
+; int fzx_write(struct fzx_state *fs, char *buf, uint16_t buflen)
+
 INCLUDE "clib_cfg.asm"
 
 SECTION code_font_fzx
@@ -28,9 +30,13 @@ asm_fzx_write:
    ;            de = & next buffer char to output
    ;            carry set
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, af'
 
    ld hl,0                     ; number of chars written
+
+   ld a,b
+   or c
+   ret z
 
 loop:
 

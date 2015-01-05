@@ -1,4 +1,6 @@
 
+; int fzx_putc(struct fzx_state *fs, int c)
+
 ; ===============================================================
 ; FZX driver - Copyright (c) 2013 Einar Saukas
 ; FZX format - Copyright (c) 2013 Andrew Owen
@@ -74,23 +76,17 @@ char_defined:
 
    inc hl
 
-   ; hl = & first fzx_char (code 32)
+   ; hl = struct fzx_char * (code 32)
    ; ix = struct fzx_state *
    ;  a = char-32
    ;  a'= font height
    ; stack = tracking
    
-   ld c,l
-   ld b,h
+   ld c,a
+   ld b,0
    
-   ld l,a
-   ld h,0
-   
-   ld e,l
-   ld d,h
-   
-   add hl,hl
-   add hl,de
+   add hl,bc
+   add hl,bc
    add hl,bc                   ; hl = struct fzx_char *
    
    ; hl = struct fzx_char *
@@ -129,7 +125,7 @@ char_defined:
    push af                     ; save shift
 
    rld
-   ld c,a                      ; c = a = width - 1
+   ld c,a                      ; c = width - 1
 
    rld                         ; restore shift_width_1
 
@@ -214,8 +210,16 @@ width_adequate:
    add a,h
    jr c, y_too_large           ; if glyph exceeds bottom edge of window
    
+   dec a
    cp (ix+15)
-   jr nc, y_too_large          ; if glyph exceeds bottom edge of window
+   
+   jr c, height_adequate
+   
+   ld a,(ix+16)
+   or a
+   jr z, y_too_large           ; if glyph exceeds bottom edge of window 
+
+height_adequate:
    
    pop af                      ; a = vertical shift
    
@@ -361,7 +365,7 @@ rotate_bitmap:
    jr z, no_rotate
 
    push bc                     ; save row count until next attr
-   ld b,a                      ; b = shift amount
+   ld b,a                      ; b = rotate amount
    
    ex af,af'
 
