@@ -4,113 +4,149 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <rect.h>
 
 // DATA STRUCTURES
 
-struct fzx_char                     // FONT'S CHAR DESCRIPTOR
+struct fzx_font
 {
-
-   uint16_t             kern_offset;    // kern in bits 15..14, offset to bitmap from fzx_char address
-   uint8_t              shift_width_1;  // shift in bits 7..4, width-1 in bits 3..0
-
+   uint8_t   height;                   // pixel height of font
+   uint8_t   tracking;                 // horizontal gap between chars in pixels
+   uint8_t   last_char;                // last defined char in bitmap 32..255
 };
 
-struct fzx_font                     // FONT STRUCTURE
+struct fzx_char
 {
-
-   uint8_t              height;         // row height in pixels
-   uint8_t              tracking;       // horizontal gap between chars in pixels
-   uint8_t              last_char;      // last defined char bitmap, in 32..255
-
+   uint16_t  kern_offset;              // kern in bits 15..14, offset to char bitmap
+   uint8_t   shift_width_1;            // vertical shift in bits 7..4, width-1 in bits 3..0
 };
 
-// FZX_FONT_BITMAP returns a struct_fzx_char array for the font that is indexed by ascii code
-// fzx fonts only define bitmaps for ascii codes >= 32 and up to some maximum code defined in the font structure
-
-#define FZX_FONT_BITMAP(font) ((struct fzx_char *)((char *)(font) + sizeof(struct fzx_font) - sizeof(struct fzx_char)*32))
-
-struct fzx_cmetric                  // FONT CHARACTER METRICS
+struct fzx_cmetric
 {
+   uint8_t   kern;                     // num pixels to leftshift rendered char within string, 0-3
+   uint8_t   width;                    // width of glyph, 1-16
+   uint8_t   shift;                    // num pixels to downshift rendered char from top of line, 0-15
+   uint8_t  *bitmap;                   // address of glyph bitmap
+};
 
-   uint8_t              kern;           // num pixels to leftshift rendered char within string, 0-3
-   uint8_t              width;          // width of glyph, 1-16
-   uint8_t              shift;          // num pixels to downshift rendered char from top of line, 0-15
-   void                *bitmap;         // address of glyph bitmap
+struct fzx_state
+{
+   uint8_t          jp;                // 195 = z80 jump instruction
+   void            *fzx_draw;          // address of fzx_draw function
+   struct fzx_font *font;              // selected font
+   uint16_t         x;                 // x coordinate in pixels
+   uint16_t         y;                 // y coordinate in pixels
+   struct r_Rect16  window;            // display area units in pixels
+   uint16_t         left_margin;       // left margin in pixels
    
+   // zx spectrum only below (temporary declaration here)
+   
+   uint8_t          fgnd_attr;         // text colour
+   uint8_t          fgnd_mask;         // set bits indicate kept background attribute bits
 };
 
-struct fzx_state                    // FZX STATE
-{
+// FZX DRAW MODES
 
-   struct fzx_font     *font;           // current font
-   uint8_t              lm;             // left margin in pixels
-   uint8_t              flags;          // reserved, set to 0 to reset
-   uint8_t              x;              // current x coordinate in pixels
-   uint8_t              y;              // current y coordinate in pixels
+extern void _fzx_draw_cpl(void);       // INVERT fzx pixels before ORing into display
+extern void _fzx_draw_or(void);        // OR fzx pixels into display
+extern void _fzx_draw_reset(void);     // CLEAR display where fzx pixels are set
+extern void _fzx_draw_xor(void);       // XOR fzx pixels into display
 
-};
-
-extern struct fzx_state fzx;
-
-#define FZX_MODE_OR    0xb600
-#define FZX_MODE_XOR   0xae00
-#define FZX_MODE_RESET 0xa62f
+// FUNCTIONS
 
 #ifdef __SDCC
 
 // SDCC
 
-extern uint16_t   fzx_buffer_extent(void *buf, size_t len);
-extern char      *fzx_buffer_partition(void *buf, size_t len, uint16_t width);
-extern char      *fzx_buffer_partition_ww(void *buf, size_t len, uint16_t width);
-extern int        fzx_char_metrics(struct fzx_cmetric *m, char c);
-extern int        fzx_mode(int mode);
-extern int        fzx_putc(char c);
-extern int        fzx_puts(char *s);
-extern int        fzx_setat(uint16_t y, uint16_t x);
-extern uint16_t   fzx_string_extent(char *s);
-extern char      *fzx_string_partition(char *s, uint16_t width);
-extern char      *fzx_string_partition_ww(char *s, uint16_t width);
-extern int        fzx_write(void *buf, size_t len);
+extern void      fzx_state_init(struct fzx_state *fs, struct fzx_font *ff, struct r_Rect16 *window);
+
+extern void      fzx_at(struct fzx_state *fs, uint16_t x, uint16_t y);
+extern int       fzx_putc(struct fzx_state *fs, int c);
+
+extern char     *fzx_char_metrics(struct fzx_font *ff, struct fzx_cmetric *fm, int c);
+extern uint16_t  fzx_glyph_width(struct fzx_font *ff, int c);
+
+extern uint16_t  fzx_string_extent(struct fzx_font *ff, char *s);
+extern char     *fzx_string_partition(struct fzx_font *ff, char *s, uint16_t allowed_width);
+extern char     *fzx_string_partition_ww(struct fzx_font *ff, char *s, uint16_t allowed_width);
+
+extern uint16_t  fzx_buffer_extent(struct fzx_font *ff, char *buf, uint16_t buflen);
+extern char     *fzx_buffer_partition(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+extern char     *fzx_buffer_partition_ww(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+
+extern int       fzx_puts(struct fzx_state *fs, char *s);
+extern int       fzx_puts_justified(struct fzx_state *fs, char *s, uint16_t allowed_width);
+
+extern int       fzx_write(struct fzx_state *fs, char *buf, uint16_t buflen);
+extern int       fzx_write_justified(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width);
 
 #else
 
 // SCCZ80
 
-extern uint16_t   __LIB__               fzx_buffer_extent(void *buf, size_t len);
-extern char       __LIB__              *fzx_buffer_partition(void *buf, size_t len, uint16_t width);
-extern char       __LIB__              *fzx_buffer_partition_ww(void *buf, size_t len, uint16_t width);
-extern int        __LIB__               fzx_char_metrics(struct fzx_cmetric *m, char c);
-extern int        __LIB__ __FASTCALL__  fzx_mode(int mode);
-extern int        __LIB__ __FASTCALL__  fzx_putc(char c);
-extern int        __LIB__ __FASTCALL__  fzx_puts(char *s);
-extern int        __LIB__               fzx_setat(uint16_t y, uint16_t x);
-extern uint16_t   __LIB__ __FASTCALL__  fzx_string_extent(char *s);
-extern char       __LIB__              *fzx_string_partition(char *s, uint16_t width);
-extern char       __LIB__              *fzx_string_partition_ww(char *s, uint16_t width);
-extern int        __LIB__               fzx_write(void *buf, size_t len);
+extern void     __LIB__             fzx_state_init(struct fzx_state *fs, struct fzx_font *ff, struct r_Rect16 *window);
+
+extern void     __LIB__             fzx_at(struct fzx_state *fs, uint16_t x, uint16_t y);
+extern int      __LIB__             fzx_putc(struct fzx_state *fs, int c);
+
+extern char     __LIB__            *fzx_char_metrics(struct fzx_font *ff, struct fzx_cmetric *fm, int c);
+extern uint16_t __LIB__             fzx_glyph_width(struct fzx_font *ff, int c);
+
+extern uint16_t __LIB__             fzx_string_extent(struct fzx_font *ff, char *s);
+extern char     __LIB__            *fzx_string_partition(struct fzx_font *ff, char *s, uint16_t allowed_width);
+extern char     __LIB__            *fzx_string_partition_ww(struct fzx_font *ff, char *s, uint16_t allowed_width);
+
+extern uint16_t __LIB__             fzx_buffer_extent(struct fzx_font *ff, char *buf, uint16_t buflen);
+extern char     __LIB__            *fzx_buffer_partition(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+extern char     __LIB__            *fzx_buffer_partition_ww(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+
+extern int      __LIB__             fzx_puts(struct fzx_state *fs, char *s);
+extern int      __LIB__             fzx_puts_justified(struct fzx_state *fs, char *s, uint16_t allowed_width);
+
+extern int      __LIB__             fzx_write(struct fzx_state *fs, char *buf, uint16_t buflen);
+extern int      __LIB__             fzx_write_justified(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern uint16_t   __LIB__ __CALLEE__    fzx_buffer_extent_callee(void *buf, size_t len);
-extern char       __LIB__ __CALLEE__   *fzx_buffer_partition_callee(void *buf, size_t len, uint16_t width);
-extern char       __LIB__ __CALLEE__   *fzx_buffer_partition_ww_callee(void *buf, size_t len, uint16_t width);
-extern int        __LIB__ __CALLEE__    fzx_char_metrics_callee(struct fzx_cmetric *m, char c);
-extern int        __LIB__ __CALLEE__    fzx_setat_callee(uint16_t y, uint16_t x);
-extern char       __LIB__ __CALLEE__   *fzx_string_partition_callee(char *s, uint16_t width);
-extern char       __LIB__ __CALLEE__   *fzx_string_partition_ww_callee(char *s, uint16_t width);
-extern int        __LIB__ __CALLEE__    fzx_write_callee(void *buf, size_t len);
+extern void     __LIB__ __CALLEE__  fzx_state_init_callee(struct fzx_state *fs, struct fzx_font *ff, struct r_Rect16 *window);
+
+extern void     __LIB__ __CALLEE__  fzx_at_callee(struct fzx_state *fs, uint16_t x, uint16_t y);
+extern int      __LIB__ __CALLEE__  fzx_putc_callee(struct fzx_state *fs, int c);
+
+extern char     __LIB__ __CALLEE__ *fzx_char_metrics_callee(struct fzx_font *ff, struct fzx_cmetric *fm, int c);
+extern uint16_t __LIB__ __CALLEE__  fzx_glyph_width_callee(struct fzx_font *ff, int c);
+
+extern uint16_t __LIB__ __CALLEE__  fzx_string_extent_callee(struct fzx_font *ff, char *s);
+extern char     __LIB__ __CALLEE__ *fzx_string_partition_callee(struct fzx_font *ff, char *s, uint16_t allowed_width);
+extern char     __LIB__ __CALLEE__ *fzx_string_partition_ww_callee(struct fzx_font *ff, char *s, uint16_t allowed_width);
+
+extern uint16_t __LIB__ __CALLEE__  fzx_buffer_extent_callee(struct fzx_font *ff, char *buf, uint16_t buflen);
+extern char     __LIB__ __CALLEE__ *fzx_buffer_partition_callee(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+extern char     __LIB__ __CALLEE__ *fzx_buffer_partition_ww_callee(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width);
+
+extern int      __LIB__ __CALLEE__  fzx_puts_callee(struct fzx_state *fs, char *s);
+extern int      __LIB__ __CALLEE__  fzx_puts_justified_callee(struct fzx_state *fs, char *s, uint16_t allowed_width);
+
+extern int      __LIB__ __CALLEE__  fzx_write_callee(struct fzx_state *fs, char *buf, uint16_t buflen);
+extern int      __LIB__ __CALLEE__  fzx_write_justified_callee(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define fzx_buffer_extent(a,b)             fzx_buffer_extent_callee(a,b)
-#define fzx_buffer_partition(a,b,c)        fzx_buffer_partition_callee(a,b,c)
-#define fzx_buffer_partition_ww(a,b,c)     fzx_buffer_partition_ww_callee(a,b,c)
-#define fzx_char_metrics(a,b)              fzx_char_metrics_callee(a,b)
-#define fzx_setat(a,b)                     fzx_setat_callee(a,b)
-#define fzx_string_partition(a,b)          fzx_string_partition_callee(a,b)
-#define fzx_string_partition_ww(a,b)       fzx_string_partition_callee(a,b)
-#define fzx_write(a,b)                     fzx_write_callee(a,b)
+#define fzx_state_init(a,b,c)               fzx_state_init_callee(a,b,c)
+#define fzx_at(a,b,c)                       fzx_at_callee(a,b,c)
+#define fzx_putc(a,b)                       fzx_putc_callee(a,b)
+#define fzx_char_metrics(a,b,c)             fzx_char_metrics_callee(a,b,c)
+#define fzx_glyph_width(a,b)                fzx_glyph_width_callee(a,b)
+#define fzx_string_extent(a,b)              fzx_string_extent_callee(a,b)
+#define fzx_string_partition(a,b,c)         fzx_string_partition_callee(a,b,c)
+#define fzx_string_partition_ww(a,b,c)      fzx_string_partition_ww_callee(a,b,c)
+#define fzx_buffer_extent(a,b,c)            fzx_buffer_extent_callee(a,b,c)
+#define fzx_buffer_partition(a,b,c,d)       fzx_buffer_partition_callee(a,b,c,d)
+#define fzx_buffer_partition_ww(a,b,c,d)    fzx_buffer_partition_ww_callee(a,b,c,d)
+#define fzx_puts(a,b)                       fzx_puts_callee(a,b)
+#define fzx_puts_justified(a,b,c)           fzx_puts_justified_callee(a,b,c)
+#define fzx_write(a,b,c)                    fzx_write_callee(a,b,c)
+#define fzx_write_justified(a,b,c,d)        fzx_write_justified_callee(a,b,c,d)
 
 #endif
 

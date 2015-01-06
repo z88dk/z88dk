@@ -1,0 +1,5 @@
+font/fzx/zx/z80/__fzx_draw_cpl
+font/fzx/zx/z80/__fzx_draw_or
+font/fzx/zx/z80/__fzx_draw_reset
+font/fzx/zx/z80/__fzx_draw_xor
+font/fzx/zx/z80/asm_fzx_putc

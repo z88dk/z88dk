@@ -3,29 +3,23 @@
 
 SECTION code_font_fzx
 
-PUBLIC _fzx_putc
+PUBLIC fzx_putc_callee, fzx0_putc_callee
 
-_fzx_putc:
+fzx_putc_callee:
 
    pop af
-   pop hl
    pop bc
-   
-   push bc
-   push hl
+   pop ix
    push af
-   
-   push hl
-   ex (sp),ix
+
+fzx0_putc_callee:
 
    call asm_fzx_putc
-   
-   pop ix
    ret nc
    
    ld l,a
    ld h,0
    
    ret
-   
+
    INCLUDE "font/fzx/zx/z80/asm_fzx_putc.asm"

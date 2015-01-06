@@ -100,7 +100,9 @@ no_space:
    jr z, number_spaces_zero
    
    call l_divu_16_16x16
+   
    ex de,hl                    ; hl = remainder_padding, de = extra_padding
+   add hl,de                   ; hl = last_padding
 
 number_spaces_zero:
 
@@ -114,7 +116,7 @@ write_loop:
 
    ; hl = char *buf
    ; bc = buflen
-   ; stack = remainder_padding, extra_padding, number of spaces
+   ; stack = last_padding, extra_padding, number of spaces
    
    push bc
    push hl
@@ -143,7 +145,7 @@ insert_spacing:
 
    ; hl = char *buf
    ; bc = buflen
-   ; stack = remainder_padding, extra_padding, number of spaces
+   ; stack = last_padding, extra_padding, number of spaces
    
    pop de                      ; de = number of spaces
    ex (sp),hl                  ; hl = extra_padding
@@ -156,35 +158,22 @@ insert_spacing:
    
    ; last space
    
-   ; hl = extra_padding
-   ; de = number of spaces
+   ; de = number of spaces = 0
    ; bc = buflen
-   ; stack = remainder_padding, char *buf
+   ; stack = last_padding, char *buf
 
-   ex de,hl
-   
-   pop af
-   ex (sp),hl
-   push af
-   
-   ; hl = remainder_padding
-   ; de = extra_padding
-   ; bc = buflen
-   ; stack = number of spaces, char *buf
-   
-   add hl,de                   ; hl = extra_padding + remainder_padding
-   
-   pop af
    pop de
-   push af
-   push af
+   pop hl                      ; hl = last_padding
+   
+   push hl
+   push de
 
 add_spacing:
    
    ; hl = extra_padding
    ; de = number of spaces
    ; bc = buflen
-   ; stack = remainder_padding, char *buf
+   ; stack = last_padding, char *buf
    
    ex de,hl                    ; de = extra_padding
    push hl                     ; save number of spaces
@@ -207,7 +196,7 @@ add_spacing:
 
 off_screen:
 
-   ; stack = remainder_padding, extra_padding, number of spaces, buflen, char *buf
+   ; stack = last_padding, extra_padding, number of spaces, buflen, char *buf
 
    dec a
    jr nz, newline

@@ -93,7 +93,9 @@ count_loop:
    jr z, number_spaces_zero
    
    call l_divu_16_16x16
+   
    ex de,hl                    ; hl = remainder_padding, de = extra_padding
+   add hl,de                   ; hl = last_padding
 
 number_spaces_zero:
 
@@ -105,9 +107,9 @@ number_spaces_zero:
 
    ; hl = char *s
    ; bc = number of spaces
-   ; stack = remainder_padding, extra_padding
+   ; stack = last_padding, extra_padding
 
-puts_loop;
+puts_loop:
 
    ld a,(hl)
    or a
@@ -146,12 +148,8 @@ puts_loop;
    
    ; last space
    
-   ex (sp),hl                  ; hl = remainder_padding
-   
-   add hl,de
-   ex de,hl                    ; de = extra_padding + remainder_padding
-   
-   ex (sp),hl
+   pop de                      ; de = last_padding
+   push de
 
 add_spacing:
 
@@ -160,7 +158,7 @@ add_spacing:
    ; hl = char *s
    ; bc = number of spaces
    ; de = spacing
-   ; stack = remainder_padding, extra_padding
+   ; stack = last_padding, extra_padding
 
    push hl
 
@@ -177,7 +175,7 @@ add_spacing:
 
 off_screen:
 
-   ; stack = remainder_padding, extra_padding, number of spaces, char *s
+   ; stack = last_padding, extra_padding, number of spaces, char *s
 
    dec a
    jr nz, newline
