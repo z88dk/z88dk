@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC asm_fzx_buffer_partition
 
-EXTERN __fzx_buffer_glyph_width
+EXTERN __fzx_buffer_glyph_width, __fzx_partition_width_adjust
 
 asm_fzx_buffer_partition:
 
@@ -23,7 +23,9 @@ asm_fzx_buffer_partition:
    ;         carry set if allowed width exceeded
    ;
    ; uses  : af, bc, de, hl
-   
+
+   call __fzx_partition_width_adjust
+
    ld a,b
    or c
    jr z, end_buffer
