@@ -295,7 +295,7 @@ include "clib_target_constants.inc"
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION code_crt_start
+SECTION CODE
 
 PUBLIC __Start, __Exit
 

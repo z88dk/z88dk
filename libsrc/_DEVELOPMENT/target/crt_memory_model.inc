@@ -10,9 +10,6 @@ SECTION CODE
 
 org __crt_org_code
 
-nop
-
-section code_crt_start
 section code_crt_init
 section code_crt_main
 section code_crt_exit

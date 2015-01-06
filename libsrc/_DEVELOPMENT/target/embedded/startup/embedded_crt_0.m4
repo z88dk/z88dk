@@ -46,7 +46,7 @@ include(../../clib_instantiate_end.m4)
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION code_crt_start
+SECTION CODE
 
 PUBLIC __Start, __Exit
 

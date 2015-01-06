@@ -649,7 +649,7 @@ EXTERN _font_4x8_def
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION code_crt_start
+SECTION CODE
 
 PUBLIC __Start, __Exit
 
