@@ -133,7 +133,7 @@ void write_defined(char *sname, int value)
 
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
-	if (value) fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    fprintf(fp,"\tdefc %s = %d\n",sname,value);
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
 }

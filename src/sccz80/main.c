@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.26 2014-12-19 05:21:23 aralbrec Exp $
+ *      $Id: main.c,v 1.27 2015-01-07 05:33:54 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -681,7 +681,7 @@ void WriteDefined(char *sname, int value)
         }
         fprintf(fp,"\nIF !DEFINED_%s\n",sname);
         fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
-   if (value) fprintf(fp,"\tdefc %s = %d\n",sname,value);
+		fprintf(fp,"\tdefc %s = %d\n",sname,value);
         fprintf(fp,"ENDIF\n\n");
         fclose(fp);
 }

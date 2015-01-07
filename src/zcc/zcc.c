@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.83 2014-10-06 21:34:22 dom Exp $
+ *      $Id: zcc.c,v 1.84 2015-01-07 05:33:54 aralbrec Exp $
  */
 
 
@@ -1276,7 +1276,7 @@ void write_zcc_defined(char *name, int value)
 {
     add_zccopt("\nIF !DEFINED_%s\n",name);
     add_zccopt("\tdefc\tDEFINED_%s = 1\n",name);
-    if (value) add_zccopt("\tdefc %s = %d\n",name,value);
+	add_zccopt("\tdefc %s = %d\n",name,value);
     add_zccopt("ENDIF\n\n");
 }
 
