@@ -12,10 +12,10 @@ TODO:
 
 * fzx output terminal
 
-* fzx remove smc
-
 * target open
 
-* crt, remove bss, error on rom model if data address not given
-
 * zx scroll reexamined
+
+* text mode open on memstreams
+
+* known issue: input terminals immediately repeat key on caps/lower transition
