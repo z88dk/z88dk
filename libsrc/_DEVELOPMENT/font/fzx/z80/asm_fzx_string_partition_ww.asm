@@ -24,60 +24,53 @@ asm_fzx_string_partition_ww:
 
    call __fzx_partition_width_adjust
 
+next_spaces:
+
+   push de                     ; save allowed prefix
+   push hl                     ; save allowed width remaining
+
 consume_spaces_loop:
 
    ld a,(de)
    or a
-   jr z, end_string_spaces
+   jr z, end_string_accept
    
    cp ' '
-   jr nz, next_word
-
-consume_spaces_loop_join:
+   jr nz, consume_word_loop
 
    call __fzx_string_glyph_width
-   jr c, end_string_spaces     ; if allowed width exceeded
+   jr c, end_string            ; if allowed width exceeded
    
    inc de
    jr consume_spaces_loop
-
-next_word:
-
-   push de                     ; save allowed prefix
-   push hl                     ; save allowed width remaining
    
 consume_word_loop:
 
    call __fzx_string_glyph_width
-   jr c, end_string_word       ; if allowed width exceeded
+   jr c, end_string            ; if allowed width exceeded
 
    inc de
+   
    ld a,(de)
-
    or a
-   jr z, end_word                ; if string ends
+   jr z, end_string_accept
    
    cp ' '
    jr nz, consume_word_loop
    
    ; word ends
-
-end_word:
    
-   call l_inc_sp - 4           ; junk two items on stack
+   pop bc                      ; junk last save point
+   pop bc
 
-   or a
-   jr nz, consume_spaces_loop_join
+   jr next_spaces
 
-end_string_spaces:
+end_string_accept:
 
-   ; de = s + prefix_len
-   ; hl = allowed width
-   
    ex de,hl
-   ret
+   jp l_inc_sp - 6             ; junk last save point
 
-end_string_word:
+end_string:
 
    pop de                      ; de = saved allowed width remaining
    pop hl                      ; hl = saved s + prefix_len

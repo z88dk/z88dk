@@ -9,8 +9,9 @@ EXTERN __fzx_buffer_glyph_width, __fzx_partition_width_adjust, l_inc_sp
 
 asm_fzx_buffer_partition_ww:
 
-   ; find longest prefix of buffer without splitting words
-   ; that has pixel extent <= to the allowed pixel extent
+   ; Find longest prefix of buffer without splitting words
+   ; that has pixel extent <= to the allowed pixel extent.
+   ; The prefix will not end in a space.
    ;
    ; enter : ix = struct fzx_font *
    ;         hl = allowed width in pixels
@@ -26,44 +27,42 @@ asm_fzx_buffer_partition_ww:
 
    call __fzx_partition_width_adjust
 
+next_spaces:
+
+   push bc                     ; save remaining buflen
+   push de                     ; save allowed prefix
+   push hl                     ; save allowed width remaining
+
 consume_spaces_loop:
 
    ld a,b
    or c
-   jr z, end_buffer_spaces
-   
+   jr z, end_buffer_accept
+
    ld a,(de)
    
    cp ' '
-   jr nz, next_word
-
-consume_spaces_loop_join:
+   jr nz, consume_word_loop
 
    call __fzx_buffer_glyph_width
-   jr c, end_buffer_spaces     ; if allowed width exceeded
+   jr c, end_buffer            ; if allowed width exceeded
    
    dec bc
    inc de
    
    jr consume_spaces_loop
 
-next_word:
-
-   push bc                     ; save allowed buflen
-   push de                     ; save allowed prefix
-   push hl                     ; save allowed width remaining
-
 consume_word_loop:
 
    call __fzx_buffer_glyph_width
-   jr c, end_buffer_word       ; if allowed width exceeded
+   jr c, end_buffer            ; if allowed width exceeded
 
    dec bc
    inc de
    
    ld a,b
    or c
-   jr z, end_word              ; if buffer ends
+   jr z, end_buffer_accept
    
    ld a,(de)
    
@@ -72,23 +71,18 @@ consume_word_loop:
 
    ; word ends
    
-   call l_inc_sp - 6           ; junk three items on stack
-   jr consume_spaces_loop_join
-   
-end_word:
+   pop af                      ; junk last save point
+   pop af
+   pop af
 
-   call l_inc_sp - 6           ; junk three items on stack
+   jr next_spaces
 
-end_buffer_spaces:
-
-   ; de = buf + prefix_len
-   ; bc = remaining buflen
-   ; hl = remaining allowed width
+end_buffer_accept:
 
    ex de,hl
-   ret
+   jp l_inc_sp - 6             ; junk last save point
 
-end_buffer_word:
+end_buffer:
 
    pop de                      ; de = saved allowed width
    pop hl                      ; hl = saved buf + prefix_len
