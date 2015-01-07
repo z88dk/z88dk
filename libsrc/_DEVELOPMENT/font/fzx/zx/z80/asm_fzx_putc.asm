@@ -189,6 +189,7 @@ exceeds_margin:
 
 x_ok:
 
+   ld (ix+5),a                 ; update possibly different x coord
    ld e,a                      ; e = x coord
 
    add a,c                     ; a = x + width - 1
@@ -205,7 +206,7 @@ width_adequate:
 
    ld a,(ix+9)                 ; a = window.x
    add a,e
-   ld l,e                      ; l = absolute x coord
+   ld l,a                      ; l = absolute x coord
 
    ; ix = struct fzx_state *
    ;  b = LSB of end of bitmap
@@ -260,10 +261,16 @@ height_adequate:
    ld a,e
    and $07                     ; a = rotate amount, z = zero rotate
 
+   ex af,af'
+
    ex (sp),hl                  ; hl = & bitmap
    ld e,b                      ; e = LSB of end of bitmap
    
-   ex af,af'
+   ld a,d
+   and $07
+   neg
+   add a,8
+   ld b,a                      ; b = number of rows until next attr
    
    ld a,c                      ; a = width - 1
    cp 8
@@ -279,6 +286,7 @@ wide_char:
    
    ; ix = struct fzx_state *
    ; hl = & bitmap
+   ;  b = number of rows until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
    ; stack = tracking, width - 1, screen address
@@ -329,6 +337,7 @@ draw_attr:
 
    ; ix = struct fzx_state *
    ; hl = & bitmap
+   ;  b = row count until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
    ; stack = screen address
@@ -346,8 +355,6 @@ draw_attr:
    
    pop hl                      ; hl = screen address
    ex (sp),hl
-
-   ld b,8                      ; row count until next attr
 
 draw_row:
 
@@ -378,9 +385,11 @@ draw_row:
 
 rotate_bitmap:
 
+   ex (sp),hl                  ; hl = screen address
+   push bc                     ; save row count until next attr
+
    jr z, no_rotate
 
-   push bc                     ; save row count until next attr
    ld b,a                      ; b = rotate amount
    
    ex af,af'
@@ -394,12 +403,10 @@ rotate_loop:
    djnz rotate_loop
    
    ex af,af'
-   pop bc                      ; b = row count until next attr
 
 no_rotate:
 
    ex af,af'
-   ex (sp),hl
    
    ; ix = struct fzx_state *
    ; hl = screen address
@@ -407,11 +414,12 @@ no_rotate:
    ;  e = LSB of end of bitmap
    ; dca= bitmap bytes
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = & bitmap
+   ; stack = & bitmap, row count until attr
 
    call l_jpix                 ; call fzx_draw
    call asm_zx_saddrpdown      ; move screen address down one pixel
    
+   pop bc                      ; b = row count until next attr
    ex (sp),hl                  ; hl = & bitmap
    
    ld a,l
@@ -419,4 +427,6 @@ no_rotate:
    jr z, draw_attr_ret         ; if bitmap finished
    
    djnz draw_row               ; if not time for new attr
+   
+   ld b,8                      ; row count until next attr
    jr draw_attr
