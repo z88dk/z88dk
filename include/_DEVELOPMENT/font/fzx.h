@@ -222,7 +222,7 @@ extern struct fzx_font *ff_ao_ZaibatsuLatin5;
 #define ff_ao_Chloe                 ((struct fzx_font *)(_ff_ao_Chloe))
 #define ff_ao_Dutch                 ((struct fzx_font *)(_ff_ao_Dutch))
 #define ff_ao_DutchLatin1           ((struct fzx_font *)(_ff_ao_DutchLatin1))
-#define ff_ao_DutchLatin1           ((struct fzx_font *)(_ff_ao_DutchLatin5))
+#define ff_ao_DutchLatin5           ((struct fzx_font *)(_ff_ao_DutchLatin5))
 #define ff_ao_GenevaMonoBold        ((struct fzx_font *)(_ff_ao_GenevaMonoBold))
 #define ff_ao_GenevaMonoBoldItalic  ((struct fzx_font *)(_ff_ao_GenevaMonoBoldItalic))
 #define ff_ao_GenevaMonoCyrillic    ((struct fzx_font *)(_ff_ao_GenevaMonoCyrillic))
