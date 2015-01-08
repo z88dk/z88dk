@@ -170,8 +170,10 @@ char_defined:
    
    ld a,(ix+6)
    or a
-   jr nz, x_too_large          ; if x > 255
-   
+;;   jr nz, x_too_large          ; if x > 255
+   jp nz, x_too_large
+
+
    ld a,(ix+5)                 ; a = x coord
    ld d,(ix+17)                ; d = left_margin
    
@@ -252,9 +254,22 @@ height_adequate:
    ;  h = absolute y coord
    ; stack = tracking, & bitmap
 
-   pop af
+   ld a,l
+   and $07
+   ld e,a
+   
+   ld a,c
+   add a,e
+   rra
+   rra
+   rra
+   inc a
+   and $03                     ; a = width of font in bytes
+
+   pop de
    push bc
    push af
+   push de
 
    call asm_zx_pxy2saddr       ; hl = screen address, de = coords
 
@@ -289,7 +304,7 @@ wide_char:
    ;  b = number of rows until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = tracking, width - 1, screen address
+   ; stack = tracking, width - 1, width in bytes, screen address
 
    ld a,l
    cp e
@@ -298,11 +313,12 @@ wide_char:
    ; glyph drawn, update x coordinate
 
    ; ix = struct fzx_state *
-   ; stack = tracking, width - 1, screen address
+   ; stack = tracking, width - 1, width in bytes, screen address
 
 draw_attr_ret:
 
    pop hl                      ; hl = screen address
+   pop bc
    pop bc                      ; c = width - 1
    pop af                      ; a = tracking
 
@@ -340,18 +356,32 @@ draw_attr:
    ;  b = row count until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = screen address
+   ; stack = width in bytes, screen address
+
+   ld d,b
+
+   pop af
+   pop bc                      ; b = width in bytes
+   push bc
+   push af
 
    ex (sp),hl
    push hl                     ; save screen address
    
    call asm_zx_saddr2aaddr     ; hl = attribute address
-   
+
+attr_loop:
+
    ld a,(ix+20)                ; a = foregound mask
    and (hl)                    ; keep screen attribute bits
    or (ix+19)                  ; mix foregound colour
    
    ld (hl),a                   ; new colour to screen
+   inc l
+   
+   djnz attr_loop
+   
+   ld b,d                      ; b = row count until next attr
    
    pop hl                      ; hl = screen address
    ex (sp),hl
@@ -363,7 +393,7 @@ draw_row:
    ;  b = row count until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = screen address
+   ; stack = width in bytes, screen address
    
    ; bitmap bytes
    
@@ -414,7 +444,7 @@ no_rotate:
    ;  e = LSB of end of bitmap
    ; dca= bitmap bytes
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = & bitmap, row count until attr
+   ; stack = width in bytes, & bitmap, row count until attr
 
    call l_jpix                 ; call fzx_draw
    call asm_zx_saddrpdown      ; move screen address down one pixel
