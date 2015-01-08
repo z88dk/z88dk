@@ -67,7 +67,7 @@ loop:
    ld c,(hl)                   ; bc = tracking
    pop hl                      ; hl = string extent
    
-   scf
+;;   scf
    sbc hl,bc
    
    ret

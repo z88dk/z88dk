@@ -80,7 +80,7 @@ no_inc:
    
    pop hl                      ; hl = extent
    
-   scf
+;;   scf
    sbc hl,bc
    
    ret

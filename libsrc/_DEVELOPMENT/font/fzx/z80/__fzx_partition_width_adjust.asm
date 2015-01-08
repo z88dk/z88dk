@@ -15,8 +15,12 @@ __fzx_partition_width_adjust:
    
    ld c,(ix+1)
    ld b,0                      ; bc = tracking
-   
-   inc bc
+
+;; inexplicably partitions are allowing one addition pixel
+;; width than they should; this fix is empirical!
+;; 
+;;   inc c
+
    add hl,bc                   ; allowed_width += tracking + 1
    
    pop bc
