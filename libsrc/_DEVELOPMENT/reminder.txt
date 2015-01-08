@@ -7,7 +7,6 @@ TODO:
 
 * output terminal
   add inverse, underline, italic, xor, or
-  word wrap
 ]
 
 * fzx output terminal
@@ -19,3 +18,17 @@ TODO:
 * text mode open on memstreams
 
 * known issue: input terminals immediately repeat key on caps/lower transition
+
+* REGISTER_SP = -1 should denote the do not alter sp condition
+
+* all struct offsets in asm code should be defined in a DEFVARS block
+
+* replace "ld rl,ixl; ld rh,ixh" pairs with "push ix; pop rp"
+saves a byte and extra speed rarely necessary
+
+* asm_fzx_putc (zx) -- move attr colouring to draw subroutines to only colour portions with drawn pixels??
+
+* update header files
+
+* remove fzx cpl mode -- cannot easily be done
+
