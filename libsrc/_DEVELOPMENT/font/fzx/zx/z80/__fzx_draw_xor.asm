@@ -3,7 +3,7 @@ SECTION code_font_fzx
 
 PUBLIC __fzx_draw_xor
 
-fzx_draw_xor:
+__fzx_draw_xor:
 
    ; must not modify: ix, b, e, af', hl
    
