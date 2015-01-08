@@ -47,7 +47,6 @@ struct fzx_state
 
 // FZX DRAW MODES
 
-extern void _fzx_draw_cpl(void);       // INVERT fzx pixels before ORing into display
 extern void _fzx_draw_or(void);        // OR fzx pixels into display
 extern void _fzx_draw_reset(void);     // CLEAR display where fzx pixels are set
 extern void _fzx_draw_xor(void);       // XOR fzx pixels into display
