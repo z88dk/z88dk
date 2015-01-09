@@ -18,6 +18,8 @@
    
    #endif
 
+   #include <arch/spectrum.h>
+
 #endif
 
 #endif
