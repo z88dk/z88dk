@@ -16,7 +16,7 @@
    
    defc TAR__clib_stdio_heap_size   = 0
    
-   defc TAR__clib_fopen_max         = -1
+   defc TAR__clib_fopen_max         = 0
    defc TAR__clib_open_max          = 0
 
 ;; end crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

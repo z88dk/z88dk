@@ -11,7 +11,7 @@
 
    defc DEF__crt_model    = 2     ; compressed rom model
    
-   defc DEF__register_sp  = -1    ; means set sp = 0 (top of memory)
+   defc DEF__register_sp  = 0     ; top of memory
    
    defc DEF__crt_initialize_bss     = 1
    
