@@ -82,7 +82,7 @@ dnl############################################################
 
    ENDIF
 
-   IF (__clib_fopen_max = -1) & (__I_STDIO_NUM_FILE = 0)
+   IF (__clib_fopen_max = 0) & (__I_STDIO_NUM_FILE = 0)
    
       ; create empty file lists
       
@@ -103,6 +103,7 @@ dnl############################################################
    ; __clib_open_max  = max number of open fds specified by user
    ; __I_FCNTL_NUM_FD = number of static file descriptors created
 
+   PUBLIC __fcntl_fdtbl
    PUBLIC __fcntl_fdtbl_size
    
    IF __I_FCNTL_NUM_FD > 0
@@ -110,8 +111,6 @@ dnl############################################################
       ; create rest of fd table in data segment
       
       SECTION data_fcntl_fdtable_body
-            
-      PUBLIC __fcntl_fdtbl
       
       EXTERN ASMHEAD_data_fcntl_fdtable_body
       
@@ -138,15 +137,11 @@ dnl############################################################
 
          SECTION bss_fcntl
          
-         PUBLIC __fcntl_fdtbl
-         
          __fcntl_fdtbl:        defs __clib_open_max * 2
       
       ELSE
       
          ; no fd table at all
-         
-         PUBLIC __fcntl_fdtbl
          
          defc __fcntl_fdtbl = 0
       
