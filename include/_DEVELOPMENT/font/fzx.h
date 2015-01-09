@@ -39,10 +39,14 @@ struct fzx_state
    struct r_Rect16  window;            // display area units in pixels
    uint16_t         left_margin;       // left margin in pixels
    
-   // zx spectrum only below (temporary declaration here)
+   #ifdef __SPECTRUM
+   
+   // zx spectrum only below
    
    uint8_t          fgnd_attr;         // text colour
    uint8_t          fgnd_mask;         // set bits indicate kept background attribute bits
+
+   #endif
 };
 
 // FZX DRAW MODES
