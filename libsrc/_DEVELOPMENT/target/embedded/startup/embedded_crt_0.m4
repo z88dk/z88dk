@@ -56,10 +56,11 @@ EXTERN _main
 ;; rst and im1 entry ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; address = 0x0001
+   ; address = 0x0000
    
    jr __Start
    
+   defm "Z88DK"
    defs 0x0008 - ASMPC
    
    ; address = 0x0008
@@ -75,6 +76,7 @@ ELSE
 
 ENDIF
 
+   defm "2.0a"
    defs 0x0010 - ASMPC
 
    ; address = 0x0010
@@ -91,6 +93,7 @@ ELSE
 
 ENDIF
 
+   defm "embe"
    defs 0x0018 - ASMPC
 
    ; address = 0x0018
@@ -106,6 +109,7 @@ ELSE
 
 ENDIF
 
+   defm "dded"
    defs 0x0020 - ASMPC
 
    ; address = 0x0020
@@ -121,6 +125,7 @@ ELSE
 
 ENDIF
 
+   defm "2015"
    defs 0x0028 - ASMPC
 
    ; address = 0x0028
@@ -136,6 +141,24 @@ ELSE
 
 ENDIF
 
+   PUBLIC l_jpix
+   
+   l_jpix:
+   
+      defb $dd
+   
+   PUBLIC l_jphl
+   
+   l_jphl:
+   
+      jp (hl)
+   
+   PUBLIC l_jpiy
+   
+   l_jpiy:
+   
+      jp (iy)
+
    defs 0x0030 - ASMPC
 
    ; address = 0x0030
@@ -150,6 +173,16 @@ ELSE
    ret
 
 ENDIF
+
+   PUBLIC l_ret
+   
+      pop hl
+      pop hl
+      pop hl
+   
+   l_ret:
+   
+      ret
 
    defs 0x0038 - ASMPC
 
