@@ -7,7 +7,7 @@
    ;; error
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ; consistent with "error.h"
+   ; keep consistent with "errno.h"
    
    PUBLIC __EOK, __EACCES, __EBADF
    PUBLIC __EBDFD, __EDOM, __EFBIG
