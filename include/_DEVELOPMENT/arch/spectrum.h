@@ -37,7 +37,8 @@
 extern void    zx_border(uint8_t colour);
 extern void    zx_cls(uint8_t attr);
 extern void    zx_cls_wc(struct r_Rect8 *r, uint8_t attr);
-extern void    zx_scroll(uint8_t rows, uint8_t attr);
+extern void    zx_scroll_up(uint8_t rows, uint8_t attr);
+extern void    zx_scroll_wc_up(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
 
 // display
 
@@ -115,7 +116,8 @@ extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
 extern void   __LIB__ __FASTCALL__  zx_border(int colour);
 extern void   __LIB__ __FASTCALL__  zx_cls(uint8_t attr);
 extern void   __LIB__               zx_cls_wc(struct r_Rect8 *r, uint8_t attr);
-extern void   __LIB__               zx_scroll(uint8_t rows, uint8_t attr);
+extern void   __LIB__               zx_scroll_up(uint8_t rows, uint8_t attr);
+extern void   __LIB__               zx_scroll_wc_up(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
 
 // display
 
@@ -161,7 +163,8 @@ extern int    __LIB__               zx_pattern_fill(int x, int y, void *pattern,
 // misc
 
 extern void   __LIB__ __CALLEE__    zx_cls_wc_callee(struct r_Rect8 *r, uint8_t attr);
-extern void   __LIB__ __CALLEE__    zx_scroll_callee(uint8_t rows, uint8_t attr);
+extern void   __LIB__ __CALLEE__    zx_scroll_up_callee(uint8_t rows, uint8_t attr);
+extern void   __LIB__ __CALLEE__    zx_scroll_wc_up_callee(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
 
 // display
 
@@ -179,7 +182,8 @@ extern int    __LIB__ __CALLEE__    zx_pattern_fill_callee(int x, int y, void *p
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
 #define zx_cls_wc(a,b)              zx_cls_wc_callee(a,b)
-#define zx_scroll(a,b)              zx_scroll_callee(a,b)
+#define zx_scroll_up(a,b)           zx_scroll_up_callee(a,b)
+#define zx_scroll_wc_up(a,b,c)      zx_scroll_wc_up_callee(a,b,c)
 
 #define zx_cyx2aaddr(a,b)           zx_cyx2aaddr_callee(a,b)
 #define zx_cyx2saddr(a,b)           zx_cyx2saddr_callee(a,b)
