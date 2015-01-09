@@ -50,7 +50,7 @@ extern void               in_mouse_kempston_reset(void);
 extern void               in_mouse_kempston_setpos(uint16_t x, uint16_t y);
 extern void               in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint16_t *y);
 extern uint16_t           in_mouse_kempston_wheel(void);
-extern int_t              in_mouse_kempston_wheel_delta(void);
+extern int16_t            in_mouse_kempston_wheel_delta(void);
 
 #else
 
