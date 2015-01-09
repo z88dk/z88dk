@@ -6,9 +6,10 @@
 @error/error.lst
 @fcntl/fcntl_asm.lst
 @font/font_4x8/fonts.lst
-@font/fzx/zx/fzx_asm.lst
-@font/fzx/fonts/fonts.lst
+@font/fzx/fzx_asm.lst
+@font/fzx/zx/zx_asm.lst
 @input/zx/input_asm.lst
+@inttypes/inttypes_asm.lst
 @l/l.lst
 @locale/locale.lst
 @math/math.lst

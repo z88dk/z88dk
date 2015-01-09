@@ -1,0 +1,7 @@
+inttypes/c/sccz80/_imaxdiv_
+inttypes/c/sccz80/_imaxdiv__callee
+inttypes/c/sccz80/imaxabs
+inttypes/c/sccz80/strtoimax
+inttypes/c/sccz80/strtoimax_callee
+inttypes/c/sccz80/strtoumax
+inttypes/c/sccz80/strtoumax_callee

@@ -4,6 +4,7 @@
 @ctype/ctype_sdcc_ix.lst
 @error/error.lst
 @fcntl/fcntl_sdcc_ix.lst
+@inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
 @l/sdcc.lst
 @locale/locale.lst

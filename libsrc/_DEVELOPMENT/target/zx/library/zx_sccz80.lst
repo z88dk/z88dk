@@ -6,9 +6,10 @@
 @error/error.lst
 @fcntl/fcntl_sccz80.lst
 @font/font_4x8/fonts.lst
-@font/fzx/zx/fzx_sccz80.lst
-@font/fzx/fonts/fonts.lst
+@font/fzx/fzx_sccz80.lst
+@font/fzx/zx/zx_sccz80.lst
 @input/zx/input_sccz80.lst
+@inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst
 @locale/locale.lst

@@ -4,6 +4,7 @@
 @ctype/ctype_asm.lst
 @error/error.lst
 @fcntl/fcntl_asm.lst
+@inttypes/inttypes_asm.lst
 @l/l.lst
 @locale/locale.lst
 @math/math.lst

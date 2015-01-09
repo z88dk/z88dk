@@ -6,9 +6,10 @@
 @error/error.lst
 @fcntl/fcntl_sdcc_iy.lst
 @font/font_4x8/fonts.lst
-@font/fzx/zx/fzx_sdcc_iy.lst
-@font/fzx/fonts/fonts.lst
+@font/fzx/fzx_sdcc_iy.lst
+@font/fzx/zx/zx_sdcc_iy.lst
 @input/zx/input_sdcc_iy.lst
+@inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
 @locale/locale.lst
