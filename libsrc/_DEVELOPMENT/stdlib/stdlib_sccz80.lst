@@ -1,3 +1,4 @@
+stdlib/c/sccz80/abort
 stdlib/c/sccz80/abs
 stdlib/c/sccz80/atexit
 stdlib/c/sccz80/atoi

@@ -1,3 +1,4 @@
+stdlib/c/sdcc_iy/abort
 stdlib/c/sdcc_iy/abs
 stdlib/c/sdcc_iy/atexit
 stdlib/c/sdcc_iy/atoi

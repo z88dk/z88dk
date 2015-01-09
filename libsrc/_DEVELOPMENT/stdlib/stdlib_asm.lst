@@ -1,3 +1,4 @@
+stdlib/z80/asm_abort
 stdlib/z80/asm_abs
 stdlib/z80/asm_atexit
 stdlib/z80/asm_atoi
