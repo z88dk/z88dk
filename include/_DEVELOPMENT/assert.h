@@ -3,6 +3,7 @@
 #define _ASSERT_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef NDEBUG
 
@@ -10,7 +11,7 @@
 
 #else
 
-   #define assert(x)           if (x == 0) fprintf(stderr, __FILE__ " line " #__LINE__ ": assert(" #exp ") failed\n");
+   #define assert(x)           if (x == 0)  { fprintf(stderr, __FILE__ " line " #__LINE__ ": assert(" #exp ") failed\n"); abort(); }
 
 #endif
 

@@ -87,7 +87,7 @@ typedef unsigned long          uintmax_t;
 #define SIZE_MAX               65535U
 
 #define WCHAR_MIN              0
-#define WCHAR_MAX              255
+#define WCHAR_MAX              255U
 
 // WINT_MIN
 // WINT_MAX

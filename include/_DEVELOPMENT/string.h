@@ -4,9 +4,40 @@
 
 #include <stddef.h>
 
+#ifndef _SIZE_T_DEFINED
+#define _SIZE_T_DEFINED
+typedef unsigned int  size_t;
+#endif
+
+#ifndef NULL
+#define NULL            ((void*)(0))
+#endif
+
+// LEGACY C
+
+#define bzero(s,n)      memset(s,0,n)
+#define bcmp(s1,s2,n)   memcmp(s1,s2,n)
+#define bcopy(s,d,l)    memcpy(d,s,l)
+#define index(s,b)      strchr(s,b)
+#define rindex(s,b)     strrchr(s,b)
+
+#define strset(s,c)     memset(s,c,strlen(s))
+#define strnset(s,c,n)  
+#define rawmemchr(a,b)  memchr(a,b,65535)
+
+
 #ifdef __SDCC
 
 // SDCC
+
+extern int     bcmp(void *b1, void *b2, size_t len);
+extern void    bcopy(const void *src, void *dst, size_t len);
+extern void    bzero(void *mem, size_t n);
+extern char   *index(char *s, int c);
+extern char   *rindex(char *s, int c);
+extern char   *strset(char *s, int c);
+extern char   *strnset(char *s, int c, size_t n);
+extern void   *rawmemchr(const void *mem, int c);
 
 extern char   *_memlwr_(void *p, size_t n);
 extern char   *_memstrcpy_(void *p, char *s, size_t n);
@@ -67,6 +98,15 @@ extern size_t  strxfrm(char *dst, char *src, size_t n);
 
 // SCCZ80 
 
+extern int    __LIB__                bcmp(void *b1, void *b2, size_t len);
+extern void   __LIB__                bcopy(const void *src, void *dst, size_t len);
+extern void   __LIB__                bzero(void *mem, size_t n);
+extern char   __LIB__               *index(char *s, int c);
+extern char   __LIB__               *rindex(char *s, int c);
+extern char   __LIB__               *strset(char *s, int c);
+extern char   __LIB__               *strnset(char *s, int c, size_t n);
+extern void   __LIB__               *rawmemchr(const void *mem, int c);
+
 extern char   __LIB__               *_memlwr_(void *p, size_t n);
 extern char   __LIB__               *_memstrcpy_(void *p, char *s, size_t n);
 extern char   __LIB__               *_memupr_(void *p, size_t n);
@@ -124,6 +164,15 @@ extern size_t __LIB__                strxfrm(char *dst, char *src, size_t n);
 
 // SCCZ80 CALLEE LINKAGE
 
+extern int    __LIB__ __CALLEE__     bcmp_callee(void *b1, void *b2, size_t len);
+extern void   __LIB__ __CALLEE__     bcopy_callee(const void *src, void *dst, size_t len);
+extern void   __LIB__ __CALLEE__     bzero_callee(void *mem, size_t n);
+extern char   __LIB__ __CALLEE__    *index_callee(char *s, int c);
+extern char   __LIB__ __CALLEE__    *rindex_callee(char *s, int c);
+extern char   __LIB__ __CALLEE__    *strset_callee(char *s, int c);
+extern char   __LIB__ __CALLEE__    *strnset_callee(char *s, int c, size_t n);
+extern void   __LIB__ __CALLEE__    *rawmemchr_callee(const void *mem, int c);
+
 extern char   __LIB__ __CALLEE__    *_memlwr__callee(void *p, size_t n);
 extern char   __LIB__ __CALLEE__    *_memstrcpy__callee(void *p, char *s, size_t n);
 extern char   __LIB__ __CALLEE__    *_memupr__callee(void *p, size_t n);
@@ -169,6 +218,15 @@ extern char   __LIB__ __CALLEE__    *strtok_r_callee(char *s, char *delim, char 
 extern size_t __LIB__ __CALLEE__     strxfrm_callee(char *dst, char *src, size_t n);
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
+
+#define bcmp(a,b,c)                  bcmp_callee(a,b,c)
+#define bcopy(a,b,c)                 bcopy_callee(a,b,c)
+#define bzero(a,b)                   bzero_callee(a,b)
+#define index(a,b)                   index_callee(a,b)
+#define rindex(a,b)                  rindex_callee(a,b)
+#define strset(a,b)                  strset_callee(a,b)
+#define strnset(a,b,c)               strnset_callee(a,b,c)
+#define rawmemchr(a,b)               rawmemchr_callee(a,b)
 
 #define _memlwr_(a,b)                _memlwr__callee(a,b)
 #define _memstrcpy_(a,b,c)           _memstrcpy__callee(a,b,c)

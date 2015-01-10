@@ -7,7 +7,17 @@
 
 // DATA STRUCTURES
 
-typedef struct div_s
+#ifndef _SIZE_T_DEFINED
+#define _SIZE_T_DEFINED
+typedef unsigned int  size_t;
+#endif
+
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
+typedef unsigned char wchar_t;
+#endif
+
+typedef struct
 {
 
    int rem;
@@ -15,7 +25,7 @@ typedef struct div_s
 
 } div_t;
 
-typedef struct ldiv_s
+typedef struct
 {
 
    long quot;
@@ -23,7 +33,18 @@ typedef struct ldiv_s
 
 } ldiv_t;
 
-#define RAND_MAX 32767
+#ifndef NULL
+#define NULL            ((void*)(0))
+#endif
+
+#define EXIT_FAILURE    0
+#define EXIT_SUCCESS    1
+
+#define RAND_MAX        32767
+
+#define MB_CUR_MAX      1
+
+// FUNCTIONS
 
 #ifdef __SDCC
 

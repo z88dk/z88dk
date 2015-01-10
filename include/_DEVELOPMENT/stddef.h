@@ -2,20 +2,27 @@
 #ifndef _STDDEF_H
 #define _STDDEF_H
 
-typedef int ptrdiff_t;
+#ifndef NULL
+#define NULL          ((void *)0)
+#endif
 
-typedef unsigned int size_t;
+typedef int           ptrdiff_t;
+
+#ifndef _SIZE_T_DEFINED
+#define _SIZE_T_DEFINED
+typedef unsigned int  size_t;
+#endif
 
 typedef unsigned char max_align_t;
 
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
 typedef unsigned char wchar_t;
-
-#undef NULL
-#define NULL ((void *)(0))
+#endif
 
 #ifdef __SDCC
 
-   #define offsetof(t,m) __builtin_offsetof(t,m)
+#define offsetof(t,m) __builtin_offsetof(t,m)
 
 #endif
 

@@ -6,39 +6,42 @@
 
 // DATA STRUCTURES
 
-#ifndef _STDDEF_H
-
-   typedef unsigned int size_t;
-   #define NULL ((void*)(0))
-
+#ifndef _SIZE_T_DEFINED
+#define _SIZE_T_DEFINED
+typedef unsigned int    size_t;
 #endif
 
-typedef unsigned long fpos_t;
+typedef unsigned long   fpos_t;
 typedef struct { unsigned char file[13];} FILE;
 
-extern FILE *stdin;
-extern FILE *stdout;
-extern FILE *stderr; 
+#ifndef NULL
+#define NULL            ((void*)(0))
+#endif
 
 #define _IOFBF          0
 #define _IOLBF          1
 #define _IONBF          2
-#define BUFSIZ          1      // this clib uses an alternative to buffering
 
-#define EOF            -1
+#define BUFSIZ          1      // clib does not do high level buffering
 
-#ifndef FOPEN_MAX
-#define FOPEN_MAX       8
-#endif
+#define EOF             (-1)
 
-#define FILENAME_MAX  256
+#define FOPEN_MAX       8      // probably changed by target
+
+#define FILENAME_MAX    128
 
 #define L_tmpnam        8
-#define TMP_MAX       256
+#define TMP_MAX         16
 
 #define SEEK_SET        0
 #define SEEK_CUR        1
 #define SEEK_END        2
+
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
+
+// FUNCTIONS
 
 #ifdef __SDCC
 
