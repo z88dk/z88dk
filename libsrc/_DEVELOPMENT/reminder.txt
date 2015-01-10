@@ -7,6 +7,10 @@ TODO:
 
 * output terminal
   add inverse, underline, italic, xor, or
+  
+* text mode open on memstreams
+
+* all struct offsets in asm code should be defined in a DEFVARS block
 ]
 
 * fzx output terminal
@@ -15,26 +19,23 @@ TODO:
 
 * zx scroll reexamined
 
-* text mode open on memstreams
-
 * known issue: input terminals immediately repeat key on caps/lower transition
-
-* all struct offsets in asm code should be defined in a DEFVARS block
 
 * replace "ld rl,ixl; ld rh,ixh" pairs with "push ix; pop rp"
 saves a byte and extra speed rarely necessary
 
-* asm_fzx_putc (zx) -- move attr colouring to draw subroutines to only colour portions with drawn pixels??
-
-* update header files
-fcntl headers, errno.h, stddef.h, stdint.h, stdio.h, stdlib.h, strings.h ?? bzero,etc
+* asm_fzx_putc (zx) -- colour maximum rectangle around char
 
 * change 4x8 font to use only nibbles in definition
 
-* justify functions need to distribute remainder spacing evenly
+* known issue: fzx justify functions need to distribute remainder spacing evenly
 
 * fzx print functions with embedded sequences
 
 * generate fresh crts for spectrum if2 target
 
 * check constraints on code location in some stdio state machines
+
+* add fast memcpy,etc selection to crt_cfg
+
+* move memory map to target directories
