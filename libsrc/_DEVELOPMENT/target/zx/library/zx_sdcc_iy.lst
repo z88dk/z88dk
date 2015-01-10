@@ -14,6 +14,7 @@
 @l/sdcc.lst
 @locale/locale.lst
 @math/math.lst
+@setjmp/setjmp_sdcc_iy.lst
 @sound/sound_sdcc_iy.lst
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
