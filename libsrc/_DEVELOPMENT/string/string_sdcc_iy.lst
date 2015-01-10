@@ -1,5 +1,9 @@
+string/c/sdcc_iy/bcmp
+string/c/sdcc_iy/bcopy
+string/c/sdcc_iy/bzero
 string/c/sdcc_iy/ffs
 string/c/sdcc_iy/ffsl
+string/c/sdcc_iy/index
 string/c/sdcc_iy/memccpy
 string/c/sdcc_iy/memchr
 string/c/sdcc_iy/memcmp
@@ -9,6 +13,8 @@ string/c/sdcc_iy/memmove
 string/c/sdcc_iy/memrchr
 string/c/sdcc_iy/memset
 string/c/sdcc_iy/memswap
+string/c/sdcc_iy/rawmemchr
+string/c/sdcc_iy/rindex
 string/c/sdcc_iy/stpcpy
 string/c/sdcc_iy/stpncpy
 string/c/sdcc_iy/strcasecmp
@@ -34,6 +40,7 @@ string/c/sdcc_iy/strncpy
 string/c/sdcc_iy/strndup
 string/c/sdcc_iy/strnicmp
 string/c/sdcc_iy/strnlen
+string/c/sdcc_iy/strnset
 string/c/sdcc_iy/strpbrk
 string/c/sdcc_iy/strrchr
 string/c/sdcc_iy/strrcspn
@@ -41,6 +48,7 @@ string/c/sdcc_iy/strrev
 string/c/sdcc_iy/strrspn
 string/c/sdcc_iy/strrstrip
 string/c/sdcc_iy/strsep
+string/c/sdcc_iy/strset
 string/c/sdcc_iy/strspn
 string/c/sdcc_iy/strstr
 string/c/sdcc_iy/strstrip

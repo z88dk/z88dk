@@ -1,5 +1,13 @@
+string/c/sccz80/bcmp
+string/c/sccz80/bcmp_callee
+string/c/sccz80/bcopy
+string/c/sccz80/bcopy_callee
+string/c/sccz80/bzero
+string/c/sccz80/bzero_callee
 string/c/sccz80/ffs
 string/c/sccz80/ffsl
+string/c/sccz80/index
+string/c/sccz80/index_callee
 string/c/sccz80/memccpy
 string/c/sccz80/memccpy_callee
 string/c/sccz80/memchr
@@ -18,6 +26,10 @@ string/c/sccz80/memset
 string/c/sccz80/memset_callee
 string/c/sccz80/memswap
 string/c/sccz80/memswap_callee
+string/c/sccz80/rawmemchr
+string/c/sccz80/rawmemchr_callee
+string/c/sccz80/rindex
+string/c/sccz80/rindex_callee
 string/c/sccz80/stpcpy
 string/c/sccz80/stpcpy_callee
 string/c/sccz80/stpncpy
@@ -64,6 +76,8 @@ string/c/sccz80/strnicmp
 string/c/sccz80/strnicmp_callee
 string/c/sccz80/strnlen
 string/c/sccz80/strnlen_callee
+string/c/sccz80/strnset
+string/c/sccz80/strnset_callee
 string/c/sccz80/strpbrk
 string/c/sccz80/strpbrk_callee
 string/c/sccz80/strrchr
@@ -76,6 +90,8 @@ string/c/sccz80/strrspn_callee
 string/c/sccz80/strrstrip
 string/c/sccz80/strsep
 string/c/sccz80/strsep_callee
+string/c/sccz80/strset
+string/c/sccz80/strset_callee
 string/c/sccz80/strspn
 string/c/sccz80/strspn_callee
 string/c/sccz80/strstr

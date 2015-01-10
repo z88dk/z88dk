@@ -1,5 +1,9 @@
+string/z80/asm_bcmp
+string/z80/asm_bcopy
+string/z80/asm_bzero
 string/z80/asm_ffs
 string/z80/asm_ffsl
+string/z80/asm_index
 string/z80/asm_memccpy
 string/z80/asm_memchr
 string/z80/asm_memcmp
@@ -9,6 +13,8 @@ string/z80/asm_memmove
 string/z80/asm_memrchr
 string/z80/asm_memset
 string/z80/asm_memswap
+string/z80/asm_rawmemchr
+string/z80/asm_rindex
 string/z80/asm_stpcpy
 string/z80/asm_stpncpy
 string/z80/asm_strcasecmp
@@ -34,6 +40,7 @@ string/z80/asm_strncpy
 string/z80/asm_strndup
 string/z80/asm_strnicmp
 string/z80/asm_strnlen
+string/z80/asm_strnset
 string/z80/asm_strpbrk
 string/z80/asm_strrchr
 string/z80/asm_strrcspn
@@ -41,6 +48,7 @@ string/z80/asm_strrev
 string/z80/asm_strrspn
 string/z80/asm_strrstrip
 string/z80/asm_strsep
+string/z80/asm_strset
 string/z80/asm_strspn
 string/z80/asm_strstr
 string/z80/asm_strstrip
