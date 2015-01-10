@@ -85,7 +85,7 @@ char_defined:
    ; ix = struct fzx_state *
    ;  a = char-32
    ;  a'= font height
-   ; stack = font height, tracking
+   ; stack = tracking
    
    ld c,a
    ld b,0
@@ -303,6 +303,7 @@ colour_loop_x:
    or (ix+19)
    ld (hl),a
    
+   inc l
    djnz colour_loop_x
    
    pop hl
