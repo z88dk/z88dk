@@ -13,19 +13,6 @@ typedef unsigned int  size_t;
 #define NULL            ((void*)(0))
 #endif
 
-// LEGACY C
-
-#define bzero(s,n)      memset(s,0,n)
-#define bcmp(s1,s2,n)   memcmp(s1,s2,n)
-#define bcopy(s,d,l)    memcpy(d,s,l)
-#define index(s,b)      strchr(s,b)
-#define rindex(s,b)     strrchr(s,b)
-
-#define strset(s,c)     memset(s,c,strlen(s))
-#define strnset(s,c,n)  
-#define rawmemchr(a,b)  memchr(a,b,65535)
-
-
 #ifdef __SDCC
 
 // SDCC
