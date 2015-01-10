@@ -33,9 +33,17 @@ typedef struct { unsigned char file[13];} FILE;
 #define L_tmpnam        8
 #define TMP_MAX         16
 
+#ifndef SEEK_SET
 #define SEEK_SET        0
+#endif
+
+#ifndef SEEK_CUR
 #define SEEK_CUR        1
+#endif
+
+#ifndef SEEK_END
 #define SEEK_END        2
+#endif
 
 extern FILE *stdin;
 extern FILE *stdout;

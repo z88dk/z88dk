@@ -26,7 +26,11 @@ typedef unsigned int           uint_fast8_t;
 typedef unsigned int           uint_fast16_t;
 typedef unsigned long          uint_fast32_t;
 
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
 typedef int                    intptr_t;
+#endif
+
 typedef unsigned int           uintptr_t;
 
 typedef long                   intmax_t;
