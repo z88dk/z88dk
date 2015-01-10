@@ -4,6 +4,7 @@ l/z80/l_dec_bc
 l/z80/l_dec_de
 l/z80/l_ex_bc_de
 l/z80/l_ex_bc_hl
+l/z80/l_fast_ldir
 l/z80/l_inc_hl
 l/z80/l_inc_sp
 l/z80/l_jphl
