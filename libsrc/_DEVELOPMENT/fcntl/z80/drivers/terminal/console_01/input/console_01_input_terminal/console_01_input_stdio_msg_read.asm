@@ -48,6 +48,8 @@ read_exit:
 
    exx
    
+   pop bc                      ; bc = num chars remaining
+   
    sbc hl,bc
    
    ld c,l
