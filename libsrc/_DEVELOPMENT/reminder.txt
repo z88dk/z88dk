@@ -16,6 +16,7 @@ TODO:
 
 * known issue: fzx justify functions need to distribute remainder spacing evenly
 
+* do we really need two sets of input/output primitives for stdio
 ]
 
 * fzx output terminal
@@ -34,5 +35,3 @@ saves a byte and extra speed rarely necessary
 * generate fresh crts for spectrum if2 target
 
 * check constraints on code location in some stdio state machines
-
-* fread and fwrite have to repeatedly read/write if less than requested bytes recvd/sent
