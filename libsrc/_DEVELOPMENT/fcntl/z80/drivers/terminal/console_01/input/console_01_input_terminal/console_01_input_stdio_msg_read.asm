@@ -1,4 +1,6 @@
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_fcntl
 
 PUBLIC console_01_input_stdio_msg_read
@@ -37,14 +39,19 @@ read_loop:
    ld (de),a                   ; write char to buffer
    inc de
    
-   jr read_loop
-
+   cp CHAR_LF
+   jr nz, read_loop
+   
 read_exit:
+
+   push bc
 
    exx
    
+   sbc hl,bc
+   
    ld c,l
-   ld b,h                      ; bc = max_length (read all chars)
+   ld b,h                      ; bc = num chars read
    
    ret
 

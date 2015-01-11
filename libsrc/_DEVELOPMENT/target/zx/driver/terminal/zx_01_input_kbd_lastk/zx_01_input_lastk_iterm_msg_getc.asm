@@ -5,7 +5,7 @@ SECTION code_fcntl
 
 PUBLIC zx_01_input_lastk_iterm_msg_getc
 
-EXTERN zx_01_input_lastk_proc_lastk, error_zc
+EXTERN zx_01_input_lastk_proc_lastk, error_zc, error_mc
 
 zx_01_input_lastk_iterm_msg_getc:
 
@@ -17,7 +17,7 @@ zx_01_input_lastk_iterm_msg_getc:
    ;  can use : af, bc, de, hl
 
    call zx_01_input_lastk_proc_lastk
-   jp z, error_zc              ; if LASTK = 0
+   ret z                       ; if LASTK == 0 return NUL
    
    ; hl = LASTK
    
@@ -37,6 +37,9 @@ loop:
    
    cp 13
    jr z, key_lf
+
+   cp CHAR_CTRL_D
+   jp z, error_mc
 
 exit:
 

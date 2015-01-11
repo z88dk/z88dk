@@ -6,7 +6,7 @@ SECTION code_fcntl
 PUBLIC zx_01_input_inkey_iterm_msg_getc
 
 EXTERN zx_01_input_inkey_proc_getk_address
-EXTERN asm_in_inkey, asm_z80_delay_ms
+EXTERN asm_in_inkey, asm_z80_delay_ms, error_mc
 
 zx_01_input_inkey_iterm_msg_getc:
 
@@ -153,6 +153,9 @@ key_pressed:
    
    cp 13
    jr z, key_lf
+
+   cp CHAR_CTRL_D
+   jp z, error_mc              ; indicate eof
 
 exit:
 
