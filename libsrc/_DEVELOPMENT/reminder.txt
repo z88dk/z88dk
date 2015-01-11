@@ -11,6 +11,11 @@ TODO:
 * text mode open on memstreams
 
 * all struct offsets in asm code should be defined in a DEFVARS block
+
+* known issue: input terminals immediately repeat key on caps/lower transition
+
+* known issue: fzx justify functions need to distribute remainder spacing evenly
+
 ]
 
 * fzx output terminal
@@ -19,16 +24,10 @@ TODO:
 
 * zx scroll reexamined
 
-* known issue: input terminals immediately repeat key on caps/lower transition
-
 * replace "ld rl,ixl; ld rh,ixh" pairs with "push ix; pop rp"
 saves a byte and extra speed rarely necessary
 
-* asm_fzx_putc (zx) -- colour maximum rectangle around char
-
 * change 4x8 font to use only nibbles in definition
-
-* known issue: fzx justify functions need to distribute remainder spacing evenly
 
 * fzx print functions with embedded sequences
 
@@ -36,6 +35,4 @@ saves a byte and extra speed rarely necessary
 
 * check constraints on code location in some stdio state machines
 
-* add fast memcpy,etc selection to crt_cfg
-
-* move memory map to target directories
+* fread and fwrite have to repeatedly read/write if less than requested bytes recvd/sent
