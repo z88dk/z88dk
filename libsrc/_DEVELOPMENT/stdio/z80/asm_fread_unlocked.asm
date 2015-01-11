@@ -18,7 +18,8 @@ SECTION code_stdio
 PUBLIC asm_fread_unlocked
 PUBLIC asm0_fread_unlocked
 
-EXTERN __stdio_verify_input, __stdio_recv_input_raw_read
+EXTERN l_ret, error_znc
+EXTERN __stdio_verify_input, __stdio_recv_input_read
 
 asm_fread_unlocked:
 
@@ -62,48 +63,89 @@ asm0_fread_unlocked:
    
    ld a,b
    or c
-   jr z, immediate_success     ; if size == 0
+   jp z, error_znc             ; if size == 0 report success
    
    push hl                     ; save nmemb
-   
-record_loop:
+
+   push bc   
+   exx
+   pop hl                      ; hl'= size
+   exx
+
+next_record_loop:
 
    ; ix = FILE *
    ; de = char *p
    ; bc = size
    ; hl = records_remaining
+   ; hl'= size
    ; stack = nmemb
-   
+
    ld a,h
    or l
-   jr z, loop_done
-   
+   jp z, l_ret - 1             ; if all records read, return success, hl = nmemb
+
    push bc
    push de
    push hl
    
-   call __stdio_recv_input_raw_read
+   exx
+   ld de,0                     ; de = num chars in record read
+   exx
    
-   pop de
-   pop hl
-   pop bc
+record_loop:
+
+   ; ix = FILE *
+   ; bc = num uncollected chars = max num chars to read
+   ; de = void *buffer = destination address
+   ; de'= total num chars read so far
+   ; hl'= size
+   ; stack = nmemb, size, char *p, records_remaining
+
+   call __stdio_recv_input_read
+   jr c, record_error          ; if eof or stream error
    
-   jr c, record_error
+   exx
+   
+   sbc hl,de                   ; size == num chars read ?
+   push hl                     ; save num uncollected chars
+   add hl,de
+   
+   exx
+   
+   pop bc                      ; bc = num still uncollected chars
+   jr c, record_error          ; if size < num chars read, should not happen
+
+   jr nz, record_loop          ; if not all chars in record collected
+   
+record_complete:
+
+   ; ix = FILE *
+   ; hl'= size
+   ; stack = nmemb, size, char *p, records_remaining
+
+   pop de                      ; de = records_remaining
+   pop hl                      ; hl = char *p
+   pop bc                      ; bc = size
    
    add hl,bc                   ; p += size
    
    ex de,hl
    dec hl                      ; records_remaining--
    
-   jr record_loop
+   jr next_record_loop
 
 record_error:
 
-   ; bc'= number of bytes successfully read from stream
+   pop de
+   pop hl
+   pop bc
+
    ; ix = FILE *
    ; hl = char *p
    ; bc = size
    ; de = records_remaining
+   ; de'= number of bytes successfully read from record
    ; stack = nmemb
 
    ex (sp),hl
@@ -114,30 +156,11 @@ record_error:
    pop de                      ; de = char *p
    
    exx
-   push bc
+   push de
    exx
    pop bc                      ; number of bytes read from incomplete record
    
    scf
-   ret
-
-loop_done:
-
-   ; ix = FILE *
-   ; de = char *p
-   ; bc = size
-   ; stack = nmemb
-
-   pop hl
-   ret
-
-immediate_success:
-
-   ; satisfy exit conditions for success
-     
-   ld l,c
-   ld h,b                      ; hl = 0
-   
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
