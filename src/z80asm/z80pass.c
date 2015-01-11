@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.129 2015-01-05 23:34:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.130 2015-01-11 23:49:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -113,7 +113,7 @@ parseline( enum flag interpret )
 					if (sym.tok == TK_LABEL || GetSym() == TK_NAME)
 					{
 						/* labels must always be touched due to forward referencing problems in expressions */
-						define_symbol(sym.string, get_PC(), TYPE_ADDRESS, SYM_TOUCHED);
+						define_symbol(sym_text(&sym), get_PC(), TYPE_ADDRESS, SYM_TOUCHED);
 
 						GetSym();      /* check for another identifier */
 					}
@@ -143,8 +143,8 @@ parseline( enum flag interpret )
 			default:
 				if (interpret == ON)
 					error_syntax();    /* Syntax error */
-				Skipline();
 			}
+			Skipline();
 		}
 	}
     list_end_line();				/* Write current source line to list file */
@@ -271,14 +271,17 @@ ifstatement( enum flag interpret )
 static Bool check_ifdef_condition(void)
 {
 	Symbol *symbol;
+	char *name;
 
 	GetSymExpect(TK_NAME);
 
-	symbol = find_symbol(sym.string, CURRENTMODULE->local_symtab);
+	name = sym_text(&sym);
+
+	symbol = find_symbol(name, CURRENTMODULE->local_symtab);
 	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
 		return TRUE;
 
-	symbol = find_symbol(sym.string, global_symtab);
+	symbol = find_symbol(name, global_symtab);
 	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
 		return TRUE;
 

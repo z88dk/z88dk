@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.105 2015-01-05 23:34:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.106 2015-01-11 23:49:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -112,7 +112,7 @@ struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( sym.string, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
+    foundsym = ( struct Z80sym * ) bsearch(sym_text(&sym), Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }
@@ -129,7 +129,8 @@ ParseIdent( enum flag interpret )
     if ( foundsym == NULL )
     {
         if ( interpret == ON )      /* only issue error message if interpreting */
-            error_unknown_ident();
+			error_syntax();
+            //error_unknown_ident();
     }
     else
     {
@@ -250,7 +251,7 @@ PUBLIC( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_public_symbol( sym.string );
+			declare_public_symbol(sym_text(&sym));
         }
         else
         {
@@ -291,7 +292,7 @@ EXTERN( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            declare_extern_symbol( sym.string );    /* Define symbol as extern */
+			declare_extern_symbol(sym_text(&sym));    /* Define symbol as extern */
         }
         else
         {
@@ -346,7 +347,7 @@ SECTION( void )
 {
     GetSym();
 	if ( sym.tok == TK_NAME )
-		new_section( sym.string );
+		new_section(sym_text(&sym));
 	else
 		error_syntax();
 }

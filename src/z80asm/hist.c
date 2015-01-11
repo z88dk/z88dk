@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.130 2014-12-24 02:11:51 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.131 2015-01-11 23:49:24 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.130 2014-12-24 02:1
 
 /*
 * $Log: hist.c,v $
-* Revision 1.130  2014-12-24 02:11:51  pauloscustodio
+* Revision 1.131  2015-01-11 23:49:24  pauloscustodio
+* Allow opcodes (e.g. RL) as constants in DEFC, DEFGROUP and DEFVARS, and as labels
+*
+* Revision 1.130  2014/12/24 02:11:51  pauloscustodio
 * - Make tokenizer context-sensitive, to be able to distinguish (TK_DI) from (TK_NAME, "di") in:
 *   di
 *   call di
@@ -2163,16 +2166,13 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 xx.xx.2014 [2.6.2] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Add lexer tokens for registers, CPU flags and DEFVARS size specifiers,
-	  simplifying the parser. As a side effect register names can no longer 
-	  be used as labels, but this would be confusing anyway.
+	- Add lexer tokens for registers, CPU flags, DEFVARS size specifiers,
+	  opcodes and directives, simplifying the parser. Build in a tokenizer 
+	  state to allow an opcode name (e.g. RL) to be used as a label, a 
+	  defc, defgroup or defvars constant.
 	  
-	- Implemented infrastructure to do parsing based on a RAGEL state machine, 
-	  and to fall back to the original parser on error. Implemented the first
-	  two simple opcodes (NOP and HALT) as a concept check.
-	  
-	- Implemented expression parsing within the RAGEL state machine, by calling
-	  the existent recursive-descent parser.
+	- Implemented parsing based on a RAGEL state machine, calling the existent
+	  recursive-descent parser for expressions.
 	  
 	- New opcodes.c module to store away all the Z80 opcode hex bytes.
 	
@@ -2185,11 +2185,6 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	- New ORG -1 to a section to be written to a new binary file, even if
 	  the address is consecutive with the previous section.
 	  
-	- Make tokenizer context-sensitive, to be able to distinguish 
-	  (TK_DI) from (TK_NAME, "di") in:
-		di
-		call di
-
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -2213,7 +2208,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2g"
+#define VERSION     "2.6.2h"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

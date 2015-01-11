@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.23 2015-01-04 23:10:30 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.24 2015-01-11 23:49:24 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -143,7 +143,7 @@ static void push_expr(Sym *expr_start, Sym *expr_end)
 	/* build expression text */
 	Str_clear(expr_text);
 	for (expr_p = expr_start; expr_p < expr_end; expr_p++)
-		Str_append(expr_text, expr_p->text);
+		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
 	
 	/* parse expression */
 	expr = parse_expr(expr_text->str);
@@ -245,28 +245,32 @@ static void read_token(void)
 	{
 	case TK_NUMBER:
 		Str_sprintf(buffer, "%d", sym_copy.number);
-		sym_copy.text = token_strings_add(buffer->str);
+		sym_copy.tstart = token_strings_add(buffer->str);
+		sym_copy.tlen = buffer->len;
 		break;
 
 	case TK_NAME:
 	case TK_LABEL:
-		sym_copy.text = token_strings_add(sym_copy.string);
+		sym_copy.tstart = token_strings_add(sym_text(&sym_copy));
+		sym_copy.tlen = strlen(sym_copy.tstart);
 		break;
 
 	case TK_STRING:
-		Str_sprintf(buffer, "\"%s\"", sym_copy.string);
-		sym_copy.text = token_strings_add(buffer->str);
+		Str_sprintf(buffer, "\"%s\"", sym_text(&sym_copy));
+		sym_copy.tstart = token_strings_add(buffer->str);
+		sym_copy.tlen = buffer->len;
 		break;
 
 	case TK_END:
-		sym_copy.text = "";
+		sym_copy.tstart = "";
+		sym_copy.tlen = 0;
 		break;
 
-	default:
-		if (!*(sym_copy.text))
-			assert(*(sym_copy.text));
+	default:;
+//		if (!*(sym_copy.text))
+//			assert(*(sym_copy.text));
 	}
-	sym_copy.string = token_strings_add(sym.string);
+//	sym_copy.string = token_strings_add(sym.string);
 	utarray_push_back(tokens, &sym_copy);
 
 	p = (Sym *)utarray_front(tokens) + (p_index >= 0 ? p_index : 0);

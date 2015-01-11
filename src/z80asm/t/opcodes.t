@@ -1840,9 +1840,10 @@ jr2:
                     f10  = 10,
                     f11,
                     f20  = 20, f21
+                    rl
                       }
-                      defb f0,f1,f2,f3,f10,f11,f20,f21
-                                        ;; 00 01 02 03 0A 0B 14 15
+                      defb f0,f1,f2,f3,f10,f11,f20,f21,rl
+                                        ;; 00 01 02 03 0A 0B 14 15 16
 
                       defgroup
                       {
@@ -1908,10 +1909,11 @@ jr2:
                     df3  ds.p 2
                     df4  ds.l 2
                     df5
+                    rr
                                         ;;
                       }
-                      defb df1, df2, df3, df4, df5
-                                        ;; 80 84 88 8E 96
+                      defb df1, df2, df3, df4, df5, rr
+                                        ;; 80 84 88 8E 96 96
 
                       defvars 0 {
                       df6  ds.b 1
@@ -2036,7 +2038,7 @@ END_ASM
 z80asm(
     options => "-l -b",
     asm  => <<'END_ASM',
-        ldx                             ;; error: unknown identifier
+        ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
         defm "                          ;; error: unclosed quoted string
@@ -2600,10 +2602,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD 10 09
-        cpir                            ;; CD 2D 09
-        cpd                             ;; CD 59 09
-        cpdr                            ;; CD 76 09
+        cpi                             ;; CD 12 09
+        cpir                            ;; CD 2F 09
+        cpd                             ;; CD 5B 09
+        cpdr                            ;; CD 78 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -3032,8 +3034,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD A2 09
-        rrd                             ;; CD C4 09
+        rld                             ;; CD A4 09
+        rrd                             ;; CD C6 09
 
 ;	# rotate 16 bits
 ;
@@ -3794,9 +3796,10 @@ jr2:
                     f10  = 10,
                     f11,
                     f20  = 20, f21
+                    rl
                       }
-                      defb f0,f1,f2,f3,f10,f11,f20,f21
-                                        ;; 00 01 02 03 0A 0B 14 15
+                      defb f0,f1,f2,f3,f10,f11,f20,f21,rl
+                                        ;; 00 01 02 03 0A 0B 14 15 16
 
                       defgroup
                       {
@@ -3862,10 +3865,11 @@ jr2:
                     df3  ds.p 2
                     df4  ds.l 2
                     df5
+                    rr
                                         ;;
                       }
-                      defb df1, df2, df3, df4, df5
-                                        ;; 80 84 88 8E 96
+                      defb df1, df2, df3, df4, df5, rr
+                                        ;; 80 84 88 8E 96 96
 
                       defvars 0 {
                       df6  ds.b 1
@@ -3973,14 +3977,14 @@ nop:
 
                           invoke 0      ;; CD 00 00
                           invoke 1      ;; CD 01 00
-                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 35 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 7E 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD A9 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD CB 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 37 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 80 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD AB 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD CD 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
 z80asm(
     options => "-l -b -RCMX000 -i".z80emu(),
     asm  => <<'END_ASM',
-        ldx                             ;; error: unknown identifier
+        ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
         defm "                          ;; error: unclosed quoted string

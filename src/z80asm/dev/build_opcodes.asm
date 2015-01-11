@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.16 2015-01-05 23:34:02 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.17 2015-01-11 23:49:25 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -30,7 +30,7 @@
 ; z80pack is less permissive than z80asm in out of range
 ;------------------------------------------------------------------------------
 
-	ldx									;; error: unknown identifier
+	ldx									;; error: syntax error
 	ld									;; error: syntax error
 	ld a,1+								;; error: syntax error
 
@@ -597,8 +597,9 @@ ENDIF
 		f10 = 10,  						;;	
 		f11,  							;;	
 		f20 = 20, f21					;;	
+		rl								;; ; opcode can be used as constant
 	} 									;;	
-	defb f0,f1,f2,f3,f10,f11,f20,f21	;; defb 0,1,2,3,10,11,20,21
+	defb f0,f1,f2,f3,f10,f11,f20,f21,rl	;; defb 0,1,2,3,10,11,20,21,22
 
 	defgroup 							;;	
 	{ 									;;
@@ -670,9 +671,10 @@ ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
 		df3 ds.p 2;						;; ; df3 = 0x84 + 2*2 = 0x88
 		df4 ds.l 2;						;; ; df4 = 0x88 + 2*3 = 0x8E
 		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
+		rr								;; ; opcode can be used as constant
 										;;
 	}									;;
-	defb df1, df2, df3, df4, df5		;; defb 80h, 84h, 88h, 8Eh, 96h
+	defb df1, df2, df3, df4, df5, rr	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
 	
 	defvars 0 {							;;
 		df6 ds.b 1						;; ; df6 = 0

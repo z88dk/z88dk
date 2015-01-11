@@ -25,7 +25,6 @@ static tokid_t _scan_get( void )
 tr0:
 	{{p = ((te))-1;}{
 	sym.tok = TK_LPAREN;
-	sym.text = "(";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -33,7 +32,6 @@ tr0:
 tr9:
 	{te = p+1;{
 	sym.tok = TK_IND_BC;
-	sym.text = "(BC)";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -41,7 +39,6 @@ tr9:
 tr10:
 	{te = p+1;{
 	sym.tok = TK_IND_C;
-	sym.text = "(C)";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -49,7 +46,6 @@ tr10:
 tr12:
 	{te = p+1;{
 	sym.tok = TK_IND_DE;
-	sym.text = "(DE)";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -57,7 +53,6 @@ tr12:
 tr14:
 	{te = p+1;{
 	sym.tok = TK_IND_HL;
-	sym.text = "(HL)";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -65,7 +60,6 @@ tr14:
 tr17:
 	{te = p+1;{
 	sym.tok = TK_IND_IX;
-	sym.text = "(IX";
 	p--; te--;
 	{p++; cs = 21; goto _out;}
 }}
@@ -73,7 +67,6 @@ tr17:
 tr18:
 	{te = p+1;{
 	sym.tok = TK_IND_IY;
-	sym.text = "(IY";
 	p--; te--;
 	{p++; cs = 21; goto _out;}
 }}
@@ -81,7 +74,6 @@ tr18:
 tr20:
 	{te = p+1;{
 	sym.tok = TK_IND_SP;
-	sym.text = "(SP)";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -91,7 +83,6 @@ tr21:
 	case 1:
 	{{p = ((te))-1;}
 	sym.tok = TK_ASMPC;
-	sym.text = "ASMPC";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -99,7 +90,6 @@ tr21:
 	case 37:
 	{{p = ((te))-1;}
 	sym.tok = TK_NZ;
-	sym.text = "NZ";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -107,7 +97,6 @@ tr21:
 	case 38:
 	{{p = ((te))-1;}
 	sym.tok = TK_Z;
-	sym.text = "Z";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -115,7 +104,6 @@ tr21:
 	case 39:
 	{{p = ((te))-1;}
 	sym.tok = TK_NC;
-	sym.text = "NC";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -123,7 +111,6 @@ tr21:
 	case 40:
 	{{p = ((te))-1;}
 	sym.tok = TK_C;
-	sym.text = "C";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -131,7 +118,6 @@ tr21:
 	case 41:
 	{{p = ((te))-1;}
 	sym.tok = TK_PO;
-	sym.text = "PO";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -139,7 +125,6 @@ tr21:
 	case 42:
 	{{p = ((te))-1;}
 	sym.tok = TK_PE;
-	sym.text = "PE";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -147,7 +132,6 @@ tr21:
 	case 43:
 	{{p = ((te))-1;}
 	sym.tok = TK_P;
-	sym.text = "P";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -155,7 +139,6 @@ tr21:
 	case 44:
 	{{p = ((te))-1;}
 	sym.tok = TK_M;
-	sym.text = "M";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -163,7 +146,6 @@ tr21:
 	case 45:
 	{{p = ((te))-1;}
 	sym.tok = TK_B;
-	sym.text = "B";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -171,7 +153,6 @@ tr21:
 	case 46:
 	{{p = ((te))-1;}
 	sym.tok = TK_D;
-	sym.text = "D";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -179,7 +160,6 @@ tr21:
 	case 47:
 	{{p = ((te))-1;}
 	sym.tok = TK_E;
-	sym.text = "E";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -187,7 +167,6 @@ tr21:
 	case 48:
 	{{p = ((te))-1;}
 	sym.tok = TK_H;
-	sym.text = "H";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -195,7 +174,6 @@ tr21:
 	case 49:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXH;
-	sym.text = "IXH";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -203,7 +181,6 @@ tr21:
 	case 50:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYH;
-	sym.text = "IYH";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -211,7 +188,6 @@ tr21:
 	case 51:
 	{{p = ((te))-1;}
 	sym.tok = TK_L;
-	sym.text = "L";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -219,7 +195,6 @@ tr21:
 	case 52:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXL;
-	sym.text = "IXL";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -227,7 +202,6 @@ tr21:
 	case 53:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYL;
-	sym.text = "IYL";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -235,7 +209,6 @@ tr21:
 	case 54:
 	{{p = ((te))-1;}
 	sym.tok = TK_A;
-	sym.text = "A";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -243,7 +216,6 @@ tr21:
 	case 55:
 	{{p = ((te))-1;}
 	sym.tok = TK_F;
-	sym.text = "F";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -251,7 +223,6 @@ tr21:
 	case 56:
 	{{p = ((te))-1;}
 	sym.tok = TK_I;
-	sym.text = "I";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -259,7 +230,6 @@ tr21:
 	case 57:
 	{{p = ((te))-1;}
 	sym.tok = TK_IIR;
-	sym.text = "IIR";
 	if ( ! (opts.cpu & CPU_RABBIT) ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -267,7 +237,6 @@ tr21:
 	case 58:
 	{{p = ((te))-1;}
 	sym.tok = TK_R;
-	sym.text = "R";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -275,7 +244,6 @@ tr21:
 	case 59:
 	{{p = ((te))-1;}
 	sym.tok = TK_EIR;
-	sym.text = "EIR";
 	if ( ! (opts.cpu & CPU_RABBIT) ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }
@@ -283,7 +251,6 @@ tr21:
 	case 61:
 	{{p = ((te))-1;}
 	sym.tok = TK_BC;
-	sym.text = "BC";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -291,7 +258,6 @@ tr21:
 	case 62:
 	{{p = ((te))-1;}
 	sym.tok = TK_DE;
-	sym.text = "DE";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -299,7 +265,6 @@ tr21:
 	case 63:
 	{{p = ((te))-1;}
 	sym.tok = TK_HL;
-	sym.text = "HL";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -307,7 +272,6 @@ tr21:
 	case 64:
 	{{p = ((te))-1;}
 	sym.tok = TK_IX;
-	sym.text = "IX";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -315,7 +279,6 @@ tr21:
 	case 65:
 	{{p = ((te))-1;}
 	sym.tok = TK_IY;
-	sym.text = "IY";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -323,7 +286,6 @@ tr21:
 	case 66:
 	{{p = ((te))-1;}
 	sym.tok = TK_AF;
-	sym.text = "AF";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -331,7 +293,6 @@ tr21:
 	case 67:
 	{{p = ((te))-1;}
 	sym.tok = TK_SP;
-	sym.text = "SP";
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -340,13 +301,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFGROUP;
-		sym.text = "DEFGROUP";
-		;
+		sym.tok_opcode = TK_DEFGROUP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DEFGROUP;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -355,13 +315,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFS;
-		sym.text = "DEFS";
-		;
+		sym.tok_opcode = TK_DEFS;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DEFS;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -370,13 +329,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFVARS;
-		sym.text = "DEFVARS";
-		;
+		sym.tok_opcode = TK_DEFVARS;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DEFVARS;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -385,13 +343,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ORG;
-		sym.text = "ORG";
-		;
+		sym.tok_opcode = TK_ORG;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_ORG;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -400,13 +357,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ADC;
-		sym.text = "ADC";
-		;
+		sym.tok_opcode = TK_ADC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_ADC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -415,13 +371,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ADD;
-		sym.text = "ADD";
-		;
+		sym.tok_opcode = TK_ADD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_ADD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -430,13 +385,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_AND;
-		sym.text = "AND";
-		;
+		sym.tok_opcode = TK_AND;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_AND;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -445,13 +399,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_BIT;
-		sym.text = "BIT";
-		;
+		sym.tok_opcode = TK_BIT;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_BIT;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -460,13 +413,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CALL;
-		sym.text = "CALL";
-		;
+		sym.tok_opcode = TK_CALL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CALL;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -475,13 +427,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CCF;
-		sym.text = "CCF";
-		;
+		sym.tok_opcode = TK_CCF;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CCF;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -490,13 +441,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CP;
-		sym.text = "CP";
-		;
+		sym.tok_opcode = TK_CP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CP;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -505,13 +455,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
-		sym.text = "CPD";
-		;
+		sym.tok_opcode = TK_CPD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -520,13 +469,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPDR;
-		sym.text = "CPDR";
-		;
+		sym.tok_opcode = TK_CPDR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPDR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -535,13 +483,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
-		sym.text = "CPI";
-		;
+		sym.tok_opcode = TK_CPI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -550,13 +497,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPIR;
-		sym.text = "CPIR";
-		;
+		sym.tok_opcode = TK_CPIR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPIR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -565,13 +511,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPL;
-		sym.text = "CPL";
-		;
+		sym.tok_opcode = TK_CPL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPL;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -580,13 +525,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DAA;
-		sym.text = "DAA";
-		;
+		sym.tok_opcode = TK_DAA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DAA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -595,13 +539,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEC;
-		sym.text = "DEC";
-		;
+		sym.tok_opcode = TK_DEC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DEC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -610,13 +553,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DI;
-		sym.text = "DI";
-		;
+		sym.tok_opcode = TK_DI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -625,13 +567,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DJNZ;
-		sym.text = "DJNZ";
-		;
+		sym.tok_opcode = TK_DJNZ;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_DJNZ;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -640,13 +581,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EI;
-		sym.text = "EI";
-		;
+		sym.tok_opcode = TK_EI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_EI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -655,13 +595,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EX;
-		sym.text = "EX";
-		;
+		sym.tok_opcode = TK_EX;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_EX;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -670,13 +609,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EXX;
-		sym.text = "EXX";
-		;
+		sym.tok_opcode = TK_EXX;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_EXX;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -685,13 +623,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_HALT;
-		sym.text = "HALT";
-		;
+		sym.tok_opcode = TK_HALT;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_HALT;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -700,13 +637,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IM;
-		sym.text = "IM";
-		;
+		sym.tok_opcode = TK_IM;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_IM;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -715,13 +651,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IN;
-		sym.text = "IN";
-		;
+		sym.tok_opcode = TK_IN;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_IN;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -730,13 +665,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INC;
-		sym.text = "INC";
-		;
+		sym.tok_opcode = TK_INC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_INC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -745,13 +679,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IND;
-		sym.text = "IND";
-		;
+		sym.tok_opcode = TK_IND;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_IND;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -760,13 +693,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INDR;
-		sym.text = "INDR";
-		;
+		sym.tok_opcode = TK_INDR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_INDR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -775,13 +707,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INI;
-		sym.text = "INI";
-		;
+		sym.tok_opcode = TK_INI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_INI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -790,13 +721,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INIR;
-		sym.text = "INIR";
-		;
+		sym.tok_opcode = TK_INIR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_INIR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -805,13 +735,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_JP;
-		sym.text = "JP";
-		;
+		sym.tok_opcode = TK_JP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_JP;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -820,13 +749,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_JR;
-		sym.text = "JR";
-		;
+		sym.tok_opcode = TK_JR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_JR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -835,13 +763,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LD;
-		sym.text = "LD";
-		;
+		sym.tok_opcode = TK_LD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -850,13 +777,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
-		sym.text = "LDD";
-		;
+		sym.tok_opcode = TK_LDD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -865,13 +791,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDDR;
-		sym.text = "LDDR";
-		;
+		sym.tok_opcode = TK_LDDR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDDR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -880,13 +805,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
-		sym.text = "LDI";
-		;
+		sym.tok_opcode = TK_LDI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -895,13 +819,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDIR;
-		sym.text = "LDIR";
-		;
+		sym.tok_opcode = TK_LDIR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDIR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -910,13 +833,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_NEG;
-		sym.text = "NEG";
-		;
+		sym.tok_opcode = TK_NEG;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_NEG;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -925,13 +847,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_NOP;
-		sym.text = "NOP";
-		;
+		sym.tok_opcode = TK_NOP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_NOP;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -940,13 +861,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OR;
-		sym.text = "OR";
-		;
+		sym.tok_opcode = TK_OR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -955,13 +875,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTDR;
-		sym.text = "OTDR";
-		;
+		sym.tok_opcode = TK_OTDR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OTDR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -970,13 +889,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTIR;
-		sym.text = "OTIR";
-		;
+		sym.tok_opcode = TK_OTIR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OTIR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -985,13 +903,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
-		sym.text = "OUT";
-		;
+		sym.tok_opcode = TK_OUT;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OUT;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1000,13 +917,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUTD;
-		sym.text = "OUTD";
-		;
+		sym.tok_opcode = TK_OUTD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OUTD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1015,13 +931,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUTI;
-		sym.text = "OUTI";
-		;
+		sym.tok_opcode = TK_OUTI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OUTI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1030,13 +945,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_POP;
-		sym.text = "POP";
-		;
+		sym.tok_opcode = TK_POP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_POP;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1045,13 +959,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PUSH;
-		sym.text = "PUSH";
-		;
+		sym.tok_opcode = TK_PUSH;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_PUSH;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1060,13 +973,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RES;
-		sym.text = "RES";
-		;
+		sym.tok_opcode = TK_RES;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RES;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1075,13 +987,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RET;
-		sym.text = "RET";
-		;
+		sym.tok_opcode = TK_RET;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RET;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1090,13 +1001,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RETI;
-		sym.text = "RETI";
-		;
+		sym.tok_opcode = TK_RETI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RETI;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1105,13 +1015,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RETN;
-		sym.text = "RETN";
-		;
+		sym.tok_opcode = TK_RETN;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RETN;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1120,13 +1029,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RL;
-		sym.text = "RL";
-		;
+		sym.tok_opcode = TK_RL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RL;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1135,13 +1043,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLA;
-		sym.text = "RLA";
-		;
+		sym.tok_opcode = TK_RLA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RLA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1150,13 +1057,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
-		sym.text = "RLC";
-		;
+		sym.tok_opcode = TK_RLC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RLC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1165,13 +1071,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLCA;
-		sym.text = "RLCA";
-		;
+		sym.tok_opcode = TK_RLCA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RLCA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1180,13 +1085,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLD;
-		sym.text = "RLD";
-		;
+		sym.tok_opcode = TK_RLD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RLD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1195,13 +1099,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RR;
-		sym.text = "RR";
-		;
+		sym.tok_opcode = TK_RR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1210,13 +1113,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRA;
-		sym.text = "RRA";
-		;
+		sym.tok_opcode = TK_RRA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RRA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1225,13 +1127,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
-		sym.text = "RRC";
-		;
+		sym.tok_opcode = TK_RRC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RRC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1240,13 +1141,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRCA;
-		sym.text = "RRCA";
-		;
+		sym.tok_opcode = TK_RRCA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RRCA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1255,13 +1155,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRD;
-		sym.text = "RRD";
-		;
+		sym.tok_opcode = TK_RRD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RRD;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1270,13 +1169,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RST;
-		sym.text = "RST";
-		;
+		sym.tok_opcode = TK_RST;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RST;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1285,13 +1183,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SBC;
-		sym.text = "SBC";
-		;
+		sym.tok_opcode = TK_SBC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SBC;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1300,13 +1197,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SCF;
-		sym.text = "SCF";
-		;
+		sym.tok_opcode = TK_SCF;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SCF;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1315,13 +1211,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SET;
-		sym.text = "SET";
-		;
+		sym.tok_opcode = TK_SET;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SET;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1330,13 +1225,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLA;
-		sym.text = "SLA";
-		;
+		sym.tok_opcode = TK_SLA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SLA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1345,13 +1239,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLL;
-		sym.text = "SLL";
-		;
+		sym.tok_opcode = TK_SLL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SLL;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1360,13 +1253,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SRA;
-		sym.text = "SRA";
-		;
+		sym.tok_opcode = TK_SRA;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SRA;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1375,13 +1267,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SRL;
-		sym.text = "SRL";
-		;
+		sym.tok_opcode = TK_SRL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SRL;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1390,13 +1281,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SUB;
-		sym.text = "SUB";
-		;
+		sym.tok_opcode = TK_SUB;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_SUB;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1405,13 +1295,12 @@ tr21:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_XOR;
-		sym.text = "XOR";
-		;
+		sym.tok_opcode = TK_XOR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_XOR;
 	}
 	{p++; cs = 21; goto _out;}
 }
@@ -1419,7 +1308,6 @@ tr21:
 	case 153:
 	{{p = ((te))-1;}
   sym.tok = TK_NAME;
-  set_tok_name();
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1427,6 +1315,7 @@ tr21:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts, 10 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1434,6 +1323,7 @@ tr21:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 1, te - ts - 1, 16 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1441,6 +1331,7 @@ tr21:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts - 1, 2 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1448,6 +1339,7 @@ tr21:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 2, te - ts - 2, 2 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1455,6 +1347,7 @@ tr21:
 	{{p = ((te))-1;}
   sym.tok = TK_NIL;
   skip_to_newline();
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }
 	break;
@@ -1465,6 +1358,7 @@ tr23:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts - 1, 16 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1472,6 +1366,7 @@ tr24:
 	{{p = ((te))-1;}{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts, 10 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1479,6 +1374,7 @@ tr26:
 	{{p = ((te))-1;}{
   sym.tok = TK_NIL;
   skip_to_newline();
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1486,20 +1382,19 @@ tr28:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 2, te - ts - 3, 2 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr29:
 	{{p = ((te))-1;}{
   sym.tok = TK_NAME;
-  set_tok_name();
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr30:
 	{te = p+1;{
 	sym.tok = TK_DS_B;
-	sym.text = "DS.B";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1507,7 +1402,6 @@ tr30:
 tr31:
 	{te = p+1;{
 	sym.tok = TK_DS_L;
-	sym.text = "DS.L";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1515,7 +1409,6 @@ tr31:
 tr32:
 	{te = p+1;{
 	sym.tok = TK_DS_P;
-	sym.text = "DS.P";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1523,7 +1416,6 @@ tr32:
 tr33:
 	{te = p+1;{
 	sym.tok = TK_DS_W;
-	sym.text = "DS.W";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1531,7 +1423,6 @@ tr33:
 tr34:
 	{{p = ((te))-1;}{
 	sym.tok = TK_DOT;
-	sym.text = ".";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1541,7 +1432,6 @@ tr38:
   while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
   while ( te[-1] == ':' || isspace(te[-1]) ) te--;
   sym.tok = TK_LABEL;
-  set_tok_name();
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1551,7 +1441,6 @@ tr39:
 tr40:
 	{te = p+1;{
 	sym.tok = TK_NEWLINE;
-	sym.text = "\n";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1560,16 +1449,13 @@ tr42:
 	{te = p+1;{
   sym.tok = TK_STRING;
   if ( ! get_sym_string() )
-  {
    error_unclosed_string();
-  }
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr43:
 	{te = p+1;{
 	sym.tok = TK_CONST_EXPR;
-	sym.text = "#";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1577,7 +1463,6 @@ tr43:
 tr45:
 	{te = p+1;{
 	sym.tok = TK_MOD;
-	sym.text = "%";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1586,22 +1471,22 @@ tr47:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   if ( get_sym_string() &&
-       sym_string->len == 1 )
+                             te - ts == 1 )
   {
-   sym.number = sym_string->str[0];
+   sym.number = *ts;
   }
   else
   {
    sym.number = 0;
    error_invalid_squoted_string();
   }
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr49:
 	{te = p+1;{
 	sym.tok = TK_RPAREN;
-	sym.text = ")";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1609,7 +1494,6 @@ tr49:
 tr51:
 	{te = p+1;{
 	sym.tok = TK_PLUS;
-	sym.text = "+";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1617,7 +1501,6 @@ tr51:
 tr52:
 	{te = p+1;{
 	sym.tok = TK_COMMA;
-	sym.text = ",";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1625,7 +1508,6 @@ tr52:
 tr53:
 	{te = p+1;{
 	sym.tok = TK_MINUS;
-	sym.text = "-";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1633,7 +1515,6 @@ tr53:
 tr54:
 	{te = p+1;{
 	sym.tok = TK_DIVIDE;
-	sym.text = "/";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1641,7 +1522,6 @@ tr54:
 tr59:
 	{te = p+1;{
 	sym.tok = TK_COLON;
-	sym.text = ":";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1649,7 +1529,6 @@ tr59:
 tr64:
 	{te = p+1;{
 	sym.tok = TK_QUESTION;
-	sym.text = "?";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1657,7 +1536,6 @@ tr64:
 tr66:
 	{te = p+1;{
 	sym.tok = TK_LSQUARE;
-	sym.text = "[";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1666,13 +1544,13 @@ tr67:
 	{te = p+1;{
   sym.tok = TK_NIL;
   skip_to_newline();
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr68:
 	{te = p+1;{
 	sym.tok = TK_RSQUARE;
-	sym.text = "]";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1680,7 +1558,6 @@ tr68:
 tr69:
 	{te = p+1;{
 	sym.tok = TK_BIN_XOR;
-	sym.text = "^";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1688,7 +1565,6 @@ tr69:
 tr70:
 	{te = p+1;{
 	sym.tok = TK_LCURLY;
-	sym.text = "{";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1696,7 +1572,6 @@ tr70:
 tr72:
 	{te = p+1;{
 	sym.tok = TK_RCURLY;
-	sym.text = "}";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1704,7 +1579,6 @@ tr72:
 tr73:
 	{te = p+1;{
 	sym.tok = TK_BIN_NOT;
-	sym.text = "~";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1712,7 +1586,6 @@ tr73:
 tr74:
 	{te = p+1;{
 	sym.tok = TK_DOT;
-	sym.text = ".";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1720,7 +1593,6 @@ tr74:
 tr114:
 	{te = p;p--;{
 	sym.tok = TK_LOG_NOT;
-	sym.text = "!";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1728,7 +1600,6 @@ tr114:
 tr115:
 	{te = p+1;{
 	sym.tok = TK_NOT_EQ;
-	sym.text = "!=";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1736,7 +1607,6 @@ tr115:
 tr117:
 	{te = p;p--;{
 	sym.tok = TK_BIN_AND;
-	sym.text = "&";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1744,7 +1614,6 @@ tr117:
 tr118:
 	{te = p+1;{
 	sym.tok = TK_LOG_AND;
-	sym.text = "&&";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1752,7 +1621,6 @@ tr118:
 tr119:
 	{te = p;p--;{
 	sym.tok = TK_LPAREN;
-	sym.text = "(";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1760,7 +1628,6 @@ tr119:
 tr120:
 	{te = p;p--;{
 	sym.tok = TK_MULTIPLY;
-	sym.text = "*";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1768,7 +1635,6 @@ tr120:
 tr121:
 	{te = p+1;{
 	sym.tok = TK_POWER;
-	sym.text = "**";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1777,6 +1643,7 @@ tr122:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts, 10 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1784,6 +1651,7 @@ tr126:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts - 1, 2 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1791,6 +1659,7 @@ tr128:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 2, te - ts - 2, 16 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1800,7 +1669,6 @@ tr129:
 tr130:
 	{te = p;p--;{
 	sym.tok = TK_LESS;
-	sym.text = "<";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1808,7 +1676,6 @@ tr130:
 tr131:
 	{te = p+1;{
 	sym.tok = TK_LEFT_SHIFT;
-	sym.text = "<<";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1816,7 +1683,6 @@ tr131:
 tr132:
 	{te = p+1;{
 	sym.tok = TK_LESS_EQ;
-	sym.text = "<=";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1824,7 +1690,6 @@ tr132:
 tr133:
 	{te = p+1;{
 	sym.tok = TK_NOT_EQ;
-	sym.text = "<>";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1832,7 +1697,6 @@ tr133:
 tr134:
 	{te = p;p--;{
 	sym.tok = TK_EQUAL;
-	sym.text = "=";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1840,7 +1704,6 @@ tr134:
 tr135:
 	{te = p+1;{
 	sym.tok = TK_EQUAL;
-	sym.text = "==";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1848,7 +1711,6 @@ tr135:
 tr136:
 	{te = p;p--;{
 	sym.tok = TK_GREATER;
-	sym.text = ">";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1856,7 +1718,6 @@ tr136:
 tr137:
 	{te = p+1;{
 	sym.tok = TK_GREATER_EQ;
-	sym.text = ">=";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1864,7 +1725,6 @@ tr137:
 tr138:
 	{te = p+1;{
 	sym.tok = TK_RIGHT_SHIFT;
-	sym.text = ">>";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1873,6 +1733,7 @@ tr139:
 	{te = p;p--;{
   sym.tok = TK_NIL;
   skip_to_newline();
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
@@ -1880,13 +1741,13 @@ tr142:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 1, te - ts - 1, 2 );
+  ts = te = p;
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr143:
 	{te = p;p--;{
 	sym.tok = TK_BIN_OR;
-	sym.text = "|";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1894,7 +1755,6 @@ tr143:
 tr144:
 	{te = p+1;{
 	sym.tok = TK_LOG_OR;
-	sym.text = "||";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1902,7 +1762,6 @@ tr144:
 tr145:
 	{te = p;p--;{
 	sym.tok = TK_A;
-	sym.text = "A";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1910,14 +1769,12 @@ tr145:
 tr150:
 	{te = p;p--;{
   sym.tok = TK_NAME;
-  set_tok_name();
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;
 tr153:
 	{te = p;p--;{
 	sym.tok = TK_AF;
-	sym.text = "AF";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1925,7 +1782,6 @@ tr153:
 tr154:
 	{te = p+1;{
 	sym.tok = TK_AF1;
-	sym.text = "AF'";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1933,7 +1789,6 @@ tr154:
 tr159:
 	{te = p;p--;{
 	sym.tok = TK_B;
-	sym.text = "B";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1941,7 +1796,6 @@ tr159:
 tr163:
 	{te = p;p--;{
 	sym.tok = TK_C;
-	sym.text = "C";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -1950,13 +1804,12 @@ tr170:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CP;
-		sym.text = "CP";
-		;
+		sym.tok_opcode = TK_CP;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CP;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -1965,13 +1818,12 @@ tr174:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
-		sym.text = "CPD";
-		;
+		sym.tok_opcode = TK_CPD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPD;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -1980,13 +1832,12 @@ tr176:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
-		sym.text = "CPI";
-		;
+		sym.tok_opcode = TK_CPI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_CPI;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -1994,7 +1845,6 @@ tr176:
 tr178:
 	{te = p;p--;{
 	sym.tok = TK_D;
-	sym.text = "D";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2002,7 +1852,6 @@ tr178:
 tr185:
 	{te = p;p--;{
 	sym.tok = TK_DE;
-	sym.text = "DE";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2010,7 +1859,6 @@ tr185:
 tr201:
 	{te = p;p--;{
 	sym.tok = TK_E;
-	sym.text = "E";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2019,13 +1867,12 @@ tr204:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_EI;
-		sym.text = "EI";
-		;
+		sym.tok_opcode = TK_EI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_EI;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2034,13 +1881,12 @@ tr206:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_EX;
-		sym.text = "EX";
-		;
+		sym.tok_opcode = TK_EX;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_EX;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2048,7 +1894,6 @@ tr206:
 tr208:
 	{te = p;p--;{
 	sym.tok = TK_H;
-	sym.text = "H";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2056,7 +1901,6 @@ tr208:
 tr213:
 	{te = p;p--;{
 	sym.tok = TK_I;
-	sym.text = "I";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }}
@@ -2065,13 +1909,12 @@ tr220:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_IN;
-		sym.text = "IN";
-		;
+		sym.tok_opcode = TK_IN;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_IN;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2080,13 +1923,12 @@ tr224:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_IND;
-		sym.text = "IND";
-		;
+		sym.tok_opcode = TK_IND;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_IND;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2095,13 +1937,12 @@ tr226:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_INI;
-		sym.text = "INI";
-		;
+		sym.tok_opcode = TK_INI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_INI;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2109,7 +1950,6 @@ tr226:
 tr228:
 	{te = p;p--;{
 	sym.tok = TK_IX;
-	sym.text = "IX";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2117,7 +1957,6 @@ tr228:
 tr231:
 	{te = p;p--;{
 	sym.tok = TK_IY;
-	sym.text = "IY";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2125,7 +1964,6 @@ tr231:
 tr236:
 	{te = p;p--;{
 	sym.tok = TK_L;
-	sym.text = "L";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2134,13 +1972,12 @@ tr238:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LD;
-		sym.text = "LD";
-		;
+		sym.tok_opcode = TK_LD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LD;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2149,13 +1986,12 @@ tr241:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
-		sym.text = "LDD";
-		;
+		sym.tok_opcode = TK_LDD;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDD;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2164,13 +2000,12 @@ tr243:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
-		sym.text = "LDI";
-		;
+		sym.tok_opcode = TK_LDI;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_LDI;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2179,13 +2014,12 @@ tr254:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OR;
-		sym.text = "OR";
-		;
+		sym.tok_opcode = TK_OR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OR;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2194,13 +2028,12 @@ tr261:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
-		sym.text = "OUT";
-		;
+		sym.tok_opcode = TK_OUT;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_OUT;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2208,7 +2041,6 @@ tr261:
 tr264:
 	{te = p;p--;{
 	sym.tok = TK_P;
-	sym.text = "P";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2216,7 +2048,6 @@ tr264:
 tr268:
 	{te = p;p--;{
 	sym.tok = TK_PO;
-	sym.text = "PO";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2224,7 +2055,6 @@ tr268:
 tr272:
 	{te = p;p--;{
 	sym.tok = TK_R;
-	sym.text = "R";
 	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
 	{p++; cs = 21; goto _out;}
 }}
@@ -2233,13 +2063,12 @@ tr279:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RET;
-		sym.text = "RET";
-		;
+		sym.tok_opcode = TK_RET;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RET;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2248,13 +2077,12 @@ tr282:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RL;
-		sym.text = "RL";
-		;
+		sym.tok_opcode = TK_RL;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RL;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2263,13 +2091,12 @@ tr286:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
-		sym.text = "RLC";
-		;
+		sym.tok_opcode = TK_RLC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RLC;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2278,13 +2105,12 @@ tr288:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RR;
-		sym.text = "RR";
-		;
+		sym.tok_opcode = TK_RR;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RR;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2293,13 +2119,12 @@ tr292:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
-		sym.text = "RRC";
-		;
+		sym.tok_opcode = TK_RRC;
 		expect_opcode = FALSE;
 	}
 	else {
 		sym.tok = TK_NAME;
-		set_tok_name();
+		sym.tok_opcode = TK_RRC;
 	}
 	{p++; cs = 21; goto _out;}
 }}
@@ -2307,7 +2132,6 @@ tr292:
 tr312:
 	{te = p;p--;{
 	sym.tok = TK_DOT;
-	sym.text = ".";
 	;
 	{p++; cs = 21; goto _out;}
 }}
@@ -2317,7 +2141,6 @@ tr313:
   while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
   while ( te[-1] == ':' || isspace(te[-1]) ) te--;
   sym.tok = TK_LABEL;
-  set_tok_name();
   {p++; cs = 21; goto _out;}
  }}
 	goto st21;

@@ -15,14 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2014
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.11 2014-12-31 16:11:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.12 2015-01-11 23:49:25 pauloscustodio Exp $ 
 */
 
 #define TOKEN_RE(name, string, regexp, set_value)	 \
 	regexp									<NL> \
 	{										<NL> \
 		<TAB>	sym.tok = name;				<NL> \
-		<TAB>	sym.text = string;			<NL> \
 		<TAB>	set_value;					<NL> \
 		<TAB>	fbreak; 					<NL> \
 	};										<NL>
@@ -33,18 +32,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.11 2014-12-3
 #define TOKEN2(name, string, set_value)	\
 		TOKEN(name, string, set_value)
 
-#define TOKEN_OPCODE(opcode, set_value)	 \
+#define TOKEN_OPCODE(opcode)	 \
 	#opcode <CAT> i										<NL> \
 	{													<NL> \
 		<TAB>		if (expect_opcode) {				<NL> \
-		<TAB><TAB>		sym.tok = TK_##opcode;			<NL> \
-		<TAB><TAB>		sym.text = #opcode;				<NL> \
-		<TAB><TAB>		set_value;						<NL> \
-		<TAB><TAB>		expect_opcode = FALSE;			<NL> \
+		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
+		<TAB><TAB>		sym.tok_opcode = TK_##opcode;	<NL> \
+		<TAB><TAB>		expect_opcode  = FALSE;			<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \
-		<TAB><TAB>		sym.tok = TK_NAME;				<NL> \
-		<TAB><TAB>		set_tok_name();					<NL> \
+		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
+		<TAB><TAB>		sym.tok_opcode = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		fbreak; 							<NL> \
 	};													<NL>
@@ -92,7 +90,7 @@ main := |*
 	name
 	{
 		sym.tok = TK_NAME;
-		set_tok_name();
+		/* set_tok_name(); */
 		fbreak;
 	};
 	
@@ -105,7 +103,7 @@ main := |*
 		
 		/* copy token */
 		sym.tok = TK_LABEL;
-		set_tok_name();
+		/* set_tok_name(); */
 		fbreak;
 	};
 	
@@ -118,48 +116,56 @@ main := |*
 		
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts, te - ts, 10 ); 
+		ts = te = p;
 		fbreak;
 	};
 	digit xdigit* 'h'i
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts, te - ts - 1, 16 ); 
+		ts = te = p;
 		fbreak;
 	};
 	"$" xdigit+
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 1, te - ts - 1, 16 ); 
+		ts = te = p;
 		fbreak;
 	};
 	'0x'i xdigit+
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 2, te - ts - 2, 16 ); 
+		ts = te = p;
 		fbreak;
 	};
 	bdigit+ 'b'i
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts, te - ts - 1, 2 ); 
+		ts = te = p;
 		fbreak;
 	};
 	"@" bdigit+
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 1, te - ts - 1, 2 ); 
+		ts = te = p;
 		fbreak;
 	};
 	'0b'i bdigit+
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 2, te - ts - 2, 2 ); 
+		ts = te = p;
 		fbreak;
 	};
 	'@' '"' [\-#]+ '"'
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 2, te - ts - 3, 2 ); 
+		ts = te = p;
 		fbreak;
 	};
 	
@@ -168,15 +174,16 @@ main := |*
 	{ 
 		sym.tok = TK_NUMBER;
 		if ( get_sym_string() && 		/* consumes input up to end quote or \n */
-		     sym_string->len == 1 )
+		     /* sym_string->len */ te - ts == 1 )
 		{
-			sym.number = sym_string->str[0];
+			sym.number = *ts; //sym_string->str[0];
 		}
 		else
 		{
 			sym.number = 0;
 			error_invalid_squoted_string(); 
 		}
+		ts = te = p;
 		fbreak;
 	};
 	
@@ -185,9 +192,7 @@ main := |*
 	{ 
 		sym.tok = TK_STRING;
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
-		{
 			error_unclosed_string(); 
-		}
 		fbreak;
 	};
 	
@@ -196,6 +201,7 @@ main := |*
 	{
 		sym.tok = TK_NIL;
 		skip_to_newline();
+		ts = te = p;
 		fbreak;
 	};
 	

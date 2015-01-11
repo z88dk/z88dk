@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.68 2015-01-03 18:39:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.69 2015-01-11 23:49:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -47,7 +47,7 @@ static Bool	 at_bol;					/* true if at beginning of line */
 static int	 cs, act;					/* Ragel state variables */
 static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
-static DEFINE_STR(sym_string, MAXLINE);
+/* static DEFINE_STR(sym_string, MAXLINE); */
 
 static Bool	expect_opcode;				/* true to return opcodes as tokens, 
 										*  false to return as names */
@@ -61,7 +61,7 @@ typedef struct scan_state_t
 	Bool	 EOL;
 	int		 cs, act;
 	int		 p, pe, eof, ts, te;
-	char	*sym_string;
+//	char	*sym_string;
 	Bool	 expect_opcode;
 } ScanState;
 
@@ -69,7 +69,7 @@ static void ut_scan_state_dtor(void *elt)
 { 
 	ScanState *state = elt; 
 	xfree(state->input_buf); 
-	xfree(state->sym_string);
+//	xfree(state->sym_string);
 }
 static UT_array *scan_state;
 static UT_icd ut_scan_state_icd = { sizeof(ScanState), NULL, NULL, ut_scan_state_dtor };
@@ -79,11 +79,15 @@ static UT_icd ut_scan_state_icd = { sizeof(ScanState), NULL, NULL, ut_scan_state
 *----------------------------------------------------------------------------*/
 static void init_sym(void)
 {
-	sym.tok = TK_END;
-	sym.text = sym.ts = sym.te = "";
+	sym.tok = sym.tok_opcode = TK_END;
+	sym.tstart = ""; 
+	sym.tlen = 0;
+#if 0
+	sym.text = "";
 	sym.string = NULL;
 	sym.filename = NULL;
 	sym.line_nr = 0;
+#endif
 	sym.number = 0;
 }
 
@@ -129,7 +133,7 @@ void save_scan_state(void)
 	save.eof = eof ? eof - input_buf->str : -1;
 	save.ts  = ts  ? ts  - input_buf->str : -1;
 	save.te  = te  ? te  - input_buf->str : -1;
-	save.sym_string = xstrdup(sym_string->str);
+//	save.sym_string = xstrdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
 	utarray_push_back(scan_state, &save);
@@ -153,7 +157,7 @@ void restore_scan_state(void)
 	eof = save->eof >= 0 ? input_buf->str + save->eof : NULL;
 	ts  = save->ts  >= 0 ? input_buf->str + save->ts  : NULL;
 	te  = save->te  >= 0 ? input_buf->str + save->te  : NULL;
-	Str_set(sym_string, save->sym_string);
+//	Str_set(sym_string, save->sym_string);
 	expect_opcode = save->expect_opcode;
 
 	utarray_pop_back(scan_state);
@@ -171,6 +175,10 @@ void scan_expect_opcode(void)
 	init();
 
 	expect_opcode = TRUE;
+
+	/* convert current symbol */
+	if (sym.tok_opcode)
+		sym.tok = sym.tok_opcode;
 }
 
 void scan_expect_operands(void)
@@ -178,6 +186,10 @@ void scan_expect_operands(void)
 	init();
 
 	expect_opcode = FALSE;
+
+	/* convert current symbol */
+	if (sym.tok_opcode)
+		sym.tok = TK_NAME;
 }
 
 /*-----------------------------------------------------------------------------
@@ -237,15 +249,6 @@ static long scan_num ( char *text, int length, int base )
 }
 
 /*-----------------------------------------------------------------------------
-*   copy ts to te to text and name, upper case name
-*----------------------------------------------------------------------------*/
-static void set_tok_name(void)
-{
-	Str_set_n(sym_string, ts, te - ts);
-	sym.string = sym_string->str;
-}
-
-/*-----------------------------------------------------------------------------
 *   copy tok_string, start with p pointing at the start quote (' or "),
 *	end with p pointing at the end quote, copy characters to tok_string
 *	handling C escape sequences. Return false if string not terminated.
@@ -253,6 +256,7 @@ static void set_tok_name(void)
 static Bool get_sym_string( void )
 {
 	char quote;
+	int  len;
 
 	/* mark token start */
 	quote = *p++;
@@ -261,32 +265,36 @@ static Bool get_sym_string( void )
 
 	/* search for end quote or end of string */
 	while (TRUE)
-{
-		if ( *p == '\\' && p[1] != '\0' )
-		{
+	{
+		if (*p == '\\' && p[1] != '\0')
 			p++;						/* skip char after backslash, may be a quote */
-}
-		else if ( *p == quote )
+		else if (*p == quote)
 		{
-			te = p;
+			*p = '\0';					/* terminate string */
+			len = str_compress_escapes(ts);
+			te = ts + len;
+			memset(te, ' ', p - te);	/* fill remaining chars with space */
+			*p = quote;					/* restore quote */
 
-			Str_set_n(sym_string, ts, te - ts);
-			sym.string = sym_string->str;
-
-			Str_compress_escapes(sym_string);
+//			te = p;
+//			Str_set_n(sym_string, ts, te - ts);
+//			sym.string = sym_string->str;
+//			Str_compress_escapes(sym_string);
 
 			return TRUE;
 		}
-		else if ( *p == '\n' || *p == '\0' )
-{
-			te = p;
+		else if (*p == '\n' || *p == '\0')
+		{
+			te = ts;
 			p--;						/* point to before separator */
 
-			Str_clear(sym_string);
-			sym.string = sym_string->str;
+//			Str_clear(sym_string);
+//			sym.string = sym_string->str;
 
 			return FALSE;
-	}
+		}
+		
+		/* advance to next */
 		p++;
 	}
 }
@@ -371,7 +379,7 @@ tokid_t GetSym( void )
 	if ( EOL )
 	{
 		at_bol = TRUE;
-		sym.text = "\n";
+		sym.tstart = "\n"; sym.tlen = 1;
 		return (sym.tok = TK_NEWLINE);			/* assign and return */
 	}
 
@@ -382,6 +390,7 @@ tokid_t GetSym( void )
 		if ( ! fill_buffer() )
 		{
 			sym.tok = TK_END;
+			ts = te = p;
 			break;
 		}
 
@@ -390,7 +399,7 @@ tokid_t GetSym( void )
 
 	} while ( sym.tok == TK_END );
 
-	sym.ts = ts; sym.te = te;			/* remember token position */
+	sym.tstart = ts; sym.tlen = te - ts;			/* remember token position */
 
 	at_bol = EOL = (sym.tok == TK_NEWLINE) ? TRUE : FALSE;
 	return sym.tok;
@@ -429,4 +438,17 @@ void SetTemporaryLine( char *line )
 		List_push(&input_stack, xstrdup(p));		/* save current input */
 #endif
 	set_scan_buf( line, FALSE );					/* assume not at BOL */
+}
+
+/*-----------------------------------------------------------------------------
+*   return static string with current token text
+*   non-reentrant, string needs to be saved by caller
+*----------------------------------------------------------------------------*/
+char *sym_text(Sym *sym)
+{
+	static Str *text;
+
+	INIT_OBJ(Str, &text);
+	Str_set_n(text, sym->tstart, sym->tlen);
+	return text->str;
 }

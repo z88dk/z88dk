@@ -13,21 +13,23 @@ static void _parse_init(void)
 static Bool _parse_statement(Bool compile_active)
 {
  int start_num_errors = get_num_errors();;
- char *name = NULL;
- char *stmt_label = NULL;
+ static Str *name = NULL;
+ static Str *stmt_label = NULL;
  int value1 = 0;
+ INIT_OBJ(Str, &name); Str_clear(name);
+ INIT_OBJ(Str, &stmt_label); Str_clear(stmt_label);
 	{
 	}
  switch (current_sm)
  {
  case SM_MAIN: cs = parser_en_main; break;
- case SM_DEFVARS_OPEN: cs = parser_en_defvars_open; break;
- case SM_DEFVARS_LINE: cs = parser_en_defvars_line; break;
- case SM_DEFGROUP_OPEN: cs = parser_en_defgroup_open; break;
- case SM_DEFGROUP_LINE: cs = parser_en_defgroup_line; break;
+ case SM_DEFVARS_OPEN: cs = parser_en_defvars_open; scan_expect_operands(); break;
+ case SM_DEFVARS_LINE: cs = parser_en_defvars_line; scan_expect_operands(); break;
+ case SM_DEFGROUP_OPEN: cs = parser_en_defgroup_open; scan_expect_operands(); break;
+ case SM_DEFGROUP_LINE: cs = parser_en_defgroup_line; scan_expect_operands(); break;
  default: assert(0);
  }
- p = pe = eof = NULL;
+ p = pe = eof = expr_start = NULL;
  while ( eof == NULL || eof != pe )
  {
   read_token();
@@ -120,586 +122,586 @@ st0:
 cs = 0;
 	goto _out;
 tr75:
-	{ if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; }
+	{ if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; }
 	goto st1479;
 tr79:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
-	{ if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; };
+	{ if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; };
        if (compile_active && ! expr_error) defs(expr_value, 0); }
 	goto st1479;
 tr88:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
-	{ if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; };
+	{ if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; };
        if (compile_active && ! expr_error) defs(value1, expr_value); }
 	goto st1479;
 tr93:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
-	{ if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; };
+	{ if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; };
        if (compile_active && ! expr_error) defs(value1, expr_value); }
 	goto st1479;
 tr96:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
-	{ if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; };
+	{ if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; };
        if (compile_active && ! expr_error) defs(expr_value, 0); }
 	goto st1479;
 tr118:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr123:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr126:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_C )); }; }
 	goto st1479;
 tr127:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_B )); }; }
 	goto st1479;
 tr128:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_D )); }; }
 	goto st1479;
 tr129:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_E )); }; }
 	goto st1479;
 tr130:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
 	goto st1479;
 tr131:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_H )); }; }
 	goto st1479;
 tr132:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_H )); }; }
 	goto st1479;
 tr133:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
 	goto st1479;
 tr134:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_L )); }; }
 	goto st1479;
 tr135:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_L )); }; }
 	goto st1479;
 tr136:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_A )); }; }
 	goto st1479;
 tr139:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_idx )); }; }
 	goto st1479;
 tr151:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr160:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr172:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr181:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr187:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_BC )); }; }
 	goto st1479;
 tr188:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_DE )); }; }
 	goto st1479;
 tr189:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_HL )); }; }
 	goto st1479;
 tr190:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_SP )); }; }
 	goto st1479;
 tr211:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr216:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr219:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_C )); }; }
 	goto st1479;
 tr220:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_B )); }; }
 	goto st1479;
 tr221:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_D )); }; }
 	goto st1479;
 tr222:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_E )); }; }
 	goto st1479;
 tr223:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
 	goto st1479;
 tr224:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_H )); }; }
 	goto st1479;
 tr225:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_H )); }; }
 	goto st1479;
 tr226:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
 	goto st1479;
 tr227:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_L )); }; }
 	goto st1479;
 tr228:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_L )); }; }
 	goto st1479;
 tr229:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_A )); }; }
 	goto st1479;
 tr232:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_ADD( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_idx )); }; }
 	goto st1479;
 tr244:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr253:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr265:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr274:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr280:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_BC )); }; }
 	goto st1479;
 tr281:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_DE )); }; }
 	goto st1479;
 tr282:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_HL )); }; }
 	goto st1479;
 tr283:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_SP )); }; }
 	goto st1479;
 tr289:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_BC )); }; }
 	goto st1479;
 tr290:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_DE )); }; }
 	goto st1479;
 tr291:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_HL )); }; }
 	goto st1479;
 tr292:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_SP )); }; }
 	goto st1479;
 tr298:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_BC )); }; }
 	goto st1479;
 tr299:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_DE )); }; }
 	goto st1479;
 tr300:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_HL )); }; }
 	goto st1479;
 tr301:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_SP )); }; }
 	goto st1479;
 tr319:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr324:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr327:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_C )); }; }
 	goto st1479;
 tr328:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_B )); }; }
 	goto st1479;
 tr329:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_D )); }; }
 	goto st1479;
 tr330:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_E )); }; }
 	goto st1479;
 tr331:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_H )); }; }
 	goto st1479;
 tr332:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_H )); }; }
 	goto st1479;
 tr333:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_H )); }; }
 	goto st1479;
 tr334:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_L )); }; }
 	goto st1479;
 tr335:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_L )); }; }
 	goto st1479;
 tr336:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_L )); }; }
 	goto st1479;
 tr337:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_A )); }; }
 	goto st1479;
 tr340:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_AND( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_idx )); }; }
 	goto st1479;
 tr352:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr361:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr373:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr382:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr401:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_C )); };
     }
 	goto st1479;
 tr402:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_B )); };
     }
 	goto st1479;
 tr403:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_D )); };
     }
 	goto st1479;
 tr404:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_E )); };
     }
 	goto st1479;
 tr405:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_H )); };
     }
 	goto st1479;
 tr406:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_L )); };
     }
 	goto st1479;
 tr407:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_A )); };
     }
 	goto st1479;
 tr408:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_BIT( expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( expr_value, REG_idx )); };
     }
 	goto st1479;
 tr420:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr429:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr441:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr450:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr465:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr470:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr477:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr482:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr489:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr494:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr501:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr506:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr513:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr518:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr525:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr530:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr537:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr542:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr549:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr554:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr561:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr566:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr569:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CCF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CCF); }; }
 	goto st1479;
 tr587:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr592:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr595:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_C )); }; }
 	goto st1479;
 tr596:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_B )); }; }
 	goto st1479;
 tr597:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_D )); }; }
 	goto st1479;
 tr598:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_E )); }; }
 	goto st1479;
 tr599:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_H )); }; }
 	goto st1479;
 tr600:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_H )); }; }
 	goto st1479;
 tr601:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_H )); }; }
 	goto st1479;
 tr602:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_L )); }; }
 	goto st1479;
 tr603:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_L )); }; }
 	goto st1479;
 tr604:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_L )); }; }
 	goto st1479;
 tr605:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_A )); }; }
 	goto st1479;
 tr608:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CP( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_idx )); }; }
 	goto st1479;
 tr620:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr629:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_CP( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_CP( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr641:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr650:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_CP( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_CP( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr651:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_CPD), "rcmx_cpd"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPD), "rcmx_cpd"); } }; }
 	goto st1479;
 tr652:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_CPDR), "rcmx_cpdr"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPDR), "rcmx_cpdr"); } }; }
 	goto st1479;
 tr653:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_CPI), "rcmx_cpi"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPI), "rcmx_cpi"); } }; }
 	goto st1479;
 tr654:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_CPIR), "rcmx_cpir"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPIR), "rcmx_cpir"); } }; }
 	goto st1479;
 tr655:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_CPL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_CPL); }; }
 	goto st1479;
 tr656:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DAA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DAA); }; }
 	goto st1479;
 tr677:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_C )); }; }
 	goto st1479;
 tr678:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_B )); }; }
 	goto st1479;
 tr679:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_D )); }; }
 	goto st1479;
 tr680:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_E )); }; }
 	goto st1479;
 tr681:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
 	goto st1479;
 tr682:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_H )); }; }
 	goto st1479;
 tr683:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_H )); }; }
 	goto st1479;
 tr684:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
 	goto st1479;
 tr685:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_L )); }; }
 	goto st1479;
 tr686:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_L )); }; }
 	goto st1479;
 tr687:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_A )); }; }
 	goto st1479;
 tr688:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_BC + Z80_DEC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_DEC16( REG_BC )); }; }
 	goto st1479;
 tr689:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_DE + Z80_DEC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_DEC16( REG_DE )); }; }
 	goto st1479;
 tr690:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_DEC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_DEC16( REG_HL )); }; }
 	goto st1479;
 tr691:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_DEC16( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC16( REG_IX )); }; }
 	goto st1479;
 tr692:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_DEC16( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC16( REG_IY )); }; }
 	goto st1479;
 tr693:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_SP + Z80_DEC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_DEC16( REG_SP )); }; }
 	goto st1479;
 tr694:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DEC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_idx )); }; }
 	goto st1479;
 tr706:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr715:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_DEC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_DEC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr727:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr736:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_DEC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_DEC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr737:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_DI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_DI); }; }
 	goto st1479;
 tr741:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr746:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr749:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EI); }; }
 	goto st1479;
 tr755:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EX_DE_HL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EX_DE_HL); }; }
 	goto st1479;
 tr759:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EX_AF_AF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
 	goto st1479;
 tr760:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EX_AF_AF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
 	goto st1479;
 tr765:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EX_IND_SP_HL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EX_IND_SP_HL); }; }
 	goto st1479;
 tr766:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_EX_IND_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_EX_IND_SP_idx); }; }
 	goto st1479;
 tr767:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_EX_IND_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_EX_IND_SP_idx); }; }
 	goto st1479;
 tr768:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_EXX); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_EXX); }; }
 	goto st1479;
 tr769:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_HALT); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_HALT); }; }
 	goto st1479;
 tr773:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IM( expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IM( expr_value )); };
     }
 	goto st1479;
 tr778:
@@ -707,33 +709,33 @@ tr778:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IM( expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IM( expr_value )); };
     }
 	goto st1479;
 tr790:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_C )); }; }
 	goto st1479;
 tr793:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_B )); }; }
 	goto st1479;
 tr796:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_D )); }; }
 	goto st1479;
 tr799:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_E )); }; }
 	goto st1479;
 tr802:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_H )); }; }
 	goto st1479;
 tr805:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
 	goto st1479;
 tr811:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(expr_start, p);
       }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr816:
 	{ expr_open_parens--; }
@@ -741,271 +743,271 @@ tr816:
      return FALSE;
      push_expr(expr_start, p);
       }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr819:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IN_REG_C( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_A )); }; }
 	goto st1479;
 tr840:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_C )); }; }
 	goto st1479;
 tr841:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_B )); }; }
 	goto st1479;
 tr842:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_D )); }; }
 	goto st1479;
 tr843:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_E )); }; }
 	goto st1479;
 tr844:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_H )); }; }
 	goto st1479;
 tr845:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_H )); }; }
 	goto st1479;
 tr846:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_H )); }; }
 	goto st1479;
 tr847:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_L )); }; }
 	goto st1479;
 tr848:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_L )); }; }
 	goto st1479;
 tr849:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_L )); }; }
 	goto st1479;
 tr850:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_A )); }; }
 	goto st1479;
 tr851:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_BC + Z80_INC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_INC16( REG_BC )); }; }
 	goto st1479;
 tr852:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_DE + Z80_INC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_INC16( REG_DE )); }; }
 	goto st1479;
 tr853:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_INC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_INC16( REG_HL )); }; }
 	goto st1479;
 tr854:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_INC16( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC16( REG_IX )); }; }
 	goto st1479;
 tr855:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_INC16( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC16( REG_IY )); }; }
 	goto st1479;
 tr856:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_SP + Z80_INC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_INC16( REG_SP )); }; }
 	goto st1479;
 tr857:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_idx )); }; }
 	goto st1479;
 tr869:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr878:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_INC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_INC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr890:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr899:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_INC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_INC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr900:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_IND); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_IND); }; }
 	goto st1479;
 tr901:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INDR); }; }
 	goto st1479;
 tr902:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INI); }; }
 	goto st1479;
 tr903:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_INIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_INIR); }; }
 	goto st1479;
 tr918:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr923:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr930:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr935:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr942:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr947:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr954:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr959:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr966:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr971:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr978:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr983:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr990:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr995:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1002:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1007:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1014:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1019:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1022:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_JP_idx); }; }
 	goto st1479;
 tr1024:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_JP_idx); }; }
 	goto st1479;
 tr1026:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_JP_idx); }; }
 	goto st1479;
 tr1034:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1039:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1046:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1051:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1058:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1063:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1070:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1075:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1082:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1087:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1131:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_IND_NN_A), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_NN_A), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1132:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1133:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1134:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1135:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1136:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1137:
 	{
     if (! expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1479;
 tr1159:
@@ -1013,13 +1015,13 @@ tr1159:
 	{
     if ( expr_in_parens ) {
      if ( REG_C == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1029,76 +1031,76 @@ tr1164:
 	{
     if ( expr_in_parens ) {
      if ( REG_C == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1167:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_C )); }; }
 	goto st1479;
 tr1168:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_B )); }; }
 	goto st1479;
 tr1169:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_D )); }; }
 	goto st1479;
 tr1170:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_E )); }; }
 	goto st1479;
 tr1171:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_H )); }; }
 	goto st1479;
 tr1172:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXH )); }; }
 	goto st1479;
 tr1173:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYH )); }; }
 	goto st1479;
 tr1174:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_L )); }; }
 	goto st1479;
 tr1175:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXL )); }; }
 	goto st1479;
 tr1176:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYL )); }; }
 	goto st1479;
 tr1177:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_A )); }; }
 	goto st1479;
 tr1178:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_C, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_idx )); }; }
 	goto st1479;
 tr1190:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1199:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1211:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1220:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1239:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_B == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1108,76 +1110,76 @@ tr1244:
 	{
     if ( expr_in_parens ) {
      if ( REG_B == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1247:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_C )); }; }
 	goto st1479;
 tr1248:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_B )); }; }
 	goto st1479;
 tr1249:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_D )); }; }
 	goto st1479;
 tr1250:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_E )); }; }
 	goto st1479;
 tr1251:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_H )); }; }
 	goto st1479;
 tr1252:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXH )); }; }
 	goto st1479;
 tr1253:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYH )); }; }
 	goto st1479;
 tr1254:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_L )); }; }
 	goto st1479;
 tr1255:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXL )); }; }
 	goto st1479;
 tr1256:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYL )); }; }
 	goto st1479;
 tr1257:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_A )); }; }
 	goto st1479;
 tr1258:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_B, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_idx )); }; }
 	goto st1479;
 tr1270:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1279:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1291:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1300:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1319:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_D == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1187,76 +1189,76 @@ tr1324:
 	{
     if ( expr_in_parens ) {
      if ( REG_D == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1327:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_C )); }; }
 	goto st1479;
 tr1328:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_B )); }; }
 	goto st1479;
 tr1329:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_D )); }; }
 	goto st1479;
 tr1330:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_E )); }; }
 	goto st1479;
 tr1331:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_H )); }; }
 	goto st1479;
 tr1332:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXH )); }; }
 	goto st1479;
 tr1333:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYH )); }; }
 	goto st1479;
 tr1334:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_L )); }; }
 	goto st1479;
 tr1335:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXL )); }; }
 	goto st1479;
 tr1336:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYL )); }; }
 	goto st1479;
 tr1337:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_A )); }; }
 	goto st1479;
 tr1338:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_D, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_idx )); }; }
 	goto st1479;
 tr1350:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1359:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1371:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1380:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1399:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_E == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1266,76 +1268,76 @@ tr1404:
 	{
     if ( expr_in_parens ) {
      if ( REG_E == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1407:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_C )); }; }
 	goto st1479;
 tr1408:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_B )); }; }
 	goto st1479;
 tr1409:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_D )); }; }
 	goto st1479;
 tr1410:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_E )); }; }
 	goto st1479;
 tr1411:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_H )); }; }
 	goto st1479;
 tr1412:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXH )); }; }
 	goto st1479;
 tr1413:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYH )); }; }
 	goto st1479;
 tr1414:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_L )); }; }
 	goto st1479;
 tr1415:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXL )); }; }
 	goto st1479;
 tr1416:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYL )); }; }
 	goto st1479;
 tr1417:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_A )); }; }
 	goto st1479;
 tr1418:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_E, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_idx )); }; }
 	goto st1479;
 tr1430:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1439:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1451:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1460:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1475:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_H == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1345,124 +1347,124 @@ tr1480:
 	{
     if ( expr_in_parens ) {
      if ( REG_H == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1483:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_C )); }; }
 	goto st1479;
 tr1484:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_B )); }; }
 	goto st1479;
 tr1485:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_D )); }; }
 	goto st1479;
 tr1486:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_E )); }; }
 	goto st1479;
 tr1487:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_H )); }; }
 	goto st1479;
 tr1488:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_L )); }; }
 	goto st1479;
 tr1489:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_A )); }; }
 	goto st1479;
 tr1490:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_H, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_idx )); }; }
 	goto st1479;
 tr1502:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1511:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1523:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1532:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1544:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1549:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1552:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_C )); }; }
 	goto st1479;
 tr1553:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_B )); }; }
 	goto st1479;
 tr1554:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_D )); }; }
 	goto st1479;
 tr1555:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_E )); }; }
 	goto st1479;
 tr1556:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXH )); }; }
 	goto st1479;
 tr1557:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXL )); }; }
 	goto st1479;
 tr1558:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_A )); }; }
 	goto st1479;
 tr1570:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1575:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1578:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_C )); }; }
 	goto st1479;
 tr1579:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_B )); }; }
 	goto st1479;
 tr1580:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_D )); }; }
 	goto st1479;
 tr1581:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_E )); }; }
 	goto st1479;
 tr1582:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYH )); }; }
 	goto st1479;
 tr1583:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYL )); }; }
 	goto st1479;
 tr1584:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_A )); }; }
 	goto st1479;
 tr1599:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_L == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1472,124 +1474,124 @@ tr1604:
 	{
     if ( expr_in_parens ) {
      if ( REG_L == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1607:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_C )); }; }
 	goto st1479;
 tr1608:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_B )); }; }
 	goto st1479;
 tr1609:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_D )); }; }
 	goto st1479;
 tr1610:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_E )); }; }
 	goto st1479;
 tr1611:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_H )); }; }
 	goto st1479;
 tr1612:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_L )); }; }
 	goto st1479;
 tr1613:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_A )); }; }
 	goto st1479;
 tr1614:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_L, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_idx )); }; }
 	goto st1479;
 tr1626:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1635:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1647:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1656:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1668:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1673:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1676:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_C )); }; }
 	goto st1479;
 tr1677:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_B )); }; }
 	goto st1479;
 tr1678:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_D )); }; }
 	goto st1479;
 tr1679:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_E )); }; }
 	goto st1479;
 tr1680:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXH )); }; }
 	goto st1479;
 tr1681:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXL )); }; }
 	goto st1479;
 tr1682:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_A )); }; }
 	goto st1479;
 tr1694:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1699:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1702:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_C )); }; }
 	goto st1479;
 tr1703:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_B )); }; }
 	goto st1479;
 tr1704:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_D )); }; }
 	goto st1479;
 tr1705:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_E )); }; }
 	goto st1479;
 tr1706:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYH )); }; }
 	goto st1479;
 tr1707:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYL )); }; }
 	goto st1479;
 tr1708:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_A )); }; }
 	goto st1479;
 tr1733:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_A == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1599,107 +1601,107 @@ tr1738:
 	{
     if ( expr_in_parens ) {
      if ( REG_A == REG_A ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1741:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_C )); }; }
 	goto st1479;
 tr1742:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_B )); }; }
 	goto st1479;
 tr1743:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_D )); }; }
 	goto st1479;
 tr1744:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_E )); }; }
 	goto st1479;
 tr1745:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_H )); }; }
 	goto st1479;
 tr1746:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXH )); }; }
 	goto st1479;
 tr1747:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYH )); }; }
 	goto st1479;
 tr1748:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_L )); }; }
 	goto st1479;
 tr1749:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXL )); }; }
 	goto st1479;
 tr1750:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYL )); }; }
 	goto st1479;
 tr1751:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_A )); }; }
 	goto st1479;
 tr1752:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_I); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_I); }; }
 	goto st1479;
 tr1753:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_IIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IIR); }; }
 	goto st1479;
 tr1754:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_R); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_R); }; }
 	goto st1479;
 tr1755:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_EIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_EIR); }; }
 	goto st1479;
 tr1756:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
 	goto st1479;
 tr1757:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
 	goto st1479;
 tr1758:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_A, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_idx )); }; }
 	goto st1479;
 tr1770:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1779:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1791:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1800:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
 	goto st1479;
 tr1803:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_I_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_I_A); }; }
 	goto st1479;
 tr1806:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_IIR_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IIR_A); }; }
 	goto st1479;
 tr1809:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_R_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_R_A); }; }
 	goto st1479;
 tr1812:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_EIR_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_EIR_A); }; }
 	goto st1479;
 tr1817:
 	{ push_expr(expr_start, p); }
 	{
     if ( expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1709,14 +1711,14 @@ tr1822:
 	{
     if ( expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1725,14 +1727,14 @@ tr1829:
 	{
     if ( expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1742,14 +1744,14 @@ tr1834:
 	{
     if ( expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1758,14 +1760,14 @@ tr1841:
 	{
     if ( expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1775,14 +1777,14 @@ tr1846:
 	{
     if ( expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1791,14 +1793,14 @@ tr1853:
 	{
     if ( expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1808,14 +1810,14 @@ tr1858:
 	{
     if ( expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1824,14 +1826,14 @@ tr1865:
 	{
     if ( expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1841,14 +1843,14 @@ tr1870:
 	{
     if ( expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1857,14 +1859,14 @@ tr1880:
 	{
     if ( expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
@@ -1874,609 +1876,609 @@ tr1885:
 	{
     if ( expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1479;
 tr1888:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_LD_SP_idx); }; }
 	goto st1479;
 tr1889:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_SP_idx); }; }
 	goto st1479;
 tr1890:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_SP_idx); }; }
 	goto st1479;
 tr1893:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_BC )); }; }
 	goto st1479;
 tr1896:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_DE )); }; }
 	goto st1479;
 tr1908:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1913:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1916:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_C )); }; }
 	goto st1479;
 tr1917:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_B )); }; }
 	goto st1479;
 tr1918:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_D )); }; }
 	goto st1479;
 tr1919:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_E )); }; }
 	goto st1479;
 tr1920:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_H )); }; }
 	goto st1479;
 tr1921:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_L )); }; }
 	goto st1479;
 tr1922:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LD_r_r( REG_idx, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_A )); }; }
 	goto st1479;
 tr1945:
 	{ push_expr(expr_start, p); }
-	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1479;
 tr1950:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1479;
 tr1953:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1954:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1955:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1956:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1957:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1958:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1959:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1979:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1984:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr1987:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
 	goto st1479;
 tr1988:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
 	goto st1479;
 tr1989:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
 	goto st1479;
 tr1990:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
 	goto st1479;
 tr1991:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
 	goto st1479;
 tr1992:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
 	goto st1479;
 tr1993:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
 	goto st1479;
 tr2016:
 	{ push_expr(expr_start, p); }
-	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1479;
 tr2021:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(); Expr *idx_expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1479;
 tr2024:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2025:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2026:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2027:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2028:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2029:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2030:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2050:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2055:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2058:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
 	goto st1479;
 tr2059:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
 	goto st1479;
 tr2060:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
 	goto st1479;
 tr2061:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
 	goto st1479;
 tr2062:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
 	goto st1479;
 tr2063:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
 	goto st1479;
 tr2064:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
 	goto st1479;
 tr2065:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LDD); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LDD); }; }
 	goto st1479;
 tr2066:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LDDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LDDR); }; }
 	goto st1479;
 tr2067:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LDI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LDI); }; }
 	goto st1479;
 tr2068:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_LDIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_LDIR); }; }
 	goto st1479;
 tr2069:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_NEG); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_NEG); }; }
 	goto st1479;
 tr2070:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_NOP); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_NOP); }; }
 	goto st1479;
 tr2088:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2093:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2096:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_C )); }; }
 	goto st1479;
 tr2097:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_B )); }; }
 	goto st1479;
 tr2098:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_D )); }; }
 	goto st1479;
 tr2099:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_E )); }; }
 	goto st1479;
 tr2100:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_H )); }; }
 	goto st1479;
 tr2101:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_H )); }; }
 	goto st1479;
 tr2102:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_H )); }; }
 	goto st1479;
 tr2103:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_L )); }; }
 	goto st1479;
 tr2104:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_L )); }; }
 	goto st1479;
 tr2105:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_L )); }; }
 	goto st1479;
 tr2106:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_A )); }; }
 	goto st1479;
 tr2109:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_idx )); }; }
 	goto st1479;
 tr2121:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2130:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr2142:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2151:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr2152:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OTDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OTDR); }; }
 	goto st1479;
 tr2153:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OTIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OTIR); }; }
 	goto st1479;
 tr2164:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_OUT_n_A), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_OUT_n_A), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2176:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_C )); }; }
 	goto st1479;
 tr2177:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_B )); }; }
 	goto st1479;
 tr2178:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_D )); }; }
 	goto st1479;
 tr2179:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_E )); }; }
 	goto st1479;
 tr2180:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_H )); }; }
 	goto st1479;
 tr2181:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_L )); }; }
 	goto st1479;
 tr2182:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUT_C_REG( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_A )); }; }
 	goto st1479;
 tr2183:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUTD); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUTD); }; }
 	goto st1479;
 tr2184:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_OUTI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_OUTI); }; }
 	goto st1479;
 tr2191:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_BC + Z80_POP( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_POP( REG_BC )); }; }
 	goto st1479;
 tr2192:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_DE + Z80_POP( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_POP( REG_DE )); }; }
 	goto st1479;
 tr2193:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_POP( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_POP( REG_HL )); }; }
 	goto st1479;
 tr2194:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_POP( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_POP( REG_IX )); }; }
 	goto st1479;
 tr2195:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_POP( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_POP( REG_IY )); }; }
 	goto st1479;
 tr2196:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_AF + Z80_POP( REG_AF )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_POP( REG_AF )); }; }
 	goto st1479;
 tr2203:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_BC + Z80_PUSH( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_PUSH( REG_BC )); }; }
 	goto st1479;
 tr2204:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_DE + Z80_PUSH( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_PUSH( REG_DE )); }; }
 	goto st1479;
 tr2205:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_HL + Z80_PUSH( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_PUSH( REG_HL )); }; }
 	goto st1479;
 tr2206:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_PUSH( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_PUSH( REG_IX )); }; }
 	goto st1479;
 tr2207:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_PUSH( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_PUSH( REG_IY )); }; }
 	goto st1479;
 tr2208:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
 	goto st1479;
 tr2227:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_C )); };
     }
 	goto st1479;
 tr2228:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_B )); };
     }
 	goto st1479;
 tr2229:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_D )); };
     }
 	goto st1479;
 tr2230:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_E )); };
     }
 	goto st1479;
 tr2231:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_H )); };
     }
 	goto st1479;
 tr2232:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_L )); };
     }
 	goto st1479;
 tr2233:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_A )); };
     }
 	goto st1479;
 tr2234:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RES( expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RES( expr_value, REG_idx )); };
     }
 	goto st1479;
 tr2246:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr2255:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr2267:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr2276:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr2280:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET); }; }
 	goto st1479;
 tr2289:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_NZ )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NZ )); }; }
 	goto st1479;
 tr2290:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_Z )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_Z )); }; }
 	goto st1479;
 tr2291:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_NC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NC )); }; }
 	goto st1479;
 tr2292:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_C )); }; }
 	goto st1479;
 tr2293:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_PO )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PO )); }; }
 	goto st1479;
 tr2294:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_PE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PE )); }; }
 	goto st1479;
 tr2295:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_P )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_P )); }; }
 	goto st1479;
 tr2296:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RET_FLAG( FLAG_M )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_M )); }; }
 	goto st1479;
 tr2297:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RETI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RETI); }; }
 	goto st1479;
 tr2298:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RETN); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RETN); }; }
 	goto st1479;
 tr2309:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_C )); }; }
 	goto st1479;
 tr2310:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_B )); }; }
 	goto st1479;
 tr2311:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_D )); }; }
 	goto st1479;
 tr2312:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_E )); }; }
 	goto st1479;
 tr2313:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_H )); }; }
 	goto st1479;
 tr2314:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_L )); }; }
 	goto st1479;
 tr2315:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_A )); }; }
 	goto st1479;
 tr2316:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_idx )); }; }
 	goto st1479;
 tr2328:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1479;
 tr2337:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1479;
 tr2349:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1479;
 tr2358:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1479;
 tr2359:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLA); }; }
 	goto st1479;
 tr2370:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_C )); }; }
 	goto st1479;
 tr2371:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_B )); }; }
 	goto st1479;
 tr2372:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_D )); }; }
 	goto st1479;
 tr2373:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_E )); }; }
 	goto st1479;
 tr2374:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_H )); }; }
 	goto st1479;
 tr2375:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_L )); }; }
 	goto st1479;
 tr2376:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_A )); }; }
 	goto st1479;
 tr2377:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_idx )); }; }
 	goto st1479;
 tr2389:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2398:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2410:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2419:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2420:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RLCA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RLCA); }; }
 	goto st1479;
 tr2421:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); } }; }
 	goto st1479;
 tr2432:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_C )); }; }
 	goto st1479;
 tr2433:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_B )); }; }
 	goto st1479;
 tr2434:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_D )); }; }
 	goto st1479;
 tr2435:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_E )); }; }
 	goto st1479;
 tr2436:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_H )); }; }
 	goto st1479;
 tr2437:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_L )); }; }
 	goto st1479;
 tr2438:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_A )); }; }
 	goto st1479;
 tr2439:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_idx )); }; }
 	goto st1479;
 tr2451:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1479;
 tr2460:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1479;
 tr2472:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1479;
 tr2481:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1479;
 tr2482:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRA); }; }
 	goto st1479;
 tr2493:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_C )); }; }
 	goto st1479;
 tr2494:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_B )); }; }
 	goto st1479;
 tr2495:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_D )); }; }
 	goto st1479;
 tr2496:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_E )); }; }
 	goto st1479;
 tr2497:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_H )); }; }
 	goto st1479;
 tr2498:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_L )); }; }
 	goto st1479;
 tr2499:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_A )); }; }
 	goto st1479;
 tr2500:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_idx )); }; }
 	goto st1479;
 tr2512:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2521:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2533:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2542:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2543:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RRCA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RRCA); }; }
 	goto st1479;
 tr2544:
-	{ { if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); } }; }
 	goto st1479;
 tr2548:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RST( expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RST( expr_value )); };
     }
 	goto st1479;
 tr2553:
@@ -2484,418 +2486,418 @@ tr2553:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_RST( expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_RST( expr_value )); };
     }
 	goto st1479;
 tr2574:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2579:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2582:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_C )); }; }
 	goto st1479;
 tr2583:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_B )); }; }
 	goto st1479;
 tr2584:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_D )); }; }
 	goto st1479;
 tr2585:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_E )); }; }
 	goto st1479;
 tr2586:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
 	goto st1479;
 tr2587:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_H )); }; }
 	goto st1479;
 tr2588:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_H )); }; }
 	goto st1479;
 tr2589:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
 	goto st1479;
 tr2590:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_L )); }; }
 	goto st1479;
 tr2591:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_L )); }; }
 	goto st1479;
 tr2592:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_A )); }; }
 	goto st1479;
 tr2595:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_idx )); }; }
 	goto st1479;
 tr2607:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2616:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr2628:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2637:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr2643:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_BC )); }; }
 	goto st1479;
 tr2644:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_DE )); }; }
 	goto st1479;
 tr2645:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_HL )); }; }
 	goto st1479;
 tr2646:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SBC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_SP )); }; }
 	goto st1479;
 tr2647:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SCF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SCF); }; }
 	goto st1479;
 tr2666:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_C )); };
     }
 	goto st1479;
 tr2667:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_B )); };
     }
 	goto st1479;
 tr2668:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_D )); };
     }
 	goto st1479;
 tr2669:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_E )); };
     }
 	goto st1479;
 tr2670:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_H )); };
     }
 	goto st1479;
 tr2671:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_L )); };
     }
 	goto st1479;
 tr2672:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_A )); };
     }
 	goto st1479;
 tr2673:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SET( expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SET( expr_value, REG_idx )); };
     }
 	goto st1479;
 tr2685:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr2694:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr2706:
 	{ if (!expr_error)
-    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                            ;
     }
 	goto st1479;
 tr2715:
 	{ if (!expr_error)
-    if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
 	goto st1479;
 tr2729:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_C )); }; }
 	goto st1479;
 tr2730:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_B )); }; }
 	goto st1479;
 tr2731:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_D )); }; }
 	goto st1479;
 tr2732:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_E )); }; }
 	goto st1479;
 tr2733:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_H )); }; }
 	goto st1479;
 tr2734:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_L )); }; }
 	goto st1479;
 tr2735:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_A )); }; }
 	goto st1479;
 tr2736:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLA( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_idx )); }; }
 	goto st1479;
 tr2748:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2757:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2769:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2778:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2789:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_C )); }; }
 	goto st1479;
 tr2790:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_B )); }; }
 	goto st1479;
 tr2791:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_D )); }; }
 	goto st1479;
 tr2792:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_E )); }; }
 	goto st1479;
 tr2793:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_H )); }; }
 	goto st1479;
 tr2794:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_L )); }; }
 	goto st1479;
 tr2795:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_A )); }; }
 	goto st1479;
 tr2796:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SLL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_idx )); }; }
 	goto st1479;
 tr2808:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2817:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2829:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2838:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2849:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_C )); }; }
 	goto st1479;
 tr2850:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_B )); }; }
 	goto st1479;
 tr2851:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_D )); }; }
 	goto st1479;
 tr2852:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_E )); }; }
 	goto st1479;
 tr2853:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_H )); }; }
 	goto st1479;
 tr2854:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_L )); }; }
 	goto st1479;
 tr2855:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_A )); }; }
 	goto st1479;
 tr2856:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRA( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_idx )); }; }
 	goto st1479;
 tr2868:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2877:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2889:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2898:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2909:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_C )); }; }
 	goto st1479;
 tr2910:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_B )); }; }
 	goto st1479;
 tr2911:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_D )); }; }
 	goto st1479;
 tr2912:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_E )); }; }
 	goto st1479;
 tr2913:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_H )); }; }
 	goto st1479;
 tr2914:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_L )); }; }
 	goto st1479;
 tr2915:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_A )); }; }
 	goto st1479;
 tr2916:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SRL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_idx )); }; }
 	goto st1479;
 tr2928:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2937:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2949:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1479;
 tr2958:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1479;
 tr2976:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2981:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr2984:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_C )); }; }
 	goto st1479;
 tr2985:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_B )); }; }
 	goto st1479;
 tr2986:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_D )); }; }
 	goto st1479;
 tr2987:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_E )); }; }
 	goto st1479;
 tr2988:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
 	goto st1479;
 tr2989:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_H )); }; }
 	goto st1479;
 tr2990:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_H )); }; }
 	goto st1479;
 tr2991:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
 	goto st1479;
 tr2992:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_L )); }; }
 	goto st1479;
 tr2993:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_L )); }; }
 	goto st1479;
 tr2994:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_A )); }; }
 	goto st1479;
 tr2997:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_SUB( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_idx )); }; }
 	goto st1479;
 tr3009:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3018:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr3030:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3039:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr3057:
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3062:
 	{ expr_open_parens--; }
 	{ push_expr(expr_start, p); }
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3065:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_C )); }; }
 	goto st1479;
 tr3066:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_B )); }; }
 	goto st1479;
 tr3067:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_D )); }; }
 	goto st1479;
 tr3068:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_E )); }; }
 	goto st1479;
 tr3069:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
 	goto st1479;
 tr3070:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_H )); }; }
 	goto st1479;
 tr3071:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_H )); }; }
 	goto st1479;
 tr3072:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
 	goto st1479;
 tr3073:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IX + Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_L )); }; }
 	goto st1479;
 tr3074:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(P_IY + Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_L )); }; }
 	goto st1479;
 tr3075:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_A )); }; }
 	goto st1479;
 tr3078:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(Z80_XOR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_idx )); }; }
 	goto st1479;
 tr3090:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3099:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr3111:
-	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(); if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1479;
 tr3120:
-	{ if (compile_active) { if (stmt_label) { if (compile_active) { define_symbol((stmt_label), get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label = NULL; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { define_symbol(stmt_label->str, get_PC() + (0), TYPE_ADDRESS, SYM_TOUCHED); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
 	goto st1479;
 tr3121:
 	{ defgroup_start(0);
@@ -2949,7 +2951,7 @@ st1479:
 case 1479:
 	goto st0;
 tr2:
-	{ stmt_label = p->string; }
+	{ Str_set_n(stmt_label, p->tstart, p->tlen); }
 	goto st2;
 st2:
 	if ( ++p == pe )
@@ -33161,14 +33163,14 @@ tr3153:
 	{ error_missing_close_block(); }
 	goto st1481;
 tr3157:
-	{ defgroup_define_const(name); }
+	{ defgroup_define_const(name->str); }
 	goto st1481;
 tr3163:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
     defgroup_start(expr_value);
-    defgroup_define_const(name);
+    defgroup_define_const(name->str);
     }
 	goto st1481;
 tr3169:
@@ -33177,7 +33179,7 @@ tr3169:
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
     defgroup_start(expr_value);
-    defgroup_define_const(name);
+    defgroup_define_const(name->str);
     }
 	goto st1481;
 tr3173:
@@ -33189,7 +33191,7 @@ st1481:
 case 1481:
 	goto st0;
 tr3154:
-	{ name = p->string; }
+	{ Str_set_n(name, p->tstart, p->tlen); }
 	goto st1451;
 st1451:
 	if ( ++p == pe )
@@ -33202,14 +33204,14 @@ case 1451:
 	}
 	goto st0;
 tr3158:
-	{ defgroup_define_const(name); }
+	{ defgroup_define_const(name->str); }
 	goto st1452;
 tr3165:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
     defgroup_start(expr_value);
-    defgroup_define_const(name);
+    defgroup_define_const(name->str);
     }
 	goto st1452;
 tr3171:
@@ -33218,7 +33220,7 @@ tr3171:
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
     defgroup_start(expr_value);
-    defgroup_define_const(name);
+    defgroup_define_const(name->str);
     }
 	goto st1452;
 st1452:
@@ -33400,13 +33402,13 @@ tr3178:
 	{ error_missing_close_block(); }
 	goto st1483;
 tr3182:
-	{ defvars_define_const( name, 0, 0 ); }
+	{ defvars_define_const( name->str, 0, 0 ); }
 	goto st1483;
 tr3190:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_B, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_B, expr_value );
     }
 	goto st1483;
 tr3195:
@@ -33414,14 +33416,14 @@ tr3195:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_B, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_B, expr_value );
     }
 	goto st1483;
 tr3201:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_W, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_W, expr_value );
     }
 	goto st1483;
 tr3206:
@@ -33429,14 +33431,14 @@ tr3206:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_W, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_W, expr_value );
     }
 	goto st1483;
 tr3212:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_P, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_P, expr_value );
     }
 	goto st1483;
 tr3217:
@@ -33444,14 +33446,14 @@ tr3217:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_P, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_P, expr_value );
     }
 	goto st1483;
 tr3223:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_L, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_L, expr_value );
     }
 	goto st1483;
 tr3228:
@@ -33459,7 +33461,7 @@ tr3228:
 	{ push_expr(expr_start, p); }
 	{ pop_eval_expr(&expr_value, &expr_error); }
 	{ if (! expr_error)
-    defvars_define_const( name, DEFVARS_SIZE_L, expr_value );
+    defvars_define_const( name->str, DEFVARS_SIZE_L, expr_value );
     }
 	goto st1483;
 tr3231:
@@ -33471,7 +33473,7 @@ st1483:
 case 1483:
 	goto st0;
 tr3179:
-	{ name = p->string; }
+	{ Str_set_n(name, p->tstart, p->tlen); }
 	goto st1461;
 st1461:
 	if ( ++p == pe )
@@ -35478,8 +35480,6 @@ case 1478:
 	_test_eof: {}
 	_out: {}
 	}
-  if (get_num_errors() != start_num_errors)
-   break;
   if ( cs == 
 0
  )
@@ -35488,6 +35488,8 @@ case 1478:
 1479
  )
    return TRUE;
+  if (get_num_errors() != start_num_errors)
+   break;
  }
  return FALSE;
 }

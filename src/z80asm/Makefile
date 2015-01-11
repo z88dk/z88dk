@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.181 2015-01-03 18:39:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.182 2015-01-11 23:49:24 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -259,9 +259,10 @@ deffile.o: lib/classlist.h options.h options_def.h symbol.h expr.h
 deffile.o: lib/array.h scan.h legacy.h scan_tokens.h opcodes.h errors.h
 deffile.o: errors_def.h sym.h model.h module.h lib/classhash.h lib/strhash.h
 deffile.o: lib/uthash.h codearea.h symtab.h objfile.h z80asm.h
-directives.o: lib/xmalloc.h directives.h errors.h errors_def.h lib/types.h
-directives.o: symtab.h lib/classhash.h lib/queue.h lib/class.h lib/strhash.h
-directives.o: lib/uthash.h sym.h symref.h lib/classlist.h
+directives.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
+directives.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
+directives.o: lib/uthash.h directives.h errors.h errors_def.h symtab.h sym.h
+directives.o: symref.h lib/classlist.h
 errors.o: lib/xmalloc.h errors.h errors_def.h lib/except.h lib/types.h
 errors.o: lib/fileutil.h lib/list.h lib/class.h lib/queue.h lib/strutil.h
 errors.o: options.h options_def.h lib/srcfile.h lib/strpool.h lib/strhash.h
@@ -329,10 +330,10 @@ options.o: legacy.h scan_tokens.h opcodes.h options.h options_def.h sym.h
 options.o: symref.h symtab.h lib/srcfile.h lib/strpool.h z80asm.h
 parse.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 parse.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h lib/uthash.h
-parse.o: expr.h lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h
-parse.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
-parse.o: symref.h lib/init.h model.h module.h symtab.h parse.h lib/strpool.h
-parse.o: lib/utarray.h parse_rules.h
+parse.o: directives.h expr.h lib/classlist.h scan.h legacy.h scan_tokens.h
+parse.o: opcodes.h errors.h errors_def.h options.h lib/list.h options_def.h
+parse.o: sym.h symref.h lib/init.h model.h module.h symtab.h parse.h
+parse.o: lib/strpool.h lib/utarray.h parse_rules.h
 prsident.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 prsident.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 prsident.o: lib/uthash.h errors.h errors_def.h listfile.h symref.h

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.114 2015-01-05 23:34:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.115 2015-01-11 23:49:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -53,17 +53,19 @@ void
 UNDEFINE( void )
 {
     Symbol *tok = NULL;
+	char *name;
 
     do
     {
         if ( GetSym() == TK_NAME )
         {
-            tok = find_local_symbol( sym.string );
+			name = sym_text(&sym);
+			tok = find_local_symbol(name);
         }
 
         if ( tok != NULL )
         {
-            SymbolHash_remove( CURRENTMODULE->local_symtab, sym.string );
+			SymbolHash_remove(CURRENTMODULE->local_symtab, name);
         }
         else
         {
@@ -81,7 +83,7 @@ DEFINE( void )
     {
         if ( GetSym() == TK_NAME )
         {
-            define_local_def_sym( sym.string, 1 );
+			define_local_def_sym(sym_text(&sym), 1);
         }
         else
         {
@@ -104,7 +106,7 @@ DEFC( void )
     {
         if ( GetSym() == TK_NAME )
         {
-			Str_set( name, sym.string ); /* remember name */
+			Str_set(name, sym_text(&sym)); /* remember name */
 
             if ( GetSym() == TK_EQUAL )
             {
@@ -283,7 +285,7 @@ DEFM( void )
     {
         if ( GetSym() == TK_STRING )
         {
-			for ( p = sym.string; *p != '\0'; p++ )
+			for (p = sym_text(&sym); *p != '\0'; p++)
 			{
                 append_byte( (Byte) *p );
 			}
@@ -320,7 +322,7 @@ INCLUDE( void )
 {
     if ( GetSym() == TK_STRING )
     {
-        Z80pass1( sym.string );				/* parse include file */
+		Z80pass1(sym_text(&sym));				/* parse include file */
     }
     else
     {
@@ -339,7 +341,7 @@ BINARY( void )
 
     if ( GetSym() == TK_STRING )
     {
-        filename = search_file( sym.string, opts.inc_path );
+		filename = search_file(sym_text(&sym), opts.inc_path);
 
         binfile = xfopen( filename, "rb" );           /* CH_0012 */
         append_file_contents( binfile, -1 );  /* read binary code */
@@ -359,7 +361,7 @@ DeclModuleName( void )
     {
         if ( sym.tok == TK_NAME )
         {
-            CURRENTMODULE->modname = strpool_add( sym.string );
+			CURRENTMODULE->modname = strpool_add(sym_text(&sym));
         }
         else
         {

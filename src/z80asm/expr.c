@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.25 2014-12-13 00:49:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.26 2015-01-11 23:49:24 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -394,7 +394,7 @@ static Bool Expr_parse_ternary_cond( Expr *expr );
 		while ( condition )									\
 		{													\
 			op = sym.tok;									\
-			Str_append(self->text, sym.text);				\
+			Str_append_n(self->text, sym.tstart, sym.tlen);	\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
 				return FALSE;								\
@@ -418,13 +418,13 @@ static Bool Expr_parse_factor( Expr *self )
 		ExprOp_init_asmpc( ExprOpArray_push( self->rpn_ops ) );
 		self->sym_type = MAX( self->sym_type, TYPE_ADDRESS );
 
-		Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 		
 		GetSym();
 		break;
 
     case TK_NAME:
-		symptr = get_used_symbol( sym.string );
+		symptr = get_used_symbol(sym_text(&sym));
 		
 		ExprOp_init_symbol( ExprOpArray_push( self->rpn_ops ),
 							symptr );
@@ -438,7 +438,7 @@ static Bool Expr_parse_factor( Expr *self )
 			self->result.not_evaluable		= TRUE;
         }
 
-        Str_append(self->text, sym.string);		/* add identifier to infix expr */
+        Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
         GetSym();
         break;
@@ -466,7 +466,7 @@ static Bool Expr_parse_unary( Expr *self )
 	switch (sym.tok) 
 	{
     case TK_MINUS:
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -480,7 +480,7 @@ static Bool Expr_parse_unary( Expr *self )
         return Expr_parse_unary( self );
 
     case TK_BIN_NOT:
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -490,7 +490,7 @@ static Bool Expr_parse_unary( Expr *self )
 		return TRUE;
 
     case TK_LOG_NOT:
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 
         if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
@@ -502,7 +502,7 @@ static Bool Expr_parse_unary( Expr *self )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         open_paren = sym.tok;
         GetSym();
 
@@ -514,7 +514,7 @@ static Bool Expr_parse_unary( Expr *self )
              ( open_paren == TK_LSQUARE && sym.tok != TK_RSQUARE ) )
 			return FALSE;
 
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		return TRUE;
 
@@ -531,7 +531,7 @@ static Bool Expr_parse_power( Expr *self )
 
     while ( sym.tok == TK_POWER )
     {
-        Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_power( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -615,7 +615,7 @@ Expr *expr_parse( void )
 
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
-		Str_append(self->text, sym.text);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 
 		GetSym();               
         is_const_expr = TRUE;

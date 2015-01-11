@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.44 2015-01-05 23:34:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.45 2015-01-11 23:49:25 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -305,7 +305,7 @@ note "BUG_0020";
 z80asm(
 	asm		=> <<'ASM',
 		IF CC
-		invalid		;; error: unknown identifier
+		invalid		;; error: syntax error
 		ENDIF
 ASM
 	options	=> "-r0 -b -DCC",

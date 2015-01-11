@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.49 2015-01-03 18:39:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.50 2015-01-11 23:49:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -38,13 +38,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.49 2015-01-03 18:39
 typedef struct sym_t 
 {
 	tokid_t  tok;			/* token */
-	char	*text;			/* characters of the retrieved token for lexemes 
+	tokid_t	 tok_opcode;	/* e.g. TK_IX, when tok = TK_NAME and token is "ix" */
+	char	*tstart;		/* start of recognized token with input buffer */
+	int 	 tlen;			/* length of recognized token with input buffer */
+#if 0
+	char	*text;			/* characters of the retrieved token for lexemes
 							*  used in the expression parser */
 	char	*string;		/* identifier to return with TK_NAME and TK_LABEL, or
 							*  double-quoted string without quotes to return with a TK_STRING */
-	char	*ts, *te;		/* Ragel's token start and token end */
 	char	*filename;		/* filename where token found, in strpool */
 	int 	 line_nr;		/* line number where token found */
+#endif
 	int		 number;		/* number to return with TK_NUMBER */
 } Sym;
 
@@ -78,3 +82,7 @@ extern void SetTemporaryLine( char *line );
 /* skip line past the newline, set EOL */
 extern void  Skipline( void );
 extern Bool EOL;
+
+/* return static string with current token text
+*  non-reentrant, string needs to be saved by caller */
+extern char *sym_text(Sym *sym);

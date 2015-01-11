@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-05 23:34:02 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-11 23:49:25 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -29,14 +29,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-
 /* macros for actions - labels */
 #define DO_LABEL(name, offset) \
 			if (compile_active) { \
-				define_symbol((name), get_PC() + (offset), \
+				define_symbol(name, get_PC() + (offset), \
 							  TYPE_ADDRESS, SYM_TOUCHED); \
 			}
 
 #define DO_STMT_LABEL() \
-			if (stmt_label) { \
-				DO_LABEL(stmt_label, 0); \
-				stmt_label = NULL; \
+			if (stmt_label->len) { \
+				DO_LABEL(stmt_label->str, 0); \
+				stmt_label->len = 0; \
 			}
 
 /* macros for actions - statements */
@@ -120,8 +120,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-
 #endif
 
 	/* label, name */
-	label = _TK_LABEL @{ stmt_label = p->string; };
-	name  = _TK_NAME  @{ name       = p->string; };
+	label = _TK_LABEL @{ Str_set_n(stmt_label, p->tstart, p->tlen); };
+	name  = _TK_NAME  @{ Str_set_n(name,       p->tstart, p->tlen); };
 	
 	/* expression */
 	action parens_open { expr_open_parens > 0 }
@@ -187,12 +187,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-
 		  name _TK_EQUAL const_expr	
 		  %{ if (! expr_error) 
 				defgroup_start(expr_value);
-			 defgroup_define_const(name);
+			 defgroup_define_const(name->str);
 		  };
 	
 	defgroup_var_next =
 		  name
-		  %{ defgroup_define_const(name); }
+		  %{ defgroup_define_const(name->str); }
 		;
 
 	defgroup_var = defgroup_var_value | defgroup_var_next;
@@ -252,11 +252,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.31 2015-01-
 		| _TK_END 					@{ error_missing_close_block(); }
 		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
-		  @{ defvars_define_const( name, 0, 0 ); }
+		  @{ defvars_define_const( name->str, 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
 		  @{ if (! expr_error) 
-				defvars_define_const( name, DEFVARS_SIZE_<S>, expr_value ); 
+				defvars_define_const( name->str, DEFVARS_SIZE_<S>, expr_value ); 
 		  }
 #endfor  <S>
 		;
@@ -751,22 +751,25 @@ static void _parse_init(void)
 static Bool _parse_statement(Bool compile_active)
 {
 	int start_num_errors = get_num_errors();;
-	char *name = NULL;			/* identifier name */
-	char *stmt_label = NULL;	/* statement label, NULL if none */
+	static Str  *name = NULL;		/* identifier name */
+	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
 	int value1 = 0;
+
+	INIT_OBJ(Str, &name); 		Str_clear(name);
+	INIT_OBJ(Str, &stmt_label);	Str_clear(stmt_label);
 	
 	%%write init nocs;
 	switch (current_sm)
 	{
 	case SM_MAIN:			cs = parser_en_main; break;
-	case SM_DEFVARS_OPEN:	cs = parser_en_defvars_open; break;
-	case SM_DEFVARS_LINE:	cs = parser_en_defvars_line; break;
-	case SM_DEFGROUP_OPEN:	cs = parser_en_defgroup_open; break;
-	case SM_DEFGROUP_LINE:	cs = parser_en_defgroup_line; break;
+	case SM_DEFVARS_OPEN:	cs = parser_en_defvars_open;  scan_expect_operands(); break;
+	case SM_DEFVARS_LINE:	cs = parser_en_defvars_line;  scan_expect_operands(); break;
+	case SM_DEFGROUP_OPEN:	cs = parser_en_defgroup_open; scan_expect_operands(); break;
+	case SM_DEFGROUP_LINE:	cs = parser_en_defgroup_line; scan_expect_operands(); break;
 	default: assert(0);
 	}
-
-	p = pe = eof = NULL;
+	
+	p = pe = eof = expr_start = NULL;
 	
 	while ( eof == NULL || eof != pe )
 	{
@@ -774,16 +777,16 @@ static Bool _parse_statement(Bool compile_active)
 		
 		%%write exec;
 
-		/* assembly error? */
-		if (get_num_errors() != start_num_errors) 
-			break;
-
 		/* Did parsing succeed? */
 		if ( cs == %%{ write error; }%% )
 			return FALSE;
 		
 		if ( cs >= %%{ write first_final; }%% )
 			return TRUE;
+			
+		/* assembly error? must test after check for end of parse */
+		if (get_num_errors() != start_num_errors) 
+			break;
 	}
 	
 	return FALSE;
