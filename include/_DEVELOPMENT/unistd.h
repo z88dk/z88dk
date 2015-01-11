@@ -51,7 +51,7 @@ extern int               close(int fd);
 extern int               dup(int fd);
 extern int               dup2(int fd, int fd2);
 extern void              _exit(int status);
-extern off_t             lseek(int fd, off_t offset, int whence)
+extern off_t             lseek(int fd, off_t offset, int whence);
 extern ssize_t           read(int fd, void *buf, size_t nbyte);
 extern ssize_t           write(int fd, const void *buf, size_t nbyte);
 
@@ -63,14 +63,14 @@ extern int      __LIB__ __FASTCALL__ close(int fd);
 extern int      __LIB__ __FASTCALL__ dup(int fd);
 extern int      __LIB__              dup2(int fd, int fd2);
 extern void     __LIB__ __FASTCALL__ _exit(int status);
-extern off_t    __LIB__              lseek(int fd, off_t offset, int whence)
+extern off_t    __LIB__              lseek(int fd, off_t offset, int whence);
 extern ssize_t  __LIB__              read(int fd, void *buf, size_t nbyte);
 extern ssize_t  __LIB__              write(int fd, const void *buf, size_t nbyte);
 
 // SCCZ80 CALLEE LINKAGE
 
 extern int      __LIB__ __CALLEE__   dup2_callee(int fd, int fd2);
-extern off_t    __LIB__ __CALLEE__   lseek_callee(int fd, off_t offset, int whence)
+extern off_t    __LIB__ __CALLEE__   lseek_callee(int fd, off_t offset, int whence);
 extern ssize_t  __LIB__ __CALLEE__   read_callee(int fd, void *buf, size_t nbyte);
 extern ssize_t  __LIB__ __CALLEE__   write_callee(int fd, const void *buf, size_t nbyte);
 
