@@ -271,7 +271,7 @@ height_adequate:
    rra
    rra
    inc a
-   and $03                     ; a = width of font in bytes
+   and $1f                     ; a = width of font in bytes
 
    pop de
    push bc
