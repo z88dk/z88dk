@@ -249,6 +249,11 @@ height_adequate:
    ;  a'= font height
    ; stack = tracking, & bitmap
 
+   ld a,(ix+20)
+   inc a
+   or (ix+19)
+   jr z, skip_colour
+
    push bc
    push hl
 
@@ -269,8 +274,8 @@ colour_rectangle:
    rra
    rra
    inc a
-   and $03
-   ld e,a                      ; e = width of char in bytes
+   and $1f
+   ld e,a                      ; e = width in characters
    
    ld a,d
    and $07
@@ -283,11 +288,11 @@ colour_rectangle:
    rra
    rra
    inc a
-   and $03
-   ld d,a                      ; d = height of char in bytes
+   and $1f
+   ld d,a                      ; d = height in characters
    
-   ;  e = width of char in bytes
-   ;  d = height of char in bytes
+   ;  e = width in characters
+   ;  d = height in characters
    ; hl = attribute address
    
 colour_loop_y:
@@ -295,11 +300,12 @@ colour_loop_y:
    push hl
    
    ld b,e
+   ld c,(ix+20)
    
 colour_loop_x:
 
    ld a,(hl)
-   and (ix+20)
+   and c
    or (ix+19)
    ld (hl),a
    
@@ -308,7 +314,7 @@ colour_loop_x:
    
    pop hl
    
-   ld bc,32
+   ld c,32
    add hl,bc
    
    dec d
@@ -316,6 +322,8 @@ colour_loop_x:
    
    pop hl
    pop bc
+
+skip_colour:
 
    ; ix = struct fzx_state *
    ;  b = LSB of end of bitmap
