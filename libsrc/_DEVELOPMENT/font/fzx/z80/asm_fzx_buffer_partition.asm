@@ -26,6 +26,8 @@ asm_fzx_buffer_partition:
 
    call __fzx_partition_width_adjust
 
+partition_loop:
+
    ld a,b
    or c
    jr z, end_buffer
@@ -38,7 +40,7 @@ asm_fzx_buffer_partition:
    dec bc
    inc de
    
-   jr asm_fzx_buffer_partition
+   jr partition_loop
 
 end_buffer:
 

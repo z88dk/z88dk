@@ -24,6 +24,8 @@ asm_fzx_string_partition:
 
    call __fzx_partition_width_adjust
 
+partition_loop:
+
    ld a,(de)
    or a
    jr z, end_string_0
@@ -32,7 +34,7 @@ asm_fzx_string_partition:
    jr c, end_string_1          ; if allowed width exceeded
    
    inc de
-   jr asm_fzx_string_partition
+   jr partition_loop
 
 end_string_1:
 
