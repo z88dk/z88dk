@@ -6,48 +6,57 @@
 ;
 ; Windowed output terminal for fixed width fonts.
 ;
-; Driver class diagram:
+; ;;;;;;;;;;;;;;;;;;;;
+; DRIVER CLASS DIAGRAM
+; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_OUTPUT_TERMINAL (root, abstract)
 ; CONSOLE_01_OUTPUT_TERMINAL_CHAR (abstract)
 ;
 ; This driver implements most of the functions necessary
-; for fixed width font output terminals, including for
-; messages delivered from the associated CONSOLE_01_INPUT
-; terminal.  
+; for fixed width font output terminals, including
+; consuming messages delivered from an attached
+; CONSOLE_01_INPUT_TERMINAL.  
 ;
-; Messages consumed from stdio:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM STDIO
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;   * STDIO_MSG_ICTL
-;     Not forwarded to base class.
+; * STDIO_MSG_PUTC
+;   Generates multiple OTERM_MSG_PUTC messages.
 ;
-; Messages consumed from CONSOLE_01_OUTPUT_TERMINAL:
+; * STDIO_MSG_WRIT
+;   Generates multiple OTERM_MSG_PUTC messages.
+;
+; * STDIO_MSG_SEEK -> no error, do nothing
+; * STDIO_MSG_FLSH -> no error, do nothing
+; * STDIO_MSG_ICTL
+; * STDIO_MSG_CLOS -> no error, do nothing
+;
+; Any other messages are reported as errors via
+; error_enotsup_zc
+;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM CONSOLE_01_OUTPUT_TERMINAL
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ;   * OTERM_MSG_PUTC
 ;
-; Messages consumed from CONSOLE_01_INPUT_TERMINAL:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM CONSOLE_01_INPUT_TERMINAL
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ;   * ITERM_MSG_PUTC
 ;   * ITERM_MSG_PRINT_CURSOR
-;
-;     Characters output by input terminal are treated
-;     differently from stdio characters.
-;
 ;   * ITERM_MSG_BS
 ;   * ITERM_MSG_BS_PWD
 ;   * ITERM_MSG_ERASE_CURSOR
-;
-;     For fixed width fonts these backspace messages
-;     are equivalent.
-;
 ;   * ITERM_MSG_READLINE_BEGIN
 ;   * ITERM_MSG_READLINE_END
 ;
-;     The input terminal is starting or ending a new edit
-;     line.  While editing a line, the output terminal
-;     always scrolls the window without pause as necessary.
-;
-; Generated messages for deriving terminals:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR DERIVED DRIVERS
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ;   * OTERM_MSG_TTY (optional)
 ;
@@ -104,7 +113,9 @@
 ;     The output terminal generates this message to
 ;     indicate the output window is full and is being paused.
 ;
-; IOCTLs understood by this driver:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IOCTLs UNDERSTOOD BY THIS DRIVER
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ;   * IOCTL_OTERM_CRLF
 ;     enable / disable crlf processing
@@ -149,10 +160,15 @@
 ;
 ;   * IOCTL_OTERM_SET_CURSOR_COORD
 ;
-; This driver reserves extra bytes in the FDSTRUCT:
+;   * IOCTL_OTERM_GET_OTERM
+;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BYTES RESERVED IN FDSTRUCT
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; offset (wrt FDSTRUCT.JP)  description
 ;
+;  8..13                    mutex
 ;   14                      x coordinate
 ;   15                      y coordinate
 ;   16                      window.x
@@ -170,7 +186,7 @@ EXTERN console_01_output_char_oterm_msg_putc, console_01_output_char_stdio_msg_i
 EXTERN console_01_output_char_iterm_msg_putc, console_01_output_char_iterm_msg_bs
 EXTERN console_01_output_char_iterm_msg_readline_begin, console_01_output_char_iterm_msg_readline_end
 
-EXTERN OTERM_MSG_TTY
+EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL, ITERM_MSG_BELL
 EXTERN OTERM_MSG_PUTC, STDIO_MSG_ICTL, ITERM_MSG_PUTC, ITERM_MSG_BS, ITERM_MSG_READLINE_BEGIN
 EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_READLINE_END
 
@@ -209,7 +225,15 @@ console_01_output_terminal_char:
    cp ITERM_MSG_READLINE_END
    jp z, console_01_output_char_iterm_msg_readline_end
    
+   ; prevent error generation for unimplemented optional messages
+   
    cp OTERM_MSG_TTY
-   jp z, error_zc                      ; prevent errno being changed
+   jp z, error_zc
+   
+   cp OTERM_MSG_BELL
+   jp z, error_zc
+   
+   cp ITERM_MSG_BELL
+   jp z, error_zc
    
    jp console_01_output_terminal       ; forward to library

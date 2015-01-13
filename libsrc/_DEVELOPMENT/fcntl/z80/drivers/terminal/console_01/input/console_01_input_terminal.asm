@@ -7,17 +7,30 @@
 ; Library input console driver that implements the
 ; CONSOLE_01_INPUT input terminal features.
 ;
-; Driver class diagram:
+; ;;;;;;;;;;;;;;;;;;;;
+; DRIVER CLASS DIAGRAM
+; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_INPUT_TERMINAL (root, abstract)
-;
-; A specific target driver's input terminal can inherit this
-; library code to implement most input terminal features.
 ;
 ; The deriving driver must implement one message generated
 ; by this driver to complete an input terminal.
 ;
-; Generated messages for the deriving input terminal:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM STDIO
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; * STDIO_MSG_GETC
+; * STDIO_MSG_EATC
+; * STDIO_MSG_READ
+; * STDIO_MSG_SEEK
+; * STDIO_MSG_FLSH
+; * STDIO_MSG_ICTL
+; * STDIO_MSG_CLOS
+;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR DERIVED DRIVERS
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; * ITERM_MSG_GETC
 ;
@@ -30,22 +43,11 @@
 ;
 ; can use:  af, bc, de, hl
 ;
-; All other messages can be forwarded to this driver.
+; If this message is implemented, the driver is complete.
 ;
-; Messages consumed from stdio:
-;
-; * STDIO_MSG_GETC
-; * STDIO_MSG_EATC
-; * STDIO_MSG_READ
-; * STDIO_MSG_SEEK
-; * STDIO_MSG_FLSH
-; * STDIO_MSG_ICTL
-; * STDIO_MSG_CLOS
-;
-; This driver generates messages for the attached
-; CONSOLE_01_OUTPUT output terminal.
-;
-; Generated messages for the output terminal:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR CONSOLE_01_OUTPUT_TERMINAL
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; * ITERM_MSG_PUTC
 ;
@@ -110,7 +112,9 @@
 ;
 ;   can use: af, bc, de, hl, ix
 ;
-; IOCTLs understood by this driver:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IOCTLs UNDERSTOOD BY THIS DRIVER
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; * IOCTL_ITERM_RESET
 ;
@@ -144,7 +148,9 @@
 ; * IOCTL_ITERM_CURS
 ;   enable / disable cursor in line mode
 ;
-; This driver reserves extra bytes in the FDSTRUCT:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BYTES RESERVED IN FDSTRUCT
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; offset (wrt FDSTRUCT.JP)  description
 ;

@@ -8,45 +8,49 @@
 ;
 ; This is an abstract class that CONSOLE_01_OUTPUT terminals
 ; can derive from to change stdio's STDIO_MSG_PUTC and
-; STDIO_MSG_WRIT messages, which demand output of a buffer
-; of characters, into multiple OTERM_MSG_PUTC messages, which
-; demand output of a single char only.
+; STDIO_MSG_WRIT messages into multiple OTERM_MSG_PUTC messages
+; which demand output of a single char only.
 ;
 ; Other stdio messages are treated as errors or no-ops
 ; as appropriate.
 ; 
-; Driver class diagram:
+; ;;;;;;;;;;;;;;;;;;;;
+; DRIVER CLASS DIAGRAM
+; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_OUTPUT_TERMINAL (root, abstract)
 ;
-; Generated messages for derived drivers:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM STDIO
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;   * OTERM_MSG_PUTC
+; * STDIO_MSG_PUTC
+;   Generates multiple OTERM_MSG_PUTC messages.
 ;
-;     Source of character is stdio.
-;     
-;     enter   :  c = ascii code
-;     can use : af, bc, de, hl
+; * STDIO_MSG_WRIT
+;   Generates multiple OTERM_MSG_PUTC messages.
 ;
-; Messages consumed from stdio:
-;
-;   * STDIO_MSG_PUTC
-;     Generates multiple OTERM_MSG_PUTC messages.
-;
-;   * STDIO_MSG_WRIT
-;     Generates multiple OTERM_MSG_PUTC messages.
-;
-;   * STDIO_MSG_SEEK
-;   * STDIO_MSG_FLSH
-;   * STDIO_MSG_CLOS
+; * STDIO_MSG_SEEK -> no error, do nothing
+; * STDIO_MSG_FLSH -> no error, do nothing
+; * STDIO_MSG_CLOS -> no error, do nothing
 ;
 ; Any other messages are reported as errors via
 ; error_enotsup_zc
 ;
-; A connected CONSOLE_01_INPUT_TERMINAL generates
-; more messages which are not consumed here.
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR DERIVED DRIVERS
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-; This driver reserves extra bytes in the FDSTRUCT:
+; * OTERM_MSG_PUTC
+;
+;   Source of character is stdio.
+;     
+;   enter   :  c = ascii code
+;   can use : af, bc, de, hl
+;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BYTES RESERVED IN FDSTRUCT
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; offset (wrt FDSTRUCT.JP)  description
 ;
