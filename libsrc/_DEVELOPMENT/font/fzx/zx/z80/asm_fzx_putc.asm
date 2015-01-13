@@ -94,8 +94,22 @@ char_defined:
    add hl,bc
    add hl,bc                   ; hl = struct fzx_char *
    
+   ; space character can have additional padding
+   
+   or a
+   jr nz, no_padding           ; char not space
+
+   ld a,(ix+19)                ; a = space_expand
+   and $0f
+   ld b,a
+
+no_padding:
+
+   ld d,b
+   
    ; hl = struct fzx_char *
    ; ix = struct fzx_state *
+   ;  d = additional_padding
    ;  a'= font height
    ; stack = tracking
    
@@ -120,13 +134,15 @@ char_defined:
    
    ; ix = struct fzx_state *
    ; hl = & fzx_char.shift_width_1
+   ;  d = additional_padding
    ;  e = kern
    ;  a'= font height
    ; stack = tracking, & bitmap
 
    ld a,(hl)
    and $0f
-   ld c,a                      ; c = width - 1
+   add a,d
+   ld c,a                      ; c = width - 1 + additional_padding
    
    ld a,(hl)
    rra
@@ -249,9 +265,9 @@ height_adequate:
    ;  a'= font height
    ; stack = tracking, & bitmap
 
-   ld a,(ix+20)
+   ld a,(ix+23)
    inc a
-   or (ix+19)
+   or (ix+22)
    jr z, skip_colour
 
    push bc
@@ -300,13 +316,13 @@ colour_loop_y:
    push hl
    
    ld b,e
-   ld c,(ix+20)
+   ld c,(ix+23)
    
 colour_loop_x:
 
    ld a,(hl)
    and c
-   or (ix+19)
+   or (ix+22)
    ld (hl),a
    
    inc l
