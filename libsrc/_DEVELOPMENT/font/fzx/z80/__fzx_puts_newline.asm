@@ -2,6 +2,7 @@
 SECTION code_font_fzx
 
 PUBLIC __fzx_puts_newline
+PUBLIC __fzx_puts_newline_set_y
 
 __fzx_puts_newline:
 
@@ -22,7 +23,9 @@ __fzx_puts_newline:
    ld h,(ix+8)                 ; hl = fzx_state.y
    
    add hl,de
-   
+
+__fzx_puts_newline_set_y:
+
    ld (ix+7),l
    ld (ix+8),h                 ; update y coord
 
