@@ -7,13 +7,11 @@ PUBLIC console_01_output_char_oterm_msg_putc
 PUBLIC console_01_output_char_oterm_msg_putc_raw
 
 EXTERN l_jpix
-EXTERN console_01_output_char_proc_reset_scroll_limit
+EXTERN console_01_output_char_proc_putchar_scroll
 EXTERN console_01_output_char_proc_get_coord
 EXTERN console_01_output_char_proc_set_coord
 
 EXTERN OTERM_MSG_TTY, OTERM_MSG_PRINTC, OTERM_MSG_BELL
-EXTERN OTERM_MSG_SCROLL, OTERM_MSG_CLS, OTERM_MSG_PAUSE
-EXTERN ITERM_MSG_BELL
 
 console_01_output_char_oterm_msg_putc:
 
@@ -103,7 +101,7 @@ x_ok:
    push bc                     ; save char info
    
    inc a
-   call putchar_scroll
+   call console_01_output_char_proc_putchar_scroll
    
    pop bc
 
@@ -144,77 +142,5 @@ putchar_lf:
    sub c
    inc a
    
-   call nc, putchar_scroll     ; if y >= height
+   call nc, console_01_output_char_proc_putchar_scroll
    jp console_01_output_char_proc_set_coord
-
-
-putchar_scroll:
-
-   ; enter: a = num rows to scroll
-   ;
-   ; exit : e = new x coord
-   ;        d = new y coord
-
-   ld c,a                      ; c = num rows to scroll
-
-   bit 7,(ix+7)
-   jr nz, scroll_it            ; if input terminal is reading input
-
-   bit 6,(ix+6)
-   jr z, scroll_immediate      ; if pause flag is reset
-   
-   sub (ix+20)   
-   jr nc, pause_scroll         ; if scroll_amount >= scroll_limit
-
-   neg
-   ld (ix+20),a
-
-   jr scroll_immediate
-
-pause_scroll:
-
-   push bc
-
-   ld a,ITERM_MSG_BELL
-   call l_jpix                 ; send signal bell
-
-   call console_01_output_char_proc_reset_scroll_limit
-
-   ld a,OTERM_MSG_PAUSE
-   call l_jpix
-
-   pop bc
-
-scroll_immediate:
-
-   bit 7,(ix+6)
-   jr nz, page_it              ; if page mode selected
-   
-scroll_it:
-
-   ; c = num rows to scroll
-
-   ld a,OTERM_MSG_SCROLL
-   call l_jpix
-   
-   ld e,0                      ; new x = 0
-   
-   ld d,(ix+19)
-   dec d                       ; new y = rect.height - 1
-   
-   ret
-
-page_it:
-
-   bit 5,(ix+7)
-   jr z, no_cls
-   
-   ld a,OTERM_MSG_CLS
-   call l_jpix
-
-no_cls:
-
-   ld de,0                     ; new x = y = 0
-
-   ld (ix+20),e                ; set scroll_limit to zero
-   ret
