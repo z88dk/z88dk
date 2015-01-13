@@ -24,6 +24,7 @@ console_01_output_char_stdio_msg_ictl:
    ; defc IOCTL_OTERM_SET_WINDOW_RECT  = $0402
    ; defc IOCTL_OTERM_GET_CURSOR_COORD = $0582
    ; defc IOCTL_OTERM_SET_CURSOR_COORD = $0502
+   ; defc IOCTL_OTERM_GET_OTERM        = $0602
    ;
    ; in addition to flags managed by stdio.
    ;
