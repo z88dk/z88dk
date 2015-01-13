@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC asm_fzx_state_init
 
-EXTERN __fzx_draw_or, l_setmem_hl
+EXTERN __fzx_draw_xor, l_setmem_hl
 
 asm_fzx_state_init:
 
@@ -21,9 +21,9 @@ asm_fzx_state_init:
    
    ld (hl),195
    inc hl
-   ld (hl),__fzx_draw_or % 256
+   ld (hl),__fzx_draw_xor % 256
    inc hl
-   ld (hl),__fzx_draw_or / 256
+   ld (hl),__fzx_draw_xor / 256
    inc hl
    ld (hl),c
    inc hl
@@ -42,7 +42,5 @@ asm_fzx_state_init:
    
    ld (hl),3
    inc hl
-   ld (hl),a
-   inc hl
    
-   ret
+   jp l_setmem_hl - 8
