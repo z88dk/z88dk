@@ -49,7 +49,9 @@ ENDIF
 
 asm0_rewind_unlocked:
 
-   res 3,(ix+3)                ; clear stream error state
+   ld a,(ix+3)
+   and $e7                     ; clear error and eof
+   ld (ix+3),a
    
    ld hl,0
    ld e,l
