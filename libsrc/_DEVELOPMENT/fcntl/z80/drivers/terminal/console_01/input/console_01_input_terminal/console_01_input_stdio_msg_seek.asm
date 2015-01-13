@@ -21,7 +21,7 @@ console_01_input_stdio_msg_seek:
    ; this message is received.
 
    exx
-   
+
    ld a,c
    
    cp STDIO_SEEK_CUR
@@ -42,7 +42,11 @@ seek_loop:
    
    call l_decu_dehl
 
+   push hl
+   
    call console_01_input_proc_getc  ; a = hl = char
-   jr nc, seek_loop                 ; if no error
+   
+   pop hl
+   jr nc, seek_loop            ; if no error
    
    jp error_lzc                ; if driver error
