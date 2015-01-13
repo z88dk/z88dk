@@ -39,16 +39,18 @@ asm_fzx_char_metrics:
    
    ex (sp),hl
    inc hl                      ; hl = & fzx_char.shift_width_1
-   
-   xor a
-   
-   rld
-   ld c,a                      ; c = shift
-   
-   rld
+
+   ld a,(hl)
+   and $0f
    ld b,a                      ; b = width - 1
    
-   rld
+   ld a,(hl)
+   rra
+   rra
+   rra
+   rra
+   and $0f
+   ld c,a                      ; c = vertical shift
    
    pop hl
    pop af
