@@ -14,7 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.67 2014-12-26 16:46:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.68 2015-01-17 18:40:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -39,6 +39,5 @@ extern size_t sizeof_relocroutine, sizeof_reloctable;
 extern char *GetLibfile( char *filename );
 
 extern void assemble_file( char *filename );
-extern void Z80pass1( char *filename );
 extern Bool Pass2info(range_t range);
 extern Bool Pass2infoExpr(range_t range, Expr *expr);
