@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.24 2015-01-11 23:49:24 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.25 2015-01-17 14:02:03 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,8 +22,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.24 2015-01-11 23:4
 #include "class.h"
 #include "codearea.h"
 #include "directives.h"
+#include "except.h"
 #include "expr.h"
-#include "init.h"
 #include "model.h"
 #include "opcodes.h"
 #include "parse.h"
@@ -35,68 +35,49 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.24 2015-01-11 23:4
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
-* 	Static - current scan context
+* 	Array of tokens
 *----------------------------------------------------------------------------*/
-
-/* array of tokens in the current statement */
-static Sym *p, *pe, *eof;
-static Sym *expr_start;
-static UT_array *tokens;
 static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 
-/* strings saved from the current statement */
-static UT_array *token_strings;
-
-/* array of expressions computed during parse */
-static void ut_exprs_init(void *elt) { Expr *expr = OBJ_NEW(Expr); *((Expr **)elt) = expr;  };
-static void ut_exprs_dtor(void *elt) { Expr *expr = *((Expr **)elt);  OBJ_DELETE(expr); };
-
-static UT_array *exprs;
-static UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
-
-static int  expr_value;
-static Bool expr_error;
-static Bool expr_in_parens;				/* true if expression has enclosing parens */
-static int  expr_open_parens;			/* number of open parens */
-
-/* Ragel state variables */
-static int cs;							/* current state */
-
-#if 0
-/* Ragel state stack */
-static UT_array *state_stack;
-static int *stack, top;
-#endif
-
-/* current parser state machine */
-static enum { SM_MAIN, 
-			  SM_DEFVARS_OPEN, SM_DEFVARS_LINE, 
-			  SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE }
-	current_sm = SM_MAIN;
-
 /*-----------------------------------------------------------------------------
-*   Cleanup memory at end
+* 	Array of expressions computed during parse 
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+void ut_exprs_init(void *elt) 
 {
-	utarray_new(tokens, &ut_Sym_icd);
-	utarray_new(token_strings, &ut_str_icd);
-#if 0
-	utarray_new(state_stack, &ut_int_icd);
-#endif
-	utarray_new(exprs, &ut_exprs_icd);
-
-	parse_init();
+	Expr *expr = OBJ_NEW(Expr); 
+	*((Expr **)elt) = expr; 
 }
 
-DEFINE_fini()
+void ut_exprs_dtor(void *elt) 
+{ 
+	Expr *expr = *((Expr **)elt);  
+	OBJ_DELETE(expr); 
+}
+
+UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
+
+/*-----------------------------------------------------------------------------
+* 	Current parse context
+*----------------------------------------------------------------------------*/
+ParseCtx *ParseCtx_new(void)
 {
-	utarray_free(tokens);
-	utarray_free(token_strings);
-#if 0
-	utarray_free(state_stack);
-#endif
-	utarray_free(exprs);
+	ParseCtx *ctx = xnew(ParseCtx);
+
+	utarray_new(ctx->tokens, &ut_Sym_icd);
+	utarray_new(ctx->token_strings, &ut_str_icd);
+	utarray_new(ctx->exprs, &ut_exprs_icd);
+
+	ctx->current_sm = SM_MAIN;
+
+	return ctx;
+}
+
+void ParseCtx_delete(ParseCtx *ctx)
+{
+	utarray_free(ctx->exprs);
+	utarray_free(ctx->token_strings);
+	utarray_free(ctx->tokens);
+	xfree(ctx);
 }
 
 /*-----------------------------------------------------------------------------
@@ -108,8 +89,6 @@ struct Expr *parse_expr(char *expr_text)
 {
 	Expr *expr;
 	int num_errors;
-
-	init();
 
 	save_scan_state();
 	{
@@ -132,7 +111,7 @@ struct Expr *parse_expr(char *expr_text)
 }
 
 /* push current expression */
-static void push_expr(Sym *expr_start, Sym *expr_end)
+static void push_expr(ParseCtx *ctx)
 {
 	static Str *expr_text;
 	Expr *expr;
@@ -142,27 +121,27 @@ static void push_expr(Sym *expr_start, Sym *expr_end)
 
 	/* build expression text */
 	Str_clear(expr_text);
-	for (expr_p = expr_start; expr_p < expr_end; expr_p++)
+	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
 	
 	/* parse expression */
 	expr = parse_expr(expr_text->str);
 
 	/* push the new expression, or NULL on error */
-	utarray_push_back(exprs, &expr);
+	utarray_push_back(ctx->exprs, &expr);
 }
 
 /*-----------------------------------------------------------------------------
 *   Pop and return expression
 *----------------------------------------------------------------------------*/
-static Expr *pop_expr(void)
+static Expr *pop_expr(ParseCtx *ctx)
 {
 	Expr *expr;
 
-	expr = *((Expr **)utarray_back(exprs));
-	*((Expr **)utarray_back(exprs)) = NULL;		/* do not destroy */
+	expr = *((Expr **)utarray_back(ctx->exprs));
+	*((Expr **)utarray_back(ctx->exprs)) = NULL;		/* do not destroy */
 	
-	utarray_pop_back(exprs);
+	utarray_pop_back(ctx->exprs);
 
 	return expr;
 }
@@ -170,39 +149,37 @@ static Expr *pop_expr(void)
 /*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
-static void pop_eval_expr(int *pvalue, Bool *perror)
+static void pop_eval_expr(ParseCtx *ctx)
 {
 	Expr *expr;
 
-	*pvalue = 0;
-	*perror = FALSE;
+	ctx->expr_value = 0;
+	ctx->expr_error = FALSE;
 
-	expr = pop_expr();
+	expr = pop_expr(ctx);
 	if (expr == NULL)
 	{
-		*perror = TRUE;				/* error output by push_expr() */
+		ctx->expr_error = TRUE;				/* error output by push_expr() */
 		return;
 	}
 
 	/* eval and discard expression */
-	*pvalue = Expr_eval(expr);
-	*perror = (expr->result.not_evaluable);
+	ctx->expr_value = Expr_eval(expr);
+	ctx->expr_error = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
 
 	/* check errors */
-	if (*perror)
+	if (ctx->expr_error)
 		error_not_defined();
 }
 
 /*-----------------------------------------------------------------------------
-*   Compute auto-label
+*   return new auto-label in strpool
 *----------------------------------------------------------------------------*/
 char *autolabel(void)
 {
 	static Str *label;
 	static int n;
-
-	init();
 
 	INIT_OBJ(Str, &label);
 
@@ -213,20 +190,20 @@ char *autolabel(void)
 /*-----------------------------------------------------------------------------
 *   String pool for the current statement
 *----------------------------------------------------------------------------*/
-static char *token_strings_add(char *str)
+static char *token_strings_add(ParseCtx *ctx, char *str)
 {
 	if (!str)		/* NULL string */
 		return NULL;
 
-	utarray_push_back(token_strings, &str);
-	return *((char **)utarray_back(token_strings));
+	utarray_push_back(ctx->token_strings, &str);
+	return *((char **)utarray_back(ctx->token_strings));
 }
 
 /*-----------------------------------------------------------------------------
 *   Read tokens from the current statement into tokensd[], to be parsed
 *	by state machine
 *----------------------------------------------------------------------------*/
-static void read_token(void)
+static void read_token(ParseCtx *ctx)
 {
 	static Str *buffer;
 	Sym sym_copy;
@@ -235,8 +212,8 @@ static void read_token(void)
 
 	INIT_OBJ(Str, &buffer);
 
-	p_index = p ? p - (Sym *)utarray_front(tokens) : -1;
-	expr_start_index = expr_start ? expr_start - (Sym *)utarray_front(tokens) : -1;
+	p_index = ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1;
+	expr_start_index = ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1;
 
 	sym_copy = sym;
 
@@ -245,20 +222,15 @@ static void read_token(void)
 	{
 	case TK_NUMBER:
 		Str_sprintf(buffer, "%d", sym_copy.number);
-		sym_copy.tstart = token_strings_add(buffer->str);
+		sym_copy.tstart = token_strings_add(ctx, buffer->str);
 		sym_copy.tlen = buffer->len;
 		break;
 
 	case TK_NAME:
 	case TK_LABEL:
-		sym_copy.tstart = token_strings_add(sym_text(&sym_copy));
-		sym_copy.tlen = strlen(sym_copy.tstart);
-		break;
-
 	case TK_STRING:
-		Str_sprintf(buffer, "\"%s\"", sym_text(&sym_copy));
-		sym_copy.tstart = token_strings_add(buffer->str);
-		sym_copy.tlen = buffer->len;
+		sym_copy.tstart = token_strings_add(ctx, sym_text(&sym_copy));
+		sym_copy.tlen = strlen(sym_copy.tstart);
 		break;
 
 	case TK_END:
@@ -271,26 +243,26 @@ static void read_token(void)
 //			assert(*(sym_copy.text));
 	}
 //	sym_copy.string = token_strings_add(sym.string);
-	utarray_push_back(tokens, &sym_copy);
+	utarray_push_back(ctx->tokens, &sym_copy);
 
-	p = (Sym *)utarray_front(tokens) + (p_index >= 0 ? p_index : 0);
-	pe = (Sym *)utarray_back(tokens) + 1;
+	ctx->p = (Sym *)utarray_front(ctx->tokens) + (p_index >= 0 ? p_index : 0);
+	ctx->pe = (Sym *)utarray_back(ctx->tokens) + 1;
 
 	if (sym.tok == TK_END)
-		eof = pe;
+		ctx->eof = ctx->pe;
 	else
-		eof = NULL;
+		ctx->eof = NULL;
 
-	expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(tokens)) + expr_start_index : NULL;
+	ctx->expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(ctx->tokens)) + expr_start_index : NULL;
 
 	GetSym();
 }
 
-static void free_tokens(void)
+static void free_tokens(ParseCtx *ctx)
 {
-	utarray_clear(tokens);
-	utarray_clear(token_strings);
-	utarray_clear(exprs);
+	utarray_clear(ctx->tokens);
+	utarray_clear(ctx->token_strings);
+	utarray_clear(ctx->exprs);
 }
 
 /*-----------------------------------------------------------------------------
@@ -299,28 +271,58 @@ static void free_tokens(void)
 #include "parse_rules.h"
 
 /*-----------------------------------------------------------------------------
-*   init the parser state
+*   parse the given assembly file, return FALSE if failed
 *----------------------------------------------------------------------------*/
-void parse_init(void)
+void parseline(ParseCtx *ctx, Bool compile_active);
+
+Bool parse_file(char *filename)
 {
-	_parse_init();
+	ParseCtx *ctx;
+	int num_errors = get_num_errors();
+	Bool fatal_error = FALSE;
+
+	ctx = ParseCtx_new();
+	TRY
+	{
+		if (opts.verbose)
+			printf("Reading '%s'...\n", filename);	/* display name of file */
+
+		src_push();
+		{
+			src_open(filename, opts.inc_path);
+			sym.tok = TK_NIL;
+			while (sym.tok != TK_END)
+				parseline(ctx, TRUE);				/* before parsing it */
+		}
+		src_pop();
+		sym.tok = TK_NEWLINE;						/* when called recursively, need to make tok != TK_NIL */
+	}
+	CATCH(FatalErrorException)
+	{
+		fatal_error = TRUE;
+	}
+	FINALLY
+	{
+		ParseCtx_delete(ctx);
+		if (fatal_error)
+			RETHROW(FatalErrorException);
+	}
+	ETRY;
+
+	return num_errors == get_num_errors();
 }
 
 /*-----------------------------------------------------------------------------
 *   Parse one statement, if possible
 *----------------------------------------------------------------------------*/
-Bool parse_statement(Bool compile_active)
+Bool parse_statement(ParseCtx *ctx, Bool compile_active)
 {
 	Bool parse_ok;
 
-	init();
-
 	save_scan_state();
 	{
-		expr_value = 0;
-		expr_error = FALSE;
-		parse_ok = _parse_statement(compile_active);
-		free_tokens(); 
+		parse_ok = _parse_statement(ctx, compile_active);
+		free_tokens(ctx);
 	}
 	if (parse_ok)
 		drop_scan_state();

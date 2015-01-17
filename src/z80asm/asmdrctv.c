@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.115 2015-01-11 23:49:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.116 2015-01-17 14:02:03 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -27,6 +27,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.115 2015-
 #include "legacy.h"
 #include "expr_def.h"
 #include "options.h"
+#include "parse.h"
 #include "scan.h"
 #include "strpool.h"
 #include "symbol.h"
@@ -315,22 +316,6 @@ DEFM( void )
 }
 
 
-
-
-void
-INCLUDE( void )
-{
-    if ( GetSym() == TK_STRING )
-    {
-		Z80pass1(sym_text(&sym));				/* parse include file */
-    }
-    else
-    {
-		error_syntax();
-    }
-
-    sym.tok = TK_NEWLINE;
-}
 
 
 void

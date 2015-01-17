@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.131 2015-01-11 23:49:24 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.132 2015-01-17 14:02:03 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.131 2015-01-11 23:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.131  2015-01-11 23:49:24  pauloscustodio
+* Revision 1.132  2015-01-17 14:02:03  pauloscustodio
+* Implemented INCLUDE within the RAGEL parser. Changed the parser to be reentrant.
+*
+* Revision 1.131  2015/01/11 23:49:24  pauloscustodio
 * Allow opcodes (e.g. RL) as constants in DEFC, DEFGROUP and DEFVARS, and as labels
 *
 * Revision 1.130  2014/12/24 02:11:51  pauloscustodio
@@ -654,7 +657,7 @@ Work on Pass 1 - Z80 commands.
 
 13.09.91, V0.003:
 Getidentifier() renamed to Getident().
-Main body of Z80pass1() finished - all parsing of Z80 instructions and assembler directives implemented. 
+Main body of parse_file() finished - all parsing of Z80 instructions and assembler directives implemented. 
 functions now split up into modules:
 
 25.02.92, V0.004:
@@ -1255,7 +1258,7 @@ Based on 1.0.31
           return.
         - main(): added try-catch to delete incomplete library file in case of
           fatal error.
-        - Z80pass1(), INCLUDE(): no need to check for fatal errors and return;
+        - parse_file(), INCLUDE(): no need to check for fatal errors and return;
           bypassed by the exception mechanism.
         - AssembleSourceFile(): error return is never used; changed to void.
         - source_file_open flag removed; z80asmfile is used for the same purpose.
@@ -2172,7 +2175,7 @@ xx.xx.2014 [2.6.2] (pauloscustodio)
 	  defc, defgroup or defvars constant.
 	  
 	- Implemented parsing based on a RAGEL state machine, calling the existent
-	  recursive-descent parser for expressions.
+	  recursive-descent parser for expressions.  Made parser reentrant.
 	  
 	- New opcodes.c module to store away all the Z80 opcode hex bytes.
 	
@@ -2208,7 +2211,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2h"
+#define VERSION     "2.6.2i"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS
