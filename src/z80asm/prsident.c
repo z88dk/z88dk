@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.107 2015-01-18 17:36:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.108 2015-01-18 18:08:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,7 +50,6 @@ void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
 void MODULE( void );
-void SECTION( void );
 void LINE( void );
 void PUBLIC( void ); void EXTERN( void ); 
 
@@ -93,7 +92,6 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( MODULE ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( PUBLIC ),
-    DEF_ENTRY( SECTION ),
     DEF_ENTRY( UNDEFINE ),
     DEF_ENTRY( XDEF ),
     DEF_ENTRY( XLIB ),
@@ -339,15 +337,4 @@ MODULE( void )
         GetSym();
         DeclModuleName();
     }
-}
-
-
-void
-SECTION( void )
-{
-    GetSym();
-	if ( sym.tok == TK_NAME )
-		new_section(sym_text(&sym));
-	else
-		error_syntax();
 }
