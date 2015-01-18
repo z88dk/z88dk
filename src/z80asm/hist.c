@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.132 2015-01-17 14:02:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.133 2015-01-18 18:37:16 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.132 2015-01-17 14:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.132  2015-01-17 14:02:03  pauloscustodio
+* Revision 1.133  2015-01-18 18:37:16  pauloscustodio
+* Implemented MODULE within the RAGEL parser
+*
+* Revision 1.132  2015/01/17 14:02:03  pauloscustodio
 * Implemented INCLUDE within the RAGEL parser. Changed the parser to be reentrant.
 *
 * Revision 1.131  2015/01/11 23:49:24  pauloscustodio
@@ -1682,8 +1685,6 @@ Based on 1.0.31
 	  symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 	  modified list_get_page_nr() to return -1 after the whole source is
 	  processed.
-	- Decouple module name creation from parsing, define CURRENTMODULE->mname
-	  directly instead of calling DeclModuleName()
 	- GetLibfile(), ReadName(), ReadNames(), CheckIfModuleWanted(),
 	  LinkLibModules(), SearchLibFile() were using global z80asmfile instead
 	  of a local FILE* variable - fixed

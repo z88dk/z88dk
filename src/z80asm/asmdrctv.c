@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.116 2015-01-17 14:02:03 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.117 2015-01-18 18:37:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -45,7 +45,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* local functions */
-void DeclModuleName( void );
 void DEFINE( void );
 void UNDEFINE( void );
 
@@ -335,26 +334,5 @@ BINARY( void )
     else
     {
 		error_syntax();
-    }
-}
-
-
-void
-DeclModuleName( void )
-{
-    if ( CURRENTMODULE->modname == NULL )
-    {
-        if ( sym.tok == TK_NAME )
-        {
-			CURRENTMODULE->modname = strpool_add(sym_text(&sym));
-        }
-        else
-        {
-			error_illegal_ident();
-        }
-    }
-    else
-    {
-        error_module_redefined();
     }
 }

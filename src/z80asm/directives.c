@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.4 2015-01-05 23:34:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.5 2015-01-18 18:37:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -23,6 +23,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.4 2015-01-05 
 #include "codearea.h"
 #include "directives.h"
 #include "errors.h"
+#include "fileutil.h"
+#include "module.h"
+#include "strpool.h"
 #include "types.h"
 #include "symtab.h"
 #include <assert.h>
@@ -112,4 +115,26 @@ void defvars_define_const(char *name, int elem_size, int count)
 		define_symbol(name, *DEFVARS_PC, TYPE_CONSTANT, 0);
 		*DEFVARS_PC = next_pc;
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*   MODULE
+*----------------------------------------------------------------------------*/
+void module_name(char *name)
+{
+	if (CURRENTMODULE->modname)
+		error_module_redefined();
+	else
+	{
+		CURRENTMODULE->modname = strpool_add(name);
+
+		if (opts.force_xlib)
+			declare_public_symbol(name);
+	}
+}
+
+void default_module_name(void)
+{
+	if (! CURRENTMODULE->modname)     /* Module name must be defined */
+		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
 }

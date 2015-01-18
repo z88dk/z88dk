@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.30 2015-01-18 17:36:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.31 2015-01-18 18:37:16 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -391,7 +391,7 @@ t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' line 1: symbol not def
 # error_not_defined_expr
 my $lib = lib_file(); $lib =~ s/\.lib$/2.lib/i;
 unlink_testfiles($lib);
-write_file(asm_file(), "module main \n main: ret");
+write_file(asm_file(), "main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
@@ -516,14 +516,7 @@ t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
 # error_symbol_redefined_module	-> tested in symtab.t
 # error_symbol_decl_local  		-> tested in symtab.t
 # error_symbol_redecl			-> tested in symtab.t
-
-#------------------------------------------------------------------------------
-# error_module_redefined
-unlink_testfiles();
-t_z80asm_error("
-	module aa
-	module bb
-", "Error at file 'test.asm' line 3: module name already defined");
+# error_module_redefined		-> tested in directives.t
 
 #------------------------------------------------------------------------------
 # error_illegal_src_filename

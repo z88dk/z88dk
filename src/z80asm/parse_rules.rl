@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.34 2015-01-18 18:08:31 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.35 2015-01-18 18:37:16 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -267,6 +267,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.34 2015-01-
 		;
 
 	/*---------------------------------------------------------------------
+	*   MODULE
+	*--------------------------------------------------------------------*/
+	module = 
+		  _TK_MODULE name _TK_NEWLINE
+		  @{ module_name(name->str); }
+		;
+
+	/*---------------------------------------------------------------------
 	*   ORG
 	*--------------------------------------------------------------------*/
 	org = _TK_ORG const_expr _TK_NEWLINE
@@ -293,6 +301,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.34 2015-01-
 		| defgroup
 		| defs
 		| defvars
+		| module
 		| org
 		| section
 		

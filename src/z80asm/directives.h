@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.4 2015-01-05 23:34:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.5 2015-01-18 18:37:16 pauloscustodio Exp $
 */
 
 #pragma once
@@ -43,3 +43,9 @@ extern void defgroup_define_const(char *name);
 
 /* create a block of empty bytes, called by the DEFS directive */
 extern void defs(int count, int fill);
+
+/* define module name */
+extern void module_name(char *name);
+
+/* define default module name, if none defined by module_name() */
+extern void default_module_name(void);

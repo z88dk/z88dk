@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.53 2015-01-18 17:36:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.54 2015-01-18 18:37:16 pauloscustodio Exp $
 #
 # Test options
 
@@ -736,44 +736,7 @@ t_z80asm_error("
 "Error at file 'test.asm' line 10: syntax error", "--line-mode");
 
 #------------------------------------------------------------------------------
-# -forcexlib, --forcexlib
-#------------------------------------------------------------------------------
-
-my $lib = lib_file(); $lib =~ s/\.lib$/2.lib/i;
-
-# OK case
-unlink_testfiles();
-write_file(asm_file(), "PUBLIC main \n main: ret");
-t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
-ok -f $lib;
-t_z80asm_ok(0, "EXTERN main \n call main", 
-		"\xCD\x03\x00\xC9",
-		"-i".$lib);
-
-# no PUBLIC - error
-unlink_testfiles($lib);
-write_file(asm_file(), "module main \n main: ret");
-t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
-ok -f $lib;
-write_file(asm_file(), "EXTERN main \n call main");
-t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' line 2: symbol not defined\n".
-		"1 errors occurred during assembly\n", 
-		1);
-
-# -forcexlib - OK
-for my $options ('-forcexlib', '--forcexlib') {
-	unlink_testfiles($lib);
-	write_file(asm_file(), "module main \n main: ret");
-	t_z80asm_capture("$options -x".$lib." ".asm_file(), "", "", 0);
-	ok -f $lib;
-	t_z80asm_ok(0, "EXTERN main \n call main", 
-			"\xCD\x03\x00\xC9",
-			"-i".$lib);
-
-}
-
-unlink_testfiles($lib);
+# -forcexlib, --forcexlib : tested in directives.t
 
 #------------------------------------------------------------------------------
 # -t (deprecated)
@@ -831,7 +794,7 @@ eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
 #------------------------------------------------------------------------------
 
 # create library
-$lib = 't/data/'.basename(lib_file());
+my $lib = 't/data/'.basename(lib_file());
 my $lib_base = basename($lib);
 my $lib_dir  = dirname($lib);
 

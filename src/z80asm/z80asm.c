@@ -13,13 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.184 2015-01-18 17:36:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.185 2015-01-18 18:37:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "deffile.h"
+#include "directives.h"
 #include "errors.h"
 #include "except.h"
 #include "expr.h"
@@ -47,7 +48,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.184 2015-01-18 17
 
 /* external functions */
 void Z80pass2( void );
-void DeclModuleName( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 
@@ -172,10 +172,9 @@ static void do_assemble( char *src_filename )
 
         parse_file( src_filename );
 
-        list_end();                    /* get_used_symbol will only generate page references until list_end() */
+        list_end();						/* get_used_symbol will only generate page references until list_end() */
 
-        if ( CURRENTMODULE->modname == NULL )     /* Module name must be defined */
-			CURRENTMODULE->modname = path_remove_ext(path_basename(src_filename));
+		default_module_name();			/* Module name must be defined */
 
         set_error_null();
         //set_error_module( CURRENTMODULE->modname );

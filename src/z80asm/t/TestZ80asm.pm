@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.12 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.13 2015-01-18 18:37:16 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -26,7 +26,7 @@ use File::Slurp;
 use List::AllUtils 'uniq';
 use Capture::Tiny::Extended 'capture';
 
-our @EXPORT = qw( z80asm z80emu 
+our @EXPORT = qw( z80asm z80emu z80nm 
 				  read_binfile write_binfile test_binfile
 				  get_legacy );
 
@@ -261,6 +261,24 @@ sub test_binfile {
 			# slow - always generates hex dump even if equal
 			eq_or_dump_diff $bin, $expected, $bin_test_name;
 		}
+	}
+}
+
+#------------------------------------------------------------------------------
+# test with z80nm
+#------------------------------------------------------------------------------
+sub z80nm {
+	my($obj_file, $expected_out) = @_;
+
+	system("make -C ../../support/ar") and die;
+	unless ( get_legacy() ) {			# don't test old object file format
+		my $line = "[line ".((caller)[2])."]";
+		my($stdout, $stderr, $return) = capture {
+			system "../../support/ar/z80nm -a $obj_file";
+		};
+		eq_or_diff_text $stdout, $expected_out, "$line stdout";
+		eq_or_diff_text $stderr, "", "$line stderr";
+		ok !!$return == !!0, "$line retval";
 	}
 }
 

@@ -13,29 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.11 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.12 2015-01-18 18:37:16 pauloscustodio Exp $
 #
 # Test linking of modules
 
 use Modern::Perl;
 use t::TestZ80asm;
-
-#------------------------------------------------------------------------------
-# test with z80nm
-#------------------------------------------------------------------------------
-system("make -C ../../support/ar") and die;
-sub t_z80nm {
-	my($obj_file, $expected_out) = @_;
-	unless ( get_legacy() ) {			# don't test old object file format
-		my $line = "[line ".((caller)[2])."]";
-		my($stdout, $stderr, $return) = capture {
-			system "../../support/ar/z80nm -a $obj_file";
-		};
-		eq_or_diff_text $stdout, $expected_out, "$line stdout";
-		eq_or_diff_text $stderr, "", "$line stderr";
-		ok !!$return == !!0, "$line retval";
-	}
-}
 
 #------------------------------------------------------------------------------
 # Test expressions across modules
@@ -86,7 +69,7 @@ z80asm(
 	bin		=> $bin,
 );
 
-t_z80nm("test.obj test1.obj", <<'END');
+z80nm("test.obj test1.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -247,7 +230,7 @@ z80asm(
 	bin		=> $expected_bin,
 );
 
-t_z80nm("test.obj test1.obj", <<'END');
+z80nm("test.obj test1.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -359,7 +342,7 @@ ASM1
 ASM2
 	bin		=> "\1\2\3",
 );
-t_z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.obj test1.obj test2.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -388,7 +371,7 @@ z80asm(
 	options => "-d -b test.obj test1.obj test2.obj",
 	bin		=> "\1\2\3",
 );
-t_z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.obj test1.obj test2.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -434,7 +417,7 @@ z80asm(
 	bin		=> $expected_bin,
 );
 
-t_z80nm("test.obj", <<'...');
+z80nm("test.obj", <<'...');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -513,7 +496,7 @@ z80asm(
 	bin		=> $expected_bin,
 );
 
-t_z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.obj test1.obj test2.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -608,7 +591,7 @@ z80asm(
 	bin		=> $expected_bin,
 );
 
-t_z80nm("test.obj test1.obj", <<'END');
+z80nm("test.obj test1.obj", <<'END');
 
 File test.obj at $0000: Z80RMF08
   Name: test
@@ -681,7 +664,7 @@ z80asm(
 	bin		=> $expected_bin,
 );
 
-t_z80nm("test.obj test1.obj test2.obj", <<'...');
+z80nm("test.obj test1.obj test2.obj", <<'...');
 
 File test.obj at $0000: Z80RMF08
   Name: test

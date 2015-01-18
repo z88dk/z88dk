@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.6 2015-01-18 17:36:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.7 2015-01-18 18:37:16 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -102,6 +102,13 @@ ASM
 	error	=> "Error at file 'test.inc' line 1: cannot include file 'test.asm' recursively",
 );
 
+# syntax
+z80asm(
+	asm		=> <<'ASM',
+		include 				;; error: syntax error
+ASM
+);
+
 #------------------------------------------------------------------------------
 # DEFGROUP - simple use tested in opcodes.t
 # test error messages here
@@ -162,6 +169,7 @@ END
 );
 z80asm(
 	asm		=> <<END,
+		defs				;; error: syntax error
 		defb 0
 		defs 65536			;; error: max. code size of 65536 bytes reached
 END
@@ -239,6 +247,12 @@ END
 
 z80asm(
 	asm 	=> <<END,
+	defvars 							;; error: syntax error
+END
+);
+
+z80asm(
+	asm 	=> <<END,
 	defvars 0
 END
 	error	=> "Error at file 'test.asm' line 2: missing {} block",
@@ -304,6 +318,78 @@ ASMTAIL                         = 0009, G:
 local_label                     = 0009, L: test
 END
 
+#------------------------------------------------------------------------------
+# MODULE
+#------------------------------------------------------------------------------
+
+# -forcexlib, --forcexlib
+
+# OK
+unlink "test1.lib";
+z80asm(
+	asm		=> "public main \n main: ret",
+	options	=> "-xtest1.lib",
+	ok		=> 1,
+);
+ok -f "test1.lib";
+z80asm(
+	asm		=> "extern main \n call main ;; CD 03 00 C9",
+	options	=> "-b -itest1.lib",
+);
+
+# no PUBLIC, error
+unlink "test1.lib";
+z80asm(
+	asm		=> "module main \n main: ret",
+	options	=> "-xtest1.lib",
+	ok		=> 1,
+);
+ok -f "test1.lib";
+z80asm(
+	asm		=> "extern main \n call main ;; error: symbol not defined",
+	options	=> "-b -itest1.lib",
+);
+
+# -forcexlib - OK
+for my $options ('-forcexlib', '--forcexlib') {
+	unlink "test1.lib";
+	z80asm(
+		asm		=> "module main \n main: ret",
+		options	=> "-xtest1.lib $options",
+		ok		=> 1,
+	);
+	ok -f "test1.lib";
+	z80asm(
+		asm		=> "extern main \n call main ;; CD 03 00 C9",
+		options	=> "-b -itest1.lib",
+	);
+}
+
+# error_module_redefined
+z80asm(
+	asm 	=> <<'END',
+		module			;; error: syntax error
+		module aa
+		module bb		;; error: module name already defined
+END
+);
+
+# module name in object file
+z80asm(
+	asm 	=> <<'END',
+		module lib
+		main: ret	;; C9
+END
+);
+z80nm("test.obj", <<'END');
+
+File test.obj at $0000: Z80RMF08
+  Name: lib
+  Names:
+    L A $0000 main
+  Code: 1 bytes
+    C $0000: C9
+END
 
 #------------------------------------------------------------------------------
 # ORG
@@ -326,6 +412,11 @@ z80asm(
 z80asm(
 	options	=> "-b -r1234",
 	asm		=> "org 0x1000 \n start: jp start ;; C3 34 12",
+);
+
+# no ORG
+z80asm(
+	asm		=> "org ;; error: syntax error",
 );
 
 # ORG redefined
